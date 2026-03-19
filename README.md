@@ -27,6 +27,8 @@ Each skill is a self-contained directory that can be added to any compatible age
 | Agent / Framework | Installation |
 |-------------------|-------------|
 | Claude Code | `/plugin install <skill-name>@nvidia-agent-skills` |
+| Codex | Copy the skill directory into your project's `.codex/skills/` folder |
+| Cursor | Copy the skill directory into your project's `.cursor/skills/` folder |
 | Other agents | Copy the skill directory into your agent's skills folder |
 | Manual | Clone this repo and point your agent to the skill path |
 
