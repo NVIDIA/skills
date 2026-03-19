@@ -69,6 +69,8 @@ Skills for NVIDIA cuOpt solver — routing, linear programming, quadratic progra
 | Skill | Description | Source |
 |-------|-------------|--------|
 | [`ad-model-onboard`](skills/ad-model-onboard/) | Onboard a HuggingFace model into TensorRT-LLM AutoDeploy — prefill-only custom model, hierarchical tests, and end-to-end validation. | [NVIDIA/TensorRT-LLM](https://github.com/NVIDIA/TensorRT-LLM) |
+| [`ad-pipeline-failure-pr`](skills/ad-pipeline-failure-pr/) | Analyze AutoDeploy CI pipeline failures, group into root-cause buckets, and create PRs or issues per bucket. | [NVIDIA/TensorRT-LLM](https://github.com/NVIDIA/TensorRT-LLM) |
+| [`ci-failure-retrieval`](skills/ci-failure-retrieval/) | Retrieve and diagnose CI test failures from TensorRT-LLM pull requests using GitHub API and Jenkins testReport API. | [NVIDIA/TensorRT-LLM](https://github.com/NVIDIA/TensorRT-LLM) |
 
 ### Nemotron Voice Agent — Real-Time Conversational AI
 
