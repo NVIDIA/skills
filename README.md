@@ -38,9 +38,49 @@ Once installed, skills activate automatically when relevant — or invoke them u
 
 ## Available Skills
 
-| Skill | Description | Status |
+### cuOpt — GPU-Accelerated Optimization
+
+Skills for NVIDIA cuOpt solver — routing, linear programming, quadratic programming, and more.
+
+| Skill | Description | Source |
 |-------|-------------|--------|
-| *Coming soon* | NVIDIA-verified skills will be listed here as they are published. | ✅ Verified |
+| [`cuopt-user-rules`](skills/cuopt-user-rules/) | Base behavior rules for using NVIDIA cuOpt. Read first before any cuOpt task. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`cuopt-developer`](skills/cuopt-developer/) | Contribute to the NVIDIA cuOpt codebase including C++/CUDA, Python, server, docs, and CI. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`cuopt-installation-api-python`](skills/cuopt-installation-api-python/) | Install cuOpt for Python — pip, conda, Docker, verification. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`cuopt-installation-api-c`](skills/cuopt-installation-api-c/) | Install cuOpt for C — conda, locate lib/headers, verification. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`cuopt-installation-common`](skills/cuopt-installation-common/) | cuOpt system and environment requirements. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`cuopt-installation-developer`](skills/cuopt-installation-developer/) | Developer installation — build cuOpt from source, run tests. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`cuopt-lp-milp-api-python`](skills/cuopt-lp-milp-api-python/) | Solve LP and MILP with the Python API — scheduling, resource allocation, production planning. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`cuopt-lp-milp-api-c`](skills/cuopt-lp-milp-api-c/) | LP and MILP with cuOpt — C API. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`cuopt-lp-milp-api-cli`](skills/cuopt-lp-milp-api-cli/) | LP and MILP with cuOpt — CLI (MPS files, cuopt_cli). | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`lp-milp-formulation`](skills/lp-milp-formulation/) | LP/MILP concepts — from problem text to formulation. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`cuopt-qp-api-python`](skills/cuopt-qp-api-python/) | Quadratic Programming (QP) with cuOpt — Python API (beta). | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`cuopt-qp-api-c`](skills/cuopt-qp-api-c/) | Quadratic Programming (QP) with cuOpt — C API. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`cuopt-qp-api-cli`](skills/cuopt-qp-api-cli/) | QP with cuOpt — CLI. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`qp-formulation`](skills/qp-formulation/) | QP problem form and constraints — domain concepts. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`cuopt-routing-api-python`](skills/cuopt-routing-api-python/) | Vehicle routing (VRP, TSP, PDP) with cuOpt — Python API. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`routing-formulation`](skills/routing-formulation/) | Vehicle routing problem types and data requirements. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`cuopt-server-api-python`](skills/cuopt-server-api-python/) | cuOpt REST server — deploy, endpoints, Python/curl client examples. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`cuopt-server-common`](skills/cuopt-server-common/) | cuOpt REST server — domain concepts and request flow. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+| [`skill-evolution`](skills/skill-evolution/) | Detect generalizable learnings from interactions and propose skill updates. | [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) |
+
+### TensorRT-LLM — LLM Inference Optimization
+
+| Skill | Description | Source |
+|-------|-------------|--------|
+| [`ad-model-onboard`](skills/ad-model-onboard/) | Onboard a HuggingFace model into TensorRT-LLM AutoDeploy — prefill-only custom model, hierarchical tests, and end-to-end validation. | [NVIDIA/TensorRT-LLM](https://github.com/NVIDIA/TensorRT-LLM) |
+
+### Nemotron Voice Agent — Real-Time Conversational AI
+
+| Skill | Description | Source |
+|-------|-------------|--------|
+| [`nemotron-voice-agent-deploy`](skills/nemotron-voice-agent-deploy/) | Deploy Nemotron Voice Agent on Workstation (x86), Jetson Thor, or Cloud NIMs — real-time speech-to-speech using NVIDIA ASR, TTS, LLM. | [NVIDIA-AI-Blueprints/nemotron-voice-agent](https://github.com/NVIDIA-AI-Blueprints/nemotron-voice-agent) |
+
+### NeMo Gym — RL Training Environments
+
+| Skill | Description | Source |
+|-------|-------------|--------|
+| [`add-benchmark`](skills/add-benchmark/) | Add a new benchmark or training environment to NeMo-Gym — data preparation, resources server, agent wiring, YAML config, testing, and reward profiling. | [NVIDIA-NeMo/Gym](https://github.com/NVIDIA-NeMo/Gym) |
 
 ---
 
