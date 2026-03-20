@@ -2,6 +2,26 @@
 
 We welcome contributions: new skills, improvements to existing ones, or documentation fixes. Please read this guide before submitting pull requests.
 
+All participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+
+---
+
+## Local Setup
+
+```bash
+git clone https://github.com/nvidia/agent-skills.git
+cd agent-skills
+```
+
+To test a skill, copy it into your agent's skills directory and try it on a real task:
+
+```bash
+# Example: test the cuOpt LP/MILP skill with Claude Code
+cp -r skills/cuopt-lp-milp-api-python ~/.claude/skills/
+```
+
+To validate a skill's `SKILL.md` structure, use the [`skills-ref`](https://github.com/agentskills/agentskills/tree/main/skills-ref) reference library.
+
 ---
 
 ## How to Contribute
@@ -11,6 +31,10 @@ We welcome contributions: new skills, improvements to existing ones, or document
 - **New skill requests** — [open an issue in this repo](../../issues). Describe the use case, the product or workflow it would cover, and any relevant context.
 - **Bugs or issues with an existing skill** — file the issue in the **source repo** where the skill originates (e.g., [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) for cuOpt skills, [NVIDIA/TensorRT-LLM](https://github.com/NVIDIA/TensorRT-LLM) for TensorRT-LLM skills). The maintainers of each product are best positioned to triage and fix skill-specific issues.
 - **Issues with this repository itself** (README, structure, contribution process) — [open an issue here](../../issues).
+
+### Finding Something to Work On
+
+Look for issues labeled [`good first issue`](../../labels/good%20first%20issue) — these are scoped, well-defined tasks ideal for new contributors. If you're unsure where to start, ask in [GitHub Discussions](../../discussions).
 
 ### Improving Existing Skills
 
@@ -49,6 +73,31 @@ We accept community-authored skills into the `community/` directory. Once review
    - Any dependencies or requirements
 5. NVIDIA will review for quality, security, and compatibility.
 6. If approved, the skill is merged and may be promoted to `skills/` with the NVIDIA-verified badge.
+
+---
+
+## Pull Request Checklist
+
+Before submitting a PR, make sure:
+
+- [ ] All commits are signed off (`git commit -s`) — see [Signing Your Work](#signing-your-work)
+- [ ] `SKILL.md` has valid YAML frontmatter with `name` and `description`
+- [ ] Skill tested locally with at least one agent
+- [ ] No secrets, credentials, or API keys included
+- [ ] PR description includes what the skill does and an example of how to use it
+
+---
+
+## Review Process
+
+NVIDIA maintainers review all pull requests. Here's what to expect:
+
+- **Acknowledgement** within a few business days
+- **Review feedback** on quality, security, and compatibility with the Agent Skills spec
+- If changes are requested, update your branch and the reviewer will re-review
+- Once approved, an NVIDIA maintainer will merge the PR
+
+If your PR hasn't received a response after a week, feel free to leave a comment to bump it.
 
 ---
 

@@ -14,15 +14,18 @@ This repository follows the open [Agent Skills specification](https://agentskill
 
 ---
 
-## Getting Started
+## Quickstart
 
-### 1. Browse the skills
+Clone the repo and copy a skill into your agent's skills directory:
 
-Explore the [`skills/`](skills/) directory to find NVIDIA-verified skills for your use case.
+```bash
+git clone https://github.com/nvidia/agent-skills.git
+cp -r agent-skills/skills/cuopt-lp-milp-api-python ~/.claude/skills/
+```
 
-### 2. Install a skill
+That's it — the skill activates automatically the next time your agent encounters a relevant task. For example, ask your agent to "solve a linear programming problem with cuOpt" and the skill guides it through the cuOpt Python API.
 
-Each skill is a self-contained directory that can be added to any compatible agent. How you install depends on your agent or framework:
+### Install by Agent
 
 | Agent / Framework | Installation |
 |-------------------|-------------|
@@ -32,9 +35,7 @@ Each skill is a self-contained directory that can be added to any compatible age
 | Other agents | Copy the skill directory into your agent's skills folder |
 | Manual | Clone this repo and point your agent to the skill path |
 
-### 3. Use a skill
-
-Once installed, skills activate automatically when relevant — or invoke them using your agent's command interface. Refer to your agent's documentation for specifics.
+Browse all skills in the [`skills/`](skills/) directory.
 
 ---
 
@@ -46,8 +47,6 @@ Once installed, skills activate automatically when relevant — or invoke them u
 | **TensorRT-LLM** | LLM inference optimization — model onboarding to AutoDeploy, CI pipeline failure analysis, and test failure diagnostics. | 3 | [NVIDIA/TensorRT-LLM](https://github.com/NVIDIA/TensorRT-LLM) |
 | **Nemotron Voice Agent** | Real-time conversational AI — deploy speech-to-speech voice agents on Workstation, Jetson Thor, or Cloud NIMs. | 1 | [NVIDIA-AI-Blueprints/nemotron-voice-agent](https://github.com/NVIDIA-AI-Blueprints/nemotron-voice-agent) |
 | **NeMo Gym** | RL training environments — add benchmarks, resources servers, agent wiring, and reward profiling. | 1 | [NVIDIA-NeMo/Gym](https://github.com/NVIDIA-NeMo/Gym) |
-
-Browse all skills in the [`skills/`](skills/) directory.
 
 ---
 
@@ -62,27 +61,7 @@ Browse all skills in the [`skills/`](skills/) directory.
 
 ## Contributing
 
-We welcome contributions from the community! Whether it's fixing a typo, improving documentation, or proposing a new skill — we'd love to hear from you.
-
-### Submitting a Skill for NVIDIA Verification
-
-Community-authored skills can be submitted for NVIDIA review and verification:
-
-1. **Build your skill** following the [Agent Skills specification](https://agentskills.io/specification).
-2. **Test locally** with your preferred agent to ensure it works as expected.
-3. **Open a Pull Request** against this repository with your skill in the `community/` directory.
-4. **NVIDIA reviews** for quality, security, and compatibility.
-5. **If approved**, the skill is merged and earns the NVIDIA-verified badge.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
-
-### What Makes a Good Skill?
-
-- Solves a clear, specific problem
-- Follows the [Agent Skills specification](https://agentskills.io/specification)
-- Includes a well-written `SKILL.md` with accurate name and description
-- Works reliably across agents and environments
-- Does not require proprietary dependencies without clear documentation
+We welcome contributions — new skills, improvements, or documentation fixes. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting pull requests.
 
 ---
 
