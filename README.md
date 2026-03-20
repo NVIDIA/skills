@@ -51,27 +51,12 @@ Browse all skills in the [`skills/`](skills/) directory.
 
 ---
 
-## Community
+## Getting Help
 
-We take a **GitHub-first approach** to community engagement. GitHub is the primary place to ask questions, report issues, request features, and collaborate with NVIDIA and fellow developers.
-
-### How to Communicate with Us
-
-| Channel | Purpose | Link |
-|---------|---------|------|
-| **GitHub Issues (this repo)** | New skill requests and issues with this repository | [Open an Issue](../../issues) |
-| **GitHub Issues (source repo)** | Bugs or issues with an existing skill — file in the repo where the skill lives (see [Available Skills](#available-skills) for links) | See source repo |
-| **GitHub Discussions** | General Q&A, ideas, show & tell, and community conversation | [Join Discussions](../../discussions) |
-| **Pull Requests** | Contribute improvements, fixes, or documentation | [Contributing Guide](CONTRIBUTING.md) |
-
-### Why GitHub-First?
-
-- **Transparent** — every conversation is public and searchable, so answers help everyone.
-- **Traceable** — issues and PRs link directly to the code changes they produce.
-- **Inclusive** — anyone with a GitHub account can participate, no special access required.
-- **Persistent** — discussions and decisions live alongside the code, not buried in chat history.
-
-> **Note:** For NVIDIA-internal inquiries or partnership-related topics, reach out via your existing NVIDIA contacts. For security vulnerabilities, please follow our [Security Policy](SECURITY.md) and report privately — do not open a public issue.
+- **Questions and discussion:** [GitHub Discussions](../../discussions)
+- **New skill requests:** [Open an Issue](../../issues) in this repo
+- **Bugs with an existing skill:** File an issue in the source repo where the skill lives (see [Available Skills](#available-skills) for links)
+- **Security vulnerabilities:** See [SECURITY.md](SECURITY.md) — do not use GitHub Issues
 
 ---
 

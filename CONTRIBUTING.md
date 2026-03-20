@@ -1,16 +1,6 @@
 # Contributing to NVIDIA Agent Skills
 
-Thank you for your interest in contributing! We welcome contributions from the community — whether it's fixing a typo, improving documentation, or proposing a new skill.
-
----
-
-## GitHub-First
-
-All communication happens on GitHub. Please use:
-
-- **Issues** for bug reports, feature requests, and questions
-- **Discussions** for open-ended conversation, ideas, and show & tell
-- **Pull Requests** for code and documentation changes
+We welcome contributions: new skills, improvements to existing ones, or documentation fixes. Please read this guide before submitting pull requests.
 
 ---
 
