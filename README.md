@@ -53,14 +53,23 @@ That's it — the skill activates automatically the next time your agent encount
 
 - **Questions and discussion:** [GitHub Discussions](../../discussions)
 - **New skill requests:** [Open an Issue](../../issues) in this repo
-- **Bugs with an existing skill:** File an issue in the source repo where the skill lives (see [Available Skills](#available-skills) for links)
-- **Security vulnerabilities:** See [SECURITY.md](SECURITY.md) — do not use GitHub Issues
+- **Bugs with an existing skill:** File an issue in the source repo where the skill lives — each product repo has its own issue tracker, contributing guidelines, and security policy. See [Available Skills](#available-skills) for links.
+- **Security vulnerabilities:** See [SECURITY.md](SECURITY.md) — do not use GitHub Issues. For vulnerabilities in a specific product's skills, follow the security policy in that product's repo.
 
 ---
 
 ## Contributing
 
 We welcome contributions — new skills, improvements, or documentation fixes. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting pull requests.
+
+For contributions to existing NVIDIA-verified skills, follow the contributing guidelines in the respective source repo:
+
+| Product | Contributing Guide |
+|---------|-------------------|
+| cuOpt | [NVIDIA/cuopt CONTRIBUTING.md](https://github.com/NVIDIA/cuopt/blob/main/CONTRIBUTING.md) |
+| TensorRT-LLM | [NVIDIA/TensorRT-LLM CONTRIBUTING.md](https://github.com/NVIDIA/TensorRT-LLM/blob/main/CONTRIBUTING.md) |
+| Nemotron Voice Agent | [NVIDIA-AI-Blueprints/nemotron-voice-agent CONTRIBUTING.md](https://github.com/NVIDIA-AI-Blueprints/nemotron-voice-agent/blob/main/CONTRIBUTING.md) |
+| NeMo Gym | [NVIDIA-NeMo/Gym CONTRIBUTING.md](https://github.com/NVIDIA-NeMo/Gym/blob/main/CONTRIBUTING.md) |
 
 ---
 
