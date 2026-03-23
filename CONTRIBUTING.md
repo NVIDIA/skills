@@ -1,98 +1,42 @@
 # Contributing to NVIDIA Agent Skills
 
-We welcome contributions: new skills, improvements to existing ones, or documentation fixes. Please read this guide before submitting pull requests.
+This repository is a **catalog** — it lists NVIDIA-verified skills and links to the source repos where they live. Skills themselves are maintained by each product team in their own repos.
 
 All participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
-## Local Setup
+## Contributing to Skills
 
-```bash
-git clone https://github.com/nvidia/agent-skills.git
-cd agent-skills
-```
+To contribute to an existing skill or propose a new one, use the contributing guidelines in the relevant product repo:
 
-NVIDIA-verified skills live in their respective product repos (see the [Available Skills](README.md#available-skills) table). To test an existing skill, clone it from the source repo and copy it into your agent's skills directory.
-
-To validate a skill's `SKILL.md` structure, use the [`skills-ref`](https://github.com/agentskills/agentskills/tree/main/skills-ref) reference library.
+| Product | Contributing Guide |
+|---------|-------------------|
+| cuOpt | [NVIDIA/cuopt CONTRIBUTING.md](https://github.com/NVIDIA/cuopt/blob/main/CONTRIBUTING.md) |
+| TensorRT-LLM | [NVIDIA/TensorRT-LLM CONTRIBUTING.md](https://github.com/NVIDIA/TensorRT-LLM/blob/main/CONTRIBUTING.md) |
+| Nemotron Voice Agent | [NVIDIA-AI-Blueprints/nemotron-voice-agent CONTRIBUTING.md](https://github.com/NVIDIA-AI-Blueprints/nemotron-voice-agent/blob/main/CONTRIBUTING.md) |
+| NeMo Gym | [NVIDIA-NeMo/Gym CONTRIBUTING.md](https://github.com/NVIDIA-NeMo/Gym/blob/main/CONTRIBUTING.md) |
 
 ---
 
-## How to Contribute
+## Contributing to This Catalog
 
-### Where to File Issues
-
-- **New skill requests** — [open an issue in this repo](../../issues). Describe the use case, the product or workflow it would cover, and any relevant context.
-- **Bugs or issues with an existing skill** — file the issue in the **source repo** where the skill originates (e.g., [NVIDIA/cuopt](https://github.com/NVIDIA/cuopt) for cuOpt skills, [NVIDIA/TensorRT-LLM](https://github.com/NVIDIA/TensorRT-LLM) for TensorRT-LLM skills). The maintainers of each product are best positioned to triage and fix skill-specific issues.
-- **Issues with this repository itself** (README, structure, contribution process) — [open an issue here](../../issues).
-
-### Finding Something to Work On
-
-Look for issues labeled [`good first issue`](../../labels/good%20first%20issue) — these are scoped, well-defined tasks ideal for new contributors. If you're unsure where to start, ask in [GitHub Discussions](../../discussions).
-
-### Improving Existing Skills
+For changes to this repo itself (README, adding a new product listing, fixing links):
 
 1. Fork the repository.
-2. Create a feature branch: `git checkout -b fix/skill-name-description`
-3. Make your changes and test locally with a compatible agent.
-4. Open a Pull Request with a clear description of the change.
+2. Create a feature branch: `git checkout -b fix/description`
+3. Make your changes.
+4. Open a Pull Request with a clear description.
 
-### Submitting a New Skill for NVIDIA Verification
-
-We accept community-authored skills into the `community/` directory. Once reviewed and approved by NVIDIA, verified skills are promoted to `skills/`.
-
-#### Requirements
-
-- Follow the [Agent Skills specification](https://agentskills.io/specification).
-- Include a `SKILL.md` with valid YAML frontmatter (`name` and `description` are required).
-- Test your skill locally with your preferred agent before submitting.
-- Do not include secrets, credentials, or proprietary dependencies without clear documentation.
-- Keep skills focused — one skill should solve one clear problem.
-
-#### Submission Process
-
-1. Fork this repository.
-2. Add your skill to `community/<your-skill-name>/`.
-3. Ensure your skill directory follows this structure:
-   ```
-   community/your-skill-name/
-   ├── SKILL.md          # Required: skill definition
-   ├── scripts/          # Optional: executable scripts
-   ├── references/       # Optional: reference documents
-   └── assets/           # Optional: static assets
-   ```
-4. Open a Pull Request with:
-   - A description of what the skill does
-   - Example usage
-   - Any dependencies or requirements
-5. NVIDIA will review for quality, security, and compatibility.
-6. If approved, the skill is merged and may be promoted to `skills/` with the NVIDIA-verified badge.
-
----
-
-## Pull Request Checklist
-
-Before submitting a PR, make sure:
+### Pull Request Checklist
 
 - [ ] All commits are signed off (`git commit -s`) — see [Signing Your Work](#signing-your-work)
-- [ ] `SKILL.md` has valid YAML frontmatter with `name` and `description`
-- [ ] Skill tested locally with at least one agent
 - [ ] No secrets, credentials, or API keys included
-- [ ] PR description includes what the skill does and an example of how to use it
+- [ ] Links verified and working
 
----
+### Review Process
 
-## Review Process
-
-NVIDIA maintainers review all pull requests. Here's what to expect:
-
-- **Acknowledgement** within a few business days
-- **Review feedback** on quality, security, and compatibility with the Agent Skills spec
-- If changes are requested, update your branch and the reviewer will re-review
-- Once approved, an NVIDIA maintainer will merge the PR
-
-If your PR hasn't received a response after a week, feel free to leave a comment to bump it.
+NVIDIA maintainers review all pull requests. Expect acknowledgement within a few business days. If your PR hasn't received a response after a week, feel free to leave a comment to bump it.
 
 ---
 
@@ -138,15 +82,3 @@ If your PR hasn't received a response after a week, feel free to leave a comment
 
     (d) I understand and agree that this project and the contribution are public and that a record of the contribution (including all personal information I submit with it, including my sign-off) is maintained indefinitely and may be redistributed consistent with this project or the open source license(s) involved.
   ```
-
----
-
-## Code of Conduct
-
-All participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md). Be respectful, constructive, and inclusive.
-
----
-
-## Questions?
-
-Open a [GitHub Discussion](../../discussions) — we're happy to help.

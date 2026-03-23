@@ -68,14 +68,13 @@ For issues with **this catalog repo itself** (README, structure, listing a new p
 
 ```
 nvidia-agent-skills/
-├── community/           # Community-submitted skills under review
 ├── CONTRIBUTING.md      # Contribution guidelines
 ├── SECURITY.md          # Security reporting policy
 ├── CODE_OF_CONDUCT.md   # Community code of conduct
 └── LICENSE              # Apache 2.0
 ```
 
-NVIDIA-verified skills live in their respective product repos (see [Available Skills](#available-skills)). This repo serves as the catalog and hosts community-submitted skills.
+This repo is a catalog. Skills are maintained in their respective product repos (see [Available Skills](#available-skills)).
 
 ---
 
