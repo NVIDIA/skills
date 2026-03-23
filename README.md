@@ -93,9 +93,3 @@ This repository adheres to the [Agent Skills specification](https://agentskills.
 
 This project is licensed under the [Apache License 2.0](LICENSE) unless otherwise noted in individual skill directories.
 
----
-
-<p align="center">
-  <strong>Built by NVIDIA. Powered by the community.</strong><br>
-  <a href="../../issues">Report a Bug</a> · <a href="../../discussions">Start a Discussion</a> · <a href="CONTRIBUTING.md">Contribute</a>
-</p>
