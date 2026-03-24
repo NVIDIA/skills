@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0 -->
+<!-- Copyright (c) 2026 NVIDIA Corporation. All rights reserved. -->
+
 # Contributing
 
 This repository is a catalog of NVIDIA-verified agent skills. Skills are maintained by each product team in their own repos.

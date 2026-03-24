@@ -1,10 +1,13 @@
+<!-- SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0 -->
+<!-- Copyright (c) 2026 NVIDIA Corporation. All rights reserved. -->
+
 # NVIDIA Agent Skills
 
 **Official, NVIDIA-verified skills for AI coding agents.**
 
 [![NVIDIA](https://img.shields.io/badge/NVIDIA-Verified-76B900?style=flat&logo=nvidia&logoColor=white)](https://nvidia.com)
 [![Agent Skills Spec](https://img.shields.io/badge/Agent%20Skills-Specification-blue)](https://agentskills.io)
-[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0%20%2B%20CC--BY--4.0-green.svg)](LICENSE)
 
 ---
 
@@ -91,5 +94,5 @@ This repository adheres to the [Agent Skills specification](https://agentskills.
 
 ## License
 
-This project is licensed under the [Apache License 2.0](LICENSE) unless otherwise noted in individual skill directories.
+This project is dual-licensed under the [Apache License 2.0](LICENSE) and [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE).
 

@@ -1,3 +1,15 @@
+SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+
+Copyright (c) 2026 NVIDIA Corporation
+
+This project is licensed under a dual license:
+- Apache License 2.0 (for code and configuration)
+- Creative Commons Attribution 4.0 International (CC BY 4.0) (for documentation)
+
+You may use the contents of this repository under the terms of either license,
+or both, as applicable to the type of content.
+
+================================================================================
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -175,16 +187,41 @@
 
    END OF TERMS AND CONDITIONS
 
-   Copyright 2026 NVIDIA Corporation
+================================================================================
+              Creative Commons Attribution 4.0 International License
+                              (CC BY 4.0)
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+                https://creativecommons.org/licenses/by/4.0/
 
-       http://www.apache.org/licenses/LICENSE-2.0
+You are free to:
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+  Share — copy and redistribute the material in any medium or format for any
+  purpose, even commercially.
+
+  Adapt — remix, transform, and build upon the material for any purpose, even
+  commercially.
+
+  The licensor cannot revoke these freedoms as long as you follow the license
+  terms.
+
+Under the following terms:
+
+  Attribution — You must give appropriate credit, provide a link to the license,
+  and indicate if changes were made. You may do so in any reasonable manner, but
+  not in any way that suggests the licensor endorses you or your use.
+
+  No additional restrictions — You may not apply legal terms or technological
+  measures that legally restrict others from doing anything the license permits.
+
+Notices:
+
+  You do not have to comply with the license for elements of the material in the
+  public domain or where your use is permitted by an applicable exception or
+  limitation.
+
+  No warranties are given. The license may not give you all of the permissions
+  necessary for your intended use. For example, other rights such as publicity,
+  privacy, or moral rights may limit how you use the material.
+
+For the full legal text, see:
+https://creativecommons.org/licenses/by/4.0/legalcode
