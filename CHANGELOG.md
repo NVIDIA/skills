@@ -7,6 +7,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.0] - 2026-03-31
+
+### Added
+
+- [NVIDIA-NeMo/Evaluator](https://github.com/NVIDIA-NeMo/Evaluator) — 4 skills (launching evaluations, accessing MLflow, NEL assistant, bring-your-own benchmarks)
+- Total catalog now: 28 skills across 5 NVIDIA product repos
+
 ## [0.1.0] - 2026-03-23
 
 ### Added

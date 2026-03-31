@@ -11,7 +11,7 @@
 
 ---
 
-Skills are portable instruction sets that teach AI agents how to perform specialized tasks — from solving vehicle routing problems with GPU-accelerated cuOpt, to onboarding HuggingFace models into TensorRT-LLM AutoDeploy, to deploying real-time voice agents on Jetson and cloud NIMs. Every skill listed here is **published and verified by NVIDIA**.
+Skills are portable instruction sets that teach AI agents how to perform specialized tasks — from solving vehicle routing problems with GPU-accelerated cuOpt, to onboarding HuggingFace models into TensorRT-LLM AutoDeploy, to deploying real-time voice agents on Jetson and cloud NIMs, to launching LLM evaluations with NeMo Evaluator. Every skill listed here is **published and verified by NVIDIA**.
 
 This repository is a **catalog** — skills are maintained in their respective product repos and linked here. It follows the open [Agent Skills specification](https://agentskills.io/specification), making skills compatible with any AI agent or framework that supports the standard.
 
@@ -49,6 +49,7 @@ That's it — the skill activates automatically the next time your agent encount
 | **TensorRT-LLM** | LLM inference optimization — model onboarding to AutoDeploy, CI pipeline failure analysis, and test failure diagnostics. | 3 | [`NVIDIA/TensorRT-LLM/.claude/skills/`](https://github.com/NVIDIA/TensorRT-LLM/tree/main/.claude/skills) |
 | **Nemotron Voice Agent** | Real-time conversational AI — deploy speech-to-speech voice agents on Workstation, Jetson Thor, or Cloud NIMs. | 1 | [`nemotron-voice-agent/.agents/skills/`](https://github.com/NVIDIA-AI-Blueprints/nemotron-voice-agent/tree/main/.agents/skills) |
 | **NeMo Gym** | RL training environments — add benchmarks, resources servers, agent wiring, and reward profiling. | 1 | [`NVIDIA-NeMo/Gym/.claude/skills/`](https://github.com/NVIDIA-NeMo/Gym/tree/main/.claude/skills) |
+| **NeMo Evaluator** | LLM evaluation — launch evaluations, access MLflow results, NeMo Evaluator Launcher assistant, and bring-your-own benchmarks. | 4 | [`NVIDIA-NeMo/Evaluator/.claude/skills/`](https://github.com/NVIDIA-NeMo/Evaluator/tree/main/packages/nemo-evaluator-launcher/.claude/skills) ([+1](https://github.com/NVIDIA-NeMo/Evaluator/tree/main/packages/nemo-evaluator/.claude/skills)) |
 
 ---
 
@@ -62,6 +63,7 @@ For skill-related issues, feature requests, new skill ideas, discussions, and co
 | **TensorRT-LLM** | [Issues](https://github.com/NVIDIA/TensorRT-LLM/issues) | [Discussions](https://github.com/NVIDIA/TensorRT-LLM/discussions) | [Contributing](https://github.com/NVIDIA/TensorRT-LLM/blob/main/CONTRIBUTING.md) | [Security](https://github.com/NVIDIA/TensorRT-LLM/blob/main/SECURITY.md) |
 | **Nemotron Voice Agent** | [Issues](https://github.com/NVIDIA-AI-Blueprints/nemotron-voice-agent/issues) | [Discussions](https://github.com/NVIDIA-AI-Blueprints/nemotron-voice-agent/discussions) | [Contributing](https://github.com/NVIDIA-AI-Blueprints/nemotron-voice-agent/blob/main/CONTRIBUTING.md) | [Security](https://github.com/NVIDIA-AI-Blueprints/nemotron-voice-agent/blob/main/SECURITY.md) |
 | **NeMo Gym** | [Issues](https://github.com/NVIDIA-NeMo/Gym/issues) | [Discussions](https://github.com/NVIDIA-NeMo/Gym/discussions) | [Contributing](https://github.com/NVIDIA-NeMo/Gym/blob/main/CONTRIBUTING.md) | [Security](https://github.com/NVIDIA-NeMo/Gym/blob/main/SECURITY.md) |
+| **NeMo Evaluator** | [Issues](https://github.com/NVIDIA-NeMo/Evaluator/issues) | [Discussions](https://github.com/NVIDIA-NeMo/Evaluator/discussions) | [Contributing](https://github.com/NVIDIA-NeMo/Evaluator/blob/main/CONTRIBUTING.md) | [Security](https://github.com/NVIDIA-NeMo/Evaluator/blob/main/SECURITY.md) |
 
 For issues with **this catalog repo itself** (README, structure, listing a new product): [open an issue here](../../issues).
 
