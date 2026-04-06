@@ -1,0 +1,75 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: Skill Catalog Sync Check
+
+on:
+  schedule:
+    - cron: "0 8 * * 1" # every Monday at 08:00 UTC
+  workflow_dispatch: # allow manual trigger
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-skills:
+    name: Verify skill counts match source repos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check skill directories in source repos
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          STATUS=0
+
+          # Each entry: "owner/repo ref skills_path expected_count label"
+          REPOS=(
+            "NVIDIA/cuopt                          main skills                                                  19 cuOpt"
+            "NVIDIA/TensorRT-LLM                   main .claude/skills                                           4 TensorRT-LLM"
+            "NVIDIA/Model-Optimizer                main .claude/skills                                           4 Model-Optimizer"
+            "NVIDIA/Megatron-LM                    main .claude/skills                                           2 Megatron-Core"
+            "NVIDIA-NeMo/Megatron-Bridge           main skills                                                   8 Megatron-Bridge"
+            "NVIDIA-AI-Blueprints/nemotron-voice-agent main .agents/skills                                       1 Nemotron-Voice-Agent"
+            "NVIDIA-NeMo/Gym                       main .claude/skills                                           1 NeMo-Gym"
+            "NVIDIA-NeMo/Evaluator                 main packages/nemo-evaluator-launcher/.claude/skills           4 NeMo-Evaluator"
+          )
+
+          echo "## Skill Catalog Sync Report"
+          echo ""
+          printf "| %-24s | %-10s | %-10s | %-6s |\n" "Product" "Expected" "Actual" "Status"
+          printf "| %-24s | %-10s | %-10s | %-6s |\n" "------------------------" "----------" "----------" "------"
+
+          for entry in "${REPOS[@]}"; do
+            read -r owner_repo ref skills_path expected label <<< "$entry"
+
+            actual=$(gh api \
+              "repos/${owner_repo}/contents/${skills_path}?ref=${ref}" \
+              --jq '[.[] | select(.type == "dir")] | length' 2>/dev/null || echo "ERR")
+
+            if [ "$actual" = "ERR" ]; then
+              status_icon="ERROR"
+              STATUS=1
+            elif [ "$actual" -eq "$expected" ]; then
+              status_icon="OK"
+            else
+              status_icon="DRIFT"
+              STATUS=1
+            fi
+
+            printf "| %-24s | %-10s | %-10s | %-6s |\n" "$label" "$expected" "$actual" "$status_icon"
+          done
+
+          echo ""
+          if [ "$STATUS" -ne 0 ]; then
+            echo "::error::Skill counts have drifted — update README.md to match source repos."
+            exit 1
+          else
+            echo "All skill counts match."
+          fi
