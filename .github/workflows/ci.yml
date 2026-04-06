@@ -5,7 +5,7 @@ name: Skill Catalog Sync Check
 
 on:
   schedule:
-    - cron: "0 8 * * 1" # every Monday at 08:00 UTC
+    - cron: "0 8 * * *" # every day at 08:00 UTC
   workflow_dispatch: # allow manual trigger
   pull_request:
     branches: [main]
