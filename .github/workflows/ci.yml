@@ -11,8 +11,8 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
-  issues: write
+  contents: write
+  pull-requests: write
 
 jobs:
   check-skills:
@@ -21,13 +21,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check skill directories in source repos
+      - name: Check skill directories and update README if drifted
+        id: sync
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
-          STATUS=0
+          DRIFTED=0
 
           # Each entry: "owner/repo ref skills_path expected_count label"
           REPOS=(
@@ -41,10 +42,11 @@ jobs:
             "NVIDIA-NeMo/Evaluator                 main packages/nemo-evaluator-launcher/.claude/skills           4 NeMo-Evaluator"
           )
 
-          echo "## Skill Catalog Sync Report"
-          echo ""
-          printf "| %-24s | %-10s | %-10s | %-6s |\n" "Product" "Expected" "Actual" "Status"
-          printf "| %-24s | %-10s | %-10s | %-6s |\n" "------------------------" "----------" "----------" "------"
+          REPORT="## Skill Catalog Sync Report\n\n"
+          REPORT+="| Product | Expected | Actual | Status |\n"
+          REPORT+="|---------|----------|--------|--------|\n"
+
+          declare -A UPDATES
 
           for entry in "${REPOS[@]}"; do
             read -r owner_repo ref skills_path expected label <<< "$entry"
@@ -54,22 +56,54 @@ jobs:
               --jq '[.[] | select(.type == "dir")] | length' 2>/dev/null || echo "ERR")
 
             if [ "$actual" = "ERR" ]; then
-              status_icon="ERROR"
-              STATUS=1
+              REPORT+="| $label | $expected | ERROR | :x: |\n"
+              DRIFTED=1
             elif [ "$actual" -eq "$expected" ]; then
-              status_icon="OK"
+              REPORT+="| $label | $expected | $actual | :white_check_mark: |\n"
             else
-              status_icon="DRIFT"
-              STATUS=1
+              REPORT+="| $label | $expected | $actual | :warning: DRIFT |\n"
+              UPDATES["$label"]="$expected:$actual"
+              DRIFTED=1
             fi
-
-            printf "| %-24s | %-10s | %-10s | %-6s |\n" "$label" "$expected" "$actual" "$status_icon"
           done
 
-          echo ""
-          if [ "$STATUS" -ne 0 ]; then
+          echo -e "$REPORT"
+          echo "drifted=$DRIFTED" >> "$GITHUB_OUTPUT"
+
+          if [ "$DRIFTED" -eq 0 ]; then
+            echo "All skill counts match."
+            exit 0
+          fi
+
+          # On PRs, just fail — don't try to auto-fix
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
             echo "::error::Skill counts have drifted — update README.md to match source repos."
             exit 1
-          else
-            echo "All skill counts match."
           fi
+
+          # On schedule/dispatch, update README.md with corrected counts
+          echo "Updating README.md with corrected skill counts..."
+          for label in "${!UPDATES[@]}"; do
+            IFS=':' read -r old_count new_count <<< "${UPDATES[$label]}"
+            # Match the skills count column in the Available Skills table row for this product
+            sed -i -E "s/(\*\*${label}\*\*[^|]*\|[^|]*\| *)${old_count}( *\|)/\1${new_count}\2/" README.md
+          done
+
+          if git diff --quiet README.md; then
+            echo "No changes to README.md after sed — manual update may be needed."
+            exit 1
+          fi
+
+          echo -e "$REPORT" > /tmp/pr-body.md
+
+      - name: Create pull request with updated counts
+        if: steps.sync.outputs.drifted == '1' && github.event_name != 'pull_request'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "fix: update skill counts to match source repos"
+          branch: auto/sync-skill-counts
+          delete-branch: true
+          title: "fix: sync skill counts with source repos"
+          body-path: /tmp/pr-body.md
+          labels: automated
