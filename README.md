@@ -46,7 +46,7 @@ That's it — the skill activates automatically the next time your agent encount
 | Product | Description | Skills | Skills Location |
 |---------|-------------|:------:|-----------------|
 | **cuOpt** | GPU-accelerated optimization — vehicle routing, linear programming, quadratic programming, installation, server deployment, and developer tools. | 19 | [`NVIDIA/cuopt/skills/`](https://github.com/NVIDIA/cuopt/tree/main/skills) |
-| **TensorRT-LLM** | LLM inference optimization — model onboarding to AutoDeploy, CI pipeline failure analysis, and test failure diagnostics. | 4 | [`NVIDIA/TensorRT-LLM/.claude/skills/`](https://github.com/NVIDIA/TensorRT-LLM/tree/main/.claude/skills) |
+| **TensorRT-LLM** | LLM inference optimization — model onboarding, performance analysis and optimization, kernel writing, CI diagnostics, code contribution, and codebase exploration. | 20 | [`NVIDIA/TensorRT-LLM/.claude/skills/`](https://github.com/NVIDIA/TensorRT-LLM/tree/main/.claude/skills) |
 | **Model-Optimizer** | Model optimization — quantization, sparsity, and distillation for efficient inference. | 4 | [`NVIDIA/Model-Optimizer/.claude/skills/`](https://github.com/NVIDIA/Model-Optimizer/tree/main/.claude/skills) |
 | **Megatron-Core** | Large-scale distributed training — model parallelism, pipeline parallelism, and mixed precision. | 2 | [`NVIDIA/Megatron-LM/.claude/skills/`](https://github.com/NVIDIA/Megatron-LM/tree/main/.claude/skills) |
 | **Megatron-Bridge** | Bridge between NeMo and Megatron — data processing, model conversion, and training utilities. | 8 | [`NVIDIA-NeMo/Megatron-Bridge/skills/`](https://github.com/NVIDIA-NeMo/Megatron-Bridge/tree/main/skills) |
