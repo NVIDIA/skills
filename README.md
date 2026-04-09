@@ -56,6 +56,17 @@ That's it — the skill activates automatically the next time your agent encount
 
 ---
 
+## Community Projects with NVIDIA Contribution
+
+The following open-source projects are not maintained by NVIDIA but include agent skills with active contributions from NVIDIA engineering teams.
+
+| Project | Description | Skills | Skills Location |
+|---------|-------------|:------:|-----------------|
+| **PyTorch** | Deep learning framework — code contribution, debugging, type coverage, issue triage, kernel development, and documentation. | 12 | [`pytorch/pytorch/.claude/skills/`](https://github.com/pytorch/pytorch/tree/main/.claude/skills) |
+| **FlashInfer** | GPU kernel library for LLM serving — CUDA kernel development, benchmarking, and crash debugging. | 3 | [`flashinfer-ai/flashinfer/.claude/skills/`](https://github.com/flashinfer-ai/flashinfer/tree/main/.claude/skills) |
+
+---
+
 ## Getting Help & Contributing
 
 For skill-related issues, feature requests, new skill ideas, discussions, and contributions — use the source repo for the relevant product:
