@@ -33,7 +33,7 @@ jobs:
           # Format: "display_name|owner/repo|ref|skills_path[+extra_path]|expected_count"
           REPOS=(
             "cuOpt|NVIDIA/cuopt|main|skills|19"
-            "TensorRT-LLM|NVIDIA/TensorRT-LLM|main|.claude/skills|4"
+            "TensorRT-LLM|NVIDIA/TensorRT-LLM|main|.claude/skills|20"
             "Model-Optimizer|NVIDIA/Model-Optimizer|main|.claude/skills|4"
             "Megatron-Core|NVIDIA/Megatron-LM|main|.claude/skills|2"
             "Megatron-Bridge|NVIDIA-NeMo/Megatron-Bridge|main|skills|8"
