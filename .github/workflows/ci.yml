@@ -32,6 +32,7 @@ jobs:
 
           # Format: "display_name|owner/repo|ref|skills_path[+extra_path]|expected_count"
           REPOS=(
+            "CUDA-Q|NVIDIA/cuda-quantum|main|.claude/skills|1"
             "cuOpt|NVIDIA/cuopt|main|skills|19"
             "TensorRT-LLM|NVIDIA/TensorRT-LLM|main|.claude/skills|20"
             "Model-Optimizer|NVIDIA/Model-Optimizer|main|.claude/skills|4"
