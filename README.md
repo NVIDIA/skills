@@ -45,6 +45,7 @@ That's it — the skill activates automatically the next time your agent encount
 
 | Product | Description | Skills | Skills Location |
 |---------|-------------|:------:|-----------------|
+| **CUDA-Q** | CUDA Quantum — onboarding guide for installation, test programs, GPU simulation, QPU hardware, and quantum applications. | 1 | [`NVIDIA/cuda-quantum/.claude/skills/`](https://github.com/NVIDIA/cuda-quantum/tree/main/.claude/skills) |
 | **cuOpt** | GPU-accelerated optimization — vehicle routing, linear programming, quadratic programming, installation, server deployment, and developer tools. | 19 | [`NVIDIA/cuopt/skills/`](https://github.com/NVIDIA/cuopt/tree/main/skills) |
 | **TensorRT-LLM** | LLM inference optimization — model onboarding, performance analysis and optimization, kernel writing, CI diagnostics, code contribution, and codebase exploration. | 20 | [`NVIDIA/TensorRT-LLM/.claude/skills/`](https://github.com/NVIDIA/TensorRT-LLM/tree/main/.claude/skills) |
 | **Model-Optimizer** | Model optimization — quantization, sparsity, and distillation for efficient inference. | 4 | [`NVIDIA/Model-Optimizer/.claude/skills/`](https://github.com/NVIDIA/Model-Optimizer/tree/main/.claude/skills) |
@@ -62,6 +63,7 @@ For skill-related issues, feature requests, new skill ideas, discussions, and co
 
 | Product | Issues | Discussions | Contributing | Security |
 |---------|--------|-------------|--------------|----------|
+| **CUDA-Q** | [Issues](https://github.com/NVIDIA/cuda-quantum/issues) | [Discussions](https://github.com/NVIDIA/cuda-quantum/discussions) | [Contributing](https://github.com/NVIDIA/cuda-quantum/blob/main/Contributing.md) | [Security](https://github.com/NVIDIA/cuda-quantum/blob/main/SECURITY.md) |
 | **cuOpt** | [Issues](https://github.com/NVIDIA/cuopt/issues) | [Discussions](https://github.com/NVIDIA/cuopt/discussions) | [Contributing](https://github.com/NVIDIA/cuopt/blob/main/CONTRIBUTING.md) | [Security](https://github.com/NVIDIA/cuopt/blob/main/SECURITY.md) |
 | **TensorRT-LLM** | [Issues](https://github.com/NVIDIA/TensorRT-LLM/issues) | [Discussions](https://github.com/NVIDIA/TensorRT-LLM/discussions) | [Contributing](https://github.com/NVIDIA/TensorRT-LLM/blob/main/CONTRIBUTING.md) | [Security](https://github.com/NVIDIA/TensorRT-LLM/blob/main/SECURITY.md) |
 | **Model-Optimizer** | [Issues](https://github.com/NVIDIA/Model-Optimizer/issues) | — | [Contributing](https://github.com/NVIDIA/Model-Optimizer/blob/main/CONTRIBUTING.md) | [Security](https://github.com/NVIDIA/Model-Optimizer/blob/main/SECURITY.md) |
