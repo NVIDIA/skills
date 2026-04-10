@@ -105,6 +105,28 @@ jobs:
             echo "⚠ Model-Optimizer checkout empty or missing — skipping to preserve existing catalog"
           fi
 
+      # ── CUDA-Q ───────────────────────────────────────────────
+      - name: Checkout CUDA-Q
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: NVIDIA/cuda-quantum
+          ref: main
+          path: .tmp/cuda-quantum
+          token: ${{ secrets.SKILLS_SYNC_PAT }}
+          sparse-checkout: |
+            .claude/skills/
+
+      - name: Copy CUDA-Q skills into catalog
+        run: |
+          if [ -d ".tmp/cuda-quantum/.claude/skills" ] && [ -n "$(ls -A .tmp/cuda-quantum/.claude/skills)" ]; then
+            mkdir -p skills/CUDA-Q
+            rsync -a --delete .tmp/cuda-quantum/.claude/skills/ skills/CUDA-Q/
+            echo "- CUDA-Q" >> /tmp/synced-products.txt
+          else
+            echo "⚠ CUDA-Q checkout empty or missing — skipping to preserve existing catalog"
+          fi
+
       # ── Megatron-Core ──────────────────────────────────────
       - name: Checkout Megatron-LM
         continue-on-error: true
