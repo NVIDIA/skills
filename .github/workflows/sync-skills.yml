@@ -1,0 +1,113 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# Sync skills from product repos into the nvidia/skills catalog.
+# Runs on a schedule (twice daily) and can be triggered manually.
+# Each product block sparse-checkouts only the skills/ directory,
+# then copies those skills into the catalog tree.
+
+name: Sync Skills from Product Repos
+
+on:
+  schedule:
+    # Twice daily: 06:00 UTC and 18:00 UTC
+    - cron: "0 6,18 * * *"
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout skills catalog
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      # ── cuOpt ──────────────────────────────────────────────
+      - name: Checkout cuOpt
+        uses: actions/checkout@v4
+        with:
+          repository: NVIDIA/cuopt
+          ref: main
+          path: .tmp/cuopt
+          sparse-checkout: |
+            skills/
+
+      - name: Copy cuOpt skills into catalog
+        run: |
+          rm -rf skills/cuopt
+          mkdir -p skills/cuopt
+          rsync -a --delete .tmp/cuopt/skills/ skills/cuopt/
+
+      # ── TensorRT-LLM ──────────────────────────────────────
+      - name: Checkout TensorRT-LLM
+        uses: actions/checkout@v4
+        with:
+          repository: NVIDIA/TensorRT-LLM
+          ref: main
+          path: .tmp/TensorRT-LLM
+          sparse-checkout: |
+            .claude/skills/
+
+      - name: Copy TensorRT-LLM skills into catalog
+        run: |
+          rm -rf skills/TensorRT-LLM
+          mkdir -p skills/TensorRT-LLM
+          rsync -a --delete .tmp/TensorRT-LLM/.claude/skills/ skills/TensorRT-LLM/
+
+      # ── Nemotron Voice Agent ───────────────────────────────
+      - name: Checkout nemotron-voice-agent
+        uses: actions/checkout@v4
+        with:
+          repository: NVIDIA-AI-Blueprints/nemotron-voice-agent
+          ref: main
+          path: .tmp/nemotron-voice-agent
+          sparse-checkout: |
+            .agents/skills/
+
+      - name: Copy nemotron-voice-agent skills into catalog
+        run: |
+          rm -rf skills/nemotron-voice-agent
+          mkdir -p skills/nemotron-voice-agent
+          rsync -a --delete .tmp/nemotron-voice-agent/.agents/skills/ skills/nemotron-voice-agent/
+
+      # ── NeMo Gym ───────────────────────────────────────────
+      - name: Checkout NeMo Gym
+        uses: actions/checkout@v4
+        with:
+          repository: NVIDIA-NeMo/Gym
+          ref: main
+          path: .tmp/NeMo-Gym
+          sparse-checkout: |
+            .claude/skills/
+
+      - name: Copy NeMo Gym skills into catalog
+        run: |
+          rm -rf skills/NeMo-Gym
+          mkdir -p skills/NeMo-Gym
+          rsync -a --delete .tmp/NeMo-Gym/.claude/skills/ skills/NeMo-Gym/
+
+      # ── Cleanup and commit ─────────────────────────────────
+      - name: Clean up temp checkouts
+        run: rm -rf .tmp
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git add -A skills/
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: sync skills from product repos"
+          git push
