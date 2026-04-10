@@ -32,6 +32,7 @@ jobs:
 
       # ── cuOpt ──────────────────────────────────────────────
       - name: Checkout cuOpt
+        continue-on-error: true
         uses: actions/checkout@v4
         with:
           repository: NVIDIA/cuopt
@@ -53,6 +54,7 @@ jobs:
 
       # ── TensorRT-LLM ──────────────────────────────────────
       - name: Checkout TensorRT-LLM
+        continue-on-error: true
         uses: actions/checkout@v4
         with:
           repository: NVIDIA/TensorRT-LLM
@@ -74,6 +76,7 @@ jobs:
 
       # ── Model-Optimizer ────────────────────────────────────
       - name: Checkout Model-Optimizer
+        continue-on-error: true
         uses: actions/checkout@v4
         with:
           repository: NVIDIA/Model-Optimizer
@@ -95,6 +98,7 @@ jobs:
 
       # ── Megatron-Core ──────────────────────────────────────
       - name: Checkout Megatron-LM
+        continue-on-error: true
         uses: actions/checkout@v4
         with:
           repository: NVIDIA/Megatron-LM
@@ -116,6 +120,7 @@ jobs:
 
       # ── Megatron-Bridge ────────────────────────────────────
       - name: Checkout Megatron-Bridge
+        continue-on-error: true
         uses: actions/checkout@v4
         with:
           repository: NVIDIA-NeMo/Megatron-Bridge
@@ -137,6 +142,7 @@ jobs:
 
       # ── Nemotron Voice Agent ───────────────────────────────
       - name: Checkout nemotron-voice-agent
+        continue-on-error: true
         uses: actions/checkout@v4
         with:
           repository: NVIDIA-AI-Blueprints/nemotron-voice-agent
@@ -158,6 +164,7 @@ jobs:
 
       # ── NeMo Gym ───────────────────────────────────────────
       - name: Checkout NeMo Gym
+        continue-on-error: true
         uses: actions/checkout@v4
         with:
           repository: NVIDIA-NeMo/Gym
@@ -179,6 +186,7 @@ jobs:
 
       # ── NeMo Evaluator Launcher ─────────────────────────────
       - name: Checkout NeMo Evaluator
+        continue-on-error: true
         uses: actions/checkout@v4
         with:
           repository: NVIDIA-NeMo/Evaluator
