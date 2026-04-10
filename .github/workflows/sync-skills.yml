@@ -21,6 +21,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  issues: write
 
 concurrency:
   group: sync-skills
@@ -261,3 +262,25 @@ jobs:
           title: ${{ steps.summary.outputs.title }}
           body: ${{ steps.summary.outputs.body }}
           delete-branch: true
+
+      - name: Open issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `Skills sync failed — ${new Date().toISOString().slice(0, 10)}`;
+            const body = [
+              `The [sync-skills workflow](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) failed.`,
+              ``,
+              `**Trigger:** \`${context.eventName}\``,
+              `**Run:** ${context.runId}`,
+              ``,
+              `Please investigate and re-run if needed.`
+            ].join('\n');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['sync-failure']
+            });
