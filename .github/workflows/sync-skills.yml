@@ -35,6 +35,9 @@ jobs:
         with:
           ref: main
 
+      - name: Initialize sync log
+        run: echo "" > /tmp/synced-products.txt
+
       # ── cuOpt ──────────────────────────────────────────────
       - name: Checkout cuOpt
         continue-on-error: true
@@ -52,7 +55,7 @@ jobs:
           if [ -d ".tmp/cuopt/skills" ] && [ -n "$(ls -A .tmp/cuopt/skills)" ]; then
             mkdir -p skills/cuopt
             rsync -a --delete .tmp/cuopt/skills/ skills/cuopt/
-            echo "✓ cuopt synced"
+            echo "- cuOpt" >> /tmp/synced-products.txt
           else
             echo "⚠ cuopt checkout empty or missing — skipping to preserve existing catalog"
           fi
@@ -74,7 +77,7 @@ jobs:
           if [ -d ".tmp/TensorRT-LLM/.claude/skills" ] && [ -n "$(ls -A .tmp/TensorRT-LLM/.claude/skills)" ]; then
             mkdir -p skills/TensorRT-LLM
             rsync -a --delete .tmp/TensorRT-LLM/.claude/skills/ skills/TensorRT-LLM/
-            echo "✓ TensorRT-LLM synced"
+            echo "- TensorRT-LLM" >> /tmp/synced-products.txt
           else
             echo "⚠ TensorRT-LLM checkout empty or missing — skipping to preserve existing catalog"
           fi
@@ -96,7 +99,7 @@ jobs:
           if [ -d ".tmp/Model-Optimizer/.claude/skills" ] && [ -n "$(ls -A .tmp/Model-Optimizer/.claude/skills)" ]; then
             mkdir -p skills/Model-Optimizer
             rsync -a --delete .tmp/Model-Optimizer/.claude/skills/ skills/Model-Optimizer/
-            echo "✓ Model-Optimizer synced"
+            echo "- Model-Optimizer" >> /tmp/synced-products.txt
           else
             echo "⚠ Model-Optimizer checkout empty or missing — skipping to preserve existing catalog"
           fi
@@ -118,7 +121,7 @@ jobs:
           if [ -d ".tmp/Megatron-LM/.claude/skills" ] && [ -n "$(ls -A .tmp/Megatron-LM/.claude/skills)" ]; then
             mkdir -p skills/Megatron-Core
             rsync -a --delete .tmp/Megatron-LM/.claude/skills/ skills/Megatron-Core/
-            echo "✓ Megatron-Core synced"
+            echo "- Megatron-Core" >> /tmp/synced-products.txt
           else
             echo "⚠ Megatron-Core checkout empty or missing — skipping to preserve existing catalog"
           fi
@@ -140,7 +143,7 @@ jobs:
           if [ -d ".tmp/Megatron-Bridge/skills" ] && [ -n "$(ls -A .tmp/Megatron-Bridge/skills)" ]; then
             mkdir -p skills/Megatron-Bridge
             rsync -a --delete .tmp/Megatron-Bridge/skills/ skills/Megatron-Bridge/
-            echo "✓ Megatron-Bridge synced"
+            echo "- Megatron-Bridge" >> /tmp/synced-products.txt
           else
             echo "⚠ Megatron-Bridge checkout empty or missing — skipping to preserve existing catalog"
           fi
@@ -162,7 +165,7 @@ jobs:
           if [ -d ".tmp/nemotron-voice-agent/.agents/skills" ] && [ -n "$(ls -A .tmp/nemotron-voice-agent/.agents/skills)" ]; then
             mkdir -p skills/nemotron-voice-agent
             rsync -a --delete .tmp/nemotron-voice-agent/.agents/skills/ skills/nemotron-voice-agent/
-            echo "✓ nemotron-voice-agent synced"
+            echo "- Nemotron Voice Agent" >> /tmp/synced-products.txt
           else
             echo "⚠ nemotron-voice-agent checkout empty or missing — skipping to preserve existing catalog"
           fi
@@ -184,7 +187,7 @@ jobs:
           if [ -d ".tmp/NeMo-Gym/.claude/skills" ] && [ -n "$(ls -A .tmp/NeMo-Gym/.claude/skills)" ]; then
             mkdir -p skills/NeMo-Gym
             rsync -a --delete .tmp/NeMo-Gym/.claude/skills/ skills/NeMo-Gym/
-            echo "✓ NeMo-Gym synced"
+            echo "- NeMo Gym" >> /tmp/synced-products.txt
           else
             echo "⚠ NeMo-Gym checkout empty or missing — skipping to preserve existing catalog"
           fi
@@ -208,7 +211,7 @@ jobs:
           if [ -d "$src" ] && [ -n "$(ls -A "$src")" ]; then
             mkdir -p skills/NeMo-Evaluator-Launcher
             rsync -a --delete "$src/" skills/NeMo-Evaluator-Launcher/
-            echo "✓ NeMo-Evaluator-Launcher synced"
+            echo "- NeMo Evaluator Launcher" >> /tmp/synced-products.txt
           else
             echo "⚠ NeMo-Evaluator-Launcher checkout empty or missing — skipping to preserve existing catalog"
           fi
@@ -220,7 +223,7 @@ jobs:
           if [ -d "$src" ] && [ -n "$(ls -A "$src")" ]; then
             mkdir -p skills/NeMo-Evaluator
             rsync -a --delete "$src/" skills/NeMo-Evaluator/
-            echo "✓ NeMo-Evaluator synced"
+            echo "- NeMo Evaluator" >> /tmp/synced-products.txt
           else
             echo "⚠ NeMo-Evaluator checkout empty or missing — skipping to preserve existing catalog"
           fi
@@ -229,11 +232,32 @@ jobs:
       - name: Clean up temp checkouts
         run: rm -rf .tmp
 
+      - name: Build sync summary
+        id: summary
+        run: |
+          if [ -s /tmp/synced-products.txt ]; then
+            products=$(cat /tmp/synced-products.txt | tr '\n' ',' | sed 's/- //g;s/,$//')
+            echo "title=chore: sync skills ($products)" >> "$GITHUB_OUTPUT"
+            {
+              echo 'body<<EOFBODY'
+              echo "## Automated skills sync"
+              echo ""
+              echo "Products synced:"
+              cat /tmp/synced-products.txt
+              echo ""
+              echo "Triggered by: \`${{ github.event_name }}\`"
+              echo 'EOFBODY'
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo "title=chore: sync skills from product repos" >> "$GITHUB_OUTPUT"
+            echo "body=Automated sync — no products reported changes." >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create pull request
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: "chore: sync skills from product repos"
+          commit-message: ${{ steps.summary.outputs.title }}
           branch: automated/sync-skills
-          title: "chore: sync skills from product repos"
-          body: "Automated sync of skills from registered product repos."
+          title: ${{ steps.summary.outputs.title }}
+          body: ${{ steps.summary.outputs.body }}
           delete-branch: true
