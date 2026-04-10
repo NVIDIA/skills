@@ -20,6 +20,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: sync-skills
@@ -228,20 +229,11 @@ jobs:
       - name: Clean up temp checkouts
         run: rm -rf .tmp
 
-      - name: Check for changes
-        id: changes
-        run: |
-          git add -A skills/
-          if git diff --cached --quiet; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Commit and push
-        if: steps.changes.outputs.changed == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore: sync skills from product repos"
-          git push
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore: sync skills from product repos"
+          branch: automated/sync-skills
+          title: "chore: sync skills from product repos"
+          body: "Automated sync of skills from registered product repos."
+          delete-branch: true
