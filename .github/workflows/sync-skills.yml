@@ -5,6 +5,10 @@
 # Runs on a schedule (twice daily) and can be triggered manually.
 # Each product block sparse-checkouts only the skills/ directory,
 # then copies those skills into the catalog tree.
+#
+# Requires a PAT (SKILLS_SYNC_PAT) with read access to all product
+# repos, stored as a repository secret. The default GITHUB_TOKEN
+# only has access to this repo and will 403 on private product repos.
 
 name: Sync Skills from Product Repos
 
@@ -33,14 +37,20 @@ jobs:
           repository: NVIDIA/cuopt
           ref: main
           path: .tmp/cuopt
+          token: ${{ secrets.SKILLS_SYNC_PAT }}
           sparse-checkout: |
             skills/
 
       - name: Copy cuOpt skills into catalog
         run: |
-          rm -rf skills/cuopt
-          mkdir -p skills/cuopt
-          rsync -a --delete .tmp/cuopt/skills/ skills/cuopt/
+          if [ -d ".tmp/cuopt/skills" ] && [ -n "$(ls -A .tmp/cuopt/skills)" ]; then
+            rm -rf skills/cuopt
+            mkdir -p skills/cuopt
+            rsync -a --delete .tmp/cuopt/skills/ skills/cuopt/
+            echo "✓ cuopt synced"
+          else
+            echo "⚠ cuopt checkout empty or missing — skipping to preserve existing catalog"
+          fi
 
       # ── TensorRT-LLM ──────────────────────────────────────
       - name: Checkout TensorRT-LLM
@@ -49,14 +59,86 @@ jobs:
           repository: NVIDIA/TensorRT-LLM
           ref: main
           path: .tmp/TensorRT-LLM
+          token: ${{ secrets.SKILLS_SYNC_PAT }}
           sparse-checkout: |
             .claude/skills/
 
       - name: Copy TensorRT-LLM skills into catalog
         run: |
-          rm -rf skills/TensorRT-LLM
-          mkdir -p skills/TensorRT-LLM
-          rsync -a --delete .tmp/TensorRT-LLM/.claude/skills/ skills/TensorRT-LLM/
+          if [ -d ".tmp/TensorRT-LLM/.claude/skills" ] && [ -n "$(ls -A .tmp/TensorRT-LLM/.claude/skills)" ]; then
+            rm -rf skills/TensorRT-LLM
+            mkdir -p skills/TensorRT-LLM
+            rsync -a --delete .tmp/TensorRT-LLM/.claude/skills/ skills/TensorRT-LLM/
+            echo "✓ TensorRT-LLM synced"
+          else
+            echo "⚠ TensorRT-LLM checkout empty or missing — skipping to preserve existing catalog"
+          fi
+
+      # ── Model-Optimizer ────────────────────────────────────
+      - name: Checkout Model-Optimizer
+        uses: actions/checkout@v4
+        with:
+          repository: NVIDIA/Model-Optimizer
+          ref: main
+          path: .tmp/Model-Optimizer
+          token: ${{ secrets.SKILLS_SYNC_PAT }}
+          sparse-checkout: |
+            .claude/skills/
+
+      - name: Copy Model-Optimizer skills into catalog
+        run: |
+          if [ -d ".tmp/Model-Optimizer/.claude/skills" ] && [ -n "$(ls -A .tmp/Model-Optimizer/.claude/skills)" ]; then
+            rm -rf skills/Model-Optimizer
+            mkdir -p skills/Model-Optimizer
+            rsync -a --delete .tmp/Model-Optimizer/.claude/skills/ skills/Model-Optimizer/
+            echo "✓ Model-Optimizer synced"
+          else
+            echo "⚠ Model-Optimizer checkout empty or missing — skipping to preserve existing catalog"
+          fi
+
+      # ── Megatron-Core ──────────────────────────────────────
+      - name: Checkout Megatron-LM
+        uses: actions/checkout@v4
+        with:
+          repository: NVIDIA/Megatron-LM
+          ref: main
+          path: .tmp/Megatron-LM
+          token: ${{ secrets.SKILLS_SYNC_PAT }}
+          sparse-checkout: |
+            .claude/skills/
+
+      - name: Copy Megatron-Core skills into catalog
+        run: |
+          if [ -d ".tmp/Megatron-LM/.claude/skills" ] && [ -n "$(ls -A .tmp/Megatron-LM/.claude/skills)" ]; then
+            rm -rf skills/Megatron-Core
+            mkdir -p skills/Megatron-Core
+            rsync -a --delete .tmp/Megatron-LM/.claude/skills/ skills/Megatron-Core/
+            echo "✓ Megatron-Core synced"
+          else
+            echo "⚠ Megatron-Core checkout empty or missing — skipping to preserve existing catalog"
+          fi
+
+      # ── Megatron-Bridge ────────────────────────────────────
+      - name: Checkout Megatron-Bridge
+        uses: actions/checkout@v4
+        with:
+          repository: NVIDIA-NeMo/Megatron-Bridge
+          ref: main
+          path: .tmp/Megatron-Bridge
+          token: ${{ secrets.SKILLS_SYNC_PAT }}
+          sparse-checkout: |
+            skills/
+
+      - name: Copy Megatron-Bridge skills into catalog
+        run: |
+          if [ -d ".tmp/Megatron-Bridge/skills" ] && [ -n "$(ls -A .tmp/Megatron-Bridge/skills)" ]; then
+            rm -rf skills/Megatron-Bridge
+            mkdir -p skills/Megatron-Bridge
+            rsync -a --delete .tmp/Megatron-Bridge/skills/ skills/Megatron-Bridge/
+            echo "✓ Megatron-Bridge synced"
+          else
+            echo "⚠ Megatron-Bridge checkout empty or missing — skipping to preserve existing catalog"
+          fi
 
       # ── Nemotron Voice Agent ───────────────────────────────
       - name: Checkout nemotron-voice-agent
@@ -65,14 +147,20 @@ jobs:
           repository: NVIDIA-AI-Blueprints/nemotron-voice-agent
           ref: main
           path: .tmp/nemotron-voice-agent
+          token: ${{ secrets.SKILLS_SYNC_PAT }}
           sparse-checkout: |
             .agents/skills/
 
       - name: Copy nemotron-voice-agent skills into catalog
         run: |
-          rm -rf skills/nemotron-voice-agent
-          mkdir -p skills/nemotron-voice-agent
-          rsync -a --delete .tmp/nemotron-voice-agent/.agents/skills/ skills/nemotron-voice-agent/
+          if [ -d ".tmp/nemotron-voice-agent/.agents/skills" ] && [ -n "$(ls -A .tmp/nemotron-voice-agent/.agents/skills)" ]; then
+            rm -rf skills/nemotron-voice-agent
+            mkdir -p skills/nemotron-voice-agent
+            rsync -a --delete .tmp/nemotron-voice-agent/.agents/skills/ skills/nemotron-voice-agent/
+            echo "✓ nemotron-voice-agent synced"
+          else
+            echo "⚠ nemotron-voice-agent checkout empty or missing — skipping to preserve existing catalog"
+          fi
 
       # ── NeMo Gym ───────────────────────────────────────────
       - name: Checkout NeMo Gym
@@ -81,14 +169,57 @@ jobs:
           repository: NVIDIA-NeMo/Gym
           ref: main
           path: .tmp/NeMo-Gym
+          token: ${{ secrets.SKILLS_SYNC_PAT }}
           sparse-checkout: |
             .claude/skills/
 
       - name: Copy NeMo Gym skills into catalog
         run: |
-          rm -rf skills/NeMo-Gym
-          mkdir -p skills/NeMo-Gym
-          rsync -a --delete .tmp/NeMo-Gym/.claude/skills/ skills/NeMo-Gym/
+          if [ -d ".tmp/NeMo-Gym/.claude/skills" ] && [ -n "$(ls -A .tmp/NeMo-Gym/.claude/skills)" ]; then
+            rm -rf skills/NeMo-Gym
+            mkdir -p skills/NeMo-Gym
+            rsync -a --delete .tmp/NeMo-Gym/.claude/skills/ skills/NeMo-Gym/
+            echo "✓ NeMo-Gym synced"
+          else
+            echo "⚠ NeMo-Gym checkout empty or missing — skipping to preserve existing catalog"
+          fi
+
+      # ── NeMo Evaluator Launcher ─────────────────────────────
+      - name: Checkout NeMo Evaluator
+        uses: actions/checkout@v4
+        with:
+          repository: NVIDIA-NeMo/Evaluator
+          ref: main
+          path: .tmp/NeMo-Evaluator
+          token: ${{ secrets.SKILLS_SYNC_PAT }}
+          sparse-checkout: |
+            packages/nemo-evaluator-launcher/.claude/skills/
+            packages/nemo-evaluator/.claude/skills/
+
+      - name: Copy NeMo Evaluator Launcher skills into catalog
+        run: |
+          src=".tmp/NeMo-Evaluator/packages/nemo-evaluator-launcher/.claude/skills"
+          if [ -d "$src" ] && [ -n "$(ls -A "$src")" ]; then
+            rm -rf skills/NeMo-Evaluator-Launcher
+            mkdir -p skills/NeMo-Evaluator-Launcher
+            rsync -a --delete "$src/" skills/NeMo-Evaluator-Launcher/
+            echo "✓ NeMo-Evaluator-Launcher synced"
+          else
+            echo "⚠ NeMo-Evaluator-Launcher checkout empty or missing — skipping to preserve existing catalog"
+          fi
+
+      # ── NeMo Evaluator ────────────────────────────────────
+      - name: Copy NeMo Evaluator skills into catalog
+        run: |
+          src=".tmp/NeMo-Evaluator/packages/nemo-evaluator/.claude/skills"
+          if [ -d "$src" ] && [ -n "$(ls -A "$src")" ]; then
+            rm -rf skills/NeMo-Evaluator
+            mkdir -p skills/NeMo-Evaluator
+            rsync -a --delete "$src/" skills/NeMo-Evaluator/
+            echo "✓ NeMo-Evaluator synced"
+          else
+            echo "⚠ NeMo-Evaluator checkout empty or missing — skipping to preserve existing catalog"
+          fi
 
       # ── Cleanup and commit ─────────────────────────────────
       - name: Clean up temp checkouts
