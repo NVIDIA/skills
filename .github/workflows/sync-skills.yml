@@ -37,7 +37,7 @@ jobs:
           ref: main
 
       - name: Initialize sync log
-        run: echo "" > /tmp/synced-products.txt
+        run: truncate -s 0 /tmp/synced-products.txt
 
       # ── cuOpt ──────────────────────────────────────────────
       - name: Checkout cuOpt
