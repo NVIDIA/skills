@@ -255,6 +255,13 @@ jobs:
       - name: Clean up temp checkouts
         run: rm -rf .tmp
 
+      - name: Fail if nothing synced
+        run: |
+          if [ ! -s /tmp/synced-products.txt ]; then
+            echo "::error::All product checkouts failed — no skills were synced"
+            exit 1
+          fi
+
       - name: Build sync summary
         id: summary
         run: |
