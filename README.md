@@ -54,6 +54,7 @@ That's it — the skill activates automatically the next time your agent encount
 | **Nemotron Voice Agent** | Real-time conversational AI — deploy speech-to-speech voice agents on Workstation, Jetson Thor, or Cloud NIMs. | 1 | [`nemotron-voice-agent/.agents/skills/`](https://github.com/NVIDIA-AI-Blueprints/nemotron-voice-agent/tree/main/.agents/skills) |
 | **NeMo Gym** | RL training environments — add benchmarks, resources servers, agent wiring, and reward profiling. | 1 | [`NVIDIA-NeMo/Gym/.claude/skills/`](https://github.com/NVIDIA-NeMo/Gym/tree/main/.claude/skills) |
 | **NeMo Evaluator** | LLM evaluation — launch evaluations, access MLflow results, NeMo Evaluator Launcher assistant, and bring-your-own benchmarks. | 4 | [`NVIDIA-NeMo/Evaluator/.claude/skills/`](https://github.com/NVIDIA-NeMo/Evaluator/tree/main/packages/nemo-evaluator-launcher/.claude/skills) ([+1](https://github.com/NVIDIA-NeMo/Evaluator/tree/main/packages/nemo-evaluator/.claude/skills)) |
+| **Dynamo** | LLM serving infrastructure — debugging, DEP management, documentation, issue triage, PR monitoring, and tool-calling parser generation. | 8 | [`ai-dynamo/dynamo/.claude/skills/`](https://github.com/ai-dynamo/dynamo/tree/main/.claude/skills) |
 
 ---
 

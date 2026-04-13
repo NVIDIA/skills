@@ -41,6 +41,7 @@ jobs:
             "Nemotron Voice Agent|NVIDIA-AI-Blueprints/nemotron-voice-agent|main|.agents/skills|1"
             "NeMo Gym|NVIDIA-NeMo/Gym|main|.claude/skills|1"
             "NeMo Evaluator|NVIDIA-NeMo/Evaluator|main|packages/nemo-evaluator-launcher/.claude/skills+packages/nemo-evaluator/.claude/skills|4"
+            "Dynamo|ai-dynamo/dynamo|main|.claude/skills|8"
           )
 
           REPORT="## Skill Catalog Sync Report\n\n"
