@@ -1,5 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# Verify that skill counts in the README match the actual skill
+# directories in each product's source repo.
+# Reads product definitions from products.yml.
 
 name: Agent Skills Sync Check
 
@@ -30,19 +34,6 @@ jobs:
 
           DRIFTED=0
 
-          # Format: "display_name|owner/repo|ref|skills_path[+extra_path]|expected_count"
-          REPOS=(
-            "CUDA-Q|NVIDIA/cuda-quantum|main|.claude/skills|1"
-            "cuOpt|NVIDIA/cuopt|main|skills|19"
-            "TensorRT-LLM|NVIDIA/TensorRT-LLM|main|.claude/skills|20"
-            "Model-Optimizer|NVIDIA/Model-Optimizer|main|.claude/skills|5"
-            "Megatron-Core|NVIDIA/Megatron-LM|main|.claude/skills|3"
-            "Megatron-Bridge|NVIDIA-NeMo/Megatron-Bridge|main|skills|9"
-            "Nemotron Voice Agent|NVIDIA-AI-Blueprints/nemotron-voice-agent|main|.agents/skills|1"
-            "NeMo Gym|NVIDIA-NeMo/Gym|main|.claude/skills|1"
-            "NeMo Evaluator|NVIDIA-NeMo/Evaluator|main|packages/nemo-evaluator-launcher/.claude/skills+packages/nemo-evaluator/.claude/skills|4"
-          )
-
           REPORT="## Skill Catalog Sync Report\n\n"
           REPORT+="| Product | Expected | Actual | Status |\n"
           REPORT+="|---------|----------|--------|--------|\n"
@@ -55,21 +46,27 @@ jobs:
             result=$(gh api "repos/${repo}/contents/${path}?ref=${ref}" \
               --jq '[.[] | select(.type == "dir")] | length' 2>&1)
             if [ $? -ne 0 ]; then
-              echo "ERR:${result}" 
+              echo "ERR:${result}"
             else
               echo "$result"
             fi
           }
 
-          for entry in "${REPOS[@]}"; do
-            IFS='|' read -r label owner_repo ref skills_paths expected <<< "$entry"
+          product_count=$(yq '.products | length' products.yml)
 
-            # Sum skill counts across all paths (split on +)
+          for i in $(seq 0 $((product_count - 1))); do
+            name=$(yq -r ".products[$i].name" products.yml)
+            repo=$(yq -r ".products[$i].repo" products.yml)
+            ref=$(yq -r ".products[$i].ref // \"main\"" products.yml)
+
+            # Count skills across all paths for this product
+            skill_path_count=$(yq -r ".products[$i].skills | length" products.yml)
             actual=0
             error_msg=""
-            IFS='+' read -ra PATHS <<< "$skills_paths"
-            for spath in "${PATHS[@]}"; do
-              count=$(count_skills_in_path "$owner_repo" "$ref" "$spath")
+
+            for j in $(seq 0 $((skill_path_count - 1))); do
+              path=$(yq -r ".products[$i].skills[$j].path" products.yml)
+              count=$(count_skills_in_path "$repo" "$ref" "$path")
               if [[ "$count" == ERR:* ]]; then
                 error_msg="${count#ERR:}"
                 break
@@ -77,15 +74,22 @@ jobs:
               actual=$((actual + count))
             done
 
+            # Read expected count from README table
+            # Match: | **Product Name** | description | COUNT | link |
+            expected=$(grep -oP "\*\*${name}\*\*[^|]*\|[^|]*\|\s*\K[0-9]+" README.md 2>/dev/null || echo "?")
+
             if [ -n "$error_msg" ]; then
-              REPORT+="| $label | $expected | ERROR | :x: ${error_msg} |\n"
-              echo "::error::${label}: ${error_msg}"
+              REPORT+="| $name | $expected | ERROR | :x: ${error_msg} |\n"
+              echo "::error::${name}: ${error_msg}"
+              DRIFTED=1
+            elif [ "$expected" = "?" ]; then
+              REPORT+="| $name | MISSING | $actual | :warning: Not in README |\n"
               DRIFTED=1
             elif [ "$actual" -eq "$expected" ]; then
-              REPORT+="| $label | $expected | $actual | :white_check_mark: |\n"
+              REPORT+="| $name | $expected | $actual | :white_check_mark: |\n"
             else
-              REPORT+="| $label | $expected | $actual | :warning: DRIFT |\n"
-              UPDATES["$label"]="$expected:$actual"
+              REPORT+="| $name | $expected | $actual | :warning: DRIFT |\n"
+              UPDATES["$name"]="$expected:$actual"
               DRIFTED=1
             fi
           done

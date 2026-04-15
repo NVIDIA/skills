@@ -2,13 +2,11 @@
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 #
 # Sync skills from product repos into the nvidia/skills catalog.
-# Runs on a schedule (twice daily) and can be triggered manually.
-# Each product block sparse-checkouts only the skills/ directory,
-# then copies those skills into the catalog tree.
+# Reads product definitions from products.yml — teams onboard by
+# adding an entry there, not by editing this workflow.
 #
 # Requires a PAT (SKILLS_SYNC_PAT) with read access to all product
-# repos, stored as a repository secret. The default GITHUB_TOKEN
-# only has access to this repo and will 403 on private product repos.
+# repos, stored as a repository secret.
 
 name: Sync Skills from Product Repos
 
@@ -36,224 +34,62 @@ jobs:
         with:
           ref: main
 
-      - name: Initialize sync log
-        run: truncate -s 0 /tmp/synced-products.txt
-
-      # ── cuOpt ──────────────────────────────────────────────
-      - name: Checkout cuOpt
-        continue-on-error: true
-        uses: actions/checkout@v4
-        with:
-          repository: NVIDIA/cuopt
-          ref: main
-          path: .tmp/cuopt
-          token: ${{ secrets.SKILLS_SYNC_PAT }}
-          sparse-checkout: |
-            skills/
-
-      - name: Copy cuOpt skills into catalog
+      - name: Sync skills from product repos
+        env:
+          GH_TOKEN: ${{ secrets.SKILLS_SYNC_PAT }}
         run: |
-          if [ -d ".tmp/cuopt/skills" ] && [ -n "$(ls -A .tmp/cuopt/skills)" ]; then
-            mkdir -p skills/cuopt
-            rsync -a --delete .tmp/cuopt/skills/ skills/cuopt/
-            echo "- cuOpt" >> /tmp/synced-products.txt
-          else
-            echo "⚠ cuopt checkout empty or missing — skipping to preserve existing catalog"
-          fi
+          set -euo pipefail
+          truncate -s 0 /tmp/synced-products.txt
 
-      # ── TensorRT-LLM ──────────────────────────────────────
-      - name: Checkout TensorRT-LLM
-        continue-on-error: true
-        uses: actions/checkout@v4
-        with:
-          repository: NVIDIA/TensorRT-LLM
-          ref: main
-          path: .tmp/TensorRT-LLM
-          token: ${{ secrets.SKILLS_SYNC_PAT }}
-          sparse-checkout: |
-            .claude/skills/
+          product_count=$(yq '.products | length' products.yml)
 
-      - name: Copy TensorRT-LLM skills into catalog
-        run: |
-          if [ -d ".tmp/TensorRT-LLM/.claude/skills" ] && [ -n "$(ls -A .tmp/TensorRT-LLM/.claude/skills)" ]; then
-            mkdir -p skills/TensorRT-LLM
-            rsync -a --delete .tmp/TensorRT-LLM/.claude/skills/ skills/TensorRT-LLM/
-            echo "- TensorRT-LLM" >> /tmp/synced-products.txt
-          else
-            echo "⚠ TensorRT-LLM checkout empty or missing — skipping to preserve existing catalog"
-          fi
+          for i in $(seq 0 $((product_count - 1))); do
+            name=$(yq -r ".products[$i].name" products.yml)
+            repo=$(yq -r ".products[$i].repo" products.yml)
+            ref=$(yq -r ".products[$i].ref // \"main\"" products.yml)
 
-      # ── Model-Optimizer ────────────────────────────────────
-      - name: Checkout Model-Optimizer
-        continue-on-error: true
-        uses: actions/checkout@v4
-        with:
-          repository: NVIDIA/Model-Optimizer
-          ref: main
-          path: .tmp/Model-Optimizer
-          token: ${{ secrets.SKILLS_SYNC_PAT }}
-          sparse-checkout: |
-            .claude/skills/
+            echo "── $name ──"
 
-      - name: Copy Model-Optimizer skills into catalog
-        run: |
-          if [ -d ".tmp/Model-Optimizer/.claude/skills" ] && [ -n "$(ls -A .tmp/Model-Optimizer/.claude/skills)" ]; then
-            mkdir -p skills/Model-Optimizer
-            rsync -a --delete .tmp/Model-Optimizer/.claude/skills/ skills/Model-Optimizer/
-            echo "- Model-Optimizer" >> /tmp/synced-products.txt
-          else
-            echo "⚠ Model-Optimizer checkout empty or missing — skipping to preserve existing catalog"
-          fi
+            # Clone with sparse checkout
+            tmp_dir=".tmp/$(echo "$repo" | tr '/' '-')"
+            if ! git clone --depth 1 --filter=blob:none --sparse \
+                   "https://x-access-token:${GH_TOKEN}@github.com/${repo}.git" \
+                   "$tmp_dir" -b "$ref" 2>/dev/null; then
+              echo "  ⚠ Clone failed for $repo — skipping"
+              continue
+            fi
 
-      # ── CUDA-Q ───────────────────────────────────────────────
-      - name: Checkout CUDA-Q
-        continue-on-error: true
-        uses: actions/checkout@v4
-        with:
-          repository: NVIDIA/cuda-quantum
-          ref: main
-          path: .tmp/cuda-quantum
-          token: ${{ secrets.SKILLS_SYNC_PAT }}
-          sparse-checkout: |
-            .claude/skills/
+            # Collect all skill paths for sparse checkout
+            skill_count=$(yq -r ".products[$i].skills | length" products.yml)
+            sparse_paths=""
+            for j in $(seq 0 $((skill_count - 1))); do
+              path=$(yq -r ".products[$i].skills[$j].path" products.yml)
+              sparse_paths="$sparse_paths $path"
+            done
+            (cd "$tmp_dir" && git sparse-checkout set $sparse_paths 2>/dev/null) || true
 
-      - name: Copy CUDA-Q skills into catalog
-        run: |
-          if [ -d ".tmp/cuda-quantum/.claude/skills" ] && [ -n "$(ls -A .tmp/cuda-quantum/.claude/skills)" ]; then
-            mkdir -p skills/CUDA-Q
-            rsync -a --delete .tmp/cuda-quantum/.claude/skills/ skills/CUDA-Q/
-            echo "- CUDA-Q" >> /tmp/synced-products.txt
-          else
-            echo "⚠ CUDA-Q checkout empty or missing — skipping to preserve existing catalog"
-          fi
+            # Copy each skill path to its catalog directory
+            synced=false
+            for j in $(seq 0 $((skill_count - 1))); do
+              path=$(yq -r ".products[$i].skills[$j].path" products.yml)
+              catalog_dir=$(yq -r ".products[$i].skills[$j].catalog_dir" products.yml)
+              src="$tmp_dir/$path"
 
-      # ── Megatron-Core ──────────────────────────────────────
-      - name: Checkout Megatron-LM
-        continue-on-error: true
-        uses: actions/checkout@v4
-        with:
-          repository: NVIDIA/Megatron-LM
-          ref: main
-          path: .tmp/Megatron-LM
-          token: ${{ secrets.SKILLS_SYNC_PAT }}
-          sparse-checkout: |
-            .claude/skills/
+              if [ -d "$src" ] && [ -n "$(ls -A "$src" 2>/dev/null)" ]; then
+                mkdir -p "skills/$catalog_dir"
+                rsync -a --delete "$src/" "skills/$catalog_dir/"
+                synced=true
+                echo "  ✓ $path → skills/$catalog_dir/"
+              else
+                echo "  ⚠ $path empty or missing — skipping to preserve existing catalog"
+              fi
+            done
 
-      - name: Copy Megatron-Core skills into catalog
-        run: |
-          if [ -d ".tmp/Megatron-LM/.claude/skills" ] && [ -n "$(ls -A .tmp/Megatron-LM/.claude/skills)" ]; then
-            mkdir -p skills/Megatron-Core
-            rsync -a --delete .tmp/Megatron-LM/.claude/skills/ skills/Megatron-Core/
-            echo "- Megatron-Core" >> /tmp/synced-products.txt
-          else
-            echo "⚠ Megatron-Core checkout empty or missing — skipping to preserve existing catalog"
-          fi
+            $synced && echo "- $name" >> /tmp/synced-products.txt
+            echo ""
+          done
 
-      # ── Megatron-Bridge ────────────────────────────────────
-      - name: Checkout Megatron-Bridge
-        continue-on-error: true
-        uses: actions/checkout@v4
-        with:
-          repository: NVIDIA-NeMo/Megatron-Bridge
-          ref: main
-          path: .tmp/Megatron-Bridge
-          token: ${{ secrets.SKILLS_SYNC_PAT }}
-          sparse-checkout: |
-            skills/
-
-      - name: Copy Megatron-Bridge skills into catalog
-        run: |
-          if [ -d ".tmp/Megatron-Bridge/skills" ] && [ -n "$(ls -A .tmp/Megatron-Bridge/skills)" ]; then
-            mkdir -p skills/Megatron-Bridge
-            rsync -a --delete .tmp/Megatron-Bridge/skills/ skills/Megatron-Bridge/
-            echo "- Megatron-Bridge" >> /tmp/synced-products.txt
-          else
-            echo "⚠ Megatron-Bridge checkout empty or missing — skipping to preserve existing catalog"
-          fi
-
-      # ── Nemotron Voice Agent ───────────────────────────────
-      - name: Checkout nemotron-voice-agent
-        continue-on-error: true
-        uses: actions/checkout@v4
-        with:
-          repository: NVIDIA-AI-Blueprints/nemotron-voice-agent
-          ref: main
-          path: .tmp/nemotron-voice-agent
-          token: ${{ secrets.SKILLS_SYNC_PAT }}
-          sparse-checkout: |
-            .agents/skills/
-
-      - name: Copy nemotron-voice-agent skills into catalog
-        run: |
-          if [ -d ".tmp/nemotron-voice-agent/.agents/skills" ] && [ -n "$(ls -A .tmp/nemotron-voice-agent/.agents/skills)" ]; then
-            mkdir -p skills/nemotron-voice-agent
-            rsync -a --delete .tmp/nemotron-voice-agent/.agents/skills/ skills/nemotron-voice-agent/
-            echo "- Nemotron Voice Agent" >> /tmp/synced-products.txt
-          else
-            echo "⚠ nemotron-voice-agent checkout empty or missing — skipping to preserve existing catalog"
-          fi
-
-      # ── NeMo Gym ───────────────────────────────────────────
-      - name: Checkout NeMo Gym
-        continue-on-error: true
-        uses: actions/checkout@v4
-        with:
-          repository: NVIDIA-NeMo/Gym
-          ref: main
-          path: .tmp/NeMo-Gym
-          token: ${{ secrets.SKILLS_SYNC_PAT }}
-          sparse-checkout: |
-            .claude/skills/
-
-      - name: Copy NeMo Gym skills into catalog
-        run: |
-          if [ -d ".tmp/NeMo-Gym/.claude/skills" ] && [ -n "$(ls -A .tmp/NeMo-Gym/.claude/skills)" ]; then
-            mkdir -p skills/NeMo-Gym
-            rsync -a --delete .tmp/NeMo-Gym/.claude/skills/ skills/NeMo-Gym/
-            echo "- NeMo Gym" >> /tmp/synced-products.txt
-          else
-            echo "⚠ NeMo-Gym checkout empty or missing — skipping to preserve existing catalog"
-          fi
-
-      # ── NeMo Evaluator Launcher ─────────────────────────────
-      - name: Checkout NeMo Evaluator
-        continue-on-error: true
-        uses: actions/checkout@v4
-        with:
-          repository: NVIDIA-NeMo/Evaluator
-          ref: main
-          path: .tmp/NeMo-Evaluator
-          token: ${{ secrets.SKILLS_SYNC_PAT }}
-          sparse-checkout: |
-            packages/nemo-evaluator-launcher/.claude/skills/
-            packages/nemo-evaluator/.claude/skills/
-
-      - name: Copy NeMo Evaluator Launcher skills into catalog
-        run: |
-          src=".tmp/NeMo-Evaluator/packages/nemo-evaluator-launcher/.claude/skills"
-          if [ -d "$src" ] && [ -n "$(ls -A "$src")" ]; then
-            mkdir -p skills/NeMo-Evaluator-Launcher
-            rsync -a --delete "$src/" skills/NeMo-Evaluator-Launcher/
-            echo "- NeMo Evaluator Launcher" >> /tmp/synced-products.txt
-          else
-            echo "⚠ NeMo-Evaluator-Launcher checkout empty or missing — skipping to preserve existing catalog"
-          fi
-
-      # ── NeMo Evaluator ────────────────────────────────────
-      - name: Copy NeMo Evaluator skills into catalog
-        run: |
-          src=".tmp/NeMo-Evaluator/packages/nemo-evaluator/.claude/skills"
-          if [ -d "$src" ] && [ -n "$(ls -A "$src")" ]; then
-            mkdir -p skills/NeMo-Evaluator
-            rsync -a --delete "$src/" skills/NeMo-Evaluator/
-            echo "- NeMo Evaluator" >> /tmp/synced-products.txt
-          else
-            echo "⚠ NeMo-Evaluator checkout empty or missing — skipping to preserve existing catalog"
-          fi
-
-      # ── Cleanup and commit ─────────────────────────────────
-      - name: Clean up temp checkouts
-        run: rm -rf .tmp
+          rm -rf .tmp
 
       - name: Fail if nothing synced
         run: |
@@ -265,23 +101,18 @@ jobs:
       - name: Build sync summary
         id: summary
         run: |
-          if [ -s /tmp/synced-products.txt ]; then
-            products=$(cat /tmp/synced-products.txt | tr '\n' ',' | sed 's/- //g;s/,$//')
-            echo "title=chore: sync skills ($products)" >> "$GITHUB_OUTPUT"
-            {
-              echo 'body<<EOFBODY'
-              echo "## Automated skills sync"
-              echo ""
-              echo "Products synced:"
-              cat /tmp/synced-products.txt
-              echo ""
-              echo "Triggered by: \`${{ github.event_name }}\`"
-              echo 'EOFBODY'
-            } >> "$GITHUB_OUTPUT"
-          else
-            echo "title=chore: sync skills from product repos" >> "$GITHUB_OUTPUT"
-            echo "body=Automated sync — no products reported changes." >> "$GITHUB_OUTPUT"
-          fi
+          products=$(cat /tmp/synced-products.txt | tr '\n' ',' | sed 's/- //g;s/,$//')
+          echo "title=chore: sync skills ($products)" >> "$GITHUB_OUTPUT"
+          {
+            echo 'body<<EOFBODY'
+            echo "## Automated skills sync"
+            echo ""
+            echo "Products synced:"
+            cat /tmp/synced-products.txt
+            echo ""
+            echo "Triggered by: \`${{ github.event_name }}\`"
+            echo 'EOFBODY'
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v6
@@ -294,6 +125,7 @@ jobs:
 
       - name: Open issue on failure
         if: failure()
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           script: |
