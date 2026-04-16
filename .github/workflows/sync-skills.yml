@@ -34,12 +34,19 @@ jobs:
         with:
           ref: main
 
+      - name: Verify yq is available
+        run: yq --version
+
       - name: Sync skills from product repos
         env:
           GH_TOKEN: ${{ secrets.SKILLS_SYNC_PAT }}
         run: |
           set -euo pipefail
           truncate -s 0 /tmp/synced-products.txt
+
+          # Configure git to use the token via credential helper
+          # so it never appears in clone URLs or error output
+          git config --global credential.helper '!f() { echo "username=x-access-token"; echo "password=${GH_TOKEN}"; }; f'
 
           product_count=$(yq '.products | length' products.yml)
 
@@ -53,7 +60,7 @@ jobs:
             # Clone with sparse checkout
             tmp_dir=".tmp/$(echo "$repo" | tr '/' '-')"
             if ! git clone --depth 1 --filter=blob:none --sparse \
-                   "https://x-access-token:${GH_TOKEN}@github.com/${repo}.git" \
+                   "https://github.com/${repo}.git" \
                    "$tmp_dir" -b "$ref" 2>/dev/null; then
               echo "  ⚠ Clone failed for $repo — skipping"
               continue
