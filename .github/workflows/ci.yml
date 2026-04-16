@@ -35,7 +35,7 @@ jobs:
             "CUDA-Q|NVIDIA/cuda-quantum|main|.claude/skills|1"
             "cuOpt|NVIDIA/cuopt|main|skills|19"
             "TensorRT-LLM|NVIDIA/TensorRT-LLM|main|.claude/skills|20"
-            "Model-Optimizer|NVIDIA/Model-Optimizer|main|.claude/skills|4"
+            "Model-Optimizer|NVIDIA/Model-Optimizer|main|.claude/skills|5"
             "Megatron-Core|NVIDIA/Megatron-LM|main|.claude/skills|3"
             "Megatron-Bridge|NVIDIA-NeMo/Megatron-Bridge|main|skills|9"
             "Nemotron Voice Agent|NVIDIA-AI-Blueprints/nemotron-voice-agent|main|.agents/skills|1"
