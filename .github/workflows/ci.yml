@@ -19,7 +19,7 @@ jobs:
     outputs:
       drifted: ${{ steps.sync.outputs.drifted }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check skill directories in source repos
         id: sync
@@ -41,6 +41,8 @@ jobs:
             "Nemotron Voice Agent|NVIDIA-AI-Blueprints/nemotron-voice-agent|main|.agents/skills|1"
             "NeMo Gym|NVIDIA-NeMo/Gym|main|.claude/skills|1"
             "NeMo Evaluator|NVIDIA-NeMo/Evaluator|main|packages/nemo-evaluator-launcher/.claude/skills+packages/nemo-evaluator/.claude/skills|4"
+            "PyTorch|pytorch/pytorch|main|.claude/skills|12"
+            "FlashInfer|flashinfer-ai/flashinfer|main|.claude/skills|3"
           )
 
           REPORT="## Skill Catalog Sync Report\n\n"
@@ -105,7 +107,7 @@ jobs:
 
       - name: Upload sync artifacts
         if: steps.sync.outputs.drifted == '1'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: sync-data
           path: |
@@ -125,10 +127,10 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Download sync artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: sync-data
           path: /tmp
@@ -153,7 +155,7 @@ jobs:
           git diff README.md
 
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "fix: update skill counts to match source repos"
