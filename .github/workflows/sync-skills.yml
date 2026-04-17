@@ -2,7 +2,7 @@
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 #
 # Sync skills from product repos into the nvidia/skills catalog.
-# Reads product definitions from products.yml — teams onboard by
+# Reads component definitions from components.yml — teams onboard by
 # adding an entry there, not by editing this workflow.
 #
 # Requires a PAT (SKILLS_SYNC_PAT) with read access to all product
@@ -48,12 +48,12 @@ jobs:
           # so it never appears in clone URLs or error output
           git config --global credential.helper '!f() { echo "username=x-access-token"; echo "password=${GH_TOKEN}"; }; f'
 
-          product_count=$(yq '.products | length' products.yml)
+          component_count=$(yq '.components | length' components.yml)
 
-          for i in $(seq 0 $((product_count - 1))); do
-            name=$(yq -r ".products[$i].name" products.yml)
-            repo=$(yq -r ".products[$i].repo" products.yml)
-            ref=$(yq -r ".products[$i].ref // \"main\"" products.yml)
+          for i in $(seq 0 $((component_count - 1))); do
+            name=$(yq -r ".components[$i].name" components.yml)
+            repo=$(yq -r ".components[$i].repo" components.yml)
+            ref=$(yq -r ".components[$i].ref // \"main\"" components.yml)
 
             echo "── $name ──"
 
@@ -67,10 +67,10 @@ jobs:
             fi
 
             # Collect all skill paths for sparse checkout
-            skill_count=$(yq -r ".products[$i].skills | length" products.yml)
+            skill_count=$(yq -r ".components[$i].skills | length" components.yml)
             sparse_paths=""
             for j in $(seq 0 $((skill_count - 1))); do
-              path=$(yq -r ".products[$i].skills[$j].path" products.yml)
+              path=$(yq -r ".components[$i].skills[$j].path" components.yml)
               sparse_paths="$sparse_paths $path"
             done
             (cd "$tmp_dir" && git sparse-checkout set $sparse_paths 2>/dev/null) || true
@@ -78,8 +78,8 @@ jobs:
             # Copy each skill path to its catalog directory
             synced=false
             for j in $(seq 0 $((skill_count - 1))); do
-              path=$(yq -r ".products[$i].skills[$j].path" products.yml)
-              catalog_dir=$(yq -r ".products[$i].skills[$j].catalog_dir" products.yml)
+              path=$(yq -r ".components[$i].skills[$j].path" components.yml)
+              catalog_dir=$(yq -r ".components[$i].skills[$j].catalog_dir" components.yml)
               src="$tmp_dir/$path"
 
               if [ -d "$src" ] && [ -n "$(ls -A "$src" 2>/dev/null)" ]; then
