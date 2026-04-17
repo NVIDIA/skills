@@ -116,3 +116,14 @@ products:
         catalog_dir: NeMo-Evaluator-Launcher
       - path: packages/nemo-evaluator/.claude/skills/
         catalog_dir: NeMo-Evaluator
+
+  - name: TileGym
+    repo: NVIDIA/TileGym
+    description: >-
+      Tile-based GPU programming — adding new kernels, cross-framework
+      conversion, and performance optimization.
+    skills:
+      - path: .claude/skills/
+        catalog_dir: TileGym
+    links:
+      discussions: false
