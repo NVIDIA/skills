@@ -55,7 +55,7 @@ That's it — the skill activates automatically the next time your agent encount
 | **NeMo Gym** | RL training environments — add benchmarks, resources servers, agent wiring, and reward profiling. | 1 | [`NVIDIA-NeMo/Gym/.claude/skills/`](https://github.com/NVIDIA-NeMo/Gym/tree/main/.claude/skills) |
 | **NeMo Evaluator** | LLM evaluation — launch evaluations, access MLflow results, NeMo Evaluator Launcher assistant, and bring-your-own benchmarks. | 4 | [`NVIDIA-NeMo/Evaluator/.claude/skills/`](https://github.com/NVIDIA-NeMo/Evaluator/tree/main/packages/nemo-evaluator-launcher/.claude/skills) ([+1](https://github.com/NVIDIA-NeMo/Evaluator/tree/main/packages/nemo-evaluator/.claude/skills)) |
 | **RAG Blueprint** | RAG pipeline — deploy, configure, troubleshoot, and manage retrieval augmented generation with Docker Compose or Helm. | 1 | [`NVIDIA-AI-Blueprints/rag/skill-source/.agents/skills/`](https://github.com/NVIDIA-AI-Blueprints/rag/tree/main/skill-source/.agents/skills) |
-| **TileGym** | Tile-based GPU programming — adding new kernels, cross-framework conversion, and performance optimization. | 3 | [`NVIDIA/TileGym/.claude/skills/`](https://github.com/NVIDIA/TileGym/tree/main/.claude/skills) |
+| **TileGym** | Tile-based GPU programming — adding new kernels, cross-framework conversion, and performance optimization. | 5 | [`NVIDIA/TileGym/.claude/skills/`](https://github.com/NVIDIA/TileGym/tree/main/.claude/skills) |
 
 ---
 
