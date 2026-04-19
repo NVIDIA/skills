@@ -2,7 +2,7 @@
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 #
 # Sync skills from product repos into the nvidia/skills catalog.
-# Reads product definitions from products.yml — teams onboard by
+# Reads component definitions from components.yml — teams onboard by
 # adding an entry there, not by editing this workflow.
 #
 # Requires a PAT (SKILLS_SYNC_PAT) with read access to all product
@@ -42,18 +42,19 @@ jobs:
           GH_TOKEN: ${{ secrets.SKILLS_SYNC_PAT }}
         run: |
           set -euo pipefail
-          truncate -s 0 /tmp/synced-products.txt
+          truncate -s 0 /tmp/synced-components.txt
+          truncate -s 0 /tmp/failed-components.txt
 
           # Configure git to use the token via credential helper
           # so it never appears in clone URLs or error output
           git config --global credential.helper '!f() { echo "username=x-access-token"; echo "password=${GH_TOKEN}"; }; f'
 
-          product_count=$(yq '.products | length' products.yml)
+          component_count=$(yq '.components | length' components.yml)
 
-          for i in $(seq 0 $((product_count - 1))); do
-            name=$(yq -r ".products[$i].name" products.yml)
-            repo=$(yq -r ".products[$i].repo" products.yml)
-            ref=$(yq -r ".products[$i].ref // \"main\"" products.yml)
+          for i in $(seq 0 $((component_count - 1))); do
+            name=$(yq -r ".components[$i].name" components.yml)
+            repo=$(yq -r ".components[$i].repo" components.yml)
+            ref=$(yq -r ".components[$i].ref // \"main\"" components.yml)
 
             echo "── $name ──"
 
@@ -63,14 +64,15 @@ jobs:
                    "https://github.com/${repo}.git" \
                    "$tmp_dir" -b "$ref" 2>/dev/null; then
               echo "  ⚠ Clone failed for $repo — skipping"
+              echo "- **$name** ($repo): clone failed" >> /tmp/failed-components.txt
               continue
             fi
 
             # Collect all skill paths for sparse checkout
-            skill_count=$(yq -r ".products[$i].skills | length" products.yml)
+            skill_count=$(yq -r ".components[$i].skills | length" components.yml)
             sparse_paths=""
             for j in $(seq 0 $((skill_count - 1))); do
-              path=$(yq -r ".products[$i].skills[$j].path" products.yml)
+              path=$(yq -r ".components[$i].skills[$j].path" components.yml)
               sparse_paths="$sparse_paths $path"
             done
             (cd "$tmp_dir" && git sparse-checkout set $sparse_paths 2>/dev/null) || true
@@ -78,8 +80,8 @@ jobs:
             # Copy each skill path to its catalog directory
             synced=false
             for j in $(seq 0 $((skill_count - 1))); do
-              path=$(yq -r ".products[$i].skills[$j].path" products.yml)
-              catalog_dir=$(yq -r ".products[$i].skills[$j].catalog_dir" products.yml)
+              path=$(yq -r ".components[$i].skills[$j].path" components.yml)
+              catalog_dir=$(yq -r ".components[$i].skills[$j].catalog_dir" components.yml)
               src="$tmp_dir/$path"
 
               if [ -d "$src" ] && [ -n "$(ls -A "$src" 2>/dev/null)" ]; then
@@ -89,10 +91,11 @@ jobs:
                 echo "  ✓ $path → skills/$catalog_dir/"
               else
                 echo "  ⚠ $path empty or missing — skipping to preserve existing catalog"
+                echo "- **$name** ($repo): \`$path\` empty or missing" >> /tmp/failed-components.txt
               fi
             done
 
-            $synced && echo "- $name" >> /tmp/synced-products.txt
+            $synced && echo "- $name" >> /tmp/synced-components.txt
             echo ""
           done
 
@@ -100,26 +103,38 @@ jobs:
 
       - name: Fail if nothing synced
         run: |
-          if [ ! -s /tmp/synced-products.txt ]; then
-            echo "::error::All product checkouts failed — no skills were synced"
+          if [ ! -s /tmp/synced-components.txt ]; then
+            echo "::error::All component checkouts failed — no skills were synced"
             exit 1
           fi
 
       - name: Build sync summary
         id: summary
         run: |
-          products=$(cat /tmp/synced-products.txt | tr '\n' ',' | sed 's/- //g;s/,$//')
-          echo "title=chore: sync skills ($products)" >> "$GITHUB_OUTPUT"
+          synced=$(cat /tmp/synced-components.txt | tr '\n' ',' | sed 's/- //g;s/,$//')
+          echo "title=chore: sync skills ($synced)" >> "$GITHUB_OUTPUT"
           {
             echo 'body<<EOFBODY'
             echo "## Automated skills sync"
             echo ""
-            echo "Products synced:"
-            cat /tmp/synced-products.txt
+            echo "**Components synced:**"
+            cat /tmp/synced-components.txt
+            if [ -s /tmp/failed-components.txt ]; then
+              echo ""
+              echo "**Components that failed to sync:**"
+              cat /tmp/failed-components.txt
+            fi
             echo ""
             echo "Triggered by: \`${{ github.event_name }}\`"
             echo 'EOFBODY'
           } >> "$GITHUB_OUTPUT"
+
+          # Surface failed count for downstream steps
+          if [ -s /tmp/failed-components.txt ]; then
+            echo "has_failures=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_failures=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v6
@@ -130,7 +145,35 @@ jobs:
           body: ${{ steps.summary.outputs.body }}
           delete-branch: true
 
-      - name: Open issue on failure
+      - name: Open issue for failed components
+        if: steps.summary.outputs.has_failures == 'true'
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const failed = fs.readFileSync('/tmp/failed-components.txt', 'utf8').trim();
+            const title = `Skills sync: some components failed — ${new Date().toISOString().slice(0, 10)}`;
+            const body = [
+              `The [sync-skills workflow](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) completed but some components failed to sync.`,
+              ``,
+              `**Failed components:**`,
+              failed,
+              ``,
+              `**Run:** ${context.runId}`,
+              `**Trigger:** \`${context.eventName}\``,
+              ``,
+              `This usually means the skill path in \`components.yml\` doesn't match the actual directory in the source repo (e.g. symlink, renamed, or removed).`
+            ].join('\n');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['sync-failure']
+            });
+
+      - name: Open issue on total failure
         if: failure()
         continue-on-error: true
         uses: actions/github-script@v7
