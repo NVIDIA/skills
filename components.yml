@@ -1,13 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 #
-# Product catalog — single source of truth for NVIDIA Agent Skills.
+# Component catalog — single source of truth for NVIDIA Agent Skills.
 #
-# To onboard a new product:
+# To onboard a new component:
 #   1. Add an entry to this file following the pattern below
 #   2. Open a pull request — that's it!
 #
-# The sync and CI workflows read this file automatically.
+# The sync workflow reads this file automatically.
 #
 # Required fields:
 #   name          Display name shown in the README
@@ -24,7 +24,7 @@
 #     discussions   Set to false if repo has no Discussions tab
 #     security      Set to false if repo has no SECURITY.md
 
-products:
+components:
   - name: CUDA-Q
     repo: NVIDIA/cuda-quantum
     description: >-
@@ -72,7 +72,7 @@ products:
       Large-scale distributed training — model parallelism, pipeline
       parallelism, and mixed precision.
     skills:
-      - path: .claude/skills/
+      - path: skills/
         catalog_dir: Megatron-Core
     links:
       security: false
