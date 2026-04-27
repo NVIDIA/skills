@@ -116,3 +116,13 @@ components:
         catalog_dir: NeMo-Evaluator-Launcher
       - path: packages/nemo-evaluator/.claude/skills/
         catalog_dir: NeMo-Evaluator
+
+  - name: NemoClaw
+    repo: NVIDIA/NemoClaw
+    description: >-
+      Secure agent sandboxing — run OpenClaw inside NVIDIA OpenShell with
+      managed inference, policy management, remote deployment, sandbox
+      monitoring, and contributor/maintainer workflows.
+    skills:
+      - path: .agents/skills/
+        catalog_dir: NemoClaw
