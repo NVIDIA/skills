@@ -45,6 +45,7 @@ jobs:
           truncate -s 0 /tmp/rsynced-components.txt
           truncate -s 0 /tmp/changed-components.txt
           truncate -s 0 /tmp/failed-components.txt
+          truncate -s 0 /tmp/sync-versions.txt
 
           # Configure git to use the token via credential helper
           # so it never appears in clone URLs or error output
@@ -68,6 +69,13 @@ jobs:
               echo "- **$name** ($repo): clone failed" >> /tmp/failed-components.txt
               continue
             fi
+
+            # Capture upstream HEAD info for the README Version column
+            upstream_sha=$(git -C "$tmp_dir" rev-parse HEAD)
+            upstream_short_sha=$(git -C "$tmp_dir" rev-parse --short HEAD)
+            upstream_date=$(git -C "$tmp_dir" show -s --format=%cs HEAD)
+            slug=$(echo "$name" | tr 'A-Z ' 'a-z-')
+            echo "$slug|$upstream_short_sha|$upstream_sha|$upstream_date|$repo" >> /tmp/sync-versions.txt
 
             # Collect all skill paths for sparse checkout
             skill_count=$(yq -r ".components[$i].skills | length" components.yml)
