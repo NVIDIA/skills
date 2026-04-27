@@ -42,7 +42,8 @@ jobs:
           GH_TOKEN: ${{ secrets.SKILLS_SYNC_PAT }}
         run: |
           set -euo pipefail
-          truncate -s 0 /tmp/synced-components.txt
+          truncate -s 0 /tmp/rsynced-components.txt
+          truncate -s 0 /tmp/changed-components.txt
           truncate -s 0 /tmp/failed-components.txt
 
           # Configure git to use the token via credential helper
@@ -95,7 +96,20 @@ jobs:
               fi
             done
 
-            $synced && echo "- $name" >> /tmp/synced-components.txt
+            # Record successful rsync (used by the "fail if nothing synced"
+            # health check) separately from actual content changes (used
+            # for the PR title and body) — a component can rsync cleanly
+            # yet have no diff when upstream is unchanged.
+            if $synced; then
+              echo "- $name" >> /tmp/rsynced-components.txt
+              for j in $(seq 0 $((skill_count - 1))); do
+                catalog_dir=$(yq -r ".components[$i].skills[$j].catalog_dir" components.yml)
+                if [ -n "$(git status --porcelain "skills/$catalog_dir" 2>/dev/null)" ]; then
+                  echo "- $name" >> /tmp/changed-components.txt
+                  break
+                fi
+              done
+            fi
             echo ""
           done
 
@@ -103,7 +117,7 @@ jobs:
 
       - name: Fail if nothing synced
         run: |
-          if [ ! -s /tmp/synced-components.txt ]; then
+          if [ ! -s /tmp/rsynced-components.txt ]; then
             echo "::error::All component checkouts failed — no skills were synced"
             exit 1
           fi
@@ -111,14 +125,29 @@ jobs:
       - name: Build sync summary
         id: summary
         run: |
-          synced=$(cat /tmp/synced-components.txt | tr '\n' ',' | sed 's/- //g;s/,$//')
-          echo "title=chore: sync skills ($synced)" >> "$GITHUB_OUTPUT"
+          # Surface failure count regardless of whether anything changed —
+          # a quiet sync can still have a misconfigured component to flag.
+          if [ -s /tmp/failed-components.txt ]; then
+            echo "has_failures=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_failures=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ ! -s /tmp/changed-components.txt ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::All components synced; no upstream content changes detected"
+            exit 0
+          fi
+          echo "has_changes=true" >> "$GITHUB_OUTPUT"
+
+          changed=$(cat /tmp/changed-components.txt | tr '\n' ',' | sed 's/- //g;s/,$//')
+          echo "title=chore: sync skills ($changed)" >> "$GITHUB_OUTPUT"
           {
             echo 'body<<EOFBODY'
             echo "## Automated skills sync"
             echo ""
-            echo "**Components synced:**"
-            cat /tmp/synced-components.txt
+            echo "**Components updated:**"
+            cat /tmp/changed-components.txt
             if [ -s /tmp/failed-components.txt ]; then
               echo ""
               echo "**Components that failed to sync:**"
@@ -129,14 +158,8 @@ jobs:
             echo 'EOFBODY'
           } >> "$GITHUB_OUTPUT"
 
-          # Surface failed count for downstream steps
-          if [ -s /tmp/failed-components.txt ]; then
-            echo "has_failures=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_failures=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Create pull request
+        if: steps.summary.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           commit-message: ${{ steps.summary.outputs.title }}
