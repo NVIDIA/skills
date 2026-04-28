@@ -24,17 +24,17 @@ config, adjust parallelism, and avoid common pitfalls.
 
 ```bash
 # Pretrain with mock data
-uv run torchrun --nproc_per_node=8 scripts/training/run_recipe.py \
+uv run python -m torch.distributed.run --nproc_per_node=8 scripts/training/run_recipe.py \
     --recipe <recipe_function_name> \
     --dataset llm-pretrain-mock
 
 # SFT with SQuAD
-uv run torchrun --nproc_per_node=8 scripts/training/run_recipe.py \
+uv run python -m torch.distributed.run --nproc_per_node=8 scripts/training/run_recipe.py \
     --recipe <recipe_function_name> \
     --dataset llm-finetune
 
 # Override any field via CLI
-uv run torchrun --nproc_per_node=8 scripts/training/run_recipe.py \
+uv run python -m torch.distributed.run --nproc_per_node=8 scripts/training/run_recipe.py \
     --recipe llama3_8b_pretrain_config \
     --dataset llm-pretrain-mock \
     'model.tensor_model_parallel_size=2' \
@@ -355,25 +355,25 @@ When the user's GPU count differs from the recipe default:
 
 ```bash
 # Scale Llama3 8B from 2 GPUs to 8 GPUs (increase DP)
-uv run torchrun --nproc_per_node=8 scripts/training/run_recipe.py \
+uv run python -m torch.distributed.run --nproc_per_node=8 scripts/training/run_recipe.py \
     --recipe llama3_8b_pretrain_config \
     --dataset llm-pretrain-mock
 
 # Reduce parallelism for Qwen3-MoE 30B to fit on 4 GPUs
-uv run torchrun --nproc_per_node=4 scripts/training/run_recipe.py \
+uv run python -m torch.distributed.run --nproc_per_node=4 scripts/training/run_recipe.py \
     --recipe qwen3_30b_a3b_sft_config \
     --dataset llm-finetune \
     'model.expert_model_parallel_size=4'
 
 # Add long context to an existing recipe
-uv run torchrun --nproc_per_node=8 scripts/training/run_recipe.py \
+uv run python -m torch.distributed.run --nproc_per_node=8 scripts/training/run_recipe.py \
     --recipe llama3_8b_pretrain_config \
     --dataset llm-pretrain-mock \
     'model.seq_length=32768' \
     'model.context_parallel_size=4'
 
 # Enable CUDA graphs on any recipe
-uv run torchrun --nproc_per_node=8 scripts/training/run_recipe.py \
+uv run python -m torch.distributed.run --nproc_per_node=8 scripts/training/run_recipe.py \
     --recipe qwen3_30b_a3b_pretrain_config \
     --dataset llm-pretrain-mock \
     'model.cuda_graph_impl=transformer_engine' \

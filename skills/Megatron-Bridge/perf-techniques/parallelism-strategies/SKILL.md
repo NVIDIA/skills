@@ -129,8 +129,57 @@ cfg.model.sequence_parallel = True
 DP size is always implicit:
 
 ```
-data_parallel_size = world_size / (TP * PP * CP)
+data_parallel_size = world_size / (TP * PP * CP)        # dense path
+expert_data_parallel_size = world_size / (PP * EP * ETP) # MoE path
 ```
+
+## Minimum GPU Count
+
+The **minimum** GPUs needed to run a config (i.e. with `DP=1`, `EDP=1`)
+is **not** the product of all parallelism dimensions. The dense path uses
+a `TP*CP`-mesh and the MoE path uses an `EP*ETP`-mesh, and within each PP
+stage these two meshes share the same set of GPUs — they overlap, they
+don't multiply. Only PP stages multiply (they're disjoint slices of the
+model). So:
+
+```
+min_gpus = PP * max(TP * CP, EP * ETP)
+```
+
+**Common simplification (WRONG):** `PP * TP * CP * EP * ETP`. This
+over-allocates GPUs and shows up in many READMEs and slurm sizing tables.
+Don't propagate it.
+
+The decoupling of attention and MoE parallelism (different mesh shapes
+for the dense and expert paths sharing the same PP-stage GPUs) is
+detailed in
+[Pangu Ultra MoE (arXiv:2504.14960)](https://arxiv.org/pdf/2504.14960).
+
+### Examples
+
+| Config | Wrong (PP·TP·CP·EP·ETP) | Correct (PP·max(TP·CP, EP·ETP)) |
+|---|---|---|
+| PP=1, TP=2, CP=1, EP=8, ETP=1 | 16 | **8** (1 node) |
+| PP=1, TP=4, CP=1, EP=8, ETP=1 | 32 | **8** (max(4, 8)) |
+| PP=1, TP=2, CP=2, EP=8, ETP=1 | 32 | **8** (max(4, 8)) |
+| PP=1, TP=2, CP=4, EP=8, ETP=1 | 64 | **8** (max(8, 8)) |
+| PP=2, TP=2, CP=1, EP=8, ETP=1 | 32 | **16** (2 · max(2, 8)) |
+| PP=1, TP=2, CP=1, EP=4, ETP=2 | 16 | **8** (max(2, 8)) |
+
+### Scaling above the minimum
+
+Adding GPUs scales `DP` and/or `EDP` (the `world_size` must satisfy
+both equations simultaneously). At `min_gpus` the larger-mesh side has
+DP (or EDP) = 1 and the smaller side absorbs the slack.
+
+Example — TP=2, CP=1, EP=8, ETP=1, PP=1:
+
+- **8 GPUs** (`min_gpus`): dense `DP = 8/2 = 4`, MoE `EDP = 8/8 = 1`
+- **16 GPUs**: dense `DP = 8`, MoE `EDP = 2` → 2× global batch
+- **32 GPUs**: dense `DP = 16`, MoE `EDP = 4` → 4× global batch
+
+When sizing slurm scripts, compute `--nodes` from `min_gpus` (or a
+multiple of it for higher throughput via DP/EDP).
 
 ## Memory Estimation
 
@@ -206,6 +255,11 @@ parallel_state.initialize_model_parallel(
 
 7. `CUDA_DEVICE_MAX_CONNECTIONS` and related env vars interact with
    overlap settings. See `skills/perf-techniques/tp-dp-comm-overlap/SKILL.md`.
+
+8. The minimum GPU count for an MoE config is `PP * max(TP*CP, EP*ETP)`,
+   not the product of all dimensions. The dense `TP*CP`-mesh and MoE
+   `EP*ETP`-mesh share the same GPUs in each PP stage. See
+   "Minimum GPU Count" section above.
 
 ## Verification
 

@@ -212,7 +212,6 @@ model_config = GPTModelProvider(
 
 ## Known Limitations
 
-- `expandable_segments:True` is incompatible with NCCL user-buffer registration
 - CPU offloading is blocked when PP > 1
 - Parallelism resizing (TP/PP) often has significant throughput costs
 - No automatic memory profiling to recommend the optimal strategy
