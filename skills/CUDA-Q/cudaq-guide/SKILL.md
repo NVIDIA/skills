@@ -3,13 +3,13 @@ name: "cudaq-guide"
 title: "Cuda Quantum"
 description: "CUDA-Q onboarding guide for installation, test programs, GPU simulation, QPU hardware, and quantum applications."
 version: "1.0.0"
-author: "Sachin Pisal <spisal@nvidia.com>"
+author: "CUDA-Q"
 tags: [cuda-quantum, quantum-computing, onboarding, getting-started, nvidia]
 tools: [Read, Glob, Grep, Bash]
 license: "Apache License 2.0"
 compatibility: "Python 3.10+, C++ 20"
 metadata:
-    author: "Sachin Pisal <spisal@nvidia.com>"
+    author: "CUDA-Q"
     tags:
         - cuda-quantum
         - quantum-computing

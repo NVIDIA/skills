@@ -156,7 +156,9 @@ export PARALLEL_LEVEL=8   # adjust based on available RAM
 ### Build Specific Components
 
 ```bash
+./build.sh --help      # Lists build options
 ./build.sh libcuopt    # C++ library
+./build.sh libmps_parser libcuopt --skip-routing-build --skip-tests-build --skip-c-python-adapters --cache-tool=ccache  # native LP/MIP-focused build without routing/tests/adapters
 ./build.sh cuopt       # Python package
 ./build.sh cuopt_server # Server
 ./build.sh docs        # Documentation
@@ -174,6 +176,22 @@ pytest -v python/cuopt/cuopt/tests
 # Server tests
 pytest -v python/cuopt_server/tests
 ```
+
+<!-- skill-evolution:start — always fetch datasets before running tests -->
+#### Download test datasets before running tests
+
+cuOpt tests depend on MPS/data files that are not checked into the repo. A
+missing dataset surfaces as a `MPS_PARSER_ERROR ... Error opening MPS file`
+test failure at 0ms — it is not a build or logic failure.
+
+Before running any C++ or Python tests, follow the dataset download and
+`RAPIDS_DATASET_ROOT_DIR` export steps in the repo's `CONTRIBUTING.md`
+("Building for development" section) — that is the canonical list and mapping.
+
+If a test fails with a missing-file error, run the matching download step from
+`CONTRIBUTING.md` and re-run the test. Do not report missing-dataset failures
+back to the user as the task outcome.
+<!-- skill-evolution:end -->
 
 ## Python Bindings
 
