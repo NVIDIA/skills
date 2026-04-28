@@ -41,7 +41,7 @@ This appends `Signed-off-by: Your Name <your@email.com>` to the commit. Unsigned
 If you forgot to sign off (existing commits without the trailer), retroactively sign all commits in your branch with:
 
 ```bash
-git rebase --signoff origin/main && git push -f
+git rebase --signoff origin/main && git push --force-with-lease
 ```
 
 See the full [Developer Certificate of Origin](https://developercertificate.org/) for details.

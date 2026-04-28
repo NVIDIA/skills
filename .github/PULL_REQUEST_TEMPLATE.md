@@ -29,7 +29,7 @@ By submitting this PR, I confirm on behalf of my team:
 ## All PRs
 
 - [ ] All commits signed off with DCO (`git commit -s`).
-      If you forgot, run `git rebase --signoff origin/main && git push -f` to retroactively sign all commits in your branch.
+      If you forgot, run `git rebase --signoff origin/main && git push --force-with-lease` to retroactively sign all commits in your branch.
 
 ## Other context (for non-onboarding PRs)
 
