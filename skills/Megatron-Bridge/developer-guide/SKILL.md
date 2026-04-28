@@ -1,6 +1,6 @@
 ---
 name: developer-guide
-description: Developer environment setup, CI/CD workflows, and CI failure debugging for Megatron Bridge. Covers container-based development, uv package management, pre-commit hooks, running tests, CI failure investigation, and common pitfalls. Use when onboarding, setting up a dev environment, troubleshooting build issues, investigating CI failures, or dealing with lockfile issues (corrupted, regenerating, or updating uv.lock).
+description: Developer environment setup, CI/CD workflows, and CI failure debugging for Megatron Bridge. Covers container-based development, uv package management, pre-commit hooks, running unit tests, CI failure investigation, and common pitfalls. Use when onboarding, setting up a dev environment, troubleshooting build issues, investigating CI failures, or dealing with lockfile issues (corrupted, regenerating, or updating uv.lock). For functional test layout, tiers, and flaky handling, see the test-system skill.
 ---
 
 # Developer Guide
@@ -277,32 +277,16 @@ docker run --rm --gpus all -v $(pwd):/workdir/ -w /workdir/ megatron-bridge \
 
 ### Functional Tests
 
-Functional tests require GPUs and are typically run inside the container:
-
-```bash
-uv run pytest tests/functional_tests/ -x -v
-```
-
-Longer functional tests use `L2_Launch_*.sh` launcher scripts in
-`tests/functional_tests/`. Each launcher must be registered in
-`.github/workflows/cicd-main.yml` under `matrix.include` to be picked up
-by CI.
+Functional tests require GPUs and are run via shell launch scripts under
+`tests/functional_tests/launch_scripts/`. For directory layout, tier semantics
+(L0/L1/L2/flaky), script conventions, and how to add or move tests, see the
+`test-system` skill.
 
 ### Adding a Unit Test
 
 1. Place it under `tests/unit_tests/<domain>/test_<name>.py`.
 2. Use the appropriate pytest marker: `@pytest.mark.unit`.
 3. Run locally: `uv run --no-sync --active pytest tests/unit_tests/<your_test>.py`
-
-### Adding a Functional Test
-
-1. Create a launch script under `tests/functional_tests/launch_scripts/active/`.
-2. Follow the naming convention: `L0_Launch_<area>_<desc>.sh`, `L1_Launch_...`, or `L2_Launch_...`.
-3. Tier guidance:
-   - **L0** — smoke tests that run on every PR; must be fast and stable.
-   - **L1** — broader coverage; runs nightly.
-   - **L2** — heavy tests (large models, checkpoint conversion); runs on schedule or manual trigger.
-4. Apply the `needs-more-tests` PR label to trigger L0 + L1 for a PR.
 
 ---
 

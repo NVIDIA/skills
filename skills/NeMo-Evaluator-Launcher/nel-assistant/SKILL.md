@@ -198,6 +198,15 @@ deployment:
     pipeline_parallel_size: 2
 ```
 
+**Multi-node performance tips**
+
+- For multi-node deployments, add `switches: 1` to `execution.sbatch_extra_flags` to instruct SLURM to allocate all nodes on the same network switch, reducing inter-node communication latency:
+  ```yaml
+  execution:
+    sbatch_extra_flags:
+      switches: 1
+  ```
+
 **Common Confusions**
 
 - **`num_instances`** controls independent deployment instances with HAProxy. **`data_parallel_size`** controls DP replicas *within* a single instance.
@@ -236,6 +245,15 @@ export NEMO_EVALUATOR_TRUST_PRE_CMD=1
    ```
    nel run --config <config_path> -o ++evaluation.nemo_evaluator_config.config.params.limit_samples=10
    ```
+   For multi-instance deployments, also scale down to a single instance to validate the deployment faster:
+   ```
+   nel run --config <config_path> \
+     -o execution.num_nodes=1 \
+     -o execution.num_instances=1 \
+     -o evaluation.nemo_evaluator_config.config.params.parallelism=5 \
+     -o ++evaluation.nemo_evaluator_config.config.params.limit_samples=10
+   ```
+   Adjust `num_nodes` to match the number of nodes a single model instance needs (e.g., 2 for a model requiring 2-node Ray TP).
 
 3. **Re-run a single task** (useful for debugging or re-testing after config changes):
    ```
