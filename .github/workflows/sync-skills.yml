@@ -130,19 +130,8 @@ jobs:
             exit 1
           fi
 
-      - name: Update README version markers
-        run: |
-          set -euo pipefail
-          if [ ! -s /tmp/sync-versions.txt ]; then
-            echo "No version data captured — skipping README update"
-            exit 0
-          fi
-          while IFS='|' read -r slug short_sha full_sha commit_date repo; do
-            cell="[\`${short_sha}\`](https://github.com/${repo}/commit/${full_sha}) · ${commit_date}"
-            # Sed delimiter is | because URLs contain / and cell content has no |
-            sed -i "s|<!-- sync:${slug}:version -->.*<!-- /sync:${slug}:version -->|<!-- sync:${slug}:version -->${cell}<!-- /sync:${slug}:version -->|" README.md
-          done < /tmp/sync-versions.txt
-          echo "README version markers updated for $(wc -l < /tmp/sync-versions.txt) components"
+      - name: Regenerate README tables
+        run: .github/scripts/regenerate-readme.sh
 
       - name: Build sync summary
         id: summary
