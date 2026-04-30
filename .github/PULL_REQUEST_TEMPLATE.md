@@ -23,7 +23,6 @@ By submitting this PR, I confirm on behalf of my team:
 - [ ] Author confirmations above are checked
 - [ ] `components.yml` entry valid (required fields, unique `catalog_dir`, path exists in source repo)
 - [ ] `SKILL.md` frontmatter spec-compliant (at least one sampled)
-- [ ] README rows added (Available Skills + Getting Help & Contributing)
 - [ ] No new license or third-party dependency requiring OSRB filing
 
 ## All PRs
