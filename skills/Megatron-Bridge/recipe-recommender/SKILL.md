@@ -1,6 +1,7 @@
 ---
 name: recipe-recommender
-description: Recommend and customize Megatron Bridge recipes for a user's model, GPU count, and training goal. Indexes library recipes (pretrain/SFT/PEFT) and performance recipes. Use when the user says "recipe", "recommend recipe", "start recipe", "which recipe", "run training", "how to train <model>", or asks for a starting config.
+description: Recommend and customize Megatron Bridge recipes for a user's model, GPU count, and training goal. Indexes library recipes (pretrain/SFT/PEFT) and performance recipes.
+when_to_use: User wants a starting recipe or training config; 'which recipe', 'recommend recipe', 'how to train Llama', 'starting config for X GPUs', 'what recipe for SFT'.
 ---
 
 # Auto Recipe — Recipe Index & Recommendation

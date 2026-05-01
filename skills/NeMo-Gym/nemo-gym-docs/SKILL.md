@@ -22,7 +22,7 @@ Unified skill for adding, updating, moving, and removing pages on the NeMo Gym F
 ```
 fern/
 ├── fern.config.json          # Org + Fern CLI version (currently 4.80.3)
-├── package.json              # Pins fern-api; `npm ci` then `npm run dev`
+├── package.json              # `npm run dev|check|generate` — wraps `npx -y fern-api@latest`
 ├── docs.yml                  # Site config: instances, versions, tabs, redirects, libraries
 ├── versions/
 │   ├── _nav_order.yml        # Cross-version nav ordering
@@ -181,7 +181,13 @@ The MDX body should still open with `# <Page Title>` matching the frontmatter ti
 
 ## Validate
 
-Run from `fern/` after `npm ci`:
+First-time setup: authenticate the CLI against the `nvidia` Fern org via Google SSO (one-time, browser flow):
+
+```bash
+npx -y fern-api@latest login    # opens browser → sign in with your @nvidia.com Google account
+```
+
+Run from `fern/` (no install step — scripts shell out to `npx -y fern-api@latest`):
 
 ```bash
 npm run check       # `fern check` — YAML + frontmatter validation
@@ -276,7 +282,7 @@ When the user ships a new version (e.g. `v0.3`):
 | `fern/components/` | Custom TSX (CTAButtons, NavButton, CustomFooter) |
 | `fern/assets/` | Shared images, SVGs, favicon |
 | `fern/main.css` | Global theme overrides — NVIDIA green, card/badge spacing |
-| `fern/package.json` | Pins `fern-api`; provides `npm run check|dev|generate|generate:library` |
+| `fern/package.json` | `npm run check|dev|generate|generate:library` — each wraps `npx -y fern-api@latest` |
 | `.github/workflows/fern-docs-*.yml` | CI: check, preview build, preview comment |
 | `.github/workflows/publish-fern-docs.yml` | CI: publish to docs.nvidia.com/nemo/gym |
 | `docs/` | Legacy Sphinx source (read-only reference for badge fidelity) |

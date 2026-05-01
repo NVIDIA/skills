@@ -1,6 +1,7 @@
 ---
 name: mlm-bridge-training
-description: Run Megatron-LM (MLM) and Megatron Bridge training with mock or real data. Covers correlation testing, available recipes, and multi-GPU examples. Use when running training, comparing MLM vs Bridge, or translating configs.
+description: Run Megatron-LM (MLM) and Megatron Bridge training with mock or real data. Covers correlation testing, available recipes, and multi-GPU examples.
+when_to_use: Running training, comparing MLM vs Bridge loss curves, translating MLM CLI args to Bridge config, or investigating why loss curves diverged after a commit; 'how do I run training', 'MLM vs Bridge', 'correlation test'.
 ---
 
 # MLM vs Bridge Training
