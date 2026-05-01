@@ -105,17 +105,17 @@ For issues with **this catalog repo itself** (README, structure, listing a new p
 ```
 NVIDIA/skills/
 ├── skills/                  # All skills, mirrored daily from product repos
-│   ├── CUDA-Q/               # CUDA-Q skills (1)
-│   ├── cuopt/                # cuOpt skills (19)
-│   ├── Megatron-Bridge/      # Megatron-Bridge skills (9)
-│   ├── Megatron-Core/        # Megatron-Core skills (6)
-│   ├── Model-Optimizer/      # Model-Optimizer skills (5)
+│   ├── CUDA-Q/               # CUDA-Q skills
+│   ├── cuopt/                # cuOpt skills
+│   ├── Megatron-Bridge/      # Megatron-Bridge skills
+│   ├── Megatron-Core/        # Megatron-Core skills
+│   ├── Model-Optimizer/      # Model-Optimizer skills
 │   ├── NeMo-Evaluator/       # NeMo Evaluator skills
 │   ├── NeMo-Evaluator-Launcher/
-│   ├── NeMo-Gym/             # NeMo Gym skills (1)
-│   ├── NemoClaw/             # NemoClaw skills (21)
-│   ├── nemotron-voice-agent/ # Nemotron Voice Agent skills (1)
-│   ├── TensorRT-LLM/         # TensorRT-LLM skills (20)
+│   ├── NeMo-Gym/             # NeMo Gym skills 
+│   ├── NemoClaw/             # NemoClaw skills 
+│   ├── nemotron-voice-agent/ # Nemotron Voice Agent skills
+│   ├── TensorRT-LLM/         # TensorRT-LLM skills 
 │   └── ...
 ├── components.d/            # Product registry — one file per component, teams onboard here
 │   ├── cuda-q.yml
