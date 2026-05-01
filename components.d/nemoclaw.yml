@@ -1,0 +1,6 @@
+name: NemoClaw
+repo: NVIDIA/NemoClaw
+description: Secure agent sandboxing — run OpenClaw inside NVIDIA OpenShell with managed inference, policy management, remote deployment, sandbox monitoring, and contributor/maintainer workflows.
+skills:
+  - path: .agents/skills/
+    catalog_dir: NemoClaw

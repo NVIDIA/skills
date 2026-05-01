@@ -1,0 +1,6 @@
+name: cuOpt
+repo: NVIDIA/cuopt
+description: GPU-accelerated optimization — vehicle routing, linear programming, quadratic programming, installation, server deployment, and developer tools.
+skills:
+  - path: skills/
+    catalog_dir: cuopt

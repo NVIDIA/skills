@@ -1,0 +1,8 @@
+name: Model-Optimizer
+repo: NVIDIA/Model-Optimizer
+description: Model optimization — quantization, sparsity, and distillation for efficient inference.
+skills:
+  - path: .claude/skills/
+    catalog_dir: Model-Optimizer
+links:
+  discussions: false

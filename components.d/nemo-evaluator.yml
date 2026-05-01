@@ -1,0 +1,8 @@
+name: NeMo Evaluator
+repo: NVIDIA-NeMo/Evaluator
+description: LLM evaluation — launch evaluations, access MLflow results, NeMo Evaluator Launcher assistant, and bring-your-own benchmarks.
+skills:
+  - path: packages/nemo-evaluator-launcher/.claude/skills/
+    catalog_dir: NeMo-Evaluator-Launcher
+  - path: packages/nemo-evaluator/.claude/skills/
+    catalog_dir: NeMo-Evaluator

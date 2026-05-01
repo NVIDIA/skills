@@ -1,0 +1,6 @@
+name: RAG Blueprint
+repo: NVIDIA-AI-Blueprints/rag
+description: RAG pipeline — deploy, configure, troubleshoot, and manage retrieval augmented generation with Docker Compose or Helm.
+skills:
+  - path: skill-source/.agents/skills/
+    catalog_dir: rag

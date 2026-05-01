@@ -1,0 +1,6 @@
+name: TensorRT-LLM
+repo: NVIDIA/TensorRT-LLM
+description: LLM inference optimization — model onboarding, performance analysis and optimization, kernel writing, CI diagnostics, code contribution, and codebase exploration.
+skills:
+  - path: .claude/skills/
+    catalog_dir: TensorRT-LLM

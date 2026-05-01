@@ -1,0 +1,6 @@
+name: NeMo Gym
+repo: NVIDIA-NeMo/Gym
+description: RL training environments — add benchmarks, resources servers, agent wiring, and reward profiling.
+skills:
+  - path: .claude/skills/
+    catalog_dir: NeMo-Gym
