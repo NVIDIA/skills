@@ -117,7 +117,13 @@ NVIDIA/skills/
 │   ├── nemotron-voice-agent/ # Nemotron Voice Agent skills (1)
 │   ├── TensorRT-LLM/         # TensorRT-LLM skills (20)
 │   └── ...
-├── components.yml           # Product registry — teams onboard here
+├── components.d/            # Product registry — one file per component, teams onboard here
+│   ├── cuda-q.yml
+│   ├── cuopt.yml
+│   ├── megatron-bridge.yml
+│   ├── ...
+│   ├── tensorrt-llm.yml
+│   └── README.md             # Schema and onboarding instructions
 ├── .github/workflows/       # Automated sync pipeline
 ├── CONTRIBUTING.md          # Contribution guidelines
 ├── SECURITY.md              # Security reporting policy
