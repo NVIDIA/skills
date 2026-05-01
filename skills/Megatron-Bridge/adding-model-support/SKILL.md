@@ -138,8 +138,8 @@ directory — keep them namespaced under the `modeling_<model>` prefix.
 3. **Model class** — Combine vision encoder + language decoder.
 
 For detailed patterns, see:
-- VLM: [vlm-patterns.md](vlm-patterns.md)
-- LLM: [llm-patterns.md](llm-patterns.md)
+- VLM: @skills/adding-model-support/vlm-patterns.md
+- LLM: @skills/adding-model-support/llm-patterns.md
 
 ### Critical: `tie_word_embeddings` for VLMs
 
@@ -308,7 +308,7 @@ Each recipe file defines functions for each model size + training mode:
 - `<model>_<size>_peft_config()` — LoRA/DoRA parameter-efficient fine-tuning
 - `<model>_<size>_pretrain_config()` — Pretraining (LLM only, usually)
 
-For detailed recipe patterns, see [recipe-patterns.md](recipe-patterns.md).
+For detailed recipe patterns, see @skills/adding-model-support/recipe-patterns.md.
 
 ### Export checklist
 
@@ -336,7 +336,7 @@ tests/functional_tests/models/<model>/
 └── test_<model>_provider.py    # compare_provider_configs (optional)
 ```
 
-For detailed test patterns, see [tests-and-examples.md](tests-and-examples.md).
+For detailed test patterns, see @skills/adding-model-support/tests-and-examples.md.
 
 ## Phase 5: Docs and Examples
 

@@ -7,7 +7,7 @@ description: Run Megatron-LM (MLM) and Megatron Bridge training with mock or rea
 
 For how they differ, the arg mapping tables, gotchas, and translation script, see:
 
-- `docs/megatron-lm-to-megatron-bridge.md`
+- @docs/megatron-lm-to-megatron-bridge.md
 
 ## Correlation Testing
 
@@ -105,7 +105,7 @@ SFT/PEFT variants use `_sft_config` / `_peft_config` suffix.
 ## Megatron-Core Submodule
 
 For what the submodule is and why two versions exist, see
-`docs/megatron-lm-to-megatron-bridge.md`.
+@docs/megatron-lm-to-megatron-bridge.md.
 
 ### Check current version
 

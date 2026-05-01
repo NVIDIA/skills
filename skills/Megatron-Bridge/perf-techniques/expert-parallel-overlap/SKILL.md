@@ -5,12 +5,12 @@ description: Validate and use MoE expert-parallel communication overlap in Megat
 
 # MoE Expert-Parallel Overlap Skill
 
-Stable docs: `docs/training/communication-overlap.md`
+Stable docs: @docs/training/communication-overlap.md
 Card: `card.yaml` (co-located)
 
 ## References
 
-- Stable docs: `docs/training/communication-overlap.md`
+- Stable docs: @docs/training/communication-overlap.md
 - Structured metadata: `skills/perf-techniques/expert-parallel-overlap/card.yaml`
 
 ## What It Is

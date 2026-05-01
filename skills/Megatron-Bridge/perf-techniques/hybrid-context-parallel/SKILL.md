@@ -7,7 +7,7 @@ description: Operational guide for enabling hierarchical context parallelism in 
 
 For what HCP is, when to use it, and the decision tree (a2a+p2p vs pure a2a vs p2p), see:
 
-- `docs/training/hybrid-context-parallel.md`
+- @docs/training/hybrid-context-parallel.md
 - `card.yaml` (co-located)
 
 ## Enablement

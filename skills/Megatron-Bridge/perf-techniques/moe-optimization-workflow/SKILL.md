@@ -5,7 +5,7 @@ description: Systematic workflow for MoE training optimization in Megatron Bridg
 
 # MoE Training Optimization Workflow
 
-Stable docs: `docs/training/moe-optimization.md`
+Stable docs: @docs/training/moe-optimization.md
 Card: `card.yaml` (co-located)
 Source: [Scalable Training of MoE Models with Megatron Core](https://arxiv.org/abs/2603.07685)
 
@@ -129,9 +129,9 @@ or tightly controlled static-shape experiments.
 
 Related references:
 
-- `skills/perf-techniques/cuda-graphs/SKILL.md`
-- `docs/training/cuda-graphs.md`
-- `docs/training/activation-recomputation.md`
+- @skills/perf-techniques/cuda-graphs/SKILL.md
+- @docs/training/cuda-graphs.md
+- @docs/training/activation-recomputation.md
 
 ## Pitfalls
 

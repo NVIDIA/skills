@@ -53,7 +53,7 @@ docker build \
 ```
 
 This builds the CI image with all dependencies installed via `uv sync --locked`.
-See `docker/README.md` for the full NeMo Framework image stack
+See @docker/README.md for the full NeMo Framework image stack
 (fw-base -> megatron-bridge -> fw-final) and build argument reference.
 
 Key build args:
@@ -299,7 +299,7 @@ Functional tests require GPUs and are run via shell launch scripts under
 - **Trigger CI**: Comment `/ok to test <commit-sha>` on the PR, or set up
   signed commits for automatic CI triggering.
 
-See `CONTRIBUTING.md` for the full PR workflow, area/type labels, and DCO
+See @CONTRIBUTING.md for the full PR workflow, area/type labels, and DCO
 requirements.
 
 ---
