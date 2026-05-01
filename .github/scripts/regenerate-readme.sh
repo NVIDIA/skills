@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Regenerate the README's Available Skills and Getting Help & Contributing
-# tables from components.yml. Used by the sync-skills workflow; can also
+# tables from components.d/*.yml. Used by the sync-skills workflow; can also
 # be run locally to preview the result.
 #
 # Reads:
-#   components.yml          — component catalog (source of truth)
+#   components.d/*.yml      — per-component catalog files (source of truth)
 #   skills/<catalog_dir>/   — to count SKILL.md files per component
 #   /tmp/sync-versions.txt  — optional, populated by the sync workflow with
 #                             upstream short SHA, full SHA, and committer
@@ -22,20 +22,25 @@ cd "$(git rev-parse --show-toplevel)"
 
 VERSIONS_FILE="${VERSIONS_FILE:-/tmp/sync-versions.txt}"
 
-sorted_indices=$(yq -r '.components | to_entries | sort_by(.value.name | downcase) | .[].key' components.yml)
+# Aggregate per-component files into a single config so the existing
+# yq queries can index into a flat .components list.
+CONFIG=/tmp/components.aggregated.yml
+yq ea '[.] | {"components": .}' components.d/*.yml > "$CONFIG"
+
+sorted_indices=$(yq -r '.components | to_entries | sort_by(.value.name | downcase) | .[].key' "$CONFIG")
 
 # Available Skills table
 {
   echo "| Product | Description | Skills | Catalog | Source | Version |"
   echo "|---------|-------------|:------:|---------|--------|---------|"
   for i in $sorted_indices; do
-    name=$(yq -r ".components[$i].name" components.yml)
-    description=$(yq -r ".components[$i].description" components.yml | tr -d '\n' | sed 's/  */ /g; s/^ //; s/ $//')
-    repo=$(yq -r ".components[$i].repo" components.yml)
-    ref=$(yq -r ".components[$i].ref // \"main\"" components.yml)
-    primary_path=$(yq -r ".components[$i].skills[0].path" components.yml)
+    name=$(yq -r ".components[$i].name" "$CONFIG")
+    description=$(yq -r ".components[$i].description" "$CONFIG" | tr -d '\n' | sed 's/  */ /g; s/^ //; s/ $//')
+    repo=$(yq -r ".components[$i].repo" "$CONFIG")
+    ref=$(yq -r ".components[$i].ref // \"main\"" "$CONFIG")
+    primary_path=$(yq -r ".components[$i].skills[0].path" "$CONFIG")
     primary_path=${primary_path%/}
-    primary_catalog=$(yq -r ".components[$i].skills[0].catalog_dir" components.yml)
+    primary_catalog=$(yq -r ".components[$i].skills[0].catalog_dir" "$CONFIG")
 
     skill_count=0
     while read -r catalog_dir; do
@@ -43,7 +48,7 @@ sorted_indices=$(yq -r '.components | to_entries | sort_by(.value.name | downcas
         cnt=$(find "skills/$catalog_dir" -name SKILL.md -type f 2>/dev/null | wc -l | tr -d ' ')
         skill_count=$((skill_count + cnt))
       fi
-    done < <(yq -r ".components[$i].skills[].catalog_dir" components.yml)
+    done < <(yq -r ".components[$i].skills[].catalog_dir" "$CONFIG")
 
     slug=$(echo "$name" | tr 'A-Z ' 'a-z-')
     version_cell="—"
@@ -64,12 +69,12 @@ sorted_indices=$(yq -r '.components | to_entries | sort_by(.value.name | downcas
   echo "| Product | Issues | Discussions | Contributing | Security |"
   echo "|---------|--------|-------------|--------------|----------|"
   for i in $sorted_indices; do
-    name=$(yq -r ".components[$i].name" components.yml)
-    repo=$(yq -r ".components[$i].repo" components.yml)
-    ref=$(yq -r ".components[$i].ref // \"main\"" components.yml)
-    contrib=$(yq -r ".components[$i].links.contributing // \"CONTRIBUTING.md\"" components.yml)
-    discussions=$(yq -r ".components[$i].links.discussions // true" components.yml)
-    security=$(yq -r ".components[$i].links.security // true" components.yml)
+    name=$(yq -r ".components[$i].name" "$CONFIG")
+    repo=$(yq -r ".components[$i].repo" "$CONFIG")
+    ref=$(yq -r ".components[$i].ref // \"main\"" "$CONFIG")
+    contrib=$(yq -r ".components[$i].links.contributing // \"CONTRIBUTING.md\"" "$CONFIG")
+    discussions=$(yq -r ".components[$i].links.discussions // true" "$CONFIG")
+    security=$(yq -r ".components[$i].links.security // true" "$CONFIG")
 
     issues_cell="[Issues](https://github.com/${repo}/issues)"
     if [ "$discussions" = "true" ]; then
