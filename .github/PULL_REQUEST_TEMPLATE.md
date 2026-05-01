@@ -3,7 +3,7 @@
 
 ## Onboarding type
 
-- [ ] New product onboarding (`components.yml` entry)
+- [ ] New product onboarding (new `components.d/<slug>.yml` file)
 - [ ] Other (catalog change, README fix, infrastructure, etc.)
 
 ## For new product onboarding — author affirmations
@@ -14,14 +14,14 @@ By submitting this PR, I confirm on behalf of my team:
 - [ ] **License selected:** Apache 2.0 / CC-BY 4.0 / Dual (Apache 2.0 + CC-BY 4.0). Specify: _____
 - [ ] **No new license or new third-party component** introduced beyond what the source repo already carries
 - [ ] **Source repo is public and under an NVIDIA-owned GitHub org**
-- [ ] `.agents/skills/` or `skills/` path used for new entries (or existing path retained for legacy entries per `components.yml`)
+- [ ] `.agents/skills/` or `skills/` path used for new entries (or existing path retained for legacy entries per `components.d/<slug>.yml`)
 
 > NVIDIA contributors: see the internal onboarding guide for the IP review process details and license selection.
 
 ## Reviewer checklist (OSS Skills PIC)
 
 - [ ] Author confirmations above are checked
-- [ ] `components.yml` entry valid (required fields, unique `catalog_dir`, path exists in source repo)
+- [ ] `components.d/<slug>.yml` entry valid (required fields, unique `catalog_dir`, path exists in source repo, filename slug matches name)
 - [ ] `SKILL.md` frontmatter spec-compliant (at least one sampled)
 - [ ] No new license or third-party dependency requiring OSRB filing
 
