@@ -1,0 +1,8 @@
+name: Megatron-Core
+repo: NVIDIA/Megatron-LM
+description: Large-scale distributed training — model parallelism, pipeline parallelism, and mixed precision.
+skills:
+  - path: skills/
+    catalog_dir: Megatron-Core
+links:
+  security: false

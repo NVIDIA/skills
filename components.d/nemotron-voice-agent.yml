@@ -1,0 +1,6 @@
+name: Nemotron Voice Agent
+repo: NVIDIA-AI-Blueprints/nemotron-voice-agent
+description: Real-time conversational AI — deploy speech-to-speech voice agents on Workstation, Jetson Thor, or Cloud NIMs.
+skills:
+  - path: .agents/skills/
+    catalog_dir: nemotron-voice-agent

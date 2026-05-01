@@ -1,0 +1,8 @@
+name: Megatron-Bridge
+repo: NVIDIA-NeMo/Megatron-Bridge
+description: Bridge between NeMo and Megatron — data processing, model conversion, and training utilities.
+skills:
+  - path: skills/
+    catalog_dir: Megatron-Bridge
+links:
+  security: false
