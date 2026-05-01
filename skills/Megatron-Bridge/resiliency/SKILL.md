@@ -1,12 +1,13 @@
 ---
 name: resiliency
-description: Resiliency features in Megatron Bridge including fault tolerance, straggler detection, in-process restart, preemption, and re-run state machine. Use when the user asks about fault tolerance, straggler detection, hang detection, automatic restart, preemption, in-process restart, checkpoint recovery, or nvidia-resiliency-ext.
+description: Resiliency features in Megatron Bridge including fault tolerance, straggler detection, in-process restart, preemption, and re-run state machine.
+when_to_use: Enabling resiliency features, or investigating a commit that caused training hangs, straggler detection failures, or broken restarts; 'fault tolerance', 'straggler detection', 'hang detection', 'automatic restart', 'in-process restart', 'preemption', 'nvidia-resiliency-ext'.
 ---
 
 # Resiliency
 
 Stable docs: @docs/training/resiliency.md, @docs/training/checkpointing.md
-Card: `card.yaml` (co-located)
+Card: @skills/resiliency/card.yaml
 
 ## Enablement
 
