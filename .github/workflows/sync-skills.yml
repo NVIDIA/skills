@@ -2,8 +2,9 @@
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 #
 # Sync skills from product repos into the nvidia/skills catalog.
-# Reads component definitions from components.yml — teams onboard by
-# adding an entry there, not by editing this workflow.
+# Reads component definitions from components.d/*.yml (one file per
+# component) — teams onboard by adding their own file there, not by
+# editing this workflow or any shared file.
 #
 # Requires a PAT (SKILLS_SYNC_PAT) with read access to all product
 # repos, stored as a repository secret.
@@ -47,16 +48,23 @@ jobs:
           truncate -s 0 /tmp/failed-components.txt
           truncate -s 0 /tmp/sync-versions.txt
 
+          # Aggregate per-component files into a single config so the
+          # iteration loop below can index by position. The components.d/
+          # layout means concurrent onboarding PRs never touch a shared
+          # file — see components.d/README.md for the schema.
+          CONFIG=/tmp/components.aggregated.yml
+          yq ea '[.] | {"components": .}' components.d/*.yml > "$CONFIG"
+
           # Configure git to use the token via credential helper
           # so it never appears in clone URLs or error output
           git config --global credential.helper '!f() { echo "username=x-access-token"; echo "password=${GH_TOKEN}"; }; f'
 
-          component_count=$(yq '.components | length' components.yml)
+          component_count=$(yq '.components | length' "$CONFIG")
 
           for i in $(seq 0 $((component_count - 1))); do
-            name=$(yq -r ".components[$i].name" components.yml)
-            repo=$(yq -r ".components[$i].repo" components.yml)
-            ref=$(yq -r ".components[$i].ref // \"main\"" components.yml)
+            name=$(yq -r ".components[$i].name" "$CONFIG")
+            repo=$(yq -r ".components[$i].repo" "$CONFIG")
+            ref=$(yq -r ".components[$i].ref // \"main\"" "$CONFIG")
 
             echo "── $name ──"
 
@@ -78,10 +86,10 @@ jobs:
             echo "$slug|$upstream_short_sha|$upstream_sha|$upstream_date|$repo" >> /tmp/sync-versions.txt
 
             # Collect all skill paths for sparse checkout
-            skill_count=$(yq -r ".components[$i].skills | length" components.yml)
+            skill_count=$(yq -r ".components[$i].skills | length" "$CONFIG")
             sparse_paths=""
             for j in $(seq 0 $((skill_count - 1))); do
-              path=$(yq -r ".components[$i].skills[$j].path" components.yml)
+              path=$(yq -r ".components[$i].skills[$j].path" "$CONFIG")
               sparse_paths="$sparse_paths $path"
             done
             (cd "$tmp_dir" && git sparse-checkout set $sparse_paths 2>/dev/null) || true
@@ -89,8 +97,8 @@ jobs:
             # Copy each skill path to its catalog directory
             synced=false
             for j in $(seq 0 $((skill_count - 1))); do
-              path=$(yq -r ".components[$i].skills[$j].path" components.yml)
-              catalog_dir=$(yq -r ".components[$i].skills[$j].catalog_dir" components.yml)
+              path=$(yq -r ".components[$i].skills[$j].path" "$CONFIG")
+              catalog_dir=$(yq -r ".components[$i].skills[$j].catalog_dir" "$CONFIG")
               src="$tmp_dir/$path"
 
               if [ -d "$src" ] && [ -n "$(ls -A "$src" 2>/dev/null)" ]; then
@@ -111,7 +119,7 @@ jobs:
             if $synced; then
               echo "- $name" >> /tmp/rsynced-components.txt
               for j in $(seq 0 $((skill_count - 1))); do
-                catalog_dir=$(yq -r ".components[$i].skills[$j].catalog_dir" components.yml)
+                catalog_dir=$(yq -r ".components[$i].skills[$j].catalog_dir" "$CONFIG")
                 if [ -n "$(git status --porcelain "skills/$catalog_dir" 2>/dev/null)" ]; then
                   echo "- $name" >> /tmp/changed-components.txt
                   break
@@ -197,7 +205,7 @@ jobs:
               `**Run:** ${context.runId}`,
               `**Trigger:** \`${context.eventName}\``,
               ``,
-              `This usually means the skill path in \`components.yml\` doesn't match the actual directory in the source repo (e.g. symlink, renamed, or removed).`
+              `This usually means the skill path in \`components.d/<slug>.yml\` doesn't match the actual directory in the source repo (e.g. symlink, renamed, or removed).`
             ].join('\n');
             await github.rest.issues.create({
               owner: context.repo.owner,
