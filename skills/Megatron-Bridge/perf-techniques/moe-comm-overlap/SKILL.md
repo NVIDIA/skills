@@ -7,7 +7,7 @@ description: MoE expert-parallel communication overlap in Megatron Bridge. Use w
 
 For the higher-level overview, see:
 
-- `docs/training/communication-overlap.md`
+- @docs/training/communication-overlap.md
 - `card.yaml` (co-located)
 
 ## Quick Decision

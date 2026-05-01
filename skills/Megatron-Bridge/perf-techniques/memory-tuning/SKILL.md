@@ -5,7 +5,7 @@ description: Techniques for reducing peak GPU memory in Megatron Bridge — expa
 
 # Memory Tuning
 
-Stable docs: `docs/parallelisms.md`
+Stable docs: @docs/parallelisms.md
 Card: `card.yaml` (co-located)
 
 ## What It Is
@@ -38,7 +38,7 @@ When a training run OOMs or is close to the memory limit:
    fragmentation-induced OOM with zero performance cost. Most Slurm launch
    templates already include it.
 2. **Add selective activation recompute** (`recompute_modules=[core_attn]`) if
-   not already enabled. See `skills/perf-techniques/activation-recompute/SKILL.md`.
+   not already enabled. See @skills/perf-techniques/activation-recompute/SKILL.md.
 3. **Avoid increasing TP** as a memory fix — doubling TP dramatically increases
    NVLink all-reduce volume and often kills throughput (-28% on Llama3 70B).
 4. **Avoid increasing PP at the cost of DP** — halving DP doubles gradient
@@ -80,7 +80,7 @@ If the model genuinely does not fit (not fragmentation), adjust parallelism:
 
 ### Activation recompute
 
-See `skills/perf-techniques/activation-recompute/SKILL.md` for full details.
+See @skills/perf-techniques/activation-recompute/SKILL.md for full details.
 
 ### CPU offloading
 
@@ -103,7 +103,7 @@ which eliminated memory fragmentation. The VPP=10 run actually used slightly
 **more** peak memory (60.2 GB vs 58.8 GB) but did not OOM because expandable
 segments prevented fragmentation.
 
-VPP should be tuned for pipeline bubble reduction (see `docs/parallelisms.md`),
+VPP should be tuned for pipeline bubble reduction (see @docs/parallelisms.md),
 not as a memory fix.
 
 ## Compatibility and Constraints
@@ -159,7 +159,7 @@ offloading.` This approach is blocked for any model using PP > 1.
 
 Selective activation recompute with `mlp` saved ~3 GB peak memory but cost
 ~16% GPU utilization on this workload. See
-`skills/perf-techniques/activation-recompute/SKILL.md` for full results.
+@skills/perf-techniques/activation-recompute/SKILL.md for full results.
 
 ## Code Anchors
 

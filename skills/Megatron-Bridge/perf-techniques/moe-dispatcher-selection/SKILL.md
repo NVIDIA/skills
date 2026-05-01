@@ -5,7 +5,7 @@ description: Choose the right MoE token dispatcher (`alltoall`, DeepEP, or Hybri
 
 # MoE Dispatcher Selection Guide
 
-Stable docs: `docs/training/moe-optimization.md`
+Stable docs: @docs/training/moe-optimization.md
 Card: `card.yaml` (co-located)
 
 ## Quick Decision

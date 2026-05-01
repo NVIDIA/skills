@@ -5,7 +5,7 @@ description: Validate and use CUDA graph capture in Megatron Bridge, including l
 
 # CUDA Graphs
 
-Stable docs: `docs/training/cuda-graphs.md`
+Stable docs: @docs/training/cuda-graphs.md
 Card: `card.yaml` (co-located)
 
 ## What It Is
@@ -37,8 +37,8 @@ For recompute-heavy workloads:
 
 Related docs:
 
-- `docs/training/cuda-graphs.md`
-- `docs/training/activation-recomputation.md`
+- @docs/training/cuda-graphs.md
+- @docs/training/activation-recomputation.md
 
 ## Enablement
 
@@ -288,7 +288,7 @@ def _delete_cuda_graphs(cuda_graph_helper):
     recompute (`recompute_granularity="selective"` + `recompute_modules`),
     disable CUDA graphs, or switch to `local` + `full_iteration`. Enforced
     in MCore `transformer_config.py:2001-2005`. See also
-    `skills/perf-techniques/activation-recompute/SKILL.md`.
+    @skills/perf-techniques/activation-recompute/SKILL.md.
 
 12. **Benchmark numbers are workload-specific**: graph wins are usually real
     when host overhead is visible, but the exact gain depends on batch shape,

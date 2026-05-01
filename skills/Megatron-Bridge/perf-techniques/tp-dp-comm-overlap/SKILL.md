@@ -7,7 +7,7 @@ description: Operational guide for enabling TP, DP, and PP communication overlap
 
 For stable background and recommendation level, see:
 
-- `docs/training/communication-overlap.md`
+- @docs/training/communication-overlap.md
 
 ## Enablement
 
