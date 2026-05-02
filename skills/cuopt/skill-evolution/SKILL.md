@@ -6,7 +6,7 @@ description: After solving a non-trivial problem, detect generalizable learnings
 
 # Skill Evolution
 
-Skills improve through a three-phase lifecycle. The agent operates in one phase at a time depending on whether ground truth is available.
+Skills improve through a single workflow: solve the user's problem, notice when a generalizable learning surfaced, score it if you can, then propose an update. The presence or absence of ground truth changes the *confidence* attached to a proposal, not the steps you take.
 
 ## Trigger conditions
 
@@ -19,25 +19,20 @@ You MUST evaluate whether to enter the skill evolution workflow when ANY of thes
 5. **Variable type or modeling error** — You chose the wrong variable type (e.g., CONTINUOUS vs INTEGER), constraint form, or objective structure, and the correction changed the result.
 6. **Thrash before landing** — You arrived at the right answer, but only after visibly thrashing: writing dead code that you then deleted, rewriting the same construct multiple times, or exploring 2+ approaches before settling. The final code looks fine, but the path to it shows the skill failed to point you at the right pattern from the start. The fix is usually a worked example or a "prefer X over Y" note that would have saved the detour.
 
-**When a trigger fires:** Finish solving the user's problem first, then evaluate whether the learning is generalizable (not user-specific) before entering Phase 1 or Phase 2.
+**When a trigger fires:** Finish solving the user's problem first, then evaluate whether the learning is generalizable (not user-specific) before entering the workflow below.
 
 **Do NOT trigger for:** Trivial typos, user-specific data/paths, one-off configuration issues, or problems already covered by existing skills.
 
-## Phase 1: Learning (with ground truth)
+## Workflow
 
-Enter this phase when you can **score** your output — a ground truth answer exists, a test suite passes/fails, or a known-correct result can be compared against.
+1. **Solve the user's problem first.** Read the relevant skills, produce a solution, ship the fix. Skill evolution never blocks the user's task.
+2. **Notice if a trigger fired** (see Trigger conditions above). If nothing surfaced a generalizable learning, you are done.
+3. **Try to score the learning — when ground truth exists.** A test exists, a known-correct answer is available, the solver returns a check-able status, etc. If the score fails, refine the candidate learning — tune the pattern, fix the example, add the missing detail — and re-score. Iterate until it scores or you conclude no version of it will; in the latter case, drop the proposal rather than ship an unscored claim. (See Scoring criteria below for what counts as ground truth.)
+4. **If no ground truth is available to score against** — no test to run, no comparable answer to check against, no solver to invoke — skip step 3 and proceed with `scored: no`. This is normal during inference-style interactions where the learning is qualitative — the proposal is still useful, just lower-confidence.
+5. **Distill, place, and propose** (see sections below). Apply only after the user approves.
+6. **Treat recurrence as evidence.** When the same unscored insight surfaces in 2+ independent interactions, the recurrence is itself a signal. Promote the insight to a stronger proposal — note the prior occurrences in the trigger field rather than re-deriving from scratch.
 
-### Skill generation loop (sandbox)
-
-Inside the learning phase, run an evolutionary loop before proposing anything:
-
-1. **Read** current skills (the general skills in `skills/*/SKILL.md`)
-2. **Reason + execute** to produce a solution
-3. **Score** against ground truth (see scoring criteria below)
-4. **If score fails** — tune the approach: adjust the pattern, fix the example, add a missing gotcha. Retry from step 2. Maximum **3 iterations**.
-5. **If score passes** — proceed to distillation.
-
-The sandbox is conceptual for interactive agents (Cursor, Claude Code): iterate internally before presenting to the user. Do not propose on the first attempt if the score failed. For CI/batch contexts, the sandbox is literal — experimental skill modifications in a temp directory, validated by running tests, then promoted.
+The loop has no hard iteration cap. The right number of refinement passes is whatever lets you confidently say "this scored" or "this won't score, dropping it." Forcing a count adds ceremony without changing the outcome.
 
 ### Scoring criteria
 
@@ -51,7 +46,7 @@ Use whatever ground truth is available:
 | Constraint satisfaction | All constraints in the formulation are met |
 | Known answer | Output matches the expected value within tolerance |
 
-If no ground truth is available, you are in Phase 2 (inference), not Phase 1.
+If no ground truth is available, the proposal proceeds with `scored: no` — see the Workflow.
 
 ### Distillation
 
@@ -112,71 +107,19 @@ The goal is to keep SKILL.md focused on what the model needs *every* invocation,
 
 ### Proposal format
 
-Present to the user as:
+Present to the user with these four fields. The diff itself carries most of the meaning; the other fields exist to give context the diff cannot.
 
 ```text
 Skill update proposal:
-  Skill: skills/<name>/SKILL.md        (or skills/<name>/assets/<file>.py)
-  Type: markdown | code
-  Phase: learning (scored)
+  Target:  skills/<name>/SKILL.md  (or skills/<name>/assets/<file>.py)
+  Trigger: <what surfaced this — including prior occurrences if recurring>
+  Scored:  yes — <how it was validated, e.g. "solver returned Optimal", "test passed">
+           no  — review carefully; not validated against ground truth
   Removal: no | yes — if yes, the user must explicitly confirm before applying
-  Section: <where it goes>
-  Trigger: <what happened that surfaced this>
-  Score: <how it was validated — e.g. "solver returned Optimal", "test passed">
-  Change: <the exact content to add or modify>
+  Diff:    <the exact content to add, remove, or modify>
 ```
 
 Only apply after the user approves. If the user declines, do not persist. If `Removal: yes`, silence is not approval — proceed only on an explicit "yes" from the user.
-
-## Phase 2: Inference (no ground truth)
-
-Enter this phase during normal user interactions where no ground truth exists to score against.
-
-### Use specialized skills
-
-Read and apply skills (including any content added by prior learning phases) to solve the user's problem.
-
-### Collect insights
-
-While solving, note **insights** — observations that could not be scored but may be valuable:
-- A pattern that worked but has no ground truth to validate against
-- A gotcha encountered that might be generalizable
-- A missing example that would have helped
-
-### Propose insights (lower confidence)
-
-Present insights to the user as lower-confidence proposals, clearly marked:
-
-```text
-Skill insight (unscored):
-  Skill: skills/<name>/SKILL.md
-  Type: markdown | code
-  Phase: inference (unscored)
-  Removal: no | yes — if yes, the user must explicitly confirm before applying
-  Section: <where it goes>
-  Trigger: <what happened>
-  Change: <the exact content to add or modify>
-  Note: This was not validated against ground truth. Review carefully.
-```
-
-The user may approve, decline, or defer for offline reflection.
-
-## Phase 3: Offline reflection
-
-After inference interactions, review accumulated insights to find patterns.
-
-### When to reflect
-
-- Multiple interactions surfaced the same insight
-- An insight from inference was later confirmed by a learning-phase score
-- A batch of deferred insights has accumulated
-
-### How to reflect
-
-1. Compare insights across interactions — look for recurring patterns
-2. If a pattern appears in 2+ independent interactions, promote it to a scored proposal (treat the recurrence as evidence)
-3. Present the promoted proposal using the Phase 1 proposal format with `Phase: reflection (pattern-validated)`
-4. Same approval gate — user must approve before applying
 
 ## Provenance tagging
 
@@ -258,8 +201,7 @@ Before proposing, verify:
 - [ ] Code assets have `# origin: skill-evolution` header and are runnable
 - [ ] Commit subject starts with `skill-evolution:` so the audit trail is greppable from `git log`
 - [ ] Placed in the single highest-impact skill (common > API > new); not duplicated across skills
-- [ ] Phase is correctly identified (learning/inference/reflection)
-- [ ] Learning-phase proposals include a score; inference-phase proposals are marked unscored
+- [ ] `Scored:` field is filled — either with how the score was obtained, or `no` if no ground truth was available
 
 ## Validation
 

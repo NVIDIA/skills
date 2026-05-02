@@ -385,6 +385,16 @@ All dependencies are managed through `dependencies.yaml` — never edit `conda/e
 | CUDA out of memory | Reduce problem size |
 | Build fails with CUDA errors on older driver | Conda installs `cuda-nvcc` for the latest supported CUDA (e.g., 13.1), but your GPU driver may not support it. Check with `nvidia-smi` — the top-right shows max CUDA version. Override with: `conda install cuda-nvcc=12.9` (or whichever version your driver supports). See [CUDA compatibility matrix](https://docs.nvidia.com/deploy/cuda-compatibility/) |
 | Slow debug library loading | Device symbols cause delay |
+<!-- skill-evolution:start — Cross-cutting change discipline -->
+| CI state doesn't persist between runs | CI containers are ephemeral. Never write persistent state to repo files from CI — use S3 (`CUOPT_S3_URI`) or artifact stores. Ask: "After this container dies, does tomorrow's run see today's data?" |
+| CI state transitions go unreported | When CI tracks state over time (e.g. test failures), every transition (new failure, recurring, stabilized) needs an explicit notification path. Ask: "When state X changes to Y, who learns about it and how?" |
+| Designing CI features without lifecycle check | Before shipping any CI feature that tracks state: (1) Where does state live between runs? (2) What writes/reads it? (3) What happens on state transitions? Verify end-to-end, not just the happy-path logic. |
+| Change applied to only some targets | Before implementing, audit the full scope of what needs the change. For CI: `ls ci/test*.sh`. For APIs: grep all callers. For patterns: find every instance. Enumerate ALL targets first, implement second. |
+| Shared resource ignores CI matrix parallelism | CI matrices run jobs in parallel across CUDA x Python x arch. Any shared resource (S3 paths, files, databases) must be keyed by the full execution context. Ask: "What happens when N parallel jobs access this simultaneously?" |
+| Same logic duplicated across files | When the same block (>10 lines) appears in 2+ places — any language, any context — extract a shared helper immediately. Don't duplicate first and refactor later. This applies to shell scripts, Python modules, C/C++ code equally. |
+| Feature not extensible for new variants | After implementing, ask: "If someone adds a new variant (test type, matrix entry, endpoint, etc.), what do they change?" If the answer is more than a one-line addition, the design needs a shared helper or auto-discovery. Avoid hardcoded lists of known variants. |
+| Reports generated without actionable detail | Reports and notifications must include enough context to act without digging: error messages, execution context (matrix, commit), history (new vs recurring), and links or attachments for full details. Provide downloadable artifacts when possible. |
+<!-- skill-evolution:end -->
 
 ## CI Gotchas
 
