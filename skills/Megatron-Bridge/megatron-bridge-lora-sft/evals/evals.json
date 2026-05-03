@@ -1,0 +1,44 @@
+[
+  {
+    "id": "lora-001-llama-dim-alpha-target-modules",
+    "question": "How do I set up LoRA fine-tuning for a Llama model in Megatron-Bridge with rank 16 targeting attention and MLP layers?",
+    "expected_skill": "megatron-bridge-lora-sft",
+    "expected_script": null,
+    "ground_truth": "Use llama32_1b_peft_config(peft_scheme='lora') as the starting recipe. Set config.peft.dim=16 and config.peft.alpha=32. The default target_modules already includes ['linear_qkv', 'linear_proj', 'linear_fc1', 'linear_fc2'] covering both attention and MLP layers. Launch with torchrun --nproc_per_node=1 tutorials/recipes/llama/01_quickstart_finetune.py --pretrained-checkpoint /path/to/checkpoint.",
+    "expected_behavior": [
+      "References llama32_1b_peft_config(peft_scheme='lora') as the recipe entry point",
+      "Sets config.peft.dim=16 (not lora_rank)",
+      "Sets config.peft.alpha=32",
+      "Mentions that default target_modules covers linear_qkv, linear_proj, linear_fc1, linear_fc2",
+      "Includes the torchrun launch command with --pretrained-checkpoint"
+    ]
+  },
+  {
+    "id": "lora-002-moe-normalize-moe-lora",
+    "question": "I'm applying LoRA to a MoE model in Megatron-Bridge but want expert layers to use a smaller rank than attention layers. How do I do that?",
+    "expected_skill": "megatron-bridge-lora-sft",
+    "expected_script": null,
+    "ground_truth": "Set normalize_moe_lora=True on the LoRA dataclass. With dim=32 and moe_router_topk=2, expert linear layers get effective dim = 32 // 2 = 16, while non-expert layers keep the full dim=32. dim must be evenly divisible by moe_router_topk. This is set directly on the LoRA dataclass: LoRA(dim=32, alpha=32, normalize_moe_lora=True, target_modules=[...]).",
+    "expected_behavior": [
+      "References normalize_moe_lora=True as the mechanism for per-layer rank reduction",
+      "Explains that expert layer effective dim = dim // moe_router_topk",
+      "Explains that non-expert layers keep the full dim",
+      "Notes that dim must be evenly divisible by moe_router_topk",
+      "Shows the LoRA dataclass usage directly, not a fabricated PEFTConfig field"
+    ]
+  },
+  {
+    "id": "lora-003-export-adapter-hf-peft",
+    "question": "How do I export my LoRA adapter checkpoint from Megatron-Bridge to HuggingFace PEFT format?",
+    "expected_skill": "megatron-bridge-lora-sft",
+    "expected_script": null,
+    "ground_truth": "Use AutoBridge(hf_model_path) and call bridge.export_adapter_ckpt(peft_checkpoint='/checkpoints/lora_run', output_path='./my_adapter'). This produces adapter_config.json and adapter_model.safetensors in the output directory. The export runs on CPU. The result loads directly with PeftModel.from_pretrained(base_model, './my_adapter'). Alternatively, use the CLI: python examples/conversion/adapter/export_adapter.py --hf-model-path ... --lora-checkpoint ... --output ...",
+    "expected_behavior": [
+      "References AutoBridge and export_adapter_ckpt as the export mechanism",
+      "Shows the peft_checkpoint and output_path arguments",
+      "States the export produces adapter_config.json and adapter_model.safetensors",
+      "Mentions the export runs on CPU (no GPU needed)",
+      "Shows PeftModel.from_pretrained as the consumption pattern, or the CLI alternative"
+    ]
+  }
+]

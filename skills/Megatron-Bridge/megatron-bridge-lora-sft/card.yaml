@@ -1,0 +1,80 @@
+title: megatron_bridge_lora_sft
+validated_on: "2026-05-03"
+summary: >
+  Megatron-Bridge exposes LoRA and DoRA via the LoRA and DoRA dataclasses in
+  src/megatron/bridge/peft/. Default target_modules cover attention and MLP dense
+  layers. MoE expert rank normalization is via normalize_moe_lora=True (divides dim
+  by moe_router_topk for expert layers). Adapter export to HuggingFace PEFT format
+  uses AutoBridge.export_adapter_ckpt — produces adapter_config.json and
+  adapter_model.safetensors compatible with PeftModel.from_pretrained.
+
+validation_status:
+  lora_dataclass:
+    - code_verified
+  dora_dataclass:
+    - code_verified
+  normalize_moe_lora:
+    - code_verified
+  recipe_function_llama32_1b:
+    - code_verified
+  export_adapter_ckpt:
+    - code_verified
+  peft_model_load_after_export:
+    - code_verified
+  tp_peft_sharding:
+    - unclear
+  end_to_end_moe_lora_finetune:
+    - unclear
+
+feature_meaning:
+  lora_dataclass: >
+    LoRA(target_modules, dim=32, alpha=32, normalize_moe_lora=False).
+    Applied to model via peft_scheme="lora" in recipe functions.
+  dora_dataclass: >
+    DoRA(target_modules, dim=32, alpha=64). DoRA default alpha is 64, not 32.
+    Applied via peft_scheme="dora".
+  normalize_moe_lora: >
+    When True, expert linear layers use dim // moe_router_topk instead of full dim.
+    Non-expert layers keep full dim. dim must be evenly divisible by moe_router_topk.
+  export_adapter_ckpt: >
+    AutoBridge(hf_model_path).export_adapter_ckpt(peft_checkpoint, output_path).
+    Generates adapter_config.json + adapter_model.safetensors. Runs on CPU.
+    Output loads directly via PeftModel.from_pretrained(base_model, output_path).
+
+recommended_path:
+  lora_minimal:
+    recipe: llama32_1b_peft_config(peft_scheme="lora")
+    peft.dim: 16
+    peft.alpha: 32
+  dora:
+    recipe: llama32_1b_peft_config(peft_scheme="dora")
+    peft.dim: 16
+    peft.alpha: 64
+  moe_lora:
+    peft.normalize_moe_lora: true
+    peft.dim: 32
+    note: dim must be divisible by moe_router_topk
+  export:
+    step_1: "bridge = AutoBridge(hf_model_path)"
+    step_2: "bridge.export_adapter_ckpt(peft_checkpoint, output_path)"
+
+known_constraints:
+  - DoRA default alpha is 64, not 32; overriding without checking defaults may produce incorrect scaling.
+  - normalize_moe_lora requires dim evenly divisible by moe_router_topk.
+  - TP > 1 with PEFT requires consistent adapter dim across all TP ranks; mismatch errors at init.
+  - export_adapter_ckpt produces HF PEFT adapter files — no separate merge step is needed before HF use.
+
+known_limitations:
+  - End-to-end MoE LoRA fine-tune on a real MoE checkpoint not confirmed in CI.
+  - TP > 1 PEFT sharding behavior not fully validated from source review.
+
+evidence:
+  - src/megatron/bridge/peft/lora.py
+  - src/megatron/bridge/peft/dora.py
+  - tutorials/recipes/llama/01_quickstart_finetune.py
+  - examples/conversion/adapter/export_adapter.py
+
+follow_up_validation:
+  - Add a checked-in end-to-end LoRA adapter export round-trip CI test.
+  - Confirm normalize_moe_lora on a real MoE checkpoint (DeepSeek, Qwen3-MoE).
+  - Clarify whether TP > 1 PEFT is validated on current container versions.
