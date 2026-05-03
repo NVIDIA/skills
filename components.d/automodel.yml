@@ -1,0 +1,8 @@
+name: NeMo-AutoModel
+repo: NVIDIA-NeMo/Automodel
+description: NeMo AutoModel — fine-tuning and training of HuggingFace-compatible models, including LoRA, PEFT, and MoE workflows.
+skills:
+  - path: skills/
+    catalog_dir: NeMo-AutoModel
+links:
+  security: false

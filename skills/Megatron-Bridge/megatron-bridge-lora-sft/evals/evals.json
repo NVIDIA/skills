@@ -1,0 +1,44 @@
+[
+  {
+    "id": "lora-001-llama3-8b-rank-attention-mlp",
+    "question": "How do I set up LoRA fine-tuning for Llama 3 8B in Megatron-Bridge with rank 32 targeting attention and MLP layers?",
+    "expected_skill": "megatron-bridge-lora-sft",
+    "expected_script": null,
+    "ground_truth": "Use llama3_8b_peft_config() as the starting recipe, then set cfg.peft.lora_rank=32, cfg.peft.lora_alpha=64, and cfg.peft.target_modules=[\"linear_qkv\", \"linear_proj\", \"linear_fc1\", \"linear_fc2\"]. Launch with uv run python -m torch.distributed.run --nproc_per_node=1 scripts/training/run_recipe.py --recipe llama3_8b_peft_config --dataset llm-finetune. Do not use match_all_linear=True.",
+    "expected_behavior": [
+      "References llama3_8b_peft_config() as the starting recipe",
+      "Sets lora_rank=32 on the peft config",
+      "Sets lora_alpha=64 (2x rank convention for LoRA)",
+      "Sets target_modules with at least 4 entries covering both attention (linear_qkv, linear_proj) and MLP (linear_fc1, linear_fc2)",
+      "Includes the uv run torch.distributed.run launch command",
+      "Does not suggest match_all_linear=True as the solution"
+    ]
+  },
+  {
+    "id": "lora-002-qwen3-moe-expert-skip",
+    "question": "I'm trying to apply LoRA to a Qwen3-30B-A3B MoE model in Megatron-Bridge but my loss isn't changing — it looks like only attention layers are being adapted. What's wrong?",
+    "expected_skill": "megatron-bridge-lora-sft",
+    "expected_script": null,
+    "ground_truth": "The root cause is that match_all_linear=True only iterates nn.Linear modules and silently skips MoE expert weights registered as nn.Parameter. Fix: use qwen3_30b_a3b_peft_config() and explicitly set target_modules to include both attention layers (linear_qkv, linear_proj) and expert layers (gate_proj, up_proj, down_proj).",
+    "expected_behavior": [
+      "Identifies the root cause as match_all_linear missing nn.Parameter expert weights",
+      "Explains that no error is raised — the skip is silent",
+      "Provides an explicit target_modules list that includes expert layer names (gate_proj, up_proj, down_proj)",
+      "References qwen3_30b_a3b_peft_config or an equivalent MoE recipe",
+      "Does not suggest increasing lora_rank as the primary fix"
+    ]
+  },
+  {
+    "id": "lora-003-adapter-merge-hf-export",
+    "question": "How do I merge LoRA adapters and export the result to HuggingFace format after training in Megatron-Bridge?",
+    "expected_skill": "megatron-bridge-lora-sft",
+    "expected_script": null,
+    "ground_truth": "Two-step process: first call merge_lora_weights(checkpoint_dir, output_dir) to fuse adapters into the base checkpoint shards, then call export_to_hf(megatron_checkpoint, hf_output_dir, model_type) or use the CLI scripts/convert/megatron_to_hf.py. Skipping the merge step produces a broken HF model because base weights do not include adapter contributions.",
+    "expected_behavior": [
+      "Shows merge step (merge_lora_weights) before the export step",
+      "Includes checkpoint_dir and output_dir arguments for the merge call",
+      "Includes either the Python export_to_hf() call or the CLI megatron_to_hf.py command with model-type argument",
+      "Warns that skipping the merge step produces a broken HF model"
+    ]
+  }
+]

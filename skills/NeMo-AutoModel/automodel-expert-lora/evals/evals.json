@@ -1,0 +1,43 @@
+[
+  {
+    "id": "moe-lora-001-mixtral-match-all-linear",
+    "question": "I'm applying LoRA to a Mixtral model in NeMo AutoModel with match_all_linear=True but the loss is not improving on expert-heavy tasks. What's wrong and how do I fix it?",
+    "expected_skill": "automodel-expert-lora",
+    "expected_script": null,
+    "ground_truth": "match_all_linear=True only iterates nn.Linear modules and silently skips Mixtral's fused expert parameters, which are nn.Parameter inside block_sparse_moe. A UserWarning is emitted by validate_lora_config_for_moe when this is detected. Fix: call detect_fused_moe_experts(model) to get target_modules=['w1','w2','w3'] and pass them explicitly to LoraConfig instead of relying on match_all_linear.",
+    "expected_behavior": [
+      "Identifies nn.Parameter vs nn.Linear as the root cause of silent expert-skip",
+      "Mentions the UserWarning emitted by apply_lora() when the condition is detected",
+      "References detect_fused_moe_experts() to obtain the correct target_modules",
+      "Provides target_modules=['w1','w2','w3'] as the Mixtral-specific fix",
+      "Does not suggest increasing lora_rank as the primary fix"
+    ]
+  },
+  {
+    "id": "moe-lora-002-qwen3-per-expert-rank",
+    "question": "How do I apply different LoRA ranks to attention vs expert layers in a Qwen3-MoE model using NeMo AutoModel?",
+    "expected_skill": "automodel-expert-lora",
+    "expected_script": null,
+    "ground_truth": "Use build_expert_lora_rank_pattern(model, base_rank=16, expert_rank_multiplier=0.5) to generate a rank_pattern dict that maps MoE pattern keys to reduced ranks, then combine with detect_fused_moe_experts(model) for target_modules and pass both to LoraConfig(r=16, target_modules=targets, rank_pattern=rank_pattern).",
+    "expected_behavior": [
+      "Includes build_expert_lora_rank_pattern with base_rank and expert_rank_multiplier parameters",
+      "Shows rank_pattern passed to LoraConfig",
+      "Includes detect_fused_moe_experts to obtain target_modules",
+      "Explains that expert_rank_multiplier < 1 reduces expert rank below base_rank",
+      "Notes that expert_rank_multiplier floors at rank 1 (rank 0 is invalid)"
+    ]
+  },
+  {
+    "id": "moe-lora-003-verify-expert-trainable",
+    "question": "After applying LoRA to my Qwen3-MoE model, how do I verify that expert layers are actually being trained and not silently skipped?",
+    "expected_skill": "automodel-expert-lora",
+    "expected_script": null,
+    "ground_truth": "Call model.print_trainable_parameters() and confirm expert layer names appear in the trainable parameter count. For a programmatic check, use detect_fused_moe_experts(model.base_model) to get expected patterns and assert that at least one trainable parameter name contains each pattern. The 12 unit tests in test_expert_lora.py also serve as a baseline regression check.",
+    "expected_behavior": [
+      "Includes model.print_trainable_parameters() call and explains what to look for",
+      "Provides a code snippet using detect_fused_moe_experts to assert expert patterns are in the trainable set",
+      "Explains that expert layer names should appear in the trainable parameter count",
+      "References the 12 unit tests in test_expert_lora.py as a baseline check"
+    ]
+  }
+]

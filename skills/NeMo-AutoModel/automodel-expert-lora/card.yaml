@@ -1,0 +1,61 @@
+title: automodel_expert_lora
+validated_on: "2026-05-03"
+summary: >
+  NeMo AutoModel v0.x adds three utilities for applying LoRA to fused MoE
+  expert layers in HuggingFace Transformers v5+ models: detect_fused_moe_experts
+  detects nn.Parameter expert weights that match_all_linear silently skips,
+  build_expert_lora_rank_pattern produces a rank_pattern dict for per-expert
+  rank sizing, and validate_lora_config_for_moe emits a UserWarning when
+  match_all_linear=True would miss expert parameters. All three are covered
+  by 12 unit tests. Related to issue #1151.
+validation_status:
+  detect_fused_moe_experts:
+    - code_verified
+  build_expert_lora_rank_pattern:
+    - code_verified
+  validate_lora_config_for_moe:
+    - code_verified
+  unit_tests:
+    - code_verified
+  mixtral_target_modules_table:
+    - doc_only
+  qwen3_moe_target_modules_table:
+    - doc_only
+  end_to_end_finetune:
+    - unclear
+feature_meaning:
+  detect_fused_moe_experts: >
+    Inspects model.named_parameters() for known fused MoE patterns
+    (block_sparse_moe, mlp.experts, moe.experts, ffn.experts) and returns
+    a sorted list of leaf parameter name suffixes to pass as target_modules.
+  build_expert_lora_rank_pattern: >
+    Maps MoE pattern keys to int(base_rank * expert_rank_multiplier).
+    Returns an empty dict for dense models, which is safe to pass to LoraConfig.
+  validate_lora_config_for_moe: >
+    Called inside apply_lora() when match_all_linear=True. Emits a UserWarning
+    listing detected expert parameter names and a fix snippet when expert layers
+    would be silently skipped.
+recommended_path:
+  moe_lora_setup:
+    step_1: targets = detect_fused_moe_experts(model)
+    step_2: rank_pattern = build_expert_lora_rank_pattern(model, base_rank=16)
+    step_3: "LoraConfig(target_modules=targets, rank_pattern=rank_pattern)"
+  verification:
+    check: model.print_trainable_parameters()
+    assert: expert layer names appear in trainable parameter count
+known_constraints:
+  - Expert detection matches known fused MoE parameter name patterns only; custom MoE architectures require manual target_modules.
+  - rank_pattern keys are matched as substrings of full parameter names; ambiguous keys may match unintended layers.
+  - expert_rank_multiplier floors at rank 1; rank 0 is invalid.
+  - target_modules suppresses the UserWarning regardless of whether the provided names actually cover expert layers.
+known_limitations:
+  - Dense model returns empty rank_pattern; PEFT falls back to global r value.
+  - End-to-end MoE LoRA fine-tune and eval loop test not yet in CI.
+  - Functional test on real Mixtral or Qwen3-MoE checkpoint pending.
+evidence:
+  - nemo_automodel/components/_peft/lora.py
+  - tests/unit/components/peft/test_expert_lora.py
+follow_up_validation:
+  - Run end-to-end MoE LoRA fine-tune and verify expert layers adapt on Mixtral or Qwen3-MoE.
+  - Add a CI job that runs the 12 unit tests on every PR touching _peft/lora.py.
+  - Extend detect_fused_moe_experts pattern list for new MoE architectures as they are added.

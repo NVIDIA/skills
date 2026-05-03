@@ -1,0 +1,83 @@
+title: megatron_bridge_lora_sft
+validated_on: "2026-05-03"
+summary: >
+  Megatron-Bridge exposes LoRA, DoRA, and full SFT fine-tuning through
+  PEFTConfig and per-model recipe functions. PEFT recipes default to rank=16,
+  alpha=32, and attention-only target_modules. MoE expert layers are
+  nn.Parameter and are invisible to match_all_linear — target_modules must
+  be set explicitly for MoE models. Adapter merge is required before
+  HuggingFace export.
+validation_status:
+  lora_peft_config:
+    - code_verified
+  dora_peft_config:
+    - code_verified
+  sft_config:
+    - code_verified
+  moe_expert_target_modules:
+    - code_verified
+  adapter_merge:
+    - code_verified
+  hf_export:
+    - code_verified
+  peft_recipe_functions:
+    - recipe_verified
+  dora_alpha_convention:
+    - doc_only
+  tp_peft_sharding:
+    - unclear
+feature_meaning:
+  lora_config: >
+    PEFTConfig with lora_rank, lora_alpha, lora_dropout, target_modules.
+    Applied via apply_lora() in src/megatron/bridge/training/peft.py.
+  dora_config: >
+    DoRA mode enabled by use_dora=True. Requires lora_alpha == lora_rank
+    for correct weight decomposition scaling.
+  sft_config: >
+    Full fine-tuning via *_sft_config recipes. All parameters trainable.
+    Uses standard optimizer and data pipeline.
+  moe_expert_targeting: >
+    Expert weights in fused MoE blocks (Qwen3-MoE, DeepSeek, GLM-4.5) are
+    nn.Parameter, not nn.Linear. match_all_linear=True silently skips them.
+    Requires gate_proj/up_proj/down_proj passed explicitly via target_modules.
+  adapter_merge_hf_export: >
+    merge_lora_weights() fuses adapters into base checkpoint shards.
+    export_to_hf() or megatron_to_hf.py CLI converts to HuggingFace format.
+    Skipping merge produces a broken HF model.
+recommended_path:
+  lora_minimal:
+    peft.lora_rank: 16
+    peft.lora_alpha: 32
+    peft.target_modules: "[linear_qkv, linear_proj]"
+  dora:
+    peft.use_dora: true
+    peft.lora_alpha: "== lora_rank"
+  moe_lora:
+    peft.target_modules: "[linear_qkv, linear_proj, gate_proj, up_proj, down_proj]"
+  merge_and_export:
+    step_1: merge_lora_weights(checkpoint_dir, output_dir)
+    step_2: export_to_hf(megatron_checkpoint, hf_output_dir, model_type)
+known_constraints:
+  - DoRA requires lora_alpha == lora_rank; using 2*rank convention produces incorrect scaling.
+  - merge_lora_weights() must run before export_to_hf(); skipping it produces a broken HF model.
+  - LoRA adapter shapes must be consistent across TP ranks; mismatched lora_rank causes a shape error at init.
+  - micro_batch_size must be 1 when PackedSequenceSpecs is active with PEFT recipes.
+  - context_parallel_size > 1 with SFT requires calculate_per_token_loss=True and ddp.average_in_collective=False.
+  - lora_dropout > 0 is training-only; adapter must be in eval mode before merge to avoid corrupting weights.
+known_limitations:
+  - match_all_linear=True silently skips MoE expert parameters; no error is raised.
+  - Expert layer LoRA requires explicit target_modules for every supported MoE model family.
+  - End-to-end LoRA merge and HF export round-trip test not yet in CI.
+  - MoE expert LoRA functional test pending.
+evidence:
+  - src/megatron/bridge/training/config.py
+  - src/megatron/bridge/training/peft.py
+  - src/megatron/bridge/peft/merge.py
+  - src/megatron/bridge/convert/__init__.py
+  - src/megatron/bridge/recipes/llama/llama3.py
+  - scripts/convert/megatron_to_hf.py
+  - tests/unit_tests/training/test_config.py
+follow_up_validation:
+  - Add a checked-in end-to-end LoRA merge and HF export round-trip CI test.
+  - Add a functional smoke test for MoE expert LoRA on Qwen3-MoE or DeepSeek.
+  - Clarify whether TP > 1 PEFT is validated on current container versions.
