@@ -1,0 +1,33 @@
+name: automodel-expert-lora
+version: "1.0"
+author: Doondi-Ashlesh
+status: community
+recommendation_level: stable
+
+description: >
+  Apply LoRA to fused MoE expert layers in NeMo AutoModel. Covers expert
+  parameter detection, rank_pattern configuration, and the validation warning
+  emitted when match_all_linear silently skips expert weights in Transformers v5+.
+
+use_cases:
+  - LoRA fine-tuning on Mixtral models targeting expert layers
+  - LoRA fine-tuning on Qwen3-MoE, DeepSeek, GLM-4.5 with expert adaptation
+  - Diagnosing silent expert-skip in existing MoE LoRA training runs
+  - Per-expert rank sizing via rank_pattern
+
+known_limitations:
+  - Expert detection relies on known fused MoE parameter name patterns
+  - Custom MoE architectures with non-standard parameter naming require
+    manual target_modules specification
+  - rank_pattern key matching is substring-based; ambiguous keys may
+    match unintended layers
+
+follow_up_validation:
+  - End-to-end MoE LoRA fine-tune + eval loop test not yet in CI
+  - Functional test on real Mixtral or Qwen3-MoE checkpoint pending
+
+related_issues:
+  - https://github.com/NVIDIA-NeMo/Automodel/issues/1151
+
+related_skills:
+  - megatron-bridge-lora-sft
