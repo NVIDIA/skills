@@ -129,7 +129,6 @@ Result: Parameters = 3 factories, 500 units target. Constraints = produce exactl
 
 ---
 
-<!-- skill-evolution:start — piecewise-linear with integer totals -->
 ## Piecewise-linear objectives with integer production
 
 When modeling **concave piecewise-linear** profit/cost functions (e.g. decreasing marginal profit for bulk sales), the standard approach uses continuous segment variables with upper bounds equal to each segment's width. For a maximization with concave profit, the solver fills higher-profit segments first naturally.
@@ -146,9 +145,7 @@ Link: x_total = s1 + s2 + …
 Resource constraints use x_total.
 Objective uses segment variables × segment profit rates.
 ```
-<!-- skill-evolution:end -->
 
-<!-- skill-evolution:start — cutting stock waste = total area minus useful area -->
 ## Cutting stock / trim loss problems
 
 In cutting stock problems, **waste area** includes both **trim loss** (unused width within each cutting pattern) and **over-production** (excess strips produced beyond demand). Minimizing only trim loss (waste width × length per pattern) ignores over-production and yields an incorrect objective.
@@ -172,9 +169,7 @@ where `required_useful_area = sum_i (order_width_i × order_length_i)`.
 ### Gotcha
 
 Using `sum_j (waste_width_j × x_j)` as the objective only captures trim loss — the unused strip within each pattern. It does **not** penalize over-production of an order. The solver will over-produce narrow orders to fill patterns efficiently, but that excess material is still waste. Always use total material area as the objective.
-<!-- skill-evolution:end -->
 ## Goal programming (preemptive / lexicographic)
-<!-- skill-evolution:start — goal programming section -->
 
 Goal programming optimizes multiple objectives in priority order. Implement it as **sequential solves** — one per priority level.
 
@@ -192,7 +187,6 @@ Deviation variables (d⁻, d⁺) and slack/idle-time variables are always **cont
 
 ---
 
-<!-- skill-evolution:start — inventory capacity must bound stock-after-purchase -->
 ## Multi-period inventory / purchasing models
 
 In problems with buying, selling, and warehouse capacity over multiple periods, decide which capacity constraints to include based on the problem's timing assumptions.
@@ -212,9 +206,7 @@ For each period *t* with inventory balance `stock[t] = stock[t-1] + buy[t] - sel
 **Key interaction with the sell constraint:** If the model already has `sell[t] <= stock[t-1]` (grain bought this period cannot be sold this period), the model is bounded even without the after-purchase constraint. The sell constraint prevents unbounded buy-sell cycling. The after-purchase constraint is then an additional physical restriction, not a mathematical necessity.
 
 **Default:** If the problem does not specify timing within a period, use **only** end-of-period capacity (`stock[t] <= capacity`). Add the after-purchase constraint only if the problem explicitly requires it.
-<!-- skill-evolution:end -->
 
-<!-- skill-evolution:start — blending with shared mixing tank (intermediate processing) -->
 ## Blending with shared mixing / intermediate processing
 
 In some blending problems, a subset of raw materials must be **mixed together first** (e.g., in a mixing tank) before being allocated to different products. The resulting intermediate has a **uniform composition** — you cannot independently assign different raw materials to different products.
@@ -237,4 +229,3 @@ Before formulating, check whether using the intermediate in each product is prof
 - Compare the **minimum cost per ton** of the intermediate (using cheapest feasible raw material mix) against each product's **selling price**.
 - If `cost_intermediate > sell_price[j]` for some product `j`, the intermediate should not be allocated to product `j`. Raw material C (or other direct inputs) alone may also be unprofitable if `cost_C > sell_price[j]`.
 - This analysis often eliminates the need for a bilinear split entirely.
-<!-- skill-evolution:end -->

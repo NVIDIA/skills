@@ -21,7 +21,6 @@ Ask these if not already clear:
 2. **Goal** — Contributing upstream, or local fork/modification?
 3. **Component** — C++/CUDA core, Python bindings, server, docs, or CI?
 
-<!-- skill-evolution:start — driver/toolkit CUDA mismatch surfaced at runtime -->
 ## Validate CUDA/driver compatibility before building
 
 Before creating the conda env or running `./build.sh`, check that the conda env's
@@ -50,7 +49,6 @@ Steps:
 
 Do this check before starting the build — a full build takes tens of minutes
 and the failure only appears when tests run.
-<!-- skill-evolution:end -->
 
 ## Typical setup (conceptual)
 

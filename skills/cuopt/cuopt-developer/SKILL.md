@@ -177,7 +177,6 @@ pytest -v python/cuopt/cuopt/tests
 pytest -v python/cuopt_server/tests
 ```
 
-<!-- skill-evolution:start — always fetch datasets before running tests -->
 #### Download test datasets before running tests
 
 cuOpt tests depend on MPS/data files that are not checked into the repo. A
@@ -191,7 +190,6 @@ Before running any C++ or Python tests, follow the dataset download and
 If a test fails with a missing-file error, run the matching download step from
 `CONTRIBUTING.md` and re-run the test. Do not report missing-dataset failures
 back to the user as the task outcome.
-<!-- skill-evolution:end -->
 
 ## Python Bindings
 
@@ -385,7 +383,6 @@ All dependencies are managed through `dependencies.yaml` — never edit `conda/e
 | CUDA out of memory | Reduce problem size |
 | Build fails with CUDA errors on older driver | Conda installs `cuda-nvcc` for the latest supported CUDA (e.g., 13.1), but your GPU driver may not support it. Check with `nvidia-smi` — the top-right shows max CUDA version. Override with: `conda install cuda-nvcc=12.9` (or whichever version your driver supports). See [CUDA compatibility matrix](https://docs.nvidia.com/deploy/cuda-compatibility/) |
 | Slow debug library loading | Device symbols cause delay |
-<!-- skill-evolution:start — Cross-cutting change discipline -->
 | CI state doesn't persist between runs | CI containers are ephemeral. Never write persistent state to repo files from CI — use S3 (`CUOPT_S3_URI`) or artifact stores. Ask: "After this container dies, does tomorrow's run see today's data?" |
 | CI state transitions go unreported | When CI tracks state over time (e.g. test failures), every transition (new failure, recurring, stabilized) needs an explicit notification path. Ask: "When state X changes to Y, who learns about it and how?" |
 | Designing CI features without lifecycle check | Before shipping any CI feature that tracks state: (1) Where does state live between runs? (2) What writes/reads it? (3) What happens on state transitions? Verify end-to-end, not just the happy-path logic. |
@@ -394,7 +391,6 @@ All dependencies are managed through `dependencies.yaml` — never edit `conda/e
 | Same logic duplicated across files | When the same block (>10 lines) appears in 2+ places — any language, any context — extract a shared helper immediately. Don't duplicate first and refactor later. This applies to shell scripts, Python modules, C/C++ code equally. |
 | Feature not extensible for new variants | After implementing, ask: "If someone adds a new variant (test type, matrix entry, endpoint, etc.), what do they change?" If the answer is more than a one-line addition, the design needs a shared helper or auto-discovery. Avoid hardcoded lists of known variants. |
 | Reports generated without actionable detail | Reports and notifications must include enough context to act without digging: error messages, execution context (matrix, commit), history (new vs recurring), and links or attachments for full details. Provide downloadable artifacts when possible. |
-<!-- skill-evolution:end -->
 
 ## CI Gotchas
 
