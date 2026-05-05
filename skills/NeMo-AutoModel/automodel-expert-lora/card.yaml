@@ -1,0 +1,76 @@
+title: automodel_expert_lora
+validated_on: "2026-05-03"
+summary: >
+  NeMo AutoModel supports LoRA on fused MoE expert layers via PeftConfig with
+  target_modules and moe_rank_scaling. Setting target_modules=["*experts*"] patches
+  GroupedExperts and GroupedExpertsDeepEP modules. moe_rank_scaling=True divides dim
+  by n_activated_experts for expert layers while keeping full dim for dense layers.
+  GroupedExpertsTE raises NotImplementedError. Confirmed from source and unit tests.
+
+validation_status:
+  peft_config_dataclass:
+    - code_verified
+  apply_lora_to_linear_modules:
+    - code_verified
+  patch_moe_module_grouped_experts:
+    - code_verified
+  patch_moe_module_deepep:
+    - code_verified
+  patch_moe_module_te_not_supported:
+    - code_verified
+  moe_rank_scaling_dim_division:
+    - code_verified
+  wildcard_target_modules_matching:
+    - code_verified
+  unit_tests:
+    - code_verified
+  end_to_end_finetune:
+    - unclear
+
+feature_meaning:
+  peft_config: >
+    Dataclass controlling LoRA application. Key fields: target_modules (list of
+    module name patterns), dim (LoRA rank), alpha, match_all_linear (nn.Linear only),
+    moe_rank_scaling (divide dim by n_activated_experts for expert layers).
+  apply_lora_to_linear_modules: >
+    Main entry point. Freezes base model parameters, iterates named modules,
+    patches matched nn.Linear and MoE expert modules. Returns count of patched modules.
+  patch_moe_module: >
+    Patches a single MoE module. GroupedExperts → GroupedExpertsLoRA,
+    GroupedExpertsDeepEP → GroupedExpertsDeepEPLoRA, GroupedExpertsTE → NotImplementedError.
+  moe_rank_scaling: >
+    When True, expert lora_dim = dim // n_activated_experts; dense lora_dim = dim.
+    Requires dim >= n_activated_experts. Non-divisible dim uses floor division with warning.
+
+recommended_path:
+  expert_lora_minimal:
+    target_modules: '["*experts*"]'
+    dim: 16
+    alpha: 32
+  expert_lora_with_rank_scaling:
+    target_modules: '["*experts*", "linear"]'
+    dim: 16
+    alpha: 32
+    moe_rank_scaling: true
+  verification:
+    check: "n = apply_lora_to_linear_modules(model, peft_config); assert n > 0"
+
+known_constraints:
+  - GroupedExpertsTE is not supported and raises NotImplementedError; no workaround exists.
+  - dim must be >= n_activated_experts when moe_rank_scaling=True or ValueError is raised.
+  - Non-divisible dim is allowed with moe_rank_scaling but uses floor division; a warning is logged.
+  - match_all_linear=True only iterates nn.Linear and silently skips all MoE expert modules.
+  - target_modules patterns are matched against module names, not parameter names.
+
+known_limitations:
+  - End-to-end MoE LoRA fine-tune on a real checkpoint (Mixtral, Qwen3-MoE) not in CI.
+  - DoRA (use_dora=True) with MoE modules: not confirmed from unit tests.
+
+evidence:
+  - nemo_automodel/components/_peft/lora.py
+  - tests/unit_tests/_peft/test_lora_experts.py
+
+follow_up_validation:
+  - Add an end-to-end CI test that runs apply_lora_to_linear_modules on a real MoE checkpoint.
+  - Confirm DoRA (use_dora=True) behavior with GroupedExperts modules.
+  - Confirm moe_rank_scaling behavior when n_activated_experts > 2.

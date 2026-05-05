@@ -1,0 +1,44 @@
+[
+  {
+    "id": "moe-lora-001-match-all-linear-silent-skip",
+    "question": "I'm applying LoRA to a MoE model in NeMo AutoModel with match_all_linear=True but expert layers are not being trained. What's happening?",
+    "expected_skill": "automodel-expert-lora",
+    "expected_script": null,
+    "ground_truth": "match_all_linear=True only iterates nn.Linear modules. MoE expert layers (GroupedExperts, GroupedExpertsDeepEP) are not nn.Linear and are silently skipped. Fix: set target_modules=['*experts*'] in PeftConfig instead of relying on match_all_linear. Confirm patching by checking that apply_lora_to_linear_modules returns a count > 0 and that expert parameter names appear with requires_grad=True.",
+    "expected_behavior": [
+      "Identifies that match_all_linear only iterates nn.Linear and silently skips MoE expert modules",
+      "Explains that GroupedExperts and GroupedExpertsDeepEP are not nn.Linear",
+      "Provides target_modules=['*experts*'] as the fix in PeftConfig",
+      "Mentions apply_lora_to_linear_modules return count as a verification step",
+      "Does not suggest increasing dim as the primary fix"
+    ]
+  },
+  {
+    "id": "moe-lora-002-moe-rank-scaling",
+    "question": "How do I apply a smaller LoRA rank to MoE expert layers than to dense attention layers in NeMo AutoModel?",
+    "expected_skill": "automodel-expert-lora",
+    "expected_script": null,
+    "ground_truth": "Use moe_rank_scaling=True in PeftConfig. With dim=16 and n_activated_experts=2, expert layers get lora_dim=8 (dim // n_activated_experts) while dense linear layers keep the full dim=16. Set target_modules to cover both expert and linear modules. dim must be >= n_activated_experts or a ValueError is raised. Non-divisible dim uses floor division with a warning.",
+    "expected_behavior": [
+      "References moe_rank_scaling=True in PeftConfig as the mechanism",
+      "Explains that expert lora_dim = dim // n_activated_experts",
+      "Explains that dense linear layers keep the full dim",
+      "Notes that dim must be >= n_activated_experts or ValueError is raised",
+      "Notes that non-divisible dim uses floor division with a warning"
+    ]
+  },
+  {
+    "id": "moe-lora-003-groupedexpertste-not-supported",
+    "question": "I'm trying to apply LoRA to a Transformer Engine MoE model in NeMo AutoModel and getting a NotImplementedError. Why?",
+    "expected_skill": "automodel-expert-lora",
+    "expected_script": null,
+    "ground_truth": "GroupedExpertsTE (Transformer Engine expert layers) are not supported by patch_moe_module. When apply_lora_to_linear_modules encounters a GroupedExpertsTE module, it raises NotImplementedError with 'LoRA is not supported for Transformer Engine'. There is no workaround — TE expert LoRA is not implemented. Only GroupedExperts (→ GroupedExpertsLoRA) and GroupedExpertsDeepEP (→ GroupedExpertsDeepEPLoRA) are supported.",
+    "expected_behavior": [
+      "Identifies GroupedExpertsTE as the unsupported module type",
+      "States that patch_moe_module raises NotImplementedError for TE expert layers",
+      "States there is no workaround — TE expert LoRA is not implemented",
+      "Lists the supported types: GroupedExperts and GroupedExpertsDeepEP",
+      "Does not suggest a TE-specific workaround that does not exist"
+    ]
+  }
+]
