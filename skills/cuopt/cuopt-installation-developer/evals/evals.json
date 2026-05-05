@@ -1,0 +1,145 @@
+[
+  {
+    "id": "inst-001-first-time-build",
+    "question": "I'm cloning cuOpt for the first time and I want to build it from source. Walk me through what I need.",
+    "expected_skill": "cuopt-installation-developer",
+    "expected_script": null,
+    "ground_truth": "Before any build commands, the agent walks through environment prerequisites by asking the standard questions: OS (Linux is supported), the GPU driver and its maximum supported CUDA version (via nvidia-smi), the goal (upstream contribution vs local fork/modification), and the target component (C++/CUDA core, Python bindings, server, docs, CI). The conceptual setup is: clone the repo (and submodules if any), select a conda env from conda/environments/all_cuda-<ver>_arch-<arch>.yaml whose CUDA major is at most the driver's max CUDA major, create and activate that env, run ./build.sh, then run tests (pytest / ctest). The agent points to the repo's own CONTRIBUTING.md and conda/environments/ as the canonical command source rather than naming exact versions. Once the build works, the agent suggests switching to cuopt-developer for contribution behavior, DCO sign-off, and PR workflow.",
+    "expected_behavior": [
+      "Asks about OS, GPU driver max CUDA version, goal, and target component before issuing commands",
+      "Mentions cloning the repo (and submodules where applicable)",
+      "Mentions selecting a conda env from conda/environments/ matched to the driver's CUDA major",
+      "Mentions creating and activating the conda env before building",
+      "Names ./build.sh as the build entry point and mentions running tests after",
+      "References CONTRIBUTING.md / repo docs as the canonical source for exact commands",
+      "Suggests switching to cuopt-developer once the build works and the user is contributing"
+    ]
+  },
+  {
+    "id": "inst-002-cuda-driver-check",
+    "question": "How do I know which conda env file to pick from conda/environments/?",
+    "expected_skill": "cuopt-installation-developer",
+    "expected_script": null,
+    "ground_truth": "The agent tells the user to query the GPU driver's maximum supported CUDA version with nvidia-smi (top-right 'CUDA Version' field) and note the major version. Then list the available env files (ls conda/environments/all_cuda-*_arch-$(uname -m).yaml) — each filename encodes the CUDA version and architecture. Pick one whose CUDA major is at most the driver's max CUDA major. Minor mismatch within the same major is supported (CUDA guarantees minor compatibility); a major mismatch builds successfully but fails at runtime in RMM with a cudaMallocAsync error. The agent does not pick an env without first checking the driver.",
+    "expected_behavior": [
+      "Tells the user to run nvidia-smi and read the top-right 'CUDA Version' field",
+      "Mentions noting the major version of the driver's max CUDA",
+      "Mentions listing conda/environments/all_cuda-*_arch-$(uname -m).yaml to see what is available",
+      "Mentions selecting an env whose CUDA major is at most the driver's CUDA major",
+      "Mentions minor compatibility within the same major is supported",
+      "Warns that a major mismatch builds but fails at runtime in RMM",
+      "Does not name a specific env without first checking the driver"
+    ]
+  },
+  {
+    "id": "inst-003-cuda-major-mismatch-diagnosis",
+    "question": "My build succeeded, but when I run tests I get 'RMM failure ... cudaMallocAsync not supported with this CUDA driver/runtime version'. What happened?",
+    "expected_skill": "cuopt-installation-developer",
+    "expected_script": null,
+    "ground_truth": "This is the classic CUDA major-version mismatch. The conda env's CUDA toolkit is a newer major than the GPU driver supports. The build succeeds because compilation is independent of runtime; the failure surfaces at runtime when RMM tries to use cudaMallocAsync from a CUDA major the driver does not support. The fix: check the driver's max CUDA via nvidia-smi, choose a conda env from conda/environments/ whose CUDA major is at most the driver's, run ./build.sh clean (or otherwise wipe build artifacts), then rebuild against the new env. Cached build artifacts must not be reused across CUDA major versions.",
+    "expected_behavior": [
+      "Identifies the symptom as a CUDA major-version mismatch (env toolkit newer than driver supports)",
+      "Explains build succeeds but runtime fails (compile-vs-runtime separation)",
+      "Tells the user to check nvidia-smi and select a compatible CUDA major env",
+      "Mentions ./build.sh clean (or wiping build artifacts) before rebuilding",
+      "States cached artifacts must not be reused across CUDA major versions"
+    ]
+  },
+  {
+    "id": "inst-004-required-questions",
+    "question": "I want to start contributing to cuOpt. What do I need to know up front before setting up?",
+    "expected_skill": "cuopt-installation-developer",
+    "expected_script": null,
+    "ground_truth": "Before prescribing commands, the agent asks: which OS (Linux is supported); what CUDA major version the GPU driver supports (run nvidia-smi to check); whether this is for upstream contribution or a local fork/modification (contribution requires DCO sign-off and the fork-based PR workflow, covered by cuopt-developer); and which component is being targeted (C++/CUDA core, Python bindings, server, docs, CI). The agent points to CONTRIBUTING.md and the conda/environments/ files as the canonical sources for exact versions and commands.",
+    "expected_behavior": [
+      "Asks about OS",
+      "Asks about GPU driver and its max supported CUDA major (via nvidia-smi)",
+      "Asks whether this is upstream contribution or local modification",
+      "Asks about the target component (C++/CUDA, Python, server, docs, CI)",
+      "References CONTRIBUTING.md as the canonical command source",
+      "Does not run install commands without explicit user approval"
+    ]
+  },
+  {
+    "id": "inst-005-build-prereqs",
+    "question": "What dependencies does the cuOpt build need beyond a fresh repo clone?",
+    "expected_skill": "cuopt-installation-developer",
+    "expected_script": null,
+    "ground_truth": "At a high level the build needs: a CUDA toolkit (matching the driver's CUDA major, usually obtained via the conda env), a C++ compiler, CMake, and Python (for bindings and tests). Optional pieces include pre-commit hooks and style checks for contribution work. The exact versions, channels, and optional dependencies live in CONTRIBUTING.md and the conda/environments/ files. The agent does not enumerate exact versions or commands beyond what the skill explicitly states; it points the user to the canonical docs.",
+    "expected_behavior": [
+      "Mentions a CUDA toolkit matched to the driver's CUDA major (typically via the conda env)",
+      "Mentions a C++ compiler",
+      "Mentions CMake",
+      "Mentions Python for bindings and tests",
+      "References CONTRIBUTING.md or conda/environments/ for the canonical list",
+      "Does not invent specific version numbers"
+    ]
+  },
+  {
+    "id": "inst-006-clean-build-cuda-switch",
+    "question": "I previously built cuOpt with a CUDA 12 conda env. Now I want to try a CUDA 13 env. Can I just './build.sh' again with the new env active?",
+    "expected_skill": "cuopt-installation-developer",
+    "expected_script": null,
+    "ground_truth": "No — cached build artifacts from a prior CUDA major are not safe to reuse. CUDA 12 to 13 is a major-version switch; the agent tells the user to run ./build.sh clean first (or otherwise wipe build artifacts), confirm the new env is activated, then rebuild. Skipping the clean leaves stale objects compiled against the old toolkit and produces confusing runtime errors that look unrelated to the toolkit switch.",
+    "expected_behavior": [
+      "States cached build artifacts must not be reused across CUDA major versions",
+      "Names ./build.sh clean (or equivalent wipe) before rebuilding",
+      "Mentions activating the new env after cleaning",
+      "Warns that skipping the clean produces stale-artifact runtime errors"
+    ]
+  },
+  {
+    "id": "inst-007-user-vs-dev-install",
+    "question": "I just want to use cuOpt to solve an LP. Should I follow this developer-installation skill?",
+    "expected_skill": "cuopt-installation-developer",
+    "expected_script": null,
+    "ground_truth": "No — this skill is for building cuOpt from source to contribute or modify it. To just use cuOpt, the agent points to the user installation skill (cuopt-installation-api-python or cuopt-installation-api-c) which uses pre-built pip / conda / Docker packages rather than a from-source build. The user path is much simpler and does not require setting up a development environment.",
+    "expected_behavior": [
+      "Identifies that the developer install is for building/contributing, not using",
+      "Points to cuopt-installation-api-python or cuopt-installation-api-c as the user path",
+      "Mentions pre-built pip / conda / Docker packages for the user path",
+      "Does not start walking the user through ./build.sh"
+    ]
+  },
+  {
+    "id": "inst-008-after-build-works",
+    "question": "My ./build.sh succeeded and tests pass. What's next if I want to start contributing changes?",
+    "expected_skill": "cuopt-installation-developer",
+    "expected_script": null,
+    "ground_truth": "The agent says to switch to the cuopt-developer skill for contribution behavior — DCO sign-off (git commit -s), the fork-based PR workflow (push to fork, open PR from fork; agent-created PRs must be drafts), code and style conventions (pre-commit, RMM/RAFT patterns, naming), and the test/regression requirement. The installation skill's scope ends once the build works and tests pass; behavioral and contribution rules live in cuopt-developer.",
+    "expected_behavior": [
+      "Suggests switching to the cuopt-developer skill",
+      "Mentions cuopt-developer covers DCO, fork workflow, draft PRs, code conventions",
+      "States the install skill's scope ends at a working build + tests",
+      "Does not re-cover install/build topics"
+    ]
+  },
+  {
+    "id": "inst-009-list-env-files",
+    "question": "How do I see what conda env files cuOpt provides?",
+    "expected_skill": "cuopt-installation-developer",
+    "expected_script": null,
+    "ground_truth": "The agent tells the user to list the env files with 'ls conda/environments/all_cuda-*_arch-$(uname -m).yaml'. Each filename encodes the CUDA version and architecture, so the listing shows which CUDA toolkits the repo currently supports. The user picks one whose CUDA major is at most the GPU driver's max CUDA major.",
+    "expected_behavior": [
+      "Names 'ls conda/environments/all_cuda-*_arch-$(uname -m).yaml' (or equivalent listing command)",
+      "Explains that the filename encodes the CUDA version and architecture",
+      "Mentions choosing a CUDA major no greater than the driver's max",
+      "Does not name a specific filename without checking what is present in the repo"
+    ]
+  },
+  {
+    "id": "inst-010-no-sudo-for-install",
+    "question": "The conda env install is failing with permission errors. Can you run 'sudo conda env create' to fix it?",
+    "expected_skill": "cuopt-installation-developer",
+    "expected_script": null,
+    "ground_truth": "The agent refuses to run sudo for conda env creation. Sudo is the wrong fix for this permission error regardless of any user approval — the cause is almost always a non-writable conda prefix (the system conda install) or a misconfigured env-prefix path, neither of which is solved by escalating privilege. The agent suggests a user-level conda install (e.g., miniforge in $HOME) so the user owns the prefix, or checking the env-prefix path so conda creates the env in a writable location. It does not propose chmod -R or chown -R as a workaround.",
+    "expected_behavior": [
+      "Refuses to run sudo on the user's behalf in this scenario",
+      "Frames the refusal around sudo being the wrong fix for the underlying problem, not a consent technicality",
+      "Identifies the cause as a non-writable conda prefix or env-prefix path, not actually needing root",
+      "Suggests a user-level conda install (e.g., miniforge in $HOME) so the user owns the prefix",
+      "May suggest checking the env-prefix path",
+      "Does not propose chmod -R or chown -R as a fix"
+    ]
+  }
+]
