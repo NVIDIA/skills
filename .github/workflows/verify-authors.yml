@@ -1,0 +1,94 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# Verify every commit in a pull request was authored AND committed by a
+# contributor with an NVIDIA-affiliated email (or a github-noreply
+# address tied to a verified NVIDIA-org account).
+#
+# Catalog skill content is published externally under NVIDIA's name.
+# Allowing commits from arbitrary personal/external email addresses
+# creates IP-traceability gaps that are hard to clean up after the
+# fact. This check enforces that every commit in a human-authored
+# onboarding or catalog PR has a clear NVIDIA author chain.
+#
+# The automated/sync-skills branch is exempt — same reason as DCO:
+# it's the bot mirror, not a contributor.
+
+name: Verify Authors
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  authors:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch with full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Verify all commit author emails are NVIDIA-affiliated
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+
+          # Bot-managed sync branch is exempt — see header comment.
+          if [ "$HEAD_REF" = "automated/sync-skills" ]; then
+            echo "Author verification exempt for bot-managed branch '$HEAD_REF'."
+            exit 0
+          fi
+
+          # Allowed email patterns:
+          #   *@nvidia.com                  — corporate accounts
+          #   *@users.noreply.github.com    — github-anonymized accounts
+          #                                   (must still be tied to an
+          #                                   NVIDIA-org GitHub user)
+          allowed='@(nvidia\.com|users\.noreply\.github\.com)$'
+
+          violations=()
+          while read -r sha; do
+            author_email=$(git show --format='%ae' -s "$sha")
+            committer_email=$(git show --format='%ce' -s "$sha")
+            for email in "$author_email" "$committer_email"; do
+              if ! echo "$email" | grep -qE "$allowed"; then
+                subject=$(git show --format='%s' -s "$sha")
+                violations+=("${sha:0:7}  $email  $subject")
+              fi
+            done
+          done < <(git log --no-merges --format='%H' "$BASE_SHA..$HEAD_SHA")
+
+          if [ ${#violations[@]} -gt 0 ]; then
+            echo "::error::Some commits in this PR have non-NVIDIA author or committer emails."
+            echo ""
+            echo "Violations (sha  email  subject):"
+            printf '  %s\n' "${violations[@]}"
+            echo ""
+            echo "Catalog content is published under NVIDIA's name — every commit"
+            echo "must carry a corporate (@nvidia.com) or github-noreply email"
+            echo "tied to an NVIDIA org member."
+            echo ""
+            echo "To fix on your branch:"
+            echo ""
+            echo "  1. Reconfigure git for this repo to use your @nvidia.com address:"
+            echo "       git config user.email <you>@nvidia.com"
+            echo ""
+            echo "  2. Rewrite the existing commits to pick up the new author:"
+            echo "       git rebase --exec 'git commit --amend --reset-author --no-edit' \\"
+            echo "           origin/main && git push --force-with-lease"
+            echo ""
+            echo "If you are not an NVIDIA employee, please contact a CODEOWNER."
+            echo "External contributions to catalog content require explicit OSRB"
+            echo "review before merge and cannot be self-served."
+            exit 1
+          fi
+
+          echo "All commits authored and committed by NVIDIA-affiliated emails."
