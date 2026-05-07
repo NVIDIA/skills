@@ -71,6 +71,11 @@ Import from `nemo_evaluator.contrib.byob.scorers`:
 | `bleu` | `{"bleu_1"..4: float}` | Sentence-level BLEU-1 through BLEU-4 (add-1 smoothing) |
 | `rouge` | `{"rouge_1": float, "rouge_2": float, "rouge_l": float}` | ROUGE-1, ROUGE-2, ROUGE-L F1 |
 | `retrieval_metrics` | `{"precision_at_k": float, "recall_at_k": float, "mrr": float, "ndcg": float}` | Retrieval quality (expects `metadata.retrieved` + `metadata.relevant`) |
+| `multiple_choice_acc` | `{"acc": float, "acc_norm": float, "acc_greedy": float}` | lm-eval-harness-style multiple-choice loglikelihood. Requires `endpoint_type="completions_logprob"` and `choices=` / `choices_field=`. `acc` = raw argmax (MMLU); `acc_norm` = per-byte length-normalized argmax (ARC/BoolQ). |
+| `mcq_letter_extract` | `{"correct": bool, "parsed": bool}` | Extract A/B/C/D from text response and compare to target letter/index/choice text |
+| `gsm8k_answer` | `{"correct": bool, "parsed": bool}` | GSM8K numeric extractor: `#### N` marker, `\boxed{N}`, or last-number fallback |
+| `boolean_yesno` | `{"correct": bool, "parsed": bool}` | English yes/no extraction |
+| `chrf` | `{"chrf": float, "chrf_pp": float}` | sacreBLEU-style chrF / chrF++ for translation quality |
 
 All built-in scorers accept a single `ScorerInput` argument.
 
@@ -89,13 +94,51 @@ strict = all_of(contains, exact_match)   # Correct only if BOTH match
 - Exact string match -> `exact_match` built-in
 - Target appears in response -> `contains` built-in
 - Token overlap / partial credit -> `f1_token` built-in
-- Translation / summarization quality -> `bleu` or `rouge` built-in
+- Translation quality (BLEU) -> `bleu` built-in
+- Translation quality (chrF / chrF++) -> `chrf` built-in
+- Summarization quality (ROUGE) -> `rouge` built-in
 - Retrieval / RAG quality -> `retrieval_metrics` built-in
-- Number extraction (math answers) -> custom: extract last number with regex
-- Letter extraction (A/B/C/D) -> custom: extract first letter A-D
-- Yes/No (boolean QA) -> custom: detect yes/no with startswith + contains
+- GSM8K-style math (#### N) -> `gsm8k_answer` built-in
+- Letter extraction (A/B/C/D) -> `mcq_letter_extract` built-in
+- Yes/No (boolean QA) -> `boolean_yesno` built-in (English)
+- MMLU/ARC/BoolQ canonical (logprob ranking) -> `multiple_choice_acc` built-in with `endpoint_type="completions_logprob"` and `choices=` (or `choices_field=`)
 - Subjective quality -> LLM-as-Judge (see below)
 - Custom logic -> ask user to describe rules, generate scorer
+
+## Multiple-Choice Loglikelihood (lm-eval-harness parity)
+
+For MMLU / ARC / BoolQ-style benchmarks where the canonical metric is
+per-choice loglikelihood ranking, set `endpoint_type="completions_logprob"`
+and declare candidate continuations:
+
+```python
+from nemo_evaluator.contrib.byob import benchmark, scorer, ScorerInput
+from nemo_evaluator.contrib.byob.scorers import multiple_choice_acc
+
+@benchmark(
+    name="my-mmlu",
+    dataset="hf://my-org/mmlu?split=test",
+    prompt="Question: {question}\nAnswer:",
+    target_field="answer",                 # gold "A".."D" or 0..3
+    endpoint_type="completions_logprob",
+    choices=[" A", " B", " C", " D"],      # static list (MMLU)
+    # OR per-row variable choices (ARC):
+    # choices_field="choices_text",
+    num_fewshot=5,                         # optional fewshot prefix
+)
+@scorer
+def mmlu_score(s: ScorerInput) -> dict:
+    return multiple_choice_acc(s)          # acc + acc_norm + acc_greedy
+```
+
+The runner POSTs `/v1/completions` once per choice with
+`echo=true, logprobs=1, max_tokens=0` -- exact same shape as lm-eval's
+`local-completions`. `multiple_choice_acc` returns:
+
+- `acc` -- argmax of raw sum-logprobs (MMLU canonical).
+- `acc_norm` -- argmax of per-byte length-normalized sum-logprobs
+  (ARC / BoolQ canonical).
+- `acc_greedy` -- highest-loglikelihood greedy choice (diagnostic).
 
 ## LLM-as-Judge
 

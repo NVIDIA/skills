@@ -30,7 +30,7 @@ scripts are named `{Tier}_{Description}.sh` (e.g., `L0_Launch_training.sh`).
 |---|---|---|
 | L0 | Every PR, every push to `main`, schedule | Yes — PR cannot merge if L0 fails |
 | L1 | Push to `main`, schedule, PRs with `needs-more-tests` label | Yes |
-| L2 | Schedule and `workflow_dispatch` only | Yes (when triggered) |
+| L2 | Schedule, `workflow_dispatch`, PRs with `full-test-suite` label | Yes (when triggered) |
 | flaky | `workflow_dispatch` with `test_suite=all` only | No — failures are informational |
 
 H100 and GB200 each have independent L0/L1/L2/flaky jobs. Moving a script to

@@ -46,7 +46,7 @@ pre-flight
               └── cicd-container-build
                     ├── unit-tests-core
                     ├── unit-tests-diffusion
-                    └── functional-tests (L0 always; L1 with needs-more-tests label; L2 on schedule)
+                    └── functional-tests (L0 always; L1 with needs-more-tests label; L2 on schedule or full-test-suite label)
 ```
 
 - Slack notifications are sent on completion for scheduled and nightly runs.
