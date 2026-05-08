@@ -1,9 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
-
 # Advanced Triton patterns (cuTile → Triton)
 
 **Strategy hub:** For an ordered summary of this file plus [optimizing-reference.md](../references/optimizing-reference.md) (and a **mandatory Gemma FMHA checklist**), read **[references/optimization-strategy.md](../references/optimization-strategy.md)** first when converting attention or matching `gemma_attention`-class perf.

@@ -1,9 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
-
 # Gotchas — Most Common cuTile → Triton Translation Errors
 
 Comprehensive table of patterns that frequently break or regress when porting

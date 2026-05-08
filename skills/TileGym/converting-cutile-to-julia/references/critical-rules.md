@@ -1,9 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
-
 # Critical Rules for cuTile Python → Julia Conversion
 
 1. **1-based indexing everywhere**: `ct.bid`, `ct.num_tiles` axis, `dims` for reductions, `permutedims` axes, `ct.extract` indices, `ct.cat` axis — ALL shifted +1 from Python.

@@ -1,8 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
 # Triton Optimization Reference (cuTile → Triton)
 
 **Use this reference when converting or optimizing GEMM/BMM/attention-style Triton kernels** so the result is within ~20% of cuTile (or of an existing optimized Triton implementation). Patterns below are derived from real comparisons (e.g. BMM: pointer + TMA kernels) and apply to batched matmul, attention, and block-level matmul.

@@ -41,7 +41,7 @@ Work with user to prepare optimization environment:
 
    Note: classification is only used to pick the optimization priority order in the experiment loop. The **core metric** is always `latency (ms)`.
 4. Check GPU environment:
-   - Ensure a GPU node (B200/H100/H200) is available
+   - Ensure a GPU node (Blackwell or Ampere GPU) is available
    - All subsequent benchmark commands should run on the GPU node
 5. Study related references:
    - `references/optimization-playbook.md`: Step-by-step recipes for each optimization (A through J) with before/after code examples
@@ -119,27 +119,12 @@ Core methodology is to apply ONE optimization per iteration from the playbook, v
 
 LOOP:
 1. Check git status: Current git branch/commit we're on
-2. Profile and classify bottleneck using quick code inspection:
-
-   | Pattern in Code | Likely Bottleneck | Optimization |
-   |----------------|-------------------|--------------|
-   | `ct.gather`/`ct.scatter` where TMA possible | TMA fallback | A (TMA) |
-   | No `for ... in range(bid, n, num_programs)` | Missing persistent | B (Persistent) |
-   | `@ct.kernel` with no `occupancy=` AND no autotune | Untuned occupancy | C (Autotune) |
-   | `ct.mma(a, b, acc)` without tf32 guard | Missing TF32 | D (TF32) |
-   | No `latency=` hints on `ct.load`/`ct.store` | Missing latency hints | E (Latency) |
-   | `ct.store()` without `allow_tma=False` | Suboptimal store path | F (Store TMA) |
-   | Small fixed tile sizes | Tile size mismatch | G (Tile Size) |
-   | All A–J exhausted or inapplicable | Unknown / kernel-specific | K (Customized Creative Optimization Plan) |
-
-3. Select and apply ONE optimization from `references/optimization-playbook.md`:
-   - **Memory-bound priority**: A (TMA) -> B (Persistent) -> C (Autotune) -> F (Store TMA) -> G (Tile Size) -> E (Latency) -> K (Creative Optimization Plan)
-   - **Compute-bound priority**: D (TF32) -> G (Tile Size) -> C (Autotune + num_ctas) -> I (Swizzle) -> B (Persistent) -> K (Creative Optimization Plan)
-4. Verify correctness — if fails, **revert immediately**. Common causes: `flush_to_zero`/`rounding_mode=APPROX` changed results, tile size OOB, `allow_tma=False` semantics, persistent loop bound error
-5. Re-benchmark and compare against current baseline
-6. Git commit
-7. Record results to @sandbox/perf_results.md
-8. Decision rules:
+2. Select and apply ONE optimization from `references/optimization-playbook.md`:
+3. Verify correctness — if fails, **revert immediately**. Common causes: `flush_to_zero`/`rounding_mode=APPROX` changed results, tile size OOB, `allow_tma=False` semantics, persistent loop bound error
+4. Re-benchmark and compare against current baseline
+5. Git commit
+6. Record results to @sandbox/perf_results.md
+7. Decision rules:
 
    | Outcome | Action |
    |---------|--------|
@@ -152,6 +137,6 @@ LOOP:
 
 9. If keeping, advance the baseline numbers and continue loop
 10. If reverting, git reset back to where you started and try the next optimization in priority order
-UNTIL: all attempts are finished, or more than 20 iterations have occurred, or the user interrupts
+UNTIL: all attempts are finished, or more than 25 iterations have occurred, or the user interrupts
 
 *Be autonomous*: Ask user clarifications at setup phase. Once stepped into the experiment loop, do not pause to ask user feedback: Use your best judgement for decision making, consult the optimization playbook and perf knobs catalog promptly, and think harder if stuck.

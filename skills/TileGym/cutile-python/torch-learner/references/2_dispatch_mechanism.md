@@ -1,8 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
 # PyTorch Dispatch Mechanism
 
 This document explains how a Python-level PyTorch call routes through the dispatcher to reach a backend-specific C++ or CUDA implementation.

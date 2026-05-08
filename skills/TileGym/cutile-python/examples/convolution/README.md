@@ -1,8 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
 ## List of test examples for Convolution
 
 For Convolution parameters, the following can be either a single value or a tuple of values and you should generate the code accordingly.

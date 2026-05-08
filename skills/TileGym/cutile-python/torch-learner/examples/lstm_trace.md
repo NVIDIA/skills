@@ -1,8 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
 # Complete Trace: nn.LSTM
 
 This document traces the full implementation of `nn.LSTM` from the Python API down to CUDA/cuDNN kernels and the autograd backward pass.

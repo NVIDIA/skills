@@ -1,8 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
 # Well-Known Operations Reference
 
 This file documents PyTorch operations whose implementations are conventional and well-understood. For these ops, **skip the full source tracing workflow** and answer directly from this reference. Only trace the source if the user asks about a specific implementation detail not covered here.

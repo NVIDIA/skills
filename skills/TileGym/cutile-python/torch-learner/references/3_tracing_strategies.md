@@ -1,8 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
 # Tracing Strategies for Different Operation Types
 
 This document provides concrete, step-by-step tracing strategies for each category of PyTorch operation. Each strategy shows the exact files to check and patterns to search for.

@@ -1,9 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
-
 # File Structure & Registration (cuTile → Triton)
 
 Where to place Triton files when converting from cuTile. Inverse of the Triton→cuTile layout.

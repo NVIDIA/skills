@@ -1,8 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
 # PyTorch Codebase Map
 
 This document describes the general architecture and layout of the PyTorch source tree. Use this as a guide for navigating the cloned PyTorch repository.

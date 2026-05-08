@@ -1,8 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
 # PyTorch Implementation Tracing Workflow
 
 Trace any PyTorch operation from the user-facing Python API through the C++ ATen library down to CUDA kernels and autograd backward passes by reading actual source code.

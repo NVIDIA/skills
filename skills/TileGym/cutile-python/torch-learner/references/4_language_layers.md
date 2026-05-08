@@ -1,8 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
 # Reading PyTorch Code Across Language Layers
 
 This document explains how to read and navigate PyTorch code at each language layer: Python, C++ (ATen), CUDA, and auto-generated code.

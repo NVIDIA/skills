@@ -1,8 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
 # Deep Agent Orchestration Workflow
 
 For complex tasks, decompose the work into sub-problems and solve them with specialized agents. This approach is inspired by [KernelFalcon](https://pytorch.org/blog/kernelfalcon-autonomous-gpu-kernel-generation-via-deep-agents/) - the key insight is that LLMs succeed more reliably when given precise, well-scoped sub-tasks rather than a single large task.

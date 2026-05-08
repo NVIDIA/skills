@@ -1,9 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
-
 # Triton Runtime Error Debugging (cuTile → Triton)
 
 This guide covers runtime errors that commonly appear after converting a cuTile kernel to Triton.

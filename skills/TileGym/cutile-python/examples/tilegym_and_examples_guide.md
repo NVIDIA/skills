@@ -1,8 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
 # TileGym and Packaged Examples Guide
 
 **Always look at existing cuTile code before writing a new kernel.** There are two sources, in priority order: TileGym's own ops (primary), then the skill's packaged `examples/` (complementary, for ops TileGym does not yet cover).

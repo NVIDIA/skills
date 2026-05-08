@@ -1,8 +1,3 @@
-<!--- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. --->
-
-<!--- SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0 --->
-
-
 # Optimization strategy (cuTile → Triton)
 
 **Purpose:** One-page strategy distilled from [translations/advanced-patterns.md](../translations/advanced-patterns.md) and [optimizing-reference.md](./optimizing-reference.md). Agents **must** apply this when converting **attention / FMHA / Gemma-style** kernels (e.g. `gemma_attention`) or any kernel where Triton is expected to match an optimized in-repo baseline.
