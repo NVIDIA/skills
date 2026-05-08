@@ -1,0 +1,40 @@
+{
+  "skills": ["video-summarization"],
+  "profile": "lvs",
+  "prerequisite_deploy_mode": "remote-all",
+  "resources": {
+    "platforms": {
+      "L40S": {
+        "modes": ["remote-all"]
+      }
+    }
+  },
+  "env": "A full-remote deployed VSS lvs profile (deploy mode = `remote-all` - the agent LLM and LVS VLM dependencies are served by remote endpoints, no local NIMs). Run on one platform only: the LVS API surface tested here is independent of GPU model once the lvs profile is deployed. Required: LVS REST API reachable at http://localhost:38111, VSS Agent reachable at http://localhost:8000/docs, Docker available for non-destructive service status checks, and `jq` available for response validation. These checks intentionally avoid full video summarization because `skills/video-summarization/eval/lvs_profile_summarize.json` owns end-to-end summarization coverage.",
+  "expects": [
+    {
+      "query": "Using the `video-summarization` skill's LVS API reference, verify the running LVS service without summarizing a video: check readiness, list available models, request a recommended config for a 300-second video with a 60-second target response time and a 5-second target event duration, fetch metrics, and report the key results.",
+      "checks": [
+        "`curl -sf --max-time 15 http://localhost:38111/v1/ready` returns exit 0",
+        "`curl -sf --max-time 15 http://localhost:38111/models | jq -e '.data | length > 0'` returns exit 0",
+        "`curl -sf --max-time 15 -X POST http://localhost:38111/recommended_config -H 'Content-Type: application/json' -d '{\"video_length\":300,\"target_response_time\":60,\"usecase_event_duration\":5}' | jq -e '.chunk_size'` returns exit 0",
+        "`curl -sf --max-time 15 http://localhost:38111/metrics | grep -q .` returns exit 0",
+        "The agent reads or explicitly cites `references/lvs-api.md` when answering direct LVS API usage details.",
+        "The agent trajectory contains API calls to `/v1/ready`, `/models`, `/recommended_config`, and `/metrics` on port 38111.",
+        "The POST `/recommended_config` request body contains exactly the requested numeric values: video_length=300, target_response_time=60, and usecase_event_duration=5.",
+        "The agent does not call `/v1/summarize`, `/summarize`, or any VLM `/v1/chat/completions` endpoint for this query.",
+        "The final response reports LVS readiness, at least one model id, the recommended chunk size or text returned by `/recommended_config`, and that metrics were reachable."
+      ]
+    },
+    {
+      "query": "Using the `video-summarization` skill's LVS deployment reference, produce a non-destructive LVS deployment status report: identify the REST port, readiness endpoint, expected compose profile or container signal, whether the service is currently reachable, and where the detailed deployment runbook lives.",
+      "checks": [
+        "`curl -sf --max-time 15 http://localhost:38111/v1/ready` returns exit 0",
+        "The agent reads or explicitly cites `references/deploy-lvs-service.md` when answering deployment/status details.",
+        "The agent uses a non-destructive status probe such as `docker ps`, `docker compose ps`, `docker logs --tail`, or `curl` readiness checks.",
+        "The agent does not run destructive or state-changing deployment commands such as `docker compose down`, `docker stop`, `docker rm`, `docker compose up`, or `docker compose up --force-recreate`.",
+        "The final response identifies REST port 38111, readiness endpoint `/v1/ready`, and the `bp_developer_lvs_2d` compose profile or the `vss-lvs` / `lvs-server` service signal.",
+        "The final response points deployment, teardown, logs, or model/database swap details back to `references/deploy-lvs-service.md` rather than inventing a separate runbook path."
+      ]
+    }
+  ]
+}

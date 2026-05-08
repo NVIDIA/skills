@@ -1,0 +1,29 @@
+{
+  "skills": [
+    "deploy"
+  ],
+  "resources": {
+    "platforms": {
+      "L40S": {
+        "modes": [
+          "remote-all"
+        ]
+      }
+    }
+  },
+  "env": "A GPU host matching `{{platform}}` with Docker + NVIDIA container toolkit + `NGC_CLI_API_KEY`. For `remote-*` modes, the corresponding `LLM_REMOTE_URL`/`LLM_REMOTE_MODEL` and/or `VLM_REMOTE_URL`/`VLM_REMOTE_MODEL` must also be set. On DGX-Spark/Thor shared mode, `HF_TOKEN` is required for the Edge 4B vLLM. The LVS profile brings up the full long-video-summarization workflow (agent + UI + NIMs) on top of the base stack. The `/deploy` skill is responsible for the full deploy workflow \u2014 this spec verifies the resulting state by probing the live stack.",
+  "expects": [
+    {
+      "query": "Deploy the VSS **lvs** profile on {{platform}} in {{mode}} mode, using the `/deploy` skill end-to-end and autonomously.",
+      "checks": [
+        "`curl -sf --max-time 15 http://localhost:8000/docs` returns exit 0 (Agent REST API responsive)",
+        "`curl -sf --max-time 15 http://localhost:3000/` returns exit 0 (Agent UI responsive)",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-agent` returns exit 0",
+        "`docker ps --format '{{.Names}}' | grep -qx metropolis-vss-ui` returns exit 0",
+        "`docker ps --format '{{.Names}}' | grep -qx mdx-redis` returns exit 0",
+        "`docker ps --format '{{.Names}}' | grep -qx centralizedb-dev` returns exit 0",
+        "`docker ps --format '{{.Names}}' | grep -qx phoenix` returns exit 0"
+      ]
+    }
+  ]
+}

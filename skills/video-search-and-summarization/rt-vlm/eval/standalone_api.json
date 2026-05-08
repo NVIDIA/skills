@@ -1,0 +1,30 @@
+{
+  "skills": ["rt-vlm"],
+  "resources": {
+    "platforms": {
+      "L40S": {
+        "modes": ["standalone"]
+      }
+    }
+  },
+  "env": "A GPU host matching `{{platform}}` with Docker, NVIDIA Container Toolkit, `NGC_CLI_API_KEY`, and remote VLM endpoint env vars (`VLM_ENDPOINT_URL` or `VLM_REMOTE_URL`, `VLM_REMOTE_MODEL`, and `NVIDIA_API_KEY` or `NGC_CLI_API_KEY`). This eval deploys only the RT-VLM microservice from `{{repo_root}}/deployments/rtvi/rtvi-vlm/rtvi-vlm-docker-compose.yml` using the Docker Compose profile `bp_developer_alerts_2d_vlm`. It does not deploy a full VSS profile and must not use `/deploy` or `scripts/dev-profile.sh`. For standalone compose validation, remove the optional `rtvi-vlm.depends_on` block if Docker Compose rejects references to sibling NIM or broker services that are not part of this single-file project. Use host port 8018, disable Kafka unless a broker is explicitly started, and ensure the public NVIDIA RTSP sample stream is reachable from the host.",
+  "expects": [
+    {
+      "query": "Use the `/rt-vlm` skill to deploy and test RT-VLM standalone on {{platform}}. Work from `{{repo_root}}/deployments/rtvi/rtvi-vlm`, configure the standalone compose env for a remote OpenAI-compatible VLM backend, activate the Docker Compose profile `bp_developer_alerts_2d_vlm`, start only the `rtvi-vlm` service on http://localhost:8018, verify readiness and models, register a temporary RTSP stream with description `rt-vlm-eval-{{mode}}` and URL `rtsp://nv-wowza-pdc.nvidia.com:1935/vod/warehouse_1.mp4`, delete that temporary stream, and leave the service running for verifier probes. Run autonomously and clean up the temporary stream before your final reply.",
+      "checks": [
+        "The agent did not invoke `/deploy`, `scripts/dev-profile.sh`, or deploy a full VSS profile.",
+        "The agent used `deployments/rtvi/rtvi-vlm/rtvi-vlm-docker-compose.yml` and the Docker Compose profile `bp_developer_alerts_2d_vlm` to start `rtvi-vlm` standalone.",
+        "The agent handled standalone compose validation by removing or otherwise neutralizing the optional `rtvi-vlm.depends_on` references to sibling services if Docker Compose rejected the single-file project.",
+        "The standalone env set `RTVI_VLM_PORT=8018`, `RTVI_VLM_MODEL_TO_USE=openai-compat`, a non-empty `RTVI_VLM_ENDPOINT`, a non-empty `RTVI_VLM_OPENAI_MODEL_DEPLOYMENT_NAME`, and `RTVI_VLM_KAFKA_ENABLED=false` unless the agent also started a Kafka broker.",
+        "`curl -sf --max-time 15 http://localhost:8018/v1/health/ready` returns exit 0.",
+        "`curl -sf --max-time 15 http://localhost:8018/v1/models` returns exit 0 and returns JSON with a non-empty model list or model metadata.",
+        "`docker ps --format '{{.Names}}' | grep -qx rtvi-vlm` returns exit 0.",
+        "The agent called `POST http://localhost:8018/v1/streams/add` with `liveStreamUrl` exactly `rtsp://nv-wowza-pdc.nvidia.com:1935/vod/warehouse_1.mp4` and a description containing `rt-vlm-eval`.",
+        "The agent parsed the RT-VLM stream id from the `results[0].id` field returned by `/v1/streams/add`, not from `.streams[0].id`.",
+        "The agent called `DELETE http://localhost:8018/v1/streams/delete/<stream_id>` for the temporary `rt-vlm-eval` stream before finishing.",
+        "`curl -sf --max-time 15 http://localhost:8018/v1/streams/get-stream-info` returns exit 0 and the response does not contain `rt-vlm-eval`.",
+        "The agent did not reference or try to run `tests/kafka/test_kafka_consumer.py`."
+      ]
+    }
+  ]
+}

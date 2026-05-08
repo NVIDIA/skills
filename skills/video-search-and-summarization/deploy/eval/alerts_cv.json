@@ -1,0 +1,29 @@
+{
+  "skills": [
+    "deploy"
+  ],
+  "resources": {
+    "platforms": {
+      "L40S": {
+        "modes": [
+          "remote-all"
+        ]
+      }
+    }
+  },
+  "env": "Multi-GPU host matching `{{platform}}` with Docker + NVIDIA container toolkit + `NGC_CLI_API_KEY`. For `remote-*` modes, the corresponding `LLM_REMOTE_URL`/`LLM_REMOTE_MODEL` and/or `VLM_REMOTE_URL`/`VLM_REMOTE_MODEL` must be set. The **alerts-verification (CV)** mode uses `deploy -m verification`: RT-CV perception generates candidate alerts upstream (one dedicated GPU), and the VLM reviews each candidate to reduce false positives. On H100/RTX-PRO-6000 two GPUs are enough (CV on GPU 0, shared LLM+VLM on GPU 1). On L40S 48GB \u00d7 2, LLM+VLM can't fit on one GPU, so only `remote-*` modes are supported. DGX-Spark (single GPU) can't run this mode at all. See `skills/deploy/references/alerts.md` \u00a7 *Two Modes*.",
+  "expects": [
+    {
+      "query": "Deploy the VSS **alerts** profile on {{platform}} in {{mode}} mode using `/deploy -m verification` (CV-driven alert generation with VLM-as-verifier). Run end-to-end and autonomously.",
+      "checks": [
+        "`curl -sf --max-time 15 http://localhost:8000/docs` returns exit 0 (Agent REST API responsive)",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-agent` returns exit 0 (Agent backend)",
+        "`docker ps --format '{{.Names}}' | grep -qx mdx-redis` returns exit 0 (shared message bus)",
+        "`docker ps --format '{{.Names}}' | grep -qx perception-alerts` returns exit 0 (RT-CV perception \u2014 the 'CV' in this mode)",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-behavior-analytics-alerts` returns exit 0 (rule-based alert generation on CV output)",
+        "`docker ps --format '{{.Names}}' | grep -qx alert-bridge` returns exit 0 (routes CV-generated alerts to VLM verifier)",
+        "`docker ps --format '{{.Names}}' | grep -qx mdx-nvstreamer-alerts` returns exit 0 (video ingestion source)"
+      ]
+    }
+  ]
+}

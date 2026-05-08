@@ -1,0 +1,28 @@
+{
+  "skills": [
+    "deploy"
+  ],
+  "resources": {
+    "platforms": {
+      "L40S": {
+        "modes": [
+          "remote-all"
+        ]
+      }
+    }
+  },
+  "env": "A GPU host matching `{{platform}}` with Docker + NVIDIA container toolkit + `NGC_CLI_API_KEY`. For `remote-*` modes, the corresponding `LLM_REMOTE_URL`/`LLM_REMOTE_MODEL` and/or `VLM_REMOTE_URL`/`VLM_REMOTE_MODEL` must be set. The **alerts-real-time (VLM)** mode uses `deploy -m real-time`: the VLM continuously processes live video at periodic intervals, producing alerts directly without upstream CV filtering \u2014 broader coverage, higher GPU load. See `skills/deploy/references/alerts.md` \u00a7 *Two Modes*.",
+  "expects": [
+    {
+      "query": "Deploy the VSS **alerts** profile on {{platform}} in {{mode}} mode using `/deploy -m real-time` (continuous VLM-driven alert generation). Run end-to-end and autonomously.",
+      "checks": [
+        "`curl -sf --max-time 15 http://localhost:8000/docs` returns exit 0 (Agent REST API responsive)",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-agent` returns exit 0 (Agent backend)",
+        "`docker ps --format '{{.Names}}' | grep -qx mdx-redis` returns exit 0 (shared message bus)",
+        "`docker ps --format '{{.Names}}' | grep -qx rtvi-vlm` returns exit 0 (continuous VLM processor \u2014 the 'VLM' in this mode)",
+        "`docker ps --format '{{.Names}}' | grep -qx mdx-nvstreamer-alerts` returns exit 0 (video ingestion source)",
+        "`! docker ps --format '{{.Names}}' | grep -qx perception-alerts` returns exit 0 (real-time mode does NOT run the CV perception pipeline)"
+      ]
+    }
+  ]
+}

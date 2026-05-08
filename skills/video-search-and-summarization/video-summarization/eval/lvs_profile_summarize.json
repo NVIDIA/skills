@@ -1,0 +1,44 @@
+{
+  "skills": ["video-summarization", "sensor-ops"],
+  "profile": "lvs",
+  "resources": {
+    "platforms": {
+      "L40S": {
+        "modes": ["remote-all"]
+      }
+    }
+  },
+  "env": "A **full-remote deployed VSS lvs profile** (deploy mode = `remote-all` — the agent's LLM and the VLM that LVS calls are both served via remote launchpad endpoints, no local NIMs). Run on ONE platform only — summarization is throughput-bound on the remote VLM, so fanning out across platforms doesn't materially change coverage. Pick the cheapest available host (L40S recommended); the lvs profile uses `network_mode: host` so LVS reaches VST via the host IP. Required: LVS microservice reachable at http://localhost:38111/v1/ready (expect HTTP 200; 503 means still warming up — retry), VST reachable at http://localhost:30888/vst/api/v1 (for clip URL resolution via sensor-ops), a sample warehouse video pre-uploaded to VIOS (seed via the sensor-ops upload query before running these checks), AND the Brev secure-link env vars set (BREV_ENV_ID from /etc/environment, BREV_LINK_PREFIX defaulting to 77770 per launchable convention — see skills/deploy/references/brev.md). LVS fetches the clip URL over HTTP from inside its own container; without the Brev secure link the URL will be http://localhost:... / http://<internal-ip>:... and LVS will either 404 or hang.",
+  "expects": [
+    {
+      "query": "Summarize the uploaded warehouse video with scenario 'warehouse monitoring' and events ['boxes falling', 'forklift stuck', 'person entering restricted area'].",
+      "checks": [
+        "The agent issues exactly one POST http://localhost:38111/summarize call — not zero, not two, no parallel hedging",
+        "The POST /summarize request body is application/json and contains the keys {url, model, scenario, events, chunk_duration, num_frames_per_chunk}; scenario equals 'warehouse monitoring' and events equals the three user-supplied strings verbatim",
+        "The url field points at a Brev secure-link clip URL (https://<BREV_LINK_PREFIX>-<BREV_ENV_ID>.brevlab.com/...), NOT http://localhost:... and NOT http://<internal-ip>:...",
+        "The LVS response is HTTP 200 and the body is an OpenAI-style envelope with choices[0].message.content populated as a JSON-encoded string",
+        "Parsing choices[0].message.content as JSON yields an object with non-empty fields {video_summary, events, total_events, uuid}",
+        "events is a non-empty array and every element has the keys {id, start_time, end_time, type, description}",
+        "The agent renders the video_summary field verbatim in its final reply — no paraphrasing, no added emojis, no re-voicing",
+        "The agent renders every event returned by LVS (not a subset), preserving the description field in full",
+        "The agent never calls POST /v1/chat/completions on a VLM endpoint directly — all summarization traffic goes through LVS"
+      ]
+    },
+    {
+      "query": "Summarize the uploaded warehouse video using default scenario and events.",
+      "checks": [
+        "The POST /summarize request body has scenario='activity monitoring' and events=['notable activity']",
+        "The LVS response is HTTP 200 with a non-empty video_summary and a non-empty events array",
+        "The agent's final reply notes that generic defaults were used and offers to redo the summary with more specific parameters"
+      ]
+    },
+    {
+      "query": "Summarize the uploaded warehouse video while LVS is stopped (simulate by `docker stop` of the LVS container before the query).",
+      "checks": [
+        "The agent's readiness probe against http://localhost:38111/v1/ready returns a connection error or non-200 status",
+        "The agent fails the request with an explicit 'LVS is unreachable' error message — it does NOT fall back to a VLM, does NOT summarize from metadata, and does NOT silently succeed",
+        "No POST /v1/chat/completions call is made to any VLM endpoint as a fallback"
+      ]
+    }
+  ]
+}

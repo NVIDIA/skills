@@ -1,0 +1,42 @@
+{
+  "skills": ["vios"],
+  "profile": "base",
+  "resources": {
+    "platforms": {
+      "L40S": {
+        "modes": ["remote-all"]
+      }
+    }
+  },
+  "env": "A **full-remote deployed VSS base profile** (deploy mode = `remote-all` — LLM and VLM both via remote launchpad endpoints, no local NIMs). Run on ONE platform only — the vios skill exercises VIOS / VST which is GPU-independent, so there's no benefit to fanning out. Required: VST reachable at http://localhost:30888/vst/api/v1 AND the Brev secure-link env vars set (BREV_ENV_ID from /etc/environment, BREV_LINK_PREFIX defaulting to 77770 per launchable convention — see skills/deploy/references/brev.md). Without BREV_ENV_ID the returned media URLs will be raw http://localhost:... and the Brev-link checks will fail.",
+  "expects": [
+    {
+      "query": "Upload the sample warehouse video to VIOS with timestamp 2025-01-01T00:00:00.000Z.",
+      "checks": [
+        "The upload API call (PUT /vst/api/v1/storage/file/<filename>?timestamp=...) returns HTTP 2xx",
+        "The response JSON contains both a sensorId and a streamId (non-empty UUIDs)",
+        "curl -sf http://localhost:30888/vst/api/v1/sensor/list returns a JSON array containing a sensor whose name matches the uploaded video's filename stem",
+        "curl -sf http://localhost:30888/vst/api/v1/sensor/<sensorId>/streams returns a non-empty streams array whose main stream's url is a local file path under /home/vst/... or similar (NOT rtsp://)"
+      ]
+    },
+    {
+      "query": "Extract a snapshot from 5 seconds into the uploaded video and return a shareable URL.",
+      "checks": [
+        "GET /vst/api/v1/replay/stream/<streamId>/picture/url?startTime=2025-01-01T00:00:05.000Z returns a JSON object with a non-empty imageUrl field",
+        "curl -sf -o /dev/null -w '%{http_code}' <imageUrl> returns 200 (use GET, not HEAD — VST lazy-renders snapshots and HEAD returns 404 until first GET materializes the file)",
+        "curl -sf -o /dev/null -w '%{content_type}' <imageUrl> returns a value starting with image/ (typically image/jpeg)",
+        "curl -sf -o /dev/null -w '%{size_download}' <imageUrl> returns a value greater than 2000 (rejects empty / error-placeholder images)"
+      ]
+    },
+    {
+      "query": "Extract a video clip from 3 to 5 seconds (mp4 container) from the uploaded video and return a shareable URL.",
+      "checks": [
+        "GET /vst/api/v1/storage/file/<streamId>/url?startTime=2025-01-01T00:00:03.000Z&endTime=2025-01-01T00:00:05.000Z&container=mp4&disableAudio=true returns a JSON object with a non-empty videoUrl field",
+        "curl -sf -o /dev/null -w '%{http_code}' <videoUrl> returns 200 (use GET, not HEAD — VST lazy-renders clips and HEAD returns 404 until first GET materializes the file)",
+        "curl -sf -o /dev/null -w '%{content_type}' <videoUrl> returns a value starting with video/ (typically video/mp4)",
+        "curl -sf -o /dev/null -w '%{size_download}' <videoUrl> returns a value greater than 1000 (rejects empty / error-page responses; a 2s 360p clip can legitimately render at a few KB)",
+        "The response JSON's startTime is within a minute of the requested 00:00:03 and expiryISO is in the future"
+      ]
+    }
+  ]
+}

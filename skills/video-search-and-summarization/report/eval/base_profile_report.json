@@ -1,0 +1,44 @@
+{
+  "skills": ["report"],
+  "profile": "base",
+  "resources": {
+    "platforms": {
+      "L40S": {
+        "modes": ["remote-all"]
+      }
+    }
+  },
+  "env": "VSS **base** profile on the target host: VSS agent HTTP API on **8000** (e.g. `http://localhost:8000/docs`), VST reachable at http://localhost:30888/vst/api/v1. Use **remote-all** (remote LLM + VLM) so no local NIMs are required. Set Brev secure-link vars (`BREV_ENV_ID`, `BREV_LINK_PREFIX`) if checks validate media URLs. (See `skills/report/SKILL.md`).",
+  "expects": [
+    {
+      "query": "Check if the warehouse_safety_0001 video is already uploaded on VST. If it doesn't exist, upload the warehouse_safety_0001 video to VIOS with timestamp 2025-01-01T00:00:00.000Z. If it exists, skip the uploading.",
+      "checks": [
+        "Trajectory or reasoning shows probing VST/VIOS for warehouse_safety_0001 **before** deciding to upload—for example listing sensors/streams via the agent tools (or equivalent REST such as curl /vst/api/v1/sensor/list)—not unconditional PUT-only behavior.",
+        "curl -sf http://localhost:30888/vst/api/v1/sensor/list returns a JSON array containing a sensor whose name matches the uploaded video's filename stem",
+        "curl -sf http://localhost:30888/vst/api/v1/sensor/<sensorId>/streams returns a non-empty streams array whose main stream's url is a local file path under /home/vst/... or similar (NOT rtsp://)"
+      ]
+    },
+    {
+      "query": "Verify the VSS stack is ready for the **report** skill. Confirm the agent serves OpenAPI at `/docs` and that VST lists at least one stream.",
+      "checks": [
+        "curl -sf --max-time 10 -o /dev/null -w '%{http_code}' http://localhost:8000/docs returns 200",
+        "curl -sf --max-time 10 http://localhost:30888/vst/api/v1/sensor/streams returns HTTP 200 and a non-empty JSON body"
+      ]
+    },
+    {
+      "query": "Give me a report for warehouse_safety_0001. VSS agent is on http://localhost:8000",
+      "checks": [
+        "The run performed at least one successful POST to http://localhost:8000/generate (or equivalent agent base URL) with Content-Type application/json and a JSON body containing input_message with HTTP 2xx.",
+        "The POST input_message asks the agent for a timestamped captioned summary for sensor or file warehouse_safety_0001 but does NOT use the word report (skill rule DO NOT mention a report to vss agent); if echoed in trajectory or logs this must hold.",
+        "The user-facing markdown has a single top-level title line matching # Video Analysis Report (allows leading whitespace after #).",
+        "The markdown contains ## Basic Information followed by a pipe-table (Field | Value) including every row header from the skill template: Report Identifier; Date of Analysis; Time of Analysis; Reporting AI Agent; Video Source; Analysis Request — each paired cell is filled with concrete text (no raw placeholders like literal <sensor_id>, <YYYY-MM-DD>, '<e.g.', or duplicate Field names without values).",
+        "The Basic Information Report Identifier row value matches pattern vss_report_ followed by 8-digit date (YYYYMMDD), underscore, and 6-digit time (HHMMSS) as in SKILL (vss_report_<YYYYMMDD_HHMMSS>).",
+        "The Basic Information Date of Analysis value looks like calendar date YYYY-MM-DD (four digits-two digits-two digits) not a template stub; Time of Analysis looks like HH:MM:SS.",
+        "The Basic Information Video Source row names warehouse_safety_0001",
+        "The Basic Information Analysis Request row restates or paraphrases the user ask (report about warehouse_safety_0001 context) rather than staying empty.",
+        "The markdown contains ## Analysis Results and beneath it substantive content: the pasted agent caption summary with timestamps or time segments (seconds or ranges), chronological sense, non-empty—not only headings or placeholders.",
+        "The Analysis Results content is visibly derived from the agent response (caption-style description); it is not a single sentence like N/A covering the whole section unless the agent truly returned that."
+      ]
+    }
+  ]
+}
