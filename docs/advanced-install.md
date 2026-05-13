@@ -1,0 +1,109 @@
+<!-- SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0 -->
+<!-- Copyright (c) 2026 NVIDIA Corporation. All rights reserved. -->
+
+# Advanced Installation
+
+Use this guide when you need more control than the root README quickstart: non-interactive installs, specific agents, global vs project scope, updates, removals, or a manual fallback.
+
+## Requirements
+
+- Node.js and npm available on your PATH. The examples use `npx`, which ships with npm.
+- Access to `https://github.com/NVIDIA/skills`.
+- An AI agent that supports Agent Skills, such as Claude Code, Codex, Cursor, OpenCode, Windsurf, Gemini CLI, or another compatible agent.
+
+## List Skills Before Installing
+
+```bash
+npx skills add nvidia/skills --list
+```
+
+Use this when you want to inspect the catalog before selecting a skill.
+
+## Install One Skill
+
+```bash
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python
+```
+
+Use the skill name from the `name:` field in the skill's `SKILL.md`. In this catalog, names usually match the leaf folder under `skills/<product>/`.
+
+## Install to a Specific Agent
+
+```bash
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent codex
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent claude-code
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent cursor
+```
+
+You can pass `--agent` more than once:
+
+```bash
+npx skills add nvidia/skills \
+  --skill cuopt-numerical-optimization-api-python \
+  --agent codex \
+  --agent claude-code
+```
+
+## Choose Project or Global Scope
+
+Project installs are the default. They place links under the current project's agent-specific skills directory so the skills travel with that project.
+
+```bash
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python
+```
+
+Global installs make the skill available across projects for the selected agent:
+
+```bash
+npx skills add nvidia/skills \
+  --skill cuopt-numerical-optimization-api-python \
+  --agent codex \
+  --global
+```
+
+## Non-Interactive Install
+
+Use `--yes` when scripting setup or bootstrapping a development environment:
+
+```bash
+npx skills add nvidia/skills \
+  --skill cuopt-numerical-optimization-api-python \
+  --agent codex \
+  --global \
+  --yes
+```
+
+## Update or Remove Installed Skills
+
+```bash
+# See installed skills
+npx skills list
+
+# Check for updates
+npx skills check
+
+# Update all installed skills
+npx skills update
+
+# Remove a skill
+npx skills remove cuopt-numerical-optimization-api-python
+```
+
+## Manual Fallback
+
+Prefer `npx skills add` because it handles agent directories, global vs project scope, and updates. If you cannot use Node.js or npm, you can still copy a skill directory manually:
+
+1. Open the product folder under [`skills/`](../skills/).
+2. Copy the specific skill directory containing `SKILL.md`.
+3. Place it in your agent's skills directory.
+
+Common global locations are:
+
+| Agent | Global skills directory |
+|-------|-------------------------|
+| Claude Code | `~/.claude/skills/` |
+| Codex | `~/.codex/skills/` |
+| Cursor | `~/.cursor/skills/` |
+
+Manual installs do not participate in `npx skills update`, so use them only as a fallback.
+

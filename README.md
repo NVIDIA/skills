@@ -21,25 +21,24 @@ We are building this in the open. The catalog, sync pipeline, and roadmap are pu
 
 ## Quickstart
 
-Browse the [Available Skills](#available-skills) table below, then install directly from this repo — every skill is mirrored here under `skills/`:
+Use the [`skills` CLI](https://github.com/vercel-labs/skills) to install NVIDIA skills into the AI agent you use. The CLI runs through `npx`, so you do not need to clone this repo or copy skill folders by hand.
 
 ```bash
-# Example: install the cuOpt LP/MILP skill
-git clone --depth 1 --filter=blob:none --sparse https://github.com/NVIDIA/skills.git
-cd skills && git sparse-checkout set skills/cuopt/cuopt-lp-milp-api-python
-cp -r skills/cuopt/cuopt-lp-milp-api-python ~/.claude/skills/
+# Browse the NVIDIA catalog without installing anything
+npx skills add nvidia/skills --list
+
+# Install from the NVIDIA catalog (interactive)
+npx skills add nvidia/skills
+
+# Install one skill into the current project and skip prompts
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --yes
 ```
 
 That's it — the skill activates automatically the next time your agent encounters a relevant task. For example, ask your agent to "solve a linear programming problem with cuOpt" and the skill guides it through the cuOpt Python API.
 
-### Install by Agent
+The CLI can prompt you to choose where to install the skill, or you can target agents explicitly using a `--agent` option, e.g. `--agent claude-code --agent codex --agent cursor`.
 
-| Agent / Framework | Installation |
-|-------------------|-------------|
-| Claude Code | Copy the skill directory into `~/.claude/skills/` |
-| Codex | Copy the skill directory into your project's `.codex/skills/` folder |
-| Cursor | Copy the skill directory into your project's `.cursor/skills/` folder |
-| Other agents | Copy the skill directory into your agent's skills folder |
+For non-interactive installs, global installs, agent-specific installs, updates, removals, and fallback manual copying, see [Advanced installation](docs/advanced-install.md).
 
 ---
 
@@ -109,6 +108,7 @@ For issues with **this catalog repo itself** (README, structure, listing a new p
 ```
 NVIDIA/skills/
 ├── skills/                  # All skills, mirrored daily from product repos
+│   ├── README.md             # Install guidance for people browsing this folder directly
 │   ├── CUDA-Q/               # CUDA-Q skills
 │   ├── cuopt/                # cuOpt skills
 │   ├── Megatron-Bridge/      # Megatron-Bridge skills
@@ -128,6 +128,8 @@ NVIDIA/skills/
 │   ├── ...
 │   ├── tensorrt-llm.yml
 │   └── README.md             # Schema and onboarding instructions
+├── docs/
+│   └── advanced-install.md   # Advanced skills CLI usage
 ├── .github/workflows/       # Automated sync pipeline
 ├── CONTRIBUTING.md          # Contribution guidelines
 ├── SECURITY.md              # Security reporting policy
@@ -153,4 +155,3 @@ This repository adheres to the [Agent Skills specification](https://agentskills.
 ## License
 
 This project is dual-licensed under the [Apache License 2.0](LICENSE) and [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE).
-
