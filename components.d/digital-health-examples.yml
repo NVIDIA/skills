@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: NVIDIA Digital Health Examples
+repo: NVIDIA/digital-health-examples
+description: Agent skills for clinical AI workflows — clinical ASR evaluation flywheel (term curation, synthetic benchmark generation, KER scoring, fine-tune guidance).
+skills:
+  - path: .agents/skills/
+    catalog_dir: digital-health-examples
