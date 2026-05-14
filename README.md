@@ -41,7 +41,7 @@ Use this when you already know the skill name and want to skip prompts.
 npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --yes
 ```
 
-Replace `cuopt-numerical-optimization-api-python` with any skill name from the catalog.
+Replace `cuopt-numerical-optimization-api-python` with any skill name from the [Skill Catalog](#skill-catalog).
 
 ### Install for a Specific Agent
 
@@ -94,7 +94,7 @@ For non-interactive installs, global installs, agent-specific installs, updates,
 
 ---
 
-## Available Skills
+## Skill Catalog
 
 <!-- skills-table-start -->
 | Product | Description | Skills | Catalog | Source | Version |
@@ -189,7 +189,7 @@ NVIDIA/skills/
 └── LICENSE                  # Apache 2.0
 ```
 
-Skills are maintained in their respective product repos (see the **Source** column in [Available Skills](#available-skills)) and automatically synced to this repo daily.
+Skills are maintained in their respective product repos (see the **Source** column in the [Skill Catalog](#skill-catalog)) and automatically synced to this repo daily.
 
 ---
 
