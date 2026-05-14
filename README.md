@@ -11,44 +11,23 @@
 
 ---
 
-Skills are portable instruction sets that teach AI agents how to use NVIDIA CUDA-X libraries, AI Blueprints, and platform tools correctly. From solving vehicle routing problems with cuOpt, to deploying RAG pipelines, to onboarding models into TensorRT-LLM, every skill listed here is **published and verified by NVIDIA**.
-
-This repository is a **catalog** — skills are maintained in their respective product repos and mirrored here daily via an automated sync pipeline. It follows the open [Agent Skills specification](https://agentskills.io/specification), making skills compatible with any AI agent or framework that supports the standard.
-
-We are building this in the open. The catalog, sync pipeline, and roadmap are public so the community can see what we ship, what we plan to ship, and how we secure skills for use. As we add signing, scanning, and evaluation, each improvement lands here incrementally.
+Skills are portable instruction sets that teach AI agents how to use NVIDIA CUDA-X libraries, AI Blueprints, and platform tools correctly. Every skill listed here is **published and verified by NVIDIA**.
 
 ---
 
 ## Quickstart
 
-Use the [`skills` CLI](https://github.com/vercel-labs/skills) to install NVIDIA skills into the AI agent you use. The CLI runs through `npx`, so you do not need to clone this repo or copy skill folders by hand.
-
-Pick the command that matches what you want to do. Each section below keeps commands in copyable command blocks.
-
-| Goal | Start here |
-|------|------------|
-| Browse the catalog | [Browse the Catalog](#browse-the-catalog) |
-| Install interactively | [Install Interactively](#install-interactively) |
-| Install one skill without prompts | [Install One Skill](#install-one-skill) |
-| Install one skill for a specific agent | [Install for Specific Agents](#install-for-specific-agents) |
-
-### Browse the Catalog
-
-Use this when you want to see available NVIDIA skills before installing anything.
-
-```bash
-npx skills add nvidia/skills --list
-```
-
-### Install Interactively
-
-Use this when you want the CLI to walk you through skill and destination choices.
+Install NVIDIA skills with the default [`skills` CLI](https://github.com/vercel-labs/skills) flow:
 
 ```bash
 npx skills add nvidia/skills
 ```
 
-### Install One Skill
+The CLI runs through `npx` and prompts you to choose a skill and install destination. You do not need to clone this repo or copy skill folders by hand.
+
+The skill is available the next time your agent loads skills and encounters a relevant task. For example, ask your agent to "solve a linear programming problem with cuOpt" and the skill guides it through the cuOpt Python API.
+
+### Install One Skill Without Prompts
 
 Use this when you already know the skill name and want to skip prompts.
 
@@ -58,7 +37,7 @@ npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --y
 
 Replace `cuopt-numerical-optimization-api-python` with any skill name from the catalog.
 
-### Install for Specific Agents
+### Install for a Specific Agent
 
 Use `--agent` to target a specific AI coding agent. These are common client targets; for the full list of supported clients, see the [`skills` CLI Supported Agents table](https://github.com/vercel-labs/skills#supported-agents).
 
@@ -97,7 +76,13 @@ npx skills add nvidia/skills \
   --agent kiro-cli
 ```
 
-That's it — the skill is available the next time your agent loads skills and encounters a relevant task. For example, ask your agent to "solve a linear programming problem with cuOpt" and the skill guides it through the cuOpt Python API.
+### Browse the Catalog
+
+Use this when you want to see available NVIDIA skills before installing anything.
+
+```bash
+npx skills add nvidia/skills --list
+```
 
 For non-interactive installs, global installs, agent-specific installs, updates, removals, and fallback manual copying, see [Advanced installation](docs/advanced-install.md).
 
