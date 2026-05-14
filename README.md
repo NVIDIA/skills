@@ -80,7 +80,7 @@ npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --a
 npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent cursor
 ```
 
-**Kiro CLI**
+**Kiro**
 
 ```bash
 npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent kiro-cli
