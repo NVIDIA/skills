@@ -23,20 +23,81 @@ We are building this in the open. The catalog, sync pipeline, and roadmap are pu
 
 Use the [`skills` CLI](https://github.com/vercel-labs/skills) to install NVIDIA skills into the AI agent you use. The CLI runs through `npx`, so you do not need to clone this repo or copy skill folders by hand.
 
+Pick the command that matches what you want to do. Each section below keeps commands in copyable command blocks.
+
+| Goal | Start here |
+|------|------------|
+| Browse the catalog | [Browse the Catalog](#browse-the-catalog) |
+| Install interactively | [Install Interactively](#install-interactively) |
+| Install one skill without prompts | [Install One Skill](#install-one-skill) |
+| Install one skill for a specific agent | [Install for Specific Agents](#install-for-specific-agents) |
+
+### Browse the Catalog
+
+Use this when you want to see available NVIDIA skills before installing anything.
+
 ```bash
-# Browse the NVIDIA catalog without installing anything
 npx skills add nvidia/skills --list
+```
 
-# Install from the NVIDIA catalog (interactive)
+### Install Interactively
+
+Use this when you want the CLI to walk you through skill and destination choices.
+
+```bash
 npx skills add nvidia/skills
+```
 
-# Install one skill into the current project and skip prompts
+### Install One Skill
+
+Use this when you already know the skill name and want to skip prompts.
+
+```bash
 npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --yes
 ```
 
-That's it — the skill activates automatically the next time your agent encounters a relevant task. For example, ask your agent to "solve a linear programming problem with cuOpt" and the skill guides it through the cuOpt Python API.
+Replace `cuopt-numerical-optimization-api-python` with any skill name from the catalog.
 
-The CLI can prompt you to choose where to install the skill, or you can target agents explicitly using a `--agent` option, e.g. `--agent claude-code --agent codex --agent cursor`.
+### Install for Specific Agents
+
+Use `--agent` to target a specific AI coding agent. These are common client targets; for the full list of supported clients, see the [`skills` CLI Supported Agents table](https://github.com/vercel-labs/skills#supported-agents).
+
+**Claude Code**
+
+```bash
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent claude-code
+```
+
+**Codex**
+
+```bash
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent codex
+```
+
+**Cursor**
+
+```bash
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent cursor
+```
+
+**Kiro CLI**
+
+```bash
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent kiro-cli
+```
+
+Use `--agent` more than once to install the same skill into multiple agents.
+
+```bash
+npx skills add nvidia/skills \
+  --skill cuopt-numerical-optimization-api-python \
+  --agent claude-code \
+  --agent codex \
+  --agent cursor \
+  --agent kiro-cli
+```
+
+That's it — the skill is available the next time your agent loads skills and encounters a relevant task. For example, ask your agent to "solve a linear programming problem with cuOpt" and the skill guides it through the cuOpt Python API.
 
 For non-interactive installs, global installs, agent-specific installs, updates, removals, and fallback manual copying, see [Advanced installation](docs/advanced-install.md).
 
