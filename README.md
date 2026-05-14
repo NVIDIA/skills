@@ -1,10 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0 -->
 <!-- Copyright (c) 2026 NVIDIA Corporation. All rights reserved. -->
 
-<h1>
-  <a href="https://commons.wikimedia.org/wiki/File:NVIDIA_logo.svg"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/NVIDIA_logo.svg" alt="NVIDIA" height="36"></a>
-  Agent Skills
-</h1>
+# NVIDIA Agent Skills
 
 **Official, NVIDIA-verified skills for AI agents.**
 
