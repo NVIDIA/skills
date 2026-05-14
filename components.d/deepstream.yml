@@ -1,0 +1,6 @@
+name: DeepStream
+repo: NVIDIA-AI-IOT/DeepStream_Coding_Agent
+description: Agentic skills for guided DeepStream development. 
+skills:
+  - path: skills/
+    catalog_dir: deepstream
