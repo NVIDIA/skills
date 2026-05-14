@@ -1,13 +1,10 @@
 <!-- SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0 -->
 <!-- Copyright (c) 2026 NVIDIA Corporation. All rights reserved. -->
 
-<p align="center">
-  <a href="https://commons.wikimedia.org/wiki/File:NVIDIA_logo.svg">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/NVIDIA_logo.svg" alt="NVIDIA logo" width="180">
-  </a>
-</p>
-
-# NVIDIA Agent Skills
+<h1>
+  <a href="https://commons.wikimedia.org/wiki/File:NVIDIA_logo.svg"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/NVIDIA_logo.svg" alt="NVIDIA" height="36"></a>
+  Agent Skills
+</h1>
 
 **Official, NVIDIA-verified skills for AI agents.**
 
@@ -17,7 +14,7 @@
 
 ---
 
-Skills are portable instruction sets that teach AI agents how to use NVIDIA CUDA-X libraries, AI Blueprints, and platform tools correctly. Every skill listed here is **published and verified by NVIDIA**.
+Skills are portable instruction sets that teach AI agents how to use NVIDIA CUDA-X libraries, AI Blueprints, and platform tools correctly. We are making NVIDIA skills available publicly and building this catalog in the open; see the [Roadmap](#roadmap) for what is planned next.
 
 ---
 
