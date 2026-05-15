@@ -1,0 +1,185 @@
+{
+  "skill_name": "deepstream-dev",
+  "evals": [
+    {
+      "id": 1,
+      "name": "basic-video-file-inference-pipeline",
+      "prompt": "Using DeepStream SDK 9.0 and the pyservicemaker Python API, generate a pipeline that reads a local video file, runs primary inference with nvinfer using the ResNet18 TrafficCamNet detector shipped with DeepStream, draws bounding boxes with nvosdbin, and renders to the screen. The user did not ask for tracking or Kafka.",
+      "expected_output": "A minimal pipeline using nvurisrcbin -> nvstreammux -> nvinfer -> nvosdbin -> platform-appropriate sink, with no nvtracker, no secondary GIE, no nvmsgbroker, and correct request-pad syntax.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Pipeline uses nvurisrcbin as the source (preferred over filesrc for local files)",
+          "type": "contains_phrase",
+          "phrase": "nvurisrcbin"
+        },
+        {
+          "text": "Pipeline batches streams through nvstreammux",
+          "type": "contains_phrase",
+          "phrase": "nvstreammux"
+        },
+        {
+          "text": "Request pads use the sink_%u template, not a literal sink_0 pad name",
+          "type": "contains_phrase",
+          "phrase": "sink_%u"
+        },
+        {
+          "text": "Pipeline references the bundled ResNet18 TrafficCamNet ONNX model path",
+          "type": "contains_phrase",
+          "phrase": "resnet18_trafficcamnet_pruned.onnx"
+        },
+        {
+          "text": "No nvtracker element is added because the user did not request tracking",
+          "type": "not_contains",
+          "phrase": "nvtracker"
+        },
+        {
+          "text": "No Kafka message broker is added because the user did not request messaging",
+          "type": "not_contains",
+          "phrase": "nvmsgbroker"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "rtsp-multi-stream-with-tracker-and-kafka",
+      "prompt": "Build a DeepStream 9.0 pyservicemaker pipeline that ingests two RTSP cameras, runs primary detection, tracks objects across frames, displays the result in a tiled view, AND publishes detection metadata to a Kafka broker. Cover the live-source and tee-split requirements.",
+      "expected_output": "Pipeline uses nvurisrcbin for each RTSP source, sets live-source=1 on nvstreammux, adds nvtracker (explicitly requested), splits the flow with a tee so nvmsgbroker (a sink) can receive metadata, and sets async=0 on all sinks.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "nvstreammux is configured with live-source=1 for RTSP/live input",
+          "type": "contains_phrase",
+          "phrase": "live-source"
+        },
+        {
+          "text": "nvtracker is included because the user explicitly requested tracking",
+          "type": "contains_phrase",
+          "phrase": "nvtracker"
+        },
+        {
+          "text": "Pipeline splits with a tee element to feed both the display branch and nvmsgbroker",
+          "type": "contains_phrase",
+          "phrase": "tee"
+        },
+        {
+          "text": "nvmsgbroker is used for Kafka publishing since the user requested cloud messaging",
+          "type": "contains_phrase",
+          "phrase": "nvmsgbroker"
+        },
+        {
+          "text": "All sinks set async=0 to avoid tee-split state-transition deadlocks",
+          "type": "contains_pattern",
+          "pattern": "async\\s*[:=]\\s*0"
+        },
+        {
+          "text": "Renderer sink honors live-source with sync=0",
+          "type": "contains_pattern",
+          "pattern": "sync\\s*[:=]\\s*0"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "yolo-dynamic-onnx-nvinfer-config",
+      "prompt": "Generate an nvinfer YAML config for a YOLOv11 model (640x640 input) exported from Ultralytics with dynamic=True. The model outputs a raw pre-NMS tensor of shape [batch, 84, 8400].",
+      "expected_output": "Config uses the property: section header, sets infer-dims=3;640;640 so TensorRT does not see -1, and uses cluster-mode: 2 (NMS) because the tensor is pre-NMS. No is-classifier flag for a detector.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Config uses the property: section header (not model:)",
+          "type": "contains_phrase",
+          "phrase": "property:"
+        },
+        {
+          "text": "infer-dims is explicitly set for the dynamic ONNX input shape",
+          "type": "contains_phrase",
+          "phrase": "infer-dims"
+        },
+        {
+          "text": "infer-dims matches the 640x640 YOLO input in C;H;W form",
+          "type": "contains_phrase",
+          "phrase": "3;640;640"
+        },
+        {
+          "text": "cluster-mode is 2 (NMS) because v8/v11 output is pre-NMS",
+          "type": "contains_pattern",
+          "pattern": "cluster-mode\\s*:\\s*2"
+        },
+        {
+          "text": "Config does not use the deprecated is-classifier flag for a detector",
+          "type": "not_contains",
+          "phrase": "is-classifier"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "negative-rejects-tracker-and-secondary-gie-when-not-requested",
+      "prompt": "Write a DeepStream pipeline that just plays a video file through inference and shows it on screen. Keep it as minimal as possible.",
+      "expected_output": "Minimal pipeline with nvurisrcbin, nvstreammux, nvinfer, nvosdbin, and a renderer. No nvtracker, no secondary GIE, no nvdsanalytics, and no nvmsgbroker are added since the user did not request them.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Skill does not add nvtracker when the user did not ask for tracking",
+          "type": "not_contains",
+          "phrase": "nvtracker"
+        },
+        {
+          "text": "Skill does not add nvdsanalytics when the user did not ask for line-crossing or ROI",
+          "type": "not_contains",
+          "phrase": "nvdsanalytics"
+        },
+        {
+          "text": "Skill does not add a secondary GIE (SGIE) for classification the user did not request",
+          "type": "not_contains_pattern",
+          "pattern": "process-mode\\s*[:=]\\s*2"
+        },
+        {
+          "text": "Skill does not add nvmsgbroker/nvmsgconv when no messaging was requested",
+          "type": "not_contains",
+          "phrase": "nvmsgbroker"
+        },
+        {
+          "text": "Pipeline still includes the required inference stage (nvinfer)",
+          "type": "contains_phrase",
+          "phrase": "nvinfer"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "negative-metadata-iteration-and-venv-setup",
+      "prompt": "My pyservicemaker probe runs len(frame.object_items) to count detections and I am installing my app inside a fresh python3 -m venv. It fails with ModuleNotFoundError: pyservicemaker and the probe raises 'iterator has no len()'. Fix both.",
+      "expected_output": "Guidance that .object_items and .frame_items return iterators (not lists), so counting must be done by iterating; and that the venv must install the bundled pyservicemaker wheel plus pyyaml because pyservicemaker is not picked up from the system site-packages.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Explains that object_items/frame_items are iterators and len() cannot be used",
+          "type": "contains_phrase",
+          "phrase": "iterator"
+        },
+        {
+          "text": "Suggests iterating to count instead of len()",
+          "type": "not_contains_pattern",
+          "pattern": "len\\(\\s*[a-zA-Z_]+\\.object_items\\s*\\)"
+        },
+        {
+          "text": "Instructs installing the bundled pyservicemaker wheel inside the venv",
+          "type": "contains_phrase",
+          "phrase": "pyservicemaker"
+        },
+        {
+          "text": "Includes the DeepStream 9.0 service-maker python wheel path",
+          "type": "contains_phrase",
+          "phrase": "/opt/nvidia/deepstream/deepstream/service-maker/python/"
+        },
+        {
+          "text": "Also installs pyyaml inside the venv so YAML nvinfer configs load",
+          "type": "contains_phrase",
+          "phrase": "pyyaml"
+        }
+      ]
+    }
+  ]
+}

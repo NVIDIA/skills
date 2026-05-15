@@ -89,7 +89,7 @@ flowchart TB
 * - Filesystem
   - System binary tampering, credential theft, config manipulation.
   - Landlock LSM + container mounts
-  - No. Requires sandbox re-creation.
+  - Landlock layout: no. Requires sandbox re-creation. Config lockdown posture: yes, with host-side shields commands.
 
 * - Process
   - Privilege escalation, fork bombs, syscall abuse.
@@ -99,7 +99,7 @@ flowchart TB
 * - Inference
   - Credential exposure, unauthorized model access, cost overruns.
   - OpenShell gateway
-  - Yes. Use `openshell inference set`.
+  - Yes. Use `nemoclaw inference set`.
 
 :::
 
@@ -130,7 +130,7 @@ If someone replaces a binary while the sandbox runs, the hash mismatch triggers 
 
 | Aspect | Detail |
 |---|---|
-| Default | Each endpoint restricts access to specific binaries. For example, the `github` preset restricts access so only `/usr/bin/gh` and `/usr/bin/git` can reach `github.com`. Binary paths support glob patterns (`*` matches one path component, `**` matches recursively). |
+| Default | Each endpoint restricts access to specific binaries. For example, the `github` preset restricts access so only `/usr/bin/git` can reach `github.com`. Binary paths support glob patterns (`*` matches one path component, `**` matches recursively). |
 | What you can change | Add binaries to an endpoint entry, or omit the `binaries` field to allow any executable. |
 | Risk if relaxed | Removing binary restrictions lets any process in the sandbox reach the endpoint. An agent could use `curl`, `wget`, or a Python script to exfiltrate data to an allowed host, bypassing the intended usage pattern. |
 | Recommendation | Always scope endpoints to the binaries that need them. If the agent needs a host from a new binary, add that binary explicitly rather than removing the restriction. |
@@ -178,7 +178,7 @@ NemoClaw ships preset policy files in `nemoclaw-blueprint/policies/presets/` for
 | `brave` | Brave Search API. | Agent can issue search queries. |
 | `brew` | Homebrew (Linuxbrew) package manager. | Allows installing arbitrary Homebrew packages, which may contain malicious code. |
 | `discord` | Discord REST API, WebSocket gateway, CDN. | CDN endpoint (`cdn.discordapp.com`) allows GET to any path. WebSocket uses `access: full` (no inspection). |
-| `github` | GitHub and GitHub REST API. | Gives agent read/write access to repositories and issues via `gh` and `git`. |
+| `github` | GitHub and GitHub REST API. | Gives agent read/write access to repositories and issues via `git`. |
 | `huggingface` | Hugging Face Hub (download-only) and inference router. | Allows downloading arbitrary models and datasets. POST is restricted to the inference router only. |
 | `jira` | Atlassian Jira API. | Gives agent read/write access to project issues and comments. |
 | `local-inference` | Local Ollama and vLLM through the host gateway. | Allows sandbox access to host-side local inference ports covered by the preset. |
@@ -263,19 +263,21 @@ See the [Process Controls](https://docs.nvidia.com/openshell/latest/security/bes
 
 The entrypoint drops dangerous Linux capabilities from the bounding set at startup using `capsh`.
 This limits what capabilities any child process (gateway, sandbox, agent) can ever acquire.
+When the entrypoint switches from root to the `sandbox` and `gateway` users, it uses `setpriv` when available to remove the remaining privilege-separation capabilities from the child process at the same time as the user change.
 
-The entrypoint drops these capabilities: `cap_net_raw`, `cap_dac_override`, `cap_sys_chroot`, `cap_fsetid`, `cap_setfcap`, `cap_mknod`, `cap_audit_write`, `cap_net_bind_service`.
-The entrypoint keeps these because it needs them for privilege separation using gosu: `cap_chown`, `cap_setuid`, `cap_setgid`, `cap_fowner`, `cap_kill`.
+The initial entrypoint drop removes `cap_sys_admin`, `cap_sys_ptrace`, `cap_net_raw`, `cap_dac_override`, `cap_sys_chroot`, `cap_fsetid`, `cap_setfcap`, `cap_mknod`, `cap_audit_write`, and `cap_net_bind_service`.
+During `setpriv` step-down, the child process also loses `cap_setuid`, `cap_setgid`, `cap_fowner`, `cap_chown`, and `cap_kill`.
 
 This is best-effort: if `capsh` is not available or `CAP_SETPCAP` is not in the bounding set, the entrypoint logs a warning and continues with the default capability set.
+If `setpriv` is unavailable, the entrypoint falls back to `gosu` and logs a warning that the remaining bounding-set capabilities were retained for the child process.
 For additional protection, pass `--cap-drop=ALL` with `docker run` or Compose (see Sandbox Hardening (use the `nemoclaw-user-deploy-remote` skill)).
 
 | Aspect | Detail |
 |---|---|
-| Default | The entrypoint drops dangerous capabilities at startup using `capsh`. Best-effort. |
+| Default | The entrypoint drops dangerous capabilities at startup using `capsh`, then uses `setpriv` during user step-down when possible. Best-effort. |
 | What you can change | When launching with `docker run` directly, pass `--cap-drop=ALL --cap-add=NET_BIND_SERVICE` for stricter enforcement. In the standard NemoClaw flow (with `nemoclaw onboard`), the entrypoint handles capability dropping automatically. |
-| Risk if relaxed | `CAP_NET_RAW` allows raw socket access for network sniffing. `CAP_DAC_OVERRIDE` bypasses filesystem permission checks. Attackers can use `CAP_SYS_CHROOT` in container escape chains. If `capsh` is unavailable, the container runs with the default Docker capability set. |
-| Recommendation | Run on an image that includes `capsh` (the NemoClaw image includes it through `libcap2-bin`). For defense-in-depth, also pass `--cap-drop=ALL` at the container runtime level. |
+| Risk if relaxed | `CAP_SYS_ADMIN` and `CAP_SYS_PTRACE` expand kernel and process attack surface. `CAP_NET_RAW` allows raw socket access for network sniffing. `CAP_DAC_OVERRIDE` bypasses filesystem permission checks. If `capsh` or `setpriv` cannot run, the container retains more of the runtime-provided capability set. |
+| Recommendation | Run on an image that includes `capsh` and `setpriv` (the NemoClaw image includes them). For defense-in-depth, also pass `--cap-drop=ALL` at the container runtime level. |
 
 ### Gateway Process Isolation
 
@@ -385,6 +387,17 @@ Device authentication requires each connecting device to go through a pairing fl
 | What you can change | Set `NEMOCLAW_DISABLE_DEVICE_AUTH=1` as a Docker build argument to disable device authentication. This is a build-time setting baked into `openclaw.json` and verified by hash at startup. |
 | Risk if relaxed | Disabling device auth allows any device on the network to connect to the gateway without proving identity. This is dangerous when combined with LAN-bind changes or cloudflared tunnels in remote deployments, resulting in an unauthenticated, publicly reachable dashboard. |
 | Recommendation | Keep device auth enabled (the default). Only disable it for headless or development environments where no untrusted devices can reach the gateway. |
+
+### Gateway Bind Address
+
+NemoClaw binds the OpenShell gateway to loopback by default.
+
+| Aspect | Detail |
+|---|---|
+| Default | `NEMOCLAW_GATEWAY_BIND_ADDRESS=127.0.0.1`. |
+| What you can change | Set `NEMOCLAW_GATEWAY_BIND_ADDRESS=0.0.0.0` before onboarding to listen on all IPv4 interfaces. |
+| Risk if relaxed | Other hosts on the network may be able to reach the OpenShell gateway. |
+| Recommendation | Keep the loopback default unless the gateway must be reachable from another host. |
 
 ### Insecure Auth Derivation
 

@@ -5,7 +5,7 @@
 Use NemoHermes when you want NemoClaw to create an OpenShell sandbox that runs Hermes instead of the default OpenClaw agent.
 The `nemohermes` command is an alias for `nemoclaw` with the Hermes agent pre-selected.
 
-> **Warning:** The Hermes agent option is experimental.
+> **Experimental Feature:** The Hermes agent option is experimental.
 > Interfaces, defaults, and supported features may change without notice, and it is not recommended for production use.
 
 Review the Prerequisites (use the `nemoclaw-user-get-started` skill) before starting.
@@ -134,10 +134,11 @@ $ nemohermes my-hermes snapshot create --name before-change
 $ nemohermes my-hermes rebuild
 ```
 
-To change the active model or provider without rebuilding the sandbox, use the OpenShell inference route.
+To change the active model or provider without rebuilding the sandbox, use `nemohermes inference set`.
+It updates the OpenShell inference route and patches `/sandbox/.hermes/config.yaml` without restarting Hermes.
 
 ```console
-$ openshell inference set -g nemoclaw --model <model> --provider <provider>
+$ nemohermes inference set --model <model> --provider <provider>
 ```
 
 To remove the sandbox when you are done, destroy it explicitly.

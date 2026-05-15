@@ -63,6 +63,7 @@ On macOS with Docker Desktop, open the Docker Desktop application and wait for i
 ### Docker permission denied on Linux
 
 On Linux, if the Docker daemon is running but you see "permission denied" errors, your user may not be in the `docker` group.
+The installer can add your user to the group, but Linux does not activate that membership in the current shell automatically.
 Add your user and activate the group in the current shell:
 
 ```console
@@ -71,6 +72,12 @@ $ newgrp docker
 ```
 
 Then retry `nemoclaw onboard`.
+If the installer stopped after printing `newgrp docker`, run that command and then re-run the installer:
+
+```console
+$ newgrp docker
+$ curl -fsSL https://www.nvidia.com/nemoclaw.sh | bash
+```
 
 ### macOS first-run failures
 
@@ -140,6 +147,11 @@ When the lookup returns an answer, retry onboarding.
 The NemoClaw dashboard uses port `18789` by default and the gateway uses port `8080`.
 If another sandbox already owns the dashboard port, onboarding scans ports `18789` through `18799` and uses the next free port.
 If all ports in that range are occupied, the error lists the owner for each port and suggests using `--control-ui-port` with a port outside the range.
+On macOS, the port check also tries a privileged `lsof` probe without prompting for a password so root-owned listeners are detected before the sandbox build starts.
+If a port becomes occupied after preflight but before `openshell forward start` runs, onboarding deletes the just-created sandbox and exits with a retry message instead of leaving a sandbox with an unreachable dashboard URL.
+
+When a previous onboard, upgrade, or sandbox crash leaves a stale `openclaw-gateway` host process holding the dashboard port, `nemoclaw onboard --fresh`, `nemoclaw <name> destroy` (when destroying the last sandbox), and `nemoclaw uninstall` automatically sweep the dashboard port range and signal `SIGTERM` then `SIGKILL` to recover.
+The sweep only targets processes owned by the current user whose command line matches `openclaw-gateway` or `openshell forward` markers, and skips dashboard ports owned by other live sandboxes.
 
 If a non-NemoClaw process is already bound to the dashboard port or the gateway port, identify the conflicting process, verify it is safe to stop, and terminate it:
 
@@ -169,6 +181,23 @@ Or set the port directly:
 ```console
 $ NEMOCLAW_DASHBOARD_PORT=19000 nemoclaw onboard
 ```
+
+For an OpenShell gateway port conflict, set `NEMOCLAW_GATEWAY_PORT` to a free
+non-privileged port that does not overlap NemoClaw's dashboard, vLLM, Ollama,
+or Ollama proxy ports:
+
+```console
+$ NEMOCLAW_GATEWAY_PORT=8990 nemoclaw onboard
+```
+
+Remote/headless hosts can bind the OpenShell gateway to all IPv4 interfaces:
+
+```console
+$ NEMOCLAW_GATEWAY_BIND_ADDRESS=0.0.0.0 NEMOCLAW_GATEWAY_PORT=8990 nemoclaw onboard
+```
+
+Use `NEMOCLAW_GATEWAY_BIND_ADDRESS=0.0.0.0` only when other hosts on the
+network should be able to reach the gateway.
 
 See Environment Variables (use the `nemoclaw-user-reference` skill) for the full list of port overrides.
 
@@ -274,7 +303,27 @@ If the installed OpenShell version exceeds the configured maximum, `nemoclaw onb
 
 Upgrade NemoClaw to a version that supports your OpenShell release, or install a supported OpenShell version from the [OpenShell releases page](https://github.com/NVIDIA/OpenShell/releases).
 
-The `install-openshell.sh` script also enforces this constraint and pins fresh installs to the validated maximum version.
+For fresh installs, NemoClaw passes the blueprint range to `install-openshell.sh` and resolves a compatible published OpenShell release before downloading.
+If GitHub release metadata is unavailable, the script uses its bundled fallback pin and the post-install gate still enforces the configured range.
+
+### Sandbox containers cannot reach the gateway
+
+On native Linux Docker-driver hosts, `nemoclaw onboard` verifies the route that sandbox containers use to reach the OpenShell gateway.
+If a host firewall blocks that path, onboarding exits with output like:
+
+```text
+✗ Sandbox containers cannot reach the gateway at host.openshell.internal:8080.
+  A host firewall may be blocking traffic from the OpenShell Docker bridge.
+```
+
+Apply the `ufw` command printed by onboarding, then rerun onboarding.
+If the message does not include a subnet, derive it from the OpenShell Docker network:
+
+```console
+$ SUBNET=$(docker network inspect openshell-docker --format '{{(index .IPAM.Config 0).Subnet}}')
+$ sudo ufw allow from "$SUBNET" to any port 8080 proto tcp
+$ nemoclaw onboard
+```
 
 ### Invalid sandbox name
 
@@ -298,7 +347,8 @@ The wizard cleans up stale port forwards and waits for gateway readiness automat
 ### Colima socket not detected (macOS)
 
 Newer Colima versions use the XDG base directory (`~/.config/colima/default/docker.sock`) instead of the legacy path (`~/.colima/default/docker.sock`).
-NemoClaw checks both paths.
+Some installations expose a top-level Colima socket at `~/.colima/docker.sock`.
+NemoClaw checks all three paths.
 If neither is found, verify that Colima is running:
 
 ```console
@@ -549,6 +599,8 @@ $ nemoclaw <name> status
 
 For local Ollama and local vLLM, `nemoclaw <name> status` also prints an `Inference` line that probes the host-side health endpoint directly.
 If that line shows `unreachable`, start the local backend first and then retry the request.
+For Local Ollama, current releases also print `Inference (auth proxy)` when a proxy token is available.
+If the backend is healthy but the auth proxy is `unauthorized` or `unreachable`, re-run onboarding so NemoClaw can recreate the proxy token, restart the proxy, and refresh the route.
 
 If the endpoint is correct but requests still fail, check for network policy rules that may block the connection.
 Then verify the credential and base URL for the provider you selected during onboarding.
@@ -601,6 +653,19 @@ Changing or exporting it later does not rewrite the baked `openclaw.json` inside
 If you need a different device-auth setting, rerun onboarding so NemoClaw rebuilds the sandbox image with the desired configuration.
 For the security trade-offs, refer to Security Best Practices (use the `nemoclaw-user-configure-security` skill).
 
+### `openclaw.json` is empty after changing inference
+
+Some runtime inference changes can leave `/sandbox/.openclaw/openclaw.json` empty if the write fails partway through.
+When that happens, OpenClaw commands may report that the config is empty instead of showing a raw JSON parse error.
+
+Current NemoClaw sandboxes capture a known-good config baseline after a successful startup.
+On the next sandbox startup, NemoClaw restores `openclaw.json` from OpenClaw's last-good copy when available, or from the NemoClaw baseline.
+If the sandbox still cannot start or reports that no baseline is available, rebuild it from the host:
+
+```console
+$ nemoclaw <name> rebuild
+```
+
 ### `openclaw channels add` or `remove` is blocked inside the sandbox
 
 This is expected.
@@ -622,7 +687,8 @@ In non-interactive mode (`NEMOCLAW_NON_INTERACTIVE=1`), the commands stage the c
 ### `openclaw config set` or `unset` is blocked inside the sandbox
 
 This is expected.
-The sandbox's OpenClaw configuration (`/sandbox/.openclaw/openclaw.json`) is baked into the container image at build time.
+NemoClaw builds the sandbox's OpenClaw configuration (`/sandbox/.openclaw/openclaw.json`) from host-side onboarding, rebuild, inference, policy, and messaging inputs.
+Fresh sandboxes keep that file writable by default so the agent can manage runtime state, but direct in-sandbox edits are not the supported or durable path for NemoClaw-managed settings.
 NemoClaw's sandbox entrypoint installs a guard that intercepts `openclaw config set` and `openclaw config unset` and prints an actionable error, because changes made inside the running sandbox do not persist across rebuilds.
 
 For most configuration changes, exit the sandbox and rerun onboarding:
@@ -849,6 +915,28 @@ permissions.
 If the file is missing or unreadable after a host reboot, re-running
 `nemoclaw onboard` regenerates it.
 
+### Ollama auth proxy is unreachable from the sandbox
+
+On native Linux Docker-driver hosts, a host firewall can allow the host proxy check but block sandbox traffic to the Ollama auth proxy.
+When that happens, onboarding exits before it saves the inference route and prints output like:
+
+```text
+✗ Sandbox containers cannot reach the Ollama auth proxy at host.openshell.internal:11435.
+  A host firewall may be blocking traffic from the OpenShell Docker bridge.
+```
+
+Apply the `ufw` command printed by onboarding, then rerun onboarding.
+If the message does not include a subnet, derive it from the OpenShell Docker network:
+
+```console
+$ SUBNET=$(docker network inspect openshell-docker --format '{{(index .IPAM.Config 0).Subnet}}')
+$ sudo ufw allow from "$SUBNET" to any port 11435 proto tcp
+$ nemoclaw onboard
+```
+
+Docker Desktop, WSL, and hosts without the OpenShell Docker network use different routing models.
+In those cases NemoClaw treats an unavailable sandbox-side probe as non-blocking and relies on the regular proxy health check.
+
 ### Local inference health check resolves to IPv6
 
 Local inference health checks now use `127.0.0.1` instead of `localhost`.
@@ -910,6 +998,20 @@ $ nemoclaw onboard
 ```
 
 If GPU passthrough is not required on this host, rerun onboarding with `--no-gpu` instead.
+
+### Docker GPU patch failed during sandbox create
+
+On Linux Docker-driver gateways, NemoClaw may create the sandbox first and then recreate the OpenShell-managed Docker container with NVIDIA GPU flags.
+If that compatibility patch fails, onboarding leaves the failed sandbox and diagnostic bundle in place so you can inspect the OpenShell and Docker state.
+The output includes a cleanup command such as:
+
+```console
+$ openshell sandbox delete <sandbox-name>
+```
+
+Fix the NVIDIA Container Toolkit or CDI configuration reported in the diagnostics, clean up the failed sandbox, then rerun onboarding.
+If you do not need GPU access inside the sandbox, rerun with `--no-sandbox-gpu`.
+Set `NEMOCLAW_DOCKER_GPU_PATCH=0` only when you need to bypass this compatibility path during troubleshooting.
 
 ### `pip install` fails with a system-packages error
 
@@ -999,3 +1101,81 @@ For additional troubleshooting, see the Quickstart (use the `nemoclaw-user-get-s
 Podman is not a tested runtime.
 OpenShell officially documents Docker-based runtimes only.
 If you encounter issues with Podman, switch to a tested runtime (Docker Engine, Docker Desktop, or Colima) and rerun onboarding.
+
+## Brev
+
+For Brev setup instructions, refer to Brev Web UI (use the `nemoclaw-user-deploy-remote` skill).
+
+### Most OpenClaw skills show as blocked
+
+After deploying NemoClaw on Brev, the Skills page in the OpenClaw gateway dashboard shows most bundled skills with a `blocked` status.
+Only three skills are available by default: `healthcheck`, `skill-creator`, and `weather`.
+
+Skills are blocked for one of three reasons.
+
+- The skill requires a macOS-only binary (`memo`, `remindctl`, `grizzly`, and similar) that is not available on the Linux (GCP) instance Brev provisions.
+- The skill requires a CLI binary that is not pre-installed in the sandbox image, such as `gh` for the GitHub skill.
+- The skill requires API credentials that have not been configured, such as a Notion API key or Discord bot token.
+
+Skills that require macOS-only binaries cannot be enabled on Brev.
+Skills that require additional CLI binaries require a custom sandbox image rebuild.
+
+For credentials, use the supported host-side setup flow. Re-run onboarding for inference or Brave Search credentials, or use `nemoclaw <name> channels add <telegram|discord|slack>` for messaging channels.
+To add a binary to the sandbox image, update the sandbox `Dockerfile.base` to install the required package, then rebuild:
+
+```console
+$ nemoclaw <name> rebuild
+```
+
+After the rebuild completes, return to the Skills page to confirm the skill status has changed from `blocked` to `ready`.
+
+### `openclaw config set` fails with a permission error on Brev
+
+When the sandbox config has been locked from the host, `openclaw.json` is owned by root and mounted read-only inside the sandbox.
+Running `openclaw config set` inside the sandbox then returns:
+
+```text
+EACCES: permission denied, open '/sandbox/.openclaw/openclaw.json'
+```
+
+In the default sandbox state, `openclaw.json` is writable by the sandbox user.
+If you see this error, use the host-side config command instead:
+
+```console
+$ nemoclaw <name> config set --key <dotpath> --value '<json-or-string>' --restart
+```
+
+Refer to Commands (use the `nemoclaw-user-reference` skill) for the full list of supported configuration keys.
+
+### OpenClaw dashboard is unreachable after extended uptime on Brev
+
+After leaving NemoClaw running for an extended period on Brev, the OpenClaw dashboard may return `ERR_CONNECTION_RESET` or fail to load in the browser.
+The agent may still respond on messaging channels such as Telegram or Slack while the dashboard is unreachable.
+
+> **Back up your workspace first:** Take a snapshot before running onboard to protect your workspace files.
+>
+> ```console
+> $ nemoclaw <name> snapshot create
+> ```
+
+Re-run onboarding to restore dashboard connectivity:
+
+```console
+$ nemoclaw onboard
+```
+
+Depending on current sandbox state, onboarding may prompt before recreating resources.
+
+### Skill install buttons do not work on Brev
+
+Clicking **Install** on a skill in the OpenClaw gateway dashboard on Brev shows no response or fails silently.
+
+Skill installation runs against the sandbox environment.
+Installing packages on the Brev host does not make them available inside the sandbox.
+To install a skill dependency, add it to the sandbox image and rebuild:
+
+```console
+$ nemoclaw <name> rebuild
+```
+
+After the rebuild completes, return to the Skills page to confirm the skill is ready.

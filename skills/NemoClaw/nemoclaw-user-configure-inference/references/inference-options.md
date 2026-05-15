@@ -28,6 +28,7 @@ NemoClaw uses provider-specific local tokens for those routes, and rebuilds of l
 | Anthropic | Tested | Native Anthropic | Uses anthropic-messages |
 | Other Anthropic-compatible endpoint | Tested | Custom Anthropic-compatible | For Claude proxies and compatible gateways |
 | Google Gemini | Tested | OpenAI-compatible | Uses Google's OpenAI-compatible endpoint |
+| Hermes Provider | Hermes only | OpenAI-compatible route | Available when onboarding Hermes Agent through `nemohermes` |
 | Local Ollama | Caveated | Local Ollama API | Available when Ollama is installed or running on the host |
 | Local NVIDIA NIM | Experimental | Local OpenAI-compatible | Requires `NEMOCLAW_EXPERIMENTAL=1` and a NIM-capable GPU |
 | Local vLLM | Experimental | Local OpenAI-compatible | Requires `NEMOCLAW_EXPERIMENTAL=1` and a server already running on `localhost:8000` |
@@ -38,7 +39,8 @@ NemoClaw uses provider-specific local tokens for those routes, and rebuilds of l
 The onboard wizard presents the following provider options by default.
 The first six are always available.
 Ollama appears when it is installed or running on the host.
-Experimental local vLLM appears when you opt in and NemoClaw detects either a running vLLM server or a supported NVIDIA GPU host profile.
+Experimental local vLLM appears when NemoClaw detects a running vLLM server.
+The managed install/start vLLM entry appears when you opt in and NemoClaw detects a supported NVIDIA GPU host profile.
 
 | Option | Description | Curated models |
 |--------|-------------|----------------|
@@ -48,6 +50,7 @@ Experimental local vLLM appears when you opt in and NemoClaw detects either a ru
 | Anthropic | Routes to the Anthropic Messages API. Set `ANTHROPIC_API_KEY`. | `claude-sonnet-4-6`, `claude-haiku-4-5`, `claude-opus-4-6` |
 | Other Anthropic-compatible endpoint | Routes to any server that implements the Anthropic Messages API (`/v1/messages`). The wizard prompts for a base URL and model name. Set `COMPATIBLE_ANTHROPIC_API_KEY`. | You provide the model name. |
 | Google Gemini | Routes to Google's OpenAI-compatible endpoint. NemoClaw prefers `/responses` only when the endpoint proves it can handle tool calling in a way OpenClaw uses; otherwise it falls back to `/chat/completions`. Set `GEMINI_API_KEY`. | `gemini-3.1-pro-preview`, `gemini-3.1-flash-lite-preview`, `gemini-3-flash-preview`, `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.5-flash-lite` |
+| Hermes Provider | Routes Hermes Agent through the host OpenShell provider registered by NemoClaw when onboarding Hermes Agent. | Curated Hermes Provider models such as `moonshotai/kimi-k2.6`, `openai/gpt-5.4-mini`, and `z-ai/glm-5.1`. |
 | Local Ollama | Routes to a local Ollama instance on `localhost:11434`. NemoClaw detects installed models, offers starter models if none are present, pulls and warms the selected model, and validates it. | Selected during onboarding. For more information, refer to Use a Local Inference Server (use the `nemoclaw-user-configure-inference` skill). |
 | Model Router | Starts a host-side router on port `4000`, registers it as an OpenAI-compatible provider, and keeps the sandbox pointed at `inference.local`. Set `NEMOCLAW_PROVIDER=routed` for non-interactive setup. | The router pool defines the model names. |
 
@@ -81,12 +84,13 @@ $ NEMOCLAW_PROVIDER=routed NVIDIA_API_KEY=<your-key> nemoclaw onboard --non-inte
 
 ## Experimental Options
 
-The following local inference options require `NEMOCLAW_EXPERIMENTAL=1` and, when prerequisites are met, appear in the onboarding selection list.
+The following local inference options are experimental.
+Local NIM and managed vLLM install/start require `NEMOCLAW_EXPERIMENTAL=1`; an already-running vLLM server appears directly in the onboarding selection list.
 
 | Option | Condition | Notes |
 |--------|-----------|-------|
 | Local NVIDIA NIM | NIM-capable GPU detected | Pulls and manages a NIM container. |
-| Local vLLM | vLLM running on `localhost:8000`, or a supported DGX Spark, DGX Station, or Linux NVIDIA GPU profile | Auto-detects the loaded model. Can install or start a managed vLLM container for supported profiles. |
+| Local vLLM | vLLM running on `localhost:8000`, or a supported DGX Spark, DGX Station, or Linux NVIDIA GPU profile | Auto-detects the loaded model when vLLM is already running. Can install or start a managed vLLM container for supported profiles after experimental opt-in. |
 
 For setup instructions, refer to Use a Local Inference Server (use the `nemoclaw-user-configure-inference` skill).
 
@@ -112,4 +116,5 @@ Other provider credentials, such as `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMI
 ## Next Steps
 
 - Use a Local Inference Server (use the `nemoclaw-user-configure-inference` skill) for Ollama, vLLM, NIM, and compatible-endpoint setup details.
+- Tool-Calling Reliability (use the `nemoclaw-user-configure-inference` skill) for deciding when Ollama is enough and when vLLM with a parser is safer.
 - Switch Inference Models (use the `nemoclaw-user-configure-inference` skill) for changing the model at runtime without re-onboarding.

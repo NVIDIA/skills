@@ -92,13 +92,6 @@ Choose a topic
   /cudaq-guide qpu             Connect to real QPU hardware
   /cudaq-guide applications    Explore what you can build
   /cudaq-guide parallelize     Run circuits in parallel across multiple QPUs
-
-Specialized skills
-  /cudaq-qec        Quantum Error Correction memory experiments
-  /cudaq-chemistry  Quantum chemistry (VQE, ADAPT-VQE)
-  /cudaq-add-backend  Add a new hardware backend
-  /cudaq-compiler   Work with the CUDA-Q compiler IR
-  /cudaq-benchmark  Benchmark and optimize performance
 ```
 
 ---
@@ -229,18 +222,12 @@ CUDA-Q ships with ready-to-run application notebooks
 | Category | Examples |
 |---|---|
 | Optimization | QAOA, ADAPT-QAOA, MaxCut |
-| Chemistry | VQE, UCCSD, ADAPT-VQE -> see `/cudaq-chemistry` |
-| Error Correction | Surface codes, QEC memory -> see `/cudaq-qec` |
+| Chemistry | VQE, UCCSD, ADAPT-VQE |
+| Error Correction | Surface codes, QEC memory |
 | Algorithms | Grover's, Shor's, QFT, Deutsch-Jozsa, HHL |
 | ML | Quantum neural networks, kernel methods |
 | Simulation | Hamiltonian dynamics, Trotter evolution |
 | Finance | Portfolio optimization, Monte Carlo |
-
-Point to sub-skills for specialized topics
-
-- `/cudaq-qec` - full QEC memory experiment walkthrough
-- `/cudaq-chemistry` - VQE and ADAPT-VQE for molecular energies
-- `/cudaq-benchmark` - performance profiling and multi-GPU scaling
 
 ---
 

@@ -121,7 +121,7 @@ Recover from a misconfigured sandbox without re-running the full onboard wizard 
 Change the active model or provider at runtime without rebuilding the sandbox:
 
 ```console
-$ openshell inference set -g nemoclaw --model <model> --provider <provider>
+$ nemoclaw inference set --model <model> --provider <provider>
 ```
 
 Refer to Switch Inference Providers (use the `nemoclaw-user-configure-inference` skill) for provider-specific model IDs and API compatibility notes.
@@ -184,6 +184,9 @@ When a new NemoClaw release becomes available, update the `nemoclaw` CLI on your
 
 Re-run the installer.
 Before it onboards anything, the installer calls `nemoclaw backup-all` (use the `nemoclaw-user-reference` skill) automatically, storing a snapshot of each running sandbox in `~/.nemoclaw/rebuild-backups/` as a safety net.
+If your existing gateway is from OpenShell earlier than `0.0.37`, the installer prompts before it runs the new automatic gateway upgrade path.
+The automatic path is offered only when the existing `nemoclaw` CLI supports `backup-all`; older installs must preserve sandbox state manually before retiring the gateway.
+For unattended installs, set `NEMOCLAW_ACCEPT_EXPERIMENTAL_OPENSHELL_UPGRADE=1`, or manually run `nemoclaw backup-all` and `openshell gateway destroy -g nemoclaw || openshell gateway destroy` before rerunning the installer as `curl -fsSL https://www.nvidia.com/nemoclaw.sh | NEMOCLAW_OPENSHELL_UPGRADE_PREPARED=1 bash`.
 
 ```console
 $ curl -fsSL https://www.nvidia.com/nemoclaw.sh | bash
@@ -197,10 +200,13 @@ The upgrade flow is non-destructive by default because NemoClaw preserves manife
 
 ```console
 $ nemoclaw <sandbox-name> snapshot create --name pre-upgrade   # optional, recommended
-$ curl -fsSL https://www.nvidia.com/nemoclaw.sh | bash          # updates CLI; auto-upgrades stale running sandboxes
+$ nemoclaw update --yes                                        # updates CLI through the maintained installer flow
 $ nemoclaw upgrade-sandboxes --check                            # verify or list remaining stale/unknown sandboxes
 $ nemoclaw upgrade-sandboxes                                    # manually rebuild remaining stale running sandboxes
 ```
+
+`nemoclaw update` is the CLI wrapper around the same installer path as `curl -fsSL https://www.nvidia.com/nemoclaw.sh | bash`.
+Use `nemoclaw update --check` when you only want to inspect version state and see the maintained update command.
 
 For scripted manual rebuilds, use `nemoclaw upgrade-sandboxes --auto` to skip the confirmation prompt.
 
@@ -220,7 +226,8 @@ NemoClaw protects your data through the same backup-and-restore flow as `nemocla
 - NemoClaw does not preserve runtime changes outside the workspace state directories. This includes packages installed inside the running container with `apt` or `pip`, files in non-workspace paths, and in-memory or process state. If you have customized the running container at runtime, capture that as `Dockerfile` changes for `nemoclaw onboard --from` or a manual `openshell sandbox download` before the rebuild starts.
 
 Aborts before the destroy step are non-destructive.
-The flow refuses to proceed past preflight if a credential is missing or past backup if any manifest-defined state path cannot be copied, so a failed run leaves the original sandbox intact and ready to retry.
+The flow refuses to proceed past preflight if a credential is missing or past backup if required manifest-defined state cannot be copied, so a failed run leaves the original sandbox intact and ready to retry.
+When a backup command reports partial archive output, NemoClaw keeps the usable entries and reports only the manifest-defined paths that could not be archived.
 
 See Backup and Restore (use the `nemoclaw-user-manage-sandboxes` skill) for the full list of state-preservation guarantees, snapshot retention, and instructions for manual backups when the auto-flow is not enough.
 
@@ -244,7 +251,7 @@ nemoclaw uninstall
 | Flag               | Effect                                               |
 |--------------------|------------------------------------------------------|
 | `--yes`            | Skip the confirmation prompt.                        |
-| `--keep-openshell` | Leave the `openshell` binary installed.              |
+| `--keep-openshell` | Leave OpenShell binaries installed.                  |
 | `--delete-models`  | Also remove NemoClaw-pulled Ollama models.           |
 
 `nemoclaw uninstall` runs the version-pinned `uninstall.sh` that shipped with your installed CLI, so it does not fetch anything over the network at uninstall time.

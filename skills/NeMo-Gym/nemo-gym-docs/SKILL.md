@@ -13,9 +13,9 @@ Unified skill for adding, updating, moving, and removing pages on the NeMo Gym F
 
 ## Scope Rule
 
-**ALL docs edits happen under `fern/`.** The legacy `docs/` directory is the original Sphinx source — do not add new pages there. Release notes, migration guides, and every new page belong under `fern/`.
+**ALL docs edits happen under `fern/`.** All new pages — including release notes and migration guides — belong under `fern/`.
 
-**Two-version mirror.** Gym maintains two real version trees in parallel: `fern/versions/latest/` and `fern/versions/v0.2/`. Unless the user says otherwise, **every change to `latest` must be mirrored to `v0.2`** (and vice versa for back-ports). The PM is particular about fidelity between versions; do not let them drift.
+**Bleeding-edge tree + GA snapshots.** Gym keeps one bleeding-edge content tree at `fern/versions/latest/` (the folder name is historical — it's mounted under the `main` slug via `main.yml`) and one frozen GA snapshot per shipped release (currently `fern/versions/v0.2.1/`). All new edits land in `fern/versions/latest/`. The `latest.yml` file is a GA *alias* — a symlink to the current GA's yml — so `/latest/...` and `/<current-ga>/...` serve the same pages. Back-ports into a frozen GA snapshot are deliberate and rare; default to editing `fern/versions/latest/` only.
 
 ## Layout at a Glance
 
@@ -25,11 +25,11 @@ fern/
 ├── package.json              # `npm run dev|check|generate` — wraps `npx -y fern-api@latest`
 ├── docs.yml                  # Site config: instances, versions, tabs, redirects, libraries
 ├── versions/
-│   ├── _nav_order.yml        # Cross-version nav ordering
-│   ├── latest.yml            # Nav tree for current train
-│   ├── latest/pages/         # MDX content for current train
-│   ├── v0.2.yml              # Nav tree for the 0.2 train
-│   └── v0.2/pages/           # MDX content for the 0.2 train
+│   ├── latest.yml            # GA alias — symlink to the current GA's yml (currently v0.2.1.yml)
+│   ├── main.yml              # Nav tree for the bleeding-edge train (mounts ./latest/pages)
+│   ├── latest/pages/         # MDX content for the bleeding-edge train (slug: main)
+│   ├── v0.2.1.yml            # Nav tree for the 0.2.1 GA snapshot
+│   └── v0.2.1/pages/         # MDX content for the 0.2.1 GA snapshot
 ├── components/               # Custom TSX (CTAButtons, NavButton, CustomFooter)
 ├── assets/                   # Images, SVGs, favicon
 ├── main.css                  # Global theme overrides (NVIDIA green, badge spacing, etc.)
@@ -37,10 +37,11 @@ fern/
 ```
 
 ```
-File system                                         Published URL
-──────────────────────────────────────────────────  ──────────────────────────────────
-fern/versions/latest/pages/get-started/quickstart.mdx  docs.nvidia.com/nemo/gym/latest/get-started/quickstart
-fern/versions/v0.2/pages/get-started/quickstart.mdx    docs.nvidia.com/nemo/gym/v0.2/get-started/quickstart
+File system                                            Published URL
+─────────────────────────────────────────────────────  ──────────────────────────────────
+fern/versions/latest/pages/get-started/quickstart.mdx  docs.nvidia.com/nemo/gym/main/get-started/quickstart
+fern/versions/v0.2.1/pages/get-started/quickstart.mdx  docs.nvidia.com/nemo/gym/v0.2.1/get-started/quickstart
+                                                       docs.nvidia.com/nemo/gym/latest/get-started/quickstart  (GA alias)
 ```
 
 ## Operations
@@ -62,28 +63,28 @@ fern/versions/v0.2/pages/get-started/quickstart.mdx    docs.nvidia.com/nemo/gym/
    <content>
    ```
 
-3. If the parent folder is mounted in `latest.yml` with `title-source: frontmatter`, the page is auto-discovered — no nav edit needed. Otherwise add a `- page:` entry under the right `section:` in `fern/versions/latest.yml`.
-4. **Mirror to `v0.2`**: copy the MDX to `fern/versions/v0.2/pages/<subdirectory>/<filename>.mdx` and update any `/latest/...` links in its body to `/v0.2/...`. Update `v0.2.yml` if a manual nav entry was needed.
+3. If the parent folder is mounted in `main.yml` with `title-source: frontmatter`, the page is auto-discovered — no nav edit needed. Otherwise add a `- page:` entry under the right `section:` in `fern/versions/main.yml`.
+4. Do **not** mirror into the current GA snapshot folder (e.g., `v0.2.1/`) — frozen GA snapshots only get back-ports on explicit request.
 
 ### Update a Page
 
 1. Locate by path, title, or keyword (`grep -rn` in `fern/versions/latest/pages/`).
-2. **Content only** — edit the MDX directly, then mirror the same edit to the `v0.2` copy.
+2. **Content only** — edit the MDX in `fern/versions/latest/pages/`. Don't touch `v0.2.1/` unless this is an explicit back-port.
 3. **Title change** — update the frontmatter `title:` and (if the parent uses `title-source: frontmatter`) nothing else; otherwise update the nav `- page:` entry too.
-4. **Section move** — `git mv` the file, update its `path:` in the nav, fix all incoming links, mirror to `v0.2`.
+4. **Section move** — `git mv` the file, update its `path:` in `main.yml`, fix all incoming links inside `fern/versions/latest/pages/`.
 5. **Slug change** — folders use the page filename for the slug. Renaming the file changes the URL; add a redirect in `fern/docs.yml` so the old URL keeps working.
 
 ### Remove a Page
 
-1. Find incoming links: `grep -rn "<filename>" fern/versions/latest/pages fern/versions/v0.2/pages --include="*.mdx"`.
-2. `git rm` the file from both `latest/` and `v0.2/`.
-3. Remove the matching `- page:` block from `latest.yml` and `v0.2.yml` if it was a manual entry.
+1. Find incoming links: `grep -rn "<filename>" fern/versions/latest/pages --include="*.mdx"`.
+2. `git rm` the file from `fern/versions/latest/pages/`.
+3. Remove the matching `- page:` block from `main.yml` if it was a manual entry.
 4. Fix or remove all incoming links.
 5. Add a redirect in `fern/docs.yml` if the URL was public.
 
-### Back-port to an Older Version
+### Back-port to a GA Snapshot
 
-When `latest` and `v0.2` diverge intentionally (e.g. an API only exists in `latest`), do not mirror — but call out the divergence in the PR description so the PM can confirm.
+Only back-port when the user explicitly asks ("back-port to v0.2.1"). Apply the same change inside the GA snapshot's `pages/` folder (e.g., `fern/versions/v0.2.1/pages/`) and update its yml if needed. `latest.yml` is a symlink to the current GA's yml, so nav changes propagate automatically.
 
 ### Worked Example: Adding a Page
 
@@ -103,27 +104,23 @@ Request: *"Add a how-to for collecting rollouts under Get Started."*
    <content>
    ```
 
-2. The `get-started` folder in `latest.yml` uses `title-source: frontmatter`, so the page appears automatically. `position: 4` controls ordering.
-3. Mirror to `fern/versions/v0.2/pages/get-started/rollout-collection.mdx`. Replace any `/latest/...` links in the body with `/v0.2/...`.
-4. `cd fern && npm run check && npm run dev`, verify both `/latest/get-started/rollout-collection` and `/v0.2/get-started/rollout-collection` render.
+2. The `get-started` folder in `main.yml` uses `title-source: frontmatter`, so the page appears automatically. `position: 4` controls ordering — it's optional; without it, pages sort alphabetically by filename.
+3. `cd fern && npm run check && npm run dev`, verify `/main/get-started/rollout-collection` renders.
 
 ### Worked Example: Renaming a Slug (with Redirect)
 
-Request: *"Rename `/latest/get-started/setup` to `/latest/get-started/detailed-setup`."*
+Request: *"Rename `/main/get-started/setup` to `/main/get-started/detailed-setup`."*
 
 1. `git mv fern/versions/latest/pages/get-started/setup.mdx fern/versions/latest/pages/get-started/detailed-setup.mdx`.
-2. Mirror the rename to `v0.2`.
-3. Add redirects in `fern/docs.yml`:
+2. Add a redirect in `fern/docs.yml`:
 
    ```yaml
    redirects:
-     - source: "/latest/get-started/setup"
-       destination: "/latest/get-started/detailed-setup"
-     - source: "/v0.2/get-started/setup"
-       destination: "/v0.2/get-started/detailed-setup"
+     - source: "/main/get-started/setup"
+       destination: "/main/get-started/detailed-setup"
    ```
 
-4. `grep -rn "/get-started/setup" fern/versions/` and update any incoming links in both versions.
+3. `grep -rn "/get-started/setup" fern/versions/latest/` and update any incoming links.
 
 ---
 
@@ -143,29 +140,23 @@ NeMo Gym uses **Fern-native MDX components directly**. Do not use GitHub `> [!NO
 
 Images live in `fern/assets/` (shared) or under a version's `pages/` (version-scoped). Reference with root-relative paths.
 
-### Cards and Badges (PM is particular about fidelity)
+### Cards and Badges
 
-Every `<Card>` on an index page should carry the same scope/status badges that the original Sphinx docs in `docs/` had. Mapping:
+Index pages use a `<Cards>` grid. Each `<Card>` can carry one or more `<Badge>` tags to indicate scope, status, or read-time.
 
-| Original `{bdg-*}` | Fern equivalent |
-|---|---|
-| `{bdg-primary}` | `<Badge intent="success" minimal outlined>...</Badge>` |
-| `{bdg-warning}` | `<Badge intent="warning" minimal outlined>...</Badge>` |
-| `{bdg-secondary}` | `<Badge minimal outlined>...</Badge>` (no intent) |
+Valid intents: `success`, `note`, `tip`, `warning`, `error`, `info`, `launch`, `check`. Use `<Badge minimal outlined>...</Badge>` (no intent) for neutral tags.
 
-Valid intents: `success`, `note`, `tip`, `warning`, `error`, `info`, `launch`, `check`. Place badges as the last line inside the `<Card>`, separated by a blank line from the body text. The CSS in `main.css` (`.fern-card .fern-docs-badge`) handles vertical spacing from the description and horizontal spacing between adjacent badges — do not add inline `style=` props.
+Place badges as the last line inside the `<Card>`, separated by a blank line from the body text. The CSS in `main.css` (`.fern-card .fern-docs-badge`) handles spacing — do not add inline `style=` props.
 
 ```mdx
 <Cards>
-  <Card title="Quickstart" href="/latest/get-started/quickstart">
+  <Card title="Quickstart" href="/main/get-started/quickstart">
     Install, start servers, and collect your first rollouts in one page.
 
     <Badge intent="success" minimal outlined>start here</Badge> <Badge minimal outlined>5 min</Badge>
   </Card>
 </Cards>
 ```
-
-When adding or editing a Card, **check the original `docs/<same-path>/index.md` for the badges that were on the corresponding `:::{grid-item-card}` directive** and reproduce them. Dropping badges silently is a regression.
 
 ## Frontmatter Fields
 
@@ -241,19 +232,20 @@ git push origin docs/v0.3.0
 URL → version mapping:
 
 ```
-docs.nvidia.com/nemo/gym/latest/...   → latest train
-docs.nvidia.com/nemo/gym/v0.2/...     → 0.2 train
+docs.nvidia.com/nemo/gym/latest/...   → GA alias (currently mirrors v0.2.1)
+docs.nvidia.com/nemo/gym/main/...     → bleeding-edge train (folder: ./latest/pages)
+docs.nvidia.com/nemo/gym/v0.2.1/...   → 0.2.1 GA snapshot
 ```
 
 ## Cutting a New Version Train
 
-When the user ships a new version (e.g. `v0.3`):
+When the user ships a new version (e.g. `v0.3.0`):
 
-1. Copy `fern/versions/latest/pages/` → `fern/versions/v0.3/pages/` (frozen snapshot of the previous "latest").
-2. Copy `fern/versions/latest.yml` → `fern/versions/v0.3.yml` and rewrite all `./latest/` path prefixes to `./v0.3/`.
-3. Replace `/latest/` link prefixes in the new `v0.3/pages/` body MDX with `/v0.3/`.
-4. Add the version to `fern/docs.yml` `versions:` list with `slug: v0.3` and `availability: stable`. Keep the `latest` entry pointing at `versions/latest.yml`.
-5. `latest/pages/` continues forward as the current dev train.
+1. `cp -r fern/versions/latest fern/versions/v0.3.0` — frozen snapshot of the bleeding-edge folder.
+2. `cp fern/versions/main.yml fern/versions/v0.3.0.yml` and rewrite `./latest/` path prefixes to `./v0.3.0/`.
+3. Retarget the `fern/versions/latest.yml` symlink at the new GA's yml: `cd fern/versions && ln -sfn v0.3.0.yml latest.yml`.
+4. In `fern/docs.yml` `versions:`, add the new GA snapshot entry (`display-name: "0.3.0"`, `slug: v0.3.0`, `availability: stable`) and demote/remove the previous GA snapshot per the support policy.
+5. `fern/versions/latest/pages/` keeps moving forward as the bleeding-edge tree. `main.yml` is unchanged.
 6. Tag `docs/v0.3.0` and push to publish.
 
 ## Debugging
@@ -264,20 +256,20 @@ When the user ships a new version (e.g. `v0.3`):
 | Page 404 in preview | `slug:` missing/duplicated in the same section; or `position:` collision in an auto-discovered folder |
 | Broken-link warning for `/latest/...` cross-version link | False positive in `fern docs dev`; works on published site |
 | `JSX expressions must have one parent element` | Wrap multi-element MDX content in `<>...</>` or a `<div>` |
-| Old Sphinx URL breaks | Add a `redirects:` entry in `fern/docs.yml` |
+| Old URL breaks (page renamed/moved) | Add a `redirects:` entry in `fern/docs.yml` |
 | Library reference missing | `npm run generate:library` in `fern/` |
 | Broken image | Path is relative to the MDX file; check `fern/assets/` exists |
-| Card badges have no spacing | Don't add inline styles — `main.css` `.fern-card .fern-docs-badge` rules handle it; if missing, restore from the badge spacing commit |
-| `latest` and `v0.2` show different content for the same page | Mirror the change you made to `latest` over to `v0.2` (or call out the intentional divergence in the PR) |
+| Card badges have no spacing | Don't add inline styles — `main.css` `.fern-card .fern-docs-badge` rules handle it |
+| `/latest/<page>` and `/<current-ga>/<page>` show different content | They shouldn't — `latest.yml` should mirror the current GA version's yml and point at the same `./<current-ga>/pages/...` content. Sync them. |
 
 ## Key References
 
 | File | Purpose |
 |---|---|
 | `fern/docs.yml` | Site config, versions, redirects, libraries |
-| `fern/versions/latest.yml` | Nav tree for the latest train |
-| `fern/versions/v0.2.yml` | Nav tree for the 0.2 train |
-| `fern/versions/_nav_order.yml` | Cross-version nav ordering |
+| `fern/versions/latest.yml` | GA alias — symlink to the current GA's yml |
+| `fern/versions/main.yml` | Nav tree for the bleeding-edge train (mounts `./latest/pages`) |
+| `fern/versions/v0.2.1.yml` | Nav tree for the 0.2.1 GA snapshot |
 | `fern/versions/<ver>/pages/` | MDX content for a version |
 | `fern/components/` | Custom TSX (CTAButtons, NavButton, CustomFooter) |
 | `fern/assets/` | Shared images, SVGs, favicon |
@@ -285,6 +277,5 @@ When the user ships a new version (e.g. `v0.3`):
 | `fern/package.json` | `npm run check|dev|generate|generate:library` — each wraps `npx -y fern-api@latest` |
 | `.github/workflows/fern-docs-*.yml` | CI: check, preview build, preview comment |
 | `.github/workflows/publish-fern-docs.yml` | CI: publish to docs.nvidia.com/nemo/gym |
-| `docs/` | Legacy Sphinx source (read-only reference for badge fidelity) |
 
 ---
