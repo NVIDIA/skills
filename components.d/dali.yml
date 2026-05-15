@@ -1,0 +1,9 @@
+name: DALI
+repo: NVIDIA/DALI
+description: GPU-accelerated data loading and processing with NVIDIA DALI.
+skills:
+  - path: .agents/skills
+    catalog_dir: DALI
+links:
+   discussions: false
+   security: false  # DALI has a SECURITY.rst file
