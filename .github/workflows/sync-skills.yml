@@ -138,6 +138,83 @@ jobs:
             exit 1
           fi
 
+      - name: Scan for missing skill signatures
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          # Walk every catalog skill (defined by SKILL.md) and flag any
+          # that's missing skill.oms.sig next to it. Group by top-level
+          # product directory so the tracking issue stays readable.
+          missing=/tmp/missing-signatures.txt
+          truncate -s 0 "$missing"
+
+          while IFS= read -r skill_md; do
+            dir=$(dirname "$skill_md")
+            if [ ! -f "$dir/skill.oms.sig" ]; then
+              product=$(echo "$dir" | awk -F/ '{print $2}')
+              echo "$product|$dir" >> "$missing"
+            fi
+          done < <(find skills -type f -name SKILL.md)
+
+          # Ensure the tracking label exists (idempotent).
+          gh label create missing-signatures \
+            --color FFA500 \
+            --description "Catalog skills missing skill.oms.sig — opened by sync-skills" \
+            --force >/dev/null
+
+          existing=$(gh issue list --label missing-signatures --state open \
+                       --json number --jq '.[0].number // empty' --limit 1)
+
+          if [ ! -s "$missing" ]; then
+            if [ -n "$existing" ]; then
+              gh issue close "$existing" \
+                --comment "All catalog skills now carry \`skill.oms.sig\`. Closing automatically."
+              echo "All signed — closed tracking issue #$existing"
+            else
+              echo "All signed — nothing to track"
+            fi
+            exit 0
+          fi
+
+          sort -t'|' -k1,1 -k2,2 -o "$missing" "$missing"
+          count=$(wc -l < "$missing" | tr -d ' ')
+
+          body=/tmp/missing-signatures-body.md
+          {
+            echo "Tracking catalog skills that are missing a NVIDIA detached signature (\`skill.oms.sig\`) next to \`SKILL.md\`."
+            echo ""
+            echo "Signing is currently **opt-in per product** — this issue is informational, not a blocker. The sync PR still merges with these skills present."
+            echo ""
+            echo "**Last updated:** $(date -u +%Y-%m-%d) by [sync run #${{ github.run_id }}]($RUN_URL)"
+            echo ""
+            echo "## Missing signatures ($count skills)"
+            current=""
+            while IFS='|' read -r product dir; do
+              if [ "$product" != "$current" ]; then
+                echo ""
+                echo "### \`$product\`"
+                current="$product"
+              fi
+              echo "- \`$dir/skill.oms.sig\`"
+            done < "$missing"
+            echo ""
+            echo "---"
+            echo "Owners: to enforce signing for your product, ensure your upstream pipeline produces \`skill.oms.sig\` alongside each \`SKILL.md\`. This issue auto-updates each sync and closes when everything is signed."
+          } > "$body"
+
+          title="Skills missing NVIDIA signatures ($count)"
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --title "$title" --body-file "$body"
+            echo "Updated tracking issue #$existing"
+          else
+            gh issue create --title "$title" --body-file "$body" --label missing-signatures
+            echo "Opened new tracking issue"
+          fi
+
       - name: Regenerate README tables
         run: .github/scripts/regenerate-readme.sh
 
