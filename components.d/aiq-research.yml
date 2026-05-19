@@ -4,4 +4,4 @@ ref: develop
 description: NVIDIA AI-Q Blueprint - easily deploy AI-Q locally and run shallow or deep research workflows as a skill.
 skills:
   - path: skills/
-    catalog_dir: aiq
+    catalog_dir: aiq-research
