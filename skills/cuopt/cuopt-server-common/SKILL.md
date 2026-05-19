@@ -4,6 +4,7 @@ version: "26.06.00"
 description: cuOpt REST server — what it does and how requests flow. Domain concepts; no deploy or client code.
 ---
 
+
 # cuOpt Server (common)
 
 Domain concepts for the cuOpt REST server. No deploy commands or client code here.

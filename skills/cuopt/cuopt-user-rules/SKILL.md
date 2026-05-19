@@ -4,6 +4,7 @@ version: "26.06.00"
 description: Base rules for end users calling NVIDIA cuOpt (routing/LP/MILP/QP/install/server). Not for cuOpt internals — use cuopt-developer for those.
 ---
 
+
 # cuOpt User Rules
 
 **Read this when helping someone *use* cuOpt** (calling the SDK, installing, deploying the server). For modifying cuOpt itself, switch to `cuopt-developer`.

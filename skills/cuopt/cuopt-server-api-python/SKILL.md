@@ -4,6 +4,7 @@ version: "26.06.00"
 description: cuOpt REST server — start server, endpoints, Python/curl client examples. Use when the user is deploying or calling the REST API.
 ---
 
+
 # cuOpt Server — Deploy and client (Python/curl)
 
 This skill covers **starting the server** and **client examples** (curl, Python). Server has no separate C API (clients can be any language).

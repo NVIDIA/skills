@@ -4,6 +4,7 @@ version: "26.06.00"
 description: LP, MILP, and QP (beta) with cuOpt — CLI only (MPS files, cuopt_cli). Use when the user is solving LP, MILP, or QP from MPS via command line.
 ---
 
+
 # cuOpt Numerical Optimization — CLI
 
 Solve LP, MILP, and QP problems from MPS files via `cuopt_cli`. The same command, options, and MPS workflow apply across all three; QP uses the standard MPS quadratic-objective extension.

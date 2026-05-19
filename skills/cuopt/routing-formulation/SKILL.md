@@ -4,6 +4,7 @@ version: "26.06.00"
 description: Vehicle routing (VRP, TSP, PDP) — problem types and data requirements. Domain concepts; no API or interface.
 ---
 
+
 # Routing Formulation
 
 Domain concepts for vehicle routing. No API or interface details here.

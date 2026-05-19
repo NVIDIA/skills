@@ -4,6 +4,7 @@ version: "26.06.00"
 description: Vehicle routing (VRP, TSP, PDP) with cuOpt — Python API only. Use when the user is building or solving routing in Python.
 ---
 
+
 # cuOpt Routing — Python API
 
 Confirm problem type (TSP, VRP, PDP) and data (locations, orders, fleet, constraints) before coding.

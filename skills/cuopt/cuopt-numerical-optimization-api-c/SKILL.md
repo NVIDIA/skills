@@ -4,6 +4,7 @@ version: "26.06.00"
 description: LP, MILP, and QP (beta) with cuOpt — C API only. Use when the user is embedding LP, MILP, or QP in C/C++.
 ---
 
+
 # cuOpt Numerical Optimization — C API
 
 Solve LP, MILP, and QP problems via the cuOpt C API. The same library, headers, build pattern, and core calls (`cuOptCreate*Problem`, `cuOptSolve`, `cuOptGetObjectiveValue`) apply across all three; QP extends the API with quadratic-objective creation calls.
