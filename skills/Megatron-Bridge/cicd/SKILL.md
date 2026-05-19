@@ -87,6 +87,17 @@ gh pr checks "$PR_NUMBER" --repo NVIDIA-NeMo/Megatron-Bridge
    ```
 6. **Cross-reference the changeset** against the failing step.
 
+### Hugging Face Model Access In CI
+
+Assume CI functional-test containers run with Hugging Face models offline
+(`HF_HUB_OFFLINE=1`) and a pre-populated `HF_HOME`. When reproducing or
+fixing CI failures involving HF models, mirror this locally by setting
+`HF_HUB_OFFLINE=1` after warming the cache. Test fixtures must not depend on
+live Hub API calls such as `list_repo_files()` or uncached downloads during CI.
+For `trust_remote_code=True` toy checkpoints, copy custom Python modules from
+the already loaded local/cache source files or a local snapshot, not by listing
+the remote repo at test time.
+
 ## Common Failure Patterns
 
 | Symptom | Likely Cause | Action |
@@ -96,6 +107,7 @@ gh pr checks "$PR_NUMBER" --repo NVIDIA-NeMo/Megatron-Bridge
 | Container build fails | Dependency conflict or stale `uv.lock` | Re-run `uv lock` inside Docker and commit updated lock |
 | Unit tests fail | Code regression or missing import | Run failing test locally; check the PR diff |
 | Functional test (L0) fails | Integration breakage | Check GPU runner logs; reproduce with `L0_Launch_*.sh` |
+| HF model fixture passes locally but fails in CI with `OfflineModeIsEnabled` | Test made a live Hugging Face Hub API/download call; CI has `HF_HUB_OFFLINE=1` | Warm local cache, reproduce with `HF_HUB_OFFLINE=1`, and change the fixture to use cached/local artifacts only |
 | `cicd-wait-in-queue` running long | Many PRs queued; automation serializes runners to avoid interleaving | Wait; or check queue depth in the Actions tab |
 | MCore submodule mismatch | Pinned commit out of sync | Update `3rdparty/Megatron-LM` submodule and re-lock |
 | Stale checkpoint auto-resume | `nemo_experiments/` from a previous run exists | `rm -rf nemo_experiments` before starting fresh |

@@ -193,7 +193,7 @@ Cython modules are built via CMake + rapids-cython-core.
 
 ```cmake
 set(cython_sources solver_wrapper.pyx solver_parameters.pyx)
-set(linked_libraries cuopt::cuopt cuopt::mps_parser)
+set(linked_libraries cuopt::cuopt)
 rapids_cython_create_modules(...)
 ```
 

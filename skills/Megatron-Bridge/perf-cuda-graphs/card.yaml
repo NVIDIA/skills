@@ -1,5 +1,5 @@
 title: cuda_graphs
-validated_on: "2026-03-23"
+validated_on: "2026-05-18"
 summary: >
   Megatron Bridge supports CUDA graph capture through two implementations:
   local full-iteration graphs (MCore FullCudaGraphWrapper) and Transformer
@@ -7,11 +7,14 @@ summary: >
   attention, MLP, and MoE router modules. Requires static tensor shapes
   and TE RNG tracker. Verified on Qwen3-30B-A3B and GPT-OSS-20B MoE pretrain
   with TE-scoped graphs, showing roughly 15-25% lower iteration time and
-  20-33% higher throughput. Large-model rollout remains memory-sensitive
-  (GPT-OSS-120B blocked OOM), and packed-sequence finetuning remains fragile:
-  Qwen3 SFT hits the non-Tensor `packed_seq_params` graph assertion, while
-  GPT-OSS SFT/LoRA were blocked earlier by missing TE packed-sequence
-  attention backends in the tested container.
+  20-33% higher throughput when the eager baseline is launch-bound. A later
+  H100 Qwen3-30B-A3B all-to-all short run captured successfully but was
+  neutral/slightly slower in replay, so target-stack validation is required.
+  Large-model rollout remains memory-sensitive (GPT-OSS-120B blocked OOM),
+  and packed-sequence finetuning remains fragile: Qwen3 SFT hits the
+  non-Tensor `packed_seq_params` graph assertion, while GPT-OSS SFT/LoRA were
+  blocked earlier by missing TE packed-sequence attention backends in the
+  tested container.
 validation_status:
   config_validation:
     - code_verified  # config.py:1524-1531
@@ -39,6 +42,8 @@ validation_status:
     - unclear  # test file exists but tests were not executed
   qwen3_moe_pretrain_te_scoped:
     - measured  # Qwen3-30B-A3B, TP2 PP2 EP4, 2x H100 nodes
+  qwen3_moe_h100_alltoall_te_scoped_neutral:
+    - measured  # Qwen3-30B-A3B H100 BF16, alltoall, replay 42.00s vs 41.36s eager
   qwen3_sft_packed_sequence_block:
     - measured  # packed_seq_params is not a Tensor for TE-scoped graphs
   gpt_oss_20b_pretrain_te_scoped:
@@ -49,13 +54,16 @@ validation_status:
     - measured  # GPT-OSS-120B, TP2 PP4 EP8, 4x H100 nodes, job 10111518
 training_dimensions:
   speed:
-    effect: "++"
-    confidence: high
+    effect: "+/-"
+    confidence: medium
     rationale: >
       Measured throughput gains on two MoE pretrain workloads with TE-scoped
       graphs: Qwen3-30B-A3B improves from 623ms to 484ms steady-state and
       214 to 274 TFLOP/s/GPU; GPT-OSS-20B improves from 467-520ms to
-      391-399ms and 37.9-42.2 to 49.4-50.4 TFLOP/s/GPU.
+      391-399ms and 37.9-42.2 to 49.4-50.4 TFLOP/s/GPU. A 2026-05-18
+      Qwen3-30B-A3B H100 BF16 all-to-all run captured 48 TE-scoped graphable
+      layers but replay was slightly slower than eager, so speedup depends on
+      launch overhead and dispatcher/container shape.
   memory:
     effect: "-"
     confidence: medium

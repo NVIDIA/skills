@@ -39,8 +39,10 @@ If you are connecting from your local machine and still need to provision the re
 
 ## Step 2: Deploy the Instance
 
-> **Warning:** The `nemoclaw deploy` command is deprecated.
-> Prefer provisioning the remote host separately, then running the standard NemoClaw installer and `nemoclaw onboard` on that host.
+**Warning:**
+
+The `nemoclaw deploy` command is deprecated.
+Prefer provisioning the remote host separately, then running the standard NemoClaw installer and `nemoclaw onboard` on that host.
 
 Create a Brev instance and run the legacy compatibility flow:
 
@@ -104,15 +106,36 @@ $ nemoclaw deploy <instance-name>
 For SSH port-forwarding, the origin is typically `http://127.0.0.1:18789` (the
 default), so no extra configuration is needed.
 
-> **Warning:** On Brev, set `CHAT_UI_URL` in the launchable environment configuration so it is
-> available when the installer builds the sandbox image. If `CHAT_UI_URL` is not
-> set on a headless host, the compatibility wrapper prints a warning.
->
-> `NEMOCLAW_DISABLE_DEVICE_AUTH` is also evaluated at image build time.
-> When `CHAT_UI_URL` points at a non-loopback origin, NemoClaw disables OpenClaw device pairing in the generated sandbox configuration because browser-only remote users cannot complete terminal-based pairing.
-> Any device that can reach the configured dashboard origin can connect without pairing, so avoid exposing that origin on internet-reachable or shared-network deployments.
+**Warning:**
 
-## Step 7: Proxy Configuration
+On Brev, set `CHAT_UI_URL` in the launchable environment configuration so it is
+available when the installer builds the sandbox image. If `CHAT_UI_URL` is not
+set on a headless host, the compatibility wrapper prints a warning.
+
+`NEMOCLAW_DISABLE_DEVICE_AUTH` is also evaluated at image build time.
+When `CHAT_UI_URL` points at a non-loopback origin, NemoClaw disables OpenClaw device pairing in the generated sandbox configuration because browser-only remote users cannot complete terminal-based pairing.
+Any device that can reach the configured dashboard origin can connect without pairing, so avoid exposing that origin on internet-reachable or shared-network deployments.
+
+## Step 7: First-Run Readiness Budget
+
+On a remote GPU host, the first `nemoclaw onboard` typically does the slowest work of the lifecycle: the sandbox image is built locally and uploaded into the OpenShell gateway, which can stream hundreds of MiB over the VM's link before the readiness wait even starts.
+The post-create readiness wait defaults to 180 seconds (`NEMOCLAW_SANDBOX_READY_TIMEOUT`), which is sized for warm-cache, workstation-class onboarding and can be exceeded on:
+
+- DGX Station first runs with large quantised models (70B+ parameter footprints, NVFP4 weights).
+- Cloud VMs where the local image-build cache is cold and the upload runs over the public network.
+- Hosts onboarding the Brave Web Search preset on the first run (the egress policy stack adds boot work).
+
+Raise the budget before re-running onboard:
+
+```console
+$ export NEMOCLAW_SANDBOX_READY_TIMEOUT=600
+$ nemoclaw onboard
+```
+
+If onboard ends with `Sandbox '<name>' was created but did not become ready within 180s`, onboard deletes the partially-created sandbox first, so the next attempt with the raised budget starts from a clean state.
+For the inference-probe budget that runs earlier in onboarding, see `NEMOCLAW_LOCAL_INFERENCE_TIMEOUT` (use the `nemoclaw-user-configure-inference` skill).
+
+## Step 8: Proxy Configuration
 
 NemoClaw routes sandbox traffic through a gateway proxy that defaults to `10.200.0.1:3128`.
 If your network requires a different proxy, set `NEMOCLAW_PROXY_HOST` and `NEMOCLAW_PROXY_PORT` before onboarding:
@@ -129,7 +152,7 @@ Only alphanumeric characters, dots, hyphens, and colons are accepted for the hos
 The port must be numeric (0-65535).
 Changing the proxy after onboarding requires re-running `nemoclaw onboard`.
 
-## Step 8: GPU Configuration
+## Step 9: GPU Configuration
 
 The deploy script uses the `NEMOCLAW_GPU` environment variable to select the GPU type.
 The default value is `a2-highgpu-1g:nvidia-tesla-a100:1`.

@@ -55,7 +55,24 @@ When an AI agent creates a pull request, it **must be a draft PR** (`gh pr creat
 
 ### PR Descriptions
 
-Keep PR summaries **short and informative**. State what changed and why in a few bullet points. Avoid verbose explanations, full file listings, or restating the diff. Reviewers read the code — the summary should give them context, not a transcript.
+Keep summaries short — a paragraph or 3–5 bullets stating *what* and *why*. Skim recent merges on the target branch to calibrate.
+
+Skip how-it-works walkthroughs, file-by-file tables, exhaustive test-plan checklists, prose restatements of the diff, and screenshots of output the reviewer can reproduce locally. Reviewers read the code; long structured summaries signal LLM-generated and erode trust.
+
+For extra context (a design decision, unusual constraint, follow-up), one or two sentences with a link to an issue or doc beats expanding the body.
+
+### Writing scripts and CI workflows
+
+Follow YAGNI strictly here — flags, fallbacks, env-var overrides, and config knobs without a concrete failure mode they prevent should be dropped. This applies to scripts and CI workflows specifically, not the codebase as a whole.
+
+A few non-YAGNI points worth keeping in mind:
+
+- Prefer extending an existing script over adding a new one.
+- Validate inputs at the top, before any expensive work.
+- One shell command per line over chained `&&`; no comments that restate the next line.
+- Keep informational CI jobs (reporting, dashboards, comment posting) out of any required-checks list.
+
+When in doubt, mirror how the surrounding cuOpt code handles the same concern.
 
 ## Common Tasks
 

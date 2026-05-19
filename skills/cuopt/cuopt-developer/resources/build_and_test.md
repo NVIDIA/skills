@@ -21,7 +21,7 @@ export PARALLEL_LEVEL=8   # adjust based on available RAM
 ```bash
 ./build.sh --help                                       # Lists build options
 ./build.sh libcuopt                                     # C++ library
-./build.sh libmps_parser libcuopt --skip-routing-build --skip-tests-build --skip-c-python-adapters --cache-tool=ccache  # native LP/MIP-focused build without routing/tests/adapters
+./build.sh libcuopt --skip-routing-build --skip-tests-build --skip-c-python-adapters --cache-tool=ccache  # native LP/MIP-focused build without routing/tests/adapters
 ./build.sh cuopt                                        # Python package
 ./build.sh cuopt_server                                 # Server
 ./build.sh docs                                         # Documentation

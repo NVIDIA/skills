@@ -122,18 +122,52 @@ Use this as the correctness-first starting point. Add delayed wgrad, flex
 dispatch, and CUDA-graph interactions only after the plain overlap path is
 known to work.
 
+## Measured Short-Run Evidence
+
+A 2026-05-18 current-main H100 x16 Qwen3 30B-A3B mock pretraining run used
+`EP=16`, `alltoall`, BF16, global batch size 1024, CUDA graphs disabled, and
+`moe_permute_fusion=false`. With iterations 3-8 as the steady window:
+
+| Case | Steady mean | Relative |
+|---|---:|---:|
+| no EP overlap | 41.25s | 1.000x |
+| EP overlap | 31.31s | 1.317x |
+| EP overlap plus `delay_wgrad_compute` | 31.20s | 1.322x |
+
+This is evidence for enabling plain EP overlap on this inter-node all-to-all
+shape. It does not show a meaningful independent win from delayed wgrad, and it
+does not validate fused MoE permutation because that path was disabled for the
+runtime stack.
+
 ## Minimal Runnable Command
 
-Performance harness example:
+Performance harness example inside a Slurm allocation. Keep the model,
+parallelism, dispatcher, and runtime fixed, and vary only the two overlap
+overrides:
 
 ```bash
-python scripts/performance/setup_experiment.py \
-  --model qwen3-30b-a3b \
-  --moe_a2a_overlap \
-  --num_nodes 2 \
-  --gpus_per_node 8 \
-  --max_steps 20
+uv run python scripts/performance/run_script.py \
+  -m qwen \
+  -mr qwen3_30b_a3b \
+  --task pretrain \
+  -g h100 \
+  -c bf16 \
+  -ng 16 \
+  -gn 8 \
+  --max_steps 8 \
+  --config_variant v1 \
+  --cuda_graph_impl none \
+  --moe_flex_dispatcher_backend None \
+  --moe_a2a_overlap false \
+  --tokenizer_type NullTokenizer \
+  comm_overlap.overlap_moe_expert_parallel_comm=true \
+  comm_overlap.delay_wgrad_compute=false \
+  model.moe_shared_expert_overlap=false
 ```
+
+Do not use `--moe_a2a_overlap true` when separating plain EP overlap from
+delayed wgrad: the performance harness helper enables both
+`overlap_moe_expert_parallel_comm` and `delay_wgrad_compute`.
 
 Unit test verification:
 

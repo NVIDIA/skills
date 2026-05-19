@@ -21,7 +21,8 @@ host-driver overhead. Bridge supports two implementations:
 
 ## Quick Decision
 
-Start with TE-scoped graphs for most training workloads:
+Start with TE-scoped graphs for most training workloads, then verify replay
+timing against eager on the same dispatcher, layout, and container:
 
 - dense models: `attn`, then optionally `mlp`
 - dropless MoE: `attn moe_router moe_preprocess`
@@ -78,15 +79,25 @@ cfg.rng.te_rng_tracker = True
 ### Performance harness CLI
 
 ```bash
-python scripts/performance/run_performance_workload.py \
+uv run python scripts/performance/run_script.py \
+  -m qwen \
+  -mr qwen3_30b_a3b \
+  --task pretrain \
+  -g h100 \
+  -c bf16 \
+  -ng 16 \
   --cuda_graph_impl transformer_engine \
-  --cuda_graph_scope attn moe_router moe_preprocess \
+  --cuda_graph_scope attn,moe_router,moe_preprocess \
   ...
 ```
 
 Valid CLI values live in `scripts/performance/argument_parser.py`:
 - `VALID_CUDA_GRAPH_IMPLS`: `["none", "local", "transformer_engine"]`
 - `VALID_CUDA_GRAPH_SCOPES`: `["full_iteration", "attn", "mlp", "moe", "moe_router", "moe_preprocess", "mamba"]`
+
+The performance harness uses a comma-separated `--cuda_graph_scope` value and
+auto-enables `model.use_te_rng_tracker` plus `rng.te_rng_tracker` when
+`--cuda_graph_impl` is not `none`.
 
 ### Required constraints
 
@@ -108,7 +119,9 @@ Valid CLI values live in `scripts/performance/argument_parser.py`:
 2. Fix sequence length and micro-batch size.
 3. Enable the narrowest useful graph scope.
 4. Confirm replay is active and memory is still acceptable.
-5. Only then widen scope or combine with overlap features.
+5. Compare eager against graph replay iterations after warmup and capture; do
+   not include the capture step in steady-state timing.
+6. Only then widen scope or combine with overlap features.
 
 ## Code Anchors
 
@@ -293,7 +306,15 @@ def _delete_cuda_graphs(cuda_graph_helper):
 
 12. **Benchmark numbers are workload-specific**: graph wins are usually real
     when host overhead is visible, but the exact gain depends on batch shape,
-    PP depth, recompute, and whether the eager baseline was already optimized.
+    PP depth, recompute, dispatcher backend, and whether the eager baseline was
+    already optimized.
+
+13. **A successful capture is not a speedup guarantee**: On 2026-05-18,
+    Qwen3 30B A3B H100 BF16 pretrain with the all-to-all dispatcher captured
+    TE-scoped `attn,moe_router,moe_preprocess` graphs successfully (`48`
+    graphable layers, about `6.9 s` capture time on rank 0), but replay
+    iterations 5-8 averaged `42.00 s` versus `41.36 s` for eager. Treat
+    scoped graphs as a bring-up candidate and validate on the target stack.
 
 ## Verification
 
