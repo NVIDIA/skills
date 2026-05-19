@@ -145,7 +145,7 @@ For issues with **this catalog repo itself** (README, structure, listing a new p
 - ✅ Security scanning for all published skills covering instruction safety and supply-chain integrity
 - 🔲 Skills signing so every published skill carries a verifiable NVIDIA signature
 - 🔲 Skills universal evaluation criteria and task-specific criteria
-- 🔲 Skills Card with machine-readable metadata for identity, provenance, quality, and behavioral boundaries
+- 🔲 Skill Card with machine-readable metadata for identity, provenance, quality, and behavioral boundaries
 - 🔲 Compliance gates before external publication
 - 🔲 Syndication to external marketplaces and MCP hubs
 
