@@ -3,12 +3,12 @@ Reads an existing agent skill directory and produces a governance skill card plu
 
 This skill is ready for commercial/non-commercial use. <br>
 
-## Owner: NVIDIA <br>
+## Owner: <span style="color:#d73a49">NVIDIA</span> <!-- VERIFY: inferred from NVIDIA GitHub org and repo context; no explicit owner key in frontmatter --> <br>
 
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to generate governance skill cards for agent skills, ensuring compliance with documentation and review requirements before submission. <br>
+Developers and governance reviewers use this skill to generate standardized skill cards for agent skills, supporting trustworthy AI documentation and legal/safety review workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
