@@ -84,7 +84,7 @@ Use this when you want to see available NVIDIA skills before installing anything
 npx skills add nvidia/skills --list
 ```
 
-For non-interactive installs, global installs, agent-specific installs, updates, removals, and fallback manual copying, see [Advanced installation](docs/advanced-install.md).
+For non-interactive installs, global installs, agent-specific installs, updates, removals, and fallback manual copying, see [Advanced installation](docs/advanced-install.mdx).
 
 ---
 
