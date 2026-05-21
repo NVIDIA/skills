@@ -1,0 +1,88 @@
+---
+title: "Verify Signed Agent Skills"
+description: "Use detached OMS signatures to verify the integrity and authenticity of published agent skills."
+---
+
+Cryptographic signing gives skill consumers a way to verify that a skill directory has not changed since it was signed. For agent skills, that matters because the review target is the whole directory: `SKILL.md`, scripts, references, assets, and any supporting files.
+
+NVIDIA has adopted the OpenSSF Model Signing format, also known as OMS, for detached skill signatures. OMS extends Sigstore-style bundles so verification can cover a directory tree instead of only a single file.
+
+## Signature Layout
+
+The signature is delivered as a detached file at the top level of the skill directory:
+
+```text
+skill-name/
+|-- SKILL.md
+|-- scripts/
+|-- references/
+|-- assets/
+`-- skill.oms.sig
+```
+
+By default, the signature covers the files and directories in the skill directory, excluding the signature file itself.
+
+<Note>
+If unsigned files are added after signing, strict verification should fail. That is the point: users need to know when the installed directory differs from the signed release.
+</Note>
+
+## Verification Inputs
+
+Verification needs three things:
+
+| Input | Purpose |
+|---|---|
+| Skill directory | The artifact being verified |
+| `skill.oms.sig` | Detached OMS signature |
+| NVIDIA agent capabilities certificate | Trust anchor for the signature |
+
+The signing source material names the certificate file `nv-agent-root-cert.pem`.
+
+## Install a Verifier
+
+Install an OMS-compatible verifier such as `model-signing`:
+
+```bash
+pip install model-signing
+```
+
+## Verify a Skill
+
+Run verification against the installed or downloaded skill directory:
+
+```bash
+model_signing verify certificate SKILL_DIR \
+  --signature SKILL_DIR/skill.oms.sig \
+  --certificate-chain nv-agent-root-cert.pem
+```
+
+If your policy intentionally permits additional unsigned files, add:
+
+```bash
+--ignore-unsigned-files
+```
+
+For production release checks, prefer strict verification unless there is a documented reason to permit unsigned additions.
+
+## Where Signing Fits
+
+Signing should happen after scanning and review:
+
+1. Run SkillSpector against the complete skill directory.
+2. Resolve or accept findings.
+3. Complete the skill card.
+4. Sign the exact directory that will be published.
+5. Publish `skill.oms.sig` with the skill.
+6. Verify the signature during installation or CI.
+
+Signing does not prove a skill is safe. It proves the released skill is the one that was signed. Pair it with scanning and a complete skill card for a usable trust story.
+
+## Consumer Checklist
+
+Before installing a signed skill:
+
+- Confirm the signature file is present as `skill.oms.sig`.
+- Confirm the certificate chain comes from the expected publisher.
+- Run the verification command against the final installed directory.
+- Review the skill card and scan report before enabling the skill.
+- Re-run verification after any local modification.

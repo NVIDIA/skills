@@ -1,0 +1,44 @@
+---
+title: "Trust Controls for Agent Skills"
+description: "A practical series on scanning, signing, and documenting AI agent skills before enterprise deployment."
+---
+
+Agent skills are becoming a reusable software layer for AI agents. That makes them powerful, but it also means they need the same discipline we expect from other deployable artifacts: security review, provenance, ownership, and clear use boundaries.
+
+This series describes the trust controls behind **NVIDIA-Verified skills** — agent skills that have been scanned, documented in a Skills Card, and signed before publication. The pipeline has three layers:
+
+1. Scan the skill before installation.
+2. Publish a skill card that states what the skill does and how it should be used.
+3. Sign the shipped directory so users can verify that what they received matches what was reviewed.
+
+<Cards>
+  <Card
+    title="A Trust Pipeline for Agent Skills"
+    icon="route"
+    href="/skills/agent-skill-trust-pipeline"
+  >
+    The end-to-end workflow that links scanning, skill cards, and cryptographic signing into a release gate.
+  </Card>
+  <Card
+    title="Scan Agent Skills Before Installation"
+    icon="scan-search"
+    href="/skills/scanning-agent-skills"
+  >
+    How SkillSpector checks skill bundles for security risks, malicious patterns, and supply-chain issues.
+  </Card>
+  <Card
+    title="Verify Signed Agent Skills"
+    icon="badge-check"
+    href="/skills/signing-agent-skills"
+  >
+    How detached OMS signatures help consumers verify skill integrity after publishing and installation.
+  </Card>
+  <Card
+    title="Write Skill Cards People Can Trust"
+    icon="id-card"
+    href="/skills/skill-cards"
+  >
+    A practical skill-card template for owners, users, risk reviewers, and deployment teams.
+  </Card>
+</Cards>
+

@@ -1,0 +1,107 @@
+---
+title: "Write Skill Cards People Can Trust"
+description: "A skill card records the owner, intended use, risks, outputs, and references for an AI agent skill."
+---
+
+A scan report tells reviewers what automated checks found. A signature tells users whether the artifact changed. A skill card tells humans what they are accepting.
+
+The **Skills Card** is the per-skill release record described below. Authors can generate one by running the `Skill Card.md` skill published at [NVIDIA/Trustworthy-AI](https://github.com/NVIDIA/Trustworthy-AI/blob/main/Skill%20Card.md), which walks through each section interactively. The card should be completed before a skill is broadly shared, especially when the skill can run tools, call APIs, write files, or influence production workflows.
+
+## What a Skill Card Should Answer
+
+| Section | Question it answers |
+|---|---|
+| Description | What does this skill do in one sentence? |
+| Owner | Who is accountable for this skill? |
+| License or terms | What rules govern use and redistribution? |
+| Use case | Who should use it, and for what purpose? |
+| Deployment geography | Where is the skill intended to be used? |
+| Risks and mitigations | What could go wrong, and how is that risk reduced? |
+| References | What docs, papers, reports, or model cards support this skill? |
+| Skill output | What does the skill produce, and in what format? |
+| Skill version | Which release or signing identifier does this card describe? |
+| Ethical considerations | What governance or misuse considerations should users keep in mind? |
+
+## Minimum Useful Card
+
+Use this as the minimum release template:
+
+```markdown
+# Skill Card
+
+## Description
+
+[Skill name] [does one concrete thing] for [target user or workflow].
+
+This skill is [ready for commercial/non-commercial use | for research and development only | for demonstration purposes and not for production usage].
+
+## Owner
+
+[Team or person accountable for maintenance and review]
+
+## License/Terms of Use
+
+[License or terms link]
+
+## Use Case
+
+[Who should use this skill and for what task]
+
+## Deployment Geography for Use
+
+[Global, regional, or country-specific deployment scope]
+
+## Known Risks and Mitigations
+
+Risk: [Plain-language risk]
+
+Mitigation: [Control, limitation, review step, or monitoring plan]
+
+## References
+
+- [Reference documentation, paper, model card, or related technical source]
+- [Scan report or CI evidence]
+
+## Skill Output
+
+Output type(s): [Analysis, API calls, code, files, or other]
+
+Output format: [Markdown, JSON, string, SARIF, files, etc.]
+
+Output parameters: [Shape, dimensions, schema, or file naming rules]
+
+Other properties: [Limits, retention, side effects, or validation notes]
+
+## Skill Version
+
+[Version, release tag, or signing identifier]
+
+## Ethical Considerations
+
+[Relevant policy, human review expectation, misuse concern, or industry-specific constraint]
+```
+
+## Connect the Card to the Release
+
+The card should point to the same evidence reviewers used:
+
+- SkillSpector scan report or CI job
+- Source repository and release tag
+- Signing identifier or `skill.oms.sig` location
+- Any model cards or dependency documentation behind the skill
+- Known limitations and accepted risks
+
+## Good Risk Statements
+
+Avoid vague risks like "model may be wrong." Make risks actionable:
+
+| Weak | Stronger |
+|---|---|
+| The skill could make mistakes. | The skill may generate incorrect remediation steps; users must review proposed code changes before execution. |
+| The skill uses APIs. | The skill sends package names to OSV.dev for vulnerability lookup; no source code or secrets should be transmitted. |
+| The skill writes files. | The skill may overwrite generated reports in the configured output directory; it must not write outside that directory. |
+
+## Approval Rule
+
+A skill card is complete when a reviewer can understand the skill's purpose, owner, output, risks, and release evidence without opening the source code first.
+

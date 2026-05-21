@@ -1,0 +1,61 @@
+---
+title: "Release Checklist"
+description: "A practical checklist for preparing an agent skill for enterprise review and publication."
+---
+
+Use this checklist when preparing a skill for review, publication, or internal deployment.
+
+## Before Scanning
+
+- The skill has a narrow, concrete purpose.
+- `SKILL.md` describes when the skill should activate.
+- Tool, shell, network, file, environment, and MCP capabilities are declared when used.
+- Scripts and references are necessary for the stated use case.
+- Test fixtures, examples, and generated files are either intentionally included or excluded.
+
+## Scanning
+
+- Run SkillSpector against the complete skill directory.
+- Save a Markdown or SARIF report for review.
+- Resolve critical and high findings before release.
+- Review medium findings for policy or usability impact.
+- Confirm the skill description matches executable behavior.
+
+```bash
+skillspector scan ./skill-name --format markdown --output skillspector-report.md
+```
+
+## Skill Card
+
+- Description is one sentence and names the actual behavior.
+- Owner is a person or accountable team.
+- License or terms are linked.
+- Use case names intended users and workflows.
+- Deployment geography is explicit.
+- Known risks have specific mitigations.
+- Output type and format are clear.
+- Version or signing identifier matches the release.
+
+## Signing
+
+- Sign the exact directory that passed review.
+- Publish `skill.oms.sig` at the top level of the skill directory.
+- Publish or reference the expected certificate chain.
+- Verify the published artifact before announcing availability.
+
+```bash
+model_signing verify certificate SKILL_DIR \
+  --signature SKILL_DIR/skill.oms.sig \
+  --certificate-chain nv-agent-root-cert.pem
+```
+
+## Release Packet
+
+The release packet should include:
+
+- Skill source or release artifact
+- Skill card
+- SkillSpector report or CI link
+- Detached OMS signature
+- Verification instructions
+- Known limitations and support contact

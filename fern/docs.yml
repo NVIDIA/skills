@@ -1,0 +1,45 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+instances:
+  - url: https://nvidia-skills.docs.buildwithfern.com/skills
+    custom-domain: docs.nvidia.com/skills
+    multi-source: true
+
+title: NVIDIA Skill Documentation
+
+global-theme: nvidia
+
+navbar-links:
+  - type: minimal
+    href: https://github.com/NVIDIA/skills
+    text: GitHub
+
+logo:
+  right-text: Skills
+
+navigation:
+  - page: Overview
+    path: ../docs/index.mdx
+    slug: /
+  - section: Documentation
+    skip-slug: true 
+    contents:
+      - page: A Trust Pipeline for Agent Skills
+        path: ../docs/agent-skill-trust-pipeline.mdx
+        slug: agent-skill-trust-pipeline
+      - page: Scan Agent Skills Before Installation
+        path: ../docs/scanning-agent-skills.mdx
+        slug: scanning-agent-skills
+      - page: Verify Signed Agent Skills
+        path: ../docs/signing-agent-skills.mdx
+        slug: signing-agent-skills
+      - page: Write Skill Cards People Can Trust
+        path: ../docs/skill-cards.mdx
+        slug: skill-cards
+      - page: Release Checklist
+        path: ../docs/release-checklist.mdx
+        slug: release-checklist
+      - page: Advanced Installation
+        path: ../docs/advanced-install.mdx
+        slug: advanced-install

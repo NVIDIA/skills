@@ -1,0 +1,120 @@
+---
+title: "Scan Agent Skills Before Installation"
+description: "Use SkillSpector to detect vulnerabilities, malicious patterns, and policy risks in AI agent skills."
+---
+
+Agent skills can look harmless while still containing risky instructions, hidden metadata, overbroad permissions, or executable code that does more than the description says. SkillSpector is a security scanner for AI agent skills that helps answer: should this skill be installed?
+
+SkillSpector accepts Git repositories, URLs, zip files, directories, and single files. It runs fast static checks by default and can add optional LLM semantic analysis for issues that require intent comparison.
+
+## What SkillSpector Checks
+
+SkillSpector covers 64 vulnerability patterns across 16 categories, including:
+
+- Prompt injection
+- Data exfiltration
+- Privilege escalation
+- Supply-chain issues
+- Excessive agency
+- Output handling
+- System prompt leakage
+- Memory poisoning
+- Tool misuse
+- Rogue-agent behavior
+- Trigger abuse
+- Dangerous code patterns
+- Taint tracking
+- YARA signatures
+- MCP least privilege
+- MCP tool poisoning
+
+It also supports live vulnerability lookup through OSV.dev for known vulnerable dependencies, with an offline fallback when network access is unavailable.
+
+## Install
+
+Create a virtual environment, install the package, and run the scanner from the repository:
+
+```bash
+git clone https://github.com/NVIDIA/SkillSpector.git
+cd SkillSpector
+
+uv venv .venv && source .venv/bin/activate
+make install
+```
+
+If `uv` is unavailable, use Python's built-in virtual environment support:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+make install
+```
+
+## Run a Scan
+
+```bash
+# Scan a local skill directory
+skillspector scan ./my-skill/
+
+# Scan a single SKILL.md file
+skillspector scan ./SKILL.md
+
+# Scan a Git repository
+skillspector scan https://github.com/user/my-skill
+
+# Scan a zip file
+skillspector scan ./my-skill.zip
+```
+
+## Choose an Output Format
+
+Use terminal output while iterating locally, JSON for automation, Markdown for review packets, and SARIF for CI or code scanning systems.
+
+```bash
+# Pretty terminal output
+skillspector scan ./my-skill/
+
+# Machine-readable JSON
+skillspector scan ./my-skill/ --format json --output report.json
+
+# Human-readable report
+skillspector scan ./my-skill/ --format markdown --output report.md
+
+# CI and IDE integration
+skillspector scan ./my-skill/ --format sarif --output report.sarif
+```
+
+## Static vs Semantic Analysis
+
+Static analysis is fast and deterministic. It can catch suspicious strings, dependency risk, dangerous APIs, and declared-permission mismatches.
+
+Semantic analysis uses an LLM to compare what a skill claims with what its code appears to do. This is useful for description-behavior mismatch, vague triggers, and subtle policy issues.
+
+Configure a provider when you want semantic checks:
+
+```bash
+export SKILLSPECTOR_PROVIDER=openai
+export OPENAI_API_KEY=sk-...
+skillspector scan ./my-skill/
+```
+
+For static-only review:
+
+```bash
+skillspector scan ./my-skill/ --no-llm
+```
+
+## Triage Policy
+
+Use scan results as a release gate:
+
+| Finding type | Recommended action |
+|---|---|
+| Critical or high severity | Block release until fixed or formally accepted |
+| Hidden instructions or tool poisoning | Remove hidden content before release |
+| Underdeclared capability | Update permissions or remove the behavior |
+| Known vulnerable dependency | Upgrade, pin a fixed version, or document why the dependency is acceptable |
+| Description-behavior mismatch | Rewrite the skill description or change the code |
+
+The goal is not just a clean report. The goal is a skill whose declared purpose, permissions, code, and documented risks all agree.
+

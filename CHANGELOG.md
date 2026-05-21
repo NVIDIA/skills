@@ -7,6 +7,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.3.0] - 2025-05-21
+
+### Added
+
+- Long-form documentation site published via Fern ([`fern/docs.yml`](fern/docs.yml), [`fern/fern.config.json`](fern/fern.config.json))
+- New documentation pages in [`docs/`](docs/):
+
+### Changed
+
+- Converted [`docs/advanced-install.md`](docs/advanced-install.md) to [`docs/advanced-install.mdx`](docs/advanced-install.mdx) for the Fern docs site
+- Updated [`README.md`](README.md) project structure section to list the new `docs/` and `fern/` directories
+
 ## [0.2.0] - 2026-03-31
 
 ### Added

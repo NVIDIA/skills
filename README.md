@@ -180,8 +180,16 @@ NVIDIA/skills/
 │   ├── ...
 │   ├── tensorrt-llm.yml
 │   └── README.md             # Schema and onboarding instructions
-├── docs/
-│   └── advanced-install.md   # Advanced skills CLI usage
+├── docs/                    # Long-form documentation (published via Fern)
+│   ├── README.md             # How to build the docs locally
+│   ├── index.mdx
+│   ├── advanced-install.mdx  # Advanced skills CLI usage
+│   ├── agent-skill-trust-pipeline.mdx
+│   ├── release-checklist.mdx
+│   ├── scanning-agent-skills.mdx
+│   ├── signing-agent-skills.mdx
+│   └── skill-cards.mdx
+├── fern/                    # Fern docs site configuration
 ├── .github/workflows/       # Automated sync pipeline
 ├── CONTRIBUTING.md          # Contribution guidelines
 ├── SECURITY.md              # Security reporting policy

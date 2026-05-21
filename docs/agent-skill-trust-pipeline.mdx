@@ -1,0 +1,61 @@
+---
+title: "A Trust Pipeline for Agent Skills"
+description: "How scanning, signing, and skill cards work together to make AI agent skills easier to review and safer to deploy."
+---
+
+AI agent skills package instructions, code, references, and assets into a format agents can reuse. They are also a new supply-chain surface: a skill can ask an agent to run commands, read files, call tools, fetch remote content, or make decisions on a user's behalf.
+
+A practical release process should answer three questions before a skill is installed:
+
+- What does this skill claim to do?
+- What did automated review find?
+- Can users verify the reviewed artifact is the artifact they received?
+
+The combination of SkillSpector scanning, a completed skill card, and an OMS signature gives those questions a concrete place in the workflow.
+
+## The Release Gate
+
+Use this order for skills intended for enterprise deployment as **NVIDIA-Verified**:
+
+1. Author the skill with a narrow purpose, clear triggers, and explicit permissions.
+2. Run SkillSpector against the complete skill directory.
+3. Fix high-risk findings or record why a finding is accepted.
+4. Complete the skill card with owner, license, use case, deployment geography, output shape, risks, and references.
+5. Sign the skill directory and publish the detached `skill.oms.sig` file with the skill.
+6. Ask consumers or CI to verify the signature before installation.
+
+<Note>
+Scanning and signing solve different problems. Scanning asks whether the content appears safe enough to ship. Signing asks whether the shipped content is the same content that was reviewed.
+</Note>
+
+## What Each Layer Catches
+
+| Layer | Primary job | Example evidence |
+|---|---|---|
+| SkillSpector scan | Detect risky behavior before installation | Markdown, JSON, SARIF, or terminal report |
+| Skill card | State human-readable intent, ownership, limits, and output behavior | `Skill Card.md` or equivalent release metadata |
+| OMS signature | Verify integrity and authenticity of the published skill directory | `skill.oms.sig` plus NVIDIA signing certificate |
+
+## Recommended Artifact Set
+
+Every released skill should ship or link to:
+
+- `SKILL.md`
+- Supporting `scripts/`, `references/`, and `assets/` as needed
+- A completed skill card
+- A SkillSpector report or CI link
+- `skill.oms.sig`
+- Verification instructions for the signing certificate and verifier command
+
+## Review Questions
+
+Before approval, reviewers should be able to answer:
+
+- Does the skill description match the behavior of its executable files?
+- Are permissions limited to what the skill actually needs?
+- Are network, shell, file, environment, and MCP capabilities declared in the `SKILL.md` frontmatter and justified by the skill's stated use case?
+- Are known risks and mitigations written in plain language?
+- Does the signature verify against the released directory?
+
+If one of those answers is unclear, the skill is not ready for broad deployment.
+
