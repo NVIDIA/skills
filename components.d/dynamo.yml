@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: Dynamo
+repo: ai-dynamo/dynamo
+description: Distributed LLM inference framework — pre-deployment sizing, model optimization, local serving, Kubernetes deployment, request-path configuration (Frontend + DynamoModel + gateway), day-2 troubleshooting, and benchmarking.
+skills:
+  - path: .agents/skills/
+    catalog_dir: Dynamo
