@@ -223,14 +223,14 @@ cfg.checkpoint.non_persistent_local_ckpt_algo = "fully_parallel"
 - Plugin: `src/megatron/bridge/recipes/run_plugins.py` — `FaultTolerancePlugin`
 - Perf plugin: `scripts/performance/resiliency_plugins.py`
 - Tests: `tests/unit_tests/training/test_fault_tolerance.py`
-- Example: `examples/resiliency/fault_tolerance/`
+- Example: `examples/training_features/resiliency/fault_tolerance/`
 
 ### Straggler detection
 - Config: `src/megatron/bridge/training/config.py` — `NVRxStragglerDetectionConfig`
 - Runtime: `src/megatron/bridge/training/nvrx_straggler.py`
 - Train loop: `src/megatron/bridge/training/train.py` — `check_nvrx_straggler_detection`
 - Tests: `tests/unit_tests/training/test_nvrx_straggler.py`, `tests/functional_tests/training/test_nvrx_straggler.py`
-- Example: `examples/resiliency/straggler_detection/`
+- Example: `examples/training_features/resiliency/straggler_detection/`
 
 ### In-process restart
 - Config: `src/megatron/bridge/training/config.py` — `InProcessRestartConfig`
@@ -281,8 +281,8 @@ cfg.checkpoint.non_persistent_local_ckpt_algo = "fully_parallel"
 
 ### Fault tolerance
 ```bash
-./examples/resiliency/fault_tolerance/run_fault_tolerance.sh
-./examples/resiliency/fault_tolerance/run_fault_tolerance.sh --simulate-fault
+./examples/training_features/resiliency/fault_tolerance/run_fault_tolerance.sh
+./examples/training_features/resiliency/fault_tolerance/run_fault_tolerance.sh --simulate-fault
 ```
 Look for `[FaultTolerance]` / `[RankMonitorServer]` log lines with section
 timeouts. Simulated fault should trigger restart from checkpoint.
@@ -290,7 +290,7 @@ timeouts. Simulated fault should trigger restart from checkpoint.
 ### Straggler detection
 ```bash
 uv run python -m torch.distributed.run --nproc_per_node=2 \
-    examples/resiliency/straggler_detection/straggler_detection_example.py
+    examples/training_features/resiliency/straggler_detection/straggler_detection_example.py
 ```
 Look for `GPU relative performance` and `GPU individual performance` reports
 with per-rank scores.

@@ -62,7 +62,7 @@ evidence:
   - docs/parallelisms.md
   - docs/performance-guide.md
   - docs/training/communication-overlap.md
-  - docs/training/hybrid-context-parallel.md
+  - docs/training/hierarchical-context-parallel.md
   - src/megatron/bridge/training/initialize.py
   - src/megatron/bridge/training/config.py
   - src/megatron/bridge/models/common/unimodal.py

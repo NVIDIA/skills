@@ -1,6 +1,6 @@
 ---
 name: cuopt-server-common
-version: "26.06.00"
+version: "26.08.00"
 description: cuOpt REST server — what it does and how requests flow. Domain concepts; no deploy or client code.
 ---
 

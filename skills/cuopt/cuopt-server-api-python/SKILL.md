@@ -1,6 +1,6 @@
 ---
 name: cuopt-server-api-python
-version: "26.06.00"
+version: "26.08.00"
 description: cuOpt REST server — start server, endpoints, Python/curl client examples. Use when the user is deploying or calling the REST API.
 ---
 

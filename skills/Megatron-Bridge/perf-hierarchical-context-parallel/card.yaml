@@ -1,4 +1,4 @@
-title: hybrid_context_parallel
+title: hierarchical_context_parallel
 validated_on: "2026-03-14"
 summary: >
   Megatron-Bridge currently supports hierarchical context parallelism
@@ -27,9 +27,9 @@ feature_meaning:
   hierarchical_context_parallel_sizes: >
     Per-level subgroup sizes for hierarchical context parallelism. The product
     must equal context_parallel_size.
-  hybrid_context_parallel_flag: >
-    Separate upstream feature for balancing packed or variable-length workloads.
-    It is not the same feature as a2a+p2p.
+  inner_outer_cp_groups: >
+    Hierarchical CP creates inner and outer context-parallel groups. With
+    a2a+p2p, the inner group uses a2a and the outer group uses p2p.
 recommended_path:
   model.context_parallel_size: 4
   model.cp_comm_type: a2a+p2p
@@ -47,7 +47,6 @@ known_limitations:
   - The decentralized-PG path initializes flat CP groups and leaves HCP unset.
   - No checked-in Bridge recipe sets cp_comm_type=a2a+p2p.
   - No checked-in Bridge functional test runs an end-to-end HCP training step.
-  - Bridge docs do not currently call out the decentralized-PG limitation.
 evidence:
   - src/megatron/bridge/training/initialize.py
   - src/megatron/bridge/training/config.py

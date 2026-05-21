@@ -67,7 +67,7 @@ evidence:
   - docs/performance-guide.md
   - docs/training/multi-token-prediction.md
   - docs/models/llm/llama3.md
-  - docs/training/hybrid-context-parallel.md
+  - docs/training/hierarchical-context-parallel.md
   - src/megatron/bridge/data/datasets/packed_sequence.py
   - src/megatron/bridge/data/datasets/sft.py
   - src/megatron/bridge/training/utils/packed_seq_utils.py

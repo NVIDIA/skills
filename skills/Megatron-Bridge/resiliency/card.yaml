@@ -111,8 +111,8 @@ evidence:
   - tests/functional_tests/training/test_nvrx_straggler.py
   - tests/functional_tests/training/test_inprocess_restart.py
   - tests/functional_tests/training/test_local_checkpointing.py
-  - examples/resiliency/fault_tolerance/
-  - examples/resiliency/straggler_detection/
+  - examples/training_features/resiliency/fault_tolerance/
+  - examples/training_features/resiliency/straggler_detection/
 follow_up_validation:
   - Add a Slurm-based FT end-to-end test with actual hang recovery.
   - Add a checked-in recipe that enables FT + straggler detection by default.
