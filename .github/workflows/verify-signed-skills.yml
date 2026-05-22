@@ -1,0 +1,125 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# Verify every published skill.oms.sig in the catalog against the
+# NVIDIA Agentic Capabilities trust anchor. Guards against signed
+# directories drifting from what the catalog publishes (e.g. when
+# the daily sync pipeline lands a SKILL.md newer than the signed
+# snapshot — the failure mode reported in issue #77).
+#
+# Trust anchor lookup order:
+#   1. .github/trust/nv-agent-root-cert.pem (committed)
+#   2. Repository secret NV_AGENT_ROOT_CERT_PEM (PEM contents)
+#
+# When neither is present the job is skipped with a warning. This
+# lets the workflow merge before the cert distribution decision is
+# settled; it activates as soon as the anchor is provided.
+
+name: Verify Signed Skills
+
+on:
+  pull_request:
+    paths:
+      - "skills/**"
+      - ".github/workflows/verify-signed-skills.yml"
+      - ".github/trust/**"
+  push:
+    branches: [main]
+    paths:
+      - "skills/**"
+      - ".github/trust/**"
+  schedule:
+    # Daily at 09:00 UTC — runs after both sync passes (06:00 / 18:00)
+    # and the prior day's signing activity.
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install model-signing
+        run: pip install "model-signing==1.1.1"
+
+      - name: Provision trust anchor
+        id: trust
+        env:
+          NV_AGENT_ROOT_CERT_PEM: ${{ secrets.NV_AGENT_ROOT_CERT_PEM }}
+        run: |
+          set -euo pipefail
+          CERT_PATH="${GITHUB_WORKSPACE}/.github/trust/nv-agent-root-cert.pem"
+          if [ ! -f "$CERT_PATH" ] && [ -n "${NV_AGENT_ROOT_CERT_PEM:-}" ]; then
+            mkdir -p "$(dirname "$CERT_PATH")"
+            printf '%s' "$NV_AGENT_ROOT_CERT_PEM" > "$CERT_PATH"
+          fi
+          if [ ! -f "$CERT_PATH" ]; then
+            echo "::warning::No NVIDIA Agentic Capabilities root certificate available."
+            echo "::warning::Commit it at .github/trust/nv-agent-root-cert.pem or set repo secret NV_AGENT_ROOT_CERT_PEM."
+            echo "has_cert=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_cert=true" >> "$GITHUB_OUTPUT"
+            echo "cert_path=$CERT_PATH" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify all signed skills
+        if: steps.trust.outputs.has_cert == 'true'
+        run: |
+          set -euo pipefail
+          CERT="${{ steps.trust.outputs.cert_path }}"
+          PASS=0
+          FAIL=0
+          : > /tmp/verify-summary.md
+          while IFS= read -r sig; do
+            DIR="$(dirname "$sig")"
+            SKILL="${DIR#skills/}"
+            if model_signing verify certificate "$DIR" \
+                 --signature "$sig" \
+                 --certificate_chain "$CERT" \
+                 --ignore_unsigned_files > /tmp/verify.log 2>&1; then
+              echo "- pass: \`$SKILL\`" >> /tmp/verify-summary.md
+              PASS=$((PASS + 1))
+            else
+              ERR="$(grep -E 'Verification failed|Hash mismatch' /tmp/verify.log | head -2 | tr '\n' ' ' | sed 's/`/\\`/g')"
+              echo "- **fail**: \`$SKILL\` — $ERR" >> /tmp/verify-summary.md
+              FAIL=$((FAIL + 1))
+            fi
+          done < <(find skills -name "skill.oms.sig" | sort)
+          {
+            echo "## Signed Skill Verification"
+            echo ""
+            echo "Passed: $PASS · Failed: $FAIL"
+            echo ""
+            cat /tmp/verify-summary.md
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$FAIL" -gt 0 ]; then
+            echo "::error::$FAIL signed skill(s) failed verification. See job summary."
+            exit 1
+          fi
+          if [ "$PASS" -eq 0 ]; then
+            echo "::warning::No skill.oms.sig files were found in the catalog."
+          fi
+
+      - name: Report skipped run
+        if: steps.trust.outputs.has_cert != 'true'
+        run: |
+          {
+            echo "## Signed Skill Verification — SKIPPED"
+            echo ""
+            echo "No NVIDIA Agentic Capabilities root certificate configured."
+            echo ""
+            echo "To enable, do one of:"
+            echo ""
+            echo "- Commit the trust anchor at \`.github/trust/nv-agent-root-cert.pem\`."
+            echo "- Set repo secret \`NV_AGENT_ROOT_CERT_PEM\` to the PEM contents."
+          } >> "$GITHUB_STEP_SUMMARY"
