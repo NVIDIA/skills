@@ -166,6 +166,21 @@ jobs:
             fi
           done < <(find skills -type f -name SKILL.md)
 
+          # Drop top-level product directories with no SKILL.md anywhere
+          # inside. These show up as misleading empty/helper-only folders
+          # to anyone browsing the catalog (e.g. a product placeholder
+          # with just a README, or a product whose every skill was just
+          # dropped above).
+          for product_dir in skills/*/; do
+            product_dir="${product_dir%/}"
+            if [ -z "$(find "$product_dir" -type f -name SKILL.md -print -quit 2>/dev/null)" ]; then
+              product=$(basename "$product_dir")
+              echo "$product|$product_dir|(orphan — no skills inside)" >> "$dropped"
+              echo "  ✗ Dropping orphan $product_dir — no SKILL.md inside"
+              rm -rf "$product_dir"
+            fi
+          done
+
           # Mark any product with a dropped skill as "changed" so the PR
           # opens even when the only diff is a removed non-compliant skill.
           if [ -s "$dropped" ]; then
