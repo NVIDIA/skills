@@ -36,7 +36,12 @@ Verification needs three things:
 | `skill.oms.sig` | Detached OMS signature |
 | NVIDIA agent capabilities certificate | Trust anchor for the signature |
 
-The signing source material names the certificate file `nv-agent-root-cert.pem`.
+The signing source material names the certificate file `nv-agent-root-cert.pem`. Download the current trust anchor from this repo: [`nv-agent-root-cert.pem`](../nv-agent-root-cert.pem). From a shell:
+
+```bash
+curl -L -o nv-agent-root-cert.pem \
+  https://raw.githubusercontent.com/NVIDIA/skills/main/nv-agent-root-cert.pem
+```
 
 ## Install a Verifier
 
