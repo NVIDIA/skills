@@ -62,7 +62,7 @@ When autotune alone isn't enough -- use NCU profiling to understand why a kernel
 
 ```
 Step 1: Baseline profiling
-  -> DISABLE_AUTOTUNE=1 ncu --set full -o baseline.ncu-rep python test.py
+  -> DISABLE_AUTOTUNE=1 ncu --set full -o baseline.ncu-rep python my_benchmark.py
   -> Identify bottleneck: compute, memory, or latency
 
 Step 2: Classify bottleneck

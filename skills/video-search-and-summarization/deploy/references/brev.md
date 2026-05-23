@@ -16,7 +16,7 @@ access pattern from [`base.md`](base.md).
 ## Architecture
 
 ```
-Browser  ──https──>  77770-<BREV_ENV_ID>.brevlab.com  (Cloudflare Access)
+Browser  --https-->  7777-<BREV_ENV_ID>.brevlab.com  (Cloudflare Access)
                              │
                              ▼
                    Brev network tunnel
@@ -42,9 +42,8 @@ https://<link-prefix>-<BREV_ENV_ID>.brevlab.com
 ```
 
 - `<BREV_ENV_ID>` is the instance's ID from `/etc/environment`.
-- `<link-prefix>` depends on how the Brev secure link is configured:
-  - **Launchable-created links (default):** `${PROXY_PORT}0` — e.g. port 7777 → prefix `77770`.
-  - **Manually-created links:** `${PROXY_PORT}` — e.g. port 7777 → prefix `7777`.
+- `<link-prefix>` is the secure-link port prefix:
+  - **Default:** `${PROXY_PORT}` — e.g. port 7777 -> prefix `7777`.
 - Override with `BREV_LINK_PREFIX=<prefix>` if your setup differs.
 
 ## Per-profile secure link requirements
@@ -79,7 +78,7 @@ This exports:
 |---|---|---|
 | `BREV_ENV_ID` | Instance ID from `/etc/environment` | `docker-compose.yml` → nginx config |
 | `PROXY_PORT` | `7777` (default, overridable) | `docker-compose.yml` → nginx container's published port |
-| `BREV_LINK_PREFIX` | `${PROXY_PORT}0` (launchable default) | Report / log URL rewriting in the agent |
+| `BREV_LINK_PREFIX` | `${PROXY_PORT}` (default) | Report / log URL rewriting in the agent |
 
 The compose stack reads those via `${VAR:-default}` so missing vars fall back
 to internal IPs — you can skip the source step on non-Brev hosts without
@@ -104,23 +103,22 @@ If step 1 fails, the nginx container (`vss-proxy`) hasn't come up — check
 `docker logs vss-proxy`. Common reason: `PROXY_PORT` collision with something
 else on the host, or missing `BREV_LINK_PREFIX` var when nginx does URL rewrites.
 
-## Brev launchable quirk — the `0` suffix
+## Brev launchable prefix
 
-Brev launchables always create secure links with a trailing `0` appended to
-the port number. A launchable opened for port 7777 ends up reachable at
-`77770-<id>.brevlab.com`, **not** `7777-<id>.brevlab.com`.
+Brev secure links now use the port number directly as the hostname prefix.
+A launchable opened for port 7777 is reachable at
+`7777-<id>.brevlab.com`.
 
-If the user manually created a secure link via the Brev dashboard, that `0`
-suffix may or may not be there — in which case set `BREV_LINK_PREFIX=7777`
-(without the `0`) to match.
+If your environment uses a non-standard secure-link prefix, set
+`BREV_LINK_PREFIX=<prefix>` before sourcing `brev_setup.sh`.
 
 ## Troubleshooting
 
 | Symptom | Cause |
 |---|---|
 | UI loads but AJAX calls to `/api/*` CORS-fail | A second secure link was created for port 8000 → browser treats it as a different origin. Delete the extra link; the UI should use the proxy only. |
-| `curl https://77770-...brevlab.com` → 502 | nginx container (`vss-proxy`) is down — `docker logs vss-proxy` |
-| `curl https://77770-...brevlab.com` → Cloudflare Access login page forever | User hasn't been granted access in the Brev org; not a deploy issue |
+| `curl https://7777-...brevlab.com` -> 502 | nginx container (`vss-proxy`) is down - `docker logs vss-proxy` |
+| `curl https://7777-...brevlab.com` -> Cloudflare Access login page forever | User hasn't been granted access in the Brev org; not a deploy issue |
 | Agent-generated report URLs don't open | `BREV_LINK_PREFIX` wasn't exported before compose → reports hard-code internal IPs. Source `brev_setup.sh` and redeploy |
 
 
@@ -139,6 +137,5 @@ source skills/deploy/scripts/brev_setup.sh
 ```
 
 It detects `/etc/environment`'s `BREV_ENV_ID` and exports `PROXY_PORT=7777`
-and `BREV_LINK_PREFIX=77770` (launchable default; override with
-`BREV_LINK_PREFIX=7777` if the secure link was created manually without
-the `0` suffix). On non-Brev instances the script is a no-op.
+and `BREV_LINK_PREFIX=7777` by default. On non-Brev instances the script is a
+no-op.

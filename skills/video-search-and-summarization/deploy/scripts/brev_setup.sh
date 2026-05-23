@@ -10,8 +10,7 @@
 #   BREV_ENV_FILE       Path to environment file (default /etc/environment).
 #                       Override in tests.
 #   PROXY_PORT          Nginx proxy port (default 7777).
-#   BREV_LINK_PREFIX    Secure-link port prefix (default ${PROXY_PORT}0 per
-#                       launchable convention).
+#   BREV_LINK_PREFIX    Secure-link port prefix (default ${PROXY_PORT}).
 #
 # Exports (only if BREV_ENV_ID is detected):
 #   BREV_ENV_ID         From $BREV_ENV_FILE
@@ -44,10 +43,9 @@ fi
 
 if [ -n "${BREV_ENV_ID:-}" ]; then
     export PROXY_PORT="${PROXY_PORT:-7777}"
-    # Brev Launchable convention: secure-link prefix is ${PROXY_PORT}0 (e.g.
-    # 7777 → 77770).  For manually-created links, override with
-    # BREV_LINK_PREFIX=<prefix> before sourcing.
-    export BREV_LINK_PREFIX="${BREV_LINK_PREFIX:-${PROXY_PORT}0}"
+    # Brev secure-link prefix is the exposed port number (e.g. 7777).
+    # Override with BREV_LINK_PREFIX=<prefix> before sourcing if needed.
+    export BREV_LINK_PREFIX="${BREV_LINK_PREFIX:-${PROXY_PORT}}"
     _brev_base_url="https://${BREV_LINK_PREFIX}-${BREV_ENV_ID}.brevlab.com"
     _brev_log "Brev detected:"
     _brev_log "  BREV_ENV_ID      = $BREV_ENV_ID"

@@ -4,6 +4,50 @@
 
 NVIDIA NemoClaw is available in early preview starting March 16, 2026. Use this page to track changes.
 
+## v0.0.49
+
+NemoClaw v0.0.49 is a hardening release focused on reliability, clearer diagnostics, OpenClaw compatibility, and stronger validation coverage:
+
+- Gateway failures now fail faster and explain more. `nemoclaw status` classifies gateway probe failures by layer, distinguishing a named gateway port that is not accepting connections, a named gateway that is present but not Connected, the active OpenShell gateway pointing at a different name, and a named gateway that is not configured at all. `nemoclaw <name> connect` exits early with recovery guidance when the OpenShell gateway is down.
+- Gateway upgrade and fallback paths are more stable. The release hardens older gateway fallback coverage, OpenShell gateway upgrade checks, crash-loop detection tests, and Brev GPU bridge gateway traffic coverage.
+- Status, doctor, and `shields status` now report a fresh mutable sandbox as not configured instead of `down`, and `nemoclaw <name> logs --tail <lines>` is locked in as a NemoClaw line count rather than OpenShell's follow-flag pun. `nemoclaw debug --quick` reports restricted kernel-log access as a skipped section instead of surfacing raw `dmesg` permission errors.
+- OpenClaw compatibility is more resilient across runtime changes. Kimi mixed tool calls are normalized more consistently, compatible OpenClaw JSON envelope changes are tolerated in tests, and OpenClaw patch drift is easier to classify during image builds.
+- Messaging channel removal is now a clean teardown. The sandbox registry and onboard session policy preset state stay in sync so removed presets do not return during later `onboard --resume` or rebuild flows; QR-paired channels also have their durable in-sandbox session directory wiped before the rebuild and removal aborts cleanly when that wipe cannot be confirmed; and `~/.nemoclaw/config.json` is re-synced from the host across every rebuild resume path so the OpenClaw plugin no longer crashes on the Dockerfile placeholder.
+- Hermes sandboxes apply only the messaging channel policies the operator selects instead of pre-enabling every Hermes messaging provider, and dynamic preset application resolves Hermes-specific policy content so Discord on Hermes no longer falls back to generic Node allowlists.
+- `nemoclaw <name> snapshot restore --to <existing-sandbox>` now refuses to overwrite an existing destination unless you pass `--force`, which makes destructive clone restores an explicit opt-in.
+- Source-checkout installs bootstrap OpenShell when needed before running preflight, so `git clone` based installs can reach the same managed OpenShell setup path as packaged installs. The Linux installer, onboard preflight, and prerequisites docs also explain why NemoClaw needs Docker group membership and the privilege impact of granting it.
+- NVIDIA NIM preflight rejects WDDM placeholder GPU names on hosts without NVIDIA firmware, and Jetson onboarding refuses sandbox GPU passthrough instead of creating a configuration the sandbox cannot use.
+- CLI and E2E coverage cover more real user paths. Missing `channels` arguments now print the correct usage, scenario suites use supported sandbox subcommands, scenario tests build against the full repository CLI, and security-sensitive credential paths have broader coverage.
+- Release infrastructure now targets Node 24 in GitHub Actions. The E2E advisor also comments with clearer scenario guidance and waits for required PR checks before deciding.
+
+## v0.0.48
+
+NemoClaw v0.0.48 improves onboarding, sandbox builds, local inference, messaging, and day-two sandbox operations:
+
+- Windows WSL onboarding detects Windows-host Ollama through both the HTTP endpoint and a Windows process probe, so the installer can offer start or restart actions even when the daemon is installed but not yet reachable from WSL.
+- Onboarding no longer prints a noisy `No active forward found` warning when it performs best-effort dashboard forward cleanup before rebuilding or recovering a sandbox.
+- `nemoclaw <name> share mount` verifies the requested remote path against the target sandbox name, so probes for non-default sandboxes no longer accidentally inspect the default sandbox.
+- The OpenClaw plugin tolerates an empty or malformed onboard `config.json` by falling back to default onboard status instead of failing during startup.
+- Hermes messaging policies are scoped to Hermes-supported channel behavior, keeping unsupported OpenClaw-specific messaging access out of Hermes sandboxes.
+- Onboard session snapshots persist machine-readable state for resume flows, which makes provider and policy decisions more durable across retries.
+- DGX Spark GPU sandbox recreation restores the startup path for Hermes by patching Docker GPU state and preserving the marker files the Hermes entrypoint needs.
+- Discord messaging routes REST and gateway traffic through the sandbox proxy path, including a loopback proxy for gateway traffic, so Discord channels work through the same policy-controlled egress model as other sandbox traffic.
+- Sandbox base images now include Homebrew and a `python` to `python3` compatibility symlink, reducing first-run setup for package and script workflows inside the sandbox.
+- The NemoClaw sandbox image includes a Docker health check so container runtimes can report whether the in-sandbox gateway is responding.
+- Sandbox startup resolves workspace template files from the installed package when source-relative files are not available, which helps package installs seed a fresh workspace consistently.
+- Installer checksum verification prefers `sha256sum` and falls back when needed, improving compatibility on Linux hosts where `shasum` is not installed.
+- VM-driver snapshot health checks now use gateway metadata instead of stale local assumptions, so snapshot operations fail less often after gateway state changes.
+
+## v0.0.47
+
+NemoClaw v0.0.47 focused on release hardening and validation coverage:
+
+- The scenario E2E framework gained baseline onboarding coverage for CLI setup, OpenShell gateway creation, sandbox state, inference routing, and smoke tests.
+- Messaging provider scenarios now validate provider attachment, placeholder configuration, secret-leak prevention, bridge reachability, Discord gateway routing, Slack provider state, Telegram injection safety, and token-rotation isolation.
+- CLI command registration was refactored so public display defaults stay consistent across sandbox channel, host, log, policy, skill, and snapshot commands.
+- PR review advisor automation was added for maintainers, with deterministic GitHub context gathering and structured review comments.
+- The release refreshed v0.0.46 documentation, generated user skills, navigation, and version metadata.
+
 ## v0.0.46
 
 NemoClaw v0.0.46 improves Windows setup, messaging channels, Hermes sandboxes, inference routing, and command compatibility:
