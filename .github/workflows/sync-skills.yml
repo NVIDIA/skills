@@ -138,7 +138,45 @@ jobs:
             exit 1
           fi
 
-      - name: Scan for missing skill signatures
+      - name: Enforce skill compliance (signature + card)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          # Every catalog skill (defined by SKILL.md) must ship with:
+          #   - skill.oms.sig  (detached NVIDIA signature)
+          #   - skill-card.md  (skill metadata card)
+          # Skills missing either file are dropped from the catalog before
+          # the PR is created — non-compliant skills do not get merged.
+          dropped=/tmp/dropped-skills.txt
+          truncate -s 0 "$dropped"
+
+          while IFS= read -r skill_md; do
+            dir=$(dirname "$skill_md")
+            missing=""
+            [ -f "$dir/skill.oms.sig" ] || missing="$missing skill.oms.sig"
+            [ -f "$dir/skill-card.md" ] || missing="$missing skill-card.md"
+            if [ -n "$missing" ]; then
+              product=$(echo "$dir" | awk -F/ '{print $2}')
+              echo "$product|$dir|$(echo "$missing" | xargs)" >> "$dropped"
+              echo "  ✗ Dropping $dir — missing:$missing"
+              rm -rf "$dir"
+            fi
+          done < <(find skills -type f -name SKILL.md)
+
+          # Mark any product with a dropped skill as "changed" so the PR
+          # opens even when the only diff is a removed non-compliant skill.
+          if [ -s "$dropped" ]; then
+            while IFS='|' read -r product _ _; do
+              if ! grep -qx "- $product" /tmp/changed-components.txt 2>/dev/null; then
+                echo "- $product" >> /tmp/changed-components.txt
+              fi
+            done < "$dropped"
+          fi
+
+      - name: Track dropped skills
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -146,72 +184,59 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Walk every catalog skill (defined by SKILL.md) and flag any
-          # that's missing skill.oms.sig next to it. Group by top-level
-          # product directory so the tracking issue stays readable.
-          missing=/tmp/missing-signatures.txt
-          truncate -s 0 "$missing"
+          dropped=/tmp/dropped-skills.txt
 
-          while IFS= read -r skill_md; do
-            dir=$(dirname "$skill_md")
-            if [ ! -f "$dir/skill.oms.sig" ]; then
-              product=$(echo "$dir" | awk -F/ '{print $2}')
-              echo "$product|$dir" >> "$missing"
-            fi
-          done < <(find skills -type f -name SKILL.md)
-
-          # Ensure the tracking label exists (idempotent).
-          gh label create missing-signatures \
+          gh label create missing-compliance \
             --color FFA500 \
-            --description "Catalog skills missing skill.oms.sig — opened by sync-skills" \
+            --description "Catalog skills dropped from sync — missing skill.oms.sig and/or skill-card.md" \
             --force >/dev/null
 
-          existing=$(gh issue list --label missing-signatures --state open \
+          existing=$(gh issue list --label missing-compliance --state open \
                        --json number --jq '.[0].number // empty' --limit 1)
 
-          if [ ! -s "$missing" ]; then
+          if [ ! -s "$dropped" ]; then
             if [ -n "$existing" ]; then
               gh issue close "$existing" \
-                --comment "All catalog skills now carry \`skill.oms.sig\`. Closing automatically."
-              echo "All signed — closed tracking issue #$existing"
+                --comment "All catalog skills now carry \`skill.oms.sig\` and \`skill-card.md\`. Closing automatically."
+              echo "All compliant — closed tracking issue #$existing"
             else
-              echo "All signed — nothing to track"
+              echo "All compliant — nothing to track"
             fi
             exit 0
           fi
 
-          sort -t'|' -k1,1 -k2,2 -o "$missing" "$missing"
-          count=$(wc -l < "$missing" | tr -d ' ')
+          sort -t'|' -k1,1 -k2,2 -o "$dropped" "$dropped"
+          count=$(wc -l < "$dropped" | tr -d ' ')
 
-          body=/tmp/missing-signatures-body.md
+          body=/tmp/missing-compliance-body.md
           {
-            echo "Tracking catalog skills that are missing a NVIDIA detached signature (\`skill.oms.sig\`) next to \`SKILL.md\`."
+            echo "Tracking catalog skills that were **dropped from sync** because they are missing a NVIDIA detached signature (\`skill.oms.sig\`) and/or skill card (\`skill-card.md\`) next to \`SKILL.md\`."
             echo ""
-            echo "Signing is currently **opt-in per product** — this issue is informational, not a blocker. The sync PR still merges with these skills present."
+            echo "**Compliance is enforced** — skills missing either file are removed from the catalog before the sync PR is opened. To restore a dropped skill, ensure both files exist alongside \`SKILL.md\` in the upstream repo."
             echo ""
             echo "**Last updated:** $(date -u +%Y-%m-%d) by [sync run #${{ github.run_id }}]($RUN_URL)"
             echo ""
-            echo "## Missing signatures ($count skills)"
+            echo "## Dropped skills ($count)"
             current=""
-            while IFS='|' read -r product dir; do
+            while IFS='|' read -r product dir missing; do
               if [ "$product" != "$current" ]; then
                 echo ""
                 echo "### \`$product\`"
                 current="$product"
               fi
-              echo "- \`$dir/skill.oms.sig\`"
-            done < "$missing"
+              echo "- \`$dir\` — missing: $missing"
+            done < "$dropped"
             echo ""
             echo "---"
-            echo "Owners: to enforce signing for your product, ensure your upstream pipeline produces \`skill.oms.sig\` alongside each \`SKILL.md\`. This issue auto-updates each sync and closes when everything is signed."
+            echo "Owners: ensure your upstream pipeline produces both \`skill.oms.sig\` and \`skill-card.md\` alongside each \`SKILL.md\`. This issue auto-updates each sync and closes when all skills are compliant."
           } > "$body"
 
-          title="Skills missing NVIDIA signatures ($count)"
+          title="Skills dropped from sync — missing signature or card ($count)"
           if [ -n "$existing" ]; then
             gh issue edit "$existing" --title "$title" --body-file "$body"
             echo "Updated tracking issue #$existing"
           else
-            gh issue create --title "$title" --body-file "$body" --label missing-signatures
+            gh issue create --title "$title" --body-file "$body" --label missing-compliance
             echo "Opened new tracking issue"
           fi
 
@@ -236,6 +261,9 @@ jobs:
           fi
           echo "has_changes=true" >> "$GITHUB_OUTPUT"
 
+          # Dedupe before composing the title — the enforce step may have
+          # re-added entries already present from the rsync loop.
+          sort -u -o /tmp/changed-components.txt /tmp/changed-components.txt
           changed=$(cat /tmp/changed-components.txt | tr '\n' ',' | sed 's/- //g;s/,$//')
           echo "title=chore: sync skills ($changed)" >> "$GITHUB_OUTPUT"
           {
@@ -244,6 +272,13 @@ jobs:
             echo ""
             echo "**Components updated:**"
             cat /tmp/changed-components.txt
+            if [ -s /tmp/dropped-skills.txt ]; then
+              echo ""
+              echo "**Skills dropped (missing \`skill.oms.sig\` and/or \`skill-card.md\`):**"
+              while IFS='|' read -r _ dir missing; do
+                echo "- \`$dir\` — missing: $missing"
+              done < /tmp/dropped-skills.txt
+            fi
             if [ -s /tmp/failed-components.txt ]; then
               echo ""
               echo "**Components that failed to sync:**"
