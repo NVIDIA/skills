@@ -8,12 +8,12 @@
 # snapshot — the failure mode reported in issue #77).
 #
 # Trust anchor lookup order:
-#   1. .github/trust/nv-agent-root-cert.pem (committed)
-#   2. Repository secret NV_AGENT_ROOT_CERT_PEM (PEM contents)
+#   1. ./nv-agent-root-cert.pem at repo root (where NVIDIA publishes it
+#      as of commit c27e3d0)
+#   2. .github/trust/nv-agent-root-cert.pem (committed fallback)
+#   3. Repository secret NV_AGENT_ROOT_CERT_PEM (PEM contents)
 #
-# When neither is present the job is skipped with a warning. This
-# lets the workflow merge before the cert distribution decision is
-# settled; it activates as soon as the anchor is provided.
+# When none is present the job is skipped with a warning.
 
 name: Verify Signed Skills
 
@@ -23,11 +23,13 @@ on:
       - "skills/**"
       - ".github/workflows/verify-signed-skills.yml"
       - ".github/trust/**"
+      - "nv-agent-root-cert.pem"
   push:
     branches: [main]
     paths:
       - "skills/**"
       - ".github/trust/**"
+      - "nv-agent-root-cert.pem"
   schedule:
     # Daily at 09:00 UTC — runs after both sync passes (06:00 / 18:00)
     # and the prior day's signing activity.
@@ -58,14 +60,22 @@ jobs:
           NV_AGENT_ROOT_CERT_PEM: ${{ secrets.NV_AGENT_ROOT_CERT_PEM }}
         run: |
           set -euo pipefail
-          CERT_PATH="${GITHUB_WORKSPACE}/.github/trust/nv-agent-root-cert.pem"
-          if [ ! -f "$CERT_PATH" ] && [ -n "${NV_AGENT_ROOT_CERT_PEM:-}" ]; then
+          ROOT_CERT="${GITHUB_WORKSPACE}/nv-agent-root-cert.pem"
+          TRUST_CERT="${GITHUB_WORKSPACE}/.github/trust/nv-agent-root-cert.pem"
+          if [ -f "$ROOT_CERT" ]; then
+            CERT_PATH="$ROOT_CERT"
+          elif [ -f "$TRUST_CERT" ]; then
+            CERT_PATH="$TRUST_CERT"
+          elif [ -n "${NV_AGENT_ROOT_CERT_PEM:-}" ]; then
+            CERT_PATH="$TRUST_CERT"
             mkdir -p "$(dirname "$CERT_PATH")"
             printf '%s' "$NV_AGENT_ROOT_CERT_PEM" > "$CERT_PATH"
+          else
+            CERT_PATH=""
           fi
-          if [ ! -f "$CERT_PATH" ]; then
+          if [ -z "$CERT_PATH" ]; then
             echo "::warning::No NVIDIA Agentic Capabilities root certificate available."
-            echo "::warning::Commit it at .github/trust/nv-agent-root-cert.pem or set repo secret NV_AGENT_ROOT_CERT_PEM."
+            echo "::warning::Commit it at ./nv-agent-root-cert.pem (preferred) or .github/trust/nv-agent-root-cert.pem, or set repo secret NV_AGENT_ROOT_CERT_PEM."
             echo "has_cert=false" >> "$GITHUB_OUTPUT"
           else
             echo "has_cert=true" >> "$GITHUB_OUTPUT"
@@ -120,6 +130,7 @@ jobs:
             echo ""
             echo "To enable, do one of:"
             echo ""
-            echo "- Commit the trust anchor at \`.github/trust/nv-agent-root-cert.pem\`."
+            echo "- Commit the trust anchor at \`./nv-agent-root-cert.pem\` (preferred, matches NVIDIA's published location)."
+            echo "- Commit it at \`.github/trust/nv-agent-root-cert.pem\` (fallback)."
             echo "- Set repo secret \`NV_AGENT_ROOT_CERT_PEM\` to the PEM contents."
           } >> "$GITHUB_STEP_SUMMARY"
