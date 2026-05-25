@@ -214,7 +214,7 @@ Example scripts target **real published models** (e.g. `Qwen/Qwen3-8B`), not toy
 The inference script must produce reasonable output — a coherent text completion for LLMs,
 a plausible image description for VLMs. This is the acceptance bar for the deliverable.
 
-### Conversion example (`examples/models/<brand>/<model>/conversion.sh`)
+### Conversion example (`examples/models/<family>/<model>/conversion.sh`)
 
 ```bash
 #!/usr/bin/env bash
@@ -251,7 +251,7 @@ uv run python -m torch.distributed.run --nproc_per_node=8 \
     --hf-model-id ${HF_MODEL} --tp ${TP} --pp ${PP} --ep ${EP}
 ```
 
-### Inference example (`examples/models/<brand>/<model>/inference.sh`)
+### Inference example (`examples/models/<family>/<model>/inference.sh`)
 
 For LLMs:
 ```bash
@@ -323,7 +323,7 @@ uv run python examples/conversion/convert_checkpoints.py import \
 
 ## Training
 
-See `examples/models/<brand>/<model>/slurm_sft.sh` and `slurm_peft.sh` for full Slurm scripts.
+See `examples/models/<family>/<model>/slurm_sft.sh` and `slurm_peft.sh` for full Slurm scripts.
 Single-node quick-start:
 
 ### SFT

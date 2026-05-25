@@ -507,37 +507,29 @@ import math
 import torch
 from types import SimpleNamespace
 
-def _fmha_autotune_configs(head_dim=None, seq_len=None):
+def _fmha_autotune_configs(head_dim=None):
     """Internal build: architecture-conditional with num_ctas/occupancy.
     Release build uses head_dim-keyed tile configs (TILE_M/TILE_N only, no hints).
 
-    Sequence-length-dependent tile selection (from Flash Attention tuning):
-      SeqLen ≤ 2048  → 64×64 optimal (maximizes parallelism)
-      SeqLen = 4096   → 128×128 or 64×64 (balanced)
-      SeqLen ≥ 8192  → 256×128 optimal (memory efficiency)
-
-    When seq_len is provided, configs are pre-filtered to the most relevant tiles.
-    When seq_len is None, all tiles are included and exhaustive_search picks the best.
+    All configs are yielded unconditionally per arch — exhaustive_search picks the
+    best for the actual workload shape at runtime. No seq_len pre-filtering.
     """
     gpu_capability = torch.cuda.get_device_capability()
     if gpu_capability in [(12, 0), (12, 1)]:
-        # sm120
-        yield SimpleNamespace(TILE_M=64, TILE_N=64, num_ctas=1, occupancy=2)
-    elif gpu_capability[0] < 9:
-        # pre-Hopper
+        # sm120: limited tile support
         yield SimpleNamespace(TILE_M=64, TILE_N=64, num_ctas=1, occupancy=2)
         yield SimpleNamespace(TILE_M=128, TILE_N=64, num_ctas=1, occupancy=2)
+    elif gpu_capability[0] < 9:
+        # pre-Hopper: num_ctas=1 only, tiles ≤ 128
+        yield SimpleNamespace(TILE_M=64, TILE_N=64, num_ctas=1, occupancy=2)
+        yield SimpleNamespace(TILE_M=128, TILE_N=64, num_ctas=1, occupancy=2)
+        yield SimpleNamespace(TILE_M=128, TILE_N=128, num_ctas=1, occupancy=1)
     else:
-        # sm90 / sm100+ (Blackwell)
-        # Short sequences: small tiles maximize parallelism
-        if seq_len is None or seq_len <= 4096:
-            yield SimpleNamespace(TILE_M=128, TILE_N=128, num_ctas=1, occupancy=2)
-        # Medium/long sequences: large tiles improve memory efficiency
-        if seq_len is None or seq_len >= 2048:
-            yield SimpleNamespace(TILE_M=256, TILE_N=128, num_ctas=1, occupancy=1)
-            yield SimpleNamespace(TILE_M=256, TILE_N=128, num_ctas=1, occupancy=2)
-        if seq_len is None or seq_len >= 4096:
-            yield SimpleNamespace(TILE_M=256, TILE_N=128, num_ctas=2, occupancy=2)
+        # sm90 / sm100+ (Blackwell): all tiles + num_ctas variants
+        yield SimpleNamespace(TILE_M=128, TILE_N=128, num_ctas=1, occupancy=2)
+        yield SimpleNamespace(TILE_M=256, TILE_N=128, num_ctas=1, occupancy=1)
+        yield SimpleNamespace(TILE_M=256, TILE_N=128, num_ctas=1, occupancy=2)
+        yield SimpleNamespace(TILE_M=256, TILE_N=128, num_ctas=2, occupancy=2)
 ```
 
 ### exhaustive_search + cache + ct.launch
@@ -556,7 +548,7 @@ def cutile_autotune_fmha(stream, q, k, v, o, sm_scale, input_pos,
 
     cache_key = (batch_size, num_heads, q_len, hidden_size, is_causal, q.dtype, str(q.device))
     if cache_key not in _fmha_tune_cache:
-        configs = list(_fmha_autotune_configs(hidden_size, seq_len=q_len))
+        configs = list(_fmha_autotune_configs(hidden_size))
 
         if os.environ.get("DISABLE_AUTOTUNE", "0") == "1":
             # Skip search; use first config directly
@@ -961,10 +953,14 @@ def _attention_varlen_autotune_configs():
         yield SimpleNamespace(TILE_M=64,  TILE_N=64,  num_ctas=1, occupancy=2)
         yield SimpleNamespace(TILE_M=128, TILE_N=64,  num_ctas=1, occupancy=2)
         yield SimpleNamespace(TILE_M=128, TILE_N=128, num_ctas=1, occupancy=1)
+        yield SimpleNamespace(TILE_M=128, TILE_N=128, num_ctas=1, occupancy=2)
+        yield SimpleNamespace(TILE_M=64,  TILE_N=128, num_ctas=1, occupancy=2)
     else:
         # Pre-Hopper fallback: num_ctas=1 only
         yield SimpleNamespace(TILE_M=64,  TILE_N=64,  num_ctas=1, occupancy=2)
         yield SimpleNamespace(TILE_M=128, TILE_N=64,  num_ctas=1, occupancy=1)
+        yield SimpleNamespace(TILE_M=128, TILE_N=64,  num_ctas=1, occupancy=2)
+        yield SimpleNamespace(TILE_M=128, TILE_N=128, num_ctas=1, occupancy=1)
 ```
 
 ### Kernel Definition
@@ -1095,7 +1091,9 @@ def _dual_gemm_autotune_configs():
     gpu_capability = torch.cuda.get_device_capability()
 
     if gpu_capability[0] >= 10:
-        # sm100+ (Blackwell): 8 configs — occupancy={1,2}, low occupancy preferred
+        # sm100+ (Blackwell): 11 configs — occupancy={1,2}, num_ctas={1,2}
+        # occ=1 is preferred for most shapes due to 2× register/SHMEM pressure in dual-GEMM,
+        # but occ=2 + num_ctas=2 can win on certain shapes (e.g. sm_103 GB300 linear_gluact).
         yield SimpleNamespace(BLOCK_M=128, BLOCK_N=128, BLOCK_K=64, GROUP_M=8, num_ctas=1, occupancy=1)
         yield SimpleNamespace(BLOCK_M=128, BLOCK_N=128, BLOCK_K=64, GROUP_M=8, num_ctas=1, occupancy=2)
         yield SimpleNamespace(BLOCK_M=128, BLOCK_N=256, BLOCK_K=64, GROUP_M=8, num_ctas=1, occupancy=1)
@@ -1104,6 +1102,10 @@ def _dual_gemm_autotune_configs():
         yield SimpleNamespace(BLOCK_M=256, BLOCK_N=256, BLOCK_K=64, GROUP_M=8, num_ctas=1, occupancy=1)
         yield SimpleNamespace(BLOCK_M=256, BLOCK_N=256, BLOCK_K=64, GROUP_M=8, num_ctas=2, occupancy=1)
         yield SimpleNamespace(BLOCK_M=128, BLOCK_N=256, BLOCK_K=64, GROUP_M=8, num_ctas=2, occupancy=1)
+        # occ=2 + num_ctas=2 probes — multicast + higher occupancy can help on sm_103+
+        yield SimpleNamespace(BLOCK_M=256, BLOCK_N=128, BLOCK_K=64, GROUP_M=8, num_ctas=2, occupancy=2)
+        yield SimpleNamespace(BLOCK_M=128, BLOCK_N=128, BLOCK_K=64, GROUP_M=8, num_ctas=2, occupancy=2)
+        yield SimpleNamespace(BLOCK_M=256, BLOCK_N=256, BLOCK_K=64, GROUP_M=8, num_ctas=2, occupancy=2)
     elif gpu_capability[0] == 9:
         # sm90 (H100): num_ctas=1, occupancy={1,2}
         yield SimpleNamespace(BLOCK_M=64,  BLOCK_N=128, BLOCK_K=64, GROUP_M=8, num_ctas=1, occupancy=1)
@@ -1117,7 +1119,7 @@ def _dual_gemm_autotune_configs():
         yield SimpleNamespace(BLOCK_M=128, BLOCK_N=128, BLOCK_K=32, GROUP_M=8, num_ctas=1, occupancy=1)
 ```
 
-**Why occupancy is biased low**: With two weight tile loads and two accumulators per CTA, the per-CTA resource footprint is ~2× a standard GEMM. On sm100+, `occupancy=2` forces the SM to fit two of these heavy CTAs simultaneously, often causing register spilling to local memory and degrading performance. Eval data confirms `occupancy=1` consistently wins for this kernel type.
+**Why occupancy is biased low**: With two weight tile loads and two accumulators per CTA, the per-CTA resource footprint is ~2× a standard GEMM. On sm100+, `occupancy=2` forces the SM to fit two of these heavy CTAs simultaneously, often causing register spilling to local memory and degrading performance. Benchmarking data confirms `occupancy=1` consistently wins for this kernel type.
 
 ### Kernel Definition
 

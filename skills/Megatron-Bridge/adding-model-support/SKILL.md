@@ -60,7 +60,7 @@ grad norms) instead of raising an error.
 
 1. **Standalone script** (recommended for user-facing models) — Write a
    `dequant_fp8_for_bridge.py` in the model's examples folder.
-   Reference: `examples/models/ministral/ministral3/dequant_fp8_for_bridge.py`.
+   Reference: `examples/models/mistral/ministral3/dequant_fp8_for_bridge.py`.
    The pattern is: `w_bf16 = fp8_weight.to(bfloat16) * weight_scale_inv`.
 
 2. **In-bridge hook** — Override `maybe_modify_loaded_hf_weight()` in the bridge class to
@@ -130,6 +130,13 @@ directory — keep them namespaced under the `modeling_<model>` prefix.
    then sets model-specific attributes on it. **Do not create a provider file** — the stock
    provider returned by `super().provider_bridge()` is usually sufficient for LLMs
    (e.g., `GPTModelProvider`, or another base provider selected via `PROVIDER_CLASS`).
+   **Do not add size-specific provider classes** whose names combine
+   `ModelProvider` with a model-size suffix. Examples of forbidden suffixes
+   include `7B`, `200M`, and `A3B`. Model size and architecture fields should
+   come from the Hugging Face config through `AutoBridge` /
+   `MegatronModelBridge` config mapping. If a recipe needs a fixed
+   architecture, configure the base provider inside the recipe function instead
+   of exporting a provider subclass.
 
 **VLM:**
 1. **Bridge** — Register bridge, implement config and weight mappings.
@@ -311,6 +318,12 @@ Each recipe file defines functions for each model size + training mode:
 
 For detailed recipe patterns, see @skills/adding-model-support/recipe-patterns.md.
 
+Recipes are the right API surface for model-size presets. Do not create or
+export size-specific provider subclasses for recipes; either call
+`AutoBridge.from_hf_pretrained(...).to_megatron_provider(load_weights=False)` to
+derive the provider from HF config, or instantiate the base provider class with
+explicit architecture fields inside the recipe function.
+
 ### Export checklist
 
 1. Family `__init__.py` — import and add to `__all__`
@@ -343,10 +356,10 @@ For detailed test patterns, see @skills/adding-model-support/tests-and-examples.
 
 ### Examples
 
-Model examples: `examples/models/<brand>/<model>/`
+Model examples: `examples/models/<family>/<model>/`
 
 ```text
-examples/models/<brand>/<model>/
+examples/models/<family>/<model>/
 ├── README.md
 ├── conversion.sh        # HF↔Megatron conversion commands (real model)
 ├── inference.sh         # Generation commands (real model, reasonable output)

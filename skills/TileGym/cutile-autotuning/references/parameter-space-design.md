@@ -220,7 +220,7 @@ The per-architecture configs in the sections above are **starting points** deriv
 - **Problem size**: If `max_dim / TILE_SIZE < 16` for any tile dimension, parallelism is too low. Add smaller tile options (e.g., 64×64 instead of only 256×256) to ensure enough CTAs for full SM occupancy.
 - **Kernel complexity**: Kernels that fuse multiple operations (dual-GEMM, GEMM+activation) use more registers and shared memory per CTA. Use conservative (smaller) tile sizes compared to standalone matmul — e.g., start with 128×128 instead of 256×256.
 - **Non-standard shapes**: Tall-skinny matrices (M >> N or N >> M) benefit from asymmetric tiles (e.g., 256×64 instead of 256×256). Match the tile aspect ratio to the problem shape.
-- **When in doubt**: Start with the recommended configs, *run the test*, and check `speedup_over_fixed`. If it's < 1.0 or only marginally above 1.0, expand the search space with additional tile sizes and re-run. Iterating on test results is more reliable than guessing.
+- **When in doubt**: Start with the recommended configs, benchmark, and compare against the fixed-config baseline. If autotuning shows no improvement or regression, expand the search space with additional tile sizes and re-benchmark. Iterating on measured results is more reliable than guessing.
 
 ## Summary Table
 

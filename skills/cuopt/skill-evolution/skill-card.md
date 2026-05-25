@@ -8,7 +8,7 @@ This skill is ready for commercial/non-commercial use. <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to capture generalizable learnings from agent interactions and propose updates to existing skills, ensuring continuous improvement of agent guidance without blocking the user's primary task. <br>
+Developers and engineers use this skill to continuously improve agent skill files by capturing generalizable learnings from problem-solving interactions and proposing structured updates. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -23,12 +23,12 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Code] <br>
-**Output Format:** [Markdown with inline code diffs] <br>
+**Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Skill Version(s): <br>
-26.06.00 (source: frontmatter) <br>
+26.08.00 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

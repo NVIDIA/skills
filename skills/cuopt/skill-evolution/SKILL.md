@@ -137,7 +137,7 @@ When skill evolution creates an entirely new skill directory, add `origin: skill
 ```yaml
 ---
 name: new-skill-name
-version: "26.06.00"
+version: "26.08.00"
 description: ...
 origin: skill-evolution
 ---

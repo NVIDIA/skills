@@ -232,3 +232,11 @@ For build/test pitfalls (Cython rebuild, OOM, CUDA driver mismatch, missing `nvc
 - **Python binding architecture**: [resources/python_bindings.md](resources/python_bindings.md)
 
 _Shell-execution, install, sudo, and outside-workspace policies are covered by [Refusal Rules — Read First](#refusal-rules--read-first) at the top of this skill._
+
+## VRP dimension internals (routing engine)
+
+When implementing or debugging **VRP dimensions** (constraints, objectives, forward/backward propagation, `combine`, local-search deltas), read:
+
+- **`resources/vrp_skills.md`** — architecture contracts, required interfaces, and implementation checklist.
+
+Read it **before** adding a new dimension or changing combine semantics.

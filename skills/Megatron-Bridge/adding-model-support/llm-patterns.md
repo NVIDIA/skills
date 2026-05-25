@@ -38,8 +38,6 @@ Create a `GPTModelProvider` subclass only when:
    RoPE params, custom MoE fields) that need to serialize into `run_config.yaml`.
 2. **Custom `provide()` logic** — The model needs special instantiation (e.g., TE version
    checks, sink attention, custom layer specs that require runtime logic).
-3. **Predefined size variants for recipes** — Hardcoded configs like `LlamaModelProvider8B`
-   used by recipe functions (not by the bridge itself).
 
 ```python
 @dataclass
@@ -62,19 +60,35 @@ def provider_bridge(self, hf_pretrained) -> MyModelProvider:
     return provider
 ```
 
-### Predefined size variants (for recipes only)
+### No Size-Specific Provider Classes
 
-Size-specific subclasses are used by recipes, not by the bridge:
+Do not create provider subclasses whose names combine `ModelProvider` with a
+model-size suffix. Examples of forbidden suffixes include `7B`, `200M`, and
+`A3B`. The bridge should derive architecture fields from the Hugging Face config
+via `AutoBridge` / `MegatronModelBridge` config mapping.
+
+For recipe presets, keep the size in the recipe function name and configure a
+base provider inside the function:
 
 ```python
-@dataclass
-class MyModelProvider7B(MyModelProvider):
-    num_layers: int = 32
-    hidden_size: int = 4096
-    num_attention_heads: int = 32
-    num_query_groups: int = 8
-    ffn_hidden_size: int = 14336
-    vocab_size: int = 128256
+def my_model_7b_pretrain_config() -> ConfigContainer:
+    cfg = _pretrain_common()
+    cfg.model = MyModelProvider(
+        num_layers=32,
+        hidden_size=4096,
+        num_attention_heads=32,
+        num_query_groups=8,
+        ffn_hidden_size=14336,
+        vocab_size=128256,
+    )
+    return cfg
+```
+
+When the recipe targets an existing HF checkpoint, prefer deriving the provider
+from HF config:
+
+```python
+cfg.model = AutoBridge.from_hf_pretrained("org/my-model-7b").to_megatron_provider(load_weights=False)
 ```
 
 ## Bridge Pattern

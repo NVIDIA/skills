@@ -13,10 +13,11 @@ Add autotuning to CuTile kernels using the `exhaustive_search` API with tune-onc
 Follow the decision tree to classify the kernel, design a search space, implement the tune-once/cache/launch pattern, and validate performance.
 
 1. **Classify** — use the Decision Tree to determine search dimensions (occupancy-only vs full tile search)
-2. **Design search space** — select the matching template from `references/kernel-type-templates.md`; prune to ≤ 30 configs via arch filters
+2. **Design search space** — select the matching template from `references/kernel-type-templates.md`; prune to ≤ 30 configs in the final code via arch filters (directed exploration probes may temporarily exceed this — see Design Philosophy)
 3. **Implement** — add `exhaustive_search` + cache + `ct.launch` following the Step-by-Step Workflow; handle in-place writes with split-buffer if needed
 4. **Test** — run correctness with autotune enabled and with `DISABLE_AUTOTUNE=1`
 5. **Validate** — A/B benchmark against fixed best-known config; see `references/search-strategies.md`
+6. **Shrink** — prune dead-weight configs that never win, targeting ≤ 8 configs per architecture to minimize compilation cost (Step 10)
 
 ## Task Router — Jump to What You Need
 
@@ -74,7 +75,7 @@ def my_op(x, output):
 Key rules:
 - **Tune once, cache, launch directly** — `exhaustive_search` runs only on first call per shape; subsequent calls use cached config + `ct.launch` with zero overhead
 - For in-place kernels use split-buffer during search (separate input/output tensors)
-- Keep ≤ 30 configs total
+- Keep ≤ 30 configs in final code (see Design Philosophy for temporary directed probes)
 - `exhaustive_search` requires a `Sequence` (list/tuple) — convert generators with `list()`
 - **Search space must include the original fixed config** — this guarantees autotuning never makes performance worse
 
@@ -82,9 +83,18 @@ Key rules:
 
 For complex kernels (matmul with tile sizes, FMHA, FP8 with num_ctas), read the full guide below + [`kernel-type-templates.md`](references/kernel-type-templates.md).
 
-> **⚠️ Two pitfalls catch almost everyone — check before submitting:**
+> **⚠️ Three pitfalls catch almost everyone — check before submitting:**
+> - **`replace_hints` on hot path?** → Cache BOTH config AND kernel object from `exhaustive_search`. Calling `replace_hints()` every invocation recompiles (100–500× slower) → Pitfall #7
 > - **In-place kernel** (writes back to input tensor)? → MUST use split-buffer pattern during search → Pitfall #1
 > - **Search space empty?** → Check arch filters and `num_ctas` constraints → Pitfall #5
+
+> **Minimum coverage**: On sm100+, FMHA/matmul/varlen search spaces must include both `num_ctas=1` and `num_ctas=2`. For core dimensions (tile sizes, occupancy), keep at least 2 distinct values even if unsure which is better — let `exhaustive_search` decide.
+
+> **When to stop tuning**: A mean speedup in [0.98, 1.02] means your *current* search space isn't helping — but doesn't mean no config will help. Before stopping, check whether you've covered the key dimensions for this kernel type (consult `references/kernel-type-templates.md`). If the search space already covers the template's recommended dimensions and the best result is still noise-floor, then stop — further micro-adjustments won't help. If key dimensions are missing (e.g., never tried `num_ctas=2` for a dual-GEMM kernel), expand the search space rather than giving up.
+>
+> Once correctness tests pass and the autotuned kernel shows speedup over the fixed-config baseline, **stop — do not re-run to "confirm".** GPU kernel timing fluctuates ±5–10 % between invocations due to clock scaling and OS scheduling; a subsequent timing dip does not mean your code is wrong.
+>
+> To improve speedup, only modify the autotune search space (configs, tile sizes, occupancy, num_ctas). Do not modify other code (Python wrapper, stream management, etc.) to chase speedup — kernel performance is determined by the config selection, not by host-side code.
 
 ## Reading Guide
 
@@ -93,9 +103,13 @@ For complex kernels (matmul with tile sizes, FMHA, FP8 with num_ctas), read the 
 
 **5-step summary**: Classify kernel → Design search space ([`parameter-space-design.md`](references/parameter-space-design.md)) → Implement using template ([`kernel-type-templates.md`](references/kernel-type-templates.md)) → Validate with A/B test → Check Pitfall Checklist.
 
+**Reading references**: Read only the reference relevant to your kernel type — e.g., for FMHA, read the Template 5 section in `references/kernel-type-templates.md`; for hardware constraints, read only the target architecture's section. Avoid reading all references end-to-end when a targeted lookup suffices.
+
 ## Design Philosophy
 
-**Build a small, precise search space bottom-up — not a large space trimmed down.** CuTile compilation is much heavier than Triton (~0.5-1s per config), so 30 configs is the hard upper limit. The approach is: classify the kernel type first, then construct only the relevant configs for that type and architecture. Never start with a large cartesian product and prune — start with the minimum viable space and expand only if data shows it's needed.
+**Build a small, precise search space bottom-up — not a large space trimmed down.** CuTile compilation is much heavier than Triton (~0.5-1s per config), so the **final code** should contain ≤ 30 configs. The approach is: classify the kernel type first, then construct only the relevant configs for that type and architecture.
+
+**Directed exploration during development**: If the initial template configs yield speedup < 1.0, you may run a *temporary* larger probe (30–100 configs) via `bash + python3 -c` to identify which dimensions matter — but this probe must be **directional**, not a blind cartesian product. Use the kernel type classification to decide *which* dimensions to vary (e.g. for dual-GEMM, probe `num_ctas × occupancy` while fixing tile sizes; for FMHA, probe `TILE_M × num_ctas` while fixing TILE_N). Once the probe identifies the winning region, lock the final code's search space to ≤ 8 top candidates. Do NOT write the large probe into the source file — it is a one-shot diagnostic tool.
 
 ## Decision Tree: What Search Dimensions Does This Kernel Need?
 
@@ -341,10 +355,11 @@ grid_fn=lambda cfg: (NUM_SMS, 1, 1)
    - **Start from reference configs**, not from scratch. Clone configs from existing production kernels of the same type (e.g., `ops/cutile/matmul.py` for GEMM) and adapt. For GEMM-class kernels, `nvMatmulHeuristics` can suggest 8-16 high-quality candidates that reach 96-99% peak performance — see [`parameter-space-design.md`](references/parameter-space-design.md) for details.
    - Detect the current GPU architecture with `torch.cuda.get_device_capability()`.
    - **Target one architecture at a time.** Generate configs only for the detected arch. Do NOT add branches for other architectures — they cannot be tested on this machine and untested code paths are unreliable. If multi-arch support is needed later, add it in a separate pass on the appropriate hardware.
+   - **When modifying code that already has autotune configs**: see "Handling Existing Autotune Configs (Multi-Architecture)" below. The "do NOT add branches" rule means do not *invent new configs* for untested architectures — it does NOT mean remove existing configs that were previously validated.
    - Identify tunable parameters (tile sizes, occupancy, num_ctas)
    - **Ensure the search space includes the original fixed config** (or an equivalent). This guarantees that the autotuned result is at least as good as the original — no performance regression is possible.
-   - If the generated set exceeds 30, apply tile size filters and pruning rules to reduce it to ≤ 30
-   - *VERIFY*: Total configs ≤ 30 (hard limit: CuTile compilation is heavy, >30 configs will timeout).
+   - If the generated set exceeds 30, apply tile size filters and pruning rules to reduce it to ≤ 30 in the final code
+   - *VERIFY*: Total configs in final code ≤ 30 (CuTile compilation is heavy, >30 configs will timeout). Temporary directed probes during development (30–100 configs, run via `bash + python3 -c`) are allowed — see Design Philosophy.
 
 6. **Implement** the tune-once/cache/launch pattern:
    - Define a `_cache` dict at module level
@@ -358,12 +373,11 @@ grid_fn=lambda cfg: (NUM_SMS, 1, 1)
    - `hints_fn` passes `occupancy` and/or `num_ctas` from config
    - *VERIFY*: `exhaustive_search` receives a `list()` of configs, not a raw generator.
 
-7. **(MANDATORY) Add DISABLE_AUTOTUNE support** for CI and profiling: check `os.environ.get("DISABLE_AUTOTUNE", "0") == "1"` — when set, skip `exhaustive_search` entirely and fall back to `ct.launch` with the first valid config. This is required for:
+7. **(Optional) Add DISABLE_AUTOTUNE support** for CI and profiling: check `os.environ.get("DISABLE_AUTOTUNE", "0") == "1"` — when set, skip `exhaustive_search` entirely and fall back to `ct.launch` with the first valid config. Useful for:
    - CI determinism (autotune adds variable wall time)
    - NCU profiling (prevents autotune trial runs from cluttering the trace — see Pitfall #4)
    - Debugging (isolates kernel correctness from autotune behavior)
-   Place the check *before* the cache lookup so that `DISABLE_AUTOTUNE=1` bypasses all autotune logic. Provide a hardcoded fallback config in case the generator yields zero configs.
-   - *VERIFY*: Running with `DISABLE_AUTOTUNE=1` produces correct results and does not call `exhaustive_search`.
+   Skip this step if your task only requires adding autotuning and the project's tests don't check for `DISABLE_AUTOTUNE`.
 
 8. **Test**: Run correctness tests first (`pytest -k "test_op and cutile"`), then benchmark.
    - *VERIFY*: Correctness passes with autotune enabled AND with `DISABLE_AUTOTUNE=1`.
@@ -371,18 +385,140 @@ grid_fn=lambda cfg: (NUM_SMS, 1, 1)
 9. **Validate with A/B test**: Compare autotune version vs fixed best-known config. See [`search-strategies.md`](references/search-strategies.md) for methodology.
    - *VERIFY*: Autotune version ≥ baseline (or within noise). If worse, check that the search space includes the original fixed config, and that `replace_hints` is being used correctly.
 
-10. **(MANDATORY) Run the test and verify performance before submitting.**
+10. **Shrink the search space** — reduce compilation cost without losing performance.
 
-    Execute the provided test script (e.g. `ENABLE_TILE=1 python3 test.py`) and check:
-    - `correctness: PASS`
-    - `speedup_over_fixed >= 1.0` (autotuned must not be slower than fixed baseline)
+    Templates provide broad search spaces as a starting point (e.g., 9 configs for varlen attention). Not all configs contribute to finding the optimal one — on a given architecture and kernel shape, many large-tile or multi-CTA configs compile for seconds each but are never selected. The goal of this step is to *prune the dead weight* so the final committed code has 5–8 configs per architecture instead of 10–15.
 
-    If `speedup_over_fixed < 1.0`:
-    - Check that the search space includes the original fixed config (this guarantees no regression)
-    - Check if `replace_hints` is being called on every code path — revisit Step 2 (if any path skips `replace_hints`, the decorator's fixed hints are used instead of autotuned values)
-    - Expand search space if all configs perform similarly (see `references/parameter-space-design.md` → "Adapting Search Space")
+    **Why this matters**: Each config in `exhaustive_search` requires a full JIT compilation + warmup + benchmark of the kernel. For complex kernels (FMHA, varlen attention), this costs 2–4 seconds *per config*. Cutting from 9 to 5 configs saves 8–16 seconds of one-time autotuning cost per unique shape, with zero performance loss.
 
-    *⚠️ DO NOT submit without running the test at least once. Writing correct-looking code is not sufficient — autotuning bugs (silent hint override, split-buffer omission) are only caught at runtime.*
+    **Procedure**:
+
+    1. After Step 9 passes, you already have a working autotuned kernel with the full template search space. Now run the test on 2–3 representative shapes and observe which config wins for each shape. You can inspect this by temporarily adding a print inside the cache-miss block:
+       ```python
+       print(f"[autotune] shape={cache_key[:5]} best={result.best.config} "
+             f"time={result.best.time_ms:.3f}ms  "
+             f"configs_tried={len(result.successes)}")
+       ```
+
+    2. Identify which configs are *competitive* — within 5% of the best for at least one shape. Configs that are never within 5% of the best across any test shape are *dead weight*.
+
+    3. Remove dead-weight configs from the generator. Always keep:
+       - The original fixed config (safety net — guarantees no regression)
+       - The config(s) that won on each test shape
+       - Any config within 5% of a winner (may win on untested shapes)
+
+    4. Re-run the test to confirm speedup is unchanged after pruning.
+
+    **Common dead-weight patterns** (prune these first):
+    - `TILE_M=256` configs for attention/varlen kernels where `S_qo` in the test shapes is ≤ 4096 and batch×heads is large — the grid is already saturated at TILE_M=128.
+    - `num_ctas=2` configs for kernels with irregular or small grids — multi-CTA parallelism requires enough CTAs to benefit from cooperative launch, which doesn't hold when `grid[0]` is small.
+    - `occupancy=4` or `occupancy=8` configs on sm100+ for compute-bound kernels — Blackwell typically prefers lower occupancy (1–2) with larger tiles.
+
+    **Target**: ≤ 8 configs per architecture branch in the final code. This keeps the one-time tuning cost under 25 seconds even for the most complex kernels (FMHA, varlen attention).
+
+    - *VERIFY*: Config count ≤ 8 per architecture. `speedup_over_fixed` unchanged after pruning.
+
+11. **(MANDATORY) Verify correctness and performance before finalizing.**
+
+    The verification requirements depend on the task type. In ALL cases, start with the code-level sanity check, then apply the task-specific verification.
+
+    ---
+
+    **A. Code-level sanity check (ALL tasks — do this first)**
+
+    Review your implementation for known performance anti-patterns. These checks catch *implementation bugs*, not algorithmic issues — they apply regardless of whether you are adding, modifying, or fixing autotune code.
+
+    - `replace_hints` must be called *exactly once* per config and the returned kernel object cached (Pitfall #7). If `replace_hints` appears on the hot path (outside the `if cache_key not in` block), you have a recompilation bug that causes 100-500× slowdown.
+    - `exhaustive_search` must be inside the cache-miss block, not called on every kernel invocation.
+    - The fast path should only do: cache lookup → `ct.launch` with the cached tuned kernel. No JIT-triggering calls in between.
+    - The cache must store `(best_cfg, tuned_kernel)` together — not just `best_cfg` alone.
+
+    ---
+
+    **B. Task-specific verification**
+
+    **B1. Adding or modifying autotune configs** (the original code is correct):
+
+    - *Correctness*: autotuned kernel output matches the reference (e.g. `torch` or fixed-config kernel) within tolerance.
+    - *Performance*: autotuned kernel must be *at least as fast* as the original fixed-config kernel. If it is slower:
+      - Check that the search space includes the original fixed config (this guarantees no regression).
+      - Check if `replace_hints` is being called on every code path — revisit Step 2 (if any path skips `replace_hints`, the decorator's fixed hints are used instead of autotuned values).
+      - Expand search space if all configs perform similarly (see `references/parameter-space-design.md` → "Adapting Search Space").
+
+    **B2. Fixing a correctness bug** (the original code produces wrong results):
+
+    - *Correctness is the primary goal*: the fixed kernel must produce correct results. Do NOT compare speedup against the broken original — a correct-but-slower kernel is always better than a fast-but-wrong one.
+    - *Perf sanity check*: after fixing, verify that the implementation is not catastrophically slow due to an implementation bug (e.g. Pitfall #7). Two ways to check:
+      1. *Code review*: confirm the code-level sanity check (Section A above) passes — this catches the most common perf bugs.
+      2. *Runtime check*: if possible, compare your fixed+autotuned kernel against a simple correct baseline (e.g. the equivalent `torch` operation, or the kernel launched with a single hardcoded config and no autotuning). Your autotuned version should not be slower than this naive baseline. Minor overhead from the fix itself (e.g. split-buffer allocation) is acceptable.
+
+    ---
+
+    *⚠️ Autotuning bugs (silent hint override, split-buffer omission, hot-path recompilation) are only caught at runtime — always verify by running the kernel, not just by reading the code.*
+
+### Handling Existing Autotune Configs (Multi-Architecture)
+
+When adding autotune to a kernel, the source code may already contain autotune configs from a previous pass on different hardware. There are three scenarios:
+
+**Scenario 1: No existing autotune code.** The source has no autotune at all — follow the standard "Adding Autotune to a New Kernel" workflow above. Generate configs for the current GPU architecture only.
+
+**Scenario 2: Existing autotune, but no config for the current architecture.** The source already has autotune with configs for other architecture(s) (e.g., sm103) but NOT for the current GPU (e.g., sm100). Steps:
+
+1. Detect the current architecture with `torch.cuda.get_device_capability()`.
+2. Check whether the existing config generator already uses architecture-conditional branching (i.e., `if/elif` on device capability).
+   - **If yes** (conditional yield structure exists): Add a new `elif` branch for the current architecture. Preserve all existing branches **unchanged** — do not modify their config values.
+   - **If no** (flat configs, no architecture branching): Add an `if` branch for the current architecture with new configs, and keep the existing flat configs in the `else` block as the default fallback. This ensures that all other architectures continue to use the original configs unchanged — the code modification must not alter kernel behavior on any architecture other than the current one.
+3. Design configs for the current architecture following the standard workflow (Steps 4–10 above).
+4. Validate only the current architecture's configs (Step 11). Other branches are assumed correct since they were previously validated on their respective hardware.
+
+Example — adding sm100 to a generator that already has sm103 configs (conditional structure exists):
+
+```python
+def _my_autotune_configs():
+    gpu_capability = torch.cuda.get_device_capability()
+
+    if gpu_capability == (10, 0):                   # sm100 (B200)
+        # NEW: configs for sm100 (added in this pass)
+        for occ in [1, 2, 4]:
+            yield SimpleNamespace(occupancy=occ, TILE_M=128, TILE_N=128)
+    elif gpu_capability == (10, 3):                  # sm103 (GB300)
+        # EXISTING: configs for sm103 (do NOT modify)
+        for occ in [2, 4, 8]:
+            yield SimpleNamespace(occupancy=occ, TILE_M=256, TILE_N=128)
+    else:
+        # Fallback for unknown architectures
+        yield SimpleNamespace(occupancy=2, TILE_M=128, TILE_N=128)
+```
+
+Example — adding current-arch configs to flat (non-branching) code:
+
+```python
+# BEFORE: flat configs (no architecture branching)
+def _my_autotune_configs():
+    for occ in [2, 4, 8]:
+        yield SimpleNamespace(occupancy=occ, TILE_M=256, TILE_N=128)
+
+# AFTER: if-branch for current arch, original configs become the else-default
+def _my_autotune_configs():
+    gpu_capability = torch.cuda.get_device_capability()
+
+    if gpu_capability == (10, 0):                    # sm100 (B200) — current arch
+        # NEW: configs designed and tested for sm100
+        for occ in [1, 2, 4]:
+            yield SimpleNamespace(occupancy=occ, TILE_M=128, TILE_N=128)
+    else:
+        # UNCHANGED: original flat configs as default for all other architectures
+        for occ in [2, 4, 8]:
+            yield SimpleNamespace(occupancy=occ, TILE_M=256, TILE_N=128)
+```
+
+**Scenario 3: Existing autotune with config for the current architecture.** The source already has a conditional branch for the current GPU architecture. Only modify the current architecture's branch (e.g., adjust tile sizes, add/remove occupancy values). Do **NOT** modify or remove configs for other architectures.
+
+**Key principles:**
+
+- **"Target one architecture at a time" means only *add or modify* configs for the detected arch** — it does NOT mean delete existing configs for other architectures. Existing configs were validated on their respective hardware and must be preserved.
+- **When adding architecture branching to flat configs**: add an `if` for the current architecture and keep existing configs in the `else` as the default. This guarantees that the code change does not alter kernel behavior on any non-current architecture — the `else` path is identical to the original flat code.
+- **Test/validation (Step 11) only applies to the current architecture's branch.** Other branches are assumed correct since they were previously validated on their respective hardware. You cannot test them here because you don't have access to that hardware.
 
 ### Integration with torch.autograd.Function
 
@@ -434,7 +570,7 @@ ct.launch(stream, grid, tuned_kernel, (Q, Q, ...))  # Q_in == Q_out (in-place)
 
 **Also wrong**: Using `Q.clone()` in `args_fn` — this adds ~4us per clone, which is fatal for small kernels (~5us). The clone+copy pattern caused 0.48x performance in RoPE.
 
-**Tip — isolating output buffers in `args_fn`**: For kernels that write to a dedicated output tensor (not in-place), use `c.clone()` inside `args_fn` to prevent trial runs from overwriting the final output buffer:
+**Tip — isolating output buffers in `args_fn`**: For kernels that write to a dedicated output tensor (not in-place), you *may* use `c.clone()` inside `args_fn` to prevent trial runs from overwriting the final output buffer. This is only needed when the caller reads the output tensor after `exhaustive_search` returns — if you immediately overwrite it with `ct.launch`, clone is unnecessary:
 
 ```python
 # Output tensor c will be overwritten by each trial — clone it so trials don't
@@ -452,12 +588,12 @@ This is safe because the clone cost (~4us) is negligible relative to compute-bou
 
 ### Pitfall #2: Compilation Timeout
 
-**Problem**: >30 configs causes compilation to exceed 5 minutes. CuTile compilation is heavier than Triton.
+**Problem**: >30 configs in the **final code** causes compilation to exceed 5 minutes. CuTile compilation is heavier than Triton.
 
 **Solution**:
-- Keep total search space ≤ 30 configs — apply arch filters, tile size filters, and pruning rules until you're under the limit
+- Keep the final code's search space ≤ 30 configs — apply arch filters, tile size filters, and pruning rules until you're under the limit
 - Use architecture-conditional yield to only generate relevant configs
-- Prune the search space using architecture-conditional yield and size filters until total configs ≤ 30
+- If the initial template configs don't beat baseline, use a temporary directed probe (30–100 configs, via bash, not written to file) to identify winning dimensions, then lock the final code to ≤ 8 top candidates (see Design Philosophy)
 
 **Real example**: Grouped GEMM expanded from 4 to 32 configs → all backward tests timed out. Reverted to occupancy-only (4 configs) with no performance loss.
 
@@ -549,7 +685,7 @@ After adding autotuning, the following kernel-level optimizations may yield addi
 
 ## Differences from Triton Autotune
 
-Key differences: Triton uses `@triton.autotune` decorator with `Config(...)` objects; CuTile uses `exhaustive_search()` with `SimpleNamespace` configs + separate cache + `ct.launch`. CuTile has no `num_warps`/`num_stages` (compiler decides) — only tile sizes + `occupancy` + `num_ctas`. CuTile compilation is heavier (keep ≤30 configs). CuTile cache is user-managed in-memory (no automatic persistence). CuTile separates `args_fn` (kernel args) from `hints_fn` (compiler hints).
+Key differences: Triton uses `@triton.autotune` decorator with `Config(...)` objects; CuTile uses `exhaustive_search()` with `SimpleNamespace` configs + separate cache + `ct.launch`. CuTile has no `num_warps`/`num_stages` (compiler decides) — only tile sizes + `occupancy` + `num_ctas`. CuTile compilation is heavier (keep ≤30 configs in final code). CuTile cache is user-managed in-memory (no automatic persistence). CuTile separates `args_fn` (kernel args) from `hints_fn` (compiler hints).
 
 ## Reference Documents
 

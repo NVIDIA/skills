@@ -4,16 +4,17 @@ Architecture-specific constraints that affect autotune parameter selection. All 
 
 ## Architecture Summary
 
-| Property | sm90 (H100) | sm100 (B200) | sm120 (5090) | sm80/sm86 (A100/A10) |
-|----------|-------------|-------------|-------------|----------------------|
-| Shared memory / SM | 228 KB | 228 KB | 128 KB | 164 KB (A100) |
-| Register file / SM | 256 KB | 256 KB | 256 KB | 256 KB |
-| Max CTAs / SM | 32* | 32* | 32* | 32* |
-| CGA support (num_ctas>1) | Yes | Yes | No (use num_ctas=1) | No (use num_ctas=1) |
-| TMA multicast | Yes | Yes | No | No |
-| Preferred tile size | Medium (64-128) | 64-256 (standard); 512 only in specific matmul | Small (64-128) | Small (64-128) |
-| Preferred num_ctas | 1-2 | 2-4 | 1 | 1 only |
-| Preferred occupancy | 2 | 1 | 1-4 | 1-2 |
+| Property | sm90 (H100) | sm100 (B200) | sm103 (GB300) | sm120 (5090) | sm80/sm86 (A100/A10) |
+|----------|-------------|-------------|--------------|-------------|----------------------|
+| Shared memory / SM | 228 KB | 228 KB | 228 KB | 128 KB | 164 KB (A100) |
+| Register file / SM | 256 KB | 256 KB | 256 KB | 256 KB | 256 KB |
+| SMs | 132 | 128 | 152 | 84 | 108 (A100) |
+| Max CTAs / SM | 32* | 32* | 32* | 32* | 32* |
+| CGA support (num_ctas>1) | Yes | Yes | Yes | No (use num_ctas=1) | No (use num_ctas=1) |
+| TMA multicast | Yes | Yes | Yes | No | No |
+| Preferred tile size | Medium (64-128) | 64-256 (standard); 512 only in specific matmul | same as sm100 | Small (64-128) | Small (64-128) |
+| Preferred num_ctas | 1-2 | 2-4 | 2-4 | 1 | 1 only |
+| Preferred occupancy | 2 | 1 | 1 | 1-4 | 1-2 |
 
 \* Max CTAs / SM is a practical CuTile scheduling limit that depends on shared memory allocation per CTA. The hardware maximum may be higher.
 
@@ -42,6 +43,12 @@ Grouped GEMM persistent kernel vs Triton (kernel-only via CUDAGraph):
 | (8, 128, 512, 512) | 8.9us | 5.4us | 0.60x (faster) |
 | (8, 256, 2048, 1024) | 92.6us | 29.8us | 0.32x |
 | (16, 128, 2048, 1024) | 147.4us | 37.8us | 0.26x |
+
+## sm103 (Blackwell GB300)
+
+sm_103 is a variant of sm_100 with 152 SMs (vs 128 on B200). SMEM, register file, CGA, and TMA multicast behavior are identical to sm_100. Use the same configs as sm_100 — `gpu_capability[0] >= 10` covers both. The extra SMs may shift the occupancy/num_ctas sweet spot slightly (more SMs → higher parallelism → `num_ctas=2` can be more beneficial), but the same template configs apply.
+
+Detect with: `torch.cuda.get_device_capability() == (10, 3)`
 
 ## sm120 (Blackwell 5090)
 
@@ -114,6 +121,7 @@ Key constraint: TILE_M/N ≤ 128 (larger tiles spill on sm80). TILE_K ∈ {32, 6
 |-------------|-------------------|-------|
 | sm90 (H100) | 1, 2, 4 | CGA support; TMA multicast with num_ctas > 1 |
 | sm100 (B200) | 1, 2, 4 | Full CGA; best TMA multicast |
+| sm103 (GB300) | 1, 2, 4 | Same as sm100; 152 SMs |
 | sm120 (5090) | 1 only | CGA hardware exists but multi-CTA yields no benefit in practice; always use num_ctas=1 |
 | sm80/sm86 (Ampere) | 1 only | No CGA support; >1 will error |
 
@@ -163,7 +171,7 @@ x = ct.gather(data, offsets, padding_value=0)
 
 ### Impact on Autotune
 
-FP8 GEMM ablation study (P5/task16, 5090, 1024x2048x1024):
+FP8 GEMM ablation study (5090, 1024x2048x1024):
 
 | Factor | Impact when removed |
 |--------|-------------------|
@@ -226,7 +234,7 @@ Each unique (tile_sizes + hints) combination triggers a full kernel recompilatio
 | 24 (block_m x occ x swap_ab) | 10-24s | ~0.5-1s |
 | 32 (full tile search) | >5min (TIMEOUT) | >10s for complex tiles |
 
-**Hard limit**: Keep total configs ≤ 30. Beyond this, compilation will timeout or take unacceptably long.
+**Hard limit**: Keep total configs in final code ≤ 30. Beyond this, compilation will timeout or take unacceptably long.
 
 ## Occupancy Guidelines per Kernel Type
 
