@@ -228,6 +228,10 @@ def render_claude_plugin_json(spec: dict[str, Any]) -> dict[str, Any]:
         out["license"] = spec["license"]
     if "keywords" in spec:
         out["keywords"] = list(spec["keywords"])
+    # Skills tree is always inside the plugin (Codex rejects ".." paths,
+    # Anthropic spec requires "./" prefixes). Container path; Claude scans
+    # immediate children for SKILL.md.
+    out["skills"] = ["./skills/"]
     return out
 
 
