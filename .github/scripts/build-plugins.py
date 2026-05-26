@@ -89,11 +89,39 @@ def die(msg: str, code: int = 1) -> None:
     sys.exit(code)
 
 
+def error(msg: str) -> None:
+    """Like die() but does not exit. For recoverable per-item failures
+    that should be loud in logs but not block the rest of the build."""
+    print(f"error: {msg}", file=sys.stderr, flush=True)
+
+
 def read_yaml(path: Path) -> dict[str, Any]:
+    """Strict YAML read — dies on parse error or non-mapping root.
+    Use for files whose absence/corruption is structural (e.g.
+    plugins.d/_defaults.yml). For per-plugin yaml files, prefer
+    read_yaml_lenient so one bad file does not block the rest."""
     with path.open() as f:
         data = yaml.safe_load(f)
     if not isinstance(data, dict):
         die(f"{path}: expected a YAML mapping at top level")
+    return data
+
+
+def read_yaml_lenient(path: Path) -> dict[str, Any] | None:
+    """Soft YAML read — returns None on parse error or non-mapping root,
+    logs an error to stderr. Caller decides whether to skip the file."""
+    try:
+        with path.open() as f:
+            data = yaml.safe_load(f)
+    except yaml.YAMLError as e:
+        error(f"{path}: YAML parse error: {e}")
+        return None
+    if not isinstance(data, dict):
+        error(
+            f"{path}: expected a YAML mapping at top level, got "
+            f"{type(data).__name__}"
+        )
+        return None
     return data
 
 
@@ -208,10 +236,11 @@ def materialize_skills(
                   NOT supported by Codex local marketplace install.
     """
     if mode not in VALID_MATERIALIZATIONS:
-        die(
-            f"plugin {plugin_name!r}: invalid skill_files={mode!r} "
-            f"(allowed: {', '.join(VALID_MATERIALIZATIONS)})"
+        log(
+            f"  ! warning: plugin {plugin_name!r}: invalid skill_files={mode!r}, "
+            f"falling back to 'copy' (allowed: {', '.join(VALID_MATERIALIZATIONS)})"
         )
+        mode = "copy"
     plugin_dir = PLUGINS_DIR / plugin_name
     target = plugin_dir / "skills"
     if target.is_symlink() or target.exists():
@@ -324,9 +353,9 @@ def render_codex_plugin_json(spec: dict[str, Any]) -> dict[str, Any]:
 
 
 def build_catalog_plugin(spec: dict[str, Any]) -> str:
+    # `name` is already validated for kebab-case + uniqueness in discover()
+    # before specs reach this function.
     name = spec["name"]
-    if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", name):
-        die(f"plugin name must be lowercase kebab-case: {name!r}")
     plugin_dir = PLUGINS_DIR / name
     plugin_dir.mkdir(parents=True, exist_ok=True)
     log(f"── catalog plugin: {name} ──")
@@ -356,20 +385,34 @@ def build_catalog_plugin(spec: dict[str, Any]) -> str:
 # ---------------------------- curated plugin ---------------------------------
 
 
-def build_curated_plugin(plugin_dir: Path) -> str:
+def build_curated_plugin(plugin_dir: Path) -> str | None:
     """
     A curated plugin is one with plugins/<name>/.skills-manifest.yml but
     no plugins.d/<name>.yml. We rebuild only its skills/ tree (mode
     selected by `skill_files:` in the manifest, default `copy`) and
     trust everything else to be hand-maintained.
+
+    Returns the plugin name on success, or None if we skipped the build
+    due to a malformed manifest. The marketplace upsert preserves the
+    plugin's existing entry verbatim either way.
     """
     manifest_path = plugin_dir / ".skills-manifest.yml"
-    spec = read_yaml(manifest_path)
     name = plugin_dir.name
+    spec = read_yaml_lenient(manifest_path)
+    if spec is None:
+        error(
+            f"  ! skipping curated plugin {name!r} — "
+            f"{manifest_path.relative_to(REPO_ROOT)} is unreadable; "
+            f"existing plugins/{name}/skills/ left untouched"
+        )
+        return None
     log(f"── curated plugin: {name} ──")
     skills = spec.get("skills") or []
     if not skills:
-        die(f"{manifest_path}: 'skills' list is empty")
+        log(
+            f"  ! warning: {manifest_path.relative_to(REPO_ROOT)} has empty "
+            f"'skills' list; producing empty plugins/{name}/skills/"
+        )
     mode = spec.get("skill_files", "copy")
     materialize_skills(name, skills, mode=mode)
     return name
@@ -458,23 +501,44 @@ def merge_with_defaults(defaults: dict[str, Any], plugin: dict[str, Any]) -> dic
 
 
 def discover() -> tuple[dict[str, dict[str, Any]], list[Path]]:
+    # _defaults.yml is structural (every plugin merges from it); a parse
+    # failure there makes downstream merges meaningless, so keep strict.
     defaults: dict[str, Any] = {}
     if PLUGINS_D_DEFAULTS.is_file():
         defaults = read_yaml(PLUGINS_D_DEFAULTS)
 
+    # Per-plugin yaml files are validated leniently: one bad/duplicate/
+    # unnamed file logs an error and gets skipped; the rest of the
+    # catalog still builds.
     catalog: dict[str, dict[str, Any]] = {}
     if PLUGINS_D.is_dir():
         for ymlfile in sorted(PLUGINS_D.glob("*.yml")):
             if ymlfile.name.startswith("_"):
                 continue
-            plugin_spec = read_yaml(ymlfile)
+            rel = ymlfile.relative_to(REPO_ROOT)
+            plugin_spec = read_yaml_lenient(ymlfile)
+            if plugin_spec is None:
+                error(f"  ! skipping {rel} — YAML errors above")
+                continue
             spec = merge_with_defaults(defaults, plugin_spec)
             name = spec.get("name")
             if not name:
-                die(f"{ymlfile}: missing 'name'")
+                error(f"{rel}: missing 'name', skipping")
+                continue
+            if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", name):
+                error(
+                    f"{rel}: plugin name {name!r} is not lowercase "
+                    f"kebab-case, skipping"
+                )
+                continue
             if name in catalog:
-                die(f"duplicate plugin name '{name}' across plugins.d/")
-            spec["__source"] = str(ymlfile.relative_to(REPO_ROOT))
+                first = catalog[name].get("__source", "?")
+                error(
+                    f"{rel}: duplicate plugin name {name!r} (already "
+                    f"declared in {first}), skipping"
+                )
+                continue
+            spec["__source"] = str(rel)
             catalog[name] = spec
 
     curated: list[Path] = []
