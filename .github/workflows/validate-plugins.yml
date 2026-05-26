@@ -46,3 +46,32 @@ jobs:
 
       - name: Build plugins and fail on drift
         run: .github/scripts/build-plugins.sh --check
+
+      # TODO: add upstream CLI validation as a follow-up step.
+      #
+      # Claude side (ready to enable when we want it):
+      #   - name: Install Claude Code CLI
+      #     run: npm install -g @anthropic-ai/claude-code@2.1.145
+      #   - name: claude plugin validate
+      #     run: |
+      #       set -e
+      #       for d in plugins/*/; do claude plugin validate "$d"; done
+      #       claude plugin validate .claude-plugin/marketplace.json
+      #       # Verified locally on 2026-05-21 against claude 2.1.145; all
+      #       # four plugin manifests + .claude-plugin/marketplace.json pass.
+      #       # Do NOT pass .agents/plugins/marketplace.json — that is the
+      #       # Codex marketplace and uses a different schema.
+      #
+      # Codex side: the codex CLI has no `plugin validate` subcommand
+      # (only add/list/marketplace/remove). Three options if we decide we
+      # want CLI-level coverage:
+      #   1. Install-as-validator dry-run: `codex plugin marketplace add
+      #      ./.agents/plugins/marketplace.json` then `codex plugin add
+      #      <name>` for each generated plugin. Real install on the
+      #      runner; ephemeral so side effects are fine.
+      #   2. Hand-roll a JSON schema check (jsonschema in Python) derived
+      #      from upstream openai/plugins samples.
+      #   3. Skip — rely on the build script's schema parity and the
+      #      drift check above.
+      # Deferred for now to keep this workflow lean; revisit if we hit a
+      # schema mismatch in the wild.
