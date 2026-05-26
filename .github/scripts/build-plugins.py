@@ -11,27 +11,35 @@ Inputs (hand-maintained):
 
   plugins.d/<name>.yml
       Catalog plugin spec. Drives full regeneration of plugins/<name>/
-      (skills/ symlinks, .claude-plugin/plugin.json, .codex-plugin/plugin.json)
+      (skills/ tree, .claude-plugin/plugin.json, .codex-plugin/plugin.json)
       and its entry in both marketplace.json files.
 
   plugins/<name>/.skills-manifest.yml
       Per-plugin skill manifest for hand-curated plugins. Only the skills/
-      symlink tree is materialized; plugin.jsons, assets, README, and the
-      marketplace entry stay hand-edited.
+      tree is rebuilt; plugin.jsons, assets, README, and the marketplace
+      entry stay hand-edited.
 
   plugins/<name>/assets/<file>      Hand-maintained logo/image assets.
   plugins/<name>/README.md          Optional plugin-specific notes.
 
 Generated outputs (committed):
-  plugins/<name>/skills/<skill>/    Symlink → ../../../skills/<Product>/<skill>
+  plugins/<name>/skills/<skill>/    Real dir or symlink (see below)
   plugins/<name>/.claude-plugin/plugin.json   (catalog plugins only)
   plugins/<name>/.codex-plugin/plugin.json    (catalog plugins only)
   .claude-plugin/marketplace.json   (catalog plugin entries; others preserved)
   .agents/plugins/marketplace.json  (catalog plugin entries; others preserved)
 
-The skills/ tree is materialized as RELATIVE symlinks, not file copies. The
-canonical SKILL.md lives only under skills/<Product>/<skill>/; plugins/
-references it via symlink so the plugin tree stays in sync automatically.
+How the skills/ tree gets populated is selected by `skill_files:` in
+plugins.d/<name>.yml (defaults to `copy` via plugins.d/_defaults.yml):
+
+  copy     rsync each curated skill into plugins/<name>/skills/<skill>/.
+           Real files. Required for `codex plugin add` (Codex 0.132
+           silently drops symlinks during install).
+  symlink  Relative symlink plugins/<name>/skills/<skill> →
+           ../../../skills/<Product>/<skill>. No duplicated SKILL.md;
+           the plugin tree stays in sync with the canonical catalog
+           automatically. Works for `claude plugin install` and
+           `npx skills add`. NOT compatible with Codex local install.
 
 Usage:
   build-plugins.py             Build everything.
@@ -328,8 +336,9 @@ def build_catalog_plugin(spec: dict[str, Any]) -> str:
 def build_curated_plugin(plugin_dir: Path) -> str:
     """
     A curated plugin is one with plugins/<name>/.skills-manifest.yml but
-    no plugins.d/<name>.yml. We materialize only its skills/ tree (as
-    symlinks) and trust everything else to be hand-maintained.
+    no plugins.d/<name>.yml. We rebuild only its skills/ tree (mode
+    selected by `skill_files:` in the manifest, default `copy`) and
+    trust everything else to be hand-maintained.
     """
     manifest_path = plugin_dir / ".skills-manifest.yml"
     spec = read_yaml(manifest_path)
