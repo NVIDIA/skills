@@ -1,0 +1,18 @@
+{
+    "name": "nvidia-skills",
+    "version": "1.0.0",
+    "description": "Build with NVIDIA agent skills.",
+    "displayName": "NVIDIA",
+    "author": {
+        "name": "NVIDIA",
+        "url": "https://github.com/NVIDIA/skills"
+    },
+    "homepage": "https://github.com/NVIDIA/skills",
+    "repository": "https://github.com/NVIDIA/skills",
+    "license": "Apache-2.0 AND CC-BY-4.0",
+    "keywords": [
+        "nvidia",
+        "agent-skills",
+        "gpu"
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "name": "nvidia-skills",
+    "owner": {
+        "name": "NVIDIA",
+        "url": "https://github.com/NVIDIA/skills"
+    },
+    "metadata": {
+        "description": "NVIDIA Skills marketplace — install the curated NVIDIA Skills plugin from this catalog repo.",
+        "version": "1.0.0"
+    },
+    "plugins": [
+        {
+            "name": "nvidia-skills",
+            "source": "./plugins/nvidia-skills",
+            "description": "Build with NVIDIA agent skills."
+        }
+    ]
+}

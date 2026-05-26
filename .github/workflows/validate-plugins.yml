@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# Validate that the generated plugin tree matches plugins.d/ + skills/.
+#
+# Runs `build-plugins.sh --check`, which rebuilds into the working tree
+# and fails if anything drifts. The cron-driven sync workflow rebuilds
+# plugins automatically; this workflow just guards against contributor
+# PRs that hand-edit a generated file or forget to re-run the build.
+
+name: Validate Plugins
+
+on:
+  pull_request:
+    paths:
+      - "plugins.d/**"
+      - "skills/**"
+      - "plugins/**"
+      - ".claude-plugin/marketplace.json"
+      - ".agents/plugins/marketplace.json"
+      - ".github/scripts/build-plugins.*"
+      - ".github/workflows/validate-plugins.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-plugins-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Build plugins and fail on drift
+        run: .github/scripts/build-plugins.sh --check

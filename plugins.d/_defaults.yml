@@ -1,0 +1,50 @@
+# Default fields applied to every plugins.d/<name>.yml.
+#
+# - Anything declared in a per-plugin yaml WINS over the defaults below.
+# - Merge is shallow: nested mappings (like `author:`) are replaced wholesale,
+#   not field-by-field. If you set `author:` in a plugin yaml, supply both
+#   `name:` and `url:`.
+#
+# Files starting with `_` are treated as include files by build-plugins.py
+# and are NOT themselves built into a plugin.
+
+version: "1.0.0"
+
+author:
+  name: NVIDIA
+  url: https://github.com/NVIDIA/skills
+
+homepage: https://github.com/NVIDIA/skills
+repository: https://github.com/NVIDIA/skills
+license: Apache-2.0 AND CC-BY-4.0
+
+# interface.websiteURL is omitted by default — duplicates `homepage` for
+# plugins that don't have a distinct product/marketing page. Set it per
+# plugin only when there is a real landing page to link to.
+# website_url: https://github.com/NVIDIA/skills
+
+# Privacy policy / Terms of service URLs are only required when a plugin
+# actually collects user data or imposes plugin-specific terms. Leave them
+# unset by default; uncomment and override per plugin when applicable.
+# privacy_policy_url: https://www.nvidia.com/en-us/about-nvidia/privacy-center/
+# terms_of_service_url: https://developer.nvidia.com/legal/terms
+
+brand_color: "#76b900"
+
+capabilities:
+  - Interactive
+  - Write
+
+# Marketplace publishing flags default to true. To opt a plugin out of one
+# or both self-hosted marketplaces, set marketplace_enabled.{claude,codex}: false
+# in that plugin's yaml.
+
+# How `include_skills` are materialized under plugins/<name>/skills/.
+#   copy     - rsync each skill into the plugin tree. Real files. Required
+#              for Codex local-marketplace install (codex plugin add
+#              silently drops symlinks). Default.
+#   symlink  - relative symlinks pointing back at the canonical skills/
+#              tree. No duplicated SKILL.md. Works for Claude install and
+#              `npx skills add`; NOT compatible with Codex local install.
+# Override per-plugin in plugins.d/<name>.yml when needed.
+materialize_skills: copy

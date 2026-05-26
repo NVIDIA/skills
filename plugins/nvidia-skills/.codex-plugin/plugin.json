@@ -1,0 +1,37 @@
+{
+    "name": "nvidia-skills",
+    "version": "1.0.0",
+    "description": "Build with NVIDIA agent skills.",
+    "author": {
+        "name": "NVIDIA",
+        "url": "https://github.com/NVIDIA/skills"
+    },
+    "homepage": "https://github.com/NVIDIA/skills",
+    "repository": "https://github.com/NVIDIA/skills",
+    "license": "Apache-2.0 AND CC-BY-4.0",
+    "keywords": [
+        "nvidia",
+        "agent-skills",
+        "gpu"
+    ],
+    "skills": "./skills/",
+    "interface": {
+        "displayName": "NVIDIA",
+        "shortDescription": "Provide agentic guidance in your NVIDIA related workflows.",
+        "longDescription": "A curated plugin bundling verified skills to provide guidance in your NVIDIA related workflows.",
+        "developerName": "NVIDIA",
+        "category": "Developer Tools",
+        "capabilities": [
+            "Interactive",
+            "Write"
+        ],
+        "logo": "./assets/nvidia.png",
+        "composerIcon": "./assets/nvidia.png",
+        "brandColor": "#76b900",
+        "defaultPrompt": [
+            "Solve an optimization problem with cuOpt.",
+            "Deploy or debug an NVIDIA RAG Blueprint.",
+            "Search a video archive with VSS."
+        ]
+    }
+}
