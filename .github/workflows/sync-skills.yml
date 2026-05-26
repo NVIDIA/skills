@@ -255,6 +255,31 @@ jobs:
             echo "Opened new tracking issue"
           fi
 
+      - name: Rebuild plugin catalog
+        run: |
+          set -euo pipefail
+          # plugins/<name>/skills/ in copy mode duplicates content from
+          # the canonical skills/ tree, so any sync that touched a
+          # curated source path leaves those copies stale. Re-run the
+          # plugin build here so the same sync PR ships a consistent
+          # tree (skills/ + plugins/) and validate-plugins.yml --check
+          # stays green. Symlink-mode plugins are a no-op for the build.
+          # build-plugins.py soft-fails missing/dropped curated skills
+          # so a rename or compliance drop does NOT block the sync PR.
+          .github/scripts/build-plugins.sh
+
+          # Mark the plugin catalog as a changed component if anything
+          # under plugins/ or either marketplace.json moved, so the PR
+          # summary surfaces it and the "has_changes" gate fires even
+          # when the only diff is the auto-rebuild.
+          if ! git diff --quiet plugins/ \
+              .claude-plugin/marketplace.json \
+              .agents/plugins/marketplace.json; then
+            if ! grep -qx "- plugin catalog" /tmp/changed-components.txt 2>/dev/null; then
+              echo "- plugin catalog" >> /tmp/changed-components.txt
+            fi
+          fi
+
       - name: Regenerate README tables
         run: .github/scripts/regenerate-readme.sh
 

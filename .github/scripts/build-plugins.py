@@ -125,15 +125,29 @@ def expand_skill_paths(entries: list[str]) -> list[tuple[str, Path]]:
 
     - "skills/cuopt/cuopt-install/"   → [("cuopt-install", REPO/skills/cuopt/cuopt-install)]
     - "skills/cuopt/"                 → all immediate children of skills/cuopt that contain SKILL.md
+
+    Soft-fails any entry that would otherwise abort the build because of an
+    upstream catalog change (rename, removal, compliance-driven SKILL.md
+    drop, basename collision). The plugin ships with whatever curated
+    skills DID resolve, the warnings are surfaced in stdout, and the daily
+    sync PR is not blocked by curation drift in plugins.d/<name>.yml.
+    Hard config errors (bad YAML, invalid plugin name, etc.) still die.
     """
     out: list[tuple[str, Path]] = []
     for entry in entries:
         rel = entry.rstrip("/")
         src = (REPO_ROOT / rel).resolve()
         if not src.exists():
-            die(f"include_skills entry not found: {entry}")
+            log(
+                f"  ! warning: include_skills entry missing on disk, skipping: {entry} "
+                f"(upstream rename/removal? update plugins.d/<name>.yml)"
+            )
+            continue
         if not src.is_dir():
-            die(f"include_skills entry is not a directory: {entry}")
+            log(
+                f"  ! warning: include_skills entry is not a directory, skipping: {entry}"
+            )
+            continue
         skill_md = src / "SKILL.md"
         if skill_md.is_file():
             out.append((src.name, src))
@@ -145,13 +159,22 @@ def expand_skill_paths(entries: list[str]) -> list[tuple[str, Path]]:
                     out.append((child.name, child))
                     found += 1
             if found == 0:
-                die(f"no SKILL.md found under {entry}")
+                log(
+                    f"  ! warning: no SKILL.md under {entry}, skipping "
+                    f"(compliance enforcement may have dropped every skill here)"
+                )
     seen: dict[str, Path] = {}
+    deduped: list[tuple[str, Path]] = []
     for name, src in out:
         if name in seen and seen[name] != src:
-            die(f"duplicate skill name '{name}': {seen[name]} vs {src}")
+            log(
+                f"  ! warning: duplicate skill basename {name!r} across "
+                f"include_skills, keeping first: {seen[name]} (dropping {src})"
+            )
+            continue
         seen[name] = src
-    return out
+        deduped.append((name, src))
+    return deduped
 
 
 VALID_MATERIALIZATIONS = ("copy", "symlink")
