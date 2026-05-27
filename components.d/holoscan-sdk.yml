@@ -1,0 +1,8 @@
+name: Holoscan SDK
+repo: nvidia-holoscan/holoscan-sdk
+description: Install and set up the Holoscan SDK on any platform (container, Debian, Python, Conda, or source).
+skills:
+  - path: skills/
+    catalog_dir: holoscan-sdk
+links:
+  discussions: false
