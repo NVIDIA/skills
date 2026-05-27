@@ -11,4 +11,4 @@ LD_LIBRARY_PATH=${LIB_PATH}:$LD_LIBRARY_PATH ./mps_solver data/sample.mps
 
 **Data:** `data/sample.mps` is a small LP (two variables, two constraints). Use any MPS file path as the first argument.
 
-**See also:** [resources/examples.md](../../resources/examples.md); repo example `docs/cuopt/source/cuopt-c/lp-qp-milp/examples/mps_file_example.c`.
+**See also:** [references/examples.md](../../references/examples.md); repo example `docs/cuopt/source/cuopt-c/lp-qp-milp/examples/mps_file_example.c`.

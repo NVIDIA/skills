@@ -8,7 +8,7 @@ This skill is ready for commercial/non-commercial use. <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers embedding linear programming, mixed-integer linear programming, or quadratic programming solvers into C/C++ applications using the NVIDIA cuOpt C API. <br>
+Developers and engineers embedding linear programming (LP), mixed-integer linear programming (MILP), or quadratic programming (QP) solvers into C/C++ applications using the NVIDIA cuOpt C API. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -18,13 +18,12 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [C API Examples (LP/MILP)](references/examples.md) <br>
 - [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
-- [examples.md](resources/examples.md) <br>
-- [assets/README.md](assets/README.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Shell commands] <br>
+**Output Type(s):** [Code, Shell commands, Configuration instructions] <br>
 **Output Format:** [Markdown with inline C code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>

@@ -133,5 +133,5 @@ curl -s http://localhost:8000/cuopt/health | jq .
 
 ## See also
 
-- [verification_examples.md](resources/verification_examples.md) — full verification recipes for Python, C, server, and Docker.
+- [verification_examples.md](references/verification_examples.md) — full verification recipes for Python, C, server, and Docker.
 - `cuopt-developer` — build cuOpt from source and contribute to the codebase.

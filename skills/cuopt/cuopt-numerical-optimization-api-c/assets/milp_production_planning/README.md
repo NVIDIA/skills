@@ -9,4 +9,4 @@ gcc -I${INCLUDE_PATH} -L${LIB_PATH} -o milp_production milp_production.c -lcuopt
 LD_LIBRARY_PATH=${LIB_PATH}:$LD_LIBRARY_PATH ./milp_production
 ```
 
-**See also:** [resources/examples.md](../../resources/examples.md) for parameters and MIP options.
+**See also:** [references/examples.md](../../references/examples.md) for parameters and MIP options.

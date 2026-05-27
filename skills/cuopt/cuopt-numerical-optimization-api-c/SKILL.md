@@ -62,7 +62,7 @@ QP uses the same library, include/lib paths, and build pattern as LP/MILP — on
 
 ## Examples
 
-- [examples.md](resources/examples.md) — LP/MILP with build instructions
+- [examples.md](references/examples.md) — LP/MILP with build instructions
 - [assets/README.md](assets/README.md) — Build commands for all reference code below
 - [lp_basic](assets/lp_basic/) — Simple LP: create problem, solve, get solution
 - [lp_duals](assets/lp_duals/) — Dual values and reduced costs

@@ -14,4 +14,4 @@ LP, MILP, and QP reference implementations. Use as reference when building new a
 | least_squares | QP |
 | maximization_workaround | QP |
 
-**Run:** From each subdir, `python model.py`. QP is **beta** and supports **MINIMIZE** only. See [resources/qp_examples.md](../resources/qp_examples.md) for additional QP examples.
+**Run:** From each subdir, `python model.py`. QP is **beta** and supports **MINIMIZE** only. See [references/qp_examples.md](../references/qp_examples.md) for additional QP examples.

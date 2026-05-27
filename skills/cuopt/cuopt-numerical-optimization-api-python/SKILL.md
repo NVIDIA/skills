@@ -153,7 +153,7 @@ if problem.Status.name in ["Optimal", "PrimalFeasible"]:
 - **Q should be PSD** (positive semi-definite) for a convex problem; otherwise the solver may return a non-optimal stationary point.
 - **Beta** — API may evolve; treat as production-capable for typical convex QP but expect occasional changes.
 
-See `resources/qp_examples.md` for least-squares, maximization-workaround, and matrix-form examples.
+See `references/qp_examples.md` for least-squares, maximization-workaround, and matrix-form examples.
 
 ## CRITICAL: Status Checking
 

@@ -8,7 +8,7 @@ This skill is ready for commercial/non-commercial use. <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers contributing to the NVIDIA cuOpt codebase use this skill for building, testing, debugging, and submitting pull requests across C++/CUDA, Python, and server components. <br>
+Developers and engineers contributing to the NVIDIA cuOpt codebase use this skill for building, testing, debugging, and submitting changes to the C++/CUDA solver core, Python bindings, REST server, and CI infrastructure. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -18,15 +18,19 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
-- [cuOpt GitHub Repository](https://github.com/NVIDIA/cuopt.git) <br>
-- [CUDA Compatibility Matrix](https://docs.nvidia.com/deploy/cuda-compatibility/) <br>
-- [RAPIDS Maintainers Docs](https://docs.rapids.ai/maintainers/) <br>
+- [Build & Test](references/build_and_test.md) <br>
+- [Contributing](references/contributing.md) <br>
+- [Coding Conventions](references/conventions.md) <br>
+- [First-Time Setup](references/first_time_setup.md) <br>
+- [Python Bindings Guide](references/python_bindings.md) <br>
+- [Troubleshooting & CI](references/troubleshooting.md) <br>
+- [VRP Dimension Developer Skills](references/vrp_skills.md) <br>
+- [cuOpt Documentation](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Code, Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 

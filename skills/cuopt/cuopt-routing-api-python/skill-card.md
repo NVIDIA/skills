@@ -8,7 +8,7 @@ This skill is ready for commercial/non-commercial use. <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers building or solving vehicle routing problems (VRP, TSP, PDP) using the NVIDIA cuOpt Python API for fleet optimization, logistics planning, and delivery scheduling. <br>
+Developers and engineers building or solving vehicle routing problems (VRP, TSP, PDP) using the NVIDIA cuOpt Python API for logistics and fleet optimization. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -18,10 +18,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [Routing Python API Examples](references/examples.md) <br>
+- [Routing REST Server Examples](references/server_examples.md) <br>
 - [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
-- [cuOpt Examples Repository](https://github.com/NVIDIA/cuopt-examples) <br>
-- [Routing Python API Examples](resources/examples.md) <br>
-- [Routing REST Server Examples](resources/server_examples.md) <br>
 
 
 ## Skill Output: <br>

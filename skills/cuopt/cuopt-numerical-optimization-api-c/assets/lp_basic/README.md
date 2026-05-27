@@ -12,4 +12,4 @@ gcc -I${INCLUDE_PATH} -L${LIB_PATH} -o lp_simple lp_simple.c -lcuopt
 LD_LIBRARY_PATH=${LIB_PATH}:$LD_LIBRARY_PATH ./lp_simple
 ```
 
-**See also:** [resources/examples.md](../../resources/examples.md) for parameter constants and more examples.
+**See also:** [references/examples.md](../../references/examples.md) for parameter constants and more examples.

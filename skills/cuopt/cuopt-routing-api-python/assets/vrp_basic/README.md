@@ -4,4 +4,4 @@
 
 **Run:** `python model.py`
 
-**See also:** [resources/examples.md](../../resources/examples.md) for VRP with time windows, capacity, and multi-depot.
+**See also:** [references/examples.md](../../references/examples.md) for VRP with time windows, capacity, and multi-depot.
