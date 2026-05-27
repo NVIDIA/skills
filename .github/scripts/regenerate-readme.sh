@@ -29,11 +29,34 @@ yq ea '[.] | {"components": .}' components.d/*.yml > "$CONFIG"
 
 sorted_indices=$(yq -r '.components | to_entries | sort_by(.value.name | downcase) | .[].key' "$CONFIG")
 
+# Only render components with at least one verified SKILL.md in the catalog.
+# Enforcement (sync workflow) removes non-compliant skills and orphan product
+# dirs before this script runs, so a zero count means the product currently
+# has no skill present in the repo that passes compliance.
+component_skill_count() {
+  local idx=$1
+  local total=0
+  while read -r catalog_dir; do
+    if [ -d "skills/$catalog_dir" ]; then
+      cnt=$(find "skills/$catalog_dir" -name SKILL.md -type f 2>/dev/null | wc -l | tr -d ' ')
+      total=$((total + cnt))
+    fi
+  done < <(yq -r ".components[$idx].skills[].catalog_dir" "$CONFIG")
+  echo "$total"
+}
+
+kept_indices=""
+for i in $sorted_indices; do
+  if [ "$(component_skill_count "$i")" -gt 0 ]; then
+    kept_indices="$kept_indices $i"
+  fi
+done
+
 # Available Skills table
 {
   echo "| Product | Description | Skills | Catalog | Source | Version |"
   echo "|---------|-------------|:------:|---------|--------|---------|"
-  for i in $sorted_indices; do
+  for i in $kept_indices; do
     name=$(yq -r ".components[$i].name" "$CONFIG")
     description=$(yq -r ".components[$i].description" "$CONFIG" | tr -d '\n' | sed 's/  */ /g; s/^ //; s/ $//')
     repo=$(yq -r ".components[$i].repo" "$CONFIG")
@@ -42,13 +65,7 @@ sorted_indices=$(yq -r '.components | to_entries | sort_by(.value.name | downcas
     primary_path=${primary_path%/}
     primary_catalog=$(yq -r ".components[$i].skills[0].catalog_dir" "$CONFIG")
 
-    skill_count=0
-    while read -r catalog_dir; do
-      if [ -d "skills/$catalog_dir" ]; then
-        cnt=$(find "skills/$catalog_dir" -name SKILL.md -type f 2>/dev/null | wc -l | tr -d ' ')
-        skill_count=$((skill_count + cnt))
-      fi
-    done < <(yq -r ".components[$i].skills[].catalog_dir" "$CONFIG")
+    skill_count=$(component_skill_count "$i")
 
     slug=$(echo "$name" | tr 'A-Z ' 'a-z-')
     version_cell="—"
@@ -68,7 +85,7 @@ sorted_indices=$(yq -r '.components | to_entries | sort_by(.value.name | downcas
 {
   echo "| Product | Issues | Discussions | Contributing | Security |"
   echo "|---------|--------|-------------|--------------|----------|"
-  for i in $sorted_indices; do
+  for i in $kept_indices; do
     name=$(yq -r ".components[$i].name" "$CONFIG")
     repo=$(yq -r ".components[$i].repo" "$CONFIG")
     ref=$(yq -r ".components[$i].ref // \"main\"" "$CONFIG")
@@ -127,4 +144,6 @@ awk -v skills_file=/tmp/skills-table.md -v help_file=/tmp/help-table.md '
 mv /tmp/README.md.new README.md
 rm -f /tmp/skills-table.md /tmp/help-table.md
 
-echo "Regenerated README tables for $(echo "$sorted_indices" | wc -l | tr -d ' ') components"
+total=$(echo "$sorted_indices" | wc -w | tr -d ' ')
+kept=$(echo "$kept_indices" | wc -w | tr -d ' ')
+echo "Regenerated README tables for $kept of $total components (filtered out $((total - kept)) with no verified skills)"
