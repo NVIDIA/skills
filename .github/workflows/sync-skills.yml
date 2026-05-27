@@ -148,8 +148,10 @@ jobs:
           # Every catalog skill (defined by SKILL.md) must ship with:
           #   - skill.oms.sig  (detached NVIDIA signature)
           #   - skill-card.md  (skill metadata card)
-          # Skills missing either file are dropped from the catalog before
-          # the PR is created — non-compliant skills do not get merged.
+          #   - evals.json     (eval definitions, anywhere within the
+          #                     skill directory — typically under benchmark/)
+          # Skills missing any of these are dropped from the catalog
+          # before the PR is created — non-compliant skills do not merge.
           dropped=/tmp/dropped-skills.txt
           truncate -s 0 "$dropped"
 
@@ -158,6 +160,8 @@ jobs:
             missing=""
             [ -f "$dir/skill.oms.sig" ] || missing="$missing skill.oms.sig"
             [ -f "$dir/skill-card.md" ] || missing="$missing skill-card.md"
+            [ -n "$(find "$dir" -type f -name evals.json -print -quit 2>/dev/null)" ] \
+              || missing="$missing evals.json"
             if [ -n "$missing" ]; then
               product=$(echo "$dir" | awk -F/ '{print $2}')
               echo "$product|$dir|$(echo "$missing" | xargs)" >> "$dropped"
@@ -203,7 +207,7 @@ jobs:
 
           gh label create missing-compliance \
             --color FFA500 \
-            --description "Catalog skills dropped from sync — missing skill.oms.sig and/or skill-card.md" \
+            --description "Catalog skills dropped from sync — missing skill.oms.sig, skill-card.md, and/or evals.json" \
             --force >/dev/null
 
           existing=$(gh issue list --label missing-compliance --state open \
@@ -212,7 +216,7 @@ jobs:
           if [ ! -s "$dropped" ]; then
             if [ -n "$existing" ]; then
               gh issue close "$existing" \
-                --comment "All catalog skills now carry \`skill.oms.sig\` and \`skill-card.md\`. Closing automatically."
+                --comment "All catalog skills now carry \`skill.oms.sig\`, \`skill-card.md\`, and \`evals.json\`. Closing automatically."
               echo "All compliant — closed tracking issue #$existing"
             else
               echo "All compliant — nothing to track"
@@ -225,9 +229,12 @@ jobs:
 
           body=/tmp/missing-compliance-body.md
           {
-            echo "Tracking catalog skills that were **dropped from sync** because they are missing a NVIDIA detached signature (\`skill.oms.sig\`) and/or skill card (\`skill-card.md\`) next to \`SKILL.md\`."
+            echo "Tracking catalog skills that were **dropped from sync** because they are missing one or more required artifacts next to \`SKILL.md\`:"
+            echo "- \`skill.oms.sig\` (NVIDIA detached signature)"
+            echo "- \`skill-card.md\` (skill metadata card)"
+            echo "- \`evals.json\` (eval definitions — anywhere within the skill directory, typically under \`benchmark/\`)"
             echo ""
-            echo "**Compliance is enforced** — skills missing either file are removed from the catalog before the sync PR is opened. To restore a dropped skill, ensure both files exist alongside \`SKILL.md\` in the upstream repo."
+            echo "**Compliance is enforced** — skills missing any of these are removed from the catalog before the sync PR is opened. To restore a dropped skill, ensure all three artifacts exist in the upstream repo."
             echo ""
             echo "**Last updated:** $(date -u +%Y-%m-%d) by [sync run #${{ github.run_id }}]($RUN_URL)"
             echo ""
@@ -243,10 +250,10 @@ jobs:
             done < "$dropped"
             echo ""
             echo "---"
-            echo "Owners: ensure your upstream pipeline produces both \`skill.oms.sig\` and \`skill-card.md\` alongside each \`SKILL.md\`. This issue auto-updates each sync and closes when all skills are compliant."
+            echo "Owners: ensure your upstream pipeline produces \`skill.oms.sig\`, \`skill-card.md\`, and \`evals.json\` for each skill. This issue auto-updates each sync and closes when all skills are compliant."
           } > "$body"
 
-          title="Skills dropped from sync — missing signature or card ($count)"
+          title="Skills dropped from sync — missing required artifacts ($count)"
           if [ -n "$existing" ]; then
             gh issue edit "$existing" --title "$title" --body-file "$body"
             echo "Updated tracking issue #$existing"
@@ -289,7 +296,7 @@ jobs:
             cat /tmp/changed-components.txt
             if [ -s /tmp/dropped-skills.txt ]; then
               echo ""
-              echo "**Skills dropped (missing \`skill.oms.sig\` and/or \`skill-card.md\`):**"
+              echo "**Skills dropped (missing \`skill.oms.sig\`, \`skill-card.md\`, and/or \`evals.json\`):**"
               while IFS='|' read -r _ dir missing; do
                 echo "- \`$dir\` — missing: $missing"
               done < /tmp/dropped-skills.txt
