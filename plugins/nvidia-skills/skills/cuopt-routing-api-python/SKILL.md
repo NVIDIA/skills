@@ -2,6 +2,15 @@
 name: cuopt-routing-api-python
 version: "26.08.00"
 description: Vehicle routing (VRP, TSP, PDP) with cuOpt — Python API only. Use when the user is building or solving routing in Python.
+license: Apache-2.0
+metadata:
+  author: NVIDIA cuOpt Team
+  tags:
+    - cuopt
+    - routing
+    - vrp
+    - tsp
+    - python
 ---
 
 
@@ -94,8 +103,8 @@ ss.set_error_logging_mode(True)
 
 ## Examples
 
-- [examples.md](resources/examples.md) — VRP, PDP, multi-depot
-- [server_examples.md](resources/server_examples.md) — REST client (curl, Python)
+- [examples.md](references/examples.md) — VRP, PDP, multi-depot
+- [server_examples.md](references/server_examples.md) — REST client (curl, Python)
 - **Reference models:** This skill's `assets/` — [vrp_basic](assets/vrp_basic/), [pdp_basic](assets/pdp_basic/). See [assets/README.md](assets/README.md).
 
 ## Escalate

@@ -8,7 +8,7 @@ This skill is ready for commercial/non-commercial use. <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who interact with cuOpt for optimization tasks use this skill to receive consistent, safe, and methodical guidance on installation, API usage, problem formulation, and result verification across all cuOpt interfaces. <br>
+Developers and engineers using NVIDIA cuOpt for optimization tasks (routing, LP, MILP, QP) who need structured guidance on clarifying requirements, verifying environments, and following safe interaction patterns when calling cuOpt APIs. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,17 +20,17 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
 - [cuOpt API Reference](https://docs.nvidia.com/cuopt/user-guide/latest/api.html) <br>
-- [cuOpt Examples Repository](https://github.com/NVIDIA/cuopt-examples) <br>
+- [cuopt-examples repo](https://github.com/NVIDIA/cuopt-examples) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Configuration instructions, Code, Shell commands] <br>
+**Output Type(s):** [Guidance, Configuration instructions, Code] <br>
 **Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Skill Version(s): <br>
-26.06.00 (source: frontmatter) <br>
+26.08.00 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
