@@ -128,7 +128,8 @@ Verify a skill against the NVIDIA trust anchor [`nv-agent-root-cert.pem`](nv-age
 pip install model-signing
 model_signing verify certificate SKILL_DIR \
   --signature SKILL_DIR/skill.oms.sig \
-  --certificate-chain nv-agent-root-cert.pem
+  --certificate_chain nv-agent-root-cert.pem \
+  --ignore_unsigned_files
 ```
 
 See [Verify Signed Agent Skills](docs/signing-agent-skills.mdx) for signature layout, the trust pipeline, and policy options.
