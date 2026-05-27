@@ -2,6 +2,14 @@
 name: cuopt-server-common
 version: "26.08.00"
 description: cuOpt REST server — what it does and how requests flow. Domain concepts; no deploy or client code.
+license: Apache-2.0
+metadata:
+  author: NVIDIA cuOpt Team
+  tags:
+    - cuopt
+    - server
+    - rest-api
+    - concepts
 ---
 
 

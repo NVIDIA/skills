@@ -8,7 +8,7 @@ This skill is ready for commercial/non-commercial use. <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers deploying or calling the NVIDIA cuOpt REST API server for GPU-accelerated optimization (routing, LP, MILP) via Python or curl clients. <br>
+Developers and engineers deploying the cuOpt REST server and building client applications that submit optimization requests (routing, LP, MILP) via HTTP endpoints. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -29,7 +29,7 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Skill Version(s): <br>
-26.06.00 (source: frontmatter) <br>
+26.08.00 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

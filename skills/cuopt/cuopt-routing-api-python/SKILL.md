@@ -2,6 +2,15 @@
 name: cuopt-routing-api-python
 version: "26.08.00"
 description: Vehicle routing (VRP, TSP, PDP) with cuOpt — Python API only. Use when the user is building or solving routing in Python.
+license: Apache-2.0
+metadata:
+  author: NVIDIA cuOpt Team
+  tags:
+    - cuopt
+    - routing
+    - vrp
+    - tsp
+    - python
 ---
 
 

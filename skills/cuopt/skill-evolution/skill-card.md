@@ -8,7 +8,7 @@ This skill is ready for commercial/non-commercial use. <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to continuously improve agent skill files by capturing generalizable learnings from problem-solving interactions and proposing structured updates. <br>
+Developers and AI engineers use this skill to capture generalizable learnings from problem-solving interactions and propose structured updates to existing skills, ensuring continuous improvement of the agent skill library. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -18,7 +18,7 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [SKILL.md](skills/skill-evolution/SKILL.md) <br>
+- [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
 
 
 ## Skill Output: <br>
