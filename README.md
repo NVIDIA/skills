@@ -153,45 +153,48 @@ See [Verify Signed Agent Skills](docs/signing-agent-skills.mdx) for signature la
 
 ```
 NVIDIA/skills/
-├── skills/                  # All skills, mirrored daily from product repos
-│   ├── README.md             # Install guidance for people browsing this folder directly
-│   ├── CUDA-Q/               # CUDA-Q skills
-│   ├── cuopt/                # cuOpt skills
-│   ├── Megatron-Bridge/      # Megatron-Bridge skills
-│   ├── Megatron-Core/        # Megatron-Core skills
-│   ├── Model-Optimizer/      # Model-Optimizer skills
-│   ├── NeMo-Evaluator/       # NeMo Evaluator skills
-│   ├── NeMo-Evaluator-Launcher/
-│   ├── NeMo-Gym/             # NeMo Gym skills 
-│   ├── NemoClaw/             # NemoClaw skills 
-│   ├── nemotron-voice-agent/ # Nemotron Voice Agent skills
-│   ├── TensorRT-LLM/         # TensorRT-LLM skills 
-│   └── ...
-├── components.d/            # Product registry — one file per component, teams onboard here
-│   ├── cuda-q.yml
+├── skills/                      # Verified skills, mirrored daily from product repos
+│   ├── README.md                 # Install guidance for people browsing this folder directly
+│   ├── aiq-research/             # AIQ — deep/shallow research workflow
+│   ├── aiq-deploy/               # AIQ — local service deployment
+│   └── cuopt/                    # cuOpt skills (routing, optimization, server, install, …)
+├── components.d/                # Product registry — one file per component, teams onboard here
+│   ├── README.md                 # Schema and onboarding instructions
+│   ├── aiq.yml
 │   ├── cuopt.yml
-│   ├── megatron-bridge.yml
-│   ├── ...
-│   ├── tensorrt-llm.yml
-│   └── README.md             # Schema and onboarding instructions
-├── docs/                    # Long-form documentation (published via Fern)
-│   ├── README.md             # How to build the docs locally
+│   └── …                         # one file per registered product
+├── plugins/                     # Packaged plugin distributions
+│   └── nvidia-skills/            # Curated NVIDIA skills bundle (Claude Code, Codex)
+├── plugins.d/                   # Plugin build registry — config for `build-plugins.py`
+│   ├── README.md
+│   ├── _defaults.yml
+│   └── nvidia-skills.yml
+├── .claude-plugin/              # Claude Code marketplace metadata
+│   └── marketplace.json
+├── .agents/plugins/             # Agent marketplace metadata (other clients)
+│   └── marketplace.json
+├── docs/                        # Long-form documentation (published via Fern)
+│   ├── README.md                 # How to build the docs locally
 │   ├── index.mdx
-│   ├── advanced-install.mdx  # Advanced skills CLI usage
+│   ├── advanced-install.mdx
 │   ├── agent-skill-trust-pipeline.mdx
 │   ├── release-checklist.mdx
 │   ├── scanning-agent-skills.mdx
 │   ├── signing-agent-skills.mdx
 │   └── skill-cards.mdx
-├── fern/                    # Fern docs site configuration
-├── .github/workflows/       # Automated sync pipeline
-├── CONTRIBUTING.md          # Contribution guidelines
-├── SECURITY.md              # Security reporting policy
-├── CODE_OF_CONDUCT.md       # Community code of conduct
-└── LICENSE                  # Apache 2.0
+├── fern/                        # Fern docs site configuration
+├── .github/
+│   ├── workflows/                # Sync pipeline, plugin validation, DCO check
+│   └── scripts/                  # regenerate-readme.sh, build-plugins.py
+├── nv-agent-root-cert.pem       # Trust anchor for OMS signature verification
+├── CHANGELOG.md
+├── CONTRIBUTING.md              # Contribution guidelines
+├── SECURITY.md                  # Security reporting policy
+├── CODE_OF_CONDUCT.md           # Community code of conduct
+└── LICENSE                      # Apache 2.0 / CC BY 4.0
 ```
 
-Skills are maintained in their respective product repos (see the **Source** column in the [Skill Catalog](#skill-catalog)) and automatically synced to this repo daily.
+Skills are maintained in their respective product repos (see the **Source** column in the [Skill Catalog](#skill-catalog)) and automatically synced to this repo daily. Products only appear under `skills/` after the sync pipeline confirms each skill carries `skill.oms.sig`, `skill-card.md`, and `evals.json`.
 
 ---
 
