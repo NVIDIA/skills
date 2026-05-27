@@ -1,5 +1,6 @@
 name: AIQ
 repo: NVIDIA-AI-Blueprints/aiq
+ref: develop
 description: NVIDIA AI-Q Blueprint - deploy local AI-Q services and run shallow or deep research workflows as agent skills.
 skills:
   - path: skills/aiq-research/
