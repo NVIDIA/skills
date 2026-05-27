@@ -17,7 +17,7 @@ jobs:
         github.event.issue.pull_request &&
         startsWith(github.event.comment.body, '/nvskills-ci')) ||
       (github.event_name == 'push' &&
-        github.actor == (vars.NVSKILLS_SIGNATURE_PUSH_ACTOR || 'nv-nvskill-ci[bot]') &&
+        github.actor == (vars.NVSKILLS_SIGNATURE_PUSH_ACTOR || 'nv-skills-ci[bot]') &&
         startsWith(github.event.head_commit.message, vars.NVSKILLS_SIGNATURE_COMMIT_TITLE || 'Attach NVSkills validation signatures'))
     runs-on: ubuntu-latest
     concurrency:
@@ -52,7 +52,7 @@ jobs:
           HEAD_SHA: ${{ github.sha }}
           HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message || '' }}
           SIGNATURE_COMMIT_TITLE: ${{ vars.NVSKILLS_SIGNATURE_COMMIT_TITLE || 'Attach NVSkills validation signatures' }}
-          SIGNATURE_PUSH_ACTOR: ${{ vars.NVSKILLS_SIGNATURE_PUSH_ACTOR || 'nv-nvskill-ci[bot]' }}
+          SIGNATURE_PUSH_ACTOR: ${{ vars.NVSKILLS_SIGNATURE_PUSH_ACTOR || 'nv-skills-ci[bot]' }}
           ACTOR: ${{ github.actor }}
         run: |
           set -euo pipefail
