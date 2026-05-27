@@ -8,7 +8,7 @@ This skill is ready for commercial/non-commercial use. <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and AI engineers use this skill to capture generalizable learnings from problem-solving interactions and propose structured updates to existing skills, ensuring continuous improvement of the agent skill library. <br>
+Developers and engineers using cuOpt skills who want to continuously improve skill quality by capturing generalizable learnings from problem-solving interactions. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,6 +19,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
+- [cuOpt Examples](https://github.com/NVIDIA/cuopt-examples) <br>
 
 
 ## Skill Output: <br>

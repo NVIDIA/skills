@@ -8,7 +8,7 @@ This skill is ready for commercial/non-commercial use. <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to understand vehicle routing problem types (TSP, VRP, PDP), identify required data inputs, and formulate routing problems before choosing an implementation interface. <br>
+Developers and engineers use this skill to identify the correct vehicle routing problem type (TSP, VRP, or PDP) and determine the data requirements before formulating an optimization problem with cuOpt. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -23,7 +23,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Configuration instructions] <br>
+**Output Type(s):** [Analysis] <br>
 **Output Format:** [Markdown] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>

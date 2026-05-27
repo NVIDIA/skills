@@ -8,7 +8,7 @@ This skill is ready for commercial/non-commercial use. <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to parse optimization problem statements, identify problem types (LP, MILP, QP), and produce correct mathematical formulations from natural-language descriptions. <br>
+Developers and engineers use this skill to parse optimization problem statements, classify problem types (LP, MILP, QP), and produce structured mathematical formulations from natural-language descriptions. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,11 +19,12 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
+- [cuOpt API Reference](https://docs.nvidia.com/cuopt/user-guide/latest/api.html) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Code] <br>
-**Output Format:** [Markdown with mathematical formulations] <br>
+**Output Type(s):** [Analysis, Formulation] <br>
+**Output Format:** [Markdown with mathematical notation] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 

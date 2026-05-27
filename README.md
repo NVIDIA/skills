@@ -98,7 +98,7 @@ For non-interactive installs, global installs, agent-specific installs, updates,
 | Product | Description | Skills | Catalog | Source | Version |
 |---------|-------------|:------:|---------|--------|---------|
 | **AIQ** | NVIDIA AI-Q Blueprint - deploy local AI-Q services and run shallow or deep research workflows as agent skills. | 2 | [`skills/aiq-research/`](skills/aiq-research) | [Source](https://github.com/NVIDIA-AI-Blueprints/aiq/tree/develop/skills/aiq-research) | [`66b009e`](https://github.com/NVIDIA-AI-Blueprints/aiq/commit/66b009e3b28219eb2a09910c347d84c0675c2028) · 2026-05-27 |
-| **cuOpt** | GPU-accelerated optimization — vehicle routing, linear programming, quadratic programming, installation, server deployment, and developer tools. | 12 | [`skills/cuopt/`](skills/cuopt) | [Source](https://github.com/NVIDIA/cuopt/tree/main/skills) | [`d415bb6`](https://github.com/NVIDIA/cuopt/commit/d415bb6447a86cd268e824ef64ac05dcbc140ca0) · 2026-05-27 |
+| **cuOpt** | GPU-accelerated optimization — vehicle routing, linear programming, quadratic programming, installation, server deployment, and developer tools. | 10 | [`skills/cuopt/`](skills/cuopt) | [Source](https://github.com/NVIDIA/cuopt/tree/main/skills) | [`bcac42e`](https://github.com/NVIDIA/cuopt/commit/bcac42e14ed296d765c38770628336dbd4e3efd0) · 2026-05-27 |
 <!-- skills-table-end -->
 
 ---

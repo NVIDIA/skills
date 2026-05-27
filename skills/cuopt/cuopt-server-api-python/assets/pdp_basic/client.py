@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-"""
-REST client: Pickup and delivery (PDP). Pairs (0,1) and (2,3); pickup before delivery.
-Requires cuOpt server running. Exits 0 if server unreachable.
-"""
+"""REST client for the cuOpt pickup-and-delivery (PDP) example. See README.md."""
 
 import os
 import sys

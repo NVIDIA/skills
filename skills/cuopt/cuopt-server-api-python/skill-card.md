@@ -8,7 +8,7 @@ This skill is ready for commercial/non-commercial use. <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers deploying the cuOpt REST server and building client applications that submit optimization requests (routing, LP, MILP) via HTTP endpoints. <br>
+Developers and engineers deploying or integrating with the NVIDIA cuOpt REST server for GPU-accelerated optimization (routing, LP, MILP), using Python or curl client examples to submit problems and retrieve solutions. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -24,7 +24,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Skill Output: <br>
 **Output Type(s):** [API Calls, Code, Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline code blocks] <br>
+**Output Format:** [Markdown with inline code blocks (Python and bash)] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
