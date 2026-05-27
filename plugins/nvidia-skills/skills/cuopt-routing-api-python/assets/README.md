@@ -7,4 +7,4 @@ Routing reference implementations (Python). Use as reference when building new a
 | [vrp_basic](vrp_basic/) | VRP | Minimal VRP: 4 locations, 1 vehicle, 3 orders |
 | [pdp_basic](pdp_basic/) | PDP | Pickup-delivery pairs, capacity dimension |
 
-**Run:** From each subdir, `python model.py` (requires cuOpt and cudf). See [resources/examples.md](../resources/examples.md) for more patterns (time windows, multi-depot).
+**Run:** From each subdir, `python model.py` (requires cuOpt and cudf). See [references/examples.md](../references/examples.md) for more patterns (time windows, multi-depot).

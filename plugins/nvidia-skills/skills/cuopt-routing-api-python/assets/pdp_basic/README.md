@@ -4,4 +4,4 @@
 
 **Run:** `python model.py`
 
-**See also:** [resources/examples.md](../../resources/examples.md) for more PDP and VRP patterns.
+**See also:** [references/examples.md](../../references/examples.md) for more PDP and VRP patterns.
