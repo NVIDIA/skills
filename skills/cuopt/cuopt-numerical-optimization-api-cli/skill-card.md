@@ -8,7 +8,7 @@ This skill is ready for commercial/non-commercial use. <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers solving linear programming, mixed-integer linear programming, or quadratic programming problems from MPS files via the cuopt_cli command-line interface. <br>
+Developers and engineers solving linear programming (LP), mixed-integer linear programming (MILP), or quadratic programming (QP) optimization problems via the cuopt_cli command-line tool using MPS-format input files. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -24,7 +24,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Code] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>

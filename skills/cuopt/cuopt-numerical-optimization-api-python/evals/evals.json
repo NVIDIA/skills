@@ -1,0 +1,19 @@
+[
+  {
+    "id": "numopt-py-eval-001-lp-api-call-sequence",
+    "question": "I want to solve a small LP (continuous variables only, maximize a linear objective with linear constraints) using the cuOpt Python API. List the API calls in order — name each method, one line per method, no full runnable script.",
+    "expected_skill": "cuopt-numerical-optimization-api-python",
+    "expected_script": null,
+    "ground_truth": "The agent produces an ordered list of API calls without a runnable script. The list, in order: (1) Import Problem, CONTINUOUS, and MAXIMIZE from cuopt.linear_programming.problem, and SolverSettings from cuopt.linear_programming.solver_settings. (2) Construct Problem('name'). (3) For each decision variable, call problem.addVariable(lb=..., vtype=CONTINUOUS, name=...). (4) For each constraint, call problem.addConstraint(<linear expression> <= or >= or == <rhs>, name=...). (5) Call problem.setObjective(<linear expression>, sense=MAXIMIZE). (6) Construct SolverSettings(); call set_parameter('time_limit', ...) for time budget. (7) Call problem.solve(settings). (8) Check problem.Status.name in ['Optimal', 'PrimalFeasible'] (PascalCase status names — case-sensitive). (9) Read problem.ObjValue for the objective, and each variable's .getValue() for its optimal value. The agent uses LP (not MILP / QP) because all variables are continuous and the objective is linear. Mentions that status names are PascalCase (Optimal, not OPTIMAL or optimal) — case sensitivity matters.",
+    "expected_behavior": [
+      "Selects LP (not MILP or QP) given continuous variables and a linear objective",
+      "Lists the API calls in order without producing a full runnable script",
+      "Names Problem, addVariable (with vtype=CONTINUOUS), addConstraint, setObjective (sense=MAXIMIZE)",
+      "Names SolverSettings, set_parameter('time_limit', ...), and problem.solve(settings)",
+      "Names problem.Status.name and the PascalCase status values (Optimal / PrimalFeasible / FeasibleFound)",
+      "Names problem.ObjValue and variable.getValue() for reading results",
+      "Mentions that status names are case-sensitive (PascalCase)",
+      "Does not invent method names that are not in the skill"
+    ]
+  }
+]

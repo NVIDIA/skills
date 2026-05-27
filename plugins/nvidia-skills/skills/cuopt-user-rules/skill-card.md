@@ -8,7 +8,7 @@ This skill is ready for commercial/non-commercial use. <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers using NVIDIA cuOpt for optimization tasks (routing, LP, MILP, QP) who need structured guidance on clarifying requirements, verifying environments, and following safe interaction patterns when calling cuOpt APIs. <br>
+Developers and engineers who use NVIDIA cuOpt for optimization tasks (routing, LP, MILP, QP) and need guidance on proper interaction patterns, environment verification, and safe usage practices across Python, C, CLI, and server interfaces. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,11 +20,11 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
 - [cuOpt API Reference](https://docs.nvidia.com/cuopt/user-guide/latest/api.html) <br>
-- [cuopt-examples repo](https://github.com/NVIDIA/cuopt-examples) <br>
+- [cuOpt Examples Repository](https://github.com/NVIDIA/cuopt-examples) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Guidance, Configuration instructions, Code] <br>
+**Output Type(s):** [Guidance, Code] <br>
 **Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
