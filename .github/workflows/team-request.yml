@@ -32,12 +32,12 @@ jobs:
           ACTOR: ${{ github.actor }}
         run: |
           set -euo pipefail
-          permission="$(curl -fsSL \
+          role_name="$(curl -fsSL \
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${REPO}/collaborators/${ACTOR}/permission" \
-            | jq -r '.permission')"
-          case "${permission}" in
+            | jq -r '.role_name // ""')"
+          case "${role_name}" in
             admin|maintain) ;;
             *) echo "Requester must have maintain or admin permission"; exit 1 ;;
           esac
