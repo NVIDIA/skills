@@ -1,0 +1,6 @@
+name: Data Designer
+repo: NVIDIA-NeMo/DataDesigner
+description: Build declarative synthetic dataset generation pipelines with NeMo Data Designer.
+skills:
+  - path: skills/data-designer/
+    catalog_dir: data-designer
