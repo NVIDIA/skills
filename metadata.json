@@ -1,18 +1,6 @@
 {
   "skills": [
     {
-      "path": "cuopt/cuopt-numerical-optimization-api-c",
-      "name": "cuopt-numerical-optimization-api-c",
-      "description": "LP, MILP, and QP (beta) with cuOpt — C API only. Use when the user is embedding LP, MILP, or QP in C/C++.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "content.audience": "developer,application_developer",
-        "discovery.activity_tags": "configure,optimize,debug,validate"
-      }
-    },
-    {
       "path": "cuopt/cuopt-numerical-optimization-api-cli",
       "name": "cuopt-numerical-optimization-api-cli",
       "description": "LP, MILP, and QP (beta) with cuOpt — CLI only (MPS files, cuopt_cli). Use when the user is solving LP, MILP, or QP from MPS via command line.",
@@ -37,30 +25,6 @@
       }
     },
     {
-      "path": "cuopt/cuopt-server-api-python",
-      "name": "cuopt-server-api-python",
-      "description": "cuOpt REST server — start server, endpoints, Python/curl client examples. Use when the user is deploying or calling the REST API.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "content.audience": "application_developer,devops_engineer,platform_engineer",
-        "discovery.activity_tags": "deploy,integrate,validate,troubleshoot"
-      }
-    },
-    {
-      "path": "cuopt/cuopt-server-common",
-      "name": "cuopt-server-common",
-      "description": "cuOpt REST server — what it does and how requests flow. Domain concepts; no deploy or client code.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "content.audience": "application_developer,solution_architect,platform_engineer",
-        "discovery.activity_tags": "assess,integrate,select"
-      }
-    },
-    {
       "path": "cuopt/cuopt-user-rules",
       "name": "cuopt-user-rules",
       "description": "Base rules for end users calling NVIDIA cuOpt (routing/LP/MILP/QP/install/server). Not for cuOpt internals — use cuopt-developer for those.",
@@ -73,39 +37,63 @@
       }
     },
     {
-      "path": "cuopt/numerical-optimization-formulation",
-      "name": "numerical-optimization-formulation",
-      "description": "Numerical optimization (LP, MILP, QP) — concepts, problem-text parsing, and formulation patterns. What LP, MILP, and QP are, required formulation questions, modeling elements, common patterns, and how to parse problem statements (parameters, constraints, decisions, objective). Domain concepts; no API or interface.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "content.audience": "developer,application_developer,solution_architect",
-        "discovery.activity_tags": "assess,transform,optimize"
-      }
-    },
-    {
-      "path": "cuopt/routing-formulation",
-      "name": "routing-formulation",
-      "description": "Vehicle routing (VRP, TSP, PDP) — problem types and data requirements. Domain concepts; no API or interface.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "content.audience": "developer,application_developer,solution_architect",
-        "discovery.activity_tags": "assess,select"
-      }
-    },
-    {
-      "path": "cuopt/skill-evolution",
-      "name": "skill-evolution",
-      "description": "After solving a non-trivial problem, detect generalizable learnings and propose skill updates so future interactions benefit automatically. Always active — applies to every interaction.",
+      "path": "cuopt/cuopt-developer",
+      "name": "cuopt-developer",
+      "description": "Modify, build, test, debug, and contribute to NVIDIA cuOpt (C++/CUDA, Python, server, CI). Use for solver internals, PRs, DCO, and code conventions.",
       "metadata": {
         "product.primary": "cuOpt",
         "classification.category.primary": "developer_tools",
         "catalog.subdomain": "decision-optimization",
-        "content.audience": "developer",
-        "discovery.activity_tags": "evaluate,contribute,extend"
+        "content.audience": "developer,hpc_developer",
+        "discovery.activity_tags": "contribute,test,debug,extend"
+      }
+    },
+    {
+      "path": "cuopt/cuopt-install",
+      "name": "cuopt-install",
+      "description": "Install cuOpt for Python, C, or as a server (pip, conda, Docker) — system requirements, install commands, and verification. Use when the user wants to install or verify cuOpt for any user-facing interface. For building cuOpt from source or contributing to cuOpt, see cuopt-developer.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "content.audience": "developer,application_developer,devops_engineer",
+        "discovery.activity_tags": "get_started,configure,validate,deploy"
+      }
+    },
+    {
+      "path": "cuopt/cuopt-numerical-optimization-api-python",
+      "name": "cuopt-numerical-optimization-api-python",
+      "description": "Solve Linear Programming (LP), Mixed-Integer Linear Programming (MILP), and Quadratic Programming (QP, beta) with the Python API. Use when the user asks about optimization with linear or quadratic objectives, linear constraints, integer variables, scheduling, resource allocation, facility location, production planning, portfolio optimization, or least squares.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "content.audience": "developer,application_developer",
+        "discovery.activity_tags": "configure,optimize,debug,validate"
+      }
+    },
+    {
+      "path": "aiq-deploy",
+      "name": "aiq-deploy",
+      "description": "Use when asked to install, deploy, run, validate, troubleshoot, or stop NVIDIA AI-Q Blueprint infrastructure.",
+      "metadata": {
+        "product.primary": "NeMo Agent Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "content.audience": "developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "deploy,configure,validate,troubleshoot,operate"
+      }
+    },
+    {
+      "path": "aiq-research",
+      "name": "aiq-research",
+      "description": "Use when asked to run deep research or AI-Q research through a reachable NVIDIA AI-Q Blueprint backend.",
+      "metadata": {
+        "product.primary": "NeMo Agent Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "content.audience": "developer,ai_engineer",
+        "discovery.activity_tags": "generate,summarize,validate"
       }
     }
   ]
