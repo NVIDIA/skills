@@ -1,13 +1,64 @@
 ---
-name: NeMo-automodel-launcher-config
+name: nemo-automodel-launcher-config
 description: Configure NeMo AutoModel job launches for interactive runs, Slurm clusters, and SkyPilot cloud execution.
 when_to_use: Configuring Slurm or SkyPilot job submission, setting up multi-node launch scripts, debugging job submission failures, or switching between interactive and cluster launch modes.
 license: Apache-2.0
+metadata:
+  author: NVIDIA
+  tags:
+    - nemo-automodel
+    - launcher-config
 ---
 
 # Launcher Configuration
 
 NeMo AutoModel supports three launch methods: interactive (torchrun), Slurm (HPC clusters), and SkyPilot (cloud-agnostic).
+
+## Instructions
+
+For launcher questions, answer directly from this skill without inspecting the
+repository unless the user asks you to edit files. Keep the answer focused on
+the relevant launch YAML, required fields, and the expected runtime behavior.
+
+Use these compact answer patterns for common questions:
+
+- Slurm multi-node: show a `slurm:` YAML block with `job_name`, `nodes`,
+  `ntasks_per_node`, `time`, `account` or `partition`, `container_image`,
+  `hf_home`, optional `extra_mounts`, `env_vars`, and `master_port`; explain
+  that the launcher derives `WORLD_SIZE = nodes * ntasks_per_node` and sets
+  `MASTER_ADDR` and `MASTER_PORT`.
+- SkyPilot spot: show a `skypilot:` YAML block with `cloud`, `accelerators`,
+  `num_nodes`, `use_spot: true`, `disk_size`, `region`, `setup`, and
+  `env_vars`; warn that spot instances can be preempted, set a short
+  `step_scheduler.checkpoint_interval`, and resume with `restore_from.path`.
+- Nsight Systems on Slurm: show `slurm.nsys_enabled: true` alongside normal
+  Slurm fields, say the launcher wraps the training command with
+  `nsys profile`, and state that it produces a `.nsys-rep` report file.
+  Treat profiling as diagnostic-only: use short profiling runs and disable it
+  for normal production training because it adds overhead and large artifacts.
+
+For Slurm answers, start with this minimal template and then adjust only the
+fields the user asked about:
+
+```yaml
+slurm:
+  job_name: llm_finetune
+  nodes: 2
+  ntasks_per_node: 8
+  time: "04:00:00"
+  account: my_account
+  partition: batch
+  container_image: nvcr.io/nvidia/nemo:dev
+  hf_home: ~/.cache/huggingface
+  master_port: 13742
+  env_vars:
+    HF_TOKEN: "${HF_TOKEN}"
+```
+
+For Slurm-only questions, do not discuss SkyPilot or profiling unless the user
+asks. For profiling questions, say the `.nsys-rep` report is written in the
+Slurm job working or output directory, using the launcher's Nsys output setting
+when one is configured.
 
 ## Routing Boundary
 
@@ -111,6 +162,16 @@ When using spot or preemptible instances:
 - Use short checkpoint intervals in the recipe, for example `step_scheduler.checkpoint_interval`, because spot instances can be preempted.
 - Resume from the most recent checkpoint after preemption with the recipe's `restore_from` setting.
 
+Minimal spot-resume recipe keys:
+
+```yaml
+step_scheduler:
+  checkpoint_interval: 100
+
+restore_from:
+  path: /checkpoints/latest
+```
+
 ## Multi-Node Environment
 
 For multi-node training (both Slurm and SkyPilot), the launcher automatically configures:
@@ -125,10 +186,25 @@ Enable Nsight Systems profiling in Slurm jobs:
 
 ```yaml
 slurm:
+  job_name: llm_profile
+  nodes: 1
+  ntasks_per_node: 8
+  time: "00:30:00"
+  account: my_account
+  partition: batch
+  container_image: nvcr.io/nvidia/nemo:dev
   nsys_enabled: true
 ```
 
-This wraps the training command with `nsys profile`, producing a `.nsys-rep` file for performance analysis.
+This is a Slurm launcher setting. Normal Slurm fields such as `job_name`,
+`nodes`, `ntasks_per_node`, `time`, `account` or `partition`, and
+`container_image` still apply.
+
+When `nsys_enabled: true`, the launcher wraps the training command with
+`nsys profile` and writes a `.nsys-rep` report file for performance analysis
+in the Slurm job working or output directory.
+Profiling is diagnostic-only: run it for a short investigation, expect overhead
+and large artifacts, and turn it off for normal production training.
 
 ## Code Anchors
 

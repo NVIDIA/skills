@@ -1,19 +1,83 @@
 ---
-name: NeMo-automodel-model-onboarding
+name: nemo-automodel-model-onboarding
 description: Guide for onboarding new model architectures into NeMo AutoModel, including architecture discovery, implementation patterns, registration, and validation.
 when_to_use: Adding or modifying model architecture support in NeMo AutoModel, such as LLM/VLM/MoE model files, custom layers, state-dict adapters, registry entries, Hugging Face config mapping, or capability flags.
 license: Apache-2.0
+metadata:
+  author: NVIDIA
+  tags:
+    - nemo-automodel
+    - model-onboarding
 ---
 
 # Adding Model Support to NeMo AutoModel
 
+## Purpose
+
 This skill guides implementation of new model architectures in NeMo AutoModel. Follow the five phases in order.
+
+## Instructions
+
+When answering an onboarding question, keep the response in this order:
+
+1. Classify the architecture from `config.json`.
+2. Name the exact implementation files under `components/models/<name>/`.
+3. Identify registry and optional custom-config updates.
+4. State the validation tests that must be added before full checkpoint use.
+
+For conceptual onboarding questions, answer from this skill without opening the
+pattern files unless the user asks you to edit code. Mention pattern filenames
+as references, then give the direct checklist.
+
+Use direct action verbs: classify the model, name the files, map the weights,
+register the class, and add tests. Do not discuss distributed strategy,
+launcher configuration, or general recipe authoring unless the user explicitly
+connects it to onboarding a new architecture.
+
+## Examples
+
+Use these compact answer patterns for common questions:
+
+- Dense causal LM: classify as dense only when `architectures` contains a
+  `ForCausalLM` class and expert fields such as `num_local_experts`,
+  `n_routed_experts`, or `num_experts_per_tok` are absent. Create
+  `components/models/<name>/model.py`, `state_dict_adapter.py`, `__init__.py`,
+  and optional `config.py`, register `MODEL_ARCH_MAPPING` in
+  `_transformers/registry.py`, add example YAML, and add tiny-config unit tests
+  plus layer-equivalence tests for rewritten layers.
+- MoE state dict: identify expert fields in `config.json`, reference
+  `moe-patterns.md`, map router tensors separately, preserve routed-expert
+  index order, map routed experts, shared experts, and gate/up/down projections,
+  add adapter key-map tests and tiny-config numerical equivalence tests, and do
+  not rely only on `from_pretrained()` or silent tensor reshapes.
+- VLM onboarding: classify as VLM only when `vision_config`, `text_config`, and
+  a `ForConditionalGeneration` architecture are present. Reference
+  `vlm-patterns.md` and existing VLM implementations such as `mistral4`,
+  `kimivl`, or `kimi_k25_vl`; check text backbone, vision tower, projector,
+  processor assumptions, text and vision `state_dict_adapter.py` mappings,
+  registry registration, and tiny image-text tests before full checkpoints.
+  Do not treat VLM onboarding as a pure causal-LM path or skip processor/image
+  tests.
+
+For MoE state-dict questions, always include the safety checklist:
+
+- Map router tensors separately from expert tensors.
+- Preserve routed-expert index order; never sort, drop, merge, or silently
+  reshape expert weights to make loading pass.
+- Map gate, up, and down projections explicitly, including combined projection
+  layouts and shared experts when present.
+- Add adapter key-map tests and tiny-config numerical equivalence tests before
+  relying on full checkpoint loading.
+
+For VLM questions, explicitly check `vision_config`, `text_config`, the
+conditional-generation architecture, text backbone, vision tower, projector,
+processor assumptions, registry entry, and tiny image-text tests.
 
 ## Routing Boundary
 
 Use this skill only when the user is adding or modifying model architecture support: model files, custom layers, state-dict adapters, Hugging Face config mapping, registry entries, or model capability flags.
 
-Do not use this skill for standalone training recipe YAML questions about optimizers, datasets, schedulers, validation datasets, or trainer wiring unless they are explicitly part of onboarding a new model architecture. Those recipe questions belong to the NeMo-automodel-recipe-development skill.
+Do not use this skill for standalone training recipe YAML questions about optimizers, datasets, schedulers, validation datasets, or trainer wiring unless they are explicitly part of onboarding a new model architecture. Those recipe questions belong to the nemo-automodel-recipe-development skill.
 
 In-scope examples:
 
@@ -138,6 +202,14 @@ For MoE models, do not stop at generic loading. The adapter must explicitly map:
 
 Add tests that assert expected key mappings and run numerical equivalence with tiny configs before trying full checkpoints.
 
+Do not use these shortcuts:
+
+- Do not validate the adapter only by calling `from_pretrained()`.
+- Do not accept missing or extra expert keys without an explicit mapping reason.
+- Do not change dtype, transpose dimensions, or reshape tensors unless the HF
+  and NeMo layouts require it and a test proves the conversion is reversible.
+- Do not skip router or shared-expert tests because dense-layer tests pass.
+
 ### 2.4 VLM onboarding checklist
 
 For VLMs, confirm the Hugging Face config has `vision_config` and `text_config`
@@ -182,7 +254,7 @@ _CUSTOM_CONFIG_REGISTRATIONS: Dict[str, Tuple[str, str]] = {
 ## Phase 3: Onboarding Example Config
 
 This phase is only for adding a minimal example config that proves the newly
-onboarded architecture can load and run. Use NeMo-automodel-recipe-development for general
+onboarded architecture can load and run. Use nemo-automodel-recipe-development for general
 recipe authoring or existing recipe modifications.
 
 ### 3.1 Create example YAML config
@@ -216,122 +288,18 @@ model = NeMoAutoModelForCausalLM.from_pretrained("<org>/<model-name>")
 
 Before using full-size models, verify with a tiny config (1-2 layers, small hidden dim) to catch shape mismatches early.
 
----
-
 ## Phase 4: Tests
 
-### General testing rules
+Create `tests/unit_tests/models/<name>/` and cover the checks below before
+loading full checkpoints:
 
-- **Match the model's dtype.** Never invent or override the dtype in tests. If the
-  model runs in `bfloat16`, tests must also use `bfloat16`. Check the model's
-  `config.json` (`torch_dtype` field) or its default `model.dtype` and use that
-  everywhere -- model init, input tensors, reference tensors, and tolerance
-  thresholds. Using a different dtype (e.g., `float32` when the model uses
-  `bfloat16`) hides real precision issues and makes parity comparisons meaningless.
-
-- **Layer-rewrite equivalence tests.** Whenever you rewrite or replace a layer
-  (attention, MLP, normalization, RoPE, etc.) with a custom implementation, you
-  **must** add a unit test that checks numerical equivalence against the original
-  HuggingFace layer. Guidelines:
-  - Use a **realistically sized** layer config, not the absolute minimum. For
-    example, `hidden_size=256, num_attention_heads=8, num_key_value_heads=4` is
-    a reasonable choice. Extremely small dimensions (e.g., `hidden_size=8`) can
-    mask numerical divergence because there are too few elements for errors to
-    accumulate.
-  - Seed both the original and rewritten layer with identical weights (copy
-    `state_dict` from one to the other via the adapter if needed).
-  - Feed the same random input through both layers and assert
-    `torch.allclose(out_original, out_rewritten, atol=..., rtol=...)` with
-    tolerances appropriate for the dtype (`atol=1e-2, rtol=1e-2` for `bfloat16`;
-    `atol=1e-5, rtol=1e-5` for `float32`).
-  - Name the test `test_<layer>_equivalence` (e.g., `test_attention_equivalence`,
-    `test_mlp_equivalence`).
-
-### 4.1 Unit tests
-
-Create `tests/unit_tests/models/<name>/` with:
-
-```python
-import pytest
-import torch
-from transformers import AutoConfig  # or custom config
-
-@pytest.fixture
-def tiny_config():
-    return AutoConfig.from_pretrained(...)  # or build manually with small dims
-
-@pytest.fixture
-def model(tiny_config):
-    from nemo_automodel.components.models.<name>.model import <Name>ForCausalLM
-    return <Name>ForCausalLM(tiny_config)
-
-def test_forward_shape(model, tiny_config):
-    batch_size, seq_len = 2, 16
-    input_ids = torch.randint(0, tiny_config.vocab_size, (batch_size, seq_len))
-    output = model(input_ids)
-    # Check output shape matches expectations
-    assert output.logits.shape == (batch_size, seq_len, tiny_config.vocab_size)
-
-def test_state_dict_roundtrip(model):
-    """Verify from_hf -> to_hf round-trip preserves weights."""
-    adapter = model.state_dict_adapter
-    original_sd = model.state_dict()
-    hf_sd = adapter.to_hf(original_sd)
-    restored_sd = adapter.from_hf(hf_sd)
-    for key in original_sd:
-        assert torch.allclose(original_sd[key], restored_sd[key]), f"Mismatch at {key}"
-```
-
-### 4.2 Layer equivalence tests
-
-When a layer has been rewritten, add a test like:
-
-```python
-def test_attention_equivalence(tiny_config):
-    """Verify custom attention matches HF reference output."""
-    dtype = tiny_config.torch_dtype  # e.g. torch.bfloat16
-    torch.manual_seed(42)
-
-    # Instantiate original HF layer and custom NeMo layer
-    from transformers.models.<name>.modeling_<name> import <Name>Attention as HFAttention
-    from nemo_automodel.components.models.<name>.layers import <Name>Attention as NeMoAttention
-
-    hf_attn = HFAttention(tiny_config, layer_idx=0).to(dtype=dtype, device="cuda")
-    nemo_attn = NeMoAttention(tiny_config, layer_idx=0).to(dtype=dtype, device="cuda")
-
-    # Copy weights from HF to NeMo (via state_dict adapter or manual mapping)
-    # ... adapter.from_hf(hf_attn.state_dict()) ...
-
-    hidden = torch.randn(2, 32, tiny_config.hidden_size, dtype=dtype, device="cuda")
-    position_ids = torch.arange(32, device="cuda").unsqueeze(0).expand(2, -1)
-
-    with torch.no_grad():
-        hf_out = hf_attn(hidden, position_ids=position_ids)[0]
-        nemo_out = nemo_attn(hidden, position_ids=position_ids)[0]
-
-    atol, rtol = (1e-2, 1e-2) if dtype == torch.bfloat16 else (1e-5, 1e-5)
-    assert torch.allclose(hf_out, nemo_out, atol=atol, rtol=rtol), (
-        f"Max diff: {(hf_out - nemo_out).abs().max().item()}"
-    )
-```
-
-### 4.3 Functional tests
-
-Create a short training test (few steps) that verifies loss decreases:
-
-```python
-@pytest.mark.skipif(not torch.cuda.is_available(), reason="Requires GPU")
-def test_training_loss_decreases(model, tiny_config):
-    # ... setup optimizer, dummy data ...
-    losses = []
-    for step in range(5):
-        loss = model(input_ids, labels=labels).loss
-        loss.backward()
-        optimizer.step()
-        optimizer.zero_grad()
-        losses.append(loss.item())
-    assert losses[-1] < losses[0], "Loss should decrease during training"
-```
+- Forward-shape smoke test with a tiny config.
+- State-dict adapter round-trip: `from_hf -> to_hf` preserves mapped names,
+  shapes, dtypes, and values.
+- Layer equivalence tests for every rewritten attention, MLP, normalization,
+  RoPE, or MoE layer. Use the model dtype from config, identical seeded weights,
+  identical inputs, and dtype-appropriate `torch.allclose` tolerances.
+- Short functional test that verifies loss decreases over a few training steps.
 
 ---
 

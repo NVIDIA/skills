@@ -1,11 +1,56 @@
 ---
-name: NeMo-automodel-recipe-development
+name: nemo-automodel-recipe-development
 description: Create and modify NeMo AutoModel training and evaluation recipes, including YAML structure, builders, and execution flow.
 when_to_use: Creating or modifying training, SFT, or eval recipes, adding new YAML config fields, debugging recipe construction or trainer issues, or understanding the recipe execution flow.
 license: Apache-2.0
+metadata:
+  author: NVIDIA
+  tags:
+    - nemo-automodel
+    - recipe-development
 ---
 
 # NeMo AutoModel Recipe Development
+
+## Instructions
+
+For recipe questions, answer with the smallest complete path to action:
+
+1. Name the relevant recipe file or YAML section.
+2. List the builder functions or config keys involved.
+3. Include a minimal YAML or command example when the question asks how to
+   configure something.
+4. End with a local validation command or tiny CPU-compatible test.
+
+For conceptual recipe questions, answer from this skill without inspecting the
+repository or loading other AutoModel skills unless the user asks you to edit
+files. Keep the response focused on recipe YAML, builders, CLI routing, tests,
+and local validation.
+
+Use these compact answer patterns for common questions:
+
+- New finetuning recipe variant: start from the closest file under
+  `nemo_automodel/recipes/`, update the model, dataset or dataloader,
+  optimizer, loss, LR scheduler, step scheduler, and checkpoint builders,
+  register a CLI route only if adding a command or domain alias, add example
+  YAML under `examples/`, then add a tiny CPU-compatible unit test and run
+  `automodel finetune llm -c <config.yaml>`.
+- `_target_` fields: describe `_target_` as the fully qualified Python callable,
+  explain that sibling keys become keyword arguments, show optimizer and dataset
+  examples, and mention nested CLI overrides such as `--optimizer.lr`.
+- Validation and checkpointing: name `step_scheduler.val_check_interval`,
+  `step_scheduler.checkpoint_interval`, `validation_dataset`,
+  `restore_from.path`, and consolidated safetensors; include the minimal YAML
+  snippet from this skill.
+
+For validation and checkpointing, always name:
+
+- `step_scheduler.val_check_interval` for validation cadence.
+- `step_scheduler.checkpoint_interval` for save cadence.
+- `validation_dataset` as the validation dataloader source.
+- `restore_from.path` for resume.
+- Consolidated safetensors as the default checkpoint format for HF ecosystem
+  compatibility.
 
 ## Routing Boundary
 
@@ -155,15 +200,22 @@ automodel finetune llm -c config.yaml \
   --distributed.tp_size 2
 ```
 
-## Adding a New Recipe Variant
+## Examples
 
-1. **Find the closest existing recipe** in `nemo_automodel/recipes/` (llm/, vlm/, diffusion/, retrieval/).
-2. **Copy it** and rename for your variant.
-3. **Modify** the model, dataset, and loss sections to match your use case.
-4. **Register the CLI route** if adding a new command or domain alias.
-5. **Add a YAML config** in `examples/` with sensible defaults.
-6. **Write a unit test** with a tiny config (small hidden dims, 1-2 layers, CPU-compatible).
-7. **Test locally**: `automodel finetune llm -c your_new_config.yaml`.
+Validation and checkpointing:
+
+```yaml
+step_scheduler:
+  val_check_interval: 100
+  checkpoint_interval: 500
+
+validation_dataset:
+  _target_: nemo_automodel.datasets.squad.SquadDataset
+  split: validation
+
+restore_from:
+  path: /checkpoints/step-500
+```
 
 ## Domain-Specific Notes
 

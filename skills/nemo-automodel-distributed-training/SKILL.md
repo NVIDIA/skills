@@ -1,15 +1,74 @@
 ---
-name: NeMo-automodel-distributed-training
+name: nemo-automodel-distributed-training
 description: Guide for selecting and configuring distributed training strategies in NeMo AutoModel, including FSDP2, Megatron FSDP, DDP, and parallelism settings.
 when_to_use: Adding or modifying distributed training strategies (FSDP2, HSDP, DDP), debugging multi-GPU or multi-node failures, configuring context or tensor parallelism, or tuning sharding settings.
 license: Apache-2.0
+metadata:
+  author: NVIDIA
+  tags:
+    - nemo-automodel
+    - distributed-training
 ---
 
 # Distributed Training in NeMo AutoModel
 
+## Purpose
+
 NeMo AutoModel uses PyTorch-native distributed training.
 All parallelism is orchestrated through a single `MeshContext` object that
 holds device meshes, strategy configs, and axis names.
+
+## Instructions
+
+For conceptual distributed-training questions, answer directly from the quick
+patterns in this skill without inspecting the repository. Start with the
+strategy choice, then list only the YAML fields and constraints relevant to the
+question.
+
+Use direct action verbs in the final answer: recommend the strategy, show the
+minimal YAML, state the sizing constraint, and name the unsupported strategies.
+Do not discuss model onboarding, recipes, Slurm, SkyPilot, or checkpointing
+unless the user asks.
+
+## Examples
+
+### TP plus PP for a large multi-node model
+
+Recommend `strategy: fsdp2`. Mention `tp_size`, `pp_size`, `cp_size`,
+`ep_size`, and the `pipeline` sub-config. State that `dp_size` is inferred from
+`world_size / (tp_size * pp_size * cp_size)`.
+
+```yaml
+distributed:
+  strategy: fsdp2
+  tp_size: 8
+  pp_size: 4
+  cp_size: 1
+  ep_size: 1
+  pipeline:
+    pp_schedule: interleaved1f1b
+    pp_microbatch_size: 1
+```
+
+### MoE expert parallelism
+
+Recommend `strategy: fsdp2` with `ep_size > 1`. Say this creates a separate
+`moe_mesh`; include the `moe` sub-config when relevant; state that `ep_size`
+must divide `dp_size * cp_size`. Do not recommend `megatron_fsdp` or `ddp`.
+
+```yaml
+distributed:
+  strategy: fsdp2
+  ep_size: 8
+  moe:
+    reshard_after_forward: false
+```
+
+### MegatronFSDP limitations
+
+Say no for pipeline parallelism, expert parallelism, and `sequence_parallel`.
+Recommend `fsdp2` for PP, EP, or `sequence_parallel`; mention that DDP is only
+simple data parallelism.
 
 ## Strategy Selection
 
@@ -382,128 +441,14 @@ scaling dimension:
 - Use PP or DP for cross-node scaling.
 - TP across InfiniBand degrades throughput severely.
 
-## Programmatic API (from_pretrained / from_config)
-
-When not using YAML recipes, configure distributed training via Python:
-
-```python
-from nemo_automodel.components.distributed.config import FSDP2Config
-from nemo_automodel.components.distributed.device_mesh import create_device_mesh
-from nemo_automodel.components.distributed.mesh import MeshContext
-from nemo_automodel._transformers.infrastructure import instantiate_infrastructure
-
-# 1. Create strategy config
-config = FSDP2Config(sequence_parallel=True, activation_checkpointing=True)
-
-# 2. Create device mesh
-device_mesh, moe_mesh = create_device_mesh(
-    config, tp_size=2, pp_size=1, cp_size=1, ep_size=1, world_size=8,
-)
-
-# 3. Build MeshContext
-mesh = MeshContext.from_meshes(
-    device_mesh, moe_mesh, strategy_config=config, activation_checkpointing=True,
-)
-
-# 4. Instantiate infrastructure
-model_wrapper, autopipeline, parallelize_fn, qat_quantizer = instantiate_infrastructure(
-    distributed_config=config, mesh=mesh,
-)
-```
-
-Or pass directly to `from_pretrained`:
-
-```python
-model = NeMoAutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-3.2-1B",
-    distributed_config=FSDP2Config(activation_checkpointing=True),
-    tp_size=2,
-)
-```
-
 ## Code Anchors
 
-Strategy config dataclasses:
-
-```
-components/distributed/config.py
-    FSDP2Config       -- sequence_parallel, tp_plan, mp_policy, offload_policy,
-                         activation_checkpointing, defer_fsdp_grad_sync
-    MegatronFSDPConfig -- zero_dp_strategy, overlap_grad_reduce, overlap_param_gather, etc.
-    DDPConfig          -- activation_checkpointing only
-```
-
-MeshContext (single source of truth for parallelism):
-
-```
-components/distributed/mesh.py
-    MeshContext  -- strategy_config, device_mesh, moe_mesh, pipeline_config, moe_config
-                    Properties: tp_size, pp_size, cp_size, ep_size, dp_size, dp_replicate_size
-    STRATEGY_MAP -- {"fsdp2": FSDP2Config, "megatron_fsdp": MegatronFSDPConfig, "ddp": DDPConfig}
-    MeshAxisName -- PP, DP, DP_REPLICATE, DP_SHARD, DP_SHARD_CP, DP_CP, CP, TP, EP, EP_SHARD
-```
-
-Device mesh creation:
-
-```
-components/distributed/device_mesh.py
-    create_device_mesh()          -- routes to FSDP2/MegatronFSDP/DDP mesh creation
-    _create_fsdp2_device_mesh()   -- shape (pp, dp_replicate, dp_shard, cp, tp) + flattened submeshes
-    _create_moe_mesh()            -- shape (pp, ep_shard, ep)
-```
-
-Distributed managers:
-
-```
-components/distributed/fsdp2.py          -- FSDP2Manager.parallelize()
-components/distributed/megatron_fsdp.py  -- MegatronFSDPManager.parallelize()
-components/distributed/ddp.py            -- DDPManager
-```
-
-Pipeline parallelism:
-
-```
-components/distributed/pipelining/config.py        -- PipelineConfig dataclass
-components/distributed/pipelining/autopipeline.py  -- AutoPipeline orchestrator
-components/distributed/pipelining/functional.py    -- pipeline_model(), schedule creation
-components/distributed/pipelining/hf_utils.py      -- HF model validation for PP
-```
-
-Context parallelism:
-
-```
-components/distributed/cp_utils.py
-    make_cp_batch_and_ctx()            -- creates CP context manager + shards batch
-    create_context_parallel_ctx()      -- wraps torch.distributed.tensor.experimental.context_parallel
-    attach_context_parallel_hooks()    -- strips attention_mask, sets is_causal=True
-    make_cp_batch_for_te()             -- TE-specific CP batch sharding (THD format)
-```
-
-Infrastructure orchestration:
-
-```
-_transformers/infrastructure.py
-    instantiate_infrastructure()    -- config objects -> runtime objects
-    apply_model_infrastructure()    -- applies sharding, PEFT, checkpoints to model
-    _shard_pp()                     -- pipeline parallel path
-    _shard_ep_fsdp()                -- EP + FSDP path (non-PP)
-```
-
-YAML parsing:
-
-```
-recipes/_dist_setup.py
-    parse_distributed_section()  -- YAML dict -> typed configs + sizes
-    setup_distributed()          -- full entry-point: parse + create meshes + MeshContext
-```
-
-MoE config:
-
-```
-components/moe/config.py
-    MoEParallelizerConfig  -- reshard_after_forward, ignore_router_for_ac, wrap_outer_model, etc.
-    MoEConfig              -- n_routed_experts, n_activated_experts, score_func, etc.
-```
+- `components/distributed/config.py`: FSDP2Config, MegatronFSDPConfig, DDPConfig.
+- `components/distributed/mesh.py`: MeshContext, strategy map, and mesh sizes.
+- `components/distributed/device_mesh.py`: device mesh and `moe_mesh` creation.
+- `components/distributed/pipelining/config.py`: PipelineConfig fields.
+- `components/moe/config.py`: MoEParallelizerConfig and MoEConfig.
+- `recipes/_dist_setup.py`: YAML parsing and distributed setup.
 
 ## Pitfalls
 
@@ -548,41 +493,6 @@ components/moe/config.py
 
 ## Verification
 
-### Basic FSDP2 (2 GPUs)
-
-```bash
-CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc-per-node=2 \
-  recipes/llm_finetune/finetune.py \
-  --config examples/llm_finetune/llama3_2/llama3_2_1b_squad.yaml
-```
-
-### Pipeline parallelism (4 GPUs, PP=2)
-
-```bash
-CUDA_VISIBLE_DEVICES=0,1,2,3 torchrun --nproc-per-node=4 \
-  recipes/llm_finetune/finetune.py \
-  --config examples/llm_finetune/llama3_1/llama3_1_8b_hellaswag_pp.yaml
-```
-
-### MegatronFSDP (2 GPUs)
-
-```bash
-CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc-per-node=2 \
-  recipes/llm_finetune/finetune.py \
-  --config examples/llm_finetune/llama3_2/llama3_2_1b_squad_megatron_fsdp.yaml
-```
-
-### MoE with EP (8 GPUs)
-
-```bash
-torchrun --nproc-per-node=8 \
-  recipes/llm_finetune/finetune.py \
-  --config examples/llm_finetune/qwen/qwen3_moe_30b_te_deepep.yaml
-```
-
-Success criteria:
-
-- Exit code 0
-- Finite loss values in logs (not NaN or Inf)
-- No NCCL timeout errors
-- Correct parallelism layout printed in logs (TP/PP/DP/EP sizes match config)
+Run the smallest recipe that exercises the requested strategy. Success means
+exit code 0, finite loss, no NCCL timeout, and log output matching the expected
+TP/PP/CP/EP sizes.

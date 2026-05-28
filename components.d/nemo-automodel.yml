@@ -2,11 +2,11 @@ name: NeMo AutoModel
 repo: NVIDIA-NeMo/Automodel
 description: NeMo AutoModel - PyTorch-native distributed training for LLMs/VLMs with Hugging Face support, recipes, launchers, and validation workflows.
 skills:
-  - path: skills/NeMo-automodel-distributed-training/
-    catalog_dir: NeMo-automodel-distributed-training
-  - path: skills/NeMo-automodel-launcher-config/
-    catalog_dir: NeMo-automodel-launcher-config
-  - path: skills/NeMo-automodel-model-onboarding/
-    catalog_dir: NeMo-automodel-model-onboarding
-  - path: skills/NeMo-automodel-recipe-development/
-    catalog_dir: NeMo-automodel-recipe-development
+  - path: skills/nemo-automodel-distributed-training/
+    catalog_dir: nemo-automodel-distributed-training
+  - path: skills/nemo-automodel-launcher-config/
+    catalog_dir: nemo-automodel-launcher-config
+  - path: skills/nemo-automodel-model-onboarding/
+    catalog_dir: nemo-automodel-model-onboarding
+  - path: skills/nemo-automodel-recipe-development/
+    catalog_dir: nemo-automodel-recipe-development
