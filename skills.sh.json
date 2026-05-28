@@ -1,0 +1,59 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Training AI",
+      "description": "Build, validate, tune, and maintain large-scale model training workflows, including distributed training, model support, training validation, performance tuning, and training-stack CI.",
+      "skills": [
+        "nemo-automodel-distributed-training",
+        "nemo-automodel-launcher-config",
+        "nemo-automodel-model-onboarding",
+        "nemo-automodel-recipe-development"
+      ]
+    },
+    {
+      "title": "Agentic AI",
+      "description": "Build and operate agentic systems, including RAG workflows, evaluation harnesses, tool use, policy, sandboxing, agent configuration, and agent workflow automation.",
+      "skills": [
+        "aiq-deploy",
+        "aiq-research",
+        "nemoclaw-user-agent-skills",
+        "nemoclaw-user-configure-inference",
+        "nemoclaw-user-configure-security",
+        "nemoclaw-user-deploy-remote",
+        "nemoclaw-user-get-started",
+        "nemoclaw-user-manage-policy",
+        "nemoclaw-user-manage-sandboxes",
+        "nemoclaw-user-monitor-sandbox",
+        "nemoclaw-user-overview",
+        "nemoclaw-user-reference",
+        "skill-card-generator"
+      ]
+    },
+    {
+      "title": "Decision Optimization",
+      "description": "Formulate and solve routing, scheduling, and numerical optimization problems using optimization solvers, APIs, services, and deployment workflows.",
+      "skills": [
+        "cuopt-numerical-optimization-api-cli",
+        "cuopt-routing-api-python",
+        "cuopt-user-rules",
+        "cuopt-developer",
+        "cuopt-install",
+        "cuopt-numerical-optimization-api-python",
+        "cuopt-server-api-python",
+        "numerical-optimization-formulation",
+        "routing-formulation",
+        "skill-evolution"
+      ]
+    },
+    {
+      "title": "Vision AI",
+      "description": "Build vision and video AI workflows for analytics, search, summarization, alerts, real-time understanding, and model integration.",
+      "skills": [
+        "deepstream-dev",
+        "deepstream-import-vision-model"
+      ]
+    }
+  ]
+}

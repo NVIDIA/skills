@@ -1,99 +1,351 @@
 {
   "skills": [
     {
-      "path": "cuopt/cuopt-numerical-optimization-api-cli",
+      "path": "skills/cuopt/cuopt-numerical-optimization-api-cli",
       "name": "cuopt-numerical-optimization-api-cli",
-      "description": "LP, MILP, and QP (beta) with cuOpt — CLI only (MPS files, cuopt_cli). Use when the user is solving LP, MILP, or QP from MPS via command line.",
+      "description": "LP, MILP, and QP (beta) with cuOpt \u2014 CLI only (MPS files, cuopt_cli). Use when the user is solving LP, MILP, or QP from MPS via command line.",
       "metadata": {
         "product.primary": "cuOpt",
         "classification.category.primary": "accelerated_computing",
         "catalog.subdomain": "decision-optimization",
-        "content.audience": "developer,application_developer",
+        "audience": "developer,application_developer",
         "discovery.activity_tags": "configure,optimize,troubleshoot,validate"
       }
     },
     {
-      "path": "cuopt/cuopt-routing-api-python",
+      "path": "skills/cuopt/cuopt-routing-api-python",
       "name": "cuopt-routing-api-python",
-      "description": "Vehicle routing (VRP, TSP, PDP) with cuOpt — Python API only. Use when the user is building or solving routing in Python.",
+      "description": "Vehicle routing (VRP, TSP, PDP) with cuOpt \u2014 Python API only. Use when the user is building or solving routing in Python.",
       "metadata": {
         "product.primary": "cuOpt",
         "classification.category.primary": "accelerated_computing",
         "catalog.subdomain": "decision-optimization",
-        "content.audience": "developer,application_developer",
+        "audience": "developer,application_developer",
         "discovery.activity_tags": "configure,optimize,validate,debug"
       }
     },
     {
-      "path": "cuopt/cuopt-user-rules",
+      "path": "skills/cuopt/cuopt-user-rules",
       "name": "cuopt-user-rules",
-      "description": "Base rules for end users calling NVIDIA cuOpt (routing/LP/MILP/QP/install/server). Not for cuOpt internals — use cuopt-developer for those.",
+      "description": "Base rules for end users calling NVIDIA cuOpt (routing/LP/MILP/QP/install/server). Not for cuOpt internals \u2014 use cuopt-developer for those.",
       "metadata": {
         "product.primary": "cuOpt",
         "classification.category.primary": "accelerated_computing",
         "catalog.subdomain": "decision-optimization",
-        "content.audience": "developer,application_developer",
+        "audience": "developer,application_developer",
         "discovery.activity_tags": "configure,validate,troubleshoot,deploy"
       }
     },
     {
-      "path": "cuopt/cuopt-developer",
+      "path": "skills/cuopt/cuopt-developer",
       "name": "cuopt-developer",
       "description": "Modify, build, test, debug, and contribute to NVIDIA cuOpt (C++/CUDA, Python, server, CI). Use for solver internals, PRs, DCO, and code conventions.",
       "metadata": {
         "product.primary": "cuOpt",
         "classification.category.primary": "developer_tools",
         "catalog.subdomain": "decision-optimization",
-        "content.audience": "developer,hpc_developer",
+        "audience": "developer,hpc_developer",
         "discovery.activity_tags": "contribute,test,debug,extend"
       }
     },
     {
-      "path": "cuopt/cuopt-install",
+      "path": "skills/cuopt/cuopt-install",
       "name": "cuopt-install",
-      "description": "Install cuOpt for Python, C, or as a server (pip, conda, Docker) — system requirements, install commands, and verification. Use when the user wants to install or verify cuOpt for any user-facing interface. For building cuOpt from source or contributing to cuOpt, see cuopt-developer.",
+      "description": "Install cuOpt for Python, C, or as a server (pip, conda, Docker) \u2014 system requirements, install commands, and verification. Use when the user wants to install or verify cuOpt for any user-facing interface. For building cuOpt from source or contributing to cuOpt, see cuopt-developer.",
       "metadata": {
         "product.primary": "cuOpt",
         "classification.category.primary": "accelerated_computing",
         "catalog.subdomain": "decision-optimization",
-        "content.audience": "developer,application_developer,devops_engineer",
+        "audience": "developer,application_developer,devops_engineer",
         "discovery.activity_tags": "get_started,configure,validate,deploy"
       }
     },
     {
-      "path": "cuopt/cuopt-numerical-optimization-api-python",
+      "path": "skills/cuopt/cuopt-numerical-optimization-api-python",
       "name": "cuopt-numerical-optimization-api-python",
       "description": "Solve Linear Programming (LP), Mixed-Integer Linear Programming (MILP), and Quadratic Programming (QP, beta) with the Python API. Use when the user asks about optimization with linear or quadratic objectives, linear constraints, integer variables, scheduling, resource allocation, facility location, production planning, portfolio optimization, or least squares.",
       "metadata": {
         "product.primary": "cuOpt",
         "classification.category.primary": "accelerated_computing",
         "catalog.subdomain": "decision-optimization",
-        "content.audience": "developer,application_developer",
+        "audience": "developer,application_developer",
         "discovery.activity_tags": "configure,optimize,debug,validate"
       }
     },
     {
-      "path": "aiq-deploy",
+      "path": "skills/cuopt/cuopt-server-api-python",
+      "name": "cuopt-server-api-python",
+      "description": "cuOpt REST server \u2014 start server, endpoints, Python/curl client examples. Use when the user is deploying or calling the REST API.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer,application_developer,devops_engineer",
+        "discovery.activity_tags": "deploy,configure,integrate,validate,debug"
+      }
+    },
+    {
+      "path": "skills/cuopt/numerical-optimization-formulation",
+      "name": "numerical-optimization-formulation",
+      "description": "Numerical optimization (LP, MILP, QP) \u2014 concepts, problem-text parsing, and formulation patterns. What LP, MILP, and QP are, required formulation questions, modeling elements, common patterns, and how to parse problem statements (parameters, constraints, decisions, objective). Domain concepts; no API or interface.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer,application_developer,data_scientist",
+        "discovery.activity_tags": "assess,select,optimize,validate"
+      }
+    },
+    {
+      "path": "skills/cuopt/routing-formulation",
+      "name": "routing-formulation",
+      "description": "Vehicle routing (VRP, TSP, PDP) \u2014 problem types and data requirements. Domain concepts; no API or interface.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer,application_developer,data_scientist",
+        "discovery.activity_tags": "assess,select,optimize,validate"
+      }
+    },
+    {
+      "path": "skills/cuopt/skill-evolution",
+      "name": "skill-evolution",
+      "description": "After solving a non-trivial problem, detect generalizable learnings and propose skill updates so future interactions benefit automatically. Always active \u2014 applies to every interaction.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer",
+        "discovery.activity_tags": "evaluate,extend,contribute"
+      }
+    },
+    {
+      "path": "skills/aiq-deploy",
       "name": "aiq-deploy",
-      "description": "Use when asked to install, deploy, run, validate, troubleshoot, or stop NVIDIA AI-Q Blueprint infrastructure.",
+      "description": "Use when asked to install, deploy, run, validate, troubleshoot, or stop NVIDIA AI-Q Blueprint infrastructure.\n",
       "metadata": {
         "product.primary": "NeMo Agent Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
-        "content.audience": "developer,devops_engineer,platform_engineer",
+        "audience": "developer,devops_engineer,platform_engineer",
         "discovery.activity_tags": "deploy,configure,validate,troubleshoot,operate"
       }
     },
     {
-      "path": "aiq-research",
+      "path": "skills/aiq-research",
       "name": "aiq-research",
-      "description": "Use when asked to run deep research or AI-Q research through a reachable NVIDIA AI-Q Blueprint backend.",
+      "description": "Use when asked to run deep research or AI-Q research through a reachable NVIDIA AI-Q Blueprint backend.\n",
       "metadata": {
         "product.primary": "NeMo Agent Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
-        "content.audience": "developer,ai_engineer",
+        "audience": "developer,ai_engineer",
         "discovery.activity_tags": "generate,summarize,validate"
+      }
+    },
+    {
+      "path": "skills/deepstream-dev",
+      "name": "deepstream-dev",
+      "description": "NVIDIA DeepStream SDK 9.0 development with Python pyservicemaker API. Use when building video analytics pipelines, GStreamer-based video processing, TensorRT inference integration, object detection/tracking, or Kafka/message broker integration.",
+      "metadata": {
+        "product.primary": "DeepStream SDK",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,application_developer,ai_engineer",
+        "discovery.activity_tags": "configure,integrate,debug,troubleshoot,deploy"
+      }
+    },
+    {
+      "path": "skills/deepstream-import-vision-model",
+      "name": "deepstream-import-vision-model",
+      "description": "Use this skill to bring any vision model from HuggingFace or NVIDIA NGC into an NVIDIA DeepStream pipeline with end-to-end automation: ONNX download, SafeTensors export, TRT engine build, custom nvinfer bbox parser, multi-stream benchmark, and PDF report. Object detection models only.\n",
+      "metadata": {
+        "product.primary": "DeepStream SDK",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,application_developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "integrate,convert,benchmark,validate,deploy"
+      }
+    },
+    {
+      "path": "skills/nemo-automodel-distributed-training",
+      "name": "nemo-automodel-distributed-training",
+      "description": "Guide for selecting and configuring distributed training strategies in NeMo AutoModel, including FSDP2, Megatron FSDP, DDP, and parallelism settings.",
+      "metadata": {
+        "product.primary": "NeMo Framework",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "train,configure,scale,optimize,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-automodel-launcher-config",
+      "name": "nemo-automodel-launcher-config",
+      "description": "Configure NeMo AutoModel job launches for interactive runs, Slurm clusters, and SkyPilot cloud execution.",
+      "metadata": {
+        "product.primary": "NeMo Framework",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,devops_engineer",
+        "discovery.activity_tags": "configure,deploy,orchestrate,scale,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-automodel-model-onboarding",
+      "name": "nemo-automodel-model-onboarding",
+      "description": "Guide for onboarding new model architectures into NeMo AutoModel, including architecture discovery, implementation patterns, registration, and validation.",
+      "metadata": {
+        "product.primary": "NeMo Framework",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "extend,integrate,test,validate,debug"
+      }
+    },
+    {
+      "path": "skills/nemo-automodel-recipe-development",
+      "name": "nemo-automodel-recipe-development",
+      "description": "Create and modify NeMo AutoModel training and evaluation recipes, including YAML structure, builders, and execution flow.",
+      "metadata": {
+        "product.primary": "NeMo Framework",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "configure,train,evaluate,extend,validate"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-agent-skills",
+      "name": "nemoclaw-user-agent-skills",
+      "description": "Describes the agent skills shipped with NemoClaw and how to access them by cloning the repository. Use when users ask about AI agent support, coding assistant integration, or the .agents/skills/ directory. Trigger keywords - nemoclaw agent skills, ai coding assistant, cursor, claude code, copilot.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,ai_engineer",
+        "discovery.activity_tags": "get_started,integrate,select,configure"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-configure-inference",
+      "name": "nemoclaw-user-configure-inference",
+      "description": "Connects NemoClaw to a local inference server. Use when setting up Ollama, vLLM, TensorRT-LLM, NIM, or any OpenAI-compatible local model server with NemoClaw. Trigger keywords - nemoclaw local inference, ollama nemoclaw, vllm nemoclaw, local model server, openai compatible endpoint, switch nemoclaw inference model, change inference runtime, nemoclaw additional model, nemoclaw sub-agent model, openclaw sub-agent, agents.list, sessions_spawn, vlm-demo, nemoclaw tool calling, ollama tool calls, vllm tool-call-parser, raw json in tui, nemoclaw inference options, nemoclaw onboarding providers, nemoclaw inference routing.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,ai_engineer,platform_engineer",
+        "discovery.activity_tags": "configure,inference,integrate,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-configure-security",
+      "name": "nemoclaw-user-configure-security",
+      "description": "Presents a risk framework for every configurable security control in NemoClaw. Use when evaluating security posture, reviewing sandbox security defaults, or assessing control trade-offs. Trigger keywords - nemoclaw security best practices, sandbox security controls risk framework, nemoclaw credential storage, openshell provider, api key security, openclaw security controls, nemoclaw security boundary, prompt injection, tool access control.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,platform_engineer,security_engineer,devops_engineer",
+        "discovery.activity_tags": "assess,configure,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-deploy-remote",
+      "name": "nemoclaw-user-deploy-remote",
+      "description": "Explains how to run NemoClaw on a remote GPU instance, including the deprecated Brev compatibility path and the preferred installer plus onboard flow. Use when deploying NemoClaw to a remote VM, onboarding a Brev instance, or migrating away from the legacy `nemoclaw deploy` wrapper. Trigger keywords - deploy nemoclaw remote gpu, nemoclaw brev cloud deployment, nemoclaw plugins, openclaw plugins, install openclaw plugin, nemoclaw onboard from dockerfile, nemoclaw brev web ui, nemoclaw getting started, brev quickstart, nvidia nemotron agent, nemoclaw sandbox hardening, container security, docker capabilities, process limits.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "deploy,configure,validate,troubleshoot,operate"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-get-started",
+      "name": "nemoclaw-user-get-started",
+      "description": "Installs NemoClaw, launches a sandbox, and runs the first agent prompt. Use when onboarding, installing, or launching a NemoClaw sandbox for the first time. Trigger keywords - nemoclaw quickstart, install nemoclaw openclaw sandbox, nemohermes quickstart, hermes agent nemoclaw, run hermes openshell sandbox, nemoclaw prerequisites, nemoclaw supported platforms, nemoclaw hardware software, nemoclaw windows wsl2 setup, nemoclaw install windows docker desktop.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,ai_engineer",
+        "discovery.activity_tags": "get_started,deploy,configure,validate"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-manage-policy",
+      "name": "nemoclaw-user-manage-policy",
+      "description": "Adds, removes, or modifies allowed endpoints in the sandbox policy. Use when customizing network policy, changing egress rules, or configuring sandbox endpoint access. Trigger keywords - customize nemoclaw network policy, sandbox egress policy configuration, nemoclaw integration policy examples, post-install policy setup, openshell approval workflow, policy preset, nemoclaw approve network requests, sandbox egress approval tui.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,platform_engineer,security_engineer,devops_engineer",
+        "discovery.activity_tags": "configure,operate,troubleshoot,validate"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-manage-sandboxes",
+      "name": "nemoclaw-user-manage-sandboxes",
+      "description": "Explains operational tasks after the quickstart: listing sandboxes, status and health checks, logs, diagnostics, port forwards, multiple sandboxes, credential reset, rebuilds, network presets, upgrades, and uninstall. Trigger keywords - manage nemoclaw sandboxes, nemoclaw status, nemoclaw list, nemoclaw dashboard port, nemoclaw rebuild, nemoclaw upgrade sandboxes, nemoclaw uninstall, sandbox mutability, sandbox runtime configuration, sandbox rebuild, nemoclaw backup, nemoclaw restore, workspace backup, openshell sandbox download upload, nemoclaw messaging channels, nemoclaw telegram, nemoclaw discord, nemoclaw slack, nemoclaw wechat, nemoclaw whatsapp, openshell channel messaging, nemoclaw workspace files, soul.md, user.md, identity.md, agents.md, sandbox persistence.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "operate,monitor,troubleshoot,configure,recover"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-monitor-sandbox",
+      "name": "nemoclaw-user-monitor-sandbox",
+      "description": "Inspects sandbox health, traces agent behavior, and diagnoses problems. Use when monitoring a running sandbox, debugging agent issues, or checking sandbox logs. Trigger keywords - monitor nemoclaw sandbox, debug nemoclaw agent issues.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "monitor,debug,troubleshoot,inspect"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-overview",
+      "name": "nemoclaw-user-overview",
+      "description": "Explains how OpenClaw, OpenShell, and NemoClaw form the ecosystem, NemoClaw's position in the stack, what NemoClaw adds beyond the community sandbox, and when to prefer NemoClaw versus integrating OpenShell and OpenClaw directly. Use when users ask about the relationship between OpenClaw, OpenShell, and NemoClaw, or when to use NemoClaw versus OpenShell. Trigger keywords - nemoclaw ecosystem, openclaw openshell, nemoclaw vs openshell, sandboxed openclaw, how nemoclaw works, nemoclaw sandbox lifecycle blueprint, nemoclaw overview, openclaw always-on assistants, nvidia openshell, nvidia nemotron, nemoclaw release notes, nemoclaw changelog.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,solutions_architect",
+        "discovery.activity_tags": "assess,select,get_started,summarize"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-reference",
+      "name": "nemoclaw-user-reference",
+      "description": "Describes the NemoClaw plugin and blueprint architecture and how they orchestrate the OpenClaw sandbox. Use when looking up architecture, plugin structure, or blueprint design. Trigger keywords - nemoclaw architecture, nemoclaw plugin blueprint structure, nemoclaw vs openshell, which cli, nemoclaw cli, openshell cli, sandbox commands, nemoclaw cli commands, nemoclaw command reference, nemoclaw network policy, sandbox egress control operator approval, nemoclaw troubleshooting, nemoclaw debug sandbox issues.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,platform_engineer,solutions_architect",
+        "discovery.activity_tags": "assess,select,configure,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/skill-card-generator",
+      "name": "skill-card-generator",
+      "description": "Use only to generate or update a governance skill card for a specified existing agent skill directory. Do not use for explaining, listing, comparing, or discussing skill capabilities.",
+      "metadata": {
+        "product.primary": "Trustworthy AI",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,platform_engineer,solutions_architect",
+        "discovery.activity_tags": "generate,validate,inspect,assess"
       }
     }
   ]
