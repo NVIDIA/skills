@@ -1,0 +1,6 @@
+name: Medical AI Skills
+repo: NVIDIA-Medtech/medical-AI-skills
+description: 
+skills:
+  - path: skills/verified
+    catalog_dir: medical-AI
