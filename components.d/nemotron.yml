@@ -1,6 +1,6 @@
 name: Nemotron
 repo: NVIDIA-NeMo/Nemotron
-description: Build sovereign model customization pipelines for diverse models using NVIDIA-authored agent skills.
+description: NVIDIA-authored agent skills for model development, customization, evaluation, and deployment workflows.
 skills:
   - path: skills/nemotron-customize/
-    catalog_dir: nemotron
+    catalog_dir: nemotron-customize
