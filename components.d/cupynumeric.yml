@@ -1,0 +1,6 @@
+name: cuPyNumeric
+repo: nv-legate/cupynumeric
+description: NumPy and SciPy on Multi-Node Multi-GPU systems
+skills:
+  - path: skills/
+    catalog_dir: cupynumeric
