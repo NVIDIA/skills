@@ -2,7 +2,7 @@
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: Dynamo
 repo: ai-dynamo/dynamo
-description: Distributed LLM inference framework — pre-deployment sizing, model optimization, local serving, Kubernetes deployment, request-path configuration (Frontend + DynamoModel + gateway), day-2 troubleshooting, and benchmarking.
+description: NVIDIA Dynamo deployment bring-up on Kubernetes — pick and deploy recipes, start router modes, validate disagg NIXL/UCX/NCCL interconnect, and triage day-2 failures.
 skills:
-  - path: .agents/skills/
+  - path: skills/
     catalog_dir: Dynamo
