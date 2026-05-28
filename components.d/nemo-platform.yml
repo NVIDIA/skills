@@ -1,0 +1,11 @@
+name: NeMo Platform
+repo: NVIDIA-NeMo/nemo-platform
+description: NeMo Platform brings NVIDIA NeMo libraries together under one CLI, Python SDK, and web UI
+skills:
+  - path: plugins/nemo-evaluator/src/nemo_evaluator/skills/nemo-evaluator/
+    catalog_dir: nemo-evaluator-plugin
+  - path: plugins/nemo-data-designer/src/nemo_data_designer_plugin/skills/data-designer/
+    catalog_dir: nemo-data-designer-plugin
+  - path: skills/nemo-setup/
+    catalog_dir: nemo-setup
+
