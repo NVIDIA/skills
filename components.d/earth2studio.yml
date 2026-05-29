@@ -1,8 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: Earth2Studio
 repo: NVIDIA/earth2studio
 description: Open-source deep-learning framework for exploring, building and deploying AI weather/climate workflows.
 skills:
-  - path: skills/
-    catalog_dir: Earth2Studio
+  - path: skills/earth2studio-data-fetch/
+    catalog_dir: earth2studio-data-fetch
+  - path: skills/earth2studio-deterministic-forecast/
+    catalog_dir: earth2studio-deterministic-forecast
+  - path: skills/earth2studio-discover/
+    catalog_dir: earth2studio-discover
+  - path: skills/earth2studio-install/
+    catalog_dir: earth2studio-install
 links:
   security: false
