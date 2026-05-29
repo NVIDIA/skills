@@ -115,9 +115,7 @@
         "nemo-mbridge-perf-tp-dp-comm-overlap",
         "nemo-mbridge-resiliency",
         "dali-dynamic-mode",
-        "nemotron-customize",
-        "docs",
-        "launch-nemo-rl"
+        "nemotron-customize"
       ]
     },
     {

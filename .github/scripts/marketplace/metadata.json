@@ -745,30 +745,6 @@
       }
     },
     {
-      "path": "skills/NeMo-RL/docs",
-      "name": "docs",
-      "description": "Documentation conventions for NeMo-RL. Covers docs/index.md updates and docstring format.",
-      "metadata": {
-        "product.primary": "NeMo RL",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "contribute,configure,validate,inspect"
-      }
-    },
-    {
-      "path": "skills/NeMo-RL/launch-nemo-rl",
-      "name": "launch-nemo-rl",
-      "description": "Playbook for launching, monitoring, stopping, and debugging NeMo-RL recipes on a Kubernetes cluster via the nrl-k8s CLI. Covers ephemeral vs long-lived RayCluster modes, iterating on runs, and debugging hung or failed training jobs.",
-      "metadata": {
-        "product.primary": "NeMo RL",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer,devops_engineer,platform_engineer",
-        "discovery.activity_tags": "deploy,configure,monitor,debug,troubleshoot"
-      }
-    },
-    {
       "path": "skills/digital-health-clinical-asr-build",
       "name": "digital-health-clinical-asr-build",
       "description": "Stage 2 of the Clinical ASR Flywheel. Use when curating clinical terms, tagging IPA, and synthesizing a NeMo manifest. NOT for scoring (use /digital-health-clinical-asr-eval).",
