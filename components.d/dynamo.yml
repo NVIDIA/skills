@@ -4,5 +4,11 @@ name: Dynamo
 repo: ai-dynamo/dynamo
 description: NVIDIA Dynamo deployment bring-up on Kubernetes — pick and deploy recipes, start router modes, validate disagg NIXL/UCX/NCCL interconnect, and triage day-2 failures.
 skills:
-  - path: skills/
-    catalog_dir: Dynamo
+  - path: skills/dynamo-interconnect-check/
+    catalog_dir: dynamo-interconnect-check
+  - path: skills/dynamo-recipe-runner/
+    catalog_dir: dynamo-recipe-runner
+  - path: skills/dynamo-router-starter/
+    catalog_dir: dynamo-router-starter
+  - path: skills/dynamo-troubleshoot/
+    catalog_dir: dynamo-troubleshoot
