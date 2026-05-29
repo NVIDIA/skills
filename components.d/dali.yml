@@ -1,9 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: DALI
 repo: NVIDIA/DALI
 description: GPU-accelerated data loading and processing with NVIDIA DALI.
 skills:
-  - path: .agents/skills
-    catalog_dir: DALI
+  - path: skills/dali-dynamic-mode/
+    catalog_dir: dali-dynamic-mode
 links:
-   discussions: false
-   security: false  # DALI has a SECURITY.rst file
+  discussions: false
+  security: false  # DALI has SECURITY.rst rather than SECURITY.md
