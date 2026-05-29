@@ -1,0 +1,14 @@
+name: Physical AI Skill Hub
+repo: NVIDIA-dev/physical-ai-skill-hub-dev
+description: Agent skills for Omniverse and Physical AI workflows.
+skills:
+  - path: skills/omniverse-cad-to-simready/
+    catalog_dir: omniverse-cad-to-simready
+  - path: skills/omniverse-realtime-viewer/
+    catalog_dir: omniverse-realtime-viewer
+  - path: skills/omniverse-usd-performance-tuning/
+    catalog_dir: omniverse-usd-performance-tuning
+  - path: skills/physical-ai-infrastructure-setup-and-resilient-scaling/
+    catalog_dir: physical-ai-infrastructure-setup-and-resilient-scaling
+  - path: skills/physical-ai-neural-reconstruction/
+    catalog_dir: physical-ai-neural-reconstruction
