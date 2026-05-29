@@ -249,3 +249,11 @@ When implementing or debugging **VRP dimensions** (constraints, objectives, forw
 - **`references/vrp_skills.md`** — architecture contracts, required interfaces, and implementation checklist.
 
 Read it **before** adding a new dimension or changing combine semantics.
+
+## Numerical issues in non-routing solver internals
+
+When a bug surfaces as **wrong-but-plausible** solver output (invalid lower bound, unexpectedly large duals, 10× iteration blow-up after a small change) rather than a crash, read:
+
+- **`resources/numerical_debugging.md`** — methodology for locating catastrophic-cancellation sites, the cancellation patterns endemic to cMIR / flow-cover / MIR-style cut construction, and threshold guidance for numerical guards.
+
+Apply the *instrument-first, guard-at-the-exact-site* workflow it describes before patching — speculative fixes on these symptoms usually miss.
