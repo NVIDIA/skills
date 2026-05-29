@@ -1,7 +1,7 @@
 {
   "skills": [
     {
-      "path": "skills/cuopt/cuopt-numerical-optimization-api-cli",
+      "path": "skills/cuopt-numerical-optimization-api-cli",
       "name": "cuopt-numerical-optimization-api-cli",
       "description": "LP, MILP, and QP (beta) with cuOpt \u2014 CLI only (MPS files, cuopt_cli). Use when the user is solving LP, MILP, or QP from MPS via command line.",
       "metadata": {
@@ -13,7 +13,7 @@
       }
     },
     {
-      "path": "skills/cuopt/cuopt-routing-api-python",
+      "path": "skills/cuopt-routing-api-python",
       "name": "cuopt-routing-api-python",
       "description": "Vehicle routing (VRP, TSP, PDP) with cuOpt \u2014 Python API only. Use when the user is building or solving routing in Python.",
       "metadata": {
@@ -25,7 +25,7 @@
       }
     },
     {
-      "path": "skills/cuopt/cuopt-user-rules",
+      "path": "skills/cuopt-user-rules",
       "name": "cuopt-user-rules",
       "description": "Base rules for end users calling NVIDIA cuOpt (routing/LP/MILP/QP/install/server). Not for cuOpt internals \u2014 use cuopt-developer for those.",
       "metadata": {
@@ -37,7 +37,7 @@
       }
     },
     {
-      "path": "skills/cuopt/cuopt-developer",
+      "path": "skills/cuopt-developer",
       "name": "cuopt-developer",
       "description": "Modify, build, test, debug, and contribute to NVIDIA cuOpt (C++/CUDA, Python, server, CI). Use for solver internals, PRs, DCO, and code conventions.",
       "metadata": {
@@ -49,7 +49,7 @@
       }
     },
     {
-      "path": "skills/cuopt/cuopt-install",
+      "path": "skills/cuopt-install",
       "name": "cuopt-install",
       "description": "Install cuOpt for Python, C, or as a server (pip, conda, Docker) \u2014 system requirements, install commands, and verification. Use when the user wants to install or verify cuOpt for any user-facing interface. For building cuOpt from source or contributing to cuOpt, see cuopt-developer.",
       "metadata": {
@@ -61,7 +61,7 @@
       }
     },
     {
-      "path": "skills/cuopt/cuopt-numerical-optimization-api-python",
+      "path": "skills/cuopt-numerical-optimization-api-python",
       "name": "cuopt-numerical-optimization-api-python",
       "description": "Solve Linear Programming (LP), Mixed-Integer Linear Programming (MILP), and Quadratic Programming (QP, beta) with the Python API. Use when the user asks about optimization with linear or quadratic objectives, linear constraints, integer variables, scheduling, resource allocation, facility location, production planning, portfolio optimization, or least squares.",
       "metadata": {
@@ -73,7 +73,7 @@
       }
     },
     {
-      "path": "skills/cuopt/cuopt-server-api-python",
+      "path": "skills/cuopt-server-api-python",
       "name": "cuopt-server-api-python",
       "description": "cuOpt REST server \u2014 start server, endpoints, Python/curl client examples. Use when the user is deploying or calling the REST API.",
       "metadata": {
@@ -85,8 +85,8 @@
       }
     },
     {
-      "path": "skills/cuopt/numerical-optimization-formulation",
-      "name": "numerical-optimization-formulation",
+      "path": "skills/cuopt-numerical-optimization-formulation",
+      "name": "cuopt-numerical-optimization-formulation",
       "description": "Numerical optimization (LP, MILP, QP) \u2014 concepts, problem-text parsing, and formulation patterns. What LP, MILP, and QP are, required formulation questions, modeling elements, common patterns, and how to parse problem statements (parameters, constraints, decisions, objective). Domain concepts; no API or interface.",
       "metadata": {
         "product.primary": "cuOpt",
@@ -97,8 +97,8 @@
       }
     },
     {
-      "path": "skills/cuopt/routing-formulation",
-      "name": "routing-formulation",
+      "path": "skills/cuopt-routing-formulation",
+      "name": "cuopt-routing-formulation",
       "description": "Vehicle routing (VRP, TSP, PDP) \u2014 problem types and data requirements. Domain concepts; no API or interface.",
       "metadata": {
         "product.primary": "cuOpt",
@@ -109,8 +109,8 @@
       }
     },
     {
-      "path": "skills/cuopt/skill-evolution",
-      "name": "skill-evolution",
+      "path": "skills/cuopt-skill-evolution",
+      "name": "cuopt-skill-evolution",
       "description": "After solving a non-trivial problem, detect generalizable learnings and propose skill updates so future interactions benefit automatically. Always active \u2014 applies to every interaction.",
       "metadata": {
         "product.primary": "cuOpt",
@@ -118,6 +118,30 @@
         "catalog.subdomain": "decision-optimization",
         "audience": "developer",
         "discovery.activity_tags": "evaluate,extend,contribute"
+      }
+    },
+    {
+      "path": "skills/cuopt-numerical-optimization-api-c",
+      "name": "cuopt-numerical-optimization-api-c",
+      "description": "LP, MILP, and QP (beta) with cuOpt \u2014 C API only. Use when the user is embedding LP, MILP, or QP in C/C++.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer,application_developer,hpc_developer",
+        "discovery.activity_tags": "integrate,optimize,debug,validate"
+      }
+    },
+    {
+      "path": "skills/cuopt-server-common",
+      "name": "cuopt-server-common",
+      "description": "cuOpt REST server \u2014 what it does and how requests flow. Domain concepts; no deploy or client code.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer,application_developer,devops_engineer,solutions_architect",
+        "discovery.activity_tags": "assess,select,configure,validate"
       }
     },
     {
@@ -346,6 +370,150 @@
         "catalog.subdomain": "agentic-ai",
         "audience": "developer,platform_engineer,solutions_architect",
         "discovery.activity_tags": "generate,validate,inspect,assess"
+      }
+    },
+    {
+      "path": "skills/Megatron-Bridge/mbridge-recipe-recommender",
+      "name": "mbridge-recipe-recommender",
+      "description": "Recommend and customize Megatron Bridge recipes for a user's model, GPU count, and training goal. Indexes library recipes (pretrain/SFT/PEFT) and performance recipes.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "select,configure,train,optimize,validate"
+      }
+    },
+    {
+      "path": "skills/cupynumeric-install",
+      "name": "cupynumeric-install",
+      "description": "Install and verify cuPyNumeric for Python \u2014 requirements, commands, verification. Source builds are out of scope.",
+      "metadata": {
+        "product.primary": "cuPyNumeric",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "data-science",
+        "audience": "developer,data_scientist,hpc_developer",
+        "discovery.activity_tags": "get_started,configure,validate"
+      }
+    },
+    {
+      "path": "skills/dali-dynamic-mode",
+      "name": "dali-dynamic-mode",
+      "description": "DALI imperative dynamic mode (`nvidia.dali.experimental.dynamic`, ndd): use when working on ndd code or migrating pipelines; skip pipeline-only tasks.",
+      "metadata": {
+        "product.primary": "DALI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "configure,migrate,debug,validate"
+      }
+    },
+    {
+      "path": "skills/dynamo-interconnect-check",
+      "name": "dynamo-interconnect-check",
+      "description": "Validate that a Dynamo deployment's NIXL/UCX/NCCL interconnect is ready for disaggregated serving over RDMA/NVLink. Use after recipe-runner brings a deployment up (especially disagg/multi-node) to confirm the KV transport is correct; use troubleshoot for diagnosing already-failed pods.",
+      "metadata": {
+        "product.primary": "Dynamo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "developer,devops_engineer,platform_engineer,ai_engineer",
+        "discovery.activity_tags": "validate,monitor,troubleshoot,debug"
+      }
+    },
+    {
+      "path": "skills/dynamo-recipe-runner",
+      "name": "dynamo-recipe-runner",
+      "description": "Select, validate, patch, and deploy existing NVIDIA Dynamo Kubernetes recipes. Use for model/backend/GPU/deployment-mode recipe bring-up; use router-starter for router-only mode work and troubleshoot for broken deployments.",
+      "metadata": {
+        "product.primary": "Dynamo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "developer,devops_engineer,platform_engineer,ai_engineer",
+        "discovery.activity_tags": "deploy,configure,orchestrate,scale,validate"
+      }
+    },
+    {
+      "path": "skills/dynamo-router-starter",
+      "name": "dynamo-router-starter",
+      "description": "Start or patch Dynamo router modes and run router endpoint smoke checks. Use for round-robin, KV-aware, least-loaded, or device-aware routing setup; use recipe-runner for recipe deployment and troubleshoot for failure diagnosis.",
+      "metadata": {
+        "product.primary": "Dynamo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "developer,devops_engineer,platform_engineer,ai_engineer",
+        "discovery.activity_tags": "configure,deploy,integrate,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/dynamo-troubleshoot",
+      "name": "dynamo-troubleshoot",
+      "description": "Diagnose failed or unhealthy Dynamo deployments. Use when pods, model-cache jobs, PVCs, workers, frontend/router health, endpoints, or benchmark jobs fail; use recipe-runner/router-starter before this for normal bring-up.",
+      "metadata": {
+        "product.primary": "Dynamo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "developer,devops_engineer,platform_engineer,ai_engineer",
+        "discovery.activity_tags": "troubleshoot,debug,inspect,monitor,recover"
+      }
+    },
+    {
+      "path": "skills/nemotron-customize",
+      "name": "nemotron-customize",
+      "description": "Plan Nemotron customization pipelines from repo steps: SFT, PEFT/LoRA, AutoModel vs Megatron-Bridge, DPO/RLVR/GRPO/RLHF, curate-then-translate, BYOB/MCQ benchmark prep or translation, checkpoint conversion, ModelOpt optimization, and endpoint or checkpoint evaluation.",
+      "metadata": {
+        "product.primary": "Nemotron",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
+        "discovery.activity_tags": "fine_tune,train,evaluate,configure,optimize"
+      }
+    },
+    {
+      "path": "skills/rag-blueprint",
+      "name": "rag-blueprint",
+      "description": "NVIDIA RAG Blueprint \u2014 deploy, configure, troubleshoot, and manage. Handles any RAG action: deploy, install, start, enable, disable, toggle, change, configure, troubleshoot, debug, fix, shutdown, stop, or tear down any RAG feature or service (Agentic RAG, VLM, guardrails, query rewriting, models, search, ingestion, observability, summarization, reasoning, and more).",
+      "metadata": {
+        "product.primary": "RAG",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,ai_engineer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "deploy,configure,troubleshoot,debug,operate"
+      }
+    },
+    {
+      "path": "skills/rag-eval",
+      "name": "rag-eval",
+      "description": "Filesystem RAG benchmarks: corpus/, train.json, evaluate_rag.py (RAGAS quality). Not for prod monitoring, latency/throughput benchmarking (use rag-perf), or evals outside this repo layout.",
+      "metadata": {
+        "product.primary": "RAG",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
+        "discovery.activity_tags": "evaluate,benchmark,validate,measure"
+      }
+    },
+    {
+      "path": "skills/rag-perf",
+      "name": "rag-perf",
+      "description": "Performance benchmarking for a deployed NVIDIA RAG Blueprint server: profiling pass + aiperf load test driven by a single YAML config. Not for accuracy / RAGAS scoring (use rag-eval) or for deploying / repairing services (use rag-blueprint).",
+      "metadata": {
+        "product.primary": "RAG",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,ai_engineer,ml_engineer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "benchmark,profile,measure,optimize,validate"
+      }
+    },
+    {
+      "path": "skills/tilegym-adding-cutile-kernel",
+      "name": "tilegym-adding-cutile-kernel",
+      "description": "Add a new cuTile GPU kernel operator to TileGym. Covers dispatch registration in ops.py, cuTile backend implementation, __init__.py exports, test creation, and benchmark in tests/benchmark. Use when adding, creating, or implementing a new cuTile operator/kernel in TileGym, or when asking how to register a new cuTile op.",
+      "metadata": {
+        "product.primary": "CUDA Tile",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,hpc_developer",
+        "discovery.activity_tags": "extend,integrate,test,benchmark,validate"
       }
     }
   ]

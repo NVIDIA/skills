@@ -3,16 +3,6 @@
   "notGrouped": "bottom",
   "groupings": [
     {
-      "title": "Training AI",
-      "description": "Build, validate, tune, and maintain large-scale model training workflows, including distributed training, model support, training validation, performance tuning, and training-stack CI.",
-      "skills": [
-        "nemo-automodel-distributed-training",
-        "nemo-automodel-launcher-config",
-        "nemo-automodel-model-onboarding",
-        "nemo-automodel-recipe-development"
-      ]
-    },
-    {
       "title": "Agentic AI",
       "description": "Build and operate agentic systems, including RAG workflows, evaluation harnesses, tool use, policy, sandboxing, agent configuration, and agent workflow automation.",
       "skills": [
@@ -28,7 +18,17 @@
         "nemoclaw-user-monitor-sandbox",
         "nemoclaw-user-overview",
         "nemoclaw-user-reference",
-        "skill-card-generator"
+        "skill-card-generator",
+        "rag-blueprint",
+        "rag-eval",
+        "rag-perf"
+      ]
+    },
+    {
+      "title": "Data Science",
+      "description": "Prepare, analyze, explore, and model data for AI and accelerated analytics workflows that are not specific to one training, inference, or agent task.",
+      "skills": [
+        "cupynumeric-install"
       ]
     },
     {
@@ -42,9 +42,41 @@
         "cuopt-install",
         "cuopt-numerical-optimization-api-python",
         "cuopt-server-api-python",
-        "numerical-optimization-formulation",
-        "routing-formulation",
-        "skill-evolution"
+        "cuopt-numerical-optimization-formulation",
+        "cuopt-routing-formulation",
+        "cuopt-skill-evolution",
+        "cuopt-numerical-optimization-api-c",
+        "cuopt-server-common"
+      ]
+    },
+    {
+      "title": "GPU Development",
+      "description": "Develop, tune, profile, and integrate GPU kernels and accelerated code, including CUDA-adjacent workflows, autotuning, low-level performance work, and framework integration.",
+      "skills": [
+        "tilegym-adding-cutile-kernel"
+      ]
+    },
+    {
+      "title": "Inference AI",
+      "description": "Deploy, serve, optimize, and evaluate models for production inference, including quantization, runtime performance, and serving configuration.",
+      "skills": [
+        "dynamo-interconnect-check",
+        "dynamo-recipe-runner",
+        "dynamo-router-starter",
+        "dynamo-troubleshoot"
+      ]
+    },
+    {
+      "title": "Training AI",
+      "description": "Build, validate, tune, and maintain large-scale model training workflows, including distributed training, model support, training validation, performance tuning, and training-stack CI.",
+      "skills": [
+        "nemo-automodel-distributed-training",
+        "nemo-automodel-launcher-config",
+        "nemo-automodel-model-onboarding",
+        "nemo-automodel-recipe-development",
+        "mbridge-recipe-recommender",
+        "dali-dynamic-mode",
+        "nemotron-customize"
       ]
     },
     {
