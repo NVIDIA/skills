@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: cuDF
+repo: rapidsai/cudf
+description: Official NVIDIA-authored guidance for NVIDIA cuDF GPU DataFrames, pandas acceleration, dask-cuDF, ETL, joins, groupby, CSV/Parquet I/O, nullable semantics, and multi-GPU DataFrame workloads.
+skills:
+  - path: skills/accelerated-computing-cudf
+    catalog_dir: accelerated-computing-cudf
