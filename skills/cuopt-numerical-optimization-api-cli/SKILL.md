@@ -14,6 +14,7 @@ metadata:
 ---
 
 
+
 # cuOpt Numerical Optimization — CLI
 
 Solve LP, MILP, and QP problems from MPS files via `cuopt_cli`. The same command, options, and MPS workflow apply across all three; QP uses the standard MPS quadratic-objective extension.
