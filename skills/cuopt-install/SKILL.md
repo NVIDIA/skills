@@ -1,7 +1,7 @@
 ---
 name: cuopt-install
 version: "26.08.00"
-description: Install cuOpt for Python, C, or as a server (pip, conda, Docker) — system requirements, install commands, and verification. Use when the user wants to install or verify cuOpt for any user-facing interface. For building cuOpt from source or contributing to cuOpt, see cuopt-developer.
+description: Install cuOpt for Python, C, or server via pip, conda, or Docker; verify the install. For building cuOpt from source, see cuopt-developer.
 license: Apache-2.0
 metadata:
   author: NVIDIA cuOpt Team

@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `cuopt-numerical-optimization-formulation`
-- Evaluation date: 2026-05-28
+- Evaluation date: 2026-05-29
 - NVSkills-Eval profile: `external`
 - Environment: `local`
 - Dataset: 1 evaluation tasks
@@ -32,6 +32,7 @@ Reported benchmark dimensions:
 
 Underlying evaluation signals used in this run:
 
+- `security` (Security): checks for unsafe operations, secret leakage, and unauthorized access.
 - `skill_execution` (Skill Execution): verifies that the agent loaded the expected skill and workflow.
 - `skill_efficiency` (Efficiency): checks routing quality, decoy avoidance, and redundant tool usage.
 - `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
@@ -53,25 +54,25 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 83% (+0%) |
-| Correctness | 2 | 100% (+0%) | 97% (+47%) |
-| Discoverability | 2 | 100% (+0%) | 84% (+84%) |
-| Effectiveness | 2 | 96% (-3%) | 90% (+1%) |
-| Efficiency | 2 | 93% (-0%) | 76% (+49%) |
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 100% (+0%) | 97% (+28%) |
+| Discoverability | 2 | 100% (+0%) | 97% (+66%) |
+| Effectiveness | 2 | 96% (+0%) | 90% (-5%) |
+| Efficiency | 2 | 93% (-0%) | 96% (+51%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 10 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 7 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/cuopt-numerical-optimization-formulation/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/cuopt-numerical-optimization-formulation/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description very long (315 chars, recommend 50-150) (`skills/cuopt-numerical-optimization-formulation/SKILL.md`)
 - LOW QUALITY/quality_discoverability: No '## Purpose' section (`skills/cuopt-numerical-optimization-formulation/SKILL.md`)
 - LOW QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/cuopt-numerical-optimization-formulation/SKILL.md`)
+- LOW QUALITY/quality_reliability: No limitations documented (`skills/cuopt-numerical-optimization-formulation/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
@@ -80,7 +81,7 @@ Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
 Notable observations:
 
 - Context Deduplication: Collected 1 file(s)
-- Inter-Skill Deduplication: Parsed skill 'cuopt-numerical-optimization-formulation': 315 char description
+- Inter-Skill Deduplication: Parsed skill 'cuopt-numerical-optimization-formulation': 143 char description
 
 ## Publication Recommendation
 

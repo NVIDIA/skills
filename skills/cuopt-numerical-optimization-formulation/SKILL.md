@@ -1,7 +1,7 @@
 ---
 name: cuopt-numerical-optimization-formulation
 version: "26.08.00"
-description: Numerical optimization (LP, MILP, QP) — concepts, problem-text parsing, and formulation patterns. What LP, MILP, and QP are, required formulation questions, modeling elements, common patterns, and how to parse problem statements (parameters, constraints, decisions, objective). Domain concepts; no API or interface.
+description: LP, MILP, QP — concepts, problem-text parsing, and formulation patterns (parameters, constraints, decisions, objective). Concepts only; no API.
 license: Apache-2.0
 metadata:
   author: NVIDIA cuOpt Team

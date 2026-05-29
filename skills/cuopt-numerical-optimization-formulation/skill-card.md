@@ -1,5 +1,5 @@
 ## Description: <br>
-Numerical optimization (LP, MILP, QP) — concepts, problem-text parsing, and formulation patterns for going from a problem description to a clear mathematical formulation. <br>
+LP, MILP, QP — concepts, problem-text parsing, and formulation patterns (parameters, constraints, decisions, objective). Concepts only; no API. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to parse optimization problem statements and produce correct LP, MILP, or QP formulations, identifying decision variables, constraints, and objectives from natural-language descriptions. <br>
+Developers and engineers who need to formulate linear, mixed-integer linear, or quadratic optimization problems using cuOpt, translating natural-language problem descriptions into structured mathematical formulations. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -30,13 +30,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- claude-code <br>
-- codex <br>
+- `claude-code` <br>
+- `codex` <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 internal skill task with 2 attempts per task (NVSkills-Eval, external profile). <br>
+Evaluated against 1 internal evaluation task with 2 attempts per task via NVSkills-Eval (external profile). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -47,6 +47,7 @@ Reported benchmark dimensions: <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
 Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
 - `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
@@ -59,14 +60,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 83% (+0%) |
-| Correctness | 2 | 100% (+0%) | 97% (+47%) |
-| Discoverability | 2 | 100% (+0%) | 84% (+84%) |
-| Effectiveness | 2 | 96% (-3%) | 90% (+1%) |
-| Efficiency | 2 | 93% (-0%) | 76% (+49%) |
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 100% (+0%) | 97% (+28%) |
+| Discoverability | 2 | 100% (+0%) | 97% (+66%) |
+| Effectiveness | 2 | 96% (+0%) | 90% (-5%) |
+| Efficiency | 2 | 93% (-0%) | 96% (+51%) |
 
 ## Skill Version(s): <br>
-26.08.00 (source: frontmatter, git tag) <br>
+26.08.00 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

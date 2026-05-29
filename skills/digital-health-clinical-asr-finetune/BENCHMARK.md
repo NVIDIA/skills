@@ -1,16 +1,16 @@
 # Evaluation Report
 
-Evaluation of the `cuopt-skill-evolution` skill before publication through NVSkills-Eval.
+Evaluation of the `digital-health-clinical-asr-finetune` skill before publication through NVSkills-Eval.
 
 This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
 
 ## Evaluation Summary
 
-- Skill: `cuopt-skill-evolution`
-- Evaluation date: 2026-05-29
+- Skill: `digital-health-clinical-asr-finetune`
+- Evaluation date: 2026-05-28
 - NVSkills-Eval profile: `external`
 - Environment: `local`
-- Dataset: 1 evaluation tasks
+- Dataset: 3 evaluation tasks
 - Attempts per task: 2
 - Pass threshold: 50%
 - Overall verdict: PASS
@@ -32,7 +32,6 @@ Reported benchmark dimensions:
 
 Underlying evaluation signals used in this run:
 
-- `security` (Security): checks for unsafe operations, secret leakage, and unauthorized access.
 - `skill_execution` (Skill Execution): verifies that the agent loaded the expected skill and workflow.
 - `skill_efficiency` (Efficiency): checks routing quality, decoy avoidance, and redundant tool usage.
 - `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
@@ -42,9 +41,9 @@ Underlying evaluation signals used in this run:
 
 ## Test Tasks
 
-The benchmark dataset contained 1 evaluation tasks:
+The benchmark dataset contained 3 evaluation tasks:
 
-- Positive tasks: 1 tasks where the skill was expected to activate.
+- Positive tasks: 3 tasks where the skill was expected to activate.
 - Negative tasks: 0 tasks where no skill was expected.
 - Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
 
@@ -54,25 +53,22 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 90% (-5%) | 97% (+0%) |
-| Discoverability | 2 | 100% (+12%) | 84% (+12%) |
-| Effectiveness | 2 | 60% (-1%) | 66% (+2%) |
-| Efficiency | 2 | 93% (+19%) | 76% (+19%) |
+| Security | 6 | 100% (+44%) | 89% (+28%) |
+| Correctness | 6 | 90% (+2%) | 97% (+29%) |
+| Discoverability | 6 | 56% (+7%) | 65% (+24%) |
+| Effectiveness | 6 | 97% (+18%) | 94% (+35%) |
+| Efficiency | 6 | 47% (+14%) | 48% (+6%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 9 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 2 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_discoverability: Description contains vague words (`skills/cuopt-skill-evolution/SKILL.md`)
-- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/cuopt-skill-evolution/SKILL.md`)
-- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/cuopt-skill-evolution/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description doesn't mention WHEN to use this skill (`skills/cuopt-skill-evolution/SKILL.md`)
-- LOW QUALITY/quality_discoverability: No '## Purpose' section (`skills/cuopt-skill-evolution/SKILL.md`)
+- LOW SCHEMA/unexpected_file: Unexpected 'skill.oms.sig' in skill root (`skills/digital-health-clinical-asr-finetune/skill.oms.sig`)
+- LOW SCHEMA/unexpected_file: Unexpected 'skill-card.md' in skill root (`skills/digital-health-clinical-asr-finetune/skill-card.md`)
 
 ## Tier 2: Deduplication Summary
 
@@ -80,8 +76,8 @@ Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
 
 Notable observations:
 
-- Context Deduplication: Collected 1 file(s)
-- Inter-Skill Deduplication: Parsed skill 'cuopt-skill-evolution': 140 char description
+- Context Deduplication: Collected 3 file(s)
+- Inter-Skill Deduplication: Parsed skill 'digital-health-clinical-asr-finetune': 195 char description
 
 ## Publication Recommendation
 

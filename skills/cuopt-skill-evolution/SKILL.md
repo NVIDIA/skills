@@ -1,7 +1,7 @@
 ---
 name: cuopt-skill-evolution
 version: "26.08.00"
-description: After solving a non-trivial problem, detect generalizable learnings and propose skill updates so future interactions benefit automatically. Always active — applies to every interaction.
+description: After solving a non-trivial problem, detect generalizable learnings and propose skill updates. Always active — applies to every interaction.
 license: Apache-2.0
 metadata:
   author: NVIDIA cuOpt Team

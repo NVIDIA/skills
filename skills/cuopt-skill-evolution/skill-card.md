@@ -1,5 +1,5 @@
 ## Description: <br>
-After solving a non-trivial problem, detect generalizable learnings and propose skill updates so future interactions benefit automatically. <br>
+After solving a non-trivial problem, detect generalizable learnings and propose skill updates. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to automatically detect generalizable learnings from agent-assisted problem solving and propose skill updates so future interactions benefit. <br>
+Developers and engineers using cuOpt AI agent skills who need to capture generalizable learnings from corrections, failures, and undocumented behaviors, and propose structured skill updates. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,14 +19,24 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [SKILL.md](skills/cuopt-skill-evolution/SKILL.md) <br>
+- [SKILL.md (Skill Evolution workflow)](skills/cuopt-skill-evolution/SKILL.md) <br>
+- [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Code] <br>
-**Output Format:** [Markdown] <br>
+**Output Format:** [Markdown with inline code diffs] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Proposals require explicit user approval before application] <br>
+
+## Evaluation Agents Used: <br>
+- claude-code <br>
+- codex <br>
+
+
+
+## Evaluation Tasks: <br>
+Evaluated against 1 evaluation task (1 positive skill-activation case) with 2 attempts per task, pass threshold 50%. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -36,7 +46,25 @@ Reported benchmark dimensions: <br>
 - Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
+Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
+- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
+- `accuracy`: Grades final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
+- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `token_efficiency`: Compares token usage with and without the skill. <br>
 
+
+
+## Evaluation Results: <br>
+| Dimension | Num | `claude-code` | `codex` |
+|---|---:|---:|---:|
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 90% (-5%) | 97% (+0%) |
+| Discoverability | 2 | 100% (+12%) | 84% (+12%) |
+| Effectiveness | 2 | 60% (-1%) | 66% (+2%) |
+| Efficiency | 2 | 93% (+19%) | 76% (+19%) |
 
 ## Skill Version(s): <br>
 26.08.00 (source: frontmatter) <br>

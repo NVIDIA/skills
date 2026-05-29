@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `cuopt-install`
-- Evaluation date: 2026-05-28
+- Evaluation date: 2026-05-29
 - NVSkills-Eval profile: `external`
 - Environment: `local`
 - Dataset: 1 evaluation tasks
@@ -32,6 +32,7 @@ Reported benchmark dimensions:
 
 Underlying evaluation signals used in this run:
 
+- `security` (Security): checks for unsafe operations, secret leakage, and unauthorized access.
 - `skill_execution` (Skill Execution): verifies that the agent loaded the expected skill and workflow.
 - `skill_efficiency` (Efficiency): checks routing quality, decoy avoidance, and redundant tool usage.
 - `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
@@ -54,24 +55,24 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+0%) | 92% (+17%) |
-| Discoverability | 2 | 100% (+0%) | 80% (+55%) |
-| Effectiveness | 2 | 100% (+6%) | 100% (+2%) |
-| Efficiency | 2 | 93% (-0%) | 78% (+51%) |
+| Correctness | 2 | 100% (+0%) | 88% (+6%) |
+| Discoverability | 2 | 100% (+0%) | 62% (+19%) |
+| Effectiveness | 2 | 97% (+4%) | 100% (+0%) |
+| Efficiency | 2 | 93% (-0%) | 61% (+17%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 10 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 7 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/cuopt-install/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/cuopt-install/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description very long (283 chars, recommend 50-150) (`skills/cuopt-install/SKILL.md`)
 - LOW QUALITY/quality_discoverability: No '## Purpose' section (`skills/cuopt-install/SKILL.md`)
 - LOW QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/cuopt-install/SKILL.md`)
+- LOW QUALITY/quality_reliability: No limitations documented (`skills/cuopt-install/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
@@ -80,7 +81,7 @@ Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
 Notable observations:
 
 - Context Deduplication: Collected 2 file(s)
-- Inter-Skill Deduplication: Parsed skill 'cuopt-install': 283 char description
+- Inter-Skill Deduplication: Parsed skill 'cuopt-install': 138 char description
 
 ## Publication Recommendation
 

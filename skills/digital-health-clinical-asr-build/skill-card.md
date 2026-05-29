@@ -1,5 +1,5 @@
 ## Description: <br>
-Install cuOpt for Python, C, or server via pip, conda, or Docker; verify the install. <br>
+Stage 2 of the Clinical ASR Flywheel — curates clinical terms, tags IPA pronunciation, and synthesizes a NeMo-format manifest with evaluation audio for clinical ASR benchmarking. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to install NVIDIA cuOpt (GPU-accelerated optimization engine) via pip, conda, or Docker and verify the installation for Python, C, or server deployments. <br>
+Developers and clinical AI engineers building clinical ASR evaluation benchmarks by curating specialty term lists, tagging pronunciation via a two-tier IPA pipeline, and synthesizing evaluation audio through NVIDIA Magpie TTS. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,25 +19,25 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Verification Examples](references/verification_examples.md) <br>
-- [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
-- [cuOpt Examples](https://github.com/NVIDIA/cuopt-examples) <br>
+- [Manifest Schema Reference](references/manifest-schema.md) <br>
+- [Pronunciation Pipeline Reference](references/pronunciation-pipeline.md) <br>
+- [AgentSkills.io Specification](https://agentskills.io/specification) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Files, Shell commands, Configuration instructions] <br>
+**Output Format:** [WAV audio files, CSV term lists, JSONL NeMo manifests, and Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Produces a cycle directory containing audio clips, manifest.jsonl, term_seed.csv, and pronunciation_overrides.csv] <br>
 
 ## Evaluation Agents Used: <br>
-- `claude-code` <br>
-- `codex` <br>
+- Claude Code (`claude-code`) <br>
+- Codex (`codex`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task (pass threshold: 50%). <br>
+Evaluated against 4 internal evaluation tasks (3 positive skill-activation, 1 negative) with 2 attempts per task and a 50% pass threshold. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -48,7 +48,6 @@ Reported benchmark dimensions: <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
 - `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
@@ -61,14 +60,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+0%) | 88% (+6%) |
-| Discoverability | 2 | 100% (+0%) | 62% (+19%) |
-| Effectiveness | 2 | 97% (+4%) | 100% (+0%) |
-| Efficiency | 2 | 93% (-0%) | 61% (+17%) |
+| Security | 8 | 74% (+8%) | 60% (+37%) |
+| Correctness | 8 | 83% (+2%) | 77% (+21%) |
+| Discoverability | 8 | 67% (+9%) | 57% (-8%) |
+| Effectiveness | 8 | 74% (+4%) | 66% (+41%) |
+| Efficiency | 8 | 58% (+11%) | 53% (-4%) |
 
 ## Skill Version(s): <br>
-26.08.00 (source: frontmatter) <br>
+1.1.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

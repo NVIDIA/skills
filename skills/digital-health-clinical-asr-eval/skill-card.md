@@ -1,5 +1,5 @@
 ## Description: <br>
-Install cuOpt for Python, C, or server via pip, conda, or Docker; verify the install. <br>
+Stage 3 of Clinical ASR Flywheel. Score a NeMo manifest, produce the five-section KER leaderboard (by-ipa_source diagnostic). Not for ASR auth (/riva-asr). <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to install NVIDIA cuOpt (GPU-accelerated optimization engine) via pip, conda, or Docker and verify the installation for Python, C, or server deployments. <br>
+Developers and engineers evaluating clinical automatic speech recognition (ASR) systems to produce keyword-error-rate (KER) leaderboards and post-eval routing recommendations. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,25 +19,24 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Verification Examples](references/verification_examples.md) <br>
-- [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
-- [cuOpt Examples](https://github.com/NVIDIA/cuopt-examples) <br>
+- [Offline ASR Recipe](references/offline-asr-recipe.md) <br>
+- [Scoring Recipes](references/scoring-recipes.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
+**Output Type(s):** [Analysis, Files, Shell commands] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- `claude-code` <br>
-- `codex` <br>
+- Claude Code (`claude-code`) <br>
+- Codex (`codex`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task (pass threshold: 50%). <br>
+Evaluated against 8 NVSkills-Eval tasks (7 positive skill-activation, 1 negative activation). Pass threshold: 50%. Overall verdict: PASS. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -48,7 +47,6 @@ Reported benchmark dimensions: <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
 - `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
@@ -61,14 +59,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+0%) | 88% (+6%) |
-| Discoverability | 2 | 100% (+0%) | 62% (+19%) |
-| Effectiveness | 2 | 97% (+4%) | 100% (+0%) |
-| Efficiency | 2 | 93% (-0%) | 61% (+17%) |
+| Security | 8 | 84% (+10%) | 92% (+44%) |
+| Correctness | 8 | 79% (+2%) | 95% (+27%) |
+| Discoverability | 8 | 49% (+2%) | 72% (+25%) |
+| Effectiveness | 8 | 85% (+6%) | 92% (+28%) |
+| Efficiency | 8 | 44% (+6%) | 57% (+10%) |
 
 ## Skill Version(s): <br>
-26.08.00 (source: frontmatter) <br>
+1.1.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

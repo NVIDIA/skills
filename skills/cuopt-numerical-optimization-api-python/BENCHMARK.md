@@ -55,24 +55,24 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+0%) | 87% (+5%) |
-| Discoverability | 2 | 100% (+0%) | 67% (+0%) |
-| Effectiveness | 2 | 80% (-3%) | 54% (+4%) |
-| Efficiency | 2 | 93% (-0%) | 56% (-4%) |
+| Correctness | 2 | 100% (+0%) | 82% (+5%) |
+| Discoverability | 2 | 100% (+0%) | 84% (+5%) |
+| Effectiveness | 2 | 79% (-1%) | 40% (-9%) |
+| Efficiency | 2 | 93% (-0%) | 77% (+1%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 18 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 15 total findings.
 
 Top findings:
 
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`SKILL.md:212`)
 - MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/qp_examples.md:162`)
 - MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/qp_examples.md:163`)
 - MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/qp_examples.md:164`)
 - MEDIUM PII/phone_numbers: International phone number (`assets/mps_solver/results.md:48`)
+- MEDIUM PII/phone_numbers: International phone number (`assets/mps_solver/results.md:69`)
 
 ## Tier 2: Deduplication Summary
 
@@ -80,19 +80,19 @@ Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 9 tota
 
 Top findings:
 
-- HIGH DUPLICATE/duplicate: Duplicate content found across assets/lp_warmstart/README.md and assets/lp_warmstart/model.py:
-  "# LP PDLP Warmstart" in assets/lp_warmstart/README.md (lines 1-5)
-  vs "(module docstring)" in assets/lp_warmstart/model.py (lines 1-4) (`assets/lp_warmstart/README.md:1`)
 - HIGH DUPLICATE/duplicate: Duplicate content found across SKILL.md and assets/mps_solver/README.md and references/qp_examples.md:
   "# Solve" in SKILL.md (lines 63-67)
   vs "# Configure and solve" in assets/mps_solver/README.md (lines 76-80)
   vs "# Solve" in references/qp_examples.md (lines 47-51) (`SKILL.md:63`)
+- HIGH DUPLICATE/duplicate: Duplicate content found across assets/lp_warmstart/README.md and assets/lp_warmstart/model.py:
+  "# LP PDLP Warmstart" in assets/lp_warmstart/README.md (lines 1-5)
+  vs "(module docstring)" in assets/lp_warmstart/model.py (lines 1-4) (`assets/lp_warmstart/README.md:1`)
 - HIGH DUPLICATE/duplicate: Duplicate content found across assets/milp_basic/README.md and assets/milp_basic/model.py:
   "# Minimal MILP" in assets/milp_basic/README.md (lines 1-10)
   vs "(module docstring)" in assets/milp_basic/model.py (lines 1-6) (`assets/milp_basic/README.md:1`)
 - HIGH DUPLICATE/duplicate: Duplicate content found within SKILL.md:
   "# MILP-specific settings" in SKILL.md (lines 94-100)
-  vs "# MILP gap tolerance (stop when within X% of optimal)" in SKILL.md (lines 216-218) (`SKILL.md:94`)
+  vs "# MILP gap tolerance (stop when within X% of optimal)" in SKILL.md (lines 220-222) (`SKILL.md:94`)
 - HIGH DUPLICATE/duplicate: Duplicate content found across SKILL.md and assets/mps_solver/README.md:
   "# Check status (CRITICAL: use PascalCase!)" in SKILL.md (lines 68-74)
   vs "# ✅ CORRECT" in SKILL.md (lines 148-151)
