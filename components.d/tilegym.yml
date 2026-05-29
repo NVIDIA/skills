@@ -1,8 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: TileGym
 repo: NVIDIA/TileGym
 description: Tile-based GPU programming — adding new kernels, cross-framework conversion, and performance optimization.
 skills:
-  - path: .agents/skills/
+  - path: skills/
     catalog_dir: TileGym
 links:
   discussions: false
