@@ -6,3 +6,5 @@ skills:
     catalog_dir: nemotron-customize
   - path: skills/nemotron-retrieval-recipes/
     catalog_dir: nemotron-retrieval-recipes
+  - path: skills/nemotron-policy-generator/
+    catalog_dir: nemotron-policy-generator
