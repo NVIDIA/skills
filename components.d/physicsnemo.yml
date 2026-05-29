@@ -1,0 +1,6 @@
+name: PhysicsNeMo
+repo: NVIDIA/physicsnemo
+description: NVIDIA PhysicsNeMo - Agent skills for the PhysicsNeMo SciML framework. 
+skills:
+  - path: skills/physicsnemo-discover/
+    catalog_dir: physicsnemo-discover
