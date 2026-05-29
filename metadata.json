@@ -51,7 +51,7 @@
     {
       "path": "skills/cuopt-install",
       "name": "cuopt-install",
-      "description": "Install cuOpt for Python, C, or as a server (pip, conda, Docker) \u2014 system requirements, install commands, and verification. Use when the user wants to install or verify cuOpt for any user-facing interface. For building cuOpt from source or contributing to cuOpt, see cuopt-developer.",
+      "description": "Install cuOpt for Python, C, or server via pip, conda, or Docker; verify the install. For building cuOpt from source, see cuopt-developer.",
       "metadata": {
         "product.primary": "cuOpt",
         "classification.category.primary": "accelerated_computing",
@@ -63,7 +63,7 @@
     {
       "path": "skills/cuopt-numerical-optimization-api-python",
       "name": "cuopt-numerical-optimization-api-python",
-      "description": "Solve Linear Programming (LP), Mixed-Integer Linear Programming (MILP), and Quadratic Programming (QP, beta) with the Python API. Use when the user asks about optimization with linear or quadratic objectives, linear constraints, integer variables, scheduling, resource allocation, facility location, production planning, portfolio optimization, or least squares.",
+      "description": "Solve LP, MILP, QP (beta) with cuOpt Python API \u2014 linear/quadratic objectives, integer variables, scheduling, portfolio, least squares.",
       "metadata": {
         "product.primary": "cuOpt",
         "classification.category.primary": "accelerated_computing",
@@ -87,7 +87,7 @@
     {
       "path": "skills/cuopt-numerical-optimization-formulation",
       "name": "cuopt-numerical-optimization-formulation",
-      "description": "Numerical optimization (LP, MILP, QP) \u2014 concepts, problem-text parsing, and formulation patterns. What LP, MILP, and QP are, required formulation questions, modeling elements, common patterns, and how to parse problem statements (parameters, constraints, decisions, objective). Domain concepts; no API or interface.",
+      "description": "LP, MILP, QP \u2014 concepts, problem-text parsing, and formulation patterns (parameters, constraints, decisions, objective). Concepts only; no API.",
       "metadata": {
         "product.primary": "cuOpt",
         "classification.category.primary": "accelerated_computing",
@@ -111,7 +111,7 @@
     {
       "path": "skills/cuopt-skill-evolution",
       "name": "cuopt-skill-evolution",
-      "description": "After solving a non-trivial problem, detect generalizable learnings and propose skill updates so future interactions benefit automatically. Always active \u2014 applies to every interaction.",
+      "description": "After solving a non-trivial problem, detect generalizable learnings and propose skill updates. Always active \u2014 applies to every interaction.",
       "metadata": {
         "product.primary": "cuOpt",
         "classification.category.primary": "developer_tools",
@@ -373,8 +373,8 @@
       }
     },
     {
-      "path": "skills/Megatron-Bridge/mbridge-recipe-recommender",
-      "name": "mbridge-recipe-recommender",
+      "path": "skills/nemo-mbridge-recipe-recommender",
+      "name": "nemo-mbridge-recipe-recommender",
       "description": "Recommend and customize Megatron Bridge recipes for a user's model, GPU count, and training goal. Indexes library recipes (pretrain/SFT/PEFT) and performance recipes.",
       "metadata": {
         "product.primary": "NeMo Megatron Bridge",
@@ -382,6 +382,234 @@
         "catalog.subdomain": "training-ai",
         "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
         "discovery.activity_tags": "select,configure,train,optimize,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-mlm-bridge-training",
+      "name": "nemo-mbridge-mlm-bridge-training",
+      "description": "Run Megatron-LM (MLM) and Megatron Bridge training with mock or real data. Covers correlation testing, available recipes, and multi-GPU examples.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "train,configure,validate,debug"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-multi-node-slurm",
+      "name": "nemo-mbridge-multi-node-slurm",
+      "description": "Convert single-node scripts to multi-node Slurm sbatch jobs and debug common multi-node failures. Covers srun-native vs uv run torch.distributed approaches, container setup, NCCL timeouts, OOM sizing for MoE models, and interactive allocation.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer,devops_engineer",
+        "discovery.activity_tags": "configure,orchestrate,scale,troubleshoot,debug"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-activation-recompute",
+      "name": "nemo-mbridge-perf-activation-recompute",
+      "description": "Validate and use selective and full activation recompute in Megatron Bridge to reduce GPU memory usage at the cost of extra compute.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "optimize,configure,validate,measure"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-cpu-offloading",
+      "name": "nemo-mbridge-perf-cpu-offloading",
+      "description": "Validate and use CPU offloading in Megatron Bridge, including layer-level activation offloading and fractional optimizer state offloading with HybridDeviceOptimizer.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "optimize,configure,validate,measure"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-cuda-graphs",
+      "name": "nemo-mbridge-perf-cuda-graphs",
+      "description": "Validate and use CUDA graph capture in Megatron Bridge, including local full-iteration graphs and Transformer Engine scoped graphs for attention, MLP, and MoE modules.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "optimize,configure,validate,benchmark"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-expert-parallel-overlap",
+      "name": "nemo-mbridge-perf-expert-parallel-overlap",
+      "description": "Validate and use MoE expert-parallel communication overlap in Megatron-Bridge, including overlap_moe_expert_parallel_comm, delay_wgrad_compute, and flex dispatcher backends such as DeepEP and HybridEP.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "optimize,configure,scale,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-hierarchical-context-parallel",
+      "name": "nemo-mbridge-perf-hierarchical-context-parallel",
+      "description": "Operational guide for enabling hierarchical context parallelism in Megatron-Bridge, including config knobs, code anchors, pitfalls, and verification.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "configure,scale,optimize,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-megatron-fsdp",
+      "name": "nemo-mbridge-perf-megatron-fsdp",
+      "description": "Operational guide for enabling Megatron FSDP in Megatron-Bridge, including config knobs, code anchors, pitfalls, and verification.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "configure,scale,optimize,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-memory-tuning",
+      "name": "nemo-mbridge-perf-memory-tuning",
+      "description": "Techniques for reducing peak GPU memory in Megatron Bridge \u2014 expandable segments, parallelism resizing, activation recompute, CPU offloading constraints, and common OOM fixes.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "optimize,troubleshoot,debug,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-moe-comm-overlap",
+      "name": "nemo-mbridge-perf-moe-comm-overlap",
+      "description": "MoE expert-parallel communication overlap in Megatron Bridge. Covers dispatch/combine overlap, flex dispatcher backends, and expert wgrad scheduling.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "optimize,configure,scale,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-moe-dispatcher-selection",
+      "name": "nemo-mbridge-perf-moe-dispatcher-selection",
+      "description": "Choose the right MoE token dispatcher (`alltoall`, DeepEP, or HybridEP) for the hardware, EP degree, and optimization stage. Summarizes patterns from DSV3, Qwen3, Qwen3-Next, and VLM bring-up work.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "select,assess,optimize,configure"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-moe-hardware-configs",
+      "name": "nemo-mbridge-perf-moe-hardware-configs",
+      "description": "Representative MoE training playbooks by hardware platform and model family. Summarizes rounded throughput bands, parallelism patterns, and common tuning stacks.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "select,assess,optimize,configure"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-moe-long-context",
+      "name": "nemo-mbridge-perf-moe-long-context",
+      "description": "Long-context MoE training guidance for Megatron Bridge. Covers CP sizing, selective recompute, dispatcher choices, and practical patterns from DSV3, Qwen3, and Qwen3-Next long-context experiments.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "configure,optimize,scale,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-moe-optimization-workflow",
+      "name": "nemo-mbridge-perf-moe-optimization-workflow",
+      "description": "Systematic workflow for MoE training optimization in Megatron Bridge, based on the Megatron-Core MoE paper. Covers the Three Walls framework, parallel folding, recompute strategy, dispatcher choice, and CUDA-graph bring-up.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "optimize,benchmark,measure,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-moe-vlm-training",
+      "name": "nemo-mbridge-perf-moe-vlm-training",
+      "description": "Practical guidance for training MoE VLMs in Megatron Bridge. Compares FSDP and 3D-parallel approaches, using rounded lessons from Qwen3-VL, Qwen3-Next, and other multimodal experiments.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "train,configure,optimize,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-parallelism-strategies",
+      "name": "nemo-mbridge-perf-parallelism-strategies",
+      "description": "Operational guide for choosing and combining parallelism strategies in Megatron Bridge, including sizing rules, hardware topology mapping, and combined parallelism configuration.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "select,configure,scale,optimize"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-sequence-packing",
+      "name": "nemo-mbridge-perf-sequence-packing",
+      "description": "Validate and use packed sequences and long-context training in Megatron-Bridge, distinguishing offline packed SFT for LLMs from in-batch packing for VLMs, and applying the right CP constraints.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "configure,optimize,validate,train"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-perf-tp-dp-comm-overlap",
+      "name": "nemo-mbridge-perf-tp-dp-comm-overlap",
+      "description": "Operational guide for enabling TP, DP, and PP communication overlap in Megatron-Bridge, including config knobs, code anchors, pitfalls, and verification.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "configure,scale,optimize,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-mbridge-resiliency",
+      "name": "nemo-mbridge-resiliency",
+      "description": "Resiliency features in Megatron Bridge including fault tolerance, straggler detection, in-process restart, preemption, and re-run state machine.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer,devops_engineer",
+        "discovery.activity_tags": "configure,troubleshoot,recover,validate"
       }
     },
     {
@@ -514,6 +742,126 @@
         "catalog.subdomain": "gpu-development",
         "audience": "developer,hpc_developer",
         "discovery.activity_tags": "extend,integrate,test,benchmark,validate"
+      }
+    },
+    {
+      "path": "skills/NeMo-RL/docs",
+      "name": "docs",
+      "description": "Documentation conventions for NeMo-RL. Covers docs/index.md updates and docstring format.",
+      "metadata": {
+        "product.primary": "NeMo RL",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "contribute,configure,validate,inspect"
+      }
+    },
+    {
+      "path": "skills/NeMo-RL/launch-nemo-rl",
+      "name": "launch-nemo-rl",
+      "description": "Playbook for launching, monitoring, stopping, and debugging NeMo-RL recipes on a Kubernetes cluster via the nrl-k8s CLI. Covers ephemeral vs long-lived RayCluster modes, iterating on runs, and debugging hung or failed training jobs.",
+      "metadata": {
+        "product.primary": "NeMo RL",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "deploy,configure,monitor,debug,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/digital-health-clinical-asr-build",
+      "name": "digital-health-clinical-asr-build",
+      "description": "Stage 2 of the Clinical ASR Flywheel. Use when curating clinical terms, tagging IPA, and synthesizing a NeMo manifest. NOT for scoring (use /digital-health-clinical-asr-eval).",
+      "metadata": {
+        "product.primary": "Nemotron for Digital Health",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "conversational-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
+        "discovery.activity_tags": "generate,synthesize,configure,validate"
+      }
+    },
+    {
+      "path": "skills/digital-health-clinical-asr-eval",
+      "name": "digital-health-clinical-asr-eval",
+      "description": "Stage 3 of Clinical ASR Flywheel. Score a NeMo manifest, produce the five-section KER leaderboard (by-ipa_source diagnostic). Not for ASR auth (/riva-asr).",
+      "metadata": {
+        "product.primary": "Nemotron for Digital Health",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "conversational-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
+        "discovery.activity_tags": "evaluate,measure,validate,compare"
+      }
+    },
+    {
+      "path": "skills/digital-health-clinical-asr-finetune",
+      "name": "digital-health-clinical-asr-finetune",
+      "description": "Stage 4 of the Clinical ASR Flywheel. Use when priority KER is above 0.3 to run stock NeMo SFT on Parakeet TDT v2 and offline cycle N+1 re-eval. NOT for generic word boosting (use /finetune-asr).",
+      "metadata": {
+        "product.primary": "Nemotron for Digital Health",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "conversational-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
+        "discovery.activity_tags": "fine_tune,train,evaluate,validate"
+      }
+    },
+    {
+      "path": "skills/digital-health-clinical-asr-setup",
+      "name": "digital-health-clinical-asr-setup",
+      "description": "Stage 1 of Clinical ASR Flywheel. Use when bootstrapping a cycle: NVCF+MW disclosure, NVIDIA_API_KEY check, deps install, TTS+ASR smoke test.",
+      "metadata": {
+        "product.primary": "Nemotron for Digital Health",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "conversational-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "get_started,configure,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/earth2studio-data-fetch",
+      "name": "earth2studio-data-fetch",
+      "description": "Fetch weather/climate data via Earth2Studio data sources for specific variables and times. Do NOT use for inference pipelines, model discovery, or installation.",
+      "metadata": {
+        "product.primary": "Earth2Studio",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "developer,data_scientist,research_academic",
+        "discovery.activity_tags": "extract,transform,configure,validate"
+      }
+    },
+    {
+      "path": "skills/earth2studio-deterministic-forecast",
+      "name": "earth2studio-deterministic-forecast",
+      "description": "Build deterministic forecast scripts with Earth2Studio (model, data source, IO, inference). Do NOT use for ensemble, diagnostics, data-only fetch, or install.",
+      "metadata": {
+        "product.primary": "Earth2Studio",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "developer,data_scientist,research_academic",
+        "discovery.activity_tags": "inference,configure,integrate,validate"
+      }
+    },
+    {
+      "path": "skills/earth2studio-discover",
+      "name": "earth2studio-discover",
+      "description": "Find Earth2Studio models, data sources, and examples for a weather/climate use case. Do NOT use for writing inference code, downloading data, or installation.",
+      "metadata": {
+        "product.primary": "Earth2Studio",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "developer,data_scientist,research_academic",
+        "discovery.activity_tags": "select,assess,compare,validate"
+      }
+    },
+    {
+      "path": "skills/earth2studio-install",
+      "name": "earth2studio-install",
+      "description": "Guide installing Earth2Studio via uv or pip, selecting model extras, and configuring the environment. Do NOT use for writing inference code, choosing models, or PhysicsNeMo questions.",
+      "metadata": {
+        "product.primary": "Earth2Studio",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "developer,data_scientist,research_academic",
+        "discovery.activity_tags": "get_started,configure,validate"
       }
     }
   ]

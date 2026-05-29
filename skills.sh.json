@@ -25,6 +25,16 @@
       ]
     },
     {
+      "title": "Conversational AI",
+      "description": "Build and deploy speech, voice, dialogue, and multimodal conversational AI workflows, including real-time assistant and voice-agent experiences.",
+      "skills": [
+        "digital-health-clinical-asr-build",
+        "digital-health-clinical-asr-eval",
+        "digital-health-clinical-asr-finetune",
+        "digital-health-clinical-asr-setup"
+      ]
+    },
+    {
       "title": "Data Science",
       "description": "Prepare, analyze, explore, and model data for AI and accelerated analytics workflows that are not specific to one training, inference, or agent task.",
       "skills": [
@@ -67,6 +77,16 @@
       ]
     },
     {
+      "title": "Simulation and Modeling",
+      "description": "Create, run, validate, and analyze simulation and modeling workflows for systems, environments, processes, and physical phenomena.",
+      "skills": [
+        "earth2studio-data-fetch",
+        "earth2studio-deterministic-forecast",
+        "earth2studio-discover",
+        "earth2studio-install"
+      ]
+    },
+    {
       "title": "Training AI",
       "description": "Build, validate, tune, and maintain large-scale model training workflows, including distributed training, model support, training validation, performance tuning, and training-stack CI.",
       "skills": [
@@ -74,9 +94,30 @@
         "nemo-automodel-launcher-config",
         "nemo-automodel-model-onboarding",
         "nemo-automodel-recipe-development",
-        "mbridge-recipe-recommender",
+        "nemo-mbridge-recipe-recommender",
+        "nemo-mbridge-mlm-bridge-training",
+        "nemo-mbridge-multi-node-slurm",
+        "nemo-mbridge-perf-activation-recompute",
+        "nemo-mbridge-perf-cpu-offloading",
+        "nemo-mbridge-perf-cuda-graphs",
+        "nemo-mbridge-perf-expert-parallel-overlap",
+        "nemo-mbridge-perf-hierarchical-context-parallel",
+        "nemo-mbridge-perf-megatron-fsdp",
+        "nemo-mbridge-perf-memory-tuning",
+        "nemo-mbridge-perf-moe-comm-overlap",
+        "nemo-mbridge-perf-moe-dispatcher-selection",
+        "nemo-mbridge-perf-moe-hardware-configs",
+        "nemo-mbridge-perf-moe-long-context",
+        "nemo-mbridge-perf-moe-optimization-workflow",
+        "nemo-mbridge-perf-moe-vlm-training",
+        "nemo-mbridge-perf-parallelism-strategies",
+        "nemo-mbridge-perf-sequence-packing",
+        "nemo-mbridge-perf-tp-dp-comm-overlap",
+        "nemo-mbridge-resiliency",
         "dali-dynamic-mode",
-        "nemotron-customize"
+        "nemotron-customize",
+        "docs",
+        "launch-nemo-rl"
       ]
     },
     {
