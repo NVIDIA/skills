@@ -175,11 +175,24 @@ See [Verify Signed Agent Skills](docs/signing-agent-skills.mdx) for signature la
 
 ```
 NVIDIA/skills/
-├── skills/                      # Verified skills, mirrored daily from product repos
-│   ├── README.md                 # Install guidance for people browsing this folder directly
-│   ├── aiq-research/             # AIQ — deep/shallow research workflow
-│   ├── aiq-deploy/               # AIQ — local service deployment
-│   └── cuopt/                    # cuOpt skills (routing, optimization, server, install, …)
+├── skills/                      # Verified skills, mirrored from product repos
+│   ├── README.md                 # Install guidance for people browsing this folder
+│   ├── aiq-deploy/               # AIQ — deploy AI-Q services
+│   ├── aiq-research/             # AIQ — research workflows
+│   ├── cuopt-developer/          # cuOpt — internals & contribution
+│   ├── cuopt-install/            # cuOpt — installation
+│   ├── cuopt-routing-api-python/ # cuOpt — VRP/TSP routing (Python)
+│   ├── dali-dynamic-mode/        # DALI — dynamic-mode pipeline authoring
+│   ├── deepstream-dev/           # DeepStream — guided development
+│   ├── dynamo-recipe-runner/     # Dynamo — Kubernetes recipe deploys
+│   ├── nemo-automodel-*/         # NeMo AutoModel — distributed training (4 skills)
+│   ├── nemoclaw-user-*/          # NemoClaw — secure agent sandboxing (10 skills)
+│   ├── nemotron-customize/       # Nemotron — model customization
+│   ├── rag-blueprint/            # RAG Blueprint — RAG pipeline
+│   ├── skill-card-generator/     # Trustworthy-AI — skill card generation
+│   └── tilegym-adding-cutile-kernel/  # TileGym — cuTile kernel authoring
+│                                 # Each skill lives flat at top level (no product parent
+│                                 # dir), so `npx skills add --skill <name>` resolves cleanly
 ├── components.d/                # Product registry — one file per component, teams onboard here
 │   ├── README.md                 # Schema and onboarding instructions
 │   ├── aiq.yml
@@ -216,7 +229,13 @@ NVIDIA/skills/
 └── LICENSE                      # Apache 2.0 / CC BY 4.0
 ```
 
-Skills are maintained in their respective product repos (see the **Source** column in the [Skill Catalog](#skill-catalog)) and automatically synced to this repo daily. Products only appear under `skills/` after the sync pipeline confirms each skill carries `skill.oms.sig`, `skill-card.md`, and `evals.json`.
+Skills are maintained in their respective product repos (see the **Source** column in the [Skill Catalog](#skill-catalog)) and synced to this repo daily. Products only appear under `skills/` after the sync pipeline confirms each skill carries:
+
+- `skill.oms.sig` — detached OMS-format signature (verifiable against `nv-agent-root-cert.pem`)
+- `skill-card.md` — skill identity and governance card
+- A Tier-3 evaluation dataset — accepted at `evals/evals.json`, `evals/*.json`, `eval/*.json`, or `benchmark/evals.json`
+
+When evaluation runs produce a `BENCHMARK.md`, it ships alongside the skill so consumers can see verifiable benchmark uplift data.
 
 ---
 
