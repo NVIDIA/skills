@@ -1,32 +1,57 @@
 name: nvidia-skills
 
-description: Build with NVIDIA agent skills.
+description: Skills for NVIDIAs ecosystem spans GPU acceleration, CUDA, AI agents, inference, robotics, Physical AI, Omniverse, and simulation. This plugin helps you understand the pieces, choose a path, validate your setup, and build practical NVIDIA-powered workflows.
 
 display_name: NVIDIA
-short_description: Provide agentic guidance in your NVIDIA related workflows.
-long_description: A curated plugin bundling verified skills to provide guidance in your NVIDIA related workflows.
+short_description: Guided help for NVIDIA AI, GPU, robotics, simulation, and 3D workflows.
+long_description: NVIDIAs ecosystem spans GPU acceleration, CUDA, AI agents, inference, robotics, Physical AI, Omniverse, and simulation. This plugin helps you understand the pieces, choose a path, validate your setup, and build practical NVIDIA-powered workflows.
 
-category: Developer Tools
+category: Coding
 logo: ./assets/nvidia.png
 composer_icon: ./assets/nvidia.png
 # screenshots: []   # optional; supply ./assets/*.png paths when we have any
 
 keywords:
   - nvidia
-  - agent-skills
   - gpu
+  - cuda
+  - ai-agents
+  - inference
+  - llm-serving
+  - robotics
+  - simulation
+  - omniverse
+  - openusd
+  - digital-twin
+  - physical-ai
+  - cad
 
 default_prompts:
-  - "Solve an optimization problem with cuOpt."
-  - "Deploy or debug an NVIDIA RAG Blueprint."
-  - "Search a video archive with VSS."
+  - "Research NVIDIA CUDA-X for me and explain which libraries matter for simulation and robotics"
+  - "How I could turn real-world driving footage into a 3D neural scene for simulation"
+  - "Help me deploy a secure OpenClaw agent"
 
 # Curated subset of skills from the canonical ./skills/ catalog.
 # Reproduced under plugins/<name>/skills/<skill-basename>/ in the form
 # selected by `skill_files:` (defined in plugins.d/_defaults.yml).
 include_skills:
-  - skills/cuopt/cuopt-routing-api-python/
-  - skills/cuopt/cuopt-user-rules/
+  # AIQ / NeMo Agent Toolkit
+  - skills/aiq-deploy/
+  - skills/aiq-research/
+  # NeMoClaw
+  - skills/nemoclaw-user-get-started/
+  # Dynamo
+  - skills/dynamo-router-starter/
+  - skills/dynamo-interconnect-check/
+  # Physical AI / Omniverse
+  - skills/physical-ai-neural-reconstruction/
+  - skills/physical-ai-infrastructure-setup-and-resilient-scaling/
+  - skills/omniverse-cad-to-simready/
+  - skills/omniverse-usd-performance-tuning/
+  - skills/omniverse-realtime-viewer/
+  # cuOpt
+  - skills/cuopt-user-rules/
+
 
 # Inherits from plugins.d/_defaults.yml:
 #   version, author, homepage, repository, license,
