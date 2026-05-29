@@ -4,3 +4,5 @@ description: Author end-to-end model development, customization, evaluation, and
 skills:
   - path: skills/nemotron-customize/
     catalog_dir: nemotron-customize
+  - path: skills/nemotron-retrieval-recipes/
+    catalog_dir: nemotron-retrieval-recipes
