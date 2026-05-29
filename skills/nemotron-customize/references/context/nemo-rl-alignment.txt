@@ -9,9 +9,12 @@ Use this pack when generating stage code for any of the alignment steps:
 Wrappers are deliberately generic. Algorithm-specific behavior lives in YAML.
 Generated projects expose clear config files, not Python switches.
 
-## In-repo references (read these first)
+## Live Repo Verification
 
-- Manifests:    `src/nemotron/steps/rl/nemo_rl/<algo>/step.toml`
+Read `../CATALOG.md`, `../ARTIFACTS.md`, and `../COMMANDS.md` before this pack.
+After the bundled references select an RL step, verify:
+
+- Manifests: `src/nemotron/steps/rl/nemo_rl/<algo>/step.toml`
 - Per-step README: `src/nemotron/steps/rl/nemo_rl/<algo>/README.md`
 - Category README: `src/nemotron/steps/rl/nemo_rl/README.md`
 - Shared runner: `src/nemotron/steps/_runners/nemo_rl.py`
@@ -135,15 +138,15 @@ data_prep/rl_prep                       → rl/nemo_rl/rlhf
 
 ## Patterns to cite
 
-- `src/nemotron/steps/patterns/rl-validate-rewards-before-scale.md` — sanity-
-  check rewards before scaling rollouts.
+- `rl-validate-rewards-before-scale` in `../PATTERNS.md` — sanity-check rewards
+  before scaling rollouts.
 
 ## Staleness checks
 
 When this pack drifts:
 
 - Refresh the GRPO example URL in NeMo-RL upstream.
-- Re-verify config keys against the installed NeMo-RL release/container.
+- Re-verify config fields against the installed NeMo-RL release/container.
 - Confirm the NeMo-Gym field names (`env.should_use_nemo_gym`,
   `env.nemo_gym.config_paths`, the `genrm_model` path) still match the runner.
 - Refresh manifest defaults from each algo's `step.toml`.

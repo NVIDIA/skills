@@ -8,11 +8,10 @@ permissions:
     - AIQ_SERVER_URL
   network:
     - http://localhost:8000
-    - https://*
 compatibility: |
-  Designed for Claude Code, OpenCode, Codex, and Agent Skills-compatible tools. Requires Python 3.11+, network
-  access to a running local or self-hosted AI-Q Blueprint server, and an AI-Q backend that exposes `/health`,
-  `/chat`, and asynchronous job endpoints.
+  Designed for Claude Code, OpenCode, Codex, and Agent Skills-compatible tools. Requires Python 3.11+ and network
+  access to a running local AI-Q Blueprint server at `http://localhost:8000` by default. Non-local backends must be
+  explicitly trusted by the user and granted by the host tool outside this public skill.
 metadata:
   version: "2.1.0"
   author: "NVIDIA AI-Q Blueprint Team <aiq-blueprint@nvidia.com>"
@@ -55,7 +54,8 @@ Users need:
 
 - Python 3.11+ available as `python3`.
 - A reachable local or self-hosted AI-Q Blueprint backend.
-- `AIQ_SERVER_URL` set when the backend is not running at `http://localhost:8000`.
+- `AIQ_SERVER_URL` set when the backend is not running at `http://localhost:8000`; non-local values must be trusted by
+  the user before any query is sent.
 - A backend configured with authentication disabled for this public helper, or a separate authenticated AI-Q skill for
   authenticated environments.
 - Network access from the local machine to the AI-Q backend URL.
@@ -69,7 +69,8 @@ The helper script has no third-party Python package dependencies; it uses Python
 1. Resolve the target backend URL.
 2. Run `health` before sending research requests.
 3. If no backend is reachable, ask for a backend URL or hand off to `aiq-deploy`.
-4. Tell the user the query will be sent to the configured AI-Q backend before sending it.
+4. Before sending any user query, state the exact AI-Q backend URL that will receive it. For non-local URLs, continue
+   only if the user has explicitly confirmed that URL is trusted in the current conversation.
 5. Poll asynchronous deep research jobs when AI-Q returns a job ID.
 6. Present returned reports with citations and source URLs intact.
 7. Stop on failed jobs and show the returned error; do not retry automatically.

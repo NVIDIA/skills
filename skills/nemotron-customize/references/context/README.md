@@ -1,8 +1,8 @@
 # Context packs
 
-Per-step extracts of upstream library documentation. Loaded by Act-phase
-sub-agents in `/nemotron-customize` to ground code generation in the real
-library API.
+Per-step extracts of upstream library documentation. Load these only after the
+bundled catalog/run/artifact references have selected a step and an action
+needs real library API detail.
 
 ## Lookup
 
@@ -10,6 +10,14 @@ library API.
 reads this once and dispatches packs to per-stage sub-agents.
 
 ## Provenance
+
+These packs are not the step catalog. For routing and normal execution, read:
+
+- `../CATALOG.md`
+- `../ARTIFACTS.md`
+- `../COMMANDS.md`
+- `../PATTERNS.md`
+- `../HARDWARE.md`
 
 Each `*.txt` file is a snapshot of upstream docs + selected source files from
 one of:
@@ -28,5 +36,5 @@ one of:
 | `nemotron-data-prep.txt` | NVIDIA-NeMo/Nemotron (this repo) | `$NEMOTRON_ROOT` |
 
 These packs are curated summaries for agent grounding. They are intentionally
-short and should point agents back to the repo step manifest, config, runner,
-and active env TOML instead of duplicating upstream documentation.
+short and should point agents back to bundled references first, then to the
+repo step manifest, config, runner, and active profile TOML for live verification.

@@ -76,13 +76,21 @@ PY
 
 Core hosted-model usage requires `NVIDIA_API_KEY`. Web research requires at least one configured search provider key for the selected config.
 
-For the public Agent Skill backend path, assume `REQUIRE_AUTH=false`. If the user requires authentication, they must configure it to match their environment before using `aiq-research`.
+For the public Agent Skill backend path, use `REQUIRE_AUTH=false` only for local single-user validation on a trusted
+machine. This disables AI-Q API authentication. For any shared, multi-user, or internet-facing deployment, set
+`REQUIRE_AUTH=true` and configure the matching authentication layer before using `aiq-research`.
 
 If required values are missing, stop and ask the user to fill `deploy/.env`. Do not ask them to paste secrets into chat.
 
 ## Normalize Skill Backend Mode
 
-When the user chooses Docker Compose Skill backend mode, set non-secret runtime defaults in `deploy/.env` before starting services. This prevents a freshly copied `.env.example` from leaving the backend in CLI/development mode. Preserve an existing `REQUIRE_AUTH` value; only add `REQUIRE_AUTH=false` when the key is missing.
+When the user chooses Docker Compose Skill backend mode, set non-secret runtime defaults in `deploy/.env` before
+starting services. This prevents a freshly copied `.env.example` from leaving the backend in CLI/development mode.
+Preserve an existing `REQUIRE_AUTH` value; only add `REQUIRE_AUTH=false` when the key is missing.
+
+WARNING: The normalization command edits `deploy/.env`. Before running it, tell the user it will update
+`APP_ENV`, `AIQ_DEV_ENV`, and possibly add `REQUIRE_AUTH=false`; if `deploy/.env` already exists with different
+values, show the planned key changes and get confirmation before applying them.
 
 ```bash
 python3 - <<'PY'

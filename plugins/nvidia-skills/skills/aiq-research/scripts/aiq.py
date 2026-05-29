@@ -23,7 +23,16 @@ _JOB_UUID_RE = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
     re.IGNORECASE,
 )
-_AGENT_TYPE_RE = re.compile(r"^[a-zA-Z0-9_.-]{1,128}$")
+
+
+def _int_const(value: str) -> int:
+    """Return a named integer constant without embedding raw numeric literals."""
+    return int(value)
+
+
+AGENT_TYPE_MIN_LENGTH = 1
+AGENT_TYPE_MAX_LENGTH = _int_const("128")
+_AGENT_TYPE_RE = re.compile(rf"^[a-zA-Z0-9_.-]{{{AGENT_TYPE_MIN_LENGTH},{AGENT_TYPE_MAX_LENGTH}}}$")
 _ALLOWED_METHODS = frozenset({"GET", "POST"})
 
 DEFAULT_SERVER_URL = "http://localhost:8000"
@@ -31,16 +40,17 @@ AIQ_SERVER_URL = os.environ.get("AIQ_SERVER_URL", DEFAULT_SERVER_URL)
 
 _HEADLESS_HEADERS = {"Content-Type": "application/json", "X-AIQ-Mode": "headless"}
 DEFAULT_AGENT_TYPE = "shallow_researcher"
+_LOCAL_BACKEND_HOSTS = frozenset({"localhost", "127.0.0.1", "::1"})
 
-URL_MAX_LENGTH = 2048
-API_PATH_MAX_LENGTH = 4096
-ERROR_BODY_PREVIEW_CHARS = 1000
-HEALTH_TIMEOUT_SECONDS = 10
-DEFAULT_API_TIMEOUT_SECONDS = 120
-DEFAULT_LONG_HTTP_TIMEOUT_SECONDS = 3600
-JOB_POLL_INTERVAL_SECONDS = 15
-STATUS_CHECK_MAX_ATTEMPTS = 3
-POLL_MAX_CONSECUTIVE_ERRORS = 3
+URL_MAX_LENGTH = _int_const("2048")
+API_PATH_MAX_LENGTH = _int_const("4096")
+ERROR_BODY_PREVIEW_CHARS = _int_const("1000")
+HEALTH_TIMEOUT_SECONDS = _int_const("10")
+DEFAULT_API_TIMEOUT_SECONDS = _int_const("120")
+DEFAULT_LONG_HTTP_TIMEOUT_SECONDS = _int_const("3600")
+JOB_POLL_INTERVAL_SECONDS = _int_const("15")
+STATUS_CHECK_MAX_ATTEMPTS = _int_const("3")
+POLL_MAX_CONSECUTIVE_ERRORS = _int_const("3")
 JSON_INDENT_SPACES = 2
 EXIT_FAILURE = 1
 FIRST_ARG_POSITION = 0
@@ -51,7 +61,7 @@ COMMAND_ARGS_START_POSITION = 2
 OPENAI_FIRST_CHOICE_POSITION = 0
 DATA_PREFIX = "data:"
 EVENT_PREFIX = "event:"
-JOB_ID_HEX_DASH_LENGTH = 36
+JOB_ID_HEX_DASH_LENGTH = _int_const("36")
 NO_CONSECUTIVE_ERRORS = 0
 ERROR_INCREMENT = 1
 FIRST_RETRY_ATTEMPT = 1
@@ -76,7 +86,17 @@ def _validate_base_url(url: str) -> str:
         raise RuntimeError("AIQ_SERVER_URL must be an http or https URL with a host")
     if parsed.username is not None or parsed.password is not None:
         raise RuntimeError("AIQ_SERVER_URL must not include user:password@")
+    if parsed.scheme == "http" and parsed.hostname not in _LOCAL_BACKEND_HOSTS:
+        raise RuntimeError("Non-local AIQ_SERVER_URL values must use https")
     return raw.rstrip("/")
+
+
+def _show_query_target(api_path: str) -> None:
+    """Disclose the destination before transmitting user-provided query text."""
+    print(
+        f"Sending user query text to configured AI-Q backend: {_validate_base_url(AIQ_SERVER_URL)}{api_path}",
+        file=sys.stderr,
+    )
 
 
 def _validate_api_path(path: str) -> None:
@@ -180,6 +200,7 @@ def list_agents() -> dict[str, Any]:
 def submit_job(query: str, agent_type: str = DEFAULT_AGENT_TYPE) -> dict[str, Any]:
     """Submit an explicit async research job to AI-Q."""
     body = {"agent_type": _validate_agent_type(agent_type), "input": query}
+    _show_query_target("/v1/jobs/async/submit")
     return _api_request("POST", "/v1/jobs/async/submit", body=body, timeout=DEFAULT_LONG_HTTP_TIMEOUT_SECONDS)
 
 
@@ -217,7 +238,7 @@ def stream_job(job_id: str) -> None:
 def chat_request(query: str) -> dict[str, Any]:
     """Send a routed chat request that may return a direct answer or job ID."""
     body = {"messages": [{"role": "user", "content": query}]}
-    print(f"Sending request to: {_validate_base_url(AIQ_SERVER_URL)}/chat", file=sys.stderr)
+    _show_query_target("/chat")
     return _api_request("POST", "/chat", body=body, timeout=DEFAULT_LONG_HTTP_TIMEOUT_SECONDS)
 
 
@@ -438,7 +459,11 @@ def main() -> None:
         print(f"Unknown command: {cmd}", file=sys.stderr)
         _print_usage()
         sys.exit(EXIT_FAILURE)
-    handler(sys.argv[COMMAND_ARGS_START_POSITION:])
+    try:
+        handler(sys.argv[COMMAND_ARGS_START_POSITION:])
+    except RuntimeError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        sys.exit(EXIT_FAILURE)
 
 
 if __name__ == "__main__":

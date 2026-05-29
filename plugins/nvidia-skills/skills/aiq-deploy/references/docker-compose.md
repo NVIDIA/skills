@@ -30,6 +30,10 @@ If port `8000` is already in use, set `PORT=8100` or another free port in `deplo
 
 Before starting, read `env-and-secrets.md` and run its Skill backend mode normalization. This sets non-secret values such as `APP_ENV=production` and `AIQ_DEV_ENV=skill`, and it defaults `REQUIRE_AUTH=false` only when not already configured.
 
+WARNING: `REQUIRE_AUTH=false` disables AI-Q API authentication. Use it only for local single-user Agent Skill
+validation on a trusted machine. For any shared, multi-user, or internet-facing deployment, set `REQUIRE_AUTH=true`
+and configure the matching authentication layer before exposing the service.
+
 ```bash
 cd deploy/compose
 BUILD_TARGET=release docker compose --env-file ../.env -f docker-compose.yaml config --quiet

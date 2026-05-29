@@ -162,7 +162,9 @@ This pipeline follows the eval-bookends pattern (eval before and after training)
 Packing follows pack-variable-length for heterogeneous SFT data.
 ```
 
-Patterns live at [src/nemotron/steps/patterns/](../../../../src/nemotron/steps/patterns/).
+Use [../PATTERNS.md](../PATTERNS.md) first for pattern selection. Fall back to
+[src/nemotron/steps/patterns/](../../../../src/nemotron/steps/patterns/) only
+when a full pattern body is needed.
 
 ### R10. Deploy targets share `stages/`
 
@@ -195,8 +197,8 @@ After the scaffold is written, spawn one sub-agent per stage. Each sub-agent:
 You are implementing stage <NN>_<name> = <step_id>.
 
 Load:
-  - skills/nemotron-customize/references/act/STAGE.md     (implementation contract)
-  - <context_pack_path>                         (from context/index.toml lookup)
+  - references/act/STAGE.md       (implementation contract)
+  - <context_pack_path>           (from references/context/index.toml lookup)
 
 Plan requirements:
   - Model: <model>

@@ -2,7 +2,8 @@
 
 Use this pack only when a user asks how to run an AutoModel SFT/PEFT step on a
 specific execution backend. It is not the source of the training schema; read
-the step config and `src/nemotron/steps/_runners/automodel.py` first.
+`../CATALOG.md` and `../COMMANDS.md` first, then verify the selected step config
+and `src/nemotron/steps/_runners/automodel.py` for live run details.
 
 ## Contract
 
@@ -24,7 +25,9 @@ the step config and `src/nemotron/steps/_runners/automodel.py` first.
 | Slurm submission | Slurm env TOML profile with the container, mounts, and env vars already defined |
 | Missing env file | Stop and ask for/generate env TOML; do not invent a batch profile |
 
-## What To Read
+## Live Verification
+
+After the bundled references select AutoModel, verify:
 
 1. `src/nemotron/steps/sft/automodel/step.toml` or
    `src/nemotron/steps/peft/automodel/step.toml`.

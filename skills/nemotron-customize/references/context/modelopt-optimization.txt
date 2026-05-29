@@ -11,14 +11,17 @@ generic; algorithm-specific knobs go in YAML under `args:`. **Don't fork
 upstream scripts into generated projects** unless the user explicitly needs
 custom algorithm code.
 
-## In-repo references (read these first)
+## Live Repo Verification
 
-- Manifests:    `src/nemotron/steps/optimize/modelopt/<algo>/step.toml`
+Read `../CATALOG.md`, `../ARTIFACTS.md`, and `../COMMANDS.md` before this pack.
+After the bundled references select a ModelOpt step, verify:
+
+- Manifests: `src/nemotron/steps/optimize/modelopt/<algo>/step.toml`
 - Per-step README: `src/nemotron/steps/optimize/modelopt/<algo>/README.md`
 - Category README: `src/nemotron/steps/optimize/modelopt/README.md`
 - Shared runner: `src/nemotron/steps/_runners/modelopt.py`
-- Configs:      `src/nemotron/steps/optimize/modelopt/<algo>/config/default.yaml`
-                + `tiny.yaml`; quantize also ships `fp8.yaml` and `nvfp4.yaml`.
+- Configs: `src/nemotron/steps/optimize/modelopt/<algo>/config/default.yaml`
+  plus `tiny.yaml`; quantize also ships `fp8.yaml` and `nvfp4.yaml`.
 
 ## Folder choice
 
@@ -135,7 +138,7 @@ torchrun:
 extra_args: []
 ```
 
-Common keys for `prune_export_config`: `hidden_size`, `ffn_hidden_size`,
+Common fields for `prune_export_config`: `hidden_size`, `ffn_hidden_size`,
 `num_layers`, `num_attention_heads`, `num_query_groups`.
 
 Output: pruned HF checkpoint. Distillation usually follows when quality needs
@@ -222,10 +225,10 @@ Artifact rules:
 
 ## Patterns to cite
 
-- `src/nemotron/steps/patterns/convert-checkpoint-safety.md` — quantize / prune / distill from a clean checkpoint, not from training-state files.
-- `src/nemotron/steps/patterns/eval-before-and-after-training.md` — measure quantized / pruned / distilled quality against the unoptimized baseline.
-- `src/nemotron/steps/patterns/byob-benchmark-design.md` — calibration and quality claims should be scored on a representative held-out benchmark, not on calibration loss alone.
-- `src/nemotron/steps/patterns/peft-adapter-merge-discipline.md` — when the optimization input is a LoRA-adapter checkpoint, merge first.
+- `convert-checkpoint-safety` in `../PATTERNS.md` — quantize / prune / distill from a clean checkpoint, not from training-state files.
+- `eval-before-and-after-training` in `../PATTERNS.md` — measure quantized / pruned / distilled quality against the unoptimized baseline.
+- `byob-benchmark-design` in `../PATTERNS.md` — calibration and quality claims should be scored on a representative held-out benchmark, not on calibration loss alone.
+- `peft-adapter-merge-discipline` in `../PATTERNS.md` — when the optimization input is a LoRA-adapter checkpoint, merge first.
 
 ## Staleness checks
 

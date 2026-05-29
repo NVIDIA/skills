@@ -18,7 +18,7 @@
     "id": "deterministic-eval-002-graphcast-arco-10day",
     "question": "Generate a deterministic forecast script using GraphCast with ARCO ERA5 data. Initialize from 2023-09-01 00Z and run for 10 days. Save all output variables to Zarr.",
     "expected_skill": "earth2studio-deterministic-forecast",
-    "expected_script": "evals/targets/eval_4_target.py",
+    "expected_script": "evals/targets/eval_2_target.py",
     "ground_truth": "Generates a script using GraphCastOperational model, ARCO data source, ZarrBackend, 10-day run. Does not filter output_coords (saves all model outputs).",
     "expected_behavior": [
       "Uses GraphCastOperational or GraphCast model class",
@@ -33,7 +33,7 @@
     "id": "deterministic-eval-003-manual-loop",
     "question": "I want to build a deterministic forecast workflow from scratch without using earth2studio.run.deterministic. Write a complete script that manually fetches initial conditions, creates the model iterator, steps through it, and writes each step to the IO backend. Use Pangu for a 5-day forecast of z500 and t2m from 2024-03-01 00Z with GFS data and ZarrBackend output.",
     "expected_skill": "earth2studio-deterministic-forecast",
-    "expected_script": "evals/targets/eval_7_target.py",
+    "expected_script": "evals/targets/eval_3_target.py",
     "ground_truth": "Generates a complete script that reimplements the deterministic workflow loop manually: fetches data with fetch_data, sets up IO coordinates, creates the prognostic iterator, loops through steps writing output via split_coords, and uses map_coords for coordinate subsetting. Does NOT call earth2studio.run.deterministic.",
     "expected_behavior": [
       "Does NOT import or call earth2studio.run.deterministic",

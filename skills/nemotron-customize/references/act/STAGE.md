@@ -233,7 +233,8 @@ def run_prep(
 ```
 
 Keep `tokenizer` and `pack_size` aligned with the downstream training stage —
-see [patterns/prep-data-is-tokenizer-locked.md](../../../../src/nemotron/steps/patterns/prep-data-is-tokenizer-locked.md) and [patterns/sft-sequence-packing.md](../../../../src/nemotron/steps/patterns/sft-sequence-packing.md).
+see [../PATTERNS.md](../PATTERNS.md) first, then fall back to the live pattern
+files only if their full bodies are needed.
 
 ---
 

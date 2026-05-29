@@ -6,15 +6,18 @@ The step builds a Data Designer pipeline from declarative YAML. Customization
 belongs in config (model alias, columns, seed data, output projection) — keep
 `step.py` generic.
 
-## In-repo references (read these first)
+## Live Repo Verification
+
+Read `../CATALOG.md`, `../ARTIFACTS.md`, and `../COMMANDS.md` before this pack.
+After the bundled references select `sdg/data_designer`, verify:
 
 - Step manifest: `src/nemotron/steps/sdg/data_designer/step.toml`
 - Per-step README: `src/nemotron/steps/sdg/data_designer/README.md`
 - Default cfg (SFT): `src/nemotron/steps/sdg/data_designer/config/default.yaml`
-- Smoke cfg:        `src/nemotron/steps/sdg/data_designer/config/tiny.yaml`
+- Smoke cfg: `src/nemotron/steps/sdg/data_designer/config/tiny.yaml`
 - Preference cfg (DPO): `src/nemotron/steps/sdg/data_designer/config/rl_pref.yaml`
-- Tool-call SFT cfg:    `src/nemotron/steps/sdg/data_designer/config/customer_support_tools.yaml`
-- Seed data:    `src/nemotron/steps/sdg/data_designer/data/<*>.jsonl`
+- Tool-call SFT cfg: `src/nemotron/steps/sdg/data_designer/config/customer_support_tools.yaml`
+- Seed data: `src/nemotron/steps/sdg/data_designer/data/<*>.jsonl`
 
 ## Step.toml contract
 
@@ -112,10 +115,10 @@ directly.
 
 ## Patterns to cite
 
-- `src/nemotron/steps/patterns/sdg-pipeline-versioning.md` — version SDG configs
-  alongside the data they produce.
-- `src/nemotron/steps/patterns/data-quality-before-quantity.md` — small + good
-  beats large + noisy for synthetic data.
+- `sdg-pipeline-versioning` in `../PATTERNS.md` — version SDG configs alongside
+  the data they produce.
+- `data-quality-before-quantity` in `../PATTERNS.md` — small + good beats large
+  + noisy for synthetic data.
 
 ## Staleness checks
 

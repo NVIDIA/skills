@@ -10,11 +10,14 @@ The step family wraps `src/nemotron/data_prep` recipes. Generated stage code
 should be a thin wrapper around the recipe entry point — no schema knowledge
 in Python.
 
-## In-repo references (read these first)
+## Live Repo Verification
+
+Read `../CATALOG.md`, `../ARTIFACTS.md`, and `../COMMANDS.md` before this pack.
+After the bundled references select a data prep step, verify:
 
 - Manifests: `src/nemotron/steps/data_prep/<step>/step.toml`
 - Per-step README: `src/nemotron/steps/data_prep/<step>/README.md`
-- Category README: `src/nemotron/steps/data_prep/README.md` (which step + when-to-pack table)
+- Category README: `src/nemotron/steps/data_prep/README.md`
 - Shared helpers: `src/nemotron/steps/data_prep/_common.py`
 
 ## Shared helpers (`data_prep/_common.py`)
@@ -39,7 +42,7 @@ Order in your `run.py`:
 ## Shared principles across data_prep steps
 
 - **Tokenizer-locked outputs.** Repack on tokenizer / template / seq_length
-  change. See `src/nemotron/steps/patterns/prep-data-is-tokenizer-locked.md`.
+  change. See `prep-data-is-tokenizer-locked` in `../PATTERNS.md`.
 - **Deterministic splits.** Always emit named splits (`train`, `valid`, `test`)
   with stable shard manifests so re-runs are bit-comparable.
 - **HF dataset interop.** A blend entry should describe HF dataset id, split,

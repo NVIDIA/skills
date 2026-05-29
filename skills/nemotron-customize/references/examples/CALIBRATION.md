@@ -40,9 +40,11 @@ Let me read the step manifests and draft the plan.
 user: I need to translate English data to Thai, then fine-tune Nano3,
       then run RL with GRPO
 
-A: That's a 6-stage pipeline. Let me read the manifests.
+A: That's a 6-stage pipeline. Let me read the bundled catalog, artifact graph,
+and patterns, then verify the selected live manifests.
 
-[reads STEPS.md, sft/guide.md, rl/guide.md, relevant step.toml files]
+[reads references/CATALOG.md, references/ARTIFACTS.md, references/PATTERNS.md,
+then relevant live step.toml/config files for verification]
 
 Here's the plan:
 

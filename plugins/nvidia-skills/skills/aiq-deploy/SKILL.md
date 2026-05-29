@@ -31,6 +31,7 @@ Use this skill to get a local or self-hosted NVIDIA AI-Q Blueprint server runnin
 
 This skill owns setup, deployment, operational checks, troubleshooting, and shutdown. It does not run deep
 research itself. After deployment is healthy, hand off the verified server URL to `aiq-research`.
+The workflow stays explicit so deployment validation and handoff are repeatable across supported agent clients.
 
 ## Prerequisites
 

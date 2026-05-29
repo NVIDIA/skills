@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nemotron-customize`
-- Evaluation date: 2026-05-28
+- Evaluation date: 2026-05-29
 - NVSkills-Eval profile: `external`
 - Environment: `local`
 - Dataset: 8 evaluation tasks
@@ -32,6 +32,7 @@ Reported benchmark dimensions:
 
 Underlying evaluation signals used in this run:
 
+- `security` (Security): checks for unsafe operations, secret leakage, and unauthorized access.
 - `skill_execution` (Skill Execution): verifies that the agent loaded the expected skill and workflow.
 - `skill_efficiency` (Efficiency): checks routing quality, decoy avoidance, and redundant tool usage.
 - `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
@@ -53,25 +54,21 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 79% (-6%) | 79% (+10%) |
-| Correctness | 8 | 95% (+12%) | 91% (+33%) |
-| Discoverability | 8 | 74% (+35%) | 68% (+27%) |
-| Effectiveness | 8 | 90% (+2%) | 86% (+32%) |
-| Efficiency | 8 | 58% (+31%) | 55% (+16%) |
+| Security | 8 | 100% (+0%) | 100% (+0%) |
+| Correctness | 8 | 96% (+13%) | 94% (+20%) |
+| Discoverability | 8 | 80% (+45%) | 71% (+21%) |
+| Effectiveness | 8 | 94% (+2%) | 90% (+21%) |
+| Efficiency | 8 | 65% (+38%) | 59% (+13%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 5 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 1 total findings.
 
 Top findings:
 
-- LOW QUALITY/quality_discoverability: Description very long (268 chars, recommend 50-150) (`skills/nemotron-customize/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description doesn't mention WHEN to use this skill (`skills/nemotron-customize/SKILL.md`)
-- LOW SCHEMA/unexpected_file: Unexpected 'skill.oms.sig' in skill root (`skills/nemotron-customize/skill.oms.sig`)
-- LOW SCHEMA/unexpected_file: Unexpected 'skill-card.md' in skill root (`skills/nemotron-customize/skill-card.md`)
-- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/nemotron-customize/SKILL.md`)
+- LOW QUALITY/quality_discoverability: Description very long (664 chars, recommend 50-150) (`skills/nemotron-customize/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
@@ -79,8 +76,8 @@ Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
 
 Notable observations:
 
-- Context Deduplication: Collected 6 file(s)
-- Inter-Skill Deduplication: Parsed skill 'nemotron-customize': 268 char description
+- Context Deduplication: Collected 11 file(s)
+- Inter-Skill Deduplication: Parsed skill 'nemotron-customize': 664 char description
 
 ## Publication Recommendation
 

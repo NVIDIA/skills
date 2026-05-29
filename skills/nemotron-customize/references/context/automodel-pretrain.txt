@@ -31,13 +31,16 @@ The same rule applies on the SFT/PEFT side: AutoModel SFT/PEFT
 recipe; Megatron-Bridge SFT/PEFT (`sft/megatron_bridge`, `peft/megatron_bridge`)
 requires both an MB recipe and the parallelism / packed-Parquet workflow.
 
-## In-repo references (read these first)
+## Live Repo Verification
+
+Read `../CATALOG.md`, `../ARTIFACTS.md`, and `../COMMANDS.md` before this pack.
+After the bundled references select `pretrain/automodel`, verify:
 
 - Step manifest: `src/nemotron/steps/pretrain/automodel/step.toml`
-- Step entry:    `src/nemotron/steps/pretrain/automodel/step.py`
+- Step entry: `src/nemotron/steps/pretrain/automodel/step.py`
 - Shared runner: `src/nemotron/steps/_runners/automodel.py`
-- Default cfg:   `src/nemotron/steps/pretrain/automodel/config/default.yaml`
-- Smoke cfg:     `src/nemotron/steps/pretrain/automodel/config/tiny.yaml`
+- Default cfg: `src/nemotron/steps/pretrain/automodel/config/default.yaml`
+- Smoke cfg: `src/nemotron/steps/pretrain/automodel/config/tiny.yaml`
 
 The step is wired through the shared AutoModel runner used by sft/peft/pretrain.
 
