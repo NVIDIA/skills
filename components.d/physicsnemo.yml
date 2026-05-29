@@ -1,6 +1,6 @@
 name: PhysicsNeMo
 repo: NVIDIA/physicsnemo
-description: NVIDIA PhysicsNeMo - Agent skills for the PhysicsNeMo SciML framework. 
+description: NVIDIA PhysicsNeMo - Open-source deep-learning framework for building, training, and fine-tuning deep learning models using state-of-the-art Physics-ML methods.
 skills:
   - path: skills/physicsnemo-discover/
     catalog_dir: physicsnemo-discover
