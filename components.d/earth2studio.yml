@@ -1,0 +1,8 @@
+name: Earth2Studio
+repo: NVIDIA/earth2studio
+description: Open-source deep-learning framework for exploring, building and deploying AI weather/climate workflows.
+skills:
+  - path: skills/
+    catalog_dir: Earth2Studio
+links:
+  security: false
