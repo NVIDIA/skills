@@ -2,18 +2,10 @@ name: Megatron-Core
 repo: NVIDIA/Megatron-LM
 description: Large-scale distributed training — model parallelism, pipeline parallelism, and mixed precision.
 skills:
-  - path: skills/mcore-build-and-dependency/
-    catalog_dir: mcore-build-and-dependency
-  - path: skills/mcore-bump-base-image/
-    catalog_dir: mcore-bump-base-image
-  - path: skills/mcore-cicd/
-    catalog_dir: mcore-cicd
   - path: skills/mcore-create-issue/
     catalog_dir: mcore-create-issue
   - path: skills/mcore-linting-and-formatting/
     catalog_dir: mcore-linting-and-formatting
-  - path: skills/mcore-onboard-gb200-1node-tests/
-    catalog_dir: mcore-onboard-gb200-1node-tests
   - path: skills/mcore-run-on-slurm/
     catalog_dir: mcore-run-on-slurm
   - path: skills/mcore-split-pr/
