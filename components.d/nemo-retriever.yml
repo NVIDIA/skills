@@ -1,0 +1,7 @@
+name: NeMo Retriever
+repo: NVIDIA/NeMo-Retriever
+ref: develop
+description: NeMo Retriever - deploy NeMo Retriever Library locally, extract information from corpus of data, and answer questions against the corpus.
+skills:
+  - path: skills/nemo-retriever/
+    catalog_dir: nemo-retriever
