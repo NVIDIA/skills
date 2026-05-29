@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# TEMPORARY — remove after Computex 2026.
+#
+# Manual catalog exceptions: skills staged via direct PRs to nvidia/skills
+# rather than synced from a public upstream. The Physical AI team's source
+# repo is private and pulling from it would risk leaking unreleased material,
+# so as a compromise they raise PRs into this catalog directly. These rows
+# need to survive the sync workflow's README regeneration, which otherwise
+# only emits rows for components declared in components.d/.
+#
+# Schema differs from components.d/ — there is no repo, ref, or source path,
+# and a single product may span multiple top-level catalog directories.
+
+components:
+  - name: Omniverse
+    description: Omniverse USD/Kit workflows — CAD-to-SimReady conversion, realtime viewer orchestration, and USD performance tuning.
+    catalog_dirs:
+      - omniverse-cad-to-simready
+      - omniverse-realtime-viewer
+      - omniverse-usd-performance-tuning
+
+  - name: Physical AI
+    description: Physical AI development — infrastructure setup for synthetic data generation, resilient scaling, and neural reconstruction (NuRec/NRE).
+    catalog_dirs:
+      - physical-ai-infrastructure-setup-and-resilient-scaling
+      - physical-ai-neural-reconstruction
