@@ -1,0 +1,51 @@
+[
+  {
+    "id": "deterministic-eval-001-3day-t2m-wind",
+    "question": "I want to forecast 2m temperature and 10m wind speed 3 days ahead from 2024-01-15 00Z. I have an A100 80GB GPU. Write me the full inference script.",
+    "expected_skill": "earth2studio-deterministic-forecast",
+    "expected_script": "evals/targets/eval_1_target.py",
+    "ground_truth": "Selects a suitable medium-range prognostic model, a compatible data source, calculates nsteps, and generates a complete deterministic inference script. Output should closely match the reference target file.",
+    "expected_behavior": [
+      "Selects a medium-range (MR class) prognostic model appropriate for 3-day forecasts",
+      "Presents data source options and selects one compatible with the chosen model",
+      "Correctly calculates nsteps based on model time step and 3-day horizon",
+      "Generated script uses earth2studio.run.deterministic with correct arguments",
+      "Script includes output_coords filtering to t2m, u10m, and v10m variables (both wind components needed for wind speed)",
+      "Generated script closely matches the structure in evals/targets/eval_1_target.py"
+    ]
+  },
+  {
+    "id": "deterministic-eval-002-graphcast-arco-10day",
+    "question": "Generate a deterministic forecast script using GraphCast with ARCO ERA5 data. Initialize from 2023-09-01 00Z and run for 10 days. Save all output variables to Zarr.",
+    "expected_skill": "earth2studio-deterministic-forecast",
+    "expected_script": "evals/targets/eval_4_target.py",
+    "ground_truth": "Generates a script using GraphCastOperational model, ARCO data source, ZarrBackend, 10-day run. Does not filter output_coords (saves all model outputs).",
+    "expected_behavior": [
+      "Uses GraphCastOperational or GraphCast model class",
+      "Uses ARCO data source",
+      "Uses ZarrBackend for IO",
+      "Correctly calculates nsteps for 10 days with GraphCast's time step",
+      "Does not include output_coords filtering (saves all variables)",
+      "Generated script closely matches the structure in evals/targets/eval_4_target.py"
+    ]
+  },
+  {
+    "id": "deterministic-eval-003-manual-loop",
+    "question": "I want to build a deterministic forecast workflow from scratch without using earth2studio.run.deterministic. Write a complete script that manually fetches initial conditions, creates the model iterator, steps through it, and writes each step to the IO backend. Use Pangu for a 5-day forecast of z500 and t2m from 2024-03-01 00Z with GFS data and ZarrBackend output.",
+    "expected_skill": "earth2studio-deterministic-forecast",
+    "expected_script": "evals/targets/eval_7_target.py",
+    "ground_truth": "Generates a complete script that reimplements the deterministic workflow loop manually: fetches data with fetch_data, sets up IO coordinates, creates the prognostic iterator, loops through steps writing output via split_coords, and uses map_coords for coordinate subsetting. Does NOT call earth2studio.run.deterministic.",
+    "expected_behavior": [
+      "Does NOT import or call earth2studio.run.deterministic",
+      "Uses fetch_data from earth2studio.data to fetch initial conditions onto the device",
+      "Calls prognostic.create_iterator(x, coords) to create the model iterator",
+      "Iterates through the model with a for/while loop, breaking at nsteps",
+      "Uses map_coords to subselect output variables/coordinates at each step",
+      "Uses split_coords before writing to the IO backend",
+      "Correctly sets up IO total_coords with time and lead_time arrays before the loop",
+      "Calls io.add_array to initialize the IO backend before writing",
+      "Correctly calculates nsteps=20 for 5 days with Pangu's 6h time step",
+      "Generated script closely matches the structure in evals/targets/eval_7_target.py"
+    ]
+  }
+]
