@@ -148,8 +148,18 @@ jobs:
           # Every catalog skill (defined by SKILL.md) must ship with:
           #   - skill.oms.sig  (detached NVIDIA signature)
           #   - skill-card.md  (skill metadata card)
-          #   - evals.json     (eval definitions, anywhere within the
-          #                     skill directory — typically under benchmark/)
+          #   - eval data      (Tier-3 NV-ACES dataset). Accepted in any
+          #                     of these forms — semantic equivalence,
+          #                     not literal-filename:
+          #                       * evals.json anywhere in the skill dir
+          #                         (canonical — recursive find)
+          #                       * any *.json under skills/<skill>/evals/
+          #                       * any *.json under skills/<skill>/eval/
+          #                     This accepts multi-profile datasets like
+          #                     eval/h100.json + eval/nvidia_hosted.json
+          #                     (RAG Blueprint pattern), benchmark/evals.json
+          #                     (cuopt-developer pattern), and the
+          #                     canonical evals/evals.json layout.
           # Skills missing any of these are dropped from the catalog
           # before the PR is created — non-compliant skills do not merge.
           dropped=/tmp/dropped-skills.txt
@@ -160,8 +170,19 @@ jobs:
             missing=""
             [ -f "$dir/skill.oms.sig" ] || missing="$missing skill.oms.sig"
             [ -f "$dir/skill-card.md" ] || missing="$missing skill-card.md"
-            [ -n "$(find "$dir" -type f -name evals.json -print -quit 2>/dev/null)" ] \
-              || missing="$missing evals.json"
+            # Eval dataset: accept canonical evals.json, OR any *.json
+            # under eval/ or evals/ subdir (multi-profile datasets).
+            has_eval=""
+            if [ -n "$(find "$dir" -type f -name evals.json -print -quit 2>/dev/null)" ]; then
+              has_eval=1
+            elif [ -d "$dir/evals" ] && \
+                 [ -n "$(find "$dir/evals" -maxdepth 1 -type f -name '*.json' -print -quit 2>/dev/null)" ]; then
+              has_eval=1
+            elif [ -d "$dir/eval" ] && \
+                 [ -n "$(find "$dir/eval" -maxdepth 1 -type f -name '*.json' -print -quit 2>/dev/null)" ]; then
+              has_eval=1
+            fi
+            [ -n "$has_eval" ] || missing="$missing evals.json"
             if [ -n "$missing" ]; then
               product=$(echo "$dir" | awk -F/ '{print $2}')
               echo "$product|$dir|$(echo "$missing" | xargs)" >> "$dropped"
