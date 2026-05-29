@@ -25,8 +25,8 @@ default_prompts:
 # Reproduced under plugins/<name>/skills/<skill-basename>/ in the form
 # selected by `skill_files:` (defined in plugins.d/_defaults.yml).
 include_skills:
-  - skills/cuopt/cuopt-routing-api-python/
-  - skills/cuopt/cuopt-user-rules/
+  - skills/cuopt-routing-api-python/
+  - skills/cuopt-user-rules/
 
 # Inherits from plugins.d/_defaults.yml:
 #   version, author, homepage, repository, license,
