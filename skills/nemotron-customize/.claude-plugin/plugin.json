@@ -1,0 +1,10 @@
+{
+  "name": "nemotron-customize",
+  "description": "Compose runnable NVIDIA Nemotron model-customization pipelines from existing repo steps.",
+  "version": "0.1.0",
+  "author": {
+    "name": "NVIDIA Nemotron Team"
+  },
+  "homepage": "https://github.com/NVIDIA/Nemotron",
+  "skills": ["./"]
+}
