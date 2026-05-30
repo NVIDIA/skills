@@ -176,13 +176,13 @@ Verify a skill against the NVIDIA trust anchor [`nv-agent-root-cert.pem`](nv-age
 
 ```bash
 pip install model-signing
-model_signing verify certificate skills/cudaq-guide \
-  --signature skills/cudaq-guide/skill.oms.sig \
+model_signing verify certificate SKILL_DIR \
+  --signature SKILL_DIR/skill.oms.sig \
   --certificate_chain nv-agent-root-cert.pem \
   --ignore_unsigned_files
 ```
 
-Replace `skills/cudaq-guide` with the path to any skill in the catalog. A successful verification confirms that the skill contents have not been modified since signing by NVIDIA.
+A successful verification confirms that the skill contents have not been modified since signing by NVIDIA.
 
 See [Verify Signed Agent Skills](docs/signing-agent-skills.mdx) for signature layout, the trust pipeline, and policy options.
 
