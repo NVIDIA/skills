@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 OR MIT <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to deploy, configure, verify, debug, or tear down NVIDIA Video Search and Summarization (VSS) profiles on GPU-equipped hosts. <br>
+Developers and engineers use this skill to deploy, configure, verify, debug, and tear down NVIDIA Video Search and Summarization (VSS) profiles on GPU-equipped hosts. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,8 +20,14 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
-- [VSS Prerequisites](https://docs.nvidia.com/vss/3.2.0/prerequisites.html) <br>
 - [GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
+- [Base Profile Reference](references/base.md) <br>
+- [Search Profile Reference](references/search.md) <br>
+- [LVS Profile Reference](references/lvs-profile.md) <br>
+- [Warehouse Profile Reference](references/warehouse.md) <br>
+- [Edge Deployment Reference](references/edge.md) <br>
+- [Prerequisites](references/prerequisites.md) <br>
+- [Troubleshooting](references/troubleshooting.md) <br>
 
 
 ## Skill Output: <br>
@@ -29,6 +35,9 @@ Mitigation: Review and scan skill before deployment. <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
+
+## Evaluation Tasks: <br>
+Evaluated with NVSkills-Eval (external profile): 9 Tier-1 static validation checks and 2 Tier-2 deduplication checks completed. Overall verdict: PASS. Tier-3 live agent evaluation not available. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
