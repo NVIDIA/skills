@@ -1,0 +1,30 @@
+{
+  "skills": [
+    "vss-deploy-profile"
+  ],
+  "resources": {
+    "platforms": {
+      "RTXPRO6000BW": {
+        "gpu_count": 2
+      }
+    }
+  },
+  "env": "A multi-GPU host matching `{{platform}}` with Docker + NVIDIA container toolkit + `NGC_CLI_API_KEY`. The warehouse 2D profile (`bp_wh_2d` — 2D Vision AI **with Agents**) runs RT-DETR perception locally on one GPU plus an **always-local** RTVI-VLM on a second GPU, on top of the full VSS stack (agent + UI + VST + behavior-analytics) over a Kafka broker. Remote LLM endpoint env vars (`LLM_REMOTE_URL`/`LLM_REMOTE_MODEL`) should also be set. The `/vss-deploy-profile` skill, which refers to the warehouse.md, is responsible for the full deploy workflow — this spec verifies the resulting state by probing the live stack.",
+  "expects": [
+    {
+      "query": "Deploy the VSS **warehouse** profile in 2D mode (`bp_wh_2d`, the agents variant) on {{platform}}. Set LLM_REMOTE_URL and LLM_REMOTE_MODEL. Get the App Data from ngc registry resource download-version nvstaging/vss-warehouse/vss-warehouse-app-data:v3.2.0-05212026. Use the `/vss-deploy-profile` skill end-to-end and autonomously.",
+      "checks": [
+        "`curl -sf --max-time 15 http://localhost:8000/docs` returns exit 0 (Agent REST API responsive)",
+        "`curl -sf --max-time 15 http://localhost:3000/` returns exit 0 (Agent UI responsive)",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-agent` returns exit 0",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-agent-ui` returns exit 0",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-rtvi-cv` returns exit 0 (RT-DETR DeepStream perception — the '2D' in this mode)",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-rtvi-vlm` returns exit 0 (always-local VLM — distinguishes `bp_wh_2d` from the minimal `bp_wh_kafka_2d` variant)",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-alert-bridge` returns exit 0 (always deployed for `bp_wh` — routes CV-generated alerts to the VLM verifier; per `references/warehouse.md` § *Services Deployed*)",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-behavior-analytics` returns exit 0 (ROI / tripwire / proximity events on CV output)",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-vios-nvstreamer` returns exit 0 (video ingestion source)",
+        "`docker ps --format '{{.Names}}' | grep -qx kafka` returns exit 0 (CV metadata + control bus)"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "skills": ["vss-manage-alerts", "vss-deploy-profile"],
+  "resources": {
+    "platforms": {
+      "L40S": {
+        "modes": ["remote-all"]
+      }
+    }
+  },
+  "deploy_mode": "real-time",
+  "env": "VSS alerts profile already deployed in VLM real-time mode (`deploy -p alerts -m real-time`). Alert Bridge running and reachable. Sensor `warehouse_sample` registered in VIOS with a live RTSP stream. No pre-existing realtime rules on Alert Bridge. Pre-authorized to deploy prerequisites.",
+  "description": "End-to-end lifecycle test for references/alert-subscriptions.md: create a rule with a natural-language phrasing, list rules to verify it exists, then stop the rule (with the two-step confirmation protocol).",
+  "expects": [
+    {
+      "query": "Watch warehouse_sample for anyone without a safety vest",
+      "checks": [
+        "The trajectory calls Alert Bridge `POST /api/v1/realtime` with a payload containing `live_stream_url` (RTSP from warehouse_sample) and `prompt` (referencing safety vest or PPE).",
+        "The Alert Bridge payload includes `sensor_id` set to the VIOS sensor ID resolved from `warehouse_sample` (via `GET /sensor/list`).",
+        "The Alert Bridge payload includes `sensor_name` set to `warehouse_sample`.",
+        "The response includes a rule `id` (UUID) and `status: success`.",
+        "The agent confirms the rule was created and reports the rule ID and sensor name to the user.",
+        "The derived `alert_type` tag is a snake_case value related to PPE or vest violation."
+      ]
+    },
+    {
+      "query": "Show me all active realtime rules",
+      "checks": [
+        "The trajectory calls Alert Bridge `GET /api/v1/realtime` to fetch the rule list.",
+        "The agent's response includes at least one rule matching the warehouse_sample sensor and PPE-related tag (created in the previous step).",
+        "The agent renders a human-readable table or list — not raw JSON.",
+        "The RTSP URL in the rule is reverse-resolved to the sensor name `warehouse_sample` (user never sees raw RTSP URLs)."
+      ]
+    },
+    {
+      "query": "Stop the PPE alert on warehouse_sample",
+      "checks": [
+        "The trajectory calls Alert Bridge `GET /api/v1/realtime` to find the matching rule.",
+        "The agent asks a yes/no confirmation question before issuing DELETE — per the two-step stop protocol in references/alert-subscriptions.md.",
+        "The confirmation message includes the rule ID and the sensor name.",
+        "The agent does NOT immediately call `DELETE /api/v1/realtime/<id>` — deletion only happens after the user confirms."
+      ]
+    }
+  ]
+}
