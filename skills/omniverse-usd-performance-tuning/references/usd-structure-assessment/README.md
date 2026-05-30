@@ -54,11 +54,11 @@ Before producing the SA report, re-read and confirm:
 
 ## Limitations
 
-- Phase 1 is purely structural: metadata, composition arcs, prim traversal.
+- SA Stage 1 is purely structural: metadata, composition arcs, prim traversal.
   No geometry arrays (points, faceVertexCounts) are read. No renderer, viewport,
   or BBoxCache computation. Mesh-level stats (triangle counts, density) are
   deferred to Phase 2c validators (SO analysis mode).
-- Phase 2 heuristics flag validation candidates; they do not justify operations
+- SA Stage 2 heuristics flag validation candidates; they do not justify operations
   by themselves.
 - Outlier detection (§2.1) uses authored `extentsHint` attributes when present.
   If extents are not authored, SA cannot flag spatial outliers — Phase 2c
@@ -80,7 +80,7 @@ Before running, read:
 
 If you have network access, prefer the live URLs (noted in each reference file).
 
-## Phase 1: Structure Analysis (no geometry load)
+## SA Stage 1: Structure Analysis (no geometry load)
 
 These checks run without a Kit viewport, GPU, or renderer. SA opens the stage
 with `Usd.Stage.Open(path)` (default load rules) and traverses the composed
@@ -151,7 +151,7 @@ Report:
 - Flag prims with geometry but no kind assignment.
 - Flag kind assignments that don't match the hierarchy (e.g., a component inside a component).
 
-## Phase 2: Structural Heuristics (metadata only, narrows validation scope)
+## SA Stage 2: Structural Heuristics (metadata only, narrows validation scope)
 
 These checks use authored extent metadata (`extentsHint`) and structural
 patterns to identify assets that likely need deep validation. They do not
@@ -458,9 +458,9 @@ The `validation_scope` section feeds directly into `so-run-validators` — it te
 the agent which assets to validate and which to skip.
 
 The `summary_counts` section is the compact handoff consumed by
-`usd-validation-runner` and `skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/validation-scoping.md`: it tells the
-validator router whether the asset is monolithic, prototype-heavy, already
-instanced, or worth restructuring before expensive validators run.
+`usd-validation-runner`: it tells the validator router whether the asset is
+monolithic, prototype-heavy, already instanced, or worth restructuring before
+expensive validators run.
 
 For `reference_count` and `payload_count`, prefer authored list-op item counts.
 If the selected USD Python runtime can only produce prim-level booleans, use

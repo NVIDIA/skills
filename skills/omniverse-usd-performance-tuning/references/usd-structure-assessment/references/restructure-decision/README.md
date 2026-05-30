@@ -64,7 +64,7 @@ The agent assembles a decision packet from prior phases:
 |---|---|---|
 | SA classification | `usd-structure-assessment` Phase 2a | Monolithic vs composed; restructure recommended? |
 | Asset-boundary candidates | `usd-structure-assessment` §2.7 + `usd-hierarchy-dedupe-candidates` | Where the cut points are if restructure is chosen |
-| Validator findings | Phase 2c `usd-validation-runner` sweep | Whether structural-only fixes would be wasted on a stage about to be restructured |
+| Validator findings | Phase 2c `usd-validation-runner` selected probes | Whether structural-only fixes would be wasted on a stage about to be restructured |
 | Instancing assessment | Phase 2d (read from SA `instancing` field) | Estimated leverage from restructure |
 | User constraints | session context | Time budget, mutation policy, output policy |
 
@@ -201,7 +201,7 @@ User accepts the existing structure. Skip Phase 2f. Continue to Phase 3 (instanc
 
 ### exit
 
-User declines mutation. Skip to Phase 6e and write a diagnosis-only optimization report capturing the SA + validator findings.
+User declines mutation. Skip to Phase 6d and write a diagnosis-only optimization report capturing the SA + validator findings.
 
 ### jump-to-verify
 
@@ -289,7 +289,7 @@ Record the user's choice in the optimization plan and emit it for downstream pha
 - If the user picks `decompose-for-selective-loading`, hand off to
   `apply-restructure` with the selected boundary level and
   `goal: selective_loading`; do not perform writes from this reference.
-- If the user picks `exit`, immediately go to Phase 6e (`optimization-report`) - do not silently continue to Phase 3.
+- If the user picks `exit`, immediately go to Phase 6d (`optimization-report`) - do not silently continue to Phase 3.
 
 ## Limitations
 

@@ -16,7 +16,7 @@ when a user directly asks to run Scene Optimizer validators on a USD asset.
 
 1. If this is the entry reference, run the local runtime gate and consume
    `<output_path>/setup-preflight.json` before validation.
-2. Apply `validation-scoping.md`, deferred-validator policy, and explicit
+2. Apply `usd-validation-runner/README.md` selected-scope policy, deferred-validator policy, and explicit
    approval for expensive checks.
 3. Apply `runtime-artifact-token-budget.md`; never read full validator CSVs or
    full `run.log` into context.
@@ -55,7 +55,7 @@ reads. Do not clone the source repo just to read upstream SO guidance.
 
 - Runtime context gate and `setup-preflight.json` consumption.
 - `operationsAvailable` and runtime-family awareness from setup.
-- Validation scoping, deferred validators, masked-stage spot-check policy, and
+- Validation scoping, selected validators, masked-stage spot-check policy, and
   expensive-check approval gates.
 - Runtime artifact token budget for CSV/log/summary handling.
 - Digitaltwin milestone routing into `so-interpret-validators`.

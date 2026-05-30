@@ -50,11 +50,11 @@ probe.
 
 ```text
 ─── Runtime context ───────────────────────────────────────────────────────
-Kit application:    {kit.chosen.application} {kit.chosen.version}
-  path:             {kit.chosen.path}
-  build:            {kit.chosen.build}
-Scene Optimizer:    {sceneOptimizer.extension} {sceneOptimizer.version}
-Asset Validator:    {assetValidator.package} {assetValidator.version} via {assetValidator.source}
+Kit application:    {runtime_context.kit.application} {runtime_context.kit.version}
+  path:             {runtime_context.kit.path}
+  build:            {runtime_context.kit.build}
+Scene Optimizer:    {runtime_context.sceneOptimizer.extension} {runtime_context.sceneOptimizer.version}
+Asset Validator:    {runtime_context.assetValidator.package} {runtime_context.assetValidator.version} via {runtime_context.assetValidator.source}
 ───────────────────────────────────────────────────────────────────────────
 ```
 

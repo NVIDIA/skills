@@ -33,7 +33,7 @@ Use this workflow for broad performance asks such as slow loading, high memory, 
 
 1. Start from the mandatory runtime context gate before producing tuning output, unless the prompt is only asking for a static classification test.
 2. Classify broad optimization requests as `ready_to_plan`; reserve `approval_required` for prompts that explicitly name a destructive operation to execute before planning.
-3. Plan the full canonical chain through `optimization-report`, preserving the structured milestone order and the `profile-stage:baseline` / `profile-stage:after` labels when listing milestones.
+3. Plan the full canonical chain through `optimization-report`, preserving the structured milestone order and the `profile-stage:baseline` / `profile-stage:after` labels when listing milestones. For broad optimization, default to 3 scoped iterations unless the user opts out, asks for a quick pass, or stop criteria apply.
 4. Invoke downstream skill bodies only when their phase is reached, and keep raw runtime artifacts on disk while reading compact summaries.
 
 Frontmatter keeps `version` and `tools` at top level for agentskills.io runtime
@@ -41,7 +41,7 @@ compatibility. NVCARPS discoverability fields live under `metadata`.
 
 ## Output Format
 
-Return a plan or status summary that names the selected entry skill, uses `ready_to_plan` for generic optimization requests, includes the full milestone chain through `optimization-report`, and labels profile phases as `profile-stage:baseline` and `profile-stage:after`. For structured outputs, the broad-optimization milestone subsequence is `omniverse-usd-performance-tuning` -> `profile-stage:baseline` -> `usd-structure-assessment` -> `usd-validation-runner` -> `restructure-decision` -> `apply-restructure` -> `so-run-validators` -> `so-interpret-validators` -> `so-run-operations` -> `profile-stage:after` -> `compare-profiles` -> `optimization-report`. End-to-end execution should produce an optimized stage when mutation runs and a report conforming to the `optimization-report` reference's schema (`scripts/optimization-report.schema.json` within that reference).
+Return a plan or status summary that names the selected entry skill, uses `ready_to_plan` for generic optimization requests, includes the full milestone chain through `optimization-report`, and labels profile phases as `profile-stage:baseline` and `profile-stage:after`. For structured outputs, the broad-optimization milestone subsequence is `omniverse-usd-performance-tuning` -> `profile-stage:baseline` -> `usd-structure-assessment` -> `usd-validation-runner` -> `restructure-decision` -> `apply-restructure` -> `so-run-validators` -> `so-interpret-validators` -> `so-run-operations` -> `profile-stage:after` -> `compare-profiles` -> `optimization-report`. End-to-end execution should produce an optimized stage when mutation runs and a report conforming to the `optimization-report` reference's schema (`scripts/optimization-report.schema.json` within that reference). Broad optimization should plan 3 scoped iterations by default; each iteration writes an interim report/update and later passes reuse prior evidence instead of restarting the full workflow.
 
 Use this workflow for broad performance asks such as slow loading, low FPS,
 high memory, GPU crashes, conversion quality, or "optimize my scene."
@@ -248,7 +248,8 @@ If you have network access, prefer the live URLs (noted in each reference file) 
 
 Read `references/workflow.md` for the canonical Phase 0-7 flow, including
 Kit/standalone branches, validator-stack routing, operation ordering,
-termination conditions, duration hints, and the optional iteration pattern.
+termination conditions, duration hints, and the default three-pass scoped
+iteration pattern.
 The compact root map at `references/skill-map.md` only routes agents
 into this workflow.
 
@@ -268,7 +269,7 @@ For deeper subtopic guidance, consult the references:
 - `references/cad-conversion/README.md` - CAD converter settings.
 - `references/upstreams/usd-optimize.md` - upstream SO mechanics and prebuilt package resolution.
 - `skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/so-run-validators/references/infrastructure.md` - local handoff for SO validator infrastructure.
-- `skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/validation-scoping.md` - tier 1/2/3 plan + scene-aware adjustment.
+- `skills/omniverse-usd-performance-tuning/references/usd-validation-runner/README.md` - tier 1/2/3 selected-probe plan, large-stage guardrails, full-sweep approval, and scene-aware adjustment.
 - `skills/omniverse-usd-performance-tuning/references/optimization-report/references/optimization-report-template.md` - the data contract every phase populates.
 
 For full Kit runtime profiling (FPS, frame time, Hydra/RTX metrics), refer to the external profiling skills at NVIDIA/omniperf.

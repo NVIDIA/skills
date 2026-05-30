@@ -33,6 +33,10 @@ project-managed `omniverse-asset-validator` environment that can import the
 same SO package. Kit remains useful when automatic extension registration or
 render-time profiling is needed.
 
+This install reference does not define operation invocation. Keep operation
+execution examples in `so-run-operations/references/invocation.md` so agents
+have one source of truth.
+
 ## Prerequisites
 
 > **Python 3.12 is a HARD requirement.** The drop ships `cp312`-only wheels.
@@ -144,31 +148,29 @@ process, so the uv-managed-Python caveat above does not apply.
 python3.12 - <<'PY'
 def operation_count():
     try:
-        from omni.scene.optimizer.core.bindings._omni_scene_optimizer_core import acquire_interface
+        from omni.scene.optimizer.core import SceneOptimizerCore
 
-        iface = acquire_interface()
-        if hasattr(iface, "get_operations"):
-            return "bindings.acquire_interface", len(iface.get_operations())
+        return "SceneOptimizerCore.getInstance", len(SceneOptimizerCore.getInstance().getOperations())
     except Exception:
         pass
 
-    import omni.scene.optimizer.core as soc
+    from omni.scene.optimizer.core.bindings._omni_scene_optimizer_core import acquire_interface
 
-    core = soc.SceneOptimizerCore.getInstance()
-    return "SceneOptimizerCore.getInstance", len(core.getOperations())
+    iface = acquire_interface()
+    if hasattr(iface, "get_operations"):
+        return "bindings.acquire_interface", len(iface.get_operations())
+    parser = iface.json_parser()
+    return "bindings.json_parser", len(parser.get_supported_operations())
 
 surface, count = operation_count()
 print(f"{surface}: {count} operations")
 PY
 ```
 
-Expect >= 40 (the exact count varies by build). Standalone drops do not all
-expose the same Python API: SO 110.0.2-style environments may require
-`acquire_interface().get_operations()` /
-`acquire_interface().execute_operation(op, context, json_string)`, while other
-builds expose `SceneOptimizerCore.getInstance().getOperations()` /
-`executeOperation`. Operation scripts must probe the selected runtime before
-choosing an API surface.
+Expect >= 40 (the exact count varies by build). This verifies import and
+operation registry only. Operation invocation is defined by
+`so-run-operations/references/invocation.md`; do not infer mutation call shapes
+from this install probe.
 
 ## Limitations
 
@@ -195,31 +197,29 @@ registry = CategoryRuleRegistry()
 # Now includes "Usd:Performance" and "Omni:Geometry" categories
 ```
 
-No `register_all()` call is needed for rule discovery. The
-`@register_rule("Usd:Performance")` decorator on each checker class handles
-registration at import time.
+No `register_all()` call is needed for rule discovery. The rule registration
+decorators handle registration at import time. Do not treat category names as
+validation scope, and do not select rules by bare name — the canonical executor
+resolves a scope note's concepts to rule classes by identity (a bare
+`find_rule()` can't tell the Scene Optimizer and Asset Validator rules that
+share a class name apart).
 
-To run only SO performance rules (excluding base OAV rules):
+To verify the install can run a scoped concept after `usd-validation-runner`
+has scoped the plan:
 
 ```python
-import omni.scene.optimizer.validators  # auto-registers
-from omni.asset_validator import ValidationEngine, CategoryRuleRegistry
-from pxr import Usd
+from usd_validation_executor import load_registry, validate_concepts
 
-registry = CategoryRuleRegistry()
-so_rules = [
-    rule
-    for category in ("Usd:Performance", "Omni:Geometry")
-    for rule in registry.get_rules(category)
-]
-
-engine = ValidationEngine(init_rules=False)
-for rule in so_rules:
-    engine.enable_rule(rule)
-
-stage = Usd.Stage.Open("path/to/asset.usd")
-results = engine.validate(stage)
+registry = load_registry()
+issues = validate_concepts(
+    "path/to/asset.usd",
+    ["primvar_indexability"],     # canonical concept from the scope note
+    registry=registry,
+)
 ```
+
+The executor builds the engine with `init_rules=False` and enables only the
+resolved rule class.
 
 The standalone import is `from omni.asset_validator import ValidationEngine`
 (no `.core`). The `.core` submodule only exists inside a running Kit session.

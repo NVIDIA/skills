@@ -223,7 +223,7 @@ quick mode plus:
 ### Prerequisites
 
 - Isaac Sim or Kit SDK with RTX renderer.
-- Scene Optimizer `omni.kit.profiler.tracy` extension.
+- Kit `omni.kit.profiler.tracy` profiler extension (Tracy is a Kit profiler, not a Scene Optimizer component).
 - GPU with display (headless with virtual display works).
 
 ### Usage
@@ -346,7 +346,7 @@ When this reference ran in quick mode only, **the report's `verdict` should
 explicitly note that render-time claims (FPS, frame time, VRAM, draw-call
 count) are unmeasured**. Improvements predicted by `rtxMeshCount` or
 prototype sharing are plausible but not verified. See
-`skills/omniverse-usd-performance-tuning/references/optimization-report/references/optimization-report-template.md` §"Degraded path (SO
+`skills/omniverse-usd-performance-tuning/references/optimization-report/references/optimization-report-template.md` §"Structural-only path (SO
 unavailable)" and §"Quick-mode-only caveat" for the report wording.
 
 ## Rules

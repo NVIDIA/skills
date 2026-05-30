@@ -160,7 +160,7 @@ The full flow with profiling:
 omniverse-usd-performance-tuning
 → profile-stage (BASELINE)
 → usd-structure-assessment
-→ usd-validation-runner (master router; uses skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/validation-scoping.md for tier detail)
+→ usd-validation-runner (master router; uses skills/omniverse-usd-performance-tuning/references/usd-validation-runner/README.md for tier detail and selected-probe policy)
 → restructure-decision (Phase 2e gate)
 → instancing-readiness (if applicable)
 → SO operations / instancing

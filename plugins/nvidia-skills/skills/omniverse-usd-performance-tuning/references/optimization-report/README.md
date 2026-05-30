@@ -27,8 +27,9 @@ Before generating the report, re-read and confirm:
    `references/report-templates/render_preview.py` with `--fixture` and
    `--output`. Never hand-write HTML. Never use LLM-generated HTML.
 - [ ] **JSON conforms to schema** — read
-   `scripts/optimization-report.schema.json` in full before writing. Do not
-   guess field names from memory.
+   `scripts/optimization-report.schema.json` in full before writing, then
+   validate the finished report with `python3 scripts/validate_report.py <report.json>`.
+   Do not guess field names from memory.
 - [ ] **Runtime context copied verbatim** from `setup-preflight.json`.
 - [ ] **Score computed deterministically** — weighted average of metric groups,
    not hand-assigned.
@@ -221,74 +222,134 @@ Structure:
       "issues": 1525,
       "notes": "Candidates for pruneLeaves"
     }
+  ],
+  "target_coverage": {
+    "complete": true,
+    "source_manifests": ["apply-restructure-manifest.json"],
+    "entries": [
+      {
+        "path": "/out/prototypes/discipline.usd",
+        "role": "prototype",
+        "mesh_count": 318,
+        "disposition": "optimized",
+        "operations": ["pruneLeaves", "deduplicateGeometry"]
+      }
+    ]
+  }
+}
+```
+
+## Phase-4 target coverage (completion gate)
+
+The required top-level `target_coverage` block is the Phase-4 analogue of the
+validation report's `coverage_ledger`: it proves every mesh-optimization target
+was resolved instead of silently dropped. It is structurally flat — `entries[]`
+plus a `complete` boolean — to mirror the validation report rather than nesting a
+`phase4` wrapper.
+
+```json
+"target_coverage": {
+  "complete": true,
+  "source_manifests": ["apply-restructure-manifest.json"],
+  "entries": [
+    {
+      "path": "/out/prototypes/rack_unit.usd",
+      "role": "prototype",
+      "mesh_count": 412,
+      "disposition": "optimized",
+      "operations": ["meshCleanup", "decimateMeshes"]
+    },
+    {
+      "path": "/out/assembly.usdc",
+      "role": "assembly_root",
+      "mesh_count": 0,
+      "disposition": "skipped_zero_meshes"
+    }
   ]
 }
 ```
 
+- `role` is one of `assembly_root | prototype | shared_layer | loadable_subasset`
+  (the restructure roles) or `monolith` for a non-restructured optimize-as-is
+  target (N=1).
+- `disposition` is one of `optimized | skipped_zero_meshes | skipped_user_declined | blocked`.
+  `complete` is true only when every entry is one of the first three; a `blocked`
+  or unresolved target keeps `complete` false and the report is not final.
+- `skipped_zero_meshes` is valid only when `mesh_count == 0` (the default-predicate
+  count). A non-zero target cannot be skipped.
+- A diagnosis-only / optimize-as-is run with no Phase-4 work is valid with
+  `entries: []` and `complete: true`. A `monolith`-only run records its single
+  target and needs no manifest.
+
+Because a report cannot self-attest coverage of a target it never enumerated,
+reconciliation against the upstream apply-restructure manifest(s) is **mandatory
+once a restructure happened**: whenever any entry has a restructure role, record
+the manifest path(s) in `target_coverage.source_manifests[]` (one per iteration).
+`validate_report.py` auto-loads them (resolved relative to the report) and also
+accepts `--manifest`, then reconciles `target_coverage` against the **union** of
+every iteration's `phase4_targets[]`:
+
+```bash
+python3 scripts/validate_report.py <report.json> \
+  [--manifest <iter1 apply-restructure-manifest.json>] \
+  [--manifest <iter2 apply-restructure-manifest.json> ...]
+```
+
+The gate exits non-zero if a restructure report records/supplies no manifest, a
+planned target is uncovered, a covered target is absent from every manifest, a
+disposition is unresolved, or a `skipped_zero_meshes` target has a manifest
+`mesh_count > 0`.
+
+## Runtime profiling handoff (producer contract)
+
+Runtime metrics — RAM, VRAM, FPS, frame time, Hydra sync, RTX render time,
+draw-call counts, shader-compile time — are deliberately **not** inputs to the
+Stage Optimization Score. They come from an external runtime profiler such as
+NVIDIA/omniperf. This report is the consumer; the producer contract is:
+
+- The runtime profiler writes its own artifact (JSON and/or dashboard) outside
+  this report. Record its path in `runtime_profiling.artifact_path` and any
+  dashboard link in `runtime_profiling.dashboard_url`.
+- Set `runtime_profiling.status` to `not_run` (no runtime profiling happened),
+  `external` (an artifact/dashboard exists elsewhere and is linked), or
+  `attached` (the profiler's summary is reproduced in `summary`).
+- Put a one-line before/after runtime summary in `runtime_profiling.summary`
+  and any measurement caveat in `runtime_profiling.caveat`.
+- Keep these values out of `metric_groups[]` and `metrics[]` so the stage score
+  stays composition-only while the runtime numbers remain visible in the report.
+
 ## Markdown template
 
-```markdown
-## USD Performance Tuning Report — {asset_name}
+The Markdown summary is **generated from the report JSON**, never hand-written.
+There is exactly one canonical Markdown layout: the committed template
+`references/report-templates/optimization-report.md.template` (Jinja-style,
+double-brace placeholders, with `{{ executive_summary }}`, a Runtime Context
+table, and `{% for %}` loops over `metric_groups`, `metrics`, `operations`, and
+`validators`). Its field names track `scripts/optimization-report.schema.json`
+(including `executive_summary` and the top-level `notes`).
 
-Stage Optimization Score: {optimization_score}/10 ({score_label})
-Verdict: {verdict}
+Render it with the **same committed renderer** used for the HTML report — just
+point `--template` at the Markdown template instead of the default HTML one:
 
-### Output File
-{output_path}
-
-### Reasoning
-
-{reasoning}
-
-### Runtime Context
-
-| Component | Value |
-|---|---|
-| Kit application | {runtime_context.kit.application} {runtime_context.kit.version} |
-| Kit path | {runtime_context.kit.path} |
-| Kit build | {runtime_context.kit.build} |
-| Scene Optimizer | {runtime_context.sceneOptimizer.extension} {runtime_context.sceneOptimizer.version} |
-| Asset Validator | {runtime_context.assetValidator.package} {runtime_context.assetValidator.version} (via {runtime_context.assetValidator.source}) |
-
----
-
-### Before / After at a Glance
-
-| Metric | Before | After | Change |
-|---|---|---|---|
-| {for each metric} |
-
-### Stage Impact Areas
-
-| Area | Score | Status | Notes |
-|---|---:|---|---|
-| Composition Load | {score}/10 | measured | {summary} |
-| Composition Complexity | {score}/10 | measured | {summary} |
-| Instancing | {score}/10 | measured | {summary} |
-| Validation | {score}/10 | measured | {summary} |
-
-### Runtime Profiling
-
-Runtime metrics such as RAM, VRAM, FPS, frame time, shader cost, and renderer
-activity are not part of the Stage Optimization Score. Use Omniperf or an
-equivalent runtime profiling dashboard for those measurements.
-
----
-
-### Operations Performed
-
-| # | Operation | Method | Result |
-|---|---|---|---|
-| {for each operation} |
-
----
-
-### Validators Attempted / Result
-
-| Validator | Result |
-|---|---|
-| {for each validator} |
+```bash
+python3 references/report-templates/render_preview.py \
+  --fixture <output_dir>/<asset_name>_optimization_report.json \
+  --template references/report-templates/optimization-report.md.template \
+  --output  <output_dir>/<asset_name>_optimization_report.md
 ```
+
+**Do not hand-fill a Markdown report** and do not paste a template body into
+chat as a fill-in form — that is the dual-maintenance drift this contract exists
+to prevent, and it violates the SKILL-level "never hand-write the report" rule.
+The JSON is the source of truth; the `.md.template` above is the only place the
+Markdown layout is maintained.
+
+The renderer emits the following sections in order (rendered-output preview —
+illustrative only, **not** a hand-fill target): the title with the asset name;
+a Stage Optimization Score / verdict / generated-timestamp / output line; the
+executive summary; Reasoning; a Runtime Context table; Stage Impact Areas; a
+Runtime Profiling note (plus a Runtime Profiling table when handoff fields are
+present); Metric Evidence; Operations; and Validators.
 
 ## Rules
 
@@ -302,14 +363,20 @@ equivalent runtime profiling dashboard for those measurements.
 > canonical shape and validate your output against the `required` and `items`
 > blocks before emitting. The schema rejects extra keys in `metric_groups[]`,
 > `metrics[]`, `operations[]`, `validators[]`, and `artifacts`; update the
-> schema first if a new report field is genuinely needed. Conformance failures
-> are caught by `scored_static_html_report_required` in runtime checks.
+> schema first if a new report field is genuinely needed. Validate the finished
+> JSON by running `python3 scripts/validate_report.py <report.json>` (committed,
+> dependency-free) before treating the report as final; the repository test
+> `test_committed_report_fixtures_conform_to_schema` holds the bundled fixtures
+> to this same schema.
 
 - Always save the JSON report — it is the structured record of what happened.
 - Always present the markdown to the user in chat.
-- Always produce the static HTML report when writing report artifacts. In
-  runtime checks, include `scored_static_html_report_required` in
-  `phase_guardrails` when planning this final report contract.
+- Always produce the static HTML report when writing report artifacts, and run
+  `python3 scripts/validate_report.py` on the report JSON before finishing.
+  `scored_static_html_report_required` is an agent-asserted planning guardrail —
+  list it in `phase_guardrails` when planning this final report contract — not an
+  automated gate. The automated conformance check is `python3 scripts/validate_report.py`
+  plus the repository schema test.
 - Always title the reader-facing report **USD Performance Tuning Report**.
 - Always include a dedicated `Reasoning` section with one to two concise
   paragraphs explaining why the selected optimizations fit the evidence.

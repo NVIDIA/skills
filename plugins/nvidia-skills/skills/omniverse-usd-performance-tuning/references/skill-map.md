@@ -104,7 +104,7 @@ flowchart TD
   P4["Phase 4 Per-asset SO ops"]
   P5["Phase 5 Ref remap + cleanup"]
   P6["Phase 6 Verify + report"]
-  P7["Phase 7 Optional iteration"]
+  P7["Phase 7 Default scoped iteration"]
   P0 --> P1 --> P2
   P2 -->|"already optimized or exit"| P6
   P2 -->|"continue"| P3 --> P4 --> P5 --> P6
@@ -116,7 +116,7 @@ flowchart TD
 - Optimization workflow: `skills/omniverse-usd-performance-tuning/references/workflow.md`
 - Runtime artifact/token policy:
   `skills/omniverse-usd-performance-tuning/references/runtime-artifact-token-budget.md`
-- Validation routing: `skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/validation-scoping.md`
+- Validation routing: `skills/omniverse-usd-performance-tuning/references/usd-validation-runner/README.md`
 - Validation command references: `skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/`
 - Scene Optimizer operation mechanics:
   [`usd-optimize`](https://github.com/NVIDIA-omniverse/usd-optimize/) or the

@@ -89,11 +89,11 @@ The gate's steps:
 
    ```
    ─── Runtime context ───────────────────────────────────────────────────────
-   Kit application:    {kit.chosen.application} {kit.chosen.version}
-     path:             {kit.chosen.path}
-     build:            {kit.chosen.build}
-   Scene Optimizer:    {sceneOptimizer.extension} {sceneOptimizer.version}
-   Asset Validator:    {assetValidator.package} {assetValidator.version} via {assetValidator.source}
+   Kit application:    {runtime_context.kit.application} {runtime_context.kit.version}
+     path:             {runtime_context.kit.path}
+     build:            {runtime_context.kit.build}
+   Scene Optimizer:    {runtime_context.sceneOptimizer.extension} {runtime_context.sceneOptimizer.version}
+   Asset Validator:    {runtime_context.assetValidator.package} {runtime_context.assetValidator.version} via {runtime_context.assetValidator.source}
    ───────────────────────────────────────────────────────────────────────────
 
    This runtime will be used for the work that follows. Continue, or change it?
@@ -128,17 +128,17 @@ run the gate instead.
 
 ## Source of truth
 
-Both formats below read from `<output_path>/setup-preflight.json` (canonical filename + location; see *Where artifacts live* above). The fields the header consumes are:
+Both formats below read from the **`runtime_context`** object in `<output_path>/setup-preflight.json` (canonical filename + location; see *Where artifacts live* above). `runtime_context` is the canonical block the probe writes and downstream skills consume; the header never reads the raw probe `kit` / `sceneOptimizer` / `assetValidator` source fields directly. The fields the header consumes are:
 
-- `kit.chosen.application` — friendly name (e.g. `USD Composer`, `Isaac Sim`, `Kit SDK`)
-- `kit.chosen.version` — release version (e.g. `110.1.0`)
-- `kit.chosen.path` — absolute install path
-- `kit.chosen.build` — full build identifier when present (e.g. `110.1.0+main.10181.f4b28ef2.gl.windows-x86_64.release`)
-- `sceneOptimizer.extension` — extension name (e.g. `omni.scene.optimizer.core`)
-- `sceneOptimizer.version` — extension version
-- `assetValidator.package` — package or extension name
-- `assetValidator.version` — version
-- `assetValidator.source` — `kit-extension` or `pip` (informs the user whether AV runs through Kit or as a standalone Python install)
+- `runtime_context.kit.application` — friendly name (e.g. `USD Composer`, `Isaac Sim`, `Kit SDK`)
+- `runtime_context.kit.version` — release version (e.g. `110.1.0`)
+- `runtime_context.kit.path` — absolute install path
+- `runtime_context.kit.build` — full build identifier when present (e.g. `110.1.0+main.10181.f4b28ef2.gl.windows-x86_64.release`)
+- `runtime_context.sceneOptimizer.extension` — extension name (e.g. `omni.scene.optimizer.core`)
+- `runtime_context.sceneOptimizer.version` — extension version
+- `runtime_context.assetValidator.package` — package or extension name
+- `runtime_context.assetValidator.version` — version
+- `runtime_context.assetValidator.source` — `kit-extension`, `pip`, or `standalone` (informs the user whether AV runs through Kit or as a standalone Python install)
 
 If `<output_path>/setup-preflight.json` is unavailable when an agent reaches a prompt that requires the header, it must invoke `setup-usd-performance-tuning` first. The header must never be skipped or partially filled.
 
@@ -153,11 +153,11 @@ Use at every decision point where the user is authorizing something that mutates
 
 ```
 ─── Runtime context ───────────────────────────────────────────────────────
-Kit application:    {kit.chosen.application} {kit.chosen.version}
-  path:             {kit.chosen.path}
-  build:            {kit.chosen.build}
-Scene Optimizer:    {sceneOptimizer.extension} {sceneOptimizer.version}
-Asset Validator:    {assetValidator.package} {assetValidator.version} via {assetValidator.source}
+Kit application:    {runtime_context.kit.application} {runtime_context.kit.version}
+  path:             {runtime_context.kit.path}
+  build:            {runtime_context.kit.build}
+Scene Optimizer:    {runtime_context.sceneOptimizer.extension} {runtime_context.sceneOptimizer.version}
+Asset Validator:    {runtime_context.assetValidator.package} {runtime_context.assetValidator.version} via {runtime_context.assetValidator.source}
 ───────────────────────────────────────────────────────────────────────────
 ```
 
@@ -167,8 +167,10 @@ If the user has more than one Kit installed and the workflow has not yet committ
 
 Use for routine status messages, ack messages, and follow-up prompts in the same session where the user has already seen Format A.
 
+This file is the **single source of truth** for the Format B string. Any skill that prints it (`omniverse-usd-performance-tuning` initial ack, `compare-profiles` verdict header) must reproduce it character-for-character:
+
 ```
-[Kit: {kit.chosen.application} {kit.chosen.version}  |  SO: {sceneOptimizer.version}  |  AV: {assetValidator.version}]
+[Kit: {runtime_context.kit.application} {runtime_context.kit.version}  |  SO: {runtime_context.sceneOptimizer.version}  |  AV: {runtime_context.assetValidator.version}]
 ```
 
 Required at:

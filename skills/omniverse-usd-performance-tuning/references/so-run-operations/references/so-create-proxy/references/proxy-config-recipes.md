@@ -6,23 +6,19 @@
 This local reference preserves the digitaltwin workflow milestone. Scene
 Optimizer mechanics for this step are owned by upstream `usd-optimize`.
 
-- Public repository: [https://github.com/NVIDIA-omniverse/usd-optimize/](https://github.com/NVIDIA-omniverse/usd-optimize/)
-- Package path: `.agents/skills/create-proxy/references/decimate-mode.md`
-- Upstream web URL: [https://github.com/NVIDIA-omniverse/usd-optimize/blob/main/.agents/skills/create-proxy/references/decimate-mode.md](https://github.com/NVIDIA-omniverse/usd-optimize/blob/main/.agents/skills/create-proxy/references/decimate-mode.md)
+Proxy config recipes are composed from the per-mode sibling handoffs in this
+folder rather than restating the same upstream doc. To avoid a duplicate
+upstream-doc reference, this stub points to those siblings instead of
+re-declaring the package path:
 
-Resolve the upstream guide without cloning the source repo:
+- Decimate-based proxy configs: see [`decimate-step-recipes.md`](decimate-step-recipes.md)
+  (upstream `create-proxy/references/decimate-mode.md`).
+- Decimation parameter tuning: see [`decimation-tuning.md`](decimation-tuning.md)
+  (upstream `create-proxy/references/parameter-tuning.md`).
+- Bounding-box proxy configs: see [`bounding-box-proxy-modes.md`](bounding-box-proxy-modes.md)
+  (upstream `create-proxy/references/bounding-box-modes.md`).
 
-1. `$SCENE_OPTIMIZER_PACKAGE_ROOT/.agents/skills/create-proxy/references/decimate-mode.md`
-2. `$SO_HOME/.agents/skills/create-proxy/references/decimate-mode.md`
-
-If no package root is available, download and extract the published
-`scene_optimizer_core_...release.zip` package for the target platform (direct
-archive URLs are in `references/upstreams/usd-optimize.md`), or use the package
-path/URL supplied by the user. If the user supplies an extracted
-package root directly, resolve this same package path under that root. If
-GitHub raw fetch is available, the web URL above is acceptable for docs-only
-reads. Do not clone the source repo just to read upstream SO guidance.
-
-For bounding-box configs, use upstream
-`.agents/skills/create-proxy/references/bounding-box-modes.md` from the same
-package root or public repo.
+For the public repository and package-root resolution rules, follow the sibling
+handoff above for the relevant mode. Direct archive URLs are in
+`references/upstreams/usd-optimize.md`. Do not clone the source repo just to
+read upstream SO guidance.

@@ -17,7 +17,9 @@ Targets come from:
 
 - `apply-restructure` mode=`restructure`: prototype USDs, shared layers, and
   newly loadable sub-assets recorded in
-  `<output_dir>/apply-restructure-manifest.json` `phase4_targets[]`.
+  `<output_dir>/apply-restructure-manifest.json` `phase4_targets[]`, plus any
+  `target_class: "assembly_root"` entry for mesh data retained in the assembly.
+  Do not filter the manifest to prototype files only.
 - Composed stages with no restructure: referenced sub-assets from
   `usd-structure-assessment` Phase 1.2 `assets.manifest`.
 - Monolithic-as-is: the original stage (`N=1`).
@@ -63,7 +65,10 @@ risk says continuing automatically is unsafe.
 When targets include prototypes and non-prototype assets, run prototypes first,
 wait for completion, then run non-prototype assets. Parallelize within each
 dependency group according to the adaptive concurrency policy. Prototype changes
-propagate to instances, so running instance-site work first wastes time.
+propagate to instances, so running instance-site work first wastes time. Treat
+an `assembly_root` target with retained meshes as a non-prototype mesh target:
+run the evidence-selected per-target mesh op chain on it before final
+assembled-root cleanup.
 
 ## Output Naming
 

@@ -23,7 +23,7 @@
       "type": "array",
       "items": { "type": "string" },
       "uniqueItems": true,
-      "description": "Operation keys the SO extension registers, as returned by acquire_interface().get_operations(). Sorted alphabetically."
+      "description": "Operation keys the SO runtime registers, as returned by the selected operation registry probe. Sorted alphabetically."
     },
     "probed_at": {
       "type": "string",

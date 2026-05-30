@@ -25,5 +25,5 @@ reads. Do not clone the source repo just to read upstream SO guidance.
 
 ## Local Responsibilities
 
-- Local validation scope, phase-aware subsets, and expensive-check gates remain in `validation-scoping.md`.
+- Local validation scope, phase-aware subsets, and expensive-check gates remain in `usd-validation-runner/README.md`.
 - Setup/install references own runtime selection and `setup-preflight.json` writer behavior.

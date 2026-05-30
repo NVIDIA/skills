@@ -78,9 +78,10 @@ validation workflows. The SO package includes
 `omni.scene.optimizer.validators` with `@register_rule` decorators that
 auto-register 25 SO performance validators into OAV when both packages share
 the same Python 3.12 environment. No manual `register_all()` call is needed
-for rule discovery — just ensure both are importable. Category-scoped runs may
-still use `ValidationEngine(init_rules=False)` plus `enable_rule()` for the
-selected registered rule classes.
+for rule discovery — just ensure both are importable. Selected runs go through
+`usd-validation-runner/scripts/usd_validation_executor.py`, which uses
+`ValidationEngine(init_rules=False)` plus `enable_rule()` after resolving each
+scope-note **canonical concept** to a rule class by identity.
 
 > Standalone achieves the same validator coverage as Kit: install
 > `omniverse-asset-validator` via pip into the same venv where the SO package
@@ -139,7 +140,7 @@ they are the preferred runtime (lighter, no Kit overhead, deterministic).
 Follow `references/standalone-runtime.md` for discovery and verification.
 
 If standalone packages are found and importable, set
-`runtime_path: "standalone"` in `<output_path>/setup-preflight.json` and
+`runtime_route: "standalone"` in `<output_path>/setup-preflight.json` and
 continue to Step 1.6.
 
 If standalone packages are not found, fall through to Step 1.5 (Kit discovery).
@@ -150,24 +151,25 @@ If standalone is unavailable, look for Kit installations. Follow
 `references/kit-discovery.md` for discovery order, path classification,
 auto-enumeration, and candidate records.
 
-Always ask before broad filesystem scanning. If one Kit candidate exists, set
-`kit.chosen` to it and continue. If multiple candidates exist, ask the user to
-choose; never silently pick one in an interactive session. The newest candidate
-is pre-selected.
+Always ask before broad filesystem scanning. If one Kit candidate exists, write
+it to `runtime_context.kit` and continue. If multiple candidates exist, ask the
+user to choose; never silently pick one in an interactive session. The newest
+candidate is pre-selected.
 
-Record the chosen candidate and `kit.chosen_by` as described in
+Record the chosen candidate and `runtime_context.kit.chosen_by` as described in
 `references/kit-discovery.md`.
 
 ## Step 1.6 - Probe the chosen Kit for SO and AV versions
 
-Once `kit.chosen` is set (or standalone is chosen), run the Python probe from
-the chosen launcher and write the probe result to
+Once `runtime_context.kit` is set (or standalone is chosen), run the Python
+probe from the chosen launcher and write the probe result to
 `<output_path>/setup-preflight.json`. Follow `references/runtime-probe.md` for
 the launcher, import-mode, version-source, and `operationsAvailable` contract.
 
 The `runtime_context` object is the literal input to the header template in
 `references/runtime-context-header.md`. Downstream skills read from this object,
-not from the source `kit` / `sceneOptimizer` / `assetValidator` fields.
+not from the raw probe `kit` / `sceneOptimizer` / `assetValidator` source
+fields.
 
 Downstream skills (`so-run-operations`, `omniverse-usd-performance-tuning`, every
 `so-interpret-validators` recommendation) cross-check `operationsAvailable`
@@ -187,6 +189,27 @@ When status is `needs-runtime-choice`, ask exactly for one of these paths:
 
 Do not continue to `so-run-validators`, `so-run-operations`, or deep validation
 until this choice is resolved.
+
+## Non-interactive (batch / CI) mode
+
+The "stop and ask" behaviors above — the `output_path` prompt, the multiple-Kit
+chooser, and the `needs-runtime-choice` gate — assume an interactive session.
+For unattended batch or CI runs the caller can pre-supply those inputs, and the
+agent must then proceed without blocking:
+
+- If `output_path`, a runtime preference, and any required candidate paths are
+  all supplied, do not prompt.
+- When the preference is `auto`, resolve the runtime by deterministic policy:
+  1. Standalone Scene Optimizer + Asset Validator, if importable.
+  2. A user-supplied Kit / USD Composer / Isaac Sim path.
+  3. The newest auto-discovered Kit — only when a broad filesystem scan was
+     explicitly authorized for this run.
+- Record `runtime_context.kit.chosen_by: auto_policy` (or
+  `standalone_preferred`) in `setup-preflight.json` so downstream skills and the
+  report can show the runtime was selected unattended rather than confirmed by a
+  human.
+- If no runtime resolves under this policy, stop with `needs-runtime-choice` and
+  name the missing inputs — do not guess a runtime or scan without permission.
 
 ## Step 3 - Verify standalone path
 
@@ -235,8 +258,8 @@ The header has two formats:
 - **Format B (compact one-liner)** — used for routine status messages and
   follow-up prompts once the user has already seen Format A in the session.
 
-When `kit.chosen` is set (single candidate or user has picked), print Format A
-once as the conclusion of this reference's interaction with the user, before the
+When `runtime_context.kit` is set (single candidate or user has picked), print
+Format A once as the conclusion of this reference's interaction with the user, before the
 agent hands off to `omniverse-usd-performance-tuning`. The user must see exactly which Kit
 application, Scene Optimizer, and Asset Validator version will be in effect
 for the rest of the session.

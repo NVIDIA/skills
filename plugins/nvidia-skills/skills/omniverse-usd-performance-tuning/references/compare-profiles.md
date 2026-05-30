@@ -36,13 +36,15 @@ workflow reference remains
 Report absolute values and percentages together. A neutral result is not a
 failure; it means the measured scene did not materially change for that metric.
 
-## Structural-Only Verdict
+## Structural-Only Runs
 
-`verdict: structural-only` is allowed only when the run used quick structural
-signals and no meaningful before/after timing or frame metrics were captured.
-The report must say which runtime or access blocker prevented a stronger
-performance verdict and must recommend the next profile capture needed to
-graduate the verdict.
+When the run used quick structural signals and no meaningful before/after timing
+or frame metrics were captured, set `workflow_mode: structural_only` in the
+report — do **not** invent a verdict value. The `verdict` stays within its enum
+(`improved | neutral | regressed | mixed`); use `neutral` when no measured metric
+materially changed. The report's `notes` field must say which runtime or access
+blocker prevented a stronger performance verdict and must recommend the next
+profile capture needed to graduate it.
 
 ## Terminal Report Requirement
 

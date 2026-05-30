@@ -61,7 +61,7 @@
   },
   "removeUnusedUVs": {
     "status": "canonical",
-    "rationale": "canonical: C1+C2: lossless mesh-cleanup op surfaced via pipelines.md cad-bim-cleanup pipeline; routing skill points at pipelines.md rather than naming the op directly.",
+    "rationale": "canonical: C1+C2: lossless mesh-cleanup op surfaced as a local routing key in pipelines.md for CAD/BIM cleanup (named pipeline recipes live upstream); routing skill points at pipelines.md rather than naming the op directly.",
     "wired_into": [
       "skills/omniverse-usd-performance-tuning/references/so-run-operations/references/pipelines.md"
     ]
@@ -122,8 +122,11 @@
   },
   "findCoincidingGeometry": {
     "status": "analysis",
-    "rationale": "analysis: A1+A2: lossless coincidence analyzer; candidate for so-interpret-validators wiring.",
-    "wired_into": []
+    "rationale": "analysis: A1+A2: lossless coincidence analyzer; wired into the so-interpret-validators interpretation map (SceneOptimizerCoincidingGeometryChecker -> spatial_coinciding) and the workflow analysis-op guidance. Prefer deduplicateGeometry before destructive deletion.",
+    "wired_into": [
+      "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/so-interpret-validators/references/rule-reference.md",
+      "skills/omniverse-usd-performance-tuning/references/workflow.md"
+    ]
   },
   "findOccludedMeshes": {
     "status": "canonical",
@@ -136,12 +139,15 @@
   },
   "findFlatHierarchies": {
     "status": "analysis",
-    "rationale": "analysis: A1+A2: lossless hierarchy-shape finder; candidate for so-interpret-validators wiring.",
-    "wired_into": []
+    "rationale": "analysis: A1+A2: lossless hierarchy-shape finder; wired into the so-interpret-validators interpretation map (SceneOptimizerFlatHierarchiesChecker -> flattenHierarchy) and the workflow analysis-op guidance.",
+    "wired_into": [
+      "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/so-interpret-validators/references/rule-reference.md",
+      "skills/omniverse-usd-performance-tuning/references/workflow.md"
+    ]
   },
   "fitPrimitives": {
     "status": "canonical",
-    "rationale": "canonical: C1+C2: bounded-loss geometry op invoked in cad-bim-cleanup pipeline (pipelines.md); critical for CAD/BIM/MEP scenes. Requires user confirmation (replaces meshes with analytic primitives).",
+    "rationale": "canonical: C1+C2: bounded-loss geometry op surfaced as a local routing key in pipelines.md for CAD/BIM cleanup (named pipeline recipes live upstream); critical for CAD/BIM/MEP scenes. Requires user confirmation (replaces meshes with analytic primitives).",
     "wired_into": [
       "skills/omniverse-usd-performance-tuning/references/so-run-operations/references/pipelines.md",
       "skills/omniverse-usd-performance-tuning/references/operations/fitPrimitives.md"
@@ -262,7 +268,7 @@
   },
   "sparseMeshes": {
     "status": "specialty",
-    "rationale": "specialty: S2: validator-finding evidence (SceneOptimizerSparseMeshChecker T2 in rule-reference.md) wires it into the so-interpret-validators chain. Analysis-only op that classifies meshes by spatial density and surfaces split / dice candidates; surfaces from validation-scoping.md Tier 3 (outlier_extent-flagged assets). Outside the default canonical flow but actionable when the checker fires.",
+    "rationale": "specialty: S2: validator-finding evidence (SceneOptimizerSparseMeshChecker T2 in rule-reference.md) wires it into the so-interpret-validators chain. Analysis-only op that classifies meshes by spatial density and surfaces split / dice candidates; surfaces from usd-validation-runner Tier 3 policy (outlier_extent-flagged assets). Outside the default canonical flow but actionable when the checker fires.",
     "wired_into": [
       "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/so-interpret-validators/references/rule-reference.md",
       "skills/omniverse-usd-performance-tuning/references/workflow.md"
@@ -292,8 +298,11 @@
   },
   "findOverlappingMeshes": {
     "status": "analysis",
-    "rationale": "analysis: A1+A2: lossless overlap analyzer; candidate for future wiring after live operationsAvailable confirms support.",
-    "wired_into": []
+    "rationale": "analysis: A1+A2: lossless overlap analyzer; wired into the so-interpret-validators interpretation map (SceneOptimizerFindOverlappingMeshesChecker -> spatial_overlapping) and the workflow analysis-op guidance.",
+    "wired_into": [
+      "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/so-interpret-validators/references/rule-reference.md",
+      "skills/omniverse-usd-performance-tuning/references/workflow.md"
+    ]
   },
   "shrinkwrap": {
     "status": "documentary",

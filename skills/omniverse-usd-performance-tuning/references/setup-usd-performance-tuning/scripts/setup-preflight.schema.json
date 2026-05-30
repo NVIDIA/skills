@@ -76,8 +76,65 @@
     },
     "runtime_context": {
       "type": "object",
-      "description": "Runtime context block that downstream skills (optimization-report) consume. Structure mirrors the optimization-report schema's runtime_context definition.",
-      "additionalProperties": true
+      "description": "Canonical runtime context block that downstream skills (optimization-report, the runtime-context-header) consume. The probe writes the chosen runtime here and the header prints from it; the source kit/sceneOptimizer/assetValidator fields above are the raw probe data. Inner shape matches the optimization-report schema's runtime_context definition exactly so the block can be copied verbatim into the report.",
+      "required": ["kit", "sceneOptimizer", "assetValidator"],
+      "properties": {
+        "kit": {
+          "type": "object",
+          "required": ["application", "version", "path"],
+          "properties": {
+            "application": {
+              "type": "string",
+              "description": "Friendly name of the Kit application, e.g. 'USD Composer', 'Isaac Sim', 'Kit SDK'."
+            },
+            "version": {
+              "type": "string",
+              "description": "Release version, e.g. '110.1.0'."
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute path to the Kit root."
+            },
+            "build": {
+              "type": ["string", "null"],
+              "description": "Full build identifier when present (e.g. '110.1.0+main.10181....release'); null when the install path does not encode one."
+            }
+          }
+        },
+        "sceneOptimizer": {
+          "type": "object",
+          "required": ["extension", "version"],
+          "properties": {
+            "extension": {
+              "type": "string",
+              "description": "Extension name, typically 'omni.scene.optimizer.core'."
+            },
+            "version": {
+              "type": "string",
+              "description": "Extension version, e.g. '110.0.4'."
+            }
+          }
+        },
+        "assetValidator": {
+          "type": "object",
+          "required": ["package", "version", "source"],
+          "properties": {
+            "package": {
+              "type": "string",
+              "description": "Package or extension name, e.g. 'omniverse-asset-validator' or 'omni.asset_validator.core'."
+            },
+            "version": {
+              "type": "string",
+              "description": "Package version."
+            },
+            "source": {
+              "type": "string",
+              "enum": ["kit-extension", "pip", "standalone"],
+              "description": "Where Asset Validator was loaded from."
+            }
+          }
+        }
+      }
     },
     "probed_at": {
       "type": "string",

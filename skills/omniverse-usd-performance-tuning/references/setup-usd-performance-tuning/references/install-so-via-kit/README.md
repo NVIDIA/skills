@@ -51,8 +51,8 @@ from omni.kit_app import KitApp
 import sys
 app = KitApp()
 app.startup(['--no-window', '--enable', 'omni.scene.optimizer.core'])
-import omni.scene.optimizer.core as soc
-print(len(soc.acquire_interface().get_operations()))
+from omni.scene.optimizer.core import SceneOptimizerCore
+print(len(SceneOptimizerCore.getInstance().getOperations()))
 sys.exit(app.shutdown())
 "
 ```
@@ -61,10 +61,9 @@ Expect ≥ 40 (floor — varies by version). First run pulls SO from the
 registry (~minutes); subsequent runs are cached under
 `~/.local/share/ov/data/Kit/`.
 
-The in-Kit verification path uses `soc.acquire_interface().get_operations()`.
-Different standalone drops can expose either this lower-level interface or the
-`SceneOptimizerCore` wrapper. Operation scripts should probe the selected
-runtime and use the API surface it actually provides.
+The in-Kit verification path uses the public `SceneOptimizerCore` registry.
+Operation invocation is defined by `so-run-operations/references/invocation.md`;
+do not infer mutation call shapes from this install probe.
 
 ## Remote Omniverse assets
 

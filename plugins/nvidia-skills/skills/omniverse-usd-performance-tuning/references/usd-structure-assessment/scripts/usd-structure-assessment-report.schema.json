@@ -104,7 +104,7 @@
     },
     "summary_counts": {
       "type": "object",
-      "description": "Routing-critical counts consumed by validation-scoping.md decision tree and restructure-decision. Strict: typos rejected.",
+      "description": "Routing-critical counts consumed by usd-validation-runner policy and restructure-decision. Strict: typos rejected.",
       "required": [
         "prim_count",
         "mesh_count",

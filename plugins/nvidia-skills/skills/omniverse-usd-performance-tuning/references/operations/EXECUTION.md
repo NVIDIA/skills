@@ -19,6 +19,12 @@ plan. Detailed executable guidance lives in the nested
 `so-run-operations` references; this page gives repo-root agents enough shape to
 avoid wrong turns before entering the skill bundle.
 
+Use setup preflight plus live `sceneOptimizer.operationsAvailable` before
+execution. Per-operation files are routing stubs; upstream `usd-optimize` docs
+own parameters and defaults. Local invocation mechanics live in
+`../so-run-operations/references/invocation.md`; do not invent or duplicate
+Python call shapes here.
+
 ## Optional Helper Wrapper Shape
 
 Use these wrapper paths only when the selected Scene Optimizer environment or
@@ -101,7 +107,10 @@ dependency-bound, or observed resource pressure makes parallelism unsafe.
 When targets include prototypes and non-prototype assets, run prototypes first.
 Parallelize within each dependency group when resources allow. Prototype
 changes propagate to instances, so instance-site work before prototype work
-wastes runtime and can produce misleading metrics.
+wastes runtime and can produce misleading metrics. If the batch manifest
+contains `target_class: "assembly_root"` with retained meshes, process it as a
+non-prototype mesh target before final stage-level cleanup; do not reduce it to
+`pruneLeaves`/`computeExtents` only.
 
 For each target, include a stable hash of the absolute input path in optimized
 USD, summary, and log filenames. After every batch, verify that produced output
@@ -115,3 +124,14 @@ Scene Optimizer mutates the opened stage in memory. Default to exporting an
 optimized `.usdc` output under `output_path`. Use in-place `Save()` only for
 newly created layers or explicitly approved source edits, and use flattened
 stage export only when the user asks for a flattened deliverable.
+
+## Rules
+
+- Confirm bounded-loss/destructive operations before mutation.
+- Use selected targets from SA/validation evidence.
+- Store config, log, output stage, and summary artifacts.
+- If helper wrappers exist in the selected environment they may be used;
+  otherwise use the Python/API executor from the invocation reference.
+- Do not pass a plain `pxr.Usd.Stage` directly to Scene Optimizer operation
+  APIs. Attach it to `ExecutionContext` or use the standalone JSON helper as
+  described in the invocation reference.

@@ -18,8 +18,10 @@
     "metric_groups",
     "metrics",
     "operations",
-    "validators"
+    "validators",
+    "target_coverage"
   ],
+  "additionalProperties": false,
   "properties": {
     "asset_name": {
       "type": "string",
@@ -30,8 +32,8 @@
       "description": "Path to the original input stage."
     },
     "output_path": {
-      "type": "string",
-      "description": "Path to the optimized output stage."
+      "type": ["string", "null"],
+      "description": "Path to the optimized output stage; null for diagnosis-only, no-op, or structural-only runs where no optimized stage was written."
     },
     "timestamp": {
       "type": "string",
@@ -41,7 +43,16 @@
     "verdict": {
       "type": "string",
       "enum": ["improved", "neutral", "regressed", "mixed"],
-      "description": "Overall optimization verdict."
+      "description": "Overall optimization verdict from compare-profiles. Stays within this enum regardless of workflow_mode; use 'neutral' when no metrics changed. Degraded (Scene Optimizer unavailable) and no-op runs are expressed via workflow_mode, not by inventing new verdict values."
+    },
+    "workflow_mode": {
+      "type": "string",
+      "enum": ["full", "structural_only", "no_op"],
+      "description": "Execution mode for this run. 'full' = optimization/mutation ran (default when omitted); 'structural_only' = Scene Optimizer was unavailable so only USD-structural work ran and no mesh operations executed; 'no_op' = no optimization was needed (e.g., structure assessment reported already_optimized). The verdict stays in its own enum in every mode."
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free-form caveats the verdict and score cannot capture on their own: degraded-path explanation, the runtime or access blocker that prevented a stronger verdict, or the next profile capture needed to graduate it."
     },
     "runtime_context": {
       "type": "object",
@@ -120,6 +131,10 @@
       "type": "string",
       "enum": ["excellent", "strong", "moderate", "neutral", "mixed", "regressed"],
       "description": "Human-readable score band derived from optimization_score: excellent >= 9.0; strong >= 7.5 and < 9.0; moderate >= 5.5 and < 7.5; neutral >= 4.5 and < 5.5; mixed >= 2.5 and < 4.5; regressed < 2.5."
+    },
+    "executive_summary": {
+      "type": "string",
+      "description": "Optional short reader-facing summary rendered near the top of the Markdown/HTML report."
     },
     "reasoning": {
       "type": "string",
@@ -250,6 +265,58 @@
             "description": "Count of reported findings for this validator row; use notes to distinguish failures, warnings, opportunities, or follow-up candidates."
           },
           "notes": { "type": "string" }
+        }
+      }
+    },
+    "target_coverage": {
+      "type": "object",
+      "description": "Phase-4 mesh-optimization coverage ledger, structurally parallel to the validation report's coverage_ledger. entries[] must cover the UNION of every iteration's apply-restructure manifest phase4_targets[]; complete is true only when every entry reached a resolved disposition. validate_report.py reconciles this against the upstream manifest(s) so a target that was never enumerated (e.g. an assembly_root dropped from a later iteration's manifest) fails closed instead of silently passing. Reconciliation is NOT optional once a restructure happened: if any entry has a restructure role (assembly_root | prototype | shared_layer | loadable_subasset) the gate requires a manifest, supplied via --manifest or recorded in source_manifests[]. A diagnosis-only / optimize-as-is-monolith run (no restructure roles) is manifest-free; an empty Phase-4 run is valid with entries: [] and complete: true.",
+      "required": ["complete", "entries"],
+      "additionalProperties": false,
+      "properties": {
+        "complete": {
+          "type": "boolean",
+          "description": "True only when every entry's disposition is one of optimized | skipped_zero_meshes | skipped_user_declined. A 'blocked' or unresolved entry keeps this false and the report is not final."
+        },
+        "source_manifests": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Path(s) to the apply-restructure manifest(s) this coverage was reconciled against, one per restructure iteration. Recorded so validate_report.py can auto-load and reconcile them (resolved relative to the report file when not absolute), making reconciliation fail-closed rather than dependent on the operator remembering --manifest. Required in effect whenever any entry has a restructure role; omit for monolith/diagnosis runs."
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "role", "mesh_count", "disposition"],
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Phase-4 target file; reconciliation key against apply-restructure manifest phase4_targets[].path."
+              },
+              "role": {
+                "type": "string",
+                "enum": ["assembly_root", "prototype", "shared_layer", "loadable_subasset", "monolith"],
+                "description": "Target kind. The restructure roles (assembly_root | prototype | shared_layer | loadable_subasset) trigger mandatory manifest reconciliation. 'monolith' is the non-restructured optimize-as-is target (N=1) and does not require a manifest."
+              },
+              "mesh_count": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Default-predicate mesh count for this target (echoed from the manifest's authoritative count). disposition 'skipped_zero_meshes' is valid only when this is 0."
+              },
+              "disposition": {
+                "type": "string",
+                "enum": ["optimized", "skipped_zero_meshes", "skipped_user_declined", "blocked"],
+                "description": "optimized = the per-target mesh op chain ran; skipped_zero_meshes = no meshes to optimize (requires mesh_count == 0); skipped_user_declined = user opted out of optimizing this target; blocked = could not be processed (keeps complete=false)."
+              },
+              "operations": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Optional: the mesh op chain applied to this target, for traceability."
+              },
+              "notes": { "type": "string" }
+            }
+          }
         }
       }
     }
