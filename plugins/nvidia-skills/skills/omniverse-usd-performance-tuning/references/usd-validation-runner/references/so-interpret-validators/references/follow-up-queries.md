@@ -36,11 +36,11 @@ Look up the rule in the *Rule reference*. Then:
    > `<RuleName>` wraps `<op>`. To apply the fix, invoke the `so-run-operations`
    > skill (Claude alias: `/so-run-operations <asset> --config '[{"operation":"<op>", ...}]'`)
    > or call the operation directly via the Python bindings after probing the
-   > selected SO API surface. For the full invocation reference (runtime probe,
-   > chains via `executeConfig`, JSON pipelines via
-   > `standalone.execute_commands_from_json`, and
-   > `acquire_interface().execute_operation` fallback), see
-   > upstream `usd-optimize/.agents/operations/INVOCATION.md`. For output
+	   > selected SO API surface. For the full invocation reference (runtime probe,
+	   > chains via `executeConfig`, JSON pipelines via
+	   > `standalone.execute_commands_from_json`, and the required
+	   > `ExecutionContext` stage attachment), see
+	   > `skills/omniverse-usd-performance-tuning/references/so-run-operations/references/invocation.md`. For output
    > Save-vs-Export policy and digitaltwin workspace rules, see
    > `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/usd-edit-target-planner/references/output-saving.md`. For
    > generic multi-op pipelines organized by bottleneck, see upstream
@@ -101,9 +101,14 @@ re-run Steps 3 + 4.
 
 ### "Only check `<RuleName>`" (before a run)
 
-The validator runner doesn't expose a `--rule` flag. Tell the user we'll run
-the full default set and filter the CSV / summarizer output to that rule before
-presenting. If they need to skip expensive rules, they can omit
-`--include-expensive` (default).
+Selecting which rules run is the canonical executor's job, keyed by **canonical
+concept** — there is no `--rule` flag and no run-everything-then-filter step.
+Map the rule the user named to its canonical concept in
+`references/usd-validation-runner/references/validator-concepts.json`, then run
+just that concept through the executor — `validate_concepts(stage, [concept])`
+for a single target, or `run_scope_note(...)` for a scoped plan (see
+`references/usd-validation-runner/README.md`). The executor enables only the
+resolved rule class, so expensive rules are never pulled in unless their concept
+is explicitly selected.
 
 ---

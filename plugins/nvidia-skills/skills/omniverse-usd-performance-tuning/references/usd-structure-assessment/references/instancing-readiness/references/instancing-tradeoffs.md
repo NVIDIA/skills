@@ -15,7 +15,7 @@ This reference is consulted by:
 
 - `usd-hierarchy-dedupe-candidates` when choosing between hierarchy dedupe vs unscoped mesh dedupe.
 - `instancing-readiness` when explaining merge safety to the user before authoring `instanceable=true`.
-- `restructure-flow` when planning Phase 2f restructure orchestration.
+- `apply-restructure` when planning Phase 2f restructure orchestration.
 - `so-interpret-validators` when recommending merge or dedupe ops based on validator findings.
 
 ## Prerequisites

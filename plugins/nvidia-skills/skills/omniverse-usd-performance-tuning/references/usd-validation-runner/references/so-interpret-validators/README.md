@@ -26,7 +26,8 @@ reads. Do not clone the source repo just to read upstream SO guidance.
 ## Local Responsibilities
 
 - Preserve logical milestone name `so-interpret-validators`.
-- Use `validation-scoping.md` for tiering, phase-aware subsets, deferred validators, and approval gates.
+- Use `usd-validation-runner/README.md` for tiering, phase-aware subsets,
+  selected-validator execution policy, and approval gates.
 - Use `rule-reference.md` only for local recommendation routing; upstream owns generic artifact interpretation mechanics.
 - Apply `runtime-artifact-token-budget.md` for CSV/log handling and route large artifacts through summaries.
 

@@ -88,12 +88,12 @@ Prefer these sources in order:
 For supported SO operation keys, use this fallback chain:
 
 ```python
-# Preferred (standalone prebuilt with impl.core):
-from omni.scene.optimizer.impl.core import SceneOptimizerCore
+# Preferred:
+from omni.scene.optimizer.core import SceneOptimizerCore
 inst = SceneOptimizerCore.getInstance()
 ops = inst.getOperations()  # returns iterable of operation names
 
-# Fallback (Kit and some standalone builds with bindings):
+# Fallback for lower-level binding-only builds:
 omni.scene.optimizer.core.bindings._omni_scene_optimizer_core \
     .acquire_interface().json_parser().get_supported_operations()
 ```

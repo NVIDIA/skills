@@ -22,16 +22,18 @@ Required top-level fields:
 | `asset_name` | string | Phase 0 | Set early; the basename of the input asset usually suffices. |
 | `input_path` | string | Phase 0 | Optional in schema, but capture it for traceability. |
 | `output_path` | string | Phase 5 | Path to the optimized stage root from Phase 5d (or `null` for diagnosis-only / structural-only path). |
-| `timestamp` | string (ISO 8601) | Phase 6e | Set when the report writes. |
-| `verdict` | enum: `improved \| neutral \| regressed \| mixed` | Phase 6c | From `compare-profiles`. Use `structural-only` semantically when SO was unavailable (degraded path) and document it in `notes`. |
-| `optimization_score` | number 0-10 | Phase 6e | Stage Optimization Score. Compute deterministically as `round(sum(group.score * group.weight) / sum(group.weight), 1)` across scored stage/composition groups only. Exclude `score=null` and `weight=0` groups. Runtime metrics are not score inputs. |
-| `score_scope` | enum: `stage_optimization` | Phase 6e | Makes the score scope explicit so readers do not confuse it with full runtime performance. |
-| `score_label` | enum | Phase 6e | Human score band from `optimization_score`: `excellent >= 9.0`, `strong >= 7.5`, `moderate >= 5.5`, `neutral >= 4.5`, `mixed >= 2.5`, `regressed < 2.5`. |
-| `reasoning` | string | Phase 6e | One to two paragraphs explaining why the agent chose this optimization approach for the asset, based on evidence and tradeoffs. |
+| `timestamp` | string (ISO 8601) | Phase 6d | Set when the report writes. |
+| `verdict` | enum: `improved \| neutral \| regressed \| mixed` | Phase 6c | From `compare-profiles`. Stays in this enum in every mode; use `neutral` when no metrics changed. Express degraded/no-op runs via `workflow_mode`, not new verdict values. |
+| `workflow_mode` | enum: `full \| structural_only \| no_op` | Phase 6d | Optional (default `full`). `structural_only` when SO was unavailable and only USD-structural work ran; `no_op` when SA reported `already_optimized`. |
+| `notes` | string | any phase | Optional. Caveats the verdict/score cannot capture: degraded-path reason, runtime/access blocker, or the next profile capture needed to graduate the verdict. |
+| `optimization_score` | number 0-10 | Phase 6d | Stage Optimization Score. Compute deterministically as `round(sum(group.score * group.weight) / sum(group.weight), 1)` across scored stage/composition groups only. Exclude `score=null` and `weight=0` groups. Runtime metrics are not score inputs. |
+| `score_scope` | enum: `stage_optimization` | Phase 6d | Makes the score scope explicit so readers do not confuse it with full runtime performance. |
+| `score_label` | enum | Phase 6d | Human score band from `optimization_score`: `excellent >= 9.0`, `strong >= 7.5`, `moderate >= 5.5`, `neutral >= 4.5`, `mixed >= 2.5`, `regressed < 2.5`. |
+| `reasoning` | string | Phase 6d | One to two paragraphs explaining why the agent chose this optimization approach for the asset, based on evidence and tradeoffs. |
 | `measurement_context` | object | Phases 0, 1a, 6a | Context for stage/composition measurements: runtime, cache policy, sample count, stage-open method. |
-| `runtime_profiling` | object | Phase 6e | Optional Omniperf/runtime-profiler handoff for RAM, VRAM, FPS, frame time, shader, renderer, and GPU metrics. |
-| `metric_groups[]` | array | Phase 6e | Stage headline areas such as composition load, structure, instancing, storage footprint, and validation. |
-| `artifacts` | object | Phase 6e | Paths to generated JSON, Markdown, and static HTML reports. |
+| `runtime_profiling` | object | Phase 6d | Optional Omniperf/runtime-profiler handoff for RAM, VRAM, FPS, frame time, shader, renderer, and GPU metrics. |
+| `metric_groups[]` | array | Phase 6d | Stage headline areas such as composition load, structure, instancing, storage footprint, and validation. |
+| `artifacts` | object | Phase 6d | Paths to generated JSON, Markdown, and static HTML reports. |
 | `metrics[]` | array | Phases 1a + 6a | Each metric: `name`, `before`, `after`, `change_pct`, `verdict`. |
 | `operations[]` | array | Phases 4 + 5 | Each op: `order`, `name`, `method`, `result`. |
 | `validators[]` | array | Phases 2c + 6b | Each validator entry: `name`, `issues`, `notes`; `issues` is the count of reported findings for that row. |
@@ -64,8 +66,8 @@ in `runtime_profiling`, ideally via Omniperf dashboard/artifacts.
 
 ### Phase 2 - Composition / discovery / restructure decision
 
-- [ ] `validators[]` - first entries (validator name + issue count from Phase 2c sweep). One row per validator that ran.
-- [ ] If user takes the "exit" branch at Phase 2e gate: skip to Phase 6e and write a structural-only report.
+- [ ] `validators[]` - first entries (validator name + issue count from Phase 2c selected probes). One row per validator that ran.
+- [ ] If user takes the "exit" branch at Phase 2e gate: skip to Phase 6d and write a diagnosis-only report (`output_path: null`, empty `operations[]`).
 
 ### Phase 3 - Stage-level instancing
 
@@ -96,7 +98,7 @@ in `runtime_profiling`, ideally via Omniperf dashboard/artifacts.
 - [ ] `reasoning` - one to two concise paragraphs explaining the chosen optimization strategy and tradeoffs.
 - [ ] `runtime_profiling` - point to Omniperf/runtime-profiler artifacts if available, or mark as `not_run` with a recommendation.
 - [ ] `artifacts` - include the JSON, Markdown, and HTML report paths.
-- [ ] Generate HTML by running `python3 references/report-templates/render_preview.py` (mandatory — do NOT hand-write HTML). See `references/optimization-report/README.md § HTML Generation`.
+- [ ] Generate HTML by running `python3 references/report-templates/render_preview.py --fixture <report.json> --output <report.html>` (mandatory — do NOT hand-write HTML, and never run it argless: that renders the committed design fixture, not your report). See `references/optimization-report/README.md § HTML Generation`.
 
 Do not emit the final report as a normal completed optimization if Phase 6a or
 Phase 6b artifacts are missing. Either run the missing phase, or record the
@@ -110,7 +112,7 @@ unclaimed, and keep the verdict no stronger than the remaining evidence allows.
 When SO is unavailable and the user declines setup:
 
 - `output_path` may be `null` (no Phase 4 ops were applied, no Phase 5 ref-rewrite happened).
-- `verdict` should be set to whatever applies; if no metrics changed, `neutral` is acceptable. Note structural-only status in the `validators[]` notes or a top-level `notes` field.
+- `verdict` stays in its enum; if no metrics changed, use `neutral`. Set `workflow_mode: structural_only` and record the SO-unavailable reason in the top-level `notes` field.
 - `operations[]` may be empty.
 - `validators[]` should still contain the Phase 2c USD-stack findings.
 - `runtime_profiling.status` should usually be `not_run` unless an external Omniperf/runtime-profiler artifact is attached.
@@ -147,11 +149,16 @@ the caveat above attached.
 
 ### Iteration (Phase 7)
 
-When the agent loops back from Phase 7 (optional):
+When the agent loops back from Phase 7:
 
+- Default broad optimization to 3 scoped iterations unless the user opts out,
+  requests a quick pass, or stop criteria apply.
+- Write an interim report/update after each iteration before continuing.
 - KEEP the `before` values from the FIRST baseline. Do NOT re-baseline.
 - Append to `operations[]` with continued `order` numbering across iterations.
 - Update `after` values from each new Phase 6a re-profile.
+- Reuse prior validator evidence unless the next pass needs a narrower targeted
+  or delta probe; expanded validation scope requires explicit approval.
 - The final `verdict` reflects the cumulative comparison (first baseline vs latest after).
 
 ### Diagnosis-only

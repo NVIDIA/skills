@@ -7,15 +7,16 @@ How to execute Scene Optimizer operations once the runtime is selected and the
 operation plan is approved. Read `<output_path>/setup-preflight.json` to
 determine which runtime and API surface to use.
 
+This is the local source of truth for Scene Optimizer operation invocation.
+Other workflow docs should link here instead of repeating Python API snippets.
+
 The two runtimes below are peers — neither is preferred. The user's Phase 0
 choice determines which section applies.
 
 ## Kit Runtime
 
 When `setup-preflight.json` indicates Kit as the selected runtime, bootstrap
-Kit first, then use the same Python API as standalone. Kit and standalone
-environments both expose `SceneOptimizerCore.getInstance()` with
-`executeOperation` or `executeConfig`.
+Kit first, then use the same supported Python shapes as standalone.
 
 ```python
 import os
@@ -35,29 +36,38 @@ app.startup([
     # "--enable", "omni.usd_resolver",
 ])
 
-import omni.scene.optimizer.core as soc
+from omni.scene.optimizer.core import ExecutionContext, SceneOptimizerCore
 from pxr import Usd
 
 # Open stage
 stage = Usd.Stage.Open(input_path)
 
-# Get optimizer instance
-core = soc.SceneOptimizerCore.getInstance()
+# Attach the stage to an ExecutionContext before direct API calls.
+context = ExecutionContext()
+context.set_stage(stage)
+core = SceneOptimizerCore.getInstance()
 
 # Verify operations are available
 ops = core.getOperations()
 
 # Execute a single operation
-config_json = '{"operation": "meshCleanup", "mergeVertices": true}'
-core.executeOperation("meshCleanup", stage, config_json)
+success, error, output = core.executeOperation(
+    "meshCleanup",
+    context,
+    {"mergeVertices": True},
+)
+if not success:
+    raise RuntimeError(error)
 
 # Or execute a pipeline
-pipeline_json = '''[
-    {"operation": "meshCleanup", "mergeVertices": true},
+pipeline = [
+    {"operation": "meshCleanup", "mergeVertices": True},
     {"operation": "optimizeMaterials"},
-    {"operation": "pruneLeaves"}
-]'''
-core.executeConfig(stage, pipeline_json)
+    {"operation": "pruneLeaves"},
+]
+for success, error, output in core.executeConfig(context, pipeline):
+    if not success:
+        raise RuntimeError(error)
 
 # Export optimized output (never overwrite source)
 stage.Export(output_path)
@@ -70,12 +80,9 @@ sys.exit(app.shutdown())
 - Cross-check every operation key against `operationsAvailable` in
   `setup-preflight.json` before execution. If missing, report
   `blocked_missing_so_operation`.
-- Probe the selected runtime before writing the script. Some builds
-  expose the C++ binding interface from
-  `omni.scene.optimizer.core.bindings._omni_scene_optimizer_core` instead
-  of `SceneOptimizerCore`. Use whichever the runtime provides.
+- Probe the selected runtime before writing the script.
 - Set `OMNI_KIT_ACCEPT_EULA=yes` in the environment before KitApp import.
-- For analysis-only operations, set `"analysisMode": 1` in the config JSON.
+- For analysis-only operations, set `context.analysisMode = 1`.
 - Operation keys come from the per-operation page's Parameters table and
   starting-config JSON. Invalid keys may warn or silently no-op.
 - First run may spend minutes fetching extensions from the registry; subsequent
@@ -102,6 +109,62 @@ by the user.
 - Apply destructive-operation approval gates via `operation-safety.md`.
 - Write optimized stages and runtime artifacts under the local output
   workspace chosen by setup.
+
+## Verified Python API Shapes
+
+Verified against
+`scene_optimizer_core_usd_25.11_py_3.12@110.1.0+master.401.324ccecb.gl.manylinux_2_35_x86_64.release`.
+
+Preferred public JSON API:
+
+```python
+import json
+from omni.scene.optimizer.core.scripts import standalone
+from pxr import Usd
+
+stage = Usd.Stage.Open(input_path)
+ok = standalone.execute_commands_from_json(stage, json.dumps([
+    {"operation": "meshCleanup", "mergeVertices": True},
+]))
+if not ok:
+    raise RuntimeError("Scene Optimizer operation chain failed")
+stage.Export(output_path)
+```
+
+Direct API with per-operation results:
+
+```python
+from omni.scene.optimizer.core import ExecutionContext, SceneOptimizerCore
+from pxr import Usd
+
+stage = Usd.Stage.Open(input_path)
+context = ExecutionContext()
+context.set_stage(stage)
+results = SceneOptimizerCore.getInstance().executeConfig(context, [
+    {"operation": "meshCleanup", "mergeVertices": True},
+])
+for success, error, output in results:
+    if not success:
+        raise RuntimeError(error)
+stage.Export(output_path)
+```
+
+## Invalid Call Shape
+
+Do not pass a plain `pxr.Usd.Stage` directly as the second argument to
+`SceneOptimizerCore.executeOperation` or `executeConfig`. The binding expects an
+`ExecutionContext`; the stage must be attached with `context.set_stage(stage)`.
+The bad shape below reproduces the failure seen in Horde testing:
+
+```python
+SceneOptimizerCore.getInstance().executeOperation("printStats", stage, {})
+# AttributeError: 'Stage' object has no attribute '_impl'
+```
+
+If `_impl` appears in an operation log, stop the operation pass, mark the
+attempt as an invalid SO invocation, and rerun through the supported shapes
+above. Do not export or report a successful optimized stage from that failed
+pass.
 
 ## Save Policy
 

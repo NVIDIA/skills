@@ -9,7 +9,7 @@ requires_confirmation: true
 risk_class: high
 args_count: 20
 requires_mesh: true
-pipelines: [cad-bim-cleanup]
+pipelines: []
 keywords: [fit, primitive, cube, sphere, cylinder, approximate]
 since_version: 2026-02-11T07:51:19Z
 requires_extension: omni.scene.optimizer.core

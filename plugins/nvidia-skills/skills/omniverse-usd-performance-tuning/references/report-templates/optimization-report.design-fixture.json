@@ -166,5 +166,26 @@
       "issues": 0,
       "notes": "No mesh-quality issues found in the sampled path."
     }
-  ]
+  ],
+  "target_coverage": {
+    "complete": true,
+    "source_manifests": ["optimization-report.design-fixture.manifest.json"],
+    "entries": [
+      {
+        "path": "/tmp/factory/prototypes/rack_unit.usd",
+        "role": "prototype",
+        "mesh_count": 412,
+        "disposition": "optimized",
+        "operations": ["meshCleanup", "fitPrimitives", "deduplicateGeometry", "decimateMeshes", "optimizeMaterials", "computeExtents"]
+      },
+      {
+        "path": "/tmp/factory/factory.optimized.usdc",
+        "role": "assembly_root",
+        "mesh_count": 1840,
+        "disposition": "optimized",
+        "operations": ["meshCleanup", "fitPrimitives", "deduplicateGeometry", "decimateMeshes", "optimizeMaterials", "computeExtents"],
+        "notes": "Assembly-root remainder (meshes left after extraction) processed through the per-target op chain, not left to stage-level cleanup."
+      }
+    ]
+  }
 }

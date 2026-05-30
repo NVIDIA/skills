@@ -1,14 +1,15 @@
 ## Description: <br>
-Top-level workflow skill for USD performance diagnosis and optimization. Use for slow loading, high memory, low FPS, or 'optimize my scene' requests; delegates auth/runtime setup to Phase 0 owners. <br>
+Top-level workflow skill for USD performance diagnosis and optimization, used for slow loading, high memory, low FPS, or generic scene optimization requests. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
-## Owner: NVIDIA <br>
+## Owner
+NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to diagnose and optimize USD scene performance — addressing slow loading, high memory usage, low FPS, and GPU crashes — within NVIDIA Omniverse workflows. <br>
+Developers and engineers working with USD scenes who need to diagnose and resolve performance issues such as slow loading, high memory usage, low FPS, or GPU crashes in NVIDIA Omniverse workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -21,20 +22,33 @@ Mitigation: Review and scan skill before deployment. <br>
 - [Workflow Reference](references/workflow.md) <br>
 - [Skill Map](references/skill-map.md) <br>
 - [USD Structure Assessment](references/usd-structure-assessment/README.md) <br>
-- [Scene Optimizer Operations](references/so-run-operations/README.md) <br>
-- [USD Validation Runner](references/usd-validation-runner/README.md) <br>
-- [Profile Stage](references/profile-stage/README.md) <br>
-- [Compare Profiles](references/compare-profiles/README.md) <br>
-- [Optimization Report](references/optimization-report/README.md) <br>
+- [Scene Optimizer Operations](references/operations/README.md) <br>
 - [Setup USD Performance Tuning](references/setup-usd-performance-tuning/README.md) <br>
-- [CAD Conversion Advisor](references/cad-conversion/README.md) <br>
+- [USD Validation Runner](references/usd-validation-runner/README.md) <br>
+- [Optimization Report](references/optimization-report/README.md) <br>
+- [Scene Optimizer Run Operations](references/so-run-operations/README.md) <br>
+- [Compare Profiles](references/compare-profiles/README.md) <br>
+- [Profile Stage](references/profile-stage/README.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Shell commands, Files] <br>
-**Output Format:** [Markdown and JSON structured reports] <br>
+**Output Type(s):** [Analysis, Shell commands, Configuration instructions, Files] <br>
+**Output Format:** [Markdown with structured JSON reports] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Produces optimization-report JSON conforming to optimization-report.schema.json and rendered HTML/Markdown summaries] <br>
+**Other Properties Related to Output:** [Produces optimization-report.schema.json-conforming reports and HTML previews via render_preview.py] <br>
+
+## Evaluation Tasks: <br>
+NVSkills-Eval 3-Tier evaluation (external profile): Tier 1 static validation (9 checks, 10 findings), Tier 2 deduplication analysis (2 checks, 17 findings). Tier 3 live agent evaluation not available in this report. <br>
+
+## Evaluation Metrics Used: <br>
+Reported benchmark dimensions: <br>
+- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
+- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
+- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
+- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
+- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+
+
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter, pyproject.toml) <br>

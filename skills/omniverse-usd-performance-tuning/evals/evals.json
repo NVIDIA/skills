@@ -69,6 +69,60 @@
         "Does not run profiling, validation, Scene Optimizer operations, or optimization-report steps.",
         "Routes to a viewer or application-building skill if one is available."
       ]
+    },
+    {
+      "id": "usd-performance-structural-only-report",
+      "question": "Optimize /tmp/factory.usd, but Scene Optimizer is not installed in my runtime and I don't want to install anything right now. Still give me a report.",
+      "expected_skill": "omniverse-usd-performance-tuning",
+      "expected_script": null,
+      "ground_truth": "With Scene Optimizer unavailable and install declined, the workflow runs in structural-only mode: structure assessment plus pre-mutation USD validation, no mesh operations. The final report keeps verdict within its enum (neutral if nothing changed), sets workflow_mode to structural_only, and records the Scene Optimizer blocker in notes. It must not invent a structural-only verdict value.",
+      "expected_behavior": [
+        "Reads the omniverse-usd-performance-tuning SKILL.md.",
+        "Recognizes Scene Optimizer is unavailable and install was declined, and continues in structural-only mode rather than halting or fabricating results.",
+        "Skips the Scene Optimizer mesh-operation phases.",
+        "Produces a report whose verdict stays within improved|neutral|regressed|mixed and sets workflow_mode to structural_only.",
+        "Records the Scene Optimizer blocker and the next profile capture needed in the report notes."
+      ]
+    },
+    {
+      "id": "usd-performance-report-schema-conformance",
+      "question": "Finish the optimization run on /tmp/factory.usd and write the final report.",
+      "expected_skill": "omniverse-usd-performance-tuning",
+      "expected_script": null,
+      "ground_truth": "The final optimization report must conform to optimization-report.schema.json. The agent should validate the report JSON with python3 scripts/validate_report.py before treating it as final, generate HTML via the renderer with --fixture/--output, and must not emit out-of-enum verdicts or invented top-level fields.",
+      "expected_behavior": [
+        "Reads the omniverse-usd-performance-tuning SKILL.md and the optimization-report reference.",
+        "Generates the report JSON against optimization-report.schema.json with verdict in improved|neutral|regressed|mixed.",
+        "Validates the finished report with python3 scripts/validate_report.py before finishing.",
+        "Generates the HTML via render_preview.py with --fixture and --output, not by hand and not argless.",
+        "Does not invent verdict values such as structural-only or no-op-needed."
+      ]
+    },
+    {
+      "id": "usd-performance-no-overwrite-source",
+      "question": "Run mesh cleanup and decimation on /data/asset.usd to make it lighter.",
+      "expected_skill": "omniverse-usd-performance-tuning",
+      "expected_script": null,
+      "ground_truth": "Destructive Scene Optimizer operations must write a new optimized output path and must not overwrite the source asset in place. The agent should also ask for approval before the explicitly named destructive operations.",
+      "expected_behavior": [
+        "Reads the omniverse-usd-performance-tuning SKILL.md.",
+        "Asks for approval before the explicitly named destructive operations (mesh cleanup, decimation).",
+        "Saves optimized output to a new path and does not overwrite the original source asset.",
+        "Validates before and after the operations and records the output path in the optimization report."
+      ]
+    },
+    {
+      "id": "usd-performance-zero-work-operation",
+      "question": "I ran the optimization and the operation report says it completed - did anything actually change?",
+      "expected_skill": "omniverse-usd-performance-tuning",
+      "expected_script": null,
+      "ground_truth": "A Scene Optimizer operation can return success while changing nothing (zero prims affected). The agent should detect a successful-but-no-op result by comparing before/after metrics, report it honestly as neutral, and not claim an improvement the metrics do not support.",
+      "expected_behavior": [
+        "Reads the omniverse-usd-performance-tuning SKILL.md.",
+        "Compares before/after metrics rather than trusting the operation's success status alone.",
+        "Recognizes a success-but-zero-work result (no prims or meshes changed) and reports it as neutral.",
+        "Does not present an unchanged stage as an improvement in the optimization report."
+      ]
     }
   ]
 }

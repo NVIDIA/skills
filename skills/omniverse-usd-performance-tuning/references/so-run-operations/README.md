@@ -30,6 +30,8 @@ reads. Do not clone the source repo just to read upstream SO guidance.
 - Apply local output workspace policy and `runtime-artifact-token-budget.md`; keep logs on disk and read bounded summaries only.
 - Apply destructive-operation approval gates via `references/operation-safety.md` before mutation.
 - Keep digitaltwin evidence-to-config routing in `references/config-from-evidence.md`.
+- Treat `references/invocation.md` as the only local source of truth for
+  Python/API invocation shapes.
 - For Phase 4b multi-target optimization, use `references/batch-mode.md` for target enumeration, adaptive concurrency, prototype-first ordering, hash-based output names, resource observations, and remainder-script prompts.
 - Preserve logical milestone name `so-run-operations` and hand results to profile/compare/report phases.
 
@@ -45,13 +47,14 @@ Before executing the op chain, re-read and confirm:
 - [ ] Per-op `parameter_prerequisites` frontmatter read for each destructive op.
 - [ ] `references/units-and-tolerances.md` — conversion formula for any
    tolerance-based op.
-- [ ] Upstream `usd-optimize` run-operations guide for invocation mechanics.
+- [ ] `references/invocation.md` for local invocation mechanics and upstream
+  handoff.
 - [ ] `references/batch-mode.md` for multi-target orchestration.
 - [ ] `runtime-artifact-token-budget.md` §"Stderr Production Guard" — redirect
   subprocess stderr, cap at 50 MB, retain head/tail samples.
 ## Execution Handoff
 
-Use upstream `run-operations` for invocation mechanics, operation source forms,
+Use `references/invocation.md` for supported Python/API invocation shapes,
 optional helper wrappers, selected-runtime API probing, output saving, and
 generic failure handling. Use this local file only for digitaltwin workflow
 gating, batch orchestration policy, and reporting policy.

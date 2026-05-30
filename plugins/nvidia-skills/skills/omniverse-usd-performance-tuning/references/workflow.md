@@ -28,7 +28,9 @@ Each `references/*.md` file starts with a header block:
 
 ## The 7-phase canonical flow
 
-Seven required phases (0-6) plus an optional Phase 7 (post-report iteration).
+Seven in-flow phases (0-6) plus Phase 7. For broad "optimize this scene"
+requests, Phase 7 defaults to 3 scoped iterations unless the user opts out,
+asks for a quick pass, or stop criteria apply.
 
 For structured milestone lists, preserve this broad-optimization subsequence:
 `omniverse-usd-performance-tuning` -> `profile-stage:baseline` ->
@@ -48,7 +50,7 @@ flowchart TD
   P4["Phase 4 Per-sub-asset mesh ops"]
   P5["Phase 5 Stage-level ref replacement and cleanup"]
   P6["Phase 6 Verify and report"]
-  P7["Phase 7 Optional iteration"]
+  P7["Phase 7 Default scoped iteration"]
   P0 --> P1 --> P2
   P2 -->|"already_optimized"| P6
   P2 -->|"exit"| P6
@@ -97,7 +99,7 @@ dispatch, the flow may continue in structural-only mode:
 - **Phase 3 still works** (instancing-readiness is pure USD); flips can be authored.
 - **Phase 4 SKIPPED** (mesh ops require SO).
 - **Phase 5 SKIPPED** (no optimized children to remap).
-- Phase 6: `profile-stage` AFTER + `usd-validation-runner` re-validation (pre-mutation USD stack only) + `optimization-report` with verdict `structural-only` and a clear note explaining that SO operations did not run.
+- Phase 6: `profile-stage` AFTER + `usd-validation-runner` re-validation (pre-mutation USD stack only) + `optimization-report` with `workflow_mode: structural_only` (the `verdict` stays in its enum — `neutral` if no metrics changed) and a `notes` entry explaining that SO operations did not run.
 
 This is the path E2E test scenarios commonly hit.
 
@@ -138,11 +140,25 @@ Five steps (2a-2d) feeding the gate at 2e, plus optional 2f if the user chooses 
        SA's asset_boundary_suggestions field already promotes hash-aligned
        cut points.
 
-2c  Phase-aware preliminary validator sweep   (USE: usd-validation-runner)
-       Validation-runner loads `usd-validation-runner/references/validation-scoping.md` for tier
-       selection. Subset is driven by SA's phase_recommendation (see
-       Decision Tree in that reference for the full rules).
-       Output: a "findings corpus" that informs 2e and Phase 4 op selection.
+2c  Phase-aware validation scope + selected probes   (USE: usd-validation-runner)
+       Read `usd-validation-runner/README.md` before writing or running
+       validator code. The runner first builds a selected validation plan from
+       SA's summary_counts, phase_recommendation, validation_scope, and
+       flagged_assets; then it runs only the selected rules/probes.
+       Validators are named by canonical concept (validator-concepts.json) and
+       executed via scripts/usd_validation_executor.py — never by bare class
+       name or a hand-written script. A flagged Tier 3 target's scoped probe is
+       mandatory (no approval); only the full-stage version is approval-gated.
+       Output: a compact scope note/artifact (validation-scope-note.schema.json)
+       plus a findings corpus that informs 2e and Phase 4 op selection. The
+       validation-report's coverage_ledger must be complete (every flagged
+       target resolved) before advancing.
+
+       Large-stage guardrail: if resolved stage size is unknown or >100 MB,
+       composed prim count is >10,000, mesh/prototype count is high, the target
+       is customer-scale CAD/BIM/MEP/factory/plant/city, or the ask is
+       performance optimization rather than formal conformance, do not run a
+       default full-stage AV/SO sweep. Ask before full sweep.
 
 2d  Stage-level instancing assessment   (USE: dedupe-candidates output from 2b)
        For composed stages: are existing references actually instanceable?
@@ -215,6 +231,9 @@ Owner: `so-interpret-validators` (build op chain from Phase 2c findings; T3 neve
          geometry, non-extracted sub-hierarchies). If the assembly root has
          0 mesh prims after extraction (pure Xform/reference hierarchy),
          skip it but log the skip decision.
+         Consume every `phase4_targets[]` entry; do not filter the manifest
+         down to prototype paths. An `assembly_root` target with retained
+         meshes is a mesh-optimization target, not a stage-cleanup-only target.
        - Composed stage:    each referenced asset from Phase 2a
        - Monolithic-as-is:  the monolith itself (N=1)
 
@@ -232,7 +251,10 @@ Owner: `so-interpret-validators` (build op chain from Phase 2c findings; T3 neve
 
 4c  Per-target op chain (built from Phase 2c findings via so-interpret-validators):
        Honor prototype-first ordering: prototypes BEFORE non-prototype targets
-       so changes propagate.
+       so changes propagate. Then run the same evidence-selected mesh op chain
+       on every non-prototype mesh target, including an `assembly_root` target
+       when it retained local meshes. Stage-level cleanup comes later; it does
+       not replace mesh operations for geometry left in the assembly.
        **Internal geometry removal runs FIRST** when SA flagged containment
        pairs with opaque enclosures:
          findOccludedMeshes (analysis) → removePrims (user-confirmed deletion)
@@ -243,25 +265,56 @@ Owner: `so-interpret-validators` (build op chain from Phase 2c findings; T3 neve
        policy before mutation.
        Prefer meshCleanup for vertex welding; reach for standalone
        mergeVertices only when the user explicitly needs that
-       upstream-documented behavior (see pipelines.md
-       "mergeVertices op vs meshCleanup.mergeVertices parameter").
-       Honor ordering invariants from
-       so-run-operations/references/pipelines.md (merge caveats: never if
-       instanced/streaming).
+       upstream-documented behavior — the op mechanics and the
+       meshCleanup.mergeVertices parameter live upstream, resolved via
+       `references/upstreams/usd-optimize.md`.
+       Honor the ordering invariants in the "Operation ordering invariants"
+       section below (merge caveats: never if instanced/streaming).
        Save each optimized output to a NEW path (don't overwrite source).
 
 4d  Per-target cheap re-verify
        Re-run cheap validators on each optimized output to catch obvious
        regressions before stage assembly. Defers full re-validation to Phase 6.
-       After restructure/decompose, follow the "Post-Restructure Validation
-       Strategy" in validation-scoping.md — do not re-compose and sweep.
+       After restructure/decompose, follow the "Post-Restructure /
+       Post-Decompose Validation Strategy" in usd-validation-runner/README.md
+       — do not re-compose and sweep.
+
+4e  Target completion gate (machine-checked; mirrors the validation
+    coverage_ledger):
+       Record each Phase-4 target in the optimization-report's top-level
+       `target_coverage.entries[]` with `path`, `role`, the default-predicate
+       `mesh_count`, and a `disposition`
+       (optimized | skipped_zero_meshes | skipped_user_declined | blocked).
+       Use the restructure roles (assembly_root | prototype | shared_layer |
+       loadable_subasset) after a restructure, and `monolith` for a
+       non-restructured optimize-as-is target (N=1).
+       `target_coverage.complete` is true only when every entry is resolved
+       (the first three dispositions); a `blocked` or absent target keeps it
+       false and the report is not final. A diagnosis-only / optimize-as-is run
+       with no Phase-4 work is valid with `entries: []` and `complete: true`.
+       The report author cannot self-attest coverage of a target that was never
+       enumerated, so the gate reconciles against the manifest(s). Reconciliation
+       is NOT optional once a restructure happened: whenever any entry has a
+       restructure role, record the source manifest(s) in
+       `target_coverage.source_manifests[]` (one per iteration). The gate
+       auto-loads them — and also accepts `--manifest` — and fails closed if a
+       restructure report has none:
+         python3 optimization-report/scripts/validate_report.py <report.json> \
+           [--manifest <iter1 apply-restructure-manifest.json>] \
+           [--manifest <iter2 …>]
+       The final report MUST cover the UNION of every iteration's
+       `phase4_targets[]` (a target listed in iter-1 but dropped from iter-2's
+       manifest is still owed coverage), `skipped_zero_meshes` is accepted only
+       when the manifest's authoritative `mesh_count` is 0, and any uncovered or
+       unresolved target exits non-zero. This is the gate that catches a
+       retained-mesh `assembly_root` left un-optimized. A `monolith`-only run
+       needs no manifest.
 
 Runtime branch:
   Kit:        ops run via selected SO Python API inside Kit
   standalone: ops run via selected SO Python API or standalone wrapper
-  All Python scripts probe the selected runtime first; do not assume
-  `SceneOptimizerCore.getInstance()` when the runtime exposes only
-  `acquire_interface().execute_operation(...)`.
+  All Python scripts follow so-run-operations/references/invocation.md; do not
+  pass plain pxr.Usd.Stage objects directly to Scene Optimizer operation APIs.
 ```
 
 ### Phase 4.5 - Layer cleanup after destructive in-place ops
@@ -311,7 +364,7 @@ Owner: `apply-restructure` (mode=ref_remap). Same skill as Phase 2f - both phase
        If regressed > 5%:    warn
        If regressed > 20%:   critical, recommend revert/halt
 
-6e  optimization-report (final step of in-flow phases; honors the skill's
+6d  optimization-report (final step of in-flow phases; honors the skill's
     existing "final step" contract).
        Populate against the optimization-report schema (`scripts/optimization-report.schema.json` within that reference). Match
        optimization-report/references/optimization-report-template.md. Include baseline metrics
@@ -323,7 +376,7 @@ Owner: `apply-restructure` (mode=ref_remap). Same skill as Phase 2f - both phase
 When returning structured plans or runtime-test milestone lists, label Phase 6a
 exactly `profile-stage:after`.
 
-### Phase 7 - Iterate (optional, post-report, agent-orchestration only)
+### Phase 7 - Iterate (default 3 scoped passes, post-report, agent-orchestration only)
 
 ```
 7a  Compute "untapped options" - the diff between what was done and what could
@@ -335,25 +388,38 @@ exactly `profile-stage:after`.
        - Phase 4 adaptive batching paused remaining sub-assets due to resource
          budget; remainder script generated
 
-7b  Offer to user (freeform, agent discretion):
-       "Optimization complete. Verdict: <verdict>. The following were not
-        applied this pass: [list]. Want to run another iteration with any
-        of these enabled, or with adjusted parameters?"
+7b  Default to 3 optimization iterations for broad "optimize this scene"
+    requests unless the user opts out, asks for a quick pass, or the request is
+    diagnosis-only. Each iteration writes an interim report/update before the
+    next begins.
 
-7c  If user accepts iteration:
-       Loop back to the relevant phase (typically Phase 2c with adjusted
-       validator subset, or Phase 4 with new ops in the chain). Keep the
-       baseline metrics from the FIRST pass (don't re-baseline).
+7c  Iteration 1 follows the normal Phase 0-6 flow. Iterations 2 and 3 are
+    lighter scoped passes: reuse prior SA/profile/validation evidence, start
+    from the previous report's untapped options, and run only targeted/delta
+    probes needed to choose the next operation set.
 
-7d  If user declines:
-       Flow truly ends. The Phase 6e report stands as the final deliverable.
+7d  Loop back to the relevant phase (typically Phase 2c with adjusted selected
+    probes, or Phase 4 with new ops in the chain). Keep baseline metrics from
+    the FIRST pass (don't re-baseline).
+
+7e  Stop before iteration 2 or 3 if no useful untapped options remain, the
+    previous pass regressed materially, the user opted out, or the next pass
+    would only repeat work.
 ```
 
-Phase 7 is optional. Always compute the "untapped options" list for transparency in the report (so the user can see what was held back even if they don't iterate). Use discretion on whether to actively offer iteration: do not nag if the user asked for "quick pass."
+Phase 7 is a default three-pass posture for broad optimization, not permission
+to run three full workflow reruns. Later passes are expected to be cheaper
+because they reuse evidence and narrow scope. Revalidation in iterations is
+same-or-narrower by default; expanded validation scope, Tier 3 cross-component
+probes, full sweeps, or newly destructive operations require explicit user
+approval. Always compute the "untapped options" list for transparency in the
+report, even if the user opts out.
 
 ## Validator-stack matrix
 
-The `usd-validation-runner` skill is the master router. For tier 1/2/3 detail, JSON plan template, and scene-aware adjustment rules, read `usd-validation-runner/references/validation-scoping.md`.
+The `usd-validation-runner` reference is the master router. It owns tier 1/2/3
+detail, selected-probe planning, full-sweep approval, JSON plan shape, and
+scene-aware adjustment rules.
 
 ### Pre-Mutation USD Stack
 
@@ -365,15 +431,15 @@ only through their owning workflow when the user explicitly asks for them.
 
 ### Performance stack (scoped)
 
-(read `usd-validation-runner/references/validation-scoping.md`) -> `so-run-validators` -> `so-interpret-validators`.
+`usd-validation-runner` selected plan -> `so-run-validators` -> `so-interpret-validators`.
 
 ### Phase-aware subset
 
-Owned by `usd-validation-runner/references/validation-scoping.md` → *Decision Tree*. Summary:
+Owned by `usd-validation-runner/README.md`. Summary:
 
 - `structuring` → minimum-openability + targeted AV blockers only.
-- `optimization` → minimum-openability + scoped AV + perf stack (Tier 1+2; Tier 3 only on flagged targets).
-- `already_optimized` → minimum-openability + scoped AV + perf Tier 1 only.
+- `optimization` → minimum-openability + scoped AV + perf stack (Tier 1 cheap whole-stage stats/probes + Tier 2 on flagged targets; Tier 3 scoped probes mandatory on flagged targets, full-stage Tier 3 requires approval).
+- `already_optimized` → minimum-openability + scoped AV + Tier 1 cheap whole-stage stats/probes only.
 
 ## Operation ordering invariants
 
@@ -401,6 +467,9 @@ checkout through `references/upstreams/usd-optimize.md`.
 - Common chain: `fitPrimitives` -> `deduplicateGeometry` -> `organizePrototypes`.
 - Prototype targets run before non-prototype targets; parallelize within each
   dependency group when resource budget allows.
+- "Stage-level operations last" means an additional assembled-root cleanup
+  pass after per-target mesh work. It does not mean skip mesh operations for
+  local meshes left behind in an `assembly_root` Phase 4 target.
 - Bounded-loss or destructive operations run only after `operation-safety.md`
   confirmation.
 - Per-operation argument defaults and caveats come from
@@ -420,16 +489,27 @@ request or as part of bespoke triage:
   fires and you need a breakdown before deciding between
   `removeSmallGeometry`, `decimateMeshes`, and `merge`.
 - `sparseMeshes` — exposes meshes with very low per-face vertex density;
-  often a sign of poor authoring or failed import. Outside the default
-  flow but useful when investigating draw-call counts.
+  often a sign of poor authoring or failed import. Treat as a Tier 2 targeted
+  medium probe through `usd-validation-runner`, not a cheap whole-stage default.
 - `utilityFunction` — meta-utility op for ad-hoc SO scripting; rarely the
   right tool but available when one of the recipe skills needs it. See
   `references/operations/utilityFunction.md`.
 
-For lossless coincidence/occlusion analyzers (`findCoincidingGeometry`,
-`findFlatHierarchies`, `findOverlappingMeshes`),
-prefer running them through `so-interpret-validators` once that skill
-wires them in (currently future-candidate per `_curation.json`).
+The lossless coincidence/occlusion analyzers (`findCoincidingGeometry`,
+`findFlatHierarchies`, `findOverlappingMeshes`) are wired as live analysis ops:
+prefer running them through `so-interpret-validators`, which routes them from
+validator findings.
+
+If you do run an analysis-only op on user request, summarize its findings as
+optimization candidates, not as raw dumps:
+
+- `countVertices` → high-poly triage: flag the heaviest meshes as
+  `decimateMeshes` / `removeSmallGeometry` candidates.
+- `findFlatHierarchies` → restructuring candidates: route to `flattenHierarchy`
+  (Xform collapse) or hierarchy dedupe.
+- `findCoincidingGeometry` / `findOverlappingMeshes` → duplicate/overlap
+  candidates: route to `deduplicateGeometry`, `removeSmallGeometry`, or flag for
+  manual review. They produce a report, not a change.
 
 `findOccludedMeshes` is now wired into the Phase 4 op chain via
 `config-from-evidence.md` — it runs first (before all other ops) on
@@ -442,18 +522,18 @@ SA-flagged containment pairs with opaque enclosures, followed by
 |---|---|
 | Phase 0: direct SO execution requested but SO unavailable | Halt with `blocked_missing_scene_optimizer`; do not substitute another workflow. |
 | Phase 0: requested SO op absent from the loaded runtime | Halt with `blocked_missing_so_operation`; surface supported alternatives if any. |
-| Phase 0: broad optimization request, SO unavailable, and user declines install | Switch to structural-only path. Skip Phases 4-5; report `structural-only` in 6e. |
+| Phase 0: broad optimization request, SO unavailable, and user declines install | Switch to structural-only path. Skip Phases 4-5; set `workflow_mode: structural_only` in the 6d report (verdict stays in its enum). |
 | Phase 0: User chooses "exit" at install prompt | Exit with reason "user declined runtime setup". |
 | Phase 1a: profile-stage fails to open the asset | Halt with diagnostic; the asset cannot be optimized if it cannot be opened. |
-| Phase 2c: SA's `phase_recommendation = already_optimized` | Skip Phases 2d-5; jump to Phase 6 verify; produce report with verdict `no-op-needed`. |
-| Phase 2e: User chooses "exit" at restructure gate | Skip to Phase 6e and write a diagnosis-only report. |
+| Phase 2c: SA's `phase_recommendation = already_optimized` | Skip Phases 2d-5; jump to Phase 6 verify; produce report with `workflow_mode: no_op` and `verdict: neutral`. |
+| Phase 2e: User chooses "exit" at restructure gate | Skip to Phase 6d and write a diagnosis-only report. |
 | Phase 2e: User chooses "optimize as-is" | Skip Phase 2f; continue to Phase 3 with the original stage. |
 | Phase 3b: All instancing candidates fail readiness | Skip Phase 3 result-application; continue to Phase 4. Note in report. |
-| Phase 4d: A target's optimized output fails cheap re-verify | Discard that target's output; continue with other targets. Report failure in 6e. |
+| Phase 4d: A target's optimized output fails cheap re-verify | Discard that target's output; continue with other targets. Report failure in 6d. |
 | Phase 6c: Verdict = regressed > 20% (critical) | Recommend revert (do not publish); user decides whether to publish anyway. |
 | Phase 6c: Verdict = `mixed` | Report honestly; do not present as success. |
-| Phase 6e: optimization-report writes successfully | In-flow phases end. Optional Phase 7 may follow. |
-| Phase 7: User declines iteration | Flow truly ends. The Phase 6e report stands as the final deliverable. |
+| Phase 6d: optimization-report writes successfully | In-flow pass ends. Phase 7 may continue into the next scoped iteration unless the user opted out or stop criteria apply. |
+| Phase 7: User declines iteration | Flow truly ends. The Phase 6d report stands as the final deliverable. |
 
 ## Expected duration hints (typical large stages: ~100K prims, ~200K meshes)
 
@@ -464,9 +544,10 @@ These are guidance for setting user expectations and timeout windows, not hard S
 | Phase 0 | < 1 min once user choices are recorded |
 | Phase 1 | ~5 min (profile open + SA pass) |
 | Phase 2c structural validators | ~2 min |
-| Phase 2c Tier 1 perf validators | ~5 min |
+| Phase 2c Tier 1 cheap whole-stage stats/probes | ~5 min |
 | Phase 2c Tier 2 perf validators | ~30 min |
-| Phase 2c Tier 3 perf validators | hours - always confirm before running |
+| Phase 2c Tier 3 perf validators (scoped to flagged targets/pairs) | minutes - mandatory when flagged |
+| Phase 2c Tier 3 perf validators (full-stage) | hours - always confirm before running |
 | Phase 4 per target | ~10-30 min depending on op chain |
 | Phase 5 ref-remap | ~few min for typical impact sets |
 | Phase 6 re-validation | same as Phase 2c |

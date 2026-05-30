@@ -14,6 +14,18 @@
 
 {{ reasoning }}
 
+{% if runtime_context %}
+## Runtime Context
+
+| Component | Value |
+|---|---|
+| Kit application | {{ runtime_context.kit.application }} {{ runtime_context.kit.version }} |
+| Kit path | {{ runtime_context.kit.path }} |
+| Kit build | {{ runtime_context.kit.build }} |
+| Scene Optimizer | {{ runtime_context.sceneOptimizer.extension }} {{ runtime_context.sceneOptimizer.version }} |
+| Asset Validator | {{ runtime_context.assetValidator.package }} {{ runtime_context.assetValidator.version }} (via {{ runtime_context.assetValidator.source }}) |
+{% endif %}
+
 ## Stage Impact Areas
 
 | Area | Score | Status | Notes |

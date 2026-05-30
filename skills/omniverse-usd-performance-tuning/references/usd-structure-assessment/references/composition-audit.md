@@ -3,7 +3,7 @@
 
 # USD Composition Audit
 
-> Composition audit is performed as part of `usd-structure-assessment` Phase 1.1; this reference holds the deeper checklist, findings taxonomy, and output schema mapping.
+> Composition audit is performed as part of `usd-structure-assessment` SA Stage 1; this reference holds the deeper checklist, findings taxonomy, and output schema mapping.
 
 ---
 
@@ -11,7 +11,7 @@
 
 Audit the composed stage and authored layers before any processor changes USD content, so downstream optimization can choose safe edit targets and understand composition risks.
 
-This is invoked as a section of `usd-structure-assessment` Phase 1 (composition inventory, asset inventory) and consulted from `usd-edit-target-planner` and `restructure-flow` when deeper composition detail is needed.
+This is invoked as a section of `usd-structure-assessment` SA Stage 1 (composition inventory, asset inventory) and consulted from `usd-edit-target-planner` and `apply-restructure` when deeper composition detail is needed.
 
 ## Schema reconciliation
 
@@ -69,7 +69,7 @@ When in doubt, write the SA umbrella shape - the audit-report subset is recovera
 - Candidate edit targets.
 - Payloads or variants requiring separate coverage.
 - Evidence needed before Scene Optimizer handoff.
-- **Referenced asset manifest** - a list of unique asset layer paths that contain geometry or material data via references or payloads. Downstream skills (`usd-edit-target-planner`, `restructure-flow`, Scene Optimizer handoff) need this list to plan per-asset optimization.
+- **Referenced asset manifest** - a list of unique asset layer paths that contain geometry or material data via references or payloads. Downstream skills (`usd-edit-target-planner`, `apply-restructure`, Scene Optimizer handoff) need this list to plan per-asset optimization.
 
 ## Output
 

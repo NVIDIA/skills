@@ -50,8 +50,8 @@ Before executing restructure writes, re-read and confirm:
   never overwrites the original stage in-place.
 - [ ] `setup-preflight.json` runtime context — confirm USD Python environment
   is available for authoring.
-- [ ] After restructure: re-validate (Phase 3a sweep) to confirm no
-  composition breaks.
+- [ ] After restructure: run scoped re-validation to confirm no composition
+  breaks.
 
 ## Limitations
 
@@ -108,7 +108,8 @@ Manifest schema:
   "phase4_targets": [
     {
       "path": "<written file to optimize in Phase 4>",
-      "target_class": "prototype | shared_layer | loadable_subasset",
+      "target_class": "prototype | shared_layer | loadable_subasset | assembly_root",
+      "mesh_count": 0,
       "dependency_group": "shared_first | dependent_after | independent",
       "source": "<boundary prim path, dedupe group id, or original asset path>",
       "weight_hints": {
@@ -132,6 +133,17 @@ Manifest schema:
   "warnings": []
 }
 ```
+
+The strict contract for this file is `scripts/apply-restructure-manifest.schema.json`.
+Every `phase4_targets[]` entry MUST carry a top-level `mesh_count` (integer >= 0):
+the authoritative default-predicate count
+(`len([p for p in Usd.PrimRange.Stage(stage, Usd.PrimDefaultPredicate) if p.IsA(UsdGeom.Mesh)])`)
+measured with the target opened standalone, matching the Postcondition below.
+`weight_hints.mesh_count` remains an optional, non-authoritative batching estimate.
+The downstream Phase-4 completion gate (`optimization-report/scripts/validate_report.py
+--manifest`) reconciles the final report's `target_coverage` against the UNION of
+every iteration's `phase4_targets[]` and accepts a `skipped_zero_meshes` disposition
+only when this `mesh_count` is `0`, so a retained-mesh target cannot be silently dropped.
 
 ## Preconditions
 
@@ -161,7 +173,9 @@ Manifest schema:
 - For `mode=restructure`: the manifest documents what mesh content remains on
   the assembly root after extraction. If the assembly root has > 0 mesh prims,
   include it in `phase4_targets[]` with `target_class: "assembly_root"` so
-  Phase 4 does not skip it.
+  Phase 4 does not skip it. Downstream Phase 4 must process that entry through
+  the per-target mesh op chain for its retained meshes; it is not limited to
+  final stage-level cleanup operations.
 
 ---
 

@@ -89,9 +89,10 @@ print(f'Total rules: {len(list(registry.rules))}')
 
 Expected: `Usd:Performance` and `Omni:Geometry` categories appear with ~25
 additional rules. No `register_all()` call is needed for rule discovery: the
-`@register_rule` decorator on each checker class handles registration at import
-time. Category-scoped runs may still use `ValidationEngine(init_rules=False)`
-plus `enable_rule()` for selected registered rule classes.
+validator registration decorators handle registration at import time. Category
+names confirm discovery only; `usd-validation-runner` selects validators by
+canonical concept and resolves them to rule classes by identity (via
+`scripts/usd_validation_executor.py`) before calling `enable_rule()`.
 
 ## Output
 

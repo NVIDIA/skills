@@ -3,8 +3,9 @@
 
 # Restructure Mode
 
-Use this reference for `apply-restructure` mode=`restructure` after
-`restructure-decision` returns `proceed`.
+Use this reference for `apply-restructure` mode=`restructure`, invoked when
+`restructure-decision` selects the `extract-as-assets` or
+`decompose-for-selective-loading` branch.
 
 ## Internal-Reference Scan
 
@@ -79,7 +80,7 @@ Execution order:
    a. Create the interface + payload layers following the reference-payload
       pattern above.
    b. Set `instanceable=true` on the payload root prim only when
-      `instancing-readiness` (see `restructure-decision/README.md`
+      `instancing-readiness` (see `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/restructure-decision/README.md`
       §"instancing-readiness gate") passes for that site's dedupe group.
    c. Reference the site's interface layer from the assembly root.
 3. For unique (non-duplicate) boundary candidates, extract as independent
