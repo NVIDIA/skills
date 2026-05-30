@@ -2,7 +2,7 @@
 name: vss-deploy-video-embedding
 description: >
   Deploy, operate, and integrate the VSS 3.2 GA RT-Embed Video Embedding
-  microservice. Covers Docker Compose bring-up, 
+  microservice. Covers Docker Compose bring-up,
   GPU and storage prerequisites, the `/v1` REST API (file uploads,
   text and video embeddings, live RTSP streams, health and metrics),
   Redis/Kafka/OTel integration, common failure modes, and teardown.
@@ -31,7 +31,7 @@ Use this skill when you need to:
 - **Legacy 3.1 name:** RT-Embed.
 - **Compose service:** `rtvi-embed`.
 - **Container name:** `vss-rtvi-embed`.
-- **Image:** `nvcr.io/nvidia/vss-core/vss-rt-embed` (override with `RTVI_EMBED_IMAGE`).
+- **Image:** `nvcr.io/nvstaging/vss-core/vss-rt-embed` (override with `RTVI_EMBED_IMAGE`).
 - **Default tag:** `3.2.0-26.05.4` (override with `RTVI_EMBED_TAG`).
 - **Profile:** `bp_developer_search_2d`.
 - **Container port:** `8000` (host-side `${RTVI_EMBED_PORT}`).
@@ -102,7 +102,7 @@ MODEL_ID="$(echo "$MODELS_JSON" | jq -r '.data[0].id // empty')"
 test -n "$MODEL_ID" || { echo "ERROR: /v1/models has no model id — wait until /v1/ready is 200" >&2; exit 1; }
 ```
 
-Sections below that call the API reuse `$BASE_URL` and `$MODEL_ID` from this block.
+The sections below that call the API reuse `$BASE_URL` and `$MODEL_ID` from this block.
 
 ## Common Operations
 

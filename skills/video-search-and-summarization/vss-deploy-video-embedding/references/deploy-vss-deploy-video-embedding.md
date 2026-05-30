@@ -2,7 +2,7 @@
 
 ## Container Image
 
-- **Image name** — `nvcr.io/nvidia/vss-core/vss-rt-embed`. The Compose service uses `${RTVI_EMBED_IMAGE}` and `${RTVI_EMBED_TAG}` so the image and tag are overridable per environment.
+- **Image name** — `nvcr.io/nvstaging/vss-core/vss-rt-embed`. The Compose service uses `${RTVI_EMBED_IMAGE}` and `${RTVI_EMBED_TAG}` so the image and tag are overridable per environment.
 - **Tag pattern** — `<vss-release>-<image-build>` (Compose default: `3.2.0-26.05.4`). The major/minor matches the VSS release; the suffix tracks the underlying image build.
 - **Registry** — `nvcr.io`. Pulls require an authenticated session with NGC.
 - **NGC pull requirements** — `docker login nvcr.io` with `$oauthtoken` and a valid `NGC_API_KEY`. The same `NGC_API_KEY` must also be present in the container environment for model and asset access.
