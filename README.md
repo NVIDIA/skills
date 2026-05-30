@@ -164,17 +164,25 @@ For issues with **this catalog repo itself** (README, structure, listing a new p
 
 ## Verifying Skills
 
-Every published skill ships with a detached OMS signature (`skill.oms.sig`). The sync pipeline drops any skill missing `skill.oms.sig`, `skill-card.md`, or `evals.json` before publishing, so anything in the catalog has all three artifacts.
+Every published skill ships with a detached OMS signature (`skill.oms.sig`). The sync pipeline drops any skill missing the required artifacts before publishing, so every skill in the catalog carries:
+
+- `SKILL.md` — the skill instructions consumed by the agent
+- `skill-card.md` — skill identity and governance card
+- `skill.oms.sig` — detached OMS signature (verifiable against `nv-agent-root-cert.pem`)
+- A Tier-3 evaluation dataset — accepted at `evals/evals.json`, `evals/*.json`, `eval/*.json`, or `benchmark/evals.json`
+- `BENCHMARK.md` — generated benchmark report capturing verifiable uplift data
 
 Verify a skill against the NVIDIA trust anchor [`nv-agent-root-cert.pem`](nv-agent-root-cert.pem):
 
 ```bash
 pip install model-signing
-model_signing verify certificate SKILL_DIR \
-  --signature SKILL_DIR/skill.oms.sig \
+model_signing verify certificate skills/cudaq-guide \
+  --signature skills/cudaq-guide/skill.oms.sig \
   --certificate_chain nv-agent-root-cert.pem \
   --ignore_unsigned_files
 ```
+
+Replace `skills/cudaq-guide` with the path to any skill in the catalog. A successful verification confirms that the skill contents have not been modified since signing by NVIDIA.
 
 See [Verify Signed Agent Skills](docs/signing-agent-skills.mdx) for signature layout, the trust pipeline, and policy options.
 
