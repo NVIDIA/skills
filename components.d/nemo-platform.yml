@@ -6,6 +6,5 @@ skills:
     catalog_dir: nemo-evaluator-plugin
   - path: skills/nemo-data-designer-plugin/
     catalog_dir: nemo-data-designer-plugin
-  - path: skills/nemo-setup/
-    catalog_dir: nemo-setup
+
 
