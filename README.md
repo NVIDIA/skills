@@ -197,29 +197,25 @@ See [Verify Signed Agent Skills](docs/signing-agent-skills.mdx) for signature la
 
 ```
 NVIDIA/skills/
-├── skills/                      # Verified skills, mirrored from product repos
-│   ├── README.md                 # Install guidance for people browsing this folder
-│   ├── aiq-deploy/               # AIQ — deploy AI-Q services
-│   ├── aiq-research/             # AIQ — research workflows
-│   ├── cuopt-developer/          # cuOpt — internals & contribution
-│   ├── cuopt-install/            # cuOpt — installation
-│   ├── cuopt-routing-api-python/ # cuOpt — VRP/TSP routing (Python)
-│   ├── dali-dynamic-mode/        # DALI — dynamic-mode pipeline authoring
-│   ├── deepstream-dev/           # DeepStream — guided development
-│   ├── dynamo-recipe-runner/     # Dynamo — Kubernetes recipe deploys
-│   ├── nemo-automodel-*/         # NeMo AutoModel — distributed training (4 skills)
-│   ├── nemoclaw-user-*/          # NemoClaw — secure agent sandboxing (10 skills)
-│   ├── nemotron-customize/       # Nemotron — model customization
-│   ├── rag-blueprint/            # RAG Blueprint — RAG pipeline
-│   ├── skill-card-generator/     # Trustworthy-AI — skill card generation
-│   └── tilegym-adding-cutile-kernel/  # TileGym — cuTile kernel authoring
-│                                 # Each skill lives flat at top level (no product parent
-│                                 # dir), so `npx skills add --skill <name>` resolves cleanly
+├── skills/                      # 110 verified skills across 24 products,
+│   │                              synced from upstream product repos
+│   ├── README.md                 # Browser-facing install guidance
+│   ├── <product-prefix>-*/       # Flat layout — one dir per skill, product-prefixed
+│   │                               # e.g. aiq-*, cuopt-*, cupynumeric-*, dali-*,
+│   │                               # deepstream-*, digital-health-*, dynamo-*,
+│   │                               # earth2studio-*, mcore-*, nemo-automodel-*,
+│   │                               # nemo-data-designer-plugin, nemo-evaluator-plugin,
+│   │                               # nemo-mbridge-* (20 skills), nemo-retriever,
+│   │                               # nemoclaw-user-* (10 skills), nemotron-*,
+│   │                               # physicsnemo-*, rag-*, skill-card-generator,
+│   │                               # tilegym-*, accelerated-computing-cudf, cudaq-guide
+│   ├── omniverse-*/              # Physical AI — manually staged (see manual-components.yml)
+│   ├── physical-ai-*/            # Physical AI — manually staged
+│   ├── NeMo-RL/                  # Legacy nested layout (5 skills under one dir)
+│   └── video-search-and-summarization/  # Legacy nested layout (15 skills under one dir)
 ├── components.d/                # Product registry — one file per component, teams onboard here
 │   ├── README.md                 # Schema and onboarding instructions
-│   ├── aiq.yml
-│   ├── cuopt.yml
-│   └── …                         # one file per registered product
+│   └── <product>.yml             # one file per registered product (24 today)
 ├── plugins/                     # Packaged plugin distributions
 │   └── nvidia-skills/            # Curated NVIDIA skills bundle (Claude Code, Codex)
 ├── plugins.d/                   # Plugin build registry — config for `build-plugins.py`
@@ -241,9 +237,13 @@ NVIDIA/skills/
 │   └── skill-cards.mdx
 ├── fern/                        # Fern docs site configuration
 ├── .github/
-│   ├── workflows/                # Sync pipeline, plugin validation, DCO check
-│   └── scripts/                  # regenerate-readme.sh, build-plugins.py
+│   ├── workflows/                # Sync pipeline, plugin validation, DCO check, author verify
+│   └── scripts/                  # regenerate-readme.sh, build-plugins.py,
+│                                 # manual-components.yml (temp Physical AI catalog
+│                                 # exception, removed after Computex 2026),
+│                                 # marketplace/metadata.json (skill metadata sidecar)
 ├── nv-agent-root-cert.pem       # Trust anchor for OMS signature verification
+├── skills.sh.json               # Skills.sh marketplace grouping config
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md              # Contribution guidelines
 ├── SECURITY.md                  # Security reporting policy
