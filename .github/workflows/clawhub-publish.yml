@@ -1,0 +1,84 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# Manually publish NVIDIA skills to ClawHub.
+#
+# Start with `dry-run` to preview the full catalog. Use `publish-single` for a
+# scoped release of one skill folder, or `publish-catalog` to sync every skill
+# under `skills/`.
+
+name: Publish Skills to ClawHub
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: What to run.
+        type: choice
+        required: true
+        default: dry-run
+        options:
+          - dry-run
+          - publish-single
+          - publish-catalog
+      skill_path:
+        description: Skill folder for publish-single, for example skills/rag-blueprint.
+        type: string
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  validate-single:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'publish-single'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Validate single-skill input
+        env:
+          SKILL_PATH: ${{ inputs.skill_path }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${SKILL_PATH}" ]]; then
+            echo "::error::skill_path is required when mode is publish-single."
+            exit 1
+          fi
+          if [[ ! "${SKILL_PATH}" =~ ^skills/[^/]+$ ]]; then
+            echo "::error::skill_path must be exactly one folder under skills/, for example skills/rag-blueprint."
+            exit 1
+          fi
+          if [[ ! -d "${SKILL_PATH}" || ! -f "${SKILL_PATH}/SKILL.md" ]]; then
+            echo "::error::skill_path must point to an existing skill folder with SKILL.md."
+            exit 1
+          fi
+
+  dry-run:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'dry-run'
+    uses: openclaw/clawhub/.github/workflows/skill-publish.yml@05d5fc115102bdce829de93aab2ddd386415d033
+    with:
+      owner: nvidia
+      dry_run: true
+
+  publish-single:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'publish-single'
+    needs: validate-single
+    uses: openclaw/clawhub/.github/workflows/skill-publish.yml@05d5fc115102bdce829de93aab2ddd386415d033
+    with:
+      owner: nvidia
+      skill_path: ${{ inputs.skill_path }}
+      dry_run: false
+    secrets:
+      clawhub_token: ${{ secrets.CLAWHUB_TOKEN }}
+
+  publish-catalog:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'publish-catalog'
+    uses: openclaw/clawhub/.github/workflows/skill-publish.yml@05d5fc115102bdce829de93aab2ddd386415d033
+    with:
+      owner: nvidia
+      dry_run: false
+    secrets:
+      clawhub_token: ${{ secrets.CLAWHUB_TOKEN }}
