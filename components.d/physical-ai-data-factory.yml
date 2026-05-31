@@ -1,4 +1,4 @@
-name: physical-ai-data-factory
+name: Physical AI
 repo: NVIDIA/physical-ai-data-factory
 description: Generate labeled synthetic training data for physical-AI inspection and perception models.
 skills:
@@ -6,3 +6,5 @@ skills:
     catalog_dir: physical-ai-defect-image-generation
   - path: skills/physical-ai-video-data-augmentation/
     catalog_dir: physical-ai-video-data-augmentation
+links:
+  discussions: false
