@@ -15,6 +15,17 @@
 #   README.md (in place) — content between marker pairs is replaced:
 #     <!-- skills-table-start --> ... <!-- skills-table-end -->
 #     <!-- help-table-start  --> ... <!-- help-table-end  -->
+#
+# Row aggregation:
+#   Components that share the same display `name` are rendered as a single
+#   README row regardless of whether they come from components.d/ (synced)
+#   or manual-components.yml (manually-staged). When both sources contribute
+#   to the same name, catalog cells are concatenated, skill counts are
+#   summed, and the synced row's metadata (description, source, version)
+#   wins over the manual row's em-dash defaults. Enables one logical
+#   product to span multiple yml entries (e.g., the Physical AI product
+#   pulling some skills from a public sub-repo and keeping the rest in the
+#   internal-staged manual list).
 
 set -euo pipefail
 
@@ -56,7 +67,9 @@ for i in $sorted_indices; do
   fi
 done
 
-# Available Skills table
+# Available Skills table — emit structured rows, aggregate by name, then format.
+# TSV columns (tab-separated):
+#   sort_key | name | description | skill_count | catalog_cell | source_cell | version_cell | is_manual
 SKILLS_ROWS=/tmp/skills-rows.tsv
 truncate -s 0 "$SKILLS_ROWS"
 
@@ -80,10 +93,13 @@ for i in $kept_indices; do
     fi
   fi
 
+  catalog_cell="[\`skills/${primary_catalog}/\`](skills/${primary_catalog})"
+  source_cell="[Source](https://github.com/${repo}/tree/${ref}/${primary_path})"
+
   sort_key=$(echo "$name" | tr 'A-Z' 'a-z')
-  row=$(printf '| **%s** | %s | %d | [`skills/%s/`](skills/%s) | [Source](https://github.com/%s/tree/%s/%s) | %s |' \
-    "$name" "$description" "$skill_count" "$primary_catalog" "$primary_catalog" "$repo" "$ref" "$primary_path" "$version_cell")
-  printf '%s\t%s\n' "$sort_key" "$row" >> "$SKILLS_ROWS"
+  printf '%s\t%s\t%s\t%d\t%s\t%s\t%s\t%d\n' \
+    "$sort_key" "$name" "$description" "$skill_count" "$catalog_cell" "$source_cell" "$version_cell" 0 \
+    >> "$SKILLS_ROWS"
 done
 
 # TEMPORARY — remove after Computex 2026. Append rows for manually-staged
@@ -111,20 +127,60 @@ if [ -f "$MANUAL_CONFIG" ]; then
     catalog_cell=${catalog_cell% · }
 
     sort_key=$(echo "$name" | tr 'A-Z' 'a-z')
-    row=$(printf '| **%s** | %s | %d | %s | — | — |' \
-      "$name" "$description" "$skill_count" "$catalog_cell")
-    printf '%s\t%s\n' "$sort_key" "$row" >> "$SKILLS_ROWS"
+    printf '%s\t%s\t%s\t%d\t%s\t%s\t%s\t%d\n' \
+      "$sort_key" "$name" "$description" "$skill_count" "$catalog_cell" "—" "—" 1 \
+      >> "$SKILLS_ROWS"
   done
 fi
 
+# Aggregation pass: group rows by sort_key (lowercase name), merge their
+# catalog cells, sum their skill counts, and prefer the synced row's
+# description / source / version cells (the manual ones default to em dash).
 {
   echo "| Product | Description | Skills | Catalog | Source | Version |"
   echo "|---------|-------------|:------:|---------|--------|---------|"
-  sort -t$'\t' -k1,1 "$SKILLS_ROWS" | cut -f2-
+  sort -t$'\t' -k1,1 "$SKILLS_ROWS" | awk -F'\t' '
+    {
+      sk = $1; name = $2; desc = $3; cnt = $4 + 0
+      cat = $5; src = $6; ver = $7; man = $8 + 0
+      if (!(sk in seen)) {
+        seen[sk] = 1
+        order[++n] = sk
+        s_name[sk] = name
+        s_desc[sk] = desc
+        s_count[sk] = cnt
+        s_cat[sk] = cat
+        s_src[sk] = src
+        s_ver[sk] = ver
+        s_man[sk] = man
+      } else {
+        # Sum skill count, concatenate catalog cells (synced first by sort order).
+        s_count[sk] += cnt
+        s_cat[sk] = s_cat[sk] " · " cat
+        # Prefer non-manual entry for display name, description, source, version.
+        if (man == 0 && s_man[sk] == 1) {
+          s_name[sk] = name
+          s_desc[sk] = desc
+          s_src[sk] = src
+          s_ver[sk] = ver
+          s_man[sk] = 0
+        }
+      }
+    }
+    END {
+      for (i = 1; i <= n; i++) {
+        sk = order[i]
+        printf "| **%s** | %s | %d | %s | %s | %s |\n", \
+          s_name[sk], s_desc[sk], s_count[sk], s_cat[sk], s_src[sk], s_ver[sk]
+      }
+    }
+  '
 } > /tmp/skills-table.md
 rm -f "$SKILLS_ROWS"
 
-# Getting Help & Contributing table
+# Getting Help & Contributing table — same aggregation pattern.
+# TSV columns:
+#   sort_key | name | issues_cell | discussions_cell | contributing_cell | security_cell | is_manual
 HELP_ROWS=/tmp/help-rows.tsv
 truncate -s 0 "$HELP_ROWS"
 
@@ -150,9 +206,9 @@ for i in $kept_indices; do
   fi
 
   sort_key=$(echo "$name" | tr 'A-Z' 'a-z')
-  row=$(printf '| **%s** | %s | %s | %s | %s |' \
-    "$name" "$issues_cell" "$discussions_cell" "$contributing_cell" "$security_cell")
-  printf '%s\t%s\n' "$sort_key" "$row" >> "$HELP_ROWS"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%d\n' \
+    "$sort_key" "$name" "$issues_cell" "$discussions_cell" "$contributing_cell" "$security_cell" 0 \
+    >> "$HELP_ROWS"
 done
 
 # TEMPORARY — remove after Computex 2026. Manual products have no public
@@ -161,15 +217,47 @@ if [ -f "$MANUAL_CONFIG" ]; then
   for i in $(seq 0 $((manual_count - 1))); do
     name=$(yq -r ".components[$i].name" "$MANUAL_CONFIG")
     sort_key=$(echo "$name" | tr 'A-Z' 'a-z')
-    row=$(printf '| **%s** | — | — | — | — |' "$name")
-    printf '%s\t%s\n' "$sort_key" "$row" >> "$HELP_ROWS"
+    printf '%s\t%s\t—\t—\t—\t—\t%d\n' "$sort_key" "$name" 1 >> "$HELP_ROWS"
   done
 fi
 
+# Aggregation: prefer the synced row's link cells when both synced + manual
+# rows share the same name. The link cells aren't combined (unlike catalog
+# cells in the skills table) because there's one logical issues / discussions /
+# contributing / security link per product, not per skill.
 {
   echo "| Product | Issues | Discussions | Contributing | Security |"
   echo "|---------|--------|-------------|--------------|----------|"
-  sort -t$'\t' -k1,1 "$HELP_ROWS" | cut -f2-
+  sort -t$'\t' -k1,1 "$HELP_ROWS" | awk -F'\t' '
+    {
+      sk = $1; name = $2; iss = $3; dis = $4; contrib = $5; sec = $6; man = $7 + 0
+      if (!(sk in seen)) {
+        seen[sk] = 1
+        order[++n] = sk
+        s_name[sk] = name
+        s_iss[sk] = iss
+        s_dis[sk] = dis
+        s_contrib[sk] = contrib
+        s_sec[sk] = sec
+        s_man[sk] = man
+      } else if (man == 0 && s_man[sk] == 1) {
+        # Replace manual rows em-dash cells with the synced rows real links.
+        s_name[sk] = name
+        s_iss[sk] = iss
+        s_dis[sk] = dis
+        s_contrib[sk] = contrib
+        s_sec[sk] = sec
+        s_man[sk] = 0
+      }
+    }
+    END {
+      for (i = 1; i <= n; i++) {
+        sk = order[i]
+        printf "| **%s** | %s | %s | %s | %s |\n", \
+          s_name[sk], s_iss[sk], s_dis[sk], s_contrib[sk], s_sec[sk]
+      }
+    }
+  '
 } > /tmp/help-table.md
 rm -f "$HELP_ROWS"
 
