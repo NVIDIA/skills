@@ -1,6 +1,0 @@
-name: Medical AI Skills
-repo: NVIDIA-Medtech/medical-AI-skills
-description: Agent-ready medical AI skills built on MONAI to streamline the medical AI lifecycle with reusable capabilities and accelerate medical AI development.
-skills:
-  - path: skills/
-    catalog_dir: medical-AI
