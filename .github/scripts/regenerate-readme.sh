@@ -20,12 +20,11 @@
 #   Components that share the same display `name` are rendered as a single
 #   README row regardless of whether they come from components.d/ (synced)
 #   or manual-components.yml (manually-staged). When both sources contribute
-#   to the same name, catalog cells are concatenated, skill counts are
-#   summed, and the synced row's metadata (description, source, version)
-#   wins over the manual row's em-dash defaults. Enables one logical
-#   product to span multiple yml entries (e.g., the Physical AI product
-#   pulling some skills from a public sub-repo and keeping the rest in the
-#   internal-staged manual list).
+#   to the same name, skill counts are summed and the synced row's metadata
+#   (description, source, version) wins over the manual row's em-dash
+#   defaults. Enables one logical product to span multiple yml entries
+#   (e.g., the Physical AI product pulling some skills from a public
+#   sub-repo and keeping the rest in the internal-staged manual list).
 
 set -euo pipefail
 
@@ -69,7 +68,7 @@ done
 
 # Available Skills table — emit structured rows, aggregate by name, then format.
 # TSV columns (tab-separated):
-#   sort_key | name | description | skill_count | catalog_cell | source_cell | version_cell | is_manual
+#   sort_key | name | description | skill_count | source_cell | version_cell | is_manual
 SKILLS_ROWS=/tmp/skills-rows.tsv
 truncate -s 0 "$SKILLS_ROWS"
 
@@ -80,7 +79,6 @@ for i in $kept_indices; do
   ref=$(yq -r ".components[$i].ref // \"main\"" "$CONFIG")
   primary_path=$(yq -r ".components[$i].skills[0].path" "$CONFIG")
   primary_path=${primary_path%/}
-  primary_catalog=$(yq -r ".components[$i].skills[0].catalog_dir" "$CONFIG")
 
   skill_count=$(component_skill_count "$i")
 
@@ -93,12 +91,11 @@ for i in $kept_indices; do
     fi
   fi
 
-  catalog_cell="[\`skills/${primary_catalog}/\`](skills/${primary_catalog})"
   source_cell="[Source](https://github.com/${repo}/tree/${ref}/${primary_path})"
 
   sort_key=$(echo "$name" | tr 'A-Z' 'a-z')
-  printf '%s\t%s\t%s\t%d\t%s\t%s\t%s\t%d\n' \
-    "$sort_key" "$name" "$description" "$skill_count" "$catalog_cell" "$source_cell" "$version_cell" 0 \
+  printf '%s\t%s\t%s\t%d\t%s\t%s\t%d\n' \
+    "$sort_key" "$name" "$description" "$skill_count" "$source_cell" "$version_cell" 0 \
     >> "$SKILLS_ROWS"
 done
 
@@ -114,49 +111,44 @@ if [ -f "$MANUAL_CONFIG" ]; then
     description=$(yq -r ".components[$i].description" "$MANUAL_CONFIG" | tr -d '\n' | sed 's/  */ /g; s/^ //; s/ $//')
 
     dir_count=$(yq -r ".components[$i].catalog_dirs | length" "$MANUAL_CONFIG")
-    catalog_cell=""
     skill_count=0
     for j in $(seq 0 $((dir_count - 1))); do
       d=$(yq -r ".components[$i].catalog_dirs[$j]" "$MANUAL_CONFIG")
-      catalog_cell="${catalog_cell}[\`${d}/\`](skills/${d}) · "
       if [ -d "skills/$d" ]; then
         cnt=$(find "skills/$d" -name SKILL.md -type f 2>/dev/null | wc -l | tr -d ' ')
         skill_count=$((skill_count + cnt))
       fi
     done
-    catalog_cell=${catalog_cell% · }
 
     sort_key=$(echo "$name" | tr 'A-Z' 'a-z')
-    printf '%s\t%s\t%s\t%d\t%s\t%s\t%s\t%d\n' \
-      "$sort_key" "$name" "$description" "$skill_count" "$catalog_cell" "—" "—" 1 \
+    printf '%s\t%s\t%s\t%d\t%s\t%s\t%d\n' \
+      "$sort_key" "$name" "$description" "$skill_count" "—" "—" 1 \
       >> "$SKILLS_ROWS"
   done
 fi
 
-# Aggregation pass: group rows by sort_key (lowercase name), merge their
-# catalog cells, sum their skill counts, and prefer the synced row's
-# description / source / version cells (the manual ones default to em dash).
+# Aggregation pass: group rows by sort_key (lowercase name), sum their skill
+# counts, and prefer the synced row's description / source / version cells
+# (the manual ones default to em dash).
 {
-  echo "| Product | Description | Skills | Catalog | Source | Version |"
-  echo "|---------|-------------|:------:|---------|--------|---------|"
+  echo "| Product | Description | Skills | Source | Version |"
+  echo "|---------|-------------|:------:|--------|---------|"
   sort -t$'\t' -k1,1 "$SKILLS_ROWS" | awk -F'\t' '
     {
       sk = $1; name = $2; desc = $3; cnt = $4 + 0
-      cat = $5; src = $6; ver = $7; man = $8 + 0
+      src = $5; ver = $6; man = $7 + 0
       if (!(sk in seen)) {
         seen[sk] = 1
         order[++n] = sk
         s_name[sk] = name
         s_desc[sk] = desc
         s_count[sk] = cnt
-        s_cat[sk] = cat
         s_src[sk] = src
         s_ver[sk] = ver
         s_man[sk] = man
       } else {
-        # Sum skill count, concatenate catalog cells (synced first by sort order).
+        # Sum skill count across all entries that share this name.
         s_count[sk] += cnt
-        s_cat[sk] = s_cat[sk] " · " cat
         # Prefer non-manual entry for display name, description, source, version.
         if (man == 0 && s_man[sk] == 1) {
           s_name[sk] = name
@@ -170,8 +162,8 @@ fi
     END {
       for (i = 1; i <= n; i++) {
         sk = order[i]
-        printf "| **%s** | %s | %d | %s | %s | %s |\n", \
-          s_name[sk], s_desc[sk], s_count[sk], s_cat[sk], s_src[sk], s_ver[sk]
+        printf "| **%s** | %s | %d | %s | %s |\n", \
+          s_name[sk], s_desc[sk], s_count[sk], s_src[sk], s_ver[sk]
       }
     }
   '
@@ -222,9 +214,9 @@ if [ -f "$MANUAL_CONFIG" ]; then
 fi
 
 # Aggregation: prefer the synced row's link cells when both synced + manual
-# rows share the same name. The link cells aren't combined (unlike catalog
-# cells in the skills table) because there's one logical issues / discussions /
-# contributing / security link per product, not per skill.
+# rows share the same name. The link cells aren't combined because there's
+# one logical issues / discussions / contributing / security link per
+# product, not per skill.
 {
   echo "| Product | Issues | Discussions | Contributing | Security |"
   echo "|---------|--------|-------------|--------------|----------|"
