@@ -1,42 +1,6 @@
 {
   "skills": [
     {
-      "path": "skills/cuopt-numerical-optimization-api-cli",
-      "name": "cuopt-numerical-optimization-api-cli",
-      "description": "LP, MILP, and QP (beta) with cuOpt \u2014 CLI only (MPS files, cuopt_cli). Use when the user is solving LP, MILP, or QP from MPS via command line.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer,application_developer",
-        "discovery.activity_tags": "configure,optimize,troubleshoot,validate"
-      }
-    },
-    {
-      "path": "skills/cuopt-routing-api-python",
-      "name": "cuopt-routing-api-python",
-      "description": "Vehicle routing (VRP, TSP, PDP) with cuOpt \u2014 Python API only. Use when the user is building or solving routing in Python.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer,application_developer",
-        "discovery.activity_tags": "configure,optimize,validate,debug"
-      }
-    },
-    {
-      "path": "skills/cuopt-user-rules",
-      "name": "cuopt-user-rules",
-      "description": "Base rules for end users calling NVIDIA cuOpt (routing/LP/MILP/QP/install/server). Not for cuOpt internals \u2014 use cuopt-developer for those.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer,application_developer",
-        "discovery.activity_tags": "configure,validate,troubleshoot,deploy"
-      }
-    },
-    {
       "path": "skills/cuopt-developer",
       "name": "cuopt-developer",
       "description": "Modify, build, test, debug, and contribute to NVIDIA cuOpt (C++/CUDA, Python, server, CI). Use for solver internals, PRs, DCO, and code conventions.",
@@ -61,69 +25,9 @@
       }
     },
     {
-      "path": "skills/cuopt-numerical-optimization-api-python",
-      "name": "cuopt-numerical-optimization-api-python",
-      "description": "Solve LP, MILP, QP (beta) with cuOpt Python API \u2014 linear/quadratic objectives, integer variables, scheduling, portfolio, least squares.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer,application_developer",
-        "discovery.activity_tags": "configure,optimize,debug,validate"
-      }
-    },
-    {
-      "path": "skills/cuopt-server-api-python",
-      "name": "cuopt-server-api-python",
-      "description": "cuOpt REST server \u2014 start server, endpoints, Python/curl client examples. Use when the user is deploying or calling the REST API.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer,application_developer,devops_engineer",
-        "discovery.activity_tags": "deploy,configure,integrate,validate,debug"
-      }
-    },
-    {
-      "path": "skills/cuopt-numerical-optimization-formulation",
-      "name": "cuopt-numerical-optimization-formulation",
-      "description": "LP, MILP, QP \u2014 concepts, problem-text parsing, and formulation patterns (parameters, constraints, decisions, objective). Concepts only; no API.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer,application_developer,data_scientist",
-        "discovery.activity_tags": "assess,select,optimize,validate"
-      }
-    },
-    {
-      "path": "skills/cuopt-routing-formulation",
-      "name": "cuopt-routing-formulation",
-      "description": "Vehicle routing (VRP, TSP, PDP) \u2014 problem types and data requirements. Domain concepts; no API or interface.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer,application_developer,data_scientist",
-        "discovery.activity_tags": "assess,select,optimize,validate"
-      }
-    },
-    {
-      "path": "skills/cuopt-skill-evolution",
-      "name": "cuopt-skill-evolution",
-      "description": "After solving a non-trivial problem, detect generalizable learnings and propose skill updates. Always active \u2014 applies to every interaction.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "developer_tools",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer",
-        "discovery.activity_tags": "evaluate,extend,contribute"
-      }
-    },
-    {
       "path": "skills/cuopt-numerical-optimization-api-c",
       "name": "cuopt-numerical-optimization-api-c",
-      "description": "LP, MILP, and QP (beta) with cuOpt \u2014 C API only. Use when the user is embedding LP, MILP, or QP in C/C++.",
+      "description": "LP, MILP, and QP (beta) with cuOpt — C API only. Use when the user is embedding LP, MILP, or QP in C/C++.",
       "metadata": {
         "product.primary": "cuOpt",
         "classification.category.primary": "accelerated_computing",
@@ -133,15 +37,111 @@
       }
     },
     {
+      "path": "skills/cuopt-numerical-optimization-api-cli",
+      "name": "cuopt-numerical-optimization-api-cli",
+      "description": "LP, MILP, and QP (beta) with cuOpt — CLI only (MPS files, cuopt_cli). Use when the user is solving LP, MILP, or QP from MPS via command line.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer,application_developer",
+        "discovery.activity_tags": "configure,optimize,troubleshoot,validate"
+      }
+    },
+    {
+      "path": "skills/cuopt-numerical-optimization-api-python",
+      "name": "cuopt-numerical-optimization-api-python",
+      "description": "Solve LP, MILP, QP (beta) with cuOpt Python API — linear/quadratic objectives, integer variables, scheduling, portfolio, least squares.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer,application_developer",
+        "discovery.activity_tags": "configure,optimize,debug,validate"
+      }
+    },
+    {
+      "path": "skills/cuopt-numerical-optimization-formulation",
+      "name": "cuopt-numerical-optimization-formulation",
+      "description": "LP, MILP, QP — concepts, problem-text parsing, and formulation patterns (parameters, constraints, decisions, objective). Concepts only; no API.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer,application_developer,data_scientist",
+        "discovery.activity_tags": "assess,select,optimize,validate"
+      }
+    },
+    {
+      "path": "skills/cuopt-routing-api-python",
+      "name": "cuopt-routing-api-python",
+      "description": "Vehicle routing (VRP, TSP, PDP) with cuOpt — Python API only. Use when the user is building or solving routing in Python.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer,application_developer",
+        "discovery.activity_tags": "configure,optimize,validate,debug"
+      }
+    },
+    {
+      "path": "skills/cuopt-routing-formulation",
+      "name": "cuopt-routing-formulation",
+      "description": "Vehicle routing (VRP, TSP, PDP) — problem types and data requirements. Domain concepts; no API or interface.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer,application_developer,data_scientist",
+        "discovery.activity_tags": "assess,select,optimize,validate"
+      }
+    },
+    {
+      "path": "skills/cuopt-server-api-python",
+      "name": "cuopt-server-api-python",
+      "description": "cuOpt REST server — start server, endpoints, Python/curl client examples. Use when the user is deploying or calling the REST API.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer,application_developer,devops_engineer",
+        "discovery.activity_tags": "deploy,configure,integrate,validate,debug"
+      }
+    },
+    {
       "path": "skills/cuopt-server-common",
       "name": "cuopt-server-common",
-      "description": "cuOpt REST server \u2014 what it does and how requests flow. Domain concepts; no deploy or client code.",
+      "description": "cuOpt REST server — what it does and how requests flow. Domain concepts; no deploy or client code.",
       "metadata": {
         "product.primary": "cuOpt",
         "classification.category.primary": "accelerated_computing",
         "catalog.subdomain": "decision-optimization",
         "audience": "developer,application_developer,devops_engineer,solutions_architect",
         "discovery.activity_tags": "assess,select,configure,validate"
+      }
+    },
+    {
+      "path": "skills/cuopt-skill-evolution",
+      "name": "cuopt-skill-evolution",
+      "description": "After solving a non-trivial problem, detect generalizable learnings and propose skill updates. Always active — applies to every interaction.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer",
+        "discovery.activity_tags": "evaluate,extend,contribute"
+      }
+    },
+    {
+      "path": "skills/cuopt-user-rules",
+      "name": "cuopt-user-rules",
+      "description": "Base rules for end users calling NVIDIA cuOpt (routing/LP/MILP/QP/install/server). Not for cuOpt internals — use cuopt-developer for those.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer,application_developer",
+        "discovery.activity_tags": "configure,validate,troubleshoot,deploy"
       }
     },
     {
@@ -373,18 +373,6 @@
       }
     },
     {
-      "path": "skills/nemo-mbridge-recipe-recommender",
-      "name": "nemo-mbridge-recipe-recommender",
-      "description": "Recommend and customize Megatron Bridge recipes for a user's model, GPU count, and training goal. Indexes library recipes (pretrain/SFT/PEFT) and performance recipes.",
-      "metadata": {
-        "product.primary": "NeMo Megatron Bridge",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
-        "discovery.activity_tags": "select,configure,train,optimize,validate"
-      }
-    },
-    {
       "path": "skills/nemo-mbridge-mlm-bridge-training",
       "name": "nemo-mbridge-mlm-bridge-training",
       "description": "Run Megatron-LM (MLM) and Megatron Bridge training with mock or real data. Covers correlation testing, available recipes, and multi-GPU examples.",
@@ -483,7 +471,7 @@
     {
       "path": "skills/nemo-mbridge-perf-memory-tuning",
       "name": "nemo-mbridge-perf-memory-tuning",
-      "description": "Techniques for reducing peak GPU memory in Megatron Bridge \u2014 expandable segments, parallelism resizing, activation recompute, CPU offloading constraints, and common OOM fixes.",
+      "description": "Techniques for reducing peak GPU memory in Megatron Bridge — expandable segments, parallelism resizing, activation recompute, CPU offloading constraints, and common OOM fixes.",
       "metadata": {
         "product.primary": "NeMo Megatron Bridge",
         "classification.category.primary": "ai_and_machine_learning",
@@ -601,6 +589,18 @@
       }
     },
     {
+      "path": "skills/nemo-mbridge-recipe-recommender",
+      "name": "nemo-mbridge-recipe-recommender",
+      "description": "Recommend and customize Megatron Bridge recipes for a user's model, GPU count, and training goal. Indexes library recipes (pretrain/SFT/PEFT) and performance recipes.",
+      "metadata": {
+        "product.primary": "NeMo Megatron Bridge",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "select,configure,train,optimize,validate"
+      }
+    },
+    {
       "path": "skills/nemo-mbridge-resiliency",
       "name": "nemo-mbridge-resiliency",
       "description": "Resiliency features in Megatron Bridge including fault tolerance, straggler detection, in-process restart, preemption, and re-run state machine.",
@@ -613,15 +613,51 @@
       }
     },
     {
+      "path": "skills/cupynumeric-hdf5",
+      "name": "cupynumeric-hdf5",
+      "description": "Read and write large cuPyNumeric arrays to HDF5 with Legate's parallel, distributed HDF5 I/O (legate.io.hdf5: to_file, from_file, from_file_batched). Use when a developer needs to save a cuPyNumeric array to an .h5/.hdf5 file, load an HDF5 dataset into a distributed cuPyNumeric array, read a large HDF5 dataset in chunks, hand arrays to an HPC pipeline as a single file, or accelerate HDF5 disk I/O with GPUDirect Storage (GDS). Do not use it for Parquet/cuDF/raw-binary or other sharded/custom layouts (see the cupynumeric-parallel-data-load skill), Zarr or object-store/S3 output, .npz or pickled archives, plain h5py without cuPyNumeric, or pure array compute such as FFT, matmul, or reductions.",
+      "metadata": {
+        "product.primary": "cuPyNumeric",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "data-science",
+        "audience": "developer,data_scientist,hpc_developer",
+        "discovery.activity_tags": "extract,transform,configure,validate"
+      }
+    },
+    {
       "path": "skills/cupynumeric-install",
       "name": "cupynumeric-install",
-      "description": "Install and verify cuPyNumeric for Python \u2014 requirements, commands, verification. Source builds are out of scope.",
+      "description": "Install and verify cuPyNumeric for Python — requirements, commands, verification. Source builds are out of scope.",
       "metadata": {
         "product.primary": "cuPyNumeric",
         "classification.category.primary": "accelerated_computing",
         "catalog.subdomain": "data-science",
         "audience": "developer,data_scientist,hpc_developer",
         "discovery.activity_tags": "get_started,configure,validate"
+      }
+    },
+    {
+      "path": "skills/cupynumeric-migration-readiness",
+      "name": "cupynumeric-migration-readiness",
+      "description": "Pre-migration readiness assessor for porting NumPy to cuPyNumeric. Use BEFORE substantial porting work begins when the user asks whether code will scale on GPU, whether they should migrate to cuPyNumeric, which NumPy patterns transfer cleanly, what must be refactored before porting, or mentions pre-port assessment, scaling analysis, or refactor planning. Inspect the user's source code, look up NumPy usage, cross-reference the cuPyNumeric API support manifest, and distinguish distributed-scaling-friendly patterns from blockers such as unsupported APIs, scalar synchronization, host round-trips, Python/object-heavy control flow, shape/data-dependent branching, and in-place mutation hazards. Produce a verdict of READY, LIGHT REFACTOR, SIGNIFICANT REFACTOR, or NOT RECOMMENDED, with concrete refactor pointers.",
+      "metadata": {
+        "product.primary": "cuPyNumeric",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "data-science",
+        "audience": "developer,data_scientist,hpc_developer",
+        "discovery.activity_tags": "assess,migrate,inspect,validate"
+      }
+    },
+    {
+      "path": "skills/cupynumeric-parallel-data-load",
+      "name": "cupynumeric-parallel-data-load",
+      "description": "Load a sharded, on-disk dataset (sharded .npy, Parquet/Arrow, raw binary, sharded HDF5, custom layouts) into a distributed cuPyNumeric ndarray via a manual partition + leaf @task launch with CPU/OMP/GPU variants. Use when no single-call loader fits, including when per-shard row counts differ across files. Prefer cupynumeric.load or legate.io.hdf5.from_file when they apply.",
+      "metadata": {
+        "product.primary": "cuPyNumeric",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "data-science",
+        "audience": "developer,data_scientist,hpc_developer",
+        "discovery.activity_tags": "extract,transform,configure,optimize"
       }
     },
     {
@@ -687,7 +723,7 @@
     {
       "path": "skills/nemotron-customize",
       "name": "nemotron-customize",
-      "description": "Plan Nemotron customization pipelines from repo steps: SFT, PEFT/LoRA, AutoModel vs Megatron-Bridge, DPO/RLVR/GRPO/RLHF, curate-then-translate, BYOB/MCQ benchmark prep or translation, checkpoint conversion, ModelOpt optimization, and endpoint or checkpoint evaluation.",
+      "description": "Plan, configure, and chain repo-native Nemotron customization steps into single-step or multi-step pipelines: curation, translation, SFT/PEFT (AutoModel or Megatron-Bridge), pretraining/CPT, RL alignment (DPO/RLVR/GRPO/RLHF), BYOB/MCQ benchmarks, checkpoint conversion, ModelOpt optimization, env profiles, and evaluation of trained checkpoints or existing/hosted endpoints. Use when a request names a Nemotron step or workflow, or asks to clean, translate, train, fine-tune, align, convert, optimize, evaluate, or compose these into a pipeline. Do NOT use for frontend/dashboard/visualization work, generic ML advice, billing/access, or non-Nemotron coding tasks.",
       "metadata": {
         "product.primary": "Nemotron",
         "classification.category.primary": "ai_and_machine_learning",
@@ -697,9 +733,21 @@
       }
     },
     {
+      "path": "skills/nemotron-retrieval-recipes",
+      "name": "nemotron-retrieval-recipes",
+      "description": "Use when planning, debugging, tuning, evaluating, exporting, or deploying public Nemotron `embed`/`rerank` retrieval recipes.",
+      "metadata": {
+        "product.primary": "Nemotron",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
+        "discovery.activity_tags": "fine_tune,train,evaluate,deploy,optimize"
+      }
+    },
+    {
       "path": "skills/rag-blueprint",
       "name": "rag-blueprint",
-      "description": "NVIDIA RAG Blueprint \u2014 deploy, configure, troubleshoot, and manage. Handles any RAG action: deploy, install, start, enable, disable, toggle, change, configure, troubleshoot, debug, fix, shutdown, stop, or tear down any RAG feature or service (Agentic RAG, VLM, guardrails, query rewriting, models, search, ingestion, observability, summarization, reasoning, and more).",
+      "description": "NVIDIA RAG Blueprint — deploy, configure, troubleshoot, and manage. Handles any RAG action: deploy, install, start, enable, disable, toggle, change, configure, troubleshoot, debug, fix, shutdown, stop, or tear down any RAG feature or service (Agentic RAG, VLM, guardrails, query rewriting, models, search, ingestion, observability, summarization, reasoning, and more).",
       "metadata": {
         "product.primary": "RAG",
         "classification.category.primary": "ai_and_machine_learning",
@@ -795,7 +843,7 @@
     {
       "path": "skills/earth2studio-data-fetch",
       "name": "earth2studio-data-fetch",
-      "description": "Fetch weather/climate data via Earth2Studio data sources for specific variables and times. Do NOT use for inference pipelines, model discovery, or installation.",
+      "description": "Fetch weather/climate data via Earth2Studio data sources for specific variables and times. Do NOT use for inference pipelines, model discovery, or installation.\n",
       "metadata": {
         "product.primary": "Earth2Studio",
         "classification.category.primary": "ai_and_machine_learning",
@@ -807,7 +855,7 @@
     {
       "path": "skills/earth2studio-deterministic-forecast",
       "name": "earth2studio-deterministic-forecast",
-      "description": "Build deterministic forecast scripts with Earth2Studio (model, data source, IO, inference). Do NOT use for ensemble, diagnostics, data-only fetch, or install.",
+      "description": "Build deterministic forecast scripts with Earth2Studio (model, data source, IO, inference). Do NOT use for ensemble, diagnostics, data-only fetch, or install.\n",
       "metadata": {
         "product.primary": "Earth2Studio",
         "classification.category.primary": "ai_and_machine_learning",
@@ -819,7 +867,7 @@
     {
       "path": "skills/earth2studio-discover",
       "name": "earth2studio-discover",
-      "description": "Find Earth2Studio models, data sources, and examples for a weather/climate use case. Do NOT use for writing inference code, downloading data, or installation.",
+      "description": "Find Earth2Studio models, data sources, and examples for a weather/climate use case. Do NOT use for writing inference code, downloading data, or installation.\n",
       "metadata": {
         "product.primary": "Earth2Studio",
         "classification.category.primary": "ai_and_machine_learning",
@@ -831,13 +879,445 @@
     {
       "path": "skills/earth2studio-install",
       "name": "earth2studio-install",
-      "description": "Guide installing Earth2Studio via uv or pip, selecting model extras, and configuring the environment. Do NOT use for writing inference code, choosing models, or PhysicsNeMo questions.",
+      "description": "Guide installing Earth2Studio via uv or pip, selecting model extras, and configuring the environment. Do NOT use for writing inference code, choosing models, or PhysicsNeMo questions.\n",
       "metadata": {
         "product.primary": "Earth2Studio",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "simulation-modeling",
         "audience": "developer,data_scientist,research_academic",
         "discovery.activity_tags": "get_started,configure,validate"
+      }
+    },
+    {
+      "path": "skills/accelerated-computing-cudf",
+      "name": "accelerated-computing-cudf",
+      "description": "Official NVIDIA-authored guidance for NVIDIA cuDF GPU DataFrames, pandas acceleration, dask-cuDF, ETL, joins, groupby, CSV/Parquet I/O, nullable semantics, and multi-GPU DataFrame workloads.",
+      "metadata": {
+        "product.primary": "cuDF",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "data-science",
+        "audience": "developer,data_scientist,data_engineer",
+        "discovery.activity_tags": "get_started,transform,integrate,validate"
+      }
+    },
+    {
+      "path": "skills/cudaq-guide",
+      "name": "cudaq-guide",
+      "description": "CUDA-Q onboarding guide for installation, test programs, GPU simulation, QPU hardware, and quantum applications.",
+      "metadata": {
+        "product.primary": "CUDA-Q",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "quantum-computing",
+        "audience": "developer,quantum_researcher,hpc_developer",
+        "discovery.activity_tags": "get_started,configure,validate"
+      }
+    },
+    {
+      "path": "skills/dicom-metadata-extract",
+      "name": "dicom-metadata-extract",
+      "description": "Used for extracting selected metadata from one DICOM file and flagging standard-tag PHI presence. Not for anonymization or clinical use.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "extract,inspect,validate"
+      }
+    },
+    {
+      "path": "skills/dicom-series-preflight",
+      "name": "dicom-series-preflight",
+      "description": "Used for header-only preflight of one DICOM series folder before conversion or inference. Not for de-identification or clinical clearance.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "assess,inspect,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/dicom-series-to-volume",
+      "name": "dicom-series-to-volume",
+      "description": "Used for converting one CT DICOM series folder to a HU NIfTI volume with affine evidence. Not for multi-frame DICOM or clinical use.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "convert,transform,validate"
+      }
+    },
+    {
+      "path": "skills/nv-generate-ct-rflow",
+      "name": "nv-generate-ct-rflow",
+      "description": "Used for generating synthetic CT volumes and masks with NV-Generate-CTMR rflow-ct. Not for production training data without review.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "generate,synthesize,validate,inspect"
+      }
+    },
+    {
+      "path": "skills/nv-generate-mr",
+      "name": "nv-generate-mr",
+      "description": "Used for generating synthetic body MRI volumes with NV-Generate-CTMR rflow-mr. Not for paired masks or production training data.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "generate,synthesize,validate,inspect"
+      }
+    },
+    {
+      "path": "skills/nv-generate-mr-brain",
+      "name": "nv-generate-mr-brain",
+      "description": "Used for generating synthetic brain MRI volumes with NV-Generate-CTMR rflow-mr-brain. Not for production training data.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "generate,synthesize,validate,inspect"
+      }
+    },
+    {
+      "path": "skills/nv-generate-mr-brain-finetune",
+      "name": "nv-generate-mr-brain-finetune",
+      "description": "Used for finetuning NV-Generate-CTMR MR-brain diffusion UNet from a NIfTI datalist. Not for clinical or production data approval.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "fine_tune,train,evaluate,validate"
+      }
+    },
+    {
+      "path": "skills/nv-generate-vae-finetune",
+      "name": "nv-generate-vae-finetune",
+      "description": "Used for finetuning the NV-Generate-CTMR MAISI VAE from CT/MRI NIfTI datalists. Not for clinical or production data approval.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "fine_tune,train,evaluate,validate"
+      }
+    },
+    {
+      "path": "skills/nv-reason-cxr",
+      "name": "nv-reason-cxr",
+      "description": "Used for command-shape or live NV-Reason-CXR chest X-ray reasoning smoke tests. Not for diagnosis or clinical reporting.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "inference,evaluate,validate,inspect"
+      }
+    },
+    {
+      "path": "skills/nv-segment-ct",
+      "name": "nv-segment-ct",
+      "description": "Used for running NV-Segment-CT VISTA3D on CT NIfTI volumes and recording label-map evidence.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "inference,validate,inspect"
+      }
+    },
+    {
+      "path": "skills/nv-segment-ct-finetune",
+      "name": "nv-segment-ct-finetune",
+      "description": "Used for smoke or dataset finetuning of NV-Segment-CT VISTA3D on CT NIfTI labels. Not for clinical validation.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "fine_tune,train,evaluate,validate"
+      }
+    },
+    {
+      "path": "skills/nv-segment-ctmr",
+      "name": "nv-segment-ctmr",
+      "description": "Used for running NV-Segment-CTMR on CT or MRI NIfTI volumes and recording label-map evidence. Not for clinical interpretation.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "inference,validate,inspect"
+      }
+    },
+    {
+      "path": "skills/holoscan-install-conda",
+      "name": "holoscan-install-conda",
+      "description": "Install Holoscan SDK v4.3+ via Conda in a CUDA 13 environment. Use for Conda installs; redirect CUDA 12 hosts to container/wheel.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "infrastructure",
+        "audience": "developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "get_started,configure,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/holoscan-install-container",
+      "name": "holoscan-install-container",
+      "description": "Install Holoscan SDK via the NGC Docker container. Use for container-based installs; not for native apt/pip/Conda installs.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "infrastructure",
+        "audience": "developer,application_developer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "get_started,deploy,configure,validate"
+      }
+    },
+    {
+      "path": "skills/holoscan-install-debian",
+      "name": "holoscan-install-debian",
+      "description": "Install Holoscan SDK natively on Ubuntu via apt. Use for C++ installs on Ubuntu; pair with /holoscan-install-wheel for Python.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "infrastructure",
+        "audience": "developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "get_started,configure,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/holoscan-install-source",
+      "name": "holoscan-install-source",
+      "description": "Build Holoscan SDK from source via the in-tree ./run script. Use only when published packages don't meet the user's needs.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "infrastructure",
+        "audience": "developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "configure,validate,debug,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/holoscan-install-wheel",
+      "name": "holoscan-install-wheel",
+      "description": "Install Holoscan SDK Python wheel via pip into a venv. Use for Python installs; not for native C++/apt or Conda installs.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "infrastructure",
+        "audience": "developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "get_started,configure,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/holoscan-setup",
+      "name": "holoscan-setup",
+      "description": "Guides Holoscan SDK installation: inspects the host, assesses platform compatibility, recommends an install method, and delegates to the matching install skill.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "infrastructure",
+        "audience": "developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "assess,select,configure,validate"
+      }
+    },
+    {
+      "path": "skills/mcore-create-issue",
+      "name": "mcore-create-issue",
+      "description": "Investigate a failing GitHub Actions run or job and create a GitHub issue for the failure.",
+      "metadata": {
+        "product.primary": "Megatron-Core",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,devops_engineer",
+        "discovery.activity_tags": "debug,troubleshoot,inspect,contribute"
+      }
+    },
+    {
+      "path": "skills/mcore-linting-and-formatting",
+      "name": "mcore-linting-and-formatting",
+      "description": "Linting and formatting for Megatron-LM. Covers running autoformat.sh, tools (ruff, black, isort, pylint, mypy), and code style rules.",
+      "metadata": {
+        "product.primary": "Megatron-Core",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "contribute,test,validate,debug"
+      }
+    },
+    {
+      "path": "skills/mcore-run-on-slurm",
+      "name": "mcore-run-on-slurm",
+      "description": "How to launch distributed Megatron-LM training jobs on a SLURM cluster. Covers a minimal sbatch skeleton, environment-variable setup for torch.distributed.run, CUDA_DEVICE_MAX_CONNECTIONS rules across hardware and parallelism modes, container conventions, monitoring, and per-rank failure diagnosis.",
+      "metadata": {
+        "product.primary": "Megatron-Core",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "train,configure,scale,monitor,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/mcore-split-pr",
+      "name": "mcore-split-pr",
+      "description": "Split a PR into multiple PRs to reduce the number of required CODEOWNERS reviewer groups.",
+      "metadata": {
+        "product.primary": "Megatron-Core",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "contribute,configure,validate"
+      }
+    },
+    {
+      "path": "skills/mcore-testing",
+      "name": "mcore-testing",
+      "description": "Test system for Megatron-LM. Covers test layout, recipe YAML structure, adding and running unit and functional tests, golden values, marker filters, and CI parity.",
+      "metadata": {
+        "product.primary": "Megatron-Core",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "test,validate,debug,contribute"
+      }
+    },
+    {
+      "path": "skills/nemo-data-designer-plugin",
+      "name": "nemo-data-designer-plugin",
+      "description": "Use when the user wants to create a dataset, generate synthetic data, or build a data generation pipeline.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_engineer",
+        "discovery.activity_tags": "generate,synthesize,configure,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-evaluator-plugin",
+      "name": "nemo-evaluator-plugin",
+      "description": "Use when working on the Evaluator plugin CLI, jobs, SDK-backed specs, or plugin-owned Evaluator skills.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "evaluate,validate,configure,inspect"
+      }
+    },
+    {
+      "path": "skills/nemo-retriever",
+      "name": "nemo-retriever",
+      "description": "Use when the user wants to search, query, extract, transcribe, describe, quote, filter, or aggregate across documents — PDFs, scanned forms / images (`.jpg` `.png` `.tiff`), Office (`.docx` `.pptx`), text (`.html` `.txt`), audio (`.mp3` `.wav` `.m4a`), or video (`.mp4` `.mov`). Prefer this over native Read / Grep for multi-file or non-PDF corpora. Not for: editing files, web browsing, single-file plain-text lookups, fine-tuning.",
+      "metadata": {
+        "product.primary": "NeMo Retriever",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,ai_engineer,data_engineer",
+        "discovery.activity_tags": "extract,inspect,summarize,configure"
+      }
+    },
+    {
+      "path": "skills/omniverse-cad-to-simready",
+      "name": "omniverse-cad-to-simready",
+      "description": "Coordinate the end-to-end CAD/source-asset to SimReady workflow. Use for broad requests such as CAD to SimReady, source asset to simulation-ready USD, or prop packaging that require conversion, material/physics assignment, SimReady conformance, validation, and optional package creation; deploy or verify Content Agents services first when property assignment is enabled; route single-stage work through nested references.",
+      "metadata": {
+        "product.primary": "Omniverse",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,simulation_engineer,application_developer",
+        "discovery.activity_tags": "convert,package,validate,integrate"
+      }
+    },
+    {
+      "path": "skills/omniverse-realtime-viewer",
+      "name": "omniverse-realtime-viewer",
+      "description": "Use as the top-level router for Omniverse Realtime Viewer USD app requests and focused viewer reference documents.",
+      "metadata": {
+        "product.primary": "Omniverse",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,simulation_engineer,application_developer",
+        "discovery.activity_tags": "deploy,integrate,validate,debug"
+      }
+    },
+    {
+      "path": "skills/omniverse-usd-performance-tuning",
+      "name": "omniverse-usd-performance-tuning",
+      "description": "Top-level workflow skill for USD performance diagnosis and optimization. Use for slow loading, high memory, low FPS, or 'optimize my scene' requests; delegates auth/runtime setup to Phase 0 owners.",
+      "metadata": {
+        "product.primary": "Omniverse",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,simulation_engineer,application_developer",
+        "discovery.activity_tags": "profile,optimize,validate,measure"
+      }
+    },
+    {
+      "path": "skills/physical-ai-defect-image-generation",
+      "name": "physical-ai-defect-image-generation",
+      "description": "Use when the user wants to orchestrate defect image generation, run associated setup, or handle outputs on OSMO. The Day 0 path handles cold-start with USD-to-ROI, image-edit augmentation, and AnomalyGen to create initial PCBA datasets. The Day 1 path performs inference and labeling on real images. This skill helps with first-time asset setup, creation of finetuning checkpoints, and configuring deployment.\nTrigger keywords: defect image generation, dig workflow, dig pipeline, defect image detection workflow, aoi pipeline, aoi anomalygen, usd2roi anomalygen, day 0 pcba, day 1 pcba, day 1 real-photo alignment, day 1 manual roi, metal surface anomaly, glass defect, anomalygen finetune, setup_pcb, setup_metal, setup_glass, setup_pretrained, dig setup, dig datasets, dig pretrained checkpoint, dig image-edit endpoint.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "generate,synthesize,train,validate"
+      }
+    },
+    {
+      "path": "skills/physical-ai-infrastructure-setup-and-resilient-scaling",
+      "name": "physical-ai-infrastructure-setup-and-resilient-scaling",
+      "description": "Use when the user wants to set up, scale, validate, or harden NVIDIA physical AI infrastructure for synthetic data generation workflows across local MicroK8s or Azure AKS, including Kubernetes clusters, inference endpoint deployment, OSMO deployment, workload submission readiness, and infrastructure failure recovery. Trigger keywords: physical ai infrastructure, resilient scaling, SDG infrastructure, microk8s, azure aks, NVCF deployment, NIM Operator, OSMO deploy, workflow scaling. Don't trigger for: OSMO log summarization or workload-only operations unless infrastructure setup, scaling, validation, or recovery is requested.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,devops_engineer,platform_engineer,ai_engineer",
+        "discovery.activity_tags": "deploy,configure,scale,monitor,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/physical-ai-video-data-augmentation",
+      "name": "physical-ai-video-data-augmentation",
+      "description": "Use when running video data augmentation and auto-labeling workflows on OSMO: flow selection, preflight, submit-time interpolation, monitoring, and output retrieval. Trigger keywords: video data augmentation, data enrichment, auto labeling, VDA demo, OSMO workflow, pseudo labeling.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "generate,synthesize,monitor,validate"
+      }
+    },
+    {
+      "path": "skills/physical-ai-neural-reconstruction",
+      "name": "physical-ai-neural-reconstruction",
+      "description": "Router for NVIDIA NuRec/NRE: USDZ rendering, NCore conversion, 3DGS, gRPC sensor sim, PhysicalAI HF datasets. Do NOT use for SimReady or infra setup.",
+      "metadata": {
+        "product.primary": "NuRec",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,simulation_engineer,ai_engineer",
+        "discovery.activity_tags": "select,convert,generate,validate"
+      }
+    },
+    {
+      "path": "skills/physicsnemo-discover",
+      "name": "physicsnemo-discover",
+      "description": "Official NVIDIA-authored guidance for navigating PhysicsNeMo — pick the model, datapipe, or example for a SciML/AI4Science task (surrogates, forecasting, downscaling, physics-informed, inverse, generative). Points at existing files via live repo search; never writes code. Do NOT use for installation or environment setup, training-loop or other code authoring/scaffolding, contributor/CI/packaging questions, repo-specific questions in physicsnemo-sym/-cfd/-curator, or general (non-physics) ML/PyTorch.",
+      "metadata": {
+        "product.primary": "PhysicsNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "developer,data_scientist,research_academic",
+        "discovery.activity_tags": "select,inspect,assess,validate"
       }
     }
   ]

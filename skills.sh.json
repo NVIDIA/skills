@@ -21,7 +21,42 @@
         "skill-card-generator",
         "rag-blueprint",
         "rag-eval",
-        "rag-perf"
+        "rag-perf",
+        "nemo-evaluator-plugin",
+        "nemo-retriever"
+      ]
+    },
+    {
+      "title": "Physical AI",
+      "description": "Build and validate AI workflows that interact with the physical world, including robotics, autonomy, simulation, synthetic data, and embodied AI systems.",
+      "skills": [
+        "omniverse-cad-to-simready",
+        "omniverse-realtime-viewer",
+        "omniverse-usd-performance-tuning",
+        "physical-ai-defect-image-generation",
+        "physical-ai-infrastructure-setup-and-resilient-scaling",
+        "physical-ai-video-data-augmentation",
+        "physical-ai-neural-reconstruction"
+      ]
+    },
+    {
+      "title": "Vision AI",
+      "description": "Build vision and video AI workflows for analytics, search, summarization, alerts, real-time understanding, and model integration.",
+      "skills": [
+        "deepstream-dev",
+        "deepstream-import-vision-model",
+        "dicom-metadata-extract",
+        "dicom-series-preflight",
+        "dicom-series-to-volume",
+        "nv-generate-ct-rflow",
+        "nv-generate-mr",
+        "nv-generate-mr-brain",
+        "nv-generate-mr-brain-finetune",
+        "nv-generate-vae-finetune",
+        "nv-reason-cxr",
+        "nv-segment-ct",
+        "nv-segment-ct-finetune",
+        "nv-segment-ctmr"
       ]
     },
     {
@@ -35,55 +70,25 @@
       ]
     },
     {
-      "title": "Data Science",
-      "description": "Prepare, analyze, explore, and model data for AI and accelerated analytics workflows that are not specific to one training, inference, or agent task.",
-      "skills": [
-        "cupynumeric-install"
-      ]
-    },
-    {
-      "title": "Decision Optimization",
-      "description": "Formulate and solve routing, scheduling, and numerical optimization problems using optimization solvers, APIs, services, and deployment workflows.",
-      "skills": [
-        "cuopt-numerical-optimization-api-cli",
-        "cuopt-routing-api-python",
-        "cuopt-user-rules",
-        "cuopt-developer",
-        "cuopt-install",
-        "cuopt-numerical-optimization-api-python",
-        "cuopt-server-api-python",
-        "cuopt-numerical-optimization-formulation",
-        "cuopt-routing-formulation",
-        "cuopt-skill-evolution",
-        "cuopt-numerical-optimization-api-c",
-        "cuopt-server-common"
-      ]
-    },
-    {
-      "title": "GPU Development",
-      "description": "Develop, tune, profile, and integrate GPU kernels and accelerated code, including CUDA-adjacent workflows, autotuning, low-level performance work, and framework integration.",
-      "skills": [
-        "tilegym-adding-cutile-kernel"
-      ]
-    },
-    {
-      "title": "Inference AI",
-      "description": "Deploy, serve, optimize, and evaluate models for production inference, including quantization, runtime performance, and serving configuration.",
-      "skills": [
-        "dynamo-interconnect-check",
-        "dynamo-recipe-runner",
-        "dynamo-router-starter",
-        "dynamo-troubleshoot"
-      ]
-    },
-    {
       "title": "Simulation and Modeling",
       "description": "Create, run, validate, and analyze simulation and modeling workflows for systems, environments, processes, and physical phenomena.",
       "skills": [
         "earth2studio-data-fetch",
         "earth2studio-deterministic-forecast",
         "earth2studio-discover",
-        "earth2studio-install"
+        "earth2studio-install",
+        "physicsnemo-discover"
+      ]
+    },
+    {
+      "title": "Data Science",
+      "description": "Prepare, analyze, explore, and model data for AI and accelerated analytics workflows that are not specific to one training, inference, or agent task.",
+      "skills": [
+        "cupynumeric-install",
+        "cupynumeric-hdf5",
+        "cupynumeric-migration-readiness",
+        "cupynumeric-parallel-data-load",
+        "accelerated-computing-cudf"
       ]
     },
     {
@@ -115,15 +120,68 @@
         "nemo-mbridge-perf-tp-dp-comm-overlap",
         "nemo-mbridge-resiliency",
         "dali-dynamic-mode",
-        "nemotron-customize"
+        "nemotron-customize",
+        "nemotron-retrieval-recipes",
+        "mcore-create-issue",
+        "mcore-linting-and-formatting",
+        "mcore-run-on-slurm",
+        "mcore-split-pr",
+        "mcore-testing",
+        "nemo-data-designer-plugin"
       ]
     },
     {
-      "title": "Vision AI",
-      "description": "Build vision and video AI workflows for analytics, search, summarization, alerts, real-time understanding, and model integration.",
+      "title": "Inference AI",
+      "description": "Deploy, serve, optimize, and evaluate models for production inference, including quantization, runtime performance, and serving configuration.",
       "skills": [
-        "deepstream-dev",
-        "deepstream-import-vision-model"
+        "dynamo-interconnect-check",
+        "dynamo-recipe-runner",
+        "dynamo-router-starter",
+        "dynamo-troubleshoot"
+      ]
+    },
+    {
+      "title": "Decision Optimization",
+      "description": "Formulate and solve routing, scheduling, and numerical optimization problems using optimization solvers, APIs, services, and deployment workflows.",
+      "skills": [
+        "cuopt-numerical-optimization-api-cli",
+        "cuopt-routing-api-python",
+        "cuopt-user-rules",
+        "cuopt-developer",
+        "cuopt-install",
+        "cuopt-numerical-optimization-api-python",
+        "cuopt-server-api-python",
+        "cuopt-numerical-optimization-formulation",
+        "cuopt-routing-formulation",
+        "cuopt-skill-evolution",
+        "cuopt-numerical-optimization-api-c",
+        "cuopt-server-common"
+      ]
+    },
+    {
+      "title": "GPU Development",
+      "description": "Develop, tune, profile, and integrate GPU kernels and accelerated code, including CUDA-adjacent workflows, autotuning, low-level performance work, and framework integration.",
+      "skills": [
+        "tilegym-adding-cutile-kernel"
+      ]
+    },
+    {
+      "title": "Quantum Computing",
+      "description": "Build, run, and validate quantum and hybrid quantum-classical applications, including CUDA-Q development workflows.",
+      "skills": [
+        "cudaq-guide"
+      ]
+    },
+    {
+      "title": "Infrastructure",
+      "description": "Deploy, operate, monitor, and troubleshoot clusters, runtimes, services, networking, and platform infrastructure for accelerated and AI workloads.",
+      "skills": [
+        "holoscan-install-conda",
+        "holoscan-install-container",
+        "holoscan-install-debian",
+        "holoscan-install-source",
+        "holoscan-install-wheel",
+        "holoscan-setup"
       ]
     }
   ]
