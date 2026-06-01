@@ -1,0 +1,27 @@
+{
+  "skills": [
+    "vss-deploy-profile"
+  ],
+  "resources": {
+    "platforms": {
+      "RTXPRO6000BW": {
+        "gpu_count": 1
+      }
+    }
+  },
+  "env": "A GPU host matching `{{platform}}` with Docker + NVIDIA container toolkit + `NGC_CLI_API_KEY`. Remote LLM/VLM endpoint env vars (`LLM_REMOTE_URL`/`LLM_REMOTE_MODEL`, `VLM_REMOTE_URL`/`VLM_REMOTE_MODEL`) may also be set. The `/vss-deploy-profile` skill is responsible for the full deploy workflow — this spec verifies the resulting state by probing the live stack, not the contents of any `.env` file.",
+  "expects": [
+    {
+      "query": "Deploy the VSS **base** profile on {{platform}}, using the `/vss-deploy-profile` skill end-to-end and autonomously.",
+      "checks": [
+        "`curl -sf --max-time 15 http://localhost:8000/docs` returns exit 0 (Agent REST API responsive)",
+        "`curl -sf --max-time 15 http://localhost:3000/` returns exit 0 (Agent UI responsive)",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-agent` returns exit 0",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-agent-ui` returns exit 0",
+        "`docker ps --format '{{.Names}}' | grep -qx redis` returns exit 0",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-vios-postgres` returns exit 0",
+        "`docker ps --format '{{.Names}}' | grep -qx phoenix` returns exit 0"
+      ]
+    }
+  ]
+}

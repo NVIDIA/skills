@@ -1,0 +1,26 @@
+{
+  "skills": [
+    "vss-deploy-profile"
+  ],
+  "resources": {
+    "platforms": {
+      "RTXPRO6000BW": {
+        "gpu_count": 2
+      }
+    }
+  },
+  "env": "Multi-GPU host matching `{{platform}}` with Docker + NVIDIA container toolkit + `NGC_CLI_API_KEY`. Remote LLM/VLM endpoint env vars (`LLM_REMOTE_URL`/`LLM_REMOTE_MODEL`, `VLM_REMOTE_URL`/`VLM_REMOTE_MODEL`) may also be set. The **alerts-real-time (VLM)** mode (`vss-deploy-profile -m real-time`) runs `rtvi-vlm` locally — a continuous VLM inference loop that processes live video and emits alerts directly, with no upstream CV filtering. The adapter selects this variant for `alerts_vlm` evaluations. See `skills/vss-deploy-profile/references/alerts.md` § *Two Modes*.",
+  "expects": [
+    {
+      "query": "Deploy the VSS **alerts** profile on {{platform}} for continuous VLM-driven alert generation. Run end-to-end and autonomously.",
+      "checks": [
+        "`curl -sf --max-time 15 http://localhost:8000/docs` returns exit 0 (Agent REST API responsive)",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-agent` returns exit 0 (Agent backend)",
+        "`docker ps --format '{{.Names}}' | grep -qx redis` returns exit 0 (shared message bus)",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-rtvi-vlm` returns exit 0 (continuous VLM processor — the 'VLM' in this mode)",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-vios-nvstreamer` returns exit 0 (video ingestion source)",
+        "`! docker ps --format '{{.Names}}' | grep -qx vss-rtvi-cv` returns exit 0 (real-time mode does NOT run the CV perception pipeline)"
+      ]
+    }
+  ]
+}
