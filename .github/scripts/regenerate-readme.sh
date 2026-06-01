@@ -181,8 +181,13 @@ for i in $kept_indices; do
   repo=$(yq -r ".components[$i].repo" "$CONFIG")
   ref=$(yq -r ".components[$i].ref // \"main\"" "$CONFIG")
   contrib=$(yq -r ".components[$i].links.contributing // \"CONTRIBUTING.md\"" "$CONFIG")
-  discussions=$(yq -r ".components[$i].links.discussions // true" "$CONFIG")
-  security=$(yq -r ".components[$i].links.security // true" "$CONFIG")
+  # yq `//` defaults on both null and false, so an explicit `discussions: false`
+  # would otherwise be silently treated as the default `true`. Read the raw
+  # value, then default to "true" only when it is missing/null.
+  discussions=$(yq -r ".components[$i].links.discussions" "$CONFIG")
+  [ "$discussions" = "null" ] && discussions="true"
+  security=$(yq -r ".components[$i].links.security" "$CONFIG")
+  [ "$security" = "null" ] && security="true"
 
   issues_cell="[Issues](https://github.com/${repo}/issues)"
   if [ "$discussions" = "true" ]; then
