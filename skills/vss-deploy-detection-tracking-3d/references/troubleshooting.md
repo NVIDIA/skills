@@ -248,11 +248,12 @@ curl -sf "http://localhost:30888/vst/api/v1/sensor/list"   # from the host itsel
 
 ### VST video wall: "Failed to create Video Source" despite a healthy pipeline
 
-**Symptom:** VST UI loads at `http://<HOST_IP>:30888/vst` fine. Click play on any sensor → `Playback Error: Error 22: Failed to create Video Source`. Data is flowing — `mdx-raw` and `mdx-bev` offsets are growing, `vss-vios-streamprocessing` is writing per-minute mkv chunks to `${VSS_DATA_DIR}/data_log/`, `rtsp://<HOST_IP>:30554/live/<sensorId>` is serving valid H264.
+**Symptom:** VST UI loads at `http://<HOST_IP>:30888/vst` fine. Click play on any sensor → `Playback Error: Error 22: Failed to create Video Source`, `Error 2: Failed to start inbound stream`, or an ICE-negotiation failure. Data is flowing — `mdx-raw` and `mdx-bev` offsets are growing, `vss-vios-streamprocessing` is writing per-minute mkv chunks to `${VSS_DATA_DIR}/data_log/`, `rtsp://<HOST_IP>:30554/live/<sensorId>` is serving valid H264.
 
-**Cause:** WebRTC negotiation fails between the browser and VST. Two specific things VST needs that often get blocked:
+**Cause:** WebRTC negotiation fails between the browser and VST — the ICE candidates advertise a host/UDP port the browser can't reach. Common triggers:
 - **Outbound STUN** to `stun.l.google.com:19302` (VST's default `stunurl_list`). Corp / VPN blocks Google STUN frequently.
 - **Inbound UDP** on a random port range (VST's default `webrtc_port_range: {min:0, max:0}`). Corp / cloud / on-prem firewalls that don't pass arbitrary UDP make ICE negotiation fail.
+- **Edge and remote hosts (Thor, cloud VM, SSH / VPN / NAT).** When you reach the host only through an SSH tunnel and forward just the TCP UI port (`-L 30888:...`), the dashboard loads but the UDP media path isn't tunnelled, so playback fails with `Error 2` / `Error 22`. This is the most common cause on IGX-THOR / AGX-THOR. See [`verify-and-view.md` § Edge and remote hosts](verify-and-view.md).
 
 **Sensor-status caveat.** While WebRTC is blocked, `GET /vst/api/v1/sensor/list` may report `state: "offline"` and `url: null` for each sensor. That field reflects browser-reachability, not pipeline health — if `streamprocessing` is actively recording chunks, the pipeline is fine. Focus diagnostics on the transport layer, not the sensor status.
 
@@ -272,7 +273,7 @@ nc -zu stun.l.google.com 19302                                            # bloc
 
 **Workarounds** (in order of effort):
 1. **Run the browser on the host itself.** VNC, X-forwarding, or RDP — bypasses the WebRTC firewall entirely.
-2. **Bypass VST UI, use RTSP directly.** `ffplay rtsp://<HOST_IP>:30554/live/<sensorId>` if port 30554 is reachable. No overlays, but you see the raw stream.
+2. **Bypass VST UI, use RTSP directly.** `ffplay rtsp://<HOST_IP>:30554/live/<sensorId>` if port 30554 is reachable. Over SSH this tunnels cleanly (RTSP is TCP): `ssh -L 30554:localhost:30554 <user>@<host>`, then `ffplay rtsp://localhost:30554/live/<sensorId>`. No overlays, but you see the raw stream.
 3. **Bypass UI entirely; consume `mdx-bev`.** Data is on the broker — write a downstream consumer.
 4. **Self-host a TURN server** on TCP/443 and reconfigure VST's `stunurl_list` / `webrtc_port_range`. Heavyweight; out of scope for this skill.
 

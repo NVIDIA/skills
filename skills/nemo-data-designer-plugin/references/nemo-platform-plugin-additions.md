@@ -2,6 +2,40 @@
 
 This skill ships in the NeMo Platform data-designer plugin. The CLI surface is `nemo data-designer …`. Most subcommands accept the same arguments as the upstream `data-designer` CLI; the differences are documented below.
 
+## `validate`: local + remote contexts
+
+Upstream `data-designer validate` runs a local-only engine compile check. The plugin's `validate` does that **and** verifies the config against NeMo Platform-specific constraints — Inference Gateway provider resolution, Files-service seed sources, Nemotron Personas filesets, the remote seed-type whitelist, etc.
+
+By default it reports both contexts independently:
+
+```bash
+nemo data-designer validate <path>
+```
+
+```text
+Local execution
+  ✔ Configuration is valid
+
+Remote execution
+  ✘ Seed source 'df' is not supported on the NeMo Platform.
+    Use a serializable seed source such as a HuggingFace dataset
+    or the Files service.
+
+Result: valid for local execution; invalid for remote execution
+```
+
+A single invocation surfaces **every** problem it can detect (it doesn't short-circuit on the first failure). Exit code is 0 only when every reported context validates cleanly.
+
+Useful flags:
+
+- `--execution-context {local,remote}` — limit the report to one context. Omit to validate both.
+- `--workspace <name>` — workspace used to resolve Inference Gateway providers and Files-service seed sources for the remote pass. Defaults to the SDK's configured workspace.
+- `--output {text,json}` — `json` emits a structured `ValidationReport` for CI / scripting use.
+
+Treat a "valid for local; invalid for remote" mixed result as **safe to proceed with `preview run` / `create run`**. Only the remote pass needs to pass before the user runs `preview submit` / `create submit`. If the user is iterating locally and the remote diagnostic is a true blocker (e.g., they intend to submit later), report it but don't loop on re-validation until they ask to.
+
+Configs that reference Inference Gateway providers exclusively (no locally-defined providers) are first-class — they validate cleanly under both contexts as long as the provider names resolve via `nemo inference providers list`.
+
 ## `preview` and `create`: local vs cluster
 
 Upstream's `preview` and `create` are flat commands that take the config path positional directly. In the plugin, both are command groups with two execution modes:

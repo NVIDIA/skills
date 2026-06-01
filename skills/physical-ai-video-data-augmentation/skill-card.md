@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers generating labeled synthetic training data for physical-AI perception models by running video data augmentation and auto-labeling workflows on NVIDIA OSMO. <br>
+Developers and engineers use this skill to orchestrate end-to-end video data augmentation and auto-labeling pipelines on NVIDIA OSMO, generating labeled synthetic training data for physical-AI perception models. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,19 +20,18 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [NVIDIA OSMO](https://developer.nvidia.com/osmo) <br>
+- [Flow: Augmentation and Auto-Labeling](references/flows/augmentation_and_al.md) <br>
+- [Flow: Auto-Labeling](references/flows/auto_labeling.md) <br>
+- [Flow: E2E](references/flows/e2e.md) <br>
+- [Flow: E2E Super Resolution](references/flows/e2e_super_resolution.md) <br>
 - [Setup Guide](references/setup.md) <br>
 - [Troubleshooting](references/troubleshooting.md) <br>
-- [Container Images](references/container-images.md) <br>
 - [NIM Endpoint Reference](references/nim/README.md) <br>
-- [Augmentation and Auto-Labeling Flow](references/flows/augmentation_and_al.md) <br>
-- [Auto-Labeling Flow](references/flows/auto_labeling.md) <br>
-- [E2E Flow](references/flows/e2e.md) <br>
-- [E2E Super-Resolution Flow](references/flows/e2e_super_resolution.md) <br>
-- [Cookbook Tuning Guide](assets/cookbooks/TUNING_GUIDE.md) <br>
+- [Container Images](references/container-images.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Files] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -44,7 +43,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 17 evaluation tasks (13 positive skill-activation, 4 negative) with 2 attempts per task and a 50% pass threshold. <br>
+Evaluated against 17 internal evaluation tasks (13 positive skill-activation, 4 negative) with 2 attempts per task and a 50% pass threshold. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -68,11 +67,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+6%) | 97% (+12%) |
-| Correctness | 8 | 82% (+2%) | 78% (-2%) |
-| Discoverability | 8 | 75% (+4%) | 66% (-2%) |
-| Effectiveness | 8 | 75% (+2%) | 71% (-7%) |
-| Efficiency | 8 | 70% (+3%) | 57% (-4%) |
+| Security | 8 | 100% (+0%) | 91% (+0%) |
+| Correctness | 8 | 81% (+0%) | 77% (-3%) |
+| Discoverability | 8 | 73% (+6%) | 68% (-3%) |
+| Effectiveness | 8 | 72% (-3%) | 70% (-4%) |
+| Efficiency | 8 | 68% (+6%) | 60% (-5%) |
 
 ## Skill Version(s): <br>
 1.0.0 (source: frontmatter) <br>

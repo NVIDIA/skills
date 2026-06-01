@@ -1,0 +1,71 @@
+[
+  {
+    "id": "mv3dt-route-and-env",
+    "question": "Deploy RTVI-CV-3D (MV3DT) on the bundled sample dataset.",
+    "expected_skill": "vss-deploy-detection-tracking-3d",
+    "ground_truth": "Loads vss-deploy-detection-tracking-3d, recognizes the sample dataset ships calibration in-tree (no calibration run needed), and configures MODE=mv3dt with BP_PROFILE=bp_wh_kafka (or bp_wh_redis) — not bp_wh_auto_calib, and not the full warehouse blueprint from vss-deploy-profile.",
+    "expected_behavior": [
+      "Loads the vss-deploy-detection-tracking-3d skill rather than the vss-deploy-profile warehouse reference.",
+      "Sets MODE=mv3dt and BP_PROFILE to bp_wh_kafka or bp_wh_redis; does not fabricate MODE values or use bp_wh_auto_calib.",
+      "Notes the sample dataset ships calibration in-tree, so no calibration run is needed.",
+      "Does not print plaintext API tokens."
+    ]
+  },
+  {
+    "id": "mv3dt-profile-size-overlays",
+    "question": "I'm deploying MV3DT and want bounding-box overlays on the VST video wall. Which profile should I use?",
+    "expected_skill": "vss-deploy-detection-tracking-3d",
+    "ground_truth": "Recommends the extended profile (MINIMAL_PROFILE=\"\") because overlays require the ELK + video-analytics-api + import-calibration services to be populated; explains that minimal mode shows raw streams without overlays and that there is no minimal-plus-ELK middle path.",
+    "expected_behavior": [
+      "Chooses the extended profile (MINIMAL_PROFILE empty) for overlays.",
+      "Explains overlays need Elasticsearch / video-analytics-api, which minimal mode omits.",
+      "Does not claim a 'minimal + ELK only' middle path exists."
+    ]
+  },
+  {
+    "id": "mv3dt-calibration-chain-videos",
+    "question": "Run MV3DT on my own 4-camera warehouse videos. I don't have calibration yet.",
+    "expected_skill": "vss-deploy-detection-tracking-3d",
+    "ground_truth": "Routes to the videos flow, detects that calibration is missing, and chains to vss-generate-video-calibration to produce it; lands the output at the MV3DT calibration mount path before deploying.",
+    "expected_behavior": [
+      "Identifies the videos data source and checks for calibration on disk.",
+      "Chains to vss-generate-video-calibration when calibration is missing.",
+      "Lands calibration at the warehouse-mv3dt-app calibration/sample-data/<dataset> path before deploying.",
+      "Deploys MV3DT only after calibration is in place."
+    ]
+  },
+  {
+    "id": "mv3dt-sbsa-dgx-spark",
+    "question": "Which image tags do I need to deploy MV3DT on a DGX Spark?",
+    "expected_skill": "vss-deploy-detection-tracking-3d",
+    "ground_truth": "On DGX-SPARK only the Perception image switches to its -sbsa tag (PERCEPTION_TAG); BEV Fusion and the other images keep their shipped tags. SBSA is not inferred from ARM64 — AGX-THOR / IGX-THOR use the normal non-SBSA tags. The shipped .env is the source of truth for which keys ship an -sbsa variant.",
+    "expected_behavior": [
+      "States that on DGX-SPARK only PERCEPTION_TAG switches to its -sbsa variant.",
+      "Does not apply an -sbsa tag to BEV Fusion or hand-construct -sbsa tags that are not shipped.",
+      "Notes AGX-THOR / IGX-THOR are ARM64 but use the shipped non-SBSA tags."
+    ]
+  },
+  {
+    "id": "mv3dt-single-camera-guard",
+    "question": "Can I use MV3DT to track with a single camera?",
+    "expected_skill": "vss-deploy-detection-tracking-3d",
+    "ground_truth": "MV3DT is a multi-view stack that requires at least two calibrated cameras; single-camera tracking is not supported, and the user is directed to the 2D / 3D-per-camera paths instead.",
+    "expected_behavior": [
+      "States that MV3DT requires two or more calibrated cameras.",
+      "Does not attempt an MV3DT deploy for a single camera.",
+      "Points to the 2D / 3D-per-camera paths instead of MV3DT."
+    ]
+  },
+  {
+    "id": "mv3dt-zero-active-sources",
+    "question": "I redeployed MV3DT but vss-rtvi-cv-mv3dt shows 'Active sources : 0' even though every container looks healthy. How do I fix it?",
+    "expected_skill": "vss-deploy-detection-tracking-3d",
+    "ground_truth": "Stale host-side state survived a plain redeploy. A clean redeploy resets containers and named volumes (down -v) AND clears host-side data_log (rotate to a backup or run cleanup_all_datalog.sh), re-applies the scoped data_log permissions, then redeploys; recovery is confirmed by the readiness gate (active sources equal to NUM_STREAMS and growing mdx-raw / mdx-bev offsets), not container health alone.",
+    "expected_behavior": [
+      "Identifies stale state (named volumes and/or host-side data_log) as the cause.",
+      "Runs docker compose down -v AND clears data_log — not down -v alone.",
+      "Re-applies the data_log permissions and redeploys.",
+      "Confirms recovery via active sources equal to NUM_STREAMS and growing broker offsets, not just container health."
+    ]
+  }
+]

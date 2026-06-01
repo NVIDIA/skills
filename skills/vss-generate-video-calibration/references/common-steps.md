@@ -31,8 +31,8 @@ Videos must be named `cam_00.mp4`, `cam_01.mp4`, … contiguous, no gaps.
 POST /v1/upload_video_files/<project_id>
 Content-Type: multipart/form-data
 
-video_files=@cam_00.mp4
-video_files=@cam_01.mp4
+files=@cam_00.mp4
+files=@cam_01.mp4
 ...
 ```
 

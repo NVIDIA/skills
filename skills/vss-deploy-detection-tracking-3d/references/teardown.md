@@ -44,7 +44,7 @@ docker volume prune -f
 docker system prune -f
 ```
 
-`volume prune -f` only removes unreferenced anonymous volumes, so named volumes like `mdx_mdx-kafka` / `mdx_vios_pg_data` survive unless you target them explicitly. Skip the prune if other docker workloads on this host share the volume namespace.
+**Prune does not reliably remove the named volumes.** Neither `docker volume prune -f` nor `docker system prune -af --volumes` is a dependable way to clear `mdx_mdx-kafka` / `mdx_vios_pg_data` — prune skips anonymous/unreferenced volumes, and named project volumes routinely survive a full system prune. Always target them explicitly with `docker volume rm $(docker volume ls -q | grep '^mdx_')` (or `down -v`, which drops the project's volumes as part of teardown). Skip the prune lines if other docker workloads on this host share the volume namespace.
 
 ## Step 3 — Clear data logs
 

@@ -65,10 +65,11 @@ The AMC microservice writes project state to `${VSS_APPS_DIR}/services/auto-cali
 
 ```bash
 sudo mkdir -p "${VSS_APPS_DIR}/services/auto-calibration/projects"
-sudo chmod 777 "${VSS_APPS_DIR}/services/auto-calibration/projects"
+# Grant the AMC container user (UID 1000) write access — scoped ACL, not 777, not chown.
+sudo setfacl -m u:1000:rwx "${VSS_APPS_DIR}/services/auto-calibration/projects"
 ```
 
-chmod, never chown — matches the convention in [`../../vss-deploy-profile/references/data-directory.md`](../../vss-deploy-profile/references/data-directory.md). Idempotent and safe to re-run.
+Scoped ACL for UID 1000 — not world-writable and not chown. This matches how the AMC skill itself handles this directory (see [`../../vss-generate-video-calibration/references/deploy-auto-calibration-service.md`](../../vss-generate-video-calibration/references/deploy-auto-calibration-service.md) Step 5) and the convention in [`../../vss-deploy-profile/references/data-directory.md`](../../vss-deploy-profile/references/data-directory.md). Idempotent and safe to re-run.
 
 ## Step 2 — Drive AMC end-to-end
 
@@ -321,7 +322,7 @@ Issues specific to the MV3DT chain:
 
 | Symptom | Fix |
 |---|---|
-| `POST /v1/create_project` returns HTTP 500 with body `{"detail":"Failed to Create Project ...: [Errno 13] Permission denied: 'projects/project_<timestamp>'"}` | First-time deploy on a fresh checkout — the MS writes project state as UID 1000 but `${VSS_APPS_DIR}/services/auto-calibration/projects/` is either missing or owned `root:root 0755` from the compose bind-mount. Run Step 1e above (`sudo chmod 777 ...`), then retry. chmod, never chown. |
+| `POST /v1/create_project` returns HTTP 500 with body `{"detail":"Failed to Create Project ...: [Errno 13] Permission denied: 'projects/project_<timestamp>'"}` | First-time deploy on a fresh checkout — the MS writes project state as UID 1000 but `${VSS_APPS_DIR}/services/auto-calibration/projects/` is either missing or owned `root:root 0755` from the compose bind-mount. Run Step 1e above (scoped `sudo setfacl -m u:1000:rwx ...`), then retry. Use the ACL, not chown. |
 | MV3DT export ZIP missing `camInfo/*.yaml` after `result_type=amc` | AMC project didn't produce the MV3DT export — verify `project_state == COMPLETED` via `/v1/get_project_info/<id>` before fetching. |
 | `result_type=vggt` returns 404 / empty ZIP | VGGT didn't run to completion. Check `vggt_state` — if `INIT` the model wasn't staged (Step 1a); if `ERROR` see VGGT log. Fall back to `result_type=amc`. |
 | `POST /export_calibration` returns non-200 | Project hasn't completed the BA pass — re-check `project_state == COMPLETED`. As a fallback, retry with `calibration_type=image` for a pixel-ROI-only export. |

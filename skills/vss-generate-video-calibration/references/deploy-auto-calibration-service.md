@@ -110,24 +110,42 @@ If you don't intend to use AMC's RTSP-stream path (only sample-dataset or pre-re
 
 ### Step 3 — Enable an auto-calibration compose profile and deploy
 
-Two paths depending on intent:
+Pick the profile that matches the intent, then run the same **generate → confirm image access → bring up** sequence:
 
-**Path A — Warehouse auto-calibration** (RTSP via nvstreamer/VST):
+| Intent | `COMPOSE_PROFILES` value |
+|---|---|
+| Warehouse auto-calibration (RTSP via nvstreamer/VST) | `bp_wh_auto_calib_2d`, `bp_wh_auto_calib_3d`, or `bp_wh_auto_calib_mv3dt` |
+| Standalone AMC only (no warehouse agent/UI stack) | `auto_calib` |
 
 ```bash
 cd deploy/docker
-# Pick the mode-specific calibration profile: bp_wh_auto_calib_2d, bp_wh_auto_calib_3d, or bp_wh_auto_calib_mv3dt.
-COMPOSE_PROFILES=bp_wh_auto_calib_2d docker compose --env-file industry-profiles/warehouse-operations/.env config > resolved.yml
+export COMPOSE_PROFILES=auto_calib   # or a bp_wh_auto_calib_* profile from the table above
+
+# 1. Generate the resolved compose for review
+docker compose --env-file industry-profiles/warehouse-operations/.env config > resolved.yml
 # Review resolved.yml — confirm vss-auto-calibration and vss-auto-calibration-ui appear
-COMPOSE_PROFILES=bp_wh_auto_calib_2d docker compose --env-file industry-profiles/warehouse-operations/.env up -d
-```
 
-**Path B — Standalone (AMC only, no warehouse agent/UI stack)**:
+# 2. Confirm the NGC key can access the AMC images before bringing the stack up.
+#    Image references are read from the resolved compose, so this tracks the release tag automatically.
+AMC_IMAGES=$(docker compose --env-file industry-profiles/warehouse-operations/.env config --images | grep auto-calibration)
+if [ -z "$AMC_IMAGES" ]; then
+  echo "No auto-calibration images found in the resolved compose."
+  echo "Confirm COMPOSE_PROFILES is exported and the chosen profile includes vss-auto-calibration before continuing."
+  exit 1
+fi
+for img in $AMC_IMAGES; do
+  echo "Checking access: $img"
+  if ! docker pull "$img"; then
+    echo
+    echo "NGC login succeeded, but this key does not have access to the required AutoMagicCalib image:"
+    echo "  $img"
+    echo "Provide an NGC key with access to the vss-core namespace, then retry."
+    exit 1
+  fi
+done
 
-```bash
-cd deploy/docker
-COMPOSE_PROFILES=auto_calib docker compose --env-file industry-profiles/warehouse-operations/.env config > resolved.yml
-COMPOSE_PROFILES=auto_calib docker compose --env-file industry-profiles/warehouse-operations/.env up -d
+# 3. Bring up the stack (images are already local from the access check)
+docker compose --env-file industry-profiles/warehouse-operations/.env up -d
 ```
 
 ### Step 4 — Verify
@@ -155,6 +173,38 @@ echo "Microservice: http://${HOST_IP}:${PORT:-8010}"
 echo "Web UI:       http://${HOST_IP}:${UI_PORT:-5000}"
 ```
 
+### Step 5 — Confirm the projects directory is writable
+
+AMC stores each project under a host directory bind-mounted into the container. The container runs as **UID 1000** (`triton-server`), so that directory must be writable by UID 1000 — otherwise the first `POST /v1/create_project` returns `[Errno 13] Permission denied`. **On a fresh checkout this almost always fails the first time**: a `git clone` leaves `services/auto-calibration/projects` owned by the cloning user (whatever their UID is), and unless that happens to be UID 1000 the container can't write. Treat the write-test failing as the expected default on a new host and apply the scoped ACL below. Check this once after the stack is healthy, before any calibration run:
+
+```bash
+PROJECTS_DIR="${VSS_APPS_DIR}/services/auto-calibration/projects"
+mkdir -p "$PROJECTS_DIR"
+
+# Write-test as the container user, against the actual bind-mount destination
+# inside the container (resolved from `docker inspect`, so this is robust to the
+# container's WorkingDir and to release path changes — do NOT hardcode it).
+DEST=$(docker inspect vss-auto-calibration \
+  --format '{{range .Mounts}}{{println .Source .Destination}}{{end}}' \
+  | awk -v s="$PROJECTS_DIR" '$1==s {print $2}')
+DEST=${DEST:-/home/auto-calibration-ms/server/projects}
+
+docker exec vss-auto-calibration sh -c \
+  "touch '$DEST/.amc_write_test' && rm -f '$DEST/.amc_write_test'" \
+  && echo "projects directory is writable" \
+  || echo "projects directory is not writable by the container — apply the ACL below"
+```
+
+> The container WorkingDir is `/home/auto-calibration-ms/server` and the projects dir mounts at `…/server/projects`, so a workdir-relative `server/projects` is wrong (it resolves to `server/server/projects` → "No such file or directory", which masks a real permission failure). Resolving the mount destination from `docker inspect` avoids this entirely.
+
+If the write test does not succeed (the common case on a fresh host — see above), grant the container user access with a narrow ACL (ask the user before changing host permissions). This adds write access for UID 1000 only and leaves existing ownership intact:
+
+```bash
+setfacl -m u:1000:rwx "$PROJECTS_DIR"     # prefix with sudo if the directory is root-owned
+```
+
+Re-run the write test to confirm, then continue. Prefer this scoped ACL over a broad `chmod -R 777`.
+
 ## Success criteria
 
 - `curl http://localhost:${VSS_AUTO_CALIBRATION_PORT:-8010}/v1/ready` returns `{"code":0,"message":"VSS Auto Calibration Microservice is ready"}`.
@@ -172,7 +222,8 @@ echo "Web UI:       http://${HOST_IP}:${UI_PORT:-5000}"
 
 | Issue | Symptoms | Solution |
 |---|---|---|
-| NGC pull fails (401 Unauthorized) | `docker compose up` returns 401 pulling the `vss-core` AMC image | The current `NGC_CLI_API_KEY` is invalid or lacks `vss-core` access. Stop and ask the user for a valid NGC key (do not silently reuse a key from earlier in the conversation — see Step 1 § Credential handling), then re-run `echo "$NGC_CLI_API_KEY" \| docker login nvcr.io --username '$oauthtoken' --password-stdin`. Confirm the user has access to the `vss-core` namespace. |
+| NGC key logs in but can't pull AMC images | The Step 3 access check stops with "Access Denied" / 401 on `docker pull` of a `vss-core` AMC image, before the stack starts | The key authenticates but lacks `vss-core` access. Ask the user for an NGC key with access to the `vss-core` namespace (do not silently reuse a key from earlier in the conversation — see Step 1 § Credential handling), re-run `echo "$NGC_CLI_API_KEY" \| docker login nvcr.io --username '$oauthtoken' --password-stdin`, then retry Step 3. |
+| `docker login` itself is rejected | Step 1 login returns an authentication error | The key is invalid or expired. Ask the user for a current NGC key and log in again before continuing. |
 | `vss-auto-calibration` stays `(starting)` for >10 min | Healthcheck not green; MS not responding on `/v1/ready` | Check logs: `docker logs vss-auto-calibration`. Common cause: missing GPU access. Verify `runtime: nvidia` works: `docker run --rm --gpus all ubuntu:22.04 nvidia-smi` |
 | UI loads but shows **"Failed to connect to the server"** | Browser dev-tools → Network tab shows the UI fetching `http://${HOST_IP}:${VSS_AUTO_CALIBRATION_PORT}/v1/...` and failing (ERR_CONNECTION_REFUSED / timeout / CORS) | (a) `HOST_IP` unset or `localhost`: `grep ^HOST_IP industry-profiles/warehouse-operations/.env` and set to the host's reachable IP. (b) `HOST_IP` is correct but `${VSS_AUTO_CALIBRATION_PORT}` isn't reachable from the browser (corp firewall blocks the port, the browser is on a different network, etc.): the UI on `:5000` still loads because that port is allowed, but the AJAX call to the MS port fails. Fix by either: (i) moving the MS to a port the browser can reach — set `VSS_AUTO_CALIBRATION_PORT=8080` (or another allowed port) in the env, regenerate `resolved.yml`, and `up -d`; (ii) SSH-tunnelling and overriding `VSS_AUTO_CALIBRATION_MS_API_URL=http://localhost:${VSS_AUTO_CALIBRATION_PORT}/v1`; or (iii) fronting the MS with a reverse proxy on an allowed port and pointing `VSS_AUTO_CALIBRATION_MS_API_URL` at it. |
 | Port already in use | `docker compose up` errors with `address already in use` for 8010 or 5000 | Pick a different port: edit `VSS_AUTO_CALIBRATION_PORT` or `VSS_AUTO_CALIBRATION_UI_PORT` in `industry-profiles/warehouse-operations/.env`, re-run dry-run + up. |
@@ -180,6 +231,7 @@ echo "Web UI:       http://${HOST_IP}:${UI_PORT:-5000}"
 | Permission denied on VGGT path | MS log shows `PermissionError` on `/tmp/vggt_model/...` | The file at `${VSS_DATA_DIR}/auto-calib/vggt/vggt_1B_commercial.pt` is not readable by UID 1000. Fix: `sudo chmod a+r ${VSS_DATA_DIR}/auto-calib/vggt/vggt_1B_commercial.pt` |
 | VIOS_BASE_URL empty (RTSP capture returns 503) | The `rtsp` calibration mode reports the MS rejects capture with "VIOS not configured" | Either deploy a warehouse calibration profile (`bp_wh_auto_calib_2d`, `bp_wh_auto_calib_3d`, or `bp_wh_auto_calib_mv3dt`) so VST is present, or set `VIOS_BASE_URL` explicitly in the env file and `docker compose up -d` again. |
 | Container exits immediately | `docker ps` shows `vss-auto-calibration` as `Exited` | Check logs: `docker logs vss-auto-calibration`. Often a GPU device-ID mismatch or VGGT path typo. |
+| `create_project` returns `[Errno 13] Permission denied` | First `POST /v1/create_project` after a fresh deploy fails writing `projects/project_<id>` | The host `services/auto-calibration/projects` directory isn't writable by the container user (UID 1000). Run the Step 5 write test, then grant access with `setfacl -m u:1000:rwx ${VSS_APPS_DIR}/services/auto-calibration/projects` and retry. |
 
 ## Stopping the services
 

@@ -68,7 +68,7 @@ curl -s -X POST "${LVS_BACKEND_URL:-http://localhost:38111}/v1/summarize" \
   -H "Content-Type: application/json" \
   -d '{
     "url": "<clip_url_from_vss_manage_video_io_storage>",
-    "model": "'"${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_0303-fp8-dynamic-kv8}"'",
+    "model": "'"${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}"'",
     "scenario": "<scenario>",
     "events": ["<event1>", "<event2>"],
     "chunk_duration": 10,

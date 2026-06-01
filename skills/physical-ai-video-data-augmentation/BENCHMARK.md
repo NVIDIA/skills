@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `physical-ai-video-data-augmentation`
-- Evaluation date: 2026-05-30
+- Evaluation date: 2026-06-01
 - NVSkills-Eval profile: `external`
 - Environment: `local`
 - Dataset: 17 evaluation tasks
@@ -54,11 +54,11 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+6%) | 97% (+12%) |
-| Correctness | 8 | 82% (+2%) | 78% (-2%) |
-| Discoverability | 8 | 75% (+4%) | 66% (-2%) |
-| Effectiveness | 8 | 75% (+2%) | 71% (-7%) |
-| Efficiency | 8 | 70% (+3%) | 57% (-4%) |
+| Security | 8 | 100% (+0%) | 91% (+0%) |
+| Correctness | 8 | 81% (+0%) | 77% (-3%) |
+| Discoverability | 8 | 73% (+6%) | 68% (-3%) |
+| Effectiveness | 8 | 72% (-3%) | 70% (-4%) |
+| Efficiency | 8 | 68% (+6%) | 60% (-5%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 

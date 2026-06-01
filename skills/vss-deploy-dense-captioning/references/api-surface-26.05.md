@@ -8,7 +8,7 @@ MODEL_ID="$(curl -fsS "$BASE_URL/v1/models" -H "Authorization: Bearer $API_KEY" 
 ```
 
 Use the exact `MODEL_ID` returned by `/v1/models` in request payloads. On local
-Cosmos Reason 2 this is usually `nim_nvidia_cosmos-reason2-8b_0303-fp8-dynamic-kv8`; backend
+Cosmos Reason 2 this is usually `nim_nvidia_cosmos-reason2-8b_hf-1208`; backend
 selector aliases such as `cosmos-reason1` or `cosmos-reason2` return HTTP 400
 unless the live model list exposes those exact ids.
 
@@ -118,7 +118,7 @@ Direct `video_url` chat:
 curl -X POST "$BASE_URL/v1/chat/completions" -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "nim_nvidia_cosmos-reason2-8b_0303-fp8-dynamic-kv8",
+    "model": "nim_nvidia_cosmos-reason2-8b_hf-1208",
     "messages": [
       {
         "role": "user",
@@ -137,7 +137,7 @@ Direct `image_url` chat:
 curl -X POST "$BASE_URL/v1/chat/completions" -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "nim_nvidia_cosmos-reason2-8b_0303-fp8-dynamic-kv8",
+    "model": "nim_nvidia_cosmos-reason2-8b_hf-1208",
     "messages": [
       {
         "role": "user",

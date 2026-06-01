@@ -141,7 +141,7 @@ other than 200 after the warmup retries, ask the user:
 Use env vars when set (strip trailing `/v1` from the VLM base — the skill appends it). Otherwise use the defaults. If neither works, ask the user — do not scan ports or read config files to guess.
 
 **Model name:** read `${VLM_NAME}` (default
-`nim_nvidia_cosmos-reason2-8b_0303-fp8-dynamic-kv8`). It must match the id RT-VLM
+`nim_nvidia_cosmos-reason2-8b_hf-1208`). It must match the id RT-VLM
 `/v1/models` advertises; do not substitute the friendly
 `nvidia/cosmos-reason2-8b`.
 
@@ -234,7 +234,7 @@ OBJECTS_JSON=''  # '' to omit, else '["forklifts","pallets","workers"]'
 curl -s -X POST "$VIDEO_SUMMARIZATION_URL/v1/summarize" \
   -H "Content-Type: application/json" \
   -d "$(jq -n --arg url "<clip_url_from_vss_manage_video_io_storage>" \
-        --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_0303-fp8-dynamic-kv8}" \
+        --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}" \
         --arg scenario "$SCENARIO" \
         --argjson events "$EVENTS_JSON" \
         --argjson objects "${OBJECTS_JSON:-null}" '{
@@ -279,7 +279,7 @@ EXAMPLE:
 curl -s -X POST "$VLM/v1/chat/completions" \
   -H "Content-Type: application/json" \
   -d "$(jq -n \
-        --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_0303-fp8-dynamic-kv8}" \
+        --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}" \
         --arg text "$PROMPT" \
         --arg url "<clip_url_from_vss_manage_video_io_storage>" \
         '{
@@ -367,7 +367,7 @@ mixed into it.
   parses the JSON string inside `content`.
 - **Prefer `/v1/summarize` for 3.2 GA**; `/summarize` is a compatibility alias.
 - **Use the exact VLM model id advertised by the endpoint** (default
-  `nim_nvidia_cosmos-reason2-8b_0303-fp8-dynamic-kv8`).
+  `nim_nvidia_cosmos-reason2-8b_hf-1208`).
 - **Render output verbatim** — no paraphrasing, no reformatting, no rewriting
   the `video_summary` or `choices[0].message.content`.
 - **One call, one render.** No parallel hedging, no double renderings.

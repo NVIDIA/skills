@@ -48,7 +48,7 @@ curl -sf "http://${HOST_IP}:8018/v1/models" | jq -r '.data[].id'
 For the default integrated Cosmos Reason 2 path, `VLM_NAME` should be:
 
 ```text
-nim_nvidia_cosmos-reason2-8b_0303-fp8-dynamic-kv8
+nim_nvidia_cosmos-reason2-8b_hf-1208
 ```
 
 Do not use `nvidia/cosmos-reason2-8b` unless the endpoint advertises that id.

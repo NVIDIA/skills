@@ -21,20 +21,25 @@ Expected — all the following must show `Up` (or `Up (healthy)` where a health 
 | `vss-rtvi-cv-bev-fusion` | `Up (healthy)` — health check is `/tmp/fusion_ready` sentinel |
 | `mosquitto` | `Up (healthy)` |
 | `kafka` *or* `redis` (per `STREAM_TYPE`) | `Up` |
-| `broker-health-check` | `Exited (0)` — one-shot, then completes |
-| `vss-vios-sensor` (= `sensor-ms-mv3dt`) | `Up (healthy)` |
-| `centralizedb` | `Up (healthy)` |
+| `vss-broker-health-check` | `Exited (0)` — one-shot, then completes |
+| `vss-vios-sensor` | `Up (healthy)` |
+| `vss-vios-ingress` | `Up (healthy)` |
+| `vss-vios-streamprocessing` | `Up (healthy)` — records streams for the VST video wall |
+| `vss-vios-postgres` | `Up (healthy)` — VST sensor-ms backing store |
+| `vss-haproxy-ingress` | `Up` — present under MV3DT (services still reached on direct ports) |
+| `sdr-controller` | `Up` (with `sdrc-*` one-shot init helpers `Exited (0)`) |
 | `vss-configurator-mv3dt` | `Up (healthy)` |
 | `vss-vios-nvstreamer-mv3dt` | `Up` (sample/videos only — absent when feeding external RTSP) |
-| `vss-auto-calibration` / `-ui` | `Up` (gated under `bp_wh_*_mv3dt`) |
 | `vss-behavior-analytics-mv3dt` | `Up` (always — NOT gated by MINIMAL_PROFILE) |
+
+> `vss-auto-calibration` / `-ui` are **not** part of the MV3DT deploy (they belong to the separate `auto_calib` calibration flow). If you see them running, they're from that flow — see [`deploy-rtvi-cv-3d-stack.md`](deploy-rtvi-cv-3d-stack.md) "What this brings up".
 
 ### Extra under extended (`MINIMAL_PROFILE=""`)
 
 | Container | Expected state |
 |---|---|
 | `elasticsearch` | `Up (healthy)` |
-| `elasticsearch-init-container` | `Exited (0)` — one-shot |
+| `vss-elasticsearch-init` | `Exited (0)` — one-shot |
 | `logstash` | `Up` |
 | `kibana` | `Up (healthy)` |
 | `vss-kibana-init-mv3dt` | `Exited (0)` — one-shot |
@@ -125,6 +130,62 @@ docker exec redis redis-cli XRANGE mdx-bev - + COUNT 1
 
 If `mdx-bev` is empty but `mdx-raw` is growing: fusion isn't producing output — check [`troubleshooting.md`](troubleshooting.md).
 
+## Step 4b — Readiness gate (must pass before reporting success)
+
+**Container health from Step 1 is not sufficient** — perception and fusion can be `Up`/`healthy` while `Active sources : 0` and the broker offsets stay flat. Do **not** report success or hand the user the URLs until every check below is green. This block ties Steps 2–4 together and adds the exact VST sensor-set check:
+
+```bash
+ENV_FILE="${VSS_APPS_DIR}/industry-profiles/warehouse-operations/.env"
+NUM_STREAMS=$(grep '^NUM_STREAMS=' "$ENV_FILE" | cut -d= -f2)
+VST_HOST="${HOST_IP:-localhost}"; VST_PORT="${VST_PORT:-30888}"
+CAL_DIR="${VSS_APPS_DIR}/industry-profiles/warehouse-operations/warehouse-mv3dt-app/calibration/sample-data/${SAMPLE_VIDEO_DATASET}"
+
+# 1. NvStreamer + perception: active sources must equal NUM_STREAMS
+ACTIVE=$(docker logs vss-rtvi-cv-mv3dt 2>&1 | grep -oE 'Active sources : [0-9]+' | tail -1 | grep -oE '[0-9]+$')
+echo "Active sources: ${ACTIVE:-0} (expect ${NUM_STREAMS})"
+
+# 2. VST sensor set must EXACTLY match the calibration cameras, all online
+EXPECTED=$(jq -r '.sensors[].id' "${CAL_DIR}/calibration.json" 2>/dev/null | sort)
+SENSORS=$(curl -sf "http://${VST_HOST}:${VST_PORT}/vst/api/v1/sensor/list" | jq -r '.[] | "\(.name)\t\(.state)"')
+echo "VST sensors (name/state):"; printf '%s\n' "${SENSORS}" | sed 's/^/  /'
+ALL_NAMES=$(printf '%s\n' "${SENSORS}"    | awk -F'\t' 'NF{print $1}' | sort)
+ONLINE_NAMES=$(printf '%s\n' "${SENSORS}" | awk -F'\t' 'tolower($2) == "online"{print $1}' | sort)
+if [ -z "${EXPECTED}" ]; then
+  # No baseline to compare against — don't report a false MISMATCH. Fix CAL_DIR /
+  # SAMPLE_VIDEO_DATASET so calibration.json is readable, then re-run this check.
+  echo "  could not read expected sensors from ${CAL_DIR}/calibration.json — skipping sensor-set comparison (check CAL_DIR / SAMPLE_VIDEO_DATASET)"
+else
+  [ "${ALL_NAMES}" = "${EXPECTED}" ] \
+    && echo "  sensor set matches calibration exactly" \
+    || echo "  MISMATCH — extra / missing / empty sensor records present"
+  [ "${ONLINE_NAMES}" = "${EXPECTED}" ] \
+    && echo "  all expected sensors online" \
+    || echo "  some expected sensors are NOT online"
+fi
+
+# 3. Broker offsets must grow across two samples. Use whichever broker is up
+#    (STREAM_TYPE / BP_PROFILE selects kafka or redis).
+if docker ps --format '{{.Names}}' | grep -qx kafka; then
+  off() { docker exec kafka kafka-get-offsets --bootstrap-server localhost:9092 --topic "$1" 2>/dev/null | awk -F: '{s+=$3} END{print s+0}'; }
+else
+  off() { docker exec redis redis-cli XLEN "$1" 2>/dev/null | tr -dc '0-9'; }
+fi
+r1=$(off mdx-raw); b1=$(off mdx-bev); sleep 15; r2=$(off mdx-raw); b2=$(off mdx-bev)
+echo "mdx-raw: ${r1:-0} -> ${r2:-0}    mdx-bev: ${b1:-0} -> ${b2:-0}"
+{ [ "${r2:-0}" -gt "${r1:-0}" ] && [ "${b2:-0}" -gt "${b1:-0}" ]; } \
+  && echo "  offsets growing on both topics" \
+  || echo "  offsets NOT growing on one or both topics"
+```
+
+**Pass criteria — all four:**
+
+1. `Active sources` equals `NUM_STREAMS`.
+2. The VST sensor set matches the calibration cameras **exactly** (no extra, empty, or stale records).
+3. Every expected sensor reports **online**.
+4. Both `mdx-raw` and `mdx-bev` offsets grew between the two samples.
+
+If any fails, the deploy is not actually processing streams — go to [`troubleshooting.md`](troubleshooting.md) (`Active sources : 0` and stale-state entries) rather than reporting the URLs. A sensor-set mismatch, stale/offline record, or `Active sources : 0` on healthy containers is the stale-state case — the fix is a **full clean redeploy** (`down -v` **and** clearing host-side `data_log`, then redeploy), not `down -v` alone. See the redeploy note in [`deploy-rtvi-cv-3d-stack.md`](deploy-rtvi-cv-3d-stack.md) Step 3.
+
 ## Step 5 — VST video wall
 
 ```
@@ -181,6 +242,26 @@ The VST UI loads over TCP/30888, but video playback uses **WebRTC**. The browser
 3. **Bypass UI entirely; consume `mdx-bev`.** The data is on the broker — write a downstream consumer in your language of choice.
 4. **Self-host TURN.** Heavyweight: stand up a TURN server on TCP/443 (reachable through corp HTTPS) and point VST at it. Out of scope for this skill; needs VST config edits.
 
+#### Edge and remote hosts (Thor, cloud VM, SSH / VPN / NAT)
+
+On IGX-THOR / AGX-THOR and other edge or cloud hosts you often reach the box only through SSH, a VPN, or a proxy — `HOST_IP` isn't directly routable from your laptop. Forwarding the UI port is enough to *load* the dashboard but **not** to play video:
+
+```bash
+# Loads the VST UI in your laptop browser — dashboard only.
+ssh -L 30888:localhost:30888 <user>@<edge-host>
+# then open: http://localhost:30888/vst/#/live-streams
+```
+
+WebRTC media travels over **UDP on a random port range plus STUN**, which a TCP `-L` tunnel does not carry — so playback still fails with `Error 2: Failed to start inbound stream`, `Error 22`, or an ICE failure even though the UI loaded. To actually see frames through SSH, forward the **RTSP** port instead (RTSP over TCP tunnels cleanly) and play the per-sensor stream:
+
+```bash
+# Real frames over SSH — no overlays, but reliable through a tunnel.
+ssh -L 30554:localhost:30554 <user>@<edge-host>
+ffplay "rtsp://localhost:30554/live/<sensorId>"   # sensorId from /vst/api/v1/sensor/list
+```
+
+For the full overlay UI on these hosts, run the browser **on the host** (VNC / X-forward / RDP — workaround 1 above) or stand up a TURN server (workaround 4). Forwarding only TCP/30888 reproduces the "UI loads, playback fails" symptom and is the most common cause of `Error 2` / `Error 22` on Thor and other SSH/VPN-only hosts.
+
 If the user is on a host without these restrictions (LAN, public IP with permissive firewall), Step 5 just works.
 
 ## Step 6 — Other diagnostic endpoints
@@ -188,12 +269,12 @@ If the user is on a host without these restrictions (LAN, public IP with permiss
 | Surface | URL | Notes |
 |---|---|---|
 | NvStreamer UI | `http://<HOST_IP>:31000` | Configure / inspect the RTSP server (sample / videos mode only) |
-| Auto-Calibration UI | `http://<HOST_IP>:5000` | Available because AMC is gated under `bp_wh_*_mv3dt`; use to re-calibrate without tearing down |
+| Auto-Calibration UI | `http://<HOST_IP>:5000` | Only if AMC was deployed via the separate `auto_calib` flow ([`calibration-workflow.md`](calibration-workflow.md)) — **not** part of the MV3DT deploy itself |
 | VST sensor list (API) | `http://<HOST_IP>:30888/vst/api/v1/sensor/list` | `jq` it to confirm `NUM_STREAMS` sensors are registered |
 | VST MCP | `http://<HOST_IP>:8001` | Read-only diagnostics |
 | Kibana (extended only) | `http://<HOST_IP>:5601` | Dashboards for `mdx-bev` and friends |
 
-No HAProxy ingress under MV3DT — `vss-haproxy-ingress` is gated under `bp_wh` (agents profile) which is not valid for `MODE=mv3dt`. Access services on direct ports.
+`vss-haproxy-ingress` does come up under MV3DT, but there's no path-based ingress routing for the MV3DT surfaces — access the services on their direct ports as listed above (the agent UI / `:7777` path routing belongs to the full `bp_wh` agents profile, not `MODE=mv3dt`).
 
 ## When something is wrong
 
