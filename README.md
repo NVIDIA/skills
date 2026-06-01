@@ -293,6 +293,66 @@ This repository adheres to the [Agent Skills specification](https://agentskills.
 
 ---
 
+## FAQ
+
+### What are NVIDIA Agent Skills?
+
+NVIDIA Agent Skills are official, NVIDIA-verified instruction sets that teach AI agents how to use NVIDIA CUDA-X libraries, AI Blueprints, and platform tools correctly. Skills are portable directories with a `SKILL.md` file that follows the [Agent Skills specification](https://agentskills.io/specification).
+
+### How do I install NVIDIA skills?
+
+Use the default `skills` CLI flow:
+
+```bash
+npx skills add nvidia/skills
+```
+
+Or install a specific skill without prompts:
+
+```bash
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --yes
+```
+
+### Which AI agents are supported?
+
+| Agent | Flag |
+|-------|------|
+| Claude Code | `--agent claude-code` |
+| Codex | `--agent codex` |
+| Cursor | `--agent cursor` |
+| Kiro | `--agent kiro-cli` |
+
+### How do I browse available skills?
+
+```bash
+npx skills add nvidia/skills --list
+```
+
+### What products have skills available?
+
+| Product | Description |
+|---------|-------------|
+| AIQ | NVIDIA AI-Q Blueprint — deploy local AI-Q services and run research workflows |
+| cuOpt | GPU-accelerated optimization — vehicle routing, linear/quadratic programming |
+| NeMo Retriever | Deploy NeMo Retriever locally, extract information from corpus |
+| Nemotron | NVIDIA Nemotron LLM models — UQA, CC, and Reasoning models |
+
+### How are skills verified?
+
+Skills are synced daily from product repos after confirming each skill carries:
+
+- `skill.oms.sig` — detached OMS-format signature (verifiable against `nv-agent-root-cert.pem`)
+- `skill-card.md` — skill identity and governance card
+- Tier-3 evaluation dataset
+
+### Where can I ask questions?
+
+Use [GitHub Discussions](../../discussions) for questions or general discussion. The issue tracker is reserved for bug reports, feature proposals, and documentation issues.
+
+### What license applies?
+
+Dual-licensed under Apache License 2.0 and Creative Commons Attribution 4.0 International (CC BY 4.0).
+
 ## License
 
 This project is dual-licensed under the [Apache License 2.0](LICENSE) and [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE).
