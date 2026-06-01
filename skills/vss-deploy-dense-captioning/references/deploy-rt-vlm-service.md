@@ -185,7 +185,7 @@ mkdir -p ./rtvi-logs && sudo chown 1001:1001 ./rtvi-logs
 | `RTVI_VLM_MODEL_TO_USE` | effectively required | `openai-compat` | `cosmos-reason1` / `cosmos-reason2` / `openai-compat` / `custom` |
 | `RTVI_VLM_ENDPOINT` | if `openai-compat` | — | Remote/sibling OpenAI-compatible VLM endpoint |
 | `VLM_NAME` | if `openai-compat` | — | Model name exposed by the remote/sibling VLM endpoint |
-| `RTVI_VLM_MODEL_PATH` | conditional | `ngc:nim/nvidia/cosmos-reason2-8b:0303-fp8-dynamic-kv8` | Needed when not `openai-compat`. Keep the source-backed `:0303-fp8-dynamic-kv8` default unless the deployment source explicitly overrides it. |
+| `RTVI_VLM_MODEL_PATH` | conditional | `ngc:nim/nvidia/cosmos-reason2-8b:hf-1208` | Needed when not `openai-compat`. Keep the source-backed `:hf-1208` default unless the deployment source explicitly overrides it. |
 
 The most important host-side variables use the `RTVI_VLM_*` or `RTVI_VLLM_*`
 prefix and are rewritten to canonical container-side names by compose.
@@ -296,7 +296,7 @@ VRAM for the 8B models.
 ```bash
 # .env for cosmos-reason2 (source-backed default used by VSS alerts/LVS):
 RTVI_VLM_MODEL_TO_USE=cosmos-reason2
-RTVI_VLM_MODEL_PATH=ngc:nim/nvidia/cosmos-reason2-8b:0303-fp8-dynamic-kv8
+RTVI_VLM_MODEL_PATH=ngc:nim/nvidia/cosmos-reason2-8b:hf-1208
 NGC_CLI_API_KEY=<ngc-key>
 
 # .env for cosmos-reason1:
@@ -482,7 +482,7 @@ RTVI_VLM_IMAGE_TAG=${VLM_TAG}
 RT_VLM_DEVICE_ID=0
 # Model config (choose one option from §11):
 RTVI_VLM_MODEL_TO_USE=cosmos-reason2
-RTVI_VLM_MODEL_PATH=ngc:nim/nvidia/cosmos-reason2-8b:0303-fp8-dynamic-kv8
+RTVI_VLM_MODEL_PATH=ngc:nim/nvidia/cosmos-reason2-8b:hf-1208
 EOF
 chmod 600 .env
 grep -qxF .env .gitignore 2>/dev/null || printf '.env\n' >> .gitignore
@@ -683,9 +683,9 @@ docker compose --env-file .env -f rtvi-vlm-docker-compose.yml down --rmi local
   deliberately more lenient for model-download-on-first-boot. Not a bug.
 - **🟢 Source-backed MODEL_PATH default**: compose, `vss-deploy-profile`, and
   the default alerts/LVS paths use
-  `ngc:nim/nvidia/cosmos-reason2-8b:0303-fp8-dynamic-kv8`. Keep that default for standalone
+  `ngc:nim/nvidia/cosmos-reason2-8b:hf-1208`. Keep that default for standalone
   local Cosmos Reason 2 validation unless the source profile explicitly changes
-  it. RTX PRO 4500 Blackwell uses the same FP8 default with tighter sizing
+  it. RTX PRO 4500 Blackwell uses the same default with tighter sizing
   caps for the smaller VRAM target. Model tags are not interchangeable; swapping tags on a live
   cache volume can trigger a `torch_aot_compile` / `_Missing has no attribute
   _modules` warning and force a full vLLM recompile on first boot.

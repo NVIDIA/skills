@@ -311,8 +311,10 @@ Average reprojection error 0(px)     : < 10
 
 ```bash
 PROJECT_ID=<id_from_step_1>
-# Calibration log lives inside the MS container's working dir.
-docker exec vss-auto-calibration tail -F server/projects/project_${PROJECT_ID}/calibration.log
+# Calibration log lives under the projects dir, relative to the container
+# WorkingDir (/home/auto-calibration-ms/server) — so the path is projects/...,
+# NOT server/projects/... (that resolves to server/server/projects → no such file).
+docker exec vss-auto-calibration tail -F projects/project_${PROJECT_ID}/calibration.log
 ```
 
 Or stream MS logs:
@@ -327,6 +329,7 @@ docker logs -f vss-auto-calibration
 |---|---|
 | `requests` not installed | Inside a venv: `python3 -m venv venv && ./venv/bin/pip install requests`. If `python3 -m venv` fails (no `python3-venv` package, no sudo): use `uv` instead — `curl -LsSf https://astral.sh/uv/install.sh \| sh` then `uv venv venv && uv pip install --python venv/bin/python requests`. The inline run block already does this fallback chain automatically. |
 | `[2] Uploaded N videos` where N >> 4 | `SAMPLE_DIR` resolved to the repo root (or another over-broad path) and `rglob("cam_*.mp4")` swept stale videos from `.cache/`, `projects/`, etc. Stop the run (`POST /v1/stop_calibration/{id}`), delete the project (`DELETE /v1/delete_project/{id}`), set `SAMPLE_DIR` explicitly to the extracted sample dir, re-run. The script anchors on `videos/` and asserts `len(videos) <= 16` to fail loud. |
+| `create_project` returns `[Errno 13] Permission denied` | The host projects directory isn't writable by the container user (UID 1000). Run the write test in `deploy-auto-calibration-service.md` § Step 5, then grant access with `setfacl -m u:1000:rwx ${VSS_APPS_DIR}/services/auto-calibration/projects` and retry. |
 | `verify_project` returns state `!= READY` | Confirm all 4 videos + alignment + layout + GT uploaded; inspect `GET /v1/get_project_info/{id}` response. |
 | Sample zip not present at `assets/sdg_08_2_sample_data_010926.zip` | The VSS repo does not bundle it. Pull from GitHub LFS or a sibling AMC checkout — see [Obtain the sample zip](#obtain-the-sample-zip). |
 | Sample not extracted | `unzip <repo_root>/assets/sdg_08_2_sample_data_010926.zip -d <repo_root>/assets/.cache/sdg_08_2_sample_data_010926/` |

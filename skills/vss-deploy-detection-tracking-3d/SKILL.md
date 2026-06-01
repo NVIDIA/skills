@@ -3,7 +3,7 @@ name: vss-deploy-detection-tracking-3d
 description: >
   Deploy and operate the RTVI-CV-3D stack (also known as MV3DT, Multi-View 3D
   Tracking, or RTVI-CV-MV3DT) — per-camera DeepStream perception plus BEV
-  Fusion over multiple calibrated cameras. Use when the user says
+  Fusion over multiple calibrated cameras. Applies to requests such as
   "deploy RTVI-CV-3D", "deploy rtvi-cv-3d", "deploy MV3DT", "deploy multi-view
   3D tracking", "deploy rtvi-cv-mv3dt", "enable multi-camera tracking",
   "enable multi camera tracking", "set up multi-camera tracking", "multi-camera
@@ -11,13 +11,23 @@ description: >
   RTVI-CV-3D / MV3DT on RTSP", "run on the sample dataset", "set up 3D
   tracking", or provides a 4-camera warehouse video/RTSP set. Routes between
   sample-data, custom-videos, and custom-RTSP flows; auto-chains to
-  `vss-generate-video-calibration` when calibration data is missing.
+  `vss-generate-video-calibration` when calibration data is missing. Not for
+  the full warehouse blueprint with agents / LLM / VLM (use `vss-deploy-profile`)
+  or 2D single-camera detection (use `vss-deploy-detection-tracking-2d`).
 license: Apache-2.0
 metadata:
   version: "3.2.0"
   github-url: "https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization"
   tags: "nvidia blueprint mv3dt detection tracking 3d warehouse"
 ---
+
+## Purpose
+
+Deploy and operate the RTVI-CV-3D / MV3DT stack — per-camera DeepStream perception plus BEV Fusion over multiple calibrated cameras — on the bundled sample dataset, custom videos, or live RTSP, without the full warehouse agent / LLM / VLM stack.
+
+## Instructions
+
+Work top-to-bottom: answer the routing questions (Q0–Q3) under [Routing](#routing), then follow the reference for the chosen path. Detailed step-by-step procedures live in `references/` (deploy, calibration chain, camera configuration, verification, teardown, troubleshooting).
 
 # VSS Deploy Detection & Tracking — 3D (RTVI-CV-3D)
 
@@ -147,12 +157,10 @@ test -d "${DATA_DIR}/videos/${DATASET}" \
 # cams separately if your GPU's mv3dt cap is high enough to use them all.
 ls "${DATA_DIR}/videos/${DATASET}/"*.mp4 2>/dev/null | wc -l
 
-# Ensure every per-service subdir under data_log/ exists, then open perms.
-# kafka / elasticsearch / redis run as different non-root UIDs against
-# bind-mounted host paths — without 777 the daemons exit with
-# "Permission denied" (kafka cluster_id), "AccessDeniedException" (ES),
-# or "Can't open the log file" (redis). chmod 777 is the documented fix;
-# do NOT recursive-chown — see data-directory.md for the per-UID rationale.
+# Ensure every per-service subdir under data_log/ exists. kafka / elasticsearch /
+# redis / postgres each run as a different non-root UID against these bind mounts —
+# without write access the daemons exit with "Permission denied" (kafka cluster_id),
+# "AccessDeniedException" (ES), or "Can't open the log file" (redis).
 mkdir -p \
   "${DATA_DIR}/data_log/analytics_cache" \
   "${DATA_DIR}/data_log/calibration_toolkit" \
@@ -161,15 +169,26 @@ mkdir -p \
   "${DATA_DIR}/data_log/kafka" \
   "${DATA_DIR}/data_log/redis/data" \
   "${DATA_DIR}/data_log/redis/log"
-chmod -R 777 "${DATA_DIR}/data_log"
+
+# Grant write access to the specific container UIDs only — scoped ACLs, NOT 777 and
+# NOT chown. UIDs (per data-directory.md): postgres=70, redis=999, elasticsearch / VST /
+# kafka=1000. The first call covers existing files; the second sets *default* ACLs so
+# files/dirs the daemons create at runtime (e.g. postgres PGDATA) inherit the access.
+ACL='u:70:rwx,u:999:rwx,u:1000:rwx'
+setfacl -R    -m "$ACL" "${DATA_DIR}/data_log"
+setfacl -R -d -m "$ACL" "${DATA_DIR}/data_log"
 ```
 
-> **Easy miss, hard to recover from.** The `mkdir -p` + `chmod -R 777` step
-> on `${DATA_DIR}/data_log` is required, not optional. Newly extracted
-> `vss-warehouse-app-data` trees are owned by the extracting user (whoever
-> ran `tar -xvf`) and container UIDs won't match. The deeper per-container
-> UID table lives in [`../vss-deploy-profile/references/data-directory.md`](../vss-deploy-profile/references/data-directory.md);
-> the same doc explains why recursive chown is the wrong fix.
+> **Scoped ACLs, not `chmod 777`.** This grants only the known container UIDs access — it does
+> **not** make `data_log` world-writable, and it does **not** `chown` (which would break postgres /
+> Elasticsearch, since they re-own their dirs on first start). Prefer this for agent-driven runs and
+> shared hosts. The canonical [`../vss-deploy-profile/references/data-directory.md`](../vss-deploy-profile/references/data-directory.md)
+> documents the broad `chmod -R 777` and the per-container UID table; this skill uses the scoped-ACL
+> equivalent instead. **Confirm with the user (`AskUserQuestion`) before changing host permissions.**
+>
+> Requires a POSIX-ACL filesystem (ext4 / xfs — the default) and the `acl` package (`setfacl`). If a
+> daemon still logs a permission error after deploy, find its UID
+> (`docker inspect <container> --format '{{.Config.User}}'`) and add `-m u:<uid>:rwx` to both calls.
 
 If app-data isn't extracted yet: download via `ngc registry resource download-version "nvidia/vss-warehouse/vss-warehouse-app-data:<version>"` and `tar -xvf` (see [`references/deploy-rtvi-cv-3d-stack.md`](references/deploy-rtvi-cv-3d-stack.md) for tag discovery and full steps).
 

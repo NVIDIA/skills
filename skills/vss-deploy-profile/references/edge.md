@@ -192,9 +192,9 @@ sequence limits from the standalone recipe above.
 
 On Thor, the VLM falls back to **`rtvi-vlm` serving Cosmos Reason 2
 in-process**. The standalone `cosmos-reason2-8b` NIM service does not run on
-Thor. `rtvi-vlm` loads `ngc:nim/nvidia/cosmos-reason2-8b:0303-fp8-dynamic-kv8` itself and
+Thor. `rtvi-vlm` loads `ngc:nim/nvidia/cosmos-reason2-8b:hf-1208` itself and
 advertises it at `http://${HOST_IP}:8018/v1` under
-`VLM_NAME=nim_nvidia_cosmos-reason2-8b_0303-fp8-dynamic-kv8` with
+`VLM_NAME=nim_nvidia_cosmos-reason2-8b_hf-1208` with
 `VLM_NAME_SLUG=none`.
 
 Remote VLM and `--vlm` swaps are not supported on Thor for `base` or

@@ -5,7 +5,7 @@
 
 # Dynamic Calibration
 
-py-analytics supports replacing the live calibration (sensors, ROIs, tripwires, homographies) at runtime via messages on the `mdx-notification` Kafka topic. This document is the **contract** between the producer (video analytics api / `web-apis`) and the consumer (the worker's `CalibrationBase` instance). For end-user docs (HTTP API, request shapes) see the `web-apis` repo.
+behavior-analytics supports replacing the live calibration (sensors, ROIs, tripwires, homographies) at runtime via messages on the `mdx-notification` Kafka topic. This document is the **contract** between the producer (video analytics api) and the consumer (the worker's `CalibrationBase` instance). For end-user docs (HTTP API, request shapes) see the `video-analytics-api` repo.
 
 ---
 
@@ -78,7 +78,7 @@ src/mdx/analytics/core/transform/calibration/
 ├── calibration_dynamic.py     # Wrapper that one-time-switches from
 │                              # no-file to a typed calibration when the
 │                              # first event lands
-└── schemas/calibration.schema.json  # Vendored from web-apis/web-api-core/
+└── schemas/calibration.schema.json  # Vendored from video-analytics-api/src/web-api-core/
                                      # schemas/ajv/calibration.json
 ```
 
@@ -92,9 +92,9 @@ Wired up in `src/mdx/analytics/core/app/app_runner.py` (one `CalibrationListener
 
 | Action | Schema | Why |
 |---|---|---|
-| `upsert-all` | Full vendored schema (`schemas/calibration.schema.json`) | This is a full snapshot — same constraints web-api enforces pre-publish. Validation here catches schema drift between web-api and the worker, or a non-web-api producer |
-| `upsert` | Full schema | Web-api enforces the same schema on the input before publishing. Worker-side validation is defense-in-depth |
-| `delete` | Minimal inline schema (sensors is non-empty array of `{id: <non-empty string>}`) | Web-api builds the delete payload from already-stored sensor records; those may legitimately omit fields the strict full schema requires (legacy data, hand-edited entries). A full check would falsely reject legitimate deletes |
+| `upsert-all` | Full vendored schema (`schemas/calibration.schema.json`) | This is a full snapshot — same constraints video analytics api enforces pre-publish. Validation here catches schema drift between video analytics api and the worker, or a non-video-analytics-api producer |
+| `upsert` | Full schema | video-analytics-api enforces the same schema on the input before publishing. Worker-side validation is defense-in-depth |
+| `delete` | Minimal inline schema (sensors is non-empty array of `{id: <non-empty string>}`) | video analytics api builds the delete payload from already-stored sensor records; those may legitimately omit fields the strict full schema requires (legacy data, hand-edited entries). A full check would falsely reject legitimate deletes |
 
 ### Two-layer enforcement
 
@@ -123,12 +123,12 @@ it locally to drop the notification, the watcher relies on the outer
 
 ### Schema vendoring
 
-The vendored `calibration.schema.json` is a one-way mirror of `web-apis/web-api-core/schemas/ajv/calibration.json` with two normalizations:
+The vendored `calibration.schema.json` is a one-way mirror of `video-analytics-api/src/web-api-core/schemas/ajv/calibration.json` with two normalizations:
 
 1. AJV's non-standard `errorMessage` keyword stripped (Python's `jsonschema` ignores it; removing keeps the file readable).
-2. Top-level `additionalProperties` relaxed from `false` to `true` for forward-compatibility with any new top-level field web-api may add. Nested `additionalProperties: false` is preserved.
+2. Top-level `additionalProperties` relaxed from `false` to `true` for forward-compatibility with any new top-level field video analytics api may add. Nested `additionalProperties: false` is preserved.
 
-When web-api's schema changes, re-vendor and re-apply both normalizations. There's no automation for this yet; it's a manual sync.
+When video analytics api's schema changes, re-vendor and re-apply both normalizations. There's no automation for this yet; it's a manual sync.
 
 ---
 
@@ -162,12 +162,12 @@ See `src/mdx/analytics/core/transform/calibration/calibration_dynamic.py` and th
 
 ## Known limitations and gotchas
 
-1. **Validation is strict on `upsert-all` / `upsert`, lenient on `delete`.** If web-api's stored data has historically-acceptable-but-now-schema-violating sensors, a `delete` referencing those sensors still works. An `upsert-all` carrying those sensors would be rejected — the operator must fix the stored data first.
+1. **Validation is strict on `upsert-all` / `upsert`, lenient on `delete`.** If video-analytics-api's stored data has historically-acceptable-but-now-schema-violating sensors, a `delete` referencing those sensors still works. An `upsert-all` carrying those sensors would be rejected — the operator must fix the stored data first.
 2. **Reload is single-process.** The main process owns the watcher; workers share the parent's `CalibrationBase` instance via fork. There's no per-worker watchdog on `CALIBRATION_DIR` (in contrast to `CONFIG_DIR`).
 3. **Stale-timestamp filter is monotone.** `CalibrationListener` rejects any notification whose `timestamp` is `<= last_insert_timestamp`. After a Kafka offset reset (or replay from offset 0), old notifications are silently skipped. This is intentional — out-of-order deliveries would otherwise corrupt the in-memory map.
 4. **`globalROIs` is not read.** Legacy test fixtures use `globalROIs` (CamelCase). Production code reads `rois` (lowercase). The vendored schema follows `rois`. Migration of legacy data is operator-owned.
-5. **No ACK back to web-api.** The dynamic-config flow publishes `ack` after applying; the calibration flow does not. A worker-side validation failure is observable only via container logs (`calibration schema violation (...)`).
-6. **No schema-sync automation between repos.** The vendored `calibration.schema.json` must be manually re-synced when `web-apis/web-api-core/schemas/ajv/calibration.json` changes.
+5. **No ACK back to video analytics api.** The dynamic-config flow publishes `ack` after applying; the calibration flow does not. A worker-side validation failure is observable only via container logs (`calibration schema violation (...)`).
+6. **No schema-sync automation between repos.** The vendored `calibration.schema.json` must be manually re-synced when `video-analytics-api/src/web-api-core/schemas/ajv/calibration.json` changes.
 
 ---
 
@@ -193,4 +193,4 @@ Aim for 100% line + branch coverage on new code under `transform/calibration/`. 
 - Watcher (`on_moved` + dotfile filter): `src/mdx/analytics/core/transform/calibration/calibration_base.py::CalibrationFileMonitor`.
 - Validator (per-action dispatch + minimal delete schema): `src/mdx/analytics/core/transform/calibration/calibration_validator.py`.
 - One-time switch on `DynamicCalibration`: `src/mdx/analytics/core/transform/calibration/calibration_dynamic.py::reload_data`.
-- Producer side (for reference): `web-apis/web-api-core/Services/Calibration.js::upsert`, `::deleteSensors`, plus `Services/NotificationManager.js::produceCalibrationNotification`.
+- Producer side (for reference): `video-analytics-api/src/web-api-core/Services/Calibration.js::upsert`, `::deleteSensors`, plus `Services/NotificationManager.js::produceCalibrationNotification`.
