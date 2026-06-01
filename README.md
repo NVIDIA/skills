@@ -130,7 +130,14 @@ For non-interactive installs, global installs, agent-specific installs, updates,
 
 ## Getting Help & Contributing
 
-For skill-related issues, feature requests, new skill ideas, discussions, and contributions — use the source repo for the relevant product:
+**Where to file an issue depends on what's broken:**
+
+- **Skill content issues** (a specific skill has a bug, missing functionality, or incorrect content) — file in the **source repo** for that product, using the per-product table below.
+- **Catalog issues** (catalog README errors, sync workflow problems, distribution channels, signing/verification flow, docs in this repo) — file [here](../../issues/new/choose) using the catalog issue templates: **Bug Report**, **Feature Request**, or **Documentation Request or Correction**.
+- **Questions or general discussion** — use [Discussions](../../discussions). The issue tracker is reserved for bug reports, feature proposals with a design, and documentation issues.
+- **Security vulnerabilities** — follow the disclosure process in [SECURITY.md](SECURITY.md); do not open a public issue.
+
+Per-product source repo links:
 
 <!-- help-table-start -->
 | Product | Issues | Discussions | Contributing | Security |
