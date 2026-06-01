@@ -3,5 +3,33 @@ repo: NVIDIA-AI-Blueprints/video-search-and-summarization
 ref: develop
 description: VSS Blueprint — deploy profiles, search and summarize video, generate analysis reports, manage alerts and incidents, query VIOS sensors, and use the RTVI VLM microservice.
 skills:
-  - path: skills/
-    catalog_dir: video-search-and-summarization
+  - path: skills/vss-ask-video/
+    catalog_dir: vss-ask-video
+  - path: skills/vss-deploy-dense-captioning/
+    catalog_dir: vss-deploy-dense-captioning
+  - path: skills/vss-deploy-detection-tracking-2d/
+    catalog_dir: vss-deploy-detection-tracking-2d
+  - path: skills/vss-deploy-detection-tracking-3d/
+    catalog_dir: vss-deploy-detection-tracking-3d
+  - path: skills/vss-deploy-profile/
+    catalog_dir: vss-deploy-profile
+  - path: skills/vss-deploy-video-embedding/
+    catalog_dir: vss-deploy-video-embedding
+  - path: skills/vss-generate-video-calibration/
+    catalog_dir: vss-generate-video-calibration
+  - path: skills/vss-generate-video-report/
+    catalog_dir: vss-generate-video-report
+  - path: skills/vss-manage-alerts/
+    catalog_dir: vss-manage-alerts
+  - path: skills/vss-manage-video-io-storage/
+    catalog_dir: vss-manage-video-io-storage
+  - path: skills/vss-query-analytics/
+    catalog_dir: vss-query-analytics
+  - path: skills/vss-search-archive/
+    catalog_dir: vss-search-archive
+  - path: skills/vss-setup-behavior-analytics/
+    catalog_dir: vss-setup-behavior-analytics
+  - path: skills/vss-setup-video-analytics-api/
+    catalog_dir: vss-setup-video-analytics-api
+  - path: skills/vss-summarize-video/
+    catalog_dir: vss-summarize-video
