@@ -68,41 +68,39 @@ done
 
 # Available Skills table — emit structured rows, aggregate by name, then format.
 # TSV columns (tab-separated):
-#   sort_key | name | description | skill_count | source_cell | version_cell | is_manual
+#   sort_key | name | description | skills_cell | is_manual
+# `skills_cell` is a backtick-quoted, comma-separated list of skill catalog
+# directories, each rendered as a markdown link to skills/<dir>/. Replaces
+# the prior Source + Version columns; Source links pointed at only the
+# primary skill (misleading for multi-skill products) and Version cells
+# rendered as em dashes whenever VERSIONS_FILE was unpopulated.
 SKILLS_ROWS=/tmp/skills-rows.tsv
 truncate -s 0 "$SKILLS_ROWS"
 
 for i in $kept_indices; do
   name=$(yq -r ".components[$i].name" "$CONFIG")
   description=$(yq -r ".components[$i].description" "$CONFIG" | tr -d '\n' | sed 's/  */ /g; s/^ //; s/ $//')
-  repo=$(yq -r ".components[$i].repo" "$CONFIG")
-  ref=$(yq -r ".components[$i].ref // \"main\"" "$CONFIG")
-  primary_path=$(yq -r ".components[$i].skills[0].path" "$CONFIG")
-  primary_path=${primary_path%/}
 
-  skill_count=$(component_skill_count "$i")
-
-  slug=$(echo "$name" | tr 'A-Z ' 'a-z-')
-  version_cell="—"
-  if [ -s "$VERSIONS_FILE" ]; then
-    if version_line=$(grep "^${slug}|" "$VERSIONS_FILE"); then
-      IFS='|' read -r _ short_sha full_sha date sha_repo <<< "$version_line"
-      version_cell="[\`${short_sha}\`](https://github.com/${sha_repo}/commit/${full_sha}) · ${date}"
+  # Build the comma-separated skills list: one link per catalog_dir that
+  # currently has at least one verified SKILL.md in the catalog.
+  skills_cell=""
+  while read -r catalog_dir; do
+    if [ -d "skills/$catalog_dir" ] && [ -n "$(find "skills/$catalog_dir" -name SKILL.md -type f 2>/dev/null | head -1)" ]; then
+      skills_cell="${skills_cell}[\`${catalog_dir}\`](skills/${catalog_dir}), "
     fi
-  fi
-
-  source_cell="[Source](https://github.com/${repo}/tree/${ref}/${primary_path})"
+  done < <(yq -r ".components[$i].skills[].catalog_dir" "$CONFIG")
+  skills_cell=${skills_cell%, }
 
   sort_key=$(echo "$name" | tr 'A-Z' 'a-z')
-  printf '%s\t%s\t%s\t%d\t%s\t%s\t%d\n' \
-    "$sort_key" "$name" "$description" "$skill_count" "$source_cell" "$version_cell" 0 \
+  printf '%s\t%s\t%s\t%s\t%d\n' \
+    "$sort_key" "$name" "$description" "$skills_cell" 0 \
     >> "$SKILLS_ROWS"
 done
 
 # TEMPORARY — remove after Computex 2026. Append rows for manually-staged
-# products (no upstream sync); Source and Version cells render as em dashes.
-# These bypass the kept_indices verified-skills filter intentionally — they
-# live in this catalog only as a stopgap until their upstream goes public.
+# products (no upstream sync). These bypass the kept_indices verified-skills
+# filter intentionally — they live in this catalog only as a stopgap until
+# their upstream goes public.
 manual_count=0
 if [ -f "$MANUAL_CONFIG" ]; then
   manual_count=$(yq '.components | length' "$MANUAL_CONFIG")
@@ -111,50 +109,50 @@ if [ -f "$MANUAL_CONFIG" ]; then
     description=$(yq -r ".components[$i].description" "$MANUAL_CONFIG" | tr -d '\n' | sed 's/  */ /g; s/^ //; s/ $//')
 
     dir_count=$(yq -r ".components[$i].catalog_dirs | length" "$MANUAL_CONFIG")
-    skill_count=0
+    skills_cell=""
     for j in $(seq 0 $((dir_count - 1))); do
       d=$(yq -r ".components[$i].catalog_dirs[$j]" "$MANUAL_CONFIG")
       if [ -d "skills/$d" ]; then
-        cnt=$(find "skills/$d" -name SKILL.md -type f 2>/dev/null | wc -l | tr -d ' ')
-        skill_count=$((skill_count + cnt))
+        skills_cell="${skills_cell}[\`${d}\`](skills/${d}), "
       fi
     done
+    skills_cell=${skills_cell%, }
 
     sort_key=$(echo "$name" | tr 'A-Z' 'a-z')
-    printf '%s\t%s\t%s\t%d\t%s\t%s\t%d\n' \
-      "$sort_key" "$name" "$description" "$skill_count" "—" "—" 1 \
+    printf '%s\t%s\t%s\t%s\t%d\n' \
+      "$sort_key" "$name" "$description" "$skills_cell" 1 \
       >> "$SKILLS_ROWS"
   done
 fi
 
-# Aggregation pass: group rows by sort_key (lowercase name), sum their skill
-# counts, and prefer the synced row's description / source / version cells
-# (the manual ones default to em dash).
+# Aggregation pass: group rows by sort_key (lowercase name). Concatenate
+# skill links when synced + manual entries share the same product name
+# (e.g., Physical AI = 5 manual + 2 synced — one row, all 7 listed).
+# Prefer the synced row's description over the manual row's.
 {
-  echo "| Product | Description | Skills | Source | Version |"
-  echo "|---------|-------------|:------:|--------|---------|"
+  echo "| Product | Description | Skills |"
+  echo "|---------|-------------|--------|"
   sort -t$'\t' -k1,1 "$SKILLS_ROWS" | awk -F'\t' '
     {
-      sk = $1; name = $2; desc = $3; cnt = $4 + 0
-      src = $5; ver = $6; man = $7 + 0
+      sk = $1; name = $2; desc = $3; skills = $4; man = $5 + 0
       if (!(sk in seen)) {
         seen[sk] = 1
         order[++n] = sk
         s_name[sk] = name
         s_desc[sk] = desc
-        s_count[sk] = cnt
-        s_src[sk] = src
-        s_ver[sk] = ver
+        s_skills[sk] = skills
         s_man[sk] = man
       } else {
-        # Sum skill count across all entries that share this name.
-        s_count[sk] += cnt
-        # Prefer non-manual entry for display name, description, source, version.
+        # Merge skill lists across entries sharing this name.
+        if (s_skills[sk] == "" || s_skills[sk] == "—") {
+          s_skills[sk] = skills
+        } else if (skills != "" && skills != "—") {
+          s_skills[sk] = s_skills[sk] ", " skills
+        }
+        # Prefer non-manual entry for display name and description.
         if (man == 0 && s_man[sk] == 1) {
           s_name[sk] = name
           s_desc[sk] = desc
-          s_src[sk] = src
-          s_ver[sk] = ver
           s_man[sk] = 0
         }
       }
@@ -162,8 +160,8 @@ fi
     END {
       for (i = 1; i <= n; i++) {
         sk = order[i]
-        printf "| **%s** | %s | %d | %s | %s |\n", \
-          s_name[sk], s_desc[sk], s_count[sk], s_src[sk], s_ver[sk]
+        printf "| **%s** | %s | %s |\n", \
+          s_name[sk], s_desc[sk], s_skills[sk]
       }
     }
   '
