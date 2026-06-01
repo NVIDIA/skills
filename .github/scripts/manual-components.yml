@@ -15,7 +15,7 @@
 
 components:
   - name: Physical AI
-    description: Physical AI development — Omniverse USD/Kit workflows (CAD-to-SimReady conversion, realtime viewer orchestration, USD performance tuning), infrastructure setup for synthetic data generation and resilient scaling, and neural reconstruction (NuRec/NRE).
+    description: Physical AI skills for simulation, synthetic data generation, training, validation and deployment and more.
     catalog_dirs:
       - omniverse-cad-to-simready
       - omniverse-realtime-viewer
