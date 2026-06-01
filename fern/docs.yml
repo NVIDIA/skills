@@ -11,9 +11,8 @@ title: NVIDIA Skill Documentation
 global-theme: nvidia
 
 navbar-links:
-  - type: minimal
-    href: https://github.com/NVIDIA/skills
-    text: GitHub
+  - type: github
+    value: https://github.com/NVIDIA/skills
 
 logo:
   right-text: Skills
