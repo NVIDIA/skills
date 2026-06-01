@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: cuFOLIO
+repo: NVIDIA-AI-Blueprints/cuFOLIO
+description: GPU-accelerated Mean-CVaR portfolio optimization with NVIDIA cuOpt — CVaR optimization, efficient frontier, scenario generation, backtesting, and rebalancing.
+skills:
+  - path: skills/cufolio/
+    catalog_dir: cufolio
