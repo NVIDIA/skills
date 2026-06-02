@@ -1,0 +1,212 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# Generate and validate the catalog-wide metadata.json and skills.sh.json.
+#
+# Modes:
+#   pull_request:     run --check; fail on drift or schema/taxonomy errors.
+#   workflow_dispatch: regenerate (with AI enrichment) and open a PR if files
+#                      changed; open or update a tracking issue on validation
+#                      failure.
+#   workflow_run:     fires after Sync Skills succeeds on main; behaves like
+#                      workflow_dispatch.
+
+name: Generate Skill Metadata
+
+on:
+  pull_request:
+    paths:
+      - "skills/**"
+      - ".github/scripts/marketplace/**"
+      - ".github/workflows/generate-skill-metadata.yml"
+      - "components.d/**"
+      - "skills.sh.json"
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Sync Skills from Product Repos"]
+    types:
+      - completed
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: generate-skill-metadata-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # ---------------------------------------------------------------------
+  # PR mode: cheap, deterministic check. Fails on drift or invalid output.
+  # ---------------------------------------------------------------------
+  check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install Python deps
+        run: pip install --upgrade pyyaml jsonschema
+
+      - name: Validate (no AI; checked-in files must be byte-stable)
+        run: python3 .github/scripts/marketplace/generate-skill-metadata.py --check --no-ai
+
+  # ---------------------------------------------------------------------
+  # Regenerate mode: dispatch or post-sync. AI enrichment allowed.
+  # ---------------------------------------------------------------------
+  regenerate:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install Python deps
+        run: pip install --upgrade pyyaml jsonschema requests
+
+      - name: Run generator
+        id: generate
+        env:
+          INFERENCE_API_KEY: ${{ secrets.INFERENCE_API_KEY }}
+          INFERENCE_API_URL: ${{ vars.INFERENCE_API_URL }}
+          INFERENCE_MODEL: ${{ vars.INFERENCE_MODEL }}
+        run: |
+          set -o pipefail
+          python3 .github/scripts/marketplace/generate-skill-metadata.py 2>&1 | tee /tmp/generator.log
+          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      # ---- Failure path: open or update a tracking issue --------------
+      - name: Open or update validation issue
+        if: steps.generate.outputs.exit_code != '0'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const log = fs.readFileSync('/tmp/generator.log', 'utf8');
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const trigger = context.eventName;
+            const truncated = log.length > 60000 ? log.slice(0, 60000) + '\n…(truncated)' : log;
+            const title = '[skill-metadata] generator validation failed';
+            const body = [
+              `Validation failed in workflow run: ${runUrl}`,
+              ``,
+              `Trigger: \`${trigger}\``,
+              ``,
+              `cc @jim-NVIDIA @jasonNVIDIA`,
+              ``,
+              `<details><summary>generator log</summary>`,
+              ``,
+              '```',
+              truncated,
+              '```',
+              ``,
+              `</details>`,
+            ].join('\n');
+
+            const search = await github.rest.search.issuesAndPullRequests({
+              q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open in:title "[skill-metadata] generator validation failed"`,
+            });
+            if (search.data.total_count > 0) {
+              const existing = search.data.items[0];
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body,
+              });
+              core.setFailed(`Validation failed; updated issue #${existing.number}.`);
+            } else {
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['skill-metadata', 'automation'],
+              });
+              core.setFailed(`Validation failed; opened issue #${created.data.number}.`);
+            }
+
+      # ---- Success path: open a PR if generated files changed ---------
+      - name: Detect changes
+        if: steps.generate.outputs.exit_code == '0'
+        id: changes
+        run: |
+          if git status --porcelain \
+              .github/scripts/marketplace/metadata.json \
+              skills.sh.json | grep -q .; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create regeneration PR
+        if: steps.generate.outputs.exit_code == '0' && steps.changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: bot/regenerate-skill-metadata
+          base: main
+          commit-message: |
+            chore(metadata): regenerate metadata.json and skills.sh.json
+
+            Generated by .github/workflows/generate-skill-metadata.yml.
+          title: "chore(metadata): regenerate metadata.json and skills.sh.json"
+          body: |
+            Auto-regenerated by [generate-skill-metadata workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+
+            - Trigger: `${{ github.event_name }}`
+            - Generator log: see workflow run.
+
+            cc @jim-NVIDIA @jasonNVIDIA
+          labels: |
+            skill-metadata
+            automation
+          delete-branch: true
+
+      - name: Close any open validation issue
+        if: steps.generate.outputs.exit_code == '0'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const search = await github.rest.search.issuesAndPullRequests({
+              q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open in:title "[skill-metadata] generator validation failed"`,
+            });
+            for (const item of search.data.items) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: item.number,
+                body: `Latest run succeeded: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}. Closing.`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: item.number,
+                state: 'closed',
+              });
+            }

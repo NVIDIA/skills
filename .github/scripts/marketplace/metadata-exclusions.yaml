@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# Temporarily-excluded skills.
+#
+# Skills listed here will NOT appear in metadata.json or skills.sh.json.
+# They are tracked separately in CI as "excluded" (not removed/unresolved).
+#
+# Identify skills by their directory name under skills/ (the SKILL.md `name`
+# frontmatter value, which equals the directory name by convention).
+#
+# Example:
+#   exclusions:
+#     - name: experimental-skill-foo
+#       reason: Awaiting OSRB review.
+#       owner: "@example-team"
+#     - name: in-flight-rename
+#       reason: Skill rename in flight; re-include after content stabilizes.
+#       owner: "@jasonNVIDIA"
+#
+# Schema:
+#   exclusions:
+#     - name: <skill-directory-name>           # required
+#       reason: <one-line explanation>          # required
+#       owner: <github-handle-or-team>          # required
+#       expires: <YYYY-MM-DD or omitted>        # optional; informational only
+
+exclusions: []

@@ -1,0 +1,105 @@
+{
+  "$comment": "SPDX-License-Identifier: Apache-2.0. Copyright (c) 2026 NVIDIA Corporation. Source of truth for skills.sh.json group titles, descriptions, and order. Subdomain slugs must match the catalog.subdomain enum in metadata.schema.json. Groups are emitted in alphabetical order by title.",
+  "subdomains": {
+    "agentic-ai": {
+      "title": "Agentic AI",
+      "description": "Build and operate agentic systems, including RAG workflows, evaluation harnesses, tool use, policy, sandboxing, agent configuration, and agent workflow automation."
+    },
+    "ai-factory": {
+      "title": "AI Factory",
+      "description": "Plan, deploy, and operate AI-factory-scale infrastructure for training, fine-tuning, and serving foundation models."
+    },
+    "ai-storage": {
+      "title": "AI Storage",
+      "description": "Design, deploy, and operate accelerated storage and data-pipeline infrastructure for AI training and inference workloads."
+    },
+    "av-simulation": {
+      "title": "AV Simulation",
+      "description": "Author and run autonomous-vehicle simulation, scenario generation, and validation workflows."
+    },
+    "conversational-ai": {
+      "title": "Conversational AI",
+      "description": "Build conversational systems including ASR, TTS, dialogue, and voice-agent stacks."
+    },
+    "cybersecurity": {
+      "title": "Cybersecurity",
+      "description": "Apply accelerated AI to security operations, threat detection, response, and policy enforcement."
+    },
+    "data-science": {
+      "title": "Data Science",
+      "description": "Prepare, analyze, explore, and model data for AI and accelerated analytics workflows that are not specific to one training, inference, or agent task."
+    },
+    "decision-optimization": {
+      "title": "Decision Optimization",
+      "description": "Formulate and solve routing, scheduling, and numerical optimization problems using optimization solvers, APIs, services, and deployment workflows."
+    },
+    "digital-twins": {
+      "title": "Digital Twins",
+      "description": "Author, simulate, and operate physically based digital-twin scenes and pipelines."
+    },
+    "extended-reality": {
+      "title": "Extended Reality",
+      "description": "Develop AR, VR, and XR experiences, devices, and runtime services."
+    },
+    "gaming": {
+      "title": "Gaming",
+      "description": "Build, optimize, and ship gaming engines, runtime SDKs, and player-facing graphics features."
+    },
+    "gpu-development": {
+      "title": "GPU Development",
+      "description": "Develop, tune, profile, and integrate GPU kernels and accelerated code, including CUDA-adjacent workflows, autotuning, low-level performance work, and framework integration."
+    },
+    "gpu-virtualization": {
+      "title": "GPU Virtualization",
+      "description": "Configure, deploy, and operate vGPU and shared-GPU infrastructure for virtualized environments."
+    },
+    "in-vehicle-computing": {
+      "title": "In-Vehicle Computing",
+      "description": "Build, validate, and deploy compute, perception, and software stacks running inside the vehicle."
+    },
+    "inference-ai": {
+      "title": "Inference AI",
+      "description": "Deploy, serve, optimize, and evaluate models for production inference, including quantization, runtime performance, and serving configuration."
+    },
+    "infrastructure": {
+      "title": "Infrastructure",
+      "description": "Provision, operate, and harden GPU compute, networking, and platform infrastructure."
+    },
+    "networking": {
+      "title": "Networking",
+      "description": "Design, deploy, and operate accelerated networking fabrics, NICs, switches, and SDKs for AI and HPC."
+    },
+    "physical-ai": {
+      "title": "Physical AI",
+      "description": "Build, train, and deploy embodied AI systems that interact with the physical world."
+    },
+    "quantum-computing": {
+      "title": "Quantum Computing",
+      "description": "Build, simulate, and deploy quantum and hybrid quantum-classical workloads."
+    },
+    "robotics": {
+      "title": "Robotics",
+      "description": "Build, validate, and deploy robotics perception, manipulation, navigation, and policy stacks."
+    },
+    "robotics-simulation": {
+      "title": "Robotics Simulation",
+      "description": "Author and run high-fidelity robotics simulation, synthetic data generation, and policy validation."
+    },
+    "scientific-visualization": {
+      "title": "Scientific Visualization",
+      "description": "Author and accelerate scientific-visualization pipelines for HPC, research, and engineering workloads."
+    },
+    "simulation-modeling": {
+      "title": "Simulation Modeling",
+      "description": "Build and accelerate physics-based simulation, surrogate modeling, and engineering analysis."
+    },
+    "training-ai": {
+      "title": "Training AI",
+      "description": "Build, validate, tune, and maintain large-scale model training workflows, including distributed training, model support, training validation, performance tuning, and training-stack CI."
+    },
+    "vision-ai": {
+      "title": "Vision AI",
+      "description": "Build vision and video AI workflows for analytics, search, summarization, alerts, real-time understanding, and model integration."
+    }
+  }
+}
