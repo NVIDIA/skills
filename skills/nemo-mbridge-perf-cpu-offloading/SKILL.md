@@ -106,61 +106,6 @@ Activation offloading is blocked for Qwen3-30B-A3B and similar large MoE
 models. The PP=1 constraint means each GPU holds all 48 layers; model
 weights + optimizer states alone (~70 GB) exceed H100 80 GB capacity.
 
-## Minimal Working Config
-
-### Optimizer offload (50%, balanced)
-
-```python
-cfg.optimizer.optimizer_cpu_offload = True
-cfg.optimizer.optimizer_offload_fraction = 0.5
-```
-
-### Optimizer offload (100% + overlap, max savings)
-
-```python
-cfg.optimizer.optimizer_cpu_offload = True
-cfg.optimizer.optimizer_offload_fraction = 1.0
-cfg.optimizer.overlap_cpu_optimizer_d2h_h2d = True
-```
-
-### Activation offload (small model, PP=1)
-
-```python
-cfg.model.cpu_offloading = True
-cfg.model.cpu_offloading_num_layers = 16
-cfg.model.cpu_offloading_activations = True
-cfg.model.cpu_offloading_weights = False
-cfg.model.pipeline_model_parallel_size = 1
-cfg.model.recompute_granularity = None
-```
-
-### Weight offload only (small model, PP=1)
-
-```python
-cfg.model.cpu_offloading = True
-cfg.model.cpu_offloading_num_layers = 8
-cfg.model.cpu_offloading_activations = False
-cfg.model.cpu_offloading_weights = True
-cfg.model.pipeline_model_parallel_size = 1
-cfg.model.recompute_granularity = None
-```
-
-### Both activations and weights (small model, PP=1)
-
-```python
-cfg.model.cpu_offloading = True
-cfg.model.cpu_offloading_num_layers = 8
-cfg.model.cpu_offloading_activations = True
-cfg.model.cpu_offloading_weights = True
-cfg.model.pipeline_model_parallel_size = 1
-cfg.model.recompute_granularity = None
-```
-
-Weight offloading and activation offloading share the same constraints (PP=1,
-no recompute, no CUDA graphs). Weight offloading has not been tested in
-the Qwen3-30B-A3B experiments — the measured results cover optimizer
-offloading only.
-
 ## Minimal Runnable Command
 
 ```bash
@@ -259,26 +204,6 @@ uv run python -m pytest \
         if self.config.cpu_offloading and self.config.cpu_offloading_activations:
             x.activation_offloading = True
         x, _ = self.linear_out(x)
-```
-
-### MCore model_parallel_config fields
-
-```3rdparty/Megatron-LM/megatron/core/model_parallel_config.py
-    cpu_offloading: bool = False
-    cpu_offloading_num_layers: int = 0
-    cpu_offloading_activations: bool = True
-    cpu_offloading_weights: bool = False
-    cpu_offloading_double_buffering: bool = False
-    cpu_offloading_retain_pinned_cpu_buffers: bool = False
-```
-
-### MCore optimizer offload config
-
-```3rdparty/Megatron-LM/megatron/core/optimizer/optimizer_config.py
-    optimizer_cpu_offload: bool = False
-    optimizer_offload_fraction: float = 0.0
-    use_torch_optimizer_for_cpu_offload: bool = False
-    overlap_cpu_optimizer_d2h_h2d: bool = False
 ```
 
 ## Failure Diagnosis

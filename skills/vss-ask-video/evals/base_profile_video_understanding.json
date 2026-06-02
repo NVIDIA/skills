@@ -1,8 +1,8 @@
 {
   "skills": [
-    "vss-ask-video"
+    "vss-ask-video",
+    "vss-deploy-profile"
   ],
-  "profile": "base",
   "resources": {
     "platforms": {
       "L40S": {
@@ -10,8 +10,17 @@
       }
     }
   },
-  "env": "VSS **base** profile with the **`video_understanding` tool** exposed on the VSS agent. VSS agent HTTP API on **8000** (e.g. `http://localhost:8000/docs`), VST reachable at http://localhost:30888/vst/api/v1. Use **remote-all** (remote LLM + VLM) so no local NIMs are required.Set Brev secure-link env vars if checks validate `localhost` media URLs. The skill's canonical pattern is `POST /generate` with `input_message` that instructs the agent to use **`video_understanding`** to answer a **visual** question about a **named sensor** (see `skills/vss-ask-video/SKILL.md`).",
   "expects": [
+    {
+      "query": "Deploy the VSS **base** profile on `{{platform}}` via `/vss-deploy-profile -p base`. Run autonomously.\n\n**Environment & prerequisites:** VSS **base** profile with the **`video_understanding` tool** exposed on the VSS agent. VSS agent HTTP API on **8000** (e.g. `http://localhost:8000/docs`), VST reachable at http://localhost:30888/vst/api/v1. Use **remote-all** (remote LLM + VLM) so no local NIMs are required.Set Brev secure-link env vars if checks validate `localhost` media URLs. The skill's canonical pattern is `POST /generate` with `input_message` that instructs the agent to use **`video_understanding`** to answer a **visual** question about a **named sensor** (see `skills/vss-ask-video/SKILL.md`).",
+      "checks": [
+        "`curl -sf --max-time 15 http://localhost:8000/docs` returns exit 0 (Agent REST API responsive)",
+        "`curl -sf --max-time 15 http://localhost:3000/` returns exit 0 (Agent UI responsive)",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-agent` returns exit 0",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-agent-ui` returns exit 0",
+        "`docker ps --format '{{.Names}}' | grep -qx redis` returns exit 0"
+      ]
+    },
     {
       "query": "Check if the warehouse_safety_0001 video is already uploaded on VST. If it doesn't exist, upload the warehouse_safety_0001 video to VIOS with timestamp 2025-01-01T00:00:00.000Z. If it exists, skip the uploading.",
       "checks": [

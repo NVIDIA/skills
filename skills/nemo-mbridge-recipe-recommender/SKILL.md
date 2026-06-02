@@ -18,6 +18,26 @@ config, adjust parallelism, and avoid common pitfalls.
 3. Recommend the recipe function name + entry-point command.
 4. Provide adjustment advice (parallelism resizing, batch tuning, pitfalls).
 
+## First Answer Checklist
+
+When recommending recipes, always include these distinctions before the long
+index details:
+
+1. **Library recipes** under `src/megatron/bridge/recipes/` are for functional
+   training and use `scripts/training/run_recipe.py`.
+2. **Performance recipes** under `scripts/performance/` are for upper-bound
+   throughput benchmarks. They use mock data and should not be presented as
+   production training recipes.
+3. For a first-time Bridge smoke test, recommend `llama3_8b_sft_config` with
+   mock data via `--dataset llm-pretrain-mock`. Do not use `llm-finetune` for
+   the setup-only tryout unless the user specifically asks for an SFT data path.
+4. For normal SFT recommendations, use `--dataset llm-finetune`; for pretrain
+   and mock validation recommendations, use `--dataset llm-pretrain-mock`.
+5. After the recipe and dataset, give the required resizing rules: TP must
+   divide `num_key_value_heads`, keep TP within one node unless using
+   NVL72-class interconnect, enable SP when TP > 1, configure CP for long
+   context, DP is implicit, and reduce `micro_batch_size` first on OOM.
+
 ---
 
 ## Entry Points
@@ -53,10 +73,7 @@ python scripts/performance/run_script.py \
     --data mock
 ```
 
-> **Perf recipes are NOT fully validated for correctness.** Most conversations
-> and testing were on mock data. They are designed for **upper-bound throughput
-> measurement**, not production training. Always validate loss curves and
-> convergence independently.
+See the Performance Recipe Index for important caveats before using these for anything beyond throughput benchmarking.
 
 ---
 

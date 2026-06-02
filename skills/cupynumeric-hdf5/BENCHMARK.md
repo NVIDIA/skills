@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `cupynumeric-hdf5`
-- Evaluation date: 2026-05-29
+- Evaluation date: 2026-06-02
 - NVSkills-Eval profile: `external`
 - Environment: `local`
 - Dataset: 17 evaluation tasks
@@ -54,11 +54,11 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+6%) | 100% (+0%) |
-| Correctness | 8 | 90% (+4%) | 93% (+9%) |
-| Discoverability | 8 | 80% (+17%) | 80% (+7%) |
-| Effectiveness | 8 | 90% (+4%) | 92% (+16%) |
-| Efficiency | 8 | 80% (+24%) | 73% (+7%) |
+| Security | 8 | 100% (+3%) | 100% (+0%) |
+| Correctness | 8 | 92% (+9%) | 96% (+12%) |
+| Discoverability | 8 | 88% (+20%) | 85% (+11%) |
+| Effectiveness | 8 | 93% (+12%) | 94% (+20%) |
+| Efficiency | 8 | 86% (+27%) | 79% (+12%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 

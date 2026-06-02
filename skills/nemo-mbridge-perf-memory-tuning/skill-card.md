@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers diagnosing GPU out-of-memory errors during distributed LLM training with Megatron Bridge, applying memory reduction techniques such as expandable segments, parallelism resizing, and activation recompute to eliminate OOM failures and optimize GPU memory utilization. <br>
+Developers and engineers diagnosing GPU out-of-memory failures during LLM training, reducing peak memory usage, or optimizing parallelism configurations in Megatron Bridge workloads. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,19 +19,26 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Megatron Bridge Performance Tuning Guide](docs/performance-guide.md) <br>
-- [Megatron Bridge Parallelisms Documentation](docs/parallelisms.md) <br>
-- [Megatron Bridge Documentation](https://docs.nvidia.com/nemo/megatron-bridge/latest/) <br>
+- [Performance Tuning Guide](docs/performance-guide.md) <br>
+- [Parallelism Documentation](docs/parallelisms.md) <br>
+- [Activation Recompute Skill](skills/nemo-mbridge-perf-activation-recompute/SKILL.md) <br>
+- [Megatron FSDP Skill](skills/nemo-mbridge-perf-megatron-fsdp/SKILL.md) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Configuration instructions, Shell commands, Analysis] <br>
-**Output Format:** [Markdown with inline bash and Python code blocks] <br>
+**Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
+## Evaluation Agents Used: <br>
+- claude-code <br>
+- codex <br>
+
+
+
 ## Evaluation Tasks: <br>
-Evaluated via NVSkills-Eval 3-Tier framework with external profile. Tier 1 static validation (9 checks), Tier 2 deduplication (2 checks). <br>
+Evaluated against 1 evaluation task with 2 attempts per task; pass threshold 50%. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -41,17 +48,28 @@ Reported benchmark dimensions: <br>
 - Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
+Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
+- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
+- `accuracy`: Grades final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
+- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `token_efficiency`: Compares token usage with and without the skill. <br>
+
 
 
 ## Evaluation Results: <br>
-| Tier | Checks | Findings | Status |
-|---|---:|---:|---|
-| Tier 1 Static Validation | 9 | 13 | Findings reported |
-| Tier 2 Deduplication | 2 | 0 | Passed |
-| Tier 3 Live Agent | — | — | Not available |
+| Dimension | Num | `claude-code` | `codex` |
+|---|---:|---:|---:|
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 100% (+0%) | 97% (+0%) |
+| Discoverability | 2 | 100% (+0%) | 72% (+0%) |
+| Effectiveness | 2 | 94% (-1%) | 93% (-4%) |
+| Efficiency | 2 | 92% (-0%) | 60% (-0%) |
 
 ## Skill Version(s): <br>
-v0.2.0rc6-1468-ga2403698 (source: git describe) <br>
+v0.2.0rc6-1528-gb0f64d72 (source: git describe) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

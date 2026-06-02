@@ -11,6 +11,21 @@ For how they differ, the arg mapping tables, gotchas, and translation script, se
 
 - @docs/megatron-lm-to-megatron-bridge.md
 
+## First Answer Checklist
+
+For MLM-vs-Bridge correlation questions, always name these items up front:
+
+1. Bridge recipe: `vanilla_gpt_pretrain_config`.
+2. Bridge entry point: `scripts/training/run_recipe.py`.
+3. MLM entry point: `3rdparty/Megatron-LM/pretrain_gpt.py`.
+4. Launch wrapper for both: `uv run python -m torch.distributed.run`.
+5. Fresh-run cleanup: `rm -rf nemo_experiments` before the Bridge run.
+
+Also state that MLM needs
+`PYTHONPATH=3rdparty/Megatron-LM:$PYTHONPATH`, matched Bridge and MLM losses
+should agree within BF16 rounding, and files under `3rdparty/Megatron-LM/`
+should not be modified from this repo.
+
 ## Correlation Testing
 
 Use `vanilla_gpt_pretrain_config` for loss-correlation testing. This recipe uses

@@ -9,6 +9,24 @@ when_to_use: Writing or converting Slurm sbatch scripts, scaling to multiple nod
 
 Convert single-node `uv run python -m torch.distributed.run` commands into multi-node Slurm sbatch scripts with Enroot container support, and debug common multi-node failures.
 
+## First Answer Checklist
+
+When converting or debugging Bridge multi-node jobs, answer in this order:
+
+1. Prefer the **srun-native** launch shape for Bridge scripts that reach
+   `initialize.py`: `#SBATCH --ntasks-per-node=8` and a direct `srun ... uv run
+   python <script> ...` launch. Do not wrap these jobs in
+   `python -m torch.distributed.run`.
+2. State that Bridge derives `RANK`, `WORLD_SIZE`, `LOCAL_RANK`,
+   `MASTER_ADDR`, and `MASTER_PORT` from SLURM variables during
+   `initialize.py` distributed init.
+3. Require shared paths and matching container mounts for the repo, data, logs,
+   `HF_HOME`, `UV_CACHE_DIR`, and `NEMO_HOME`.
+4. For NCCL timeout reports, do these first-log checks before speculating:
+   - grep for real errors while filtering warning/frame noise
+   - inspect `Failures:` to find the first failed rank and node
+   - grep for `ncclUniqueId`, `timeout`, or `crash on rank 0`
+
 ## Two Approaches: srun-native vs uv run torch.distributed
 
 | Approach | `ntasks-per-node` | Process spawning | Best for |
@@ -20,34 +38,9 @@ Convert single-node `uv run python -m torch.distributed.run` commands into multi
 
 ## Cluster Environment
 
-### Container
+Use a shared filesystem for the repository, data, logs, `HF_HOME`, `UV_CACHE_DIR`, and `NEMO_HOME`. `NEMO_HOME` must not use the container-local default (`/root/.cache/nemo`) for multi-node SFT/PEFT jobs, because packed-sequence data prepared on node 0 must be visible to the other nodes.
 
-```bash
-CONTAINER_IMAGE="<PATH_TO_YOUR_CONTAINER>.sqsh"
-CONTAINER_MOUNTS="<SHARED_FS>:<SHARED_FS>,<PATH_TO_MEGATRON_BRIDGE>:/opt/Megatron-Bridge,<PATH_TO_DATA>:/opt/data"
-```
-
-### Standard Paths
-
-```bash
-WORKDIR="/opt/Megatron-Bridge"
-DATA_PATH="<PATH_TO_PREPROCESSED_DATA>/dclm_01_01_text_document"
-```
-
-### Tokens / Caches
-
-```bash
-export GH_TOKEN=<YOUR_GITHUB_TOKEN>
-export HF_TOKEN=<YOUR_HF_TOKEN>
-export HF_HOME=<SHARED_FS>/HF_HOME
-export UV_CACHE_DIR="<SHARED_FS>/uv_cache"
-export NEMO_HOME="<SHARED_FS>/cache/nemo"
-```
-
-**Important**: `NEMO_HOME` must point to a shared filesystem (e.g. Lustre) for multi-node SFT/PEFT jobs.
-The default (`/root/.cache/nemo`) is container-local and not shared across nodes.
-Without this, packed-sequence data files prepared on node 0 are invisible to other
-nodes, causing `TypeError: 'NoneType' object is not an iterator`.
+Keep credentials out of sbatch templates and logs. Provide `HF_TOKEN`, `GH_TOKEN`, and `WANDB_API_KEY` through the scheduler environment or a restricted secrets file, and never hardcode token values in the script body. For copy-paste environment and sbatch templates, read `references/templates.md`.
 
 ### Log Directory
 
@@ -75,27 +68,7 @@ Slurm spawns all processes directly. No `torch.distributed.run`, no TRAIN_CMD es
 
 ### Build and Launch
 
-Two-phase srun: first a single-process srun to populate the uv cache, then the full multi-node srun.
-
-```bash
-# Env exports at sbatch level (before srun)
-export TORCH_NCCL_AVOID_RECORD_STREAMS=1
-export NCCL_NVLS_ENABLE=0
-
-# Phase 1: Single-process uv sync to build/populate the shared cache
-srun --mpi=pmix -N 1 --ntasks=1 \
-  --container-image="$CONTAINER_IMAGE" \
-  --container-mounts="$CONTAINER_MOUNTS" \
-  --no-container-mount-home \
-  bash -c "cd $WORKDIR && uv sync"
-
-# Phase 2: Full multi-node run (uv sync is a fast no-op since cache is warm)
-srun --mpi=pmix \
-  --container-image="$CONTAINER_IMAGE" \
-  --container-mounts="$CONTAINER_MOUNTS" \
-  --no-container-mount-home \
-  bash -c "cd $WORKDIR && uv sync && uv run --no-sync python <script.py> <args>"
-```
+Use a two-phase `srun` pattern: first run a single-process `uv sync` to populate the shared cache, then launch the full multi-node job. The full copy-paste version lives in `references/templates.md`.
 
 ### srun-native Key Points
 
@@ -152,43 +125,11 @@ uv run python -m torch.distributed.run \
 
 Use the same two-phase pattern: first a single-process srun to warm the uv cache, then the full run.
 
-**Environment exports go inside TRAIN_CMD** (they must be set inside the container):
-
-```bash
-TRAIN_CMD="
-export CUDA_DEVICE_MAX_CONNECTIONS=1 && \
-export NVTE_ALLOW_NONDETERMINISTIC_ALGO=1 && \
-export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True && \
-export NCCL_NVLS_ENABLE=0 && \
-export GH_TOKEN=$GH_TOKEN && \
-export HF_TOKEN=$HF_TOKEN && \
-export HF_HOME=$HF_HOME && \
-export UV_CACHE_DIR=$UV_CACHE_DIR && \
-wandb login \$WANDB_API_KEY && \
-mkdir -p $LOGDIR && \
-cd $WORKDIR && \
-uv sync && \
-<training command here>
-"
-```
+Set runtime variables inside the container, but do not inject token values into a long `bash -c` string. Export credentials through the scheduler or source a restricted secrets file before the job starts. Keep `HF_HOME`, `UV_CACHE_DIR`, and `NEMO_HOME` on shared storage.
 
 ### 4. Launch (two-phase)
 
-```bash
-# Phase 1: Single-process uv sync to build/populate the shared cache
-srun --mpi=pmix -N 1 --ntasks=1 \
-  --container-image="$CONTAINER_IMAGE" \
-  --container-mounts="$CONTAINER_MOUNTS" \
-  --no-container-mount-home \
-  bash -c "cd $WORKDIR && uv sync"
-
-# Phase 2: Full multi-node run (uv sync in TRAIN_CMD is a fast no-op)
-srun --mpi=pmix --no-kill \
-  --container-image="$CONTAINER_IMAGE" \
-  --container-mounts="$CONTAINER_MOUNTS" \
-  --no-container-mount-home \
-  bash -c "$TRAIN_CMD" 2>&1 | tee "$LOGDIR/<prefix>_${SLURM_JOB_ID}.log"
-```
+Use the two-phase launch template in `references/templates.md`, keeping `#SBATCH --ntasks-per-node=1` for this legacy approach.
 
 ### 5. (Optional) Add Loss Extraction Footer
 

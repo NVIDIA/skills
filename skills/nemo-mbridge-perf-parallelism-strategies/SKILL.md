@@ -183,6 +183,14 @@ Example — TP=2, CP=1, EP=8, ETP=1, PP=1:
 When sizing slurm scripts, compute `--nodes` from `min_gpus` (or a
 multiple of it for higher throughput via DP/EDP).
 
+When answering MoE sizing prompts, include this checklist:
+
+- compute `min_gpus = PP * max(TP * CP, EP * ETP)` with the requested values
+- explicitly reject the wrong `PP * TP * CP * EP * ETP` full product
+- give both DP formulas: dense `world_size / (TP * PP * CP)` and MoE
+  `world_size / (PP * EP * ETP)`
+- mention TP topology, SP, CP divisibility, and long-sequence CP guidance
+
 ## Memory Estimation
 
 Without parallelism (70B model, FP16):

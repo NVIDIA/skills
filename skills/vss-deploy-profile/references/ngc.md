@@ -70,7 +70,7 @@ export NGC_CLI_API_KEY='<key>'
 echo "export NGC_CLI_API_KEY='<key>'" >> ~/.bashrc
 ```
 
-> Do not store the raw key in `TOOLS.md` or any workspace file.
+> Do not store the raw key in any workspace file.
 
 ---
 

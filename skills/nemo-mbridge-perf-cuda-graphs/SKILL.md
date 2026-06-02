@@ -7,7 +7,7 @@ when_to_use: Reducing host-driver overhead via CUDA graphs, or tracing a crash o
 
 # CUDA Graphs
 
-Stable docs: @docs/training/cuda-graphs.md
+Stable documentation: @docs/training/cuda-graphs.md
 Card: @skills/nemo-mbridge-perf-cuda-graphs/card.yaml
 
 ## What It Is

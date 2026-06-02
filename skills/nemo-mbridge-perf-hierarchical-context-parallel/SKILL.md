@@ -88,25 +88,7 @@ pg_collection = ProcessGroupCollection(
 
 ## Implementation Map
 
-### Config definition
-
-`hierarchical_context_parallel_sizes` is declared in `ModelParallelConfig`:
-
-```
-# 3rdparty/Megatron-LM/megatron/core/model_parallel_config.py
-hierarchical_context_parallel_sizes: Optional[list[int]] = None
-# For a2a+p2p, first value = a2a group size, second value = p2p group size.
-# Product must equal context_parallel_size.
-```
-
-`cp_comm_type` is declared in `TransformerConfig`:
-
-```
-# 3rdparty/Megatron-LM/megatron/core/transformer/transformer_config.py
-cp_comm_type: Optional[Union[str, List[str]]] = None
-# Can be per-layer (List[str]) or uniform (str).
-# Values: "p2p", "all_gather", "a2a", "a2a+p2p"
-```
+The code anchors above show the config declarations and argument validation.
 
 ### Validation (MCore)
 

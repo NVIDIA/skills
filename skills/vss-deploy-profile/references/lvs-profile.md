@@ -32,7 +32,7 @@ Container names below are the actual `container_name:` keys from `deploy/docker/
 | Redis | `redis` | 6379 | Cache |
 | Phoenix | `phoenix` | 6006 | Observability |
 
-Post-deploy readiness probe: `curl -sf http://${HOST_IP}:38111/v1/ready` should return exit 0 once `vss-lvs` is serving. The VSS Agent at `http://${HOST_IP}:8000/docs` is the cross-profile readiness signal; this one confirms the LVS-specific microservice.
+Post-deploy readiness probe: `curl -sf http://${HOST_IP}:38111/v1/ready` should return exit 0 once `vss-lvs` is serving. The VSS Agent at `http://${HOST_IP}:8000/health` is the cross-profile readiness signal; this one confirms the LVS-specific microservice.
 
 ## Default models
 

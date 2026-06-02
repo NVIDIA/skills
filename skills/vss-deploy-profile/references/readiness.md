@@ -38,6 +38,16 @@ inference NIMs, etc., on the ports the profile actually opens). Run those
 warmup) and only declare the deploy done once every documented endpoint
 returns the expected success exit code.
 
+**Cross-profile gate — the VSS Agent must answer on `:8000/health`.** Every
+profile runs the agent, so this probe is required regardless of profile. A
+`running` agent container does not mean the NAT-serve process is listening —
+it can be up while `:8000` never bound (config error, unreachable model
+endpoint), and Step 1 would still pass:
+
+```bash
+curl -sf --max-time 15 http://localhost:8000/health >/dev/null && echo "agent OK"
+```
+
 ## Step 3 — triage slow containers
 
 If any probe times out, dump `docker compose ps` and

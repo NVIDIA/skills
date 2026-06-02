@@ -1,5 +1,5 @@
 ## Description: <br>
-Practical guidance for training MoE vision-language models in Megatron Bridge, comparing FSDP and 3D-parallel approaches using rounded lessons from Qwen3-VL, Qwen3-Next, and other multimodal experiments. <br>
+Practical guidance for training MoE VLMs in Megatron Bridge, comparing FSDP and 3D-parallel approaches using rounded lessons from Qwen3-VL, Qwen3-Next, and other multimodal experiments. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training MoE vision-language models with Megatron Bridge, selecting between FSDP and 3D-parallel approaches and tuning performance on NVIDIA GPU systems. <br>
+Developers and engineers training Mixture-of-Experts vision-language models using Megatron Bridge, selecting between FSDP and 3D-parallel strategies and tuning performance on GB200 and B200 GPU systems. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,16 +19,24 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [MoE VLM Training Skill Definition](skills/nemo-mbridge-perf-moe-vlm-training/SKILL.md) <br>
 - [Performance Tuning Guide](docs/performance-guide.md) <br>
 - [Megatron Bridge Documentation](https://docs.nvidia.com/nemo/megatron-bridge/latest/) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Configuration instructions, Analysis] <br>
+**Output Type(s):** [Analysis, Configuration instructions] <br>
 **Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
+
+## Evaluation Agents Used: <br>
+- Claude Code (`claude-code`) <br>
+- Codex (`codex`) <br>
+
+
+
+## Evaluation Tasks: <br>
+Evaluated against 1 internal evaluation task with 2 attempts per task using the NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -38,10 +46,33 @@ Reported benchmark dimensions: <br>
 - Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
+Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
+- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
+- `accuracy`: Grades final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
+- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `token_efficiency`: Compares token usage with and without the skill. <br>
 
+
+
+## Evaluation Results: <br>
+| Dimension | Num | `claude-code` | `codex` |
+|---|---:|---:|---:|
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 100% (+0%) | 88% (+0%) |
+| Discoverability | 2 | 100% (+0%) | 62% (+0%) |
+| Effectiveness | 2 | 90% (+1%) | 86% (-1%) |
+| Efficiency | 2 | 93% (-0%) | 60% (-0%) |
+
+## Testing Completed: <br>
+**[x] Agent Red-Teaming** <br>
+**[ ] Network Security** <br>
+**[ ] Product Security** <br>
 
 ## Skill Version(s): <br>
-v0.2.0rc6-1467-g4644b92f (source: git describe) <br>
+97db3553 (source: git SHA, committed 2026-06-02) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
