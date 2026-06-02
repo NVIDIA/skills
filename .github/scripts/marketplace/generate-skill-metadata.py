@@ -434,9 +434,23 @@ class _AIClient:
         self,
         skill: Skill,
         component: dict | None,
-        missing_fields: list[str],
+        requested_fields: list[str],
         taxonomy: dict,
+        current_values: dict | None = None,
     ) -> dict:
+        """Ask the model to assign or review the given metadata fields.
+
+        Modes:
+        - Fill mode (``current_values is None``): every ``requested_fields``
+          entry is treated as missing; the model picks a value for each.
+        - Amend mode (``current_values`` provided): the model is shown the
+          existing value for each requested field and asked to either keep it
+          (return it verbatim) or change it to a better-fitting controlled
+          value if the new skill content warrants it.
+        Validation is identical in both modes — every requested key must be
+        returned with a non-empty string from the controlled vocabulary, no
+        extra keys, no ``UNRESOLVED`` placeholders.
+        """
         if not self.api_key:
             raise EnrichmentError(
                 "AI enrichment needed but INFERENCE_API_KEY is not set."
@@ -447,6 +461,7 @@ class _AIClient:
                 "the model name (no default is provided)."
             )
 
+        amend_mode = current_values is not None
         system = textwrap.dedent(
             """
             You assign NVIDIA skill metadata. You must:
@@ -461,28 +476,57 @@ class _AIClient:
             """
         ).strip()
 
-        controlled = {f: taxonomy[f]["values"] for f in missing_fields}
-        kinds = {f: taxonomy[f]["kind"] for f in missing_fields}
-        user = {
+        controlled = {f: taxonomy[f]["values"] for f in requested_fields}
+        kinds = {f: taxonomy[f]["kind"] for f in requested_fields}
+        user: dict = {
             "skill_path": skill.path,
             "skill_name": skill.name,
             "skill_description": skill.description,
             "skill_frontmatter": skill.frontmatter,
             "component": component or {},
             "skill_card_excerpt": (skill.skill_card or "")[:4000],
-            "missing_fields": missing_fields,
+            "requested_fields": requested_fields,
             "controlled_values_per_field": controlled,
             "field_kinds": kinds,
-            "instructions": (
+        }
+        if amend_mode:
+            user["existing_values"] = {
+                f: current_values.get(f) for f in requested_fields
+            }
+            user["mode"] = "amend"
+            user["instructions"] = (
+                "The skill's name and/or description has materially changed "
+                "since this metadata was assigned. Review each requested "
+                "field's existing value against the current skill content. "
+                "For each field, return either the existing value verbatim "
+                "(if it still fits the new content) or a different "
+                "controlled value (if the new content clearly warrants a "
+                "different choice). Prefer keeping the existing value; only "
+                "change a field when the new content makes a different "
+                "controlled value clearly more appropriate. Return one "
+                "string value per requested field. For multi-csv fields, "
+                "use 1-5 values joined by commas with no spaces, ordered "
+                "most-relevant first. Do not invent values, do not return "
+                "arrays, do not return extra keys, do not include "
+                "explanations."
+            )
+        else:
+            user["mode"] = "fill"
+            user["instructions"] = (
                 "Choose values from controlled_values_per_field. For "
                 "multi-csv fields, choose 1-5 most-applicable values, joined "
                 "by commas with no spaces, ordered most-relevant first. Do "
                 "not invent values, do not return arrays, do not return "
                 "extra keys, do not include explanations."
-            ),
-        }
+            )
 
-        body = {
+        # `temperature` is intentionally omitted: this is a strict
+        # controlled-vocabulary classification task constrained by
+        # response_format=json_object plus a small per-field enum, so the
+        # model's default temperature is fine, and omitting the field keeps
+        # us compatible with models (e.g. gpt-5.x) that reject any explicit
+        # value.
+        body: dict = {
             "model": self.model,
             "messages": [
                 {"role": "system", "content": system},
@@ -492,7 +536,6 @@ class _AIClient:
                 },
             ],
             "max_tokens": 512,
-            "temperature": 0,
             "response_format": {"type": "json_object"},
         }
 
@@ -528,12 +571,12 @@ class _AIClient:
         if not isinstance(obj, dict):
             raise EnrichmentError("Inference API JSON is not an object.")
 
-        unexpected = set(obj.keys()) - set(missing_fields)
+        unexpected = set(obj.keys()) - set(requested_fields)
         if unexpected:
             raise EnrichmentError(
                 f"Inference API returned unexpected keys: {sorted(unexpected)}"
             )
-        for f in missing_fields:
+        for f in requested_fields:
             if f not in obj or not isinstance(obj[f], str) or not obj[f]:
                 raise EnrichmentError(
                     f"Inference API did not return a usable string for `{f}`."
@@ -573,6 +616,7 @@ def build_skill_entry(
     taxonomy: dict,
     ai_client,
     errors: list[str],
+    is_materially_changed: bool = False,
 ) -> dict | None:
     component = components.get(skill.path)
 
@@ -602,6 +646,25 @@ def build_skill_entry(
             return None
         for k in missing:
             metadata[k] = enrichment[k]
+    elif is_materially_changed and ai_client is not None:
+        # Skill name/description changed but all required fields already have
+        # valid values. Ask the AI whether any of those values should be
+        # amended to better fit the new content. If AI returns the same value
+        # for a field, output stays byte-stable.
+        try:
+            amended = ai_client(
+                skill,
+                component,
+                list(MVP_FIELDS),
+                taxonomy,
+                current_values=metadata,
+            )
+        except EnrichmentError as exc:
+            errors.append(f"{skill.path}: {exc}")
+            return None
+        for k in MVP_FIELDS:
+            if amended.get(k):
+                metadata[k] = amended[k]
 
     # Re-order to schema field order.
     ordered_metadata = {k: metadata[k] for k in MVP_FIELDS if k in metadata}
@@ -795,6 +858,7 @@ def main(argv: list[str] | None = None) -> int:
 
     errors: list[str] = []
     entries: list[dict] = []
+    materially_changed = set(cls.materially_changed)
     for skill in sorted(skills_now, key=lambda s: s.path):
         entry = build_skill_entry(
             skill,
@@ -805,6 +869,7 @@ def main(argv: list[str] | None = None) -> int:
             taxonomy,
             ai_client,
             errors,
+            is_materially_changed=skill.path in materially_changed,
         )
         if entry is not None:
             entries.append(entry)

@@ -118,20 +118,36 @@ from the shell environment. `.env` is gitignored.
 
 ## How AI enrichment is constrained
 
-- The generator only calls the API for fields that cannot be derived
-  deterministically (i.e. that are not already present in the carried-forward
-  baseline metadata or directly mappable from `components.d/`).
-- Each request is bounded to a single skill and includes:
-  - the skill path, name, description, and frontmatter,
-  - matched `components.d/` data,
-  - the first 4 KiB of `skill-card.md` if present,
-  - the explicit list of allowed values per missing field.
-- The model is required to return a single JSON object whose keys are exactly
-  the requested fields. Any unexpected key, missing field, non-string value,
-  or `UNRESOLVED` value causes a hard validation failure.
-- The generator never writes a value that is not in the schema's controlled
-  vocabulary; jsonschema validation runs on every output before files are
-  written.
+The generator calls the inference API in one of two narrow modes per skill:
+
+1. **Fill mode** — used for new skills (no baseline metadata) or skills whose
+   carried-forward metadata is missing required fields. The model is asked to
+   pick a value from the controlled vocabulary for each missing field.
+2. **Amend mode** — used when a skill is `materially_changed` (its `name` or
+   `description` in `SKILL.md` differs from the baseline) but the existing
+   metadata still validates. The model is shown each existing value and asked
+   whether to keep it (return verbatim) or change it because the new content
+   warrants a different controlled value. The prompt explicitly biases toward
+   preserving existing values; only clear mismatches should be amended.
+
+Skills classified as `unchanged` never trigger an AI call — their metadata
+flows through byte-identically. Running with `--no-ai` disables both modes;
+in that case `materially_changed` skills keep their existing metadata as-is
+(only `name` / `description` update) and any `added` skill that needs fill
+mode causes a hard error.
+
+Every request is bounded to a single skill and includes:
+- the skill path, name, description, and frontmatter,
+- matched `components.d/` data,
+- the first 4 KiB of `skill-card.md` if present,
+- the explicit list of requested fields and allowed values per field,
+- (amend mode only) the existing value for each requested field.
+
+The model must return a single JSON object whose keys are exactly the
+requested fields. Any unexpected key, missing field, non-string value, or
+`UNRESOLVED` value causes a hard validation failure. The generator never
+writes a value that is not in the schema's controlled vocabulary; jsonschema
+validation runs on every output before files are written.
 
 ## Adding a new subdomain
 
