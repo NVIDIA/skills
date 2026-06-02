@@ -64,12 +64,12 @@
             "Unpacks each yield as `(chunk, offsets)` and converts the chunk with `cn.asarray`",
             "Places each chunk by its actual shape/offsets (accounts for clipped boundary chunks)",
             "Ends with a blocking execution fence",
-            "Clarifies that from_file_batched chunks the file read — the preallocated array (`cn.empty(shape)`) still has to fit in distributed memory",
+            "Clarifies that from_file_batched chunks the file read \u2014 the preallocated array (`cn.empty(shape)`) still has to fit in distributed memory",
             "Uses only documented legate.io.hdf5 API and does not invent a streaming-write counterpart"
         ],
         "expected_script": null,
         "expected_skill": "cupynumeric-hdf5",
-        "ground_truth": "The agent uses `from_file_batched(path, dataset_name, chunk_size)`, which yields one `LogicalArray` per chunk plus the offsets where that chunk belongs in the global shape. It preallocates the destination with `cn.empty(shape, dtype)` (reading shape/dtype from h5py first), then for each `(chunk, offsets)` places `cn.asarray(chunk)` at `out[r0:r0+chunk.shape[0], ...]` using each chunk's actual shape because boundary chunks are clipped. It ends with `get_legate_runtime().issue_execution_fence(block=True)`. It clarifies that `from_file_batched` chunks the source-file read, not the result — the preallocated array must still fit in distributed memory. It may note `from_file_batched` raises `ValueError` if `chunk_size` is non-positive or its length differs from the dataset rank.",
+        "ground_truth": "The agent uses `from_file_batched(path, dataset_name, chunk_size)`, which yields one `LogicalArray` per chunk plus the offsets where that chunk belongs in the global shape. It preallocates the destination with `cn.empty(shape, dtype)` (reading shape/dtype from h5py first), then for each `(chunk, offsets)` places `cn.asarray(chunk)` at `out[r0:r0+chunk.shape[0], ...]` using each chunk's actual shape because boundary chunks are clipped. It ends with `get_legate_runtime().issue_execution_fence(block=True)`. It clarifies that `from_file_batched` chunks the source-file read, not the result \u2014 the preallocated array must still fit in distributed memory. It may note `from_file_batched` raises `ValueError` if `chunk_size` is non-positive or its length differs from the dataset rank.",
         "id": "hdf5-005-batched-streaming",
         "question": "I have a very large HDF5 dataset I can't read into host memory in one shot. How do I load it into a distributed cuPyNumeric array a chunk at a time?",
         "should_trigger": true
@@ -83,7 +83,7 @@
         ],
         "expected_script": null,
         "expected_skill": "cupynumeric-hdf5",
-        "ground_truth": "The agent explains that `legate.io.hdf5` imports `h5py` at module load, so the whole module fails to import until h5py is installed. The fix is `conda install -c conda-forge h5py`. It notes h5py is not part of the default cuPyNumeric environment. It does not run the install command itself.",
+        "ground_truth": "The agent explains that `legate.io.hdf5` imports `h5py` at module load, so the whole module fails to import until h5py is installed. The fix is `conda install -c conda-forge h5py`. It notes h5py is not part of the default cuPyNumeric environment.  It does not run the install command itself.",
         "id": "hdf5-006-h5py-prerequisite",
         "question": "On a fresh cuPyNumeric env, `from legate.io.hdf5 import to_file` raises `ModuleNotFoundError: No module named 'h5py'`. cuPyNumeric and legate import fine. What do I need?",
         "should_trigger": true
@@ -206,7 +206,7 @@
         ],
         "expected_script": null,
         "expected_skill": null,
-        "ground_truth": "Parquet/tabular interchange is outside this single-array HDF5 skill. The useful answer routes to the cupynumeric-parallel-data-load skill — which owns cuPyNumeric's no-built-in-loader paths for Parquet/Arrow/custom layouts — or simply states that HDF5 is not the right API. It does not recommend legate-dataframe (not supported), and does not suggest writing a Parquet column via the HDF5 API.",
+        "ground_truth": "Parquet/tabular interchange is outside this single-array HDF5 skill. The useful answer routes to the cupynumeric-parallel-data-load skill \u2014 which owns cuPyNumeric's no-built-in-loader paths for Parquet/Arrow/custom layouts \u2014 or simply states that HDF5 is not the right API. It does not recommend legate-dataframe (not supported), and does not suggest writing a Parquet column via the HDF5 API.",
         "id": "hdf5-neg-004-parquet-cudf",
         "question": "I have a cuPyNumeric array I want to expose as a column in a Parquet dataset that the cuDF team will load. What's the right path?",
         "should_trigger": false

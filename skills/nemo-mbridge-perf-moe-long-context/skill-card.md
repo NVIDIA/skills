@@ -1,5 +1,5 @@
 ## Description: <br>
-Long-context MoE training guidance for Megatron Bridge, covering CP sizing, selective recompute, dispatcher choices, and practical patterns from DSV3, Qwen3, and Qwen3-Next long-context experiments. <br>
+Long-context MoE training guidance for Megatron Bridge covering CP sizing, selective recompute, dispatcher choices, and practical patterns from DSV3, Qwen3, and Qwen3-Next long-context experiments. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training MoE models at long sequence lengths (16K–256K tokens), or investigating commits that caused long-context MoE OOM or degraded throughput. <br>
+Developers and engineers training MoE models at long sequence lengths (16K–256K tokens) who need guidance on context parallelism sizing, selective recompute strategies, and dispatcher selection to avoid OOM or degraded throughput. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,8 +19,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Megatron Bridge Documentation](https://docs.nvidia.com/nemo/megatron-bridge/latest/) <br>
-- [Megatron Bridge GitHub Repository](https://github.com/NVIDIA-NeMo/Megatron-Bridge) <br>
+- [MoE Optimization Docs](docs/training/moe-optimization.md) <br>
+- [Activation Recomputation Docs](docs/training/activation-recomputation.md) <br>
+- [Performance Tuning Guide](docs/performance-guide.md) <br>
 
 
 ## Skill Output: <br>
@@ -29,8 +30,14 @@ Mitigation: Review and scan skill before deployment. <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
+## Evaluation Agents Used: <br>
+- Claude Code (`claude-code`) <br>
+- Codex (`codex`) <br>
+
+
+
 ## Evaluation Tasks: <br>
-NVSkills-Eval 3-Tier Evaluation with external profile, evaluated on 2026-05-28. <br>
+Evaluated against 1 positive skill-activation task with 2 attempts per task (NVSkills-Eval external profile, local environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -40,10 +47,28 @@ Reported benchmark dimensions: <br>
 - Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
+Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
+- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
+- `accuracy`: Grades final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
+- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `token_efficiency`: Compares token usage with and without the skill. <br>
 
+
+
+## Evaluation Results: <br>
+| Dimension | Num | `claude-code` | `codex` |
+|---|---:|---:|---:|
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 100% (+0%) | 97% (+0%) |
+| Discoverability | 2 | 100% (+0%) | 72% (-12%) |
+| Effectiveness | 2 | 98% (-1%) | 92% (-4%) |
+| Efficiency | 2 | 93% (-0%) | 60% (-18%) |
 
 ## Skill Version(s): <br>
-v0.2.0rc6-1467-g4644b92f (source: git tag) <br>
+v0.2.0rc6-1529-g97db3553 (source: git tag) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

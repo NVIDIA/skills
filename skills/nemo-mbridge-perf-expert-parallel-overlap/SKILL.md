@@ -7,9 +7,6 @@ when_to_use: Enabling EP overlap to hide dispatch/combine latency, or tracing a 
 
 # MoE Expert-Parallel Overlap Skill
 
-Stable docs: @docs/training/communication-overlap.md
-Card: @skills/nemo-mbridge-perf-expert-parallel-overlap/card.yaml
-
 ## References
 
 - Stable docs: @docs/training/communication-overlap.md
@@ -57,13 +54,48 @@ Expected outcome:
 - if the run is tiny, communication-light, or dominated by another wall, the
   gain may be negligible
 
+## Correctness-First alltoall Benchmark
+
+For the plain EP-overlap isolation benchmark, keep flex dispatch and delayed
+wgrad disabled. The measured shape was Qwen3 MoE 30B-A3B SFT on 16 H100 GPUs:
+`EP=16`, `alltoall`, BF16, global batch size 1024, CUDA graphs disabled,
+`moe_permute_fusion=false`, measured over iterations 3-8.
+
+Use these overrides for the plain-overlap case:
+
+```bash
+--cuda_graph_impl none \
+--moe_flex_dispatcher_backend None \
+--moe_a2a_overlap false \
+comm_overlap.overlap_moe_expert_parallel_comm=true \
+comm_overlap.delay_wgrad_compute=false \
+model.moe_shared_expert_overlap=false
+```
+
+Do not use `--moe_a2a_overlap true` for this isolation test: the performance
+harness helper enables both `overlap_moe_expert_parallel_comm` and
+`delay_wgrad_compute`, so it does not isolate plain EP overlap.
+
+Steady-window timing from that benchmark:
+
+| Case | Steady mean | Relative |
+|---|---:|---:|
+| no EP overlap | 41.25s | 1.000x |
+| EP overlap | 31.31s | 1.317x |
+| EP overlap plus `delay_wgrad_compute` | 31.20s | 1.322x |
+
+This is evidence for enabling plain EP overlap on this inter-node all-to-all
+shape. It does not show a meaningful independent win from delayed wgrad, and it
+does not validate fused MoE permutation because that path was disabled for the
+runtime stack.
+
 ## Enablement
 
 ### alltoall dispatcher
 
 ```python
 cfg.comm_overlap.overlap_moe_expert_parallel_comm = True
-cfg.comm_overlap.delay_wgrad_compute = True
+cfg.comm_overlap.delay_wgrad_compute = False
 cfg.model.moe_shared_expert_overlap = False
 
 cfg.model.expert_model_parallel_size = 8
@@ -72,6 +104,9 @@ cfg.model.moe_token_dispatcher_type = "alltoall"
 cfg.model.bf16 = True
 cfg.model.fp16 = False
 ```
+
+Enable `delay_wgrad_compute=True` only after the plain overlap path is known to
+work and its extra compatibility constraints have been checked.
 
 ### flex dispatcher (DeepEP or HybridEP)
 
@@ -122,23 +157,6 @@ cfg.model.bf16 = True
 Use this as the correctness-first starting point. Add delayed wgrad, flex
 dispatch, and CUDA-graph interactions only after the plain overlap path is
 known to work.
-
-## Measured Short-Run Evidence
-
-A 2026-05-18 current-main H100 x16 Qwen3 30B-A3B mock pretraining run used
-`EP=16`, `alltoall`, BF16, global batch size 1024, CUDA graphs disabled, and
-`moe_permute_fusion=false`. With iterations 3-8 as the steady window:
-
-| Case | Steady mean | Relative |
-|---|---:|---:|
-| no EP overlap | 41.25s | 1.000x |
-| EP overlap | 31.31s | 1.317x |
-| EP overlap plus `delay_wgrad_compute` | 31.20s | 1.322x |
-
-This is evidence for enabling plain EP overlap on this inter-node all-to-all
-shape. It does not show a meaningful independent win from delayed wgrad, and it
-does not validate fused MoE permutation because that path was disabled for the
-runtime stack.
 
 ## Minimal Runnable Command
 

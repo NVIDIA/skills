@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 OR Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to save or load cuPyNumeric arrays to and from HDF5 files for large-scale distributed HPC and scientific computing workflows. <br>
+Developers and engineers who need to save cuPyNumeric arrays to HDF5 files, load HDF5 datasets into distributed cuPyNumeric arrays, read large datasets in chunks, or accelerate HDF5 disk I/O with GPUDirect Storage for HPC pipelines. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,15 +19,15 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Legate I/O API Documentation](https://docs.nvidia.com/legate/latest/api/python/io/index.html) <br>
-- [cuPyNumeric GitHub](https://github.com/nv-legate/cupynumeric) <br>
-- [HDF5 — The HDF Group](https://www.hdfgroup.org/solutions/hdf5/) <br>
-- [VFD GDS Plugin](https://github.com/nv-legate/vfd-gds) <br>
+- [Legate HDF5 I/O API Documentation](https://docs.nvidia.com/legate/latest/api/python/io/index.html) <br>
+- [cuPyNumeric GitHub Repository](https://github.com/nv-legate/cupynumeric) <br>
+- [HDF5 - The HDF Group](https://www.hdfgroup.org/solutions/hdf5/) <br>
+- [VFD-GDS Plugin (GPUDirect Storage for HDF5)](https://github.com/nv-legate/vfd-gds) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Configuration instructions] <br>
-**Output Format:** [Markdown with inline Python code blocks] <br>
+**Output Type(s):** [Code, Shell commands, Configuration instructions] <br>
+**Output Format:** [Markdown with inline Python and bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -38,7 +38,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 17 tasks (11 positive activation, 6 negative activation) with 2 attempts per task via NVSkills-Eval. <br>
+Evaluated against 17 evaluation tasks (11 positive activation, 6 negative activation) with 2 attempts per task and a 50% pass threshold. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,11 +62,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+6%) | 100% (+0%) |
-| Correctness | 8 | 90% (+4%) | 93% (+9%) |
-| Discoverability | 8 | 80% (+17%) | 80% (+7%) |
-| Effectiveness | 8 | 90% (+4%) | 92% (+16%) |
-| Efficiency | 8 | 80% (+24%) | 73% (+7%) |
+| Security | 8 | 100% (+3%) | 100% (+0%) |
+| Correctness | 8 | 92% (+9%) | 96% (+12%) |
+| Discoverability | 8 | 88% (+20%) | 85% (+11%) |
+| Effectiveness | 8 | 93% (+12%) | 94% (+20%) |
+| Efficiency | 8 | 86% (+27%) | 79% (+12%) |
 
 ## Skill Version(s): <br>
 2.0.0 (source: frontmatter) <br>

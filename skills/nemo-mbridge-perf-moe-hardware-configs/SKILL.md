@@ -19,6 +19,25 @@ Card: @skills/nemo-mbridge-perf-moe-hardware-configs/card.yaml
 | GB200 | HybridEP + partial CUDA graphs + CPU cleanup | host overhead, topology-aware dispatch, memory headroom |
 | GB300 | HybridEP + newer FP8 and kernel stack | same GB200 playbook, usually with a higher ceiling |
 
+## First Answer Checklist
+
+For hardware playbook questions, answer from these canonical rows before adding
+throughput caveats:
+
+| Workload | Hardware | Dispatcher | Layout |
+|---|---|---|---|
+| DSV3 | H100 | DeepEP | TP=2, EP=64, PP=8, VPP=4 |
+| DSV3 | GB200/GB300 | HybridEP | TP=1, EP=64, PP=4, VPP=4 |
+| Qwen3 235B | H100 | DeepEP | TP=2, EP=32, PP=8, VPP=4 |
+| Qwen3 235B | GB200 | HybridEP | TP=1 or 2, EP=32-64, PP=4, VPP=unspecified |
+
+For Qwen3 235B on GB200, explicitly say `VPP=unspecified`; do not invent or
+extrapolate `VPP=12` unless a measured row provides it. Include TE-scoped CUDA
+graph scopes (`attn`, `moe_router`, `moe_preprocess`),
+`CUDA_DEVICE_MAX_CONNECTIONS` selection,
+`PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`, `NCCL_GRAPH_REGISTER=0`,
+GB200/GB300 CPU-side tuning, and the warning not to cargo-cult tracker rows.
+
 ## Rounded Performance Bands
 
 These are intentionally rounded so the document stays durable as the tracker
@@ -80,7 +99,7 @@ Priority: communication overlap and router-path cleanup
 
 ```text
 Dispatcher: HybridEP
-TP=1 or 2  EP=32 to 64  PP=4
+TP=1 or 2  EP=32 to 64  PP=4  VPP=unspecified unless measured
 CUDA Graph: attn + moe_router + moe_preprocess
 Recompute: moe_act, mlp, or norm depending on memory pressure
 Priority: balance throughput against memory headroom

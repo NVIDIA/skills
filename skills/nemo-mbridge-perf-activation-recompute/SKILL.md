@@ -10,6 +10,24 @@ when_to_use: Reducing GPU memory via activation recompute, or investigating a co
 Stable docs: @docs/training/activation-recomputation.md
 Card: @skills/nemo-mbridge-perf-activation-recompute/card.yaml
 
+## Answer Checklist
+
+For OOM or CUDA graph questions, lead with this exact sequence:
+
+1. First try `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`; many
+   borderline failures are allocator fragmentation, not activation capacity.
+2. Prefer selective recompute before full-layer recompute:
+   `recompute_granularity="selective"` with `recompute_modules=["core_attn"]`.
+3. If still borderline, optionally add `"layernorm"`; use `"mlp"` only as a
+   last resort because it has a large compute cost on wide dense FFNs.
+4. Use full-layer recompute only after selective recompute fails to fit, and
+   always name the required fields: `recompute_granularity="full"`,
+   `recompute_method`, and `recompute_num_layers`.
+5. If FP8 or TE-scoped CUDA graphs are enabled, call out the assertion risk:
+   full-layer recompute is incompatible with TE scopes such as `attn`, `mlp`,
+   and `moe_router`. Valid fixes are selective recompute, `cuda_graph_impl="none"`,
+   or `cuda_graph_impl="local"` with `cuda_graph_scope="full_iteration"`.
+
 ## What It Is
 
 Activation recompute trades GPU compute for memory by discarding intermediate
@@ -44,18 +62,11 @@ cost entirely, but it is **incompatible with PP > 1**.
 
 ## Enablement
 
-### Selective recompute (default for most recipes)
+### Selective recompute
 
 ```python
 cfg.model.recompute_granularity = "selective"
-cfg.model.recompute_modules = ["core_attn"]
-```
-
-### Selective recompute with additional modules
-
-```python
-cfg.model.recompute_granularity = "selective"
-cfg.model.recompute_modules = ["core_attn", "layernorm"]  # or ["mlp"] or ["mlp", "core_attn"]
+cfg.model.recompute_modules = ["core_attn"]  # add "layernorm", "mlp", or other valid modules as needed
 ```
 
 ### Full-layer recompute

@@ -22,6 +22,30 @@ Think in terms of the paper's Three Walls:
 MoE tuning is iterative. Fixing one wall usually exposes the next one, so the
 best workflow is: fit first, scale second, profile third, then retune.
 
+## First Answer Checklist
+
+For MoE optimization workflow prompts, present the response in this order:
+
+1. **Fit**: make the model memory-feasible first. Use the smallest model
+   parallelism that fits, prefer selective recompute before full recompute, add
+   offloading only after recompute and parallelism are insufficient, and use
+   `--fake-init-process-group` to sanity-check large layouts.
+2. **Scale**: maximize DP after the model fits, keep hot communication inside
+   the fastest interconnect, use PP plus VPP for multi-node scaling, prefer EP
+   over extra TP for expert layers, and add CP when long context makes attention
+   memory dominant.
+3. **Profile**: identify the dominant wall: memory, communication, host
+   overhead, or compute.
+4. **Retune**: change dispatcher, overlap, FP8 mode, CUDA graphs, or recompute
+   based on the profiled bottleneck.
+5. Include the exact Parallel Folding meshes: `Attention: TP x CP x DP x PP`
+   and `MoE: ETP x EP x EDP x PP`.
+6. Include the default mappings: `alltoall` for safe bring-up,
+   `flex` + `deepep` for H100/B200-style systems, `flex` + `hybridep` for
+   GB200/GB300/NVL72 systems, Hopper to FP8 blockwise, Blackwell to MXFP8, and
+   dropless MoE TE-scoped CUDA graphs over `attn`, `moe_router`, and
+   `moe_preprocess`.
+
 ## Phase 1: Make The Run Memory-Feasible
 
 Start with a configuration that fits reliably before chasing throughput.

@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers enabling CPU offload to reduce GPU memory pressure during LLM training, or investigating commits that changed CPU offloading configuration and caused OOM or crashes. <br>
+Developers and engineers enabling CPU offload to reduce GPU memory pressure in Megatron Bridge training workloads, or investigating configuration changes that caused OOM errors or crashes. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,18 +20,23 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [CPU Offloading Documentation](docs/training/cpu-offloading.md) <br>
-- [Performance Tuning Guide](docs/performance-guide.md) <br>
-- [Skill Structured Metadata](skills/nemo-mbridge-perf-cpu-offloading/card.yaml) <br>
+- [Megatron Bridge Documentation](https://docs.nvidia.com/nemo/megatron-bridge/latest/) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Configuration instructions, Shell commands, Analysis] <br>
-**Output Format:** [Markdown with inline Python and bash code blocks] <br>
+**Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
+## Evaluation Agents Used: <br>
+- Claude Code (`claude-code`) <br>
+- Codex (`codex`) <br>
+
+
+
 ## Evaluation Tasks: <br>
-Evaluated via NVSkills-Eval 3-Tier Evaluation (external profile) on 2026-05-28. Tier 1 static validation ran 9 checks with 14 findings. Tier 2 deduplication ran 2 checks with 1 finding. Tier 3 live agent evaluation was not available. <br>
+Evaluated against 1 evaluation task with 2 attempts per task; positive skill-activation cases only. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -41,10 +46,33 @@ Reported benchmark dimensions: <br>
 - Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
+Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
+- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
+- `accuracy`: Grades final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
+- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `token_efficiency`: Compares token usage with and without the skill. <br>
 
+
+
+## Evaluation Results: <br>
+| Dimension | Num | `claude-code` | `codex` |
+|---|---:|---:|---:|
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 100% (+0%) | 88% (+0%) |
+| Discoverability | 2 | 100% (+0%) | 62% (+0%) |
+| Effectiveness | 2 | 93% (-5%) | 96% (+0%) |
+| Efficiency | 2 | 92% (-0%) | 60% (-0%) |
+
+## Testing Completed: <br>
+**[x] Agent Red-Teaming** <br>
+**[ ] Network Security** <br>
+**[ ] Product Security** <br>
 
 ## Skill Version(s): <br>
-b058d061 (source: git SHA, committed 2026-05-28) <br>
+b0f64d72 (source: git SHA, committed 2026-06-02) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

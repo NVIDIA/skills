@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers enabling MoE expert-parallel communication overlap to optimize distributed training throughput for Mixture-of-Experts models in Megatron-Bridge. <br>
+Developers and ML engineers enabling MoE expert-parallel communication overlap to hide dispatch/combine latency and improve training throughput on multi-GPU systems with Megatron-Bridge. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -21,7 +21,7 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [Communication Overlap Documentation](docs/training/communication-overlap.md) <br>
 - [Performance Tuning Guide](docs/performance-guide.md) <br>
-- [Megatron-Bridge Documentation](https://docs.nvidia.com/nemo/megatron-bridge/latest/) <br>
+- [Megatron-Bridge GitHub Repository](https://github.com/NVIDIA-NeMo/Megatron-Bridge) <br>
 
 
 ## Skill Output: <br>
@@ -29,6 +29,15 @@ Mitigation: Review and scan skill before deployment. <br>
 **Output Format:** [Markdown with inline Python and bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
+
+## Evaluation Agents Used: <br>
+- Claude Code (`claude-code`) <br>
+- Codex (`codex`) <br>
+
+
+
+## Evaluation Tasks: <br>
+Evaluated against 1 evaluation task with 2 attempts per task using NVSkills-Eval external profile in a local environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -38,10 +47,28 @@ Reported benchmark dimensions: <br>
 - Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
+Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
+- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
+- `accuracy`: Grades final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
+- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `token_efficiency`: Compares token usage with and without the skill. <br>
 
+
+
+## Evaluation Results: <br>
+| Dimension | Num | `claude-code` | `codex` |
+|---|---:|---:|---:|
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 100% (+0%) | 91% (+3%) |
+| Discoverability | 2 | 100% (+0%) | 66% (+3%) |
+| Effectiveness | 2 | 95% (-1%) | 84% (+1%) |
+| Efficiency | 2 | 92% (-0%) | 58% (-2%) |
 
 ## Skill Version(s): <br>
-v0.2.0rc6-1469-g6fe590a5 (source: git describe, committed 2026-05-28) <br>
+b0f64d72 (source: git SHA, committed 2026-06-02) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

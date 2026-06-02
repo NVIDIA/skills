@@ -42,8 +42,9 @@ SEED=1234
 TRAIN_ITERS=20
 
 # ── Tokens / Caches ──────────────────────────────────────────────────────
-export GH_TOKEN=<YOUR_GITHUB_TOKEN>
-export HF_TOKEN=<YOUR_HF_TOKEN>
+# Provide tokens through the scheduler environment or a chmod 600 secrets file.
+# Never hardcode token values in this script or write them to logs.
+: "${HF_TOKEN:?Set HF_TOKEN in the secure job environment before submitting}"
 export HF_HOME=<SHARED_FS>/HF_HOME
 export UV_CACHE_DIR="<SHARED_FS>/uv_cache"
 export NEMO_HOME="<SHARED_FS>/cache/nemo"
@@ -54,8 +55,6 @@ export CUDA_DEVICE_MAX_CONNECTIONS=1 && \
 export NVTE_ALLOW_NONDETERMINISTIC_ALGO=1 && \
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True && \
 export NCCL_NVLS_ENABLE=0 && \
-export GH_TOKEN=$GH_TOKEN && \
-export HF_TOKEN=$HF_TOKEN && \
 export HF_HOME=$HF_HOME && \
 export UV_CACHE_DIR=$UV_CACHE_DIR && \
 export NEMO_HOME=$NEMO_HOME && \
