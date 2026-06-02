@@ -1,0 +1,14 @@
+name: TAO Toolkit
+repo: NVIDIA-TAO/tao-skills-bank
+description: NVIDIA TAO Toolkit - fine-tune and optimize 100+ pretrained vision AI models with your own data using low-code microservices, then export production-ready models for edge or cloud deployment.
+skills:
+  - path: applications/
+    catalog_dir: tao-applications
+  - path: data/
+    catalog_dir: tao-data
+  - path: models/
+    catalog_dir: tao-models
+  - path: platform/
+    catalog_dir: tao-platform
+  - path: skills/
+    catalog_dir: tao-skills
