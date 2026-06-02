@@ -313,19 +313,10 @@ jobs:
           set -euo pipefail
           # Compare the freshly-rebuilt plugin tree against the pre-sync
           # commit (HEAD — the sync changes are still uncommitted at this
-          # point) and auto-bump for any plugin whose curated content
-          # moved.
-          #
-          # --auto-structural makes structural changes (skill add/remove,
-          # asset add/remove, capability change) auto-bump y instead of
-          # failing. The sync is machine-driven so we can't ask a human
-          # to pre-bump; the PR reviewer is the effective builder and
-          # they need the PR to exist before they can review. Skills
-          # dropped by compliance enforcement land here as structural
-          # changes — auto-y keeps the sync robust.
-          #
-          # See plugin-versioning-mini-prd.md.
-          .github/scripts/version-plugins.sh --apply --auto-structural --base HEAD
+          # point) and auto-bump any plugin whose curated content moved:
+          # z for in-place edits, y for structural changes (skill add/
+          # remove, capability change). See plugin-versioning-mini-prd.md.
+          .github/scripts/version-plugins.sh --apply --base HEAD
 
       - name: Regenerate README tables
         run: .github/scripts/regenerate-readme.sh

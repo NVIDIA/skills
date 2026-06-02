@@ -6,10 +6,15 @@ For every catalog plugin defined in plugins.d/<name>.yml, compare the
 current head payload against a base ref and decide:
 
   - No payload change     -> keep version.
-  - Content-only change   -> under version_policy: auto, bump z.
-                             Under manual policy, require builder bump.
-  - Structural change     -> require builder bump (x or y).
+  - Content-only change   -> auto-bump z.
+  - Structural change     -> auto-bump y.
   - Builder already bumped version -> validate and accept.
+
+Major (x) bumps are always builder-only — they encode a breaking-change
+claim that automation cannot infer from a diff. Everything else is
+mechanical: the script computes the magnitude from the diff shape and
+writes it back. Reviewers see the proposed bump in the PR diff alongside
+the change that triggered it.
 
 Implements the rules in plugin-versioning-mini-prd.md.
 
@@ -26,7 +31,7 @@ Exit codes:
   0   Nothing to do, or all bumps applied successfully.
   1   Internal error (bad YAML, git failure, etc.).
   2   Validation findings exist that require a builder decision
-      (structural change without bump, invalid version edit, etc.).
+      (e.g. invalid version edit on the PR).
 """
 from __future__ import annotations
 
@@ -386,7 +391,6 @@ class ChangeKind:
 class PluginAnalysis:
     name: str
     yaml_path: Path
-    policy: str
     base_version: SemVer
     head_version: SemVer
     builder_changed_version: bool
@@ -446,11 +450,16 @@ def classify_change(
 # ---------------------------- validation -------------------------------------
 
 
-def validate_builder_version(
-    base: SemVer, head: SemVer, change_kind: str
-) -> list[str]:
-    """Apply the PRD validation rules to a builder-set version change.
-    Returns a list of human-readable findings; empty list means OK."""
+def validate_builder_version(base: SemVer, head: SemVer) -> list[str]:
+    """Apply validation rules to a builder-set version change.
+    Returns a list of human-readable findings; empty list means OK.
+
+    Magnitude-matches-change is intentionally NOT checked here — if the
+    builder explicitly set a version, we respect their choice. The
+    reviewer sees the proposed version delta in the PR diff and can
+    push back if it's wrong. We only catch mechanical mistakes:
+    non-monotonic edits and accidental large major jumps.
+    """
     findings: list[str] = []
 
     if head <= base:
@@ -458,16 +467,9 @@ def validate_builder_version(
             f"version did not increase: base {base} -> head {head} "
             "(must be strictly greater)"
         )
-        return findings  # downstream checks meaningless if non-monotonic
+        return findings
 
     bumped = base.bumped_part(head)
-    if change_kind == ChangeKind.STRUCTURAL and bumped == "patch":
-        findings.append(
-            f"structural change requires y or x bump, but version went "
-            f"{base} -> {head} (patch only)"
-        )
-
-    # No-skipping guardrail: large major jumps must be explicit.
     if bumped == "major" and head.major - base.major > 1:
         findings.append(
             f"major version jumped by more than 1 ({base} -> {head}); "
@@ -513,15 +515,6 @@ def analyze_plugin(
     if not name:
         print(f"  ! {rel}: missing 'name', skipping", file=sys.stderr)
         return None
-
-    policy = head_spec.get("version_policy", "auto")
-    if policy not in ("auto", "manual"):
-        print(
-            f"  ! {rel}: invalid version_policy={policy!r} "
-            "(allowed: auto, manual). Treating as manual.",
-            file=sys.stderr,
-        )
-        policy = "manual"
 
     try:
         head_version = SemVer.parse(str(head_spec.get("version", "")))
@@ -582,7 +575,6 @@ def analyze_plugin(
     return PluginAnalysis(
         name=name,
         yaml_path=plugin_yaml_path,
-        policy=policy,
         base_version=base_version,
         head_version=head_version,
         builder_changed_version=builder_changed_version,
@@ -601,28 +593,19 @@ class Plan:
     no_ops: list[PluginAnalysis] = field(default_factory=list)
 
 
-def decide(
-    analysis: PluginAnalysis,
-    auto_structural: bool = False,
-) -> tuple[str, str | None]:
+def decide(analysis: PluginAnalysis) -> tuple[str, str | None]:
     """Return (verdict, payload) for one plugin.
 
     verdict ∈ {'noop', 'bump', 'accept', 'fail'}
       noop    -> nothing changed, nothing to do.
-      bump    -> auto-bump z (or y, if structural + auto_structural).
-                 Payload is the new SemVer string.
+      bump    -> auto-bump (z for content, y for structural). Payload
+                 is the new SemVer string.
       accept  -> builder already changed version; validated OK.
-      fail    -> validation/policy failure; payload is the message.
-
-    `auto_structural` opts into auto-bumping y for structural changes
-    instead of failing. The default (False) matches the PRD's rule:
-    structural changes need a builder decision. Sync workflows pass
-    True because the human PR reviewer is the effective "builder" and
-    the PR has to exist before they can intervene.
+      fail    -> validation failure; payload is the message.
     """
     if analysis.builder_changed_version:
         findings = validate_builder_version(
-            analysis.base_version, analysis.head_version, analysis.change_kind
+            analysis.base_version, analysis.head_version
         )
         if findings:
             return "fail", "; ".join(findings)
@@ -632,38 +615,20 @@ def decide(
         return "noop", None
 
     if analysis.change_kind == ChangeKind.STRUCTURAL:
-        if auto_structural and analysis.policy == "auto":
-            new = SemVer(
-                analysis.head_version.major,
-                analysis.head_version.minor + 1,
-                0,
-            )
-            return "bump", str(new)
-        msg = (
-            f"structural change requires builder-owned x or y bump; "
-            f"current version {analysis.head_version}. Reasons: "
-            + "; ".join(analysis.structural_reasons)
+        new = SemVer(
+            analysis.head_version.major,
+            analysis.head_version.minor + 1,
+            0,
         )
-        return "fail", msg
-
-    # content-only change without builder bump
-    if analysis.policy == "manual":
-        return (
-            "fail",
-            f"payload changed but version_policy is manual; bump version "
-            f"explicitly (current {analysis.head_version}).",
-        )
+        return "bump", str(new)
 
     return "bump", str(analysis.head_version.bump_patch())
 
 
-def build_plan(
-    analyses: list[PluginAnalysis],
-    auto_structural: bool = False,
-) -> Plan:
+def build_plan(analyses: list[PluginAnalysis]) -> Plan:
     plan = Plan()
     for a in analyses:
-        verdict, payload = decide(a, auto_structural=auto_structural)
+        verdict, payload = decide(a)
         if verdict == "noop":
             plan.no_ops.append(a)
         elif verdict == "bump":
@@ -691,11 +656,10 @@ def print_plan(plan: Plan, apply_mode: bool) -> None:
         verb = "applying" if apply_mode else "would apply"
         print(f"── auto-bumps ({len(plan.bumps)}) — {verb} ──")
         for a, new in plan.bumps:
-            reason = (
-                "structural change, --auto-structural"
-                if a.change_kind == ChangeKind.STRUCTURAL
-                else "content-only change, policy=auto"
-            )
+            if a.change_kind == ChangeKind.STRUCTURAL:
+                reason = "structural change: " + "; ".join(a.structural_reasons)
+            else:
+                reason = "content-only change"
             print(f"  > {a.name}: {a.head_version} -> {new}  ({reason})")
     if plan.findings:
         print(f"── findings ({len(plan.findings)}) — builder action needed ──")
@@ -726,17 +690,6 @@ def main(argv: list[str]) -> int:
         "--check",
         action="store_true",
         help="Exit non-zero if any plugin needs a builder decision. No writes.",
-    )
-    p.add_argument(
-        "--auto-structural",
-        action="store_true",
-        help=(
-            "Auto-bump y on structural changes instead of failing. "
-            "Default behavior follows the PRD (structural changes need "
-            "a builder decision). Use this in machine-driven flows where "
-            "the PR reviewer is the effective builder (e.g. the daily "
-            "skill sync, where compliance drops can remove skills)."
-        ),
     )
     args = p.parse_args(argv)
 
@@ -773,7 +726,7 @@ def main(argv: list[str]) -> int:
             if a is not None:
                 analyses.append(a)
 
-    plan = build_plan(analyses, auto_structural=args.auto_structural)
+    plan = build_plan(analyses)
     print_plan(plan, apply_mode=args.apply)
 
     if args.apply and plan.bumps:

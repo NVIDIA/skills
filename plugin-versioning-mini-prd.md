@@ -11,13 +11,12 @@
 
 Use **independent SemVer per plugin**.
 
-NVIDIA plugin builders own the `x.y` stream. Automation only owns the `z` stream.
+Automation owns `y` and `z`. Builders own `x`.
 
 ```yaml
 # plugins.d/nvidia-skills.yml
 name: nvidia-skills
 version: "1.2.3"
-# version_policy: auto    # inherited from plugins.d/_defaults.yml; override here only if needed
 include_skills:
   - skills/aiq-deploy/
   - skills/aiq-research/
@@ -26,14 +25,19 @@ include_skills:
 ```yaml
 # plugins.d/_defaults.yml — applies to every catalog plugin
 version: "1.0.0"
-version_policy: auto       # auto | manual
 ```
 
 Decision:
 
-- `1.2.x` patch changes: automation may update `z` and commit the change back to the PR branch (see [Writeback Mechanism](#writeback-mechanism)).
-- `1.x` or `x.y` changes: NVIDIA plugin builders update YAML `version`.
+- **Content-only change** (existing skill files edited, asset bytes changed) → automation bumps `z`.
+- **Structural change** (skill add/remove, capability change, asset path change) → automation bumps `y`.
+- **Major bump** (breaking change for downstream users) → builder sets `version:` explicitly. Automation validates the edit but doesn't infer `x`.
+- **Builder set any version** → automation validates (monotonic, no pre-release, no oversized major skip) and respects it.
 - Generated `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` copy YAML `version`.
+
+Why automation handles `y` and `z`: every PR has a reviewer who already sees the proposed version delta alongside the diff that triggered it. The reviewer can push back if the magnitude is wrong. Gating contributor pushes on a manual bump just adds friction without adding signal.
+
+Why builders still own `x`: a major bump is a claim about downstream consumers ("this breaks something you depend on"), not a property of the diff. Automation can't infer it.
 
 ## Scope
 
@@ -43,7 +47,7 @@ In scope:
 
 Out of scope:
 
-- **Curated plugins** (driven by `plugins/<name>/.skills-manifest.yml`, where `plugin.json` is hand-maintained). These are always treated as `version_policy: manual`. Their hand-maintained `.claude-plugin/plugin.json` is the source of truth; automation never edits it.
+- **Curated plugins** (driven by `plugins/<name>/.skills-manifest.yml`, where `plugin.json` is hand-maintained). Their hand-maintained `.claude-plugin/plugin.json` is the source of truth; automation never edits it.
 - **Marketplace entries** (`.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json`). They do not carry per-plugin version fields. Per-plugin `plugin.json` is authoritative; clients prefer it over the marketplace entry (see [Research Appendix](#research-appendix)).
 - **Marketplace `metadata.version`** stays static; bumping it is a separate decision.
 
@@ -60,67 +64,35 @@ This keeps update prompts trustworthy and gives external marketplaces a clear ha
 
 ## Ownership Model
 
-| Version Part | Owner | Examples |
+| Version Part | Owner | Triggered by |
 |---|---|---|
-| `x` major | NVIDIA plugin builders | breaking behavior, rename, large compatibility shift |
-| `y` minor | NVIDIA plugin builders | skill added, skill removed, capability/default prompt changed, new logo/composer_icon/screenshot or asset removed (user-visible discovery surface) |
-| `z` patch | automation, when policy is `auto` | existing skill instructions/references/evals/scripts changed, in-place asset byte changes (resized logo, recompressed screenshot) |
+| `x` major | Builders | Breaking behavior, rename, large compatibility shift. Builder edits `version:` explicitly; automation only validates. |
+| `y` minor | Automation | Skill added/removed, capability/default-prompt change, logo/composer_icon/screenshot path added/removed/changed (user-visible discovery surface). |
+| `z` patch | Automation | Existing skill instructions/references/evals/scripts changed; in-place asset byte changes (resized logo, recompressed screenshot). |
 
-Automation should never infer minor or major.
+Automation classifies the change from the diff shape and writes the bump back to `plugins.d/<name>.yml`. Builders can pre-empt automation by setting `version:` themselves — automation will accept any builder-set version that passes validation, even a "wrong-magnitude" choice (the reviewer is the backstop, not CI).
 
-Pre-release tags (`1.2.3-rc1`, `1.2.3+sha`) are **not** supported in YAML `version`. Both Claude and Codex compare SemVer semantically; pre-release ordering is an extra failure mode we don't need yet. Validation rejects them.
+## Validation Rules
 
-Skill removal (default rule): treat as `y` in `0.x` and `1.x`; once any plugin reaches `2.0` and we commit to API stability, treat as `x`. Codify this in the validator so reviewers don't relitigate every PR.
-
-## Version Policy
-
-| Policy | Behavior |
-|---|---|
-| `auto` | If only existing included skill content changed, automation increments `z`. If the PR already changed YAML `version`, automation validates it and does not bump again. |
-| `manual` | Automation never edits YAML `version`. If payload changed and YAML `version` did not, automation reports that a version decision is needed and fails CI. |
-
-`version_policy: auto` is the default in `plugins.d/_defaults.yml`, so individual plugin yamls don't need to set it. Override per-plugin only to opt into `manual`.
-
-When the bumped plugin doesn't yet override `version` in its own yaml (still inheriting `1.0.0` from `_defaults.yml`), automation writes the new version into **that plugin's** `plugins.d/<name>.yml`, never into `_defaults.yml`. The first auto-bump for a fresh plugin promotes `1.0.0 → 1.0.1` into the plugin yaml.
-
-### Validation Rules
-
-Whenever automation runs in `auto` mode and the PR already changed YAML `version`, automation applies these rules and fails with a clear message on any violation:
+When a PR already changed YAML `version`, automation only enforces mechanical safety, not semantic policy:
 
 1. **Monotonic**: new version must be strictly greater than base version (SemVer compare).
-2. **Magnitude matches change**:
-    - Structural change (skill added, skill removed, capability/default_prompt change, asset added/removed) → builder must bump `y` or `x`. A `z`-only bump is **rejected**.
-    - Pure content change → any of `z`, `y`, `x` is acceptable (builders may signal a release intentionally).
-3. **No pre-release tags**: `version` must match `^\d+\.\d+\.\d+$`. `-rc`/`+sha` suffixes are rejected.
-4. **No skipping**: `1.2.3 → 1.2.99` is allowed; `1.2.3 → 5.0.0` requires the PR to include a `MAJOR_BUMP.md` note (or equivalent explicit signal — pick a convention). This is a guardrail against typos and accidental keystrokes.
+2. **No pre-release tags**: `version` must match `^\d+\.\d+\.\d+$`. `-rc` / `+sha` suffixes are rejected (both Claude and Codex compare SemVer semantically; pre-release ordering is an extra failure mode we don't need yet).
+3. **No oversized major skip**: `1.2.3 → 1.2.99` is allowed; `1.2.3 → 5.0.0` requires an explicit signal in the PR. This guards against typos.
 
-In `manual` mode, automation runs the same validations but never writes a new version itself; it reports findings and exits non-zero when payload changed without a `version` change.
-
-### Machine-driven contexts (`--auto-structural`)
-
-The strict "structural change requires builder bump" rule assumes a human is authoring the PR and can make the decision before CI runs. The daily skill sync is different: skills can be added or removed by upstream renames, compliance drops, or product moves, and there is no human in the loop until the sync PR exists.
-
-For machine-driven flows, automation runs with `--auto-structural`, which downgrades structural-change-without-bump from a failure to a y-bump. The PR reviewer is the effective builder: they see the structural change *and* its y-bump in one diff and can accept, override, or close.
-
-`--auto-structural` is off by default. Only the sync workflow uses it. Contributor PRs run without the flag so the strict rule still applies.
+Magnitude-vs-change-shape is intentionally **not** validated. If the builder writes `1.2.3 → 1.2.4` on a PR that adds a skill, automation accepts it. The reviewer sees both the bump and the added skill in the diff and pushes back if it's wrong.
 
 ## Builder DX
 
 ### Existing Skill Content Changed
 
-Builder changes an existing included skill:
+Builder edits an existing included skill (e.g. `skills/aiq-deploy/SKILL.md`). Automation bumps `z`:
 
 ```text
-skills/aiq-deploy/SKILL.md
+1.2.3 -> 1.2.4   (content-only change)
 ```
 
-Automation result:
-
-```text
-1.2.3 -> 1.2.4
-```
-
-No builder version edit required when `version_policy: auto`.
+No builder action on `version:` required.
 
 ### Skill Added Or Removed
 
@@ -133,69 +105,75 @@ include_skills:
   - skills/new-skill/
 ```
 
-Builder must also update YAML `version`:
+Automation bumps `y`:
 
-```yaml
-version: "1.3.0"
+```text
+1.2.3 -> 1.3.0   (structural change: skills added: new-skill)
 ```
 
-Automation validates the version and does not bump again.
+No builder action on `version:` required. The reviewer sees the y-bump alongside the added skill and decides if the magnitude is right.
 
-### Human Override Rule
+### Major Bump (Breaking Change)
 
-If the PR already changes YAML `version`, automation treats that as intentional.
+If the change breaks downstream consumers — renaming a plugin, removing capabilities users depend on, redefining behavior — the builder edits `version:` explicitly:
 
-Example:
+```yaml
+version: "2.0.0"
+```
+
+Automation validates (monotonic, no pre-release, no oversized skip) and respects it.
+
+### Builder Override Rule
+
+If the PR already changes YAML `version`, automation never bumps on top of it.
 
 ```text
 Base version: 1.2.0
-PR adds a skill
-PR version: 1.3.0
-Automation keeps: 1.3.0
+PR adds a skill, sets version to 1.3.0
+Automation: validate, accept, do not bump again.
 ```
 
-Bad behavior to avoid:
+Bad behavior automation explicitly avoids:
 
 ```text
-1.2.0 -> 1.3.0 by builder -> 1.4.0 by automation
+1.2.0 -> 1.3.0 by builder -> 1.4.0 by automation   (would be wrong)
 ```
 
 ## Writeback Mechanism
 
-Decision: **CI bumps `z` and commits the change back to the PR branch** before `build-plugins.py --check` runs the drift guard.
+Two integration points, both shipped:
 
-Flow on every PR with `version_policy: auto`:
+**Daily sync workflow** (`sync-skills.yml`): the cron-driven workflow already rebuilds the plugin tree after rsyncing upstream content. Right after that rebuild, it runs `version-plugins.sh --apply --base HEAD` to bump any plugin whose curated content moved relative to the pre-sync commit. The bump lands in the same uncommitted working tree, gets committed by `peter-evans/create-pull-request`, and ships in the sync PR alongside the content change.
 
-1. CI checks out the PR head with a token that can push back to the PR branch (e.g. a deploy key or a GitHub App token, not the default `GITHUB_TOKEN` if the PR is from a fork — fork PRs degrade to "comment with the proposed bump and require the builder to push it").
-2. CI runs the versioning analyzer: computes base-payload hash and head-payload hash, classifies the change (none / content-only / structural), and decides whether to bump.
-3. If a bump is warranted and the YAML `version` was not already changed in the PR:
-    - Rewrite `plugins.d/<name>.yml` with the new version (preserving comments and key order via `ruamel.yaml`, not `pyyaml`).
+**Contributor PRs** (`validate-plugins.yml`): the read-only `--check` step fails the PR if any plugin has a payload change that hasn't been version-bumped (either by automation in a previous CI run, or by the contributor explicitly). When the contributor is in-repo, they can run `version-plugins.sh --apply --base origin/main` locally and commit the bump. For full bot-pushed-back enforcement on contributor PRs, see "Future work" — the current rollout is read-only.
+
+Flow inside one `--apply` invocation:
+
+1. Resolve the base ref (PR target merge-base, `HEAD~1` on main, `HEAD` for sync, or `--base` override).
+2. `git worktree add` the base ref to a temp dir. Run `build-plugins.py` there. Hash the materialized base tree.
+3. Hash the live head tree. Classify the diff (none / content-only / structural).
+4. For each plugin needing a bump:
+    - Rewrite `plugins.d/<name>.yml` with the new version (preserves comments and key order via `ruamel.yaml`).
     - Re-run `build-plugins.py` so generated `plugin.json` files reflect the bump.
-    - Commit with a fixed message (e.g. `chore(version): bump <plugin> to <new>`) and push back to the PR branch using the bot identity.
-4. CI then runs `build-plugins.py --check` for the drift guard. The auto-bump commit + regenerated `plugin.json`s mean the tree is clean.
-
-Fork-PR handling: when push-back is impossible, automation comments the proposed bump on the PR and fails CI with a clear "builder must apply this bump before merge" message.
-
-Manual-policy plugins skip steps 2–3 entirely; CI only runs validation and the drift guard.
-
-The CI bot identity must be allow-listed against `CODEOWNERS` for `plugins.d/**` so the auto-bump commit can land without a human approval.
+5. Drift guard (`build-plugins.py --check`, run later in the workflow) passes because step 4 left the tree clean.
 
 ## Build Algorithm
 
 ```mermaid
 flowchart TD
-    A["Resolve base ref (PR target merge-base; HEAD~1 on main; --base override)"] --> B["Hash base payload + head payload"]
-    B --> C{"Payload changed?"}
-    C -- "No" --> D["Keep version"]
-    C -- "Yes" --> E["Classify change: content-only vs structural"]
-    E --> F{"YAML version already changed?"}
-    F -- "Yes" --> G["Run validation rules"]
-    F -- "No, content-only, auto policy" --> H["Increment z, commit back"]
-    F -- "No, structural, auto policy" --> I["Fail: builder must bump x or y"]
-    F -- "No, manual policy" --> J["Fail: version decision required"]
-    G -- "OK" --> K["Render plugin.json files"]
-    H --> K
-    D --> K
+    A["Resolve base ref<br/>(PR base / HEAD~1 / HEAD / --base)"] --> B["git worktree at base + build there"]
+    B --> C["Hash head tree + base tree"]
+    C --> D{"YAML version already changed?"}
+    D -- "Yes" --> E["Validate: monotonic, no pre-release, no oversized major skip"]
+    D -- "No" --> F{"Payload diff?"}
+    F -- "None" --> G["Keep version"]
+    F -- "Content-only" --> H["Bump z"]
+    F -- "Structural" --> I["Bump y"]
+    E -- "OK" --> J["Render plugin.json files"]
+    E -- "Findings" --> K["Fail PR with message"]
+    G --> J
+    H --> J
+    I --> J
 ```
 
 ## Payload Comparison
@@ -229,7 +207,6 @@ Automation must materialize the base payload too. Two viable approaches: (a) `gi
 ### Excluded from the hash
 
 - YAML `version`
-- YAML `version_policy`
 - generated `plugin.json.version`
 - file path glob exclusions: `**/__pycache__/**`, `**/.DS_Store`, `**/*.pyc`, `**/*.pyo`, `**/*.swp`, `**/.idea/**`, `**/.vscode/**`
 - `plugins/<name>/.skills-manifest.yml` (spec, not payload — and only present on curated plugins, which are out of scope anyway)
@@ -291,19 +268,19 @@ NVIDIA's generated plugin package is the source of truth. External marketplaces 
 
 Versioning behavior:
 
-- Existing skill content change under `version_policy: auto` increments `z`.
-- In-place asset byte change (e.g. resized logo) under `auto` increments `z`.
-- Skill added/removed requires builder to update `y` (or `x` once we hit `2.0` and commit to API stability).
-- Asset added/removed (logo, composer_icon, screenshots) requires builder to update `y`.
-- Capability/default-prompt changes require builder to update `y`.
-- If YAML `version` changed in the PR, automation runs validation (monotonic, magnitude matches change, no pre-release tags, no large unexplained jumps) and does not bump again.
-- `version_policy: manual` never edits YAML `version`; automation reports when a version decision is needed and fails CI.
+- Existing skill content change → automation bumps `z`.
+- In-place asset byte change (resized logo, recompressed screenshot) → automation bumps `z`.
+- Skill added/removed → automation bumps `y`.
+- Asset added/removed (logo, composer_icon, screenshots) → automation bumps `y`.
+- Capability/default-prompt change → automation bumps `y`.
+- Builder sets `version:` in the PR → automation validates (monotonic, no pre-release tag, no oversized major skip) and accepts; no further bump.
+- Builder-set version with "wrong" magnitude (e.g. `1.2.3 → 1.2.4` on a structural change) → accepted; reviewer's call, not CI's.
 
 Writeback:
 
-- Auto-bumps land as a CI bot commit on the PR branch before drift-check.
-- Fork-PR bumps surface as a CI comment with the proposed version and fail the check until the builder applies it.
-- The auto-bump commit also regenerates affected `plugin.json` files so `build-plugins.py --check` passes in the same CI run.
+- Sync workflow (`sync-skills.yml`) auto-bumps land in the sync PR alongside the upstream content change.
+- Contributor PRs (`validate-plugins.yml`) fail with a clear message when payload changed without a version bump; contributor applies `version-plugins.sh --apply --base origin/main` locally and commits.
+- Each auto-bump also regenerates affected `plugin.json` files so `build-plugins.py --check` passes in the same CI run.
 
 Manifests and propagation:
 
@@ -316,22 +293,26 @@ Curated plugins (out of scope for automation, but enforced):
 - The versioning automation skips any plugin without a `plugins.d/<name>.yml`.
 - Hand-maintained `.claude-plugin/plugin.json` for curated plugins is never rewritten by automation.
 
+## Future Work
+
+- **Bot-pushed writeback for contributor PRs.** Today contributor PRs run `--check` (fail with a message); the contributor runs `--apply` locally and commits. A future iteration could push the bump back from CI using a GitHub App token, with fork-PR fallback to a PR comment. Deferred until the friction of the local-run flow is visible.
+- **Per-skill diff in PR summary.** When the bump fires, also surface which skills changed and how (added / removed / content-edited). Quality-of-life; not a blocker.
+- **Marketplace handoff artifact.** Auto-produce a CI artifact or PR-template snippet with source SHA + version delta for external marketplace maintainers (anthropics/claude-plugins-official, openai/plugins).
+
 ## Open Questions
 
-- Should PR summaries compute per-skill diffs for clearer release notes? (Quality-of-life; not a blocker.)
-- How do we surface the version delta and source SHA to external marketplace maintainers? (Manual today; could be a CI artifact / PR template snippet.)
-- Should there be a "no-op release" path — bumping `z` deliberately when the payload didn't change but the builder wants to refresh client caches? (Probably no; if it's needed, do it with an explicit YAML edit.)
+- "No-op release" path — bump `z` deliberately when the payload didn't change but the builder wants to refresh client caches? Lean no; if needed, do it with an explicit YAML edit.
 
 Resolved here, not left open:
 
-- *Skill removal magnitude* — codified in [Ownership Model](#ownership-model): `y` until any plugin reaches `2.0`, then `x`.
 - *Client auto-upgrade behavior* — Claude auto-checks every 24h, Codex requires explicit `marketplace/upgrade`. Vendor behavior, not ours to decide; document per-client UX in user-facing docs.
 
 ## Other Alternatives Considered
 
-- **Auto-bump patch and minor**: rejected because adding/removing skills is a product capability change. NVIDIA plugin builders should own `x.y`.
-- **Only manual versioning**: rejected because routine skill-content refreshes would be easy to forget and users could miss updates.
-- **Use Git SHA as version**: rejected because SHA is good for source provenance, not user-facing release meaning.
+- **Builders own `x.y`, automation only `z` (the earlier strict version of this PRD).** Rejected because structural-change-needs-builder-bump-or-CI-fails added friction without adding signal: reviewers already see the proposed bump in the PR diff. The strict rule also broke the daily auto-sync (compliance drops can remove skills with no human in the loop) and required an `--auto-structural` escape hatch that just proved the rule was wrong.
+- **Auto-bump everything including `x`.** Rejected because a major version is a claim about downstream consumers ("this breaks something"), not a property of the diff. Automation cannot infer that. Builders signal `x` by editing `version:` explicitly.
+- **Only manual versioning.** Rejected because routine skill-content refreshes would be easy to forget and users could miss updates.
+- **Use Git SHA as version.** Rejected because SHA is good for source provenance, not user-facing release meaning.
 
 ## Research Appendix
 
