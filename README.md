@@ -224,19 +224,19 @@ NVIDIA/skills/
 │   ├── <product-prefix>-*/       # Flat layout — one dir per skill, product-prefixed
 │   │                               # e.g. aiq-*, cuopt-*, cupynumeric-*, dali-*,
 │   │                               # deepstream-*, digital-health-*, dynamo-*,
-│   │                               # earth2studio-*, mcore-*, nemo-automodel-*,
-│   │                               # nemo-data-designer-plugin, nemo-evaluator-plugin,
-│   │                               # nemo-mbridge-* (20 skills), nemo-retriever,
+│   │                               # earth2studio-*, launch-nemo-rl, mcore-*,
+│   │                               # nemo-automodel-*, nemo-data-designer-plugin,
+│   │                               # nemo-evaluator-plugin, nemo-mbridge-* (20 skills),
+│   │                               # nemo-retriever, nemo-rl-* (4 skills),
 │   │                               # nemoclaw-user-* (10 skills), nemotron-*,
 │   │                               # physicsnemo-*, rag-*, skill-card-generator,
-│   │                               # tilegym-*, accelerated-computing-cudf, cudaq-guide
+│   │                               # tilegym-*, vss-* (15 skills),
+│   │                               # accelerated-computing-cudf, cudaq-guide
 │   ├── omniverse-*/              # Physical AI — manually staged (see manual-components.yml)
-│   ├── physical-ai-*/            # Physical AI — manually staged
-│   ├── NeMo-RL/                  # Legacy nested layout (5 skills under one dir)
-│   └── video-search-and-summarization/  # Legacy nested layout (15 skills under one dir)
+│   └── physical-ai-*/            # Physical AI — manually staged
 ├── components.d/                # Product registry — one file per component, teams onboard here
 │   ├── README.md                 # Schema and onboarding instructions
-│   └── <product>.yml             # one file per registered product (24 today)
+│   └── <product>.yml             # one file per registered product (32 today)
 ├── plugins/                     # Packaged plugin distributions
 │   └── nvidia-skills/            # Curated NVIDIA skills bundle (Claude Code, Codex)
 ├── plugins.d/                   # Plugin build registry — config for `build-plugins.py`
