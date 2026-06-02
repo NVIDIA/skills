@@ -10,6 +10,15 @@
 
 version: "1.0.0"
 
+# Versioning automation policy. Applies to every catalog plugin unless
+# overridden in plugins.d/<name>.yml. See plugin-versioning-mini-prd.md.
+#
+#   auto    — automation may bump z when only existing payload content
+#             changed. Builder still owns x and y. Default.
+#   manual  — automation never edits YAML version; CI fails if payload
+#             changed without a version bump.
+version_policy: auto
+
 author:
   name: NVIDIA
   url: https://github.com/NVIDIA/skills
