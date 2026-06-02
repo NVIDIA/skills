@@ -121,13 +121,18 @@ If the probe fails or the listed ids don't include `${VLM_MODEL}`, fall back to 
 
 ### Step 3 — Call the VLM directly
 
-Use the OpenAI-compatible `chat/completions` endpoint with a `video_url` content block — the same payload shape `video_understanding` builds in `src/vss_agents/tools/video_understanding.py` (`_build_vlm_messages`):
+Use the OpenAI-compatible `chat/completions` endpoint with a `video_url` content block — the same payload shape **and multimodal settings** `video_understanding` builds in `src/vss_agents/tools/video_understanding.py` (`_build_vlm_messages` + the Cosmos `base_vlm.bind(...)` call).
+
+The frame sampling and visual-token (pixel) budget below mirror the **base profile** `video_understanding` config (`deploy/docker/developer-profiles/dev-profile-base/vss-agent/configs/config.yml`): `max_fps=2`, `max_frames=30`, `min_pixels=3136`, `max_pixels=8388608`. **Send `mm_processor_kwargs` and `media_io_kwargs`** so the direct call uses the same frame sampling and pixel budget as the in-agent `video_understanding` tool — omitting them lets the VLM apply its own defaults, so the output diverges from the agent path.
 
 ```bash
 PROMPT='Describe in detail what happens in the video, with timestamps (start–end in seconds from clip start) for each segment or event. Cover scenes, objects, people, vehicles, and notable actions.'
 
-# Cosmos Reason 2 reasoning prompt suffix — matches video_understanding.py for is_cosmos_reason2 + reasoning=true.
-# Drop this suffix for non-cosmos-reason2 VLMs.
+# Reasoning is OFF by default — matches the base-profile video_understanding config (`reasoning: false`).
+# video_understanding.py uses config.reasoning unless the caller overrides it, so default to non-reasoning.
+# Append the Cosmos Reason 2 reasoning suffix ONLY when the user explicitly asks for reasoning
+# (drop it for non-cosmos-reason2 VLMs). With reasoning off, the response has no <think> block.
+if [ "${REASONING:-false}" = "true" ]; then
 PROMPT="${PROMPT}
 
 Answer the question using the following format:
@@ -137,6 +142,29 @@ Your reasoning.
 </think>
 
 Write your final answer immediately after the </think> tag."
+fi
+
+# Multimodal settings — mirror the base-profile video_understanding config (config.yml).
+MAX_FPS=2; MAX_FRAMES=30; MIN_PIXELS=3136; MAX_PIXELS=8388608
+
+# num_frames = min(int(clip_seconds) * max_fps, max_frames), min 1 — matches video_understanding.py.
+# clip_seconds (Step 1 endTime-startTime) may be fractional; truncate to integer seconds — bash $((...))
+# is integer-only and errors on "15.0"/"1.5". Default 15s -> caps at MAX_FRAMES.
+CLIP_SECONDS=$(awk -v s="${CLIP_SECONDS:-15}" 'BEGIN{printf "%d", s}')
+NUM_FRAMES=$(( CLIP_SECONDS * MAX_FPS ))
+[ "$NUM_FRAMES" -gt "$MAX_FRAMES" ] && NUM_FRAMES=$MAX_FRAMES
+[ "$NUM_FRAMES" -lt 1 ] && NUM_FRAMES=1
+
+# num_frames (media_io_kwargs) applies to any Cosmos VLM. The pixel budget (mm_processor_kwargs) below is
+# Cosmos Reason 2-SPECIFIC: both the size{shortest_edge,longest_edge} shape and the 3136/8388608 values come
+# from the CR2 base config. Do NOT reuse these for Cosmos Reason 1 — CR1 takes videos_kwargs{min_pixels,
+# max_pixels}, whose max_pixels is a different quantity than CR2's longest_edge (see the Cosmos Reason NIM
+# docs). For CR1/other VLMs, add that model's own mm_processor_kwargs per its docs. Build the JSON fragment:
+case "$VLM_MODEL" in
+  *cosmos-reason2*) MM_KWARGS=", \"mm_processor_kwargs\": {\"size\": {\"shortest_edge\": ${MIN_PIXELS}, \"longest_edge\": ${MAX_PIXELS}}}, \"media_io_kwargs\": {\"video\": {\"num_frames\": ${NUM_FRAMES}}}" ;;
+  *cosmos*)         MM_KWARGS=", \"media_io_kwargs\": {\"video\": {\"num_frames\": ${NUM_FRAMES}}}" ;;  # CR1/other Cosmos: also add mm_processor_kwargs per the model's NIM docs
+  *)                MM_KWARGS="" ;;
+esac
 
 curl -s -X POST "${VLM_ENDPOINT}/chat/completions" \
   -H "Content-Type: application/json" \
@@ -153,10 +181,12 @@ curl -s -X POST "${VLM_ENDPOINT}/chat/completions" \
     }
   ],
   "max_tokens": 1024,
-  "temperature": 0.0
+  "temperature": 0.0${MM_KWARGS}
 }
 EOF
 ```
+
+> The `case "$VLM_MODEL"` block sends the Cosmos Reason 2 pixel budget (`size:{shortest_edge:3136, longest_edge:8388608}`, from `config.yml`) **only for Cosmos Reason 2**, plus `num_frames` for any Cosmos VLM. **Do not reuse these pixel values for other VLMs:** Cosmos Reason 1 takes `videos_kwargs:{min_pixels, max_pixels}`, and its `max_pixels` is **not** the same quantity as CR2's `longest_edge` — set CR1/other-VLM `mm_processor_kwargs` per that model's [Cosmos Reason NIM docs](https://docs.nvidia.com/nim/vision-language-models/1.6.0/introduction.html). Non-Cosmos VLMs need no extra kwargs.
 
 If the VLM returns a `<think>…</think>` block (Cosmos Reason reasoning mode), keep only the text after `</think>` as the report body.
 
