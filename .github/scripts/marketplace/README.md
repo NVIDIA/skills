@@ -10,9 +10,7 @@ This repo generates two catalog-wide metadata files:
   `metadata.json`, grouping skills by `catalog.subdomain`.
 
 Both files are produced by
-[`.github/scripts/marketplace/generate-skill-metadata.py`](../.github/scripts/marketplace/generate-skill-metadata.py).
-The full design is documented in
-[`metadata-generation-prd.md`](metadata-generation-prd.md).
+[`generate-skill-metadata.py`](./generate-skill-metadata.py) (this directory).
 
 ## Authoring rules
 
@@ -22,16 +20,15 @@ config) live under `.github/scripts/marketplace/`:
 - The generator never rewrites `SKILL.md` content. Skill `name` and
   `description` are copied verbatim from each `SKILL.md` frontmatter.
 - All controlled values come from
-  [`.github/scripts/marketplace/metadata.schema.json`](../.github/scripts/marketplace/metadata.schema.json).
-  The schema is the single source of truth and is consumed directly at
-  runtime; there is no derived taxonomy companion file to keep in sync.
-- The
-  [`.github/scripts/marketplace/skills-sh.schema.json`](../.github/scripts/marketplace/skills-sh.schema.json)
-  describes the structural contract for the generated `skills.sh.json`.
+  [`metadata.schema.json`](./metadata.schema.json). The schema is the single
+  source of truth and is consumed directly at runtime; there is no derived
+  taxonomy companion file to keep in sync.
+- [`skills-sh.schema.json`](./skills-sh.schema.json) describes the structural
+  contract for the generated `skills.sh.json`.
 - Subdomain group titles, descriptions, and ordering live in
-  [`.github/scripts/marketplace/skills-subdomains.json`](../.github/scripts/marketplace/skills-subdomains.json).
+  [`skills-subdomains.json`](./skills-subdomains.json).
 - Skills can be temporarily withheld from both outputs by adding them to
-  [`.github/scripts/marketplace/metadata-exclusions.yaml`](../.github/scripts/marketplace/metadata-exclusions.yaml).
+  [`metadata-exclusions.yaml`](./metadata-exclusions.yaml).
 - Skill-to-product mapping is deterministic only when a skill is declared in
   one of the synced `components.d/*.yml` registries. Skills outside that set
   (e.g. catalog-only entries staged via direct PR) fall through to AI
@@ -95,7 +92,7 @@ python3 .github/scripts/marketplace/generate-skill-metadata.py --report-only
 ## CI behavior
 
 Defined in
-[`.github/workflows/generate-skill-metadata.yml`](../.github/workflows/generate-skill-metadata.yml).
+[`.github/workflows/generate-skill-metadata.yml`](../../workflows/generate-skill-metadata.yml).
 
 | Trigger | Action | AI? |
 | --- | --- | --- |
@@ -139,10 +136,10 @@ from the shell environment. `.env` is gitignored.
 ## Adding a new subdomain
 
 1. Add the slug to `catalog.subdomain.enum` in
-   [`.github/scripts/marketplace/metadata.schema.json`](../.github/scripts/marketplace/metadata.schema.json).
+   [`metadata.schema.json`](./metadata.schema.json).
 2. Add a matching entry to
-   [`.github/scripts/marketplace/skills-subdomains.json`](../.github/scripts/marketplace/skills-subdomains.json)
-   with a `title` and `description`.
+   [`skills-subdomains.json`](./skills-subdomains.json) with a `title` and
+   `description`.
 3. Re-run the generator to assign or migrate skills as needed.
 
 ## Adding a new product enum
