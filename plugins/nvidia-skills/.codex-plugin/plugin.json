@@ -14,6 +14,8 @@
         "gpu",
         "cuda",
         "ai-agents",
+        "data-loading",
+        "training",
         "inference",
         "llm-serving",
         "robotics",
@@ -28,7 +30,7 @@
     "interface": {
         "displayName": "NVIDIA",
         "shortDescription": "Guided help for NVIDIA AI, GPU, robotics, simulation, and 3D workflows.",
-        "longDescription": "NVIDIAs ecosystem spans GPU acceleration, CUDA, AI agents, inference, robotics, Physical AI, Omniverse, and simulation. This plugin helps you understand the pieces, choose a path, validate your setup, and build practical NVIDIA-powered workflows.",
+        "longDescription": "NVIDIAs ecosystem spans GPU acceleration, CUDA, AI agents, data loading, training, inference, robotics, Physical AI, Omniverse, and simulation. This plugin helps you understand the pieces, choose a path, validate your setup, and build practical NVIDIA-powered workflows.",
         "developerName": "NVIDIA",
         "category": "Coding",
         "capabilities": [

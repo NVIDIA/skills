@@ -4,7 +4,7 @@ description: Skills for NVIDIAs ecosystem spans GPU acceleration, CUDA, AI agent
 
 display_name: NVIDIA
 short_description: Guided help for NVIDIA AI, GPU, robotics, simulation, and 3D workflows.
-long_description: NVIDIAs ecosystem spans GPU acceleration, CUDA, AI agents, inference, robotics, Physical AI, Omniverse, and simulation. This plugin helps you understand the pieces, choose a path, validate your setup, and build practical NVIDIA-powered workflows.
+long_description: NVIDIAs ecosystem spans GPU acceleration, CUDA, AI agents, data loading, training, inference, robotics, Physical AI, Omniverse, and simulation. This plugin helps you understand the pieces, choose a path, validate your setup, and build practical NVIDIA-powered workflows.
 
 category: Coding
 logo: ./assets/nvidia.png
@@ -16,6 +16,8 @@ keywords:
   - gpu
   - cuda
   - ai-agents
+  - data-loading
+  - training
   - inference
   - llm-serving
   - robotics
@@ -51,6 +53,8 @@ include_skills:
   - skills/omniverse-realtime-viewer/
   # cuOpt
   - skills/cuopt-user-rules/
+  # DALI
+  - skills/dali-dynamic-mode/
 
 
 # Inherits from plugins.d/_defaults.yml:
