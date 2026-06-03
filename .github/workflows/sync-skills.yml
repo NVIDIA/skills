@@ -430,12 +430,29 @@ jobs:
             title="Skills dropped from sync — $joined"
           fi
 
+          # Assign the rolling tracker to the catalog PIC so any drift
+          # change reliably reaches them via GitHub notifications,
+          # independent of repo-watch settings. The CATALOG_TRACKER_ASSIGNEES
+          # secret can hold a comma-separated list (e.g. "mosheabr,otherpic")
+          # — falls back to "mosheabr" if the secret isn't set, so the
+          # workflow stays self-contained without manual repo config.
+          assignees="${{ secrets.CATALOG_TRACKER_ASSIGNEES }}"
+          assignees="${assignees:-mosheabr}"
+
           if [ -n "$existing" ]; then
             gh issue edit "$existing" --title "$title" --body-file "$body"
-            echo "Updated tracking issue #$existing"
+            # `--add-assignee` is idempotent — re-asserts assignment on
+            # every run so a manual unassign doesn't permanently mute it.
+            IFS=',' read -r -a assignee_arr <<< "$assignees"
+            for a in "${assignee_arr[@]}"; do
+              gh issue edit "$existing" --add-assignee "$a" || true
+            done
+            echo "Updated tracking issue #$existing (assignees: $assignees)"
           else
-            gh issue create --title "$title" --body-file "$body" --label missing-compliance
-            echo "Opened new tracking issue"
+            gh issue create --title "$title" --body-file "$body" \
+              --label missing-compliance \
+              --assignee "$assignees"
+            echo "Opened new tracking issue (assignees: $assignees)"
           fi
 
       - name: Rebuild plugin catalog
