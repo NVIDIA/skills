@@ -2,13 +2,124 @@ name: TAO Toolkit
 repo: NVIDIA-TAO/tao-skills-bank
 description: NVIDIA TAO Toolkit - fine-tune and optimize 100+ pretrained vision AI models with your own data using low-code microservices, then export production-ready models for edge or cloud deployment.
 skills:
-  - path: skills/applications/
-    catalog_dir: tao-applications
-  - path: skills/data/
-    catalog_dir: tao-data
-  - path: skills/models/
-    catalog_dir: tao-models
-  - path: skills/platform/
-    catalog_dir: tao-platform
-  - path: skills/misc/
-    catalog_dir: tao-misc
+  # applications
+  - path: skills/applications/tao-analyze-changenet-rca/
+    catalog_dir: tao-analyze-changenet-rca
+  - path: skills/applications/tao-finetune-huggingface-model/
+    catalog_dir: tao-finetune-huggingface-model
+  - path: skills/applications/tao-port-huggingface-model/
+    catalog_dir: tao-port-huggingface-model
+  - path: skills/applications/tao-run-automl/
+    catalog_dir: tao-run-automl
+  - path: skills/applications/tao-run-automl-deft-pipeline/
+    catalog_dir: tao-run-automl-deft-pipeline
+  - path: skills/applications/tao-run-deft-aoi/
+    catalog_dir: tao-run-deft-aoi
+  - path: skills/applications/tao-run-inference-service/
+    catalog_dir: tao-run-inference-service
+  - path: skills/applications/tao-train-single-step/
+    catalog_dir: tao-train-single-step
+  # data
+  - path: skills/data/tao-analyze-gaps-visual-changenet/
+    catalog_dir: tao-analyze-gaps-visual-changenet
+  - path: skills/data/tao-analyze-gaps-vlm-bcq/
+    catalog_dir: tao-analyze-gaps-vlm-bcq
+  - path: skills/data/tao-convert-dataset-format/
+    catalog_dir: tao-convert-dataset-format
+  - path: skills/data/tao-generate-image-grounding/
+    catalog_dir: tao-generate-image-grounding
+  - path: skills/data/tao-generate-referring-expressions/
+    catalog_dir: tao-generate-referring-expressions
+  - path: skills/data/tao-generate-video-reasoning-annotations/
+    catalog_dir: tao-generate-video-reasoning-annotations
+  - path: skills/data/tao-mine-aoi-images/
+    catalog_dir: tao-mine-aoi-images
+  - path: skills/data/tao-route-visual-changenet-samples/
+    catalog_dir: tao-route-visual-changenet-samples
+  - path: skills/data/tao-validate-dataset-format/
+    catalog_dir: tao-validate-dataset-format
+  # models
+  - path: skills/models/tao-finetune-clip/
+    catalog_dir: tao-finetune-clip
+  - path: skills/models/tao-finetune-cosmos-embed/
+    catalog_dir: tao-finetune-cosmos-embed
+  - path: skills/models/tao-finetune-cosmos-reason/
+    catalog_dir: tao-finetune-cosmos-reason
+  - path: skills/models/tao-train-action-recognition/
+    catalog_dir: tao-train-action-recognition
+  - path: skills/models/tao-train-bevfusion/
+    catalog_dir: tao-train-bevfusion
+  - path: skills/models/tao-train-centerpose/
+    catalog_dir: tao-train-centerpose
+  - path: skills/models/tao-train-deformable-detr/
+    catalog_dir: tao-train-deformable-detr
+  - path: skills/models/tao-train-depth-anything-v2/
+    catalog_dir: tao-train-depth-anything-v2
+  - path: skills/models/tao-train-dino/
+    catalog_dir: tao-train-dino
+  - path: skills/models/tao-train-fast-foundation-stereo/
+    catalog_dir: tao-train-fast-foundation-stereo
+  - path: skills/models/tao-train-foundation-stereo/
+    catalog_dir: tao-train-foundation-stereo
+  - path: skills/models/tao-train-grounding-dino/
+    catalog_dir: tao-train-grounding-dino
+  - path: skills/models/tao-train-image-classification/
+    catalog_dir: tao-train-image-classification
+  - path: skills/models/tao-train-mask-auto-encoder/
+    catalog_dir: tao-train-mask-auto-encoder
+  - path: skills/models/tao-train-mask-auto-label/
+    catalog_dir: tao-train-mask-auto-label
+  - path: skills/models/tao-train-mask-grounding-dino/
+    catalog_dir: tao-train-mask-grounding-dino
+  - path: skills/models/tao-train-mask2former/
+    catalog_dir: tao-train-mask2former
+  - path: skills/models/tao-train-metric-learning-recognition/
+    catalog_dir: tao-train-metric-learning-recognition
+  - path: skills/models/tao-train-nvdinov2/
+    catalog_dir: tao-train-nvdinov2
+  - path: skills/models/tao-train-nvpanoptix3d/
+    catalog_dir: tao-train-nvpanoptix3d
+  - path: skills/models/tao-train-ocdnet/
+    catalog_dir: tao-train-ocdnet
+  - path: skills/models/tao-train-ocrnet/
+    catalog_dir: tao-train-ocrnet
+  - path: skills/models/tao-train-oneformer/
+    catalog_dir: tao-train-oneformer
+  - path: skills/models/tao-train-optical-inspection/
+    catalog_dir: tao-train-optical-inspection
+  - path: skills/models/tao-train-pointpillars/
+    catalog_dir: tao-train-pointpillars
+  - path: skills/models/tao-train-pose-classification/
+    catalog_dir: tao-train-pose-classification
+  - path: skills/models/tao-train-reid/
+    catalog_dir: tao-train-reid
+  - path: skills/models/tao-train-rtdetr/
+    catalog_dir: tao-train-rtdetr
+  - path: skills/models/tao-train-segformer/
+    catalog_dir: tao-train-segformer
+  - path: skills/models/tao-train-sparse4d/
+    catalog_dir: tao-train-sparse4d
+  - path: skills/models/tao-train-visual-changenet/
+    catalog_dir: tao-train-visual-changenet
+  # platform
+  - path: skills/platform/tao-run-on-brev/
+    catalog_dir: tao-run-on-brev
+  - path: skills/platform/tao-run-on-docker/
+    catalog_dir: tao-run-on-docker
+  - path: skills/platform/tao-run-on-kubernetes/
+    catalog_dir: tao-run-on-kubernetes
+  - path: skills/platform/tao-run-on-lepton/
+    catalog_dir: tao-run-on-lepton
+  - path: skills/platform/tao-run-on-local-docker/
+    catalog_dir: tao-run-on-local-docker
+  - path: skills/platform/tao-run-on-slurm/
+    catalog_dir: tao-run-on-slurm
+  - path: skills/platform/tao-run-platform/
+    catalog_dir: tao-run-platform
+  - path: skills/platform/tao-setup-nvidia-gpu-host/
+    catalog_dir: tao-setup-nvidia-gpu-host
+  # core
+  - path: skills/core/tao-launch-workflow/
+    catalog_dir: tao-launch-workflow
+  - path: skills/core/tao-list-capabilities/
+    catalog_dir: tao-list-capabilities
