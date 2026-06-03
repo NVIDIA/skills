@@ -138,6 +138,71 @@ jobs:
             exit 1
           fi
 
+      - name: Detect signature drift in rsync
+        run: |
+          set -euo pipefail
+
+          # Signature drift = the rsync changed files under skills/<dir>/
+          # but did NOT change skills/<dir>/skill.oms.sig. The on-source
+          # signature is therefore stale relative to the on-source content,
+          # and landing it would break cryptographic verification on the
+          # next "Verify Signed Skills" sweep.
+          #
+          # Recovery:
+          #   - Skill existed on main → revert the catalog dir to its
+          #     pre-rsync (signed) state. The signed version stays live;
+          #     the unsigned update is held until the source team runs
+          #     /nvskills-ci and the next sync picks up the fresh sig.
+          #   - New skill (no prior version on main) → drop outright.
+          #
+          # Both cases are recorded in /tmp/dropped-skills.txt with a
+          # reason string starting with "sig drift", so the
+          # "Track dropped skills" step surfaces them in the rolling
+          # tracker issue alongside missing-artifact drops.
+          dropped=/tmp/dropped-skills.txt
+          touch "$dropped"
+
+          while IFS= read -r skill_md; do
+            dir=$(dirname "$skill_md")
+
+            # Files changed by the rsync (working tree vs HEAD).
+            changed=$(git diff --name-only HEAD -- "$dir/" 2>/dev/null || true)
+            if [ -z "$changed" ]; then
+              continue
+            fi
+
+            sig_changed=$(echo "$changed" | grep -E '(^|/)skill\.oms\.sig$' || true)
+            non_sig_changed=$(echo "$changed" | grep -vE '(^|/)skill\.oms\.sig$' || true)
+
+            if [ -n "$non_sig_changed" ] && [ -z "$sig_changed" ]; then
+              product=$(echo "$dir" | awk -F/ '{print $2}')
+              file_count=$(echo "$non_sig_changed" | wc -l | tr -d ' ')
+
+              if git ls-tree HEAD -- "$dir" | grep -q .; then
+                reason="sig drift reverted ($file_count file(s) changed without skill.oms.sig refresh)"
+                echo "$product|$dir|$reason" >> "$dropped"
+                echo "  ↩ $dir — $reason — reverting to HEAD"
+                git checkout HEAD -- "$dir/"
+                git clean -fd "$dir/" >/dev/null
+              else
+                reason="sig drift dropped ($file_count file(s) without skill.oms.sig — new skill, no prior version)"
+                echo "$product|$dir|$reason" >> "$dropped"
+                echo "  ✗ $dir — $reason"
+                rm -rf "$dir"
+              fi
+            fi
+          done < <(find skills -type f -name SKILL.md)
+
+          # Mark any product with a dropped skill as "changed" so the PR
+          # opens (matches the pattern used by the compliance step).
+          if [ -s "$dropped" ]; then
+            while IFS='|' read -r product _ _; do
+              if ! grep -qx "- $product" /tmp/changed-components.txt 2>/dev/null; then
+                echo "- $product" >> /tmp/changed-components.txt
+              fi
+            done < "$dropped"
+          fi
+
       - name: Enforce skill compliance (signature + card)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -228,7 +293,7 @@ jobs:
 
           gh label create missing-compliance \
             --color FFA500 \
-            --description "Catalog skills dropped from sync — missing skill.oms.sig, skill-card.md, and/or evals.json" \
+            --description "Catalog skills dropped or reverted by sync — missing artifacts or signature drift" \
             --force >/dev/null
 
           existing=$(gh issue list --label missing-compliance --state open \
@@ -237,7 +302,7 @@ jobs:
           if [ ! -s "$dropped" ]; then
             if [ -n "$existing" ]; then
               gh issue close "$existing" \
-                --comment "All catalog skills now carry \`skill.oms.sig\`, \`skill-card.md\`, and \`evals.json\`. Closing automatically."
+                --comment "All catalog skills now carry \`skill.oms.sig\`, \`skill-card.md\`, and \`evals.json\`, and no signature drift detected. Closing automatically."
               echo "All compliant — closed tracking issue #$existing"
             else
               echo "All compliant — nothing to track"
@@ -248,33 +313,65 @@ jobs:
           sort -t'|' -k1,1 -k2,2 -o "$dropped" "$dropped"
           count=$(wc -l < "$dropped" | tr -d ' ')
 
+          # Partition entries by reason for clearer reporting.
+          drift_count=$(awk -F'|' '$3 ~ /^sig drift/' "$dropped" | wc -l | tr -d ' ')
+          missing_count=$(awk -F'|' '$3 !~ /^sig drift/' "$dropped" | wc -l | tr -d ' ')
+
           body=/tmp/missing-compliance-body.md
           {
-            echo "Tracking catalog skills that were **dropped from sync** because they are missing one or more required artifacts next to \`SKILL.md\`:"
-            echo "- \`skill.oms.sig\` (NVIDIA detached signature)"
-            echo "- \`skill-card.md\` (skill metadata card)"
-            echo "- \`evals.json\` (eval definitions — anywhere within the skill directory, typically under \`benchmark/\`)"
+            echo "Tracking catalog skills that were **dropped from sync** or **reverted** in the last run. Two failure modes are surfaced here:"
             echo ""
-            echo "**Compliance is enforced** — skills missing any of these are removed from the catalog before the sync PR is opened. To restore a dropped skill, ensure all three artifacts exist in the upstream repo."
+            echo "1. **Missing artifacts** — \`SKILL.md\` exists on the source repo but one or more required companions don't:"
+            echo "   - \`skill.oms.sig\` (NVIDIA detached signature)"
+            echo "   - \`skill-card.md\` (skill metadata card)"
+            echo "   - \`evals.json\` (eval definitions — anywhere within the skill directory)"
+            echo "2. **Signature drift** — files in the skill dir were updated on the source repo, but \`skill.oms.sig\` wasn't refreshed alongside. Loading this content would break crypto verification, so:"
+            echo "   - Skills that previously existed on \`main\` are **reverted** to their last-signed version (the signed copy stays live)."
+            echo "   - Brand-new skills with drift are **dropped** outright."
+            echo "   Recovery: comment \`/nvskills-ci\` on a follow-up PR on the source repo so the next sync picks up a fresh, content-aligned signature."
             echo ""
             echo "**Last updated:** $(date -u +%Y-%m-%d) by [sync run #${{ github.run_id }}]($RUN_URL)"
             echo ""
-            echo "## Dropped skills ($count)"
-            current=""
-            while IFS='|' read -r product dir missing; do
-              if [ "$product" != "$current" ]; then
-                echo ""
-                echo "### \`$product\`"
-                current="$product"
-              fi
-              echo "- \`$dir\` — missing: $missing"
-            done < "$dropped"
-            echo ""
+            if [ "$missing_count" -gt 0 ]; then
+              echo "## Missing artifacts ($missing_count)"
+              current=""
+              while IFS='|' read -r product dir reason; do
+                case "$reason" in sig\ drift*) continue ;; esac
+                if [ "$product" != "$current" ]; then
+                  echo ""
+                  echo "### \`$product\`"
+                  current="$product"
+                fi
+                echo "- \`$dir\` — missing: $reason"
+              done < "$dropped"
+              echo ""
+            fi
+            if [ "$drift_count" -gt 0 ]; then
+              echo "## Signature drift ($drift_count)"
+              current=""
+              while IFS='|' read -r product dir reason; do
+                case "$reason" in sig\ drift*) ;; *) continue ;; esac
+                if [ "$product" != "$current" ]; then
+                  echo ""
+                  echo "### \`$product\`"
+                  current="$product"
+                fi
+                echo "- \`$dir\` — $reason"
+              done < "$dropped"
+              echo ""
+            fi
             echo "---"
-            echo "Owners: ensure your upstream pipeline produces \`skill.oms.sig\`, \`skill-card.md\`, and \`evals.json\` for each skill. This issue auto-updates each sync and closes when all skills are compliant."
+            echo "Owners: re-run \`/nvskills-ci\` on the source repo after editing skill content so the signature stays in sync. This issue auto-updates each sync and closes when all skills are compliant."
           } > "$body"
 
-          title="Skills dropped from sync — missing required artifacts ($count)"
+          if [ "$drift_count" -gt 0 ] && [ "$missing_count" -gt 0 ]; then
+            title="Skills dropped from sync — $missing_count missing artifacts, $drift_count sig drift"
+          elif [ "$drift_count" -gt 0 ]; then
+            title="Skills dropped from sync — $drift_count sig drift"
+          else
+            title="Skills dropped from sync — missing required artifacts ($missing_count)"
+          fi
+
           if [ -n "$existing" ]; then
             gh issue edit "$existing" --title "$title" --body-file "$body"
             echo "Updated tracking issue #$existing"
