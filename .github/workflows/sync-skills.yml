@@ -165,8 +165,13 @@ jobs:
           while IFS= read -r skill_md; do
             dir=$(dirname "$skill_md")
 
-            # Files changed by the rsync (working tree vs HEAD).
-            changed=$(git diff --name-only HEAD -- "$dir/" 2>/dev/null || true)
+            # Files changed by the rsync. `git diff` only sees tracked
+            # modifications; rsync-added files are untracked at this
+            # point, so we union diff + ls-files --others to capture
+            # the full delta.
+            modified=$(git diff --name-only HEAD -- "$dir/" 2>/dev/null || true)
+            untracked=$(git ls-files --others --exclude-standard -- "$dir/" 2>/dev/null || true)
+            changed=$(printf '%s\n%s\n' "$modified" "$untracked" | sed '/^$/d')
             if [ -z "$changed" ]; then
               continue
             fi
@@ -179,13 +184,14 @@ jobs:
               file_count=$(echo "$non_sig_changed" | wc -l | tr -d ' ')
 
               if git ls-tree HEAD -- "$dir" | grep -q .; then
-                reason="sig drift reverted ($file_count file(s) changed without skill.oms.sig refresh)"
+                reason="sig drift: reverted ($file_count file(s) changed without skill.oms.sig refresh)"
                 echo "$product|$dir|$reason" >> "$dropped"
                 echo "  ↩ $dir — $reason — reverting to HEAD"
                 git checkout HEAD -- "$dir/"
-                git clean -fd "$dir/" >/dev/null
+                # -x clears ignored files too so the dir matches HEAD exactly.
+                git clean -fdx -- "$dir/" >/dev/null
               else
-                reason="sig drift dropped ($file_count file(s) without skill.oms.sig — new skill, no prior version)"
+                reason="sig drift: dropped ($file_count file(s) without skill.oms.sig — new skill, no prior version)"
                 echo "$product|$dir|$reason" >> "$dropped"
                 echo "  ✗ $dir — $reason"
                 rm -rf "$dir"
@@ -195,9 +201,11 @@ jobs:
 
           # Mark any product with a dropped skill as "changed" so the PR
           # opens (matches the pattern used by the compliance step).
+          # `--` and `-F` are explicit so the leading "-" in the pattern
+          # isn't parsed as a grep option.
           if [ -s "$dropped" ]; then
             while IFS='|' read -r product _ _; do
-              if ! grep -qx "- $product" /tmp/changed-components.txt 2>/dev/null; then
+              if ! grep -Fqx -- "- $product" /tmp/changed-components.txt 2>/dev/null; then
                 echo "- $product" >> /tmp/changed-components.txt
               fi
             done < "$dropped"
@@ -227,8 +235,13 @@ jobs:
           #                     canonical evals/evals.json layout.
           # Skills missing any of these are dropped from the catalog
           # before the PR is created — non-compliant skills do not merge.
+          #
+          # Append-only: the preceding "Detect signature drift" step
+          # writes to the same /tmp/dropped-skills.txt with "sig drift:"
+          # prefixed reasons. Do NOT truncate here — that would wipe
+          # drift records.
           dropped=/tmp/dropped-skills.txt
-          truncate -s 0 "$dropped"
+          touch "$dropped"
 
           while IFS= read -r skill_md; do
             dir=$(dirname "$skill_md")
@@ -250,7 +263,9 @@ jobs:
             [ -n "$has_eval" ] || missing="$missing evals.json"
             if [ -n "$missing" ]; then
               product=$(echo "$dir" | awk -F/ '{print $2}')
-              echo "$product|$dir|$(echo "$missing" | xargs)" >> "$dropped"
+              # Prefixed reason so the tracker-issue partition splits
+              # cleanly into missing-artifacts / orphan / sig-drift.
+              echo "$product|$dir|missing artifacts: $(echo "$missing" | xargs)" >> "$dropped"
               echo "  ✗ Dropping $dir — missing:$missing"
               rm -rf "$dir"
             fi
@@ -265,7 +280,7 @@ jobs:
             product_dir="${product_dir%/}"
             if [ -z "$(find "$product_dir" -type f -name SKILL.md -print -quit 2>/dev/null)" ]; then
               product=$(basename "$product_dir")
-              echo "$product|$product_dir|(orphan — no skills inside)" >> "$dropped"
+              echo "$product|$product_dir|orphan: no SKILL.md inside" >> "$dropped"
               echo "  ✗ Dropping orphan $product_dir — no SKILL.md inside"
               rm -rf "$product_dir"
             fi
@@ -273,9 +288,10 @@ jobs:
 
           # Mark any product with a dropped skill as "changed" so the PR
           # opens even when the only diff is a removed non-compliant skill.
+          # `-F` literal, `--` to stop option parsing (pattern starts with "-").
           if [ -s "$dropped" ]; then
             while IFS='|' read -r product _ _; do
-              if ! grep -qx "- $product" /tmp/changed-components.txt 2>/dev/null; then
+              if ! grep -Fqx -- "- $product" /tmp/changed-components.txt 2>/dev/null; then
                 echo "- $product" >> /tmp/changed-components.txt
               fi
             done < "$dropped"
@@ -313,13 +329,17 @@ jobs:
           sort -t'|' -k1,1 -k2,2 -o "$dropped" "$dropped"
           count=$(wc -l < "$dropped" | tr -d ' ')
 
-          # Partition entries by reason for clearer reporting.
-          drift_count=$(awk -F'|' '$3 ~ /^sig drift/' "$dropped" | wc -l | tr -d ' ')
-          missing_count=$(awk -F'|' '$3 !~ /^sig drift/' "$dropped" | wc -l | tr -d ' ')
+          # Partition by explicit reason prefix: "missing artifacts:" /
+          # "orphan:" / "sig drift:". Anything that doesn't match a known
+          # prefix is grouped under "Other" so nothing is silently lost.
+          missing_count=$(awk -F'|' '$3 ~ /^missing artifacts:/' "$dropped" | wc -l | tr -d ' ')
+          orphan_count=$(awk -F'|' '$3 ~ /^orphan:/' "$dropped" | wc -l | tr -d ' ')
+          drift_count=$(awk -F'|' '$3 ~ /^sig drift:/' "$dropped" | wc -l | tr -d ' ')
+          other_count=$(awk -F'|' '$3 !~ /^(missing artifacts:|orphan:|sig drift:)/' "$dropped" | wc -l | tr -d ' ')
 
           body=/tmp/missing-compliance-body.md
           {
-            echo "Tracking catalog skills that were **dropped from sync** or **reverted** in the last run. Two failure modes are surfaced here:"
+            echo "Tracking catalog skills that were **dropped** or **reverted** by the last sync run. Failure modes surfaced here:"
             echo ""
             echo "1. **Missing artifacts** — \`SKILL.md\` exists on the source repo but one or more required companions don't:"
             echo "   - \`skill.oms.sig\` (NVIDIA detached signature)"
@@ -329,47 +349,56 @@ jobs:
             echo "   - Skills that previously existed on \`main\` are **reverted** to their last-signed version (the signed copy stays live)."
             echo "   - Brand-new skills with drift are **dropped** outright."
             echo "   Recovery: comment \`/nvskills-ci\` on a follow-up PR on the source repo so the next sync picks up a fresh, content-aligned signature."
+            echo "3. **Orphan product dirs** — product folder under \`skills/\` with no \`SKILL.md\` inside (e.g. every skill was dropped, leaving only helper files)."
             echo ""
             echo "**Last updated:** $(date -u +%Y-%m-%d) by [sync run #${{ github.run_id }}]($RUN_URL)"
             echo ""
-            if [ "$missing_count" -gt 0 ]; then
-              echo "## Missing artifacts ($missing_count)"
-              current=""
+
+            emit_section() {
+              local heading="$1" filter_kind="$2" count="$3"
+              [ "$count" -gt 0 ] || return 0
+              echo "## $heading ($count)"
+              local current=""
               while IFS='|' read -r product dir reason; do
-                case "$reason" in sig\ drift*) continue ;; esac
+                case "$reason" in
+                  "missing artifacts: "*) kind="missing"; display="${reason#missing artifacts: }" ;;
+                  "orphan: "*)            kind="orphan";  display="${reason#orphan: }" ;;
+                  "sig drift: "*)         kind="drift";   display="${reason#sig drift: }" ;;
+                  *)                      kind="other";   display="$reason" ;;
+                esac
+                [ "$kind" = "$filter_kind" ] || continue
                 if [ "$product" != "$current" ]; then
                   echo ""
                   echo "### \`$product\`"
                   current="$product"
                 fi
-                echo "- \`$dir\` — missing: $reason"
+                echo "- \`$dir\` — $display"
               done < "$dropped"
               echo ""
-            fi
-            if [ "$drift_count" -gt 0 ]; then
-              echo "## Signature drift ($drift_count)"
-              current=""
-              while IFS='|' read -r product dir reason; do
-                case "$reason" in sig\ drift*) ;; *) continue ;; esac
-                if [ "$product" != "$current" ]; then
-                  echo ""
-                  echo "### \`$product\`"
-                  current="$product"
-                fi
-                echo "- \`$dir\` — $reason"
-              done < "$dropped"
-              echo ""
-            fi
+            }
+
+            emit_section "Missing artifacts"   "missing" "$missing_count"
+            emit_section "Signature drift"     "drift"   "$drift_count"
+            emit_section "Orphan product dirs" "orphan"  "$orphan_count"
+            emit_section "Other"               "other"   "$other_count"
+
             echo "---"
             echo "Owners: re-run \`/nvskills-ci\` on the source repo after editing skill content so the signature stays in sync. This issue auto-updates each sync and closes when all skills are compliant."
           } > "$body"
 
-          if [ "$drift_count" -gt 0 ] && [ "$missing_count" -gt 0 ]; then
-            title="Skills dropped from sync — $missing_count missing artifacts, $drift_count sig drift"
-          elif [ "$drift_count" -gt 0 ]; then
-            title="Skills dropped from sync — $drift_count sig drift"
+          # Title summarizes the active failure modes. Build it from
+          # whichever buckets are non-empty so it stays accurate as
+          # categories come and go.
+          parts=()
+          [ "$missing_count" -gt 0 ] && parts+=("$missing_count missing artifacts")
+          [ "$drift_count"   -gt 0 ] && parts+=("$drift_count sig drift")
+          [ "$orphan_count"  -gt 0 ] && parts+=("$orphan_count orphan")
+          [ "$other_count"   -gt 0 ] && parts+=("$other_count other")
+          if [ ${#parts[@]} -eq 0 ]; then
+            title="Skills dropped from sync"   # shouldn't happen (we exit 0 above)
           else
-            title="Skills dropped from sync — missing required artifacts ($missing_count)"
+            joined=$(IFS=', '; echo "${parts[*]}")
+            title="Skills dropped from sync — $joined"
           fi
 
           if [ -n "$existing" ]; then
