@@ -47,6 +47,7 @@ jobs:
           truncate -s 0 /tmp/changed-components.txt
           truncate -s 0 /tmp/failed-components.txt
           truncate -s 0 /tmp/sync-versions.txt
+          truncate -s 0 /tmp/rsynced-skill-dirs.txt
 
           # Aggregate per-component files into a single config so the
           # iteration loop below can index by position. The components.d/
@@ -105,6 +106,10 @@ jobs:
                 mkdir -p "skills/$catalog_dir"
                 rsync -a --delete "$src/" "skills/$catalog_dir/"
                 synced=true
+                # Exact rsynced destination — used by the drift-detection
+                # step to scan only the dirs this run actually touched
+                # (nesting-safe; not derived by awk-extracting paths).
+                echo "skills/$catalog_dir" >> /tmp/rsynced-skill-dirs.txt
                 echo "  ✓ $path → skills/$catalog_dir/"
               else
                 echo "  ⚠ $path empty or missing — skipping to preserve existing catalog"
@@ -162,20 +167,27 @@ jobs:
           dropped=/tmp/dropped-skills.txt
           touch "$dropped"
 
-          # Drive the scan from "skill dirs the rsync touched" rather than
-          # "skill dirs containing a SKILL.md after rsync." The latter
-          # misses cases where rsync deleted/renamed SKILL.md without
-          # refreshing skill.oms.sig — the existing signed copy on main
-          # would otherwise be silently overwritten with an unsigned
-          # state. We union diff (tracked modifications + deletions) +
-          # ls-files --others (untracked additions) at the top-level
-          # skill-dir granularity, then de-dupe.
-          touched_dirs=$( {
-            git diff --name-only HEAD -- skills/ 2>/dev/null
-            git ls-files --others --exclude-standard -- skills/ 2>/dev/null
-          } | awk -F/ 'NF>=2 && $1=="skills" {print $1"/"$2}' | sort -u)
+          # Scan the EXACT catalog dirs the rsync targeted this run,
+          # recorded by the previous step into /tmp/rsynced-skill-dirs.txt.
+          # This is nesting-safe (handles `skills/<product>/<skill>` as
+          # well as the flat `skills/<skill>` layout) and avoids the
+          # bugs of awk-extracting "skills/$1/$2" from git output —
+          # that approach collapsed multi-skill products to one entry,
+          # masking drift on sibling skills and misclassifying new
+          # skills under existing products as "existing on main."
+          #
+          # If the file doesn't exist (extremely defensive — the rsync
+          # step always creates it), exit cleanly with no drift found.
+          if [ ! -f /tmp/rsynced-skill-dirs.txt ]; then
+            echo "  (no rsync targets recorded — nothing to scan for drift)"
+            exit 0
+          fi
+          sort -u -o /tmp/rsynced-skill-dirs.txt /tmp/rsynced-skill-dirs.txt
 
-          for dir in $touched_dirs; do
+          # Newline-safe iteration — catalog dirs shouldn't contain
+          # spaces but defensive against that ever changing.
+          while IFS= read -r dir; do
+            [ -z "$dir" ] && continue
             # Files in this skill dir changed by the rsync (modifications +
             # deletions via diff, additions via ls-files --others).
             modified=$(git diff --name-only HEAD -- "$dir/" 2>/dev/null || true)
@@ -206,7 +218,7 @@ jobs:
                 rm -rf "$dir"
               fi
             fi
-          done
+          done < /tmp/rsynced-skill-dirs.txt
 
           # Mark any product with a dropped skill as "changed" so the PR
           # opens (matches the pattern used by the compliance step).
@@ -406,7 +418,11 @@ jobs:
           if [ ${#parts[@]} -eq 0 ]; then
             title="Skills dropped from sync"   # shouldn't happen (we exit 0 above)
           else
-            joined=$(IFS=', '; echo "${parts[*]}")
+            # Bash array expansion under custom IFS only uses the first
+            # char as separator, so a comma-space IFS gives "a,b" not
+            # "a, b". Build the join with printf + trailing strip instead.
+            joined=$(printf '%s, ' "${parts[@]}")
+            joined="${joined%, }"
             title="Skills dropped from sync — $joined"
           fi
 
