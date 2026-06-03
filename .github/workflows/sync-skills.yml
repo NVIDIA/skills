@@ -162,13 +162,22 @@ jobs:
           dropped=/tmp/dropped-skills.txt
           touch "$dropped"
 
-          while IFS= read -r skill_md; do
-            dir=$(dirname "$skill_md")
+          # Drive the scan from "skill dirs the rsync touched" rather than
+          # "skill dirs containing a SKILL.md after rsync." The latter
+          # misses cases where rsync deleted/renamed SKILL.md without
+          # refreshing skill.oms.sig — the existing signed copy on main
+          # would otherwise be silently overwritten with an unsigned
+          # state. We union diff (tracked modifications + deletions) +
+          # ls-files --others (untracked additions) at the top-level
+          # skill-dir granularity, then de-dupe.
+          touched_dirs=$( {
+            git diff --name-only HEAD -- skills/ 2>/dev/null
+            git ls-files --others --exclude-standard -- skills/ 2>/dev/null
+          } | awk -F/ 'NF>=2 && $1=="skills" {print $1"/"$2}' | sort -u)
 
-            # Files changed by the rsync. `git diff` only sees tracked
-            # modifications; rsync-added files are untracked at this
-            # point, so we union diff + ls-files --others to capture
-            # the full delta.
+          for dir in $touched_dirs; do
+            # Files in this skill dir changed by the rsync (modifications +
+            # deletions via diff, additions via ls-files --others).
             modified=$(git diff --name-only HEAD -- "$dir/" 2>/dev/null || true)
             untracked=$(git ls-files --others --exclude-standard -- "$dir/" 2>/dev/null || true)
             changed=$(printf '%s\n%s\n' "$modified" "$untracked" | sed '/^$/d')
@@ -197,7 +206,7 @@ jobs:
                 rm -rf "$dir"
               fi
             fi
-          done < <(find skills -type f -name SKILL.md)
+          done
 
           # Mark any product with a dropped skill as "changed" so the PR
           # opens (matches the pattern used by the compliance step).
@@ -477,11 +486,42 @@ jobs:
             echo "**Components updated:**"
             cat /tmp/changed-components.txt
             if [ -s /tmp/dropped-skills.txt ]; then
-              echo ""
-              echo "**Skills dropped (missing \`skill.oms.sig\`, \`skill-card.md\`, and/or \`evals.json\`):**"
-              while IFS='|' read -r _ dir missing; do
-                echo "- \`$dir\` — missing: $missing"
-              done < /tmp/dropped-skills.txt
+              # Partition by reason prefix to match the tracker issue.
+              # Mirrors the categorization in the "Track dropped skills"
+              # step so the PR body and the rolling issue stay consistent.
+              missing_lines=$(awk -F'|' '$3 ~ /^missing artifacts:/' /tmp/dropped-skills.txt || true)
+              drift_lines=$(awk -F'|'   '$3 ~ /^sig drift:/'         /tmp/dropped-skills.txt || true)
+              orphan_lines=$(awk -F'|'  '$3 ~ /^orphan:/'            /tmp/dropped-skills.txt || true)
+              other_lines=$(awk -F'|'   '$3 !~ /^(missing artifacts:|orphan:|sig drift:)/' /tmp/dropped-skills.txt || true)
+
+              if [ -n "$missing_lines" ]; then
+                echo ""
+                echo "**Skills dropped — missing required artifacts (\`skill.oms.sig\`, \`skill-card.md\`, and/or \`evals.json\`):**"
+                echo "$missing_lines" | while IFS='|' read -r _ dir reason; do
+                  echo "- \`$dir\` — ${reason#missing artifacts: }"
+                done
+              fi
+              if [ -n "$drift_lines" ]; then
+                echo ""
+                echo "**Skills held — signature drift (content changed without \`skill.oms.sig\` refresh):**"
+                echo "$drift_lines" | while IFS='|' read -r _ dir reason; do
+                  echo "- \`$dir\` — ${reason#sig drift: }"
+                done
+              fi
+              if [ -n "$orphan_lines" ]; then
+                echo ""
+                echo "**Orphan product dirs dropped (no SKILL.md inside):**"
+                echo "$orphan_lines" | while IFS='|' read -r _ dir reason; do
+                  echo "- \`$dir\` — ${reason#orphan: }"
+                done
+              fi
+              if [ -n "$other_lines" ]; then
+                echo ""
+                echo "**Other drops:**"
+                echo "$other_lines" | while IFS='|' read -r _ dir reason; do
+                  echo "- \`$dir\` — $reason"
+                done
+              fi
             fi
             if [ -s /tmp/failed-components.txt ]; then
               echo ""
