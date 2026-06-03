@@ -197,8 +197,12 @@ jobs:
               continue
             fi
 
-            sig_changed=$(echo "$changed" | grep -E '(^|/)skill\.oms\.sig$' || true)
-            non_sig_changed=$(echo "$changed" | grep -vE '(^|/)skill\.oms\.sig$' || true)
+            # Match only the root sig at "$dir/skill.oms.sig" — a nested
+            # file like "$dir/docs/skill.oms.sig" would not count as a
+            # sig refresh, since compliance requires the root signature.
+            sig_path="$dir/skill.oms.sig"
+            sig_changed=$(echo "$changed" | grep -Fx -- "$sig_path" || true)
+            non_sig_changed=$(echo "$changed" | grep -Fvx -- "$sig_path" || true)
 
             if [ -n "$non_sig_changed" ] && [ -z "$sig_changed" ]; then
               product=$(echo "$dir" | awk -F/ '{print $2}')
