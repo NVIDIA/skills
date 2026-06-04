@@ -19,35 +19,17 @@ description: >
 
 # Earth2Studio Deterministic Forecast Skill
 
-## Purpose
-
 Guide users through building deterministic (single-member) weather forecast
-inference scripts with Earth2Studio. Covers model selection, data source
-compatibility, IO backend choice, nsteps calculation, and generating a
-complete script following `earth2studio.run.deterministic`.
+inference scripts using `earth2studio.run.deterministic`.
 
 ## Prerequisites
 
-- Earth2Studio installed (`pip install earth2studio` or `uv add earth2studio`)
-- CUDA-capable GPU with sufficient VRAM for the chosen model
-- Network access for model weight download and data fetching
-- Python 3.10+
+- Earth2Studio installed with CUDA-capable GPU
+- Python 3.10+, network access for model weights and data
 
-## Instructions
+## Live Doc References
 
-You are helping a user build a deterministic forecast inference script
-using Earth2Studio. The script follows the structure of
-`earth2studio.run.deterministic` — a pipeline that takes a prognostic
-model, fetches initial conditions from a data source, steps the model
-forward, and writes output to an IO backend.
-
-## Core principle: live docs drive every recommendation
-
-Model availability, data source APIs, and IO backends change between
-releases. Before recommending any component, fetch the relevant live
-doc page to confirm it exists and check its current interface.
-
-Live doc references (fetch only what the current step requires):
+Fetch relevant docs to verify current APIs before recommending components:
 
 | Component | URL |
 |-----------|-----|
@@ -55,190 +37,112 @@ Live doc references (fetch only what the current step requires):
 | Data sources (analysis) | <https://nvidia.github.io/earth2studio/modules/datasources_analysis.html> |
 | Data sources (forecast) | <https://nvidia.github.io/earth2studio/modules/datasources_forecast.html> |
 | IO backends | <https://nvidia.github.io/earth2studio/modules/io.html> |
-| `run.deterministic` source | <https://github.com/NVIDIA/earth2studio/blob/main/earth2studio/run.py> |
-| Lexicon (variable compat) | <https://github.com/NVIDIA/earth2studio/tree/main/earth2studio/lexicon> |
+| `run.deterministic` | <https://github.com/NVIDIA/earth2studio/blob/main/earth2studio/run.py> |
 
-## Interaction protocol
+## Workflow
 
-### Step 1. Understand forecast requirements
+### 1. Gather Requirements (skip what's already provided)
 
-Ask the user (cap at 3 questions, skip what's already answered):
+- Time horizon (hours/days/weeks)
+- Variables of interest (t2m, wind, geopotential, etc.)
+- Region (global or specific like CONUS)
+- GPU/VRAM available
 
-1. **Time horizon** — how far ahead? Hours (nowcast), days
-   (medium-range), weeks/months (seasonal)?
-2. **Variables of interest** — what do they want to predict?
-   (temperature, wind, geopotential, precipitation, etc.)
-3. **Region** — global or regional (e.g. CONUS for HRRR-based models)?
-4. **Hardware** — what GPU / VRAM do they have? (filters model choices)
+### 2. Select Model
 
-### Step 2. Select prognostic model
+Fetch prognostic models page. Filter by time horizon, region, VRAM. Note model's:
+- Input variables (`input_coords["variable"]`)
+- Time step size (`output_coords["lead_time"]`)
 
-Fetch the prognostic models page. Filter candidates by:
+### 3. Select Data Source
 
-- **Time horizon** → model class badge (NWC, MR, S2S, CM)
-- **Region** → region badge (Global, NA, etc.)
-- **VRAM** → rec VRAM badge
-- **Variables** → check model's `input_coords`/`output_coords` against what the user needs
+Data source must provide all model input variables. Verify via lexicon at
+`earth2studio/lexicon/<source>.py`. Common pairings: Global models → GFS/ARCO/IFS;
+Regional → HRRR.
 
-Present 2–4 candidate models with tradeoffs (resolution, speed, accuracy, VRAM). Let the user choose.
+### 4. Select IO Backend
 
-Once selected, note the model's:
+Default: `ZarrBackend`. Use `NetCDF4Backend` for legacy tools, `XarrayBackend`
+for in-memory/small runs.
 
-- Required input variables (from `input_coords["variable"]`)
-- Time step size (from `output_coords["lead_time"]`)
-- These determine `nsteps` and constrain which data sources work
+### 5. Calculate nsteps
 
-### Step 3. Select data source
+`nsteps = forecast_hours / model_step_hours`
 
-The data source must provide the model's required input variables. Fetch
-the analysis data source page (or forecast source page if comparing
-against operational forecasts).
+Example: 5-day forecast with 6h step → `nsteps = 120 / 6 = 20`
 
-Verify compatibility:
+### 6. Decide: output_coords Filtering
 
-1. Fetch the candidate source's lexicon from
-   `earth2studio/lexicon/<source>.py`
-2. Confirm all variables in the model's `input_coords["variable"]`
-   exist as keys in the source's VOCAB
+- **Filter variables** (`output_coords`) when user requests specific variables (e.g., "t2m and wind") - reduces output size
+- **Save all variables** (omit `output_coords`) when user says "all variables" or doesn't specify - preserves full model output
 
-Present viable options. Common pairings:
-
-- Global models (AIFS, Pangu, GraphCast, SFNO, etc.) →
-  GFS, ARCO, CDS, WB2ERA5, IFS
-- Regional models (StormCast, HRRR-based) → HRRR
-- Historical/research runs → ARCO, CDS, WB2ERA5, NCAR_ERA5
-
-Let the user choose. Confirm the initialization time(s) they want to forecast from.
-
-### Step 4. Select IO backend
-
-Present the available IO backends (fetch the IO page to confirm current list):
-
-| Backend | Best for |
-|---------|----------|
-| ZarrBackend | Large outputs, chunked storage, recommended default |
-| AsyncZarrBackend | Same as Zarr but async writes for performance |
-| NetCDF4Backend | Compatibility with legacy tools |
-| XarrayBackend | In-memory, small runs, interactive exploration |
-| KVBackend | Key-value dict, debugging |
-
-Recommend ZarrBackend unless the user has a specific reason for another. Ask where they want output saved.
-
-### Step 5. Determine nsteps
-
-Calculate `nsteps` from:
-
-- User's desired forecast horizon (e.g. 5 days)
-- Model's time step (e.g. 6 hours for most global models)
-- `nsteps = forecast_hours / model_step_hours`
-
-Confirm with the user: *"For a 5-day forecast with a 6-hour time step, that's 20 steps. Correct?"*
-
-### Step 6. Generate the inference script
-
-Write a complete Python script following the `earth2studio.run.deterministic` pattern. The script structure:
+### 7. Generate Script
 
 ```python
-import datetime
 from collections import OrderedDict
-
 import numpy as np
 import torch
-
 from earth2studio.models.px import <ModelClass>
 from earth2studio.data import <DataSourceClass>
 from earth2studio.io import <IOBackendClass>
 from earth2studio.run import deterministic
 
-# 1. Initialize model
 model = <ModelClass>.load_model(<ModelClass>.load_default_package())
-
-# 2. Initialize data source
 data = <DataSourceClass>()
-
-# 3. Initialize IO backend
 io = <IOBackendClass>("<output_path>")
 
-# 4. (Optional) Subselect output variables/coords
-output_coords = OrderedDict({
-    "variable": np.array(["t2m", "u10m", ...]),  # only save these
-})
+# Include output_coords ONLY if user requested specific variables
+output_coords = OrderedDict({"variable": np.array(["t2m", "u10m"])})
 
-# 5. Run deterministic forecast
 io = deterministic(
     time=["YYYY-MM-DDTHH:MM:SS"],
     nsteps=<N>,
     prognostic=model,
     data=data,
     io=io,
-    output_coords=output_coords,  # optional
+    output_coords=output_coords,  # omit if saving all variables
     device=torch.device("cuda"),
 )
-
-# 6. Post-run: inspect results
-print("Forecast complete. Output at: <output_path>")
 ```
 
-**Before writing the script**, fetch the specific model's doc page
-to confirm:
+### 8. Manual Loop Alternative
 
-- The correct class import path
-- How to load the model (`load_model` + `load_default_package()`
-  is the standard pattern but verify)
-- Any model-specific constructor arguments
+When user explicitly requests manual implementation (NOT using `earth2studio.run.deterministic`), follow this checklist in order:
 
-Also fetch the data source's doc page to confirm constructor arguments
-(some need cache paths, tokens, etc.).
+1. **fetch_data** - Get initial conditions: `x, coords = fetch_data(data, time, model.input_coords, device)`
+2. **Setup total_coords** - Build coordinate arrays for time and lead_time dimensions
+3. **io.add_array** - Initialize IO backend with total_coords before loop
+4. **create_iterator** - Create prognostic iterator: `model_iter = model.create_iterator(x, coords)`
+5. **Loop through nsteps** - `for step, (x, coords) in enumerate(model_iter): if step >= nsteps: break`
+6. **map_coords** - Filter output variables if needed: `x_out, coords_out = map_coords(x, coords, output_coords)`
+7. **split_coords** - Prepare for IO write: `x_out, coords_out = split_coords(x_out, coords_out)`
+8. **io.write** - Write each step to backend
 
-### Step 7. Explain the script and next steps
+### 9. Explain Next Steps
 
-After delivering the script, explain:
+- How to change forecast time or run multiple initializations
+- How to read output (`xr.open_zarr(...)`)
+- Point to diagnostic workflow for post-processing
 
-- How to change the forecast time (just edit the `time` list)
-- How to run multiple initializations (add more entries to `time`)
-- How to subset output variables via `output_coords`
-- Where the output is saved and how to read it back
-  (e.g. `xr.open_zarr(...)`)
-- If they want to add diagnostics on top, point them to the
-  `diagnostic` workflow pattern
+## Ownership
 
-## Ownership and out-of-scope
+**Owns:** Model selection, data source compatibility, IO backend selection,
+nsteps calculation, generating `earth2studio.run.deterministic` scripts.
 
-**Owns:** prognostic model selection for deterministic forecasts, data
-source compatibility verification, IO backend selection, nsteps
-calculation, generating the complete inference script following
-`earth2studio.run.deterministic` structure.
-
-**Does not own:** ensemble workflows, diagnostic model chaining,
-data-only fetch (earth2studio-data-fetch),
-installation (earth2studio-install), model training or fine-tuning,
-custom model development.
-
-## Examples
-
-**Typical invocation:**
-> "Run a 5-day global forecast with Pangu-Weather starting from
-> today's GFS analysis, saving output to Zarr."
-
-The skill walks through Steps 1-7: confirms requirements, selects Pangu24,
-pairs with GFS data source, picks ZarrBackend, calculates nsteps=5 (24h steps),
-generates the script, and explains how to inspect results.
-
-## Limitations
-
-- Only deterministic (single-member) forecasts; use ensemble workflow for
-  probabilistic runs
-- Cannot train or fine-tune models — inference only
-- Model weights require first-time download (several GB depending on model)
-- Regional models (e.g. StormCast) require matching regional data sources
-- GPU required; CPU-only inference is not supported for most models
+**Does not own:** Ensemble workflows, diagnostics, data-only fetch, installation,
+model training.
 
 ## Troubleshooting
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| `KeyError` on variable | Lexicon missing variable | Check compat; pick different source |
-| `OutOfMemoryError` | VRAM exceeded | Use smaller model or free cache |
-| `FileNotFoundError` package | Weights not cached | Call `load_default_package()` first |
-| `TimeoutError` data fetch | API slow/unreachable | Retry or use cached source |
-| `ValueError: nsteps` | Horizon < model step | Increase horizon or finer model |
+See `references/troubleshooting.md` for common errors and solutions.
+
+## Reminders
+
+- **Always fetch live docs** before recommending models or data sources - APIs change between releases
+- **Verify lexicon compatibility** - Model input variables must exist in data source's VOCAB
+- **Use `load_default_package()`** - This is the standard pattern for loading model weights
+- **Time format is ISO 8601** - Use `"YYYY-MM-DDTHH:MM:SS"` format for the `time` argument
+- **Wind speed needs both components** - If user asks for "wind speed", include both `u10m` and `v10m`
+- **nsteps is integer division** - `nsteps = total_hours // model_step_hours`
+- **ZarrBackend is the default** - Only suggest alternatives if user has specific requirements
+- **GPU is required** - All prognostic models require CUDA; CPU inference is not supported

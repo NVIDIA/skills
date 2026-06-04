@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nemo-data-designer-plugin`
-- Evaluation date: 2026-05-30
+- Evaluation date: 2026-06-02
 - NVSkills-Eval profile: `external`
 - Environment: `local`
 - Dataset: 4 evaluation tasks
@@ -49,16 +49,16 @@ The benchmark included 4 recorded Tier 3 trials, but the source evaluation datas
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 89% (+29%) | 95% (+5%) |
-| Discoverability | 2 | 59% (+9%) | 92% (+32%) |
-| Effectiveness | 2 | 91% (+31%) | 87% (+1%) |
-| Efficiency | 2 | 44% (-6%) | 81% (+44%) |
+| Correctness | 2 | 97% (+0%) | 91% (+8%) |
+| Discoverability | 2 | 89% (+0%) | 82% (+2%) |
+| Effectiveness | 2 | 96% (+1%) | 91% (+26%) |
+| Efficiency | 2 | 73% (-0%) | 74% (-1%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 16 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 17 total findings.
 
 Top findings:
 

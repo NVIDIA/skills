@@ -1,16 +1,16 @@
 # Evaluation Report
 
-Evaluation of the `nemo-evaluator-plugin` skill before publication through NVSkills-Eval.
+Evaluation of the `nemotron-policy-generator` skill before publication through NVSkills-Eval.
 
 This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
 
 ## Evaluation Summary
 
-- Skill: `nemo-evaluator-plugin`
+- Skill: `nemotron-policy-generator`
 - Evaluation date: 2026-06-03
 - NVSkills-Eval profile: `external`
 - Environment: `local`
-- Dataset: 1 evaluation tasks
+- Dataset: 11 evaluation tasks
 - Attempts per task: 2
 - Pass threshold: 50%
 - Overall verdict: PASS
@@ -42,10 +42,10 @@ Underlying evaluation signals used in this run:
 
 ## Test Tasks
 
-The benchmark dataset contained 1 evaluation tasks:
+The benchmark dataset contained 11 evaluation tasks:
 
-- Positive tasks: 1 tasks where the skill was expected to activate.
-- Negative tasks: 0 tasks where no skill was expected.
+- Positive tasks: 6 tasks where the skill was expected to activate.
+- Negative tasks: 5 tasks where no skill was expected.
 - Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
 
 Task composition is derived from the evaluation dataset when possible. Entries with `expected_skill` set are treated as positive skill-activation cases, while entries with `expected_skill: null` are treated as negative activation cases.
@@ -54,25 +54,25 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 92% (+0%) | 85% (+5%) |
-| Discoverability | 2 | 63% (+0%) | 95% (+12%) |
-| Effectiveness | 2 | 85% (-2%) | 70% (+8%) |
-| Efficiency | 2 | 51% (+3%) | 93% (+15%) |
+| Security | 8 | 100% (+15%) | 100% (+9%) |
+| Correctness | 8 | 88% (-4%) | 77% (+10%) |
+| Discoverability | 8 | 92% (+6%) | 79% (+3%) |
+| Effectiveness | 8 | 80% (+2%) | 64% (+19%) |
+| Efficiency | 8 | 76% (+8%) | 71% (+3%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 12 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 7 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_correctness: No documented scripts in table format (`skills/nemo-evaluator-plugin/SKILL.md`)
-- MEDIUM QUALITY/quality_correctness: Instructions don't mention 'run_script' (`skills/nemo-evaluator-plugin/SKILL.md`)
-- MEDIUM QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.author' (`skills/nemo-evaluator-plugin/SKILL.md`)
-- MEDIUM QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/nemo-evaluator-plugin/SKILL.md`)
-- MEDIUM QUALITY/quality_efficiency: Deeply nested references in llm-judge.md (`skills/nemo-evaluator-plugin/SKILL.md`)
+- MEDIUM QUALITY/quality_discoverability: Description uses first/second person (`skills/nemotron-policy-generator/SKILL.md`)
+- LOW QUALITY/quality_discoverability: Description very long (352 chars, recommend 50-150) (`skills/nemotron-policy-generator/SKILL.md`)
+- LOW QUALITY/quality_discoverability: No '## Purpose' section (`skills/nemotron-policy-generator/SKILL.md`)
+- LOW QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/nemotron-policy-generator/SKILL.md`)
+- LOW QUALITY/quality_reliability: No limitations documented (`skills/nemotron-policy-generator/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
@@ -80,8 +80,8 @@ Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
 
 Notable observations:
 
-- Context Deduplication: Collected 6 file(s)
-- Inter-Skill Deduplication: Parsed skill 'nemo-evaluator-plugin': 117 char description
+- Context Deduplication: Collected 5 file(s)
+- Inter-Skill Deduplication: Parsed skill 'nemotron-policy-generator': 352 char description
 
 ## Publication Recommendation
 

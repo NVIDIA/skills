@@ -16,7 +16,9 @@ For local iteration, keep the metric and dataset in a spec file and run:
 nemo evaluator evaluate run --spec-file evaluation-spec.json
 ```
 
-For cluster execution, submit the same spec:
+The checked-in `skills/nemo-evaluator-plugin/assets/specs/llm_as_judge.json` is a local-run example. It expects `NVIDIA_API_KEY` to be set in the local shell.
+
+For durable execution, submit the same spec:
 
 ```bash
 nemo evaluator evaluate submit \
@@ -24,5 +26,7 @@ nemo evaluator evaluate submit \
   --workspace default \
   --profile default
 ```
+
+Before submitting an LLM-judge spec via `submit`, replace local environment-variable names with platform secret names, such as `nvidia-api-key`.
 
 Prefer `--spec-file` over inline `--spec` for LLM-judge metrics because prompts and score definitions quickly become hard to audit as shell-escaped JSON.

@@ -1,0 +1,63 @@
+{
+    "metrics": [
+        {
+            "bundle_kind": "metric-bundle",
+            "bundle_format_version": "v1",
+            "metric_type": "llm-judge",
+            "metadata": {
+                "description": null,
+                "labels": {}
+            },
+            "outputs": [
+                {
+                    "name": "helpfulness",
+                    "description": "How well does the response help the user?",
+                    "value_json_schema": {
+                        "description": "Continuous numeric metric value.",
+                        "title": "ContinuousScore",
+                        "type": "number"
+                    }
+                }
+            ],
+            "secrets": {
+                "NVIDIA_API_KEY": "NVIDIA_API_KEY"
+            },
+            "payload": {
+                "python_version": "3.11.15",
+                "cloudpickle_version": "3.1.2",
+                "pickle_protocol": 5,
+                "blob": "gAWVOAkAAAAAAACMJG5lbW9fZXZhbHVhdG9yX3Nkay5tZXRyaWNzLmxsbV9qdWRnZZSMDkxMTUp1ZGdlTWV0cmljlJOUKYGUfZQojAhfX2RpY3RfX5R9lCiMBHR5cGWUjBhuZW1vX2V2YWx1YXRvcl9zZGsuZW51bXOUjApNZXRyaWNUeXBllJOUjAlsbG0tanVkZ2WUhZRSlIwLZGVzY3JpcHRpb26UTowGbGFiZWxzlH2UjBNzdXBwb3J0ZWRfam9iX3R5cGVzlF2UKIwgbmVtb19ldmFsdWF0b3Jfc2RrLnZhbHVlcy5jb21tb26UjBFTdXBwb3J0ZWRKb2JUeXBlc5STlIwGb25saW5llIWUUpRoFYwHb2ZmbGluZZSFlFKUZYwFbW9kZWyUjCBuZW1vX2V2YWx1YXRvcl9zZGsudmFsdWVzLm1vZGVsc5SMBU1vZGVslJOUKYGUfZQoaAV9lCiMA3VybJSMNGh0dHBzOi8vaW50ZWdyYXRlLmFwaS5udmlkaWEuY29tL3YxL2NoYXQvY29tcGxldGlvbnOUjARuYW1llIwhbnZpZGlhL25lbW90cm9uLTMtc3VwZXItMTIwYi1hMTJilIwPZGVmYXVsdF9oZWFkZXJzlE6MCGhvc3RfdXJslE6MDmFwaV9rZXlfc2VjcmV0lGgTjAlTZWNyZXRSZWaUk5QpgZR9lChoBX2UjARyb290lIwOTlZJRElBX0FQSV9LRVmUc4wXX19weWRhbnRpY19maWVsZHNfc2V0X1-Uj5QojARyb290lJB1YowGZm9ybWF0lGgIjAtNb2RlbEZvcm1hdJSTlIwDbmltlIWUUpR1jBJfX3B5ZGFudGljX2V4dHJhX1-UTmgxj5QoaCloI2glaDSQjBRfX3B5ZGFudGljX3ByaXZhdGVfX5ROdWKMBnNjb3Jlc5RdlIwgbmVtb19ldmFsdWF0b3Jfc2RrLnZhbHVlcy5zY29yZXOUjApSYW5nZVNjb3JllJOUKYGUfZQoaAV9lChoJYwLaGVscGZ1bG5lc3OUaA6MKUhvdyB3ZWxsIGRvZXMgdGhlIHJlc3BvbnNlIGhlbHAgdGhlIHVzZXI_lIwGcGFyc2VylGg_jA9KU09OU2NvcmVQYXJzZXKUk5QpgZR9lChoBX2UKGgHjARqc29ulIwJanNvbl9wYXRolGhFdWg6Tmgxj5QoaE6QaDxOdWKMB21pbmltdW2USwCMB21heGltdW2USwR1aDpOaDGPlChoR2hRaA5oJWhQkGg8TnViYYwPcHJvbXB0X3RlbXBsYXRllH2UjAhtZXNzYWdlc5RdlCh9lCiMBHJvbGWUjAZzeXN0ZW2UjAdjb250ZW50lIyGWW91IGFyZSBhbiBldmFsdWF0b3IuIFJhdGUgdGhlIHJlc3BvbnNlJ3MgaGVscGZ1bG5lc3MgZnJvbSAwLTQuIFJldHVybiBvbmx5IGEgSlNPTiBvYmplY3Qgd2l0aCB0aGlzIHNoYXBlOiB7ImhlbHBmdWxuZXNzIjogPGludGVnZXI-fS6UdX2UKGhYjAR1c2VylGhajHNVc2VyIHByb21wdDoge3tpdGVtLmlucHV0fX0KCkFzc2lzdGFudCByZXNwb25zZToge3tzYW1wbGUub3V0cHV0X3RleHQgfCBkZWZhdWx0KGl0ZW0ub3V0cHV0KX19CgpSYXRlIHRoaXMgcmVzcG9uc2UulHVlc4wPb3B0aW9uYWxfZmllbGRzlF2UjBFzdHJ1Y3R1cmVkX291dHB1dJR9lIwGc2NoZW1hlH2UKGgHjAZvYmplY3SUjApwcm9wZXJ0aWVzlH2UaEV9lChoB4wHaW50ZWdlcpRoUEsAaFFLBHVzjAhyZXF1aXJlZJRdlGhFYXVzjAlpbmZlcmVuY2WUjCBuZW1vX2V2YWx1YXRvcl9zZGsudmFsdWVzLnBhcmFtc5SMD0luZmVyZW5jZVBhcmFtc5STlCmBlH2UKGgFfZQojAt0ZW1wZXJhdHVyZZRHAAAAAAAAAACMCm1heF90b2tlbnOUTQCAjBVtYXhfY29tcGxldGlvbl90b2tlbnOUTowFdG9wX3CUTowEc3RvcJROdWg6fZRoMY-UKGhzaHSQaDxOdWKMDXN5c3RlbV9wcm9tcHSUTowJcmVhc29uaW5nlE6MFmlnbm9yZV9yZXF1ZXN0X2ZhaWx1cmWUiYwIam9iX3R5cGWUaBh1aDpOaDGPlChoX2gcaFNobGg9aGFofJBoPH2UKIwRX3ByZXByb2Nlc3NfaG9va3OUXZQojBxuZW1vX2V2YWx1YXRvcl9zZGsuaW5mZXJlbmNllIwVQWRkSW5mZXJlbmNlUGFyYW1ldGVylJOUKYGUfZSMBnBhcmFtc5R9lChoc0cAAAAAAAAAAGh0TQCAdXNijCRuZW1vX2V2YWx1YXRvcl9zZGsuc3RydWN0dXJlZF9vdXRwdXSUjBlJbmZlcmVuY2VTdHJ1Y3R1cmVkT3V0cHV0lJOUKYGUfZQojAxfanNvbl9zY2hlbWGUfZQoaAdoZWhmaGdoamhrdYwHX3N0cmljdJSJjARtb2RllGiJjBRTdHJ1Y3R1cmVkT3V0cHV0TW9kZZSTlIwRbnZleHRfZ3VpZGVkX2pzb26UhZRSlIwPaW5mZXJlbmNlX3BhcmFtlH2UjApleHRyYV9ib2R5lH2UjAVudmV4dJR9lIwLZ3VpZGVkX2pzb26UaI9zc3N1YmiCjAdMb2dIb29rlJOUKYGUfZSMBmxvZ2dlcpSMB2xvZ2dpbmeUjAlnZXRMb2dnZXKUk5RogoWUUpRzYmWMEl9wb3N0cHJvY2Vzc19ob29rc5RdlGigYYwaX3VzZV9tYXhfY29tcGxldGlvbl90b2tlbnOUiYwIX2FwaV9rZXmUTowHX2NsaWVudJROjA1faW5mZXJlbmNlX2ZulE6MCF9wYXJzZXJzlH2UaEVoP4wPU2NvcmVQYXJzZXJKU09OlJOUKYGUfZQojAVzY29yZZRoQmhOaEVoYWhijAtqc29uX3NjaGVtYZRoZHVic4wMX3Njb3JlX2R1bXBzlH2UaEV9lChoJWhFaA5oRmhQSwBoUUsEdXOMG19wcm9tcHRfdGVtcGxhdGVfaXNfZGVmYXVsdJSJdXViLg==",
+                "digest": "dfd6a04359b75b41cba2817bc1496244425e8290102b36c20bd04e7f62b31b8e",
+                "kind": "cloudpickle"
+            }
+        }
+    ],
+    "dataset": [
+        {
+            "input": "What is the capital of France?"
+        },
+        {
+            "input": "How do I make scrambled eggs?"
+        }
+    ],
+    "params": {
+        "parallelism": 2,
+        "limit_samples": 2,
+        "request_timeout": 120,
+        "max_retries": 3
+    },
+    "target": {
+        "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        "name": "nvidia/nemotron-3-super-120b-a12b",
+        "api_key_secret": "NVIDIA_API_KEY",
+        "format": "nim"
+    },
+    "prompt_template": {
+        "messages": [
+            {
+                "role": "user",
+                "content": "{{item.input}}"
+            }
+        ]
+    }
+}

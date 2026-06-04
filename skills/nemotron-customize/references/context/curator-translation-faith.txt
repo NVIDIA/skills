@@ -29,6 +29,10 @@ Use this context when generating a `translate/nemo_curator` stage.
 - `backend=google` uses Google Cloud Translation; require Google credentials, `google.api_version`, and `google.project_id` for v3.
 - `output_mode=both` is the safest default for generated projects because it keeps translated fields and metadata.
 - FAITH scoring follows the same translated segments produced by the translation stage, then merges scores back onto output records.
+- Optional controls: `translation_prompt_path`, `generation_config`,
+  `max_concurrent_requests`, `health_check`, `dry_run`, `dry_run_log_count`,
+  plus FAITH-specific `faith_eval.prompt_path`, `faith_eval.generation_config`,
+  and `faith_eval.max_concurrent_requests`.
 
 ## Questions To Ask Before Generation
 
