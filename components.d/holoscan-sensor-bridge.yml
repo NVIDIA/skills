@@ -6,13 +6,12 @@ repo: nvidia-holoscan/holoscan-sensor-bridge
 description: Agent-ready skills for Holoscan Sensor Bridge devkit workflows, covering demo environment bring-up, FPGA flashing for Lattice and VB1940 hardware, example application execution, and QA test-plan automation.
 links:
   discussions: false
-  security: false
 skills:
-  - path: skills/hsb-setup-skill/
-    catalog_dir: hsb-setup-skill
-  - path: skills/hsb-flash-skill/
-    catalog_dir: hsb-flash-skill
-  - path: skills/hsb-app-skill/
-    catalog_dir: hsb-app-skill
-  - path: skills/hsb-test-skill/
-    catalog_dir: hsb-test-skill
+  - path: skills/hsb-setup/
+    catalog_dir: hsb-setup
+  - path: skills/hsb-flash/
+    catalog_dir: hsb-flash
+  - path: skills/hsb-app/
+    catalog_dir: hsb-app
+  - path: skills/hsb-test/
+    catalog_dir: hsb-test
