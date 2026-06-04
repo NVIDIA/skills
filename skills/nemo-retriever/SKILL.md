@@ -19,8 +19,8 @@ If `command -v retriever` returns nothing, follow `references/install.md` to ins
 
 | Turn type | Read this once | Then execute |
 | :--- | :--- | :--- |
-| **Setup turn** (first turn — `./lancedb/nv-ingest.lance` doesn't exist) | `references/setup.md` | Build the index |
-| **Query turn** (every subsequent turn — user asks a question) | `references/query.md` | One `retriever query` call |
+| **Setup turn** (first turn — `./lancedb/nemo-retriever.lance` doesn't exist) | `references/setup.md` | Build the index |
+| **Query turn** (every subsequent turn — user asks a question) | `references/query.md` | One `retriever query` call, then `Write` `./output.json` *(eval-harness contract only — for general use, just answer in chat; see `query.md` top callout)* |
 | Anything errored or returned empty | `references/troubleshooting.md` | Apply the named recovery; do not improvise |
 
 For the full `retriever ingest` / `retriever query` CLI specs, see `references/cli/ingest.md` and `references/cli/query.md`. You do not need these for routine turns — `<RETRIEVER_VENV>/bin/retriever <subcommand> --help` is faster.

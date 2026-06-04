@@ -13,7 +13,7 @@ Why this exists
 that don't match the active COMPOSE_PROFILES, but leaves depends_on: entries
 pointing at those filtered-out services. Compose's schema validator rejects
 any depends_on target that isn't a defined service in the file — even when
-the entry is `required: false` — so `docker compose -f resolved.yml up -d`
+the entry is `required: false` — so `docker compose --env-file <env> -f resolved.yml up -d`
 aborts with:
 
     service "X" depends on undefined service "Y": invalid compose project
@@ -27,7 +27,7 @@ files. The dependencies are correctly marked optional in the source; profile
 filtering is what creates the dangling references in the resolved artifact.
 
 This MUST run after `docker compose ... config > resolved.yml` and before
-`docker compose -f resolved.yml up -d`. The vss-deploy-profile skill (SKILL.md Step 3c)
+`docker compose --env-file <env> -f resolved.yml up -d`. The vss-deploy-profile skill (SKILL.md Step 3c)
 calls this as part of every deploy.
 
 Usage

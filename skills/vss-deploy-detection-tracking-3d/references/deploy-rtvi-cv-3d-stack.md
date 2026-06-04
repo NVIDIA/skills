@@ -10,8 +10,8 @@ The actual `docker compose up` recipe. Parent: [`../SKILL.md`](../SKILL.md). Run
 
 | Container | Image | Role |
 |---|---|---|
-| `vss-rtvi-cv-mv3dt` | `nvcr.io/nvstaging/vss-core/vss-rt-cv:${PERCEPTION_TAG}` | Per-camera DeepStream perception |
-| `vss-rtvi-cv-bev-fusion` | `nvcr.io/nvstaging/vss-core/vss-rt-cv-mv3dt-bev-fusion:${BEV_FUSION_MV3DT_TAG}` | BEV Fusion — fuses per-camera detections to a single BEV frame |
+| `vss-rtvi-cv-mv3dt` | `nvcr.io/nvidia/vss-core/vss-rt-cv:${PERCEPTION_TAG}` | Per-camera DeepStream perception |
+| `vss-rtvi-cv-bev-fusion` | `nvcr.io/nvidia/vss-core/vss-rt-cv-mv3dt-bev-fusion:${BEV_FUSION_MV3DT_TAG}` | BEV Fusion — fuses per-camera detections to a single BEV frame |
 | `mosquitto` | `eclipse-mosquitto:2` | MQTT bus between perception and fusion |
 | `kafka` *or* `redis` | (per `STREAM_TYPE`) | Carries `mdx-raw` (input) and `mdx-bev` (output) |
 | `vss-broker-health-check` | (built locally) | Validates broker + creates topics (one-shot, exits 0) |
@@ -21,7 +21,7 @@ The actual `docker compose up` recipe. Parent: [`../SKILL.md`](../SKILL.md). Run
 | `vss-haproxy-ingress` | haproxy | Ingress — **present under MV3DT** (services are still reached on their direct ports) |
 | `vss-vios-postgres` (PostgreSQL) | postgres | Backing store for VST sensor-ms |
 | `sdr-controller` | (built locally) | SDR + Envoy consolidation (registers streamprocessing) |
-| `vss-configurator-mv3dt` (+ `*-init`) | `nvcr.io/nvstaging/vss-core/vss-configurator` | Sensor registration, DeepStream config materialization |
+| `vss-configurator-mv3dt` (+ `*-init`) | `nvcr.io/nvidia/vss-core/vss-configurator` | Sensor registration, DeepStream config materialization |
 | `vss-vios-nvstreamer-mv3dt` | nvstreamer | RTSP server for sample/videos data |
 | **`vss-behavior-analytics-mv3dt`** | analytics | 3D spatial analytics — always under `bp_wh_*_mv3dt`, **not** gated by `MINIMAL_PROFILE` |
 
@@ -226,22 +226,15 @@ This is the directory containing the **extracted** `vss-warehouse-app-data` tarb
 └── auto-calib/vggt/          optional VGGT model
 ```
 
-If you haven't extracted it yet, discover the latest tag rather than relying on a pinned one — release cuts and staging snapshots get re-published over time, and the most recent tag is rarely the one any doc still references:
+If you haven't extracted it yet, use the published warehouse app-data resource from the VSS 3.2.0 manifests:
 
 ```bash
 export NGC_CLI_API_KEY='<your-key>'
 
-# Discover what's actually published for your key. Try both orgs — most
-# keys see one or the other (not both). Release tags follow <maj>.<min>.<patch>;
-# staging tags are dated (e.g. v3.2.0-MMDDYYYY). Pick the most recent
-# UPLOAD_COMPLETE row that matches the perception/fusion image tag base
-# in .env (PERCEPTION_TAG=<base>-...). Mismatching app-data and image
-# versions is a common silent-deploy bug.
-NGC_CLI_ORG=nvidia    ngc registry resource list "nvidia/vss-warehouse/vss-warehouse-app-data:*"    --format_type ascii | head -10
-NGC_CLI_ORG=nvstaging ngc registry resource list "nvstaging/vss-warehouse/vss-warehouse-app-data:*" --format_type ascii | head -10
+NGC_CLI_ORG=nvidia ngc registry resource list "nvidia/vss-warehouse/vss-warehouse-app-data:*" --format_type ascii | head -10
 
-ORG=<nvidia-or-nvstaging>
-TAG=<picked-tag>
+ORG=nvidia
+TAG=3.2.0
 NGC_CLI_ORG="$ORG" ngc registry resource download-version "${ORG}/vss-warehouse/vss-warehouse-app-data:${TAG}"
 
 # The tarball extracts into a nested vss-warehouse-app-data/ directory — flatten it.
@@ -280,8 +273,8 @@ On DGX-SPARK, switch `PERCEPTION_TAG` to its `-sbsa` variant — comment the def
 
 ```bash
 # PERCEPTION_TAG ships an SBSA variant for DGX-SPARK — comment the default, uncomment the -sbsa line:
-# PERCEPTION_TAG="3.2.0-26.05.1"
-PERCEPTION_TAG="3.2.0-sbsa-26.05.1"
+# PERCEPTION_TAG="3.2.0"
+PERCEPTION_TAG="3.2.0-sbsa"
 ```
 
 The `blueprint-configurator` enforces this: on `HARDWARE_PROFILE=DGX-SPARK` it validates that `PERCEPTION_TAG` contains `sbsa`.
@@ -376,9 +369,8 @@ for img in $VSS_CORE_IMAGES; do
     echo
     echo "NGC login succeeded, but this key does not have access to the required MV3DT image:"
     echo "  $img"
-    echo "vss-core is published under both nvidia/ and nvstaging/, and your key may only see one."
-    echo "Either point PERCEPTION_IMAGE / BEV_FUSION_MV3DT_IMAGE in .env at the org your key can pull,"
-    echo "or provide an NGC key with vss-core access, then retry."
+    echo "vss-core is published under nvidia/vss-core for VSS 3.2.0."
+    echo "Provide an NGC key with access to the published vss-core artifacts, then retry."
     exit 1
   fi
 done
@@ -412,7 +404,7 @@ Once perception logs an FPS line and `/tmp/fusion_ready` exists (check via `dock
 
 ## When deploy fails
 
-- Image pull 401 / 403 → the Step 3 access check should have caught this before bring-up; if it slips through, re-run `docker login nvcr.io` and verify `ngc registry image list "nvstaging/vss-core/*"` (or `nvidia/vss-core/*`) returns results. If only one org resolves, point `PERCEPTION_IMAGE` / `BEV_FUSION_MV3DT_IMAGE` in `.env` at that org.
+- Image pull 401 / 403 → the Step 3 access check should have caught this before bring-up; if it slips through, re-run `docker login nvcr.io` and verify `ngc registry image list "nvidia/vss-core/*"` (or `nvidia/vss-core/*`) returns results. If only one org resolves, point `PERCEPTION_IMAGE` / `BEV_FUSION_MV3DT_IMAGE` in `.env` at that org.
 - `error from registry: Incorrect Repository Format` mid-pull → Docker/Compose version incompatibility with the bare-tag local-build services in `services/infra/compose.yml`. See [`troubleshooting.md`](troubleshooting.md) — "`error from registry: Incorrect Repository Format` during compose pull" for a version-independent pre-build workaround and the Docker-pin alternative.
 - `unknown or invalid runtime name: nvidia` → install NVIDIA Container Toolkit (`vss-deploy-profile/references/prerequisites.md` §2.3).
 - `redis ... Can't open the log file: Permission denied`, `kafka ... /tmp/kafka-data/cluster_id: Permission denied`, or elasticsearch `AccessDeniedException` → `$VSS_DATA_DIR/data_log` isn't writable by the container UIDs. Run the `mkdir -p` + scoped-ACL permission step from [`../SKILL.md`](../SKILL.md) Prerequisites §4 and redeploy. Don't recursive-chown.

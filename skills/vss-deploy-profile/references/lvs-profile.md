@@ -9,7 +9,7 @@ Long-video summarization. The LLM stack is identical to `base` (`base.md`) — s
 - **No SDR, Envoy, or SDRC router.** VST sensor and ingress talk to **vss-vios-streamprocessing** on **:30001** directly (`STREAM_PROCESSOR_MODULE_ENDPOINT`, `VST_NGINX_MODE=vst-direct`). Alerts/search use **SDRC** on **:10000** instead.
 - **No standalone VLM NIM service.** The `vlm_local_*_<slug>` compose profile is *not* enabled for LVS. The VLM lives inside the `rtvi-vlm` container.
 - **`rtvi-vlm` (port 8018) is the VLM serving layer.** It can load a VLM checkpoint directly (integrated mode) or proxy to a remote OpenAI-compatible endpoint.
-- **RT-VLM image tags:** x86 / Jetson-Tegra uses `nvcr.io/nvstaging/vss-core/vss-rt-vlm:3.2.0-26.05.4`; SBSA / DGX Spark / Grace uses `nvcr.io/nvstaging/vss-core/vss-rt-vlm:3.2.0-26.05.4-sbsa`.
+- **RT-VLM image tags:** x86 / Jetson-Tegra uses `nvcr.io/nvidia/vss-core/vss-rt-vlm:3.2.0`; SBSA / DGX Spark / Grace uses `nvcr.io/nvidia/vss-core/vss-rt-vlm:3.2.0-sbsa`.
 - **Default integrated checkpoint:** `ngc:nim/nvidia/cosmos-reason2-8b:hf-1208`.
 - **`VLM_NAME` is the model basename, NOT the friendly NIM name.** For the default integrated path: `VLM_NAME=nim_nvidia_cosmos-reason2-8b_hf-1208` (production-confirmed; using `nvidia/cosmos-reason2-8b` causes vss-lvs to return 400). Same caveat as alerts. Detail in [Default models](#default-models) and [Hard rules](#hard-rules).
 - **GPU device for VLM is `RT_VLM_DEVICE_ID`** (defaults to `${VLM_DEVICE_ID:-0}` via the rtvi-vlm compose), not the standalone `VLM_DEVICE_ID`. In shared mode, LLM and RT-VLM both pin to GPU 0.
@@ -32,7 +32,7 @@ Container names below are the actual `container_name:` keys from `deploy/docker/
 | Redis | `redis` | 6379 | Cache |
 | Phoenix | `phoenix` | 6006 | Observability |
 
-Post-deploy readiness probe: `curl -sf http://${HOST_IP}:38111/v1/ready` should return exit 0 once `vss-lvs` is serving. The VSS Agent at `http://${HOST_IP}:8000/docs` is the cross-profile readiness signal; this one confirms the LVS-specific microservice.
+Post-deploy readiness probe: `curl -sf http://${HOST_IP}:38111/v1/ready` should return exit 0 once `vss-lvs` is serving. The VSS Agent at `http://${HOST_IP}:8000/health` is the cross-profile readiness signal; this one confirms the LVS-specific microservice.
 
 ## Default models
 
@@ -173,7 +173,7 @@ For dedicated mode, set `LLM_DEVICE_ID=0`, `RT_VLM_DEVICE_ID=1`, leave `RTVI_VLL
 
 - **`VLM_NAME` must equal RT-VLM's `/v1/models` basename.** This is the single most important field for LVS to function. For the default integrated Cosmos2: `VLM_NAME=nim_nvidia_cosmos-reason2-8b_hf-1208`. Using the friendly NIM name `nvidia/cosmos-reason2-8b` causes vss-lvs to return `400 BadParameters: No such model …` and summarization fails — confirmed in production (2026-05-10). Transformation rule for NGC NIM paths: `ngc:nim/<org>/<model>:<tag>` → `nim_<org>_<model>_<tag>`. For HF git paths or any custom MODEL_PATH, verify by `curl http://${HOST_IP}:8018/v1/models | jq` after RT-VLM boots and copy the `id` field.
 - **L40S (48 GB) cannot host the LLM + RT-VLM shared.** 23.4 + 20.8 = 44.2 GB > 40.8 GB usable. Use a 2-GPU L40S host (LLM on device 0, RT-VLM on device 1) or escalate to the user about a remote VLM (Path B).
-- **RT-VLM image tag must match the CPU platform.** x86 and Jetson-Tegra platforms, including AGX/IGX Thor, use `RTVI_VLM_IMAGE_TAG=3.2.0-26.05.4` (`nvcr.io/nvstaging/vss-core/vss-rt-vlm:3.2.0-26.05.4`). SBSA server-ARM platforms, including DGX Spark and Grace, use `RTVI_VLM_IMAGE_TAG=3.2.0-26.05.4-sbsa` (`nvcr.io/nvstaging/vss-core/vss-rt-vlm:3.2.0-26.05.4-sbsa`). LLM-side, follow `edge.md`: DGX Spark uses the standalone DGX Spark Nano 9B NIM, while AGX/IGX Thor still uses the Edge 4B fallback.
+- **RT-VLM image tag must match the CPU platform.** x86 and Jetson-Tegra platforms, including AGX/IGX Thor, use `RTVI_VLM_IMAGE_TAG=3.2.0` (`nvcr.io/nvidia/vss-core/vss-rt-vlm:3.2.0`). SBSA server-ARM platforms, including DGX Spark and Grace, use `RTVI_VLM_IMAGE_TAG=3.2.0-sbsa` (`nvcr.io/nvidia/vss-core/vss-rt-vlm:3.2.0-sbsa`). LLM-side, follow `edge.md`: DGX Spark uses the standalone DGX Spark Nano 9B NIM, while AGX/IGX Thor still uses the Edge 4B fallback.
 - **Don't co-deploy a standalone Cosmos NIM with RT-VLM.** The standalone `vlm_local_*_cosmos-reason2-8b` profile must NOT be active for LVS. Verify by checking that `resolved.yml` doesn't have a `cosmos-reason2-8b` or `cosmos-reason2-8b-shared-gpu` service alongside `rtvi-vlm`.
 - **`VLM_MODE=remote` ⇒ `RTVI_VLM_MODEL_PATH=none`.** Forgetting this leaves RT-VLM trying to load weights AND proxy at the same time → startup hang or OOM.
 - **`/v1` suffix mismatch.** `VLM_BASE_URL` no `/v1`; `RTVI_VLM_ENDPOINT` yes `/v1`. The skill should always write both consistently when going remote.
@@ -188,13 +188,19 @@ For dedicated mode, set `LLM_DEVICE_ID=0`, `RT_VLM_DEVICE_ID=1`, leave `RTVI_VLL
 
 ## Endpoints (after deploy)
 
-| Service | URL |
+`PUBLIC` = the deployed public origin (`docker inspect vss-agent` →
+`VSS_AGENT_EXTERNAL_URL`; on Brev the `https://7777-<id>.brevlab.com` secure
+link). Report the ingress URLs, not raw ports — see
+[`base.md`](base.md#endpoints-after-deploy) / [`brev.md`](brev.md). Rows marked
+*(direct)* are internal service ports: on-host `curl` only, not browser-reachable on Brev.
+
+| Service | URL to report (through ingress) |
 |---|---|
-| Agent UI | `http://<HOST_IP>:3000/` |
-| Agent REST API | `http://<HOST_IP>:8000/` |
-| RT-VLM | `http://<HOST_IP>:8018/v1/` (OpenAI-compatible) |
-| Kibana | `http://<HOST_IP>:5601/` |
-| Phoenix | `http://<HOST_IP>:6006/` |
+| Agent UI | `${PUBLIC}/` |
+| Agent REST API | `${PUBLIC}/api` |
+| Kibana | `${PUBLIC}/kibana` |
+| Phoenix | `${PUBLIC}/phoenix` |
+| RT-VLM (direct) | `http://<HOST_IP>:8018/v1/` (OpenAI-compatible) |
 
 ## Env file location
 
@@ -206,7 +212,7 @@ deploy/docker/developer-profiles/dev-profile-lvs/generated.env   # skill's worki
 ## Debugging
 
 - **`docker logs vss-rtvi-vlm`** — startup takes up to 20 min on first run (model download from NGC). Look for `Maximum concurrency for X tokens per GPU: Y x` to confirm vLLM is up and the KV-cache budget is what you set.
-- **`vss-lvs` returns `400 BadParameters: No such model '<id>'`** (summarization fails in the UI) — `VLM_NAME` doesn't match what RT-VLM advertises. Verify with `curl http://${HOST_IP}:8018/v1/models | jq`; the `id` field must equal `VLM_NAME` in `dev-profile-lvs/generated.env` (the deployed values). For the default integrated path that's `nim_nvidia_cosmos-reason2-8b_hf-1208` (NOT `nvidia/cosmos-reason2-8b`). Fix → `docker compose -f resolved.yml up -d --no-deps --force-recreate vss-lvs vss-agent`. If the same UI chat thread is stuck in the failed-tool loop, refresh or start a fresh prompt.
+- **`vss-lvs` returns `400 BadParameters: No such model '<id>'`** (summarization fails in the UI) — `VLM_NAME` doesn't match what RT-VLM advertises. Verify with `curl http://${HOST_IP}:8018/v1/models | jq`; the `id` field must equal `VLM_NAME` in `dev-profile-lvs/generated.env` (the deployed values). For the default integrated path that's `nim_nvidia_cosmos-reason2-8b_hf-1208` (NOT `nvidia/cosmos-reason2-8b`). Fix → `docker compose --env-file <env> -f resolved.yml up -d --no-deps --force-recreate vss-lvs vss-agent`. If the same UI chat thread is stuck in the failed-tool loop, refresh or start a fresh prompt.
 - **VLM never produces summaries** — check that the topic `mdx-vlm-captions` is being written. `docker exec kafka kafka-console-consumer --bootstrap-server localhost:9092 --topic mdx-vlm-captions --max-messages 1`.
 - **Empty Kibana dashboards** — shared `logstash` may have failed to load the `mdx-lvs` pipeline or protobuf codec; `docker logs logstash` should show pipeline startup for `mdx-lvs-logstash.conf`.
 - **OOM in RT-VLM under load** — lower `RTVI_VLLM_GPU_MEMORY_UTILIZATION` by 0.05; if that doesn't help, drop `RTVI_VLM_MAX_MODEL_LEN` to `16384` and `RTVI_VLLM_MAX_NUM_SEQS` to `64`.

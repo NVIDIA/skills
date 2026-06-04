@@ -1,4 +1,4 @@
-> Part of behavior-analytics docs. See `../README.md` for the project overview.
+> See [`../SKILL.md`](../SKILL.md) for the project overview.
 
 # Dynamic Configuration
 
@@ -196,6 +196,8 @@ Read-only sections (`kafka`, `redisStream`, `mqtt`, `coordinateReferenceSystem`,
 
 ## Component map
 
+Under `video-search-and-summarization/services/analytics/behavior-analytics/`:
+
 ```
 src/mdx/analytics/core/transform/config/
 ├── config_validator.py        # Stateless validation: shape -> scope -> allowlist -> per-key value
@@ -206,7 +208,7 @@ src/mdx/analytics/core/transform/config/
 └── config_monitor.py          # Per-worker watchdog: pick up files written by the listener
 ```
 
-Wired up in `src/mdx/analytics/core/app/app_runner.py` (one `ConfigListener` per main process) and `src/mdx/analytics/core/app/app_base.py` (one `ConfigFileMonitor` per worker). The listener writes a JSON file into `CONFIG_DIR` (default `/tmp/checkpoint/config`) on every successful apply; each worker's `ConfigFileMonitor` picks up the file via watchdog `on_moved` and applies through its own local `ConfigApplier`.
+Wired up in `video-search-and-summarization/services/analytics/behavior-analytics/src/mdx/analytics/core/app/app_runner.py` (one `ConfigListener` per main process) and `video-search-and-summarization/services/analytics/behavior-analytics/src/mdx/analytics/core/app/app_base.py` (one `ConfigFileMonitor` per worker). The listener writes a JSON file into `CONFIG_DIR` (default `/tmp/checkpoint/config`) on every successful apply; each worker's `ConfigFileMonitor` picks up the file via watchdog `on_moved` and applies through its own local `ConfigApplier`.
 
 ### Why per-worker monitor, not per-process
 
@@ -258,6 +260,8 @@ Note the deliberate split between "zero items in input" (success no-op) and "ite
 
 ## Testing approach
 
+Test files live under `video-search-and-summarization/services/analytics/behavior-analytics/`:
+
 | Layer | Test file | What to add |
 |---|---|---|
 | Cache invalidation | `tests/unit/mdx/analytics/core/schema/test_config.py::TestAppConfig` | Test that mutating + `invalidate_caches()` flips a cached property's value. |
@@ -269,11 +273,13 @@ Note the deliberate split between "zero items in input" (success no-op) and "ite
 | Worker file monitor | `tests/unit/mdx/analytics/core/transform/config/test_config_monitor.py` | Test new file-handling paths. |
 | End-to-end | `tests/integration/dynamic_config/dynamic_config_e2e.py` | Add a scenario for new wire-level behavior. See its README. |
 
-Aim for 100% line + branch coverage on new code under `transform/config/`. The six modules there are at 100% today — keep that bar.
+Aim for 100% line + branch coverage on new code under `src/mdx/analytics/core/transform/config/`. The six modules there are at 100% today — keep that bar.
 
 ---
 
 ## Where to find canonical examples
+
+All paths below are under `video-search-and-summarization/services/analytics/behavior-analytics/`:
 
 - Read-at-use consumer: `src/mdx/analytics/core/stream/state/behavior/state_management_base.py` (just stores the `AppConfig` reference; reads at use-time).
 - Per-call value-capture: `src/mdx/analytics/core/stream/state/behavior/state_management_e.py::_create_trajectory` (passes values into a per-call sub-object).

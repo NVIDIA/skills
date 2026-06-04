@@ -25,10 +25,6 @@ Use this skill when:
 - After a driver or Docker update
 - Called from BOOTSTRAP during first-time setup
 
-## Read TOOLS.md First
-
-Check `TOOLS.md` for the VSS section. If missing, the environment isn't configured yet — run BOOTSTRAP first.
-
 ---
 
 ## Sudo Access

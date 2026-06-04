@@ -102,8 +102,8 @@ curl -fsS -X DELETE "$BASE_URL/v1/generate_video_embeddings/$STREAM_ID"
 | Variable | Purpose | Default | Required? |
 |---|---|---|---|
 | `RTVI_EMBED_PORT` | Host port mapped to container `8000`. | (unset; `${RTVI_EMBED_PORT?}` fails fast) | Yes |
-| `RTVI_EMBED_IMAGE` | Container image. | `nvcr.io/nvstaging/vss-core/vss-rt-embed` | No |
-| `RTVI_EMBED_TAG` | Container image tag. | `3.2.0-26.05.4` | No |
+| `RTVI_EMBED_IMAGE` | Container image. | `nvcr.io/nvidia/vss-core/vss-rt-embed` | No |
+| `RTVI_EMBED_TAG` | Container image tag. | `3.2.0` | No |
 | `RT_EMBED_DEVICE_ID` | GPU device id used by the Compose `device_ids` reservation. | `0` | No |
 | `RTVI_EMBED_NVIDIA_VISIBLE_DEVICES` | Maps to `NVIDIA_VISIBLE_DEVICES` inside the container. | `all` | No |
 | `RTVI_EMBED_NUM_GPUS` | Sets `NUM_GPUS` inside the container. | (unset) | No |
@@ -169,7 +169,7 @@ curl -fsS -X DELETE "$BASE_URL/v1/generate_video_embeddings/$STREAM_ID"
 ```yaml
 services:
   rtvi-embed:
-    image: ${RTVI_EMBED_IMAGE:-nvcr.io/nvstaging/vss-core/vss-rt-embed}:${RTVI_EMBED_TAG:-3.2.0-26.05.4}
+    image: ${RTVI_EMBED_IMAGE:-nvcr.io/nvidia/vss-core/vss-rt-embed}:${RTVI_EMBED_TAG:-3.2.0}
     container_name: vss-rtvi-embed
     user: "1001:1001"
     profiles: ["bp_developer_search_2d"]
