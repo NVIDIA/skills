@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
-name: NVIDIA Digital Health Examples
+name: Digital Health
 repo: NVIDIA/digital-health-examples
 description: Agent skills for the clinical ASR evaluation flywheel — term curation, synthetic clinical-speech benchmark generation, KER (Keyword Error Rate) scoring, and fine-tune guidance.
 skills:
