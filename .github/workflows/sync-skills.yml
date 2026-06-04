@@ -190,6 +190,13 @@ jobs:
             [ -z "$dir" ] && continue
             # Files in this skill dir changed by the rsync (modifications +
             # deletions via diff, additions via ls-files --others).
+            #
+            # NOTE on the deleted-sig case: if rsync deletes skill.oms.sig
+            # alongside content edits, the deletion appears in `git diff`
+            # so sig_changed matches and drift is NOT flagged here.
+            # That's fine in practice — the now-sigless skill falls
+            # through to the compliance step and is dropped under
+            # "missing artifacts: skill.oms.sig". Defense in depth.
             modified=$(git diff --name-only HEAD -- "$dir/" 2>/dev/null || true)
             untracked=$(git ls-files --others --exclude-standard -- "$dir/" 2>/dev/null || true)
             changed=$(printf '%s\n%s\n' "$modified" "$untracked" | sed '/^$/d')
@@ -430,29 +437,51 @@ jobs:
             title="Skills dropped from sync — $joined"
           fi
 
-          # Assign the rolling tracker to the catalog PIC so any drift
-          # change reliably reaches them via GitHub notifications,
-          # independent of repo-watch settings. The CATALOG_TRACKER_ASSIGNEES
-          # secret can hold a comma-separated list (e.g. "mosheabr,otherpic")
-          # — falls back to "mosheabr" if the secret isn't set, so the
-          # workflow stays self-contained without manual repo config.
+          # Assign the rolling tracker to one or more catalog PIC(s) so
+          # any drift change reliably reaches them via GitHub
+          # notifications, independent of repo-watch settings.
+          # CATALOG_TRACKER_ASSIGNEES is a comma-separated list of
+          # **individual GitHub user handles** — GitHub does NOT accept
+          # team handles as issue assignees, so a team rotation has to
+          # be expressed as the explicit current owners in the secret.
+          # If the secret is unset we skip assignment entirely and emit
+          # a loud warning — no hardcoded personal fallback, because a
+          # deactivated personal handle would silently mute notifications
+          # (Sayali's review #3, refined by Codex's note that teams
+          # aren't valid assignees).
           assignees="${{ secrets.CATALOG_TRACKER_ASSIGNEES }}"
-          assignees="${assignees:-mosheabr}"
+          if [ -z "$assignees" ]; then
+            echo "::warning title=Drift notifications inactive::CATALOG_TRACKER_ASSIGNEES secret is unset — the rolling drift-tracker issue will be created but no one will be auto-assigned. Set this secret to a comma-separated list of GitHub user handles (e.g. \"alice,bob\") to restore notifications."
+          fi
+
+          # Both branches assign in a tolerant loop so a bad/deactivated
+          # handle in CATALOG_TRACKER_ASSIGNEES doesn't take down the
+          # tracker step — even though the step is `continue-on-error`,
+          # a failing `gh issue create` would still skip the tracker
+          # update entirely, defeating the feature (Sayali's review #2,
+          # refined by Codex's note that the step's continue-on-error
+          # already prevents catastrophic sync failure).
+          IFS=',' read -r -a assignee_arr <<< "$assignees"
 
           if [ -n "$existing" ]; then
             gh issue edit "$existing" --title "$title" --body-file "$body"
             # `--add-assignee` is idempotent — re-asserts assignment on
             # every run so a manual unassign doesn't permanently mute it.
-            IFS=',' read -r -a assignee_arr <<< "$assignees"
             for a in "${assignee_arr[@]}"; do
-              gh issue edit "$existing" --add-assignee "$a" || true
+              a=$(echo "$a" | xargs)   # trim whitespace
+              [ -n "$a" ] && (gh issue edit "$existing" --add-assignee "$a" || echo "  warn: could not assign '$a' to issue #$existing")
             done
-            echo "Updated tracking issue #$existing (assignees: $assignees)"
+            echo "Updated tracking issue #$existing (assignees attempted: ${assignees:-<none configured>})"
           else
-            gh issue create --title "$title" --body-file "$body" \
-              --label missing-compliance \
-              --assignee "$assignees"
-            echo "Opened new tracking issue (assignees: $assignees)"
+            # Create first (no assignee), then add assignees in a
+            # tolerant loop so a typo can't block issue creation.
+            new_url=$(gh issue create --title "$title" --body-file "$body" --label missing-compliance)
+            new_num=$(echo "$new_url" | grep -oE '[0-9]+$')
+            echo "Opened new tracking issue #$new_num"
+            for a in "${assignee_arr[@]}"; do
+              a=$(echo "$a" | xargs)
+              [ -n "$a" ] && (gh issue edit "$new_num" --add-assignee "$a" || echo "  warn: could not assign '$a' to issue #$new_num")
+            done
           fi
 
       - name: Rebuild plugin catalog
