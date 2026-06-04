@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nemotron-customize`
-- Evaluation date: 2026-05-29
+- Evaluation date: 2026-06-04
 - NVSkills-Eval profile: `external`
 - Environment: `local`
 - Dataset: 8 evaluation tasks
@@ -55,10 +55,10 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 8 | 100% (+0%) | 100% (+0%) |
-| Correctness | 8 | 96% (+13%) | 94% (+20%) |
-| Discoverability | 8 | 80% (+45%) | 71% (+21%) |
-| Effectiveness | 8 | 94% (+2%) | 90% (+21%) |
-| Efficiency | 8 | 65% (+38%) | 59% (+13%) |
+| Correctness | 8 | 95% (+16%) | 94% (+22%) |
+| Discoverability | 8 | 78% (+45%) | 68% (+19%) |
+| Effectiveness | 8 | 94% (+7%) | 91% (+25%) |
+| Efficiency | 8 | 63% (+37%) | 54% (+11%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 

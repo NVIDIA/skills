@@ -32,7 +32,7 @@ Container names below are the actual `container_name:` keys from `deploy/docker/
 | Redis | `redis` | 6379 | Cache |
 | Phoenix | `phoenix` | 6006 | Observability |
 
-Post-deploy readiness probe: `curl -sf http://${HOST_IP}:38111/v1/ready` should return exit 0 once `vss-lvs` is serving. The VSS Agent at `http://${HOST_IP}:8000/docs` is the cross-profile readiness signal; this one confirms the LVS-specific microservice.
+Post-deploy readiness probe: `curl -sf http://${HOST_IP}:38111/v1/ready` should return exit 0 once `vss-lvs` is serving. The VSS Agent at `http://${HOST_IP}:8000/health` is the cross-profile readiness signal; this one confirms the LVS-specific microservice.
 
 ## Default models
 
@@ -188,13 +188,19 @@ For dedicated mode, set `LLM_DEVICE_ID=0`, `RT_VLM_DEVICE_ID=1`, leave `RTVI_VLL
 
 ## Endpoints (after deploy)
 
-| Service | URL |
+`PUBLIC` = the deployed public origin (`docker inspect vss-agent` →
+`VSS_AGENT_EXTERNAL_URL`; on Brev the `https://7777-<id>.brevlab.com` secure
+link). Report the ingress URLs, not raw ports — see
+[`base.md`](base.md#endpoints-after-deploy) / [`brev.md`](brev.md). Rows marked
+*(direct)* are internal service ports: on-host `curl` only, not browser-reachable on Brev.
+
+| Service | URL to report (through ingress) |
 |---|---|
-| Agent UI | `http://<HOST_IP>:3000/` |
-| Agent REST API | `http://<HOST_IP>:8000/` |
-| RT-VLM | `http://<HOST_IP>:8018/v1/` (OpenAI-compatible) |
-| Kibana | `http://<HOST_IP>:5601/` |
-| Phoenix | `http://<HOST_IP>:6006/` |
+| Agent UI | `${PUBLIC}/` |
+| Agent REST API | `${PUBLIC}/api` |
+| Kibana | `${PUBLIC}/kibana` |
+| Phoenix | `${PUBLIC}/phoenix` |
+| RT-VLM (direct) | `http://<HOST_IP>:8018/v1/` (OpenAI-compatible) |
 
 ## Env file location
 
@@ -206,7 +212,7 @@ deploy/docker/developer-profiles/dev-profile-lvs/generated.env   # skill's worki
 ## Debugging
 
 - **`docker logs vss-rtvi-vlm`** — startup takes up to 20 min on first run (model download from NGC). Look for `Maximum concurrency for X tokens per GPU: Y x` to confirm vLLM is up and the KV-cache budget is what you set.
-- **`vss-lvs` returns `400 BadParameters: No such model '<id>'`** (summarization fails in the UI) — `VLM_NAME` doesn't match what RT-VLM advertises. Verify with `curl http://${HOST_IP}:8018/v1/models | jq`; the `id` field must equal `VLM_NAME` in `dev-profile-lvs/generated.env` (the deployed values). For the default integrated path that's `nim_nvidia_cosmos-reason2-8b_hf-1208` (NOT `nvidia/cosmos-reason2-8b`). Fix → `docker compose -f resolved.yml up -d --no-deps --force-recreate vss-lvs vss-agent`. If the same UI chat thread is stuck in the failed-tool loop, refresh or start a fresh prompt.
+- **`vss-lvs` returns `400 BadParameters: No such model '<id>'`** (summarization fails in the UI) — `VLM_NAME` doesn't match what RT-VLM advertises. Verify with `curl http://${HOST_IP}:8018/v1/models | jq`; the `id` field must equal `VLM_NAME` in `dev-profile-lvs/generated.env` (the deployed values). For the default integrated path that's `nim_nvidia_cosmos-reason2-8b_hf-1208` (NOT `nvidia/cosmos-reason2-8b`). Fix → `docker compose --env-file <env> -f resolved.yml up -d --no-deps --force-recreate vss-lvs vss-agent`. If the same UI chat thread is stuck in the failed-tool loop, refresh or start a fresh prompt.
 - **VLM never produces summaries** — check that the topic `mdx-vlm-captions` is being written. `docker exec kafka kafka-console-consumer --bootstrap-server localhost:9092 --topic mdx-vlm-captions --max-messages 1`.
 - **Empty Kibana dashboards** — shared `logstash` may have failed to load the `mdx-lvs` pipeline or protobuf codec; `docker logs logstash` should show pipeline startup for `mdx-lvs-logstash.conf`.
 - **OOM in RT-VLM under load** — lower `RTVI_VLLM_GPU_MEMORY_UTILIZATION` by 0.05; if that doesn't help, drop `RTVI_VLM_MAX_MODEL_LEN` to `16384` and `RTVI_VLLM_MAX_NUM_SEQS` to `64`.

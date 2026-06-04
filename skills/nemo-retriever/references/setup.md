@@ -1,18 +1,20 @@
-# Setup turn (when `./lancedb/nv-ingest.lance` doesn't exist)
+# Setup turn (when `./lancedb/nemo-retriever.lance` doesn't exist)
 
-`retriever ingest ./pdfs/` runs the full pipeline (text extraction + page-element detection + OCR + embedding + LanceDB insert). On corpora >~800 pages this often won't fit a typical setup turn budget (10 min) — the OCR + page-element stages dominate and scale roughly linearly with page count. Always build an index — pick the recipe by corpus size:
+`retriever ingest ./pdfs/` runs the full pipeline (text extraction + page-element detection + OCR + embedding + LanceDB insert). On corpora >~50000 pages this often won't fit a typical setup turn budget — the OCR + page-element stages dominate and scale roughly linearly with page count. Always build an index — pick the recipe by corpus size:
 
 ```bash
 TOTAL_PAGES=$(<RETRIEVER_VENV>/bin/python -c "import pypdfium2, glob; print(sum(len(pypdfium2.PdfDocument(p)) for p in glob.glob('./pdfs/*.pdf')))" 2>/dev/null || echo 0)
 echo "total_pages=$TOTAL_PAGES"
-if [ "$TOTAL_PAGES" -le 800 ]; then
+if [ "$TOTAL_PAGES" -le 50000 ]; then
   <RETRIEVER_VENV>/bin/retriever ingest ./pdfs/ --embed-model-name nvidia/llama-nemotron-embed-1b-v2
 else
-  <RETRIEVER_VENV>/bin/retriever pipeline run ./pdfs/ --run-mode inprocess --method pdfium --no-extract-tables --no-extract-charts --no-extract-page-as-image --evaluation-mode none --embed-model-name nvidia/llama-nemotron-embed-1b-v2 --quiet
+  <RETRIEVER_VENV>/bin/retriever pipeline run ./pdfs/ --run-mode inprocess --method pdfium --no-extract-tables --no-extract-charts --no-extract-page-as-image --evaluation-mode none --embed-model-name nvidia/llama-nemotron-embed-1b-v2 --vdb-kwargs-json '{"uri": "lancedb", "table_name": "nemo-retriever"}' --quiet
 fi
 ```
 
-`retriever ingest` is quiet by default; the `else` (`retriever pipeline run`) branch needs `--quiet` passed explicitly. Quiet mode suppresses progress bars, HuggingFace download logs, vLLM init noise, Ray worker stdout, and INFO-level pipeline status lines on success, while still flushing captured output to stderr on error. Without it the `pipeline run` branch burns thousands of tokens on irrelevant progress output. On success you only see one line: `Ingested N document(s) into LanceDB lancedb/nv-ingest.` (for `retriever ingest`) or `Pipeline complete: N page(s) → lancedb lancedb/nv-ingest (T.Ts).` (for `retriever pipeline run`).
+Both branches write the **same** LanceDB table, `lancedb/nemo-retriever` — the table `retriever query` reads by default. `retriever ingest` defaults to that table automatically; `retriever pipeline run` has no `--table-name` flag and would otherwise default to `nv-ingest`, so the `else` branch pins it with `--vdb-kwargs-json '{"uri": "lancedb", "table_name": "nemo-retriever"}'`. Keep these aligned or queries will read an empty table.
+
+`retriever ingest` is quiet by default; the `else` (`retriever pipeline run`) branch needs `--quiet` passed explicitly. Quiet mode suppresses progress bars, HuggingFace download logs, vLLM init noise, Ray worker stdout, and INFO-level pipeline status lines on success, while still flushing captured output to stderr on error. Without it the `pipeline run` branch burns thousands of tokens on irrelevant progress output. On success you only see one line: `Ingested N document(s) into LanceDB lancedb/nemo-retriever.` (for `retriever ingest`) or `Pipeline complete: N page(s) → lancedb lancedb/nemo-retriever (T.Ts).` (for `retriever pipeline run`).
 
 The `else` branch skips page-element detection, OCR, table extraction, and chart extraction — only pdfium text extraction + embedding. Embedding runs locally via the bundled HuggingFace model by default (no remote NIM needed). It's strictly better to have a text-only index than no index at all: the per-query pdfium text-extract fallback re-extracts a full PDF *per query*, which is both slow and expensive. Page-element detection may emit warning logs when its remote endpoint isn't reachable; the warnings are non-fatal as long as the embedding step itself succeeds (and are silenced by `--quiet` on a successful run).
 

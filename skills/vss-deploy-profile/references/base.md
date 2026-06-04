@@ -183,7 +183,7 @@ Wait for the user to pick. **Don't silently substitute a different local model**
 2. **Write** it into the env file the resolved compose will load. The path is `deploy/docker/services/nim/<model-slug>/hw-<HARDWARE_PROFILE>(-shared).env` — pick or create whichever `HARDWARE_PROFILE` label fits (use the host's actual profile for documentation value, or `OTHER` if none matches and you're not contributing back).
    - **LLM NIM**: `NIM_KVCACHE_PERCENT=<v>` **and** `NIM_GPU_MEM_FRACTION=<v>`. **VLM NIM**: `NIM_KVCACHE_PERCENT=<v>` **and** `NIM_PASSTHROUGH_ARGS="--gpu-memory-utilization <v>"`. Also set `NIM_MAX_MODEL_LEN` and `NIM_MAX_NUM_SEQS` if you need to constrain context/concurrency.
    - vLLM: edit the model's `compose.yml` to set `--gpu-memory-utilization <value>` (or pass through an env var if the compose supports it)
-3. **Re-resolve and deploy**: `docker compose --env-file <env> config > resolved.yml && docker compose -f resolved.yml up -d`. Before running `up -d`, verify `resolved.yml` includes the right LLM/VLM service for your `LLM_NAME_SLUG` / `VLM_NAME_SLUG` and that the sizing values you wrote are visible in its `environment:` block.
+3. **Re-resolve and deploy**: `docker compose --env-file <env> config > resolved.yml && docker compose --env-file <env> -f resolved.yml up -d`. `--env-file` is required on `up` too — without it `COMPOSE_PROFILES` is unset and `up` exits 0 with zero services (see `SKILL.md` Step 5). Before running `up -d`, verify `resolved.yml` includes the right LLM/VLM service for your `LLM_NAME_SLUG` / `VLM_NAME_SLUG` and that the sizing values you wrote are visible in its `environment:` block.
 4. **Watch container logs** for the KV-cache report on startup (NIM logs `KV cache size: X GB` once it boots; vLLM logs `Maximum concurrency for X tokens per GPU: Y x`):
    - **OOM at model load** → lower fraction by 0.05 and redeploy.
    - **OOM mid-inference** (after a few requests, on long prompts) → also lower `NIM_MAX_MODEL_LEN` / `--max-model-len` and `NIM_MAX_NUM_SEQS` (e.g. from `4096`/`16` to `2048`/`4`).
@@ -424,13 +424,31 @@ The agent sets the upstream variables — `COMPOSE_PROFILES` is derived automati
 
 ## Endpoints (after deploy)
 
-| Service | URL |
+**Report the deployed public origin, not a raw container port.** Read it
+directly from the running stack — `docker inspect vss-agent` exposes
+`VSS_AGENT_EXTERNAL_URL`, the fully-assembled `proto://host:port` the agent
+actually serves (orchestrator equivalent: `docker_read`). Don't synthesize a
+`<HOST_IP>:<port>` URL — that surfaces an unreachable internal IP on Brev,
+where this origin is the `https://7777-<id>.brevlab.com` secure link (see
+[`brev.md`](brev.md)). Call that value `PUBLIC` below; everything is routed
+through the HAProxy ingress at that origin.
+
+| Service | URL to report (through ingress) |
 |---|---|
-| Agent UI | `http://<HOST_IP>:3000/` |
-| Agent REST API | `http://<HOST_IP>:8000/` |
-| Swagger UI | `http://<HOST_IP>:8000/docs` |
-| Reports | `http://<HOST_IP>:8000/static/agent_report_<DATE>.md` |
-| Phoenix telemetry | `http://<HOST_IP>:6006/` |
+| Agent UI | `${PUBLIC}/` |
+| Agent REST API | `${PUBLIC}/api` |
+| Reports | `${PUBLIC}/static/agent_report_<DATE>.md` |
+| Phoenix telemetry | `${PUBLIC}/phoenix` |
+
+**Direct service ports — internal only** (on-host `curl` debugging; not
+browser-reachable on Brev, never report these as the access URL):
+
+| Service | Direct port |
+|---|---|
+| Agent UI (direct) | `http://<HOST_IP>:3000/` |
+| Agent REST API (direct) | `http://<HOST_IP>:8000/` |
+| Swagger UI | `http://<HOST_IP>:8000/docs` — not routed through the ingress; direct/port-forward only |
+| Phoenix (direct) | `http://<HOST_IP>:6006/` |
 
 ## Env File Location
 

@@ -258,15 +258,22 @@ For Path B (default — VLM on GPU 0 with RT-CV), the math is on GPU 0 instead: 
 
 ## Endpoints (after deploy)
 
-| Service | URL |
+`PUBLIC` = the deployed public origin (`docker inspect vss-agent` →
+`VSS_AGENT_EXTERNAL_URL`; on Brev the `https://7777-<id>.brevlab.com` secure
+link). Report the ingress URLs, not raw ports — see
+[`base.md`](base.md#endpoints-after-deploy) / [`brev.md`](brev.md). Rows marked
+*(direct)* are internal service ports: on-host `curl` only, not browser-reachable on Brev.
+
+| Service | URL to report (through ingress) |
 |---|---|
-| Agent UI | `http://<HOST_IP>:3000/` |
-| Agent REST API | `http://<HOST_IP>:8000/` |
-| RT-Embed | `http://<HOST_IP>:8017/` |
-| Elasticsearch | `http://<HOST_IP>:9200/` |
-| Kibana | `http://<HOST_IP>:5601/` |
-| VLM (Path B/C) | `http://<HOST_IP>:30082/v1/` (NIM) or `http://<HOST_IP>:8018/v1/` (RT-VLM) |
-| Phoenix | `http://<HOST_IP>:6006/` |
+| Agent UI | `${PUBLIC}/` |
+| Agent REST API | `${PUBLIC}/api` |
+| Kibana | `${PUBLIC}/kibana` |
+| Phoenix | `${PUBLIC}/phoenix` |
+| nvstreamer | own secure link `https://31000-<id>.brevlab.com` on Brev (see [`brev.md`](brev.md)); else `http://<HOST_IP>:31000/` |
+| RT-Embed (direct) | `http://<HOST_IP>:8017/` |
+| Elasticsearch (direct) | `http://<HOST_IP>:9200/` |
+| VLM (direct, Path B/C) | `http://<HOST_IP>:30082/v1/` (NIM) or `http://<HOST_IP>:8018/v1/` (RT-VLM) |
 
 ## Env file location
 
@@ -277,7 +284,7 @@ deploy/docker/developer-profiles/dev-profile-search/generated.env   # skill's wo
 
 ## Stage perception models (RT-DETR warehouse)
 
-**MUST run before `docker compose -f resolved.yml up -d`.** The compose's `perception-2d-init` container only fetches the SigLIP vision encoder. The RT-DETR detector model that RT-CV needs is staged separately by `dev-profile.sh` — and since this skill doesn't run that script, the agent must stage it directly.
+**MUST run before `docker compose --env-file <env> -f resolved.yml up -d`.** The compose's `perception-2d-init` container only fetches the SigLIP vision encoder. The RT-DETR detector model that RT-CV needs is staged separately by `dev-profile.sh` — and since this skill doesn't run that script, the agent must stage it directly.
 
 Symptom if skipped: RT-CV starts but its TensorRT engine build fails because `${VSS_DATA_DIR}/models/rtdetr_warehouse_v1.0.2.fp16.onnx` is missing. (User-confirmed on 2026-05-10.)
 

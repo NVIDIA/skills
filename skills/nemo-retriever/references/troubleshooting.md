@@ -18,7 +18,7 @@ For an unlisted subcommand: `<RETRIEVER_VENV>/bin/retriever <subcommand> --help`
 ## Failure modes (expected, not errors)
 
 - **First `ingest` takes ~60s+** — vLLM warmup. Expected.
-- **First `query` takes ~10–15s** — embedder cold-start. Expected.
+- **First `query` is slow** — embedder (and reranker, with `--rerank`) cold-start. ~10–15s on an idle GPU, but **1–3 minutes under concurrent load**. Expected — wait for it; do not kill or relaunch. It is wrapped in `timeout 2000`, so let it run to that ceiling before treating it as failed.
 - **Empty result** — ingest didn't run. Use the fallback above.
 - **`Clamping num_partitions ...`** — informational on tiny corpora, not an error.
 - **Low-relevance top hit on tiny corpus** — look at `_distance` *gaps* between hits, not absolute values.

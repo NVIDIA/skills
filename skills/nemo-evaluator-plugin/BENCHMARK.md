@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nemo-evaluator-plugin`
-- Evaluation date: 2026-05-30
+- Evaluation date: 2026-06-03
 - NVSkills-Eval profile: `external`
 - Environment: `local`
 - Dataset: 1 evaluation tasks
@@ -55,24 +55,24 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 92% (+8%) | 94% (+12%) |
-| Discoverability | 2 | 61% (+27%) | 94% (+5%) |
-| Effectiveness | 2 | 98% (+7%) | 92% (+29%) |
-| Efficiency | 2 | 48% (+25%) | 92% (+7%) |
+| Correctness | 2 | 92% (+0%) | 85% (+5%) |
+| Discoverability | 2 | 63% (+0%) | 95% (+12%) |
+| Effectiveness | 2 | 85% (-2%) | 70% (+8%) |
+| Efficiency | 2 | 51% (+3%) | 93% (+15%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 10 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 12 total findings.
 
 Top findings:
 
+- MEDIUM QUALITY/quality_correctness: No documented scripts in table format (`skills/nemo-evaluator-plugin/SKILL.md`)
+- MEDIUM QUALITY/quality_correctness: Instructions don't mention 'run_script' (`skills/nemo-evaluator-plugin/SKILL.md`)
 - MEDIUM QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.author' (`skills/nemo-evaluator-plugin/SKILL.md`)
 - MEDIUM QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/nemo-evaluator-plugin/SKILL.md`)
 - MEDIUM QUALITY/quality_efficiency: Deeply nested references in llm-judge.md (`skills/nemo-evaluator-plugin/SKILL.md`)
-- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/nemo-evaluator-plugin/SKILL.md`)
-- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nemo-evaluator-plugin/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
@@ -80,8 +80,8 @@ Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
 
 Notable observations:
 
-- Context Deduplication: Collected 4 file(s)
-- Inter-Skill Deduplication: Parsed skill 'nemo-evaluator-plugin': 103 char description
+- Context Deduplication: Collected 6 file(s)
+- Inter-Skill Deduplication: Parsed skill 'nemo-evaluator-plugin': 117 char description
 
 ## Publication Recommendation
 

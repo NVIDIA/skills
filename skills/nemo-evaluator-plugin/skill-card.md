@@ -1,5 +1,5 @@
 ## Description: <br>
-Use when working on the Evaluator plugin CLI, jobs, SDK-backed specs, or plugin-owned Evaluator skills. <br>
+Use when working on the Evaluator plugin CLI, jobs, SDK-backed specs, metric types, or plugin-owned Evaluator skills. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to configure, run, and troubleshoot NeMo Evaluator plugin jobs for inline metric execution and benchmark evaluation of models and agents. <br>
+Developers and engineers who need to run evaluation tasks (exact-match metrics, LLM-as-judge scoring, benchmark suites, and durable evaluation jobs) against a running NeMo Platform server. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,14 +19,16 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Evaluator API Auth](references/api-auth.md) <br>
 - [LLM Judge Notes](references/llm-judge.md) <br>
+- [Evaluator API Auth](references/api-auth.md) <br>
 - [Evaluation Troubleshooting](references/troubleshooting.md) <br>
+- [NeMo Platform Documentation](https://nvidia-nemo.github.io/nemo-platform/) <br>
+- [Berkeley Function Calling Leaderboard](https://gorilla.cs.berkeley.edu/leaderboard.html) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Code, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash and Python code blocks] <br>
+**Output Type(s):** [Shell commands, API Calls, JSON, Configuration instructions] <br>
+**Output Format:** [Markdown with inline bash code blocks and JSON spec files] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -37,7 +39,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 internal skill evaluation task with 2 attempts per task (pass threshold: 50%). <br>
+Evaluated against 1 evaluation task (positive skill-activation case) with 2 attempts per task via NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,10 +64,10 @@ Underlying evaluation signals used in this run: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 92% (+8%) | 94% (+12%) |
-| Discoverability | 2 | 61% (+27%) | 94% (+5%) |
-| Effectiveness | 2 | 98% (+7%) | 92% (+29%) |
-| Efficiency | 2 | 48% (+25%) | 92% (+7%) |
+| Correctness | 2 | 92% (+0%) | 85% (+5%) |
+| Discoverability | 2 | 63% (+0%) | 95% (+12%) |
+| Effectiveness | 2 | 85% (-2%) | 70% (+8%) |
+| Efficiency | 2 | 51% (+3%) | 93% (+15%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: pyproject.toml) <br>

@@ -11,7 +11,6 @@
       }
     }
   },
-  "env": "Bare GPU host matching `{{platform}}` with Docker + NVIDIA Container Toolkit, `NGC_CLI_API_KEY`, and remote LLM/VLM endpoint env vars (`LLM_REMOTE_URL`, `LLM_REMOTE_MODEL`, `VLM_REMOTE_URL`, `VLM_REMOTE_MODEL`). Sample data ships in NGC bundle `nvidia/vss-developer/dev-profile-sample-data:3.1.0`. Pre-authorized to deploy prerequisites and start any alerts needed to drive incident generation in real-time mode.",
   "expects": [
     {
       "query": "Deploy the VSS alerts profile on {{platform}} in real-time (VLM) mode using remote LLM and remote VLM endpoints.",

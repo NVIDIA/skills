@@ -222,16 +222,22 @@ Formula: `NIM_KVCACHE_PERCENT = 1 - 0.35 - 0.15 = 0.50`. Same fraction across GP
 
 ## Endpoints (after deploy)
 
-| Service | URL |
+`PUBLIC` = the deployed public origin (`docker inspect vss-agent` →
+`VSS_AGENT_EXTERNAL_URL`; on Brev the `https://7777-<id>.brevlab.com` secure
+link). Report the ingress URLs, not raw ports — see
+[`base.md`](base.md#endpoints-after-deploy) / [`brev.md`](brev.md). Rows marked
+*(direct)* are internal service ports: on-host `curl` only, not browser-reachable on Brev.
+
+| Service | URL to report (through ingress) |
 |---|---|
-| Agent UI | `http://<HOST_IP>:3000/` (Alerts tab) |
-| Agent REST API | `http://<HOST_IP>:8000/` |
-| Alert-bridge realtime API | `http://<HOST_IP>:9080/api/v1/realtime` |
-| RT-VLM | `http://<HOST_IP>:8018/v1/` (or remote if `VLM_MODE=remote`) |
-| Video-Analytics MCP | `http://<HOST_IP>:9901/` |
-| Kibana | `http://<HOST_IP>:5601/` |
-| nvstreamer | `http://<HOST_IP>:31000/` |
-| Phoenix | `http://<HOST_IP>:6006/` |
+| Agent UI | `${PUBLIC}/` (Alerts tab) |
+| Agent REST API | `${PUBLIC}/api` |
+| Kibana | `${PUBLIC}/kibana` |
+| Phoenix | `${PUBLIC}/phoenix` |
+| nvstreamer | own secure link `https://31000-<id>.brevlab.com` on Brev (see [`brev.md`](brev.md)); else `http://<HOST_IP>:31000/` |
+| Alert-bridge realtime API (direct) | `http://<HOST_IP>:9080/api/v1/realtime` |
+| RT-VLM (direct) | `http://<HOST_IP>:8018/v1/` (or remote if `VLM_MODE=remote`) |
+| Video-Analytics MCP (direct) | `http://<HOST_IP>:9901/` |
 
 ## Readiness checks (per mode)
 
@@ -279,7 +285,7 @@ deploy/docker/developer-profiles/dev-profile-alerts/generated.env   # skill's wo
 
 ## Stage perception models (RTDETR-ITS + GDINO)
 
-**MUST run before `docker compose -f resolved.yml up -d` for verification mode (`MODE=2d_cv`).** The alerts compose has no init container that downloads the perception detector models — `dev-profile.sh` stages them via NGC CLI, and since this skill doesn't run that script, the agent stages them directly.
+**MUST run before `docker compose --env-file <env> -f resolved.yml up -d` for verification mode (`MODE=2d_cv`).** The alerts compose has no init container that downloads the perception detector models — `dev-profile.sh` stages them via NGC CLI, and since this skill doesn't run that script, the agent stages them directly.
 
 Real-time mode (`MODE=2d_vlm`) doesn't deploy RT-CV and skips this entirely.
 
