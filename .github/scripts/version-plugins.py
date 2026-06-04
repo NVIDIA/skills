@@ -16,7 +16,19 @@ mechanical: the script computes the magnitude from the diff shape and
 writes it back. Reviewers see the proposed bump in the PR diff alongside
 the change that triggered it.
 
-Implements the rules in plugin-versioning-mini-prd.md.
+Validation of builder-set versions enforces only mechanical safety:
+
+  - Monotonic: new version must be strictly greater than base.
+  - No pre-release tags: ^\\d+\\.\\d+\\.\\d+$ only.
+  - No oversized major skip: 1.x -> 5.x rejected as a likely typo.
+
+Magnitude-vs-change-shape is intentionally NOT validated; if the builder
+explicitly set a version, automation respects it. The reviewer sees the
+diff and pushes back if the magnitude is wrong.
+
+Payload hashing is deterministic and excludes the YAML `version` field
+itself plus generic noise (`__pycache__`, `.DS_Store`, `.pyc`, etc.).
+See `_hash_plugin_tree` and `_excluded` for the exact rules.
 
 Usage:
   version-plugins.py                Plan only; prints findings, no writes.

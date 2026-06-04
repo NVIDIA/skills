@@ -59,8 +59,9 @@ jobs:
           # Read-only: fail the PR if a payload change requires a version
           # bump that the contributor has not applied. The script auto-
           # resolves the base ref from GITHUB_BASE_REF on pull_request
-          # events, so no --base flag needed here. See plugin-versioning-
-          # mini-prd.md for the policy.
+          # events, so no --base flag needed here. Self-serve fix:
+          # `.github/scripts/version-plugins.sh --apply --base origin/main`
+          # locally, then commit the bump.
           .github/scripts/version-plugins.sh --check
 
       # TODO: add upstream CLI validation as a follow-up step.

@@ -315,7 +315,7 @@ jobs:
           # commit (HEAD — the sync changes are still uncommitted at this
           # point) and auto-bump any plugin whose curated content moved:
           # z for in-place edits, y for structural changes (skill add/
-          # remove, capability change). See plugin-versioning-mini-prd.md.
+          # remove, capability change). Builders own x bumps explicitly.
           .github/scripts/version-plugins.sh --apply --base HEAD
 
       - name: Regenerate README tables
