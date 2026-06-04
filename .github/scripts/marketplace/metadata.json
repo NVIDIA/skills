@@ -745,6 +745,30 @@
       }
     },
     {
+      "path": "skills/nemotron-policy-generator",
+      "name": "nemotron-policy-generator",
+      "description": "Generates BYO custom safety policies for NVIDIA Nemotron content-safety guardrails — Nemotron-Content-Safety-Reasoning-4B (text) and multimodal Nemotron-3-Content-Safety. Produces a Markdown policy, JSON taxonomy, and drop-in inference prompts. Maps rough words or an existing policy to V2 categories, adding custom categories or topic-following rules.",
+      "metadata": {
+        "product.primary": "Nemotron",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,ai_engineer,security_engineer,solutions_architect",
+        "discovery.activity_tags": "generate,configure,validate,classify"
+      }
+    },
+    {
+      "path": "skills/nemotron-speech",
+      "name": "nemotron-speech",
+      "description": "Routes NVIDIA Nemotron Speech (Riva) NIM tasks — deploys, runs, and tests ASR, TTS, and NMT NIMs on build.nvidia.com or self-hosted.",
+      "metadata": {
+        "product.primary": "Riva",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "conversational-ai",
+        "audience": "developer,application_developer,ai_engineer,devops_engineer",
+        "discovery.activity_tags": "deploy,inference,configure,validate,troubleshoot"
+      }
+    },
+    {
       "path": "skills/rag-blueprint",
       "name": "rag-blueprint",
       "description": "NVIDIA RAG Blueprint — deploy, configure, troubleshoot, and manage. Handles any RAG action: deploy, install, start, enable, disable, toggle, change, configure, troubleshoot, debug, fix, shutdown, stop, or tear down any RAG feature or service (Agentic RAG, VLM, guardrails, query rewriting, models, search, ingestion, observability, summarization, reasoning, and more).",
@@ -1203,13 +1227,85 @@
     {
       "path": "skills/nemo-evaluator-plugin",
       "name": "nemo-evaluator-plugin",
-      "description": "Use when working on the Evaluator plugin CLI, jobs, SDK-backed specs, or plugin-owned Evaluator skills.",
+      "description": "Use when working on the Evaluator plugin CLI, jobs, SDK-backed specs, metric types, or plugin-owned Evaluator skills.",
       "metadata": {
         "product.primary": "NeMo",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "developer,ai_engineer,ml_engineer",
         "discovery.activity_tags": "evaluate,validate,configure,inspect"
+      }
+    },
+    {
+      "path": "skills/data-designer",
+      "name": "data-designer",
+      "description": "Use when the user wants to create a dataset, generate synthetic data, or build a data generation pipeline.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_engineer",
+        "discovery.activity_tags": "generate,synthesize,configure,validate"
+      }
+    },
+    {
+      "path": "skills/launch-nemo-rl",
+      "name": "launch-nemo-rl",
+      "description": "Playbook for launching, monitoring, stopping, and debugging NeMo-RL recipes on a Kubernetes cluster via the nrl-k8s CLI. Covers ephemeral vs long-lived RayCluster modes, iterating on runs, and debugging hung or failed training jobs.",
+      "metadata": {
+        "product.primary": "NeMo RL",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,devops_engineer",
+        "discovery.activity_tags": "deploy,monitor,troubleshoot,debug,orchestrate"
+      }
+    },
+    {
+      "path": "skills/nemo-rl-auto-research",
+      "name": "nemo-rl-auto-research",
+      "description": "Autonomous NeMo-RL research agent workflow for directed hypothesis testing and open-ended discovery. Guides agents through the full experiment lifecycle: understanding recipes and environments, wiring RL or NeMo-gym runs, launching reproducible baselines and iterations, analyzing results, preserving human oversight, and using git plus TSV logs as the research ledger. Do NOT use for: bug fixes, code review, documentation, refactoring, dependency updates, or single-file changes.",
+      "metadata": {
+        "product.primary": "NeMo RL",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,research_academic",
+        "discovery.activity_tags": "train,evaluate,benchmark,optimize,orchestrate"
+      }
+    },
+    {
+      "path": "skills/nemo-rl-brev-etiquette",
+      "name": "nemo-rl-brev-etiquette",
+      "description": "Brev instance operating guidance for NeMo-RL agents working in /home/ubuntu/RL with limited workspace disk, a larger /ephemeral volume, and optional /home/ubuntu/RL/.env secrets. Use when running nemo-rl-auto-research campaigns, experiments, training jobs, model or dataset downloads, shared cache-heavy commands, log-producing runs, checkpoint generation, W&B or Hugging Face authenticated workflows, or any workflow that may create large files on Brev.",
+      "metadata": {
+        "product.primary": "NeMo RL",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,devops_engineer",
+        "discovery.activity_tags": "configure,operate,troubleshoot,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-rl-docs",
+      "name": "nemo-rl-docs",
+      "description": "Documentation conventions for NeMo-RL. Covers docs/index.md updates and docstring format. Do NOT use for: bug fixes, test fixes, dependency bumps, refactoring, CI/CD changes, performance tuning, or any task that does not involve writing or updating documentation.",
+      "metadata": {
+        "product.primary": "NeMo RL",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "contribute,extend,validate,inspect"
+      }
+    },
+    {
+      "path": "skills/nemo-rl-session-memory",
+      "name": "nemo-rl-session-memory",
+      "description": "Manage durable working-session memory for coding agents. Use when a user asks to preserve or recover agent context across disconnects, VS Code restarts, long-running work, handoffs, or any session where important state should be written periodically under the repo's session directory. Do NOT use for: simple questions, short tasks, one-off commands, linting, or code review.",
+      "metadata": {
+        "product.primary": "NeMo RL",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "configure,recover,inspect,operate"
       }
     },
     {

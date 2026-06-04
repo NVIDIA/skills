@@ -23,7 +23,8 @@
         "rag-eval",
         "rag-perf",
         "nemo-evaluator-plugin",
-        "nemo-retriever"
+        "nemo-retriever",
+        "nemotron-policy-generator"
       ]
     },
     {
@@ -66,7 +67,8 @@
         "digital-health-clinical-asr-build",
         "digital-health-clinical-asr-eval",
         "digital-health-clinical-asr-finetune",
-        "digital-health-clinical-asr-setup"
+        "digital-health-clinical-asr-setup",
+        "nemotron-speech"
       ]
     },
     {
@@ -127,7 +129,13 @@
         "mcore-run-on-slurm",
         "mcore-split-pr",
         "mcore-testing",
-        "nemo-data-designer-plugin"
+        "nemo-data-designer-plugin",
+        "data-designer",
+        "launch-nemo-rl",
+        "nemo-rl-auto-research",
+        "nemo-rl-brev-etiquette",
+        "nemo-rl-docs",
+        "nemo-rl-session-memory"
       ]
     },
     {
