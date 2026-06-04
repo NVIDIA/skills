@@ -1,0 +1,57 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: Jetson BSP
+repo: NVIDIA-AI-IOT/jetson-bsp-skills
+description: Agentic skills for setting up and customizing an NVIDIA Jetson Linux Board Support Package (BSP) — pick a target, prepare image and sources, customize IO (camera, PCIe, USB, pinmux, clocks, and more), then promote, flash, and validate.
+skills:
+  - path: skills/jetson-build-source/
+    catalog_dir: jetson-build-source
+  - path: skills/jetson-customize-camera/
+    catalog_dir: jetson-customize-camera
+  - path: skills/jetson-customize-clocks/
+    catalog_dir: jetson-customize-clocks
+  - path: skills/jetson-customize-fan/
+    catalog_dir: jetson-customize-fan
+  - path: skills/jetson-customize-mgbe/
+    catalog_dir: jetson-customize-mgbe
+  - path: skills/jetson-customize-nvpmodel/
+    catalog_dir: jetson-customize-nvpmodel
+  - path: skills/jetson-customize-pcie/
+    catalog_dir: jetson-customize-pcie
+  - path: skills/jetson-customize-pinmux/
+    catalog_dir: jetson-customize-pinmux
+  - path: skills/jetson-customize-uphy/
+    catalog_dir: jetson-customize-uphy
+  - path: skills/jetson-customize-usb/
+    catalog_dir: jetson-customize-usb
+  - path: skills/jetson-derive-carrier/
+    catalog_dir: jetson-derive-carrier
+  - path: skills/jetson-download-bsp/
+    catalog_dir: jetson-download-bsp
+  - path: skills/jetson-flash-image/
+    catalog_dir: jetson-flash-image
+  - path: skills/jetson-generate-kb/
+    catalog_dir: jetson-generate-kb
+  - path: skills/jetson-init-image/
+    catalog_dir: jetson-init-image
+  - path: skills/jetson-init-source/
+    catalog_dir: jetson-init-source
+  - path: skills/jetson-init-target/
+    catalog_dir: jetson-init-target
+  - path: skills/jetson-link-docs/
+    catalog_dir: jetson-link-docs
+  - path: skills/jetson-optimize-memory/
+    catalog_dir: jetson-optimize-memory
+  - path: skills/jetson-print-bsp-info/
+    catalog_dir: jetson-print-bsp-info
+  - path: skills/jetson-promote-image/
+    catalog_dir: jetson-promote-image
+  - path: skills/jetson-quick-start/
+    catalog_dir: jetson-quick-start
+  - path: skills/jetson-set-target/
+    catalog_dir: jetson-set-target
+  - path: skills/jetson-validate-image/
+    catalog_dir: jetson-validate-image
+links:
+  contributing: false
+  discussions: false
