@@ -1,12 +1,24 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 #
-# Validate that the generated plugin tree matches plugins.d/ + skills/.
+# Advisory checks on the generated plugin tree against plugins.d/ + skills/.
 #
-# Runs `build-plugins.sh --check`, which rebuilds into the working tree
-# and fails if anything drifts. The cron-driven sync workflow rebuilds
-# plugins automatically; this workflow just guards against contributor
-# PRs that hand-edit a generated file or forget to re-run the build.
+# Both steps below are advisory (continue-on-error). They surface plumbing
+# issues — drift between the source-of-truth (skills/ + plugins.d/) and
+# the generated tree (plugins/<name>/, plugin.json, marketplace JSONs),
+# and missing per-plugin version bumps — but do NOT block the PR from
+# merging. The reasoning:
+#
+#   - The skills layer is the product; the plugin packaging is plumbing.
+#   - Plumbing drift is eventually consistent: the cron-driven sync
+#     workflow (sync-skills.yml, twice daily at 06:00 + 18:00 UTC)
+#     regenerates plugins/ from source on every run, so any drift on
+#     main self-heals within ~12 hours.
+#   - Blocking skill-content PRs on plugin-layer concerns would create
+#     friction without preventing real harm.
+#
+# Reviewers and contributors should still pay attention to yellow ⚠️
+# results — they're real signals — but they aren't merge gates.
 
 name: Validate Plugins
 
@@ -51,18 +63,26 @@ jobs:
       - name: Install PyYAML
         run: pip install pyyaml
 
-      - name: Build plugins and fail on drift
+      - name: Plugin tree drift check (advisory)
+        # Advisory: rebuilds the plugin tree from plugins.d/ + skills/ and
+        # surfaces any drift (stale plugin/<name>/skills/<x>/, out-of-date
+        # plugin.json, marketplace JSON mismatch, hand-edited generated
+        # file). Self-serve fix: run `.github/scripts/build-plugins.sh`
+        # locally and commit the result. Drift on main self-heals via
+        # the next scheduled sync-skills.yml run.
+        continue-on-error: true
         run: .github/scripts/build-plugins.sh --check
 
-      - name: Versioning policy check
-        run: |
-          # Read-only: fail the PR if a payload change requires a version
-          # bump that the contributor has not applied. The script auto-
-          # resolves the base ref from GITHUB_BASE_REF on pull_request
-          # events, so no --base flag needed here. Self-serve fix:
-          # `.github/scripts/version-plugins.sh --apply --base origin/main`
-          # locally, then commit the bump.
-          .github/scripts/version-plugins.sh --check
+      - name: Versioning policy check (advisory)
+        # Advisory: flags any catalog plugin whose payload moved since the
+        # PR base without a corresponding version bump. The script auto-
+        # resolves the base ref from GITHUB_BASE_REF on pull_request events.
+        # Self-serve fix: run
+        #   `.github/scripts/version-plugins.sh --apply --base origin/main`
+        # locally, then commit the bump. Bumps on main also self-heal via
+        # the next scheduled sync-skills.yml run.
+        continue-on-error: true
+        run: .github/scripts/version-plugins.sh --check
 
       # TODO: add upstream CLI validation as a follow-up step.
       #
