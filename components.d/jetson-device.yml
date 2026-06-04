@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: Jetson Device
+repo: NVIDIA-AI-IOT/jetson-device-skills
+description: Device-side agent skills for working with a live NVIDIA Jetson after boot — diagnostics, memory auditing, headless setup, inference memory tuning, LLM serving and benchmarking, packaging guidance, and speculative decoding.
+skills:
+  - path: skills/jetson-diagnostic/
+    catalog_dir: jetson-diagnostic
+  - path: skills/jetson-headless-mode/
+    catalog_dir: jetson-headless-mode
+  - path: skills/jetson-inference-mem-tune/
+    catalog_dir: jetson-inference-mem-tune
+  - path: skills/jetson-llm-benchmark/
+    catalog_dir: jetson-llm-benchmark
+  - path: skills/jetson-llm-serve/
+    catalog_dir: jetson-llm-serve
+  - path: skills/jetson-memory-audit/
+    catalog_dir: jetson-memory-audit
+  - path: skills/jetson-package/
+    catalog_dir: jetson-package
+  - path: skills/jetson-print-device-info/
+    catalog_dir: jetson-print-device-info
+  - path: skills/jetson-speculative-decoding/
+    catalog_dir: jetson-speculative-decoding
+links:
+  contributing: false
+  discussions: false
