@@ -615,7 +615,7 @@ def build_skill_entry(
     schema_validator: Draft202012Validator,
     taxonomy: dict,
     ai_client,
-    errors: list[str],
+    skill_warnings: list[str],
     is_materially_changed: bool = False,
 ) -> dict | None:
     component = components.get(skill.path)
@@ -634,7 +634,7 @@ def build_skill_entry(
     missing = missing_required_fields(metadata)
     if missing:
         if ai_client is None:
-            errors.append(
+            skill_warnings.append(
                 f"{skill.path}: missing required fields {missing}; AI enrichment "
                 f"is disabled (--no-ai)."
             )
@@ -642,7 +642,7 @@ def build_skill_entry(
         try:
             enrichment = ai_client(skill, component, missing, taxonomy)
         except EnrichmentError as exc:
-            errors.append(f"{skill.path}: {exc}")
+            skill_warnings.append(f"{skill.path}: {exc}")
             return None
         for k in missing:
             metadata[k] = enrichment[k]
@@ -660,7 +660,7 @@ def build_skill_entry(
                 current_values=metadata,
             )
         except EnrichmentError as exc:
-            errors.append(f"{skill.path}: {exc}")
+            skill_warnings.append(f"{skill.path}: {exc}")
             return None
         for k in MVP_FIELDS:
             if amended.get(k):
@@ -698,14 +698,9 @@ def build_skills_sh(metadata: dict, subdomains: dict) -> dict:
     for slug, skills in groups.items():
         groups[slug] = sorted(skills)
 
-    # Alphabetical order by group title.
-    title_sorted = sorted(
-        sub_map.keys(),
-        key=lambda s: sub_map[s]["title"].lower(),
-    )
-
+    # Emit groups in the order defined in skills-subdomains.json.
     out_groups = []
-    for slug in title_sorted:
+    for slug in sub_map.keys():
         if not groups[slug]:
             continue
         out_groups.append(
@@ -753,13 +748,15 @@ def validate_inventory_round_trip(
     metadata_obj: dict,
     skills_sh_obj: dict,
     errors: list[str],
+    skipped_paths: set[str] | None = None,
 ) -> None:
     md_paths = {e["path"] for e in metadata_obj["skills"]}
     md_names = {e["name"] for e in metadata_obj["skills"]}
     found_paths = {s.path for s in skills_now}
     found_names = {s.name for s in skills_now}
+    skipped = skipped_paths or set()
 
-    for missing_path in sorted(found_paths - md_paths):
+    for missing_path in sorted(found_paths - md_paths - skipped):
         errors.append(f"metadata.json: missing entry for {missing_path}.")
     for stale_path in sorted(md_paths - found_paths):
         errors.append(
@@ -857,6 +854,7 @@ def main(argv: list[str] | None = None) -> int:
     ai_client = build_ai_client(allow_ai=not args.no_ai)
 
     errors: list[str] = []
+    skill_warnings: list[str] = []
     entries: list[dict] = []
     materially_changed = set(cls.materially_changed)
     for skill in sorted(skills_now, key=lambda s: s.path):
@@ -868,7 +866,7 @@ def main(argv: list[str] | None = None) -> int:
             metadata_validator,
             taxonomy,
             ai_client,
-            errors,
+            skill_warnings,
             is_materially_changed=skill.path in materially_changed,
         )
         if entry is not None:
@@ -895,7 +893,8 @@ def main(argv: list[str] | None = None) -> int:
             skills_sh_obj, skills_sh_validator, "skills.sh.json", errors
         )
         validate_skills_sh_uniqueness(skills_sh_obj, errors)
-        validate_inventory_round_trip(skills_now, metadata_obj, skills_sh_obj, errors)
+        skipped_paths = {s.path for s in skills_now if s.path not in {e["path"] for e in entries}}
+        validate_inventory_round_trip(skills_now, metadata_obj, skills_sh_obj, errors, skipped_paths=skipped_paths)
 
     if errors:
         print("VALIDATION FAILED:", file=sys.stderr)
@@ -942,6 +941,17 @@ def main(argv: list[str] | None = None) -> int:
         f"skills.sh.json: {'updated' if sh_changed else 'unchanged'} "
         f"({len(skills_sh_obj.get('groupings', []))} non-empty groups)"
     )
+
+    if skill_warnings:
+        print(
+            f"\nPARTIAL SUCCESS: {len(skill_warnings)} skill(s) could not be enriched "
+            f"and were excluded from output:",
+            file=sys.stderr,
+        )
+        for w in skill_warnings:
+            print(f"  - {w}", file=sys.stderr)
+        return 1
+
     return 0
 
 
