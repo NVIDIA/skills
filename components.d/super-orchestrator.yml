@@ -1,0 +1,6 @@
+name: Super Orchestrator
+repo: nikhil49023/super-orchestrator-skill
+description: Master orchestration skill utilizing code-graph-first, local firecrawl, dynamic subagents in isolated workspaces, automated token logging, and free opencode models for lightweight tasks.
+skills:
+  - path: .
+    catalog_dir: super-orchestrator
