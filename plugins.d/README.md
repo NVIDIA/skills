@@ -59,6 +59,32 @@ plugin by setting `skill_files: symlink` (or `copy`) in
 3. Commit the regenerated `plugins/<name>/` tree and the updated
    `marketplace.json` files alongside the new yaml.
 
+## Renaming a plugin
+
+The build script doesn't know a rename happened — it just sees a new
+name and builds a fresh `plugins/<new-name>/` next to the old folder.
+You have to delete the old one yourself, or it will sit in the repo
+forever (CI won't flag it).
+
+To rename `plugins.d/old.yml` → `plugins.d/new.yml`:
+
+```sh
+git mv plugins.d/old.yml plugins.d/new.yml
+# edit the file and change `name: old` to `name: new`
+git rm -r plugins/old
+.github/scripts/build-plugins.sh
+```
+
+The rebuild regenerates both `marketplace.json` files for you; just
+`git add` everything that changed (the renamed yaml, the new
+`plugins/new/` tree, the deleted `plugins/old/`, and both
+`marketplace.json` files) and commit it all together.
+
+Heads up: the plugin name is what users type to install
+(`claude plugin install <name>`, `codex plugin add <name>`). If the old
+name has been published anywhere, renaming is a breaking change for
+those users.
+
 ## Curated (hand-maintained) plugins
 
 A directory under `plugins/<name>/` that has its own

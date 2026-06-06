@@ -2,5 +2,13 @@ name: NeMo-RL
 repo: NVIDIA-NeMo/RL
 description: RLHF training on Ray — GRPO, DPO, and SFT for LLMs and VLMs with FSDP2 and Megatron-Core.
 skills:
-  - path: skills/
-    catalog_dir: NeMo-RL
+  - path: skills/launch-nemo-rl/
+    catalog_dir: launch-nemo-rl
+  - path: skills/nemo-rl-auto-research/
+    catalog_dir: nemo-rl-auto-research
+  - path: skills/nemo-rl-brev-etiquette/
+    catalog_dir: nemo-rl-brev-etiquette
+  - path: skills/nemo-rl-docs/
+    catalog_dir: nemo-rl-docs
+  - path: skills/nemo-rl-session-memory/
+    catalog_dir: nemo-rl-session-memory

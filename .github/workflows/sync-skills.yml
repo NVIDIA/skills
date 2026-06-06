@@ -253,8 +253,18 @@ jobs:
           # Every catalog skill (defined by SKILL.md) must ship with:
           #   - skill.oms.sig  (detached NVIDIA signature)
           #   - skill-card.md  (skill metadata card)
-          #   - evals.json     (eval definitions, anywhere within the
-          #                     skill directory — typically under benchmark/)
+          #   - eval data      (Tier-3 NV-ACES dataset). Accepted in any
+          #                     of these forms — semantic equivalence,
+          #                     not literal-filename:
+          #                       * evals.json anywhere in the skill dir
+          #                         (canonical — recursive find)
+          #                       * any *.json under skills/<skill>/evals/
+          #                       * any *.json under skills/<skill>/eval/
+          #                     This accepts multi-profile datasets like
+          #                     eval/h100.json + eval/nvidia_hosted.json
+          #                     (RAG Blueprint pattern), benchmark/evals.json
+          #                     (cuopt-developer pattern), and the
+          #                     canonical evals/evals.json layout.
           # Skills missing any of these are dropped from the catalog
           # before the PR is created — non-compliant skills do not merge.
           #
@@ -270,8 +280,19 @@ jobs:
             missing=""
             [ -f "$dir/skill.oms.sig" ] || missing="$missing skill.oms.sig"
             [ -f "$dir/skill-card.md" ] || missing="$missing skill-card.md"
-            [ -n "$(find "$dir" -type f -name evals.json -print -quit 2>/dev/null)" ] \
-              || missing="$missing evals.json"
+            # Eval dataset: accept canonical evals.json, OR any *.json
+            # under eval/ or evals/ subdir (multi-profile datasets).
+            has_eval=""
+            if [ -n "$(find "$dir" -type f -name evals.json -print -quit 2>/dev/null)" ]; then
+              has_eval=1
+            elif [ -d "$dir/evals" ] && \
+                 [ -n "$(find "$dir/evals" -maxdepth 1 -type f -name '*.json' -print -quit 2>/dev/null)" ]; then
+              has_eval=1
+            elif [ -d "$dir/eval" ] && \
+                 [ -n "$(find "$dir/eval" -maxdepth 1 -type f -name '*.json' -print -quit 2>/dev/null)" ]; then
+              has_eval=1
+            fi
+            [ -n "$has_eval" ] || missing="$missing evals.json"
             if [ -n "$missing" ]; then
               product=$(echo "$dir" | awk -F/ '{print $2}')
               # Prefixed reason so the tracker-issue partition splits
@@ -578,53 +599,105 @@ jobs:
           body: ${{ steps.summary.outputs.body }}
           delete-branch: true
 
-      - name: Open issue for failed components
-        if: steps.summary.outputs.has_failures == 'true'
+      - name: Update sync-failure tracking issue (rolling)
+        if: always()
         continue-on-error: true
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const failed = fs.readFileSync('/tmp/failed-components.txt', 'utf8').trim();
-            const title = `Skills sync: some components failed — ${new Date().toISOString().slice(0, 10)}`;
-            const body = [
-              `The [sync-skills workflow](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) completed but some components failed to sync.`,
-              ``,
-              `**Failed components:**`,
-              failed,
-              ``,
-              `**Run:** ${context.runId}`,
-              `**Trigger:** \`${context.eventName}\``,
-              ``,
-              `This usually means the skill path in \`components.d/<slug>.yml\` doesn't match the actual directory in the source repo (e.g. symlink, renamed, or removed).`
-            ].join('\n');
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title,
-              body,
-              labels: ['sync-failure']
-            });
+            const hasFailures = '${{ steps.summary.outputs.has_failures }}' === 'true';
+            const jobFailed = '${{ job.status }}' === 'failure';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
 
-      - name: Open issue on total failure
-        if: failure()
-        continue-on-error: true
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const title = `Skills sync failed — ${new Date().toISOString().slice(0, 10)}`;
-            const body = [
-              `The [sync-skills workflow](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) failed.`,
-              ``,
-              `**Trigger:** \`${context.eventName}\``,
-              `**Run:** ${context.runId}`,
-              ``,
-              `Please investigate and re-run if needed.`
-            ].join('\n');
-            await github.rest.issues.create({
+            // Find the existing rolling tracker (if any).
+            const { data: openIssues } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title,
-              body,
-              labels: ['sync-failure']
+              state: 'open',
+              labels: 'sync-failure',
             });
+            const tracker = openIssues[0];
+
+            if (!hasFailures && !jobFailed) {
+              // Clean run — close the rolling tracker if open, then exit.
+              if (tracker) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: tracker.number,
+                  body: `Sync run [#${context.runId}](${runUrl}) completed cleanly — closing the rolling sync-failure tracker. A new tracker opens automatically if a future sync fails.`,
+                });
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: tracker.number,
+                  state: 'closed',
+                });
+                console.log(`Clean run — closed tracker #${tracker.number}`);
+              } else {
+                console.log('Clean run — no tracker to close');
+              }
+              return;
+            }
+
+            // There IS a failure to report. Build a single rolling body that
+            // reflects the current state, not a historical run log.
+            let title, bodyLines = [];
+            const today = new Date().toISOString().slice(0, 10);
+
+            if (jobFailed) {
+              title = `Sync failure tracker — sync workflow run failed (${today})`;
+              bodyLines.push(
+                `The most recent sync workflow run failed entirely.`,
+                ``,
+                `**Most recent run:** [#${context.runId}](${runUrl})`,
+                `**Trigger:** \`${context.eventName}\``,
+                `**Last updated:** ${today}`,
+                ``,
+                `This issue auto-updates on every sync run and closes when sync runs cleanly again.`,
+              );
+            } else {
+              // Partial failure — read the failed components list.
+              let failed = '';
+              try {
+                failed = fs.readFileSync('/tmp/failed-components.txt', 'utf8').trim();
+              } catch (e) {
+                failed = '(failed-components.txt not available)';
+              }
+              const count = failed.split('\n').filter(l => l.trim()).length;
+              title = `Sync failure tracker — ${count} component(s) currently failing (${today})`;
+              bodyLines.push(
+                `Components that failed to sync on the most recent run. This issue auto-updates each sync and closes when all components are syncing cleanly.`,
+                ``,
+                `**Currently failing components (${count}):**`,
+                failed,
+                ``,
+                `**Most recent run:** [#${context.runId}](${runUrl})`,
+                `**Trigger:** \`${context.eventName}\``,
+                `**Last updated:** ${today}`,
+                ``,
+                `Failures usually mean the skill path in \`components.d/<slug>.yml\` doesn't match the actual directory in the source repo (e.g. symlink, renamed, removed, or moved branch).`,
+              );
+            }
+            const body = bodyLines.join('\n');
+
+            if (tracker) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: tracker.number,
+                title,
+                body,
+              });
+              console.log(`Updated rolling tracker #${tracker.number}`);
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['sync-failure'],
+              });
+              console.log('Opened new rolling tracker');
+            }

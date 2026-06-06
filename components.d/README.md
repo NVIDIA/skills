@@ -18,14 +18,14 @@ One file per component, aggregated at workflow runtime. This layout exists so si
 | `name`        | string | Display name shown in the README (e.g., `CUDA-Q`, `Nemotron Voice Agent`).  |
 | `repo`        | string | GitHub repository (`owner/repo`).                                           |
 | `description` | string | One-line description for the README's Available Skills table.               |
-| `skills`      | list   | Skill source locations (see below).                                         |
+| `skills`      | list   | Skill source locations — one entry per skill (see below).                   |
 
 Each entry under `skills:` requires:
 
-| Field         | Type   | Description                                                              |
-|---------------|--------|--------------------------------------------------------------------------|
-| `path`        | string | Directory in the source repo containing skills (e.g., `.agents/skills/`).|
-| `catalog_dir` | string | Directory name under `skills/` in this catalog (must be unique).         |
+| Field         | Type   | Description                                                                                |
+|---------------|--------|--------------------------------------------------------------------------------------------|
+| `path`        | string | Directory in the source repo containing a single skill (a directory with `SKILL.md` at its root). |
+| `catalog_dir` | string | Top-level directory name under `skills/` in this catalog (must be unique across components). |
 
 ## Optional fields
 
@@ -44,22 +44,35 @@ name: Your Product
 repo: NVIDIA/your-product
 description: One-line description of what the skills do.
 skills:
-  - path: .agents/skills/
+  - path: skills/your-product-install/
+    catalog_dir: your-product-install
+  - path: skills/your-product-deploy/
+    catalog_dir: your-product-deploy
+```
+
+Each entry points at one skill source directory and creates one top-level catalog directory under `skills/`. The catalog layout mirrors the source naming 1:1 for discoverability — each skill becomes its own `skills/<catalog_dir>/` entry in this catalog, rather than nesting under a per-product subdirectory.
+
+## Bulk layout (deprecated)
+
+> [!IMPORTANT]
+> The bulk layout — where one entry's `path` points at a *parent* directory containing multiple skills, all landing under a single nested `catalog_dir` — is deprecated for new components. Use the flat layout above instead.
+>
+> Existing components on the bulk layout continue to work and will be migrated incrementally. The sync workflow handles both layouts identically (a directory-to-directory `rsync`); the difference is in the catalog shape produced.
+
+The deprecated pattern looked like:
+
+```yaml
+# DEPRECATED — do not copy for new components
+skills:
+  - path: skills/
     catalog_dir: your-product
 ```
 
-For multi-skill components, add multiple entries under `skills:`:
+This produced nested paths like `skills/your-product/<skill-name>/` for every skill found under the source `skills/` directory. The flat layout above is preferred because:
 
-```yaml
-name: NeMo Evaluator
-repo: NVIDIA-NeMo/Evaluator
-description: LLM evaluation — launch evaluations, access MLflow results, and bring-your-own benchmarks.
-skills:
-  - path: packages/nemo-evaluator-launcher/.claude/skills/
-    catalog_dir: NeMo-Evaluator-Launcher
-  - path: packages/nemo-evaluator/.claude/skills/
-    catalog_dir: NeMo-Evaluator
-```
+- Each skill gets a discoverable top-level catalog directory, scannable alongside skills from other components.
+- The `catalog_dir` per skill makes the catalog naming explicit at onboarding time rather than relying on whatever subdirectory names happened to ship in the source `skills/` tree.
+- Source skills can be added, removed, or renamed without changing the catalog's top-level shape silently.
 
 ## How aggregation works
 

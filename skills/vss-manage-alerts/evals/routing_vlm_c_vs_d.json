@@ -1,0 +1,37 @@
+{
+  "skills": ["vss-manage-alerts", "vss-deploy-profile"],
+  "resources": {
+    "platforms": {
+      "L40S": {
+        "modes": ["remote-all"]
+      }
+    }
+  },
+  "deploy_mode": "real-time",
+  "env": "VSS alerts profile already deployed in VLM real-time mode (`deploy -p alerts -m real-time`). Alert Bridge running with at least one active rule. Sensor `warehouse_sample` registered in VIOS. Some incidents already recorded in Elasticsearch. Pre-authorized to deploy prerequisites.",
+  "description": "Routing boundary: Workflow C (query past incidents via /generate) vs Workflow D (list active subscription rules via Alert Bridge GET). Tests that the parent alerts skill correctly distinguishes 'what happened' from 'what is running'.",
+  "expects": [
+    {
+      "query": "What alerts have been triggered today?",
+      "checks": [
+        "The trajectory calls `POST /generate` with a query intent — 'triggered today' means past incidents, routing to Workflow C.",
+        "The agent does NOT call Alert Bridge `GET /api/v1/realtime` — that lists active rules, not past incidents."
+      ]
+    },
+    {
+      "query": "What alert rules are currently active?",
+      "checks": [
+        "The trajectory calls Alert Bridge `GET /api/v1/realtime` — 'rules' + 'currently active' means subscription inventory, routing to Workflow D.",
+        "The agent does NOT call `POST /generate` to query incidents.",
+        "The agent renders a human-readable summary of active rules (not raw JSON)."
+      ]
+    },
+    {
+      "query": "Any alerts so far today?",
+      "checks": [
+        "The trajectory calls `POST /generate` — casual incident query routes to Workflow C, not D's list-rules.",
+        "The agent does NOT call Alert Bridge `GET /api/v1/realtime` — 'alerts' here means incidents, not subscription rules."
+      ]
+    }
+  ]
+}

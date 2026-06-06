@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+name: Data Designer
+repo: NVIDIA-NeMo/DataDesigner
+description: Build declarative synthetic dataset generation pipelines with NeMo Data Designer.
+skills:
+  - path: skills/data-designer/
+    catalog_dir: data-designer

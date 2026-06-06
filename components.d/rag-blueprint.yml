@@ -1,6 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: RAG Blueprint
 repo: NVIDIA-AI-Blueprints/rag
+ref: develop
 description: RAG pipeline — deploy, configure, troubleshoot, and manage retrieval augmented generation with Docker Compose or Helm.
 skills:
-  - path: skill-source/.agents/skills/
-    catalog_dir: rag
+  - path: skills/rag-blueprint/
+    catalog_dir: rag-blueprint
+  - path: skills/rag-eval/
+    catalog_dir: rag-eval
+  - path: skills/rag-perf/
+    catalog_dir: rag-perf

@@ -1,6 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: DeepStream
 repo: NVIDIA-AI-IOT/DeepStream_Coding_Agent
-description: Agentic skills for guided DeepStream development. 
+description: Agentic skills for guided DeepStream development.
 skills:
-  - path: skills/
-    catalog_dir: deepstream
+  - path: skills/deepstream-dev/
+    catalog_dir: deepstream-dev
+  - path: skills/deepstream-import-vision-model/
+    catalog_dir: deepstream-import-vision-model
+links:
+  discussions: false

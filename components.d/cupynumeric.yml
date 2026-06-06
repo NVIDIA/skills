@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: cuPyNumeric
+repo: nv-legate/cupynumeric
+description: NumPy and SciPy on multi-node multi-GPU systems — skills to help with installing cuPyNumeric, migrating existing NumPy code, and doing parallel I/O
+skills:
+  - path: skills/cupynumeric-hdf5/
+    catalog_dir: cupynumeric-hdf5
+  - path: skills/cupynumeric-install/
+    catalog_dir: cupynumeric-install
+  - path: skills/cupynumeric-migration-readiness/
+    catalog_dir: cupynumeric-migration-readiness
+  - path: skills/cupynumeric-parallel-data-load/
+    catalog_dir: cupynumeric-parallel-data-load
+links:
+  discussions: false
+  security: false

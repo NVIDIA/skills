@@ -1,0 +1,10 @@
+name: Physical AI
+repo: NVIDIA/physical-ai-data-factory
+description: Physical AI skills for simulation, synthetic data generation, training, validation and deployment and more.
+skills:
+  - path: skills/physical-ai-defect-image-generation/
+    catalog_dir: physical-ai-defect-image-generation
+  - path: skills/physical-ai-video-data-augmentation/
+    catalog_dir: physical-ai-video-data-augmentation
+links:
+  discussions: false

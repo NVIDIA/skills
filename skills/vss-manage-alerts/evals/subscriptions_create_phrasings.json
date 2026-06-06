@@ -1,0 +1,100 @@
+{
+  "skills": ["vss-manage-alerts", "vss-deploy-profile"],
+  "resources": {
+    "platforms": {
+      "L40S": {
+        "modes": ["remote-all"]
+      }
+    }
+  },
+  "deploy_mode": "real-time",
+  "env": "VSS alerts profile already deployed in VLM real-time mode (`deploy -p alerts -m real-time`). Alert Bridge running and reachable. Sensors `warehouse_sample` and `Camera_02` registered in VIOS with live RTSP streams. No pre-existing realtime rules on Alert Bridge. Pre-authorized to deploy prerequisites.",
+  "description": "Phrasing diversity test for alert rule creation (references/alert-subscriptions.md). Each entry uses a different sentence structure to request 'create a realtime alert rule'. Checks verify correct extraction of sensor_name, prompt (verbatim), and alert_type (snake_case tag), plus correct payload structure.",
+  "expects": [
+    {
+      "_phrasing": "canonical: 'send me alerts for <condition> in camera <sensor>'",
+      "_extraction": { "sensor_name": "warehouse_sample", "prompt_must_contain": "fallen boxes", "alert_type_pattern": "fallen_box*|box_drop*|drop*box*" },
+      "query": "Send me alerts for fallen boxes in camera warehouse_sample",
+      "checks": [
+        "The trajectory calls Alert Bridge `POST /api/v1/realtime`.",
+        "The Alert Bridge payload's `prompt` field contains 'fallen boxes' verbatim or a semantically equivalent phrase — the agent must NOT rephrase the user's condition into something unrelated.",
+        "The Alert Bridge payload's `live_stream_url` is an RTSP URL resolved from the sensor named `warehouse_sample` (not `camera_warehouse_sample` or `camera warehouse_sample` — the word 'camera' in the query is a generic noun, not part of the sensor name).",
+        "The Alert Bridge payload's `sensor_id` is the VIOS sensor ID resolved from `warehouse_sample` (via `GET /sensor/list`).",
+        "The Alert Bridge payload's `sensor_name` is `warehouse_sample`.",
+        "The Alert Bridge payload's `alert_type` is a snake_case tag of 2-4 words describing the condition (e.g. `fallen_boxes`, `box_drop_detection`, or similar — NOT a generic tag like `alert` or `realtime_alert`).",
+        "The Alert Bridge payload includes `system_prompt` set to 'Answer yes or no' (or equivalent yes/no instruction) and `chunk_duration` set to 30.",
+        "The response includes a rule `id` (UUID) and `status: success`."
+      ]
+    },
+    {
+      "_phrasing": "imperative: 'create alert for <condition> on <sensor>'",
+      "_extraction": { "sensor_name": "Camera_02", "prompt_must_contain": "smoke", "alert_type_pattern": "smoke*|fire_smoke*" },
+      "query": "Create alert for smoke detection on Camera_02",
+      "checks": [
+        "The trajectory calls Alert Bridge `POST /api/v1/realtime`.",
+        "The Alert Bridge payload's `prompt` field contains 'smoke' — the agent extracted the detection condition correctly, not the sensor name.",
+        "The Alert Bridge payload's `live_stream_url` is an RTSP URL resolved from the sensor named `Camera_02` via VIOS `GET /sensor/list` + `GET /sensor/{id}/streams`.",
+        "The Alert Bridge payload's `sensor_id` is the VIOS sensor ID resolved from `Camera_02`.",
+        "The Alert Bridge payload's `sensor_name` is `Camera_02`.",
+        "The Alert Bridge payload's `alert_type` is a snake_case tag related to smoke (e.g. `smoke_detection`, `fire_smoke_detection` — NOT `camera_02` or a sensor-derived tag).",
+        "The Alert Bridge payload includes `system_prompt` set to 'Answer yes or no' and `chunk_duration` set to 30.",
+        "The response includes a rule `id` (UUID) and `status: success`."
+      ]
+    },
+    {
+      "_phrasing": "subject-first: '<condition> needs an alert on <sensor>'",
+      "_extraction": { "sensor_name": "warehouse_sample", "prompt_must_contain": "vehicle collision", "alert_type_pattern": "vehicle_collision*" },
+      "query": "Vehicle collisions needs an alert on warehouse_sample",
+      "checks": [
+        "The trajectory calls Alert Bridge `POST /api/v1/realtime`.",
+        "The Alert Bridge payload's `prompt` field contains 'vehicle collision' — the agent correctly identified the condition as the sentence subject ('Vehicle collisions'), NOT the sensor.",
+        "The Alert Bridge payload's `live_stream_url` is an RTSP URL resolved from `warehouse_sample` — the agent correctly identified 'warehouse_sample' as the sensor despite it appearing after 'on' at the end of the sentence.",
+        "The Alert Bridge payload's `sensor_id` is the VIOS sensor ID resolved from `warehouse_sample`.",
+        "The Alert Bridge payload's `sensor_name` is `warehouse_sample`.",
+        "The Alert Bridge payload's `alert_type` is a snake_case tag like `vehicle_collision` — NOT `warehouse_sample` or a sensor-derived tag.",
+        "The response includes a rule `id` (UUID) and `status: success`."
+      ]
+    },
+    {
+      "_phrasing": "passive voice: 'alert needs to be created for <condition> on <sensor>'",
+      "_extraction": { "sensor_name": "Camera_02", "prompt_must_contain": "unauthorized access", "alert_type_pattern": "unauthorized_access*" },
+      "query": "Alert needs to be created for unauthorized access on Camera_02",
+      "checks": [
+        "The trajectory calls Alert Bridge `POST /api/v1/realtime`.",
+        "The Alert Bridge payload's `prompt` field contains 'unauthorized access' — extracted from the passive construction, not confused with the subject 'Alert'.",
+        "The Alert Bridge payload's `live_stream_url` is an RTSP URL resolved from `Camera_02` — not mistakenly treating 'unauthorized access' as a sensor name.",
+        "The Alert Bridge payload's `sensor_id` is the VIOS sensor ID resolved from `Camera_02`.",
+        "The Alert Bridge payload's `sensor_name` is `Camera_02`.",
+        "The Alert Bridge payload's `alert_type` is a snake_case tag like `unauthorized_access` — NOT `alert` or a tag derived from the sentence subject.",
+        "The response includes a rule `id` (UUID) and `status: success`."
+      ]
+    },
+    {
+      "_phrasing": "casual + embedded location: 'I want to be notified about <condition + location> on <sensor>'",
+      "_extraction": { "sensor_name": "warehouse_sample", "prompt_must_contain": "people loitering", "alert_type_pattern": "loiter*|people_loiter*" },
+      "query": "I want to be notified about people loitering near the loading dock on warehouse_sample",
+      "checks": [
+        "The trajectory calls Alert Bridge `POST /api/v1/realtime` — 'notified' without 'slack'/'webhook' routes to Workflow D, NOT Workflow E.",
+        "The agent does NOT attempt Slack setup.",
+        "The Alert Bridge payload's `prompt` field contains 'people loitering near the loading dock' or equivalent — the phrase 'near the loading dock' is part of the detection condition, NOT part of the sensor name.",
+        "The Alert Bridge payload's `live_stream_url` is an RTSP URL resolved from `warehouse_sample` — the sensor name is only the token after 'on', not 'loading dock on warehouse_sample'.",
+        "The Alert Bridge payload's `sensor_id` is the VIOS sensor ID resolved from `warehouse_sample`.",
+        "The Alert Bridge payload's `sensor_name` is `warehouse_sample`.",
+        "The Alert Bridge payload's `alert_type` is a snake_case tag related to loitering (e.g. `people_loitering`, `loitering_detection` — NOT `loading_dock` or a location-derived tag).",
+        "The response includes a rule `id` (UUID) and `status: success`."
+      ]
+    },
+    {
+      "_phrasing": "verification: list all rules to confirm correct extraction across all phrasings",
+      "query": "Show me all active realtime rules",
+      "checks": [
+        "The trajectory calls Alert Bridge `GET /api/v1/realtime`.",
+        "The response contains at least 4 rules (from the previous create entries).",
+        "The listed rules span BOTH sensors (`warehouse_sample` and `Camera_02`) — confirming that sensor extraction was correct across different phrasings and both sensors were used.",
+        "Each rule's `alert_type` is a distinct, condition-specific snake_case tag (e.g. `fallen_boxes`, `smoke_detection`, `vehicle_collision`, `unauthorized_access`, `people_loitering`) — NOT generic tags and NOT sensor-name-derived tags.",
+        "The RTSP URLs are reverse-resolved to human-readable sensor names in the agent's output.",
+        "The agent renders a readable table or list — not raw JSON."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+name: NeMo MBridge
+repo: NVIDIA-NeMo/Megatron-Bridge
+description: NeMo MBridge - PyTorch-native bridge between Hugging Face and Megatron-Core for checkpoint conversion, training recipes, and NVIDIA GPU performance workflows.
+skills:
+  - path: skills/nemo-mbridge-mlm-bridge-training/
+    catalog_dir: nemo-mbridge-mlm-bridge-training
+  - path: skills/nemo-mbridge-multi-node-slurm/
+    catalog_dir: nemo-mbridge-multi-node-slurm
+  - path: skills/nemo-mbridge-perf-activation-recompute/
+    catalog_dir: nemo-mbridge-perf-activation-recompute
+  - path: skills/nemo-mbridge-perf-cpu-offloading/
+    catalog_dir: nemo-mbridge-perf-cpu-offloading
+  - path: skills/nemo-mbridge-perf-cuda-graphs/
+    catalog_dir: nemo-mbridge-perf-cuda-graphs
+  - path: skills/nemo-mbridge-perf-expert-parallel-overlap/
+    catalog_dir: nemo-mbridge-perf-expert-parallel-overlap
+  - path: skills/nemo-mbridge-perf-hierarchical-context-parallel/
+    catalog_dir: nemo-mbridge-perf-hierarchical-context-parallel
+  - path: skills/nemo-mbridge-perf-megatron-fsdp/
+    catalog_dir: nemo-mbridge-perf-megatron-fsdp
+  - path: skills/nemo-mbridge-perf-memory-tuning/
+    catalog_dir: nemo-mbridge-perf-memory-tuning
+  - path: skills/nemo-mbridge-perf-moe-comm-overlap/
+    catalog_dir: nemo-mbridge-perf-moe-comm-overlap
+  - path: skills/nemo-mbridge-perf-moe-dispatcher-selection/
+    catalog_dir: nemo-mbridge-perf-moe-dispatcher-selection
+  - path: skills/nemo-mbridge-perf-moe-hardware-configs/
+    catalog_dir: nemo-mbridge-perf-moe-hardware-configs
+  - path: skills/nemo-mbridge-perf-moe-long-context/
+    catalog_dir: nemo-mbridge-perf-moe-long-context
+  - path: skills/nemo-mbridge-perf-moe-optimization-workflow/
+    catalog_dir: nemo-mbridge-perf-moe-optimization-workflow
+  - path: skills/nemo-mbridge-perf-moe-vlm-training/
+    catalog_dir: nemo-mbridge-perf-moe-vlm-training
+  - path: skills/nemo-mbridge-perf-parallelism-strategies/
+    catalog_dir: nemo-mbridge-perf-parallelism-strategies
+  - path: skills/nemo-mbridge-perf-sequence-packing/
+    catalog_dir: nemo-mbridge-perf-sequence-packing
+  - path: skills/nemo-mbridge-perf-tp-dp-comm-overlap/
+    catalog_dir: nemo-mbridge-perf-tp-dp-comm-overlap
+  - path: skills/nemo-mbridge-recipe-recommender/
+    catalog_dir: nemo-mbridge-recipe-recommender
+  - path: skills/nemo-mbridge-resiliency/
+    catalog_dir: nemo-mbridge-resiliency

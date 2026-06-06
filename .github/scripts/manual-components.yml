@@ -14,15 +14,11 @@
 # and a single product may span multiple top-level catalog directories.
 
 components:
-  - name: Omniverse
-    description: Omniverse USD/Kit workflows — CAD-to-SimReady conversion, realtime viewer orchestration, and USD performance tuning.
+  - name: Physical AI
+    description: Physical AI skills for simulation, synthetic data generation, training, validation and deployment and more.
     catalog_dirs:
       - omniverse-cad-to-simready
       - omniverse-realtime-viewer
       - omniverse-usd-performance-tuning
-
-  - name: Physical AI
-    description: Physical AI development — infrastructure setup for synthetic data generation, resilient scaling, and neural reconstruction (NuRec/NRE).
-    catalog_dirs:
       - physical-ai-infrastructure-setup-and-resilient-scaling
       - physical-ai-neural-reconstruction

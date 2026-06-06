@@ -1,8 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: TileGym
 repo: NVIDIA/TileGym
 description: Tile-based GPU programming — adding new kernels, cross-framework conversion, and performance optimization.
 skills:
-  - path: .agents/skills/
-    catalog_dir: TileGym
+  - path: skills/tilegym-adding-cutile-kernel/
+    catalog_dir: tilegym-adding-cutile-kernel
+  - path: skills/tilegym-converting-cutile-to-julia/
+    catalog_dir: tilegym-converting-cutile-to-julia
+  - path: skills/tilegym-converting-cutile-to-triton/
+    catalog_dir: tilegym-converting-cutile-to-triton
+  - path: skills/tilegym-cutile-autotuning/
+    catalog_dir: tilegym-cutile-autotuning
+  - path: skills/tilegym-cutile-python/
+    catalog_dir: tilegym-cutile-python
+  - path: skills/tilegym-improve-cutile-kernel-perf/
+    catalog_dir: tilegym-improve-cutile-kernel-perf
+  - path: skills/tilegym-monkey-patch-kernels-to-transformers/
+    catalog_dir: tilegym-monkey-patch-kernels-to-transformers
 links:
   discussions: false
