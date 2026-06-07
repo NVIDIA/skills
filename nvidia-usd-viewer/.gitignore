@@ -1,0 +1,21 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Caches (ovrtx shader compilation, CUDA, Warp, npm)
+.cache/
+
+# Runtime data
+logs/
+*.log
+data/viewer-settings.json
+
+# Secrets / env
+.env
+.env.local

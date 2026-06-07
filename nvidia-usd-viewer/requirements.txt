@@ -1,6 +1,11 @@
-# Server dependencies
-ovrtx
+# Python server dependencies for the USD Viewer RTX streaming tutorial.
+#
+# ovrtx: install from the NVIDIA package index (not PyPI):
+#   pip install ovrtx --index-url https://pypi.nvidia.com --extra-index-url https://pypi.org/simple
+#
+# All other packages install from standard PyPI.
+
 ovstream
 warp-lang
 numpy
-# usd-core==24.11  # Uncomment only if server needs direct pxr queries
+# usd-core==24.11  # Uncomment only if the server needs direct pxr queries.
