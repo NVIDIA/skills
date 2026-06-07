@@ -18,16 +18,9 @@ RENDER_PRODUCT_PATH   = "/Render/OVServer"
 RENDER_SETTINGS_PATH  = "/Render/OVSettings"
 
 
-def _inline_usda_with_sublayer(scene_path: str, width: int, height: int) -> str:
-    abs_path = os.path.abspath(scene_path).replace("\\", "/")
-    return f"""#usda 1.0
-(
-    subLayers = [
-        @{abs_path}@
-    ]
-)
-
-def Camera "OVCamera" (
+def _render_block(width: int, height: int) -> str:
+    """Returns the Render scope block shared by both USDA variants."""
+    return f"""def Camera "OVCamera" (
     prepend apiSchemas = ["CameraAPI"]
 ) {{
     float2 clippingRange = (1.0, 10000000.0)
@@ -40,7 +33,7 @@ def Camera "OVCamera" (
 
 def Scope "Render" {{
     def RenderSettings "OVSettings" {{
-        rel camera = </OVCamera>
+        rel products = [</Render/OVServer>]
         token aspectRatioConformPolicy = "expandAperture"
         int2 resolution = ({width}, {height})
     }}
@@ -49,19 +42,36 @@ def Scope "Render" {{
         rel camera = </OVCamera>
         token productType = "raster"
         int2 resolution = ({width}, {height})
+        rel orderedVars = [</Render/Vars/LdrColor>]
+    }}
 
-        def RenderVar "ViewportTexture0" {{
+    def Scope "Vars" {{
+        def RenderVar "LdrColor" {{
             token dataType = "color4f"
             custom string driver:parameters:aov:name = "LdrColor"
             token sourceName = "LdrColor"
-            token sourceType = "lpe"
+            token sourceType = "raw"
         }}
     }}
 }}
 """
 
 
+def _inline_usda_with_sublayer(scene_path: str, width: int, height: int) -> str:
+    abs_path = os.path.abspath(scene_path).replace("\\", "/")
+    render = _render_block(width, height)
+    return f"""#usda 1.0
+(
+    subLayers = [
+        @{abs_path}@
+    ]
+)
+
+{render}"""
+
+
 def _inline_usda_empty_scene(width: int, height: int) -> str:
+    render = _render_block(width, height)
     return f"""#usda 1.0
 (
     defaultPrim = "World"
@@ -80,38 +90,7 @@ def Xform "World" {{
     }}
 }}
 
-def Camera "OVCamera" (
-    prepend apiSchemas = ["CameraAPI"]
-) {{
-    float2 clippingRange = (1.0, 10000000.0)
-    float focalLength = 50.0
-    float horizontalAperture = 36.0
-    float verticalAperture = 24.0
-    double3 xformOp:translate = (0.0, 200.0, 500.0)
-    uniform token[] xformOpOrder = ["xformOp:translate"]
-}}
-
-def Scope "Render" {{
-    def RenderSettings "OVSettings" {{
-        rel camera = </OVCamera>
-        token aspectRatioConformPolicy = "expandAperture"
-        int2 resolution = ({width}, {height})
-    }}
-
-    def RenderProduct "OVServer" {{
-        rel camera = </OVCamera>
-        token productType = "raster"
-        int2 resolution = ({width}, {height})
-
-        def RenderVar "ViewportTexture0" {{
-            token dataType = "color4f"
-            custom string driver:parameters:aov:name = "LdrColor"
-            token sourceName = "LdrColor"
-            token sourceType = "lpe"
-        }}
-    }}
-}}
-"""
+{render}"""
 
 
 class SceneLoader:
