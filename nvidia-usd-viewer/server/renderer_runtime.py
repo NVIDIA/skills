@@ -1,9 +1,4 @@
-"""Owns the ovrtx renderer, render loop stepping, and live attribute writes.
-
-All methods must be called from the render loop thread only.
-Refer to the omniverse-realtime-viewer skill → references/ovrtx-rendering/
-for the full renderer construction and frame-extraction contract.
-"""
+"""Owns the ovrtx renderer, render loop stepping, and live attribute writes."""
 from __future__ import annotations
 
 import logging
@@ -37,20 +32,19 @@ class RendererRuntime:
         self._stage_loaded = False
         self._frame_index = 0
         self._bgra_buf: Optional[np.ndarray] = None
+        self._target_fps: int = 30
 
     # ------------------------------------------------------------------
     # Lifecycle
     # ------------------------------------------------------------------
 
-    def initialize(self) -> None:
+    def initialize(self, target_fps: int = 30) -> None:
+        self._target_fps = target_fps
         ov = _ov()
-        # Build RendererConfig with only the parameters supported by this
-        # version of ovrtx. cuda_gpu_index was removed in newer releases.
         cfg_kwargs = dict(sync_mode=True)
         try:
             cfg = ov.RendererConfig(selection_outline_enabled=True, **cfg_kwargs)
         except TypeError:
-            # selection_outline_enabled not supported either — use minimal config
             try:
                 cfg = ov.RendererConfig(**cfg_kwargs)
             except TypeError:
@@ -92,7 +86,22 @@ class RendererRuntime:
         if not self._stage_loaded or self._render_product_path is None:
             return None
 
-        frame = self._renderer.step(self._render_product_path)
+        delta_time = 1.0 / self._target_fps
+
+        # Try step(render_product_path, delta_time) first;
+        # fall back to step(render_product_path) if delta_time not accepted.
+        try:
+            frame = self._renderer.step(self._render_product_path, delta_time)
+        except TypeError:
+            try:
+                frame = self._renderer.step(self._render_product_path)
+            except Exception as exc:
+                log.warning("renderer.step() failed: %s", exc)
+                return None
+        except Exception as exc:
+            log.warning("renderer.step() failed: %s", exc)
+            return None
+
         if frame is None:
             return None
 
@@ -100,13 +109,13 @@ class RendererRuntime:
         if rgba is None:
             return None
 
-        # RGBA8 → BGRA8 using persistent buffer to avoid per-frame allocation.
+        # RGBA8 → BGRA8
         if self._bgra_buf is None or self._bgra_buf.shape != rgba.shape:
             self._bgra_buf = np.empty_like(rgba)
-        self._bgra_buf[:, :, 0] = rgba[:, :, 2]  # B ← R
-        self._bgra_buf[:, :, 1] = rgba[:, :, 1]  # G ← G
-        self._bgra_buf[:, :, 2] = rgba[:, :, 0]  # R ← B
-        self._bgra_buf[:, :, 3] = rgba[:, :, 3]  # A ← A
+        self._bgra_buf[:, :, 0] = rgba[:, :, 2]
+        self._bgra_buf[:, :, 1] = rgba[:, :, 1]
+        self._bgra_buf[:, :, 2] = rgba[:, :, 0]
+        self._bgra_buf[:, :, 3] = rgba[:, :, 3]
 
         self._frame_index += 1
         return self._bgra_buf
@@ -130,18 +139,16 @@ class RendererRuntime:
         return None
 
     def warmup(self, frames: int = 8) -> None:
-        """Step several frames to complete shader compilation."""
         log.info("Warming up renderer (%d frames)...", frames)
         for _ in range(frames):
             self.step_and_get_bgra()
         log.info("Warmup done (frame_index=%d)", self._frame_index)
 
     # ------------------------------------------------------------------
-    # Live attribute writes — render-loop-only
+    # Live attribute writes
     # ------------------------------------------------------------------
 
     def write_camera_transform(self, matrix: np.ndarray) -> None:
-        """Write 4×4 world-space camera transform (row-major float64)."""
         if self._renderer is None or self._camera_path is None:
             return
         ov = _ov()

@@ -1,14 +1,4 @@
-"""USD Viewer streaming server — entry point.
-
-Startup sequence (omniverse-realtime-viewer → streaming-viewer-recipe):
-  1. Set OVRTX_SKIP_USD_CHECK=1  (before any ovrtx import)
-  2. Construct ovrtx.Renderer
-  3. Load initial stage via open_usd_from_string
-  4. Warm up renderer (shader compilation)
-  5. Initialize ovstream; register callbacks BEFORE start()
-  6. Start /healthz HTTP server (503 until first valid frame)
-  7. Enter render loop — drain commands, step renderer, stream frames
-"""
+"""USD Viewer streaming server — entry point."""
 from __future__ import annotations
 
 import json
@@ -21,7 +11,6 @@ import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Optional
 
-# Must be set before ANY ovrtx import.
 os.environ.setdefault("OVRTX_SKIP_USD_CHECK", "1")
 
 from server.camera_controller import CameraController
@@ -40,10 +29,6 @@ logging.basicConfig(
 )
 log = logging.getLogger("usd_viewer")
 
-
-# ---------------------------------------------------------------------------
-# /healthz  — 503 until first frame; then 200
-# ---------------------------------------------------------------------------
 
 class _HealthServer:
     def __init__(self, port: int) -> None:
@@ -77,10 +62,6 @@ class _HealthServer:
         if self._srv:
             self._srv.shutdown()
 
-
-# ---------------------------------------------------------------------------
-# Application runtime
-# ---------------------------------------------------------------------------
 
 class ViewerApp:
     def __init__(self, cfg) -> None:
@@ -126,16 +107,12 @@ class ViewerApp:
             stream_height=cfg.height,
         )
 
-    # ------------------------------------------------------------------
-    # Startup
-    # ------------------------------------------------------------------
-
     def run(self) -> None:
         log.info("USD Viewer  %dx%d @ %dfps  GPU=%d",
                  self._cfg.width, self._cfg.height,
                  self._cfg.target_fps, self._cfg.gpu_index)
 
-        self._renderer.initialize()
+        self._renderer.initialize(target_fps=self._cfg.target_fps)
 
         if self._cfg.initial_scene:
             self._load_scene(self._cfg.initial_scene)
@@ -143,7 +120,7 @@ class ViewerApp:
         self._renderer.warmup(frames=8)
 
         self._stream.initialize()
-        self._stream.start()    # callbacks registered inside start()
+        self._stream.start()
         self._health.start()
 
         self._running = True
@@ -157,10 +134,6 @@ class ViewerApp:
         self._renderer.open_usd_from_string(usda, rp_path, cam_path)
         self._router.send_scene_loaded(url)
 
-    # ------------------------------------------------------------------
-    # Render loop — sole owner of renderer, stage, and camera writes
-    # ------------------------------------------------------------------
-
     def _render_loop(self) -> None:
         frame_dt  = 1.0 / self._cfg.target_fps
         first_frame = True
@@ -168,7 +141,6 @@ class ViewerApp:
         while self._running:
             t0 = time.monotonic()
 
-            # Drain command queue before stepping.
             while not self._q.empty():
                 try:
                     self._dispatch(self._q.get_nowait())
@@ -202,8 +174,6 @@ class ViewerApp:
         if connected:
             self._router.send_initial_state()
 
-    # ------------------------------------------------------------------
-
     def _on_signal(self, sig, _frame) -> None:
         log.info("Signal %d — shutting down", sig)
         self._running = False
@@ -214,8 +184,6 @@ class ViewerApp:
         self._health.stop()
         log.info("Shutdown complete")
 
-
-# ---------------------------------------------------------------------------
 
 def main():
     cfg = parse_args()
