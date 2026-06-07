@@ -44,11 +44,17 @@ class RendererRuntime:
 
     def initialize(self) -> None:
         ov = _ov()
-        cfg = ov.RendererConfig(
-            sync_mode=True,
-            selection_outline_enabled=True,
-            cuda_gpu_index=self.gpu_index,
-        )
+        # Build RendererConfig with only the parameters supported by this
+        # version of ovrtx. cuda_gpu_index was removed in newer releases.
+        cfg_kwargs = dict(sync_mode=True)
+        try:
+            cfg = ov.RendererConfig(selection_outline_enabled=True, **cfg_kwargs)
+        except TypeError:
+            # selection_outline_enabled not supported either — use minimal config
+            try:
+                cfg = ov.RendererConfig(**cfg_kwargs)
+            except TypeError:
+                cfg = ov.RendererConfig()
         self._renderer = ov.Renderer(config=cfg)
         log.info("ovrtx.Renderer created (GPU %d)", self.gpu_index)
 
@@ -94,7 +100,7 @@ class RendererRuntime:
         if rgba is None:
             return None
 
-        # RGBA8 → BGRA8 using persistent buffer to avoid allocations per frame.
+        # RGBA8 → BGRA8 using persistent buffer to avoid per-frame allocation.
         if self._bgra_buf is None or self._bgra_buf.shape != rgba.shape:
             self._bgra_buf = np.empty_like(rgba)
         self._bgra_buf[:, :, 0] = rgba[:, :, 2]  # B ← R
@@ -110,7 +116,6 @@ class RendererRuntime:
         try:
             import torch
             ldr = frame["LdrColor"]
-            # DLPack tensor from ovrtx; channel-last (H × W × 4).
             rgba = torch.utils.dlpack.from_dlpack(ldr).cpu().numpy()
             return rgba.astype(np.uint8)
         except Exception:
@@ -140,13 +145,16 @@ class RendererRuntime:
         if self._renderer is None or self._camera_path is None:
             return
         ov = _ov()
-        self._renderer.write_attribute(
-            self._camera_path,
-            "omni:xform",
-            matrix.flatten().tolist(),
-            semantic=ov.AttributeSemantic.TRANSFORM_WORLD,
-            create_new_prim=False,
-        )
+        try:
+            self._renderer.write_attribute(
+                self._camera_path,
+                "omni:xform",
+                matrix.flatten().tolist(),
+                semantic=ov.AttributeSemantic.TRANSFORM_WORLD,
+                create_new_prim=False,
+            )
+        except Exception as exc:
+            log.debug("write_camera_transform failed: %s", exc)
 
     # ------------------------------------------------------------------
     # Properties
