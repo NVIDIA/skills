@@ -1,0 +1,6 @@
+# Server dependencies
+ovrtx
+ovstream
+warp-lang
+numpy
+# usd-core==24.11  # Uncomment only if server needs direct pxr queries

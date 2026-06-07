@@ -1,0 +1,15 @@
+{
+  "name": "nvidia-usd-viewer",
+  "description": "USD Viewer with RTX rendering and WebRTC streaming",
+  "instance": {
+    "type": "g5.xlarge",
+    "provider": "aws"
+  },
+  "setup": "./setup.sh",
+  "run": "./run.sh",
+  "ports": [
+    { "port": 5173,  "name": "Browser UI",        "public": true  },
+    { "port": 8888,  "name": "Health check",       "public": false },
+    { "port": 49100, "name": "WebRTC signaling",   "public": true  }
+  ]
+}

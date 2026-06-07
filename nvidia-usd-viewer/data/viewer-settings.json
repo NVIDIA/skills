@@ -1,0 +1,7 @@
+{
+  "renderPreset": "quality",
+  "samplesPerPixel": 64,
+  "maxBounces": 6,
+  "toneMapping": "aces",
+  "exposure": 0.0
+}
