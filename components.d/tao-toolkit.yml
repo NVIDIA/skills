@@ -104,8 +104,6 @@ skills:
   # platform
   - path: skills/platform/tao-run-on-brev/
     catalog_dir: tao-run-on-brev
-  - path: skills/platform/tao-run-on-docker/
-    catalog_dir: tao-run-on-docker
   - path: skills/platform/tao-run-on-kubernetes/
     catalog_dir: tao-run-on-kubernetes
   - path: skills/platform/tao-run-on-lepton/
