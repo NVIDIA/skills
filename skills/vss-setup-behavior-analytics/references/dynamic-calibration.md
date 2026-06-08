@@ -1,7 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-
-> Part of behavior-analytics docs. See `../README.md` for the project overview.
+> See [`../SKILL.md`](../SKILL.md) for the project overview.
 
 # Dynamic Calibration
 
@@ -65,6 +62,8 @@ The action prefix is parsed by `reload_data` (`os.path.basename(file_path).split
 
 ## Component map
 
+Under `video-search-and-summarization/services/analytics/behavior-analytics/`:
+
 ```
 src/mdx/analytics/core/transform/calibration/
 ├── calibration_listener.py    # Main-process consumer thread: drain mdx-notification
@@ -78,11 +77,11 @@ src/mdx/analytics/core/transform/calibration/
 ├── calibration_dynamic.py     # Wrapper that one-time-switches from
 │                              # no-file to a typed calibration when the
 │                              # first event lands
-└── schemas/calibration.schema.json  # Vendored from video-analytics-api/src/web-api-core/
-                                     # schemas/ajv/calibration.json
+└── schemas/calibration.schema.json  # Vendored from
+                                     # video-search-and-summarization/services/analytics/video-analytics-api/src/web-api-core/schemas/ajv/calibration.json
 ```
 
-Wired up in `src/mdx/analytics/core/app/app_runner.py` (one `CalibrationListener` and one `CalibrationBase`-derived instance per main process). Unlike dynamic config, calibration is **not** per-worker — workers pickle the parent's calibration at fork time and the live updates happen in the parent's watcher. Workers see the new sensor map by reading at use-time via the parent's `CalibrationBase` reference.
+Wired up in `video-search-and-summarization/services/analytics/behavior-analytics/src/mdx/analytics/core/app/app_runner.py` (one `CalibrationListener` and one `CalibrationBase`-derived instance per main process). Unlike dynamic config, calibration is **not** per-worker — workers pickle the parent's calibration at fork time and the live updates happen in the parent's watcher. Workers see the new sensor map by reading at use-time via the parent's `CalibrationBase` reference.
 
 ---
 
@@ -123,7 +122,7 @@ it locally to drop the notification, the watcher relies on the outer
 
 ### Schema vendoring
 
-The vendored `calibration.schema.json` is a one-way mirror of `video-analytics-api/src/web-api-core/schemas/ajv/calibration.json` with two normalizations:
+The vendored `calibration.schema.json` is a one-way mirror of `video-search-and-summarization/services/analytics/video-analytics-api/src/web-api-core/schemas/ajv/calibration.json` with two normalizations:
 
 1. AJV's non-standard `errorMessage` keyword stripped (Python's `jsonschema` ignores it; removing keeps the file readable).
 2. Top-level `additionalProperties` relaxed from `false` to `true` for forward-compatibility with any new top-level field video analytics api may add. Nested `additionalProperties: false` is preserved.
@@ -156,7 +155,7 @@ DynamicCalibration(config, calibration_path=None)
 
 After the one-time switch, the inherited `CalibrationBase` watcher continues to drive `reload_data`, which now delegates to the typed `_calibrator`. The switch is guarded by `_switch_lock` so a burst of file events can't double-switch.
 
-See `src/mdx/analytics/core/transform/calibration/calibration_dynamic.py` and the unit tests in `tests/unit/mdx/analytics/core/transform/calibration/test_calibration_dynamic.py` for the contract.
+See `video-search-and-summarization/services/analytics/behavior-analytics/src/mdx/analytics/core/transform/calibration/calibration_dynamic.py` and the unit tests in `video-search-and-summarization/services/analytics/behavior-analytics/tests/unit/mdx/analytics/core/transform/calibration/test_calibration_dynamic.py` for the contract.
 
 ---
 
@@ -167,11 +166,13 @@ See `src/mdx/analytics/core/transform/calibration/calibration_dynamic.py` and th
 3. **Stale-timestamp filter is monotone.** `CalibrationListener` rejects any notification whose `timestamp` is `<= last_insert_timestamp`. After a Kafka offset reset (or replay from offset 0), old notifications are silently skipped. This is intentional — out-of-order deliveries would otherwise corrupt the in-memory map.
 4. **`globalROIs` is not read.** Legacy test fixtures use `globalROIs` (CamelCase). Production code reads `rois` (lowercase). The vendored schema follows `rois`. Migration of legacy data is operator-owned.
 5. **No ACK back to video analytics api.** The dynamic-config flow publishes `ack` after applying; the calibration flow does not. A worker-side validation failure is observable only via container logs (`calibration schema violation (...)`).
-6. **No schema-sync automation between repos.** The vendored `calibration.schema.json` must be manually re-synced when `video-analytics-api/src/web-api-core/schemas/ajv/calibration.json` changes.
+6. **No schema-sync automation between repos.** The vendored `calibration.schema.json` must be manually re-synced when `video-search-and-summarization/services/analytics/video-analytics-api/src/web-api-core/schemas/ajv/calibration.json` changes.
 
 ---
 
 ## Testing approach
+
+Test files live under `video-search-and-summarization/services/analytics/behavior-analytics/`:
 
 | Layer | Test file | What to add |
 |---|---|---|
@@ -179,18 +180,20 @@ See `src/mdx/analytics/core/transform/calibration/calibration_dynamic.py` and th
 | Listener | `tests/unit/mdx/analytics/core/transform/calibration/test_calibration_listener.py` | Test new notification shapes, atomic-write behavior, pruning. |
 | Watcher | `tests/unit/mdx/analytics/core/transform/calibration/test_calibration_base.py` (`CalibrationFileMonitor`) | Test new event-handling paths in `on_moved`. |
 | Base reload | `tests/unit/mdx/analytics/core/transform/calibration/test_calibration_base.py` | Test new `update_calibration_info` branches, `_load_sensors` extraction. |
-| Typed subclasses | `test_calibration.py` / `test_calibration_e.py` / `test_calibration_i.py` | Test sensor-type-specific logic. |
-| DynamicCalibration | `test_calibration_dynamic.py` | Test the one-time switch and `reload_data` override. |
+| Typed subclasses | `tests/unit/mdx/analytics/core/transform/calibration/test_calibration.py`, `tests/unit/mdx/analytics/core/transform/calibration/test_calibration_e.py`, `tests/unit/mdx/analytics/core/transform/calibration/test_calibration_i.py` | Test sensor-type-specific logic. |
+| DynamicCalibration | `tests/unit/mdx/analytics/core/transform/calibration/test_calibration_dynamic.py` | Test the one-time switch and `reload_data` override. |
 | End-to-end | `tests/integration/dynamic_calibration/dynamic_calibration_e2e.py` | Add a scenario for new wire-level behavior. See its README. |
 
-Aim for 100% line + branch coverage on new code under `transform/calibration/`. Keep parity with the dynamic-config side.
+Aim for 100% line + branch coverage on new code under `src/mdx/analytics/core/transform/calibration/`. Keep parity with the dynamic-config side.
 
 ---
 
 ## Where to find canonical examples
 
+Consumer-side paths are under `video-search-and-summarization/services/analytics/behavior-analytics/`; the producer-side path is under `video-search-and-summarization/services/analytics/video-analytics-api/`.
+
 - Listener (atomic-write contract): `src/mdx/analytics/core/transform/calibration/calibration_listener.py`.
 - Watcher (`on_moved` + dotfile filter): `src/mdx/analytics/core/transform/calibration/calibration_base.py::CalibrationFileMonitor`.
 - Validator (per-action dispatch + minimal delete schema): `src/mdx/analytics/core/transform/calibration/calibration_validator.py`.
 - One-time switch on `DynamicCalibration`: `src/mdx/analytics/core/transform/calibration/calibration_dynamic.py::reload_data`.
-- Producer side (for reference): `video-analytics-api/src/web-api-core/Services/Calibration.js::upsert`, `::deleteSensors`, plus `Services/NotificationManager.js::produceCalibrationNotification`.
+- Producer side (for reference, in `video-analytics-api/`): `src/web-api-core/Services/Calibration.js::upsert`, `::deleteSensors`, plus `src/web-api-core/Services/NotificationManager.js::produceCalibrationNotification`.

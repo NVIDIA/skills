@@ -345,13 +345,13 @@ docker compose -f compose.yml \
 
 **Cause(s):**
 - `docker login nvcr.io` not run (or token expired).
-- `NGC_CLI_API_KEY` resolves to an org that doesn't have access to the image — `vss-core` lives in both `nvidia/` and `nvstaging/`, and your key may only see one.
+- `NGC_CLI_API_KEY` doesn't have access to the image — `vss-core` lives in `nvidia`, and your key may not see it.
 
 **Diagnose:**
 ```bash
 docker login --username '$oauthtoken' --password "${NGC_CLI_API_KEY}" nvcr.io
 ngc registry image list "nvidia/vss-core/*"      2>&1 | head -5
-ngc registry image list "nvstaging/vss-core/*"   2>&1 | head -5
+ngc registry image list "nvidia/vss-core/*"   2>&1 | head -5
 ```
 
 **Fix:** Re-login. If neither org lists the image, your key doesn't have access — confirm with `ngc org list`. Then either set `PERCEPTION_IMAGE` and `BEV_FUSION_MV3DT_IMAGE` in `.env` to the org that works for you, or get a new key.

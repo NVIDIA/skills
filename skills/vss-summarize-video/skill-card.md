@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers building AI-powered video analytics applications who need to produce narrative summaries of recorded video clips with timestamped events. <br>
+Developers and engineers use this skill to produce narrative summaries of recorded video clips via the VSS video summarization microservice or a VLM fallback. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,20 +20,29 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [NVIDIA VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
-- [Video Summarization API Reference](references/video-summarization-api.md) <br>
-- [Video Summarization Deployment](references/video-summarization-deployment.md) <br>
-- [End-to-End Example](references/end-to-end-example.md) <br>
 - [GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
+- [End-to-End Example](references/end-to-end-example.md) <br>
+- [HITL Prompts](references/hitl-prompts.md) <br>
+- [Video Summarization API](references/video-summarization-api.md) <br>
+- [Video Summarization Debugging](references/video-summarization-debugging.md) <br>
+- [Video Summarization Deployment](references/video-summarization-deployment.md) <br>
+- [Video Summarization Environment Variables](references/video-summarization-environment-variables.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Shell commands] <br>
+**Output Type(s):** [API Calls, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
+## Evaluation Agents Used: <br>
+- `claude-code` <br>
+- `codex` <br>
+
+
+
 ## Evaluation Tasks: <br>
-NVSkills-Eval 3-Tier Evaluation with external profile; Tier 1 static validation (9 checks), Tier 2 deduplication (2 checks). Tier 3 live agent evaluation not available. <br>
+Evaluated against 1 evaluation task with 2 attempts per task; pass threshold 50%. Overall verdict: PASS. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -43,7 +52,25 @@ Reported benchmark dimensions: <br>
 - Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
+Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
+- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
+- `accuracy`: Grades final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
+- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `token_efficiency`: Compares token usage with and without the skill. <br>
 
+
+
+## Evaluation Results: <br>
+| Dimension | Num | `claude-code` | `codex` |
+|---|---:|---:|---:|
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 100% (+75%) | 97% (+61%) |
+| Discoverability | 2 | 100% (+75%) | 91% (+35%) |
+| Effectiveness | 2 | 72% (+48%) | 78% (+54%) |
+| Efficiency | 2 | 92% (+67%) | 86% (+37%) |
 
 ## Skill Version(s): <br>
 3.2.0 (source: frontmatter) <br>

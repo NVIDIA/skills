@@ -210,22 +210,24 @@ print(f"Videos:     {[v.name for v in videos]}")
 
 s = requests.Session()
 
-# Step 1 — Create project
+# Create the sample-dataset project
 project_name = f"sample_test_{int(time.time())}"
 r = s.post(f"{BASE_URL}/create_project", data={"project_name": project_name})
 r.raise_for_status()
 project_id = r.json()["project_id"]
 print(f"[1] Created project {project_name} → {project_id}")
 
-# Step 2 — Upload videos (sorted; upload order defines the camera indices).
-# Same multipart pattern as videos.md § "Step 2 — Upload videos (sorted)",
-# iterating over this script's `videos` (the bundled cam_*.mp4).
-files, handles = [], []
-for v in videos:
-    f = open(v, "rb"); handles.append(f)
-    files.append(("files", (v.name, f, "video/mp4")))
-r = s.post(f"{BASE_URL}/upload_video_files/{project_id}", files=files, timeout=300)
-for f in handles: f.close()
+# Upload the bundled sample cameras; order defines camera indices.
+upload_parts, open_files = [], []
+try:
+    for video_path in videos:
+        handle = video_path.open("rb")
+        open_files.append(handle)
+        upload_parts.append(("files", (video_path.name, handle, "video/mp4")))
+    r = s.post(f"{BASE_URL}/upload_video_files/{project_id}", files=upload_parts, timeout=300)
+finally:
+    for handle in open_files:
+        handle.close()
 r.raise_for_status()
 print(f"[2] Uploaded {len(videos)} videos")
 
@@ -312,8 +314,8 @@ Average reprojection error 0(px)     : < 10
 ```bash
 PROJECT_ID=<id_from_step_1>
 # Calibration log lives under the projects dir, relative to the container
-# WorkingDir (/home/auto-calibration-ms/server) — so the path is projects/...,
-# NOT server/projects/... (that resolves to server/server/projects → no such file).
+# working directory. Use projects/...; do not prefix it with the
+# working-directory basename.
 docker exec vss-auto-calibration tail -F projects/project_${PROJECT_ID}/calibration.log
 ```
 

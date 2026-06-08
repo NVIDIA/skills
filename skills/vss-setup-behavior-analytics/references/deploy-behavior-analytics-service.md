@@ -139,7 +139,7 @@ Don't add a `--calibration` flag and don't mount one. The app starts with a `Dyn
     --calibration /resources/calibration.json
   ```
 
-The schema for the calibration JSON is vendored from `vss-analytics-api/web-api-core/schemas/ajv/calibration.json` and lives at `behavior-analytics/src/mdx/analytics/core/transform/calibration/schemas/calibration.schema.json`.
+The schema for the calibration JSON is vendored from `video-analytics-api/src/web-api-core/schemas/ajv/calibration.json` and lives at `behavior-analytics/src/mdx/analytics/core/transform/calibration/schemas/calibration.schema.json`.
 
 ---
 
@@ -208,3 +208,4 @@ docker compose -f services/analytics/behavior-analytics/compose.yml down
 | `dropping config message: unrecognized reference-id …` | Inbound dynamic-config `upsert` / `upsert-all` carries a reference-id outside the accepted set. | Reference-id must start with `video-analytics-api-` (web-api), `behavior-analytics-` (bootstrap echo), or equal the active source-type literal (`kafka` / `redis` / `mqtt`). |
 | `dropping config message: no config to update` | Inbound `upsert` had `config: null` or omitted the field. | An `upsert` with no config is a producer bug; `upsert-all` with `config=null` is allowed (it's the bootstrap-failure signal). |
 | Workers fall behind / `Avg processing speed` very low | Worker count too low for the input rate. | Increase `numWorkersForBehaviorCreation` (and `numWorkersForFrameEnhancement` / `numWorkersForSpaceEstimation` for 3D) in the config's `app[]` section. |
+

@@ -97,3 +97,5 @@ curl -s -X POST "${VSS_AGENT_BASE_URL}/generate" \
 - **vss-generate-video-report** — timestamped **reports** via the **VSS agent** (`/generate`); this skill is **direct VLM** for ad-hoc **video Q&A**.
 
 
+
+bump:1

@@ -338,7 +338,7 @@ osmo workflow submit assets/configs/osmo/<flow>.yaml \
 ```
 
 Compatibility note:
-- Use exactly one `--set-string` flag and pass all key/value pairs after it.
+- Use exactly one `--set-string` flag and pass all the key/value pairs after it.
 - Do not repeat `--set`/`--set-string` flags in the same command; some OSMO builds
   only honor the last occurrence.
 - Do not mix `--set` and `--set-string` in one submit command.

@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `vss-deploy-detection-tracking-3d`
-- Evaluation date: 2026-06-01
+- Evaluation date: 2026-06-03
 - NVSkills-Eval profile: `external`
 - Environment: `local`
 - Dataset: 6 evaluation tasks
@@ -54,25 +54,25 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+17%) | 100% (+8%) |
-| Correctness | 8 | 91% (-1%) | 92% (+36%) |
-| Discoverability | 8 | 63% (-5%) | 64% (+7%) |
-| Effectiveness | 8 | 84% (+2%) | 80% (+40%) |
-| Efficiency | 8 | 48% (-2%) | 50% (+5%) |
+| Security | 8 | 100% (+0%) | 100% (+17%) |
+| Correctness | 8 | 90% (+2%) | 85% (+18%) |
+| Discoverability | 8 | 61% (+2%) | 69% (+10%) |
+| Effectiveness | 8 | 88% (+1%) | 66% (+19%) |
+| Efficiency | 8 | 46% (+3%) | 55% (+10%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 15 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 11 total findings.
 
 Top findings:
 
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/calibration-workflow.md:220`)
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/calibration-workflow.md:225`)
+- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/calibration-workflow.md:237`)
+- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/calibration-workflow.md:242`)
 - MEDIUM QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.author' (`skills/vss-deploy-detection-tracking-3d/SKILL.md`)
 - MEDIUM QUALITY/quality_discoverability: Description uses first/second person (`skills/vss-deploy-detection-tracking-3d/SKILL.md`)
-- MEDIUM QUALITY/quality_efficiency: Deeply nested references in teardown.md (`skills/vss-deploy-detection-tracking-3d/SKILL.md`)
+- MEDIUM QUALITY/quality_efficiency: Deeply nested references in troubleshooting.md (`skills/vss-deploy-detection-tracking-3d/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 

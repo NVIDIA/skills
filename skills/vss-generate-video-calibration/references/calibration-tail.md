@@ -12,7 +12,7 @@ import os
 import time
 from urllib.parse import urlparse
 
-# Step A — Verify project
+# Verify the project before calibration
 s.post(f"{BASE_URL}/verify_project/{project_id}").raise_for_status()
 
 # Step B — Start calibration (detector_type is a /calibrate argument; not consumed by /v1/config)

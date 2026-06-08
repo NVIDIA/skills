@@ -5,16 +5,16 @@
 set -euo pipefail
 export UV_PROJECT_ENVIRONMENT=/opt/venv
 unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY no_proxy NO_PROXY
-set -a; source "${SETUP_DIR}/.env"; set +a
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC1091
+source "${SCRIPT_DIR}/endpoint_common.sh"
+load_setup_env_or_fail "${SETUP_DIR:-}"
 # Export API keys under all names the container code may read.
 # External providers often reuse a single NVIDIA/NGC key for VLM+LLM calls.
 export OPENAI_API_KEY="${OPENAI_API_KEY:-${VLM_API_KEY:-${LLM_API_KEY:-${NVIDIA_API_KEY:-${NGC_CLI_API_KEY:-}}}}}"
 export VLM_API_KEY="${VLM_API_KEY:-${OPENAI_API_KEY:-${NVIDIA_API_KEY:-${NGC_CLI_API_KEY:-}}}}"
 export LLM_API_KEY="${LLM_API_KEY:-${OPENAI_API_KEY:-${NVIDIA_API_KEY:-${NGC_CLI_API_KEY:-}}}}"
 export HF_TOKEN="${HUGGING_FACE_HUB_TOKEN:-${HF_TOKEN:-}}"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck disable=SC1091
-source "${SCRIPT_DIR}/endpoint_common.sh"
 
 _AUTH_HDR="$(make_auth_header "${VLM_API_KEY:-${OPENAI_API_KEY:-${NVIDIA_API_KEY:-${NGC_CLI_API_KEY:-}}}}")"
 _LLM_AUTH_HDR="$(make_auth_header "${LLM_API_KEY:-${OPENAI_API_KEY:-${NVIDIA_API_KEY:-${NGC_CLI_API_KEY:-}}}}")"

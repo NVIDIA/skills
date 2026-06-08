@@ -102,6 +102,7 @@ workflow:
           "VLM_MODEL=Qwen/Qwen3-VL-30B-A3B-Instruct" \
           "BARRIER_NUM_NODES=1" \
           > "{{output}}/.env"
+        cp "{{output}}/.env" "{{output}}/runtime.env"
         echo "Setup complete."
 
   # =========================================================================

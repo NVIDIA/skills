@@ -7,10 +7,10 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `physical-ai-video-data-augmentation`
-- Evaluation date: 2026-06-01
+- Evaluation date: 2026-06-06
 - NVSkills-Eval profile: `external`
-- Environment: `local`
-- Dataset: 17 evaluation tasks
+- Environment: `astra-sandbox`
+- Dataset: 1 evaluation tasks
 - Attempts per task: 2
 - Pass threshold: 50%
 - Overall verdict: PASS
@@ -42,10 +42,10 @@ Underlying evaluation signals used in this run:
 
 ## Test Tasks
 
-The benchmark dataset contained 17 evaluation tasks:
+The benchmark dataset contained 1 evaluation tasks:
 
-- Positive tasks: 13 tasks where the skill was expected to activate.
-- Negative tasks: 4 tasks where no skill was expected.
+- Positive tasks: 1 tasks where the skill was expected to activate.
+- Negative tasks: 0 tasks where no skill was expected.
 - Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
 
 Task composition is derived from the evaluation dataset when possible. Entries with `expected_skill` set are treated as positive skill-activation cases, while entries with `expected_skill: null` are treated as negative activation cases.
@@ -54,11 +54,11 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+0%) | 91% (+0%) |
-| Correctness | 8 | 81% (+0%) | 77% (-3%) |
-| Discoverability | 8 | 73% (+6%) | 68% (-3%) |
-| Effectiveness | 8 | 72% (-3%) | 70% (-4%) |
-| Efficiency | 8 | 68% (+6%) | 60% (-5%) |
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 100% (+75%) | 97% (+72%) |
+| Discoverability | 2 | 100% (+75%) | 97% (+72%) |
+| Effectiveness | 2 | 90% (+85%) | 100% (+84%) |
+| Efficiency | 2 | 94% (+69%) | 96% (+69%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 

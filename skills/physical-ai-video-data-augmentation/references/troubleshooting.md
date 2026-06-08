@@ -4,7 +4,7 @@
 ## Table of Contents
 
 - [When to Consult Adjacent Skills](#when-to-consult-adjacent-skills)
-- [URL Layout](#url-layout)
+- [Storage URL layout reference](#storage-url-layout-reference)
 - [Preflight](#preflight)
 - [Canonical Submit Commands](#canonical-submit-commands)
 - [Output Retrieval](#output-retrieval)
@@ -23,23 +23,11 @@ execution.
 Workflow-level routing, interpolation, and pre-submit guard failures stay with
 this skill.
 
-## URL Layout
+## Storage URL layout reference
 
-```text
-STORAGE_ROOT=<storage_url>
-DATASET=<dataset>
-RUN=<run_id>
-```
-
-| Use | URL |
-|---|---|
-| Input dataset root | `${STORAGE_ROOT}/datasets/${DATASET}` |
-| Setup output | `${STORAGE_ROOT}/datasets/${DATASET}-outputs/${RUN}/setup_b0` |
-| Augmented outputs | `${STORAGE_ROOT}/datasets/${DATASET}-outputs/${RUN}/outputs/augmented/` |
-| Original labels | `${STORAGE_ROOT}/datasets/${DATASET}-outputs/${RUN}/outputs/pseudo_labeled/` |
-| Augmented labels | `${STORAGE_ROOT}/datasets/${DATASET}-outputs/${RUN}/outputs/pseudo_labeled_augmented/` |
-| Cosmos cache | `${STORAGE_ROOT}/data/models/cosmos_transfer` |
-| Auto-labeling cache | `${STORAGE_ROOT}/data/models/auto_labeling` |
+Use the canonical URL map in `references/setup.md` under `## URL layout`.
+This troubleshooting reference links to that single source of truth to avoid
+drift.
 
 ## Preflight
 

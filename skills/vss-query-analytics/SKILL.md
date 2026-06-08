@@ -210,4 +210,4 @@ and speaks JSON-RPC 2.0 over Server-Sent Events.
    retries to any future write-tools without first confirming they
    are idempotent.
 
-bump:1
+bump:2

@@ -144,7 +144,6 @@ RTVI VLM has no equivalent mode setting — it is always deployed locally on `RT
 | Path | Backend | Profile |
 |---|---|---|
 | `/` | `vss-agent-ui` (Next.js) | `bp_wh` (returns 503 in `bp_wh_kafka`/`bp_wh_redis` — no UI backend) |
-| `/vst`, `/vst/...` | `vss-vios-ingress` (VST / VIOS UI) | All |
 | `/storage`, `/storage/...` | `vst-storage` (compat → `/vst/storage/...`) | All |
 | `/kibana`, `/kibana/...` | `kibana` | `bp_wh`, or kafka/redis extended (2D or 3D) |
 | `/video-analytics-api`, `.../...` | `vss-video-analytics-api` | `bp_wh`, or kafka/redis extended |
@@ -169,7 +168,7 @@ RTVI VLM has no equivalent mode setting — it is always deployed locally on `RT
 | Phoenix (direct) | `http://<HOST_IP>:6006` | `bp_wh` only (prefer `/phoenix` via HAProxy) |
 | Kibana (direct) | `http://<HOST_IP>:5601` | Prefer `/kibana` via HAProxy |
 | Video Analytics API (direct) | `http://<HOST_IP>:8081` (`MDX_PORT`) | Prefer `/video-analytics-api` via HAProxy |
-| VST UI (direct) | `http://<HOST_IP>:30888/vst` | Prefer `/vst` via HAProxy |
+| VST UI | `http://<HOST_IP>:30888/vst/` | All — direct port, not proxied via HAProxy |
 
 `EXTERNAL_IP` defaults to `${HOST_IP}` but should be set to the browser-reachable hostname/IP. On Brev, follow the same secure-link pattern as the other VSS profiles (`SKILL.md` Step 1c). The HAProxy `h_main` ACL only routes when the `Host:` header matches `${VSS_PUBLIC_HOST}`, `${EXTERNAL_IP}`, `${HOST_IP}`, `localhost`, or `127.0.0.1` (with or without `:${HAPROXY_PORT}`) — wrong Host headers get a 404 from haproxy.
 
@@ -192,7 +191,7 @@ App data (sample videos, perception models) is **not** bundled with the repo. Pi
 |---|---|---|
 | `<repo>/data` | Quick start — drop assets into the repo's `data/` directory | `<repo>/data` |
 | Custom local path | Existing dataset on a non-repo path (e.g. `/mnt/warehouse-data`) | user-provided path |
-| NGC app-data resource | Reproducing the official sample-video deployment | extracted path of `nvidia/vss-warehouse/vss-warehouse-app-data:<version>` **or** `nvstaging/vss-warehouse/vss-warehouse-app-data:<version>` (staging keys land here) |
+| NGC app-data resource | Reproducing the official sample-video deployment | extracted path of `nvidia/vss-warehouse/vss-warehouse-app-data:<version>` |
 
 Ask the user which source they want and whether they already have the assets on disk. Only run the NGC download (next subsection) when they explicitly choose the NGC source.
 
@@ -200,9 +199,9 @@ Ask the user which source they want and whether they already have the assets on 
 
 | Artifact | NGC Resource | Local directory after extract |
 |---|---|---|
-| App data (videos, models) | `nvidia/vss-warehouse/vss-warehouse-app-data:<version>` **or** `nvstaging/vss-warehouse/vss-warehouse-app-data:<version>` | `vss-warehouse-app-data_v<version>/` |
+| App data (videos, models) | `nvidia/vss-warehouse/vss-warehouse-app-data:<version>` | `vss-warehouse-app-data_v<version>/` |
 
-> **Org may be `nvidia` or `nvstaging`.** Production keys access the canonical `nvidia/...` path; staging / NVIDIAN keys typically only see `nvstaging/...`. If you get `403 Access Denied` on one, retry with the other before assuming the resource is missing. Confirm by running `ngc org list` to see which orgs the current key belongs to.
+> **Org:** use the canonical `nvidia/...` resource path for the published 3.2.0 bundle. If you get `403 Access Denied`, confirm the NGC key has access to the published VSS warehouse resource.
 
 ## Known Limitations
 
@@ -266,7 +265,7 @@ Pulls images and builds the perception container (~10–15 min first run). If `d
 LOG=${LOG:-/tmp/warehouse-blueprint.log}
 cd <repo>/deploy/docker
 
-docker login --username '$oauthtoken' --password "${NGC_CLI_API_KEY}" nvcr.io
+printf '%s' "$NGC_CLI_API_KEY" | docker login --username '$oauthtoken' --password-stdin nvcr.io
 
 nohup docker compose -f compose.yml \
   --env-file industry-profiles/warehouse-operations/.env \
@@ -348,22 +347,26 @@ If no key: go to https://ngc.nvidia.com → **Setup → API Keys → Generate Pe
 > **Important:** NGC API keys may look like base64. Use the key exactly as provided — **do not base64-decode it.**
 
 ```bash
-export NGC_CLI_API_KEY='<key>'
-echo "export NGC_CLI_API_KEY='<key>'" >> ~/.bashrc
+read -rsp "NGC API key: " NGC_CLI_API_KEY
+echo
+export NGC_CLI_API_KEY
 ```
 
 Or configure interactively: `ngc config set`
 
-> Never commit the NGC API key to version control.
+> Security note: Prefer a current-session handoff: enter the key with `read -rs`,
+> inject it from a secrets manager, and pass it to `docker login` with
+> `--password-stdin`. Do not pass the raw key as a CLI argument, write it to any
+> workspace file or shell profile such as `~/.bashrc`, or commit it to version
+> control. If an env file is unavoidable, keep it outside the repo and restrict
+> it with `chmod 600`.
 
 #### 1.4 Verify NGC Access
 
-Image paths in `deploy/docker/` reference **both** `nvcr.io/nvidia/vss-core/...` (public org) and `nvcr.io/nvstaging/vss-core/...` (staging org). Which one your key resolves depends on your NGC org membership — list both teams and the warehouse resources visible to it. Confirm the actual paths against `<repo>/deploy/docker/services/**/compose*.{yml,yaml}` and the warehouse `.env` (e.g. `PERCEPTION_IMAGE`, `BEV_FUSION_MV3DT_IMAGE`).
+Image paths in `deploy/docker/` reference the published `nvcr.io/nvidia/vss-core/...` artifacts. Confirm the key can access those images and the warehouse resources before deploying.
 
 ```bash
-# Probe both orgs — at least one should succeed for warehouse to deploy
-ngc registry image list "nvidia/vss-core/*"     2>&1 | head -10
-ngc registry image list "nvstaging/vss-core/*"  2>&1 | head -10
+ngc registry image list "nvidia/vss-core/*" 2>&1 | head -10
 ```
 
 **`Missing org` error** → run `ngc config set` (or write `~/.ngc/config` directly) and match the org to the one used when generating the key. Run `ngc org list` to see which orgs the current key has access to before guessing.
@@ -779,7 +782,7 @@ NVIDIA_API_KEY=''                              # required for build.nvidia.com r
 OPENAI_API_KEY=''                              # required for OpenAI remote endpoints
 ```
 
-> **DGX-SPARK (SBSA):** swap to the `-sbsa`-tagged image variants. Comment the default `PERCEPTION_TAG="3.2.0-26.05.1"` and uncomment `PERCEPTION_TAG="3.2.0-sbsa-26.05.1"`. Apply the same pattern to `BEV_FUSION_MV3DT_TAG` (mv3dt only), `RTVI_VLM_IMAGE_TAG`, `VST_*_IMAGE_TAG`, and `NVSTREAMER_IMAGE_TAG`.
+> **DGX-SPARK (SBSA):** swap to the `-sbsa`-tagged image variants. Comment the default `PERCEPTION_TAG="3.2.0"` and uncomment `PERCEPTION_TAG="3.2.0-sbsa"`. Apply the same pattern to `BEV_FUSION_MV3DT_TAG` (mv3dt only), `RTVI_VLM_IMAGE_TAG`, `VST_*_IMAGE_TAG`, and `NVSTREAMER_IMAGE_TAG`.
 
 ---
 
@@ -824,7 +827,22 @@ Run **[Lifecycle: Monitor](#lifecycle-monitor)** using the same `LOG` as Phase 8
 
 ## After deploy
 
-See [Access Points](#access-points) for service URLs.
+The deploy script prints the actual access points once the stack is up. Expected output (substitute your host IP or domain name — on Brev use the secure-link domain, on Ubuntu use the machine IP):
+
+```
+Access Points:
+
+HAProxy:             http://<host_ip/domain_name>:7777
+Kibana:              http://<host_ip/domain_name>:7777/kibana
+VST:                 http://<host_ip/domain_name>:30888/vst/
+Grafana:             http://<host_ip/domain_name>:3000
+NvStreamer:          http://<host_ip/domain_name>:31000
+Video Analytics API: http://<host_ip/domain_name>:7777/video-analytics-api
+```
+
+VST is accessed directly on port `30888` — it does not go through the HAProxy ingress.
+
+See [Access Points](#access-points) for the full HAProxy route table and direct-port diagnostics table.
 
 ---
 
@@ -847,7 +865,22 @@ In 2D, Auto-Calibration adds blank `group` and `region` fields to the generated 
 
 After calibration is generated via Auto-Calibration, run camera clustering before redeploying the full warehouse profile. For 3D/MV3DT, the required field lives directly on each camera sensor as `sensors[].group`. The warehouse blueprint docker compose setup uses one BEV group, so run the clustering tool with `--n_clusters 1` and then verify the group field is present.
 
-If you have a plan-view image, include it when running clustering so region metadata is derived in the same pass. For multiple independent BEV groups, tune `--n_clusters` and `--max_camera_per_group`; otherwise keep `--n_clusters 1`. Docs: https://docs.nvidia.com/vss/3.1.0/warehouse-docs/3D-profile.html#camera-clustering
+```bash
+CALIBRATION_JSON=/path/to/calibration.json
+REPO_ROOT=/path/to/video-search-and-summarization
+SDU_DIR="${REPO_ROOT}/libs/analytics/spatialai-data-utils"
+SENSOR_COUNT=$(jq '.sensors | length' "${CALIBRATION_JSON}")
+
+PYTHONPATH="${SDU_DIR}:${PYTHONPATH:-}" python3 \
+  "${SDU_DIR}/tools/camera_grouping/create_camera_clusters.py" \
+  "${CALIBRATION_JSON}" \
+  --max_camera_per_group "${SENSOR_COUNT}" \
+  --n_clusters 1 \
+  --disable_param_tuning \
+  --overwrite
+```
+
+Docs: 3D https://docs.nvidia.com/vss/3.2.0/warehouse-docs/3D-profile.html#camera-clustering and for mv3dt, https://docs.nvidia.com/vss/3.2.0/warehouse-docs/mv3dt-profile.html#camera-clustering
 
 ### MV3DT-specific configuration updates
 

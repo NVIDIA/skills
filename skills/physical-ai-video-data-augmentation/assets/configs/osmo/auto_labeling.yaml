@@ -72,6 +72,7 @@ workflow:
           "SUPER_RESOLUTION_ENABLED=false" \
           "BARRIER_NUM_NODES=1" \
           > "{{output}}/.env"
+        cp "{{output}}/.env" "{{output}}/runtime.env"
         echo "Setup complete."
 
   - name: auto_labeling_group

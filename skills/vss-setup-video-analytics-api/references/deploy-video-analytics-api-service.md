@@ -20,7 +20,7 @@ You only edit the existing service compose:
 1. **`command:`** — which config file the Node server loads at startup.
 2. **`volumes:`** — what config (required) and what data-log directory (optional) to mount.
 
-Walk steps 1-3 below to decide each one; the bring-it-up command lives in [Deploy + verify](#deploy--verify) at the end.
+Walk steps 1-3 below to decide each one; the bring-it-up command lives in [Deploy + verify](#deploy--verify) at the end. For a field-by-field JSON config reference, see the [Configuration Guide](configuration.md).
 
 ---
 
@@ -160,18 +160,18 @@ The server auto-discovers controllers from `src/app/controllers/rest-apis/` and 
 
 | Endpoint | What it does |
 |---|---|
-| `/livez` | Health check. Returns 200 when routes are registered and the server has initialized successfully. |
-| `/sensor` | CRUD for sensor metadata (GET / POST / DELETE). Supports file uploads (images). |
-| `/config` | Dynamic config management. GET retrieves current config; POST publishes config updates to Kafka. |
-| `/calibration` | Calibration retrieval, upsert, delete-sensor, image upload, and image metadata endpoints. Update operations can publish calibration notifications to Kafka. |
-| `/behavior` | Query behavior data from Elasticsearch. |
-| `/alerts` | Query alert data with time-range and sensor filters. |
-| `/events` | Query event data from Elasticsearch. |
-| `/incidents` | Query incident data from Elasticsearch. |
-| `/frames` | Query frame-level data from Elasticsearch. |
-| `/metrics` | Aggregation / computation metrics (occupancy, behavior metrics). |
-| `/tracker` | Tracker data queries. |
-| `/clustering` | Clustering analysis queries. |
+| `/livez` | Responds with `{ "isAlive": true }` if the API server has started successfully and routes are registered. |
+| `/sensor` | Lists sensors overlooking a coordinate in the floorplan of a place (`/sensor/lookup`). |
+| `/config` | Config management: upload config files such as `calibration.json`, `roadNetwork.json`, and `usdAssets.json` (`/config/upload-file/{docType}`); dynamically update microservice configurations (`/config/update/{docType}`); poll update status (`/config/update/status/{docType}/{referenceId}`); retrieve road-network and USD-assets configs. |
+| `/config/calibration` | Retrieves the current calibration document (`GET /config/calibration`, optionally filtered by `sensorId`; `emptyIfNotFound` controls the empty response behavior). Also supports calibration upsert (`/upsert`), delete-sensor (`/delete-sensor`), image upload/retrieval/delete/metadata (`/images`, `/image`, `/image-metadata`, `/delete-images`), and last-modified-timestamp. Update operations publish calibration notifications to Kafka. |
+| `/behavior` | Retrieves behavior metadata from Elasticsearch (`/behavior`); gets behavior start and end PTS milliseconds for nvstreamer-based sensors (`/behavior/pts`). |
+| `/alerts` | Retrieves behavior-based alerts with time-range and sensor filters (`/alerts`); indicates whether a place or sensor has severe alerts (`/alerts/severe`). |
+| `/events` | Retrieves tripwire cross-line events (`/events/tripwire`), ROI entry/exit events (`/events/roi`), and AMR mission-control events for a place and time range (`/events/amr`). |
+| `/incidents` | Retrieves incident records from Elasticsearch (`/incidents`); indicates whether a place or sensor has severe incidents (`/incidents/severe`). |
+| `/frames` | Retrieves raw, enhanced, and BEV frame metadata; frame-level alerts; high-confidence object detections for reference embeddings and object search; latest proximity-detection clusters for a sensor and time range; and PTS calculation for nvstreamer sensors. |
+| `/metrics` | KPI queries: average speed, flowrate, travel time, tripwire counts and histograms, FOV / ROI / tracker / tripwire occupancy and histograms, ROI space-utilization histograms, last-processed timestamp, and road-network segment speed. |
+| `/tracker` | Cross-sensor tracking: unique object counts and locations, full unique-object records with constituent behaviors, behavior locations matched to a global object, and last RTLS / AMR source record. |
+| `/clustering` | Retrieves sampled behavior clusters for a sensor and time range (`/clustering/behavior`); adds a label to a behavior cluster (`/clustering/add-label`). |
 
 The server must initialize against Elasticsearch before `/livez` can return healthy. Data-query endpoints also need matching Elasticsearch indices and data. Endpoints that publish notifications (config, calibration) or expose RTLS / AMR streams also require Kafka.
 

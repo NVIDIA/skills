@@ -109,13 +109,22 @@ cd "${VSS_APPS_DIR}"
 docker compose -f compose.yml \
   --env-file industry-profiles/warehouse-operations/.env down -v --rmi local
 
-# Clear bind-mounted AMC state — DESTRUCTIVE
-sudo rm -rf "${VSS_APPS_DIR}/services/auto-calibration/projects/"
-
-# Clear your own calibration outputs (keep the ship-with-repo sample!)
+# Clear bind-mounted AMC state — DESTRUCTIVE.
+# Auto-proceed when sudo is passwordless; otherwise surface the commands for the user.
 DATASET="${SAMPLE_VIDEO_DATASET:?}"
-if [ "${DATASET}" != "warehouse-4cams-20mx20m-synthetic" ]; then
-  sudo rm -rf "${VSS_APPS_DIR}/industry-profiles/warehouse-operations/warehouse-mv3dt-app/calibration/sample-data/${DATASET}"
+if sudo -n true 2>/dev/null; then
+  sudo rm -rf "${VSS_APPS_DIR}/services/auto-calibration/projects/"
+
+  # Clear your own calibration outputs (keep the ship-with-repo sample!)
+  if [ "${DATASET}" != "warehouse-4cams-20mx20m-synthetic" ]; then
+    sudo rm -rf "${VSS_APPS_DIR}/industry-profiles/warehouse-operations/warehouse-mv3dt-app/calibration/sample-data/${DATASET}"
+  fi
+else
+  echo "Sudo requires a password on this host. Please run the commands below in your shell, then confirm to continue:"
+  echo "  sudo rm -rf \"${VSS_APPS_DIR}/services/auto-calibration/projects/\""
+  if [ "${DATASET}" != "warehouse-4cams-20mx20m-synthetic" ]; then
+    echo "  sudo rm -rf \"${VSS_APPS_DIR}/industry-profiles/warehouse-operations/warehouse-mv3dt-app/calibration/sample-data/${DATASET}\""
+  fi
 fi
 
 # Drop data_log and optionally revert .env (intentional this time)
