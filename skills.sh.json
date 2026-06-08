@@ -8,6 +8,8 @@
       "skills": [
         "aiq-deploy",
         "aiq-research",
+        "nemo-evaluator-plugin",
+        "nemo-retriever",
         "nemoclaw-user-agent-skills",
         "nemoclaw-user-configure-inference",
         "nemoclaw-user-configure-security",
@@ -18,13 +20,11 @@
         "nemoclaw-user-monitor-sandbox",
         "nemoclaw-user-overview",
         "nemoclaw-user-reference",
-        "skill-card-generator",
+        "nemotron-policy-generator",
         "rag-blueprint",
         "rag-eval",
         "rag-perf",
-        "nemo-evaluator-plugin",
-        "nemo-retriever",
-        "nemotron-policy-generator"
+        "skill-card-generator"
       ]
     },
     {
@@ -36,8 +36,8 @@
         "omniverse-usd-performance-tuning",
         "physical-ai-defect-image-generation",
         "physical-ai-infrastructure-setup-and-resilient-scaling",
-        "physical-ai-video-data-augmentation",
-        "physical-ai-neural-reconstruction"
+        "physical-ai-neural-reconstruction",
+        "physical-ai-video-data-augmentation"
       ]
     },
     {
@@ -86,22 +86,30 @@
       "title": "Data Science",
       "description": "Prepare, analyze, explore, and model data for AI and accelerated analytics workflows that are not specific to one training, inference, or agent task.",
       "skills": [
-        "cupynumeric-install",
+        "accelerated-computing-cudf",
         "cupynumeric-hdf5",
+        "cupynumeric-install",
         "cupynumeric-migration-readiness",
-        "cupynumeric-parallel-data-load",
-        "accelerated-computing-cudf"
+        "cupynumeric-parallel-data-load"
       ]
     },
     {
       "title": "Training AI",
       "description": "Build, validate, tune, and maintain large-scale model training workflows, including distributed training, model support, training validation, performance tuning, and training-stack CI.",
       "skills": [
+        "dali-dynamic-mode",
+        "data-designer",
+        "launch-nemo-rl",
+        "mcore-create-issue",
+        "mcore-linting-and-formatting",
+        "mcore-run-on-slurm",
+        "mcore-split-pr",
+        "mcore-testing",
         "nemo-automodel-distributed-training",
         "nemo-automodel-launcher-config",
         "nemo-automodel-model-onboarding",
         "nemo-automodel-recipe-development",
-        "nemo-mbridge-recipe-recommender",
+        "nemo-data-designer-plugin",
         "nemo-mbridge-mlm-bridge-training",
         "nemo-mbridge-multi-node-slurm",
         "nemo-mbridge-perf-activation-recompute",
@@ -120,22 +128,14 @@
         "nemo-mbridge-perf-parallelism-strategies",
         "nemo-mbridge-perf-sequence-packing",
         "nemo-mbridge-perf-tp-dp-comm-overlap",
+        "nemo-mbridge-recipe-recommender",
         "nemo-mbridge-resiliency",
-        "dali-dynamic-mode",
-        "nemotron-customize",
-        "nemotron-retrieval-recipes",
-        "mcore-create-issue",
-        "mcore-linting-and-formatting",
-        "mcore-run-on-slurm",
-        "mcore-split-pr",
-        "mcore-testing",
-        "nemo-data-designer-plugin",
-        "data-designer",
-        "launch-nemo-rl",
         "nemo-rl-auto-research",
         "nemo-rl-brev-etiquette",
         "nemo-rl-docs",
-        "nemo-rl-session-memory"
+        "nemo-rl-session-memory",
+        "nemotron-customize",
+        "nemotron-retrieval-recipes"
       ]
     },
     {
@@ -152,18 +152,18 @@
       "title": "Decision Optimization",
       "description": "Formulate and solve routing, scheduling, and numerical optimization problems using optimization solvers, APIs, services, and deployment workflows.",
       "skills": [
-        "cuopt-numerical-optimization-api-cli",
-        "cuopt-routing-api-python",
-        "cuopt-user-rules",
         "cuopt-developer",
         "cuopt-install",
-        "cuopt-numerical-optimization-api-python",
-        "cuopt-server-api-python",
-        "cuopt-numerical-optimization-formulation",
-        "cuopt-routing-formulation",
-        "cuopt-skill-evolution",
         "cuopt-numerical-optimization-api-c",
-        "cuopt-server-common"
+        "cuopt-numerical-optimization-api-cli",
+        "cuopt-numerical-optimization-api-python",
+        "cuopt-numerical-optimization-formulation",
+        "cuopt-routing-api-python",
+        "cuopt-routing-formulation",
+        "cuopt-server-api-python",
+        "cuopt-server-common",
+        "cuopt-skill-evolution",
+        "cuopt-user-rules"
       ]
     },
     {

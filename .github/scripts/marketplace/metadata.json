@@ -1,6 +1,54 @@
 {
   "skills": [
     {
+      "path": "skills/accelerated-computing-cudf",
+      "name": "accelerated-computing-cudf",
+      "description": "Official NVIDIA-authored guidance for NVIDIA cuDF GPU DataFrames, pandas acceleration, dask-cuDF, ETL, joins, groupby, CSV/Parquet I/O, nullable semantics, and multi-GPU DataFrame workloads.",
+      "metadata": {
+        "product.primary": "cuDF",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "data-science",
+        "audience": "developer,data_scientist,data_engineer",
+        "discovery.activity_tags": "get_started,transform,integrate,validate"
+      }
+    },
+    {
+      "path": "skills/aiq-deploy",
+      "name": "aiq-deploy",
+      "description": "Use when asked to install, deploy, run, validate, troubleshoot, or stop NVIDIA AI-Q Blueprint infrastructure.\n",
+      "metadata": {
+        "product.primary": "NeMo Agent Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "deploy,configure,validate,troubleshoot,operate"
+      }
+    },
+    {
+      "path": "skills/aiq-research",
+      "name": "aiq-research",
+      "description": "Use when asked to run deep research or AI-Q research through a reachable NVIDIA AI-Q Blueprint backend.\n",
+      "metadata": {
+        "product.primary": "NeMo Agent Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,ai_engineer",
+        "discovery.activity_tags": "generate,summarize,validate"
+      }
+    },
+    {
+      "path": "skills/cudaq-guide",
+      "name": "cudaq-guide",
+      "description": "CUDA-Q onboarding guide for installation, test programs, GPU simulation, QPU hardware, and quantum applications.",
+      "metadata": {
+        "product.primary": "CUDA-Q",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "quantum-computing",
+        "audience": "developer,quantum_researcher,hpc_developer",
+        "discovery.activity_tags": "get_started,configure,validate"
+      }
+    },
+    {
       "path": "skills/cuopt-developer",
       "name": "cuopt-developer",
       "description": "Modify, build, test, debug, and contribute to NVIDIA cuOpt (C++/CUDA, Python, server, CI). Use for solver internals, PRs, DCO, and code conventions.",
@@ -145,27 +193,75 @@
       }
     },
     {
-      "path": "skills/aiq-deploy",
-      "name": "aiq-deploy",
-      "description": "Use when asked to install, deploy, run, validate, troubleshoot, or stop NVIDIA AI-Q Blueprint infrastructure.\n",
+      "path": "skills/cupynumeric-hdf5",
+      "name": "cupynumeric-hdf5",
+      "description": "Read and write large cuPyNumeric arrays to HDF5 with Legate's parallel, distributed HDF5 I/O (legate.io.hdf5: to_file, from_file, from_file_batched). Use when a developer needs to save a cuPyNumeric array to an .h5/.hdf5 file, load an HDF5 dataset into a distributed cuPyNumeric array, read a large HDF5 dataset in chunks, hand arrays to an HPC pipeline as a single file, or accelerate HDF5 disk I/O with GPUDirect Storage (GDS). Do not use it for Parquet/cuDF/raw-binary or other sharded/custom layouts (see the cupynumeric-parallel-data-load skill), Zarr or object-store/S3 output, .npz or pickled archives, plain h5py without cuPyNumeric, or pure array compute such as FFT, matmul, or reductions.",
       "metadata": {
-        "product.primary": "NeMo Agent Toolkit",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,devops_engineer,platform_engineer",
-        "discovery.activity_tags": "deploy,configure,validate,troubleshoot,operate"
+        "product.primary": "cuPyNumeric",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "data-science",
+        "audience": "developer,data_scientist,hpc_developer",
+        "discovery.activity_tags": "extract,transform,configure,validate"
       }
     },
     {
-      "path": "skills/aiq-research",
-      "name": "aiq-research",
-      "description": "Use when asked to run deep research or AI-Q research through a reachable NVIDIA AI-Q Blueprint backend.\n",
+      "path": "skills/cupynumeric-install",
+      "name": "cupynumeric-install",
+      "description": "Install and verify cuPyNumeric for Python — requirements, commands, verification. Source builds are out of scope.",
       "metadata": {
-        "product.primary": "NeMo Agent Toolkit",
+        "product.primary": "cuPyNumeric",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "data-science",
+        "audience": "developer,data_scientist,hpc_developer",
+        "discovery.activity_tags": "get_started,configure,validate"
+      }
+    },
+    {
+      "path": "skills/cupynumeric-migration-readiness",
+      "name": "cupynumeric-migration-readiness",
+      "description": "Pre-migration readiness assessor for porting NumPy to cuPyNumeric. Use BEFORE substantial porting work begins when the user asks whether code will scale on GPU, whether they should migrate to cuPyNumeric, which NumPy patterns transfer cleanly, what must be refactored before porting, or mentions pre-port assessment, scaling analysis, or refactor planning. Inspect the user's source code, look up NumPy usage, cross-reference the cuPyNumeric API support manifest, and distinguish distributed-scaling-friendly patterns from blockers such as unsupported APIs, scalar synchronization, host round-trips, Python/object-heavy control flow, shape/data-dependent branching, and in-place mutation hazards. Produce a verdict of READY, LIGHT REFACTOR, SIGNIFICANT REFACTOR, or NOT RECOMMENDED, with concrete refactor pointers.",
+      "metadata": {
+        "product.primary": "cuPyNumeric",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "data-science",
+        "audience": "developer,data_scientist,hpc_developer",
+        "discovery.activity_tags": "assess,migrate,inspect,validate"
+      }
+    },
+    {
+      "path": "skills/cupynumeric-parallel-data-load",
+      "name": "cupynumeric-parallel-data-load",
+      "description": "Load a sharded, on-disk dataset (sharded .npy, Parquet/Arrow, raw binary, sharded HDF5, custom layouts) into a distributed cuPyNumeric ndarray via a manual partition + leaf @task launch with CPU/OMP/GPU variants. Use when no single-call loader fits, including when per-shard row counts differ across files. Prefer cupynumeric.load or legate.io.hdf5.from_file when they apply.",
+      "metadata": {
+        "product.primary": "cuPyNumeric",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "data-science",
+        "audience": "developer,data_scientist,hpc_developer",
+        "discovery.activity_tags": "extract,transform,configure,optimize"
+      }
+    },
+    {
+      "path": "skills/dali-dynamic-mode",
+      "name": "dali-dynamic-mode",
+      "description": "DALI imperative dynamic mode (`nvidia.dali.experimental.dynamic`, ndd): use when working on ndd code or migrating pipelines; skip pipeline-only tasks.",
+      "metadata": {
+        "product.primary": "DALI",
         "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,ai_engineer",
-        "discovery.activity_tags": "generate,summarize,validate"
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "configure,migrate,debug,validate"
+      }
+    },
+    {
+      "path": "skills/data-designer",
+      "name": "data-designer",
+      "description": "Use when the user wants to create a dataset, generate synthetic data, or build a data generation pipeline.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_engineer",
+        "discovery.activity_tags": "generate,synthesize,configure,validate"
       }
     },
     {
@@ -190,6 +286,330 @@
         "catalog.subdomain": "vision-ai",
         "audience": "developer,application_developer,ai_engineer,ml_engineer",
         "discovery.activity_tags": "integrate,convert,benchmark,validate,deploy"
+      }
+    },
+    {
+      "path": "skills/dicom-metadata-extract",
+      "name": "dicom-metadata-extract",
+      "description": "Used for extracting selected metadata from one DICOM file and flagging standard-tag PHI presence. Not for anonymization or clinical use.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "extract,inspect,validate"
+      }
+    },
+    {
+      "path": "skills/dicom-series-preflight",
+      "name": "dicom-series-preflight",
+      "description": "Used for header-only preflight of one DICOM series folder before conversion or inference. Not for de-identification or clinical clearance.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "assess,inspect,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/dicom-series-to-volume",
+      "name": "dicom-series-to-volume",
+      "description": "Used for converting one CT DICOM series folder to a HU NIfTI volume with affine evidence. Not for multi-frame DICOM or clinical use.",
+      "metadata": {
+        "product.primary": "MONAI",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "convert,transform,validate"
+      }
+    },
+    {
+      "path": "skills/digital-health-clinical-asr-build",
+      "name": "digital-health-clinical-asr-build",
+      "description": "Stage 2 of the Clinical ASR Flywheel. Use when curating clinical terms, tagging IPA, and synthesizing a NeMo manifest. NOT for scoring (use /digital-health-clinical-asr-eval).",
+      "metadata": {
+        "product.primary": "Nemotron for Digital Health",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "conversational-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
+        "discovery.activity_tags": "generate,synthesize,configure,validate"
+      }
+    },
+    {
+      "path": "skills/digital-health-clinical-asr-eval",
+      "name": "digital-health-clinical-asr-eval",
+      "description": "Stage 3 of Clinical ASR Flywheel. Score a NeMo manifest, produce the five-section KER leaderboard (by-ipa_source diagnostic). Not for ASR auth (/riva-asr).",
+      "metadata": {
+        "product.primary": "Nemotron for Digital Health",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "conversational-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
+        "discovery.activity_tags": "evaluate,measure,validate,compare"
+      }
+    },
+    {
+      "path": "skills/digital-health-clinical-asr-finetune",
+      "name": "digital-health-clinical-asr-finetune",
+      "description": "Stage 4 of the Clinical ASR Flywheel. Use when priority KER is above 0.3 to run stock NeMo SFT on Parakeet TDT v2 and offline cycle N+1 re-eval. NOT for generic word boosting (use /finetune-asr).",
+      "metadata": {
+        "product.primary": "Nemotron for Digital Health",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "conversational-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
+        "discovery.activity_tags": "fine_tune,train,evaluate,validate"
+      }
+    },
+    {
+      "path": "skills/digital-health-clinical-asr-setup",
+      "name": "digital-health-clinical-asr-setup",
+      "description": "Stage 1 of Clinical ASR Flywheel. Use when bootstrapping a cycle: NVCF+MW disclosure, NVIDIA_API_KEY check, deps install, TTS+ASR smoke test.",
+      "metadata": {
+        "product.primary": "Nemotron for Digital Health",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "conversational-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "get_started,configure,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/dynamo-interconnect-check",
+      "name": "dynamo-interconnect-check",
+      "description": "Validate that a Dynamo deployment's NIXL/UCX/NCCL interconnect is ready for disaggregated serving over RDMA/NVLink. Use after recipe-runner brings a deployment up (especially disagg/multi-node) to confirm the KV transport is correct; use troubleshoot for diagnosing already-failed pods.",
+      "metadata": {
+        "product.primary": "Dynamo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "developer,devops_engineer,platform_engineer,ai_engineer",
+        "discovery.activity_tags": "validate,monitor,troubleshoot,debug"
+      }
+    },
+    {
+      "path": "skills/dynamo-recipe-runner",
+      "name": "dynamo-recipe-runner",
+      "description": "Select, validate, patch, and deploy existing NVIDIA Dynamo Kubernetes recipes. Use for model/backend/GPU/deployment-mode recipe bring-up; use router-starter for router-only mode work and troubleshoot for broken deployments.",
+      "metadata": {
+        "product.primary": "Dynamo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "developer,devops_engineer,platform_engineer,ai_engineer",
+        "discovery.activity_tags": "deploy,configure,orchestrate,scale,validate"
+      }
+    },
+    {
+      "path": "skills/dynamo-router-starter",
+      "name": "dynamo-router-starter",
+      "description": "Start or patch Dynamo router modes and run router endpoint smoke checks. Use for round-robin, KV-aware, least-loaded, or device-aware routing setup; use recipe-runner for recipe deployment and troubleshoot for failure diagnosis.",
+      "metadata": {
+        "product.primary": "Dynamo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "developer,devops_engineer,platform_engineer,ai_engineer",
+        "discovery.activity_tags": "configure,deploy,integrate,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/dynamo-troubleshoot",
+      "name": "dynamo-troubleshoot",
+      "description": "Diagnose failed or unhealthy Dynamo deployments. Use when pods, model-cache jobs, PVCs, workers, frontend/router health, endpoints, or benchmark jobs fail; use recipe-runner/router-starter before this for normal bring-up.",
+      "metadata": {
+        "product.primary": "Dynamo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "developer,devops_engineer,platform_engineer,ai_engineer",
+        "discovery.activity_tags": "troubleshoot,debug,inspect,monitor,recover"
+      }
+    },
+    {
+      "path": "skills/earth2studio-data-fetch",
+      "name": "earth2studio-data-fetch",
+      "description": "Fetch weather/climate data via Earth2Studio data sources for specific variables and times. Do NOT use for inference pipelines, model discovery, or installation.\n",
+      "metadata": {
+        "product.primary": "Earth2Studio",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "developer,data_scientist,research_academic",
+        "discovery.activity_tags": "extract,transform,configure,validate"
+      }
+    },
+    {
+      "path": "skills/earth2studio-deterministic-forecast",
+      "name": "earth2studio-deterministic-forecast",
+      "description": "Build deterministic forecast scripts with Earth2Studio (model, data source, IO, inference). Do NOT use for ensemble, diagnostics, data-only fetch, or install.\n",
+      "metadata": {
+        "product.primary": "Earth2Studio",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "developer,data_scientist,research_academic",
+        "discovery.activity_tags": "inference,configure,integrate,validate"
+      }
+    },
+    {
+      "path": "skills/earth2studio-discover",
+      "name": "earth2studio-discover",
+      "description": "Find Earth2Studio models, data sources, and examples for a weather/climate use case. Do NOT use for writing inference code, downloading data, or installation.\n",
+      "metadata": {
+        "product.primary": "Earth2Studio",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "developer,data_scientist,research_academic",
+        "discovery.activity_tags": "select,assess,compare,validate"
+      }
+    },
+    {
+      "path": "skills/earth2studio-install",
+      "name": "earth2studio-install",
+      "description": "Guide installing Earth2Studio via uv or pip, selecting model extras, and configuring the environment. Do NOT use for writing inference code, choosing models, or PhysicsNeMo questions.\n",
+      "metadata": {
+        "product.primary": "Earth2Studio",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "developer,data_scientist,research_academic",
+        "discovery.activity_tags": "get_started,configure,validate"
+      }
+    },
+    {
+      "path": "skills/holoscan-install-conda",
+      "name": "holoscan-install-conda",
+      "description": "Install Holoscan SDK v4.3+ via Conda in a CUDA 13 environment. Use for Conda installs; redirect CUDA 12 hosts to container/wheel.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "infrastructure",
+        "audience": "developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "get_started,configure,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/holoscan-install-container",
+      "name": "holoscan-install-container",
+      "description": "Install Holoscan SDK via the NGC Docker container. Use for container-based installs; not for native apt/pip/Conda installs.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "infrastructure",
+        "audience": "developer,application_developer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "get_started,deploy,configure,validate"
+      }
+    },
+    {
+      "path": "skills/holoscan-install-debian",
+      "name": "holoscan-install-debian",
+      "description": "Install Holoscan SDK natively on Ubuntu via apt. Use for C++ installs on Ubuntu; pair with /holoscan-install-wheel for Python.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "infrastructure",
+        "audience": "developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "get_started,configure,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/holoscan-install-source",
+      "name": "holoscan-install-source",
+      "description": "Build Holoscan SDK from source via the in-tree ./run script. Use only when published packages don't meet the user's needs.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "infrastructure",
+        "audience": "developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "configure,validate,debug,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/holoscan-install-wheel",
+      "name": "holoscan-install-wheel",
+      "description": "Install Holoscan SDK Python wheel via pip into a venv. Use for Python installs; not for native C++/apt or Conda installs.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "infrastructure",
+        "audience": "developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "get_started,configure,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/holoscan-setup",
+      "name": "holoscan-setup",
+      "description": "Guides Holoscan SDK installation: inspects the host, assesses platform compatibility, recommends an install method, and delegates to the matching install skill.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "infrastructure",
+        "audience": "developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "assess,select,configure,validate"
+      }
+    },
+    {
+      "path": "skills/launch-nemo-rl",
+      "name": "launch-nemo-rl",
+      "description": "Playbook for launching, monitoring, stopping, and debugging NeMo-RL recipes on a Kubernetes cluster via the nrl-k8s CLI. Covers ephemeral vs long-lived RayCluster modes, iterating on runs, and debugging hung or failed training jobs.",
+      "metadata": {
+        "product.primary": "NeMo RL",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,devops_engineer",
+        "discovery.activity_tags": "deploy,monitor,troubleshoot,debug,orchestrate"
+      }
+    },
+    {
+      "path": "skills/mcore-create-issue",
+      "name": "mcore-create-issue",
+      "description": "Investigate a failing GitHub Actions run or job and create a GitHub issue for the failure.",
+      "metadata": {
+        "product.primary": "Megatron-Core",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,devops_engineer",
+        "discovery.activity_tags": "debug,troubleshoot,inspect,contribute"
+      }
+    },
+    {
+      "path": "skills/mcore-linting-and-formatting",
+      "name": "mcore-linting-and-formatting",
+      "description": "Linting and formatting for Megatron-LM. Covers running autoformat.sh, tools (ruff, black, isort, pylint, mypy), and code style rules.",
+      "metadata": {
+        "product.primary": "Megatron-Core",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "contribute,test,validate,debug"
+      }
+    },
+    {
+      "path": "skills/mcore-run-on-slurm",
+      "name": "mcore-run-on-slurm",
+      "description": "How to launch distributed Megatron-LM training jobs on a SLURM cluster. Covers a minimal sbatch skeleton, environment-variable setup for torch.distributed.run, CUDA_DEVICE_MAX_CONNECTIONS rules across hardware and parallelism modes, container conventions, monitoring, and per-rank failure diagnosis.",
+      "metadata": {
+        "product.primary": "Megatron-Core",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
+        "discovery.activity_tags": "train,configure,scale,monitor,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/mcore-split-pr",
+      "name": "mcore-split-pr",
+      "description": "Split a PR into multiple PRs to reduce the number of required CODEOWNERS reviewer groups.",
+      "metadata": {
+        "product.primary": "Megatron-Core",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "contribute,configure,validate"
+      }
+    },
+    {
+      "path": "skills/mcore-testing",
+      "name": "mcore-testing",
+      "description": "Test system for Megatron-LM. Covers test layout, recipe YAML structure, adding and running unit and functional tests, golden values, marker filters, and CI parity.",
+      "metadata": {
+        "product.primary": "Megatron-Core",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "test,validate,debug,contribute"
       }
     },
     {
@@ -241,135 +661,27 @@
       }
     },
     {
-      "path": "skills/nemoclaw-user-agent-skills",
-      "name": "nemoclaw-user-agent-skills",
-      "description": "Describes the agent skills shipped with NemoClaw and how to access them by cloning the repository. Use when users ask about AI agent support, coding assistant integration, or the .agents/skills/ directory. Trigger keywords - nemoclaw agent skills, ai coding assistant, cursor, claude code, copilot.",
+      "path": "skills/nemo-data-designer-plugin",
+      "name": "nemo-data-designer-plugin",
+      "description": "Use when the user wants to create a dataset, generate synthetic data, or build a data generation pipeline.",
       "metadata": {
-        "product.primary": "NeMoClaw",
+        "product.primary": "NeMo",
         "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,application_developer,ai_engineer",
-        "discovery.activity_tags": "get_started,integrate,select,configure"
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_engineer",
+        "discovery.activity_tags": "generate,synthesize,configure,validate"
       }
     },
     {
-      "path": "skills/nemoclaw-user-configure-inference",
-      "name": "nemoclaw-user-configure-inference",
-      "description": "Connects NemoClaw to a local inference server. Use when setting up Ollama, vLLM, TensorRT-LLM, NIM, or any OpenAI-compatible local model server with NemoClaw. Trigger keywords - nemoclaw local inference, ollama nemoclaw, vllm nemoclaw, local model server, openai compatible endpoint, switch nemoclaw inference model, change inference runtime, nemoclaw additional model, nemoclaw sub-agent model, openclaw sub-agent, agents.list, sessions_spawn, vlm-demo, nemoclaw tool calling, ollama tool calls, vllm tool-call-parser, raw json in tui, nemoclaw inference options, nemoclaw onboarding providers, nemoclaw inference routing.",
+      "path": "skills/nemo-evaluator-plugin",
+      "name": "nemo-evaluator-plugin",
+      "description": "Use when working on the Evaluator plugin CLI, jobs, SDK-backed specs, metric types, or plugin-owned Evaluator skills.",
       "metadata": {
-        "product.primary": "NeMoClaw",
+        "product.primary": "NeMo",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
-        "audience": "developer,application_developer,ai_engineer,platform_engineer",
-        "discovery.activity_tags": "configure,inference,integrate,validate,troubleshoot"
-      }
-    },
-    {
-      "path": "skills/nemoclaw-user-configure-security",
-      "name": "nemoclaw-user-configure-security",
-      "description": "Presents a risk framework for every configurable security control in NemoClaw. Use when evaluating security posture, reviewing sandbox security defaults, or assessing control trade-offs. Trigger keywords - nemoclaw security best practices, sandbox security controls risk framework, nemoclaw credential storage, openshell provider, api key security, openclaw security controls, nemoclaw security boundary, prompt injection, tool access control.",
-      "metadata": {
-        "product.primary": "NeMoClaw",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,platform_engineer,security_engineer,devops_engineer",
-        "discovery.activity_tags": "assess,configure,validate,troubleshoot"
-      }
-    },
-    {
-      "path": "skills/nemoclaw-user-deploy-remote",
-      "name": "nemoclaw-user-deploy-remote",
-      "description": "Explains how to run NemoClaw on a remote GPU instance, including the deprecated Brev compatibility path and the preferred installer plus onboard flow. Use when deploying NemoClaw to a remote VM, onboarding a Brev instance, or migrating away from the legacy `nemoclaw deploy` wrapper. Trigger keywords - deploy nemoclaw remote gpu, nemoclaw brev cloud deployment, nemoclaw plugins, openclaw plugins, install openclaw plugin, nemoclaw onboard from dockerfile, nemoclaw brev web ui, nemoclaw getting started, brev quickstart, nvidia nemotron agent, nemoclaw sandbox hardening, container security, docker capabilities, process limits.",
-      "metadata": {
-        "product.primary": "NeMoClaw",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,devops_engineer,platform_engineer",
-        "discovery.activity_tags": "deploy,configure,validate,troubleshoot,operate"
-      }
-    },
-    {
-      "path": "skills/nemoclaw-user-get-started",
-      "name": "nemoclaw-user-get-started",
-      "description": "Installs NemoClaw, launches a sandbox, and runs the first agent prompt. Use when onboarding, installing, or launching a NemoClaw sandbox for the first time. Trigger keywords - nemoclaw quickstart, install nemoclaw openclaw sandbox, nemohermes quickstart, hermes agent nemoclaw, run hermes openshell sandbox, nemoclaw prerequisites, nemoclaw supported platforms, nemoclaw hardware software, nemoclaw windows wsl2 setup, nemoclaw install windows docker desktop.",
-      "metadata": {
-        "product.primary": "NeMoClaw",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,application_developer,ai_engineer",
-        "discovery.activity_tags": "get_started,deploy,configure,validate"
-      }
-    },
-    {
-      "path": "skills/nemoclaw-user-manage-policy",
-      "name": "nemoclaw-user-manage-policy",
-      "description": "Adds, removes, or modifies allowed endpoints in the sandbox policy. Use when customizing network policy, changing egress rules, or configuring sandbox endpoint access. Trigger keywords - customize nemoclaw network policy, sandbox egress policy configuration, nemoclaw integration policy examples, post-install policy setup, openshell approval workflow, policy preset, nemoclaw approve network requests, sandbox egress approval tui.",
-      "metadata": {
-        "product.primary": "NeMoClaw",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,platform_engineer,security_engineer,devops_engineer",
-        "discovery.activity_tags": "configure,operate,troubleshoot,validate"
-      }
-    },
-    {
-      "path": "skills/nemoclaw-user-manage-sandboxes",
-      "name": "nemoclaw-user-manage-sandboxes",
-      "description": "Explains operational tasks after the quickstart: listing sandboxes, status and health checks, logs, diagnostics, port forwards, multiple sandboxes, credential reset, rebuilds, network presets, upgrades, and uninstall. Trigger keywords - manage nemoclaw sandboxes, nemoclaw status, nemoclaw list, nemoclaw dashboard port, nemoclaw rebuild, nemoclaw upgrade sandboxes, nemoclaw uninstall, sandbox mutability, sandbox runtime configuration, sandbox rebuild, nemoclaw backup, nemoclaw restore, workspace backup, openshell sandbox download upload, nemoclaw messaging channels, nemoclaw telegram, nemoclaw discord, nemoclaw slack, nemoclaw wechat, nemoclaw whatsapp, openshell channel messaging, nemoclaw workspace files, soul.md, user.md, identity.md, agents.md, sandbox persistence.",
-      "metadata": {
-        "product.primary": "NeMoClaw",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,devops_engineer,platform_engineer",
-        "discovery.activity_tags": "operate,monitor,troubleshoot,configure,recover"
-      }
-    },
-    {
-      "path": "skills/nemoclaw-user-monitor-sandbox",
-      "name": "nemoclaw-user-monitor-sandbox",
-      "description": "Inspects sandbox health, traces agent behavior, and diagnoses problems. Use when monitoring a running sandbox, debugging agent issues, or checking sandbox logs. Trigger keywords - monitor nemoclaw sandbox, debug nemoclaw agent issues.",
-      "metadata": {
-        "product.primary": "NeMoClaw",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,devops_engineer,platform_engineer",
-        "discovery.activity_tags": "monitor,debug,troubleshoot,inspect"
-      }
-    },
-    {
-      "path": "skills/nemoclaw-user-overview",
-      "name": "nemoclaw-user-overview",
-      "description": "Explains how OpenClaw, OpenShell, and NemoClaw form the ecosystem, NemoClaw's position in the stack, what NemoClaw adds beyond the community sandbox, and when to prefer NemoClaw versus integrating OpenShell and OpenClaw directly. Use when users ask about the relationship between OpenClaw, OpenShell, and NemoClaw, or when to use NemoClaw versus OpenShell. Trigger keywords - nemoclaw ecosystem, openclaw openshell, nemoclaw vs openshell, sandboxed openclaw, how nemoclaw works, nemoclaw sandbox lifecycle blueprint, nemoclaw overview, openclaw always-on assistants, nvidia openshell, nvidia nemotron, nemoclaw release notes, nemoclaw changelog.",
-      "metadata": {
-        "product.primary": "NeMoClaw",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,application_developer,solutions_architect",
-        "discovery.activity_tags": "assess,select,get_started,summarize"
-      }
-    },
-    {
-      "path": "skills/nemoclaw-user-reference",
-      "name": "nemoclaw-user-reference",
-      "description": "Describes the NemoClaw plugin and blueprint architecture and how they orchestrate the OpenClaw sandbox. Use when looking up architecture, plugin structure, or blueprint design. Trigger keywords - nemoclaw architecture, nemoclaw plugin blueprint structure, nemoclaw vs openshell, which cli, nemoclaw cli, openshell cli, sandbox commands, nemoclaw cli commands, nemoclaw command reference, nemoclaw network policy, sandbox egress control operator approval, nemoclaw troubleshooting, nemoclaw debug sandbox issues.",
-      "metadata": {
-        "product.primary": "NeMoClaw",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,application_developer,platform_engineer,solutions_architect",
-        "discovery.activity_tags": "assess,select,configure,troubleshoot"
-      }
-    },
-    {
-      "path": "skills/skill-card-generator",
-      "name": "skill-card-generator",
-      "description": "Use only to generate or update a governance skill card for a specified existing agent skill directory. Do not use for explaining, listing, comparing, or discussing skill capabilities.",
-      "metadata": {
-        "product.primary": "Trustworthy AI",
-        "classification.category.primary": "developer_tools",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,platform_engineer,solutions_architect",
-        "discovery.activity_tags": "generate,validate,inspect,assess"
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "evaluate,validate,configure,inspect"
       }
     },
     {
@@ -613,111 +925,183 @@
       }
     },
     {
-      "path": "skills/cupynumeric-hdf5",
-      "name": "cupynumeric-hdf5",
-      "description": "Read and write large cuPyNumeric arrays to HDF5 with Legate's parallel, distributed HDF5 I/O (legate.io.hdf5: to_file, from_file, from_file_batched). Use when a developer needs to save a cuPyNumeric array to an .h5/.hdf5 file, load an HDF5 dataset into a distributed cuPyNumeric array, read a large HDF5 dataset in chunks, hand arrays to an HPC pipeline as a single file, or accelerate HDF5 disk I/O with GPUDirect Storage (GDS). Do not use it for Parquet/cuDF/raw-binary or other sharded/custom layouts (see the cupynumeric-parallel-data-load skill), Zarr or object-store/S3 output, .npz or pickled archives, plain h5py without cuPyNumeric, or pure array compute such as FFT, matmul, or reductions.",
+      "path": "skills/nemo-retriever",
+      "name": "nemo-retriever",
+      "description": "Use when the user wants to search, query, extract, transcribe, describe, quote, filter, or aggregate across documents — PDFs, scanned forms / images (`.jpg` `.png` `.tiff`), Office (`.docx` `.pptx`), text (`.html` `.txt`), audio (`.mp3` `.wav` `.m4a`), or video (`.mp4` `.mov`). Prefer this over native Read / Grep for multi-file or non-PDF corpora. Not for: editing files, web browsing, single-file plain-text lookups, fine-tuning.",
       "metadata": {
-        "product.primary": "cuPyNumeric",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "data-science",
-        "audience": "developer,data_scientist,hpc_developer",
-        "discovery.activity_tags": "extract,transform,configure,validate"
+        "product.primary": "NeMo Retriever",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,ai_engineer,data_engineer",
+        "discovery.activity_tags": "extract,inspect,summarize,configure"
       }
     },
     {
-      "path": "skills/cupynumeric-install",
-      "name": "cupynumeric-install",
-      "description": "Install and verify cuPyNumeric for Python — requirements, commands, verification. Source builds are out of scope.",
+      "path": "skills/nemo-rl-auto-research",
+      "name": "nemo-rl-auto-research",
+      "description": "Autonomous NeMo-RL research agent workflow for directed hypothesis testing and open-ended discovery. Guides agents through the full experiment lifecycle: understanding recipes and environments, wiring RL or NeMo-gym runs, launching reproducible baselines and iterations, analyzing results, preserving human oversight, and using git plus TSV logs as the research ledger. Do NOT use for: bug fixes, code review, documentation, refactoring, dependency updates, or single-file changes.",
       "metadata": {
-        "product.primary": "cuPyNumeric",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "data-science",
-        "audience": "developer,data_scientist,hpc_developer",
-        "discovery.activity_tags": "get_started,configure,validate"
-      }
-    },
-    {
-      "path": "skills/cupynumeric-migration-readiness",
-      "name": "cupynumeric-migration-readiness",
-      "description": "Pre-migration readiness assessor for porting NumPy to cuPyNumeric. Use BEFORE substantial porting work begins when the user asks whether code will scale on GPU, whether they should migrate to cuPyNumeric, which NumPy patterns transfer cleanly, what must be refactored before porting, or mentions pre-port assessment, scaling analysis, or refactor planning. Inspect the user's source code, look up NumPy usage, cross-reference the cuPyNumeric API support manifest, and distinguish distributed-scaling-friendly patterns from blockers such as unsupported APIs, scalar synchronization, host round-trips, Python/object-heavy control flow, shape/data-dependent branching, and in-place mutation hazards. Produce a verdict of READY, LIGHT REFACTOR, SIGNIFICANT REFACTOR, or NOT RECOMMENDED, with concrete refactor pointers.",
-      "metadata": {
-        "product.primary": "cuPyNumeric",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "data-science",
-        "audience": "developer,data_scientist,hpc_developer",
-        "discovery.activity_tags": "assess,migrate,inspect,validate"
-      }
-    },
-    {
-      "path": "skills/cupynumeric-parallel-data-load",
-      "name": "cupynumeric-parallel-data-load",
-      "description": "Load a sharded, on-disk dataset (sharded .npy, Parquet/Arrow, raw binary, sharded HDF5, custom layouts) into a distributed cuPyNumeric ndarray via a manual partition + leaf @task launch with CPU/OMP/GPU variants. Use when no single-call loader fits, including when per-shard row counts differ across files. Prefer cupynumeric.load or legate.io.hdf5.from_file when they apply.",
-      "metadata": {
-        "product.primary": "cuPyNumeric",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "data-science",
-        "audience": "developer,data_scientist,hpc_developer",
-        "discovery.activity_tags": "extract,transform,configure,optimize"
-      }
-    },
-    {
-      "path": "skills/dali-dynamic-mode",
-      "name": "dali-dynamic-mode",
-      "description": "DALI imperative dynamic mode (`nvidia.dali.experimental.dynamic`, ndd): use when working on ndd code or migrating pipelines; skip pipeline-only tasks.",
-      "metadata": {
-        "product.primary": "DALI",
+        "product.primary": "NeMo RL",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,research_academic",
+        "discovery.activity_tags": "train,evaluate,benchmark,optimize,orchestrate"
+      }
+    },
+    {
+      "path": "skills/nemo-rl-brev-etiquette",
+      "name": "nemo-rl-brev-etiquette",
+      "description": "Brev instance operating guidance for NeMo-RL agents working in /home/ubuntu/RL with limited workspace disk, a larger /ephemeral volume, and optional /home/ubuntu/RL/.env secrets. Use when running nemo-rl-auto-research campaigns, experiments, training jobs, model or dataset downloads, shared cache-heavy commands, log-producing runs, checkpoint generation, W&B or Hugging Face authenticated workflows, or any workflow that may create large files on Brev.",
+      "metadata": {
+        "product.primary": "NeMo RL",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,devops_engineer",
+        "discovery.activity_tags": "configure,operate,troubleshoot,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-rl-docs",
+      "name": "nemo-rl-docs",
+      "description": "Documentation conventions for NeMo-RL. Covers docs/index.md updates and docstring format. Do NOT use for: bug fixes, test fixes, dependency bumps, refactoring, CI/CD changes, performance tuning, or any task that does not involve writing or updating documentation.",
+      "metadata": {
+        "product.primary": "NeMo RL",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "training-ai",
         "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "configure,migrate,debug,validate"
+        "discovery.activity_tags": "contribute,extend,validate,inspect"
       }
     },
     {
-      "path": "skills/dynamo-interconnect-check",
-      "name": "dynamo-interconnect-check",
-      "description": "Validate that a Dynamo deployment's NIXL/UCX/NCCL interconnect is ready for disaggregated serving over RDMA/NVLink. Use after recipe-runner brings a deployment up (especially disagg/multi-node) to confirm the KV transport is correct; use troubleshoot for diagnosing already-failed pods.",
+      "path": "skills/nemo-rl-session-memory",
+      "name": "nemo-rl-session-memory",
+      "description": "Manage durable working-session memory for coding agents. Use when a user asks to preserve or recover agent context across disconnects, VS Code restarts, long-running work, handoffs, or any session where important state should be written periodically under the repo's session directory. Do NOT use for: simple questions, short tasks, one-off commands, linting, or code review.",
       "metadata": {
-        "product.primary": "Dynamo",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "inference-ai",
-        "audience": "developer,devops_engineer,platform_engineer,ai_engineer",
-        "discovery.activity_tags": "validate,monitor,troubleshoot,debug"
+        "product.primary": "NeMo RL",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "configure,recover,inspect,operate"
       }
     },
     {
-      "path": "skills/dynamo-recipe-runner",
-      "name": "dynamo-recipe-runner",
-      "description": "Select, validate, patch, and deploy existing NVIDIA Dynamo Kubernetes recipes. Use for model/backend/GPU/deployment-mode recipe bring-up; use router-starter for router-only mode work and troubleshoot for broken deployments.",
+      "path": "skills/nemoclaw-user-agent-skills",
+      "name": "nemoclaw-user-agent-skills",
+      "description": "Describes the agent skills shipped with NemoClaw and how to access them by cloning the repository. Use when users ask about AI agent support, coding assistant integration, or the .agents/skills/ directory. Trigger keywords - nemoclaw agent skills, ai coding assistant, cursor, claude code, copilot.",
       "metadata": {
-        "product.primary": "Dynamo",
+        "product.primary": "NeMoClaw",
         "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "inference-ai",
-        "audience": "developer,devops_engineer,platform_engineer,ai_engineer",
-        "discovery.activity_tags": "deploy,configure,orchestrate,scale,validate"
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,ai_engineer",
+        "discovery.activity_tags": "get_started,integrate,select,configure"
       }
     },
     {
-      "path": "skills/dynamo-router-starter",
-      "name": "dynamo-router-starter",
-      "description": "Start or patch Dynamo router modes and run router endpoint smoke checks. Use for round-robin, KV-aware, least-loaded, or device-aware routing setup; use recipe-runner for recipe deployment and troubleshoot for failure diagnosis.",
+      "path": "skills/nemoclaw-user-configure-inference",
+      "name": "nemoclaw-user-configure-inference",
+      "description": "Connects NemoClaw to a local inference server. Use when setting up Ollama, vLLM, TensorRT-LLM, NIM, or any OpenAI-compatible local model server with NemoClaw. Trigger keywords - nemoclaw local inference, ollama nemoclaw, vllm nemoclaw, local model server, openai compatible endpoint, switch nemoclaw inference model, change inference runtime, nemoclaw additional model, nemoclaw sub-agent model, openclaw sub-agent, agents.list, sessions_spawn, vlm-demo, nemoclaw tool calling, ollama tool calls, vllm tool-call-parser, raw json in tui, nemoclaw inference options, nemoclaw onboarding providers, nemoclaw inference routing.",
       "metadata": {
-        "product.primary": "Dynamo",
+        "product.primary": "NeMoClaw",
         "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "inference-ai",
-        "audience": "developer,devops_engineer,platform_engineer,ai_engineer",
-        "discovery.activity_tags": "configure,deploy,integrate,validate,troubleshoot"
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,ai_engineer,platform_engineer",
+        "discovery.activity_tags": "configure,inference,integrate,validate,troubleshoot"
       }
     },
     {
-      "path": "skills/dynamo-troubleshoot",
-      "name": "dynamo-troubleshoot",
-      "description": "Diagnose failed or unhealthy Dynamo deployments. Use when pods, model-cache jobs, PVCs, workers, frontend/router health, endpoints, or benchmark jobs fail; use recipe-runner/router-starter before this for normal bring-up.",
+      "path": "skills/nemoclaw-user-configure-security",
+      "name": "nemoclaw-user-configure-security",
+      "description": "Presents a risk framework for every configurable security control in NemoClaw. Use when evaluating security posture, reviewing sandbox security defaults, or assessing control trade-offs. Trigger keywords - nemoclaw security best practices, sandbox security controls risk framework, nemoclaw credential storage, openshell provider, api key security, openclaw security controls, nemoclaw security boundary, prompt injection, tool access control.",
       "metadata": {
-        "product.primary": "Dynamo",
+        "product.primary": "NeMoClaw",
         "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "inference-ai",
-        "audience": "developer,devops_engineer,platform_engineer,ai_engineer",
-        "discovery.activity_tags": "troubleshoot,debug,inspect,monitor,recover"
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,platform_engineer,security_engineer,devops_engineer",
+        "discovery.activity_tags": "assess,configure,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-deploy-remote",
+      "name": "nemoclaw-user-deploy-remote",
+      "description": "Explains how to run NemoClaw on a remote GPU instance, including the deprecated Brev compatibility path and the preferred installer plus onboard flow. Use when deploying NemoClaw to a remote VM, onboarding a Brev instance, or migrating away from the legacy `nemoclaw deploy` wrapper. Trigger keywords - deploy nemoclaw remote gpu, nemoclaw brev cloud deployment, nemoclaw plugins, openclaw plugins, install openclaw plugin, nemoclaw onboard from dockerfile, nemoclaw brev web ui, nemoclaw getting started, brev quickstart, nvidia nemotron agent, nemoclaw sandbox hardening, container security, docker capabilities, process limits.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "deploy,configure,validate,troubleshoot,operate"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-get-started",
+      "name": "nemoclaw-user-get-started",
+      "description": "Installs NemoClaw, launches a sandbox, and runs the first agent prompt. Use when onboarding, installing, or launching a NemoClaw sandbox for the first time. Trigger keywords - nemoclaw quickstart, install nemoclaw openclaw sandbox, nemohermes quickstart, hermes agent nemoclaw, run hermes openshell sandbox, nemoclaw prerequisites, nemoclaw supported platforms, nemoclaw hardware software, nemoclaw windows wsl2 setup, nemoclaw install windows docker desktop.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,ai_engineer",
+        "discovery.activity_tags": "get_started,deploy,configure,validate"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-manage-policy",
+      "name": "nemoclaw-user-manage-policy",
+      "description": "Adds, removes, or modifies allowed endpoints in the sandbox policy. Use when customizing network policy, changing egress rules, or configuring sandbox endpoint access. Trigger keywords - customize nemoclaw network policy, sandbox egress policy configuration, nemoclaw integration policy examples, post-install policy setup, openshell approval workflow, policy preset, nemoclaw approve network requests, sandbox egress approval tui.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,platform_engineer,security_engineer,devops_engineer",
+        "discovery.activity_tags": "configure,operate,troubleshoot,validate"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-manage-sandboxes",
+      "name": "nemoclaw-user-manage-sandboxes",
+      "description": "Explains operational tasks after the quickstart: listing sandboxes, status and health checks, logs, diagnostics, port forwards, multiple sandboxes, credential reset, rebuilds, network presets, upgrades, and uninstall. Trigger keywords - manage nemoclaw sandboxes, nemoclaw status, nemoclaw list, nemoclaw dashboard port, nemoclaw rebuild, nemoclaw upgrade sandboxes, nemoclaw uninstall, sandbox mutability, sandbox runtime configuration, sandbox rebuild, nemoclaw backup, nemoclaw restore, workspace backup, openshell sandbox download upload, nemoclaw messaging channels, nemoclaw telegram, nemoclaw discord, nemoclaw slack, nemoclaw wechat, nemoclaw whatsapp, openshell channel messaging, nemoclaw workspace files, soul.md, user.md, identity.md, agents.md, sandbox persistence.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "operate,monitor,troubleshoot,configure,recover"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-monitor-sandbox",
+      "name": "nemoclaw-user-monitor-sandbox",
+      "description": "Inspects sandbox health, traces agent behavior, and diagnoses problems. Use when monitoring a running sandbox, debugging agent issues, or checking sandbox logs. Trigger keywords - monitor nemoclaw sandbox, debug nemoclaw agent issues.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "monitor,debug,troubleshoot,inspect"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-overview",
+      "name": "nemoclaw-user-overview",
+      "description": "Explains how OpenClaw, OpenShell, and NemoClaw form the ecosystem, NemoClaw's position in the stack, what NemoClaw adds beyond the community sandbox, and when to prefer NemoClaw versus integrating OpenShell and OpenClaw directly. Use when users ask about the relationship between OpenClaw, OpenShell, and NemoClaw, or when to use NemoClaw versus OpenShell. Trigger keywords - nemoclaw ecosystem, openclaw openshell, nemoclaw vs openshell, sandboxed openclaw, how nemoclaw works, nemoclaw sandbox lifecycle blueprint, nemoclaw overview, openclaw always-on assistants, nvidia openshell, nvidia nemotron, nemoclaw release notes, nemoclaw changelog.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,solutions_architect",
+        "discovery.activity_tags": "assess,select,get_started,summarize"
+      }
+    },
+    {
+      "path": "skills/nemoclaw-user-reference",
+      "name": "nemoclaw-user-reference",
+      "description": "Describes the NemoClaw plugin and blueprint architecture and how they orchestrate the OpenClaw sandbox. Use when looking up architecture, plugin structure, or blueprint design. Trigger keywords - nemoclaw architecture, nemoclaw plugin blueprint structure, nemoclaw vs openshell, which cli, nemoclaw cli, openshell cli, sandbox commands, nemoclaw cli commands, nemoclaw command reference, nemoclaw network policy, sandbox egress control operator approval, nemoclaw troubleshooting, nemoclaw debug sandbox issues.",
+      "metadata": {
+        "product.primary": "NeMoClaw",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,platform_engineer,solutions_architect",
+        "discovery.activity_tags": "assess,select,configure,troubleshoot"
       }
     },
     {
@@ -733,18 +1117,6 @@
       }
     },
     {
-      "path": "skills/nemotron-retrieval-recipes",
-      "name": "nemotron-retrieval-recipes",
-      "description": "Use when planning, debugging, tuning, evaluating, exporting, or deploying public Nemotron `embed`/`rerank` retrieval recipes.",
-      "metadata": {
-        "product.primary": "Nemotron",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
-        "discovery.activity_tags": "fine_tune,train,evaluate,deploy,optimize"
-      }
-    },
-    {
       "path": "skills/nemotron-policy-generator",
       "name": "nemotron-policy-generator",
       "description": "Generates BYO custom safety policies for NVIDIA Nemotron content-safety guardrails — Nemotron-Content-Safety-Reasoning-4B (text) and multimodal Nemotron-3-Content-Safety. Produces a Markdown policy, JSON taxonomy, and drop-in inference prompts. Maps rough words or an existing policy to V2 categories, adding custom categories or topic-following rules.",
@@ -757,6 +1129,18 @@
       }
     },
     {
+      "path": "skills/nemotron-retrieval-recipes",
+      "name": "nemotron-retrieval-recipes",
+      "description": "Use when planning, debugging, tuning, evaluating, exporting, or deploying public Nemotron `embed`/`rerank` retrieval recipes.",
+      "metadata": {
+        "product.primary": "Nemotron",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
+        "discovery.activity_tags": "fine_tune,train,evaluate,deploy,optimize"
+      }
+    },
+    {
       "path": "skills/nemotron-speech",
       "name": "nemotron-speech",
       "description": "Routes NVIDIA Nemotron Speech (Riva) NIM tasks — deploys, runs, and tests ASR, TTS, and NMT NIMs on build.nvidia.com or self-hosted.",
@@ -766,210 +1150,6 @@
         "catalog.subdomain": "conversational-ai",
         "audience": "developer,application_developer,ai_engineer,devops_engineer",
         "discovery.activity_tags": "deploy,inference,configure,validate,troubleshoot"
-      }
-    },
-    {
-      "path": "skills/rag-blueprint",
-      "name": "rag-blueprint",
-      "description": "NVIDIA RAG Blueprint — deploy, configure, troubleshoot, and manage. Handles any RAG action: deploy, install, start, enable, disable, toggle, change, configure, troubleshoot, debug, fix, shutdown, stop, or tear down any RAG feature or service (Agentic RAG, VLM, guardrails, query rewriting, models, search, ingestion, observability, summarization, reasoning, and more).",
-      "metadata": {
-        "product.primary": "RAG",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,application_developer,ai_engineer,devops_engineer,platform_engineer",
-        "discovery.activity_tags": "deploy,configure,troubleshoot,debug,operate"
-      }
-    },
-    {
-      "path": "skills/rag-eval",
-      "name": "rag-eval",
-      "description": "Filesystem RAG benchmarks: corpus/, train.json, evaluate_rag.py (RAGAS quality). Not for prod monitoring, latency/throughput benchmarking (use rag-perf), or evals outside this repo layout.",
-      "metadata": {
-        "product.primary": "RAG",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
-        "discovery.activity_tags": "evaluate,benchmark,validate,measure"
-      }
-    },
-    {
-      "path": "skills/rag-perf",
-      "name": "rag-perf",
-      "description": "Performance benchmarking for a deployed NVIDIA RAG Blueprint server: profiling pass + aiperf load test driven by a single YAML config. Not for accuracy / RAGAS scoring (use rag-eval) or for deploying / repairing services (use rag-blueprint).",
-      "metadata": {
-        "product.primary": "RAG",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,ai_engineer,ml_engineer,devops_engineer,platform_engineer",
-        "discovery.activity_tags": "benchmark,profile,measure,optimize,validate"
-      }
-    },
-    {
-      "path": "skills/tilegym-adding-cutile-kernel",
-      "name": "tilegym-adding-cutile-kernel",
-      "description": "Add a new cuTile GPU kernel operator to TileGym. Covers dispatch registration in ops.py, cuTile backend implementation, __init__.py exports, test creation, and benchmark in tests/benchmark. Use when adding, creating, or implementing a new cuTile operator/kernel in TileGym, or when asking how to register a new cuTile op.",
-      "metadata": {
-        "product.primary": "CUDA Tile",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "gpu-development",
-        "audience": "developer,hpc_developer",
-        "discovery.activity_tags": "extend,integrate,test,benchmark,validate"
-      }
-    },
-    {
-      "path": "skills/digital-health-clinical-asr-build",
-      "name": "digital-health-clinical-asr-build",
-      "description": "Stage 2 of the Clinical ASR Flywheel. Use when curating clinical terms, tagging IPA, and synthesizing a NeMo manifest. NOT for scoring (use /digital-health-clinical-asr-eval).",
-      "metadata": {
-        "product.primary": "Nemotron for Digital Health",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "conversational-ai",
-        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
-        "discovery.activity_tags": "generate,synthesize,configure,validate"
-      }
-    },
-    {
-      "path": "skills/digital-health-clinical-asr-eval",
-      "name": "digital-health-clinical-asr-eval",
-      "description": "Stage 3 of Clinical ASR Flywheel. Score a NeMo manifest, produce the five-section KER leaderboard (by-ipa_source diagnostic). Not for ASR auth (/riva-asr).",
-      "metadata": {
-        "product.primary": "Nemotron for Digital Health",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "conversational-ai",
-        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
-        "discovery.activity_tags": "evaluate,measure,validate,compare"
-      }
-    },
-    {
-      "path": "skills/digital-health-clinical-asr-finetune",
-      "name": "digital-health-clinical-asr-finetune",
-      "description": "Stage 4 of the Clinical ASR Flywheel. Use when priority KER is above 0.3 to run stock NeMo SFT on Parakeet TDT v2 and offline cycle N+1 re-eval. NOT for generic word boosting (use /finetune-asr).",
-      "metadata": {
-        "product.primary": "Nemotron for Digital Health",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "conversational-ai",
-        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
-        "discovery.activity_tags": "fine_tune,train,evaluate,validate"
-      }
-    },
-    {
-      "path": "skills/digital-health-clinical-asr-setup",
-      "name": "digital-health-clinical-asr-setup",
-      "description": "Stage 1 of Clinical ASR Flywheel. Use when bootstrapping a cycle: NVCF+MW disclosure, NVIDIA_API_KEY check, deps install, TTS+ASR smoke test.",
-      "metadata": {
-        "product.primary": "Nemotron for Digital Health",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "conversational-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "get_started,configure,validate,troubleshoot"
-      }
-    },
-    {
-      "path": "skills/earth2studio-data-fetch",
-      "name": "earth2studio-data-fetch",
-      "description": "Fetch weather/climate data via Earth2Studio data sources for specific variables and times. Do NOT use for inference pipelines, model discovery, or installation.\n",
-      "metadata": {
-        "product.primary": "Earth2Studio",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "simulation-modeling",
-        "audience": "developer,data_scientist,research_academic",
-        "discovery.activity_tags": "extract,transform,configure,validate"
-      }
-    },
-    {
-      "path": "skills/earth2studio-deterministic-forecast",
-      "name": "earth2studio-deterministic-forecast",
-      "description": "Build deterministic forecast scripts with Earth2Studio (model, data source, IO, inference). Do NOT use for ensemble, diagnostics, data-only fetch, or install.\n",
-      "metadata": {
-        "product.primary": "Earth2Studio",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "simulation-modeling",
-        "audience": "developer,data_scientist,research_academic",
-        "discovery.activity_tags": "inference,configure,integrate,validate"
-      }
-    },
-    {
-      "path": "skills/earth2studio-discover",
-      "name": "earth2studio-discover",
-      "description": "Find Earth2Studio models, data sources, and examples for a weather/climate use case. Do NOT use for writing inference code, downloading data, or installation.\n",
-      "metadata": {
-        "product.primary": "Earth2Studio",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "simulation-modeling",
-        "audience": "developer,data_scientist,research_academic",
-        "discovery.activity_tags": "select,assess,compare,validate"
-      }
-    },
-    {
-      "path": "skills/earth2studio-install",
-      "name": "earth2studio-install",
-      "description": "Guide installing Earth2Studio via uv or pip, selecting model extras, and configuring the environment. Do NOT use for writing inference code, choosing models, or PhysicsNeMo questions.\n",
-      "metadata": {
-        "product.primary": "Earth2Studio",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "simulation-modeling",
-        "audience": "developer,data_scientist,research_academic",
-        "discovery.activity_tags": "get_started,configure,validate"
-      }
-    },
-    {
-      "path": "skills/accelerated-computing-cudf",
-      "name": "accelerated-computing-cudf",
-      "description": "Official NVIDIA-authored guidance for NVIDIA cuDF GPU DataFrames, pandas acceleration, dask-cuDF, ETL, joins, groupby, CSV/Parquet I/O, nullable semantics, and multi-GPU DataFrame workloads.",
-      "metadata": {
-        "product.primary": "cuDF",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "data-science",
-        "audience": "developer,data_scientist,data_engineer",
-        "discovery.activity_tags": "get_started,transform,integrate,validate"
-      }
-    },
-    {
-      "path": "skills/cudaq-guide",
-      "name": "cudaq-guide",
-      "description": "CUDA-Q onboarding guide for installation, test programs, GPU simulation, QPU hardware, and quantum applications.",
-      "metadata": {
-        "product.primary": "CUDA-Q",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "quantum-computing",
-        "audience": "developer,quantum_researcher,hpc_developer",
-        "discovery.activity_tags": "get_started,configure,validate"
-      }
-    },
-    {
-      "path": "skills/dicom-metadata-extract",
-      "name": "dicom-metadata-extract",
-      "description": "Used for extracting selected metadata from one DICOM file and flagging standard-tag PHI presence. Not for anonymization or clinical use.",
-      "metadata": {
-        "product.primary": "MONAI",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "vision-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "extract,inspect,validate"
-      }
-    },
-    {
-      "path": "skills/dicom-series-preflight",
-      "name": "dicom-series-preflight",
-      "description": "Used for header-only preflight of one DICOM series folder before conversion or inference. Not for de-identification or clinical clearance.",
-      "metadata": {
-        "product.primary": "MONAI",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "vision-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "assess,inspect,validate,troubleshoot"
-      }
-    },
-    {
-      "path": "skills/dicom-series-to-volume",
-      "name": "dicom-series-to-volume",
-      "description": "Used for converting one CT DICOM series folder to a HU NIfTI volume with affine evidence. Not for multi-frame DICOM or clinical use.",
-      "metadata": {
-        "product.primary": "MONAI",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "vision-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "convert,transform,validate"
       }
     },
     {
@@ -1081,246 +1261,6 @@
       }
     },
     {
-      "path": "skills/holoscan-install-conda",
-      "name": "holoscan-install-conda",
-      "description": "Install Holoscan SDK v4.3+ via Conda in a CUDA 13 environment. Use for Conda installs; redirect CUDA 12 hosts to container/wheel.",
-      "metadata": {
-        "product.primary": "Holoscan",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "infrastructure",
-        "audience": "developer,application_developer,platform_engineer",
-        "discovery.activity_tags": "get_started,configure,validate,troubleshoot"
-      }
-    },
-    {
-      "path": "skills/holoscan-install-container",
-      "name": "holoscan-install-container",
-      "description": "Install Holoscan SDK via the NGC Docker container. Use for container-based installs; not for native apt/pip/Conda installs.",
-      "metadata": {
-        "product.primary": "Holoscan",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "infrastructure",
-        "audience": "developer,application_developer,platform_engineer,devops_engineer",
-        "discovery.activity_tags": "get_started,deploy,configure,validate"
-      }
-    },
-    {
-      "path": "skills/holoscan-install-debian",
-      "name": "holoscan-install-debian",
-      "description": "Install Holoscan SDK natively on Ubuntu via apt. Use for C++ installs on Ubuntu; pair with /holoscan-install-wheel for Python.",
-      "metadata": {
-        "product.primary": "Holoscan",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "infrastructure",
-        "audience": "developer,application_developer,platform_engineer",
-        "discovery.activity_tags": "get_started,configure,validate,troubleshoot"
-      }
-    },
-    {
-      "path": "skills/holoscan-install-source",
-      "name": "holoscan-install-source",
-      "description": "Build Holoscan SDK from source via the in-tree ./run script. Use only when published packages don't meet the user's needs.",
-      "metadata": {
-        "product.primary": "Holoscan",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "infrastructure",
-        "audience": "developer,application_developer,platform_engineer",
-        "discovery.activity_tags": "configure,validate,debug,troubleshoot"
-      }
-    },
-    {
-      "path": "skills/holoscan-install-wheel",
-      "name": "holoscan-install-wheel",
-      "description": "Install Holoscan SDK Python wheel via pip into a venv. Use for Python installs; not for native C++/apt or Conda installs.",
-      "metadata": {
-        "product.primary": "Holoscan",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "infrastructure",
-        "audience": "developer,application_developer,platform_engineer",
-        "discovery.activity_tags": "get_started,configure,validate,troubleshoot"
-      }
-    },
-    {
-      "path": "skills/holoscan-setup",
-      "name": "holoscan-setup",
-      "description": "Guides Holoscan SDK installation: inspects the host, assesses platform compatibility, recommends an install method, and delegates to the matching install skill.",
-      "metadata": {
-        "product.primary": "Holoscan",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "infrastructure",
-        "audience": "developer,application_developer,platform_engineer",
-        "discovery.activity_tags": "assess,select,configure,validate"
-      }
-    },
-    {
-      "path": "skills/mcore-create-issue",
-      "name": "mcore-create-issue",
-      "description": "Investigate a failing GitHub Actions run or job and create a GitHub issue for the failure.",
-      "metadata": {
-        "product.primary": "Megatron-Core",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer,devops_engineer",
-        "discovery.activity_tags": "debug,troubleshoot,inspect,contribute"
-      }
-    },
-    {
-      "path": "skills/mcore-linting-and-formatting",
-      "name": "mcore-linting-and-formatting",
-      "description": "Linting and formatting for Megatron-LM. Covers running autoformat.sh, tools (ruff, black, isort, pylint, mypy), and code style rules.",
-      "metadata": {
-        "product.primary": "Megatron-Core",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "contribute,test,validate,debug"
-      }
-    },
-    {
-      "path": "skills/mcore-run-on-slurm",
-      "name": "mcore-run-on-slurm",
-      "description": "How to launch distributed Megatron-LM training jobs on a SLURM cluster. Covers a minimal sbatch skeleton, environment-variable setup for torch.distributed.run, CUDA_DEVICE_MAX_CONNECTIONS rules across hardware and parallelism modes, container conventions, monitoring, and per-rank failure diagnosis.",
-      "metadata": {
-        "product.primary": "Megatron-Core",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
-        "discovery.activity_tags": "train,configure,scale,monitor,troubleshoot"
-      }
-    },
-    {
-      "path": "skills/mcore-split-pr",
-      "name": "mcore-split-pr",
-      "description": "Split a PR into multiple PRs to reduce the number of required CODEOWNERS reviewer groups.",
-      "metadata": {
-        "product.primary": "Megatron-Core",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "contribute,configure,validate"
-      }
-    },
-    {
-      "path": "skills/mcore-testing",
-      "name": "mcore-testing",
-      "description": "Test system for Megatron-LM. Covers test layout, recipe YAML structure, adding and running unit and functional tests, golden values, marker filters, and CI parity.",
-      "metadata": {
-        "product.primary": "Megatron-Core",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "test,validate,debug,contribute"
-      }
-    },
-    {
-      "path": "skills/nemo-data-designer-plugin",
-      "name": "nemo-data-designer-plugin",
-      "description": "Use when the user wants to create a dataset, generate synthetic data, or build a data generation pipeline.",
-      "metadata": {
-        "product.primary": "NeMo",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer,data_engineer",
-        "discovery.activity_tags": "generate,synthesize,configure,validate"
-      }
-    },
-    {
-      "path": "skills/nemo-evaluator-plugin",
-      "name": "nemo-evaluator-plugin",
-      "description": "Use when working on the Evaluator plugin CLI, jobs, SDK-backed specs, metric types, or plugin-owned Evaluator skills.",
-      "metadata": {
-        "product.primary": "NeMo",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "evaluate,validate,configure,inspect"
-      }
-    },
-    {
-      "path": "skills/data-designer",
-      "name": "data-designer",
-      "description": "Use when the user wants to create a dataset, generate synthetic data, or build a data generation pipeline.",
-      "metadata": {
-        "product.primary": "NeMo",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer,data_engineer",
-        "discovery.activity_tags": "generate,synthesize,configure,validate"
-      }
-    },
-    {
-      "path": "skills/launch-nemo-rl",
-      "name": "launch-nemo-rl",
-      "description": "Playbook for launching, monitoring, stopping, and debugging NeMo-RL recipes on a Kubernetes cluster via the nrl-k8s CLI. Covers ephemeral vs long-lived RayCluster modes, iterating on runs, and debugging hung or failed training jobs.",
-      "metadata": {
-        "product.primary": "NeMo RL",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer,devops_engineer",
-        "discovery.activity_tags": "deploy,monitor,troubleshoot,debug,orchestrate"
-      }
-    },
-    {
-      "path": "skills/nemo-rl-auto-research",
-      "name": "nemo-rl-auto-research",
-      "description": "Autonomous NeMo-RL research agent workflow for directed hypothesis testing and open-ended discovery. Guides agents through the full experiment lifecycle: understanding recipes and environments, wiring RL or NeMo-gym runs, launching reproducible baselines and iterations, analyzing results, preserving human oversight, and using git plus TSV logs as the research ledger. Do NOT use for: bug fixes, code review, documentation, refactoring, dependency updates, or single-file changes.",
-      "metadata": {
-        "product.primary": "NeMo RL",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer,research_academic",
-        "discovery.activity_tags": "train,evaluate,benchmark,optimize,orchestrate"
-      }
-    },
-    {
-      "path": "skills/nemo-rl-brev-etiquette",
-      "name": "nemo-rl-brev-etiquette",
-      "description": "Brev instance operating guidance for NeMo-RL agents working in /home/ubuntu/RL with limited workspace disk, a larger /ephemeral volume, and optional /home/ubuntu/RL/.env secrets. Use when running nemo-rl-auto-research campaigns, experiments, training jobs, model or dataset downloads, shared cache-heavy commands, log-producing runs, checkpoint generation, W&B or Hugging Face authenticated workflows, or any workflow that may create large files on Brev.",
-      "metadata": {
-        "product.primary": "NeMo RL",
-        "classification.category.primary": "infrastructure",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer,devops_engineer",
-        "discovery.activity_tags": "configure,operate,troubleshoot,validate"
-      }
-    },
-    {
-      "path": "skills/nemo-rl-docs",
-      "name": "nemo-rl-docs",
-      "description": "Documentation conventions for NeMo-RL. Covers docs/index.md updates and docstring format. Do NOT use for: bug fixes, test fixes, dependency bumps, refactoring, CI/CD changes, performance tuning, or any task that does not involve writing or updating documentation.",
-      "metadata": {
-        "product.primary": "NeMo RL",
-        "classification.category.primary": "developer_tools",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "contribute,extend,validate,inspect"
-      }
-    },
-    {
-      "path": "skills/nemo-rl-session-memory",
-      "name": "nemo-rl-session-memory",
-      "description": "Manage durable working-session memory for coding agents. Use when a user asks to preserve or recover agent context across disconnects, VS Code restarts, long-running work, handoffs, or any session where important state should be written periodically under the repo's session directory. Do NOT use for: simple questions, short tasks, one-off commands, linting, or code review.",
-      "metadata": {
-        "product.primary": "NeMo RL",
-        "classification.category.primary": "developer_tools",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "configure,recover,inspect,operate"
-      }
-    },
-    {
-      "path": "skills/nemo-retriever",
-      "name": "nemo-retriever",
-      "description": "Use when the user wants to search, query, extract, transcribe, describe, quote, filter, or aggregate across documents — PDFs, scanned forms / images (`.jpg` `.png` `.tiff`), Office (`.docx` `.pptx`), text (`.html` `.txt`), audio (`.mp3` `.wav` `.m4a`), or video (`.mp4` `.mov`). Prefer this over native Read / Grep for multi-file or non-PDF corpora. Not for: editing files, web browsing, single-file plain-text lookups, fine-tuning.",
-      "metadata": {
-        "product.primary": "NeMo Retriever",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,ai_engineer,data_engineer",
-        "discovery.activity_tags": "extract,inspect,summarize,configure"
-      }
-    },
-    {
       "path": "skills/omniverse-cad-to-simready",
       "name": "omniverse-cad-to-simready",
       "description": "Coordinate the end-to-end CAD/source-asset to SimReady workflow. Use for broad requests such as CAD to SimReady, source asset to simulation-ready USD, or prop packaging that require conversion, material/physics assignment, SimReady conformance, validation, and optional package creation; deploy or verify Content Agents services first when property assignment is enabled; route single-stage work through nested references.",
@@ -1381,18 +1321,6 @@
       }
     },
     {
-      "path": "skills/physical-ai-video-data-augmentation",
-      "name": "physical-ai-video-data-augmentation",
-      "description": "Use when running video data augmentation and auto-labeling workflows on OSMO: flow selection, preflight, submit-time interpolation, monitoring, and output retrieval. Trigger keywords: video data augmentation, data enrichment, auto labeling, VDA demo, OSMO workflow, pseudo labeling.",
-      "metadata": {
-        "product.primary": "Physical AI Dataset",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "physical-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "generate,synthesize,monitor,validate"
-      }
-    },
-    {
       "path": "skills/physical-ai-neural-reconstruction",
       "name": "physical-ai-neural-reconstruction",
       "description": "Router for NVIDIA NuRec/NRE: USDZ rendering, NCore conversion, 3DGS, gRPC sensor sim, PhysicalAI HF datasets. Do NOT use for SimReady or infra setup.",
@@ -1405,6 +1333,18 @@
       }
     },
     {
+      "path": "skills/physical-ai-video-data-augmentation",
+      "name": "physical-ai-video-data-augmentation",
+      "description": "Use when running video data augmentation and auto-labeling workflows on OSMO: flow selection, preflight, submit-time interpolation, monitoring, and output retrieval. Trigger keywords: video data augmentation, data enrichment, auto labeling, VDA demo, OSMO workflow, pseudo labeling.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,ai_engineer,ml_engineer",
+        "discovery.activity_tags": "generate,synthesize,monitor,validate"
+      }
+    },
+    {
       "path": "skills/physicsnemo-discover",
       "name": "physicsnemo-discover",
       "description": "Official NVIDIA-authored guidance for navigating PhysicsNeMo — pick the model, datapipe, or example for a SciML/AI4Science task (surrogates, forecasting, downscaling, physics-informed, inverse, generative). Points at existing files via live repo search; never writes code. Do NOT use for installation or environment setup, training-loop or other code authoring/scaffolding, contributor/CI/packaging questions, repo-specific questions in physicsnemo-sym/-cfd/-curator, or general (non-physics) ML/PyTorch.",
@@ -1414,6 +1354,66 @@
         "catalog.subdomain": "simulation-modeling",
         "audience": "developer,data_scientist,research_academic",
         "discovery.activity_tags": "select,inspect,assess,validate"
+      }
+    },
+    {
+      "path": "skills/rag-blueprint",
+      "name": "rag-blueprint",
+      "description": "NVIDIA RAG Blueprint — deploy, configure, troubleshoot, and manage. Handles any RAG action: deploy, install, start, enable, disable, toggle, change, configure, troubleshoot, debug, fix, shutdown, stop, or tear down any RAG feature or service (Agentic RAG, VLM, guardrails, query rewriting, models, search, ingestion, observability, summarization, reasoning, and more).",
+      "metadata": {
+        "product.primary": "RAG",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,ai_engineer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "deploy,configure,troubleshoot,debug,operate"
+      }
+    },
+    {
+      "path": "skills/rag-eval",
+      "name": "rag-eval",
+      "description": "Filesystem RAG benchmarks: corpus/, train.json, evaluate_rag.py (RAGAS quality). Not for prod monitoring, latency/throughput benchmarking (use rag-perf), or evals outside this repo layout.",
+      "metadata": {
+        "product.primary": "RAG",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,ai_engineer,ml_engineer,data_scientist",
+        "discovery.activity_tags": "evaluate,benchmark,validate,measure"
+      }
+    },
+    {
+      "path": "skills/rag-perf",
+      "name": "rag-perf",
+      "description": "Performance benchmarking for a deployed NVIDIA RAG Blueprint server: profiling pass + aiperf load test driven by a single YAML config. Not for accuracy / RAGAS scoring (use rag-eval) or for deploying / repairing services (use rag-blueprint).",
+      "metadata": {
+        "product.primary": "RAG",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,ai_engineer,ml_engineer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "benchmark,profile,measure,optimize,validate"
+      }
+    },
+    {
+      "path": "skills/skill-card-generator",
+      "name": "skill-card-generator",
+      "description": "Use only to generate or update a governance skill card for a specified existing agent skill directory. Do not use for explaining, listing, comparing, or discussing skill capabilities.",
+      "metadata": {
+        "product.primary": "Trustworthy AI",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,platform_engineer,solutions_architect",
+        "discovery.activity_tags": "generate,validate,inspect,assess"
+      }
+    },
+    {
+      "path": "skills/tilegym-adding-cutile-kernel",
+      "name": "tilegym-adding-cutile-kernel",
+      "description": "Add a new cuTile GPU kernel operator to TileGym. Covers dispatch registration in ops.py, cuTile backend implementation, __init__.py exports, test creation, and benchmark in tests/benchmark. Use when adding, creating, or implementing a new cuTile operator/kernel in TileGym, or when asking how to register a new cuTile op.",
+      "metadata": {
+        "product.primary": "CUDA Tile",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,hpc_developer",
+        "discovery.activity_tags": "extend,integrate,test,benchmark,validate"
       }
     }
   ]
