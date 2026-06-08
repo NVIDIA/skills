@@ -1,7 +1,8 @@
 # Python server dependencies for the USD Viewer RTX streaming tutorial.
 #
 # ovrtx: install from the NVIDIA package index (not PyPI):
-#   pip install ovrtx --index-url https://pypi.nvidia.com --extra-index-url https://pypi.org/simple
+#   pip install "ovrtx==0.2.0.280040" --index-url https://pypi.nvidia.com --extra-index-url https://pypi.org/simple
+# Pinned to 0.2.0.280040 — 0.3.0 has a segfault in usdrt.population.plugin on step() after scene load.
 #
 # All other packages install from standard PyPI.
 

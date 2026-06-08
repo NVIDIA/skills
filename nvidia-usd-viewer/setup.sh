@@ -69,8 +69,8 @@ python -m pip install --upgrade pip setuptools wheel --quiet
 echo ""
 echo "[4/6] Installing Python dependencies..."
 
-echo "  ovrtx  (NVIDIA package index)..."
-pip install --upgrade ovrtx \
+echo "  ovrtx  (NVIDIA package index — pinned to 0.2.0 for stability)..."
+pip install "ovrtx==0.2.0.280040" \
   --index-url https://pypi.nvidia.com \
   --extra-index-url https://pypi.org/simple \
   --quiet
