@@ -16,7 +16,6 @@ name: Generate Skill Metadata
 on:
   pull_request:
     paths:
-      - "skills/**"
       - ".github/scripts/marketplace/**"
       - ".github/workflows/generate-skill-metadata.yml"
       - "components.d/**"
