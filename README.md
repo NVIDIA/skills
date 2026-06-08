@@ -215,8 +215,9 @@ See [Verify Signed Agent Skills](docs/signing-agent-skills.mdx) for signature la
 - ✅ Skills signing so every published skill carries a verifiable NVIDIA signature
 - ✅ Skills universal evaluation criteria and task-specific criteria
 - ✅ Skill Card with machine-readable metadata for identity, provenance, quality, and behavioral boundaries
-- 🔲 Compliance gates before external publication
-- 🔲 Syndication to external marketplaces and MCP hubs
+- ✅ Sync-time compliance gates — signature drift detection and missing-artifact enforcement
+- ✅ Syndication to external marketplaces — Skills.sh, Codex plugin, Claude Code plugin, ClawHub, Hermes Hub
+- 🔲 Syndication to additional MCP hubs and partner channels
 
 ---
 
@@ -224,7 +225,7 @@ See [Verify Signed Agent Skills](docs/signing-agent-skills.mdx) for signature la
 
 ```
 NVIDIA/skills/
-├── skills/                      # 110 verified skills across 24 products,
+├── skills/                      # NVIDIA-verified skills (count grows continuously),
 │   │                              synced from upstream product repos
 │   ├── README.md                 # Browser-facing install guidance
 │   ├── <product-prefix>-*/       # Flat layout — one dir per skill, product-prefixed
@@ -242,7 +243,7 @@ NVIDIA/skills/
 │   └── physical-ai-*/            # Physical AI — manually staged
 ├── components.d/                # Product registry — one file per component, teams onboard here
 │   ├── README.md                 # Schema and onboarding instructions
-│   └── <product>.yml             # one file per registered product (32 today)
+│   └── <product>.yml             # one file per registered product
 ├── plugins/                     # Packaged plugin distributions
 │   └── nvidia-skills/            # Curated NVIDIA skills bundle (Claude Code, Codex)
 ├── plugins.d/                   # Plugin build registry — config for `build-plugins.py`
