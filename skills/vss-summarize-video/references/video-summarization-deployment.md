@@ -20,7 +20,7 @@ Key service signals in the current develop branch:
 | Compose profile | `bp_developer_lvs_2d` |
 | video summarization service | `lvs-server` |
 | video summarization container | `vss-lvs` |
-| video summarization image | `${LVS_IMAGE:-nvcr.io/nvstaging/vss-core/vss-video-summarization}:${LVS_TAG:-3.2.0-rc11-d65196a}` |
+| video summarization image | `${LVS_IMAGE:-nvcr.io/nvidia/vss-core/vss-video-summarization}:${LVS_TAG:-3.2.0}` |
 | REST API | `http://<HOST_IP>:38111` |
 | Readiness | `GET /v1/ready` |
 | MCP port | `38112`, disabled by default in the developer profile |
@@ -84,8 +84,8 @@ Video summarization service values:
 | Var | Default / Example | Purpose |
 |---|---|---|
 | `LVS_BACKEND_URL` | `http://${HOST_IP}:38111` | Agent-facing video summarization URL. |
-| `LVS_IMAGE` | `nvcr.io/nvstaging/vss-core/vss-video-summarization` | video summarization image repository. |
-| `LVS_TAG` | `3.2.0-rc11-d65196a` | video summarization image tag in current develop. |
+| `LVS_IMAGE` | `nvcr.io/nvidia/vss-core/vss-video-summarization` | video summarization image repository. |
+| `LVS_TAG` | `3.2.0` | video summarization image tag in current develop. |
 | `LVS_ENABLE_MCP` | `false` | Enable MCP/SSE endpoint only when needed. |
 | `LVS_DATABASE_BACKEND` | `elasticsearch_db` | Default event database backend. |
 | `KAFKA_ENABLED` | `true` in dev-profile-lvs | Enables RTVI -> Kafka -> Logstash -> ES integration. |
@@ -276,8 +276,8 @@ that exact id.
 The Helm service chart lives at `deploy/helm/services/video-summarization`.
 Important 3.2 values:
 
-- `image.repository: nvcr.io/nvstaging/vss-core/vss-video-summarization`
-- `image.tag: "3.2.0-rc11-d65196a"`
+- `image.repository: nvcr.io/nvidia/vss-core/vss-video-summarization`
+- `image.tag: "3.2.0"`
 - `service.backendPort: 38111`
 - `service.mcpPort: 38112`
 - `KAFKA_ENABLED: "true"`

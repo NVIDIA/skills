@@ -24,7 +24,7 @@ If flags below look stale, re-check `retriever ingest --help`.
 
 ## Canonical invocations
 
-Ingest a single file into the default table (`lancedb/nv-ingest.lance`):
+Ingest a single file into the default table (`lancedb/nemo-retriever.lance`):
 
 ```bash
 <RETRIEVER_VENV>/bin/retriever ingest data/multimodal_test.pdf

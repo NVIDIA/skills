@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 OR MIT <br>
 ## Use Case: <br>
-Developers and engineers who need to deploy the video-analytics-api REST service standalone with custom configuration, data-log bind, and Elasticsearch/Kafka connectivity without deploying the full VSS warehouse stack. <br>
+Developers and engineers deploying the VSS video-analytics-api REST service standalone to serve calibration, sensor, behavior, alerts, and events data backed by Elasticsearch and optionally Kafka. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -21,8 +21,9 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [Deploy Video Analytics API Service](references/deploy-video-analytics-api-service.md) <br>
 - [Configuration Guide](references/configuration.md) <br>
-- [NVIDIA VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
+- [NGC Credentials](references/ngc.md) <br>
 - [GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
+- [VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
 
 
 ## Skill Output: <br>
@@ -30,6 +31,15 @@ Mitigation: Review and scan skill before deployment. <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
+
+## Evaluation Agents Used: <br>
+- claude-code <br>
+- codex <br>
+
+
+
+## Evaluation Tasks: <br>
+Evaluated against 1 task (positive skill-activation case) with 2 attempts per task in the astra-sandbox environment using the NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -39,7 +49,25 @@ Reported benchmark dimensions: <br>
 - Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
+Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
+- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
+- `accuracy`: Grades final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
+- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `token_efficiency`: Compares token usage with and without the skill. <br>
 
+
+
+## Evaluation Results: <br>
+| Dimension | Num | `claude-code` | `codex` |
+|---|---:|---:|---:|
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 70% (+45%) | 79% (+41%) |
+| Discoverability | 2 | 92% (+67%) | 83% (+28%) |
+| Effectiveness | 2 | 54% (+40%) | 56% (+42%) |
+| Efficiency | 2 | 78% (+54%) | 71% (+27%) |
 
 ## Skill Version(s): <br>
 3.2.0 (source: frontmatter) <br>

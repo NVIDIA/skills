@@ -61,13 +61,24 @@ Even though this flow drives AMC via the API, **tell the user they can watch liv
 
 ### 1e. Open perms on the project-state bind-mount (pre-empt UID-1000 gotcha)
 
-The AMC microservice writes project state to `${VSS_APPS_DIR}/services/auto-calibration/projects/` as UID 1000. On a fresh checkout this directory either doesn't exist yet, or compose's bind-mount created it as `root:root 0755` at `up` time — either way, the first `POST /v1/create_project` (Step 2) fails with `HTTP 500 {"detail":"Failed to Create Project ...: [Errno 13] Permission denied: 'projects/project_<timestamp>'"}`. Open it before driving the API:
+The AMC microservice writes project state to `${VSS_APPS_DIR}/services/auto-calibration/projects/` as UID 1000. On a fresh checkout this directory either doesn't exist yet, or compose's bind-mount created it as `root:root 0755` at `up` time — either way, the first `POST /v1/create_project` (Step 2) fails with `HTTP 500 {"detail":"Failed to Create Project ...: [Errno 13] Permission denied: 'projects/project_<timestamp>'"}`. Open it before driving the API.
+
+These commands need `sudo`. Detect the sudo mode first — same pattern as [`../../vss-deploy-profile/SKILL.md#pre-flight-check`](../../vss-deploy-profile/SKILL.md) — so this step works on hosts where sudo is passwordless **and** on hosts where it prompts for a password:
 
 ```bash
-sudo mkdir -p "${VSS_APPS_DIR}/services/auto-calibration/projects"
-# Grant the AMC container user (UID 1000) write access — scoped ACL, not 777, not chown.
-sudo setfacl -m u:1000:rwx "${VSS_APPS_DIR}/services/auto-calibration/projects"
+if sudo -n true 2>/dev/null; then
+  sudo mkdir -p "${VSS_APPS_DIR}/services/auto-calibration/projects"
+  # Grant the AMC container user (UID 1000) write access — scoped ACL, not 777, not chown.
+  sudo setfacl -m u:1000:rwx "${VSS_APPS_DIR}/services/auto-calibration/projects"
+  echo "AMC projects directory ready."
+else
+  echo "Sudo requires a password on this host. Please run the two commands below in your shell, then confirm to continue:"
+  echo "  sudo mkdir -p \"${VSS_APPS_DIR}/services/auto-calibration/projects\""
+  echo "  sudo setfacl -m u:1000:rwx \"${VSS_APPS_DIR}/services/auto-calibration/projects\""
+fi
 ```
+
+When sudo prompts for a password, hand the block above to the user with a *"run this once and confirm"* note and resume Step 2 only after they confirm. Do not retry the `sudo -n` check in a loop — it will not change without user action.
 
 Scoped ACL for UID 1000 — not world-writable and not chown. This matches how the AMC skill itself handles this directory (see [`../../vss-generate-video-calibration/references/deploy-auto-calibration-service.md`](../../vss-generate-video-calibration/references/deploy-auto-calibration-service.md) Step 5) and the convention in [`../../vss-deploy-profile/references/data-directory.md`](../../vss-deploy-profile/references/data-directory.md). Idempotent and safe to re-run.
 
@@ -193,8 +204,14 @@ cp /tmp/calibration.json "${CAL_DIR}/calibration.json"
 PROJECT_OUTPUT="${VSS_APPS_DIR}/services/auto-calibration/projects/project_${project_id}/output"
 ls "${PROJECT_OUTPUT}"/*.png 2>/dev/null | head -4 | xargs -I{} cp {} "${CAL_DIR}/images/" || true
 
-# Permissions — perception mount must be readable inside the container
-sudo chmod -R a+rX "${CAL_DIR}"
+# Permissions — perception mount must be readable inside the container.
+# Auto-proceed when sudo is passwordless; otherwise surface the command for the user.
+if sudo -n true 2>/dev/null; then
+  sudo chmod -R a+rX "${CAL_DIR}"
+else
+  echo "Sudo requires a password on this host. Please run the command below in your shell, then confirm to continue:"
+  echo "  sudo chmod -R a+rX \"${CAL_DIR}\""
+fi
 ```
 
 > **Permission rule:** always `chmod`, never `chown`. Containers run as varied UIDs; world-readable is the safe baseline. This matches the convention in `vss-deploy-profile/references/data-directory.md`.
@@ -276,7 +293,12 @@ JSON
   echo "synthesized imageMetadata.json with place=${PLACE_PATH}"
 fi
 
-sudo chmod -R a+rX "${CAL_DIR}/images"
+if sudo -n true 2>/dev/null; then
+  sudo chmod -R a+rX "${CAL_DIR}/images"
+else
+  echo "Sudo requires a password on this host. Please run the command below in your shell, then confirm to continue:"
+  echo "  sudo chmod -R a+rX \"${CAL_DIR}/images\""
+fi
 ```
 
 If no candidate PNG is available (rare — most users have a layout for the AMC alignment step), the import container will still exit 1, but the rest of the stack runs without overlays. Either re-deploy with `MINIMAL_PROFILE="true"` or source a plan-view PNG manually.

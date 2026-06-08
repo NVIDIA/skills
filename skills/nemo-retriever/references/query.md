@@ -2,18 +2,20 @@
 
 
 ```bash
-<RETRIEVER_VENV>/bin/retriever query "<the user's question>" --top-k 10 --embed-model-name nvidia/llama-nemotron-embed-1b-v2 --rerank \
-  | tee /tmp/hits.json \
-  | <RETRIEVER_VENV>/bin/python -c "import json,sys; [print(f'rank={h.get(\"rank\",0)} page={h[\"page_number\"]} pdf={h[\"pdf_basename\"]} type={h.get(\"metadata\",{}).get(\"type\",\"?\")}') for h in json.load(sys.stdin)]"
+timeout 2000 <RETRIEVER_VENV>/bin/retriever query "<the user's question>" --top-k 10 --embed-model-name nvidia/llama-nemotron-embed-1b-v2 --query-embed-backend hf --reranker-backend hf --rerank \
+  | tee ./hits.json \
+  | <RETRIEVER_VENV>/bin/python -c "import json,sys,os; [print(f'rank={i+1} page={h[\"page_number\"]} doc={os.path.basename(h[\"source\"])}') for i,h in enumerate(json.load(sys.stdin))]"
 ```
 
-Run that **exactly** as a single pipeline — do not split it into `HITS=$(...)` + `echo "$HITS" | <RETRIEVER_VENV>/bin/python -c ...` (the assignment swallows stdout, the pipe sees nothing, you waste 3 bash calls recovering). Stdout is clean JSON (model-init logs are silenced at the CLI layer); leave stderr unredirected so real errors surface on the first call. The summary above lists only rank/page/pdf/type — to read hit text for synthesizing `final_answer`, parse `/tmp/hits.json` directly. The top hit's text is one one-liner away: `<RETRIEVER_VENV>/bin/python -c "import json; print(json.load(open('/tmp/hits.json'))[0]['text'])"` (or `[i]` for the rank-(i+1) hit). Fetch only what you need — pulling all 10 hits' text into context inflates cached prompt size on every subsequent turn.
+Run that **exactly** as a single pipeline — do not split it into `HITS=$(...)` + `echo "$HITS" | <RETRIEVER_VENV>/bin/python -c ...` (the assignment swallows stdout, the pipe sees nothing, you waste 3 bash calls recovering). Stdout is clean JSON (model-init logs are silenced at the CLI layer); leave stderr unredirected so real errors surface on the first call. The full hits land in `./hits.json` **in the current working directory** (not `/tmp` — a shared `/tmp` path gets clobbered when queries run in parallel). The summary above lists rank/page/doc — to read hit text for synthesizing `final_answer`, parse `./hits.json` directly. The top hit's text is one one-liner away: `<RETRIEVER_VENV>/bin/python -c "import json; print(json.load(open('./hits.json'))[0]['text'])"` (or `[i]` for the rank-(i+1) hit). Fetch only what you need — pulling all 10 hits' text into context inflates cached prompt size on every subsequent turn.
 
 That's your FIRST tool call on every query turn. Do not Read, Glob, Grep, or list PDFs before this — those duplicate what `retriever query` already did.
 
-**No narration between tool calls.** Do not write "Let me search…", "I'll now analyze…", "The retriever returned…", or any other commentary. Every assistant token you emit with the `retriever query` Bash call becomes input tokens (and cached input tokens) for every subsequent turn in this session — quadratic cost. Go straight from reading the summary to writing the JSON file. The only assistant text in a query turn should be the tool calls themselves.
+`--query-embed-backend hf` and `--reranker-backend hf` run the query embedder and reranker via HuggingFace instead of vLLM: a single query then loads in ~20–30s (vLLM's batch engine cold-starts much slower and hogs GPU memory). Same model, same hits — just a faster, lighter cold start for one-off queries. (Ingest still uses vLLM for batch throughput.)
 
-Each hit has: `text`, `pdf_basename`, `page_number` (int, **1-indexed**: the first page of a PDF is page `1`), `pdf_page` (string composite key `"<basename>_<page_number>"` — not a number, don't use it as one), `_distance`, and `metadata` (JSON with `type` ∈ `text|table|chart|image`).
+**No narration between tool calls.** Do not write "Let me search…", "I'll now analyze…", "The retriever returned…", or any other commentary. Every assistant token you emit between the `retriever query` Bash call and the `Write` of `./output.json` becomes input tokens (and cached input tokens) for every subsequent turn in this session — quadratic cost. Go straight from reading the summary to writing the JSON file. The only assistant text in a query turn should be the tool calls themselves.
+
+Each hit has exactly three keys: `source` (the **full PDF path** — the doc_id is its basename, `os.path.basename(h["source"])[:-4]` to drop `.pdf`), `page_number` (int, **1-indexed**: the first page of a PDF is page `1`), and `text`. There is no `pdf_basename`, `metadata`, `pdf_page`, or `_distance` field — referencing those raises `KeyError`.
 
 ## Keyword/regex search across the corpus
 
@@ -55,7 +57,7 @@ After your reply, STOP. No print, no summary, no further tool calls.
 **Page filter** — "what's on page N of doc.pdf" → filter LanceDB directly, no `Read`:
 
 ```bash
-<RETRIEVER_VENV>/bin/python -c "import lancedb; t=lancedb.connect('./lancedb').open_table('nv-ingest'); df=t.to_pandas(); print('\n'.join(df[(df.pdf_basename=='APPLE_2022_10K.pdf')&(df.page_number==14)].text))"
+<RETRIEVER_VENV>/bin/python -c "import lancedb,json; df=lancedb.connect('./lancedb').open_table('nemo-retriever').to_pandas(); print('\n'.join(r['text'] for _,r in df.iterrows() if json.loads(r['source'])['source_name']=='APPLE_2022_10K.pdf' and json.loads(r['metadata'])['page_number']==14))"
 ```
 
 **Verbatim quote with `[page]` citation** — quote retrieved chunks with `[page N]` markers in `final_answer`; don't paraphrase.
@@ -63,7 +65,7 @@ After your reply, STOP. No print, no summary, no further tool calls.
 **Corpus-level aggregate** — "list distinct sources", "count chunks per source" → no `ls`/`grep`/`find`:
 
 ```bash
-<RETRIEVER_VENV>/bin/python -c "import lancedb; df=lancedb.connect('./lancedb').open_table('nv-ingest').to_pandas(); print(sorted(df.pdf_basename.unique())); print(df.pdf_basename.value_counts().to_dict())"
+<RETRIEVER_VENV>/bin/python -c "import lancedb,json; from collections import Counter; df=lancedb.connect('./lancedb').open_table('nemo-retriever').to_pandas(); names=[json.loads(s)['source_name'] for s in df['source']]; print(sorted(set(names))); print(dict(Counter(names)))"
 ```
 
 **Image / chart captioning** — when the user asks to *describe / caption* an image (prose summary, not OCR text): `retriever ingest` already produces chart/image-type hits whose `text` field is the model-generated caption (see "Charts and images" above). Workflow: ingest the image folder (`setup.md` image recipe), then `retriever query` with a topic-related question — the hits with `metadata.type=chart|image` carry the caption in `text`. Use that as `final_answer`. No separate captioning CLI command.

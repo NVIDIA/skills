@@ -105,6 +105,21 @@ Only `auto_calib`, `bp_wh_auto_calib_2d`, `bp_wh_auto_calib_3d`, and `bp_wh_auto
 
 > **3D / MV3DT:** When deploying calibration for 3D or MV3DT modes, generated calibration files must include a populated `sensors[].group` object on every camera sensor. For MV3DT, after generating `calibration.json`, also run the utility scripts under `tools/rtvi-cv-mv3dt-utils` to refresh `camInfo/<sensor_id>.yml`, `pub_sub_info_config.yml`, and the tracker `ObjectModelProjection.cameraModelFilepath` mappings. Then run camera clustering with `--n_clusters 1` for the standard single-BEV warehouse setup, and verify the group field is present under sensors in `calibration.json`. Use `auto_calib` to upload videos directly, or `bp_wh_auto_calib_3d` / `bp_wh_auto_calib_mv3dt` to calibrate against RTSP streams. See [Calibration Generation](warehouse.md#calibration-generation).
 
+```bash
+CALIBRATION_JSON=/path/to/calibration.json
+REPO_ROOT=/path/to/video-search-and-summarization
+SDU_DIR="${REPO_ROOT}/libs/analytics/spatialai-data-utils"
+SENSOR_COUNT=$(jq '.sensors | length' "${CALIBRATION_JSON}")
+
+PYTHONPATH="${SDU_DIR}:${PYTHONPATH:-}" python3 \
+  "${SDU_DIR}/tools/camera_grouping/create_camera_clusters.py" \
+  "${CALIBRATION_JSON}" \
+  --max_camera_per_group "${SENSOR_COUNT}" \
+  --n_clusters 1 \
+  --disable_param_tuning \
+  --overwrite
+```
+
 ### Extended profile only (`MINIMAL_PROFILE=""`, any mode) — adds
 
 | Container | Role |
@@ -125,7 +140,7 @@ Only `auto_calib`, `bp_wh_auto_calib_2d`, `bp_wh_auto_calib_3d`, and `bp_wh_auto
 | `vss-agent` | Orchestrator |
 | `vss-agent-ui` | Next.js UI |
 | `vss-va-mcp` | Video Analysis MCP server |
-| `vss-haproxy-ingress` | Front-door on `HAPROXY_PORT` (default `7777`). Also deployed in kafka/redis extended (proxies VST + kibana + analytics API there) |
+| `vss-haproxy-ingress` | Front-door on `HAPROXY_PORT` (default `7777`). Also deployed in kafka/redis extended (proxies kibana + analytics API there) |
 | `phoenix` | Telemetry / observability |
 
 > **No VLM NIM container.** VSS has two VLM paths: standalone VLM NIM (`VLM_MODE` / `VLM_NAME_SLUG`) and integrated RTVI VLM (`vss-rtvi-vlm`). Warehouse uses **RTVI VLM only** — `vss-agent` connects to it directly. `VLM_MODE=none` in the warehouse `.env`. Do not search for a VLM NIM container — it does not exist in this stack.
@@ -220,6 +235,19 @@ nvidia-smi --query-compute-apps=gpu_uuid,pid,process_name,used_gpu_memory \
 ```
 
 ## Service Access Points
+
+Expected access points after a successful deploy (substitute your host IP or domain name — on Brev use the secure-link domain, on Ubuntu use the machine IP):
+
+```
+HAProxy:             http://<host_ip/domain_name>:7777
+Kibana:              http://<host_ip/domain_name>:7777/kibana
+VST:                 http://<host_ip/domain_name>:30888/vst/
+Grafana:             http://<host_ip/domain_name>:3000
+NvStreamer:          http://<host_ip/domain_name>:31000
+Video Analytics API: http://<host_ip/domain_name>:7777/video-analytics-api
+```
+
+VST is accessed directly on port `30888` — it does not go through the HAProxy ingress.
 
 For the full HAProxy ingress route table, direct-port diagnostics table, and
 the `h_main` Host-header ACL rules, see
@@ -585,7 +613,7 @@ bash ./scripts/cleanup_all_datalog.sh -e industry-profiles/warehouse-operations/
 ```bash
 LOG=${LOG:-/tmp/warehouse-blueprint.log}
 cd <repo>/deploy/docker
-docker login --username '$oauthtoken' --password "${NGC_CLI_API_KEY}" nvcr.io
+printf '%s' "$NGC_CLI_API_KEY" | docker login --username '$oauthtoken' --password-stdin nvcr.io
 nohup docker compose -f compose.yml \
   --env-file industry-profiles/warehouse-operations/.env \
   up --detach --pull always --force-recreate --build \

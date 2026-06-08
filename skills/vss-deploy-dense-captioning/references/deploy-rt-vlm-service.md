@@ -3,15 +3,15 @@
 ## 1. Overview
 
 **Service**: `rtvi-vlm` (container name `vss-rtvi-vlm`)
-**Image (x86 / Jetson-Tegra)**: `nvcr.io/nvstaging/vss-core/vss-rt-vlm:3.2.0-26.05.4` (multiarch)
-**Image (SBSA / DGX Spark / Grace)**: `nvcr.io/nvstaging/vss-core/vss-rt-vlm:3.2.0-26.05.4-sbsa`
+**Image (x86 / Jetson-Tegra)**: `nvcr.io/nvidia/vss-core/vss-rt-vlm:3.2.0` (multiarch)
+**Image (SBSA / DGX Spark / Grace)**: `nvcr.io/nvidia/vss-core/vss-rt-vlm:3.2.0-sbsa`
 **Primary port**: `${RTVI_VLM_PORT}` → container `8000` (FastAPI REST, `/v1`)
 **Validated GPUs**: H100 · RTX PRO 6000 Blackwell · L40S · DGX SPARK · IGX Thor · AGX Thor
 
 Derive `<compose-default>` from the checked-out
 `deploy/docker/services/rtvi/rtvi-vlm/rtvi-vlm-docker-compose.yml` instead of
 hardcoding it in commands. The current `develop` compose default is
-`3.2.0-26.05.4`; SBSA server-ARM platforms append `-sbsa`.
+`3.2.0`; SBSA server-ARM platforms append `-sbsa`.
 
 Real-Time VLM is VSS's streaming vision-language inference service: RTSP decode →
 segmentation → VLM inference (vLLM) → Kafka publication (NvSchema protobuf).
@@ -83,7 +83,7 @@ COMPOSE_DEFAULT_TAG=$(sed -nE 's/.*RTVI_VLM_IMAGE_TAG:-([^}]+).*/\1/p' "$COMPOSE
 export RTVI_VLM_IMAGE_TAG="${RTVI_VLM_IMAGE_TAG:-$COMPOSE_DEFAULT_TAG}"
 
 # Verify pull for the exact image this compose will use.
-docker pull "nvcr.io/nvstaging/vss-core/vss-rt-vlm:${RTVI_VLM_IMAGE_TAG}"
+docker pull "nvcr.io/nvidia/vss-core/vss-rt-vlm:${RTVI_VLM_IMAGE_TAG}"
 ```
 
 > ⚠ **`docker compose pull` fails on standalone deployments** (recent Docker
@@ -505,7 +505,7 @@ echo "<your-ngc-key>" | sudo docker login nvcr.io -u '$oauthtoken' --password-st
 #   'echo "$NGC_CLI_API_KEY" | docker login nvcr.io -u $oauthtoken --password-stdin'
 
 # Step 5. Pull image directly (docker compose pull fails on standalone — see §4)
-sudo docker pull "nvcr.io/nvstaging/vss-core/vss-rt-vlm:${VLM_TAG}"
+sudo docker pull "nvcr.io/nvidia/vss-core/vss-rt-vlm:${VLM_TAG}"
 
 # Step 6. Bring up — plain `up` (no profile) starts nothing
 sudo --preserve-env=NGC_CLI_API_KEY \
@@ -628,7 +628,7 @@ once the service is up):
 | Volume mount error mentioning `data_log/vst/clip_storage` | `VSS_DATA_DIR` unset → malformed mount | Set `VSS_DATA_DIR`; pre-create the `data_log/vst/clip_storage` subtree |
 | `sudo chown` prompts for a password or fails in an agent session | Host path ownership requires user privileges | Ask the host owner to run `sudo chown -R 1001:1001 "$VSS_DATA_DIR/data_log/vst/clip_storage"`; do not use `chmod 777` |
 | `service "X" depends on undefined service "Y": invalid compose project` | Recent Docker Compose rejects `depends_on` refs to sibling NIM services not defined in this single-file project — even with `required: false`. | Remove the `depends_on` block from the local compose copy (§12 step 0b). Only needed for standalone deploys without the full met-blueprints project. |
-| `docker compose pull` → `invalid compose project` | Same `depends_on` validation runs before pull | Use `docker pull nvcr.io/nvstaging/vss-core/vss-rt-vlm:<tag>` directly (§4) |
+| `docker compose pull` → `invalid compose project` | Same `depends_on` validation runs before pull | Use `docker pull nvcr.io/nvidia/vss-core/vss-rt-vlm:<tag>` directly (§4) |
 | `docker compose pull --no-deps` → `unknown flag: --no-deps` | Compose 2.38 does not support `--no-deps` on `pull` | Use direct `docker pull` (§4), or strip `depends_on` and validate before `up` (§12 step 0b). |
 | `password is empty` on `sudo docker login` | `sudo` drops the user's environment — `$NGC_CLI_API_KEY` is not set in the sudo shell | Pass the key inline: `echo "<key>" \| sudo docker login nvcr.io -u '$oauthtoken' --password-stdin`, or use `sudo --preserve-env=NGC_CLI_API_KEY` |
 | `unauthorized` on `docker compose pull` | Missing NGC auth or no org access | `docker login nvcr.io` with a key that has `nvidia/vss-core` access |

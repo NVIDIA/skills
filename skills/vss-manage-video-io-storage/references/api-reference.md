@@ -6,7 +6,7 @@ VIOS stores videos uploaded by the user. For requests that reference a
 **"sample"** video by friendly name (e.g. *"the sample warehouse
 video"*, *"sample-warehouse-ladder"*, *"warehouse_safety_0001"*) the
 expected file is one of the 8 mp4s shipped in NGC bundle
-`nvidia/vss-developer/dev-profile-sample-data:3.1.0`. Before any
+`nvidia/vss-developer/dev-profile-sample-data:3.2.0`. Before any
 upload-style request, ensure the bundle is extracted locally:
 
 ```bash
@@ -18,11 +18,11 @@ if [ ! -d "$SAMPLE_DIR" ]; then
 
   # NGC CLI required (export NGC_CLI_API_KEY first if not already set).
   ngc registry resource download-version \
-    nvidia/vss-developer/dev-profile-sample-data:3.1.0 \
+    nvidia/vss-developer/dev-profile-sample-data:3.2.0 \
     --org nvidia --team vss-developer
 
-  # Bundle ships as a single tar.gz inside dev-profile-sample-data_v3.1.0/.
-  tar -xzf dev-profile-sample-data_v3.1.0/dev-profile-sample-data.tar.gz
+  # Bundle ships as a single tar.gz inside dev-profile-sample-data_v3.2.0/.
+  tar -xzf dev-profile-sample-data_v3.2.0/dev-profile-sample-data.tar.gz
 fi
 
 ls "$SAMPLE_DIR"/  # verify expected mp4s present

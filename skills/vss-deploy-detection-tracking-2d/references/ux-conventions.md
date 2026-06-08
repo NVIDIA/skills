@@ -60,7 +60,7 @@ Every substantive decision shows up as a `✔ <what>: <value>` line:
 |---|---|
 | Use case picked | `✔ Use case: warehouse-2d` |
 | Platform detected | `✔ Platform: x86-dgpu (RTX 3050)` |
-| Docker image confirmed | `✔ Docker image: vss-rt-cv:3.2.0-26.04.1 (amd64 matches x86-dgpu)` |
+| Docker image confirmed | `✔ Docker image: vss-rt-cv:3.2.0 (amd64 matches x86-dgpu)` |
 | Resource plan finalized | `✔ Resource plan:` + `    • model → NGC (...)` + `    • videos → NGC (...)` |
 | NGC creds (or skipped) | `✔ NGC credentials: reusing existing config (org=...)` or `✔ NGC credentials: not needed (all sources local)` |
 | Pipeline settings | `✔ Pipeline: batch=4, dynamic, filesrc, eglsink (delay 10s)` |

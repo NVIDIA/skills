@@ -65,26 +65,31 @@ If the user doesn't have a key yet, guide them:
 Once they have the key:
 
 ```bash
-export NGC_CLI_API_KEY='<key>'
-# Optionally persist in shell profile:
-echo "export NGC_CLI_API_KEY='<key>'" >> ~/.bashrc
+read -rsp "NGC API key: " NGC_CLI_API_KEY
+echo
+export NGC_CLI_API_KEY
 ```
 
-> Do not store the raw key in `TOOLS.md` or any workspace file.
+> Security note: Prefer a current-session handoff: enter the key with `read -rs`,
+> inject it from a secrets manager, and pass it to `docker login` with
+> `--password-stdin`. Do not pass the raw key as a CLI argument, write it to any
+> workspace file or shell profile such as `~/.bashrc`, or commit it to version
+> control. If an env file is unavoidable, keep it outside the repo and restrict
+> it with `chmod 600`.
 
 ---
 
 ## Verify Access
 
 ```bash
-ngc registry resource info nvstaging/vss-developer/dev-profile-compose:3.2.0-26.05.2
+ngc registry resource info nvidia/vss-developer/dev-profile-sample-data
 ```
 
-Should return resource info without errors.
+Should return resource info (including the latest version) without errors.
 
-> **`nvstaging` not `nvidia`** on develop. develop pulls every VSS image from the staging org (`nvcr.io/nvstaging/vss-core/...` per the compose files), so the verify-access check must use the same org — `nvstaging/vss-developer/dev-profile-compose:<release-tag>` exercises that exact path. For main-branch deploys (published org), swap `nvstaging` → `nvidia`.
+> **Why this check?** `dev-profile-sample-data` is a published artifact in the `nvidia/vss-developer` catalog — the same sample-data bundle the deploy pulls for its sample videos — so reaching it confirms the API key and org are scoped to the public VSS catalog (where the `nvcr.io/nvidia/vss-core/...` images also live).
 >
-> **Why resource and not image?** Image tags on develop carry the build's commit SHA (e.g. `vss-agent:3.2.0-26.05.5-220a0fdacdd2` from `VSS_AGENT_VERSION` in `dev-profile-base/.env`), which churns every weekly cut and would make this doc stale immediately. The `dev-profile-compose` resource is versioned with the bare release tag and is stable across SHA-stamped image rebuilds.
+> **Why no version pin?** A bare `resource info` (no `:tag`) already proves access and returns the latest version on its own, so the check survives release bumps (`3.2.0` → `3.2.x` / `3.3.0`) instead of going stale. A resource is also a steadier target than an image — `dev-profile-sample-data` is cut per release line (`3.0.0` → `3.1.0` → `3.2.0`), while image tags churn on every patch. Pin a `:tag` only to confirm a specific version exists.
 
 **Common error:** `Missing org — If Authenticated, org is also required.`
 → Fix: run `ngc config set` and ensure the org matches the one selected when generating the key.

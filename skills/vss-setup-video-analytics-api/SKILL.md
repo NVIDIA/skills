@@ -14,7 +14,7 @@ Deploy the video-analytics-api REST service standalone with the user's chosen co
 
 ## Instructions
 
-Follow the routing tables and step-by-step workflows below. Each section that ends in *workflow*, *quick start*, or *flow* is intended to be executed top-to-bottom. Detailed reference material lives in `references/` and helper scripts live in `scripts/` — call them via `run_script` when the skill points to a script by name.
+Follow the routing tables and step-by-step workflows below. Each section that ends in *workflow*, *quick start*, or *flow* is intended to be executed top-to-bottom. Detailed reference material lives in `references/`.
 
 ## Examples
 
@@ -36,8 +36,9 @@ docker compose -f services/analytics/video-analytics-api/compose.yml up -d vss-v
 curl -sf http://localhost:8081/livez
 ```
 
-Follow `references/deploy-video-analytics-api-service.md` for the full
+Follow [`references/deploy-video-analytics-api-service.md`](references/deploy-video-analytics-api-service.md) for the full
 workflow (config source, data-log bind, infrastructure dependencies, REST endpoints).
+For the field-by-field JSON config reference, see [`references/configuration.md`](references/configuration.md).
 
 ## Limitations
 
@@ -55,7 +56,7 @@ workflow (config source, data-log bind, infrastructure dependencies, REST endpoi
 
 Deploy **just** the `vss-video-analytics-api` container (the Node.js REST API from the upstream `video-analytics-api` repo), not as part of the full warehouse blueprint stack.
 
-The full operational walkthrough — config-source options, data-log volume behavior, infrastructure dependencies, REST API endpoints, deploy + verify, troubleshooting — is [`references/deploy-video-analytics-api-service.md`](references/deploy-video-analytics-api-service.md). This SKILL.md only handles routing and prerequisites.
+The full operational walkthrough — config-source options, data-log volume behavior, infrastructure dependencies, REST API endpoints, deploy + verify, troubleshooting — lives in [`references/deploy-video-analytics-api-service.md`](references/deploy-video-analytics-api-service.md). The field-by-field JSON config reference lives in [`references/configuration.md`](references/configuration.md). This SKILL.md only handles routing and prerequisites.
 
 ## When to use
 
@@ -69,7 +70,7 @@ The full operational walkthrough — config-source options, data-log volume beha
 ## Prerequisites
 
 1. **Repo checkout** with `$VSS_APPS_DIR` pointing at `<repo>/deploy/docker/`. Required by the service compose's volume binds.
-2. **NGC credentials** — `$NGC_CLI_API_KEY` set so docker can pull the image. See [`../vss-deploy-profile/references/ngc.md`](../vss-deploy-profile/references/ngc.md).
+2. **NGC credentials** — `$NGC_CLI_API_KEY` set so docker can pull the image. See [`references/ngc.md`](references/ngc.md).
 
    > **Secure-handling note for `NGC_CLI_API_KEY`**: this key is a
    > long-lived credential that pulls all NVIDIA private images
@@ -136,3 +137,5 @@ The API consumes real-time location (`mdx-rtls`) and AMR (`mdx-amr`) messages fr
 - If the user wants to understand the dynamic config / dynamic calibration wire contract from the **consumer** (behavior-analytics) side: point them at [`../vss-setup-behavior-analytics/references/dynamic-config.md`](../vss-setup-behavior-analytics/references/dynamic-config.md) and [`../vss-setup-behavior-analytics/references/dynamic-calibration.md`](../vss-setup-behavior-analytics/references/dynamic-calibration.md).
 - If the user wants to query or interact with the REST API endpoints: the endpoint table above and the deploy reference cover what's available. For the full OpenAPI spec, see `src/app/specification/openapi.json` in the `video-analytics-api` repo.
 
+
+bump:1

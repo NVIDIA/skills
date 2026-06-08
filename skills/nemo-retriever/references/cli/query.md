@@ -42,35 +42,30 @@ Top-3, custom table:
 
 ## Outputs
 
-- JSON array on stdout, one object per hit, sorted by ascending `_distance`
-  (lower = more similar). Each hit includes:
-  - `_distance` — vector distance in the embedding space.
-  - `text` — the retrieved primitive's text content.
-  - `source` / `path` / `source_id` — origin document path.
-  - `page_number`, `pdf_basename`, `pdf_page` — locator.
-  - `metadata` — JSON string with `type` (`text` / `table` / `chart` / `image`)
-    and, where applicable, a normalised `bbox_xyxy_norm`.
-
-Pipe through Python for filtering, e.g. only chart hits:
-
-```bash
-<RETRIEVER_VENV>/bin/retriever query "gadget costs" | <RETRIEVER_VENV>/bin/python -c 'import json,sys; hits=json.load(sys.stdin); print(json.dumps([h for h in hits if json.loads(h["metadata"]).get("type")=="chart"], indent=2))'
-```
+- JSON array on stdout, one object per hit, in retriever ranking order.
+- The root CLI intentionally returns compact objects:
+  - `source` — origin document path.
+  - `page_number` — 1-indexed page when available.
+  - `text` — retrieved primitive text, table text, chart text, or image caption.
+- Internal scores, raw metadata, and bounding boxes are available from the Python
+  `Retriever.query(...)` API, not the public root CLI output.
 
 ## Key flags
 
 | Flag | Default | Notes |
 |---|---|---|
-| `--top-k` | `10` | Max hits to return. Must be ≥ 1. |
+| `--top-k` | `10` | Final number of hits to return. Must be >= 1. |
+| `--candidate-k` | unset | Wider pre-filter/pre-dedup candidate pool. When set, it must be >= `--top-k`; make it larger when `--page-dedup` or `--content-types` could reduce final hits. |
+| `--page-dedup` | `false` | Collapse results to unique document pages. |
+| `--content-types` | unset | Comma-separated content types to keep, such as `text,table` or `image,chart`; query-time values are normalized to canonical hit metadata types, `images` is accepted as an alias for captioned image rows, and untyped hits are excluded. |
 | `--lancedb-uri` | `lancedb` | Must match what `ingest` wrote to. |
 | `--table-name` | `nemo-retriever` | Must match what `ingest` wrote to. |
 
-## Distance interpretation
+## Ranking interpretation
 
 - The embedder (`llama-nemotron-embed-vl-1b-v2`) returns mean-pooled vectors;
-  LanceDB returns L2 distance by default. Typical relevant hits are in the
-  ~1.0–1.7 range for this model on prose queries; treat `_distance` as
-  **ranking-only**, not a calibrated similarity score.
+  LanceDB ranks by L2 distance by default. The root CLI hides raw distance values;
+  treat result order as ranking-only, not calibrated confidence.
 - The query uses the **VL** variant of the embedder so text queries can match
   ingested image/chart embeddings as well as text. Expect mixed-modality hits
   in the result list.
@@ -85,8 +80,9 @@ Pipe through Python for filtering, e.g. only chart hits:
   Subsequent queries in the same process are sub-second; one-shot CLI
   invocations always pay this cost.
 - **Surprisingly low-relevance top hit** — for very short corpora, even
-  unrelated queries return *something* with a non-huge distance. Inspect
-  `_distance` gaps between hits rather than absolute values.
+  unrelated queries return *something*. Broaden with `--candidate-k`, use
+  `--page-dedup` for page diversity, or use `--content-types` for targeted
+  table/chart/image-caption searches.
 
 ## Related
 

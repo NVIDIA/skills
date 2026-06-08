@@ -32,8 +32,11 @@ Concepts and workflow for going from a problem description to a clear formulatio
 | Constraints | Linear | Linear | Linear (no quadratic constraints) |
 | Variables | Continuous | Mixed: continuous + integer/binary | Continuous |
 | Sense | min or max | min or max | **minimize only** (negate to max) |
+| Duals / sensitivity | Shadow prices + reduced costs | **None** (integer optima) | Shadow prices + reduced costs |
 
 If the objective is purely linear, prefer LP/MILP — do not artificially introduce quadratic terms. If any variable is integer or binary, the problem is MILP regardless of the rest.
+
+**Post-solve sensitivity (LP / QP only).** Continuous LP and QP solutions expose **dual values** (shadow prices — the marginal objective change per unit a binding constraint is relaxed: *where to invest to improve the outcome*) and **reduced costs** (for a variable the optimizer left at zero, how far it must improve to enter the solution: a *near-miss*). **MILP solutions have no duals** — integer optima are not continuous, so there are none to return. See the language-specific API skills for how to retrieve them after a solve.
 
 ## Required formulation questions
 

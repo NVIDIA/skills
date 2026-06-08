@@ -39,12 +39,12 @@ Read **only** the workflow file that matches the selected mode, then follow it:
 
 - **Sampler and validation columns need both a type and params.** E.g., `sampler_type="category"` with `params=dd.CategorySamplerParams(...)`.
 - **Jinja2 templates** in `prompt`, `system_prompt`, and `expr` fields: reference columns with `{{ column_name }}`, nested fields with `{{ column_name.field }}`.
-- `**SamplerColumnConfig`:** Takes `params`, not `sampler_params`.
+- **`SamplerColumnConfig`:** Takes `params`, not `sampler_params`.
 - **LLM judge score access:** `LLMJudgeColumnConfig` produces a nested dict where each score name maps to `{reasoning: str, score: int}`. To get the numeric score, use the `.score` attribute. For example, for a judge column named `quality` with a score named `correctness`, use `{{ quality.correctness.score }}`. Using `{{ quality.correctness }}` returns the full dict, not the numeric score.
 
 # Troubleshooting
 
-- `**nemo data-designer` CLI not found:** Tell the user that `nemo data-designer` is not installed in this environment (requires Python >= 3.11). Ask if they would like you to create a virtual environment and install it, or if they prefer to do it themselves. Do not install anything without the user's permission.
+- **`nemo data-designer` CLI not found:** Tell the user that `nemo data-designer` is not installed in this environment (requires Python >= 3.11). Ask if they would like you to create a virtual environment and install it, or if they prefer to do it themselves. Do not install anything without the user's permission.
 - **Network errors during preview:** A sandbox environment may be blocking outbound requests. Ask the user for permission to retry the command with the sandbox disabled. Only as a last resort, if retrying outside the sandbox also fails, tell the user to run the command themselves.
 
 # Output Template

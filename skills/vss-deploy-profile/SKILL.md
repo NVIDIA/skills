@@ -13,13 +13,16 @@ metadata:
 
 Deploy any VSS profile (`base`, `search`, `lvs`, `warehouse`, `alerts`, `edge`) using a compose-centric workflow: build env overrides, generate resolved compose (dry-run), review, then deploy. This SKILL.md covers the cross-profile concerns (**profile routing**, **prerequisites**, **NGC**, **GPU setup**, and the deploy/teardown flow). Profile-specific service lists, sizing, env recipes, endpoints, and debugging live in per-profile reference docs — load the one that matches the user's intent.
 
-Helper script: `run_script("scripts/normalize_resolved_yml.py", "<resolved.yml>")` normalizes a `docker compose config` dry-run dump for diff-friendly review during Step 3c. All other deployment work goes through `compose` / `dev-profile.sh`.
+Helper scripts normalize `docker compose config` output and probe selected
+remote model endpoints before env mutation. All other deployment work goes
+through `compose` / `dev-profile.sh`.
 
 ## Available Scripts
 
 | Script | Purpose | Arguments |
 |---|---|---|
 | `scripts/normalize_resolved_yml.py` | Strip optional `depends_on` entries for services filtered out of `resolved.yml` before deploy. | Path to `resolved.yml` |
+| `scripts/probe_remote_models.sh` | Probe an OpenAI-compatible remote LLM/VLM endpoint and verify the selected model id. | Base URL, optional expected model id |
 
 ## Profile Routing
 
@@ -55,9 +58,16 @@ The source `.env` is treated as **read-only defaults** committed to the repo. Th
 
 ## Prerequisites
 
-1. **Repo path** — find `video-search-and-summarization/` on disk. Check `TOOLS.md` if available.
-2. **NGC CLI & API key** — see [`references/ngc.md`](references/ngc.md). Confirm `$NGC_CLI_API_KEY` is set.
+1. **Repo path** — auto-detect `video-search-and-summarization/` before
+   asking the user. Use the detected path as `$REPO` for all subsequent
+   commands.
+2. **Credential gates** — see [`references/credentials.md`](references/credentials.md): `NGC_CLI_API_KEY` for local/local_shared NIM pulls, `NVIDIA_API_KEY` for remote NIM endpoints, and `HF_TOKEN` for edge recipes that use gated HF models.
 3. **System prerequisites (GPU driver, Docker, NVIDIA Container Toolkit, kernel sysctls)** — full checks in [`references/prerequisites.md`](references/prerequisites.md). Canonical hardware/driver matrix is the [VSS prerequisites page](https://docs.nvidia.com/vss/3.2.0/prerequisites.html).
+
+The auto-detect snippet (git-root, then a common-path probe gated on
+`deploy/docker/compose.yml` + `dev-profile.sh` + `skills/vss-deploy-profile`)
+lives in [`references/prerequisites.md`](references/prerequisites.md#repo-detect).
+Export the resolved `$REPO`; if detection fails, ask the user for the checkout path.
 
 ### Pre-flight check
 
@@ -102,6 +112,15 @@ for the remediation tree.
 - `$LLM_REMOTE_URL` / `$VLM_REMOTE_URL` if the user asks for remote
 - `$NGC_CLI_API_KEY` (local NIMs) or `$NVIDIA_API_KEY` (remote)
 
+**Endpoint intent gate.** Don't infer remote placement from stray env vars
+(`LLM_ENDPOINT_URL`, `VLM_ENDPOINT_URL`, `LLM_BASE_URL`, `VLM_BASE_URL` may be
+leftovers). Use remote LLM/VLM only when (1) the user asked for / supplied a
+remote endpoint, (2) local sizing can't fit the selected models and the user
+agrees, or (3) an edge recipe needs a standalone local service VSS treats as
+`remote` (e.g. DGX Spark Nano 9B on `localhost:30081`). If an endpoint var is
+set but the user didn't ask for remote, surface it in Step 1 and ask — never
+silently deploy remote because a var happened to exist.
+
 If no combination on this host satisfies the profile's sizing requirements, **stop and report the blocker** — don't silently pick another shape.
 
 > **Edge shared mode is platform-specific.** On DGX Spark, run `nvcr.io/nim/nvidia/nvidia-nemotron-nano-9b-v2-dgx-spark:1.0.0-variant` as a standalone local NIM on port `30081` and point the agent at it with `LLM_MODE=remote`. On AGX/IGX Thor, keep using the Edge 4B standalone vLLM fallback with `HF_TOKEN`. Full recipes are in [`references/edge.md`](references/edge.md).
@@ -118,7 +137,15 @@ Full procedure lives in [`references/teardown.md`](references/teardown.md).
 
 ### Step 0a — Credentials gate (run before any env mutation)
 
-Validate every credential the chosen profile needs **before** Step 1c copies `.env` to `generated.env`. A 401 here is a 30-second failure; the same 401 inside a NIM cold-start is a 10–20 min failure. Run the discovery and probe flow in [`references/credentials.md`](references/credentials.md), then map the result against the chosen mode: missing or invalid required credentials are blockers, optional credentials are not.
+Validate every credential and selected remote endpoint the chosen profile
+needs **before** Step 1c copies `.env` to `generated.env`. A 401 here is a
+30-second failure; the same 401 inside a NIM cold-start is a 10–20 min
+failure. Run the discovery and probe flow in
+[`references/credentials.md`](references/credentials.md), including
+`scripts/probe_remote_models.sh` for any LLM/VLM endpoint you plan to write
+into `generated.env`. Map the result against the chosen mode: missing
+or invalid required credentials/endpoints are blockers, optional credentials
+are not.
 
 ### Step 1 — Gather context
 
@@ -127,9 +154,9 @@ Before building env overrides, confirm:
 | Value | How to determine |
 |---|---|
 | **Profile** | Match user intent to the routing table above. Default: `base` |
-| **Repo path** | Find `video-search-and-summarization/` on disk |
+| **Repo path** | Use the `$REPO` value auto-detected in prerequisites. If auto-detect failed, ask the user for the checkout path before continuing. |
 | **Hardware** | `nvidia-smi --query-gpu=name,memory.total --format=csv,noheader` |
-| **LLM/VLM placement** | Cross-reference available GPUs against the chosen profile's **Minimum GPU count** table |
+| **LLM/VLM placement** | Explicitly decide local / local_shared / remote. Cross-reference available GPUs against the chosen profile's **Minimum GPU count** table. If endpoint env vars are present but the user did not request remote, ask whether to use or ignore them. |
 | **API keys** | `NGC_CLI_API_KEY` for local NIMs, `NVIDIA_API_KEY` for remote |
 | **`HOST_IP`** | `hostname -I \| awk '{print $1}'` — the host's primary internal IP |
 | **`EXTERNAL_IP`** | Browser-reachable host/IP. On Brev, use the secure-link domain (see [`references/brev.md`](references/brev.md)). |
@@ -141,9 +168,8 @@ Before `docker compose up`, verify `EXTERNAL_IP`, `HAPROXY_PORT`, `VSS_PUBLIC_HO
 
 Layout (asset paths, ownership, mount points, profile-specific subdirs) is documented in [`references/data-directory.md`](references/data-directory.md). Read that file before deploying for the first time on a host or when changing profiles.
 
-> **FORBIDDEN: `chown -R ubuntu:ubuntu $VSS_DATA_DIR` (or any recursive chown).**
->
-> This is "good housekeeping" to a shell-admin instinct but is **the** deploy-breaking command in this stack. You will observe a "healthy" deploy (containers Up, endpoints 200) while the video pipeline is silently broken. Use `chmod -R 777` on the specific subdirs documented in `data-directory.md` — nothing else.
+> **FORBIDDEN: recursive `chown` on `$VSS_DATA_DIR` (e.g. `chown -R ubuntu:ubuntu`).**
+> It feels like good housekeeping but is **the** deploy-breaker in this stack — the deploy looks healthy (containers Up, endpoints 200) while the video pipeline is silently broken. Use `chmod -R 777` only on the specific subdirs documented in `data-directory.md`.
 
 ### Step 1c — Initialize `generated.env`
 
@@ -170,17 +196,20 @@ sed -i "s|^EXTERNAL_IP=.*|EXTERNAL_IP=7777-${brev_env_id}.brevlab.com|" "$ENV_GE
 
 ### Step 2 — Build env_overrides
 
-Produce an `env_overrides` dict from the user request and the gathered context: choose remote/local LLM/VLM, set credentials, point at endpoints, set platform-specific flags. The full mapping (every override key, when it applies, defaults, profile-specific differences) lives in [`references/env-overrides.md`](references/env-overrides.md). Each profile reference has worked examples for that profile's common scenarios.
+Produce an `env_overrides` dict from the user request and the gathered
+context: explicitly choose remote/local LLM/VLM, set credentials, point at
+endpoints, set platform-specific flags. Do not let existing shell env vars
+silently pick placement; write the selected `LLM_MODE` / `VLM_MODE` and
+matching endpoint/model fields into `generated.env`. The full mapping (every
+override key, when it applies, defaults, profile-specific differences) lives
+in [`references/env-overrides.md`](references/env-overrides.md). Each profile
+reference has worked examples for that profile's common scenarios.
 
 ### Step 3 — Apply overrides + dry-run
 
 **Working env file:** `<repo>/deploy/docker/developer-profiles/dev-profile-<profile>/generated.env` (created in Step 1c).
 
-> **Two env files, distinct roles.**
-> - `.env` — **read-only defaults**, checked in. Don't mutate it from the skill.
-> - `generated.env` — **the skill's per-deploy working copy**. All overrides (the dict from Step 2, plus the Brev `EXTERNAL_IP` from Step 1d) land here. `--env-file` always points at this file. Post-deploy verifiers should also read from `generated.env` for the actually-deployed values — see [Debugging a Deployment](#debugging-a-deployment).
->
-> `generated.env` matches the convention `dev-profile.sh` uses internally — it's a per-invocation scratchpad regenerated by `cp .env generated.env` each run.
+> **Two env files, distinct roles.** `.env` is read-only checked-in defaults (never mutate from the skill); `generated.env` is the skill's per-deploy working copy — all overrides (Step 2 dict + the Brev `EXTERNAL_IP`) land there, `--env-file` always points at it, and post-deploy verifiers read it for the actually-deployed values. It mirrors `dev-profile.sh`'s own `cp .env generated.env` scratchpad.
 
 ```bash
 # (Step 1c already ran: cp $ENV_SRC $ENV_GEN)
@@ -244,22 +273,19 @@ docker compose --env-file $ENV_GEN -f resolved.yml up -d
 
 > **`--env-file` is mandatory.** Without the same `generated.env` used in Step 3, `COMPOSE_PROFILES` may be unset and `up -d` can exit 0 with zero selected services.
 
-> **Do NOT use `--force-recreate` on retries.** It destroys already-warm NIM containers, forcing another 3–5 min torch.compile + CUDA-graph capture per NIM. If the previous `up -d` partially failed, fix the root cause (usually perms or an env typo) and just re-run `up -d` — Docker will re-create only the containers whose config changed or that are down.
+> **Avoid broad `--force-recreate` on ordinary retries** — it destroys warm
+> NIM containers (another 3–5 min torch.compile + CUDA-graph capture each).
+> Fix the root cause (usually perms or an env typo) and just re-run `up -d`;
+> use targeted `--force-recreate --no-deps <service...>` only when a profile
+> reference documents it as the recovery path.
 
 `docker compose up -d` only creates containers; it does not wait for internal services to finish warming. Never declare deploy success until the readiness gates pass.
 
 ### Step 5b — Wait until the stack is actually healthy
 
-**Gate 0 — container count must be > 0.** Refuse to proceed past `up -d` until compose started the expected services:
+**Gate 0 — container count must be > 0.** Refuse to proceed past `up -d` until the started count (`docker compose -f resolved.yml ps -q | wc -l`) is non-zero and ≥ the expected count (`config --services | wc -l`); a zero/short count almost always means a missing `--env-file` in Step 5. The exact gate plus the full readiness procedure live in [`references/readiness.md`](references/readiness.md).
 
-```bash
-expected=$(docker compose --env-file $ENV_GEN -f resolved.yml config --services | wc -l)
-actual=$(docker compose -f resolved.yml ps -q | wc -l)
-[ "$actual" -gt 0 ] && [ "$actual" -ge "$expected" ] \
-  || { echo "FAIL: expected $expected services, got $actual — re-check Step 5 --env-file"; exit 1; }
-```
-
-Cold deploys can take 10–20 min. The full readiness procedure lives in [`references/readiness.md`](references/readiness.md), and each profile reference lists the required endpoints. **Never declare deploy done after `up -d`; only after every documented endpoint succeeds.**
+Cold deploys can take 10–20 min, and each profile reference lists the required endpoints. **Never declare deploy done after `up -d`; only after every documented endpoint succeeds.**
 
 ## Tear Down
 
@@ -283,15 +309,14 @@ Each profile reference has a **Debugging** section listing the exact commands an
 docker ps --format 'table {{.Names}}\t{{.Status}}'
 
 # 2. Agent API + UI responding
-curl -sf http://localhost:8000/docs >/dev/null && echo "agent OK"
+curl -sf http://localhost:8000/health >/dev/null && echo "agent OK"
 curl -sf http://localhost:3000/ >/dev/null && echo "ui OK"
-
-# 3. VLM NIM responding (base/lvs profiles)
-curl -sf http://localhost:30082/v1/models | python3 -m json.tool
-
-# 4. LLM NIM responding
-curl -sf http://localhost:30081/v1/models | python3 -m json.tool
 ```
+
+The LLM/VLM NIM probes — including the `*_MODE=remote` handling that skips
+`localhost:3008x` (where a connection refused is expected) and probes the
+selected `*_BASE_URL/v1/models` via `scripts/probe_remote_models.sh` — are in
+[`references/troubleshooting.md`](references/troubleshooting.md#nim-probes).
 
 ### End-to-end video sanity check
 
@@ -312,4 +337,3 @@ After the quick checks above pass, drive a real query through the agent — e.g.
 ## Troubleshooting
 
 Start with [`references/agent-failure-modes.md`](references/agent-failure-modes.md) for cross-profile failures such as NIM cold-start timeouts, OOM, remote endpoint 5xx responses, missing `NGC_CLI_API_KEY` / `HF_TOKEN`, unexpanded values in `resolved.yml` etc.
-

@@ -103,7 +103,7 @@ Locate `video-search-and-summarization/` on disk. All compose commands run from 
 
 ### 2. NGC CLI + key
 
-`$NGC_CLI_API_KEY` must be set. Both `nvidia/vss-core/*` and `nvstaging/vss-core/*` are valid orgs depending on which the user's key resolves to. See `vss-deploy-profile/references/ngc.md` for setup if missing.
+`$NGC_CLI_API_KEY` must be set. Both `nvidia/vss-core/*` and `nvidia/vss-core/*` are valid orgs depending on which the user's key resolves to. See `vss-deploy-profile/references/ngc.md` for setup if missing.
 
 If the user previously ran `ngc config set` but `$NGC_CLI_API_KEY` isn't exported in this shell, the key is already on disk:
 

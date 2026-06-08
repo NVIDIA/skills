@@ -16,6 +16,48 @@ remediation when any gate fails. For DGX Spark / IGX Thor / AGX Thor, also
 run the cache-cleaner install and verification block in
 [`edge.md`](edge.md#cache-cleaner-every-edge-deploy).
 
+## Repo detection
+<a id="repo-detect"></a>
+
+Auto-detect the `video-search-and-summarization/` checkout and export it as
+`$REPO` before asking the user. Probe the git root first, then common paths,
+accepting a candidate only if it carries `deploy/docker/compose.yml`,
+`deploy/docker/scripts/dev-profile.sh`, and `skills/vss-deploy-profile/`:
+
+```bash
+REPO="${REPO:-}"
+if [ -z "$REPO" ]; then
+  git_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+  candidates=()
+  [ -n "$git_root" ] && candidates+=("$git_root")
+  candidates+=(
+    "$PWD"
+    "$PWD/.."
+    "$PWD/../.."
+    "$HOME/video-search-and-summarization"
+    "$HOME/VSS/vss-oss/video-search-and-summarization"
+    "$HOME/VSS/video-search-and-summarization"
+  )
+
+  for candidate in "${candidates[@]}"; do
+    candidate="$(cd "$candidate" 2>/dev/null && pwd -P || true)"
+    if [ -n "$candidate" ] \
+      && [ -f "$candidate/deploy/docker/compose.yml" ] \
+      && [ -x "$candidate/deploy/docker/scripts/dev-profile.sh" ] \
+      && [ -d "$candidate/skills/vss-deploy-profile" ]; then
+      REPO="$candidate"
+      break
+    fi
+  done
+fi
+
+if [ -z "$REPO" ]; then
+  echo "Could not auto-detect video-search-and-summarization; ask the user for the checkout path."
+else
+  echo "REPO=$REPO"
+fi
+```
+
 ## When to Use
 
 Use this skill when:
@@ -24,10 +66,6 @@ Use this skill when:
 - User asks to verify GPU, Docker, or system setup
 - After a driver or Docker update
 - Called from BOOTSTRAP during first-time setup
-
-## Read TOOLS.md First
-
-Check `TOOLS.md` for the VSS section. If missing, the environment isn't configured yet — run BOOTSTRAP first.
 
 ---
 
