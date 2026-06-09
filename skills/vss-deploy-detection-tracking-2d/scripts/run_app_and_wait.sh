@@ -2,6 +2,7 @@
 
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
+# run_app_and_wait.sh starts the app and waits for readiness and metrics.
 #
 # Licensed under Apache-2.0 (full text: http://www.apache.org/licenses/LICENSE-2.0).
 
@@ -269,9 +270,7 @@ fi
 # fakesink / eglsink: poll FPS + GPU/CPU for the deploy summary.
 if [[ $NO_METRICS -eq 0 && "$SINK" != "filedump" ]]; then
   echo "→ Collecting metrics (3 samples × 5s, 10s warmup)..."
-  # Pass --log so collect_metrics.sh can fall back to PERF-line parsing
-  # when /api/v1/metrics returns stream-count=0 (typical for static-mode
-  # deploys, where the API only counts dynamically-added streams).
+  # Pass --log for PERF-line fallback — see collect_metrics.sh for rationale.
   /tmp/scripts/collect_metrics.sh --samples 3 --interval 5 --warmup 10 --log "$LOG"
 elif [[ "$SINK" == "filedump" ]]; then
   echo "ℹ Metrics skipped for filedump sink — output is being written to file."

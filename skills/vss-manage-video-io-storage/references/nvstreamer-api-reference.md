@@ -57,7 +57,7 @@ Per-sensor shape on NvStreamer:
 - `type`: always `sensor_nvstream`
 - `state`: `online` whenever NvStreamer can read the file
 - `isTimelinePresent`: **always `false`** — NvStreamer does not record
-- `location`: absolute container-side path to the source file (e.g. `/home/vst/vst_release/streamer_videos/warehouse_sample.mp4`)
+- `location`: absolute container-side path to the source file (e.g. `${VST_CONTAINER_ROOT}/streamer_videos/warehouse_sample.mp4`)
 - `sensorId` / `name`: filename-without-extension for auto-discovered and POST-uploaded files; a UUID `sensorId` paired with the filename `name` for PUT-uploaded files
 - `sensorIp`: the host IP — every file sensor on a given instance shares the same address
 - `hardware`/`manufacturer`/`serialNumber`/`firmwareVersion`/`hardwareId`: the literal string `"unknown"`
@@ -81,7 +81,7 @@ curl -s "http://<NVSTREAMER_ENDPOINT>/vst/api/v1/sensor/<sensorId>/status" | jq 
 curl -s "http://<NVSTREAMER_ENDPOINT>/vst/api/v1/sensor/<sensorId>/streams" | jq .
 ```
 Each stream returns:
-- `url` — `rtsp://<host>:<rtsp-server-port>/nvstream/<absolute-container-path>`. Example: `rtsp://${HOST_IP}:31561/nvstream/home/vst/vst_release/streamer_videos/warehouse_sample.mp4`.
+- `url` — `rtsp://<host>:<rtsp-server-port>/nvstream/<absolute-container-path>`. Example: `rtsp://${HOST_IP}:31561/nvstream/${VST_CONTAINER_ROOT}/streamer_videos/warehouse_sample.mp4`.
 - `type` — `"Rtsp"`
 - `storageLocation` — `"Local"`
 - `metadata.codec` — `"h264"` / `"h265"`; populates asynchronously (~15-30 seconds after upload)

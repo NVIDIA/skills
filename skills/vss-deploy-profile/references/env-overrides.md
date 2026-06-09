@@ -9,8 +9,8 @@ Build a dictionary of env var overrides based on user intent. Only include vars 
 | Var | Value |
 |---|---|
 | `HARDWARE_PROFILE` | Detected or user-specified |
-| `VSS_APPS_DIR` | `<repo>/deployments` |
-| `VSS_DATA_DIR` | `<repo>/data` (or user-specified) |
+| `VSS_APPS_DIR` | `<repo>/deploy/docker` |
+| `VSS_DATA_DIR` | `${VSS_APPS_DIR}/data-dir` (or user-specified) |
 | `HOST_IP` | Detected host IP |
 
 Credential env vars are mode-scoped. Set `NGC_CLI_API_KEY` only when
@@ -90,10 +90,11 @@ all of the following before `docker compose up`:
    `LLM_MODE` / `VLM_MODE` is the #1 cause of deployments coming up with
    wrong compose profiles.
 
-Never leave `LLM_MODE` or `VLM_MODE` unset when the user said "remote".
-The `.env` template's placeholder value is `LLM_MODE=local` — failing to
-overwrite it means you silently deployed in local mode with remote URLs
-dangling, which no `COMPOSE_PROFILES` path correctly supports.
+Never leave `LLM_MODE` or `VLM_MODE` at the template default when the user
+said "remote". The base `.env` defaults are `LLM_MODE=local_shared` and
+`VLM_MODE=local_shared` (same as `dev-profile.sh` derives for same-device
+local deployments). Failing to overwrite them keeps local shared NIM
+`COMPOSE_PROFILES` active while remote URLs dangle unused.
 
 > **Important — `/v1` suffix on base URLs**
 >

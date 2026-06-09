@@ -2,6 +2,7 @@
 
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
+# fetch_resources.sh downloads, extracts, and scans NGC assets for a use case.
 #
 # Licensed under Apache-2.0 (full text: http://www.apache.org/licenses/LICENSE-2.0).
 

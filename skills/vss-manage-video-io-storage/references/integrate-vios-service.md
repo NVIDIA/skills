@@ -7,11 +7,11 @@ VIOS (Video IO & Storage Microservice) is the VSS service responsible for video 
 VIOS is a **multi-container microservice**, deployed in one of two routing modes depending on the profile:
 
 1. **Direct routing** (`VST_NGINX_MODE=vst-direct`, used by `bp_developer_base_2d`) — 4 long-running containers: `vss-vios-postgres` (centralizedb), `vss-vios-ingress` (nginx routing via `nginx-vst-direct.conf`), `vss-vios-sensor` (sensor-ms with `STREAM_PROCESSOR_MODULE_ENDPOINT=http://localhost:30001` → calls streamprocessing directly, no L7 router), and `vss-vios-streamprocessing` (streamprocessing-ms — HTTP on 30001, RTSP server pool 30554–30564, WebRTC on 80). No SDRC. Per `dev-profile-base/.env:222-224` ("Direct streamprocessing (no SDR/Envoy/SDRC router on :10000)").
-2. **SDRC-routed** (`VST_NGINX_MODE` unset / default, used by `bp_developer_lvs_2d`, `bp_developer_search_2d`, `bp_developer_alerts_2d_{cv,vlm}`, and all `bp_wh_*` warehouse profiles) — adds a 5th long-running container `sdr-controller` (the SDRC workload — combined WDM controller + Envoy router, image `nvcr.io/nvstaging/vss-core/sdr-mw-l:3.0.0-prd.5`; controller on `WDM_CONTROLLER_PORT=5003`, SDRC direct listener on `8011`, Envoy admin on `9902`, and the rendered Envoy listener `WDM_MS_LISTENER_PORT` from `config.yml` — default `10000`, matching the SDRC-mode default of `STREAM_PROCESSOR_MODULE_ENDPOINT=http://localhost:10000` in `vss-vios-sensor`). Plus five one-shot SDRC init containers (`init-dirs`, `render-config`, `wdm-env-from-config`, `wait-for-redis`, `wait-for-docker-workloads`), but **only `init-dirs` + `render-config` (plus the external `broker-health-check`) are strict prerequisites for `sdr-controller`** — see [`sdrc/docker-compose.yaml`](../../../deploy/docker/services/infra/sdrc/docker-compose.yaml) lines 158-164. The other three (`wdm-env-from-config`, `wait-for-redis`, `wait-for-docker-workloads`) write env files and gate downstream peer services (e.g. RT-CV); `sdr-controller` does not consume their output and runs in parallel with them.
+2. **SDRC-routed** (`VST_NGINX_MODE` unset / default, used by `bp_developer_lvs_2d`, `bp_developer_search_2d`, `bp_developer_alerts_2d_{cv,vlm}`, and all `bp_wh_*` warehouse profiles) — adds a 5th long-running container `sdr-controller` (the SDRC workload — combined WDM controller + Envoy router, image `nvcr.io/nvidia/vss-core/sdr-mw-l:3.2.0`; controller on `WDM_CONTROLLER_PORT=5003`, SDRC direct listener on `8011`, Envoy admin on `9902`, and the rendered Envoy listener `WDM_MS_LISTENER_PORT` from `config.yml` — default `10000`, matching the SDRC-mode default of `STREAM_PROCESSOR_MODULE_ENDPOINT=http://localhost:10000` in `vss-vios-sensor`). Plus five one-shot SDRC init containers (`init-dirs`, `render-config`, `wdm-env-from-config`, `wait-for-redis`, `wait-for-docker-workloads`), but **only `init-dirs` + `render-config` (plus the external `broker-health-check`) are strict prerequisites for `sdr-controller`** — see [`sdrc/docker-compose.yaml`](../../../deploy/docker/services/infra/sdrc/docker-compose.yaml) lines 158-164. The other three (`wdm-env-from-config`, `wait-for-redis`, `wait-for-docker-workloads`) write env files and gate downstream peer services (e.g. RT-CV); `sdr-controller` does not consume their output and runs in parallel with them.
 
 Container suffixes on `streamprocessing-ms` (`-2d`, `-3d`, `-mv3dt`) reflect industry-profile variants — only the base `streamprocessing-ms` runs in IN-1. Source: `vios-microservices.rst` § VIOS Microservices table + [`deploy/docker/services/infra/sdrc/docker-compose.yaml`](../../../deploy/docker/services/infra/sdrc/docker-compose.yaml) + [`dev-profile-base/.env`](../../../deploy/docker/developer-profiles/dev-profile-base/.env) lines 222-224 + verified live on `2xRTXPro-ubuntu` 2026-05-23.
 
-> **SDR → SDRC migration.** The legacy `vss-vios-sdr` (Flask WDM agent on port 4003, image `nvcr.io/nvidia/vss-core/sdr:3.1.0`) + `vss-vios-envoy` (L7 proxy on 10000, image `nvcr.io/nvidia/vss-core/envoy-proxy:3.1.0`) pair is **deprecated** and removed from `develop`. Both responsibilities (workload discovery + L7 routing) are consolidated in the single `sdr-controller` workload defined in [`deploy/docker/services/infra/sdrc/docker-compose.yaml`](../../../deploy/docker/services/infra/sdrc/docker-compose.yaml). The `localhost:10000` contract that downstream callers depend on is preserved by the SDRC-rendered Envoy listener (`WDM_MS_LISTENER_PORT`). New skills and build-outputs should reference SDRC only.
+**SDR → SDRC migration.** The legacy `vss-vios-sdr` (Flask WDM agent on port 4003, image `nvcr.io/nvidia/vss-core/sdr:3.1.0`) + `vss-vios-envoy` (L7 proxy on 10000, image `nvcr.io/nvidia/vss-core/envoy-proxy:3.1.0`) pair is **deprecated** and removed from `develop`. Both responsibilities (workload discovery + L7 routing) are consolidated in the single `sdr-controller` workload defined in [`deploy/docker/services/infra/sdrc/docker-compose.yaml`](../../../deploy/docker/services/infra/sdrc/docker-compose.yaml). The `localhost:10000` contract that downstream callers depend on is preserved by the SDRC-rendered Envoy listener (`WDM_MS_LISTENER_PORT`). New deployments should reference SDRC only.
 
 > **VSS 3.2 architectural change.** The recorder, RTSP server, replay-stream service, and storage service formerly shipped as separate containers (`recorder-ms-{1-5}`, `replaystream-ms-1`, `rtsp-server-ms`, `storage-ms`) are now **consolidated into the single `launch_vst` binary inside `vss-vios-streamprocessing`**. The `vios-microservices.rst` enumerated list (§ "Storage / RTSP Server / Replay Stream / Recorder Service") describes the **scaled-enterprise topology**; the dev profile uses the consolidated single-container form. All recording / playback functionality is still present — just bundled.
 
@@ -19,12 +19,12 @@ Use this service in any deployment that needs (a) RTSP camera registration and p
 
 ## Two ingestion topologies (read first)
 
-VIOS supports **two distinct video-ingestion patterns** that the build-vision-agent skill must distinguish in Step 4:
+VIOS supports **two distinct video-ingestion patterns**; a deployment chooses between them based on the described input source:
 
 ### Topology A — External RTSP camera (the canonical IN-1 path)
 
 ```
-External RTSP camera (or test mediamtx+ffmpeg)
+External RTSP camera (or any RTSP source — e.g. a synthetic test stream)
   │
   └─→ POST /vst/api/v1/sensor/add  ───▶ vss-vios-sensor (30000) ──┐
                                                                    │ HTTP via SDRC-rendered Envoy listener
@@ -59,7 +59,7 @@ ${VSS_DATA_DIR}/videos/<profile-name>/*.mp4   (sample files on host disk)
 
 Use when the user prompt names sample files, OOBE clips, or asks for a deployment without external camera dependencies. **No sensor/add call required** — NvStreamer auto-publishes everything in the watched directory. Source: `deploy/docker/developer-profiles/dev-profile-alerts/compose.yml` § `nvstreamer-alerts` + `deploy/docker/developer-profiles/dev-profile-alerts/nvstreamer/configs/vst-config.json`.
 
-Both topologies surface the same Kafka `camera_streaming` event downstream, so consumers (RT-CV, vss-agent) work with either. The build-vision-agent skill picks the topology based on the user prompt's described input source.
+Both topologies surface the same Kafka `camera_streaming` event downstream, so consumers (RT-CV, vss-agent) work with either. Pick the topology based on the deployment's described input source.
 
 ## Required Peer Services
 
@@ -67,85 +67,10 @@ Both topologies surface the same Kafka `camera_streaming` event downstream, so c
 - **Kafka** — required when VSS publishes sensor add/remove events on a Kafka message bus. Broker address read from `KAFKA_BOOTSTRAP_URL` (default `localhost:9092` per `vst.env`); message key `KAFKA_MSG_KEY=sensor.id`. Used for downstream consumers to react to sensor lifecycle. Source: `vst.env` lines 56–58 + `vios-microservices.rst` § Key Features bullet 10.
 - **Redis** — required (host-network default). Used for caching sensor state and as an alternate message bus for sensor events; reachable at `REDIS_HOSTADDR:REDIS_PORT` (default `localhost:6379`); event key `REDIS_MSG_KEY=vst.event`. Source: `vst.env` lines 53–55.
 - **MinIO (optional)** — optional. S3-compatible object storage when video clips are stored in object storage rather than local filesystem. Source: `vios-microservices.rst` § OSS Containers.
-- **SDRC (`sdr-controller`) — REQUIRED, NOT OPTIONAL.** Combined WDM controller + Envoy router; replaces the legacy `sdr-streamprocessing` + `envoy-streamprocessing` pair. Image `${SDR_MW_L_IMAGE:-nvcr.io/nvstaging/vss-core/sdr-mw-l:3.0.0-prd.5}`. Watches Redis `vst.event` + Docker container state, advertises workloads to its embedded Envoy router via the WDM control plane, and serves the `streamid`-header-routed L7 listener that `vss-vios-sensor` calls into. Listens on: `WDM_CONTROLLER_PORT=5003` (workload control plane), `WDM_SDRC_DIRECT_LISTENER_PORT=8011` (direct listener), `ENVOY_ADMIN_PORT=9902` (Envoy admin), and `WDM_MS_LISTENER_PORT` from the rendered `config.yml` (default `10000` — preserves the `vss-vios-sensor` endpoint contract). Mounts `${SDR_CONTROLLER_CONFIG_PATH}/configs:/configs/:ro` (the rendered `config.yml` + `docker_cluster_config-streamprocessing.json`), `./log:/logs`, and the host docker socket `/var/run/docker.sock`. Reads its env vars directly from the compose `environment:` block — `sdr-controller` does not mount the `.wdm-env` written by `wdm-env-from-config` (see the inline comment at [`sdrc/docker-compose.yaml`](../../../deploy/docker/services/infra/sdrc/docker-compose.yaml) lines 134-135: *"Does not use wdm-env-from-config (env is explicit below, like a hand-written docker run)"*). Strict prerequisites are `broker-health-check`, `init-dirs`, and `render-config` (compose lines 158-164); the other init containers serve downstream peer services. Source: [`deploy/docker/services/infra/sdrc/docker-compose.yaml`](../../../deploy/docker/services/infra/sdrc/docker-compose.yaml) + Helm chart [`deploy/helm/services/infra/charts/sdrc/`](../../../deploy/helm/services/infra/charts/sdrc/).
+- **SDRC (`sdr-controller`) — REQUIRED, NOT OPTIONAL.** Combined WDM controller + Envoy router; replaces the legacy `sdr-streamprocessing` + `envoy-streamprocessing` pair. Image `${SDR_MW_L_IMAGE:-nvcr.io/nvidia/vss-core/sdr-mw-l:3.2.0}`. Watches Redis `vst.event` + Docker container state, advertises workloads to its embedded Envoy router via the WDM control plane, and serves the `streamid`-header-routed L7 listener that `vss-vios-sensor` calls into. Listens on: `WDM_CONTROLLER_PORT=5003` (workload control plane), `WDM_SDRC_DIRECT_LISTENER_PORT=8011` (direct listener), `ENVOY_ADMIN_PORT=9902` (Envoy admin), and `WDM_MS_LISTENER_PORT` from the rendered `config.yml` (default `10000` — preserves the `vss-vios-sensor` endpoint contract). Mounts `${SDR_CONTROLLER_CONFIG_PATH}/configs:/configs/:ro` (the rendered `config.yml` + `docker_cluster_config-streamprocessing.json`), `./log:/logs`, and the host docker socket `/var/run/docker.sock`. Reads its env vars directly from the compose `environment:` block — `sdr-controller` does not mount the `.wdm-env` written by `wdm-env-from-config` (see the inline comment at [`sdrc/docker-compose.yaml`](../../../deploy/docker/services/infra/sdrc/docker-compose.yaml) lines 134-135: *"Does not use wdm-env-from-config (env is explicit below, like a hand-written docker run)"*). Strict prerequisites are `broker-health-check`, `init-dirs`, and `render-config` (compose lines 158-164); the other init containers serve downstream peer services. Source: [`deploy/docker/services/infra/sdrc/docker-compose.yaml`](../../../deploy/docker/services/infra/sdrc/docker-compose.yaml) + Helm chart [`deploy/helm/services/infra/charts/sdrc/`](../../../deploy/helm/services/infra/charts/sdrc/).
 
-> **Critical wiring (SDRC mode):** `vss-vios-sensor` reads `STREAM_PROCESSOR_MODULE_ENDPOINT` from its env (consumer-overridable, not hardcoded — see `dev-profile-base/.env:223` for the direct-routing override). In SDRC mode the default is `http://localhost:10000` — sensor-ms calls the SDRC-rendered Envoy listener, which routes to streamprocessing-ms. **Without `sdr-controller` listening on `WDM_MS_LISTENER_PORT` (default 10000), `POST /sensor/add` fails with `InvalidParameterError: Invalid Parameters`** (the failure happens inside the adaptor pre-check, ~2ms after the parameters log, with no diagnostic). And until `sdr-controller` has finished registering `vss-vios-streamprocessing` with its Envoy LDS/CDS, the listener returns 503 to downstream `/record/*` / `/replay/*` / `/live/*` calls. The IN-1 build-output (when using SDRC mode) must add the invented profile flag to: `streamprocessing-ms*`, `sensor-ms*`, AND **the entire SDRC stack in [`services/infra/sdrc/docker-compose.yaml`](../../../deploy/docker/services/infra/sdrc/docker-compose.yaml)** (`init-dirs`, `render-config`, `wdm-env-from-config`, `wait-for-redis`, `wait-for-docker-workloads`, `sdr-controller`). If targeting direct-routing instead (lighter, base-profile-style), set `STREAM_PROCESSOR_MODULE_ENDPOINT=http://localhost:30001` + `VST_NGINX_MODE=vst-direct` in the build-output `.env` and skip the SDRC stack entirely.
+> **Critical wiring (SDRC mode):** `vss-vios-sensor` reads `STREAM_PROCESSOR_MODULE_ENDPOINT` from its env (consumer-overridable, not hardcoded — see `dev-profile-base/.env:223` for the direct-routing override). In SDRC mode the default is `http://localhost:10000` — sensor-ms calls the SDRC-rendered Envoy listener, which routes to streamprocessing-ms. **Without `sdr-controller` listening on `WDM_MS_LISTENER_PORT` (default 10000), `POST /sensor/add` fails with `InvalidParameterError: Invalid Parameters`** (the failure happens inside the adaptor pre-check, ~2ms after the parameters log, with no diagnostic). And until `sdr-controller` has finished registering `vss-vios-streamprocessing` with its Envoy LDS/CDS, the listener returns 503 to downstream `/record/*` / `/replay/*` / `/live/*` calls. A deployment using SDRC mode must enable: `streamprocessing-ms*`, `sensor-ms*`, AND **the entire SDRC stack in [`services/infra/sdrc/docker-compose.yaml`](../../../deploy/docker/services/infra/sdrc/docker-compose.yaml)** (`init-dirs`, `render-config`, `wdm-env-from-config`, `wait-for-redis`, `wait-for-docker-workloads`, `sdr-controller`). If targeting direct-routing instead (lighter, base-profile-style), set `STREAM_PROCESSOR_MODULE_ENDPOINT=http://localhost:30001` + `VST_NGINX_MODE=vst-direct` in the `.env` and skip the SDRC stack entirely.
 - **Blueprint configurator readiness URL** — optional but used by VIOS start-up gating. `sensor-bp-wait-bp-configurator` polls `BP_CONFIGURATOR_READYZ_URL` (default `http://127.0.0.1:5001/readyz`) so VST services avoid an explicit `depends_on` on external configurator workloads. Timeout `SENSOR_BP_WAIT_BP_CONFIGURATOR_MAX_SEC=300`. Source: `vst.env` lines 42–46.
-
-### Structured component_services (consumed by `vss-build-vision-agent` Step 4)
-
-See `references/component-services-schema.md` for the schema and `references/microservice-catalog.md` for the catalog.
-
-```yaml
-component_services:
-  # PostgreSQL — required, single variant
-  - key: centralizedb
-    file: services/vios/foundational/docker-compose.yaml
-    role: PostgreSQL state store for sensor configurations and stream metadata.
-  # VST ingress — required, single variant
-  - key: vst-ingress
-    file: services/vios/foundational/docker-compose.yaml
-    role: Public REST gateway for /sensor, /storage, /record, /replay, /live, /proxy.
-  # SDRC controller — required, single variant. Combined WDM controller + Envoy router;
-  # replaces the legacy sdr-streamprocessing + envoy-streamprocessing pair (deprecated
-  # in 3.2, source tree slated for removal). Co-deploys with its five one-shot init
-  # containers (init-dirs, render-config, wdm-env-from-config, wait-for-redis,
-  # wait-for-docker-workloads) from the same docker-compose.yaml — Step 6.5 must add
-  # the invented profile flag to every service in that file, not just sdr-controller.
-  # Step 6.5 must ALSO materialize a
-  # config.yml.tmpl + docker_cluster_config-streamprocessing.json.tmpl pair under the
-  # build-output's SDR_CONTROLLER_CONFIG_PATH/configs (model after
-  # developer-profiles/dev-profile-alerts/sdrc/2d_vlm/configs/ — single-workload form);
-  # render-config substitutes ${HOST_IP} / ${NUM_STREAMS} / ${NUM_SENSORS} in place.
-  - key: sdr-controller
-    file: services/infra/sdrc/docker-compose.yaml
-    role: WDM controller + Envoy router; advertises streamprocessing-ms on the rendered Envoy listener (WDM_MS_LISTENER_PORT, default 10000) so vss-vios-sensor's STREAM_PROCESSOR_MODULE_ENDPOINT=http://localhost:10000 contract is honored. Requires the build-output to materialize the SDRC config templates per the comment above — there is no separate component_services entry for templates because they aren't a compose service.
-  # Sensor microservice — sibling-variant branching by sensor topology
-  - variants:
-      key: sensor_topology
-      cases:
-        rtsp-and-uploaded:
-          - key: sensor-ms
-            file: services/vios/initiator/docker-compose.yaml
-            role: VST adaptor with vst_rtsp profile — accepts both RTSP input and uploaded files.
-        warehouse-2d:
-          - key: sensor-ms-2d
-            file: services/vios/initiator/docker-compose.yaml
-            role: VST adaptor preconfigured with the warehouse-2d vst_config overlay.
-        warehouse-3d:
-          - key: sensor-ms-3d
-            file: services/vios/initiator/docker-compose.yaml
-            role: VST adaptor preconfigured with the warehouse-3d vst_config overlay.
-        warehouse-mv3dt:
-          - key: sensor-ms-mv3dt
-            file: services/vios/initiator/docker-compose.yaml
-            role: VST adaptor preconfigured with the multi-view warehouse vst_config overlay.
-  # Streamprocessing — sibling-variant branching by the SAME topology selector as sensor-ms
-  - variants:
-      key: sensor_topology
-      cases:
-        rtsp-and-uploaded:
-          - key: streamprocessing-ms
-            file: services/vios/streamprocessing/docker-compose.yaml
-            role: DeepStream pipeline for plain RTSP-and-uploaded video streams.
-        warehouse-2d:
-          - key: streamprocessing-ms-2d
-            file: services/vios/streamprocessing/docker-compose.yaml
-            role: DeepStream pipeline with warehouse-2d label overlay.
-        warehouse-3d:
-          - key: streamprocessing-ms-3d
-            file: services/vios/streamprocessing/docker-compose.yaml
-            role: DeepStream pipeline with warehouse-3d label overlay.
-        warehouse-mv3dt:
-          - key: streamprocessing-ms-mv3dt
-            file: services/vios/streamprocessing/docker-compose.yaml
-            role: DeepStream pipeline with multi-view warehouse label overlay.
-  # bp-configurator wait shim — NOT in any default allow-list; warehouse profiles only.
-  - key: sensor-bp-wait-bp-configurator
-    file: services/vios/initiator/docker-compose.yaml
-    role: One-shot poller that waits for the warehouse blueprint configurator readyz endpoint.
-    required: false
-```
 
 ## Integration Interfaces
 
@@ -163,7 +88,7 @@ component_services:
   - `DELETE /sensor/{sensorId}` — remove sensor
   Source: `references/api-reference.md` § 1–2 + `met-blueprint-docs/vst-sensor-management-api.rst` + verified live 2026-05-23.
 
-  > **Upstream documentation bug (Finding 6, 2026-05-23):** the OpenAPI YAML shipped inside `vss-vios-sensor` at `/home/vst/vst_release/webroot/doc/sensor_management_ms.yaml` declares the request field as `url`, but the actual `launch_vst` binary rejects payloads with `url` and accepts only `sensorUrl`. The authoritative usage is in `services/agent/src/vss_agents/tools/vst/utils.py` (the VSS agent's VIOS helper) which uses `sensorUrl`. When authoring `POST /sensor/add` clients, follow the VSS-agent contract, not the in-container OpenAPI.
+  > **Upstream documentation bug (Finding 6, 2026-05-23):** the OpenAPI YAML shipped inside `vss-vios-sensor` at `${VST_CONTAINER_ROOT}/webroot/doc/sensor_management_ms.yaml` declares the request field as `url`, but the actual `launch_vst` binary rejects payloads with `url` and accepts only `sensorUrl`. The authoritative usage is in `services/agent/src/vss_agents/tools/vst/utils.py` (the VSS agent's VIOS helper) which uses `sensorUrl`. When authoring `POST /sensor/add` clients, follow the VSS-agent contract, not the in-container OpenAPI.
   **Auth:** none in default deployments (Ingress NGINX is reverse-proxy only); can be wrapped with an auth layer externally.
 
 - **Method:** REST — VST Live Stream + Replay + Record Management
@@ -207,7 +132,7 @@ component_services:
   **Path:** `${CLIP_STORAGE_PATH}` (default `${VST_VOLUME}/clip_storage`, which expands to `${VSS_DATA_DIR}/data_log/vst/clip_storage`)
   **Schema:** raw video files keyed by sensor/stream ID and time range.
   **Trigger:** continuous, while recording is enabled per the sensor's aging policy.
-  This is the **IN-1 producer half** of the on-demand path: RT-VLM mounts the same host directory at `/home/vst/vst_release/streamer_videos` to read clips for VOD captioning. Source: `vst.env` line 22 + `deploy-rt-vlm-service.md` §6.
+  This is the **IN-1 producer half** of the on-demand path: RT-VLM mounts the same host directory at `${VST_CONTAINER_ROOT}/streamer_videos` to read clips for VOD captioning. Source: `vst.env` line 22 + `deploy-rt-vlm-service.md` §6.
 
 - **Method:** Filesystem write — long-term video storage
   **Path:** `${VST_VIDEO_STORAGE_PATH}` (default `${VST_VOLUME}/vst_video`)
@@ -296,7 +221,7 @@ The IN-1-relevant subset (full list in `deploy/docker/services/vios/vst.env`):
 | `ENVOY_ADMIN_PORT` | Embedded Envoy admin port. **Hardcoded** at `sdrc/docker-compose.yaml:150`. | `9902` | not env-controllable |
 | `WDM_WL_REDIS_PORT` | Redis port `sdr-controller` connects to (substituted as `${WDM_WL_REDIS_PORT:-6379}` at compose line 144). | `6379` | optional |
 | `WDM_MS_LISTENER_PORT` | Rendered Envoy listener port that fronts `streamprocessing-ms`; **must remain `10000`** because `vss-vios-sensor`'s `STREAM_PROCESSOR_MODULE_ENDPOINT=http://localhost:10000` hardcodes it. Set via the rendered `config.yml`, not the compose env. | `10000` | conditional |
-| `SDR_MW_L_IMAGE` | `sdr-controller` image override (full repo + tag) | `nvcr.io/nvstaging/vss-core/sdr-mw-l:3.0.0-prd.5` | optional |
+| `SDR_MW_L_IMAGE` | `sdr-controller` image override (full repo + tag) | `nvcr.io/nvidia/vss-core/sdr-mw-l:3.2.0` | optional |
 
 ## Network Requirements
 
@@ -325,24 +250,24 @@ The IN-1-relevant subset (full list in `deploy/docker/services/vios/vst.env`):
 
 - **VIOS image-name canonicalization (Finding 2).** The current canonical image names are `vss-vios-sensor`, `vss-vios-streamprocessing`, `vss-vios-ingress` (NOT the legacy `vss-vst-*` names). Source: `vst.env` lines 64–66. Catalog and integration consumers must use the `vss-vios-*` naming, with the corresponding `*_IMAGE_TAG` env vars driven externally.
 - **Bind-mount permissions are NOT recursive chown.** Specific subdirs require `chmod 777` (not recursive across the parent), enabling the container's UID 1001 to write. The standard remedy is `mkdir -p $VSS_DATA_DIR/data_log/vst/{clip_storage,vst_video,temp_files,vst_data}` followed by per-subdir permission grants.
-- **CLIP_STORAGE_PATH is the IN-1 contract with RT-VLM.** RT-VLM expects to read videos at the container path `/home/vst/vst_release/streamer_videos`, which the build-vision-agent compose binds from the same host directory (`${VSS_DATA_DIR}/data_log/vst/clip_storage`) that VIOS writes to. If `VSS_DATA_DIR` is set inconsistently between VIOS and RT-VLM, the on-demand caption path silently breaks — RT-VLM gets an empty filesystem mount.
-- **`vst.env` must be loaded by every VIOS include.** The top-level `deploy/docker/services/vios/compose.yml` re-declares `env_file: [..., vst.env]` on each `include:` directive. If a build-output copy `include:`s a VIOS sub-compose without re-declaring `vst.env`, ~20 VIOS-internal variables (`CLIP_STORAGE_PATH`, `SDR_IMAGE`, `KAFKA_BOOTSTRAP_URL`, `REDIS_HOSTADDR`, image tags, etc.) collapse to empty and dry-run fails. This was Finding 1 of the IN-1 first run. Source: `deploy/docker/services/vios/compose.yml` lines 17–26.
+- **CLIP_STORAGE_PATH is the IN-1 contract with RT-VLM.** RT-VLM expects to read videos at the container path `${VST_CONTAINER_ROOT}/streamer_videos`, which a consuming deployment binds from the same host directory (`${VSS_DATA_DIR}/data_log/vst/clip_storage`) that VIOS writes to. If `VSS_DATA_DIR` is set inconsistently between VIOS and RT-VLM, the on-demand caption path silently breaks — RT-VLM gets an empty filesystem mount.
+- **`vst.env` must be loaded by every VIOS include.** The top-level `deploy/docker/services/vios/compose.yml` re-declares `env_file: [..., vst.env]` on each `include:` directive. If a deployment's compose copy `include:`s a VIOS sub-compose without re-declaring `vst.env`, ~20 VIOS-internal variables (`CLIP_STORAGE_PATH`, `SDR_IMAGE`, `KAFKA_BOOTSTRAP_URL`, `REDIS_HOSTADDR`, image tags, etc.) collapse to empty and dry-run fails. This was Finding 1 of the IN-1 first run. Source: `deploy/docker/services/vios/compose.yml` lines 17–26.
 - **Host networking implications.** With `network_mode: host`, the VIOS containers cannot also have `ports:` mappings — collisions on the host must be resolved by changing the `*_HTTP_PORT` variables. Containers reach each other by `localhost:<port>` (no compose DNS).
-- **Compose profile gating.** VIOS service blocks are gated by `profiles:` on every container, listing the existing developer / industry blueprint flags (`bp_developer_alerts_2d_vlm`, `bp_developer_search_2d`, `bp_wh_2d`, etc.). The build-vision-agent skill **invents a new flag** (e.g., `bp_developer_in_1` for IN-1) per generation and adds it to every relevant `profiles:` list — only in the patched copy under `build-output/patched/services/vios/`. Upstream stays untouched.
+- **Compose profile gating.** VIOS service blocks are gated by `profiles:` on every container, listing the existing developer / industry blueprint flags (`bp_developer_alerts_2d_vlm`, `bp_developer_search_2d`, `bp_wh_2d`, etc.). A standalone deployment adds its chosen compose-profile flag to every relevant `profiles:` list in a patched copy of the compose — the upstream tree stays untouched.
 - **Startup ordering.** `sensor-bp-wait-bp-configurator` and `sensor-bp-wait-storage` are explicit wait-poller containers used INSTEAD OF `depends_on` so VIOS can come up alongside profile composes that don't define the configurator/storage workloads. Don't add `depends_on` to those external services.
 - **Sample-data bundle and friendly names.** `references/api-reference.md` § "Sample data bootstrap" documents 8 NGC-shipped sample mp4s (warehouse, warehouse-ladder, warehouse-safety-1/2, sim-traffic, sim-jaywalking, sim-box-conveyor, drone-bridge). When the user asks for "the sample warehouse video," map to `warehouse_sample.mp4` (etc.); do not invent paths for unknown friendly names.
-- **The VIOS + SDRC service set must be patched together.** When generating a build-output for Topology A, the skill's Step 6.5 Patch 1 must add the invented profile flag to: `sensor-ms*`, `streamprocessing-ms*`, AND every service in [`services/infra/sdrc/docker-compose.yaml`](../../../deploy/docker/services/infra/sdrc/docker-compose.yaml) — the `profiles:` lists at lines 24, 47, 76, 100, 117, and 137 covering `init-dirs`, `render-config`, `wdm-env-from-config`, `wait-for-redis`, `wait-for-docker-workloads`, and `sdr-controller`. Patching only `streamprocessing-ms` leaves sensor-ms unable to reach the SDRC-rendered Envoy listener on `localhost:10000` and `POST /sensor/add` fails with `Invalid Parameters` with no useful diagnostic. The legacy `sdr-streamprocessing` + `envoy-streamprocessing` pair (and the four-service VIOS quartet they were part of) is deprecated in 3.2 — do not reproduce it in new build-outputs.
-- **Patched compose must include SDRC workload-definition templates.** The SDRC `render-config` init container reads `*.tmpl` files from `${SDR_CONTROLLER_CONFIG_PATH}/configs/` and renders each in place. The skill's Step 6.5 must materialize a `config.yml.tmpl` + `docker_cluster_config-streamprocessing.json.tmpl` pair into the build-output under whatever path becomes `SDR_CONTROLLER_CONFIG_PATH`. Use [`developer-profiles/dev-profile-alerts/sdrc/2d_vlm/configs/`](../../../deploy/docker/developer-profiles/dev-profile-alerts/sdrc/2d_vlm/configs/) as the reference single-workload template (no rtvi-cv variant for the VIOS-only build-output). If the `*.tmpl` files are absent, `sdrc-render-config` exits with `render-config: no *.tmpl files found in /tmpl`, the rest of the SDRC chain never runs, and downstream `sdr-controller` never boots — leaving sensor-ms's `localhost:10000` call unanswered. The legacy `./envoy.yaml` + `./sdr-config/` bind-mount sources from the deprecated `services/vios/sdr/streamprocessing/` tree no longer apply.
+- **The VIOS + SDRC service set must be enabled together.** For Topology A, a deployment must enable `sensor-ms*`, `streamprocessing-ms*`, AND every service in [`services/infra/sdrc/docker-compose.yaml`](../../../deploy/docker/services/infra/sdrc/docker-compose.yaml) — the `profiles:` lists at lines 24, 47, 76, 100, 117, and 137 covering `init-dirs`, `render-config`, `wdm-env-from-config`, `wait-for-redis`, `wait-for-docker-workloads`, and `sdr-controller`. Patching only `streamprocessing-ms` leaves sensor-ms unable to reach the SDRC-rendered Envoy listener on `localhost:10000` and `POST /sensor/add` fails with `Invalid Parameters` with no useful diagnostic. The legacy `sdr-streamprocessing` + `envoy-streamprocessing` pair (and the four-service VIOS quartet they were part of) is deprecated in 3.2 — do not reproduce it.
+- **SDRC requires workload-definition templates.** The SDRC `render-config` init container reads `*.tmpl` files from `${SDR_CONTROLLER_CONFIG_PATH}/configs/` and renders each in place. A deployment must provide a `config.yml.tmpl` + `docker_cluster_config-streamprocessing.json.tmpl` pair at whatever path becomes `SDR_CONTROLLER_CONFIG_PATH`. Use [`developer-profiles/dev-profile-alerts/sdrc/2d_vlm/configs/`](../../../deploy/docker/developer-profiles/dev-profile-alerts/sdrc/2d_vlm/configs/) as the reference single-workload template (no rtvi-cv variant for a VIOS-only deployment). If the `*.tmpl` files are absent, `sdrc-render-config` exits with `render-config: no *.tmpl files found in /tmpl`, the rest of the SDRC chain never runs, and downstream `sdr-controller` never boots — leaving sensor-ms's `localhost:10000` call unanswered. The legacy `./envoy.yaml` + `./sdr-config/` bind-mount sources from the deprecated `services/vios/sdr/streamprocessing/` tree no longer apply.
 - **VOD URL is 404 until first segment rolls.** `rtsp://<host>:30564/vod/<id>` returns `404 Stream Not Found` until at least one recording segment exists on disk. This is normal; do not interpret as a wiring failure. Either wait the segment-rotation interval (default 5 min) or explicitly trigger a roll-over before testing VOD playback.
-- **The OpenAPI YAML inside the sensor-ms container is out of date.** `/home/vst/vst_release/webroot/doc/sensor_management_ms.yaml` documents `url` as the RTSP-mode field name; the actual binary requires `sensorUrl`. Always cross-check against `services/agent/src/vss_agents/tools/vst/utils.py` — that's the authoritative usage example shipped alongside the binary.
+- **The OpenAPI YAML inside the sensor-ms container is out of date.** `${VST_CONTAINER_ROOT}/webroot/doc/sensor_management_ms.yaml` documents `url` as the RTSP-mode field name; the actual binary requires `sensorUrl`. Always cross-check against `services/agent/src/vss_agents/tools/vst/utils.py` — that's the authoritative usage example shipped alongside the binary.
 - **`/url` JSON envelope variants return double-`http://` URLs (Finding 8, 2026-05-25).** The four `/url` storage / replay endpoints (`/storage/file/{streamId}/url`, `/replay/stream/{streamId}/picture/url`, `/storage/stream/{streamId}/picture/url`, and the bulk-timeline `/url` variant) construct their `videoUrl` / `imageUrl` fields by prepending `http://` to a value that already contains the scheme — producing `http://http://localhost:30888/storage/temp_files/<file>`. The underlying file IS served correctly at the (single-`http://`) location; the defect is purely in response-body URL construction.
   - **Client-side remediation:** strip the first `http://` (`url.startswith("http://http://") and url[7:]`) before issuing the secondary GET.
   - **Skill / consumer recommendation:** prefer the binary direct endpoints (`/storage/file/{streamId}?...`, `/replay/stream/{streamId}/picture?...`, `/storage/stream/{streamId}/picture?...`) — they return the actual bytes with correct headers and avoid the URL-construction path entirely.
-  - **Verified live** 2026-05-25 against VIOS image `nvcr.io/nvstaging/vss-core/vss-vios-ingress:2.1.0-26.05.2` / `vss-vios-streamprocessing:2.1.0-26.05.2`. Source: Phase 2 IN-1 validation run on `2xRTXPro-ubuntu` with `streamId=1b5eb54a-7d5b-4ad9-840d-729c399dfcf3` — `imageUrl` response field literal: `http://http://localhost:30888/storage/temp_files/warehouse_safety_in1_..._6334d.jpg`.
+  - **Verified live** 2026-05-25 against VIOS image `nvcr.io/nvidia/vss-core/vss-vios-ingress:3.2.0` / `vss-vios-streamprocessing:3.2.0`. Source: Phase 2 IN-1 validation run on `2xRTXPro-ubuntu` with `streamId=1b5eb54a-7d5b-4ad9-840d-729c399dfcf3` — `imageUrl` response field literal: `http://http://localhost:30888/storage/temp_files/warehouse_safety_in1_..._6334d.jpg`.
 
 ## Example Compose Snippet
 
-VIOS is structured as multiple compose files included from `deploy/docker/services/vios/compose.yml` — `foundational/docker-compose.yaml` and `initiator/docker-compose.yaml`. The combined WDM controller + Envoy router is a sibling stack at `deploy/docker/services/infra/sdrc/docker-compose.yaml`. The build-vision-agent skill patches both trees under `build-output/patched/services/{vios,infra/sdrc}/` and `include:`s them from `build-output/compose.yml`.
+VIOS is structured as multiple compose files included from `deploy/docker/services/vios/compose.yml` — `foundational/docker-compose.yaml` and `initiator/docker-compose.yaml`. The combined WDM controller + Envoy router is a sibling stack at `deploy/docker/services/infra/sdrc/docker-compose.yaml`. A deployment patches copies of both trees (never the upstream tree) and `include:`s them from its top-level compose.
 
 The IN-1 Topology A service set (canonical container names verified live 2026-05-23):
 
@@ -350,54 +275,54 @@ The IN-1 Topology A service set (canonical container names verified live 2026-05
 services:
 
   vss-vios-postgres:           # foundational/docker-compose.yaml (was `centralizedb`)
-    profiles: [..., bp_developer_in_1]   # invented flag added by Step 6.5 Patch 1
+    profiles: [..., <your-profile-flag>]   # add your deployment's compose-profile flag
 
   vss-vios-ingress:            # foundational/docker-compose.yaml (nginx reverse proxy on :30888)
-    profiles: [..., bp_developer_in_1]
+    profiles: [..., <your-profile-flag>]
 
   vss-vios-sensor:             # initiator/docker-compose.yaml (sensor-ms; HTTP_PORT=30000; ADAPTOR=vst_rtsp;
                                #   NEED_STORAGE=false, NEED_RECORDING=false, NEED_RTSPSERVER=false;
                                #   STREAM_PROCESSOR_MODULE_ENDPOINT=http://localhost:10000
                                #   → SDRC-rendered Envoy listener)
-    profiles: [..., bp_developer_in_1]
+    profiles: [..., <your-profile-flag>]
 
   vss-vios-streamprocessing:   # services/vios/streamprocessing/docker-compose.yaml
                                #   (HTTP_PORT=30001; RTSP server pool 30554–30564; WebRTC on :80;
                                #   recorder/storage/RTSP all bundled in launch_vst)
-    profiles: [..., bp_developer_in_1]
+    profiles: [..., <your-profile-flag>]
 
   # SDRC init containers (one-shot). Strict prerequisites for sdr-controller are
   # init-dirs + render-config (+ external broker-health-check). The other three run
   # in parallel with sdr-controller and serve downstream peer consumers.
   init-dirs:                   # services/infra/sdrc/docker-compose.yaml — chmod 0777 ./log + ./.wdm-env
                                #   (host paths relative to the SDRC compose-file directory).
-    profiles: [..., bp_developer_in_1]
+    profiles: [..., <your-profile-flag>]
   render-config:               # services/infra/sdrc/docker-compose.yaml — renders *.tmpl in place
                                #   under ${SDR_CONTROLLER_CONFIG_PATH}/configs, substituting
                                #   ${HOST_IP}, ${NUM_STREAMS}, ${NUM_SENSORS}.
-    profiles: [..., bp_developer_in_1]
+    profiles: [..., <your-profile-flag>]
   wdm-env-from-config:         # services/infra/sdrc/docker-compose.yaml — writes ./.wdm-env from
                                #   the rendered config.yml. Consumed by wait-for-* and downstream
                                #   peers; NOT by sdr-controller.
-    profiles: [..., bp_developer_in_1]
+    profiles: [..., <your-profile-flag>]
   wait-for-redis:              # services/infra/sdrc/docker-compose.yaml — blocks until Redis is up
                                #   (gates downstream peer consumers, not sdr-controller).
-    profiles: [..., bp_developer_in_1]
+    profiles: [..., <your-profile-flag>]
   wait-for-docker-workloads:   # services/infra/sdrc/docker-compose.yaml — blocks until the docker
                                #   workloads listed in config.yml exist (gates downstream peers).
-    profiles: [..., bp_developer_in_1]
+    profiles: [..., <your-profile-flag>]
 
   sdr-controller:              # services/infra/sdrc/docker-compose.yaml
-                               #   image: sdr-mw-l:3.0.0-prd.5
+                               #   image: sdr-mw-l:3.2.0
                                #   WDM controller :5003, SDRC direct :8011, Envoy admin :9902,
                                #   rendered Envoy listener WDM_MS_LISTENER_PORT default :10000
                                #   (replaces vss-vios-sdr + vss-vios-envoy from the legacy tree)
                                #   depends_on: broker-health-check, init-dirs, render-config
                                #   (NOT wdm-env-from-config — env is explicit in compose)
-    profiles: [..., bp_developer_in_1]
+    profiles: [..., <your-profile-flag>]
     network_mode: host
     volumes:
-      # Step 6.5 Patch 3 must materialize a config.yml.tmpl + docker_cluster_config-*.json.tmpl pair
+      # the deployment must materialize a config.yml.tmpl + docker_cluster_config-*.json.tmpl pair
       # here, modeled after developer-profiles/dev-profile-alerts/sdrc/2d_vlm/configs/.
       - "${SDR_CONTROLLER_CONFIG_PATH}/configs:/configs/:ro"   # trailing slash matches compose line 157
       - ./log:/logs
@@ -410,17 +335,17 @@ For Topology B (NvStreamer file-driven), use this service shape instead of `vss-
 
 ```yaml
   vss-vios-nvstreamer:         # developer-profiles/dev-profile-alerts/compose.yml § nvstreamer-alerts
-    image: nvcr.io/nvstaging/vss-core/vss-vios-nvstreamer:${NVSTREAMER_IMAGE_TAG}
-    profiles: [..., bp_developer_in_1]
+    image: nvcr.io/nvidia/vss-core/vss-vios-nvstreamer:${NVSTREAMER_IMAGE_TAG}
+    profiles: [..., <your-profile-flag>]
     network_mode: host
     environment:
       ADAPTOR: streamer          # NvStreamer mode — auto-scans video_path for files
       HTTP_PORT: ${NVSTREAMER_HTTP_PORT}   # default 31000; RTSP server defaults to 31554
     volumes:
-      - ./nvstreamer/configs/vst-config.json:/home/vst/vst_release/configs/vst_config.json
-      - ./nvstreamer/configs/vst-storage.json:/home/vst/vst_release/configs/vst_storage.json
-      - ${VSS_DATA_DIR}/videos/<profile-name>:/home/vst/vst_release/streamer_videos
-      - ${VSS_DATA_DIR}/data_log/nvstreamer/vst_data:/home/vst/vst_release/vst_data
+      - ./nvstreamer/configs/vst-config.json:${VST_CONTAINER_ROOT}/configs/vst_config.json
+      - ./nvstreamer/configs/vst-storage.json:${VST_CONTAINER_ROOT}/configs/vst_storage.json
+      - ${VSS_DATA_DIR}/videos/<profile-name>:${VST_CONTAINER_ROOT}/streamer_videos
+      - ${VSS_DATA_DIR}/data_log/nvstreamer/vst_data:${VST_CONTAINER_ROOT}/vst_data
 ```
 
 Both topologies emit the same `camera_streaming` Kafka/Redis event downstream.
@@ -440,4 +365,4 @@ Both topologies emit the same `camera_streaming` Kafka/Redis event downstream.
   4. `ffprobe -rtsp_transport tcp rtsp://<host>:30554/live/<sensorId>` — expect H.264 stream metadata (live playback works).
   5. `POST /vst/api/v1/record/<sensorId>/start` — start recording.
   6. After ~1–5 min, `ffprobe rtsp://<host>:30564/vod/<sensorId>` — expect H.264 metadata (VOD playback works) and `SELECT * FROM video_record_details` shows non-zero rows in `vss-vios-postgres`.
-- **End-to-end VOD captioning (Topology A + B):** confirm RT-VLM can read a VIOS-recorded file by submitting `POST /v1/files` to RT-VLM with the file path from VIOS — the shared bind mount makes it visible at the RT-VLM container path `/home/vst/vst_release/streamer_videos`.
+- **End-to-end VOD captioning (Topology A + B):** confirm RT-VLM can read a VIOS-recorded file by submitting `POST /v1/files` to RT-VLM with the file path from VIOS — the shared bind mount makes it visible at the RT-VLM container path `${VST_CONTAINER_ROOT}/streamer_videos`.

@@ -13,6 +13,10 @@ overrides to the generated profile env and resolve compose from that file:
 deploy/docker/developer-profiles/dev-profile-lvs/generated.env
 ```
 
+Password values should be supplied by that profile env or deployment-specific
+overrides; the service compose file intentionally does not define password
+defaults.
+
 Core deployment:
 
 | Var | Purpose |
@@ -140,7 +144,7 @@ Neo4j graph backend with the open-source `neo4j:5.26.4` container:
 LVS_DATABASE_BACKEND=graph_db
 GRAPH_DB_HOST=127.0.0.1          # or ${HOST_IP}; avoid graph-db with host-networked lvs-server
 GRAPH_DB_USERNAME=neo4j
-GRAPH_DB_PASSWORD=passneo4j
+GRAPH_DB_PASSWORD=<neo4j-password>
 GRAPH_DB_HTTP_PORT=7474
 GRAPH_DB_BOLT_PORT=7687
 LVS_EMB_ENABLE=true
@@ -156,7 +160,7 @@ container:
 LVS_DATABASE_BACKEND=graph_db_arango
 ARANGO_DB_HOST=127.0.0.1         # or ${HOST_IP}; avoid arango-db with host-networked lvs-server
 ARANGO_DB_USERNAME=root
-ARANGO_DB_PASSWORD=passroot
+ARANGO_DB_PASSWORD=<arango-password>
 ARANGO_DB_PORT=8529
 LVS_EMB_ENABLE=true
 LVS_EMB_MODEL_NAME=nvidia/llama-3.2-nv-embedqa-1b-v2

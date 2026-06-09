@@ -159,7 +159,7 @@ UI fallback details — see [SKILL.md UI Fallback Pattern](../SKILL.md#ui-fallba
 
 ## Step 7 — Hand off to the Shared Calibration Tail
 
-See [`common-steps.md` § Hand off](common-steps.md#hand-off-to-the-shared-calibration-tail).
+Continue with [SKILL.md Step A onward](../SKILL.md#step-a--verify-project) (verify → calibrate → poll → results). Use [`calibration-tail.md`](calibration-tail.md) for the shared Python snippet; [`common-steps.md` § Hand off](common-steps.md#hand-off-to-the-shared-calibration-tail) has the reusable handoff note.
 
 ---
 

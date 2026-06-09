@@ -597,22 +597,10 @@ edit followed by a plain-English `— annotation`.** No `Edited` prefix
 (Pad the key=value column so all `—` separators line up vertically
 within a section.)
 
-**Forbidden patterns — these are the abbreviations the agent falls
-back to and they're banned:**
-
-| ❌ Forbidden                                                            | ✅ Required                                                                                                |
-|-------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
-| `✔ Edited <file> <key>=<value>` (with the word "Edited")                 | Drop "Edited" — every row inside the box is an edit. Just `✔ <key>=<value>  — <annotation>`.              |
-| `✔ Updated to 3 in ds-main-config.txt ([streammux] [primary-gie] [source-list])` | Three separate rows: `[streammux] batch-size=3`, `[primary-gie] batch-size=3`, `[source-list] max-batch-size=3`. |
-| `✔ eglsink applied to ds-main-config.txt`                               | Four rows for the four sink keys plus their annotations.                                                   |
-| `✔ Tile grid  1 rows × 3 columns` (single row)                          | Two rows: `[tiled-display] rows=1` and `[tiled-display] columns=3` (each annotated).                       |
-| Stream sources section listing only the source URLs                     | Six `[source-list]` rows, each annotated.                                                                  |
-
-The complete per-use-case key list **with the canonical
-plain-English annotation per key** lives in
-`apply-config.md` § "Per-use-case complete
-edit list". The agent reads that table for the active use case +
-chosen settings, then emits one annotated row per key.
+The forbidden-patterns table and the complete per-use-case key list
+(with canonical annotations) both live in
+`apply-config.md` — § "Forbidden patterns" and § "Per-use-case complete
+edit list". Read that file for the active use case before emitting Step 4 rows.
 
 If a section's table has 6 keys for the active settings, the section
 shows 6 `✔` rows. **Never** collapse to fewer rows than the table
@@ -660,66 +648,23 @@ NOT add a second "deployment summary" box; the Results box already
 carries every value (use case, container, image, batch/sink, FPS,
 GPU, log path, REST endpoints).
 
-**Step 6 — post-deploy AskQuestion is REQUIRED, never free-form
-bullets.** Right after the "Perception Application — Results" box,
-the agent MUST issue the Step 6 `AskQuestion` from
-`next-steps.md` § "11.c". The user picks
-one of these buckets:
+**Step 6 — post-deploy AskQuestion is REQUIRED.**
+See § "Step ordering invariants — DO NOT skip ahead" rule 5 above for the
+ordering rule; the full bucket table and forbidden-patterns list live in
+`next-steps.md` § "11.c".
 
-| Bucket                  | What it does                                                                                            |
-|-------------------------|---------------------------------------------------------------------------------------------------------|
-| **Check metrics & FPS** | Re-runs `collect_metrics.sh` (3 samples) against `/api/v1/metrics` and prints averaged FPS + GPU + RAM. |
-| **Manage streams**      | Add a stream (`POST /api/v1/stream/add`), remove a stream (`POST /api/v1/stream/remove`), or list active streams (`GET /api/v1/stream/get-stream-info`). |
-| **Check liveness / readiness** | Probes the three RTVI-CV health endpoints — `GET /api/v1/live` (process up), `GET /api/v1/ready` (pipeline ready, returns `ds-ready=YES`), `GET /api/v1/startup` (init complete) — plus `GET /api/v1/stream/get-stream-info` for active streams. **There is no `/api/v1/health` endpoint** — never curl it. |
-| **Stop the deployment** | Stop the perception app (keep container), stop the container (`docker stop`), or full teardown (the 5-step teardown flow with explicit cleanup-scope confirmation). |
+Render each per-step exit box with a centered title and 128-character width.
+Use only the canonical pre-rendered border table in § "Pre-rendered top +
+bottom borders — COPY VERBATIM" below for the exact top and bottom border
+strings.
 
-**Forbidden after the Results box:**
-
-- ❌ Free-form "Next steps:" bullet list with raw `curl` / `docker stop`
-  examples. Those examples already live inside `next-steps.md`'s
-  bucket descriptions; the user picks a bucket and the skill emits
-  the concrete command for them.
-- ❌ Skipping Step 6 entirely on the assumption "the user knows what
-  to do next". The menu is the deploy's exit handle — without it
-  the user has to remember which curl URL to type next.
-
-If the user picks `Stop the deployment → Full teardown`, the skill
-jumps to the Teardown Flow at
-`teardown-flow.md`.
-
-Per-step exit template (title centered, 96 wide, NGC source rows shown):
-
-```
-┌─────────────────────────────────────────────────────── Deploy targets ───────────────────────────────────────────────────────┐
-│                                                                                                                              │
-│   ✔ Use case    warehouse-2d                                                                                                 │
-│   ✔ Platform    x86-dgpu (RTX 3050, 8 GB VRAM)                                                                               │
-│   ✔ Image       nvcr.io/<org>/<repo>:<tag>  (amd64 ✓)                                                                        │
-│   ✔ NGC creds   reusing ~/.ngc/config (mode 0600)                                                                            │
-│                                                                                                                              │
-│   ✔ Model       <DEFAULT_MODEL_BASENAME>                                                                                     │
-│                 from  <DEFAULT_MODEL_NGC_REF>                                                                                │
-│                                                                                                                              │
-│   ✔ Videos      <DEFAULT_VIDEOS_BASENAME>  (<N> cams)                                                                        │
-│                 from  <DEFAULT_VIDEOS_NGC_REF>                                                                               │
-│                                                                                                                              │
-└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-```
-
-For smartcity use cases the two `from` rows show **different** NGC refs
-(model from `rtdetr_model` / `gdino_model`, videos from
-`smartcity_dataset`). For warehouse use cases both `from` rows show the
-same `warehouse_dataset` ref.
-
-Other step exit titles, same centering rule:
-
-```
-┌─────────────────────────────────────────────────── Pipeline configuration ───────────────────────────────────────────────────┐
-┌───────────────────────────────────────────────────────── Container ──────────────────────────────────────────────────────────┐
-┌──────────────────────────────────────────────────── Apply configuration ─────────────────────────────────────────────────────┐
-┌──────────────────────────────────────────────── Perception Application — Plan ───────────────────────────────────────────────┐
-┌────────────────────────────────────────────── Perception Application — Results ──────────────────────────────────────────────┐
-```
+The Step 1 `Deploy targets` box body includes the selected use case, platform,
+image, NGC credential status, model asset, and video asset. For smartcity use
+cases the model rows cite `rtdetr_model` / `gdino_model` and the video rows cite
+`smartcity_dataset`; for warehouse use cases both asset groups cite the
+`warehouse_dataset` ref. The other standard exit titles are `Pipeline
+configuration`, `Container`, `Apply configuration`, `Perception Application —
+Plan`, and `Perception Application — Results`.
 
 > **No intermediate substep boxes — but keep the legitimate multi-box
 > flows.**

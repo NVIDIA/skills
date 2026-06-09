@@ -7,10 +7,10 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `vss-deploy-detection-tracking-3d`
-- Evaluation date: 2026-06-03
+- Evaluation date: 2026-06-08
 - NVSkills-Eval profile: `external`
-- Environment: `local`
-- Dataset: 6 evaluation tasks
+- Environment: `astra-sandbox`
+- Dataset: 3 evaluation tasks
 - Attempts per task: 2
 - Pass threshold: 50%
 - Overall verdict: PASS
@@ -42,9 +42,9 @@ Underlying evaluation signals used in this run:
 
 ## Test Tasks
 
-The benchmark dataset contained 6 evaluation tasks:
+The benchmark dataset contained 3 evaluation tasks:
 
-- Positive tasks: 6 tasks where the skill was expected to activate.
+- Positive tasks: 3 tasks where the skill was expected to activate.
 - Negative tasks: 0 tasks where no skill was expected.
 - Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
 
@@ -54,25 +54,25 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+0%) | 100% (+17%) |
-| Correctness | 8 | 90% (+2%) | 85% (+18%) |
-| Discoverability | 8 | 61% (+2%) | 69% (+10%) |
-| Effectiveness | 8 | 88% (+1%) | 66% (+19%) |
-| Efficiency | 8 | 46% (+3%) | 55% (+10%) |
+| Security | 6 | 100% (+0%) | 100% (+0%) |
+| Correctness | 6 | 96% (+12%) | 88% (+11%) |
+| Discoverability | 6 | 81% (+23%) | 64% (+2%) |
+| Effectiveness | 6 | 80% (+9%) | 70% (+2%) |
+| Efficiency | 6 | 64% (+22%) | 46% (+1%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 11 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 12 total findings.
 
 Top findings:
 
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/calibration-workflow.md:237`)
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/calibration-workflow.md:242`)
 - MEDIUM QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.author' (`skills/vss-deploy-detection-tracking-3d/SKILL.md`)
-- MEDIUM QUALITY/quality_discoverability: Description uses first/second person (`skills/vss-deploy-detection-tracking-3d/SKILL.md`)
-- MEDIUM QUALITY/quality_efficiency: Deeply nested references in troubleshooting.md (`skills/vss-deploy-detection-tracking-3d/SKILL.md`)
+- MEDIUM QUALITY/quality_efficiency: Deeply nested references in teardown.md (`skills/vss-deploy-detection-tracking-3d/SKILL.md`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/vss-deploy-detection-tracking-3d/SKILL.md`)
+- MEDIUM SCHEMA/author_missing: Author not specified in metadata (`skills/vss-deploy-detection-tracking-3d/SKILL.md`)
+- MEDIUM SECURITY/Unknown (SQP-2): The Python block in Step 0 performs file renames on video files, camInfo YAML files, and rewrites calibration.json in-pl (`references/configure-cameras.md:38`)
 
 ## Tier 2: Deduplication Summary
 
@@ -81,7 +81,7 @@ Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
 Notable observations:
 
 - Context Deduplication: Collected 7 file(s)
-- Inter-Skill Deduplication: Parsed skill 'vss-deploy-detection-tracking-3d': 952 char description
+- Inter-Skill Deduplication: Parsed skill 'vss-deploy-detection-tracking-3d': 418 char description
 
 ## Publication Recommendation
 

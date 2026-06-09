@@ -40,8 +40,8 @@
 #    Multi-arch and SBSA tags publish at different cadences — keep separate.
 # ─────────────────────────────────────────────────────────────────────────────
 docker_image:
-  multi_arch: nvcr.io/nvstaging/vss-core/vss-rt-cv:3.2.0-26.05.1      # x86_64 dGPU + aarch64 Jetson
-  sbsa:       nvcr.io/nvstaging/vss-core/vss-rt-cv:3.2.0-sbsa-26.05.1 # SBSA (Spark, Grace-Hopper)
+  multi_arch: nvcr.io/nvidia/vss-core/vss-rt-cv:3.2.0      # x86_64 dGPU + aarch64 Jetson
+  sbsa:       nvcr.io/nvidia/vss-core/vss-rt-cv:3.2.0-sbsa # SBSA (Spark, Grace-Hopper)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 2. In-container path layout (the image is built around these).
@@ -66,14 +66,7 @@ runtime:
   gpu_id: 0
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 4. NGC org default — written to ~/.ngc/config when the user has no existing
-#    config and didn't override at the prompt.
-# ─────────────────────────────────────────────────────────────────────────────
-ngc:
-  default_org: nvstaging
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 5. NGC resource catalog. Each entry is declared ONCE here and referenced by
+# 4. NGC resource catalog. Each entry is declared ONCE here and referenced by
 #    individual assets via `<asset>.source`. A single usecase may pull from
 #    multiple resources (e.g. model from one, videos from another).
 #
@@ -90,30 +83,30 @@ ngc_resources:
   # both video sets. Reused by warehouse-2d and warehouse-3d.
   warehouse_dataset:
     kind:        resource
-    ref:         nvstaging/vss-warehouse/vss-warehouse-app-data:v3.2.0-04282026
-    extract_dir: vss-warehouse-app-data_vv3.2.0-04282026
+    ref:         nvidia/vss-warehouse/vss-warehouse-app-data:3.2.0
+    extract_dir: vss-warehouse-app-data_v3.2.0
 
   # Smartcity videos. Detection models are SEPARATE entries below
   # Reused by smartcity-rtdetr and smartcity-gdino.
   smartcity_dataset:
     kind:        resource
-    ref:         nvstaging/vss-smartcities/vss-smartcities-app-data:v3.0-ea-26.01.2-1
-    extract_dir: vss-smartcities-app-data_vv3.0-ea-26.01.2-1
+    ref:         nvidia/vss-smartcities/vss-smartcities-app-data:3.1.0
+    extract_dir: vss-smartcities-app-data_v3.1.0
 
   # RT-DETR (2D) model.
   rtdetr_model:
     kind:        model
-    ref:         nvstaging/tao/trafficcamnet_transformer_lite:deployable_resnet50_v2.0
+    ref:         nvidia/tao/trafficcamnet_transformer_lite:deployable_resnet50_v2.0
     extract_dir: trafficcamnet_transformer_lite_vdeployable_resnet50_v2.0
 
   # Grounding DINO (open-vocab detector) model.
   gdino_model:
     kind:        model
-    ref:         nvstaging/tao/mask_grounding_dino:mask_grounding_dino_swin_tiny_commercial_deployable_v2.1_wo_mask_arm
+    ref:         nvidia/tao/mask_grounding_dino:mask_grounding_dino_swin_tiny_commercial_deployable_v2.1_wo_mask_arm
     extract_dir: mask_grounding_dino_vmask_grounding_dino_swin_tiny_commercial_deployable_v2.1_wo_mask_arm
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 6. Per-usecase defaults.
+# 5. Per-usecase defaults.
 #
 #    NGC assets — `model`, `videos`, `labels`, `anchor`:
 #      Object with `source` (key into `ngc_resources`) + `path` (relative to

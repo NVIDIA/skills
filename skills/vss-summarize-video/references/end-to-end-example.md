@@ -13,7 +13,7 @@ VIDEO_SUMMARIZATION_URL=${LVS_BACKEND_URL:-http://${HOST_IP:-localhost}:38111}
 # Retry on 503 (warmup) for up to ~30s before concluding the service is unavailable.
 video_sum_code=000
 for i in $(seq 1 10); do
-  video_sum_code=$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 3 "$VIDEO_SUMMARIZATION_URL/v1/ready")
+  video_sum_code=$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 3 --max-time 10 "$VIDEO_SUMMARIZATION_URL/v1/ready")
   case "$video_sum_code" in 200) break ;; 503) sleep 3 ;; *) break ;; esac
 done
 
@@ -27,7 +27,7 @@ if [ "$video_sum_code" = "200" ]; then
   EVENTS_JSON='["notable activity"]'         # jq-compatible JSON array
   OBJECTS_JSON=''                            # '' to omit, else '["cars","trucks"]'
 
-  curl -s -X POST "$VIDEO_SUMMARIZATION_URL/v1/summarize" \
+  curl -s --max-time 300 -X POST "$VIDEO_SUMMARIZATION_URL/v1/summarize" \
     -H "Content-Type: application/json" \
     -d "$(jq -n --arg url "$CLIP" \
           --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}" \
@@ -59,7 +59,7 @@ EXAMPLE:
 [0.0s-4.0s] <description of the first event>
 [4.0s-12.0s] <description of the second event>'
 
-  curl -s -X POST "$VLM/v1/chat/completions" \
+  curl -s --max-time 300 -X POST "$VLM/v1/chat/completions" \
     -H "Content-Type: application/json" \
     -d "$(jq -n --arg url "$CLIP" --arg text "$PROMPT" \
           --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}" '{

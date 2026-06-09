@@ -52,16 +52,26 @@ Ports that should NOT get their own secure link (they're behind the nginx proxy)
 
 ## Setup flow
 
-Before `docker compose up`, set `EXTERNAL_IP` in the profile `generated.env`
-to the Brev secure-link domain (the skill's per-deploy working copy — see
-``SKILL.md`` (see `../SKILL.md`) Step 1c/1d). The profile's other `VSS_PUBLIC_*`
-vars derive from `EXTERNAL_IP`, so this single edit propagates through
-haproxy and the agent's URL renders.
+Before `docker compose up`, set the Brev secure-link overrides in the profile
+`generated.env` (the skill's per-deploy working copy — see ``SKILL.md`` (see
+`../SKILL.md`) Step 1c/1d). **`EXTERNAL_IP` alone is not enough** — the Brev secure
+link is served over **HTTPS on 443**, but the profile `.env` ships
+`VSS_PUBLIC_HTTP_PROTOCOL=http`, `VSS_PUBLIC_WS_PROTOCOL=ws`, and
+`VSS_PUBLIC_PORT=${HAPROXY_PORT}` (7777). Leaving those at the defaults makes the
+agent emit `http://…:7777` UI/API/WS URLs from an `https://` page → the browser
+blocks them as mixed content. Set the host, protocol, and port together:
 
 ```bash
 brev_env_id=$(awk -F= '/^BREV_ENV_ID=/ {gsub(/"/, "", $2); print $2; exit}' /etc/environment)
-sed -i "s|^EXTERNAL_IP=.*|EXTERNAL_IP=7777-${brev_env_id}.brevlab.com|" \
-  deploy/docker/developer-profiles/dev-profile-<profile>/generated.env
+GEN=deploy/docker/developer-profiles/dev-profile-<profile>/generated.env
+host="7777-${brev_env_id}.brevlab.com"
+sed -i \
+  -e "s|^EXTERNAL_IP=.*|EXTERNAL_IP=${host}|" \
+  -e "s|^VSS_PUBLIC_HOST=.*|VSS_PUBLIC_HOST=${host}|" \
+  -e "s|^VSS_PUBLIC_HTTP_PROTOCOL=.*|VSS_PUBLIC_HTTP_PROTOCOL=https|" \
+  -e "s|^VSS_PUBLIC_WS_PROTOCOL=.*|VSS_PUBLIC_WS_PROTOCOL=wss|" \
+  -e "s|^VSS_PUBLIC_PORT=.*|VSS_PUBLIC_PORT=443|" \
+  "$GEN"
 ```
 
 ## Verifying the deploy is reachable externally

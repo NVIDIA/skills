@@ -1,5 +1,7 @@
 {
-  "skills": ["vss-manage-video-io-storage"],
+  "skills": [
+    "vss-manage-video-io-storage"
+  ],
   "resources": {
     "platforms": {
       "L40S": {
@@ -7,13 +9,12 @@
       }
     }
   },
-  "env": "**No VSS profile is pre-deployed.** VIOS may or may not be running on the host; the agent must probe `http://localhost:30888/vst/api/v1/sensor/version` first and, if it fails, stand VIOS up standalone via this skill's bundled [`references/deploy-vios-service.md`](../references/deploy-vios-service.md) runbook (the deploy is pre-authorized — see SKILL.md § Deployment prerequisite, *Pre-authorized autonomous mode*). Do NOT invoke `/vss-deploy-profile`; the point of this eval is to exercise the standalone VIOS deploy + API contract end-to-end. **Either deploy mode is acceptable** — the lightweight direct-routing mode (`VST_NGINX_MODE=vst-direct`, like `dev-profile-base`) or the SDRC-routed mode (the runbook's default). Every check in this spec exercises file upload + snapshot + clip + sensor metadata + recorder status, all of which work under either routing mode. VIOS is mostly GPU-independent: only the `vss-vios-streamprocessing` container needs a GPU (NVDEC/NVENC for clip extraction, snapshot rendering, recorder pipelines) — sensor-ms, nvstreamer, ingress, postgres, and `sdr-controller` (when present) are CPU-only. The L40S × 1 platform is sufficient for this workload; pick any host whose `nvidia-container-toolkit` is functional. Required env vars: `NGC_CLI_API_KEY` (for `nvcr.io/nvstaging/vss-core/*` image pulls), `HOST_IP` (consumed by the SDRC `render-config` init container via `${HOST_IP:?...}` — missing causes `docker compose up` to fail fast at substitution time before any container starts), `VSS_DATA_DIR` + `VSS_APPS_DIR` (host roots for VIOS bind mounts), plus the Brev secure-link env vars (`BREV_ENV_ID` from `/etc/environment`, `BREV_LINK_PREFIX` defaulting to 7777 per current Brev secure-link convention — see skills/vss-deploy-profile/references/brev.md). Without `BREV_ENV_ID` the returned media URLs will be raw `http://localhost:...` and the Brev-link checks will fail.",
   "expects": [
     {
-      "query": "Upload the sample warehouse video to VIOS with timestamp 2025-01-01T00:00:00.000Z.",
+      "query": "Upload the sample warehouse video to VIOS with timestamp 2025-01-01T00:00:00.000Z.\n\n**Environment & prerequisites:** **No VSS profile is pre-deployed.** VIOS may or may not be running on the host; the agent must probe `http://localhost:30888/vst/api/v1/sensor/version` first and, if it fails, stand VIOS up standalone via this skill's bundled [`references/deploy-vios-service.md`](../references/deploy-vios-service.md) runbook (the deploy is pre-authorized \u2014 see SKILL.md \u00a7 Deployment prerequisite, *Pre-authorized autonomous mode*). Do NOT invoke `/vss-deploy-profile`; the point of this eval is to exercise the standalone VIOS deploy + API contract end-to-end. **Either deploy mode is acceptable** \u2014 the lightweight direct-routing mode (`VST_NGINX_MODE=vst-direct`, like `dev-profile-base`) or the SDRC-routed mode (the runbook's default). Every check in this spec exercises file upload + snapshot + clip + sensor metadata + recorder status, all of which work under either routing mode. VIOS is mostly GPU-independent: only the `vss-vios-streamprocessing` container needs a GPU (NVDEC/NVENC for clip extraction, snapshot rendering, recorder pipelines) \u2014 sensor-ms, nvstreamer, ingress, postgres, and `sdr-controller` (when present) are CPU-only. The L40S \u00d7 1 platform is sufficient for this workload; pick any host whose `nvidia-container-toolkit` is functional. Required env vars: `NGC_CLI_API_KEY` (for `nvcr.io/nvidia/vss-core/*` image pulls), `HOST_IP` (consumed by the SDRC `render-config` init container via `${HOST_IP:?...}` \u2014 missing causes `docker compose up` to fail fast at substitution time before any container starts), `VSS_DATA_DIR` + `VSS_APPS_DIR` (host roots for VIOS bind mounts), plus the Brev secure-link env vars (`BREV_ENV_ID` from `/etc/environment`, `BREV_LINK_PREFIX` defaulting to 7777 per current Brev secure-link convention \u2014 see skills/vss-deploy-profile/references/brev.md). Without `BREV_ENV_ID` the returned media URLs will be raw `http://localhost:...` and the Brev-link checks will fail.",
       "checks": [
-        "The upload PUT to /vst/api/v1/storage/file/<filename>?timestamp=... either returns HTTP 2xx OR returns the VST sensor-cap error (HTTP 5xx with body containing 'Maximum number of sensors limit reached') — the latter is an acceptable warm-pool outcome on a re-used box, as long as the end-state checks below pass.",
-        "The agent ultimately obtained a sensorId and streamId for the warehouse video — either parsed from a 2xx upload response OR resolved from /sensor/list + /sensor/<sensorId>/streams after the upload hit the sensor-cap. Subsequent steps in this trial depend on those IDs being known.",
+        "The upload PUT to /vst/api/v1/storage/file/<filename>?timestamp=... either returns HTTP 2xx OR returns the VST sensor-cap error (HTTP 5xx with body containing 'Maximum number of sensors limit reached') \u2014 the latter is an acceptable warm-pool outcome on a re-used box, as long as the end-state checks below pass.",
+        "The agent ultimately obtained a sensorId and streamId for the warehouse video \u2014 either parsed from a 2xx upload response OR resolved from /sensor/list + /sensor/<sensorId>/streams after the upload hit the sensor-cap. Subsequent steps in this trial depend on those IDs being known.",
         "curl -sf http://localhost:30888/vst/api/v1/sensor/list returns a JSON array containing a sensor whose name matches the uploaded video's filename stem",
         "curl -sf http://localhost:30888/vst/api/v1/sensor/<sensorId>/streams returns a non-empty JSON array (confirms the sensor has at least one stream registered; downstream snapshot / clip calls rely on a streamId being available)."
       ]
@@ -22,7 +23,7 @@
       "query": "Extract a snapshot from 5 seconds into the uploaded video and return a shareable URL.",
       "checks": [
         "GET /vst/api/v1/replay/stream/<streamId>/picture/url?startTime=2025-01-01T00:00:05.000Z returns a JSON object with a non-empty imageUrl field",
-        "curl -sf -o /dev/null -w '%{http_code}' <imageUrl> returns 200 (use GET, not HEAD — VST lazy-renders snapshots and HEAD returns 404 until first GET materializes the file)",
+        "curl -sf -o /dev/null -w '%{http_code}' <imageUrl> returns 200 (use GET, not HEAD \u2014 VST lazy-renders snapshots and HEAD returns 404 until first GET materializes the file)",
         "curl -sf -o /dev/null -w '%{content_type}' <imageUrl> returns a value starting with image/ (typically image/jpeg)",
         "curl -sf -o /dev/null -w '%{size_download}' <imageUrl> returns a value greater than 2000 (rejects empty / error-placeholder images)"
       ]
@@ -31,7 +32,7 @@
       "query": "Extract a video clip from 3 to 5 seconds (mp4 container) from the uploaded video and return a shareable URL.",
       "checks": [
         "GET /vst/api/v1/storage/file/<streamId>/url?startTime=2025-01-01T00:00:03.000Z&endTime=2025-01-01T00:00:05.000Z&container=mp4&disableAudio=true returns a JSON object with a non-empty videoUrl field",
-        "curl -sf -o /dev/null -w '%{http_code}' <videoUrl> returns 200 (use GET, not HEAD — VST lazy-renders clips and HEAD returns 404 until first GET materializes the file)",
+        "curl -sf -o /dev/null -w '%{http_code}' <videoUrl> returns 200 (use GET, not HEAD \u2014 VST lazy-renders clips and HEAD returns 404 until first GET materializes the file)",
         "curl -sf -o /dev/null -w '%{content_type}' <videoUrl> returns a value starting with video/ (typically video/mp4)",
         "curl -sf -o /dev/null -w '%{size_download}' <videoUrl> returns a value greater than 1000 (rejects empty / error-page responses; a 2s 360p clip can legitimately render at a few KB)",
         "The response JSON's startTime is within a minute of the requested 00:00:03 and expiryISO is in the future"
@@ -45,7 +46,7 @@
         "GET /vst/api/v1/live/version returns a JSON object with a non-empty `version` field",
         "GET /vst/api/v1/replay/version returns a JSON object with a non-empty `version` field",
         "GET /vst/api/v1/record/version returns a JSON object with a non-empty `recorder_version` field",
-        "GET /vst/api/v1/proxy/info returns HTTP 200 with a JSON body (proxy does not expose /version — /info is used in its place)"
+        "GET /vst/api/v1/proxy/info returns HTTP 200 with a JSON body (proxy does not expose /version \u2014 /info is used in its place)"
       ]
     },
     {
@@ -53,7 +54,7 @@
       "checks": [
         "GET /vst/api/v1/sensor/<sensorId>/info returns a JSON object with non-empty `sensorId` and `name`, and no `state` field",
         "GET /vst/api/v1/sensor/<sensorId>/status returns a JSON object whose `state` is `online`",
-        "GET /vst/api/v1/sensor/<sensorId>/streams returns a streams array whose main stream's `url` is a local file path under /home/vst/... (NOT rtsp://)",
+        "GET /vst/api/v1/sensor/<sensorId>/streams returns a streams array whose main stream's `url` is a local file path under ${VST_CONTAINER_ROOT}/... (NOT rtsp://)",
         "GET /vst/api/v1/sensor/<sensorId>/settings returns `null`"
       ]
     },

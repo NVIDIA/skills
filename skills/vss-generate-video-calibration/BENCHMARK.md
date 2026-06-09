@@ -10,7 +10,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 - Evaluation date: 2026-06-08
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
-- Dataset: 6 evaluation tasks
+- Dataset: 3 evaluation tasks
 - Attempts per task: 2
 - Pass threshold: 50%
 - Overall verdict: PASS
@@ -42,9 +42,9 @@ Underlying evaluation signals used in this run:
 
 ## Test Tasks
 
-The benchmark dataset contained 6 evaluation tasks:
+The benchmark dataset contained 3 evaluation tasks:
 
-- Positive tasks: 6 tasks where the skill was expected to activate.
+- Positive tasks: 3 tasks where the skill was expected to activate.
 - Negative tasks: 0 tasks where no skill was expected.
 - Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
 
@@ -54,11 +54,11 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+0%) | 88% (-12%) |
-| Correctness | 8 | 72% (+31%) | 71% (+29%) |
-| Discoverability | 8 | 67% (+13%) | 68% (+13%) |
-| Effectiveness | 8 | 47% (+37%) | 45% (+32%) |
-| Efficiency | 8 | 56% (+10%) | 54% (+6%) |
+| Security | 6 | 100% (+58%) | 75% (+0%) |
+| Correctness | 6 | 92% (+3%) | 75% (+32%) |
+| Discoverability | 6 | 91% (+13%) | 64% (+4%) |
+| Effectiveness | 6 | 50% (-10%) | 38% (+28%) |
+| Efficiency | 6 | 70% (+16%) | 47% (-2%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
@@ -69,10 +69,10 @@ Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found
 Top findings:
 
 - MEDIUM QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.author' (`skills/vss-generate-video-calibration/SKILL.md`)
+- MEDIUM QUALITY/quality_efficiency: Deeply nested references in common-steps.md (`skills/vss-generate-video-calibration/SKILL.md`)
 - MEDIUM SCHEMA/author_missing: Author not specified in metadata (`skills/vss-generate-video-calibration/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SQP-2): The RTSP capture request hardcodes `ssl_verify: false`, which disables TLS certificate verification. This exposes the co (`references/rtsp.md:105`)
-- MEDIUM SECURITY/Unknown (SQP-2): The skill documentation instructs the agent to silently auto-detect and upload local files (videos, config, alignment JS (`references/videos.md:16`)
-- MEDIUM SECURITY/Unknown (SQP-2): The Python script performs directory scanning (VIDEO_DIR and its parent) and uploads discovered files to a remote HTTP e (`references/videos.md:156`)
+- MEDIUM SECURITY/Unknown (SQP-2): The RTSP capture request hardcodes ssl_verify=false, disabling TLS certificate verification. This exposes the connection (`references/rtsp.md:105`)
+- MEDIUM SECURITY/Unknown (SQP-2): The inline bash script automatically creates virtual environments and installs Python packages (requests) without explic (`references/sample-dataset.md:122`)
 
 ## Tier 2: Deduplication Summary
 

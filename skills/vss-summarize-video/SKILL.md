@@ -1,6 +1,6 @@
 ---
 name: vss-summarize-video
-description: Use to summarize a recorded video via the LVS summarization microservice (HITL-gated) with a VLM fallback. Not for live RTSP captioning or incident-range reports.
+description: Use to summarize a recorded video via the LVS summarization microservice (HITL-gated) with a VLM fallback. Not for report generation or live RTSP captioning.
 license: Apache-2.0
 metadata:
   version: "3.2.0"
@@ -10,14 +10,14 @@ metadata:
 ---
 ## Instructions
 
-Follow the routing tables and step-by-step workflows below. Each section that ends in *workflow*, *quick start*, or *flow* is intended to be executed top-to-bottom. Detailed reference material lives in `references/` and helper scripts live in `scripts/` — call them via `run_script` when the skill points to a script by name.
+Follow the routing tables and step-by-step workflows below. Each section that ends in *workflow*, *quick start*, or *flow* is intended to be executed top-to-bottom. Detailed reference material lives in `references/`.
 
 ## Examples
 
 Worked end-to-end examples are kept under `evals/` (each `*.json` manifest contains a runnable scenario) and inline in the per-workflow `curl` blocks below. Run a Tier-3 evaluation with `nv-base validate <this-skill-dir> --agent-eval` to replay them.
 
-You are a video summarization assistant. You call the VLM NIM or the video summarization
-microservice **directly**. Always run `curl` commands yourself; never instruct the user to run them.
+Call the VLM NIM or the video summarization microservice **directly**.
+Always run `curl` commands yourself; never instruct the user to run them.
 
 Primary video workflow query type: **"Summarize this video."** Direct video summarization API
 and service-ops requests are handled by the reference-routed sections below.
@@ -29,7 +29,7 @@ timestamped events when the LVS microservice path is reachable.
 
 **Do NOT use this skill for:**
 - Live RTSP captioning — use `vss-deploy-dense-captioning`.
-- Incident-range or alert-window reports — use `vss-generate-video-report` Mode B.
+- Report generation, including incident or alert-window reports — use `vss-generate-video-report` Mode B.
 - Semantic search across the archive — use `vss-search-archive`.
 
 ## Prerequisites
@@ -157,7 +157,7 @@ VLM="${VLM_BASE_URL:-${RTVI_VLM_BASE_URL:-http://${HOST_IP:-localhost}:8018}}"
 VLM="${VLM%/v1}"
 
 # VLM / RT-VLM: 200 on /v1/models
-vlm_code=$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 3 \
+vlm_code=$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 3 --max-time 10 \
   "$VLM/v1/models")
 [ "$vlm_code" = "200" ] && echo "VLM OK" || echo "VLM not reachable (HTTP $vlm_code)"
 
@@ -165,7 +165,7 @@ vlm_code=$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 3 \
 VIDEO_SUMMARIZATION_URL=${LVS_BACKEND_URL:-http://${HOST_IP:-localhost}:38111}
 video_sum_code=000
 for i in $(seq 1 10); do
-  video_sum_code=$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 3 "$VIDEO_SUMMARIZATION_URL/v1/ready")
+  video_sum_code=$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 3 --max-time 10 "$VIDEO_SUMMARIZATION_URL/v1/ready")
   case "$video_sum_code" in
     200) echo "video summarization OK"; break ;;
     503) sleep 3 ;;                 # warming up; keep polling
@@ -231,7 +231,7 @@ SCENARIO='warehouse monitoring'
 EVENTS_JSON='["notable activity"]'
 OBJECTS_JSON=''  # '' to omit, else '["forklifts","pallets","workers"]'
 
-curl -s -X POST "$VIDEO_SUMMARIZATION_URL/v1/summarize" \
+curl -s --max-time 300 -X POST "$VIDEO_SUMMARIZATION_URL/v1/summarize" \
   -H "Content-Type: application/json" \
   -d "$(jq -n --arg url "<clip_url_from_vss_manage_video_io_storage>" \
         --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}" \
@@ -276,7 +276,7 @@ EXAMPLE:
 [0.0s-4.0s] <description of the first event>
 [4.0s-12.0s] <description of the second event>'
 
-curl -s -X POST "$VLM/v1/chat/completions" \
+curl -s --max-time 300 -X POST "$VLM/v1/chat/completions" \
   -H "Content-Type: application/json" \
   -d "$(jq -n \
         --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}" \

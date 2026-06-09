@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 OR MIT <br>
 ## Use Case: <br>
-Developers and engineers managing video cameras, sensors, RTSP streams, recordings, snapshots, and storage through the VIOS REST API in NVIDIA VSS deployments. <br>
+Developers and engineers managing video input/output and storage workflows in NVIDIA VSS deployments — sensor management, stream configuration, video uploads, snapshots, clip extraction, and recording timelines via the VIOS and NvStreamer REST APIs. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,18 +19,28 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [VIOS REST API Reference](references/api-reference.md) <br>
-- [NvStreamer REST API Reference](references/nvstreamer-api-reference.md) <br>
+- [VIOS API Reference](references/api-reference.md) <br>
+- [NvStreamer API Reference](references/nvstreamer-api-reference.md) <br>
 - [Deploy VIOS Service](references/deploy-vios-service.md) <br>
 - [Integrate VIOS Service](references/integrate-vios-service.md) <br>
 - [NVIDIA VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
+- [GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, API Calls, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [API Calls, Shell commands, JSON] <br>
+**Output Format:** [Markdown with inline bash code blocks and JSON responses] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
+
+## Evaluation Agents Used: <br>
+- `claude-code` <br>
+- `codex` <br>
+
+
+
+## Evaluation Tasks: <br>
+Evaluated against 2 evaluation tasks in the `external` NVSkills-Eval profile, run in an `astra-sandbox` environment with 2 attempts per task and a 50% pass threshold. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -40,7 +50,25 @@ Reported benchmark dimensions: <br>
 - Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
+Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
+- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
+- `accuracy`: Grades final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
+- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `token_efficiency`: Compares token usage with and without the skill. <br>
 
+
+
+## Evaluation Results: <br>
+| Dimension | Num | `claude-code` | `codex` |
+|---|---:|---:|---:|
+| Security | 4 | 100% (+0%) | 88% (+12%) |
+| Correctness | 4 | 95% (+57%) | 88% (+39%) |
+| Discoverability | 4 | 93% (+68%) | 70% (+13%) |
+| Effectiveness | 4 | 69% (+48%) | 67% (+38%) |
+| Efficiency | 4 | 80% (+60%) | 54% (+5%) |
 
 ## Skill Version(s): <br>
 3.2.0 (source: frontmatter) <br>

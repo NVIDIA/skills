@@ -6,7 +6,7 @@ VIOS stores videos uploaded by the user. For requests that reference a
 **"sample"** video by friendly name (e.g. *"the sample warehouse
 video"*, *"sample-warehouse-ladder"*, *"warehouse_safety_0001"*) the
 expected file is one of the 8 mp4s shipped in NGC bundle
-`nvidia/vss-developer/dev-profile-sample-data:3.1.0`. Before any
+`nvidia/vss-developer/dev-profile-sample-data:3.2.0`. Before any
 upload-style request, ensure the bundle is extracted locally:
 
 ```bash
@@ -18,11 +18,11 @@ if [ ! -d "$SAMPLE_DIR" ]; then
 
   # NGC CLI required (export NGC_CLI_API_KEY first if not already set).
   ngc registry resource download-version \
-    nvidia/vss-developer/dev-profile-sample-data:3.1.0 \
+    nvidia/vss-developer/dev-profile-sample-data:3.2.0 \
     --org nvidia --team vss-developer
 
-  # Bundle ships as a single tar.gz inside dev-profile-sample-data_v3.1.0/.
-  tar -xzf dev-profile-sample-data_v3.1.0/dev-profile-sample-data.tar.gz
+  # Bundle ships as a single tar.gz inside dev-profile-sample-data_v3.2.0/.
+  tar -xzf dev-profile-sample-data_v3.2.0/dev-profile-sample-data.tar.gz
 fi
 
 ls "$SAMPLE_DIR"/  # verify expected mp4s present
@@ -368,7 +368,7 @@ curl -s -X DELETE "http://<VST_ENDPOINT>/vst/api/v1/storage/file/<streamId>?star
 
 > **Identify sensor type before deleting:** call `GET /sensor/<sensorId>/streams` and check the `url` field.
 > - If `url` starts with `rtsp://` → RTSP/IP sensor
-> - If `url` is a file path (e.g. `/home/vst/.../video.mp4`) → uploaded file sensor
+> - If `url` is a file path (e.g. `${VST_CONTAINER_ROOT}/.../video.mp4`) → uploaded file sensor
 >
 > **Which delete to use:**
 > - **Uploaded file sensor** — use ONLY `DELETE /storage/file/<streamId>?startTime=...&endTime=...`. This deletes the physical file and removes the sensor from all APIs. Do NOT use `DELETE /sensor/<sensorId>` alone — it removes the sensor from APIs but leaves the physical file on disk.
@@ -420,7 +420,7 @@ curl -s "http://<VST_ENDPOINT>/vst/api/v1/sensor/<sensorId>/network" | jq .
 ```
 Response: `{ipAddressV4, ipAddressV6, subnetMaskV4, subnetMaskV6, dhcpV4, dhcpV6, isIpv4Enabled, isIpv6Enabled}`.
 - `dhcpV4`/`dhcpV6` are strings (e.g. `"false"`, `"Off"`), not booleans.
-- `subnetMaskV4` is a dotted-quad string (e.g. `"255.255.255.0"`).
+- `subnetMaskV4` is a dotted-quad string (for example, `"<ipv4-subnet-mask>"`).
 - `subnetMaskV6` is a numeric prefix-length **string** (e.g. `"64"`), NOT a dotted netmask — asymmetric with IPv4.
 
 **Set sensor network info** (POST, not PUT):

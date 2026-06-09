@@ -2,6 +2,7 @@
 
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
+# setup_sparse4d.sh builds or reuses Sparse4D engines and stages configs.
 #
 # Licensed under Apache-2.0 (full text: http://www.apache.org/licenses/LICENSE-2.0).
 
@@ -132,9 +133,7 @@ echo "   Sparse4D repo : $SPARSE4D_REPO"
 echo "   Cache dir     : $ENGINE_CACHE_DIR"
 echo "   Cache target  : $CACHE_TARGET"
 
-# ── Cache lookup (exact or compatible) ──────────────────────────────
-# Prints machine-parseable marker lines: ENGINE_CACHE: HIT_EXACT|HIT_COMPAT|MISS|FORCE
-# so the calling agent/skill can relay the cache decision to the user.
+# ── Cache lookup (exact or compatible) — see setup_gdino.sh for comment ────
 RESOLVED=""
 if [[ "$FORCE" -eq 0 ]]; then
     if RESOLVED=$(engine_cache_hit "$STEM" "$BATCH" .engine); then

@@ -65,14 +65,23 @@ Source-backed topic sets:
 | Bare copied `rtvi-vlm-docker-compose.yml` without env overrides | `vision-llm-messages` | `vision-llm-events-incidents` | `vision-llm-errors` |
 
 Always confirm the live container before validating Kafka, because these env vars
-are fixed at RT-VLM container start:
+are fixed at RT-VLM container start. In a full VSS alerts real-time profile, the
+Kafka container is `mdx-kafka`; use that exact container name in consumer
+commands and final proof snippets. Do not shorten it to `kafka`, even if another
+container with that name exists. Run this shared setup once before the topic
+checks and consumer snippets below:
 ```bash
-docker exec vss-rtvi-vlm printenv KAFKA_TOPIC KAFKA_INCIDENT_TOPIC ERROR_MESSAGE_TOPIC
-```
-
-For deterministic validation, first check topic offsets:
-```bash
-KAFKA_CONTAINER="${KAFKA_CONTAINER:-rtvi-vlm-kafka}" # set to mdx-kafka/kafka if your deployment uses that name
+if [ -z "${KAFKA_CONTAINER:-}" ]; then
+  if docker ps --format '{{.Names}}' | grep -qx mdx-kafka; then
+    KAFKA_CONTAINER=mdx-kafka
+  elif docker ps --format '{{.Names}}' | grep -qx rtvi-vlm-kafka; then
+    KAFKA_CONTAINER=rtvi-vlm-kafka
+  elif docker ps --format '{{.Names}}' | grep -qx kafka; then
+    KAFKA_CONTAINER=kafka
+  else
+    KAFKA_CONTAINER=rtvi-vlm-kafka
+  fi
+fi
 CAPTION_TOPIC="${CAPTION_TOPIC:-$(docker exec vss-rtvi-vlm printenv KAFKA_TOPIC 2>/dev/null || true)}"
 INCIDENT_TOPIC="${INCIDENT_TOPIC:-$(docker exec vss-rtvi-vlm printenv KAFKA_INCIDENT_TOPIC 2>/dev/null || true)}"
 ERROR_TOPIC="${ERROR_TOPIC:-$(docker exec vss-rtvi-vlm printenv ERROR_MESSAGE_TOPIC 2>/dev/null || true)}"
@@ -90,6 +99,12 @@ kafka_cli() {
   ' sh "$@"
 }
 
+docker exec vss-rtvi-vlm printenv KAFKA_TOPIC KAFKA_INCIDENT_TOPIC ERROR_MESSAGE_TOPIC 2>/dev/null || true
+printf 'Kafka container: %s\n' "$KAFKA_CONTAINER"
+```
+
+For deterministic validation, first check topic offsets:
+```bash
 for T in "$CAPTION_TOPIC" "$INCIDENT_TOPIC" "$ERROR_TOPIC"; do
   kafka_cli kafka-get-offsets \
     --bootstrap-server 127.0.0.1:9092 \
@@ -141,7 +156,7 @@ container; it may make Kafka CLI checks pass while RT-VLM publish fails.
 
 ```bash
 : "${KAFKA_CONTAINER:?Set this to the existing Kafka container name}"
-: "${HOST_IP:=host.docker.internal}"
+# HOST_IP must match the listener RT-VLM uses in KAFKA_BOOTSTRAP_SERVERS.
 ```
 
 If launching a dedicated broker, first confirm that port `9092` is free. If it
@@ -235,15 +250,8 @@ case "$KAFKA_IMAGE" in
     ;;
 esac
 
-kafka_cli() {
-  docker exec "$KAFKA_CONTAINER" sh -lc '
-    tool="$1"; shift
-    if command -v "$tool" >/dev/null 2>&1; then
-      exec "$tool" "$@"
-    fi
-    exec "/opt/kafka/bin/${tool}.sh" "$@"
-  ' sh "$@"
-}
+# Assumes the shared kafka_cli helper from "HTTP response vs. Kafka message bus"
+# is loaded in this shell.
 
 for i in $(seq 1 60); do
   kafka_cli kafka-topics --bootstrap-server 127.0.0.1:9092 --list >/dev/null 2>&1 && break
@@ -251,11 +259,8 @@ for i in $(seq 1 60); do
   [ "$i" = 60 ] && { docker logs --tail 80 "$KAFKA_CONTAINER"; exit 1; }
 done
 
-CAPTION_TOPIC="${CAPTION_TOPIC:-mdx-vlm}"
-INCIDENT_TOPIC="${INCIDENT_TOPIC:-mdx-vlm-incidents}"
-ERROR_TOPIC="${ERROR_TOPIC:-vision-llm-errors}"
-# For a bare copied compose with no topic overrides, set:
-#   CAPTION_TOPIC=vision-llm-messages INCIDENT_TOPIC=vision-llm-events-incidents
+# Override CAPTION_TOPIC, INCIDENT_TOPIC, and ERROR_TOPIC before creating
+# topics if your copied compose uses non-default names such as vision-llm-*.
 
 for T in "$CAPTION_TOPIC" "$INCIDENT_TOPIC" "$ERROR_TOPIC"; do
   kafka_cli kafka-topics \
@@ -281,24 +286,7 @@ After Kafka is running, confirm RT-VLM can reach the same broker address it was
 configured with:
 
 ```bash
-KAFKA_CONTAINER="${KAFKA_CONTAINER:-rtvi-vlm-kafka}"
-CAPTION_TOPIC="${CAPTION_TOPIC:-$(docker exec vss-rtvi-vlm printenv KAFKA_TOPIC 2>/dev/null || true)}"
-INCIDENT_TOPIC="${INCIDENT_TOPIC:-$(docker exec vss-rtvi-vlm printenv KAFKA_INCIDENT_TOPIC 2>/dev/null || true)}"
-ERROR_TOPIC="${ERROR_TOPIC:-$(docker exec vss-rtvi-vlm printenv ERROR_MESSAGE_TOPIC 2>/dev/null || true)}"
-CAPTION_TOPIC="${CAPTION_TOPIC:-mdx-vlm}"
-INCIDENT_TOPIC="${INCIDENT_TOPIC:-mdx-vlm-incidents}"
-ERROR_TOPIC="${ERROR_TOPIC:-vision-llm-errors}"
-
-kafka_cli() {
-  docker exec "$KAFKA_CONTAINER" sh -lc '
-    tool="$1"; shift
-    if command -v "$tool" >/dev/null 2>&1; then
-      exec "$tool" "$@"
-    fi
-    exec "/opt/kafka/bin/${tool}.sh" "$@"
-  ' sh "$@"
-}
-
+# Assumes the shared topic variables and kafka_cli helper are loaded.
 docker exec vss-rtvi-vlm printenv KAFKA_BOOTSTRAP_SERVERS
 docker logs vss-rtvi-vlm 2>&1 | grep -i 'KafkaTimeoutError\\|Failed to update metadata' || true
 
@@ -323,24 +311,7 @@ Then consume bounded, metadata-only samples from all three topics. `--timeout-ms
 prevents a no-message topic from hanging indefinitely; `print.value=false` avoids
 printing protobuf bytes:
 ```bash
-KAFKA_CONTAINER="${KAFKA_CONTAINER:-rtvi-vlm-kafka}"
-CAPTION_TOPIC="${CAPTION_TOPIC:-$(docker exec vss-rtvi-vlm printenv KAFKA_TOPIC 2>/dev/null || true)}"
-INCIDENT_TOPIC="${INCIDENT_TOPIC:-$(docker exec vss-rtvi-vlm printenv KAFKA_INCIDENT_TOPIC 2>/dev/null || true)}"
-ERROR_TOPIC="${ERROR_TOPIC:-$(docker exec vss-rtvi-vlm printenv ERROR_MESSAGE_TOPIC 2>/dev/null || true)}"
-CAPTION_TOPIC="${CAPTION_TOPIC:-mdx-vlm}"
-INCIDENT_TOPIC="${INCIDENT_TOPIC:-mdx-vlm-incidents}"
-ERROR_TOPIC="${ERROR_TOPIC:-vision-llm-errors}"
-
-kafka_cli() {
-  docker exec "$KAFKA_CONTAINER" sh -lc '
-    tool="$1"; shift
-    if command -v "$tool" >/dev/null 2>&1; then
-      exec "$tool" "$@"
-    fi
-    exec "/opt/kafka/bin/${tool}.sh" "$@"
-  ' sh "$@"
-}
-
+# Assumes the shared topic variables and kafka_cli helper are loaded.
 for T in "$CAPTION_TOPIC" "$INCIDENT_TOPIC" "$ERROR_TOPIC"; do
   kafka_cli kafka-console-consumer \
     --bootstrap-server 127.0.0.1:9092 \
@@ -353,6 +324,23 @@ for T in "$CAPTION_TOPIC" "$INCIDENT_TOPIC" "$ERROR_TOPIC"; do
     --property print.headers=true \
     --property print.value=false
 done
+```
+
+For a full VSS alerts real-time profile, the incident-topic proof should include
+`mdx-kafka` explicitly. Skip this block for standalone RT-VLM; use the
+`kafka_cli` consumer above instead.
+
+```bash
+docker exec mdx-kafka kafka-console-consumer \
+  --bootstrap-server 127.0.0.1:9092 \
+  --topic "${INCIDENT_TOPIC:-mdx-vlm-incidents}" \
+  --from-beginning \
+  --timeout-ms 5000 \
+  --max-messages 20 \
+  --property print.timestamp=true \
+  --property print.key=true \
+  --property print.headers=true \
+  --property print.value=false
 ```
 
 Typical proof of an HTTP + Kafka alert pass:

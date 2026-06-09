@@ -2,6 +2,7 @@
 
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
+# collect_metrics.sh samples RTVI-CV performance counters and prints averages.
 #
 # Licensed under Apache-2.0 (full text: http://www.apache.org/licenses/LICENSE-2.0).
 
@@ -235,11 +236,7 @@ for i in $(seq 1 "$SAMPLES"); do
         done < <(printf '%s' "$RESP" | parse_api_metrics)
     fi
 
-    # Log-fallback: when /api/v1/metrics returns stream-count=0 (typical for
-    # static-mode deploys, where the API only counts dynamically-added
-    # streams), parse the deployment log's PERF lines to recover real FPS.
-    # We tag entries via FPS_COUNT so the averaging logic below handles
-    # them identically to API entries.
+    # Log-fallback: see _PARSE_LOG_PY block above for PERF-line rationale.
     if (( STREAM_COUNT_LAST == 0 )) && [[ -n "$LOG" ]]; then
         while IFS=$'\t' read -r type id fps; do
             [[ "$type" == "STREAM_FPS" ]] || continue
@@ -264,9 +261,6 @@ done
 
 # ── Average helper ───────────────────────────────────────────────────
 avg() {
-    # Skip "n/a" sentinels from the REST API so they don't get coerced to 0
-    # by awk's numeric coercion and pull the average toward zero. Returns
-    # "n/a" when called with no args OR every sample is "n/a".
     [[ $# -eq 0 ]] && { echo "n/a"; return; }
     awk 'BEGIN{s=0;n=0} { if ($1=="n/a") next; s+=$1; n++ } END{if(n==0){print "n/a"}else{printf "%.1f",s/n}}' \
         <<< "$(printf '%s\n' "$@")"
@@ -332,9 +326,7 @@ fi
 
 # Optional JSON dump
 if [[ -n "$JSON_OUT" ]]; then
-    # Build the JSON body via python so camera IDs (from the REST API)
-    # that contain `"`, `\`, or control chars can't escape the JSON
-    # string. Same pattern as add_streams.sh uses for /stream/add.
+    # Build JSON via python for safe serialization — see add_streams.sh for rationale.
     PER_STREAM_ARGS=()
     for id in "${!FPS_SUM[@]}"; do
         n="${FPS_COUNT[$id]:-1}"; s="${FPS_SUM[$id]:-0}"

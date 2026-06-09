@@ -33,39 +33,5 @@
       "Lands calibration at the warehouse-mv3dt-app calibration/sample-data/<dataset> path before deploying.",
       "Deploys MV3DT only after calibration is in place."
     ]
-  },
-  {
-    "id": "mv3dt-sbsa-dgx-spark",
-    "question": "Which image tags do I need to deploy MV3DT on a DGX Spark?",
-    "expected_skill": "vss-deploy-detection-tracking-3d",
-    "ground_truth": "On DGX-SPARK only the Perception image switches to its -sbsa tag (PERCEPTION_TAG); BEV Fusion and the other images keep their shipped tags. SBSA is not inferred from ARM64 — AGX-THOR / IGX-THOR use the normal non-SBSA tags. The shipped .env is the source of truth for which keys ship an -sbsa variant.",
-    "expected_behavior": [
-      "States that on DGX-SPARK only PERCEPTION_TAG switches to its -sbsa variant.",
-      "Does not apply an -sbsa tag to BEV Fusion or hand-construct -sbsa tags that are not shipped.",
-      "Notes AGX-THOR / IGX-THOR are ARM64 but use the shipped non-SBSA tags."
-    ]
-  },
-  {
-    "id": "mv3dt-single-camera-guard",
-    "question": "Can I use MV3DT to track with a single camera?",
-    "expected_skill": "vss-deploy-detection-tracking-3d",
-    "ground_truth": "MV3DT is a multi-view stack that requires at least two calibrated cameras; single-camera tracking is not supported, and the user is directed to the 2D / 3D-per-camera paths instead.",
-    "expected_behavior": [
-      "States that MV3DT requires two or more calibrated cameras.",
-      "Does not attempt an MV3DT deploy for a single camera.",
-      "Points to the 2D / 3D-per-camera paths instead of MV3DT."
-    ]
-  },
-  {
-    "id": "mv3dt-zero-active-sources",
-    "question": "I redeployed MV3DT but vss-rtvi-cv-mv3dt shows 'Active sources : 0' even though every container looks healthy. How do I fix it?",
-    "expected_skill": "vss-deploy-detection-tracking-3d",
-    "ground_truth": "Stale host-side state survived a plain redeploy. A clean redeploy resets containers and named volumes (down -v) AND clears host-side data_log (rotate to a backup or run cleanup_all_datalog.sh), re-applies the scoped data_log permissions, then redeploys; recovery is confirmed by the readiness gate (active sources equal to NUM_STREAMS and growing mdx-raw / mdx-bev offsets), not container health alone.",
-    "expected_behavior": [
-      "Identifies stale state (named volumes and/or host-side data_log) as the cause.",
-      "Runs docker compose down -v AND clears data_log — not down -v alone.",
-      "Re-applies the data_log permissions and redeploys.",
-      "Confirms recovery via active sources equal to NUM_STREAMS and growing broker offsets, not just container health."
-    ]
   }
 ]

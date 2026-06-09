@@ -7,14 +7,18 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `vss-manage-alerts`
-- Evaluation date: 2026-05-29
+- Evaluation date: 2026-06-08
 - NVSkills-Eval profile: `external`
+- Environment: `astra-sandbox`
+- Dataset: 28 evaluation tasks
+- Attempts per task: 2
+- Pass threshold: 50%
 - Overall verdict: PASS
-- Tier 3 live agent evaluation: not available in this report
 
 ## Agents Used
 
-- Tier 3 agent details were not available in this report.
+- `claude-code`
+- `codex`
 
 ## Metrics Used
 
@@ -28,15 +32,29 @@ Reported benchmark dimensions:
 
 Underlying evaluation signals used in this run:
 
-- No Tier 3 evaluation signal details were available in this report.
+- `security` (Security): checks for unsafe operations, secret leakage, and unauthorized access.
+- `skill_execution` (Skill Execution): verifies that the agent loaded the expected skill and workflow.
+- `skill_efficiency` (Efficiency): checks routing quality, decoy avoidance, and redundant tool usage.
+- `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
+- `goal_accuracy` (Goal Accuracy): checks whether the overall user task completed successfully.
+- `behavior_check` (Behavior Check): verifies expected behavior steps, including safety expectations.
+- `token_efficiency` (Token Efficiency): compares token usage with and without the skill.
 
 ## Test Tasks
 
-Tier 3 evaluation task details were not available in this report.
+The benchmark included 28 recorded Tier 3 trials, but the source evaluation dataset was not available in this report payload.
 
 ## Results
 
-Tier 3 dimension rollup was not available in this report.
+| Dimension | Num | `claude-code` | `codex` |
+|---|---:|---:|---:|
+| Security | 8 | 82% (+32%) | 64% (+11%) |
+| Correctness | 8 | 87% (+0%) | 86% (+17%) |
+| Discoverability | 8 | 96% (+3%) | 85% (+17%) |
+| Effectiveness | 8 | 71% (+2%) | 62% (+12%) |
+| Efficiency | 8 | 82% (+9%) | 74% (+21%) |
+
+Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 

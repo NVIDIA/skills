@@ -205,8 +205,8 @@ link). Report the ingress URLs, not raw ports — see
 ## Env file location
 
 ```
-deploy/docker/developer-profiles/dev-profile-lvs/.env            # source defaults (read-only)
-deploy/docker/developer-profiles/dev-profile-lvs/generated.env   # skill's working copy (apply overrides here)
+deploy/docker/developer-profiles/dev-profile-lvs/.env
+deploy/docker/developer-profiles/dev-profile-lvs/generated.env
 ```
 
 ## Debugging
