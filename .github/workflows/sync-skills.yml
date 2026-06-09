@@ -354,6 +354,109 @@ jobs:
             done < "$dropped"
           fi
 
+      - name: Resolve skill contacts
+        # For each dropped/reverted skill, resolve the original onboarder
+        # via git blame on the owning components.d/<slug>.yml and emit a
+        # mapping (catalog_dir → @github-login) into /tmp/skill-contacts.txt.
+        # Downstream steps (tracker issue body, sync PR body) read this
+        # file and @-mention the contact so the source-team owner is
+        # notified directly instead of via a manual catalog-PIC ping.
+        #
+        # Resolution rules:
+        #   - YML owner: first file matching `catalog_dir: <dir>` under
+        #     components.d/*.yml (orphans without a YML are skipped with
+        #     a warning).
+        #   - Author email: `git log --diff-filter=A` on the YML — the
+        #     person who added the component is the canonical contact.
+        #   - Email → GH login: GitHub user search by email. The repo's
+        #     Verify Authors gate guarantees NVIDIA-issued emails, so the
+        #     lookup usually resolves. If it doesn't, we emit a loud
+        #     workflow warning rather than silently skipping the tag.
+        # Lookups are cached in-memory across the run to keep API calls
+        # well under the rate limit even on large drop batches.
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          dropped=/tmp/dropped-skills.txt
+          contacts=/tmp/skill-contacts.txt
+          : > "$contacts"
+
+          if [ -s "$dropped" ]; then
+            :
+          else
+            echo "  (no dropped skills — nothing to resolve)"
+            exit 0
+          fi
+
+          # File-backed cache for email → GH login lookups so we make at
+          # most one API call per unique email even on large drop batches.
+          # File-backed rather than associative array so the step works
+          # under any bash version.
+          cache=/tmp/email-login-cache.txt
+          : > "$cache"
+
+          while IFS='|' read -r product dir reason; do
+            [ -z "$dir" ] && continue
+            cat_dir=$(basename "$dir")
+
+            # Find owning YML. Multiple `catalog_dir:` matches across
+            # components.d/ are not expected (uniqueness gate at PR time)
+            # but if it happens we take the first deterministically.
+            owner_yml=$(grep -l "catalog_dir: $cat_dir" components.d/*.yml 2>/dev/null | sort | head -1)
+            if [ -z "$owner_yml" ]; then
+              echo "::warning::no YML owner found for $dir — cannot resolve contact (orphan or schema mismatch)"
+              continue
+            fi
+
+            # Author of the first commit that added this YML = onboarder.
+            # --diff-filter=A returns the "A"dded entry. tail -1 in case
+            # the YML was added, deleted, and re-added (last A wins).
+            author_email=$(git log --diff-filter=A --format='%ae' -- "$owner_yml" 2>/dev/null | tail -1 || true)
+            if [ -z "$author_email" ]; then
+              echo "::warning::no add-commit author for $owner_yml — cannot resolve contact for $cat_dir"
+              continue
+            fi
+
+            # Email → GH login lookup. Check cache first.
+            cached=$(awk -F'|' -v e="$author_email" '$1==e {print $2; exit}' "$cache")
+            if [ -n "$cached" ]; then
+              # Cache hit. Sentinel "-" means "tried, got empty" — don't retry.
+              if [ "$cached" = "-" ]; then
+                login=""
+              else
+                login="$cached"
+              fi
+            else
+              # GitHub search by email; +in:email is the qualifier.
+              login=$(gh api "search/users?q=${author_email}+in:email" \
+                       --jq '.items[0].login // empty' 2>/dev/null || echo "")
+              # Persist result (use "-" sentinel for empty so future
+              # lookups hit the cache instead of re-querying).
+              if [ -n "$login" ]; then
+                echo "$author_email|$login" >> "$cache"
+              else
+                echo "$author_email|-" >> "$cache"
+              fi
+            fi
+
+            if [ -z "$login" ]; then
+              echo "::warning::could not resolve GitHub login for $author_email (onboarder of $owner_yml) — $cat_dir will land without contact tag"
+              continue
+            fi
+
+            echo "$cat_dir|@$login|$author_email|$owner_yml" >> "$contacts"
+            echo "  $cat_dir → @$login (from $author_email via $(basename "$owner_yml"))"
+          done < "$dropped"
+
+          if [ -s "$contacts" ]; then
+            resolved=$(wc -l < "$contacts" | tr -d ' ')
+            total=$(wc -l < "$dropped" | tr -d ' ')
+            echo "Resolved $resolved/$total contacts."
+          fi
+
       - name: Track dropped skills
         continue-on-error: true
         env:
@@ -417,6 +520,18 @@ jobs:
             echo "**Last updated:** $(date -u +%Y-%m-%d) by [sync run #${{ github.run_id }}]($RUN_URL)"
             echo ""
 
+            # Look up the resolved GitHub login (if any) for a catalog
+            # dir from /tmp/skill-contacts.txt produced by the
+            # "Resolve skill contacts" step. Empty result means the
+            # contact resolver couldn't find a login — section emits
+            # without a cc trailer in that case.
+            contacts_file=/tmp/skill-contacts.txt
+            lookup_contact() {
+              local cat_dir="$1"
+              [ -f "$contacts_file" ] || { echo ""; return; }
+              awk -F'|' -v d="$cat_dir" '$1==d {print $2; exit}' "$contacts_file"
+            }
+
             emit_section() {
               local heading="$1" filter_kind="$2" count="$3"
               [ "$count" -gt 0 ] || return 0
@@ -436,7 +551,13 @@ jobs:
                   echo "### \`$product\`"
                   current="$product"
                 fi
-                echo "- \`$dir\` — $display"
+                cat_dir=$(basename "$dir")
+                contact=$(lookup_contact "$cat_dir")
+                if [ -n "$contact" ]; then
+                  echo "- \`$dir\` — $display (cc: $contact)"
+                else
+                  echo "- \`$dir\` — $display"
+                fi
               done < "$dropped"
               echo ""
             }
@@ -595,39 +716,59 @@ jobs:
               orphan_lines=$(awk -F'|'  '$3 ~ /^orphan:/'            /tmp/dropped-skills.txt || true)
               other_lines=$(awk -F'|'   '$3 !~ /^(missing artifacts:|orphan:|sig drift:|sig missing:)/' /tmp/dropped-skills.txt || true)
 
+              # Lookup helper mirrors the tracker-issue step: append a
+              # `cc: @<login>` trailer per skill when /tmp/skill-contacts.txt
+              # has a resolved entry, otherwise emit the line bare.
+              contacts_file=/tmp/skill-contacts.txt
+              emit_with_contact() {
+                local dir="$1" display="$2"
+                local cat_dir contact
+                cat_dir=$(basename "$dir")
+                if [ -f "$contacts_file" ]; then
+                  contact=$(awk -F'|' -v d="$cat_dir" '$1==d {print $2; exit}' "$contacts_file")
+                else
+                  contact=""
+                fi
+                if [ -n "$contact" ]; then
+                  echo "- \`$dir\` — $display (cc: $contact)"
+                else
+                  echo "- \`$dir\` — $display"
+                fi
+              }
+
               if [ -n "$missing_lines" ]; then
                 echo ""
                 echo "**Skills dropped — missing required artifacts (\`skill.oms.sig\`, \`skill-card.md\`, and/or \`evals.json\`):**"
                 echo "$missing_lines" | while IFS='|' read -r _ dir reason; do
-                  echo "- \`$dir\` — ${reason#missing artifacts: }"
+                  emit_with_contact "$dir" "${reason#missing artifacts: }"
                 done
               fi
               if [ -n "$drift_lines" ]; then
                 echo ""
                 echo "**Skills held — signature drift (content changed without \`skill.oms.sig\` refresh):**"
                 echo "$drift_lines" | while IFS='|' read -r _ dir reason; do
-                  echo "- \`$dir\` — ${reason#sig drift: }"
+                  emit_with_contact "$dir" "${reason#sig drift: }"
                 done
               fi
               if [ -n "$nosig_lines" ]; then
                 echo ""
                 echo "**Skills held — no signature in source (\`skill.oms.sig\` absent upstream):**"
                 echo "$nosig_lines" | while IFS='|' read -r _ dir reason; do
-                  echo "- \`$dir\` — ${reason#sig missing: }"
+                  emit_with_contact "$dir" "${reason#sig missing: }"
                 done
               fi
               if [ -n "$orphan_lines" ]; then
                 echo ""
                 echo "**Orphan product dirs dropped (no SKILL.md inside):**"
                 echo "$orphan_lines" | while IFS='|' read -r _ dir reason; do
-                  echo "- \`$dir\` — ${reason#orphan: }"
+                  emit_with_contact "$dir" "${reason#orphan: }"
                 done
               fi
               if [ -n "$other_lines" ]; then
                 echo ""
                 echo "**Other drops:**"
                 echo "$other_lines" | while IFS='|' read -r _ dir reason; do
-                  echo "- \`$dir\` — $reason"
+                  emit_with_contact "$dir" "$reason"
                 done
               fi
             fi
