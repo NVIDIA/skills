@@ -13,8 +13,8 @@ name: Sync Skills from Product Repos
 
 on:
   schedule:
-    # Twice daily: 06:00 UTC and 18:00 UTC
-    - cron: "0 6,18 * * *"
+    # Hourly
+    - cron: "0 * * * *"
   workflow_dispatch: # Allow manual trigger
 
 permissions:
