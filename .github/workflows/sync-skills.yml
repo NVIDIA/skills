@@ -405,7 +405,11 @@ jobs:
             # Find owning YML. Multiple `catalog_dir:` matches across
             # components.d/ are not expected (uniqueness gate at PR time)
             # but if it happens we take the first deterministically.
-            owner_yml=$(grep -l "catalog_dir: $cat_dir" components.d/*.yml 2>/dev/null | sort | head -1)
+            # Anchor the match to end-of-line so e.g. catalog_dir "rag"
+            # doesn't false-positive on a line declaring "rag-blueprint".
+            # YAML lines for components.d/*.yml don't carry trailing
+            # comments/whitespace, so $ is a reliable anchor here.
+            owner_yml=$(grep -l "catalog_dir: ${cat_dir}$" components.d/*.yml 2>/dev/null | sort | head -1)
             if [ -z "$owner_yml" ]; then
               echo "::warning::no YML owner found for $dir — cannot resolve contact (orphan or schema mismatch)"
               continue
