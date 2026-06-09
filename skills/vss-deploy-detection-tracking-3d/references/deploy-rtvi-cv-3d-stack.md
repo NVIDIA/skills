@@ -133,19 +133,31 @@ fi
 
 `down -v` is destructive (drops the VST DB and broker volumes), so **confirm with the user via `AskUserQuestion` before running it.** Full discussion of `down -v` semantics is in [`teardown.md`](teardown.md); the targeted sensor-trim alternative is in [`configure-cameras.md`](configure-cameras.md) Step 5.
 
-### Step 0b — Patch hardcoded `streamprocessing` mounts (custom datasets only)
+### Step 0b — Align `streamprocessing` mounts for custom datasets
 
-`services/vios/streamprocessing/docker-compose.yaml` hardcodes two bind-mount sources to `sample-data/warehouse-4cams-20mx20m-synthetic/` regardless of `SAMPLE_VIDEO_DATASET`:
+`services/vios/streamprocessing/docker-compose.yaml` may include bind-mount sources that point at the bundled sample dataset. For custom datasets, update those sources to resolve through `${SAMPLE_VIDEO_DATASET}` so VST overlay configuration uses the same calibration dataset as the rest of the stack.
 
-```yaml
-# Under the `streamprocessing-ms-mv3dt:` service block — `streamprocessing-ms-3d:` mirrors the same pattern for MODE=3d.
-- ${VSS_APPS_DIR}/.../calibration/sample-data/warehouse-4cams-20mx20m-synthetic/calibration.json:/home/vst/vst_release/configs/calibration.json
-- ${VSS_APPS_DIR}/.../calibration/sample-data/warehouse-4cams-20mx20m-synthetic/images/Top.png:/home/vst/vst_release/configs/Top.png
+Under the `streamprocessing-ms-mv3dt:` service block (`streamprocessing-ms-3d:` mirrors the same pattern for MODE=3d), replace only these source fragments:
+
+The fragments appear embedded within the full `${VSS_APPS_DIR}/.../calibration/` source path; the sed block below handles this automatically.
+
+```text
+sample-data/warehouse-4cams-20mx20m-synthetic/calibration.json
+sample-data/warehouse-4cams-20mx20m-synthetic/images/Top.png
 ```
 
-VST reads from `/home/vst/vst_release/configs/calibration.json` when rendering 3D bbox overlays on each camera stream — so for any `SAMPLE_VIDEO_DATASET` other than `warehouse-4cams-20mx20m-synthetic`, **VST overlays project with the sample warehouse's `cameraMatrix` instead of yours**, even though every other consumer (perception, behavior-analytics, video-analytics-api) correctly uses your dataset's calibration. Symptom: bbox positions wildly off on the VST video wall, top-view widget shows the sample warehouse layout instead of yours, AMC/Kibana overlays look fine.
+with:
 
-Idempotent patch — no-op when slug is already the literal sample, no-op after a prior patch:
+```text
+sample-data/${SAMPLE_VIDEO_DATASET}/calibration.json
+sample-data/${SAMPLE_VIDEO_DATASET}/images/Top.png
+```
+
+Keep each mount destination unchanged.
+
+VST reads from its container configuration directory when rendering 3D bbox overlays on each camera stream. If the mounts still point at the bundled sample dataset while `SAMPLE_VIDEO_DATASET` points at a custom dataset, VST overlays may use the sample `cameraMatrix` while perception, behavior-analytics, and video-analytics-api use the custom dataset calibration. Symptom: bbox positions do not align with the VST video wall, the top-view widget shows the sample warehouse layout, and AMC/Kibana overlays look as expected.
+
+Idempotent update — no-op when the sample dataset is in use, no-op after a prior update:
 
 ```bash
 COMPOSE_SP="${VSS_APPS_DIR}/services/vios/streamprocessing/docker-compose.yaml"
@@ -171,7 +183,7 @@ docker compose -f compose.yml \
 # → hard-refresh the VST tab (Ctrl+Shift+R) so the cached streamId is dropped.
 ```
 
-This is an upstream-bug workaround. When the compose source is fixed (`${SAMPLE_VIDEO_DATASET}` instead of the literal), this step becomes a true no-op and can be dropped from the skill.
+When the compose source already uses `${SAMPLE_VIDEO_DATASET}`, this step is a no-op and can be skipped.
 
 ## Step 1 — Env recipe
 

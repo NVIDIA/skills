@@ -54,7 +54,7 @@ The deployment flow is always: copy `.env` to `generated.env`, apply overrides, 
 # 5. docker compose --env-file generated.env -f resolved.yml up -d
 ```
 
-The source `.env` is treated as **read-only defaults** committed to the repo. The skill's per-deploy working copy is `generated.env` — same pattern `dev-profile.sh` uses internally. This keeps the checked-in `.env` clean across iterations.
+`.env` is read-only checked-in defaults; `generated.env` is the per-deploy working copy. Step 1c covers this in full.
 
 ## Prerequisites
 
@@ -123,7 +123,7 @@ silently deploy remote because a var happened to exist.
 
 If no combination on this host satisfies the profile's sizing requirements, **stop and report the blocker** — don't silently pick another shape.
 
-> **Edge shared mode is platform-specific.** On DGX Spark, run `nvcr.io/nim/nvidia/nvidia-nemotron-nano-9b-v2-dgx-spark:1.0.0-variant` as a standalone local NIM on port `30081` and point the agent at it with `LLM_MODE=remote`. On AGX/IGX Thor, keep using the Edge 4B standalone vLLM fallback with `HF_TOKEN`. Full recipes are in [`references/edge.md`](references/edge.md).
+> **Edge shared mode is platform-specific.** Full recipes are in [`references/edge.md`](references/edge.md).
 
 ## Deployment Flow
 
@@ -159,7 +159,7 @@ Before building env overrides, confirm:
 | **LLM/VLM placement** | Explicitly decide local / local_shared / remote. Cross-reference available GPUs against the chosen profile's **Minimum GPU count** table. If endpoint env vars are present but the user did not request remote, ask whether to use or ignore them. |
 | **API keys** | `NGC_CLI_API_KEY` for local NIMs, `NVIDIA_API_KEY` for remote |
 | **`HOST_IP`** | `hostname -I \| awk '{print $1}'` — the host's primary internal IP |
-| **`EXTERNAL_IP`** | Browser-reachable host/IP. On Brev, use the secure-link domain (see [`references/brev.md`](references/brev.md)). |
+| **`EXTERNAL_IP`** | Browser-reachable host/IP. On Brev, the secure-link domain — Step 1d detects Brev and (only then) reads `references/brev.md` to set it. |
 | **`HAPROXY_PORT`** | Browser-facing ingress port. Default `7777`; ensure it is free. |
 
 Before `docker compose up`, verify `EXTERNAL_IP`, `HAPROXY_PORT`, `VSS_PUBLIC_HOST`, and `VSS_PUBLIC_PORT` are populated with browser-reachable values. Otherwise the stack may appear healthy while UI/API/VST links 404 or loop through Cloudflare Access.
@@ -168,8 +168,6 @@ Before `docker compose up`, verify `EXTERNAL_IP`, `HAPROXY_PORT`, `VSS_PUBLIC_HO
 
 Layout (asset paths, ownership, mount points, profile-specific subdirs) is documented in [`references/data-directory.md`](references/data-directory.md). Read that file before deploying for the first time on a host or when changing profiles.
 
-> **FORBIDDEN: recursive `chown` on `$VSS_DATA_DIR` (e.g. `chown -R ubuntu:ubuntu`).**
-> It feels like good housekeeping but is **the** deploy-breaker in this stack — the deploy looks healthy (containers Up, endpoints 200) while the video pipeline is silently broken. Use `chmod -R 777` only on the specific subdirs documented in `data-directory.md`.
 
 ### Step 1c — Initialize `generated.env`
 
@@ -185,14 +183,16 @@ cp "$ENV_SRC" "$ENV_GEN"
 
 All subsequent writes (Brev `EXTERNAL_IP`, the env_overrides dict from Step 2) go to `$ENV_GEN`. `$ENV_SRC` is read-only from here on.
 
-### Step 1d — If deploying on Brev, set `EXTERNAL_IP` to the secure-link domain
+### Step 1d — Brev only: detect first, then set `EXTERNAL_IP` to the secure-link domain
 
-Read `BREV_ENV_ID` from `/etc/environment` and write `EXTERNAL_IP` into `generated.env` (NOT `.env`). Full secure-link behavior and troubleshooting are in [`references/brev.md`](references/brev.md).
+**Detect Brev before anything else** — a Brev-provisioned instance sets `BREV_ENV_ID` in `/etc/environment`; nothing else does:
 
 ```bash
-brev_env_id=$(awk -F= '/^BREV_ENV_ID=/ {gsub(/"/, "", $2); print $2; exit}' /etc/environment)
-sed -i "s|^EXTERNAL_IP=.*|EXTERNAL_IP=7777-${brev_env_id}.brevlab.com|" "$ENV_GEN"
+grep -qE '^BREV_ENV_ID=' /etc/environment && echo "on Brev" || echo "not Brev"
 ```
+
+- **not Brev** → skip the rest of this step and **do not read [`references/brev.md`](references/brev.md)**; keep the normal `${HOST_IP}`-based `EXTERNAL_IP`.
+- **on Brev** → apply the Brev secure-link overrides from [`references/brev.md` § Setup flow](references/brev.md#setup-flow) to `generated.env` (NOT `.env`). Those set `EXTERNAL_IP` / `VSS_PUBLIC_HOST` to the secure-link domain **and** `VSS_PUBLIC_HTTP_PROTOCOL=https` / `VSS_PUBLIC_WS_PROTOCOL=wss` / `VSS_PUBLIC_PORT=443` — setting `EXTERNAL_IP` alone leaves `http://…:7777` UI/API/WS links that the browser blocks as mixed content.
 
 ### Step 2 — Build env_overrides
 
@@ -205,11 +205,12 @@ override key, when it applies, defaults, profile-specific differences) lives
 in [`references/env-overrides.md`](references/env-overrides.md). Each profile
 reference has worked examples for that profile's common scenarios.
 
+
 ### Step 3 — Apply overrides + dry-run
 
 **Working env file:** `<repo>/deploy/docker/developer-profiles/dev-profile-<profile>/generated.env` (created in Step 1c).
 
-> **Two env files, distinct roles.** `.env` is read-only checked-in defaults (never mutate from the skill); `generated.env` is the skill's per-deploy working copy — all overrides (Step 2 dict + the Brev `EXTERNAL_IP`) land there, `--env-file` always points at it, and post-deploy verifiers read it for the actually-deployed values. It mirrors `dev-profile.sh`'s own `cp .env generated.env` scratchpad.
+> **Reminder (see Step 1c):** apply all overrides (Step 2 dict + Brev `EXTERNAL_IP`) to `generated.env`; `--env-file` always points at it, and post-deploy verifiers read it for the actually-deployed values.
 
 ```bash
 # (Step 1c already ran: cp $ENV_SRC $ENV_GEN)
@@ -231,7 +232,43 @@ The resolved YAML is saved to `<repo>/deploy/docker/resolved.yml`.
 
 Unexpanded `${VAR}` tokens in `resolved.yml` mean compose did not see those env values. Diagnostic procedure and common culprits live in [`references/troubleshooting.md`](references/troubleshooting.md).
 
-### Step 3c — Strip dangling optional `depends_on` from resolved.yml
+
+### Step 3c — Verify access to selected NGC artifacts
+
+Do this after `resolved.yml` exists and before `docker compose up`. The NGC
+token probe in Step 0a proves only that the key authenticates; it does not
+prove the key's org/team can access the selected image or model repositories.
+
+Build the artifact list from the actual selected deployment:
+
+- `resolved.yml`: every `image:` under `nvcr.io/...` that Compose will pull.
+- `$ENV_GEN`: NGC-backed model/resource paths such as
+  `RTVI_VLM_MODEL_PATH=ngc:nim/nvidia/cosmos-reason2-8b:hf-1208`. Skip
+  `none`, `git:...`, local paths, and remote endpoint URLs.
+- Profile staging steps: any NGC model/resource downloads documented in the
+  profile reference, such as alerts/search perception model staging.
+
+Probe each selected artifact with the normalized NGC key before continuing:
+
+- Container images: `docker manifest inspect <nvcr.io/...>` after `docker
+  login nvcr.io` — for gated `nvcr.io` repos a `401`/`403` here is a definitive
+  no-entitlement signal (manifest read requires the same org/team grant as the
+  layer pull); or the matching `ngc registry image info ...` when the artifact
+  maps cleanly to an NGC image path.
+- NGC model/resource paths: run the matching `ngc registry model info ...` or
+  `ngc registry resource info ...` for the exact repo/tag that the profile will
+  load or download.
+- Profile-staged TAO/perception models: run the corresponding `ngc registry
+  model info ...` / `resource info ...` for each repo/tag before the staging
+  block downloads files.
+
+If any probe returns `401`, `403`, `permission`, `not being a member of the
+organization that owns the repo`, missing org/repo, or a similar access error,
+stop and prompt the user for an NGC key from an org/team entitled to those
+artifacts. Do not start Compose and discover the failure during NIM cold start.
+
+### Step 3d — Strip dangling optional `depends_on` from resolved.yml
+
 
 **MUST run after Step 3, before Step 5.** Skipping this aborts the deploy:
 
@@ -318,16 +355,6 @@ The LLM/VLM NIM probes — including the `*_MODE=remote` handling that skips
 selected `*_BASE_URL/v1/models` via `scripts/probe_remote_models.sh` — are in
 [`references/troubleshooting.md`](references/troubleshooting.md#nim-probes).
 
-### End-to-end video sanity check
-
-After the quick checks above pass, drive a real query through the agent — e.g. ask it over the REST API or UI to describe a video you've uploaded to VST. If the agent returns a non-empty answer, the upload → ingest → inference → reply path is healthy. If it fails, `docker logs vss-agent` shows which stage tripped.
-
-## Examples
-
-- Base profile, remote models: route to `base`, copy `dev-profile-base/.env` to `generated.env`, set `LLM_MODE=remote` / `VLM_MODE=remote`, dry-run, normalize, deploy, then verify `/docs` and UI.
-- Search profile on RTX: route to `search`, follow [`references/search.md`](references/search.md) for sizing and endpoints, seed videos, then run the search-profile readiness checks.
-- Edge target: route through [`references/edge.md`](references/edge.md), then use the same `generated.env` → dry-run → normalize → deploy flow.
-
 ## Limitations
 
 - This skill deploys compose-based VSS profiles only; standalone microservice deployment belongs to the matching `vss-deploy-*` skill.
@@ -336,4 +363,8 @@ After the quick checks above pass, drive a real query through the agent — e.g.
 
 ## Troubleshooting
 
-Start with [`references/agent-failure-modes.md`](references/agent-failure-modes.md) for cross-profile failures such as NIM cold-start timeouts, OOM, remote endpoint 5xx responses, missing `NGC_CLI_API_KEY` / `HF_TOKEN`, unexpanded values in `resolved.yml` etc.
+The common-error quick reference, the full symptom → cause → fix table, the
+unexpanded-`${...}` diagnostic, and the NIM endpoint probes are consolidated in
+[`references/troubleshooting.md`](references/troubleshooting.md) — start there
+for any deploy, runtime, or probe failure, then continue in the matching
+per-profile reference's Debugging section.

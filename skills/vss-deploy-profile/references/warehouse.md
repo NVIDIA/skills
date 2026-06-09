@@ -13,7 +13,7 @@ Work through **one path** under [Choose your path](#choose-your-path). Reference
 | Profile Name | MODE | BP_PROFILE | SAMPLE_VIDEO_DATASET | NUM_STREAMS | LLM | RTVI VLM |
 |---|---|---|---|---|---|---|
 | 2D Vision AI Profile | `2d` | `bp_wh_kafka` or `bp_wh_redis` | `warehouse-loading-dock-3cams-synthetic` | 3 | none | none |
-| 2D Vision AI with Agents Profile | `2d` | `bp_wh` | `nv-warehouse-4cams` | 4 | `local` / `local_shared` / `remote` / `none` | **always local** |
+| 2D Vision AI with Agents Profile | `2d` | `bp_wh` | `nv-warehouse-4cams` | 4 | `local` / `remote` / `none` | **always local** |
 | 3D Vision AI Profile | `3d` | `bp_wh_kafka` or `bp_wh_redis` | `warehouse-4cams-20mx20m-synthetic` | 4 | none | none |
 | MV3DT Vision AI Profile | `mv3dt` | `bp_wh_kafka` or `bp_wh_redis` | `warehouse-4cams-20mx20m-synthetic` | 4 | none | none |
 | Warehouse Auto-Calibration | `2d` / `3d` / `mv3dt` | `bp_wh_auto_calib` | (same as mode default) | (same as mode default) | none | none |
@@ -104,7 +104,7 @@ Deploys only the minimum services needed for camera calibration — no perceptio
 
 | Container | Port | When |
 |---|---|---|
-| LLM NIM — container name = `LLM_NAME_SLUG` (e.g. `nvidia-nemotron-nano-9b-v2`) | `LLM_PORT` (default `30081`) | `LLM_MODE=local` or `local_shared` |
+| LLM NIM — container name = `LLM_NAME_SLUG` (e.g. `nvidia-nemotron-nano-9b-v2`) | `LLM_PORT` (default `30081`) | `LLM_MODE=local` |
 | `vss-rtvi-vlm` (real-time VLM) | 8018 | **Always** deployed for `bp_wh` — hardcoded in compose profile `bp_wh_2d` |
 | `vss-alert-bridge` | `ALERT_BRIDGE_PORT` (default `9080`) | Always deployed for `bp_wh` |
 
@@ -125,11 +125,9 @@ Deploys only the minimum services needed for camera calibration — no perceptio
 | RT-CV perception (DeepStream — RT-DETR for 2D, Sparse4D for 3D, MV3DT for mv3dt) — always local | `RT_CV_DEVICE_ID` (default: `0`) | All warehouse profiles |
 | RTVI VLM — always local | `RT_VLM_DEVICE_ID` (default: `1`) | `bp_wh` only |
 | LLM NIM (dedicated) | `LLM_DEVICE_ID` (default: `2`) | `bp_wh` with `LLM_MODE=local` |
-| LLM NIM sharing the RTVI VLM device | `SHARED_LLM_VLM_DEVICE_ID` (default: `2`) | `bp_wh` with `LLM_MODE=local_shared` |
 
-`LLM_MODE` accepts `local`, `local_shared`, `remote`, or `none`:
+`LLM_MODE` accepts `local`, `remote`, or `none`:
 - `local` — LLM NIM on its own GPU (`LLM_DEVICE_ID`)
-- `local_shared` — LLM NIM colocated with RTVI VLM on `SHARED_LLM_VLM_DEVICE_ID` (use when GPU count is limited)
 - `remote` — point at an external LLM endpoint via `LLM_BASE_URL` (no LLM NIM deployed)
 - `none` — no LLM, for `bp_wh_kafka` / `bp_wh_redis` / `bp_wh_auto_calib`
 
@@ -170,7 +168,7 @@ RTVI VLM has no equivalent mode setting — it is always deployed locally on `RT
 | Video Analytics API (direct) | `http://<HOST_IP>:8081` (`MDX_PORT`) | Prefer `/video-analytics-api` via HAProxy |
 | VST UI | `http://<HOST_IP>:30888/vst/` | All — direct port, not proxied via HAProxy |
 
-`EXTERNAL_IP` defaults to `${HOST_IP}` but should be set to the browser-reachable hostname/IP. On Brev, follow the same secure-link pattern as the other VSS profiles (`SKILL.md` Step 1c). The HAProxy `h_main` ACL only routes when the `Host:` header matches `${VSS_PUBLIC_HOST}`, `${EXTERNAL_IP}`, `${HOST_IP}`, `localhost`, or `127.0.0.1` (with or without `:${HAPROXY_PORT}`) — wrong Host headers get a 404 from haproxy.
+`EXTERNAL_IP` defaults to `${HOST_IP}` but should be set to the browser-reachable hostname/IP. On Brev, apply the [Brev secure link overrides](#brev-secure-link-overrides) in Phase 5 — the HAProxy ingress, agent, and UI all need `https`/`wss` on the secure-link domain. The HAProxy `h_main` ACL only routes when the `Host:` header matches `${VSS_PUBLIC_HOST}`, `${EXTERNAL_IP}`, `${HOST_IP}`, `localhost`, or `127.0.0.1` (with or without `:${HAPROXY_PORT}`) — wrong Host headers get a 404 from haproxy.
 
 ## Compose File Structure
 
@@ -265,6 +263,11 @@ Pulls images and builds the perception container (~10–15 min first run). If `d
 LOG=${LOG:-/tmp/warehouse-blueprint.log}
 cd <repo>/deploy/docker
 
+# Brev only: export before docker compose so COMPOSE_PROFILES and BREV_ENV_ID
+# are available for variable substitution. Skip on non-Brev hosts.
+export BREV_ENV_ID=$(awk -F= '/^BREV_ENV_ID=/{gsub(/"/, "", $2); print $2; exit}' /etc/environment 2>/dev/null)
+export COMPOSE_PROFILES=<literal-value-from-env>   # e.g. bp_wh_2d,llm_remote_nvidia-nemotron-nano-9b-v2
+
 printf '%s' "$NGC_CLI_API_KEY" | docker login --username '$oauthtoken' --password-stdin nvcr.io
 
 nohup docker compose -f compose.yml \
@@ -289,7 +292,7 @@ docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
 - 2D / 3D profiles: `vss-vios-nvstreamer`, `vss-rtvi-cv`, `vss-configurator`, `vss-behavior-analytics`, broker (`kafka` / `redis`), `vss-broker-health-check`, plus the `vss-vios-*` VST stack
 - 3D extra: `vss-rtvi-cv-config-adaptor`
 - MV3DT profiles: `vss-vios-nvstreamer-mv3dt`, `vss-rtvi-cv-mv3dt`, `vss-rtvi-cv-bev-fusion`, `mosquitto`, `vss-configurator-mv3dt`, `vss-behavior-analytics-mv3dt`, broker (`kafka` / `redis`), `vss-broker-health-check`, plus VST stack
-- `bp_wh` extra: `vss-rtvi-vlm`, `vss-alert-bridge`, `vss-agent`, `vss-agent-ui`, `vss-va-mcp`, `vss-haproxy-ingress`, `phoenix`, plus the LLM NIM container (named after `LLM_NAME_SLUG`) when `LLM_MODE=local` / `local_shared`
+- `bp_wh` extra: `vss-rtvi-vlm`, `vss-alert-bridge`, `vss-agent`, `vss-agent-ui`, `vss-va-mcp`, `vss-haproxy-ingress`, `phoenix`, plus the LLM NIM container (named after `LLM_NAME_SLUG`) when `LLM_MODE=local`
 - Extended extra (kafka/redis, any mode): `vss-haproxy-ingress`, `logstash`, `kibana`, `vss-video-analytics-api` (MV3DT uses `vss-video-analytics-api-mv3dt`)
 - `elasticsearch`: `BP_PROFILE=bp_wh` (always), **or** kafka/redis with `MINIMAL_PROFILE=""` (extended, any mode)
 - `bp_wh_auto_calib`: only nvstreamer, configurator, auto-calibration, and VST subset
@@ -342,24 +345,9 @@ canonical reference.
 
 #### 1.3 Configure API Key
 
-If no key: go to https://ngc.nvidia.com → **Setup → API Keys → Generate Personal Key** (set **NGC Catalog** permission). Copy immediately.
+Generate and export the key as in [`ngc.md` § Configure NGC API Key](ngc.md#configure-ngc-api-key) — the same `read -rs` handoff and security guidance apply. Or configure interactively: `ngc config set`.
 
 > **Important:** NGC API keys may look like base64. Use the key exactly as provided — **do not base64-decode it.**
-
-```bash
-read -rsp "NGC API key: " NGC_CLI_API_KEY
-echo
-export NGC_CLI_API_KEY
-```
-
-Or configure interactively: `ngc config set`
-
-> Security note: Prefer a current-session handoff: enter the key with `read -rs`,
-> inject it from a secrets manager, and pass it to `docker login` with
-> `--password-stdin`. Do not pass the raw key as a CLI argument, write it to any
-> workspace file or shell profile such as `~/.bashrc`, or commit it to version
-> control. If an env file is unavoidable, keep it outside the repo and restrict
-> it with `chmod 600`.
 
 #### 1.4 Verify NGC Access
 
@@ -374,6 +362,15 @@ ngc registry image list "nvidia/vss-core/*" 2>&1 | head -10
 ---
 
 ### Phase 2: System Prerequisites
+
+**Detect if this is a Brev-managed instance first:**
+
+```bash
+grep "BREV_ENV_ID" /etc/environment && echo "Brev instance — apply Brev-specific steps" \
+  || echo "Not Brev — standard deployment"
+```
+
+If `BREV_ENV_ID` is present, also complete [§2.7 Brev-specific host setup](#27-brev-specific-host-setup-brev-deployments-only) below, apply the [Brev Secure Link Overrides](#brev-secure-link-overrides) in Phase 5, and run the [post-deploy Brev steps](#after-deploy-brev). For Brev architecture and secure-link troubleshooting, see [`brev.md`](brev.md) — note that `brev.md` documents the dev-profile `generated.env` flow; for warehouse, the equivalent overrides go directly into `industry-profiles/warehouse-operations/.env` (Phase 5).
 
 Run each check in order. **If a check fails, automatically install and re-verify — do not wait for the user.** Only stop if a requirement cannot be met automatically (unsupported hardware, insufficient RAM/CPU).
 
@@ -619,6 +616,39 @@ free -h  # 64 GB+ RAM
 df -h /  # 500 GB+ SSD
 ```
 
+#### 2.7 Brev-specific host setup (Brev deployments only)
+
+These steps are required on any Brev-provisioned instance and are not covered by the standard system prerequisites above.
+
+**UFW — allow Docker bridge networks to reach host services**
+
+`vss-rtvi-vlm` runs on the Docker bridge network (`mdx_default`, subnet `172.18.0.0/16`) and needs to reach host-network services (HAProxy, VST). UFW blocks this by default:
+
+```bash
+sudo ufw allow from 172.17.0.0/16
+sudo ufw allow from 172.18.0.0/16
+```
+
+**CDI spec — regenerate both locations**
+
+The NVIDIA Container Toolkit writes CDI specs to two paths. The `/var/run/cdi/` copy can be stale (referencing `/dev/dri/cardN` devices that don't exist on headless GPU instances), causing all GPU containers to fail to start with `failed to stat CDI host device`. Always regenerate both:
+
+```bash
+sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+sudo nvidia-ctk cdi generate --output=/var/run/cdi/nvidia.yaml
+```
+
+**`/etc/hosts` — resolve Brev domains locally**
+
+Host-network containers (e.g. `vss-alert-bridge`) validate video clip URLs that contain the Brev domain. Without a local hosts entry, the request goes to Cloudflare which blocks non-443 ports:
+
+```bash
+HOST_IP=$(hostname -I | awk '{print $1}')
+BREV_ENV_ID=$(awk -F= '/^BREV_ENV_ID=/{gsub(/"/, "", $2); print $2; exit}' /etc/environment)
+echo "${HOST_IP} 7777-${BREV_ENV_ID}.brevlab.com" | sudo tee -a /etc/hosts
+echo "${HOST_IP} 30888-${BREV_ENV_ID}.brevlab.com" | sudo tee -a /etc/hosts
+```
+
 ---
 
 ### Phase 3: Interactive Configuration
@@ -699,6 +729,31 @@ MINIMAL_PROFILE=""       # extended
 
   Once the calibration file is ready, redeploy with the full warehouse profile.
 
+#### Q6 — LLM Placement (`bp_wh` only)
+
+Skip for `bp_wh_kafka`, `bp_wh_redis`, and `bp_wh_auto_calib` (set `LLM_MODE=none` for those).
+
+For `bp_wh`, **always ask explicitly** — do not default to `local`:
+
+> "How should the LLM be deployed?
+> - **local** — LLM NIM on its own GPU (`LLM_DEVICE_ID`, default `2`). Requires a third GPU.
+> - **remote** — point at an external LLM endpoint via `LLM_BASE_URL` (e.g. `https://integrate.api.nvidia.com/v1`). No LLM NIM deployed. Requires `NVIDIA_API_KEY`.
+> - **none** — disable LLM entirely."
+
+`vst-rtvi-vlm` (RTVI VLM) is **always** deployed locally for `bp_wh_2d`.
+
+```bash
+nvidia-smi --query-gpu=index,name,memory.total --format=csv,noheader
+```
+
+| GPU count | Recommended LLM mode |
+|---|---|
+| ≥ 3 GPUs | `local` — dedicated GPU for LLM NIM |
+| 2 GPUs, RTVI VLM uses > 50 % of GPU 1 VRAM | `remote` — RTVI VLM leaves insufficient room for LLM NIM |
+| 1 GPU | `remote` or `none` |
+
+If the user chooses `remote`, also confirm `LLM_BASE_URL` and `NVIDIA_API_KEY` are set.
+
 ---
 
 ### Phase 4: Acquire App Data (first run only)
@@ -747,11 +802,10 @@ HARDWARE_PROFILE=H100
 RT_CV_DEVICE_ID='0'                 # perception (always local)
 RT_VLM_DEVICE_ID='1'                # RTVI VLM, bp_wh only (always local)
 LLM_DEVICE_ID='2'                   # bp_wh + LLM_MODE=local
-SHARED_LLM_VLM_DEVICE_ID='2'        # bp_wh + LLM_MODE=local_shared (LLM colocated with RTVI VLM)
 
 # --- LLM (bp_wh only; set LLM_MODE=none for bp_wh_kafka / bp_wh_redis / bp_wh_auto_calib) ---
 # RTVI VLM has no mode — it is always deployed locally for bp_wh.
-LLM_MODE=local                      # local | local_shared | remote | none
+LLM_MODE=local                      # local | remote | none
 LLM_NAME=nvidia/nvidia-nemotron-nano-9b-v2
 LLM_NAME_SLUG=nvidia-nemotron-nano-9b-v2
 # LLM_BASE_URL — only when LLM_MODE=remote
@@ -782,7 +836,108 @@ NVIDIA_API_KEY=''                              # required for build.nvidia.com r
 OPENAI_API_KEY=''                              # required for OpenAI remote endpoints
 ```
 
-> **DGX-SPARK (SBSA):** swap to the `-sbsa`-tagged image variants. Comment the default `PERCEPTION_TAG="3.2.0"` and uncomment `PERCEPTION_TAG="3.2.0-sbsa"`. Apply the same pattern to `BEV_FUSION_MV3DT_TAG` (mv3dt only), `RTVI_VLM_IMAGE_TAG`, `VST_*_IMAGE_TAG`, and `NVSTREAMER_IMAGE_TAG`.
+#### Brev Secure Link Overrides
+
+Brev secure links use a hostname of the form `<port>-<env>.brevlab.com` (e.g. `7777-abc123.brevlab.com`) — the HAProxy port is prefixed directly to the Brev environment ID. The Brev reverse proxy terminates TLS and forwards to the container's HAProxy port, so browser-facing URLs must use `https`/`wss` on port `443` (the standard HTTPS port, which can be omitted from URLs).
+
+After editing the main `.env` variables above, apply these overrides in the **same** `.env` file when deploying on Brev:
+
+```ini
+# --- Brev secure link overrides ---
+# Replace <BREV_ENV_ID> with your Brev environment ID (e.g. vbi9qjb1x).
+# Find it via: echo "$BREV_ENV_ID" or from the Brev dashboard URL.
+HAPROXY_PORT=7777
+VSS_PUBLIC_HTTP_PROTOCOL=https
+VSS_PUBLIC_WS_PROTOCOL=wss
+VSS_PUBLIC_HOST=7777-<BREV_ENV_ID>.brevlab.com
+VSS_PUBLIC_PORT=443
+```
+
+##### Browser-facing URLs (automatically covered by VSS_PUBLIC_* overrides)
+
+These compose template variables all use `${VSS_PUBLIC_HTTP_PROTOCOL}://${VSS_PUBLIC_HOST}:${VSS_PUBLIC_PORT}` (or the `wss` variant) and resolve correctly once the overrides above are applied:
+
+| Compose variable | Resolves to (Brev) | Compose file |
+|---|---|---|
+| `VSS_AGENT_EXTERNAL_URL` | `https://7777-<BREV_ENV_ID>.brevlab.com` | `services/agent/compose.yml` |
+| `VSS_AGENT_REPORTS_BASE_URL` | `https://7777-<BREV_ENV_ID>.brevlab.com/static/` | `services/agent/compose.yml` |
+| `VST_EXTERNAL_URL` | `https://7777-<BREV_ENV_ID>.brevlab.com` | `services/agent/compose.yml` |
+| `NEXT_PUBLIC_AGENT_API_URL_BASE` | `https://7777-<BREV_ENV_ID>.brevlab.com/api/v1` | `services/ui/compose.yml` |
+| `NEXT_PUBLIC_SIDEBAR_CHAT_AGENT_API_URL_BASE` | `https://7777-<BREV_ENV_ID>.brevlab.com/api/v1` | `services/ui/compose.yml` |
+| `NEXT_PUBLIC_VST_API_URL` | `https://7777-<BREV_ENV_ID>.brevlab.com/vst/api` | `services/ui/compose.yml` |
+| `NEXT_PUBLIC_MDX_WEB_API_URL` | `https://7777-<BREV_ENV_ID>.brevlab.com/video-analytics-api` | `services/ui/compose.yml` |
+| `NEXT_PUBLIC_ALERTS_API_URL` | `https://7777-<BREV_ENV_ID>.brevlab.com/alert-bridge/api/v1` | `services/ui/compose.yml` |
+| `NEXT_PUBLIC_WEBSOCKET_CHAT_COMPLETION_URL` | `wss://7777-<BREV_ENV_ID>.brevlab.com/websocket` | `services/ui/compose.yml` |
+| `NEXT_PUBLIC_SIDEBAR_CHAT_WEBSOCKET_CHAT_COMPLETION_URL` | `wss://7777-<BREV_ENV_ID>.brevlab.com/websocket` | `services/ui/compose.yml` |
+| `NEXT_PUBLIC_DASHBOARD_TAB_KIBANA_BASE_URL` | `https://7777-<BREV_ENV_ID>.brevlab.com/kibana` | `services/ui/compose.yml` |
+
+##### Internal service-to-service URLs (no Brev override needed)
+
+These URLs stay on the internal host network — containers talk to each other via `HOST_IP` or `localhost`, never through the Brev reverse proxy:
+
+| Variable | Template | Compose file |
+|---|---|---|
+| `VIDEO_ANALYSIS_MCP_URL` | `http://${VSS_AGENT_HOST}:${VSS_VA_MCP_PORT}` (0.0.0.0:9901) | `services/agent/compose.yml` |
+| `LLM_BASE_URL` | `http://${HOST_IP}:${LLM_PORT}` | `services/agent/compose.yml` |
+| `VLM_BASE_URL` | `http://${HOST_IP}:${VLM_PORT}` | `services/agent/compose.yml` |
+| `RTVI_VLM_BASE_URL` | `http://${HOST_IP}:8018` | `services/agent/compose.yml` |
+| `ALERT_BRIDGE_URL` | `http://${HOST_IP}:${ALERT_BRIDGE_PORT:-9080}` | `services/agent/compose.yml` |
+| `PHOENIX_ENDPOINT` | `http://${HOST_IP}:6006` | `services/agent/compose.yml` |
+| `VST_INTERNAL_URL` | `http://${HOST_IP}:30888` | `services/agent/compose.yml` |
+| `EVAL_LLM_JUDGE_BASE_URL` | `http://${HOST_IP}:${LLM_PORT}` | `services/agent/compose.yml` |
+| `VST_INGRESS_ENDPOINT` | `${HOST_IP}:30888/vst` (no scheme) | `services/vios/vst.env` |
+| `KAFKA_BOOTSTRAP_SERVERS` | `${HOST_IP}:9092` | `services/rtvi/rtvi-vlm/rtvi-vlm-docker-compose.yml` |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://otel-collector:4318` | `services/rtvi/rtvi-vlm/rtvi-vlm-docker-compose.yml` |
+| Healthcheck endpoints | `http://localhost:8000/...` | all compose files |
+
+`vss-rtvi-vlm` (`services/rtvi/rtvi-vlm/rtvi-vlm-docker-compose.yml`) has **no browser-facing URLs** — it consumes RTSP streams and publishes to Kafka/Redis. All its URLs (Kafka bootstrap, OTEL, Redis, healthcheck) are internal.
+
+##### HTTP chat completion URLs (use HOST_IP directly)
+
+Two UI variables bypass the `VSS_PUBLIC_*` template and use `HOST_IP` directly:
+
+| Variable | Template | Compose file |
+|---|---|---|
+| `NEXT_PUBLIC_HTTP_CHAT_COMPLETION_URL` | `http://${HOST_IP}:${VSS_AGENT_PORT:-8000}/chat/stream` | `services/ui/compose.yml` |
+| `NEXT_PUBLIC_SIDEBAR_CHAT_HTTP_CHAT_COMPLETION_URL` | `http://${HOST_IP}:${VSS_AGENT_PORT:-8000}/chat/stream` | `services/ui/compose.yml` |
+
+In HTTP chat mode, the browser posts to the UI's same-origin `/api/chat` route. The Next.js API handler then uses these `HOST_IP` URLs server-side to reach `vss-agent` on the host network. The `vss-agent-ui` container runs in bridge mode (`ports: 3000:3000`), so `HOST_IP` is the reachable route from UI server to agent. For browser-visible chat traffic, HAProxy routes `/api/chat` to `vss-agent-ui`, and routes `/chat` / `/websocket` to `vss-agent` (see [Access Points](#access-points)).
+
+##### Map URL (disabled by default)
+
+| Variable | Template | Compose file |
+|---|---|---|
+| `NEXT_PUBLIC_MAP_URL` | `${NEXT_PUBLIC_MAP_URL:-http://${EXTERNAL_IP}:3002}` | `services/ui/compose.yml` |
+
+Uses `EXTERNAL_IP:3002` directly (not `VSS_PUBLIC_*`). The map tab is **disabled by default** for warehouse (`NEXT_PUBLIC_ENABLE_MAP_TAB=false`). If enabled on Brev, create a secure link for port `3002` and override explicitly: `NEXT_PUBLIC_MAP_URL=https://3002-<BREV_ENV_ID>.brevlab.com`.
+
+> **Do not** use the old `http://7777-<BREV_ENV_ID>.brevlab.com:7777` form — the Brev reverse proxy does not expose the raw HAProxy port. Using `http` with `:7777` will fail with connection refused or mixed-content errors in the browser.
+
+##### `COMPOSE_PROFILES` — set as a literal string on Brev
+
+The `COMPOSE_PROFILES` variable in the warehouse `.env` is defined as a shell-style template:
+
+```ini
+COMPOSE_PROFILES=${BP_PROFILE}_${MODE},llm_${LLM_MODE}_${LLM_NAME_SLUG}
+```
+
+Some Docker Compose versions do not expand variable references within `--env-file` values, leaving the literal `${BP_PROFILE}` string unexpanded. Always override with the resolved value in the `.env` file for the chosen profile:
+
+```bash
+# Example for bp_wh + 2d + remote LLM (nemotron-nano-9b-v2)
+COMPOSE_PROFILES=bp_wh_2d,llm_remote_nvidia-nemotron-nano-9b-v2
+
+# Example for bp_wh + 2d + local LLM
+COMPOSE_PROFILES=bp_wh_2d,llm_local_nvidia-nemotron-nano-9b-v2
+```
+
+##### `vss-rtvi-vlm` bridge network access + socat proxy (Brev only)
+
+`vss-rtvi-vlm` runs on the Docker bridge network and needs to resolve Brev secure-link domains to fetch video clips for VLM verification. These steps are applied **after the stack is up** — see [After deploy — Brev](#after-deploy-brev).
+
+> **`COMPOSE_PROFILES` must be exported** before running any `docker compose` command with the warehouse `.env`. The variable is defined as a template inside `.env` and is not expanded by `--env-file` in all Docker Compose versions. Set it as a literal value directly in `.env` (e.g. `COMPOSE_PROFILES=bp_wh_2d,llm_remote_nvidia-nemotron-nano-9b-v2`) and also `export COMPOSE_PROFILES=bp_wh_2d,...` in the shell before running `docker compose up`.
+
+> **DGX-SPARK (SBSA):** swap to the `-sbsa`-tagged image variants. Comment the default `PERCEPTION_TAG="3.2.0"` and uncomment `PERCEPTION_TAG="3.2.0-sbsa"`. Apply the same pattern to `RTVI_VLM_IMAGE_TAG`.
 
 ---
 
@@ -827,22 +982,92 @@ Run **[Lifecycle: Monitor](#lifecycle-monitor)** using the same `LOG` as Phase 8
 
 ## After deploy
 
-The deploy script prints the actual access points once the stack is up. Expected output (substitute your host IP or domain name — on Brev use the secure-link domain, on Ubuntu use the machine IP):
+The deploy script prints the actual access points once the stack is up.
+
+**Standard (bare-metal / VM with reachable IP):**
 
 ```
 Access Points:
 
-HAProxy:             http://<host_ip/domain_name>:7777
-Kibana:              http://<host_ip/domain_name>:7777/kibana
-VST:                 http://<host_ip/domain_name>:30888/vst/
-Grafana:             http://<host_ip/domain_name>:3000
-NvStreamer:          http://<host_ip/domain_name>:31000
-Video Analytics API: http://<host_ip/domain_name>:7777/video-analytics-api
+HAProxy:             http://<host_ip>:7777
+Kibana:              http://<host_ip>:7777/kibana
+VST:                 http://<host_ip>:30888/vst/
+Grafana:             http://<host_ip>:35000
+NvStreamer:          http://<host_ip>:31000
+Video Analytics API: http://<host_ip>:7777/video-analytics-api
+```
+
+**Brev (secure-link domain):**
+
+```
+Access Points (Brev):
+
+HAProxy:             https://7777-<BREV_ENV_ID>.brevlab.com
+VSS UI:              https://7777-<BREV_ENV_ID>.brevlab.com
+Kibana:              https://7777-<BREV_ENV_ID>.brevlab.com/kibana
+VST:                 https://30888-<BREV_ENV_ID>.brevlab.com/vst/
+NvStreamer:          https://31000-<BREV_ENV_ID>.brevlab.com
+Video Analytics API: https://7777-<BREV_ENV_ID>.brevlab.com/video-analytics-api
+
+Brev Secure Links — each exposed port requires its own secure-link hostname:
+  Port 7777  (HAProxy)    → https://7777-<BREV_ENV_ID>.brevlab.com
+  Port 30888 (VST)        → https://30888-<BREV_ENV_ID>.brevlab.com
+  Port 31000 (NvStreamer)  → https://31000-<BREV_ENV_ID>.brevlab.com
+  Port 35000  (Grafana)     → https://35000-<BREV_ENV_ID>.brevlab.com
+
+HAProxy-routed paths (/, /kibana, /api, /chat, /websocket, /alert-bridge,
+/video-analytics-api, /phoenix, /va-mcp, /static) all go through
+the port-7777 secure link. Direct-port services (VST, NvStreamer, Grafana)
+each need their own secure link opened in the Brev dashboard.
 ```
 
 VST is accessed directly on port `30888` — it does not go through the HAProxy ingress.
 
 See [Access Points](#access-points) for the full HAProxy route table and direct-port diagnostics table.
+
+---
+
+## After deploy — Brev
+
+Run these steps once the stack is healthy. Re-apply after any `vss-rtvi-vlm` restart.
+
+```bash
+BREV_ENV_ID=$(awk -F= '/^BREV_ENV_ID=/{gsub(/"/, "", $2); print $2; exit}' /etc/environment)
+```
+
+**1. Start socat TLS proxy** (create cert once per host, start after every host reboot):
+
+```bash
+# Create self-signed cert — once per host
+sudo openssl req -x509 -newkey rsa:2048 \
+  -keyout /etc/ssl/private/vst-proxy.key \
+  -out /etc/ssl/certs/vst-proxy.crt \
+  -days 3650 -nodes \
+  -subj "/CN=30888-${BREV_ENV_ID}.brevlab.com" 2>/dev/null
+sudo cat /etc/ssl/private/vst-proxy.key /etc/ssl/certs/vst-proxy.crt > /tmp/vst-proxy.pem
+
+# Start proxy — re-run after every host reboot
+sudo nohup socat OPENSSL-LISTEN:443,bind=172.18.0.1,cert=/tmp/vst-proxy.pem,verify=0,fork \
+  TCP:127.0.0.1:30888 > /tmp/socat.log 2>&1 &
+ss -tlnp | grep ':443'   # confirm listening
+```
+
+This TLS proxy allows `vss-rtvi-vlm` (Docker bridge network) to reach VST over `https://30888-<BREV_ENV_ID>.brevlab.com` via the bridge gateway `172.18.0.1:443`.
+
+**2. Inject Brev domain entries into `vss-rtvi-vlm`** (re-apply after every container restart):
+
+```bash
+docker exec -u root vss-rtvi-vlm sh -c "
+  echo '172.18.0.1 7777-${BREV_ENV_ID}.brevlab.com' >> /etc/hosts
+  echo '172.18.0.1 30888-${BREV_ENV_ID}.brevlab.com' >> /etc/hosts
+"
+
+# Verify
+docker exec vss-rtvi-vlm getent hosts 7777-${BREV_ENV_ID}.brevlab.com
+# Expected: 172.18.0.1   7777-<BREV_ENV_ID>.brevlab.com
+```
+
+With both steps complete, `vss-rtvi-vlm` can resolve Brev secure-link domains to the bridge gateway and reach HAProxy (port 7777) and VST (port 30888) for clip downloads.
 
 ---
 
@@ -905,4 +1130,7 @@ When adding new cameras to the MV3DT profile, run the MV3DT utility scripts unde
 | `vss-configurator` health check failing | Wait 60s and recheck (60s start period) |
 | Low FPS | GPU oversaturated — reduce `NUM_STREAMS` and redeploy |
 | Dataset/mode mismatch | `nv-warehouse-4cams` → `bp_wh` + `MODE=2d`; `warehouse-4cams-20mx20m-synthetic` → `MODE=3d` or `MODE=mv3dt` |
+| Brev: UI loads but API calls fail / mixed-content errors | `VSS_PUBLIC_*` overrides not applied — URLs still use `http://7777-<BREV_ENV_ID>.brevlab.com:7777` instead of `https://7777-<BREV_ENV_ID>.brevlab.com`. Apply [Brev secure link overrides](#brev-secure-link-overrides) and redeploy |
+| Brev: HAProxy returns 404 | `Host:` header doesn't match `h_main` ACL — verify `VSS_PUBLIC_HOST` matches the Brev secure-link domain (`7777-<BREV_ENV_ID>.brevlab.com`) |
+| Brev: WebSocket connection refused | `VSS_PUBLIC_WS_PROTOCOL` still set to `ws` instead of `wss`, or `VSS_PUBLIC_PORT` not set to `443` |
 | Redeploy / reset without reinstall | [Redeploy](#redeploy) |

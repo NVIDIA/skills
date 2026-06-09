@@ -2,23 +2,13 @@
 
 A deploy runs across **5 user-visible steps** and 2-4 minutes (or 15+ min on first-time TRT engine build). The agent's terminal output IS the user interface. This file defines the visual vocabulary so that output is scannable, non-redundant, and self-explanatory.
 
-> **The 5 steps are the todo widget.** SKILL.md's internal section
-> headers and substep labels (`Step 2`, `Step 3.2`, `Step 4.a`, `1.b`,
-> `1.c`, `5.b.2`, `T3`, etc.) are model-facing only — they MUST NOT
-> appear in `→` / `✔` / `?` / `⚠` / `✖` lines, box titles, or any other
-> user-visible text. The user only knows the 5 todos in the widget
-> (`1/5. Prepare deploy …` … `5/5. Start app`). User-facing lines
-> describe the action directly:
+> **The 5 steps are the todo widget.** Internal substep labels (`1.b`, `4.a`,
+> `5.b.2`, `T3`, etc.) are model-facing only — never let them appear in
+> `→` / `✔` / `?` / `⚠` / `✖` lines, box titles, or any user-visible text.
+> Describe the action directly instead.
 >
-> | ❌ Forbidden                                                      | ✅ Required                                       |
-> |-------------------------------------------------------------------|---------------------------------------------------|
-> | `→ Step 1.b/1.c: detect platform + load YAML defaults`            | `→ Detect platform + load YAML defaults`          |
-> | `✔ 4.a: assets resolved`                                          | `✔ Assets resolved (model + videos)`              |
-> | `→ Step 4.f: Engine cache lookup`                                 | `→ Engine cache lookup`                           |
-> | `→ 5.b.2 — launch app`                                            | `→ Launch app + poll readiness`                   |
->
-> See SKILL.md § "User-facing announcements — never include substep
-> notation" for the canonical rule.
+> See `deploy-vss-detection-tracking-2d.md` § "User-facing announcements —
+> never include substep notation" for the canonical rule and full example table.
 
 ## Six-glyph vocabulary (use exactly these)
 
@@ -60,7 +50,7 @@ Every substantive decision shows up as a `✔ <what>: <value>` line:
 |---|---|
 | Use case picked | `✔ Use case: warehouse-2d` |
 | Platform detected | `✔ Platform: x86-dgpu (RTX 3050)` |
-| Docker image confirmed | `✔ Docker image: vss-rt-cv:3.2.0-26.04.1 (amd64 matches x86-dgpu)` |
+| Docker image confirmed | `✔ Docker image: vss-rt-cv:3.2.0 (amd64 matches x86-dgpu)` |
 | Resource plan finalized | `✔ Resource plan:` + `    • model → NGC (...)` + `    • videos → NGC (...)` |
 | NGC creds (or skipped) | `✔ NGC credentials: reusing existing config (org=...)` or `✔ NGC credentials: not needed (all sources local)` |
 | Pipeline settings | `✔ Pipeline: batch=4, dynamic, filesrc, eglsink (delay 10s)` |

@@ -113,14 +113,33 @@ echo "docker stop <CONTAINER_NAME>"
 
 Cleanup beyond the container:
 
+> Storage under `~/rtvicv-storage/` may be root-owned (the container runs as
+> `--user root`), so removal needs `sudo`. An agent cannot type a password, so
+> detect sudo capability first and capture it in `$SUDO` — on a host where
+> `sudo` needs a password this hands off cleanly instead of hanging:
+>
+> ```bash
+> # NOTE: no docker-group/rootless branch here (unlike platforms.md) — being in
+> # the docker group lets you run containers without sudo but does NOT grant
+> # permission to delete root-owned files under ~/rtvicv-storage/. Do not add a
+> # `docker info` branch back: it would mask the real need for elevated rm.
+> if sudo -n true 2>/dev/null; then SUDO="sudo"            # passwordless → proceed
+> elif [ "$(id -u)" -eq 0 ]; then SUDO=""                  # already root
+> else
+>     echo "✖ sudo needs a password and the agent cannot enter it." >&2
+>     echo "  Run this once, then re-run teardown: sudo -v" >&2
+>     exit 1
+> fi
+> ```
+
 ```bash
 # engines option — clear just the cached TRT engines
-sudo rm -rf $HOME/rtvicv-storage/engines/
+$SUDO rm -rf $HOME/rtvicv-storage/engines/
 echo "Cleared engine cache — next deploy will rebuild (3-10 min per model)."
 
 # full option — CONFIRM TWICE with the user before running this (10+ GB re-download next time)
-sudo rm -rf $HOME/rtvicv-storage/engines/
-sudo rm -rf $HOME/rtvicv-storage/resources/
+$SUDO rm -rf $HOME/rtvicv-storage/engines/
+$SUDO rm -rf $HOME/rtvicv-storage/resources/
 echo "Cleared engine cache and NGC resources — next deploy will re-download everything."
 ```
 

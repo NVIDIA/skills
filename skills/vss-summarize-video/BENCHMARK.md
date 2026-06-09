@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `vss-summarize-video`
-- Evaluation date: 2026-06-05
+- Evaluation date: 2026-06-09
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,23 +54,20 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+75%) | 97% (+61%) |
-| Discoverability | 2 | 100% (+75%) | 91% (+35%) |
-| Effectiveness | 2 | 72% (+48%) | 78% (+54%) |
-| Efficiency | 2 | 92% (+67%) | 86% (+37%) |
+| Security | 1 | 100% (+100%) | 100% (+100%) |
+| Correctness | 1 | 100% (+12%) | 97% (+36%) |
+| Discoverability | 1 | 100% (+6%) | 92% (+4%) |
+| Effectiveness | 1 | 72% (+10%) | 88% (+38%) |
+| Efficiency | 1 | 90% (+19%) | 83% (+7%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 4 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 1 total findings.
 
 Top findings:
 
-- MEDIUM SECURITY/Unknown (SQP-2): The deployment reference document contains hardcoded default credentials for database services (Neo4j: username 'neo4j'/ (`references/video-summarization-deployment.md:152`)
-- MEDIUM SECURITY/Unknown (SQP-2): The credentials table lists sensitive environment variables (NGC_CLI_API_KEY, NVIDIA_API_KEY, OPENAI_API_KEY, HF_TOKEN)  (`references/video-summarization-environment-variables.md:39`)
-- MEDIUM SECURITY/Unknown (SQP-2): The database backend recipes contain hardcoded default passwords (e.g., GRAPH_DB_PASSWORD=passneo4j, ARANGO_DB_PASSWORD= (`references/video-summarization-environment-variables.md:139`)
 - LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/vss-summarize-video/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
@@ -80,7 +77,7 @@ Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
 Notable observations:
 
 - Context Deduplication: Collected 7 file(s)
-- Inter-Skill Deduplication: Parsed skill 'vss-summarize-video': 162 char description
+- Inter-Skill Deduplication: Parsed skill 'vss-summarize-video': 157 char description
 
 ## Publication Recommendation
 

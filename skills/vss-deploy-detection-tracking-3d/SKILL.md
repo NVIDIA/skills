@@ -1,19 +1,12 @@
 ---
 name: vss-deploy-detection-tracking-3d
 description: >
-  Deploy and operate the RTVI-CV-3D stack (also known as MV3DT, Multi-View 3D
-  Tracking, or RTVI-CV-MV3DT) — per-camera DeepStream perception plus BEV
-  Fusion over multiple calibrated cameras. Applies to requests such as
-  "deploy RTVI-CV-3D", "deploy rtvi-cv-3d", "deploy MV3DT", "deploy multi-view
-  3D tracking", "deploy rtvi-cv-mv3dt", "enable multi-camera tracking",
-  "enable multi camera tracking", "set up multi-camera tracking", "multi-camera
-  tracking", "run RTVI-CV-3D on my videos", "run MV3DT on my videos", "run
-  RTVI-CV-3D / MV3DT on RTSP", "run on the sample dataset", "set up 3D
-  tracking", or provides a 4-camera warehouse video/RTSP set. Routes between
-  sample-data, custom-videos, and custom-RTSP flows; auto-chains to
-  `vss-generate-video-calibration` when calibration data is missing. Not for
-  the full warehouse blueprint with agents / LLM / VLM (use `vss-deploy-profile`)
-  or 2D single-camera detection (use `vss-deploy-detection-tracking-2d`).
+  Deploy and operate RTVI-CV-3D / MV3DT multi-camera 3D tracking: per-camera
+  DeepStream perception plus BEV Fusion over calibrated cameras. Supports the
+  bundled sample dataset, custom video files, and RTSP streams, and chains to
+  `vss-generate-video-calibration` when calibration is missing. Use
+  `vss-deploy-profile` for the full warehouse blueprint and
+  `vss-deploy-detection-tracking-2d` for single-camera 2D detection.
 license: Apache-2.0
 metadata:
   version: "3.2.0"
@@ -201,6 +194,22 @@ If any check fails, fix before continuing — don't proceed to deploy.
 ### 6. Browser reachability (cloud / corp-VPN hosts only)
 
 If the user will view the VST video wall through a browser on a different network than the deploy host (cloud VM, corp VPN, ssh-tunnelled session), upstream firewall rules may block VST WebRTC (STUN to `stun.l.google.com:19302`, plus random UDP for media). See [`references/verify-and-view.md#browser-reachability`](references/verify-and-view.md) for symptoms and workarounds. Also: some hosts block the AMC microservice's default port (TCP/8010); if the user reports the AMC UI on `:5000` works but its data calls fail, retry with a different `VSS_AUTO_CALIBRATION_PORT`.
+
+## Troubleshooting
+
+When any deploy, calibration, or verification step fails, stop and classify the failure before retrying. The quick checks below cover the most common MV3DT errors; use [`references/troubleshooting.md`](references/troubleshooting.md) for full diagnostic commands and fixes, [`../vss-generate-video-calibration/SKILL.md`](../vss-generate-video-calibration/SKILL.md) for AMC workflow failures, and [`../vss-deploy-profile/references/warehouse-debug.md`](../vss-deploy-profile/references/warehouse-debug.md) for broader warehouse-stack issues.
+
+| Symptom | Likely cause | First check or fix |
+|---|---|---|
+| `vss-rtvi-cv-bev-fusion` is unhealthy or `/tmp/fusion_ready` is missing | Broker not ready, `MAX_EXPECTED_SENSORS` mismatch, or `STREAM_TYPE` mismatch | Check `broker-health-check`, `docker inspect --format '{{.State.Health.Status}}' vss-rtvi-cv-bev-fusion`, and `mdx-raw` / `mdx-bev`; then re-run [`references/configure-cameras.md`](references/configure-cameras.md) if stream counts differ |
+| Perception shows `Active sources : 0`, no FPS, or fewer cameras than expected | Stale VST sensor state, wrong dataset slug, missing calibration, or per-GPU stream cap | Verify `SAMPLE_VIDEO_DATASET`, `NUM_STREAMS`, `camInfo/`, and the VST sensor list; if old sensors remain, follow [`references/teardown.md`](references/teardown.md) before redeploying |
+| `vss-rtvi-cv-mv3dt` exits with `MqttCommunicator` "invalid node" or tracker submit failures | Camera names in videos, `calibration.json`, and `camInfo/` do not match the `Camera`, `Camera_01`, ... convention | Normalize all camera names together with [`references/configure-cameras.md`](references/configure-cameras.md) Step 0, then clear stale VST state and redeploy |
+| AMC project creation, upload, calibration, or MV3DT export fails | AutoMagicCalib service/API issue outside this MV3DT deploy path | Use [`../vss-generate-video-calibration/SKILL.md`](../vss-generate-video-calibration/SKILL.md) to deploy/debug AMC, then return to [`references/calibration-workflow.md`](references/calibration-workflow.md) after export succeeds |
+| `vss-behavior-analytics-mv3dt` restarts with calibration schema validation errors | AMC export has empty `group`, `region`, or `place` fields | Apply the placeholder patch in [`references/calibration-workflow.md`](references/calibration-workflow.md) Step 4a, or populate those fields in AMC before export |
+| Extended profile has no overlays and `vss-import-calibration-output-mv3dt` logs `imageMetadata.json not found` | AMC MV3DT export did not produce `images/Top.png` and `images/imageMetadata.json` | Synthesize both files with [`references/calibration-workflow.md`](references/calibration-workflow.md) Step 4b, then restart the one-shot importer |
+| Image pulls, model load, or first-start engine build fail | Missing / expired `NGC_CLI_API_KEY`, incorrect `VSS_DATA_DIR`, missing BodyPose3DNet files, or GPU OOM | Re-check NGC auth, confirm `${VSS_DATA_DIR}/models/mv3dt/BodyPose3DNet/`, tail `vss-rtvi-cv-mv3dt` logs, and free or change `RT_CV_DEVICE_ID` if the GPU is exhausted |
+
+Before destructive recovery (`docker compose down -v`, clearing `data_log`, deleting VST sensor state, or changing host ACLs), explain the impact and get user confirmation. Capture the failing command, relevant `.env` values, `docker compose ps`, and the last container logs before making state-reset changes.
 
 ## How it fits together
 
