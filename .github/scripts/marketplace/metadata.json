@@ -1095,7 +1095,7 @@
     {
       "path": "skills/nemoclaw-user-reference",
       "name": "nemoclaw-user-reference",
-      "description": "Describes the NemoClaw plugin and blueprint architecture and how they orchestrate the OpenClaw sandbox. Use when looking up architecture, plugin structure, or blueprint design. Trigger keywords - nemoclaw architecture, nemoclaw plugin blueprint structure, nemoclaw vs openshell, which cli, nemoclaw cli, openshell cli, sandbox commands, nemoclaw cli commands, nemoclaw command reference, nemoclaw network policy, sandbox egress control operator approval, nemoclaw troubleshooting, nemoclaw debug sandbox issues.",
+      "description": "Describes the NemoClaw integration layer and blueprint architecture and how they orchestrate compatible agent sandboxes. Use when looking up architecture, agent integration, plugin structure, or blueprint design. Trigger keywords - nemoclaw architecture, nemoclaw agent architecture, nemoclaw plugin blueprint structure, nemoclaw vs openshell, which cli, nemoclaw cli, openshell cli, sandbox commands, nemoclaw cli commands, nemoclaw command reference, nemoclaw network policy, sandbox egress control operator approval, nemoclaw troubleshooting, nemoclaw debug sandbox issues.",
       "metadata": {
         "product.primary": "NeMoClaw",
         "classification.category.primary": "ai_and_machine_learning",
