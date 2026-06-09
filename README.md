@@ -43,7 +43,7 @@ Replace `cuopt-numerical-optimization-api-python` with any skill name from the [
 
 ### Install for a Specific Agent
 
-Use `--agent` to target a specific AI coding agent. These are common client targets; for the full list of supported clients, see the [`skills` CLI Supported Agents table](https://github.com/vercel-labs/skills#supported-agents).
+Use `--agent` to target a specific AI coding agent. Initially, we'll support common client targets, expanding the list over time. For the full list of clients supported by the spec, see the [`skills` CLI Supported Agents table](https://github.com/vercel-labs/skills#supported-agents).
 
 **Claude Code**
 
