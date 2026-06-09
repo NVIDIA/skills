@@ -23,7 +23,11 @@ Use this skill when:
 ngc --version
 
 # Is key in environment?
-echo "NGC_CLI_API_KEY: ${NGC_CLI_API_KEY:+SET}${NGC_CLI_API_KEY:-NOT SET}"
+if [[ -n "${NGC_CLI_API_KEY:-}" ]]; then
+  echo "NGC_CLI_API_KEY: SET"
+else
+  echo "NGC_CLI_API_KEY: NOT SET"
+fi
 ```
 
 ---

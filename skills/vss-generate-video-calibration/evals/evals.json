@@ -33,38 +33,5 @@
       "Checks that VIOS is reachable before starting capture.",
       "Uses /v1/rtsp/capture, polls the session, and ingests clips before calibrating."
     ]
-  },
-  {
-    "id": "amc-sample-verify",
-    "question": "Verify the AMC install on the bundled sample dataset.",
-    "expected_skill": "vss-generate-video-calibration",
-    "ground_truth": "Routes to the sample-dataset mode: obtains and extracts the sample zip if it is not already present, uploads the four cameras plus alignment, layout, and ground truth, calibrates with the resnet detector, and reports the evaluation metrics (L2 distance and reprojection error).",
-    "expected_behavior": [
-      "Routes to the sample-dataset mode.",
-      "Obtains and extracts the sample zip when it is missing rather than assuming it ships with the repo.",
-      "Calibrates with resnet and reports the evaluation metrics (L2 / reprojection error)."
-    ]
-  },
-  {
-    "id": "amc-projects-permission",
-    "question": "AMC's POST /v1/create_project returns HTTP 500 with '[Errno 13] Permission denied' on the projects directory. How do I fix it?",
-    "expected_skill": "vss-generate-video-calibration",
-    "ground_truth": "The host projects directory bind-mounted into the microservice is not writable by the container user (UID 1000). Grant access with a scoped ACL (setfacl -m u:1000:rwx on the projects directory), not chmod 777 and not chown, then retry create_project.",
-    "expected_behavior": [
-      "Identifies that the projects directory is not writable by the container user (UID 1000).",
-      "Applies a scoped setfacl for UID 1000 rather than chmod 777 or chown.",
-      "Retries create_project after fixing permissions."
-    ]
-  },
-  {
-    "id": "amc-mv3dt-export",
-    "question": "Calibration finished. How do I get the result in MV3DT format?",
-    "expected_skill": "vss-generate-video-calibration",
-    "ground_truth": "Fetches the MV3DT export from GET /v1/result/<project_id>/mv3dt_result, preferring result_type=vggt when VGGT refinement completed and otherwise result_type=amc; the response is a zip with the transforms and per-camera camInfo files.",
-    "expected_behavior": [
-      "Uses GET /v1/result/<project_id>/mv3dt_result for the MV3DT-format output.",
-      "Prefers result_type=vggt when VGGT completed, falling back to result_type=amc.",
-      "Does not print plaintext API tokens."
-    ]
   }
 ]

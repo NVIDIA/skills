@@ -35,6 +35,10 @@ Worked end-to-end examples are kept under `evals/` (each `*.json` manifest conta
 
 Run AutoMagicCalib over one of three input sources and drive the calibration through the microservice REST API. The input-resolution work differs per source; everything from `verify_project` onward is identical and lives in this file. Pick the right input-mode reference and pair it with the [Shared Calibration Tail](#shared-calibration-tail) below.
 
+Shared helper references are loaded only when needed:
+- Read [`references/common-steps.md`](references/common-steps.md) when a mode reference needs the shared `create_project`, video-upload, or handoff snippets.
+- Read [`references/calibration-tail.md`](references/calibration-tail.md) when you need the reusable Python implementation of the verify → calibrate → poll → results tail.
+
 ## Input Routing
 
 Match the user's request to a mode, then load that mode's reference for input collection, mode-specific API calls, and the full Python script.
@@ -59,7 +63,7 @@ Mode-specific prerequisites (VIOS for `rtsp`, sample zip for `sample-dataset`) l
 
 ## Shared Calibration Tail
 
-The verify → calibrate → poll → results sequence is identical regardless of input mode. After the mode-specific reference has uploaded videos / ingested RTSP clips / uploaded the bundled sample, run this tail.
+The verify → calibrate → poll → results sequence is identical regardless of input mode. After the mode-specific reference has uploaded videos / ingested RTSP clips / uploaded the bundled sample, run this tail. Use [`references/calibration-tail.md`](references/calibration-tail.md) for the shared Python snippet.
 
 ### Step A — Verify Project
 

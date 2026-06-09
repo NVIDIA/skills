@@ -46,12 +46,49 @@ Ask the user to confirm detection before proceeding.
 
 ---
 
+## Privileged access (run once, before any `sudo` command below)
+
+The docker-run and Jetson perf commands below use `sudo`. An agent cannot
+type an interactive password, so on a host where `sudo` requires one these
+commands hang or fail silently. Detect sudo capability up front and capture
+the result in `$SUDO`:
+
+```bash
+# Self-contained: this snippet may run in a different shell than the Platform
+# Detection block above, so re-derive IS_JETSON here (env vars don't persist
+# across separate bash invocations) before the docker-group guard reads it.
+IS_JETSON=0
+[[ -f /etc/nv_tegra_release ]] && IS_JETSON=1
+
+if sudo -n true 2>/dev/null; then
+    SUDO="sudo"                       # passwordless sudo → proceed as-is
+elif [ "$(id -u)" -eq 0 ]; then
+    SUDO=""                           # already root → no sudo needed
+elif docker info >/dev/null 2>&1 && [ "${IS_JETSON:-0}" -eq 0 ]; then
+    SUDO=""                           # docker-group / rootless (x86/SBSA only — Jetson perf commands
+                                      # nvpmodel, jetson_clocks, and governor writes require real root,
+                                      # so Jetson docker-group hosts fall through to the recovery below)
+else
+    echo "✖ sudo requires a password and the agent cannot enter it." >&2
+    echo "  Run this once in your terminal, then re-run the skill:" >&2
+    echo "      sudo -v        # caches your sudo credential for ~15 min" >&2
+    exit 1
+fi
+```
+
+Use **`$SUDO`** in place of `sudo` in every command below. On passwordless /
+root / docker-group hosts the resolved command is identical to today; only
+password-required hosts now get a clear recovery handoff instead of a silent
+hang.
+
+---
+
 ## x86 / aarch64 (multi-arch dGPU)
 
 Use the default multi-arch image tag for this platform.
 
 ```bash
-sudo docker run --name=<CONTAINER_NAME> --network=host \
+$SUDO docker run --name=<CONTAINER_NAME> --network=host \
   --gpus "device=<GPU_INDEX>" --shm-size=6g \
   -v <STORAGE_HOST>:/opt/storage \
   -it --user root --rm \
@@ -76,7 +113,7 @@ sudo docker run --name=<CONTAINER_NAME> --network=host \
 Requires `--privileged`. Use the SBSA image variant.
 
 ```bash
-sudo docker run --name=<CONTAINER_NAME> --network=host \
+$SUDO docker run --name=<CONTAINER_NAME> --network=host \
   --gpus "device=<GPU_INDEX>" --privileged --shm-size=6g \
   -v <STORAGE_HOST>:/opt/storage \
   -it --user root --rm \
@@ -92,15 +129,15 @@ sudo docker run --name=<CONTAINER_NAME> --network=host \
 Boost CPU/GPU and VIC clocks. Run **outside the container**:
 
 ```bash
-sudo nvpmodel -m 0
-sudo jetson_clocks
-for p in /sys/class/devfreq/*.vic; do sudo sh -c "echo performance > $p/governor"; done
+$SUDO nvpmodel -m 0
+$SUDO jetson_clocks
+for p in /sys/class/devfreq/*.vic; do $SUDO sh -c "echo performance > $p/governor"; done
 ```
 
 ### Launch
 
 ```bash
-sudo docker run --name=<CONTAINER_NAME> --network=host \
+$SUDO docker run --name=<CONTAINER_NAME> --network=host \
   --gpus '"device=<GPU_INDEX>"' --runtime nvidia --shm-size=6g \
   -v <STORAGE_HOST>:/opt/storage \
   -it --user root --rm \
@@ -131,7 +168,7 @@ export DISPLAY=:0    # or :1 depending on your X11 setup
 Example (x86 dGPU with display):
 
 ```bash
-sudo docker run --name=<CONTAINER_NAME> --network=host \
+$SUDO docker run --name=<CONTAINER_NAME> --network=host \
   --gpus "device=<GPU_INDEX>" --shm-size=6g \
   -v <STORAGE_HOST>:/opt/storage \
   -e DISPLAY=$DISPLAY \

@@ -2,6 +2,7 @@
 
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
+# setup_tracker_reid.sh prepares NvDCF ReID model files and cached engines.
 #
 # Licensed under Apache-2.0 (full text: http://www.apache.org/licenses/LICENSE-2.0).
 

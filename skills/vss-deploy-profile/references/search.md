@@ -278,8 +278,8 @@ link). Report the ingress URLs, not raw ports — see
 ## Env file location
 
 ```
-deploy/docker/developer-profiles/dev-profile-search/.env            # source defaults (read-only)
-deploy/docker/developer-profiles/dev-profile-search/generated.env   # skill's working copy (apply overrides here)
+deploy/docker/developer-profiles/dev-profile-search/.env
+deploy/docker/developer-profiles/dev-profile-search/generated.env
 ```
 
 ## Stage perception models (RT-DETR warehouse)

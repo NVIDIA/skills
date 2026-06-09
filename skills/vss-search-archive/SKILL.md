@@ -1,6 +1,6 @@
 ---
 name: vss-search-archive
-description: Use to run top-level VSS fusion search on archived video, or to ingest video files / RTSP streams for search. Not for ad-hoc Q&A or live captioning.
+description: Use to run top-level VSS fusion search on archived video, or to ingest video files / RTSP streams for search. Do NOT use for ad-hoc visual Q&A (use vss-ask-video), live captioning (use vss-deploy-dense-captioning), or video summarization and reports (use vss-summarize-video).
 license: Apache-2.0
 metadata:
   author: "NVIDIA Video Search and Summarization team"
@@ -10,17 +10,18 @@ metadata:
 ---
 ## Purpose
 
-Run the top-level VSS fusion search across archived video and ingest new clips / RTSP streams for search.
+Run the top-level VSS fusion search across archived video, ingest new clips / RTSP streams for search, and delete search-ingested sources.
 
 ## Prerequisites
 
 - Active VSS deployment reachable on `$HOST_IP` (see `vss-deploy-profile` and `references/`).
+- `vss-manage-video-io-storage` skill installed (used to list and manage video sources before search).
 - NGC credentials in `$NGC_CLI_API_KEY` and `$NVIDIA_API_KEY` for any image pulls.
 - `curl`, `jq`, and Docker available on the caller.
 
 ## Instructions
 
-Follow the routing tables and step-by-step workflows below. Each section that ends in *workflow*, *quick start*, or *flow* is intended to be executed top-to-bottom. Detailed reference material lives in `references/` and helper scripts live in `scripts/` — call them via `run_script` when the skill points to a script by name.
+Follow the routing tables and step-by-step workflows below. Each section that ends in *workflow*, *quick start*, or *flow* is intended to be executed top-to-bottom. Detailed reference material lives in `references/`.
 
 ## Examples
 
@@ -53,6 +54,7 @@ Search video archives by natural language using Cosmos Embed1 embeddings. Requir
 - Any natural-language search across video archives
 - "Ingest `<file>` for search" / "upload this video for search"
 - "Add this RTSP stream for search" / "register `<rtsp_url>` for search"
+- "Delete `<file>` from search" / "remove this video and embeddings"
 
 ---
 
@@ -91,21 +93,42 @@ Confirm the source exists in VIOS first (Mandatory workflow Step 2). If it is mi
 
 ### File upload — universal three-step flow
 
-```bash
-# 1. Ask the agent for the chunked-upload URL
-URL=$(curl -s -X POST "http://${HOST_IP}:8000/api/v1/videos" \
-  -H "Content-Type: application/json" \
-  -d '{"filename": "<filename.mp4>"}' | jq -r .url)
+Use the timestamped upload form below. The VSS agent/search profile uses
+`2025-01-01T00:00:00.000Z` as the uploaded `video_file` base timestamp;
+VIOS storage and embeddings must share that timeline, otherwise
+screenshot URLs and critic frame fetches can fail.
 
-# 2. Chunked POST the file to that VST URL (the UI streams chunks; from a shell,
-#    a single multipart POST is fine). The final-chunk response carries sensorId.
-SENSOR=$(curl -s -X POST "$URL" \
-  -F "file=@/path/to/<filename.mp4>;type=video/mp4" | jq -r .sensorId)
+```bash
+FILENAME="<filename.mp4>"
+FILE_PATH="/path/to/${FILENAME}"
+
+# 1. Ask the agent for the chunked-upload URL
+UPLOAD_URL=$(curl -s -X POST "http://${HOST_IP}:8000/api/v1/videos" \
+  -H "Content-Type: application/json" \
+  -d "{\"filename\":\"${FILENAME}\"}" | jq -r .url)
+
+# 2. Chunked POST the file to that VST URL (nvstreamer protocol).
+#    The final-chunk response carries sensorId.
+IDENTIFIER=$(uuidgen 2>/dev/null || cat /proc/sys/kernel/random/uuid)
+UPLOAD_RESPONSE=$(curl -s -X POST "${UPLOAD_URL}" \
+  -H "nvstreamer-chunk-number: 1" \
+  -H "nvstreamer-total-chunks: 1" \
+  -H "nvstreamer-is-last-chunk: true" \
+  -H "nvstreamer-identifier: ${IDENTIFIER}" \
+  -H "nvstreamer-file-name: ${FILENAME}" \
+  -F "mediaFile=@${FILE_PATH};filename=${FILENAME}" \
+  -F "filename=${FILENAME}" \
+  -F 'metadata={"timestamp":"2025-01-01T00:00:00"}')
 
 # 3. Tell the agent the upload finished — this fans out to RTVI-CV + RTVI-embed
-curl -s -X POST "http://${HOST_IP}:8000/api/v1/videos/${SENSOR}/complete" \
-  -H "Content-Type: application/json" \
-  -d '{"filename": "<filename.mp4>"}' | jq .
+SENSOR=$(printf '%s' "${UPLOAD_RESPONSE}" | jq -r .sensorId)
+[ -z "${SENSOR}" ] || [ "${SENSOR}" = "null" ] \
+  && { echo "Upload failed: no sensorId in response: ${UPLOAD_RESPONSE}"; exit 1; }
+printf '%s' "${UPLOAD_RESPONSE}" \
+  | jq --arg filename "${FILENAME}" '. + {filename: $filename}' \
+  | curl -s -X POST "http://${HOST_IP}:8000/api/v1/videos/${SENSOR}/complete" \
+      -H "Content-Type: application/json" \
+      -d @- | jq .
 ```
 
 Wait for the `/complete` response (it returns `chunks_processed > 0` once embeddings land). Only then is the video searchable.
@@ -118,7 +141,7 @@ Wait for the `/complete` response (it returns `chunks_processed > 0` once embedd
 curl -s -X POST "http://${HOST_IP}:8000/api/v1/rtsp-streams/add" \
   -H "Content-Type: application/json" \
   -d '{
-    "sensor_url": "rtsp://<host>:<port>/<path>",
+    "sensorUrl": "rtsp://<host>:<port>/<path>",
     "name": "<sensor-name>",
     "username": "",
     "password": "",
@@ -128,6 +151,18 @@ curl -s -X POST "http://${HOST_IP}:8000/api/v1/rtsp-streams/add" \
 ```
 
 The response shape is `{status, message, error}` — no `sensorId` (the agent keys the stream by the `name` you provided). On any step's failure earlier steps roll back. The `start_embedding_generation` step is fire-and-verify: a 2xx confirms the request was accepted and the embedding pipeline is running in the background, **not** that the stream is searchable yet. Search hits will start appearing only after enough chunks land in Elasticsearch — poll with a low-`top_k` query a few seconds in if you need a readiness signal.
+
+### Delete source — agent-backed cleanup
+
+Delete through the agent backend, not bare VIOS, so VIOS storage and search embeddings are cleaned up together.
+
+```bash
+# For video files: video_id is the VIOS sensor/video UUID
+curl -s -X DELETE "http://${HOST_IP}:8000/api/v1/videos/<video_id>" | jq .
+
+# For RTSP streams: name is the registered source name
+curl -s -X DELETE "http://${HOST_IP}:8000/api/v1/rtsp-streams/delete/<name>" | jq .
+```
 
 ---
 
@@ -159,11 +194,7 @@ When using this skill, ALWAYS follow this high-level workflow:
    If the user query references a specific video / sensor name
    (e.g. "the airport video", "warehouse_cam_3", "sample warehouse"),
    verify it's actually registered in VIOS **before** firing
-   `POST .../generate`:
-
-   ```bash
-   curl -s "http://${HOST_IP}:30888/vst/api/v1/sensor/list" | jq '.[].name'
-   ```
+   `POST .../generate`. List sources via the `vss-manage-video-io-storage` skill.
 
    Then:
    - **If the named source (or a clearly substring-matching name) IS in the list** → proceed to step 3. Forward the user's natural-language query verbatim — the agent's own search tool decomposer (`services/agent/src/vss_agents/tools/search.py`) extracts `video_sources` from the prose given the available sources, so the skill does NOT need to construct a structured `video sources` payload.

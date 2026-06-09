@@ -2,6 +2,7 @@
 
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
+# write_deployment_log.sh records deployment settings, commands, and results.
 #
 # Licensed under Apache-2.0 (full text: http://www.apache.org/licenses/LICENSE-2.0).
 

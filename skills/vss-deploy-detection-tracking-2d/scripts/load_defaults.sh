@@ -2,6 +2,7 @@
 
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
+# load_defaults.sh resolves platform and per-use-case deployment defaults.
 #
 # Licensed under Apache-2.0 (full text: http://www.apache.org/licenses/LICENSE-2.0).
 

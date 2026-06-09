@@ -277,20 +277,21 @@ nc -zu stun.l.google.com 19302                                            # bloc
 3. **Bypass UI entirely; consume `mdx-bev`.** Data is on the broker — write a downstream consumer.
 4. **Self-host a TURN server** on TCP/443 and reconfigure VST's `stunurl_list` / `webrtc_port_range`. Heavyweight; out of scope for this skill.
 
-### VST overlays show the sample warehouse layout, or 3D bboxes wildly misaligned despite a correct calibration on disk
+### VST overlays show the sample warehouse layout, or 3D bboxes do not align with custom calibration
 
-**Symptom:** VST's top-view widget displays the bundled sample warehouse layout (orange shelving, recognizably not your scene) AND/OR 3D bounding boxes are drawn at the wrong pixel positions on every camera stream — even though `calibration.json` at `<CAL_DIR>` looks correct, AMC's own overlay images in the project output look correct, perception is at 30 FPS, and `mdx-bev` is growing. Re-running AMC, switching detectors, or running VGGT refinement makes no visible difference to the VST overlay.
+**Symptom:** VST top-view widget displays the bundled sample warehouse layout and/or 3D bounding boxes do not line up with the camera views, even though `calibration.json` at `<CAL_DIR>` looks correct, AMC overlay images in the project output look correct, perception is at 30 FPS, and `mdx-bev` is growing. Re-running AMC, switching detectors, or running VGGT refinement does not change the VST overlay.
 
-**Cause:** `services/vios/streamprocessing/docker-compose.yaml` hardcodes two bind-mount sources to the literal `sample-data/warehouse-4cams-20mx20m-synthetic/` slug instead of `${SAMPLE_VIDEO_DATASET}`. VST reads from `/home/vst/vst_release/configs/calibration.json` when rendering 3D bbox overlays — so for any non-sample dataset, **VST projects with the sample warehouse's `cameraMatrix` regardless of what's in your dataset's calibration.json**. Every other consumer in the stack (perception, behavior-analytics, video-analytics-api) reads from your dataset's path correctly; only the streamprocessing → VST overlay path is wrong.
+**Cause:** `services/vios/streamprocessing/docker-compose.yaml` may include bind-mount sources that point at the bundled sample dataset instead of `${SAMPLE_VIDEO_DATASET}`. VST reads overlay configuration from its container configuration directory, so for custom datasets the VST overlay may use the sample `cameraMatrix` while perception, behavior-analytics, and video-analytics-api read from the custom dataset calibration path.
 
 **Diagnose:**
 ```bash
 docker inspect vss-vios-streamprocessing \
-  --format '{{range .Mounts}}{{if eq .Destination "/home/vst/vst_release/configs/calibration.json"}}{{.Source}}{{end}}{{end}}'
-# If the printed path contains "warehouse-4cams-20mx20m-synthetic" instead of your ${SAMPLE_VIDEO_DATASET}, that's the bug.
+  --format '{{range .Mounts}}{{println .Destination " <- " .Source}}{{end}}' \
+  | grep -E "calibration\.json|Top\.png"
+# If either source path contains "warehouse-4cams-20mx20m-synthetic" instead of your ${SAMPLE_VIDEO_DATASET}, update the mount sources.
 ```
 
-**Fix:** Apply the patch from [`deploy-rtvi-cv-3d-stack.md`](deploy-rtvi-cv-3d-stack.md) Step 0b — replaces the literal sample slug with `${SAMPLE_VIDEO_DATASET}`. Then recreate `streamprocessing-ms-mv3dt` in place and hard-refresh the VST tab. Full stack restart is not required.
+**Fix:** Apply the update from [`deploy-rtvi-cv-3d-stack.md`](deploy-rtvi-cv-3d-stack.md) Step 0b so the sample-data path resolves through `${SAMPLE_VIDEO_DATASET}`. Then recreate `streamprocessing-ms-mv3dt` in place and hard-refresh the VST tab. Full stack restart is not required.
 
 ### No bounding-box overlays in VST video wall
 

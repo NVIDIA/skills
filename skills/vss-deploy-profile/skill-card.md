@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and DevOps engineers use this skill to select, configure, deploy, verify, debug, or tear down NVIDIA Video Search and Summarization (VSS) compose-based profiles on GPU-equipped hosts. <br>
+Developers and engineers deploying NVIDIA AI Blueprint Video Search and Summarization profiles on GPU-equipped hosts, using a compose-centric workflow to build env overrides, generate resolved compose files, and manage the full deploy/teardown lifecycle. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,8 +20,8 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
-- [GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
 - [VSS Prerequisites](https://docs.nvidia.com/vss/3.2.0/prerequisites.html) <br>
+- [GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
 
 
 ## Skill Output: <br>
@@ -37,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 5 tasks (5 positive skill-activation cases, 2 attempts per task, 50% pass threshold) in the NVSkills-Eval external profile on astra-sandbox environment. <br>
+Evaluated against 5 internal evaluation tasks (5 positive skill-activation cases, 0 negative cases). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+0%) | 95% (+10%) |
-| Correctness | 8 | 96% (+77%) | 91% (+54%) |
-| Discoverability | 8 | 93% (+72%) | 85% (+28%) |
-| Effectiveness | 8 | 64% (+59%) | 61% (+54%) |
-| Efficiency | 8 | 77% (+51%) | 76% (+22%) |
+| Security | 5 | 90% (+10%) | 80% (+0%) |
+| Correctness | 5 | 92% (+11%) | 82% (+32%) |
+| Discoverability | 5 | 92% (+15%) | 75% (+24%) |
+| Effectiveness | 5 | 64% (+10%) | 56% (+35%) |
+| Efficiency | 5 | 67% (+15%) | 59% (+20%) |
 
 ## Skill Version(s): <br>
 3.2.0 (source: frontmatter) <br>

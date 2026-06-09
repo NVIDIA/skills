@@ -34,23 +34,23 @@ This skill is invoked as a **sub-workflow** of the parent `alerts` skill (Workfl
 
 ## Setup
 
-**1. Alert Bridge endpoint:** `http://host.openshell.internal:9080`
+**1. Alert Bridge endpoint:** `http://${HOST_IP}:9080`
 - It is reachable directly from the sandbox at this URL.
 - Do NOT prompt the user for the endpoint; use this one.
-- All Alert Bridge API calls use this base: `http://host.openshell.internal:9080/api/v1/realtime`
+- All Alert Bridge API calls use this base: `http://${HOST_IP}:9080/api/v1/realtime`
 
 **2. Alert Bridge health check path:** `/health` (NOT `/api/v1/health`)
 - The correct probe is:
   ```bash
-  curl -sf --connect-timeout 5 "http://host.openshell.internal:9080/health"
+  curl -sf --connect-timeout 5 "http://${HOST_IP}:9080/health"
   ```
 - `/api/v1/health` returns 404 — do not use it.
 - If the backend is unavailable (non-zero exit code or connection error), abort and report the connectivity error.
 
-**3. Do NOT route through the VSS Agent `/generate` endpoint under any circumstance. Workflow D MUST call Alert Bridge directly at `http://host.openshell.internal:9080/api/v1/realtime`. If Alert Bridge is unreachable, abort and report the connectivity error — do not fall back to `/generate`.
+**3. Do NOT route through the VSS Agent `/generate` endpoint under any circumstance. Workflow D MUST call Alert Bridge directly at `http://${HOST_IP}:9080/api/v1/realtime`. If Alert Bridge is unreachable, abort and report the connectivity error — do not fall back to `/generate`.
 
 **4. Payload must include `sensor_id` as the UUID from VIOS:**
-- Call `GET http://host.openshell.internal:30888/vst/api/v1/sensor/list`
+- Call `GET http://${HOST_IP}:30888/vst/api/v1/sensor/list`
 - Match by name, extract the `sensorId` field (UUID).
 - Put that UUID in the Alert Bridge payload's `sensor_id` field — not the name.
 
@@ -59,7 +59,7 @@ This skill is invoked as a **sub-workflow** of the parent `alerts` skill (Workfl
 **Auth:** Optional. Most deployments run without auth. If a `401` is returned, retry with `-H "Authorization: Bearer <token>"` and ask the user for the token.
 
 **Dependency — vss-manage-video-io-storage skill (VIOS/VST):**
-This skill depends on the `vss-manage-video-io-storage` skill for VST endpoint resolution. The VST API at `http://host.openshell.internal:30888/vst/api/v1/` is used to look up sensor IDs, names, and RTSP stream URLs.
+This skill depends on the `vss-manage-video-io-storage` skill for VST endpoint resolution. The VST API at `http://${HOST_IP}:30888/vst/api/v1/` is used to look up sensor IDs, names, and RTSP stream URLs.
 - If VST is unreachable, sensor resolution cannot proceed. Surface it as: "Cannot resolve sensor — the camera service (VST) is not responding. Please ensure VST is running and try again."
 
 ---
@@ -92,7 +92,7 @@ Resolve the user's sensor name to three values needed for the payload: `sensor_i
 **2a. Fetch the sensor list:**
 
 ```bash
-curl -s "http://host.openshell.internal:30888/vst/api/v1/sensor/list" | jq .
+curl -s "http://${HOST_IP}:30888/vst/api/v1/sensor/list" | jq .
 ```
 
 Example response (each entry has `name` and `sensorId`):
@@ -120,7 +120,7 @@ If **multiple matches** — list them and ask which one the user meant.
 **2c. Fetch RTSP URL using the `sensorId`:**
 
 ```bash
-curl -s "http://host.openshell.internal:30888/vst/api/v1/sensor/<sensorId>/streams" | jq .
+curl -s "http://${HOST_IP}:30888/vst/api/v1/sensor/<sensorId>/streams" | jq .
 ```
 
 Select the main stream (`isMain: true`) and extract the `url` field → this becomes `live_stream_url` in the payload.
@@ -165,7 +165,7 @@ From the user's prompt, generate a short `snake_case` tag that summarizes the al
 Construct the payload using values collected from the previous steps and POST to the Alert Bridge realtime endpoint:
 
 ```bash
-curl -s -X POST "http://host.openshell.internal:9080/api/v1/realtime" \
+curl -s -X POST "http://${HOST_IP}:9080/api/v1/realtime" \
   -H "Content-Type: application/json" \
   -d '{
     "live_stream_url": "<RTSP_URL>",
@@ -240,12 +240,12 @@ The resolved RTSP URL(s) are used **only for client-side filtering** — to matc
 ### Step 3 — Fetch Rules from Alert Bridge
 
 ```bash
-curl -s "http://host.openshell.internal:9080/api/v1/realtime" | jq .
+curl -s "http://${HOST_IP}:9080/api/v1/realtime" | jq .
 ```
 
 If the user specified an `alert_type` tag, add it as a query parameter:
 ```bash
-curl -s "http://host.openshell.internal:9080/api/v1/realtime?alert_type=<TAG>" | jq .
+curl -s "http://${HOST_IP}:9080/api/v1/realtime?alert_type=<TAG>" | jq .
 ```
 
 **Client-side filtering on the response:**
@@ -312,7 +312,7 @@ Example: *"Stop the PPE alert on warehouse-dock-1."*
 **Fetch rules and filter:**
 
 ```bash
-curl -s "http://host.openshell.internal:9080/api/v1/realtime" | jq .
+curl -s "http://${HOST_IP}:9080/api/v1/realtime" | jq .
 ```
 
 Resolve the user's `sensor_name` to RTSP URL(s) via the VST API (same as Create Step 2), then apply both filters client-side on the response:
@@ -342,7 +342,7 @@ This section applies only when the user's message is "yes" (or equivalent) in re
 - User said **yes** -> execute:
 
 ```bash
-curl -s -X DELETE "http://host.openshell.internal:9080/api/v1/realtime/<RULE_ID>" | jq .
+curl -s -X DELETE "http://${HOST_IP}:9080/api/v1/realtime/<RULE_ID>" | jq .
 ```
 
 **Response handling:**
@@ -378,9 +378,9 @@ All errors must be translated into plain language. Never show raw HTTP responses
 
 ## Tips
 
-- **RTSP streams only:** Realtime alerts require a live RTSP stream. When resolving a sensor in Step 2, verify the stream `url` starts with `rtsp://`. If the `url` is a file path (e.g. `"/home/vst/vst_release/streamer_videos/video.mp4"`), the sensor is a file-based upload and cannot be used for realtime monitoring. Report: "Sensor '`<name>`' is a file-based sensor, not a live camera. Realtime alerts require a live RTSP stream."
+- **RTSP streams only:** Realtime alerts require a live RTSP stream. When resolving a sensor in Step 2, verify the stream `url` starts with `rtsp://`. If the `url` is a file path (e.g. `"/data/vst/streamer_videos/video.mp4"`), the sensor is a file-based upload and cannot be used for realtime monitoring. Report: "Sensor '`<name>`' is a file-based sensor, not a live camera. Realtime alerts require a live RTSP stream."
 - **jq:** All JSON responses are piped through `jq .` for readability.
-- **Endpoint resolution:** Alert Bridge is at `http://host.openshell.internal:9080`, VST is at `http://host.openshell.internal:30888`. These are hardcoded — do not prompt the user for them.
+- **Endpoint resolution:** The host comes from the `$HOST_IP` environment variable — Alert Bridge at `http://${HOST_IP}:9080`, VST at `http://${HOST_IP}:30888`. The ports are fixed; do not prompt the user for the host or ports.
 - **Prompt passthrough:** The user's prompt is sent verbatim to the Alert Bridge `prompt` field. Do not rephrase, summarize, or alter it — the vision model needs the user's original intent.
 
 ---

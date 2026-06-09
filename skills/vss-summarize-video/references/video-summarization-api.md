@@ -69,14 +69,16 @@ curl -sf "$BASE_URL/models" | jq '.data[] | {id, object, owned_by, api_type}'
 ## File Summarization
 
 `POST /v1/summarize` and `POST /summarize` both use `SummarizationQuery`.
+The OpenAPI schema requires `model`, `scenario`, and `events` on every request;
+omitting `scenario` (or any other required key) returns HTTP 422.
 
 Required fields:
 
 | Field | Type | Notes |
 |---|---|---|
-| `model` | string | Must match an available model id. |
-| `scenario` | string | User-provided use-case context. |
-| `events` | array[string] | User-provided event names to detect or summarize. |
+| `model` | string | Required. Must match an available model id. |
+| `scenario` | string | Required. User-provided use-case context. |
+| `events` | array[string] | Required. User-provided event names to detect or summarize. |
 
 Source fields:
 
@@ -210,7 +212,8 @@ curl -sf "$BASE_URL/metrics" | head
 
 - `400` means invalid syntax or malformed request.
 - `401` means auth was required but missing or invalid.
-- `422` usually means a schema validation failure. Check for extra fields.
+- `422` usually means a schema validation failure. Check for missing required
+  keys (`model`, `scenario`, `events` on `/v1/summarize`) or extra fields.
 - `429` means rate limiting.
 - `503` from readiness means warming or dependencies unavailable.
 - `503` from summarize means the service is busy processing another file.

@@ -98,7 +98,7 @@ focal_length=1269.0&focal_length=1099.5&...
 
 ### Step 5 — Hand off to the Shared Calibration Tail
 
-Once uploads are done (and any UI fallback confirmed on disk), continue with [SKILL.md Step A onward](../SKILL.md#step-a--verify-project) (verify → calibrate → poll → results).
+Once uploads are done (and any UI fallback confirmed on disk), continue with [SKILL.md Step A onward](../SKILL.md#step-a--verify-project) (verify → calibrate → poll → results). Use [`calibration-tail.md`](calibration-tail.md) for the shared Python snippet.
 
 ---
 
