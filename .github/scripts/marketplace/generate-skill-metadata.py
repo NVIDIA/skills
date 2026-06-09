@@ -37,6 +37,7 @@ import os
 import re
 import sys
 import textwrap
+import time
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -421,6 +422,10 @@ def build_ai_client(allow_ai: bool):
     return _AIClient()
 
 
+_RETRY_ATTEMPTS = 3
+_RETRY_BASE_SECONDS = 1  # doubles on each retry: 1s, 2s, 4s
+
+
 class _AIClient:
     def __init__(self) -> None:
         self.api_key = os.environ.get("INFERENCE_API_KEY")
@@ -547,15 +552,55 @@ class _AIClient:
                 "AI enrichment needed but `requests` is not installed."
             ) from exc
 
-        resp = requests.post(
-            self.api_url,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.api_key}",
-            },
-            json=body,
-            timeout=60,
-        )
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}",
+        }
+        last_error: str = ""
+        for attempt in range(_RETRY_ATTEMPTS + 1):
+            try:
+                resp = requests.post(
+                    self.api_url,
+                    headers=headers,
+                    json=body,
+                    timeout=60,
+                )
+            except requests.Timeout:
+                last_error = "request timed out"
+                if attempt < _RETRY_ATTEMPTS:
+                    time.sleep(_RETRY_BASE_SECONDS * (2 ** attempt))
+                    continue
+                raise EnrichmentError(
+                    f"Inference API timed out after {_RETRY_ATTEMPTS + 1} attempts."
+                )
+            except requests.ConnectionError as exc:
+                last_error = str(exc)
+                if attempt < _RETRY_ATTEMPTS:
+                    time.sleep(_RETRY_BASE_SECONDS * (2 ** attempt))
+                    continue
+                raise EnrichmentError(
+                    f"Inference API connection failed after {_RETRY_ATTEMPTS + 1} attempts: {exc}"
+                )
+
+            # Retry on rate-limit (429) and transient server errors (5xx).
+            if resp.status_code == 429 or resp.status_code >= 500:
+                last_error = f"HTTP {resp.status_code}"
+                if attempt < _RETRY_ATTEMPTS:
+                    wait = _RETRY_BASE_SECONDS * (2 ** attempt)
+                    print(
+                        f"  [retry {attempt + 1}/{_RETRY_ATTEMPTS}] "
+                        f"API returned {resp.status_code} for {skill.path}; "
+                        f"retrying in {wait}s…",
+                        file=sys.stderr,
+                    )
+                    time.sleep(wait)
+                    continue
+                raise EnrichmentError(
+                    f"Inference API returned HTTP {resp.status_code} after "
+                    f"{_RETRY_ATTEMPTS + 1} attempts: {resp.text[:500]}"
+                )
+            break  # success or a non-retryable error code
+
         if resp.status_code != 200:
             raise EnrichmentError(
                 f"Inference API returned HTTP {resp.status_code}: {resp.text[:500]}"
@@ -950,6 +995,12 @@ def main(argv: list[str] | None = None) -> int:
         )
         for w in skill_warnings:
             print(f"  - {w}", file=sys.stderr)
+        # Write a structured warnings file for CI to surface in issue bodies.
+        warnings_path = Path("/tmp/skill-warnings.json")
+        warnings_path.write_text(
+            json.dumps({"omitted_skills": skill_warnings}, indent=2) + "\n",
+            encoding="utf-8",
+        )
         return 1
 
     return 0

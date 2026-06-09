@@ -110,6 +110,25 @@ jobs:
             const trigger = context.eventName;
             const truncated = log.length > 60000 ? log.slice(0, 60000) + '\n…(truncated)' : log;
             const title = '[skill-metadata] generator validation failed';
+
+            // Surface omitted skills prominently if the structured warnings
+            // file exists (written by the generator on partial-success runs).
+            let omittedSection = '';
+            try {
+              const warnings = JSON.parse(fs.readFileSync('/tmp/skill-warnings.json', 'utf8'));
+              const items = (warnings.omitted_skills || []);
+              if (items.length > 0) {
+                omittedSection = [
+                  `### Skills omitted from this run (${items.length})`,
+                  ``,
+                  `These skills could not be enriched and were **excluded from \`metadata.json\` and \`skills.sh.json\`**. They will be retried on the next run once the issue is resolved.`,
+                  ``,
+                  items.map(w => `- \`${w}\``).join('\n'),
+                  ``,
+                ].join('\n');
+              }
+            } catch (_) {}
+
             const body = [
               `Validation failed in workflow run: ${runUrl}`,
               ``,
@@ -117,7 +136,8 @@ jobs:
               ``,
               `cc @jim-NVIDIA @jasonNVIDIA`,
               ``,
-              `<details><summary>generator log</summary>`,
+              omittedSection,
+              `<details><summary>Full generator log</summary>`,
               ``,
               '```',
               truncated,
