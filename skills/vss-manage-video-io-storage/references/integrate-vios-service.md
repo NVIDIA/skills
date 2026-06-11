@@ -57,7 +57,9 @@ ${VSS_DATA_DIR}/videos/<profile-name>/*.mp4   (sample files on host disk)
         └─► WebRTC playback on 31000
 ```
 
-Use when the user prompt names sample files, OOBE clips, or asks for a deployment without external camera dependencies. **No sensor/add call required** — NvStreamer auto-publishes everything in the watched directory. Source: `deploy/docker/developer-profiles/dev-profile-alerts/compose.yml` § `nvstreamer-alerts` + `deploy/docker/developer-profiles/dev-profile-alerts/nvstreamer/configs/vst-config.json`.
+Use when the user explicitly asks to serve sample files or OOBE clips over RTSP, or asks for a deployment without external camera dependencies. **No sensor/add call required** — NvStreamer auto-publishes everything in the watched directory. Source: `deploy/docker/developer-profiles/dev-profile-alerts/compose.yml` § `nvstreamer-alerts` + `deploy/docker/developer-profiles/dev-profile-alerts/nvstreamer/configs/vst-config.json`.
+
+For video ingestion into the natural-language search workflow, use [`vss-search-archive`](../../vss-search-archive/SKILL.md) instead. Search ingestion must go through the VSS agent-backed file or RTSP ingest routes so the source is wired into RTVI-CV, RTVI-Embed, and Elasticsearch; a bare VIOS upload or NvStreamer publish only stores / serves the video and does not create search embeddings.
 
 Both topologies surface the same Kafka `camera_streaming` event downstream, so consumers (RT-CV, vss-agent) work with either. Pick the topology based on the deployment's described input source.
 

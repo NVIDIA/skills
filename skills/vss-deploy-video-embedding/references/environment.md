@@ -7,7 +7,7 @@ This reference lists every variable the Compose service consumes and how host-le
 | Variable | Purpose | Notes |
 |---|---|---|
 | `RTVI_EMBED_PORT` | Host port mapped to container `8000`. | Compose uses `${RTVI_EMBED_PORT?}`, so a missing value fails `docker compose config`. |
-| `VSS_DATA_DIR` | Host root for VSS shared data. | `${VSS_DATA_DIR}/data_log/vst/clip_storage` is bind-mounted into the container at `/home/vst/vst_release/streamer_videos`. |
+| `VSS_DATA_DIR` | Host root for VSS shared data. | `${VSS_DATA_DIR}/data_log/vst/clip_storage` is bind-mounted to the container clip-storage reader path declared in `rtvi-embed-docker-compose.yml`. |
 | `HOST_IP` | Host IP used to construct Kafka bootstrap servers. | Only required when `RTVI_EMBED_KAFKA_ENABLED=true` is set on the host (Compose injects this as `KAFKA_ENABLED` inside the container). Setting `KAFKA_ENABLED` directly on the host has no effect. |
 | `NGC_API_KEY` | NGC API key for asset downloads. | Required for first-boot model fetches from NGC. |
 | `HF_TOKEN` | Hugging Face token. | Optional. Recommended to avoid Hugging Face 429 rate-limit errors during the first-boot Cosmos-Embed1 weights download. |
@@ -18,8 +18,8 @@ Several host-side variables map to differently named container variables. The Co
 
 | Host variable | Container variable | Default |
 |---|---|---|
-| `RTVI_EMBED_IMAGE` | image base | `nvcr.io/nvstaging/vss-core/vss-rt-embed` |
-| `RTVI_EMBED_TAG` | image tag | `3.2.0-26.05.4` |
+| `RTVI_EMBED_IMAGE` | image base | `nvcr.io/nvidia/vss-core/vss-rt-embed` |
+| `RTVI_EMBED_TAG` | image tag | `3.2.0` |
 | `RT_EMBED_DEVICE_ID` | `device_ids[0]` reservation | `0` |
 | `RTVI_EMBED_NVIDIA_VISIBLE_DEVICES` | `NVIDIA_VISIBLE_DEVICES` | `all` |
 | `RTVI_EMBED_NUM_GPUS` | `NUM_GPUS` | (unset) |

@@ -18,8 +18,11 @@ if [[ -n "${NGC_CLI_API_KEY:-}" ]] && [[ -n "${NGC_API_KEY:-}" ]] && \
   echo "NGC: NGC_CLI_API_KEY and NGC_API_KEY differ — choose one NGC personal API key"
 elif [[ -n "${NGC_CLI_API_KEY:-${NGC_API_KEY:-}}" ]]; then
   ngc_resolved="${NGC_CLI_API_KEY:-${NGC_API_KEY:-}}"
+  # Probe the registry pull scope (what image pulls actually use), not
+  # service=ngc - a key scoped only for nvcr.io pulls is valid for a deploy
+  # but is rejected by the ngc platform scope (false negative).
   curl -sf -u "\$oauthtoken:${ngc_resolved}" \
-    "https://authn.nvidia.com/token?service=ngc" >/dev/null \
+    "https://authn.nvidia.com/token?service=registry&scope=repository:nvidia/vss-core/vss-agent:pull" >/dev/null \
     && echo "NGC key ok" || echo "NGC key invalid (401/403)"
 else
   echo "NGC: not set — skip (required for any local NIM)"

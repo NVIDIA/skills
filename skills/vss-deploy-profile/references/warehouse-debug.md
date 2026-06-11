@@ -662,3 +662,4 @@ docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
 5. Re-run **Phase 2** (FPS check) and, for 3D / MV3DT, **Phase 5** (BEV sync) to confirm the issue is resolved.
 
 If the issue persists after redeploy, consult the [Documentation Reference](#documentation-reference) links above and `warehouse.md` → Troubleshooting.
+

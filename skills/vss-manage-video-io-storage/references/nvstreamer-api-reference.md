@@ -4,7 +4,7 @@ NvStreamer (`vss-vios-nvstreamer`) is the **file-to-RTSP republisher** that VIOS
 
 NvStreamer is the same `launch_vst` binary as VIOS, launched with `ADAPTOR=streamer`. It runs on `network_mode: host` and listens on its own HTTP port (default `${NVSTREAMER_HTTP_PORT:-31000}`) with an RTSP server pool on `31554–31561`. It reports `type: "streamer"` on `/version` (VIOS reports `type: "vst"`) — that's the discriminator if you're unsure which service an endpoint belongs to.
 
-> **When to call NvStreamer vs VIOS.** Use NvStreamer for: uploading test/sample videos, retrieving the auto-generated RTSP URL for an on-disk file, listing file-backed sensors, capturing frame snapshots from a file, forcing a videos-directory rescan. Use VIOS (`api-reference.md`) for: live cameras, recording, clip download, historical playback, replay-WebRTC, and the recorder service. The two surfaces share the same path prefix (`/vst/api/v1/`) but live on different ports — point your `curl` at the right one.
+> **When to call NvStreamer vs VIOS.** Use NvStreamer for: serving test/sample videos over RTSP, retrieving the auto-generated RTSP URL for an on-disk file, listing file-backed sensors, capturing frame snapshots from a file, forcing a videos-directory rescan. Use VIOS (`api-reference.md`) for: direct MP4 upload, live cameras, recording, clip download, historical playback, replay-WebRTC, and the recorder service. The two surfaces share the same path prefix (`/vst/api/v1/`) but live on different ports — point your `curl` at the right one.
 
 ---
 

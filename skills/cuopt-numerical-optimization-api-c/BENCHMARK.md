@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `cuopt-numerical-optimization-api-c`
-- Evaluation date: 2026-05-28
+- Evaluation date: 2026-06-10
 - NVSkills-Eval profile: `external`
-- Environment: `local`
-- Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Environment: `astra-sandbox`
+- Dataset: 4 evaluation tasks
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -32,6 +32,7 @@ Reported benchmark dimensions:
 
 Underlying evaluation signals used in this run:
 
+- `security` (Security): checks for unsafe operations, secret leakage, and unauthorized access.
 - `skill_execution` (Skill Execution): verifies that the agent loaded the expected skill and workflow.
 - `skill_efficiency` (Efficiency): checks routing quality, decoy avoidance, and redundant tool usage.
 - `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
@@ -41,9 +42,9 @@ Underlying evaluation signals used in this run:
 
 ## Test Tasks
 
-The benchmark dataset contained 1 evaluation tasks:
+The benchmark dataset contained 4 evaluation tasks:
 
-- Positive tasks: 1 tasks where the skill was expected to activate.
+- Positive tasks: 4 tasks where the skill was expected to activate.
 - Negative tasks: 0 tasks where no skill was expected.
 - Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
 
@@ -53,17 +54,17 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+25%) |
-| Correctness | 2 | 100% (+0%) | 92% (-5%) |
-| Discoverability | 2 | 100% (+5%) | 80% (+8%) |
-| Effectiveness | 2 | 95% (-1%) | 92% (+9%) |
-| Efficiency | 2 | 93% (+13%) | 73% (+17%) |
+| Security | 4 | 100% (+0%) | 100% (+0%) |
+| Correctness | 4 | 88% (+16%) | 72% (+16%) |
+| Discoverability | 4 | 68% (+46%) | 55% (+36%) |
+| Effectiveness | 4 | 92% (+7%) | 70% (+17%) |
+| Efficiency | 4 | 66% (+48%) | 62% (+35%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 9 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 7 total findings.
 
 Top findings:
 

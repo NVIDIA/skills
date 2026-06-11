@@ -13,7 +13,7 @@ docker compose -f compose.yml \
   down -v
 ```
 
-`down -v` removes the MV3DT containers (perception, fusion, mosquitto, broker, VST sensor stack, configurator, nvstreamer, auto-calibration) **and** resets the named docker volumes (Kafka log, Postgres VST DB, Elasticsearch data, Logstash libs). This is the recommended path for any redeploy where:
+`down -v` removes the MV3DT containers (perception, fusion, mosquitto, broker, VST sensor stack, configurator, nvstreamer) **and** resets the named docker volumes (Kafka log, Postgres VST DB, Elasticsearch data, Logstash libs). This is the recommended path for any redeploy where:
 
 - the dataset or camera count changed (sensor records re-initialize from the new calibration),
 - the calibration file changed for the same dataset slug,
@@ -83,7 +83,7 @@ COMPOSE_PROFILES=auto_calib docker compose \
   down
 ```
 
-When AMC came up under the warehouse profile gating (because `bp_wh_*_mv3dt` includes auto-calibration), Step 1 already removed it — no separate teardown needed.
+Normal MV3DT profiles (`bp_wh_kafka_mv3dt` / `bp_wh_redis_mv3dt`) do not include AMC. Auto-calibration warehouse profiles use `bp_wh_auto_calib_*`; if AMC is still running after the MV3DT teardown, use the command above.
 
 ## What is preserved across teardown
 

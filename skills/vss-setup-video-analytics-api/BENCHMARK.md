@@ -7,14 +7,13 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `vss-setup-video-analytics-api`
-- Evaluation date: 2026-06-08
+- Evaluation date: 2026-06-09
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
-The skill should be reviewed before NVSkills-Eval publication. **Skill owners should address the applicable findings below and rerun NVSkills-Eval to refresh this benchmark.**
+- Overall verdict: PASS
 
 ## Agents Used
 
@@ -55,31 +54,32 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 70% (+45%) | 79% (+41%) |
-| Discoverability | 2 | 92% (+67%) | 83% (+28%) |
-| Effectiveness | 2 | 54% (+40%) | 56% (+42%) |
-| Efficiency | 2 | 78% (+54%) | 71% (+27%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+75%) | 91% (+56%) |
+| Discoverability | 1 | 100% (+75%) | 77% (+27%) |
+| Effectiveness | 1 | 88% (+78%) | 58% (+44%) |
+| Efficiency | 1 | 92% (+67%) | 67% (+25%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 4 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 2 total findings.
 
 Top findings:
 
 - MEDIUM QUALITY/quality_efficiency: Deeply nested references in deploy-video-analytics-api-service.md (`skills/vss-setup-video-analytics-api/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SQP-2): The skill instructs users to persist a sensitive NGC API key to ~/.bashrc without adequately warning about the security  (`references/ngc.md:28`)
-- LOW QUALITY/quality_efficiency: Non-descriptive filename: ngc.md (`skills/vss-setup-video-analytics-api/SKILL.md`)
 - LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/vss-setup-video-analytics-api/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 1 total findings.
+Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
 
-Top findings:
+Notable observations:
 
-- HIGH DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/deploy-video-analytics-api-service.md:
-  "## REST API capabilities" in SKILL.md (lines 94-101)
-  vs "## REST API endpoints" in references/deploy-video-analytics-api-service.md (lines 173-173) (`SKILL.md:94`)
+- Context Deduplication: Collected 4 file(s)
+- Inter-Skill Deduplication: Parsed skill 'vss-setup-video-analytics-api': 159 char description
+
+## Publication Recommendation
+
+The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

@@ -13,7 +13,7 @@ The sample includes GT, so the run produces evaluation metrics (L2 distance, rep
   - The inline run block self-heals: if `requests` is missing it creates a throwaway venv under `${TMPDIR:-/tmp}/amc-sample-test-venv` (nothing written to the repo).
   - If `python3 -m venv` itself fails with `ensurepip not available`, the inline block falls back to [`uv`](https://astral.sh/uv) (sudo-free, installed via `curl -LsSf https://astral.sh/uv/install.sh | sh`). If neither path is available: `sudo apt install -y python3-venv python3-pip` as a last resort.
 
-The shared AMC microservice prereq comes from the SKILL.md [Prerequisites](../SKILL.md#prerequisites-shared-across-modes) section.
+The shared AMC microservice prereq comes from the SKILL.md [Prerequisites](../SKILL.md#prerequisites-shared-across-calibration-modes) section.
 
 ## Quick Start for Agents
 

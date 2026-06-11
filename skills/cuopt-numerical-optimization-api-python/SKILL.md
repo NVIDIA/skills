@@ -253,13 +253,14 @@ settings.set_parameter("log_to_console", 1)
 | QP rejected with MAXIMIZE | QP only supports MINIMIZE | Negate the objective: minimize `-f(x)` |
 | QP returns non-optimal | Q not PSD or variables badly scaled | Check Q is PSD; rescale variables to similar magnitudes |
 
-## Getting Dual Values (LP only)
+## Getting Dual Values (LP / QP)
+
+Duals and reduced costs are returned for **LP and QP**. They are not returned for a problem with quadratic constraints (every value comes back as `NaN`), so read them only when all constraints are linear. MILP returns no duals.
 
 ```python
 if problem.Status.name == "Optimal":
-    constraint = problem.getConstraint("resource_a")
-    shadow_price = constraint.DualValue
-    print(f"Shadow price: {shadow_price}")
+    constraint = problem.getConstraint("resource_a")   # linear constraint
+    print(f"Dual value: {constraint.DualValue}")       # NaN if the model has quadratic constraints
 ```
 
 ## Reference Models

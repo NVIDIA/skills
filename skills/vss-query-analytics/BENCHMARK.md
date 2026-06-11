@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `vss-query-analytics`
-- Evaluation date: 2026-06-08
+- Evaluation date: 2026-06-09
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,21 +54,20 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 50% (+50%) | 50% (+50%) |
-| Discoverability | 2 | 0% (+0%) | 0% (+0%) |
-| Effectiveness | 2 | 66% (+66%) | 60% (+60%) |
-| Efficiency | 2 | 27% (+0%) | 28% (-0%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 50% (+50%) | 50% (+50%) |
+| Discoverability | 1 | 0% (+0%) | 0% (+0%) |
+| Effectiveness | 1 | 62% (+62%) | 62% (+62%) |
+| Efficiency | 1 | 27% (+0%) | 28% (-0%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 2 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 1 total findings.
 
 Top findings:
 
-- MEDIUM SECURITY/Unknown (SQP-2): The skill references NGC_CLI_API_KEY and NVIDIA_API_KEY in its prerequisites section but the skill's description metadat (`SKILL.md:18`)
 - LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/vss-query-analytics/SKILL.md`)
 
 ## Tier 2: Deduplication Summary

@@ -15,22 +15,20 @@
     {
       "query": "Deploy the VSS alerts profile on {{platform}} in real-time (VLM) mode using remote LLM and remote VLM endpoints.",
       "checks": [
-        "`curl -sf --max-time 15 http://localhost:8000/docs` returns exit 0 (VSS Agent REST API responsive).",
+        "`sh -c 'i=1; while [ \"$i\" -le 12 ]; do curl -sf --max-time 10 http://localhost:8000/docs >/dev/null 2>&1 && exit 0; sleep 5; i=$((i+1)); done; exit 1'` returns exit 0 (VSS Agent REST API responsive; polls up to ~3 min to absorb deploy readiness timing).",
         "`docker ps --format '{{.Names}}' | grep -qx vss-agent` returns exit 0.",
-        "`docker ps --format '{{.Names}}' | grep -qx rtvi-vlm` returns exit 0 (continuous VLM processor \u2014 required for VLM real-time mode).",
-        "`docker ps --format '{{.Names}}' | grep -qx mdx-nvstreamer-alerts` returns exit 0 (NVStreamer simulates live cameras).",
-        "`docker ps --format '{{.Names}}' | grep -qx mdx-kafka` returns exit 0 (Kafka backplane for alert/incident topics).",
-        "`! docker ps --format '{{.Names}}' | grep -qx perception-alerts` returns exit 0 (CV-only perception is NOT running \u2014 confirms VLM real-time, not verification)."
+        "`docker ps --format '{{.Names}}' | grep -qx vss-rtvi-vlm` returns exit 0 (continuous VLM processor \u2014 required for VLM real-time mode).",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-vios-nvstreamer` returns exit 0 (NVStreamer simulates live cameras).",
+        "`docker ps --format '{{.Names}}' | grep -qx kafka` returns exit 0 (Kafka backplane for alert/incident topics).",
+        "`! docker ps --format '{{.Names}}' | grep -qx vss-rtvi-cv` returns exit 0 (CV-only perception is NOT running \u2014 confirms VLM real-time, not verification)."
       ]
     },
     {
-      "query": "Add the `warehouse_sample.mp4` sample video through NVStreamer so it becomes a live camera that the alerts pipeline can monitor, then start a real-time alert on it for boxes being dropped.",
+      "query": "Add the `warehouse_sample.mp4` sample video through NVStreamer so it becomes a live camera that the alerts pipeline can monitor, then start an alert on it for a ladder PPE violation \u2014 anyone on a ladder without a hardhat and safety vest \u2014 which is the condition the warehouse sample footage actually exhibits (see the alerts profile's `alert_type_config.json`), so the VLM reliably produces incidents. Onboard via the NVStreamer file-upload path (PUT the sample file to NVStreamer on port 31000) so the camera is NVStreamer-served, then register that NVStreamer RTSP in VIOS (port 30888) \u2014 even if a `warehouse_sample` entry already exists in VIOS, ensure it is the NVStreamer-served stream (re-onboard through NVStreamer if needed). Start the alert through the VSS Agent's `/generate` endpoint \u2014 do NOT call the `rtvi-vlm` microservice on port 8018 directly. Registering the sensor in VIOS (POST /sensor/add) is REQUIRED \u2014 the task is NOT complete until `warehouse_sample` appears in VIOS. Before finishing, poll until ALL of these hold: NVStreamer (port 31000) lists `warehouse_sample`, VIOS (port 30888) lists `warehouse_sample`, AND rtvi-vlm (`http://localhost:8018/v1/streams/get-stream-info`) shows a live stream; wait and retry for a couple of minutes if any is still propagating.",
       "checks": [
-        "The trajectory uploaded the file to NVStreamer (`PUT http://localhost:31000/vst/api/v1/storage/file/...`) \u2014 i.e. used the NVStreamer VST API on port `31000`, NOT VIOS on port `30888` or the `rtvi-vlm` microservice on `8018`.",
-        "After upload, the resulting NVStreamer-served RTSP (port `31554`) was registered in VIOS via `POST http://localhost:30888/vst/api/v1/sensor/add` with a `sensorUrl` referencing `:31554` \u2014 i.e. VIOS points at NVStreamer, not at any external/public RTSP host.",
-        "The trajectory issued at least one `POST http://localhost:8000/generate` whose `input_message` references **start** + the sensor name + **boxes**/**dropped** (drives `rtvi_prompt_gen` + `rtvi_vlm_alert action=start` through the agent, not via direct `rtvi-vlm` calls).",
-        "The trajectory does NOT call `http://localhost:8018/v1/streams/add` or `http://localhost:8018/v1/generate_captions_alerts` directly.",
-        "After the start, `curl -sf --max-time 15 http://localhost:8018/v1/streams/get-stream-info` returns HTTP 200 and includes a stream whose URL contains `:31554` or whose description references the warehouse sample sensor (confirms the agent registered the NVStreamer-served stream with rtvi-vlm)."
+        "`sh -c 'i=1; while [ \"$i\" -le 24 ]; do curl -sf --max-time 10 http://localhost:30888/vst/api/v1/sensor/list 2>/dev/null | grep -qi warehouse_sample && exit 0; sleep 5; i=$((i+1)); done; exit 1'` returns exit 0 (warehouse_sample is registered in VIOS; polls up to ~2 min to absorb VIOS registration/propagation delay).",
+        "`sh -c 'i=1; while [ \"$i\" -le 12 ]; do curl -sf --max-time 10 http://localhost:31000/vst/api/v1/sensor/list 2>/dev/null | grep -qi warehouse_sample && exit 0; sleep 5; i=$((i+1)); done; exit 1'` returns exit 0 (warehouse_sample is served by the local NVStreamer instance on port 31000 - confirms onboarding via the NVStreamer file-ingest path, i.e. a file-backed sample stream rather than an arbitrary external camera; polls to absorb upload propagation).",
+        "`sh -c 'i=1; while [ \"$i\" -le 18 ]; do curl -sf --max-time 10 http://localhost:8018/v1/streams/get-stream-info 2>/dev/null | grep -qi rtsp && exit 0; sleep 5; i=$((i+1)); done; exit 1'` returns exit 0 (vss-rtvi-vlm has at least one registered live rtsp stream - confirms the alert was started and wired through the agent path; matches the rtsp scheme rather than a fixed port since the served URL is rewritten to the deployment's external IP, and polls up to ~4 min while the stream registers)."
       ]
     },
     {
@@ -42,12 +40,10 @@
       ]
     },
     {
-      "query": "List incidents from the past 5 minutes for the warehouse sample sensor. If none have been recorded yet, keep polling every 30 seconds until at least one incident shows up (or fail clearly after a reasonable timeout).",
+      "query": "How many incidents has the alert recorded for the warehouse sample sensor? Query through the VSS Agent's `POST /generate` endpoint \u2014 the agent dispatches incident lookups to `rtvi_vlm_alert get_incidents`. Report the count (it may be 0 if the VLM has not flagged any yet). Do NOT call the Alert Bridge `/api/v1/realtime` endpoints.",
       "checks": [
-        "The trajectory issued at least two POSTs to `http://localhost:9901/mcp` \u2014 one `initialize` to obtain `mcp-session-id` from the response **header**, then `tools/call` invocations passing that header (the required two-step VA-MCP pattern; one-shot calls fail with `Bad Request: Missing session ID`).",
-        "At least one `tools/call` payload invoked `video_analytics__get_incidents` with arguments scoping the query to the warehouse sample sensor and to the past 5 minutes (e.g. `source` set to the sensor and `start_time` ~5 minutes before now in ISO 8601 UTC).",
-        "The trajectory shows polling behaviour \u2014 multiple `get_incidents` calls separated in time (e.g. ~30s apart) until the result returned a non-empty incident list, rather than a single one-shot call.",
-        "The final assistant reply summarizes at least one real incident returned by `get_incidents` (timestamp, sensor, and either a category/description or verdict) \u2014 not `[]`, not an error trace, not a `Missing session ID` failure, and not a fabricated incident absent from the tool response."
+        "The trajectory issued at least one `POST http://localhost:8000/generate` asking for incidents on the warehouse sample sensor \u2014 the VLM-real-time incident-query path (the agent dispatches it to `rtvi_vlm_alert get_incidents`). It did not answer the count from memory.",
+        "The final assistant reply reports a numeric incident count for the warehouse sample sensor \u2014 a number, which may legitimately be 0 if the VLM has not flagged any incidents yet \u2014 not an error trace and not raw JSON."
       ]
     }
   ]

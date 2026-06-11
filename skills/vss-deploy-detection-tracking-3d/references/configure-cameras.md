@@ -10,7 +10,7 @@ The shipped warehouse `.env` defaults to `NUM_STREAMS=4` and a 4-camera sample. 
 
 | Consumer | Where | What it does |
 |---|---|---|
-| `vss-configurator-mv3dt` | `blueprint-configurator/blueprint_config.yml` line 579–586 | Computes `final_stream_count = min(NUM_STREAMS, max_streams_supported[HARDWARE_PROFILE].mv3dt)` and applies a `keep_count` op against `${VSS_DATA_DIR}/videos/${SAMPLE_VIDEO_DATASET}/` — keeps `final_stream_count` `.mp4` files (lex-sorted, last N kept) |
+| `vss-configurator-mv3dt` | `blueprint-configurator/blueprint_config.yml` line 579–586 | Computes `final_stream_count = min(NUM_STREAMS, max_streams_supported[HARDWARE_PROFILE].mv3dt)`. For sample/videos, applies a `keep_count` op against `${VSS_DATA_DIR}/videos/${SAMPLE_VIDEO_DATASET}/`; for RTSP, keep `camera_info.json`, calibration, and `NUM_STREAMS` aligned yourself. |
 | `vss-rtvi-cv-bev-fusion` | `services/rtvi/rtvi-cv/rtvi-cv-mv3dt/compose.yaml:53` (`MAX_EXPECTED_SENSORS: ${NUM_STREAMS:-4}`) | BEV Fusion buffers per-camera detections; if `MAX_EXPECTED_SENSORS` < actual streams, late cameras get dropped from fused frames |
 | `vss-rtvi-cv-mv3dt` (perception) | `warehouse-mv3dt-app.yml:290-291` (`BATCH_SIZE` and `MAX_BATCH_SIZE` set to `${NUM_STREAMS:-4}`) | DeepStream batch size — wrong value triggers reallocation or OOM at engine build |
 | `vss-vios-nvstreamer-mv3dt` / VST sensor-ms | streamcount registration with VST | If configurator registers more sensors than calibration covers, perception will receive frames for un-calibrated cameras and reject them |
@@ -27,25 +27,27 @@ ERROR from tracking_tracker: Failed to submit input to tracker
 gstnvtracker: Low-level tracker lib returned error 1
 ```
 
-VST infers sensor names from the video filename, so the rename must touch videos, `camInfo/*.yml`, and the `sensors[].id` field in `calibration.json` together. Run **once** before deploy — once VST has registered sensors with the old names, you'd need `down -v` to redo it (see [`troubleshooting.md`](troubleshooting.md) "Perception reports `Active sources : 0`").
+VST infers sensor names from the video filename, so the rename must touch videos, `camInfo/*.yml`, and the `sensors[].id` field in `calibration.json` together. Run **once** before deploy — once VST has registered sensors with the old names, use Step 5 below to reconcile VST state before redeploy (see [`troubleshooting.md`](troubleshooting.md) "Perception reports `Active sources : 0`").
 
 Skip when:
 - Q1 = `sample` (calibration ships with the correct names already).
 - The user supplied a calibration that already uses `Camera, Camera_01..N`.
 
-Idempotent — the block below is a no-op when the first sensor is already named `Camera`.
+Idempotent and guarded: the block below is a no-op when the first sensor is already named `Camera`. It defaults to **dry-run** and prints the planned changes. For custom AMC/VGGT outputs whose sensor IDs are `cam_00..`, review the plan and re-run with `APPLY_RENAME=1` before deploy; otherwise VST streamprocessing cannot match runtime stream names to calibration IDs. When applied, it writes `calibration.pre-normalize.json` and `camera-normalization-manifest.json` under `CAL_DIR` before changing files in place.
 
 ```bash
 DATASET="${SAMPLE_VIDEO_DATASET:?}"
 CAL_DIR="${VSS_APPS_DIR}/industry-profiles/warehouse-operations/warehouse-mv3dt-app/calibration/sample-data/${DATASET}"
 VIDEO_DIR="${VSS_DATA_DIR}/videos/${DATASET}"
 
+APPLY_RENAME="${APPLY_RENAME:-0}" \
 VSS_APPS_DIR="${VSS_APPS_DIR}" VSS_DATA_DIR="${VSS_DATA_DIR}" \
   SAMPLE_VIDEO_DATASET="${DATASET}" python3 - <<'PY'
-import json, os
+import json, os, shutil
 from pathlib import Path
 
 DATASET = os.environ["SAMPLE_VIDEO_DATASET"]
+APPLY = os.environ.get("APPLY_RENAME") == "1"
 CAL_DIR = Path(os.environ["VSS_APPS_DIR"]) / "industry-profiles/warehouse-operations/warehouse-mv3dt-app/calibration/sample-data" / DATASET
 VID_DIR = Path(os.environ["VSS_DATA_DIR"]) / "videos" / DATASET
 
@@ -67,13 +69,21 @@ for i, s in enumerate(d["sensors"]):
     new = "Camera" if i == 0 else f"Camera_{i:02d}"
     remap[s["id"]] = new
 
+operations = []
+
+def plan_rename(src, dst, label):
+    if src.exists():
+        if src == dst:
+            return
+        if dst.exists():
+            raise SystemExit(f"refusing to overwrite existing {label}: {dst}")
+        operations.append((label, src, dst))
+
 # 1. Rename video files (extension-agnostic)
 for old_name, new_name in remap.items():
     for ext in ("mp4", "m4v", "mkv", "MP4"):
-        p = VID_DIR / f"{old_name}.{ext}"
-        if p.exists():
-            p.rename(VID_DIR / f"{new_name}.{ext}")
-            print(f"video: {p.name} -> {new_name}.{ext}")
+        src = VID_DIR / f"{old_name}.{ext}"
+        plan_rename(src, VID_DIR / f"{new_name}.{ext}", "video")
 
 # 2. Rename camInfo files — AMC default (camInfo_NN.yml), sensor-id-named (<id>.yml),
 #    or extension variants. Pick the first that exists per sensor index.
@@ -83,18 +93,37 @@ for i, (old_name, new_name) in enumerate(remap.items()):
         f"camInfo_{i:02d}.yml", f"camInfo_{i:02d}.yaml",
         f"{old_name}.yml",     f"{old_name}.yaml",
     ):
-        p = caminfo / cand
-        if p.exists():
-            p.rename(caminfo / f"{new_name}.yml")
-            print(f"camInfo: {cand} -> {new_name}.yml")
+        src = caminfo / cand
+        if src.exists():
+            plan_rename(src, caminfo / f"{new_name}.yml", "camInfo")
             break
+
+print("camera name remap:", remap)
+for label, src, dst in operations:
+    print(f"{label}: {src.name} -> {dst.name}")
+print("calibration.json: sensor IDs will be rewritten")
+
+if not APPLY:
+    print("dry-run only — re-run with APPLY_RENAME=1 to apply these changes")
+    raise SystemExit(0)
+
+backup = CAL_DIR / "calibration.pre-normalize.json"
+if not backup.exists():
+    shutil.copy2(cal_path, backup)
+manifest = CAL_DIR / "camera-normalization-manifest.json"
+manifest.write_text(json.dumps({"dataset": DATASET, "remap": remap, "cal_dir": str(CAL_DIR), "video_dir": str(VID_DIR)}, indent=2))
+
+for label, src, dst in operations:
+    src.rename(dst)
 
 # 3. Rewrite sensor IDs and any cross-references (e.g. globalCoordinates sibling refs)
 txt = json.dumps(d, indent=2)
-for old, new in remap.items():
-    txt = txt.replace(f'"{old}"', f'"{new}"')
+for old, new_name in remap.items():
+    txt = txt.replace(f'"{old}"', f'"{new_name}"')
 cal_path.write_text(txt)
 print("renamed sensor IDs to:", [s["id"] for s in json.loads(txt)["sensors"]])
+print(f"backup: {backup}")
+print(f"manifest: {manifest}")
 PY
 ```
 
@@ -129,22 +158,20 @@ If `CAM_COUNT == 1`: MV3DT is a multi-view stack — single-camera deployment is
 
 ## Step 2 — Check against the GPU's `max_streams_supported`
 
-Before propagating `NUM_STREAMS`, confirm the GPU can actually run that many MV3DT streams. The configurator trims the video set to the GPU's cap when `NUM_STREAMS` exceeds it.
+Before propagating `NUM_STREAMS`, confirm the GPU can actually run that many MV3DT streams. For sample/videos, the configurator can trim the video set to the GPU's cap when `NUM_STREAMS` exceeds it. For RTSP, set `NUM_STREAMS` to the number of entries in `camera_info.json` and keep it within the supported count.
 
 ```bash
 HARDWARE_PROFILE_VAL=$(grep '^HARDWARE_PROFILE=' "${ENV_FILE:-${VSS_APPS_DIR}/industry-profiles/warehouse-operations/.env}" | cut -d= -f2)
 echo "HARDWARE_PROFILE=${HARDWARE_PROFILE_VAL}"
 
-# Lookup mv3dt cap (from blueprint_config.yml lines 592-642)
+# Lookup public MV3DT supported stream count from the Warehouse Quickstart Guide.
 case "${HARDWARE_PROFILE_VAL}" in
   RTXPRO6000BW)  CAP=18 ;;
   H100)          CAP=13 ;;
-  RTXA6000ADA)   CAP=6  ;;
   L40S)          CAP=7  ;;
-  L4|RTXA6000)   CAP=2  ;;
-  IGX-THOR)      CAP=7  ;;
+  IGX-THOR)      CAP=4  ;;
   DGX-SPARK)     CAP=4  ;;
-  *)             CAP="?"; echo "WARN: HARDWARE_PROFILE=${HARDWARE_PROFILE_VAL} unknown to this skill" ;;
+  *)             CAP="?"; echo "WARN: HARDWARE_PROFILE=${HARDWARE_PROFILE_VAL} is not in the public MV3DT table; check .env and blueprint_config.yml before proceeding" ;;
 esac
 
 echo "GPU cap for mv3dt: ${CAP}"
@@ -152,10 +179,10 @@ echo "Calibrated cameras: ${CAM_COUNT}"
 echo "Effective stream count = min(${CAM_COUNT}, ${CAP})"
 ```
 
-If `CAP < CAM_COUNT`, the user has more cameras than the GPU can process at MV3DT batch size. The configurator's `keep_count` file_management op will trim `.mp4` files at `${VSS_DATA_DIR}/videos/${SAMPLE_VIDEO_DATASET}/` down to `CAP`. Decide:
+If `CAP < CAM_COUNT`, the user has more cameras than the GPU can process at MV3DT batch size. For sample/videos, the configurator's `keep_count` file_management op will trim `.mp4` files at `${VSS_DATA_DIR}/videos/${SAMPLE_VIDEO_DATASET}/` down to `CAP`. For RTSP, reduce the camera list/calibration to the supported count or use a larger GPU before deploy. Decide:
 
 - **Accept the cap.** Continue — perception will run with `CAP` streams, fusion will see `CAP` cameras. Tell the user explicitly so they're not surprised.
-- **Move to a larger GPU.** Re-check `HARDWARE_PROFILE` against the actual hardware (see SKILL.md Prerequisites §3 for the canonical slugs — e.g. `RTXA6000` for Ampere, `RTXA6000ADA` for Ada).
+- **Move to a larger GPU.** Re-check `HARDWARE_PROFILE` against the actual hardware (see SKILL.md Prerequisites §3 for the supported MV3DT hardware slugs).
 - **Override the cap.** Add a hardware-profile override in `blueprint-configurator/blueprint_config.yml` (advanced, requires understanding the trade-off — FPS will drop).
 
 ## Step 3 — Sync NUM_STREAMS in .env
@@ -177,7 +204,7 @@ fi
 grep '^NUM_STREAMS=' "${ENV_FILE}"
 ```
 
-This single key drives all three consumers above — compose substitutes `${NUM_STREAMS}` at `up` time.
+This single key drives all three consumers above — compose substitutes `${NUM_STREAMS}` at `up` time. For RTSP, it must also equal the number of sensors in `SENSOR_FILE_PATH`; for sample/videos, it must equal the effective dataset/calibration count.
 
 ## Step 4 — Confirm DeepStream batch size
 
@@ -194,21 +221,11 @@ Expected: lines show `${BATCH_SIZE}` / `${NUM_STREAMS}` (good — env-driven) or
 
 Relevant only when this is a **re-deploy** after the camera set changed (e.g. user re-calibrated with a different camera count, switched dataset slugs, or renamed cameras). On a fresh deploy, VST is empty — skip.
 
-`vss-configurator-mv3dt` registers cameras with VST on start; it expects the VST sensor list and the new calibration to align by camera **name** (`Camera`, `Camera_01`, …). The cleanest, most reliable way to reconcile when the camera set changes is to reset VST state via teardown:
+`vss-configurator-mv3dt` registers cameras with VST on start; it expects the VST sensor list and the new calibration to align by camera **name** (`Camera`, `Camera_01`, …). Default to the targeted VST API path below when the user wants to preserve existing broker, database, and overlay history.
 
-```bash
-# Recommended path — fully resets VST sensor records so configurator re-registers from the new calibration
-cd "${VSS_APPS_DIR}"
-docker compose -f compose.yml \
-  --env-file industry-profiles/warehouse-operations/.env \
-  down -v
-```
+### Default — targeted sensor trim via the VST API
 
-Then proceed straight to [`deploy-rtvi-cv-3d-stack.md`](deploy-rtvi-cv-3d-stack.md). See [`teardown.md`](teardown.md) for the full discussion of `down -v` semantics.
-
-### Alternate — targeted sensor trim via the VST API
-
-When you want to keep most VST state and only remove sensors that no longer appear in the new calibration:
+Use this path when you only need to remove sensors that no longer appear in the new calibration:
 
 ```bash
 VST_HOST="${HOST_IP:-localhost}"
@@ -232,7 +249,20 @@ curl -sf "http://${VST_HOST}:${VST_PORT}/vst/api/v1/sensor/list" \
 curl -sf "http://${VST_HOST}:${VST_PORT}/vst/api/v1/sensor/list" | jq -r '.[].name' | sort
 ```
 
-The targeted path works when each sensor record is reachable via the public DELETE API. If you see HTTP 404 responses for some records, or the configurator reports `Sensors count limit reached` on the next start, switch to the `down -v` path above — it guarantees all sensor state resets together with the rest of VST.
+Then proceed straight to [`deploy-rtvi-cv-3d-stack.md`](deploy-rtvi-cv-3d-stack.md). If the API returns HTTP 404 for some records, or the next start reports `Sensors count limit reached`, use the clean-reset path below after confirming the user accepts the volume reset.
+
+### Last resort — reset compose volumes with `down -v`
+
+> **WARNING:** `docker compose down -v` removes the containers and named volumes for this MV3DT compose project, not just VST sensor records. That resets data such as VST Postgres sensor metadata (`mdx_vios_pg_data`), broker/Kafka state and offsets (`mdx_mdx-kafka`), Elasticsearch overlay/index data, Logstash state, and any anonymous volumes created by compose. Use this only when the targeted VST API path does not fully reconcile the sensor set, or when the user explicitly wants a clean redeploy.
+
+```bash
+cd "${VSS_APPS_DIR}"
+docker compose -f compose.yml \
+  --env-file industry-profiles/warehouse-operations/.env \
+  down -v
+```
+
+After the reset, proceed to [`deploy-rtvi-cv-3d-stack.md`](deploy-rtvi-cv-3d-stack.md). See [`teardown.md`](teardown.md) for the full discussion of `down -v` semantics.
 
 ## Step 6 — Sanity check before deploy
 
@@ -244,6 +274,16 @@ echo "calibration.json sensors: $(jq '.sensors | length' "${CAL_DIR}/calibration
 echo "camInfo files:            $(find "${CAL_DIR}/camInfo/" -maxdepth 1 \( -name '*.yml' -o -name '*.yaml' \) 2>/dev/null | wc -l)"
 echo "NUM_STREAMS (.env):       $(grep '^NUM_STREAMS=' "${ENV_FILE}" | cut -d= -f2)"
 echo "GPU cap for mv3dt:        ${CAP}"
+
+# Sensor IDs must match VST runtime names exactly: Camera, Camera_01, ...
+ok=1; i=0
+while IFS= read -r id; do
+  expected="Camera"
+  test "$i" -eq 0 || expected=$(printf 'Camera_%02d' "$i")
+  test "$id" = "$expected" || { echo "sensor ID mismatch: got '$id', expected '$expected'"; ok=0; }
+  i=$((i + 1))
+done < <(jq -r '.sensors[].id' "${CAL_DIR}/calibration.json")
+test "$ok" -eq 1 || { echo "Run Step 0 with APPLY_RENAME=1 before deploy"; exit 1; }
 ```
 
-All three counts should line up; `NUM_STREAMS` ≤ `CAP`. Now proceed to [`deploy-rtvi-cv-3d-stack.md`](deploy-rtvi-cv-3d-stack.md).
+All three counts should line up, `NUM_STREAMS` ≤ `CAP`, and sensor IDs should follow `Camera, Camera_01, ...`. Now proceed to [`deploy-rtvi-cv-3d-stack.md`](deploy-rtvi-cv-3d-stack.md).

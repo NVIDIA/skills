@@ -2,6 +2,7 @@
 name: vss-setup-behavior-analytics
 description: Use to deploy the vss-behavior-analytics service standalone (entrypoint, config-source, optional calibration). Not for the full warehouse deploy.
 license: Apache-2.0
+
 metadata:
   author: "NVIDIA Video Search and Summarization team"
   version: "3.2.0"
@@ -66,7 +67,7 @@ The full operational walkthrough — entrypoint table, config-source options, ca
 ## Prerequisites
 
 1. **Repo checkout** with `$VSS_APPS_DIR` pointing at `<repo>/deploy/docker/`. Required by the service compose's volume binds.
-2. **NGC credentials** — `$NGC_CLI_API_KEY` set so docker can pull the image. See [`references/ngc.md`](references/ngc.md).
+2. **NGC credentials** — `$NGC_CLI_API_KEY` set so docker can pull the image. See [`references/ngc-api-key-registry-login.md`](references/ngc-api-key-registry-login.md).
 3. **Docker runtime** — Docker Engine **28.3.3** with Docker Compose plugin **v2.39.1+**. Verify with `docker --version` and `docker compose version`.
 4. **Optional broker** (Kafka / Redis Streams / MQTT). The container starts fine **without** one — the Kafka client retries a bounded number of times, then the app exits and `restart: always` cycles the container. Status will show `Restarting (N)` in `docker ps` until a broker is reachable. With a broker, dynamic config / dynamic calibration over `mdx-notification` become available.
 5. **Optional config / calibration files on disk** if the user is bringing their own.

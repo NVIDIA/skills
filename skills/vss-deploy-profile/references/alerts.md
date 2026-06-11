@@ -203,11 +203,7 @@ On RTX 4500 the LLM is remote, so there is no local `NIM_KVCACHE_PERCENT` to set
 
 ## Endpoints (after deploy)
 
-`PUBLIC` = the deployed public origin (`docker inspect vss-agent` →
-`VSS_AGENT_EXTERNAL_URL`; on Brev the `https://7777-<id>.brevlab.com` secure
-link). Report the ingress URLs, not raw ports — see
-[`base.md`](base.md#endpoints-after-deploy) / [`brev.md`](brev.md). Rows marked
-*(direct)* are internal service ports: on-host `curl` only, not browser-reachable on Brev.
+See [`base.md` — Endpoints](base.md#endpoints-after-deploy) for how `${PUBLIC}` is resolved and Brev secure-link behavior. Rows marked *(direct)* are on-host only, not browser-reachable on Brev.
 
 | Service | URL to report (through ingress) |
 |---|---|

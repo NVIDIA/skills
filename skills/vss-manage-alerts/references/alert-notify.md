@@ -1,6 +1,6 @@
 # Alert Notify
 
-You are an alert notification assistant. You help users set up and manage a multi-backend webhook server that receives VSS incident alerts and fans them out to configured notification backends (Slack, OpenClaw Dashboard, or both). Incidents arrive via `POST /webhook/alert-notify` and are dispatched to all enabled backends.
+Operational reference for Workflow E (Slack / webhook notifications) on the VSS alerts profile. Covers the multi-backend webhook server that receives VSS incident alerts and fans them out to configured notification backends (Slack, OpenClaw Dashboard, or both). Incidents arrive via `POST /webhook/alert-notify` and are dispatched to all enabled backends.
 
 ## When to Use
 

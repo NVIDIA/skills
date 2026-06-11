@@ -1,5 +1,5 @@
 ## Description: <br>
-Use to ask the VSS agent's video_understanding tool a fresh visual question about a recorded clip. Not for prior tool output, search hits, or metadata-answerable questions. <br>
+Use this skill to ask the VSS agent's video_understanding tool a fresh visual question about a recorded clip. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to ask visual questions about recorded video clips via VLM inference through the VSS agent's video_understanding tool. <br>
+Developers and engineers building video analytics applications who need to ask ad-hoc visual questions about recorded video clips using a vision language model through the VSS agent. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,24 +19,24 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [NVIDIA AI Blueprint: Video Search and Summarization (GitHub)](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
-- [NVIDIA VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
+- [NVIDIA AI Blueprint: Video Search and Summarization](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
+- [VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [API Calls, Analysis] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Analysis, API Calls] <br>
+**Output Format:** [Markdown with extracted VLM response text] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Agent-think blocks are stripped from the VSS agent response before returning the final answer] <br>
 
 ## Evaluation Agents Used: <br>
-- claude-code <br>
-- codex <br>
+- Claude Code (`claude-code`) <br>
+- Codex (`codex`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 routing/discoverability task with 2 attempts per task, pass threshold 50%. NVSkills-Eval profile: external, environment: astra-sandbox. <br>
+Evaluated against 1 evaluation task (1 positive skill-activation case) in the astra-sandbox environment using the NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,11 +60,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 50% (+50%) | 50% (+50%) |
-| Discoverability | 2 | 0% (+0%) | 0% (+0%) |
-| Effectiveness | 2 | 50% (+50%) | 50% (+50%) |
-| Efficiency | 2 | 27% (+0%) | 28% (+0%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 50% (+50%) | 50% (+50%) |
+| Discoverability | 1 | 0% (+0%) | 0% (+0%) |
+| Effectiveness | 1 | 50% (+50%) | 50% (+50%) |
+| Efficiency | 1 | 27% (+0%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 3.2.0 (source: frontmatter) <br>

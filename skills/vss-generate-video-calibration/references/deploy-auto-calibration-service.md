@@ -155,8 +155,16 @@ PORT=$(grep ^VSS_AUTO_CALIBRATION_PORT deploy/docker/industry-profiles/warehouse
 UI_PORT=$(grep ^VSS_AUTO_CALIBRATION_UI_PORT deploy/docker/industry-profiles/warehouse-operations/.env | cut -d= -f2)
 HOST_IP=$(hostname -I | awk '{print $1}')
 
-# MS ready
-curl -sf "http://localhost:${PORT:-8010}/v1/ready"
+# MS ready (cold pulls can take a bit after compose returns)
+READY_URL="http://localhost:${PORT:-8010}/v1/ready"
+for i in $(seq 1 24); do
+  if curl -sf "$READY_URL"; then
+    break
+  fi
+  echo "Waiting for AMC microservice readiness... ($i/24)"
+  sleep 5
+done
+curl -sf "$READY_URL"
 # Expected: {"code":0,"message":"VSS Auto Calibration Microservice is ready"}
 
 # UI reachable

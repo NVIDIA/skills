@@ -2,7 +2,7 @@
 
 Parent: [`../SKILL.md`](../SKILL.md). Load this reference **only when** the user picked `videos` or `rtsp` in Q1 AND the calibration check in Q2 found `calibration.json` + `camInfo/` missing or incomplete.
 
-**Skip when:** Q1 = `sample` (calibration ships with the repo) or the user has supplied a calibration path themselves — go straight to [`configure-cameras.md`](configure-cameras.md) → [`deploy-rtvi-cv-3d-stack.md`](deploy-rtvi-cv-3d-stack.md).
+**Skip when:** Q1 = `sample` (calibration ships with the repo and is already normalized) — go straight to [`deploy-rtvi-cv-3d-stack.md`](deploy-rtvi-cv-3d-stack.md). If the user supplied a calibration path, go to [`configure-cameras.md`](configure-cameras.md) first so camera names and `NUM_STREAMS` are validated before deploy.
 
 This reference drives AMC end-to-end via its REST API — the user does **not** open the AMC UI. Hand-back to SKILL.md happens once calibration files are landed at the MV3DT mount path.
 
@@ -21,7 +21,7 @@ The user's Q3 slug becomes the `${SAMPLE_VIDEO_DATASET}` directory name.
 
 ## Step 1 — Hand off to the AMC skill for setup
 
-**Do not reinvent AMC setup here.** Walk the full deploy flow in [`../../vss-generate-video-calibration/references/deploy-auto-calibration-service.md`](../../vss-generate-video-calibration/references/deploy-auto-calibration-service.md) end-to-end. For MV3DT chaining, follow Path B (standalone `COMPOSE_PROFILES=auto_calib`). The AMC skill owns the canonical procedure and will stay in sync with the AMC microservice as it evolves.
+**Do not reinvent AMC setup here.** Walk the full deploy flow in [`../../vss-generate-video-calibration/references/deploy-auto-calibration-service.md`](../../vss-generate-video-calibration/references/deploy-auto-calibration-service.md) end-to-end. The AMC skill owns its deploy profile, VIOS prerequisites, RTSP capture flow, and API contract; this MV3DT skill only adds the MV3DT export and final-deploy handoff.
 
 The MV3DT chain has two skill-specific requirements on top of the AMC skill's defaults:
 
@@ -31,20 +31,13 @@ The AMC skill marks VGGT as **optional Step 2** ("Skip unless the user explicitl
 
 Follow `deploy-auto-calibration-service.md` **Step 2** verbatim — HuggingFace license-accept, `HF_TOKEN`, `hf download facebook/VGGT-1B-Commercial`, place at `${VSS_DATA_DIR}/auto-calib/vggt/vggt_1B_commercial.pt`, `chmod a+r`. Skip only if the user explicitly opts out of VGGT (small accuracy hit, but still works).
 
-### 1b. VIOS preflight (rtsp mode only)
+### 1b. RTSP preflight (rtsp mode only)
 
-If Q1 was `rtsp`, walk `deploy-auto-calibration-service.md` **Step 2b** — VIOS needs to be reachable at `${VST_INTERNAL_URL}` so AMC can ingest live streams. For `videos` mode, VIOS is not needed and you can skip 2b.
+If Q1 was `rtsp`, follow [`../../vss-generate-video-calibration/references/rtsp.md`](../../vss-generate-video-calibration/references/rtsp.md) for the VIOS probe, capture request, polling, ingest, and alignment/layout upload flow. For `videos` mode, use the AMC `videos.md` reference instead.
 
-### 1c. Deploy
+### 1c. Deploy AMC
 
-Per `deploy-auto-calibration-service.md` **Step 3 (Path B)**:
-
-```bash
-cd "${VSS_APPS_DIR}"
-COMPOSE_PROFILES=auto_calib docker compose \
-  --env-file industry-profiles/warehouse-operations/.env \
-  up -d
-```
+Use [`../../vss-generate-video-calibration/references/deploy-auto-calibration-service.md`](../../vss-generate-video-calibration/references/deploy-auto-calibration-service.md) as the source of truth for bringing up AMC. Do not hardcode an RTSP-specific compose profile in this MV3DT reference; use whatever deployment/profile that AMC skill selects for the user's calibration mode.
 
 ### 1d. Verify
 
@@ -55,7 +48,7 @@ curl -sf "http://localhost:${VSS_AUTO_CALIBRATION_PORT:-8010}/v1/ready"
 # Expected: {"code":0,"message":"VSS Auto Calibration Microservice is ready"}
 ```
 
-This brings up `vss-auto-calibration` + `vss-auto-calibration-ui` without perception, BEV Fusion, mosquitto, nvstreamer-mv3dt, or VST. The `auto_calib` compose profile shares only `redis` with MV3DT — teardown later won't collide with anything MV3DT will deploy.
+AMC readiness, VIOS configuration, and RTSP capture prerequisites are owned by the AMC skill. Confirm AMC is ready here, then continue with the mode-specific AMC reference in Step 2.
 
 Even though this flow drives AMC via the API, **tell the user they can watch live calibration progress in the AMC UI** at `http://${HOST_IP}:${VSS_AUTO_CALIBRATION_UI_PORT:-5000}` (open the project created in Step 2).
 
@@ -96,6 +89,8 @@ Inputs the AMC flow needs from the parent SKILL.md's Q3:
 - `project_name` — short slug
 - `detector_type` — `resnet` or `transformer`, passed at the AMC shared-tail Step B (`POST /v1/calibrate/<id>`)
 - `VIDEO_DIR` (videos mode) or RTSP URLs (rtsp mode)
+
+For `rtsp`, keep the ordered RTSP URL list from the AMC capture request. After calibration export and camera-name normalization, final MV3DT deployment needs the same URLs in `camera_info.json`, with camera names matching the normalized `calibration.json` sensor IDs (`Camera`, `Camera_01`, ...).
 
 Capture the `project_id` from the AMC flow's project-creation step — you'll need it in Step 3 to fetch the MV3DT export. Wait until `project_state == COMPLETED` before proceeding.
 
@@ -183,7 +178,7 @@ curl -sfL \
 
 `calibration_type=cartesian` produces the full schema (BA results — same shape as the shipped sample). Use `calibration_type=image` only as a fallback for projects that didn't complete the full BA pass — it produces a pixel-ROI-only file behavior-analytics can still load.
 
-ROI / tripwire arrays defined via the AMC UI Parameters dialog are included in the export; empty arrays don't block deploy (behavior-analytics just runs without those rules). **But** `group`, `region`, and `place` per sensor are a different story — when the API-only path leaves them blank, `vss-behavior-analytics-mv3dt`'s schema validator rejects the file at startup with `calibration 'upsert-all' payload failed schema validation: sensors/0/group/alias: '' should be non-empty; sensors/0/group/dimensions: [] is too short; ...` and the container enters a restart loop. Step 4 below patches these fields with placeholder values when they're empty so deploy can proceed; for metrically meaningful values, populate them in the AMC UI Parameters step before export.
+ROI / tripwire arrays defined via the AMC UI Parameters dialog are included in the export; empty arrays don't block deploy (behavior-analytics just runs without those rules). **But** `group`, `region`, and `place` per sensor are a different story — when the API-only AMC/VGGT path leaves them blank, `vss-behavior-analytics-mv3dt`'s schema validator rejects the file at startup with `calibration 'upsert-all' payload failed schema validation: sensors/0/group/alias: '' should be non-empty; sensors/0/group/dimensions: [] is too short; ...` and the container enters a restart loop. Step 4 below patches these fields with placeholder values when they're empty so deploy can proceed; for metrically meaningful values, populate them in the AMC UI Parameters step before export.
 
 ## Step 4 — Land everything at the MV3DT mount path
 
@@ -216,18 +211,29 @@ fi
 
 > **Permission rule:** always `chmod`, never `chown`. Containers run as varied UIDs; world-readable is the safe baseline. This matches the convention in `vss-deploy-profile/references/data-directory.md`.
 
-### 4a — Patch empty `group` / `region` / `place` (only needed for API-only AMC runs)
+### 4a — Patch empty `group` / `region` / `place` (custom-data exports)
 
-`vss-behavior-analytics-mv3dt` validates `sensors[].group`, `sensors[].region`, and `sensors[].place` at startup and crashes when they're empty (typical for API-only AMC exports — see Step 3d note above). Inject placeholder values that pass the validator so deploy can proceed.
+`vss-behavior-analytics-mv3dt` validates `sensors[].group`, `sensors[].region`, and `sensors[].place` at startup. API-only AMC or VGGT exports can leave one of these sections empty, so inject placeholder values that pass the validator and let deploy proceed.
 
 > These placeholders only satisfy the schema so the stack starts — they are **not** geometrically meaningful. The square `dimensions` will make the BEV top-view floor map look squished/stretched and any region-scoped analytics use the wrong bounds. Getting accurate values is a **post-deploy tuning step**, not a blocker: leave the placeholders here and point the user to [`verify-and-view.md` § "Tune BEV `group`/`region` for better overlays"](verify-and-view.md) after the stack is up. (The BEV `origin`/`dimensions` are normally derived from camera FOV coverage by the VSS Configurator / `spatial-ai-data-utils`'s `calculate_origin.py`, or set per the NVIDIA 3D-profile customization docs.)
 
 Idempotent — re-running this block is safe and does nothing once values are populated.
 
 ```bash
-# `// ""` makes this null-safe: AMC may emit group as an empty-string object, as
-# null, or omit the key entirely — all three mean "needs patching".
-if jq -e '(.sensors[0].group.name // "") == ""' "${CAL_DIR}/calibration.json" >/dev/null 2>&1; then
+# `//` makes this null-safe. VGGT can populate group while leaving region
+# empty, so test every schema-required group/region/place field before deploy.
+if jq -e '
+  any(.sensors[]?;
+    ((.group.name // "") == "")
+    or ((.group.alias // "") == "")
+    or ((.group.dimensions // []) | length < 4)
+    or ((.region.placeLevel // "") == "")
+    or ((.region.origin // []) | length < 2)
+    or (((.region.dimensions.length // 0) | tonumber? // 0) <= 0)
+    or (((.region.dimensions.width // 0) | tonumber? // 0) <= 0)
+    or ((.place // []) | length < 3)
+  )
+' "${CAL_DIR}/calibration.json" >/dev/null 2>&1; then
   jq '
     .sensors |= map(
         .group = {
@@ -317,14 +323,7 @@ All checks should pass (or be N/A under `MINIMAL_PROFILE="true"`). If `camInfo/`
 
 ## Step 5 — Tear down AMC
 
-Leave the host clean before MV3DT comes up — they share `redis` and the host:port for `vss-auto-calibration` (still on `bp_wh_*_mv3dt` profile gating, so it will redeploy correctly under MV3DT later).
-
-```bash
-cd "${VSS_APPS_DIR}"
-COMPOSE_PROFILES=auto_calib docker compose \
-  --env-file industry-profiles/warehouse-operations/.env \
-  down
-```
+Leave the host clean before MV3DT comes up. Use the stopping/teardown command from [`../../vss-generate-video-calibration/references/deploy-auto-calibration-service.md`](../../vss-generate-video-calibration/references/deploy-auto-calibration-service.md) for the AMC deployment path that was used. Do not tear down the final MV3DT profile here.
 
 Project state under `${VSS_APPS_DIR}/services/auto-calibration/projects/project_<id>/` is bind-mounted, so it survives the down. You can re-run AMC later without losing work.
 
@@ -332,9 +331,10 @@ Project state under `${VSS_APPS_DIR}/services/auto-calibration/projects/project_
 
 Calibration is now on disk at `${CAL_DIR}`. Hand back to the parent flow:
 
-1. Walk [`configure-cameras.md`](configure-cameras.md) — set `NUM_STREAMS` to the `camInfo/*.yaml` count, sync DeepStream batch sizes.
-2. Walk [`deploy-rtvi-cv-3d-stack.md`](deploy-rtvi-cv-3d-stack.md) — `docker compose up` with `MODE=mv3dt` + `BP_PROFILE=bp_wh_kafka` + `MINIMAL_PROFILE=""` (extended, the Q0 default — overlays enabled). Use `MINIMAL_PROFILE="true"` only if the user explicitly chose minimal in Q0.
-3. Walk [`verify-and-view.md`](verify-and-view.md) — confirm perception FPS, BEV ready, VST video wall.
+1. Walk [`configure-cameras.md`](configure-cameras.md) — run Step 0 to normalize AMC/VGGT sensor IDs and video names to `Camera, Camera_01, ...`, then set `NUM_STREAMS` to the `camInfo/*.yaml` count and sync DeepStream batch sizes.
+2. For `rtsp`, create or update `${VSS_APPS_DIR}/industry-profiles/warehouse-operations/camera_configs/camera_info.json` before final deploy. Use the ordered RTSP URLs from AMC capture, and use the normalized sensor IDs from `${CAL_DIR}/calibration.json` as each `camera_name`. Set `SENSOR_INFO_SOURCE=file` and `SENSOR_FILE_PATH` in `.env`; [`deploy-rtvi-cv-3d-stack.md`](deploy-rtvi-cv-3d-stack.md) shows the schema and validates it.
+3. Walk [`deploy-rtvi-cv-3d-stack.md`](deploy-rtvi-cv-3d-stack.md) — `docker compose up` with `MODE=mv3dt` + `BP_PROFILE=bp_wh_kafka` + `MINIMAL_PROFILE=""` (extended, the Q0 default — overlays enabled). Use `MINIMAL_PROFILE="true"` only if the user explicitly chose minimal in Q0.
+4. Walk [`verify-and-view.md`](verify-and-view.md) — confirm perception FPS, BEV ready, VST video wall.
 
 ## Failure modes specific to this chain
 

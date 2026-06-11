@@ -14,13 +14,13 @@ Answer read-only analytics questions (incidents, metrics, sensor data) by routin
 
 ## Prerequisites
 
-- Active VSS deployment reachable on `$HOST_IP` (see `vss-deploy-profile` and `references/`).
+- Active VSS deployment reachable on `$HOST_IP` (see `vss-deploy-profile`).
 - NGC credentials in `$NGC_CLI_API_KEY` and `$NVIDIA_API_KEY` for any image pulls.
 - `curl`, `jq`, and Docker available on the caller.
 
 ## Instructions
 
-Follow the routing tables and step-by-step workflows below. Each section that ends in *workflow*, *quick start*, or *flow* is intended to be executed top-to-bottom. Detailed reference material lives in `references/` and helper scripts live in `scripts/` — call them via `run_script` when the skill points to a script by name.
+Follow the routing tables and step-by-step workflows below. Each section that ends in *workflow*, *quick start*, or *flow* is intended to be executed top-to-bottom.
 
 ## Examples
 
@@ -191,11 +191,11 @@ and speaks JSON-RPC 2.0 over Server-Sent Events.
 
    - `connection refused` → the `alerts` profile is down; redeploy.
    - `timeout` → the host is up but the MCP gateway is wedged; restart
-     `va-mcp-server` (`docker compose restart va-mcp-server`).
+     `vss-va-mcp` (`docker compose restart vss-va-mcp`).
    - `404` on `/mcp` → fall back to `GET /` for liveness.
 
 2. **Sessions expire.** Each `mcp-session-id` is bound to the current
-   `va-mcp-server` process. If a `tools/call` returns
+   `vss-va-mcp` process. If a `tools/call` returns
    `Bad Request: Missing session ID` mid-flow, re-run Step 1
    (`initialize`) to mint a fresh `SESSION_ID` and retry.
 

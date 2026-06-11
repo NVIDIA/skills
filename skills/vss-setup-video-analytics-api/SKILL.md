@@ -70,7 +70,7 @@ The full operational walkthrough — config-source options, data-log volume beha
 ## Prerequisites
 
 1. **Repo checkout** with `$VSS_APPS_DIR` pointing at `<repo>/deploy/docker/`. Required by the service compose's volume binds.
-2. **NGC credentials** — `$NGC_CLI_API_KEY` set so docker can pull the image. See [`references/ngc.md`](references/ngc.md).
+2. **NGC credentials** — `$NGC_CLI_API_KEY` set so docker can pull the image. See [`references/ngc-api-key-registry-login.md`](references/ngc-api-key-registry-login.md).
 
    > **Secure-handling note for `NGC_CLI_API_KEY`**: this key is a
    > long-lived credential that pulls all NVIDIA private images
@@ -101,13 +101,9 @@ Hand the user [`references/deploy-video-analytics-api-service.md`](references/de
 
 The compose-file edits, config options, deploy + verify commands, REST API endpoint table, and troubleshooting table all live in that reference — don't duplicate them here.
 
-## REST API capabilities
+## Endpoint Reference
 
-Once the container is up and Elasticsearch is reachable, the API serves the
-endpoint groups listed in [`references/deploy-video-analytics-api-service.md`
-§ REST API endpoints](references/deploy-video-analytics-api-service.md#rest-api-endpoints).
-
-The server must initialize against Elasticsearch before `/livez` can return healthy. Data-query endpoints also need matching Elasticsearch indices and data. Endpoints that publish notifications (config, calibration) or expose RTLS / AMR streams also require Kafka.
+Use [`references/deploy-video-analytics-api-service.md`](references/deploy-video-analytics-api-service.md) for the REST endpoint table and runtime dependency notes.
 
 ## Kafka-dependent features (runtime, requires broker)
 
@@ -117,13 +113,13 @@ Once the container is up **and a Kafka broker is reachable**, three additional c
 
 The API acts as the **producer** for dynamic config updates. When an operator POSTs to `/config`, the API publishes an `upsert` message to the `mdx-notification` topic with Kafka key `behavior-analytics-config`. The downstream `behavior-analytics` container consumes this and ACKs back. The API also handles the bootstrap flow — when `behavior-analytics` starts, it publishes a `request-config` message, and the API replies with `upsert-all` containing the latest verified config from Elasticsearch.
 
-Consumer-side validation, ACK semantics, and the full wire contract are documented in [`../vss-setup-behavior-analytics/references/dynamic-config.md`](../vss-setup-behavior-analytics/references/dynamic-config.md).
+Consumer-side validation, ACK semantics, and the full wire contract are documented in the `vss-setup-behavior-analytics` dynamic-config reference.
 
 ### Dynamic calibration
 
 The API produces calibration update notifications on `mdx-notification` with Kafka key `calibration`. Supports `upsert-all` (full snapshot), `upsert` (per-sensor merge), and `delete` (per-sensor removal). The downstream `behavior-analytics` container consumes these and applies them to the live calibration.
 
-Consumer-side validation and per-action policy are documented in [`../vss-setup-behavior-analytics/references/dynamic-calibration.md`](../vss-setup-behavior-analytics/references/dynamic-calibration.md).
+Consumer-side validation and per-action policy are documented in the `vss-setup-behavior-analytics` dynamic-calibration reference.
 
 ### RTLS / AMR
 
@@ -131,11 +127,11 @@ The API consumes real-time location (`mdx-rtls`) and AMR (`mdx-amr`) messages fr
 
 ## Routing rules
 
-- If the user wants "the full stack" (UI / agent / perception): hand off to [`vss-deploy-profile`](../vss-deploy-profile/SKILL.md) with profile `warehouse` (or `alerts`). Don't run this skill in parallel.
-- If the user wants to deploy the analytics pipeline (behavior creation, incident detection): hand off to [`vss-setup-behavior-analytics`](../vss-setup-behavior-analytics/SKILL.md).
+- If the user wants "the full stack" (UI / agent / perception): hand off to `vss-deploy-profile` with profile `warehouse` (or `alerts`). Don't run this skill in parallel.
+- If the user wants to deploy the analytics pipeline (behavior creation, incident detection): hand off to `vss-setup-behavior-analytics`.
 - If the user wants to publish a runtime config / calibration update through the REST API: confirm Kafka is reachable, then use the `/config` or calibration endpoints and point them at the behavior-analytics dynamic-update references for the consumer wire contract.
-- If the user wants to understand the dynamic config / dynamic calibration wire contract from the **consumer** (behavior-analytics) side: point them at [`../vss-setup-behavior-analytics/references/dynamic-config.md`](../vss-setup-behavior-analytics/references/dynamic-config.md) and [`../vss-setup-behavior-analytics/references/dynamic-calibration.md`](../vss-setup-behavior-analytics/references/dynamic-calibration.md).
-- If the user wants to query or interact with the REST API endpoints: the endpoint table above and the deploy reference cover what's available. For the full OpenAPI spec, see `src/app/specification/openapi.json` in the `video-analytics-api` repo.
+- If the user wants to understand the dynamic config / dynamic calibration wire contract from the **consumer** (behavior-analytics) side: point them at the `vss-setup-behavior-analytics` dynamic-config and dynamic-calibration references.
+- If the user wants to query or interact with the REST API endpoints: the deploy reference endpoint table covers what's available. For the full OpenAPI spec, see `src/app/specification/openapi.json` in the `video-analytics-api` repo.
 
 
 bump:1

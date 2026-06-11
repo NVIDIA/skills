@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 OR MIT <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers deploying the VSS video-analytics-api REST service standalone to serve calibration, sensor, behavior, alerts, and events data backed by Elasticsearch and optionally Kafka. <br>
+Developers and engineers deploying the VSS video-analytics-api REST service standalone against existing Elasticsearch and optional Kafka infrastructure, outside the full warehouse blueprint stack. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,10 +19,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Deploy Video Analytics API Service](references/deploy-video-analytics-api-service.md) <br>
 - [Configuration Guide](references/configuration.md) <br>
-- [NGC Credentials](references/ngc.md) <br>
-- [GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
+- [Deploy Video Analytics API Service](references/deploy-video-analytics-api-service.md) <br>
+- [NGC API Key and Registry Login](references/ngc-api-key-registry-login.md) <br>
 - [VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
 
 
@@ -33,13 +32,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- claude-code <br>
-- codex <br>
+- Claude Code (`claude-code`) <br>
+- Codex (`codex`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 task (positive skill-activation case) with 2 attempts per task in the astra-sandbox environment using the NVSkills-Eval external profile. <br>
+Evaluated against 1 evaluation task (positive skill-activation scenario) in the astra-sandbox environment using NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,11 +62,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 70% (+45%) | 79% (+41%) |
-| Discoverability | 2 | 92% (+67%) | 83% (+28%) |
-| Effectiveness | 2 | 54% (+40%) | 56% (+42%) |
-| Efficiency | 2 | 78% (+54%) | 71% (+27%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+75%) | 91% (+56%) |
+| Discoverability | 1 | 100% (+75%) | 77% (+27%) |
+| Effectiveness | 1 | 88% (+78%) | 58% (+44%) |
+| Efficiency | 1 | 92% (+67%) | 67% (+25%) |
 
 ## Skill Version(s): <br>
 3.2.0 (source: frontmatter) <br>

@@ -10,7 +10,7 @@ The Video Embedding microservice (legacy name: RT-Embed) generates dense vector 
 - **Redis** — Optional. Only required when error-message publishing is enabled (`ENABLE_REDIS_ERROR_MESSAGES=true`). Configure via `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB`, and `REDIS_PASSWORD`.
 - **Apache Kafka** — Optional. Only required when `RTVI_EMBED_KAFKA_ENABLED=true` is set on the host (Compose injects this as `KAFKA_ENABLED` inside the container). The service publishes embedding messages to the topic named by `RTVI_EMBED_KAFKA_TOPIC` (injected as `KAFKA_TOPIC`; default `vision-embed-messages`) and errors to `RTVI_EMBED_ERROR_MESSAGE_TOPIC` (injected as `ERROR_MESSAGE_TOPIC`; default `vision-embed-errors`) using `KAFKA_BOOTSTRAP_SERVERS` (Compose builds this from `${HOST_IP}:9092`).
 - **OpenTelemetry collector** — Optional. Only required when `RTVI_EMBED_ENABLE_OTEL_MONITORING=true` is set on the host (Compose injects this as `ENABLE_OTEL_MONITORING` inside the container). The service exports OTLP traces and metrics to `OTEL_EXPORTER_OTLP_ENDPOINT` (default `http://otel-collector:4318`).
-- **Upstream video source (VST or compatible clip writer)** — Optional. When you want to embed clips written by VST, mount `${VSS_DATA_DIR}/data_log/vst/clip_storage` at the service's `/home/vst/vst_release/streamer_videos` path so the service can read clip files locally.
+- **Upstream video source (VST or compatible clip writer)** — Optional. When you want to embed clips written by VST, bind `${VSS_DATA_DIR}/data_log/vst/clip_storage` to the container clip-storage reader mount declared in `rtvi-embed-docker-compose.yml` so the service can read clip files locally.
 
 ## Integration Interfaces
 
@@ -49,20 +49,7 @@ The service exposes a v1 REST API. Set `BASE_URL=http://<host>:${RTVI_EMBED_PORT
 - **Metadata / NIM-compatible** — `GET /v1/metadata`, `GET /v1/version`, `GET /v1/license`, `GET /v1/manifest`.
 - **Metrics** — `GET /v1/metrics` (Prometheus text format).
 
-Example: embed an uploaded video.
-
-```bash
-# 1. Upload the media file.
-FILE_ID=$(curl -fsS -X POST "$BASE_URL/v1/files" \
-  -F purpose=vision \
-  -F media_type=video \
-  -F file=@/path/to/clip.mp4 | jq -r .id)
-
-# 2. Generate embeddings.
-curl -fsS -X POST "$BASE_URL/v1/generate_video_embeddings" \
-  -H "Content-Type: application/json" \
-  -d "{\"id\": \"$FILE_ID\", \"model\": \"cosmos-embed1-448p\", \"chunk_duration\": 60}"
-```
+Example: embed an uploaded video. See [Upload a file and embed it](rest-api.md#upload-a-file-and-embed-it) in `rest-api.md` for the canonical upload-and-embed `curl` sequence.
 
 Example: embed a text query.
 
@@ -72,38 +59,15 @@ curl -fsS -X POST "$BASE_URL/v1/generate_text_embeddings" \
   -d '{"text_input": "a forklift moving pallets", "model": "cosmos-embed1-448p"}'
 ```
 
-Example: register and embed a live RTSP stream. Live-stream requests **require** `stream: true` and `chunk_duration > 0`; a synchronous call returns `400 BadParameters: "Only streaming output is supported for live-streams"` and an unset/zero `chunk_duration` returns `400 BadParameter: "chunk_duration must be greater than 0"`. Send `Accept: text/event-stream` and use `curl -N` so SSE events stream immediately.
-
-```bash
-# 1. Add the live stream.
-STREAM_ID=$(curl -fsS -X POST "$BASE_URL/v1/streams/add" \
-  -H "Content-Type: application/json" \
-  -d '{"streams":[{"liveStreamUrl":"rtsp://host:port/live/video","description":"camera-001"}]}' \
-  | jq -r '.results[0].id')
-
-# 2. Start embedding for that stream (SSE).
-curl -N -X POST "$BASE_URL/v1/generate_video_embeddings" \
-  -H "Content-Type: application/json" \
-  -H "Accept: text/event-stream" \
-  -d "{
-    \"id\": \"$STREAM_ID\",
-    \"model\": \"cosmos-embed1-448p\",
-    \"stream\": true,
-    \"chunk_duration\": 10,
-    \"chunk_overlap_duration\": 2
-  }"
-
-# 3. Stop embedding for that stream when done (terminates SSE with data: [DONE]).
-curl -fsS -X DELETE "$BASE_URL/v1/generate_video_embeddings/$STREAM_ID"
-```
+Example: register and embed a live RTSP stream. Live-stream requests **require** `stream: true` and `chunk_duration > 0`; a synchronous call returns `400 BadParameters: "Only streaming output is supported for live-streams"` and an unset/zero `chunk_duration` returns `400 BadParameter: "chunk_duration must be greater than 0"`. Send `Accept: text/event-stream` and use `curl -N` so SSE events stream immediately. See [Register, embed, and stop a live RTSP stream](rest-api.md#register-embed-and-stop-a-live-rtsp-stream) in `rest-api.md` for the canonical add / SSE / stop sequence.
 
 ## Environment Variables
 
 | Variable | Purpose | Default | Required? |
 |---|---|---|---|
 | `RTVI_EMBED_PORT` | Host port mapped to container `8000`. | (unset; `${RTVI_EMBED_PORT?}` fails fast) | Yes |
-| `RTVI_EMBED_IMAGE` | Container image. | `nvcr.io/nvstaging/vss-core/vss-rt-embed` | No |
-| `RTVI_EMBED_TAG` | Container image tag. | `3.2.0-26.05.4` | No |
+| `RTVI_EMBED_IMAGE` | Container image. | `nvcr.io/nvidia/vss-core/vss-rt-embed` | No |
+| `RTVI_EMBED_TAG` | Container image tag. | `3.2.0` | No |
 | `RT_EMBED_DEVICE_ID` | GPU device id used by the Compose `device_ids` reservation. | `0` | No |
 | `RTVI_EMBED_NVIDIA_VISIBLE_DEVICES` | Maps to `NVIDIA_VISIBLE_DEVICES` inside the container. | `all` | No |
 | `RTVI_EMBED_NUM_GPUS` | Sets `NUM_GPUS` inside the container. | (unset) | No |
@@ -145,6 +109,7 @@ curl -fsS -X DELETE "$BASE_URL/v1/generate_video_embeddings/$STREAM_ID"
 | `ASSET_STORAGE_DIR` | Optional host directory bound to `/tmp/assets` inside the container. | (unset; mount is skipped) | No |
 | `RTVI_EMBED_LOG_DIR` | Optional host directory bound to `/opt/nvidia/rtvi/log/rtvi/`. | (unset; mount is skipped) | No |
 | `VSS_DATA_DIR` | Host root for VSS data; `data_log/vst/clip_storage` under this path is mounted into the container. | (unset) | Yes |
+| `RTVI_EMBED_CLIP_STORAGE_CONTAINER_PATH` | Container-side clip reader mount for the VST `clip_storage` bind (matches `rtvi-embed-docker-compose.yml`). | (from shipped compose; see export below) | Yes when binding clip storage |
 
 ## Network Requirements
 
@@ -166,10 +131,25 @@ curl -fsS -X DELETE "$BASE_URL/v1/generate_video_embeddings/$STREAM_ID"
 
 ## Example Compose Snippet
 
+Set the container-side clip reader mount before validating or starting this snippet. Run from the VSS repo root so the relative compose path resolves. Read the target from the shipped compose file (same value as in `rtvi-embed-docker-compose.yml`):
+
+```bash
+RTVI_EMBED_COMPOSE=deploy/docker/services/rtvi/rtvi-embed/rtvi-embed-docker-compose.yml
+export RTVI_EMBED_CLIP_STORAGE_CONTAINER_PATH="$(
+  grep 'data_log/vst/clip_storage' "$RTVI_EMBED_COMPOSE" \
+    | head -1 \
+    | sed -E 's/.*clip_storage:([^[:space:]]+).*/\1/'
+)"
+[ -z "$RTVI_EMBED_CLIP_STORAGE_CONTAINER_PATH" ] && {
+  echo "ERROR: could not extract container clip-storage path from $RTVI_EMBED_COMPOSE" >&2
+  return 1 2>/dev/null || exit 1
+}
+```
+
 ```yaml
 services:
   rtvi-embed:
-    image: ${RTVI_EMBED_IMAGE:-nvcr.io/nvstaging/vss-core/vss-rt-embed}:${RTVI_EMBED_TAG:-3.2.0-26.05.4}
+    image: ${RTVI_EMBED_IMAGE:-nvcr.io/nvidia/vss-core/vss-rt-embed}:${RTVI_EMBED_TAG:-3.2.0}
     container_name: vss-rtvi-embed
     user: "1001:1001"
     profiles: ["bp_developer_search_2d"]
@@ -197,7 +177,7 @@ services:
       - "${NGC_MODEL_CACHE:-rtvi-ngc-model-cache}:/opt/nvidia/rtvi/.rtvi/ngc_model_cache"
       - "${RTVI_EMBED_HF_CACHE:-rtvi-hf-cache}:/tmp/huggingface"
       - "rtvi-triton-model-repo:/tmp/triton_model_repo"
-      - "${VSS_DATA_DIR}/data_log/vst/clip_storage:/home/vst/vst_release/streamer_videos"
+      - "${VSS_DATA_DIR}/data_log/vst/clip_storage:${RTVI_EMBED_CLIP_STORAGE_CONTAINER_PATH}"
     ipc: host
     ulimits:
       memlock:
@@ -220,6 +200,8 @@ volumes:
   rtvi-ngc-model-cache:
   rtvi-triton-model-repo:
 ```
+
+The export above parses the container-side target from the clip_storage volume line in `deploy/docker/services/rtvi/rtvi-embed/rtvi-embed-docker-compose.yml`.
 
 ## Authentication & Authorization
 

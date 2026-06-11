@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `vss-manage-alerts`
-- Evaluation date: 2026-06-08
+- Evaluation date: 2026-06-11
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
-- Dataset: 28 evaluation tasks
-- Attempts per task: 2
+- Dataset: 14 evaluation tasks
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -42,27 +42,31 @@ Underlying evaluation signals used in this run:
 
 ## Test Tasks
 
-The benchmark included 28 recorded Tier 3 trials, but the source evaluation dataset was not available in this report payload.
+The benchmark included 14 recorded Tier 3 trials, but the source evaluation dataset was not available in this report payload.
 
 ## Results
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 82% (+32%) | 64% (+11%) |
-| Correctness | 8 | 87% (+0%) | 86% (+17%) |
-| Discoverability | 8 | 96% (+3%) | 85% (+17%) |
-| Effectiveness | 8 | 71% (+2%) | 62% (+12%) |
-| Efficiency | 8 | 82% (+9%) | 74% (+21%) |
+| Security | 7 | 100% (+0%) | 79% (-7%) |
+| Correctness | 7 | 92% (+60%) | 95% (+50%) |
+| Discoverability | 7 | 96% (+57%) | 82% (+21%) |
+| Effectiveness | 7 | 66% (+49%) | 68% (+45%) |
+| Efficiency | 7 | 88% (+52%) | 72% (+16%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 1 total findings.
+Tier 1 validation passed. NVSkills-Eval ran 9 checks and found 0 total findings.
 
-Top findings:
+Notable observations:
 
-- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/vss-manage-alerts/SKILL.md`)
+- SECURITY: no findings reported.
+- SCHEMA: Found skill manifest: SKILL.md
+- VERSION: Valid semantic version: 3.2.0
+- PII: Scanning 10 files for PII
+- LICENSE: no findings reported.
 
 ## Tier 2: Deduplication Summary
 
@@ -70,7 +74,7 @@ Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
 
 Notable observations:
 
-- Context Deduplication: Collected 8 file(s)
+- Context Deduplication: Collected 9 file(s)
 - Inter-Skill Deduplication: Parsed skill 'vss-manage-alerts': 166 char description
 
 ## Publication Recommendation

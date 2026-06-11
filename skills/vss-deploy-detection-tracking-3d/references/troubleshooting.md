@@ -83,6 +83,26 @@ If the VST sensor names and calibration sensor IDs don't match `Camera / Camera_
 
 **Fix:** Tear down (`down -v` to clear VST sensor state), then walk [`configure-cameras.md`](configure-cameras.md) **Step 0** — rename videos, `camInfo/*.yml`, and `sensors[].id` in `calibration.json` to the `Camera, Camera_NN` convention together. Redeploy.
 
+### VST streamprocessing logs `No calibration data found for sensor: Camera...`
+
+**Symptom:** VST video streams are present, but overlays are missing. `vss-vios-streamprocessing` logs show:
+
+```
+No calibration data found for sensor: Camera
+No calibration data found for sensor: Camera_01
+```
+
+**Cause:** The VST runtime stream names are `Camera, Camera_01, ...`, but the deployed `calibration.json` still has AMC/VGGT IDs such as `cam_00, cam_01, ...`. Streamprocessing matches by sensor name and cannot find the calibration entries.
+
+**Diagnose:**
+```bash
+docker logs vss-vios-streamprocessing 2>&1 | grep 'No calibration data found' | tail
+jq -r '.sensors[].id' "${CAL_DIR}/calibration.json"
+curl -sf "http://${HOST_IP:-localhost}:30888/vst/api/v1/sensor/list" | jq -r '.[].name' | sort
+```
+
+**Fix:** Walk [`configure-cameras.md`](configure-cameras.md) **Step 0** and apply the normalization (`APPLY_RENAME=1`) so videos, `camInfo/*.yml`, and `sensors[].id` all use `Camera, Camera_01, ...`. Then recreate streamprocessing or do a clean redeploy if VST already registered stale sensors. Re-run [`verify-and-view.md`](verify-and-view.md) Step 4b before reporting success.
+
 ### `vss-behavior-analytics-mv3dt` restart loop with `calibration 'upsert-all' payload failed schema validation`
 
 **Symptom:** `vss-behavior-analytics-mv3dt` is in `Restarting` state. Logs show:
@@ -91,7 +111,7 @@ If the VST sensor names and calibration sensor IDs don't match `Camera / Camera_
 [ERROR] calibration 'upsert-all' payload failed schema validation: sensors/0/group/alias: '' should be non-empty; sensors/0/group/dimensions: [] is too short; sensors/0/group/name: '' should be non-empty; sensors/0/group/origin: [] is too short; sensors/0/group/type: '' should be non-empty (+ N more ...)
 ```
 
-**Cause:** AMC's API-only `export_calibration?calibration_type=cartesian` leaves `sensors[].group`, `sensors[].region`, and `sensors[].place` as empty objects/arrays when the user didn't define ROIs / regions in the AMC UI Parameters step. The schema validator rejects these and the container exits 1.
+**Cause:** API-only AMC/VGGT `export_calibration?calibration_type=cartesian` can leave `sensors[].group`, `sensors[].region`, or `sensors[].place` as empty objects/arrays when the user didn't define ROIs / regions in the AMC UI Parameters step. The schema validator rejects these and the container exits 1.
 
 **Diagnose:**
 ```bash
@@ -99,7 +119,7 @@ jq '.sensors[0] | {group, region, place}' "${CAL_DIR}/calibration.json"
 # Empty group.name / region.placeLevel / place=[] confirm the cause.
 ```
 
-**Fix:** Walk [`calibration-workflow.md`](calibration-workflow.md) **Step 4a** — the inline `jq` block patches placeholder values into the empty fields so the validator passes. For metric BEV bounds, populate these in the AMC UI Parameters step before export instead.
+**Fix:** Walk [`calibration-workflow.md`](calibration-workflow.md) **Step 4a** — the inline `jq` block patches placeholder values into the empty fields so the validator passes. For metric BEV bounds, populate these in the AMC UI Parameters step before export or tune them after deploy using [`verify-and-view.md`](verify-and-view.md) **Tune BEV `group` / `region` for better overlays**.
 
 ### `vss-import-calibration-output-mv3dt` exits 1 with `imageMetadata.json not found`
 
@@ -122,7 +142,45 @@ ls "${CAL_DIR}/images/" 2>/dev/null
 docker logs vss-import-calibration-output-mv3dt 2>&1 | tail -10
 ```
 
-**Fix:** Walk [`calibration-workflow.md`](calibration-workflow.md) **Step 4b** — synthesize `Top.png` from the user's `layout.png` (or any project-output PNG) and write a matching `imageMetadata.json` with a `place` string mirroring `sensors[0].place`. Then `docker start vss-import-calibration-output-mv3dt` to retry the one-shot — no full redeploy needed.
+**Fix:** Walk [`calibration-workflow.md`](calibration-workflow.md) **Step 4b** — synthesize `Top.png` from the user's `layout.png` (or any project-output PNG) and write a matching `imageMetadata.json` with a `place` string mirroring `sensors[0].place`. Then force-recreate the one-shot importer so logs reflect only the retry — no full redeploy needed.
+
+```bash
+cd "${VSS_APPS_DIR}"
+docker compose -f compose.yml \
+  --env-file industry-profiles/warehouse-operations/.env \
+  up --no-deps --force-recreate import-calibration-output-container-mv3dt
+```
+
+### `vss-import-calibration-output-mv3dt` exits 0 but overlays are missing
+
+**Symptom:** Under extended profile (`MINIMAL_PROFILE=""`), `vss-import-calibration-output-mv3dt` shows `Exited (0)`, but VST overlays are missing. Importer logs include `{"error":"Something broke!"}` or video-analytics API logs show `EACCES: permission denied, open '/web-api-app/files/...'`.
+
+**Cause:** The video-analytics API upload bind (`${VSS_DATA_DIR}/data_log/vss_video_analytics_api:/web-api-app/files`) is not writable by the API container. The importer uses `curl` without failing on HTTP error responses, so the one-shot can exit 0 even when the API rejected the calibration/image upload.
+
+**Diagnose:**
+```bash
+docker logs vss-import-calibration-output-mv3dt 2>&1 | tail -50
+docker logs vss-video-analytics-api-mv3dt 2>&1 | grep -iE 'EACCES|permission denied|Something broke|error' | tail -20
+docker exec vss-video-analytics-api-mv3dt sh -lc 'touch /web-api-app/files/.amc_write_test && rm -f /web-api-app/files/.amc_write_test'
+```
+
+**Fix:** Create the upload directory before retrying and apply the same scoped ACL used in `SKILL.md` Prerequisites §4. Then restart the API and rerun the one-shot importer; no full redeploy is needed.
+
+```bash
+API_UPLOAD_DIR="${VSS_DATA_DIR}/data_log/vss_video_analytics_api"
+mkdir -p "${API_UPLOAD_DIR}"
+setfacl -R    -m u:1000:rwx "${API_UPLOAD_DIR}"
+setfacl -R -d -m u:1000:rwx "${API_UPLOAD_DIR}"
+
+docker restart vss-video-analytics-api-mv3dt
+
+cd "${VSS_APPS_DIR}"
+docker compose -f compose.yml \
+  --env-file industry-profiles/warehouse-operations/.env \
+  up --no-deps --force-recreate import-calibration-output-container-mv3dt
+```
+
+Re-run [`verify-and-view.md`](verify-and-view.md) Step 4b. Do not report success until the import check is clean.
 
 ### `vss-rtvi-cv-bev-fusion` not healthy / `/tmp/fusion_ready` missing
 
@@ -230,9 +288,10 @@ curl -s "http://localhost:8010/v1/amc/calibrate/${project_id}/log" | tail -60
 
 **Fix:** Per [`calibration-workflow.md`](calibration-workflow.md) Step 2 — re-poll until `project_state == COMPLETED`. If VGGT requested, also check `vggt_state == COMPLETED` (VGGT only runs if the model file is staged).
 
-### VST video wall (`:30888`) unreachable
+### VST video wall (`/vst` on `:30888`) unreachable
 
 **Cause(s):**
+- The browser opened the base port instead of `http://<HOST_IP>:30888/vst`.
 - VST stack didn't come up (sensor-ms / postgres in bad state).
 - Firewall blocks port 30888 from the browser host.
 - `HOST_IP` is `localhost` and you're trying to reach from a remote browser.
@@ -351,11 +410,10 @@ docker compose -f compose.yml \
 **Diagnose:**
 ```bash
 docker login --username '$oauthtoken' --password "${NGC_CLI_API_KEY}" nvcr.io
-ngc registry image list "nvidia/vss-core/*"      2>&1 | head -5
-ngc registry image list "nvidia/vss-core/*"   2>&1 | head -5
+ngc registry image list "nvidia/vss-core/*" 2>&1 | head -5
 ```
 
-**Fix:** Re-login. If neither org lists the image, your key doesn't have access — confirm with `ngc org list`. Then either set `PERCEPTION_IMAGE` and `BEV_FUSION_MV3DT_IMAGE` in `.env` to the org that works for you, or get a new key.
+**Fix:** Re-login. If `nvidia/vss-core/*` does not list the image, the key does not have access — confirm with `ngc org list`, then use a key with access to the published VSS images.
 
 ### Pipeline stalls at end-of-video (videos mode) — `Active sources : 0`, offsets flat
 

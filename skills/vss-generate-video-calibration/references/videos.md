@@ -32,7 +32,8 @@ See the [Settings File + Detector Pattern](../SKILL.md#settings-file--detector-p
 ### Optional
 5. **Ground truth zip** — `GT.zip` with `_World_Cameras_Camera_XX/` folders (enables evaluation metrics).
 6. **Focal lengths** — one per camera, e.g. `1269.0, 1099.5, 1099.5`.
-7. **Run VGGT refinement?** — only if VGGT model is staged (see `deploy-auto-calibration-service.md` Step 2).
+
+VGGT refinement is handled after AMC completes by [SKILL.md Step E](../SKILL.md#step-e--vggt-refinement). Do not collect a separate videos-mode VGGT flag; staging the model is optional during deployment, and missing VGGT must not block the AMC run.
 
 Root `README.md` "Custom Dataset" section documents input-video guidelines and ground-truth format.
 
@@ -124,7 +125,7 @@ LAYOUT_PNG     = None                                   # e.g. Path("/path/to/la
 GT_ZIP         = None                                   # optional: Path("/path/to/GT.zip")
 FOCAL_LENGTHS  = None                                   # optional: [1269.0, 1099.5]
 DETECTOR_TYPE  = "resnet"                               # "resnet" or "transformer" (overridden if CONFIG_FILE pins it)
-RUN_VGGT       = False
+RUN_VGGT_IF_READY = False  # Set True if the user requested VGGT or staged VGGT in this run
 
 # Projects dir on the host (for verifying manual alignment output).
 # Bind-mounted into the MS container from $VSS_APPS_DIR/services/auto-calibration/projects
@@ -239,26 +240,27 @@ if ui_tasks:
         )
         print(f"    Alignment files verified at {manual_dir}")
 
-# Paste references/calibration-tail.md here before optional VGGT.
+# Paste references/calibration-tail.md here before VGGT refinement.
 
-# Step E — VGGT (optional)
-if RUN_VGGT:
-    info = s.get(f"{BASE_URL}/get_project_info/{project_id}").json()
-    vggt_state = info.get("project_info", {}).get("vggt_state", "INIT")
-    if vggt_state == "READY":
-        s.post(f"{BASE_URL}/vggt/calibrate/{project_id}").raise_for_status()
-        print("\n[E] VGGT started")
-        t0 = time.time()
-        while time.time() - t0 < 900:
-            vs = s.get(f"{BASE_URL}/get_project_info/{project_id}").json() \
-                .get("project_info", {}).get("vggt_state", "INIT")
-            if vs == "COMPLETED":
-                print("     VGGT done"); break
-            if vs == "ERROR":
-                raise RuntimeError("VGGT failed")
-            time.sleep(10)
-    else:
-        print(f"\n[E] VGGT not ready (state={vggt_state}) — skipping")
+# Step E — VGGT refinement
+info = s.get(f"{BASE_URL}/get_project_info/{project_id}").json()
+vggt_state = info.get("project_info", {}).get("vggt_state", "INIT")
+if vggt_state == "READY" and RUN_VGGT_IF_READY:
+    s.post(f"{BASE_URL}/vggt/calibrate/{project_id}").raise_for_status()
+    print("\n[E] VGGT started")
+    t0 = time.time()
+    while time.time() - t0 < 900:
+        vs = s.get(f"{BASE_URL}/get_project_info/{project_id}").json() \
+            .get("project_info", {}).get("vggt_state", "INIT")
+        if vs == "COMPLETED":
+            print("     VGGT done"); break
+        if vs == "ERROR":
+            raise RuntimeError("VGGT failed")
+        time.sleep(10)
+elif vggt_state == "READY":
+    print("\n[E] VGGT is ready. Ask whether to run refinement; set RUN_VGGT_IF_READY=True for direct-mode runs.")
+else:
+    print(f"\n[E] VGGT not ready (state={vggt_state}) — skipping. VGGT refinement is available after staging the model.")
 
 print(f"\nProject: {project_id}")
 print(f"Final camera parameters: ${{VSS_APPS_DIR}}/services/auto-calibration/projects/project_{project_id}/output/multi_view_results/BA_output/results_ba/refined/camInfo_XX.yaml")

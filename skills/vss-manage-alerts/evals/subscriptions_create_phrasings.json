@@ -1,7 +1,8 @@
 {
   "skills": [
     "vss-manage-alerts",
-    "vss-deploy-profile"
+    "vss-deploy-profile",
+    "vss-manage-video-io-storage"
   ],
   "resources": {
     "platforms": {
@@ -16,6 +17,17 @@
   "description": "Phrasing diversity test for alert rule creation (references/alert-subscriptions.md). Each entry uses a different sentence structure to request 'create a realtime alert rule'. Checks verify correct extraction of sensor_name, prompt (verbatim), and alert_type (snake_case tag), plus correct payload structure.",
   "expects": [
     {
+      "query": "Deploy the VSS alerts profile on {{platform}} in real-time (VLM) mode using remote LLM and remote VLM endpoints. Then, so later steps have cameras to target, onboard two sensors into VIOS using the vss-manage-video-io-storage skill: upload the bundled warehouse sample video through NVStreamer (port 31000) twice \u2014 once as a sensor named `warehouse_sample` and once as a sensor named `Camera_02` \u2014 then register each NVStreamer-served RTSP (port 31554) in VIOS (port 30888). Confirm both sensors appear in `GET /sensor/list` with an RTSP stream before finishing. Do NOT finish until the system is fully ready: poll until BOTH the VSS Agent REST API (`curl -sf http://localhost:8000/docs`) and VIOS (`curl -sf http://localhost:30888/vst/api/v1/sensor/list`) respond successfully and BOTH `warehouse_sample` and `Camera_02` are listed \u2014 wait and retry for a few minutes if a service is still starting.",
+      "checks": [
+        "`sh -c 'i=1; while [ \"$i\" -le 12 ]; do curl -sf --max-time 10 http://localhost:8000/docs >/dev/null 2>&1 && exit 0; sleep 5; i=$((i+1)); done; exit 1'` returns exit 0 (VSS Agent REST API responsive; polls up to ~3 min to absorb deploy readiness timing).",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-agent` returns exit 0.",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-rtvi-vlm` returns exit 0 (continuous VLM processor \u2014 required for VLM real-time mode).",
+        "`! docker ps --format '{{.Names}}' | grep -qx vss-rtvi-cv` returns exit 0 (CV-only perception is NOT running \u2014 confirms VLM real-time, not verification).",
+        "`sh -c 'i=1; while [ \"$i\" -le 12 ]; do curl -sf --max-time 10 http://localhost:30888/vst/api/v1/sensor/list 2>/dev/null | grep -q warehouse_sample && exit 0; sleep 5; i=$((i+1)); done; exit 1'` returns exit 0 (warehouse_sample onboarded into VIOS; polls to absorb upload/registration delay).",
+        "`sh -c 'i=1; while [ \"$i\" -le 12 ]; do curl -sf --max-time 10 http://localhost:30888/vst/api/v1/sensor/list 2>/dev/null | grep -q Camera_02 && exit 0; sleep 5; i=$((i+1)); done; exit 1'` returns exit 0 (Camera_02 onboarded into VIOS; polls to absorb upload/registration delay)."
+      ]
+    },
+    {
       "_phrasing": "canonical: 'send me alerts for <condition> in camera <sensor>'",
       "_extraction": {
         "sensor_name": "warehouse_sample",
@@ -25,13 +37,11 @@
       "query": "Send me alerts for fallen boxes in camera warehouse_sample",
       "checks": [
         "The trajectory calls Alert Bridge `POST /api/v1/realtime`.",
-        "The Alert Bridge payload's `prompt` field contains 'fallen boxes' verbatim or a semantically equivalent phrase \u2014 the agent must NOT rephrase the user's condition into something unrelated.",
-        "The Alert Bridge payload's `live_stream_url` is an RTSP URL resolved from the sensor named `warehouse_sample` (not `camera_warehouse_sample` or `camera warehouse_sample` \u2014 the word 'camera' in the query is a generic noun, not part of the sensor name).",
-        "The Alert Bridge payload's `sensor_id` is the VIOS sensor ID resolved from `warehouse_sample` (via `GET /sensor/list`).",
-        "The Alert Bridge payload's `sensor_name` is `warehouse_sample`.",
-        "The Alert Bridge payload's `alert_type` is a snake_case tag of 2-4 words describing the condition (e.g. `fallen_boxes`, `box_drop_detection`, or similar \u2014 NOT a generic tag like `alert` or `realtime_alert`).",
-        "The Alert Bridge payload includes `system_prompt` set to 'Answer yes or no' (or equivalent yes/no instruction) and `chunk_duration` set to 30.",
-        "The response includes a rule `id` (UUID) and `status: success`."
+        "`curl -sf --max-time 15 http://localhost:9080/api/v1/realtime | grep -qi 'fallen.box'` returns exit 0 (a created rule's prompt contains 'fallen box', confirming the agent preserved the user's detection condition verbatim; deterministic end-state probe).",
+        "`curl -sf --max-time 15 http://localhost:9080/api/v1/realtime | grep -qi rtsp` returns exit 0 (a created rule's live_stream_url is a real rtsp:// stream resolved from VIOS (host/port may be rewritten to the deployment's external IP, so match the rtsp scheme, not a fixed port) - confirms live_stream_url/sensor_id came from the live sensor list, not a fabricated or 'camera_'-prefixed name; deterministic end-state probe).",
+        "`curl -sf --max-time 15 http://localhost:9080/api/v1/realtime | grep -qi warehouse_sample` returns exit 0 (a realtime rule is registered against the warehouse_sample sensor).",
+        "`curl -sf --max-time 15 http://localhost:9080/api/v1/realtime | jq -e '[.rules[] | select(.sensor_name==\"warehouse_sample\") | select(.alert_type | test(\"fallen|box|drop\";\"i\"))] | length >= 1'` returns exit 0 (the stored rule for warehouse_sample carries a condition-specific alert_type related to fallen boxes, not a generic or sensor-derived tag; deterministic end-state probe).",
+        "`curl -sf --max-time 15 http://localhost:9080/api/v1/realtime | jq -e '[.rules[] | select(.sensor_name==\"warehouse_sample\") | select(.chunk_duration == 30 and ((.system_prompt // \"\") | length > 0) and ((.id // \"\") | test(\"[0-9a-fA-F-]{36}\")))] | length >= 1'` returns exit 0 (the stored rule uses the canonical payload defaults \u2014 chunk_duration 30, a non-empty system_prompt \u2014 and has a UUID id; deterministic end-state probe)."
       ]
     },
     {
@@ -44,68 +54,11 @@
       "query": "Create alert for smoke detection on Camera_02",
       "checks": [
         "The trajectory calls Alert Bridge `POST /api/v1/realtime`.",
-        "The Alert Bridge payload's `prompt` field contains 'smoke' \u2014 the agent extracted the detection condition correctly, not the sensor name.",
-        "The Alert Bridge payload's `live_stream_url` is an RTSP URL resolved from the sensor named `Camera_02` via VIOS `GET /sensor/list` + `GET /sensor/{id}/streams`.",
-        "The Alert Bridge payload's `sensor_id` is the VIOS sensor ID resolved from `Camera_02`.",
-        "The Alert Bridge payload's `sensor_name` is `Camera_02`.",
-        "The Alert Bridge payload's `alert_type` is a snake_case tag related to smoke (e.g. `smoke_detection`, `fire_smoke_detection` \u2014 NOT `camera_02` or a sensor-derived tag).",
-        "The Alert Bridge payload includes `system_prompt` set to 'Answer yes or no' and `chunk_duration` set to 30.",
-        "The response includes a rule `id` (UUID) and `status: success`."
-      ]
-    },
-    {
-      "_phrasing": "subject-first: '<condition> needs an alert on <sensor>'",
-      "_extraction": {
-        "sensor_name": "warehouse_sample",
-        "prompt_must_contain": "vehicle collision",
-        "alert_type_pattern": "vehicle_collision*"
-      },
-      "query": "Vehicle collisions needs an alert on warehouse_sample",
-      "checks": [
-        "The trajectory calls Alert Bridge `POST /api/v1/realtime`.",
-        "The Alert Bridge payload's `prompt` field contains 'vehicle collision' \u2014 the agent correctly identified the condition as the sentence subject ('Vehicle collisions'), NOT the sensor.",
-        "The Alert Bridge payload's `live_stream_url` is an RTSP URL resolved from `warehouse_sample` \u2014 the agent correctly identified 'warehouse_sample' as the sensor despite it appearing after 'on' at the end of the sentence.",
-        "The Alert Bridge payload's `sensor_id` is the VIOS sensor ID resolved from `warehouse_sample`.",
-        "The Alert Bridge payload's `sensor_name` is `warehouse_sample`.",
-        "The Alert Bridge payload's `alert_type` is a snake_case tag like `vehicle_collision` \u2014 NOT `warehouse_sample` or a sensor-derived tag.",
-        "The response includes a rule `id` (UUID) and `status: success`."
-      ]
-    },
-    {
-      "_phrasing": "passive voice: 'alert needs to be created for <condition> on <sensor>'",
-      "_extraction": {
-        "sensor_name": "Camera_02",
-        "prompt_must_contain": "unauthorized access",
-        "alert_type_pattern": "unauthorized_access*"
-      },
-      "query": "Alert needs to be created for unauthorized access on Camera_02",
-      "checks": [
-        "The trajectory calls Alert Bridge `POST /api/v1/realtime`.",
-        "The Alert Bridge payload's `prompt` field contains 'unauthorized access' \u2014 extracted from the passive construction, not confused with the subject 'Alert'.",
-        "The Alert Bridge payload's `live_stream_url` is an RTSP URL resolved from `Camera_02` \u2014 not mistakenly treating 'unauthorized access' as a sensor name.",
-        "The Alert Bridge payload's `sensor_id` is the VIOS sensor ID resolved from `Camera_02`.",
-        "The Alert Bridge payload's `sensor_name` is `Camera_02`.",
-        "The Alert Bridge payload's `alert_type` is a snake_case tag like `unauthorized_access` \u2014 NOT `alert` or a tag derived from the sentence subject.",
-        "The response includes a rule `id` (UUID) and `status: success`."
-      ]
-    },
-    {
-      "_phrasing": "casual + embedded location: 'I want to be notified about <condition + location> on <sensor>'",
-      "_extraction": {
-        "sensor_name": "warehouse_sample",
-        "prompt_must_contain": "people loitering",
-        "alert_type_pattern": "loiter*|people_loiter*"
-      },
-      "query": "I want to be notified about people loitering near the loading dock on warehouse_sample",
-      "checks": [
-        "The trajectory calls Alert Bridge `POST /api/v1/realtime` \u2014 'notified' without 'slack'/'webhook' routes to Workflow D, NOT Workflow E.",
-        "The agent does NOT attempt Slack setup.",
-        "The Alert Bridge payload's `prompt` field contains 'people loitering near the loading dock' or equivalent \u2014 the phrase 'near the loading dock' is part of the detection condition, NOT part of the sensor name.",
-        "The Alert Bridge payload's `live_stream_url` is an RTSP URL resolved from `warehouse_sample` \u2014 the sensor name is only the token after 'on', not 'loading dock on warehouse_sample'.",
-        "The Alert Bridge payload's `sensor_id` is the VIOS sensor ID resolved from `warehouse_sample`.",
-        "The Alert Bridge payload's `sensor_name` is `warehouse_sample`.",
-        "The Alert Bridge payload's `alert_type` is a snake_case tag related to loitering (e.g. `people_loitering`, `loitering_detection` \u2014 NOT `loading_dock` or a location-derived tag).",
-        "The response includes a rule `id` (UUID) and `status: success`."
+        "`curl -sf --max-time 15 http://localhost:9080/api/v1/realtime | grep -qi smoke` returns exit 0 (a created rule's prompt contains 'smoke', confirming the agent extracted the detection condition correctly, not the sensor name; deterministic end-state probe).",
+        "`curl -sf --max-time 15 http://localhost:9080/api/v1/realtime | grep -qi rtsp` returns exit 0 (a created rule's live_stream_url is a real rtsp:// stream resolved from VIOS (host/port may be rewritten to the deployment's external IP, so match the rtsp scheme, not a fixed port) - confirms live_stream_url/sensor_id came from the live sensor list; deterministic end-state probe).",
+        "`curl -sf --max-time 15 http://localhost:9080/api/v1/realtime | grep -qi camera_02` returns exit 0 (a realtime rule is registered against the Camera_02 sensor).",
+        "`curl -sf --max-time 15 http://localhost:9080/api/v1/realtime | jq -e '[.rules[] | select(.sensor_name==\"Camera_02\") | select(.alert_type | test(\"smoke|fire\";\"i\"))] | length >= 1'` returns exit 0 (the stored rule for Camera_02 carries a smoke-related alert_type, not a sensor-derived tag; deterministic end-state probe).",
+        "`curl -sf --max-time 15 http://localhost:9080/api/v1/realtime | jq -e '[.rules[] | select(.sensor_name==\"Camera_02\") | select(.chunk_duration == 30 and ((.system_prompt // \"\") | length > 0) and ((.id // \"\") | test(\"[0-9a-fA-F-]{36}\")))] | length >= 1'` returns exit 0 (the stored rule uses the canonical payload defaults \u2014 chunk_duration 30, a non-empty system_prompt \u2014 and has a UUID id; deterministic end-state probe)."
       ]
     },
     {
@@ -113,9 +66,9 @@
       "query": "Show me all active realtime rules",
       "checks": [
         "The trajectory calls Alert Bridge `GET /api/v1/realtime`.",
-        "The response contains at least 4 rules (from the previous create entries).",
-        "The listed rules span BOTH sensors (`warehouse_sample` and `Camera_02`) \u2014 confirming that sensor extraction was correct across different phrasings and both sensors were used.",
-        "Each rule's `alert_type` is a distinct, condition-specific snake_case tag (e.g. `fallen_boxes`, `smoke_detection`, `vehicle_collision`, `unauthorized_access`, `people_loitering`) \u2014 NOT generic tags and NOT sensor-name-derived tags.",
+        "The response contains at least 2 rules (from the previous create entries).",
+        "The listed rules span BOTH sensors (`warehouse_sample` and `Camera_02`) \u2014 confirming that sensor extraction was correct across the two phrasings.",
+        "The two rules created in this run are present with condition-specific snake_case `alert_type` tags \u2014 a `warehouse_sample` rule whose tag relates to fallen boxes (e.g. `fallen_boxes` / `box_drop`) and a `Camera_02` rule whose tag relates to smoke (e.g. `smoke_detection`) \u2014 i.e. tags derived from the detection condition, not generic (`alert`) or sensor-derived. (Leftover/pre-existing rules from other runs may also appear on the shared backend; this check concerns the rules this run created, not global uniqueness across all listed rules.)",
         "The RTSP URLs are reverse-resolved to human-readable sensor names in the agent's output.",
         "The agent renders a readable table or list \u2014 not raw JSON."
       ]

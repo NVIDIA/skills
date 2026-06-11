@@ -982,46 +982,7 @@ Run **[Lifecycle: Monitor](#lifecycle-monitor)** using the same `LOG` as Phase 8
 
 ## After deploy
 
-The deploy script prints the actual access points once the stack is up.
-
-**Standard (bare-metal / VM with reachable IP):**
-
-```
-Access Points:
-
-HAProxy:             http://<host_ip>:7777
-Kibana:              http://<host_ip>:7777/kibana
-VST:                 http://<host_ip>:30888/vst/
-Grafana:             http://<host_ip>:35000
-NvStreamer:          http://<host_ip>:31000
-Video Analytics API: http://<host_ip>:7777/video-analytics-api
-```
-
-**Brev (secure-link domain):**
-
-```
-Access Points (Brev):
-
-HAProxy:             https://7777-<BREV_ENV_ID>.brevlab.com
-VSS UI:              https://7777-<BREV_ENV_ID>.brevlab.com
-Kibana:              https://7777-<BREV_ENV_ID>.brevlab.com/kibana
-VST:                 https://30888-<BREV_ENV_ID>.brevlab.com/vst/
-NvStreamer:          https://31000-<BREV_ENV_ID>.brevlab.com
-Video Analytics API: https://7777-<BREV_ENV_ID>.brevlab.com/video-analytics-api
-
-Brev Secure Links — each exposed port requires its own secure-link hostname:
-  Port 7777  (HAProxy)    → https://7777-<BREV_ENV_ID>.brevlab.com
-  Port 30888 (VST)        → https://30888-<BREV_ENV_ID>.brevlab.com
-  Port 31000 (NvStreamer)  → https://31000-<BREV_ENV_ID>.brevlab.com
-  Port 35000  (Grafana)     → https://35000-<BREV_ENV_ID>.brevlab.com
-
-HAProxy-routed paths (/, /kibana, /api, /chat, /websocket, /alert-bridge,
-/video-analytics-api, /phoenix, /va-mcp, /static) all go through
-the port-7777 secure link. Direct-port services (VST, NvStreamer, Grafana)
-each need their own secure link opened in the Brev dashboard.
-```
-
-VST is accessed directly on port `30888` — it does not go through the HAProxy ingress.
+The deploy script prints the actual access points once the stack is up. For the full URL tables (standard and Brev), see [`warehouse-debug.md` — Service Access Points](warehouse-debug.md#service-access-points).
 
 See [Access Points](#access-points) for the full HAProxy route table and direct-port diagnostics table.
 
@@ -1134,3 +1095,4 @@ When adding new cameras to the MV3DT profile, run the MV3DT utility scripts unde
 | Brev: HAProxy returns 404 | `Host:` header doesn't match `h_main` ACL — verify `VSS_PUBLIC_HOST` matches the Brev secure-link domain (`7777-<BREV_ENV_ID>.brevlab.com`) |
 | Brev: WebSocket connection refused | `VSS_PUBLIC_WS_PROTOCOL` still set to `ws` instead of `wss`, or `VSS_PUBLIC_PORT` not set to `443` |
 | Redeploy / reset without reinstall | [Redeploy](#redeploy) |
+

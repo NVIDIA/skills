@@ -1,6 +1,6 @@
 ---
 name: vss-ask-video
-description: Use to ask the VSS agent's video_understanding tool a fresh visual question about a recorded clip. Not for prior tool output, search hits, or metadata-answerable questions.
+description: Use this skill to ask the VSS agent's video_understanding tool a fresh visual question about a recorded clip. Not for prior tool output, search hits, or metadata-answerable questions.
 license: Apache-2.0
 metadata:
   version: "3.2.0"
@@ -89,13 +89,35 @@ curl -s -X POST "${VSS_AGENT_BASE_URL}/generate" \
   -d '{"input_message": "Call video_understanding tool to answer the following question about <sensor-id>: <user query>"}' | jq .
 ```
 
+### Response contract and extraction
+
+`/generate` returns a JSON object with the assistant output in `value`, for example:
+
+```json
+{"value":"<agent-think><agent-think-step ...>...</agent-think-step></agent-think>\n\n<final answer>\n\n"}
+```
+
+There is no separate clean-answer field. The consumable answer is the text in `.value` after removing any `<agent-think>...</agent-think>` block.
+
+Required handling for this skill (and any downstream caller):
+
+1. Read `.value` from the JSON response.
+2. Strip `<agent-think>...</agent-think>` sections wherever they appear.
+3. Return only the remaining final-answer text to the user.
+
+Example extraction:
+
+```bash
+curl -s -X POST "${VSS_AGENT_BASE_URL}/generate" \
+  -H "Content-Type: application/json" \
+  -d '{"input_message":"Call video_understanding tool to answer the following question about <sensor-id>: <user query>"}' \
+| jq -r '.value' \
+| python3 -c 'import re,sys; t=sys.stdin.read(); t=re.sub(r"<agent-think>.*?</agent-think>\s*", "", t, flags=re.S); print(t.strip())'
+```
+
 ---
 
 ## Cross-Reference
 
 - **vss-manage-video-io-storage** — VST storage/replay URLs so **`VIDEO_URL`** is valid for the VLM.
-- **vss-generate-video-report** — timestamped **reports** via the **VSS agent** (`/generate`); this skill is **direct VLM** for ad-hoc **video Q&A**.
-
-
-
-bump:1
+- **vss-generate-video-report** — timestamped **reports** via **Mode A (direct VLM)** or **Mode B (video-analytics incidents)**; this skill is **VSS-agent `/generate`** for ad-hoc **video Q&A**.

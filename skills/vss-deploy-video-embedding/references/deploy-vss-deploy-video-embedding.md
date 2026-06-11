@@ -2,8 +2,8 @@
 
 ## Container Image
 
-- **Image name** — `nvcr.io/nvstaging/vss-core/vss-rt-embed`. The Compose service uses `${RTVI_EMBED_IMAGE}` and `${RTVI_EMBED_TAG}` so the image and tag are overridable per environment.
-- **Tag pattern** — `<vss-release>-<image-build>` (Compose default: `3.2.0-26.05.4`). The major/minor matches the VSS release; the suffix tracks the underlying image build.
+- **Image name** — `nvcr.io/nvidia/vss-core/vss-rt-embed`. The Compose service uses `${RTVI_EMBED_IMAGE}` and `${RTVI_EMBED_TAG}` so the image and tag are overridable per environment.
+- **Tag** — published VSS release tag (Compose default: `3.2.0`). Override `RTVI_EMBED_TAG` only when pinning a different published build.
 - **Registry** — `nvcr.io`. Pulls require an authenticated session with NGC.
 - **NGC pull requirements** — `docker login nvcr.io` with `$oauthtoken` and a valid `NGC_API_KEY`. The same `NGC_API_KEY` must also be present in the container environment for model and asset access.
 - **Architecture support** — x86_64. The image is built for `linux/amd64`; aarch64 variants are not specified in the Compose service.
@@ -47,7 +47,7 @@ deploy:
 | `/tmp/triton_model_repo` | Generated Triton model repository for the configured embedding model. | Named volume (`rtvi-triton-model-repo`). | Multi-GB. | Writable by container UID/GID `1001:1001`. |
 | `/tmp/assets` | Optional asset storage when `ASSET_STORAGE_DIR` is set. | Bind mount (gated by `${ASSET_STORAGE_DIR:+...}`). | Sized by uploaded media volume. | Writable by container UID/GID `1001:1001`. |
 | `/opt/nvidia/rtvi/log/rtvi/` | Optional host-side log directory when `RTVI_EMBED_LOG_DIR` is set. | Bind mount (gated by `${RTVI_EMBED_LOG_DIR:+...}`). | Grows with log retention. | Writable by container UID/GID `1001:1001`. |
-| `/home/vst/vst_release/streamer_videos` | Shared clip storage written by upstream VST so the embedding service can read locally recorded clips. | Bind mount from `${VSS_DATA_DIR}/data_log/vst/clip_storage`. | Sized by clip retention. | Readable by container UID/GID `1001:1001`. |
+| Container clip-storage reader mount | Shared clip storage written by upstream VST so the embedding service can read locally recorded clips. | Bind mount from `${VSS_DATA_DIR}/data_log/vst/clip_storage` to the target path in `rtvi-embed-docker-compose.yml`. | Sized by clip retention. | Readable by container UID/GID `1001:1001`. |
 
 The named volumes `rtvi-hf-cache`, `rtvi-ngc-model-cache`, and `rtvi-triton-model-repo` survive `docker compose down`. They are destroyed by `docker compose down -v`, which forces a full model re-download and Triton repo rebuild on the next start.
 
@@ -68,7 +68,7 @@ The named volumes `rtvi-hf-cache`, `rtvi-ngc-model-cache`, and `rtvi-triton-mode
 | Model download fails with HTTP 429 against Hugging Face. | Anonymous Hugging Face downloads are being rate-limited while pulling `nvidia/Cosmos-Embed1-448p`. | Set `HF_TOKEN` to a valid Hugging Face token to lift the rate limit, or pre-populate the `rtvi-hf-cache` volume so first boot does not need to re-fetch the weights. |
 | Model download fails with HTTP 401/403 against NGC. | `NGC_API_KEY` is missing or invalid. | Provide a valid `NGC_API_KEY` and confirm `docker login nvcr.io` succeeded on the host. |
 | Service starts but `/v1/ready` keeps returning 503. | A peer such as Redis or Kafka was enabled but is not reachable. | Either disable the feature on the host (`ENABLE_REDIS_ERROR_MESSAGES=false`, `RTVI_EMBED_KAFKA_ENABLED=false` — the latter maps to the container's `KAFKA_ENABLED`) or fix peer reachability (`REDIS_HOST`, `HOST_IP`/`KAFKA_BOOTSTRAP_SERVERS`). |
-| Process exits with permission errors on `/opt/nvidia/rtvi/.rtvi/ngc_model_cache` or `/tmp/huggingface`. | Host-side bind mount is not writable by UID/GID `1001:1001`. | `chown -R 1001:1001` on the host bind target, or rely on the named volumes which are provisioned with correct permissions. |
+| Process exits with permission errors on `/opt/nvidia/rtvi/.rtvi/ngc_model_cache` or `/tmp/huggingface`. | Host-side bind mount is not writable by UID/GID `1001:1001`. | Run `sudo -n chown -R 1001:1001 <host-path>` or ask the host owner to run the same command; do not use `chmod 777`. Named volumes avoid this issue. |
 | GPU not visible inside the container. | NVIDIA Container Toolkit not installed or driver too old. | Install/upgrade NVIDIA Container Toolkit and matching driver, then re-pull the image and restart the service. |
 
 ## Prerequisites

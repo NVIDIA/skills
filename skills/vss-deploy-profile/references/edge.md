@@ -104,6 +104,44 @@ SKILL.md pre-flight smoke test does not install it.
 > sudo su -c 'echo performance > <VIC_DEVFREQ_PATH>/governor'
 > ```
 
+### Unified-memory GPU budget (reserve ≥ 0.2)
+<a id="unified-memory-budget"></a>
+
+On these platforms CPU, GPU, OS page cache, and every container draw from **one**
+shared pool, so a GPU-memory *fraction* — `NIM_GPU_MEM_FRACTION` / `NIM_KVCACHE_PERCENT`
+for NIM-served models (the DGX-Spark base LLM and Cosmos VLM run as NIMs), or
+`RTVI_VLLM_GPU_MEMORY_UTILIZATION` for RT-VLM (alerts / lvs / Thor) — is a slice of
+memory that is **not all free**.
+vLLM measures *free* at startup and aborts before loading the model if free is
+below what the fraction asks for (`desired = util × total`):
+
+```text
+ValueError: Free memory on device (X/124.61 GiB) on startup is less than desired
+GPU memory utilization (0.8, 99.69 GiB). Decrease GPU memory utilization …
+```
+
+which surfaces in VSS as `Engine core initialization failed` /
+`Failed to load VLM on GPU 0`.
+
+**Rule:** compute each fraction against *actual free* memory and leave **≥ 0.2 of
+total** (~20%) as reserve — `util ≤ free/total − 0.2` — and for co-resident
+services keep the **sum** of their fractions `≤ 0.8`:
+
+```bash
+# DGX Spark reports free/total via nvidia-smi (Thor/Tegra often reports N/A — see below)
+set -- $(nvidia-smi --query-gpu=memory.free,memory.total --format=csv,noheader,nounits | head -1 | tr -d ',')
+free=$1; total=$2
+awk -v f="$free" -v t="$total" 'BEGIN{u=f/t-0.2; if(u<0)u=0; printf "max util ~ %.2f  (free %d / total %d MiB; 0.2 reserve)\n", u, f, t}'
+```
+
+The conservative per-service defaults already aim for this on a clean box (each
+fraction ≈ 0.4, so two co-resident services sum to ≤ 0.8): the standalone DGX-Spark
+LLM NIM recipe below sets `NIM_GPU_MEM_FRACTION=0.4`, and `dev-profile.sh`'s
+`get_rtvi_vllm_gpu_memory_utilization()` returns `0.4` for RT-VLM. If other tenants
+are resident (so `free` is lower than the formula's value), **lower the fractions to
+fit**. If `nvidia-smi` can't read free (Thor/Tegra often reports `[N/A]`), keep the
+conservative ~0.4 and drop by `0.05` on the first `Free … less than desired` abort.
+
 ## DGX Spark - Nano 9B v2 DGX Spark NIM + local Cosmos Reason2 VLM
 
 Start the LLM as a standalone local NIM on port `30081`:

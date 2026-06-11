@@ -128,6 +128,103 @@ EOF
 sudo sysctl --system
 ```
 
+## Network addressing — HOST_IP / EXTERNAL_IP
+<a id="addressing"></a>
+
+VST and the NIMs bind *all* host interfaces under host networking (nginx
+`listen 30888`), so these vars don't bind anything — they only choose which host
+address clients **dial** (`VST_INGRESS_ENDPOINT=${HOST_IP}:30888/vst`,
+`VLM_BASE_URL=http://${HOST_IP}:…`; UI/report links use `EXTERNAL_IP`).
+
+**`HOST_IP` — the in-cluster dial address.** Must be reachable from the docker
+bridge (VLM→VST), the host-net agent, and (since `EXTERNAL_IP` inherits it) LAN
+browsers. Detect it like `dev-profile.sh`: `ip route get 1.1.1.1`, which is correct
+on bare-metal LAN **and** cloud VMs (returns the primary **private** IP). The one
+exception is a host whose **default route is a VPN/tunnel** (`gpd*`, `tun*`, `wg*`,
+`tailscale*`) — there `ip route` returns the VPN IP, which the bridge and LAN
+clients **cannot** reach. Detect that and fall back to the LAN IP:
+
+```bash
+HOST_IP=$(ip route get 1.1.1.1 | awk '/src/{for(i=1;i<=NF;i++)if($i=="src")print $(i+1)}')
+IFACE=$(ip route get 1.1.1.1  | awk '/dev/{for(i=1;i<=NF;i++)if($i=="dev")print $(i+1)}')
+case "$IFACE" in gpd*|tun*|tap*|wg*|ppp*|tailscale*|utun*)
+  echo "default route is VPN ($IFACE → $HOST_IP) — not bridge-reachable. LAN candidates:"
+  ip -4 -o addr show scope global up \
+    | awk '$2 !~ /^(gpd|tun|tap|wg|ppp|tailscale|utun|docker|br-|veth)/{print $2, $4}' ;;
+esac
+```
+
+If the VPN branch fires — or the host is multi-NIC and the right IP is ambiguous —
+**prompt the user for the LAN IP instead of guessing.** Verify the pick with the
+bridge→host probe in [`troubleshooting.md`](troubleshooting.md#vlm-500--fetch_video_async-timeouterror--bridge-nim-cant-reach-host-vst).
+
+**`EXTERNAL_IP` — the browser-facing address.** Defaults to `${HOST_IP}`
+(`dev-profile.sh` leaves `--external-ip` empty). Equal to `HOST_IP` is correct for a
+plain LAN box. Set it explicitly only when the browser path differs from the
+internal one:
+
+| Environment | `EXTERNAL_IP` |
+|---|---|
+| Plain LAN | same as `HOST_IP` (the LAN IP) |
+| Cloud VM (AWS/GCP/Azure) | the **public/elastic IP** — **not on the NIC** (provider NAT, so `ip route`/`ip addr` can't see it). Read from instance metadata, e.g. AWS IMDSv1: `curl -s --max-time 2 http://169.254.169.254/latest/meta-data/public-ipv4` (`--max-time` so it fails fast off-AWS; IMDSv2-only instances must first fetch an `X-aws-ec2-metadata-token`). **Prompt the user** to confirm the public IP and that the security group opens the port. |
+| Brev | the `…brevlab.com` secure-link domain (Step 1d / `brev.md`) |
+| Reach over a tunnel | the tunnel address (Tailscale `100.x`, cloudflared/ngrok hostname) |
+
+A private `192.168.x` / `10.x` `EXTERNAL_IP` (including a GlobalProtect VPN IP) is
+only reachable on that LAN/VPN, never the public internet — and corp VPNs usually
+block client-to-client, so a VPN IP rarely works even for VPN peers. For real remote
+access use the cloud public IP or a mesh VPN (Tailscale). **When unsure where the
+user will browse from, ask before setting `EXTERNAL_IP`.**
+
+## Firewall — Docker bridge → host services
+<a id="firewall"></a>
+
+Pick `HOST_IP` / `EXTERNAL_IP` first — see [Network addressing](#addressing).
+
+VSS runs a mixed network topology: VST and `vss-agent` use host networking, but
+the VLM/LLM NIMs run on the `mdx_default` Docker bridge. The agent hands the VLM a
+`http://$HOST_IP:30888/...` VST URL, so the bridge must reach host ports. If `ufw`
+is active it blocks the bridge subnet by default — the VLM then can't download
+clips and `video_understanding` returns HTTP 500 (`fetch_video_async TimeoutError`).
+
+Allow the Docker bridge subnets before deploying (skip if `ufw` is inactive). Use
+the specific `/16`s, **not** a broad `172.16.0.0/12` (it overlaps corporate-VPN
+ranges); **do not disable ufw**:
+
+```bash
+if sudo ufw status 2>/dev/null | grep -q "Status: active"; then
+  sudo ufw allow from 172.17.0.0/16   # docker default bridge
+  sudo ufw allow from 172.18.0.0/16   # mdx_default (first compose bridge)
+  sudo ufw reload
+fi
+```
+
+If `mdx_default` already exists and landed on a different subnet (multiple Docker
+stacks on the host), allow that one instead:
+`docker network inspect mdx_default -f '{{range .IPAM.Config}}{{.Subnet}}{{end}}'`.
+(Same step `warehouse.md` documents for Brev; applies to any ufw-active host.)
+
+**Browser access from another machine.** The bridge rule above only lets *containers*
+reach the host — it does **not** open ports to other devices. The `HAPROXY_PORT`
+ingress (default `7777`) reverse-proxies the UI, agent API, and VST, so a single
+allow covers all three:
+
+```bash
+sudo ufw allow 7777/tcp        # HAProxy ingress — fronts UI + agent + VST. Or scope to your LAN:
+# sudo ufw allow from 192.168.0.0/16 to any port 7777 proto tcp
+sudo ufw reload
+```
+
+`nvstreamer` is the exception — its port (`31000`, host-networked) is **not** behind
+the ingress, so reaching its UI / RTSP directly needs its own allow:
+
+```bash
+sudo ufw allow 31000/tcp
+sudo ufw reload
+```
+
+(Reachability still depends on `EXTERNAL_IP` — see [Network addressing](#addressing).)
+
 ## GPU Module Loading
 
 If `nvidia-smi` fails with "NVIDIA-SMI has failed" but the driver is installed, load the kernel modules:

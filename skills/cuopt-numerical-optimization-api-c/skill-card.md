@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers embedding linear programming, mixed-integer linear programming, or quadratic programming solvers in C/C++ applications using the NVIDIA cuOpt GPU-accelerated optimization library. <br>
+Developers and engineers embedding LP, MILP, or QP numerical optimization into C/C++ applications using the NVIDIA cuOpt GPU-accelerated solver. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,13 +19,13 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [examples.md](references/examples.md) <br>
+- [C API Examples (LP/MILP)](references/examples.md) <br>
 - [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
-- [cuopt-examples](https://github.com/NVIDIA/cuopt-examples) <br>
+- [cuOpt Examples Repository](https://github.com/NVIDIA/cuopt-examples) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Shell commands, Configuration instructions] <br>
+**Output Type(s):** [Code, Shell commands] <br>
 **Output Format:** [Markdown with inline C code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -37,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (positive skill-activation case) with 2 attempts per task via NVSkills-Eval 3-Tier Evaluation. <br>
+Evaluated against 4 internal evaluation tasks (positive skill-activation cases) via NVSkills-Eval with the external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -48,6 +48,7 @@ Reported benchmark dimensions: <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
 Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
 - `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
@@ -60,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+25%) |
-| Correctness | 2 | 100% (+0%) | 92% (-5%) |
-| Discoverability | 2 | 100% (+5%) | 80% (+8%) |
-| Effectiveness | 2 | 95% (-1%) | 92% (+9%) |
-| Efficiency | 2 | 93% (+13%) | 73% (+17%) |
+| Security | 4 | 100% (+0%) | 100% (+0%) |
+| Correctness | 4 | 88% (+16%) | 72% (+16%) |
+| Discoverability | 4 | 68% (+46%) | 55% (+36%) |
+| Effectiveness | 4 | 92% (+7%) | 70% (+17%) |
+| Efficiency | 4 | 66% (+48%) | 62% (+35%) |
 
 ## Skill Version(s): <br>
 26.08.00 (source: frontmatter) <br>

@@ -1,6 +1,6 @@
 # Alert Subscriptions
 
-You are a realtime alert subscription assistant. You help users create, list, and stop alert monitoring rules on cameras by translating natural language requests into Alert Bridge API calls. You use the VST API (via `vss-manage-video-io-storage` skill) to resolve sensor names to sensor IDs and RTSP stream URLs.
+Operational reference for Workflow D (Alert Bridge realtime subscriptions) on the VSS alerts profile. Covers creating, listing, and stopping alert monitoring rules on cameras by translating natural language requests into Alert Bridge API calls. Uses the VST API (via `vss-manage-video-io-storage` skill) to resolve sensor names to sensor IDs and RTSP stream URLs.
 
 ## When to Use
 
@@ -14,8 +14,13 @@ This skill is invoked as a **sub-workflow** of the parent `alerts` skill (Workfl
 - "Create an alert on parking-cam-3 for vehicle collisions"
 - "Watch sensor entrance-1 for tailgating"
 - "Alert me if someone enters restricted zone on cam-floor-2"
+- "Send me alerts for fallen boxes in camera warehouse_sample"
+- "Notify me about people loitering near the loading dock on warehouse_sample"
+- "Vehicle collisions needs an alert on warehouse_sample"
 
-**List — rule inventory:**
+> **Create vs List — a request that names a *new detection condition* to watch for is a CREATE (issue `POST /api/v1/realtime`), even when phrased as "send me alerts for &lt;condition&gt;", "notify me about &lt;condition&gt;", or "&lt;condition&gt; needs an alert on &lt;sensor&gt;".** Such phrasings set up a *new* rule — they are NOT a request to list/show existing rules and NOT a query of past incidents. Only route to **List** when the user asks to see/show/list **existing** rules with **no** new condition to add. When a sensor + condition is present, you MUST `POST` to create the rule; listing (`GET`) alone does not satisfy a create request, and an already-existing similar rule does not excuse skipping the `POST`.
+
+**List — rule inventory (show EXISTING rules; no new condition):**
 - "Show me all realtime alert rules that are currently running"
 - "What realtime alerts do we have set up right now?"
 - "List active rules on warehouse-dock-1"
@@ -145,6 +150,8 @@ From the user's prompt, generate a short `snake_case` tag that summarizes the al
 - Lowercase, words separated by underscores
 - 2-4 words maximum
 - Descriptive of the specific monitoring condition
+- **Derive it from the detection condition in *this* request only.** Map the *condition phrase*, not the sensor name, the sentence subject, or a location: "anyone without a safety vest" → `ppe_vest_violation` (NOT `box_dropped`), "smoke detection" → `smoke_detection` (NOT `camera_02`), "people loitering near the loading dock" → `people_loitering` (NOT `loading_dock`).
+- **Never reuse an `alert_type` from an existing rule or a previous request.** If you list existing rules first (e.g. to check for duplicates), ignore their tags when deriving this one — a leftover `fallen_boxes`/`box_dropped` rule from an earlier request must not influence a safety-vest request.
 
 **Examples:**
 
@@ -178,6 +185,15 @@ curl -s -X POST "http://${HOST_IP}:9080/api/v1/realtime" \
     "chunk_overlap_duration": 5
   }' | jq .
 ```
+
+**Send this canonical payload consistently.** Use exactly these field names
+and the fixed defaults shown (`system_prompt: "Answer yes or no"`,
+`chunk_duration: 30`, `chunk_overlap_duration: 5`) on every create — do not
+improvise extra fields, rename fields, or vary the defaults between requests.
+Only `live_stream_url`, `alert_type`, and `prompt` are strictly required by the
+API; the three sensor/`system_prompt`/chunk fields above are skill conventions
+that keep created rules uniform and the behavior reproducible. Omit `model` (the
+service falls back to its configured default).
 
 **Payload field reference:**
 
@@ -260,7 +276,7 @@ For each rule remaining after filtering, determine the human-readable sensor nam
 
 1. If the rule already contains a non-null `sensor_name` field, use it directly.
 2. Otherwise, fall back to reverse-resolving: fetch all streams via `GET /sensor/streams` (returns all streams grouped by sensorId), find the stream whose `url` matches the rule's `live_stream_url`, and use the corresponding sensor's `name`.
-3. If neither approach yields a name, display the `live_stream_url` as-is (fallback).
+3. If neither approach yields a name, show the rule's `sensor_id` (or the literal `(unresolved sensor)`) — **never** print the raw `live_stream_url` / `rtsp://` URL to the user.
 
 ---
 
@@ -275,6 +291,8 @@ Display one line per rule with these fields:
 | **Prompt** | `prompt` from the rule (truncate if longer than ~80 chars) |
 | **Created** | `created_at` from the rule |
 | **Rule ID** | `id` from the rule |
+
+> **Never expose raw RTSP / `live_stream_url` values in your reply.** The user must see only the reverse-resolved **sensor name** (or the `sensor_id` fallback) — do NOT print `rtsp://...` URLs, and do NOT dump the raw rule JSON. Show only human-readable fields: sensor name, tag, prompt, created time, rule ID. Leaking an `rtsp://` URL is an error.
 
 **Empty list is a success case.** If no rules are returned (or all are filtered out), reply:
 > "No realtime alert rules are currently running."
@@ -293,6 +311,8 @@ Do not treat an empty list as an error.
 | "yes" (after a confirmation question) | **Confirmation** — triggers deletion | Call DELETE -> report result |
 
 "Stop X" and "yes" are NOT the same intent. "Stop X" always produces a question. Only "yes" produces a deletion. Even if you already know the rule ID from conversation context, "Stop X" still produces only a question.
+
+> **This confirmation is a user-facing safety gate, not a setup/deploy confirmation.** It ALWAYS applies — including under autonomous, pre-authorized, or non-interactive/CI execution. A "run autonomously / do not ask for confirmation" instruction authorizes deploy and setup actions only; it does NOT authorize you to skip this stop/delete confirmation. When there is no interactive user to answer (e.g. an eval harness), reply with the yes/no confirmation question (stating the rule ID and sensor) and STOP — do not issue the `DELETE`.
 
 ### On "Stop" Request — Find Rule and Ask Confirmation
 

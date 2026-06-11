@@ -1,30 +1,36 @@
 ---
 name: vss-deploy-detection-tracking-3d
 description: >
-  Deploy and operate RTVI-CV-3D / MV3DT multi-camera 3D tracking: per-camera
-  DeepStream perception plus BEV Fusion over calibrated cameras. Supports the
-  bundled sample dataset, custom video files, and RTSP streams, and chains to
-  `vss-generate-video-calibration` when calibration is missing. Use
-  `vss-deploy-profile` for the full warehouse blueprint and
+  Deploy and operate the RTVI-CV-3D microservice as MV3DT (`MODE=mv3dt`):
+  per-camera DeepStream perception plus BEV Fusion over calibrated cameras.
+  Supports the bundled sample dataset, custom video files, and RTSP streams,
+  and chains to `vss-generate-video-calibration` when calibration is missing.
+  Use `vss-deploy-profile` for the full warehouse blueprint and
   `vss-deploy-detection-tracking-2d` for single-camera 2D detection.
 license: Apache-2.0
 metadata:
   version: "3.2.0"
   github-url: "https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization"
-  tags: "nvidia blueprint mv3dt detection tracking 3d warehouse"
+  tags: "nvidia blueprint rtvi-cv-3d mv3dt detection tracking 3d warehouse"
 ---
 
 ## Purpose
 
-Deploy and operate the RTVI-CV-3D / MV3DT stack — per-camera DeepStream perception plus BEV Fusion over multiple calibrated cameras — on the bundled sample dataset, custom videos, or live RTSP, without the full warehouse agent / LLM / VLM stack.
+Deploy and operate the RTVI-CV-3D microservice as MV3DT (`MODE=mv3dt`) — per-camera DeepStream perception plus BEV Fusion over multiple calibrated cameras — on the bundled sample dataset, custom videos, or live RTSP, without the full warehouse agent / LLM / VLM stack.
 
 ## Instructions
 
 Work top-to-bottom: answer the routing questions (Q0–Q3) under [Routing](#routing), then follow the reference for the chosen path. Detailed step-by-step procedures live in `references/` (deploy, calibration chain, camera configuration, verification, teardown, troubleshooting).
 
-# VSS Deploy Detection & Tracking — 3D (RTVI-CV-3D)
+## Examples
 
-Bring up the RTVI-CV-3D stack from the warehouse blueprint: per-camera DeepStream perception (`vss-rtvi-cv-mv3dt`) + BEV Fusion (`vss-rtvi-cv-bev-fusion`) + mosquitto MQTT bus + broker + VST sensor stack — without the agent / LLM / VLM stack that comes with the full warehouse blueprint.
+- Enable multi-camera tracking on the sample dataset.
+- Deploy RTVI-CV-3D on my videos here: `<path/to/videos>`.
+- Run MV3DT on RTSP streams after calibration.
+
+# VSS Deploy Detection & Tracking — 3D (RTVI-CV-3D / MV3DT)
+
+Bring up the RTVI-CV-3D microservice as the MV3DT stack (`MODE=mv3dt`) from the warehouse blueprint: per-camera DeepStream perception (`vss-rtvi-cv-mv3dt`) + BEV Fusion (`vss-rtvi-cv-bev-fusion`) + mosquitto MQTT bus + broker + VST sensor stack — without the agent / LLM / VLM stack that comes with the full warehouse blueprint.
 
 The actual compose machinery lives in `deploy/docker/industry-profiles/warehouse-operations/warehouse-mv3dt-app/`. This skill drives the env overrides, calibration chain, and verification.
 
@@ -46,11 +52,12 @@ Default to **extended** unless the user explicitly asks for minimal. Extended de
 ### Q1 — Data source
 
 Ask this unless the source is explicit in the user's first message. A bare request
-like "deploy rtvi-cv-3d" does **not** imply `sample`.
+like "deploy rtvi-cv-3d" routes to this MV3DT skill (`MODE=mv3dt`), but does
+**not** imply `sample`.
 
 - **sample** — the bundled 4-camera synthetic dataset (`warehouse-4cams-20mx20m-synthetic`). Calibration ships in-tree; no AMC run needed.
 - **videos** — the user has local video files (any `*.mp4` named after their cameras). Standalone AMC (`auto_calib` profile) will run if calibration is missing.
-- **rtsp** — the user has live RTSP URLs. Calibration via VIOS-driven AMC.
+- **rtsp** — the user has live RTSP URLs. Calibration via VIOS-driven AMC; final deploy also needs a Sensor Info File (`camera_info.json`) with those RTSP URLs.
 
 ### Q2 — Calibration coverage (skip for `sample`)
 
@@ -67,7 +74,7 @@ test -f "${CAL_DIR}/calibration.json" \
   && ls "${CAL_DIR}/camInfo/"*.{yml,yaml} 2>/dev/null
 ```
 
-If the user supplied a calibration path themselves, validate that path instead — don't recompute. See `configure-cameras.md` for the authoritative camera-count discovery (parses `calibration.json`).
+If the user supplied a calibration path themselves, validate that path instead — don't recompute. See `configure-cameras.md` for camera-name normalization and authoritative camera-count discovery (parses `calibration.json`).
 
 ### Q3 — Detector + dataset slug (only when Q2 triggers AMC)
 
@@ -78,15 +85,15 @@ If the user supplied a calibration path themselves, validate that path instead �
 
 | Q1 | Q2 result | Path |
 |---|---|---|
-| `sample` | (cal ships in-tree) | [`references/deploy-rtvi-cv-3d-stack.md`](references/deploy-rtvi-cv-3d-stack.md) directly |
-| `videos` | cal present | [`references/deploy-rtvi-cv-3d-stack.md`](references/deploy-rtvi-cv-3d-stack.md) directly |
+| `sample` | (cal ships in-tree and already normalized) | [`references/deploy-rtvi-cv-3d-stack.md`](references/deploy-rtvi-cv-3d-stack.md) directly |
+| `videos` | cal present | [`references/configure-cameras.md`](references/configure-cameras.md) → [`references/deploy-rtvi-cv-3d-stack.md`](references/deploy-rtvi-cv-3d-stack.md) |
 | `videos` | cal missing | [`references/calibration-workflow.md`](references/calibration-workflow.md) (videos mode) → [`references/configure-cameras.md`](references/configure-cameras.md) → [`references/deploy-rtvi-cv-3d-stack.md`](references/deploy-rtvi-cv-3d-stack.md) |
-| `rtsp` | cal present | [`references/deploy-rtvi-cv-3d-stack.md`](references/deploy-rtvi-cv-3d-stack.md) directly |
+| `rtsp` | cal present | [`references/configure-cameras.md`](references/configure-cameras.md) → [`references/deploy-rtvi-cv-3d-stack.md`](references/deploy-rtvi-cv-3d-stack.md) |
 | `rtsp` | cal missing | [`references/calibration-workflow.md`](references/calibration-workflow.md) (rtsp mode) → [`references/configure-cameras.md`](references/configure-cameras.md) → [`references/deploy-rtvi-cv-3d-stack.md`](references/deploy-rtvi-cv-3d-stack.md) |
 
 Every path converges on [`references/verify-and-view.md`](references/verify-and-view.md) once `up -d` completes. [`references/troubleshooting.md`](references/troubleshooting.md) and [`references/teardown.md`](references/teardown.md) are linked but off the happy path.
 
-**Disambiguation rule.** If the user mentions "warehouse" without "mv3dt" / "3D tracking" / "multi-view", consider routing to [`../vss-deploy-profile/references/warehouse.md`](../vss-deploy-profile/references/warehouse.md) instead — that's the full warehouse blueprint (2D / 3D / MV3DT + agents). This skill is for **MV3DT only** without the agent stack / LLM / VLM.
+**Disambiguation rule.** In this skill, "RTVI-CV-3D" means the MV3DT microservice deployment and uses `MODE=mv3dt`. Route to [`../vss-deploy-profile/references/warehouse.md`](../vss-deploy-profile/references/warehouse.md) only when the user asks for the full warehouse blueprint, Sparse4D, `MODE=3d`, or `warehouse-3d-app`. This skill is for **MV3DT only** without the agent stack / LLM / VLM.
 
 ## Prerequisites
 
@@ -96,7 +103,7 @@ Locate `video-search-and-summarization/` on disk. All compose commands run from 
 
 ### 2. NGC CLI + key
 
-`$NGC_CLI_API_KEY` must be set. Both `nvidia/vss-core/*` and `nvidia/vss-core/*` are valid orgs depending on which the user's key resolves to. See `vss-deploy-profile/references/ngc.md` for setup if missing.
+`$NGC_CLI_API_KEY` must be set and must have access to `nvidia/vss-core/*` images. See `vss-deploy-profile/references/ngc.md` for setup if missing.
 
 If the user previously ran `ngc config set` but `$NGC_CLI_API_KEY` isn't exported in this shell, the key is already on disk:
 
@@ -109,22 +116,21 @@ Make sure the key value also lands in `industry-profiles/warehouse-operations/.e
 
 ### 3. `HARDWARE_PROFILE` slug
 
-> The canonical `HARDWARE_PROFILE` keys live in `industry-profiles/warehouse-operations/blueprint-configurator/blueprint_config.yml` (lines 592–642). Use the slug from the table below — e.g. on an RTX A6000 (Ampere) host the value is `RTXA6000`.
+> The public MV3DT supported stream counts are listed in the Warehouse Quickstart Guide under "MV3DT Vision AI Profile Supported Deployment Options." Use the matching `HARDWARE_PROFILE` slug below.
 
 Pick from `nvidia-smi --query-gpu=name --format=csv,noheader`:
 
-| GPU name | `HARDWARE_PROFILE` | MV3DT `max_streams_supported` |
+| GPU name | `HARDWARE_PROFILE` | MV3DT supported streams |
 |---|---|---|
 | RTX PRO 6000 Blackwell | `RTXPRO6000BW` | 18 |
 | H100 (NVL, SXM HBM3) | `H100` | 13 |
-| RTX A6000 Ada Generation | `RTXA6000ADA` | 6 |
 | L40S | `L40S` | 7 |
-| L4 | `L4` | 2 |
-| RTX A6000 (Ampere) | `RTXA6000` | 2 |
-| IGX Thor | `IGX-THOR` | 7 |
+| IGX Thor | `IGX-THOR` | 4 |
 | DGX Spark | `DGX-SPARK` | 4 |
 
-**The per-GPU MV3DT cap is enforced at deploy time.** `vss-configurator-mv3dt` computes `final_stream_count = min(NUM_STREAMS, max_streams_supported)` and applies a `keep_count` file-management op against `${VSS_DATA_DIR}/videos/${SAMPLE_VIDEO_DATASET}/` so only `final_stream_count` `.mp4` files remain (sorted lexicographically, last N kept). If your GPU's `mv3dt` cap (above table) is below your camera count, perception / `mdx-raw` / `mdx-bev` run with the cap's worth of streams. Either pick a GPU with a higher cap or surface the cap explicitly to the user so they're aware which streams will be processed.
+If the user's GPU is not listed here, check `industry-profiles/warehouse-operations/.env` for available `HARDWARE_PROFILE` values, then confirm the matching profile exists in `blueprint-configurator/blueprint_config.yml` before using it. Do not infer a stream count from the slug alone.
+
+**The per-GPU MV3DT cap is enforced at deploy time.** `vss-configurator-mv3dt` computes `final_stream_count = min(NUM_STREAMS, max_streams_supported)` and applies a `keep_count` file-management op against `${VSS_DATA_DIR}/videos/${SAMPLE_VIDEO_DATASET}/` so only `final_stream_count` `.mp4` files remain (sorted lexicographically, last N kept). If your GPU's MV3DT supported stream count (above table) is below your camera count, perception / `mdx-raw` / `mdx-bev` run with the supported stream count. Either pick a GPU with a higher supported stream count or surface the cap explicitly to the user so they're aware which streams will be processed.
 
 ### 4. App data on disk
 
@@ -151,9 +157,9 @@ test -d "${DATA_DIR}/videos/${DATASET}" \
 ls "${DATA_DIR}/videos/${DATASET}/"*.mp4 2>/dev/null | wc -l
 
 # Ensure every per-service subdir under data_log/ exists. kafka / elasticsearch /
-# redis / postgres each run as a different non-root UID against these bind mounts —
-# without write access the daemons exit with "Permission denied" (kafka cluster_id),
-# "AccessDeniedException" (ES), or "Can't open the log file" (redis).
+# redis / postgres and the video-analytics API upload path (`/web-api-app/files`)
+# run as non-root UIDs against these bind mounts. Without write access the daemons
+# or calibration/image import can fail with permission errors.
 mkdir -p \
   "${DATA_DIR}/data_log/analytics_cache" \
   "${DATA_DIR}/data_log/calibration_toolkit" \
@@ -161,7 +167,8 @@ mkdir -p \
   "${DATA_DIR}/data_log/elastic/logs" \
   "${DATA_DIR}/data_log/kafka" \
   "${DATA_DIR}/data_log/redis/data" \
-  "${DATA_DIR}/data_log/redis/log"
+  "${DATA_DIR}/data_log/redis/log" \
+  "${DATA_DIR}/data_log/vss_video_analytics_api"
 
 # Grant write access to the specific container UIDs only — scoped ACLs, NOT 777 and
 # NOT chown. UIDs (per data-directory.md): postgres=70, redis=999, elasticsearch / VST /
@@ -177,7 +184,7 @@ setfacl -R -d -m "$ACL" "${DATA_DIR}/data_log"
 > Elasticsearch, since they re-own their dirs on first start). Prefer this for agent-driven runs and
 > shared hosts. The canonical [`../vss-deploy-profile/references/data-directory.md`](../vss-deploy-profile/references/data-directory.md)
 > documents the broad `chmod -R 777` and the per-container UID table; this skill uses the scoped-ACL
-> equivalent instead. **Confirm with the user (`AskUserQuestion`) before changing host permissions.**
+> equivalent instead. **Ask the user for confirmation before changing host permissions.**
 >
 > Requires a POSIX-ACL filesystem (ext4 / xfs — the default) and the `acl` package (`setfacl`). If a
 > daemon still logs a permission error after deploy, find its UID
@@ -217,16 +224,16 @@ Before destructive recovery (`docker compose down -v`, clearing `data_log`, dele
 SKILL.md (this file — Q0/Q1/Q2/Q3 routing)
   └─ if cal missing ─> calibration-workflow.md
   │                     └─ chains to vss-generate-video-calibration (deploy + drive API)
-  │                     └─ fetches /v1/result/{project_id}/mv3dt_result?result_type=amc
+  │                     └─ fetches /v1/result/{project_id}/mv3dt_result?result_type=amc (plus vggt when refinement is enabled)
   │                     └─ lands calibration files at warehouse-mv3dt-app/calibration/sample-data/<slug>/
-  ├─> configure-cameras.md (NUM_STREAMS sync, VST sensor trim)
+  ├─> configure-cameras.md (camera-name normalization, NUM_STREAMS sync, VST sensor trim)
   └─> deploy-rtvi-cv-3d-stack.md (compose up with bp_wh_kafka_mv3dt + extended/minimal)
         └─> verify-and-view.md (FPS, fusion_ready, mdx-bev, VST video wall + WebRTC checks)
 ```
 
 ## Related Skills
 
-- [`vss-generate-video-calibration`](../vss-generate-video-calibration/SKILL.md) — the AMC skill. Owns the `auto_calib` compose profile, calibration API, and the `/v1/result/.../mv3dt_result` export hook this skill consumes. `calibration-workflow.md` chains into it.
+- [`vss-generate-video-calibration`](../vss-generate-video-calibration/SKILL.md) — the AMC skill. Owns AMC deployment, RTSP capture, calibration API, and the `/v1/result/.../mv3dt_result` export hook this skill consumes. `calibration-workflow.md` chains into it.
 - [`vss-deploy-profile`](../vss-deploy-profile/SKILL.md) — cross-profile umbrella. Use that instead when the user wants the **full warehouse blueprint** (with agents / LLM / VLM), not just MV3DT.
 - [`vss-manage-video-io-storage`](../vss-manage-video-io-storage/SKILL.md) — VIOS / VST API skill. Useful for the VST video wall (overlay viz) and for sensor management referenced in `configure-cameras.md`.
 
