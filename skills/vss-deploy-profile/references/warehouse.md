@@ -737,7 +737,7 @@ For `bp_wh`, **always ask explicitly** — do not default to `local`:
 
 > "How should the LLM be deployed?
 > - **local** — LLM NIM on its own GPU (`LLM_DEVICE_ID`, default `2`). Requires a third GPU.
-> - **remote** — point at an external LLM endpoint via `LLM_BASE_URL` (e.g. `https://integrate.api.nvidia.com/v1`). No LLM NIM deployed. Requires `NVIDIA_API_KEY`.
+> - **remote** — point at an external LLM endpoint via `LLM_BASE_URL` (e.g. `https://integrate.api.nvidia.com/v1`). No LLM NIM deployed. Requires `NVIDIA_API_KEY` — log in to the [NVIDIA NIM API catalog](https://build.nvidia.com) and get a NIM Catalog API key.
 > - **none** — disable LLM entirely."
 
 `vst-rtvi-vlm` (RTVI VLM) is **always** deployed locally for `bp_wh_2d`.
