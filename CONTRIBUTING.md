@@ -11,12 +11,13 @@ For changes to the catalog itself (fixing links, adding a new product listing), 
 
 ## Recommended Skill Directory Path
 
-When publishing skills in your product repo, use one of these canonical paths so agents can discover them consistently:
+When publishing skills in a product repo, keep the source of truth in `skills/` at the repo root. This is the recommended default for product-owned or OSS skills, where skills are a first-class artifact.
 
-- **`.agents/skills/`** — recommended default; agent-agnostic (matches the [agentskills.io](https://agentskills.io/specification) spec; recognized by Claude Code, Cursor, Codex, Windsurf, and other compatible agents).
-- **`skills/`** at repo root — acceptable for OSS product repos where skills are a first-class product artifact.
+Use `.agents/skills/` for installed skills that agents discover at runtime, or for repos that are intentionally structured as agent-readable skills packs.
 
-Avoid agent-specific paths (`.claude/skills/`, `.codex/skills/`, `.cursor/skills/`) for new entries — they create duplication. Existing products on those paths can keep them; `components.yml` handles per-repo paths via the `skills[].path` field.
+Avoid agent-specific paths in the repo (`.claude/skills/`, `.codex/skills/`, `.cursor/skills/`) for new entries — they create duplication. Existing products on those paths can keep them; `components.yml` handles per-repo paths via the `skills[].path` field.
+
+At install time, your tooling or packaging can copy or symlink from `skills/` into the appropriate agent discovery locations (for example `.agents/skills/`, `.claude/skills/`, `.codex/skills/`) as required by each tool.
 
 ## IP Review and License (External Skills)
 
