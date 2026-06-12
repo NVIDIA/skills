@@ -31,7 +31,7 @@ import json
 import os
 import subprocess
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 SKILLS_DIR = Path("skills")
 SIG_NAME = "skill.oms.sig"
@@ -57,15 +57,16 @@ def all_skill_dirs() -> list[Path]:
     return sorted(d for d in SKILLS_DIR.iterdir() if d.is_dir())
 
 
-def signed_manifest(sig_path: Path) -> tuple[list[dict], list[str]]:
-    """Decode the DSSE/in-toto payload and return resources plus ignored paths."""
+def signed_manifest(sig_path: Path) -> tuple[list[dict], list[str], bool]:
+    """Decode the DSSE/in-toto payload and return resources plus path policy."""
     bundle = json.loads(sig_path.read_text())
     payload = base64.b64decode(bundle["dsseEnvelope"]["payload"])
     statement = json.loads(payload)
     predicate = statement["predicate"]
     serialization = predicate.get("serialization", {})
     ignore_paths = serialization.get("ignore_paths", [])
-    return predicate["resources"], ignore_paths
+    allow_symlinks = bool(serialization.get("allow_symlinks", False))
+    return predicate["resources"], ignore_paths, allow_symlinks
 
 
 def actual_skill_files(skill_dir: Path) -> list[str]:
@@ -85,6 +86,34 @@ def is_ignored(path: str, ignore_paths: list[str]) -> bool:
     return False
 
 
+def safe_resource_target(
+    skill_dir: Path, name: object, allow_symlinks: bool,
+) -> tuple[Path | None, str | None]:
+    """Return a checked on-disk target for a signed resource name."""
+    if not isinstance(name, str):
+        return None, f"{skill_dir}/{name}: INVALID PATH — resource name is not a string"
+    path = PurePosixPath(name)
+    if (
+        name in ("", ".")
+        or path.is_absolute()
+        or ".." in path.parts
+        or path.as_posix() != name
+    ):
+        return None, f"{skill_dir}/{name}: INVALID PATH — resource name must be normalized and relative"
+
+    target = skill_dir / name
+    root = skill_dir.resolve()
+    try:
+        resolved = target.resolve(strict=target.exists())
+        resolved.relative_to(root)
+    except (OSError, RuntimeError, ValueError):
+        return None, f"{skill_dir}/{name}: INVALID PATH — resource resolves outside skill directory"
+
+    if target.is_symlink() and not allow_symlinks:
+        return None, f"{skill_dir}/{name}: INVALID PATH — signature does not allow symlinks"
+    return target, None
+
+
 def verify_skill(skill_dir: Path) -> list[str]:
     """Return a list of human-readable problems (empty == content matches)."""
     sig = skill_dir / SIG_NAME
@@ -93,7 +122,7 @@ def verify_skill(skill_dir: Path) -> list[str]:
         # presence). Surface it as a note, but don't fail the integrity check.
         return []
     try:
-        resources, ignore_paths = signed_manifest(sig)
+        resources, ignore_paths, allow_symlinks = signed_manifest(sig)
     except Exception as exc:  # malformed bundle is itself a real problem
         return [f"{skill_dir}/{SIG_NAME}: could not parse signature bundle: {exc}"]
 
@@ -101,9 +130,12 @@ def verify_skill(skill_dir: Path) -> list[str]:
     signed_names: set[str] = set()
     for res in resources:
         name = res["name"]
+        target, path_problem = safe_resource_target(skill_dir, name, allow_symlinks)
+        if path_problem:
+            problems.append(path_problem)
+            continue
         signed_names.add(name)
         want = res["digest"]
-        target = skill_dir / name
         if not target.is_file():
             problems.append(f"{skill_dir}/{name}: MISSING — listed in signature, absent on disk")
             continue
