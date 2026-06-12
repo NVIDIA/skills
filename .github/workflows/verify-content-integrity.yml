@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# Verify that each skill's files still match its signed manifest.
+#
+# A skill.oms.sig is a Sigstore bundle wrapping a DSSE/in-toto statement that
+# lists every signed file and its sha256 digest. Checking that a signature is
+# *present* and *genuine* does NOT prove the files still match it — a skill can
+# carry a real signature while its content has drifted (e.g. a team signs an
+# early commit, keeps editing, and the sync picks up later content with the
+# stale signature). This check recomputes each signed file's hash and compares
+# it to the manifest, failing on any mismatch or missing file.
+#
+# On a pull request it checks only the skills changed in the PR (so it catches
+# drift being introduced without blocking on unrelated pre-existing state). On
+# a schedule / manual run it checks the whole catalog as a safety net for
+# drift already on main.
+
+name: Verify Content Integrity
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  schedule:
+    # Daily full-catalog sweep (07:17 UTC). Surfaces pre-existing drift.
+    - cron: "17 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  content-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Full history so the PR diff (base...head) can be computed.
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Verify content matches signatures
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 .github/scripts/verify_content_integrity.py
