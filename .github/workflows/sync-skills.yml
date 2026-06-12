@@ -461,6 +461,19 @@ jobs:
             echo "Resolved $resolved/$total contacts."
           fi
 
+      - name: Snapshot existing drop-tracker state
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Save the pre-update issue body so "Ping skill owners" can
+          # determine which drops are new this run vs already tracked.
+          # Writes {} on any failure so downstream steps degrade gracefully.
+          gh issue list --label missing-compliance --state open \
+            --json number,body --jq '.[0] // {}' --limit 1 \
+            > /tmp/pre-update-tracker.json 2>/dev/null \
+            || echo '{}' > /tmp/pre-update-tracker.json
+
       - name: Track dropped skills
         continue-on-error: true
         env:
@@ -642,6 +655,62 @@ jobs:
               [ -n "$a" ] && (gh issue edit "$new_num" --add-assignee "$a" || echo "  warn: could not assign '$a' to issue #$new_num")
             done
           fi
+
+      - name: Ping skill owners for new drops
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          dropped=/tmp/dropped-skills.txt
+          contacts=/tmp/skill-contacts.txt
+
+          # Nothing to do if there are no drops or no resolved contacts.
+          [ -s "$dropped" ]  || exit 0
+          [ -s "$contacts" ] || exit 0
+
+          # Pre-update body tells us which skills were already in the issue
+          # before this run. Only comment for first-time drops so owners
+          # get one notification per incident, not one per sync cycle.
+          pre_body=$(jq -r '.body // ""' /tmp/pre-update-tracker.json 2>/dev/null || true)
+
+          # Get the current issue number (Track step just created/updated it).
+          issue_num=$(gh issue list --label missing-compliance --state open \
+                        --json number --jq '.[0].number // empty' --limit 1)
+          [ -n "$issue_num" ] || exit 0
+
+          new_lines=""
+          while IFS='|' read -r product dir reason; do
+            # Orphan product dirs have no source skill — skip.
+            case "$reason" in orphan:*) continue ;; esac
+
+            # Already tracked in a prior run — skip to avoid repeat pings.
+            if printf '%s' "$pre_body" | grep -qF "\`$dir\`"; then
+              continue
+            fi
+
+            # Look up the resolved contact from "Resolve skill contacts".
+            cat_dir=$(basename "$dir")
+            contact=$(awk -F'|' -v d="$cat_dir" '$1==d {print $2; exit}' "$contacts")
+
+            line="- \`$dir\` — ${reason#*: }"
+            [ -n "$contact" ] && line="$line (cc: $contact)"
+            new_lines="${new_lines}${line}"$'\n'
+          done < "$dropped"
+
+          [ -n "$new_lines" ] || exit 0
+
+          ping_body=/tmp/ping-comment-body.md
+          {
+            echo "### New skill drops this sync run — action required"
+            echo ""
+            echo "The following skills were dropped or reverted for the **first time** in this sync run:"
+            echo ""
+            printf '%s\n' "$new_lines"
+            echo "**How to fix:** comment \`/nvskills-ci\` on a follow-up PR in the source repo after updating the skill content. The next sync will pick up the refreshed \`skill.oms.sig\` automatically."
+          } > "$ping_body"
+          gh issue comment "$issue_num" --body-file "$ping_body"
+          echo "Posted owner-ping comment on issue #$issue_num"
 
       - name: Rebuild plugin catalog
         run: |
