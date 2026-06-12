@@ -15,7 +15,7 @@ When publishing skills in a product repo, keep the source of truth in `skills/` 
 
 Use `.agents/skills/` for installed skills that agents discover at runtime, or for repos that are intentionally structured as agent-readable skills packs.
 
-Avoid agent-specific paths in the repo (`.claude/skills/`, `.codex/skills/`, `.cursor/skills/`) for new entries — they create duplication. Existing products on those paths can keep them; `components.yml` handles per-repo paths via the `skills[].path` field.
+Avoid agent-specific paths in the repo (`.claude/skills/`, `.codex/skills/`, `.cursor/skills/`) for new entries — they create duplication. Existing products on those paths can keep them; `components.d/<slug>.yml` handles per-repo paths via the `skills[].path` field.
 
 At install time, your tooling or packaging can copy or symlink from `skills/` into the appropriate agent discovery locations (for example `.agents/skills/`, `.claude/skills/`, `.codex/skills/`) as required by each tool.
 
