@@ -537,7 +537,7 @@ class _AIClient:
                 {"role": "system", "content": system},
                 {
                     "role": "user",
-                    "content": json.dumps(user, ensure_ascii=False),
+                    "content": json.dumps(user, ensure_ascii=False, default=str),
                 },
             ],
             "max_tokens": 512,

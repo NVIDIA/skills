@@ -88,14 +88,16 @@ jobs:
 
       - name: Run generator
         id: generate
+        continue-on-error: true
         env:
           INFERENCE_API_KEY: ${{ secrets.INFERENCE_API_KEY }}
           INFERENCE_API_URL: ${{ vars.INFERENCE_API_URL }}
           INFERENCE_MODEL: ${{ vars.INFERENCE_MODEL }}
         run: |
-          set -o pipefail
-          python3 .github/scripts/marketplace/generate-skill-metadata.py 2>&1 | tee /tmp/generator.log
-          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+          rc=0
+          python3 .github/scripts/marketplace/generate-skill-metadata.py 2>&1 | tee /tmp/generator.log || rc=$?
+          echo "exit_code=${rc}" >> "$GITHUB_OUTPUT"
+          exit ${rc}
 
       # ---- Failure path: open or update a tracking issue --------------
       - name: Open or update validation issue
