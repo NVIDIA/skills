@@ -12,7 +12,8 @@ A skill can therefore carry a perfectly genuine signature while its content
 has drifted — e.g. a team signs commit 1, makes more commits, and the sync
 picks up a later content with the stale signature. This script closes that
 gap: for each signed file it recomputes the sha256 on disk and compares it to
-the signed digest, failing on any mismatch or missing file.
+the signed digest, then walks the skill directory and fails on any unsigned
+extra file unless the signature metadata explicitly ignores it.
 
 Scope:
   * pull_request  -> only the skills changed in the PR (fast; catches drift
@@ -56,12 +57,32 @@ def all_skill_dirs() -> list[Path]:
     return sorted(d for d in SKILLS_DIR.iterdir() if d.is_dir())
 
 
-def signed_resources(sig_path: Path) -> list[dict]:
-    """Decode the DSSE/in-toto payload and return its resource list."""
+def signed_manifest(sig_path: Path) -> tuple[list[dict], list[str]]:
+    """Decode the DSSE/in-toto payload and return resources plus ignored paths."""
     bundle = json.loads(sig_path.read_text())
     payload = base64.b64decode(bundle["dsseEnvelope"]["payload"])
     statement = json.loads(payload)
-    return statement["predicate"]["resources"]
+    predicate = statement["predicate"]
+    serialization = predicate.get("serialization", {})
+    ignore_paths = serialization.get("ignore_paths", [])
+    return predicate["resources"], ignore_paths
+
+
+def actual_skill_files(skill_dir: Path) -> list[str]:
+    """Return all file-like paths in the skill directory, relative to its root."""
+    files: list[str] = []
+    for path in sorted(skill_dir.rglob("*")):
+        if path.is_file() or path.is_symlink():
+            files.append(path.relative_to(skill_dir).as_posix())
+    return files
+
+
+def is_ignored(path: str, ignore_paths: list[str]) -> bool:
+    for ignored in ignore_paths:
+        ignored = ignored.strip("/")
+        if path == ignored or path.startswith(f"{ignored}/"):
+            return True
+    return False
 
 
 def verify_skill(skill_dir: Path) -> list[str]:
@@ -72,13 +93,15 @@ def verify_skill(skill_dir: Path) -> list[str]:
         # presence). Surface it as a note, but don't fail the integrity check.
         return []
     try:
-        resources = signed_resources(sig)
+        resources, ignore_paths = signed_manifest(sig)
     except Exception as exc:  # malformed bundle is itself a real problem
         return [f"{skill_dir}/{SIG_NAME}: could not parse signature bundle: {exc}"]
 
     problems: list[str] = []
+    signed_names: set[str] = set()
     for res in resources:
         name = res["name"]
+        signed_names.add(name)
         want = res["digest"]
         target = skill_dir / name
         if not target.is_file():
@@ -89,6 +112,12 @@ def verify_skill(skill_dir: Path) -> list[str]:
             problems.append(
                 f"{skill_dir}/{name}: HASH MISMATCH — content does not match signature"
             )
+    for name in actual_skill_files(skill_dir):
+        if name == SIG_NAME or name in signed_names or is_ignored(name, ignore_paths):
+            continue
+        problems.append(
+            f"{skill_dir}/{name}: UNSIGNED EXTRA — present on disk, absent from signature"
+        )
     return problems
 
 
@@ -136,9 +165,10 @@ def main() -> int:
         for p in problems:
             print(f"  - {p}")
         print(
-            "\nThese files no longer match what their signature signed. The skill "
-            "owner must re-run the signing pipeline so content and skill.oms.sig "
-            "are consistent, then re-sync. See CONTRIBUTING.md."
+            "\nThese files are missing, modified, or not covered by what their "
+            "signature signed. The skill owner must re-run the signing pipeline "
+            "so content and skill.oms.sig are consistent, then re-sync. See "
+            "CONTRIBUTING.md."
         )
         return 1
 
