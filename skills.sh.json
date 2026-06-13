@@ -31,6 +31,10 @@
       "title": "Physical AI",
       "description": "Build and validate AI workflows that interact with the physical world, including robotics, autonomy, simulation, synthetic data, and embodied AI systems.",
       "skills": [
+        "hsb-app",
+        "hsb-flash",
+        "hsb-setup",
+        "hsb-test",
         "omniverse-cad-to-simready",
         "omniverse-realtime-viewer",
         "omniverse-usd-performance-tuning",
@@ -57,7 +61,57 @@
         "nv-reason-cxr",
         "nv-segment-ct",
         "nv-segment-ct-finetune",
-        "nv-segment-ctmr"
+        "nv-segment-ctmr",
+        "tao-analyze-changenet-rca",
+        "tao-analyze-gaps-visual-changenet",
+        "tao-analyze-gaps-vlm-bcq",
+        "tao-finetune-clip",
+        "tao-generate-image-grounding",
+        "tao-generate-referring-expressions",
+        "tao-mine-aoi-images",
+        "tao-port-huggingface-model",
+        "tao-route-visual-changenet-samples",
+        "tao-run-deft-aoi",
+        "tao-train-action-recognition",
+        "tao-train-bevfusion",
+        "tao-train-deformable-detr",
+        "tao-train-depth-anything-v2",
+        "tao-train-dino",
+        "tao-train-fast-foundation-stereo",
+        "tao-train-foundation-stereo",
+        "tao-train-grounding-dino",
+        "tao-train-image-classification",
+        "tao-train-mask-auto-label",
+        "tao-train-mask-grounding-dino",
+        "tao-train-mask2former",
+        "tao-train-nvdinov2",
+        "tao-train-nvpanoptix3d",
+        "tao-train-ocdnet",
+        "tao-train-ocrnet",
+        "tao-train-oneformer",
+        "tao-train-optical-inspection",
+        "tao-train-pointpillars",
+        "tao-train-pose-classification",
+        "tao-train-reid",
+        "tao-train-rtdetr",
+        "tao-train-segformer",
+        "tao-train-sparse4d",
+        "tao-train-visual-changenet",
+        "vss-ask-video",
+        "vss-deploy-dense-captioning",
+        "vss-deploy-detection-tracking-2d",
+        "vss-deploy-detection-tracking-3d",
+        "vss-deploy-profile",
+        "vss-deploy-video-embedding",
+        "vss-generate-video-calibration",
+        "vss-generate-video-report",
+        "vss-manage-alerts",
+        "vss-manage-video-io-storage",
+        "vss-query-analytics",
+        "vss-search-archive",
+        "vss-setup-behavior-analytics",
+        "vss-setup-video-analytics-api",
+        "vss-summarize-video"
       ]
     },
     {
@@ -135,7 +189,21 @@
         "nemo-rl-docs",
         "nemo-rl-session-memory",
         "nemotron-customize",
-        "nemotron-retrieval-recipes"
+        "nemotron-retrieval-recipes",
+        "tao-convert-dataset-format",
+        "tao-finetune-cosmos-reason",
+        "tao-finetune-huggingface-model",
+        "tao-generate-video-reasoning-annotations",
+        "tao-launch-workflow",
+        "tao-list-capabilities",
+        "tao-run-automl",
+        "tao-run-automl-deft-pipeline",
+        "tao-run-platform",
+        "tao-train-centerpose",
+        "tao-train-mask-auto-encoder",
+        "tao-train-metric-learning-recognition",
+        "tao-train-single-step",
+        "tao-validate-dataset-format"
       ]
     },
     {
@@ -145,7 +213,8 @@
         "dynamo-interconnect-check",
         "dynamo-recipe-runner",
         "dynamo-router-starter",
-        "dynamo-troubleshoot"
+        "dynamo-troubleshoot",
+        "tao-run-inference-service"
       ]
     },
     {
@@ -170,7 +239,13 @@
       "title": "GPU Development",
       "description": "Develop, tune, profile, and integrate GPU kernels and accelerated code, including CUDA-adjacent workflows, autotuning, low-level performance work, and framework integration.",
       "skills": [
-        "tilegym-adding-cutile-kernel"
+        "tilegym-adding-cutile-kernel",
+        "tilegym-converting-cutile-to-julia",
+        "tilegym-converting-cutile-to-triton",
+        "tilegym-cutile-autotuning",
+        "tilegym-cutile-python",
+        "tilegym-improve-cutile-kernel-perf",
+        "tilegym-monkey-patch-kernels-to-transformers"
       ]
     },
     {
@@ -189,7 +264,11 @@
         "holoscan-install-debian",
         "holoscan-install-source",
         "holoscan-install-wheel",
-        "holoscan-setup"
+        "holoscan-setup",
+        "tao-run-on-brev",
+        "tao-run-on-kubernetes",
+        "tao-run-on-slurm",
+        "tao-setup-nvidia-gpu-host"
       ]
     }
   ]

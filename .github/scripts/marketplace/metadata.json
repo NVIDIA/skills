@@ -541,6 +541,54 @@
       }
     },
     {
+      "path": "skills/hsb-app",
+      "name": "hsb-app",
+      "description": "Discover and run Holoscan Sensor Bridge example applications on a connected devkit. Filters available apps by the user's platform, HSB software version, board type, and sensors. Supports timed execution, failure analysis, code-edit suggestions, and iterative re-runs.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "application_developer,developer,hands_on_builder,platform_engineer",
+        "discovery.activity_tags": "get_started,select,operate,debug,test"
+      }
+    },
+    {
+      "path": "skills/hsb-flash",
+      "name": "hsb-flash",
+      "description": "Flash the FPGA on an HSB board connected to an NVIDIA devkit. Supports HSB Lattice boards (FPGA versions 2407, 2412, 2507, 2510) and Leopard Imaging VB1940 \"all-in-one\" cameras (FPGA versions 2507, 2510). Uses release-specific YAML manifests and board-type-specific program commands. Lattice and VB1940 commands must never be mixed.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,hands_on_builder,platform_engineer,application_developer",
+        "discovery.activity_tags": "configure,deploy,operate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/hsb-setup",
+      "name": "hsb-setup",
+      "description": "Clone the latest NVIDIA Holoscan Sensor Bridge repo, ask which supported devkit is being used, configure the host per platform, build the correct demo container, run it, and verify HSB connectivity by pinging 192.168.0.2. Use for Holoscan Sensor Bridge setup, build, container launch, and first-connectivity bring-up.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,platform_engineer,devops_engineer,hands_on_builder",
+        "discovery.activity_tags": "get_started,configure,deploy,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/hsb-test",
+      "name": "hsb-test",
+      "description": "Execute QA test plans on Holoscan Sensor Bridge hardware. Reads a user-provided test document, filters tests by the user's setup, determines which tests can run automatically, executes them with pass/fail evaluation, and produces a structured test results report.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,application_developer,platform_engineer,hands_on_builder",
+        "discovery.activity_tags": "test,validate,evaluate,measure,debug"
+      }
+    },
+    {
       "path": "skills/launch-nemo-rl",
       "name": "launch-nemo-rl",
       "description": "Playbook for launching, monitoring, stopping, and debugging NeMo-RL recipes on a Kubernetes cluster via the nrl-k8s CLI. Covers ephemeral vs long-lived RayCluster modes, iterating on runs, and debugging hung or failed training jobs.",
@@ -1405,6 +1453,654 @@
       }
     },
     {
+      "path": "skills/tao-analyze-changenet-rca",
+      "name": "tao-analyze-changenet-rca",
+      "description": "Performs deep Root Cause Analysis (RCA) on NVIDIA TAO Visual ChangeNet classification experiments with image-evidence-driven investigation. Use when analyzing ChangeNet model failures, investigating poor recall / FAR / PASS-NO_PASS metrics, auditing visual inspection pipeline quality, or running an RCA report for an AOI defect-detection model. Trigger phrases include \"RCA on my ChangeNet model\", \"why is my AOI model failing\", \"audit ChangeNet predictions\", \"investigate FAR regressions\", \"root cause analysis on visual-changenet\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,application_developer",
+        "discovery.activity_tags": "troubleshoot,debug,evaluate,inspect,assess"
+      }
+    },
+    {
+      "path": "skills/tao-analyze-gaps-visual-changenet",
+      "name": "tao-analyze-gaps-visual-changenet",
+      "description": "Performs gap analysis on NVIDIA TAO Visual ChangeNet (VCN) Classify experiments by invoking the data-services container (`tao_toolkit.data_services` from `versions.yaml`) directly via `docker run … gap_analysis vcn_aoi …` — picks the optimal decision threshold, ranks per-sample weakness, and emits a top-K weakest parquet expanded per-lighting for downstream augmentation. Use when analyzing VCN classification failures, picking SDA augmentation targets, auditing PASS/NO_PASS boundary cases, or running DEFT gap analysis on an AOI ChangeNet model.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,data_scientist,ai_engineer,developer",
+        "discovery.activity_tags": "evaluate,assess,classify,select,optimize"
+      }
+    },
+    {
+      "path": "skills/tao-analyze-gaps-vlm-bcq",
+      "name": "tao-analyze-gaps-vlm-bcq",
+      "description": "Extract false-positive and false-negative gaps from VLM binary-classification-question (BCQ, yes/no) predictions. Use after running VLM evaluation when you have a predictions JSON and need to identify failure cases for DEFT root cause analysis on a binary-classification VLM workflow.",
+      "metadata": {
+        "product.primary": "TAO",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,developer",
+        "discovery.activity_tags": "extract,evaluate,troubleshoot,debug,assess"
+      }
+    },
+    {
+      "path": "skills/tao-convert-dataset-format",
+      "name": "tao-convert-dataset-format",
+      "description": "Run `tao-daft convert` to convert NVIDIA TAO DAFT datasets between supported formats. Do not use for non-DAFT data. Use when the user asks to convert a DAFT dataset, change DAFT format, change a TAO dataset format, or run `tao-daft convert`.",
+      "metadata": {
+        "product.primary": "TAO",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,data_engineer,developer",
+        "discovery.activity_tags": "convert,transform,configure"
+      }
+    },
+    {
+      "path": "skills/tao-finetune-clip",
+      "name": "tao-finetune-clip",
+      "description": "CLIP vision-language model for image-text retrieval, zero-shot classification, embedding extraction, ONNX export, and TensorRT deployment. Use when fine-tuning or training CLIP, running zero-shot classification, computing image embeddings, or deploying CLIP to ONNX/TensorRT.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,data_scientist",
+        "discovery.activity_tags": "fine_tune,train,classify,extract,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-finetune-cosmos-reason",
+      "name": "tao-finetune-cosmos-reason",
+      "description": "Cosmos-Reason2-8B video QA supervised fine-tuning with FSDP parallelism. Use when training or evaluating video question-answering models, fine-tuning Cosmos-Reason2 with SFT, or working with Cosmos-RL. Trigger phrases include \"fine-tune Cosmos-Reason\", \"Cosmos-RL SFT\", \"video QA fine-tune\", \"Cosmos-Reason2-8B training\".",
+      "metadata": {
+        "product.primary": "Cosmos",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,research_academic,developer",
+        "discovery.activity_tags": "fine_tune,train,evaluate,inference,configure"
+      }
+    },
+    {
+      "path": "skills/tao-finetune-huggingface-model",
+      "name": "tao-finetune-huggingface-model",
+      "description": "Fine-tune any HuggingFace CV / VLM / LLM model on local NVIDIA GPUs inside an NGC PyTorch container. Use when the user wants to fine-tune a HuggingFace model (full or LoRA), train a vision / VLM / LLM model end-to-end, generate a reproducible HF training pipeline, smoke-test a HuggingFace model locally before scale-up, push a fine-tuned model to the HF Hub with a model card, or emit a self-contained rerun skill for an existing HuggingFace finetune. Supports image classification, object detection, semantic / instance / panoptic segmentation, depth estimation, image-text-to-text VLM (SFT / LoRA), and LLM SFT / DPO / GRPO. Six-step workflow: inspect and qualify, hardware and NGC image, research, generate and smoke, train + eval + infer, push and emit rerun skill.\n",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,data_scientist",
+        "discovery.activity_tags": "fine_tune,train,evaluate,inference,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-generate-image-grounding",
+      "name": "tao-generate-image-grounding",
+      "description": "Two-step image grounding pipeline: extracts referring expressions from (image, caption) pairs and grounds them to pixel-space bounding boxes via a VLM. Use when the user wants to ground captions to bboxes, generate phrase-grounded annotations, auto-label images for grounding, or run the image_grounding pipeline. Triggers include 'image grounding', 'phrase grounding', 'ground captions', 'auto-label image grounding', 'image_grounding'.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,data_scientist,ai_engineer,developer",
+        "discovery.activity_tags": "generate,extract,configure,inference"
+      }
+    },
+    {
+      "path": "skills/tao-generate-referring-expressions",
+      "name": "tao-generate-referring-expressions",
+      "description": "Four-step image referring-expression pipeline: turns images plus KITTI bounding-box labels into region descriptions, scene captions, grounded referring expressions, and (optionally) verified expressions via VLM distillation. Use when the user wants to generate referring-expression annotations from images with KITTI labels, build region descriptions, produce grouped grounding phrases tied to bboxes, run a double-check verification pass on grounding expressions, auto-label traffic / scene images for referring datasets, or run the image_referring_expression pipeline. Triggers include 'referring expression', 'region description', 'KITTI labels', 'spatial relationship annotation', 'auto-label image referring expression', 'image_referring_expression'.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,developer",
+        "discovery.activity_tags": "generate,extract,validate,configure"
+      }
+    },
+    {
+      "path": "skills/tao-generate-video-reasoning-annotations",
+      "name": "tao-generate-video-reasoning-annotations",
+      "description": "Multi-step video annotation pipeline that turns raw videos into Chain-of-Thought training data — multi-level captions, structured descriptions, and QA pairs (MCQ, binary, open-ended) with reasoning traces, via VLM/LLM distillation. Use when the user wants to \"create video training data\", \"generate video QA datasets\", \"build CoT reasoning traces from videos\", \"auto-label videos\", or run the video_reasoning_annotation pipeline. Triggers include \"video annotation\", \"video CoT\", \"video QA\", \"chain-of-thought\", \"video captioning pipeline\", \"video distillation\".",
+      "metadata": {
+        "product.primary": "TAO",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "data_engineer,ml_engineer,ai_engineer,application_developer",
+        "discovery.activity_tags": "generate,transform,extract,train"
+      }
+    },
+    {
+      "path": "skills/tao-launch-workflow",
+      "name": "tao-launch-workflow",
+      "description": "Shared launch intake for any TAO workflow or action. Use when the user wants to run TAO AutoML, train, evaluate, infer, export, generate TensorRT engines, or launch DEFT/workflow jobs on an execution platform.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "orchestrate,train,evaluate,inference,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-list-capabilities",
+      "name": "tao-list-capabilities",
+      "description": "Answer what the TAO Skill Bank plugin can do by generating the response from packaged application, data, model, AutoML, and platform manifests.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "summarize,inspect,get_started,select"
+      }
+    },
+    {
+      "path": "skills/tao-mine-aoi-images",
+      "name": "tao-mine-aoi-images",
+      "description": "Runs the DEFT embed-then-mine workflow for VCN AOI iterations — embeds the gap-analysis target parquet, embeds a source pool, and mines nearest-neighbour source images for downstream augmentation. Use as the immediate next step after `tao-route-visual-changenet-samples` when expanding a real-image augmentation queue from the mining subset.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,data_scientist,data_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "select,extract,transform,evaluate,train"
+      }
+    },
+    {
+      "path": "skills/tao-port-huggingface-model",
+      "name": "tao-port-huggingface-model",
+      "description": "Integrate a HuggingFace Computer Vision model into the NVIDIA TAO Toolkit ecosystem (tao-core config, tao-pytorch trainer, tao-deploy TensorRT pipeline). Use when the user asks to \"integrate a HuggingFace model into TAO\", \"add an HF model to TAO Toolkit\", \"wire a HuggingFace ViT/DETR/ SegFormer into tao-pytorch\", \"build a TAO trainer + deploy pipeline for an HF CV model\", or pastes a HuggingFace model URL/ID and wants it turned into a TAO model. Covers the full 7-phase loop: prerequisites check, HuggingFace inspection and validation, codebase exploration, tao-core configuration and native trainer implementation, ONNX export plus TensorRT deploy integration, packaging and L0 testing, container-based end-to-end validation, and (conditional) accuracy/latency tuning. Supports classification, object detection, semantic / instance / panoptic segmentation, zero-shot detection, and depth estimation.\n",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "integrate,deploy,train,convert,validate"
+      }
+    },
+    {
+      "path": "skills/tao-route-visual-changenet-samples",
+      "name": "tao-route-visual-changenet-samples",
+      "description": "Routes the weakest VCN samples (output of `tao-analyze-gaps-visual-changenet`) into per-augmentation-module subsets — one parquet for k-NN mining, one for AnomalyGen (Cosmos SDG) — based on each module's label eligibility. Use as the immediate next step after DEFT gap analysis in a VCN AOI SDA iteration.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,developer",
+        "discovery.activity_tags": "select,transform,orchestrate,extract,assess"
+      }
+    },
+    {
+      "path": "skills/tao-run-automl",
+      "name": "tao-run-automl",
+      "description": "Run AutoML / hyperparameter optimization (HPO) for NVIDIA TAO networks using AutoMLRunner. Handles algorithm selection (bayesian, hyperband, asha, bohb, llm, hybrid, autoresearch), WandB experiment tracking, job execution on any TAO SDK platform, result interpretation, and per-rec custom evaluation hooks. Use when the user mentions TAO AutoML, hyperparameter optimization, HPO, automl, automl_settings, AutoMLRunner, tao_automl, bayesian search, hyperband, ASHA, LLM-guided search, autoresearch, or wants to tune training hyperparameters for any TAO network. Platform-agnostic — runs on any SDK (Lepton, Brev, SLURM, Kubernetes, Docker).",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,developer",
+        "discovery.activity_tags": "optimize,train,evaluate,configure,monitor"
+      }
+    },
+    {
+      "path": "skills/tao-run-automl-deft-pipeline",
+      "name": "tao-run-automl-deft-pipeline",
+      "description": "Run the canonical NVIDIA AOI three-phase training pipeline — Phase 1 AutoML baseline (HPO), Phase 2 DEFT loop (RCA → SDG → mining → plain-train retrain), Phase 3 AutoML refinement on the DEFT-augmented dataset. This is the default entry point for any \"run the AOI workflow\", \"fine-tune my PCB AOI model end-to-end\", \"improve my AOI ChangeNet model\", or \"AOI workflow with AutoML\" request — route here instead of tao-run-deft-aoi directly unless the user explicitly asks for the DEFT loop ONLY (e.g. \"run JUST the DEFT loop\", \"skip AutoML, only DEFT\"). Also handles the same three-phase pattern for non-AOI DEFT applications — AutoML baseline then DEFT loop warm-started from AutoML's winning HPs then post-DEFT AutoML refinement on the iteration-augmented dataset. Trigger phrases include \"run the AOI workflow\", \"AOI end-to-end\", \"AutoML + DEFT\", \"AutoML then DEFT\", \"tune hyperparameters then DEFT\", \"DEFT with AutoML at both ends\", \"warm-start DEFT\", \"improve my AOI model\".\n",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,developer",
+        "discovery.activity_tags": "train,fine_tune,optimize,orchestrate,configure"
+      }
+    },
+    {
+      "path": "skills/tao-run-deft-aoi",
+      "name": "tao-run-deft-aoi",
+      "description": "Run the full DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection models: baseline evaluate, RCA, ingestion of customer-supplied pre-generated AnomalyGen images, k-NN mining, retraining, and deployment gating until FAR / recall KPI targets are met. EA variant — does not run AnomalyGen inline; the customer pre-generates synthetic NG/OK pairs out-of-band and the loop ingests them. Use for prompts like \"run the DEFT loop\", \"fine-tune until FAR below 0.1% at recall=100%\", or \"improve my AOI ChangeNet model with RCA and pre-generated synthetic defects\"; do not use for standalone TAO training, one-off inference, generic anomaly generation, or RCA-only analysis.\n",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer",
+        "discovery.activity_tags": "fine_tune,train,evaluate,optimize,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-run-inference-service",
+      "name": "tao-run-inference-service",
+      "description": "Start, query, and stop a network-specific TAO inference microservice ({network_arch}-inference-microservice) by delegating container execution to the appropriate platform skill. Handles container image resolution, job-payload JSON construction, and the service registry. Use when the user wants to run inference on a TAO model checkpoint using a microservice container, deploy a TAO inference endpoint, or stop a running inference container.\n",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "deploy,inference,operate,orchestrate,configure"
+      }
+    },
+    {
+      "path": "skills/tao-run-on-brev",
+      "name": "tao-run-on-brev",
+      "description": "Brev managed GPU instances with Docker support. Use when running TAO training, evaluation, or inference on Brev GPU instances, managing Brev deployments, or dispatching TAO jobs through the Brev CLI. Trigger phrases include \"run on Brev\", \"Brev GPU instance\", \"submit job to Brev\", \"Brev CLI deployment\".",
+      "metadata": {
+        "product.primary": "Brev",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "infrastructure",
+        "audience": "ml_engineer,ai_engineer,devops_engineer,platform_engineer,developer",
+        "discovery.activity_tags": "deploy,train,evaluate,inference,operate"
+      }
+    },
+    {
+      "path": "skills/tao-run-on-kubernetes",
+      "name": "tao-run-on-kubernetes",
+      "description": "Kubernetes execution platform — submits TAO container jobs as single-pod k8s Jobs with NVIDIA GPU scheduling. Use when running on EKS / GKE / AKS / on-prem clusters with the NVIDIA GPU Operator installed, or when integrating TAO into an existing k8s-native ML platform.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "infrastructure",
+        "audience": "ml_engineer,devops_engineer,platform_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "orchestrate,deploy,configure,train,inference"
+      }
+    },
+    {
+      "path": "skills/tao-run-on-slurm",
+      "name": "tao-run-on-slurm",
+      "description": "Remote SLURM GPU cluster execution over SSH with sbatch/srun, Pyxis/Enroot containers, and Lustre-backed results. Use when running TAO training/eval/inference jobs on an on-prem or DGX SLURM cluster. Trigger phrases include \"run on SLURM\", \"submit sbatch\", \"DGX SLURM cluster\", \"Pyxis/Enroot container\", \"Lustre dataset\".",
+      "metadata": {
+        "product.primary": "TAO",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "infrastructure",
+        "audience": "platform_engineer,devops_engineer,ml_engineer,hpc_developer,ai_engineer",
+        "discovery.activity_tags": "orchestrate,train,deploy,inference,evaluate"
+      }
+    },
+    {
+      "path": "skills/tao-run-platform",
+      "name": "tao-run-platform",
+      "description": "TAO Execution SDK for submitting and monitoring GPU training jobs on supported platforms (Lepton, Brev, SLURM, local Docker, Kubernetes). Use when the user wants to run TAO jobs through the SDK, get job tracking, S3 I/O wrapping, multi-node distributed training, or platform-specific features that docker-run can't provide. Trigger phrases include \"use the TAO SDK\", \"call tao_sdk\", \"AutoMLRunner\", \"ActionWorkflow\", \"Job handles\", \"S3 I/O wrapping\", \"TAO platform run\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit API",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,platform_engineer,devops_engineer,developer",
+        "discovery.activity_tags": "orchestrate,train,monitor,deploy,scale"
+      }
+    },
+    {
+      "path": "skills/tao-setup-nvidia-gpu-host",
+      "name": "tao-setup-nvidia-gpu-host",
+      "description": "Host setup for TAO GPU backends. Checks and, after user approval, installs NVIDIA driver branch 580, CUDA Toolkit 13.0, and NVIDIA Container Toolkit 1.19.0 for Docker/local-Docker and Kubernetes GPU worker hosts. The `--check-only` path works on any Linux distribution; `--install` automates debian-family (Ubuntu/Debian/Pop!_OS/Mint/Zorin/Raspbian), rhel-family (Fedora/RHEL/Rocky/AlmaLinux), and suse-family (openSUSE/SLES) hosts, and prints actionable manual-install steps for everything else.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "infrastructure",
+        "audience": "devops_engineer,platform_engineer,it_operations,ml_engineer,developer",
+        "discovery.activity_tags": "configure,validate,deploy,get_started,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/tao-train-action-recognition",
+      "name": "tao-train-action-recognition",
+      "description": "Action recognition from video sequences. Supports RGB, optical flow, and joint (multi-stream) input types for classifying temporal actions in video clips. Use when training, evaluating, exporting, or running inference on a TAO action-recognition model. Trigger phrases include \"train action recognition\", \"video action classification\", \"RGB + optical flow action model\", \"TAO ActionRecognition\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,data_scientist,application_developer",
+        "discovery.activity_tags": "train,evaluate,inference,classify,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-bevfusion",
+      "name": "tao-train-bevfusion",
+      "description": "BEVFusion for multi-sensor 3D object detection. Fuses LiDAR point clouds and camera images in bird's-eye-view (BEV) space, used in autonomous driving for robust 3D perception. Use when training, evaluating, or running inference for a TAO BEVFusion model. Trigger phrases include \"train BEVFusion\", \"LiDAR + camera fusion\", \"BEV 3D detection\", \"multi-sensor 3D perception\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "train,evaluate,inference,configure,convert"
+      }
+    },
+    {
+      "path": "skills/tao-train-centerpose",
+      "name": "tao-train-centerpose",
+      "description": "CenterPose for keypoint / pose estimation. Detects object centers and regresses keypoint locations for 6-DoF object pose estimation. Use when training, evaluating, exporting, or running inference for a TAO CenterPose model. Trigger phrases include \"train CenterPose\", \"6-DoF object pose\", \"keypoint estimation\", \"object pose regression\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "train,evaluate,inference,deploy,configure"
+      }
+    },
+    {
+      "path": "skills/tao-train-deformable-detr",
+      "name": "tao-train-deformable-detr",
+      "description": "Deformable DETR for 2D object detection. Uses deformable attention for efficient multi-scale feature processing, lighter than DINO with competitive accuracy. Use when training, evaluating, exporting, quantizing, or running inference for a TAO Deformable-DETR model. Trigger phrases include \"train deformable-detr\", \"Deformable DETR object detection\", \"lightweight DETR detector\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,developer,data_scientist",
+        "discovery.activity_tags": "train,evaluate,inference,deploy,optimize"
+      }
+    },
+    {
+      "path": "skills/tao-train-depth-anything-v2",
+      "name": "tao-train-depth-anything-v2",
+      "description": "Monocular depth estimation using Metric Depth Anything v2 or Relative Depth Anything architectures. Predicts per-pixel depth from single RGB images. Use when training, evaluating, exporting, or running inference for a TAO monocular depth model. Trigger phrases include \"train monocular depth\", \"DepthAnything v2\", \"metric depth from single image\", \"monocular depth estimation\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "train,evaluate,inference,deploy,configure"
+      }
+    },
+    {
+      "path": "skills/tao-train-dino",
+      "name": "tao-train-dino",
+      "description": "DINO (DETR with Improved DeNoising Anchor Boxes) for 2D object detection. Transformer-based detector with denoising training, multi-scale features, and optional distillation support. Use when training, evaluating, exporting, distilling, quantizing, or running inference for a TAO DINO detector. Trigger phrases include \"train DINO\", \"DETR object detection\", \"TAO 2D detection\", \"DINO with distillation\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,developer,data_scientist",
+        "discovery.activity_tags": "train,evaluate,inference,optimize,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-fast-foundation-stereo",
+      "name": "tao-train-fast-foundation-stereo",
+      "description": "Real-time stereo depth estimation using FastFoundationStereo (FFS), the distilled bp2 commercial variant of FoundationStereo. Predicts disparity maps from stereo image pairs with ~10× lower latency than full FoundationStereo. Use when training, evaluating, exporting, or running inference for a TAO FastFoundationStereo (FFS) model. Trigger phrases include \"train fast stereo\", \"real-time stereo disparity\", \"FastFoundationStereo\", \"distilled stereo depth\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,robotics_developer,application_developer,developer",
+        "discovery.activity_tags": "train,evaluate,inference,deploy,configure"
+      }
+    },
+    {
+      "path": "skills/tao-train-foundation-stereo",
+      "name": "tao-train-foundation-stereo",
+      "description": "Stereo depth estimation using FoundationStereo. Predicts disparity maps from stereo image pairs for 3D reconstruction. Use when training, evaluating, exporting, or running inference for a TAO FoundationStereo model. Trigger phrases include \"train stereo depth\", \"FoundationStereo\", \"stereo disparity estimation\", \"3D reconstruction from stereo\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer,robotics_developer",
+        "discovery.activity_tags": "train,evaluate,inference,deploy,configure"
+      }
+    },
+    {
+      "path": "skills/tao-train-grounding-dino",
+      "name": "tao-train-grounding-dino",
+      "description": "Grounding DINO for open-set object detection. Combines DINO-style detection with a BERT text encoder for language-guided detection — detects objects described by text prompts without a fixed class vocabulary. Use when training, evaluating, exporting, quantizing, or running inference for a TAO Grounding DINO model. Trigger phrases include \"train Grounding DINO\", \"open-vocabulary detection\", \"text-prompted detector\", \"language-guided object detection\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,data_scientist,application_developer",
+        "discovery.activity_tags": "train,evaluate,inference,optimize,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-image-classification",
+      "name": "tao-train-image-classification",
+      "description": "PyTorch-based TAO image classification. Supports a wide range of backbones (FAN, EfficientNet, ResNet, etc.) with distillation and quantization for deployment. Use when training, evaluating, distilling, quantizing, exporting, or running inference for a TAO image-classification (PyT) model. Trigger phrases include \"train image classifier\", \"TAO classification\", \"ResNet/EfficientNet/FAN backbone classifier\", \"classification-pyt\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,data_scientist,application_developer",
+        "discovery.activity_tags": "train,evaluate,optimize,deploy,inference"
+      }
+    },
+    {
+      "path": "skills/tao-train-mask-auto-encoder",
+      "name": "tao-train-mask-auto-encoder",
+      "description": "Masked Auto-Encoder (MAE) for self-supervised pretraining and fine-tuning. Masks random patches and reconstructs them to learn visual representations; supports pretrain and finetune stages. Use when training, evaluating, exporting, or running inference for a TAO MAE backbone. Trigger phrases include \"pretrain MAE\", \"self-supervised vision pretraining\", \"Masked Autoencoder\", \"Mask Auto-Encoder\", \"MAE fine-tune\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,developer",
+        "discovery.activity_tags": "train,fine_tune,evaluate,inference,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-mask-auto-label",
+      "name": "tao-train-mask-auto-label",
+      "description": "MAL (Mask Auto-Label) for weakly-supervised segmentation. Produces segmentation masks from minimal annotations (point or box annotations) using a ViT-MAE backbone. Use when training, evaluating, or running inference for a TAO MAL model. Trigger phrases include \"train MAL\", \"Mask Auto-Label\", \"weakly-supervised segmentation\", \"box-prompted segmentation\", \"minimal-annotation mask prediction\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,data_scientist",
+        "discovery.activity_tags": "train,evaluate,inference,configure"
+      }
+    },
+    {
+      "path": "skills/tao-train-mask-grounding-dino",
+      "name": "tao-train-mask-grounding-dino",
+      "description": "Mask Grounding DINO for grounded instance segmentation. Extends Grounding DINO with a mask-prediction head for open-set segmentation guided by text prompts. Use when training, evaluating, exporting, quantizing, or running inference for a TAO Mask-Grounding-DINO model. Trigger phrases include \"train Mask Grounding DINO\", \"open-vocabulary segmentation\", \"text-prompted instance segmentation\", \"grounded mask DETR\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,application_developer",
+        "discovery.activity_tags": "train,evaluate,inference,optimize,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-mask2former",
+      "name": "tao-train-mask2former",
+      "description": "Mask2Former for universal image segmentation (panoptic, instance, and semantic). Transformer-based with masked attention for high-quality segmentation results. Use when training, evaluating, exporting, quantizing, or running inference for a TAO Mask2Former model. Trigger phrases include \"train Mask2Former\", \"universal segmentation\", \"panoptic / instance / semantic segmentation\", \"masked-attention transformer segmenter\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "train,evaluate,inference,optimize,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-metric-learning-recognition",
+      "name": "tao-train-metric-learning-recognition",
+      "description": "Metric-learning recognition (ml-recog) for fine-grained visual recognition. Learns embeddings for retrieval-based matching (e.g., retail product recognition) using triplet / contrastive losses. Use when training, evaluating, exporting, or running inference for a TAO metric-learning recognition model. Trigger phrases include \"train metric learning\", \"ml-recog\", \"retrieval embeddings\", \"triplet loss recognition\", \"fine-grained matching\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,data_scientist,application_developer",
+        "discovery.activity_tags": "train,evaluate,inference,deploy,configure"
+      }
+    },
+    {
+      "path": "skills/tao-train-nvdinov2",
+      "name": "tao-train-nvdinov2",
+      "description": "NVDINOv2 for self-supervised visual representation learning. Trains vision transformers via self-distillation (teacher-student) without labels and produces general-purpose visual features. Use when training, distilling, exporting, or running inference for a TAO NVDINOv2 backbone. Trigger phrases include \"train NVDINOv2\", \"self-supervised ViT pretraining\", \"DINOv2 backbone\", \"visual representation learning\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,application_developer",
+        "discovery.activity_tags": "train,inference,configure,convert,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-nvpanoptix3d",
+      "name": "tao-train-nvpanoptix3d",
+      "description": "NVPanoptix3D for panoptic 3D scene reconstruction from posed RGB images. Produces 3D panoptic segmentation (semantic, instance, and panoptic masks) with occupancy completion. Built on a VGGT backbone with a Mask2Former-style head and 3D frustum reconstruction. Use when training, evaluating, exporting, or running inference for a TAO NVPanoptix3D model. Trigger phrases include \"train NVPanoptix3D\", \"panoptic 3D reconstruction\", \"3D scene segmentation\", \"occupancy completion\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "train,evaluate,inference,deploy,configure"
+      }
+    },
+    {
+      "path": "skills/tao-train-ocdnet",
+      "name": "tao-train-ocdnet",
+      "description": "OCDNet for scene text detection. Detects arbitrary-oriented text regions in natural images using a differentiable binarization approach. Use when training, evaluating, exporting, pruning, quantizing, retraining, or running inference for a TAO OCDNet model. Trigger phrases include \"train OCDNet\", \"scene text detection\", \"arbitrary-oriented text boxes\", \"differentiable binarization detector\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,application_developer",
+        "discovery.activity_tags": "train,evaluate,inference,optimize,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-ocrnet",
+      "name": "tao-train-ocrnet",
+      "description": "OCRNet for scene text recognition. Recognizes text content from cropped text-region images and supports CTC and attention-based decoders. Use when training, evaluating, exporting, pruning, quantizing, retraining, or running inference for a TAO OCRNet model. Trigger phrases include \"train OCRNet\", \"scene text recognition\", \"OCR cropped text\", \"CTC / attention text decoder\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer,data_scientist",
+        "discovery.activity_tags": "train,evaluate,inference,optimize,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-oneformer",
+      "name": "tao-train-oneformer",
+      "description": "OneFormer for universal image segmentation. Unifies panoptic, instance, and semantic segmentation with a single architecture using task-conditioned queries. Use when training, evaluating, exporting, quantizing, or running inference for a TAO OneFormer model. Trigger phrases include \"train OneFormer\", \"universal segmentation\", \"task-conditioned segmentation\", \"panoptic / instance / semantic in one model\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,developer",
+        "discovery.activity_tags": "train,evaluate,inference,optimize,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-optical-inspection",
+      "name": "tao-train-optical-inspection",
+      "description": "Optical Inspection for defect detection using Siamese networks. Compares image pairs to detect manufacturing defects, anomalies, or quality issues. Use when training, evaluating, exporting, or running inference for a TAO Optical Inspection model on AOI / quality-control data. Trigger phrases include \"train optical inspection\", \"AOI defect detection\", \"Siamese defect classifier\", \"PCB / manufacturing inspection\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "train,evaluate,inference,deploy,configure"
+      }
+    },
+    {
+      "path": "skills/tao-train-pointpillars",
+      "name": "tao-train-pointpillars",
+      "description": "PointPillars for 3D object detection from LiDAR point clouds. Encodes point clouds into a pseudo-image via a pillar-based representation, then applies 2D detection — used in autonomous driving and robotics. Use when training, evaluating, exporting, pruning, retraining, or running inference for a TAO PointPillars model. Trigger phrases include \"train PointPillars\", \"LiDAR 3D detection\", \"point-cloud object detection\", \"pillar-based 3D detector\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,robotics_developer,developer",
+        "discovery.activity_tags": "train,evaluate,inference,optimize,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-pose-classification",
+      "name": "tao-train-pose-classification",
+      "description": "Pose classification using ST-GCN (Spatial Temporal Graph Convolutional Network). Classifies skeleton sequences into action categories from pose-keypoint data. Use when training, evaluating, exporting, or running inference for a TAO pose-classification model. Trigger phrases include \"train pose classification\", \"skeleton action recognition\", \"ST-GCN\", \"keypoint sequence classifier\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "train,evaluate,inference,classify,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-reid",
+      "name": "tao-train-reid",
+      "description": "Person re-identification (ReID). Learns discriminative embeddings to match the same person across different camera views, based on metric learning. Use when training, evaluating, exporting, or running inference for a TAO person re-identification model. Trigger phrases include \"train ReID\", \"person re-identification\", \"cross-camera person matching\", \"ReID embeddings\", \"person re-id\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,developer",
+        "discovery.activity_tags": "train,evaluate,inference,configure,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-rtdetr",
+      "name": "tao-train-rtdetr",
+      "description": "RT-DETR (Real-Time DEtection TRansformer) for 2D object detection. Designed for real-time inference with competitive accuracy and supports distillation and quantization for deployment optimization. Use when training, evaluating, distilling, quantizing, exporting, or running inference for a TAO RT-DETR model. Trigger phrases include \"train RT-DETR\", \"real-time DETR\", \"low-latency object detection\", \"RT-DETR distillation / quantization\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,data_scientist,application_developer",
+        "discovery.activity_tags": "train,evaluate,optimize,deploy,inference"
+      }
+    },
+    {
+      "path": "skills/tao-train-segformer",
+      "name": "tao-train-segformer",
+      "description": "SegFormer for semantic segmentation. Lightweight transformer-based architecture with hierarchical feature extraction, efficient for real-time segmentation tasks. Use when training, evaluating, exporting, quantizing, or running inference for a TAO SegFormer model. Trigger phrases include \"train SegFormer\", \"semantic segmentation\", \"lightweight transformer segmenter\", \"real-time semantic segmentation\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "train,evaluate,inference,optimize,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-single-step",
+      "name": "tao-train-single-step",
+      "description": "Standard single-step train/eval/export workflow for any TAO model. Use when training a TAO model on a dataset without iterative data augmentation, AutoML, or DEFT loops. Trigger phrases include \"single train run\", \"train then evaluate then export\", \"plain TAO training\", \"normal training\", \"no AutoML\", \"skip the loop\". Routes through the per-model SKILL.md for action specifics and through `tao-launch-workflow` for platform/credentials/dataset intake.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,data_scientist",
+        "discovery.activity_tags": "train,evaluate,package,configure"
+      }
+    },
+    {
+      "path": "skills/tao-train-sparse4d",
+      "name": "tao-train-sparse4d",
+      "description": "Sparse4D for multi-camera temporal 3D object detection and tracking. Uses sparse queries with deformable attention across camera views and time for end-to-end 3D perception, with an instance bank for temporal tracking. Use when training, evaluating, exporting, quantizing, or running inference for a TAO Sparse4D model. Trigger phrases include \"train Sparse4D\", \"multi-camera 3D detection\", \"temporal 3D tracker\", \"sparse query 3D perception\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,robotics_developer",
+        "discovery.activity_tags": "train,evaluate,inference,optimize,convert"
+      }
+    },
+    {
+      "path": "skills/tao-train-visual-changenet",
+      "name": "tao-train-visual-changenet",
+      "description": "Visual ChangeNet for binary image classification and segmentation in AOI defect detection. Use when training, evaluating, exporting, or running inference for PCB defect detection or visual inspection, comparing image pairs for PASS/NO_PASS classification, or producing change-segmentation masks. Trigger phrases include \"train Visual ChangeNet\", \"ChangeNet classify\", \"ChangeNet segment\", \"AOI defect detection\", \"PCB inspection model\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,developer",
+        "discovery.activity_tags": "train,evaluate,inference,classify,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-validate-dataset-format",
+      "name": "tao-validate-dataset-format",
+      "description": "Run `tao-daft validate` to check NVIDIA TAO DAFT datasets for structure, schema, and cross-reference errors. Do not use for non-DAFT formats. Use when the user asks to validate a DAFT dataset, check DAFT schema, validate a TAO dataset format, or run `tao-daft validate`.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,developer,data_engineer",
+        "discovery.activity_tags": "validate,inspect,troubleshoot,test"
+      }
+    },
+    {
       "path": "skills/tilegym-adding-cutile-kernel",
       "name": "tilegym-adding-cutile-kernel",
       "description": "Add a new cuTile GPU kernel operator to TileGym. Covers dispatch registration in ops.py, cuTile backend implementation, __init__.py exports, test creation, and benchmark in tests/benchmark. Use when adding, creating, or implementing a new cuTile operator/kernel in TileGym, or when asking how to register a new cuTile op.",
@@ -1414,6 +2110,258 @@
         "catalog.subdomain": "gpu-development",
         "audience": "developer,hpc_developer",
         "discovery.activity_tags": "extend,integrate,test,benchmark,validate"
+      }
+    },
+    {
+      "path": "skills/tilegym-converting-cutile-to-julia",
+      "name": "tilegym-converting-cutile-to-julia",
+      "description": "Converts cuTile Python GPU kernels (@ct.kernel) to cuTile.jl Julia equivalents. Handles kernel syntax translation, 0-indexed to 1-indexed conversion, broadcasting differences, memory layout (row-major to column-major), type system mapping, and launch API differences. Use when converting, porting, or translating cuTile Python kernels to Julia cuTile.jl, or debugging/optimizing existing Julia cuTile translations.",
+      "metadata": {
+        "product.primary": "CUDA Tile",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "hpc_developer,developer,application_developer",
+        "discovery.activity_tags": "convert,migrate,debug,optimize,test"
+      }
+    },
+    {
+      "path": "skills/tilegym-converting-cutile-to-triton",
+      "name": "tilegym-converting-cutile-to-triton",
+      "description": "Converts cuTile GPU kernels (@ct.kernel) to Triton (@triton.jit). Handles standard in-repo conversion, debugging (cudaErrorIllegalAddress, shape mismatch, numerical mismatch), and mapping cuTile idioms (ct.load/ct.store, ct.Constant, ct.launch) to Triton equivalents. Covers dual-kernel layout flags (e.g. transpose=True/False + autotune grid via META) per translations/advanced-patterns.md. Use when converting, porting, or translating cuTile kernels to Triton, or debugging existing Triton translations.",
+      "metadata": {
+        "product.primary": "CUDA Tile",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,hpc_developer,application_developer",
+        "discovery.activity_tags": "convert,debug,optimize,migrate,validate"
+      }
+    },
+    {
+      "path": "skills/tilegym-cutile-autotuning",
+      "name": "tilegym-cutile-autotuning",
+      "description": "Use when adding, modifying, optimizing, or debugging CuTile autotuning code. Trigger signals: `exhaustive_search` / `replace_hints` / `hints_fn` / `cuda.tile.tune` in code, `autotune` in filenames, or correctness/performance issues in autotuned CuTile kernels. Covers: tune-once/cache/launch pattern, per-architecture configs (sm80–sm120), parameter space design (tile sizes, occupancy, num_ctas), and 7 common pitfalls with solutions.",
+      "metadata": {
+        "product.primary": "CUDA Tile",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,hpc_developer,application_developer",
+        "discovery.activity_tags": "optimize,debug,configure,benchmark,test"
+      }
+    },
+    {
+      "path": "skills/tilegym-cutile-python",
+      "name": "tilegym-cutile-python",
+      "description": "Expert cuTile programming assistant. Write high-performance GPU kernels using cuTile's tile-based programming model with proper validation and optimization. Supports deep agent orchestration for complex multi-kernel tasks.",
+      "metadata": {
+        "product.primary": "CUDA Tile",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,hpc_developer,application_developer,ai_engineer",
+        "discovery.activity_tags": "generate,optimize,validate,orchestrate,debug"
+      }
+    },
+    {
+      "path": "skills/tilegym-improve-cutile-kernel-perf",
+      "name": "tilegym-improve-cutile-kernel-perf",
+      "description": "Iteratively optimize cuTile kernel performance through systematic profiling, bottleneck analysis, IR comparison, and targeted tuning. Covers tile sizes, occupancy, autotune configs, TMA, latency hints, persistent scheduling, num_ctas, flush_to_zero, and IR-level debugging. Use when asked to \"optimize cutile kernel\", \"improve kernel perf\", \"tune cutile performance\", \"make kernel faster\", or iteratively benchmark and refine a cuTile GPU kernel in the TileGym project.",
+      "metadata": {
+        "product.primary": "CUDA Tile",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "hpc_developer,developer,application_developer",
+        "discovery.activity_tags": "optimize,benchmark,profile,debug,compare"
+      }
+    },
+    {
+      "path": "skills/tilegym-monkey-patch-kernels-to-transformers",
+      "name": "tilegym-monkey-patch-kernels-to-transformers",
+      "description": "Integrate TileGym kernels into Hugging Face `transformers` models by replacing the library's submodule(s) and certain class(es)' implementations, and patching certain class(es)' init/forward/load weight methods prior to instantiating models. Used when the user requires integrating TileGym kernels into `transformers` models.",
+      "metadata": {
+        "product.primary": "CUDA Tile",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,ml_engineer,ai_engineer,hpc_developer,application_developer",
+        "discovery.activity_tags": "integrate,optimize,configure,inference,train"
+      }
+    },
+    {
+      "path": "skills/vss-ask-video",
+      "name": "vss-ask-video",
+      "description": "Use this skill to ask the VSS agent's video_understanding tool a fresh visual question about a recorded clip. Not for prior tool output, search hits, or metadata-answerable questions.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ai_engineer,ml_engineer,developer",
+        "discovery.activity_tags": "inference,inspect,extract,summarize"
+      }
+    },
+    {
+      "path": "skills/vss-deploy-dense-captioning",
+      "name": "vss-deploy-dense-captioning",
+      "description": "Use this skill when deploying standalone RT-VLM dense captioning or calling its REST API (uploads, captions, streams, chat-completions, Kafka). Not for VSS profile deploy or video-search ingestion.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,devops_engineer,platform_engineer,ai_engineer",
+        "discovery.activity_tags": "deploy,inference,integrate,operate,configure"
+      }
+    },
+    {
+      "path": "skills/vss-deploy-detection-tracking-2d",
+      "name": "vss-deploy-detection-tracking-2d",
+      "description": "Use this skill when the user wants to deploy, run, debug, tear down, or call the REST API of the RTVI-CV 2D detection / tracking microservice. Trigger when the user says things like 'deploy rtvi-cv', 'start warehouse 2d', 'add a stream', 'check rtvi-cv health', or 'stop the perception container'. Not for VLM, embedding, or analytics — use the matching vss-* skill.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "devops_engineer,application_developer,platform_engineer,solutions_architect,ai_engineer",
+        "discovery.activity_tags": "deploy,operate,debug,configure,monitor"
+      }
+    },
+    {
+      "path": "skills/vss-deploy-detection-tracking-3d",
+      "name": "vss-deploy-detection-tracking-3d",
+      "description": "Deploy and operate the RTVI-CV-3D microservice as MV3DT (`MODE=mv3dt`): per-camera DeepStream perception plus BEV Fusion over calibrated cameras. Supports the bundled sample dataset, custom video files, and RTSP streams, and chains to `vss-generate-video-calibration` when calibration is missing. Use `vss-deploy-profile` for the full warehouse blueprint and `vss-deploy-detection-tracking-2d` for single-camera 2D detection.\n",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,solutions_architect,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "deploy,operate,configure,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/vss-deploy-profile",
+      "name": "vss-deploy-profile",
+      "description": "Use to select, configure, deploy, verify, debug, or tear down a VSS profile (base, search, lvs, warehouse, edge). Not for standalone microservices — use the vss-deploy-* skill.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "devops_engineer,solutions_architect,platform_engineer,application_developer,ai_engineer",
+        "discovery.activity_tags": "deploy,configure,validate,debug,select"
+      }
+    },
+    {
+      "path": "skills/vss-deploy-video-embedding",
+      "name": "vss-deploy-video-embedding",
+      "description": "Use this skill when deploying, operating, or integrating the VSS 3.2 GA RT-Embed Video Embedding microservice. Covers Docker Compose bring-up, GPU and storage prerequisites, the `/v1` REST API (file uploads, text and video embeddings, live RTSP streams, health and metrics), Redis/Kafka/OTel integration, common failure modes, and teardown.\n",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "devops_engineer,application_developer,platform_engineer,solutions_architect,ml_engineer",
+        "discovery.activity_tags": "deploy,operate,integrate,configure,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/vss-generate-video-calibration",
+      "name": "vss-generate-video-calibration",
+      "description": "Use to run AutoMagicCalib on local MP4s, RTSP, or the bundled sample dataset, and to deploy vss-auto-calibration when needed. Do not use for non-AMC calibration or runtime analytics.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ai_engineer,devops_engineer,solutions_architect,hands_on_builder",
+        "discovery.activity_tags": "generate,deploy,configure,operate,validate"
+      }
+    },
+    {
+      "path": "skills/vss-generate-video-report",
+      "name": "vss-generate-video-report",
+      "description": "Use this skill when producing a VSS analysis report — Mode A per-clip VLM, Mode B incident-range via video-analytics. Not for standalone video summarization, real-time alerts, or ad-hoc Q&A.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ai_engineer,ml_engineer,solutions_architect",
+        "discovery.activity_tags": "generate,synthesize,summarize,inference,extract"
+      }
+    },
+    {
+      "path": "skills/vss-manage-alerts",
+      "name": "vss-manage-alerts",
+      "description": "Use for VSS alert workflows — real-time monitoring, Alert-Bridge subscriptions, Slack notifications, incident queries, camera onboarding. Not for non-alert analytics.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,production_operator,devops_engineer,solutions_architect",
+        "discovery.activity_tags": "monitor,operate,configure,integrate,deploy"
+      }
+    },
+    {
+      "path": "skills/vss-manage-video-io-storage",
+      "name": "vss-manage-video-io-storage",
+      "description": "Use to call the VIOS REST API (sensor list, timelines, clip extraction, snapshots, add/delete sensors and streams). Not for VLM inference or search.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,developer,platform_engineer,devops_engineer,solutions_architect",
+        "discovery.activity_tags": "operate,configure,integrate,extract,deploy"
+      }
+    },
+    {
+      "path": "skills/vss-query-analytics",
+      "name": "vss-query-analytics",
+      "description": "Use this skill when reading video-analytics metrics, incidents, alerts, and sensor data via the VA-MCP server (port 9901). Not for live VLM or incident-range narrative reports.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ai_engineer,platform_engineer,production_operator",
+        "discovery.activity_tags": "monitor,inspect,extract,operate"
+      }
+    },
+    {
+      "path": "skills/vss-search-archive",
+      "name": "vss-search-archive",
+      "description": "Use to run top-level VSS fusion search on archived video, or to ingest video files / RTSP streams for search. Do NOT use for ad-hoc visual Q&A (use vss-ask-video), live captioning (use vss-deploy-dense-captioning), or video summarization and reports (use vss-summarize-video).",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ai_engineer,ml_engineer,solutions_architect,developer",
+        "discovery.activity_tags": "inference,extract,integrate,operate,deploy"
+      }
+    },
+    {
+      "path": "skills/vss-setup-behavior-analytics",
+      "name": "vss-setup-behavior-analytics",
+      "description": "Use to deploy the vss-behavior-analytics service standalone (entrypoint, config-source, optional calibration). Not for the full warehouse deploy.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "devops_engineer,platform_engineer,application_developer,solutions_architect",
+        "discovery.activity_tags": "deploy,configure,operate,integrate"
+      }
+    },
+    {
+      "path": "skills/vss-setup-video-analytics-api",
+      "name": "vss-setup-video-analytics-api",
+      "description": "Use to deploy the vss-video-analytics-api REST service standalone (config-source, data-log bind, Elasticsearch, optional Kafka). Not for full warehouse deploy.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "devops_engineer,platform_engineer,application_developer,solutions_architect",
+        "discovery.activity_tags": "deploy,configure,integrate,operate"
+      }
+    },
+    {
+      "path": "skills/vss-summarize-video",
+      "name": "vss-summarize-video",
+      "description": "Use to summarize a recorded video via the LVS summarization microservice (HITL-gated) with a VLM fallback. Not for report generation or live RTSP captioning.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ai_engineer,ml_engineer,solutions_architect,developer",
+        "discovery.activity_tags": "summarize,inference,integrate,deploy,operate"
       }
     }
   ]
