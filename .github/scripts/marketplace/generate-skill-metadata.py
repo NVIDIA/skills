@@ -324,14 +324,17 @@ def classify(
     removed_candidates = sorted(base_paths - cur_paths)
 
     # Detect simple renames by matching name+description across baseline-removed
-    # and current-added.
+    # and current-added. Both fields must match to avoid false positives when
+    # two unrelated skills happen to share the same name.
     renamed: dict[str, str] = {}
-    name_to_added = {cur_by_path[p].name: p for p in added}
+    name_desc_to_added = {
+        (cur_by_path[p].name, cur_by_path[p].description): p for p in added
+    }
     for old in list(removed_candidates):
         old_entry = base_by_path[old]
-        old_name = old_entry.get("name")
-        if old_name in name_to_added:
-            new_path = name_to_added[old_name]
+        key = (old_entry.get("name"), old_entry.get("description"))
+        if key in name_desc_to_added:
+            new_path = name_desc_to_added[key]
             renamed[old] = new_path
             removed_candidates.remove(old)
             added.remove(new_path)
@@ -565,22 +568,16 @@ class _AIClient:
                     json=body,
                     timeout=60,
                 )
-            except requests.Timeout:
-                last_error = "request timed out"
+            except (requests.Timeout, requests.ConnectionError):
+                last_error = "request timed out or connection failed"
                 if attempt < _RETRY_ATTEMPTS:
                     time.sleep(_RETRY_BASE_SECONDS * (2 ** attempt))
                     continue
                 raise EnrichmentError(
-                    f"Inference API timed out after {_RETRY_ATTEMPTS + 1} attempts."
+                    f"Inference API unreachable after {_RETRY_ATTEMPTS + 1} attempts."
                 )
-            except requests.ConnectionError as exc:
-                last_error = str(exc)
-                if attempt < _RETRY_ATTEMPTS:
-                    time.sleep(_RETRY_BASE_SECONDS * (2 ** attempt))
-                    continue
-                raise EnrichmentError(
-                    f"Inference API connection failed after {_RETRY_ATTEMPTS + 1} attempts: {exc}"
-                )
+            except requests.RequestException as exc:
+                raise EnrichmentError(f"Inference API request failed: {exc}")
 
             # Retry on rate-limit (429) and transient server errors (5xx).
             if resp.status_code == 429 or resp.status_code >= 500:
@@ -775,15 +772,28 @@ def validate_against_schema(
         errors.append(f"{label}: {loc}: {err.message}")
 
 
-def validate_skills_sh_uniqueness(obj: dict, errors: list[str]) -> None:
+def validate_skills_sh_uniqueness(
+    obj: dict,
+    errors: list[str],
+    name_to_paths: dict[str, list[str]] | None = None,
+) -> None:
     seen: dict[str, str] = {}
     for g in obj.get("groupings", []):
         for s in g.get("skills", []):
             if s in seen:
-                errors.append(
-                    f"skills.sh.json: skill `{s}` appears in both "
-                    f"`{seen[s]}` and `{g.get('title')}`."
-                )
+                group_a = seen[s]
+                group_b = g.get("title")
+                paths = (name_to_paths or {}).get(s, [])
+                if group_a == group_b and len(paths) >= 2:
+                    errors.append(
+                        f"skills.sh.json: skill `{s}` appears at both "
+                        f"`{paths[0]}` and `{paths[1]}` — both map to `{group_a}`."
+                    )
+                else:
+                    errors.append(
+                        f"skills.sh.json: skill `{s}` appears in both "
+                        f"`{group_a}` and `{group_b}`."
+                    )
             else:
                 seen[s] = g.get("title")
 
@@ -887,7 +897,11 @@ def main(argv: list[str] | None = None) -> int:
 
     exclusions = load_exclusions()
     components = load_components()
-    skills_now, excluded_names = discover_skills(exclusions)
+    try:
+        skills_now, excluded_names = discover_skills(exclusions)
+    except GeneratorError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 1
 
     baseline = load_json(METADATA_PATH) if METADATA_PATH.exists() else None
     cls = classify(skills_now, baseline, excluded_names)
@@ -937,7 +951,10 @@ def main(argv: list[str] | None = None) -> int:
         validate_against_schema(
             skills_sh_obj, skills_sh_validator, "skills.sh.json", errors
         )
-        validate_skills_sh_uniqueness(skills_sh_obj, errors)
+        name_to_paths: dict[str, list[str]] = {}
+        for e in metadata_obj["skills"]:
+            name_to_paths.setdefault(e["name"], []).append(e["path"])
+        validate_skills_sh_uniqueness(skills_sh_obj, errors, name_to_paths)
         skipped_paths = {s.path for s in skills_now if s.path not in {e["path"] for e in entries}}
         validate_inventory_round_trip(skills_now, metadata_obj, skills_sh_obj, errors, skipped_paths=skipped_paths)
 
