@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `vss-deploy-profile`
-- Evaluation date: 2026-06-11
+- Evaluation date: 2026-06-15
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 5 evaluation tasks
@@ -54,11 +54,11 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 5 | 100% (+0%) | 90% (-10%) |
-| Correctness | 5 | 96% (+64%) | 75% (+38%) |
-| Discoverability | 5 | 94% (+49%) | 79% (+24%) |
-| Effectiveness | 5 | 67% (+61%) | 51% (+44%) |
-| Efficiency | 5 | 77% (+39%) | 71% (+23%) |
+| Security | 5 | 100% (+0%) | 100% (+10%) |
+| Correctness | 5 | 94% (+69%) | 84% (+47%) |
+| Discoverability | 5 | 95% (+62%) | 78% (+19%) |
+| Effectiveness | 5 | 56% (+52%) | 54% (+48%) |
+| Efficiency | 5 | 79% (+46%) | 72% (+17%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 

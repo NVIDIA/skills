@@ -29,16 +29,23 @@ import hashlib
 import importlib.metadata
 import json
 import math
+import mimetypes
 import os
 import struct
 import sys
 import time
+import uuid
 import zlib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 
 DEFAULT_MODEL = "nvidia/NV-Reason-CXR-3B"
+HF_SPACE_URL = "https://nvidia-nv-reason-cxr.hf.space"
+HF_SPACE_API_TIMEOUT_SECONDS = 300
 DEFAULT_PROMPT = "Find abnormalities and support devices."
 PROMPT_PRESETS = {
     "findings": "Find abnormalities and support devices.",
@@ -247,7 +254,7 @@ def _jpeg_info(path: Path) -> tuple[int, int]:
         int("0xCA", 0),
         int("0xCB", 0),
         int("0xCD", 0),
-        float("0xCE"),
+        int("0xCE", 0),
         int("0xCF", 0),
     }
     while i < len(data):
@@ -347,7 +354,7 @@ def _write_synthetic_png(path: Path, *, width: int = int("96"), height: int = in
     path.write_bytes(png)
 
 
-def _load_json_fixture(path: Path, out_dir: Path, cli_prompt: str | None) -> InputSpec:
+def _load_json_fixture(path: Path, out_dir: Path | None, cli_prompt: str | None) -> InputSpec:
     try:
         fixture = json.loads(path.read_text())
     except json.JSONDecodeError as e:
@@ -364,6 +371,11 @@ def _load_json_fixture(path: Path, out_dir: Path, cli_prompt: str | None) -> Inp
         raise SkillError("fixture field mock_response must be a string when present")
 
     if image_value in GENERATED_IMAGE_SENTINELS:
+        if out_dir is None:
+            raise SkillError(
+                "--out-dir is required when a JSON fixture requests "
+                "generated://synthetic_chest_xray"
+            )
         image_path = out_dir / "input_synthetic_chest_xray.png"
         _write_synthetic_png(image_path)
         return InputSpec(
@@ -390,7 +402,7 @@ def _load_json_fixture(path: Path, out_dir: Path, cli_prompt: str | None) -> Inp
     )
 
 
-def _load_input(path: Path, out_dir: Path, cli_prompt: str | None) -> InputSpec:
+def _load_input(path: Path, out_dir: Path | None, cli_prompt: str | None) -> InputSpec:
     if not path.exists():
         raise SkillError(f"input not found: {path}")
     if path.suffix.lower() == ".json":
@@ -554,6 +566,193 @@ def _run_transformers_inference(
     return generated_text, runtime
 
 
+# Normalize HTTP and network errors from Gradio API calls.
+def _http_fetch(
+    url: str,
+    *,
+    data: bytes | None = None,
+    headers: dict[str, str] | None = None,
+    timeout: int,
+) -> bytes:
+    try:
+        with urlopen(Request(url, data=data, headers=headers or {}), timeout=timeout) as response:
+            return response.read()
+    except HTTPError as e:
+        detail = e.read().decode("utf-8", "replace")
+        raise SkillError(f"HTTP {e.code}: {detail}") from e
+    except URLError as e:
+        raise SkillError(f"network error: {e.reason}") from e
+
+
+# Upload the local image and shape the response as Gradio FileData.
+def _hf_space_image_payload(base_url: str, image_path: Path, *, timeout: int) -> dict[str, Any]:
+    boundary = f"----gradio-upload-{uuid.uuid4().hex}"
+    mime = mimetypes.guess_type(image_path.name)[0] or "application/octet-stream"
+    filename = image_path.name.replace('"', "%22")
+    body = (
+        (
+            f"--{boundary}\r\n"
+            f'Content-Disposition: form-data; name="files"; filename="{filename}"\r\n'
+            f"Content-Type: {mime}\r\n\r\n"
+        ).encode()
+        + image_path.read_bytes()
+        + f"\r\n--{boundary}--\r\n".encode()
+    )
+    headers = {"Content-Type": f"multipart/form-data; boundary={boundary}"}
+    uploaded = json.loads(
+        _http_fetch(
+            f"{base_url}/gradio_api/upload", data=body, headers=headers, timeout=timeout
+        ).decode("utf-8", "replace")
+    )
+
+    item = uploaded[0] if isinstance(uploaded, list) and uploaded else uploaded
+    payload = dict(item) if isinstance(item, dict) else {"path": item}
+    payload.setdefault("orig_name", image_path.name)
+    payload.setdefault("size", image_path.stat().st_size)
+    payload.setdefault("mime_type", mime)
+    payload.setdefault("is_stream", False)
+    payload.setdefault("meta", {"_type": "gradio.FileData"})
+    return payload
+
+
+# Resolve the current Gradio function id for the fixed chat endpoint.
+def _hf_space_chat_fn_index(base_url: str, *, timeout: int) -> int:
+    config = json.loads(
+        _http_fetch(f"{base_url}/config", timeout=timeout).decode("utf-8", "replace")
+    )
+    target = "chat"
+    for index, dependency in enumerate(config.get("dependencies", [])):
+        if str(dependency.get("api_name", "")).lstrip("/") == target:
+            return int(dependency.get("id", index))
+    raise SkillError(f"could not find /{target} in Gradio config")
+
+
+# Reassemble server-sent Gradio chunks into the full model response text.
+def _stream_hf_space_response(response: Any) -> str:
+    event_lines: list[str] = []
+    chunks: list[str] = []
+
+    for raw in response:
+        line = raw.decode("utf-8", "replace").rstrip("\r\n")
+        if line:
+            event_lines.append(line)
+            continue
+        if not event_lines:
+            continue
+
+        data = "\n".join(
+            line.split(":", 1)[1].lstrip() for line in event_lines if line.startswith("data:")
+        )
+        event_lines = []
+        if not data:
+            continue
+
+        message = json.loads(data)
+        msg = message.get("msg")
+        if msg == "process_generating":
+            output = message.get("output", {}).get("data", [])
+            patches = output[0] if isinstance(output, list) and output else []
+            if not isinstance(patches, list):
+                continue
+            for patch in patches:
+                if isinstance(patch, list) and len(patch) >= 3 and patch[0] == "append":
+                    chunk = patch[2]
+                    if isinstance(chunk, str):
+                        chunks.append(chunk)
+        elif msg == "process_completed":
+            if not message.get("success", False):
+                raise SkillError(json.dumps(message, ensure_ascii=False))
+            if chunks:
+                return "".join(chunks)
+            output = message.get("output", {})
+            result = output.get("data") if isinstance(output, dict) else output
+            if isinstance(result, list) and result:
+                result = result[0]
+            if isinstance(result, str):
+                return result
+            if result is not None:
+                return json.dumps(result, ensure_ascii=False, indent=2)
+            return ""
+        elif msg == "close_stream":
+            break
+
+    if chunks:
+        return "".join(chunks)
+    raise SkillError("Gradio stream closed before completion")
+
+
+# Submit the uploaded image and prompt to the Space queue and stream the result.
+def _call_hf_space_endpoint(
+    *,
+    base_url: str,
+    prompt: str,
+    image_payload: dict[str, Any],
+    timeout: int,
+) -> str:
+    session_hash = uuid.uuid4().hex
+    payload = {
+        "data": [prompt, [], image_payload],
+        "fn_index": _hf_space_chat_fn_index(base_url, timeout=timeout),
+        "session_hash": session_hash,
+    }
+    body = json.dumps(payload, ensure_ascii=False).encode()
+    headers = {"Content-Type": "application/json"}
+    joined = json.loads(
+        _http_fetch(
+            f"{base_url}/gradio_api/queue/join",
+            data=body,
+            headers=headers,
+            timeout=timeout,
+        ).decode("utf-8", "replace")
+    )
+    if not joined.get("event_id"):
+        raise SkillError(f"missing Gradio event_id: {joined!r}")
+
+    stream_url = f"{base_url}/gradio_api/queue/data?{urlencode({'session_hash': session_hash})}"
+    try:
+        with urlopen(Request(stream_url), timeout=timeout) as response:
+            return _stream_hf_space_response(response)
+    except HTTPError as e:
+        detail = e.read().decode("utf-8", "replace")
+        raise SkillError(f"HTTP {e.code}: {detail}") from e
+    except URLError as e:
+        raise SkillError(f"network error: {e.reason}") from e
+
+
+# Run the fixed public Space backend and return text plus remote runtime metadata.
+def _run_hf_space_api_inference(
+    *,
+    image_path: Path,
+    prompt: str,
+) -> tuple[str, dict[str, str | int | bool | None]]:
+    try:
+        timeout = HF_SPACE_API_TIMEOUT_SECONDS
+        base_url = HF_SPACE_URL
+        image_payload = _hf_space_image_payload(base_url, image_path, timeout=timeout)
+        response_text = _call_hf_space_endpoint(
+            base_url=base_url,
+            prompt=prompt,
+            image_payload=image_payload,
+            timeout=timeout,
+        )
+    except SkillError:
+        raise
+    except Exception as e:
+        raise SkillError(f"HF Space API inference failed: {e}") from e
+    if not response_text:
+        raise SkillError("HF Space API returned empty response")
+
+    runtime = {
+        "device": "remote",
+        "torch_dtype": "remote",
+        "transformers_version": None,
+        "torch_version": None,
+        "generated_tokens": None,
+        "truncated_by_max_new_tokens": None,
+    }
+    return response_text, runtime
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Run NV-Reason-CXR-3B inference on a PNG/JPEG chest X-ray image."
@@ -571,7 +770,21 @@ def _build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Optional prompt preset used when --prompt is not supplied.",
     )
-    parser.add_argument("--out-dir", type=Path, default=Path("runs/nv_reason_cxr"))
+    parser.add_argument(
+        "--backend",
+        choices=["local", "hf-space-api"],
+        default="local",
+        help="Inference backend. Defaults to local Hugging Face Transformers.",
+    )
+    parser.add_argument(
+        "--out-dir",
+        type=Path,
+        default=None,
+        help=(
+            "Optional artifact directory. Required for generated JSON fixtures; "
+            "the eval harness passes this explicitly."
+        ),
+    )
     parser.add_argument(
         "--model-id",
         default=os.environ.get("NV_REASON_CXR_MODEL", DEFAULT_MODEL),
@@ -606,6 +819,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.max_new_tokens < 1:
         print("error: --max-new-tokens must be >= 1", file=sys.stderr)
         return 2
+    if args.backend == "hf-space-api" and args.local_files_only:
+        print(
+            "error: --local-files-only is only valid with --backend local",
+            file=sys.stderr,
+        )
+        return 2
 
     try:
         if args.check_setup:
@@ -617,17 +836,21 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 2
 
-        out_dir = args.out_dir.resolve()
-        out_dir.mkdir(parents=True, exist_ok=True)
+        out_dir = args.out_dir.resolve() if args.out_dir is not None else None
+        if out_dir is not None:
+            out_dir.mkdir(parents=True, exist_ok=True)
         prompt = args.prompt
         if prompt is None and args.prompt_preset:
             prompt = PROMPT_PRESETS[args.prompt_preset]
         spec = _load_input(args.image_or_fixture.resolve(), out_dir, prompt)
         info = _image_info(spec.image_path)
         local_files_only = bool(
-            args.local_files_only
-            or _truthy(os.environ.get("TRANSFORMERS_OFFLINE"))
-            or _truthy(os.environ.get("HF_HUB_OFFLINE"))
+            args.backend == "local"
+            and (
+                args.local_files_only
+                or _truthy(os.environ.get("TRANSFORMERS_OFFLINE"))
+                or _truthy(os.environ.get("HF_HUB_OFFLINE"))
+            )
         )
         mock = bool(args.mock or spec.fixture_mock or _truthy(os.environ.get("MOCK_NV_REASON_CXR")))
 
@@ -643,7 +866,7 @@ def main(argv: list[str] | None = None) -> int:
                 "truncated_by_max_new_tokens": False,
             }
             mode = "mock"
-        else:
+        elif args.backend == "local":
             response_text, runtime_extra = _run_transformers_inference(
                 image_path=spec.image_path,
                 prompt=spec.prompt,
@@ -655,6 +878,12 @@ def main(argv: list[str] | None = None) -> int:
                 local_files_only=local_files_only,
             )
             mode = "hf_transformers"
+        else:
+            response_text, runtime_extra = _run_hf_space_api_inference(
+                image_path=spec.image_path,
+                prompt=spec.prompt,
+            )
+            mode = "hf_space_api"
         elapsed = time.perf_counter() - t0
 
         payload = {
@@ -676,12 +905,12 @@ def main(argv: list[str] | None = None) -> int:
                 "text_chars": len(response_text),
             },
             "runtime": {
-                "model": args.model_id,
+                "model": args.model_id if args.backend == "local" else DEFAULT_MODEL,
                 "mode": mode,
                 "mock": mock,
                 "device": str(runtime_extra["device"]),
                 "torch_dtype": str(runtime_extra["torch_dtype"]),
-                "max_new_tokens": args.max_new_tokens,
+                "max_new_tokens": args.max_new_tokens if args.backend == "local" else None,
                 "inference_seconds": round(elapsed, int("6")),
                 "local_files_only": local_files_only,
                 "transformers_version": runtime_extra["transformers_version"],

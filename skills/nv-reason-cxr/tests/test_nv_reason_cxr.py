@@ -21,10 +21,12 @@ They do not download or run the NV-Reason-CXR model.
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import subprocess
 import sys
 from pathlib import Path
+from types import ModuleType
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 SCRIPT = SKILL_DIR / "scripts" / "run_nv_reason_cxr.py"
@@ -40,11 +42,23 @@ def _run(*args: str | Path) -> subprocess.CompletedProcess[str]:
     )
 
 
+# Import the runner module so tests can exercise internal stream parsing.
+def _script_module() -> ModuleType:
+    spec = importlib.util.spec_from_file_location("nv_reason_cxr_runner", SCRIPT)
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
 def test_json_fixture_mock_generates_valid_output(tmp_path: Path) -> None:
     proc = _run(FIXTURE, "--out-dir", tmp_path / "out")
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
     assert payload["skill"] == "nv_reason_cxr"
+    assert "backend" not in payload["runtime"]
     assert payload["runtime"]["mock"] is True
     assert payload["runtime"]["mode"] == "mock"
     assert payload["runtime"]["model"] == "nvidia/NV-Reason-CXR-3B"
@@ -86,6 +100,30 @@ def test_direct_png_mock_path(tmp_path: Path) -> None:
     assert payload["runtime"]["mock"] is True
 
 
+def test_direct_png_mock_without_out_dir_does_not_create_default_runs(tmp_path: Path) -> None:
+    first = _run(FIXTURE, "--out-dir", tmp_path / "fixture_out")
+    assert first.returncode == 0, first.stderr
+    generated = Path(json.loads(first.stdout)["input"]["image"]["path"])
+
+    proc = subprocess.run(
+        [sys.executable, str(SCRIPT), str(generated), "--mock"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert proc.returncode == 0, proc.stderr
+    payload = json.loads(proc.stdout)
+    assert payload["input"]["image"]["source"] == "file"
+    assert not (tmp_path / "runs").exists()
+
+
+def test_generated_fixture_requires_out_dir() -> None:
+    proc = _run(FIXTURE)
+    assert proc.returncode == 2
+    assert "--out-dir is required" in proc.stderr
+
+
 def test_prompt_preset_for_direct_image(tmp_path: Path) -> None:
     first = _run(FIXTURE, "--out-dir", tmp_path / "fixture_out")
     assert first.returncode == 0, first.stderr
@@ -102,6 +140,72 @@ def test_prompt_preset_for_direct_image(tmp_path: Path) -> None:
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
     assert "structured response" in payload["input"]["prompt"]
+
+
+# Verify API mock mode preserves the same public JSON contract.
+def test_api_backend_mock_keeps_json_contract(tmp_path: Path) -> None:
+    proc = _run(
+        FIXTURE,
+        "--backend",
+        "hf-space-api",
+        "--mock",
+        "--out-dir",
+        tmp_path / "api_mock_out",
+    )
+    assert proc.returncode == 0, proc.stderr
+    payload = json.loads(proc.stdout)
+    assert "backend" not in payload["runtime"]
+    assert payload["runtime"]["mode"] == "mock"
+    assert payload["runtime"]["mock"] is True
+    assert payload["runtime"]["device"] == "none"
+    assert payload["runtime"]["max_new_tokens"] is None
+    assert "space" not in payload["runtime"]
+    assert "api_name" not in payload["runtime"]
+    assert "space_url" not in payload["runtime"]
+    assert payload["output"]["response_text"]
+
+
+# Reject local cache-only mode before attempting a remote API call.
+def test_api_backend_rejects_local_files_only(tmp_path: Path) -> None:
+    proc = _run(
+        FIXTURE,
+        "--backend",
+        "hf-space-api",
+        "--local-files-only",
+        "--out-dir",
+        tmp_path / "api_bad_out",
+    )
+    assert proc.returncode == 2
+    assert "--local-files-only is only valid with --backend local" in proc.stderr
+
+
+# Ensure streaming output keeps model-generated reasoning tags intact.
+def test_hf_space_stream_preserves_reasoning_and_answer_tags() -> None:
+    module = _script_module()
+    generating = {
+        "msg": "process_generating",
+        "output": {
+            "data": [
+                [
+                    ["append", None, "<think>first sentence."],
+                    ["append", None, " second sentence.</think>"],
+                    ["append", None, "\n<answer>Finding</answer>"],
+                ]
+            ]
+        },
+    }
+    completed = {"msg": "process_completed", "success": True}
+    stream = [
+        f"data: {json.dumps(generating)}\n".encode(),
+        b"\n",
+        f"data: {json.dumps(completed)}\n".encode(),
+        b"\n",
+    ]
+
+    assert (
+        module._stream_hf_space_response(stream)
+        == "<think>first sentence. second sentence.</think>\n<answer>Finding</answer>"
+    )
 
 
 def test_rejects_non_image_file(tmp_path: Path) -> None:

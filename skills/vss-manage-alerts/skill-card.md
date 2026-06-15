@@ -1,5 +1,5 @@
 ## Description: <br>
-Use for VSS alert workflows — real-time monitoring, Alert-Bridge subscriptions, Slack notifications, incident queries, camera onboarding. Not for non-alert analytics. <br>
+Use for VSS alert workflows — real-time monitoring, Alert-Bridge subscriptions, Slack notifications, incident queries, camera onboarding. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 OR MIT <br>
 ## Use Case: <br>
-Developers and operators managing real-time video alert pipelines on NVIDIA VSS deployments, including monitoring, alert subscriptions, Slack notifications, and incident queries. <br>
+Developers and operations engineers managing video surveillance alert pipelines use this skill to configure real-time monitoring, create alert subscriptions, set up Slack notifications, query incidents, and onboard cameras within an NVIDIA VSS deployment. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,11 +19,11 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [alert-notify.md](references/alert-notify.md) <br>
-- [alert-subscriptions.md](references/alert-subscriptions.md) <br>
-- [cv-verifier-prompts.md](references/cv-verifier-prompts.md) <br>
-- [NVIDIA VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
-- [Video Search and Summarization GitHub](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
+- [Alert Subscriptions Reference](references/alert-subscriptions.md) <br>
+- [Alert Notify Reference](references/alert-notify.md) <br>
+- [CV Verifier Prompts Reference](references/cv-verifier-prompts.md) <br>
+- [VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
+- [GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
 
 
 ## Skill Output: <br>
@@ -33,13 +33,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- claude-code <br>
-- codex <br>
+- `claude-code` <br>
+- `codex` <br>
 
 
 
 ## Evaluation Tasks: <br>
-14 evaluation tasks via NVSkills-Eval external profile in astra-sandbox environment. <br>
+Evaluated against 7 internal evaluation tasks (6 positive skill-activation, 1 negative). NVSkills-Eval profile: external. Pass threshold: 50%. Overall verdict: PASS. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,11 +63,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 7 | 100% (+0%) | 79% (-7%) |
-| Correctness | 7 | 92% (+60%) | 95% (+50%) |
-| Discoverability | 7 | 96% (+57%) | 82% (+21%) |
-| Effectiveness | 7 | 66% (+49%) | 68% (+45%) |
-| Efficiency | 7 | 88% (+52%) | 72% (+16%) |
+| Security | 7 | 100% (+0%) | 93% (-7%) |
+| Correctness | 7 | 89% (+55%) | 78% (+33%) |
+| Discoverability | 7 | 99% (+55%) | 89% (+26%) |
+| Effectiveness | 7 | 62% (+44%) | 51% (+27%) |
+| Efficiency | 7 | 89% (+51%) | 80% (+22%) |
 
 ## Skill Version(s): <br>
 3.2.0 (source: frontmatter) <br>

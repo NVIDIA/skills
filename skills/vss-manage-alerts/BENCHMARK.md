@@ -7,10 +7,10 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `vss-manage-alerts`
-- Evaluation date: 2026-06-11
+- Evaluation date: 2026-06-14
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
-- Dataset: 14 evaluation tasks
+- Dataset: 7 evaluation tasks
 - Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
@@ -42,40 +42,37 @@ Underlying evaluation signals used in this run:
 
 ## Test Tasks
 
-The benchmark included 14 recorded Tier 3 trials, but the source evaluation dataset was not available in this report payload.
+The benchmark dataset contained 7 evaluation tasks:
+
+- Positive tasks: 6 tasks where the skill was expected to activate.
+- Negative tasks: 1 tasks where no skill was expected.
+- Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
+
+Task composition is derived from the evaluation dataset when possible. Entries with `expected_skill` set are treated as positive skill-activation cases, while entries with `expected_skill: null` are treated as negative activation cases.
 
 ## Results
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 7 | 100% (+0%) | 79% (-7%) |
-| Correctness | 7 | 92% (+60%) | 95% (+50%) |
-| Discoverability | 7 | 96% (+57%) | 82% (+21%) |
-| Effectiveness | 7 | 66% (+49%) | 68% (+45%) |
-| Efficiency | 7 | 88% (+52%) | 72% (+16%) |
+| Security | 7 | 100% (+0%) | 93% (-7%) |
+| Correctness | 7 | 89% (+55%) | 78% (+33%) |
+| Discoverability | 7 | 99% (+55%) | 89% (+26%) |
+| Effectiveness | 7 | 62% (+44%) | 51% (+27%) |
+| Efficiency | 7 | 89% (+51%) | 80% (+22%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed. NVSkills-Eval ran 9 checks and found 0 total findings.
+Tier 1 validation passed. NVSkills-Eval ran 1 checks and found 0 total findings.
 
 Notable observations:
 
-- SECURITY: no findings reported.
 - SCHEMA: Found skill manifest: SKILL.md
-- VERSION: Valid semantic version: 3.2.0
-- PII: Scanning 10 files for PII
-- LICENSE: no findings reported.
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 9 file(s)
-- Inter-Skill Deduplication: Parsed skill 'vss-manage-alerts': 166 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

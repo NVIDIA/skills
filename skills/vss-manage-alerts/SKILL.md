@@ -127,7 +127,7 @@ grep -E '^MODE=' deploy/docker/developer-profiles/dev-profile-alerts/generated.e
 
 > **`alerts` vs `alert rules` (C vs D) — pick exactly one, never both:**
 > *what happened / has been triggered* (incidents) → **Workflow C**
-> (`POST /generate` or `GET /api/v1/realtime/incidents`). *What
+> (`POST /generate`). *What
 > rules/subscriptions are configured or active* → **Workflow D** (the
 > **bare** `GET /api/v1/realtime`, no `/incidents`). Bare `alerts` =
 > incidents (C); `alert rules` / `subscriptions` / `active rules` =
@@ -264,23 +264,10 @@ detected lately?" are incident queries — issue a `POST /generate` (e.g.
 running the query.** A bare "alerts" question is *always* an incident
 lookup (Workflow C), not a subscription-rule listing (Workflow D).
 
-> **Two valid incident endpoints:** (1) `POST /generate` —
-> natural-language questions via the VSS Agent; (2)
-> `GET http://<HOST>:9080/api/v1/realtime/incidents` — Alert Bridge
-> **incidents** endpoint (params `sensor_id`, `start_time`, `end_time`
-> ISO-8601, `limit`, `offset`; response has `total`, `count`,
-> `incidents[]`). **Prefer (2) for counts/filtered lists** — read `total`
-> for "how many".
->
-> ```bash
-> curl -sf "http://<HOST>:9080/api/v1/realtime/incidents?sensor_id=<UUID>&start_time=<ISO>" | jq '.total'
-> ```
->
 > **Do NOT list subscription rules for an incident query.** The **bare**
 > `GET /api/v1/realtime` (no `/incidents`) lists *rules* (Workflow D) and
 > is wrong for "what happened" — never call/probe it or load the Workflow
-> D playbook for an incident query. The `/incidents` endpoint above is a
-> **different** endpoint and **is** allowed here.
+> D playbook for an incident query.
 >
 > **Empty result is a valid answer.** If no incidents match (e.g. a
 > freshly deployed system with no activity yet), report that **none were
