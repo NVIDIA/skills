@@ -49,6 +49,18 @@
       }
     },
     {
+      "path": "skills/cufolio",
+      "name": "cufolio",
+      "description": "Use when a user asks to build, optimize, backtest, rebalance, or analyze a stock portfolio with Mean-CVaR, efficient frontiers, scenario generation, or NVIDIA cuOpt.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "data_scientist,developer,application_developer,ai_engineer",
+        "discovery.activity_tags": "optimize,evaluate,benchmark,generate,assess"
+      }
+    },
+    {
       "path": "skills/cuopt-developer",
       "name": "cuopt-developer",
       "description": "Modify, build, test, debug, and contribute to NVIDIA cuOpt (C++/CUDA, Python, server, CI). Use for solver internals, PRs, DCO, and code conventions.",
@@ -1702,6 +1714,30 @@
         "catalog.subdomain": "infrastructure",
         "audience": "ml_engineer,devops_engineer,platform_engineer,ai_engineer,developer",
         "discovery.activity_tags": "orchestrate,deploy,configure,train,inference"
+      }
+    },
+    {
+      "path": "skills/tao-run-on-lepton",
+      "name": "tao-run-on-lepton",
+      "description": "DGX Cloud Lepton managed GPU compute platform with run/status/cancel interface. Use when submitting TAO jobs to DGX Cloud, dispatching training/eval/inference to Lepton GPU resources, or managing Lepton workspace deployments. Trigger phrases include \"run on Lepton\", \"submit to DGX Cloud\", \"Lepton job\", \"managed GPU on DGX Cloud\".",
+      "metadata": {
+        "product.primary": "DGX Cloud",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "infrastructure",
+        "audience": "ml_engineer,ai_engineer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "orchestrate,deploy,train,inference,monitor"
+      }
+    },
+    {
+      "path": "skills/tao-run-on-local-docker",
+      "name": "tao-run-on-local-docker",
+      "description": "Local Docker execution for TAO SDK job containers using the host Docker daemon and NVIDIA GPU runtime. Use when running TAO jobs on the current machine or a directly attached Docker host. Trigger phrases include \"run locally\", \"local Docker\", \"use my GPU\", \"run on my machine\", \"host Docker daemon\".",
+      "metadata": {
+        "product.primary": "TAO",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "operate,configure,deploy,train,inference"
       }
     },
     {

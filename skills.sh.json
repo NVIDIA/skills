@@ -198,6 +198,7 @@
         "tao-list-capabilities",
         "tao-run-automl",
         "tao-run-automl-deft-pipeline",
+        "tao-run-on-local-docker",
         "tao-run-platform",
         "tao-train-centerpose",
         "tao-train-mask-auto-encoder",
@@ -221,6 +222,7 @@
       "title": "Decision Optimization",
       "description": "Formulate and solve routing, scheduling, and numerical optimization problems using optimization solvers, APIs, services, and deployment workflows.",
       "skills": [
+        "cufolio",
         "cuopt-developer",
         "cuopt-install",
         "cuopt-numerical-optimization-api-c",
@@ -267,6 +269,7 @@
         "holoscan-setup",
         "tao-run-on-brev",
         "tao-run-on-kubernetes",
+        "tao-run-on-lepton",
         "tao-run-on-slurm",
         "tao-setup-nvidia-gpu-host"
       ]
