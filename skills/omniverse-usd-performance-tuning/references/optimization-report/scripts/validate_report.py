@@ -30,6 +30,23 @@ report's own ``target_coverage.source_manifests[]`` (auto-loaded relative to the
 report), so a restructure report cannot pass merely because the operator forgot
 the flag. Monolith/diagnosis runs (no restructure roles) stay manifest-free.
 
+Footprint gate (repack-normalization)
+-------------------------------------
+When the optional ``footprint`` block is present, the gate checks the
+raw -> repack_normalized -> optimized arithmetic is consistent and fails closed
+on a repack-as-optimization claim: a raw->optimized saving that is almost
+entirely the free crate re-encode (structural shrink ~0 off the
+repack-normalized baseline) cannot be presented as the optimization win.
+
+Preservation gate (axis-A silent-loss)
+--------------------------------------
+When the optional ``preservation`` block is present, the gate checks its shape
+matches what the run-scoring oracle consumes:
+integer ``rendered_mesh_count`` / ``dangling`` and boolean
+``distinct_geometry_bytes_preserved`` / ``bounds_preserved``. Whether those
+values actually pass (count unchanged, bounds/bytes preserved, dangling 0) is
+scored against the asset's oracle, not here.
+
 Usage:
     python3 validate_report.py <report.json> [--schema <schema.json>] \\
         [--manifest <apply-restructure-manifest.json> ...]
@@ -53,6 +70,14 @@ PHASE4_RESOLVED_DISPOSITIONS = frozenset(
 RESTRUCTURE_TARGET_CLASSES = frozenset(
     {"prototype", "shared_layer", "loadable_subasset", "assembly_root"}
 )
+#: Reuse/descent frontier dispositions that SHARE a unit (and therefore make a
+#: scene-graph / consolidation claim that must be backed by MEASURED reuse).
+SHARED_IDENTITY_DISPOSITIONS = frozenset({"externalize_shared", "internal_share"})
+#: Reuse/descent frontier reduction routes that DESTROY identity — allowed only on weak-identity
+#: (anonymous / structural-fallback) units, never on a strong-identity part.
+IDENTITY_DESTROYING_ROUTES = frozenset({"point_instance", "merge"})
+#: Identity signals that mark a unit as a real, addressable part (strong identity).
+STRONG_IDENTITY_SIGNALS = frozenset({"kind", "naming", "semantic"})
 #: Coverage-entry roles that mean "a restructure happened", so a manifest is
 #: mandatory and reconciliation is not optional. The ``monolith`` role (an
 #: optimize-as-is N=1 target) and an empty ledger stay manifest-free.
@@ -123,6 +148,58 @@ def validate_report(report: Any, schema: dict | None = None) -> list[str]:
     return errors
 
 
+def _validate_frontier_entry(target: dict, label: str) -> list[str]:
+    """Enforce the reuse/descent frontier contract on a single phase4_targets[] entry (C3).
+
+    These checks are conditional on the frontier fields being present, so a
+    minimal (path / target_class / mesh_count) manifest is unaffected. When the
+    frontier metadata IS authored the contract makes a bad descent FAIL, not
+    merely be discouraged in prose:
+
+    * a shared (externalize_shared / internal_share) or identity-destroying
+      (point_instance / merge) entry must carry an ``identity_signal`` (the
+      queryable boundary basis);
+    * a shared entry whose frontier landed on anonymous meshes
+      (``identity_signal == "none"``) fails — the descent crossed from parts into
+      triangles;
+    * an identity-destroying ``reduction_route`` on a STRONG-identity unit
+      (kind / naming / semantic) fails — point_instance / merge are the matrix's
+      two weak-identity-only rows.
+    """
+    errors: list[str] = []
+    disposition = target.get("identity_disposition")
+    route = target.get("reduction_route")
+    signal = target.get("identity_signal")
+
+    is_shared = disposition in SHARED_IDENTITY_DISPOSITIONS
+    is_destroying = route in IDENTITY_DESTROYING_ROUTES
+
+    if (is_shared or is_destroying) and not signal:
+        errors.append(
+            f"{label}: identity_signal is required on a shared "
+            f"({disposition}) or identity-destroying ({route}) entry "
+            "(the boundary basis must be queryable)"
+        )
+
+    if is_shared and signal == "none":
+        errors.append(
+            f"{label}: identity_disposition {disposition!r} landed on anonymous "
+            "meshes (identity_signal 'none') — a shared frontier must land on a "
+            "named/kind/semantic unit or, at worst, the coarsest repeating subtree "
+            "(structural_fallback), never anonymous geometry"
+        )
+
+    if is_destroying and signal in STRONG_IDENTITY_SIGNALS:
+        errors.append(
+            f"{label}: identity-destroying reduction_route {route!r} on a "
+            f"strong-identity unit (identity_signal {signal!r}) — point_instance / "
+            "merge are reserved for weak-identity (anonymous / structural_fallback) "
+            "units; a named/kind/semantic part must stay addressable"
+        )
+
+    return errors
+
+
 def validate_manifest_structure(manifest: Any) -> list[str]:
     """Enforce the load-bearing apply-restructure manifest invariants.
 
@@ -161,6 +238,66 @@ def validate_manifest_structure(manifest: Any) -> list[str]:
                 f"{label}: mesh_count must be an integer >= 0 (authoritative "
                 f"default-predicate count), got {mesh_count!r}"
             )
+        errors.extend(_validate_frontier_entry(target, label))
+
+    # Measured-reuse-before-consolidation (C3): a scene-graph / consolidation win
+    # may only be reported from MEASURED reuse, never estimated. When any target
+    # claims a shared disposition (externalize_shared / internal_share), the
+    # manifest's top-level ``frontier`` block must record reuse_measured: true.
+    shared_entries = [
+        t for t in (targets or [])
+        if isinstance(t, dict) and t.get("identity_disposition") in SHARED_IDENTITY_DISPOSITIONS
+    ]
+    if shared_entries:
+        frontier = manifest.get("frontier")
+        if not isinstance(frontier, dict) or frontier.get("reuse_measured") is not True:
+            errors.append(
+                "frontier: a shared disposition (externalize_shared/internal_share) is claimed "
+                "but frontier.reuse_measured is not true — a scene-graph / consolidation win "
+                "must be backed by MEASURED reuse (distinct vs total units), never estimated. "
+                "When measured reuse is low, pivot to the disk tier instead of forcing sharing."
+            )
+
+    # apply-restructure residual-mesh postcondition (mirrored here for the
+    # manifest, enforced live in apply-restructure where the USD stage is open).
+    # When extraction leaves > 0 mesh prims on the assembly root, apply-restructure
+    # records the authoritative residual count under ``assembly_root`` AND lists the
+    # same root in ``phase4_targets[]`` as ``target_class: assembly_root``. Fail loud
+    # if a restructure manifest is written with residual meshes but no such target
+    # entry: a retained-mesh assembly root must never be silently dropped from Phase 4.
+    residual = manifest.get("assembly_root")
+    if isinstance(residual, dict):
+        residual_count = residual.get("mesh_count")
+        residual_path = residual.get("path")
+        if (
+            isinstance(residual_count, int)
+            and not isinstance(residual_count, bool)
+            and residual_count > 0
+        ):
+            root_entry = next(
+                (
+                    t
+                    for t in (targets or [])
+                    if isinstance(t, dict)
+                    and t.get("target_class") == "assembly_root"
+                    and (residual_path is None or t.get("path") == residual_path)
+                ),
+                None,
+            )
+            if root_entry is None:
+                errors.append(
+                    f"assembly_root records residual mesh_count {residual_count} > 0 but no "
+                    "phase4_targets[] entry with target_class 'assembly_root'"
+                    + (f" and path {residual_path}" if residual_path else "")
+                    + " is present (apply-restructure postcondition: a retained-mesh assembly "
+                    "root must be a Phase-4 target, never silently dropped)"
+                )
+            elif root_entry.get("mesh_count") != residual_count:
+                errors.append(
+                    f"assembly_root residual mesh_count {residual_count} does not match its "
+                    f"phase4_targets[] entry mesh_count {root_entry.get('mesh_count')!r} "
+                    "(both must echo the same authoritative default-predicate count)"
+                )
     return errors
 
 
@@ -207,6 +344,141 @@ def _manifest_targets(manifests: list[Any]) -> dict[str, int | None]:
     return planned
 
 
+#: Arithmetic-consistency tolerance (percentage points) for the footprint split.
+_FOOTPRINT_TOLERANCE_PP = 0.6
+#: A structural change smaller than this magnitude (percent) is treated as "no
+#: real structural shrink off the repack-normalized baseline" for the
+#: repack-as-optimization fail-closed check.
+_FOOTPRINT_STRUCTURAL_EPSILON_PCT = 1.0
+
+
+def _pct_change(before: float, after: float) -> float | None:
+    if before == 0:
+        return None
+    return (after - before) / before * 100.0
+
+
+def validate_footprint(report: Any) -> list[str]:
+    """Gate the optional repack-normalized footprint block.
+
+    Returns violation messages (empty == passes or no footprint block). When a
+    ``footprint`` block is present it must (1) be arithmetically consistent
+    across raw -> repack_normalized -> optimized, and (2) fail closed if the
+    only reduction is the free crate re-encode while the structural win off the
+    repack-normalized baseline is ~0 (repack-as-optimization). A repack — or an
+    unshared disaggregation — presented as the optimization win is a fail-closed
+    reporting error per the plan.
+    """
+    errors: list[str] = []
+    footprint = report.get("footprint") if isinstance(report, dict) else None
+    if footprint is None:
+        return errors
+    if not isinstance(footprint, dict):
+        return ["footprint must be an object"]
+
+    raw = footprint.get("raw_input_bytes")
+    normalized = footprint.get("repack_normalized_baseline_bytes")
+    optimized = footprint.get("optimized_bytes")
+    nums = {
+        "raw_input_bytes": raw,
+        "repack_normalized_baseline_bytes": normalized,
+        "optimized_bytes": optimized,
+    }
+    for name, value in nums.items():
+        if not isinstance(value, (int, float)) or isinstance(value, bool) or value < 0:
+            errors.append(f"footprint.{name} must be a number >= 0, got {value!r}")
+    if errors:
+        return errors
+
+    if footprint.get("scored_against") != "repack_normalized":
+        errors.append(
+            "footprint.scored_against must be 'repack_normalized' — the storage "
+            "dimension and any footprint claim score against the repack-normalized "
+            "baseline, not the raw input"
+        )
+
+    structural_delta = footprint.get("structural_delta_pct")
+    expected_structural = _pct_change(normalized, optimized)
+    if isinstance(structural_delta, (int, float)) and not isinstance(structural_delta, bool):
+        if expected_structural is not None and abs(structural_delta - expected_structural) > _FOOTPRINT_TOLERANCE_PP:
+            errors.append(
+                f"footprint.structural_delta_pct ({structural_delta}) does not match "
+                f"repack_normalized->optimized ({expected_structural:.2f}%) within "
+                f"{_FOOTPRINT_TOLERANCE_PP}pp"
+            )
+    else:
+        errors.append("footprint.structural_delta_pct must be a number")
+
+    repack_delta = footprint.get("repack_delta_pct")
+    if isinstance(repack_delta, (int, float)) and not isinstance(repack_delta, bool):
+        expected_repack = _pct_change(raw, normalized)
+        if expected_repack is not None and abs(repack_delta - expected_repack) > _FOOTPRINT_TOLERANCE_PP:
+            errors.append(
+                f"footprint.repack_delta_pct ({repack_delta}) does not match "
+                f"raw->repack_normalized ({expected_repack:.2f}%) within "
+                f"{_FOOTPRINT_TOLERANCE_PP}pp"
+            )
+
+    raw_delta = footprint.get("raw_delta_pct")
+    if isinstance(raw_delta, (int, float)) and not isinstance(raw_delta, bool):
+        expected_raw = _pct_change(raw, optimized)
+        if expected_raw is not None and abs(raw_delta - expected_raw) > _FOOTPRINT_TOLERANCE_PP:
+            errors.append(
+                f"footprint.raw_delta_pct ({raw_delta}) does not match "
+                f"raw->optimized ({expected_raw:.2f}%) within {_FOOTPRINT_TOLERANCE_PP}pp"
+            )
+
+    # Repack-as-optimization fail-closed: a raw->optimized saving that is almost
+    # entirely the free crate re-encode (structural shrink ~0 off the normalized
+    # baseline) must not be presented as the optimization win.
+    if (
+        isinstance(structural_delta, (int, float))
+        and not isinstance(structural_delta, bool)
+        and structural_delta > -_FOOTPRINT_STRUCTURAL_EPSILON_PCT
+    ):
+        observed_raw = raw_delta if isinstance(raw_delta, (int, float)) and not isinstance(raw_delta, bool) else _pct_change(raw, optimized)
+        if observed_raw is not None and observed_raw < -_FOOTPRINT_STRUCTURAL_EPSILON_PCT:
+            errors.append(
+                f"footprint: raw->optimized shows {observed_raw:.2f}% but the structural "
+                f"reduction off the repack-normalized baseline is only {structural_delta:.2f}% "
+                "— the saving is the free crate re-encode, not the optimization. Presenting a "
+                "repack (or an unshared disaggregation) as the optimization win is a "
+                "fail-closed reporting error."
+            )
+    return errors
+
+
+def validate_preservation(report: Any) -> list[str]:
+    """Gate the optional axis-A preservation (silent-loss) block.
+
+    Returns violation messages (empty == passes or no preservation block). The
+    block is optional at the report level, but when present its shape must match
+    exactly what the run-scoring oracle consumes so the
+    schema, scorer, and validator agree: an integer ``rendered_mesh_count`` and
+    ``dangling`` (both >= 0), and boolean ``distinct_geometry_bytes_preserved``
+    and ``bounds_preserved``. This is shape-only — whether the values pass the
+    gate (count unchanged, both bools true, dangling 0) is the scorer's job
+    against the asset's oracle, not a static check here.
+    """
+    errors: list[str] = []
+    pres = report.get("preservation") if isinstance(report, dict) else None
+    if pres is None:
+        return errors
+    if not isinstance(pres, dict):
+        return ["preservation must be an object"]
+    for name in ("rendered_mesh_count", "dangling"):
+        value = pres.get(name)
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            errors.append(
+                f"preservation.{name} must be an integer >= 0, got {value!r}"
+            )
+    for name in ("distinct_geometry_bytes_preserved", "bounds_preserved"):
+        value = pres.get(name)
+        if not isinstance(value, bool):
+            errors.append(f"preservation.{name} must be a boolean, got {value!r}")
+    return errors
+
+
 def reconcile_target_coverage(report: Any, manifests: list[Any] | None = None) -> list[str]:
     """Gate the report's Phase-4 target_coverage; reconcile against manifest(s).
 
@@ -236,10 +508,45 @@ def reconcile_target_coverage(report: Any, manifests: list[Any] | None = None) -
                 f"target_coverage entry {path}: skipped_zero_meshes requires "
                 f"mesh_count == 0, got {mesh_count!r} (a non-zero target cannot be skipped)"
             )
+        # No-op-masquerading-as-optimized: an entry that claims the mesh op chain
+        # ran must have touched at least one mesh when the target has meshes.
+        optimized_mesh_count = entry.get("optimized_mesh_count")
+        if (
+            disposition == "optimized"
+            and isinstance(optimized_mesh_count, int)
+            and not isinstance(optimized_mesh_count, bool)
+            and optimized_mesh_count == 0
+            and isinstance(mesh_count, int)
+            and not isinstance(mesh_count, bool)
+            and mesh_count > 0
+        ):
+            errors.append(
+                f"target_coverage entry {path}: disposition 'optimized' but "
+                f"optimized_mesh_count is 0 while mesh_count is {mesh_count} > 0 "
+                "(no-op masquerading as optimized — record the meshes actually touched, "
+                "or use skipped_user_declined / skipped_zero_meshes)"
+            )
 
     present_restructure_roles = sorted(
         {e.get("role") for e in entries} & RESTRUCTURE_ROLES
     )
+
+    # Once a restructure exists (a manifest is supplied/recorded OR a restructure
+    # role appears), 'monolith' is illegal: it is by definition the N=1, no-manifest,
+    # non-restructured optimize-as-is path. A monolith entry alongside manifest
+    # provenance or restructure roles is a contradiction, not a valid ledger row.
+    recorded_manifests = coverage.get("source_manifests") or []
+    manifest_context = bool(manifests) or bool(recorded_manifests)
+    if manifest_context or present_restructure_roles:
+        for entry in entries:
+            if entry.get("role") == "monolith":
+                errors.append(
+                    f"target_coverage entry {entry.get('path', '<unknown>')}: role 'monolith' "
+                    "is illegal once a restructure exists (a source manifest is present or a "
+                    "restructure role appears in target_coverage). 'monolith' is only the N=1, "
+                    "no-manifest, non-restructured optimize-as-is target."
+                )
+
     if present_restructure_roles and not manifests:
         errors.append(
             "target_coverage has restructure role(s) "
@@ -324,6 +631,8 @@ def main() -> int:
 
     manifests = [manifest for _, manifest in labeled]
     errors.extend(reconcile_target_coverage(report, manifests))
+    errors.extend(validate_footprint(report))
+    errors.extend(validate_preservation(report))
 
     if errors:
         print(f"{args.report}: INVALID ({len(errors)} error(s))")

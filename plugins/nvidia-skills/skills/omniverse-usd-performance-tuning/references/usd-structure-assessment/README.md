@@ -60,10 +60,9 @@ Before producing the SA report, re-read and confirm:
   deferred to Phase 2c validators (SO analysis mode).
 - SA Stage 2 heuristics flag validation candidates; they do not justify operations
   by themselves.
-- Outlier detection (§2.1) uses authored `extentsHint` attributes when present.
-  If extents are not authored, SA cannot flag spatial outliers — Phase 2c
-  validators (`countVertices` / `MeshDensityChecker`) catch density outliers
-  downstream with SO loaded.
+- Density/over-tessellation outliers are not an SA concern: SA reads no geometry
+  arrays. Phase 2c validators (`countVertices` / `MeshDensityChecker` →
+  `perf_high_vertex_count`) catch density outliers downstream with SO loaded.
 ## Troubleshooting
 
 - If assets, layers, and composition arcs are conflated, re-read the reference
@@ -90,7 +89,7 @@ attributes like `extentsHint`.
 
 Mesh-level statistics (triangle counts, vertex density) are **not** SA's job.
 Those are produced by Phase 2c validators (`countVertices`, `MeshDensityChecker`)
-which run Scene Optimizer in analysis mode.
+which run Usd Optimize in analysis mode.
 
 ### 1.1 Composition inventory
 
@@ -108,7 +107,7 @@ which run Scene Optimizer in analysis mode.
   from stage metadata (zero cost). `mesh_count` from prim-type traversal (count
   prims of type `UsdGeom.Mesh` — no geometry arrays needed).
   These fields are consumed by downstream operations
-  (see `so-run-operations/references/units-and-tolerances.md`).
+  (see `usd-optimize-run-operations/references/units-and-tolerances.md`).
 ### 1.2 Asset inventory
 
 Group layers into assets. An asset is typically a directory containing:
@@ -124,28 +123,14 @@ Report:
 - Assets missing expected layers (no payload, no interface, geometry-only).
 - The **referenced asset manifest**: list of geometry layer paths for downstream per-asset work.
 
-### 1.3 Layer health
-
-- File formats (usdc vs usda vs usd).
-- Flag large `.usda` data files (>100KB) — should be `.usdc`.
-- Flag tiny layers (<500B) — accumulated automation artifacts?
-- Flag anonymous or session layers.
-- Total size on disk.
-
-### 1.4 Instancing analysis
+### 1.3 Instancing analysis
 
 - Count instanceable prims and active instances.
 - Count prototypes.
 - Identify repeated references to the same asset — these are instancing candidates.
 - Compute instance ratio: instances / total referenceable prims.
 
-### 1.5 Variant and payload state
-
-- Count variant sets and selected variants.
-- Identify unloaded payloads.
-- Flag variant-dependent geometry or material differences.
-
-### 1.6 Kind hierarchy
+### 1.4 Kind hierarchy
 
 - Check that kind metadata is present and consistent (assembly → component → subcomponent).
 - Flag prims with geometry but no kind assignment.
@@ -153,71 +138,58 @@ Report:
 
 ## SA Stage 2: Structural Heuristics (metadata only, narrows validation scope)
 
-These checks use authored extent metadata (`extentsHint`) and structural
-patterns to identify assets that likely need deep validation. They do not
-load geometry arrays. If `extentsHint` is not authored on a prim, SA skips
-spatial heuristics for that prim — Phase 2c validators catch it downstream.
+These checks use structural patterns and boundary nomination to identify assets
+that likely need deep validation. They do not load geometry arrays. Authored
+extent metadata (`extentsHint`), when present, is used only as optional
+*confirmation* of a nomination — never as a required input. If `extentsHint` is
+not authored, SA proceeds on structural/semantic signal alone; geometry-intrinsic
+issues (density, over-tessellation) are deferred to Phase 2c validators.
 
-### 2.1 Outlier detection
+### 2.1 Containment detection (boundary-nomination primary; bbox confirmation-only)
 
-Using `extentsHint` or authored extent attributes (when present):
+Internal/occluded geometry is found by **boundary nomination** (the two sources —
+`candidate_source` `hash` and `semantics` — are defined once in §2.5), not by a
+first-step bounding-box containment sweep.
 
-- Flag assets where a single mesh's authored extent spans a large fraction of
-  the overall stage extent. This suggests fused architectural geometry that should
-  be split into separate assets (e.g., floor + walls + ceiling as one mesh).
-- Flag assets with authored extents disproportionately small relative to their
-  subtree depth or sibling count — possible over-tessellation candidates.
-- If extents are not authored, SA cannot flag spatial outliers. This is expected
-  for many real-world assets. Phase 2c validators (`countVertices` /
-  `MeshDensityChecker`) provide the density signal when SO is loaded.
+A containment pair exists only when a nominated `enclosing` boundary contains a
+nominated `enclosed` boundary. **A `hash` nomination alone does not create a
+pair:** hash groups are repeated/sibling modules (blades in a rack), not
+shell/interior relationships. Emit a pair only when both sides carry a
+`spatial_role` (`enclosing` + `enclosed`) established from semantics/kind/hierarchy
+(or, when authored extents exist, a `bbox_confirmed` containment check).
 
-### 2.2 Containment detection
+For each nominated enclosing/enclosed pair:
 
-Using authored extent overlap analysis (only when `extentsHint` is present):
+- **Enclosure opacity is an optional hint, not a required assertion** (metadata
+  read, no geometry access). Inspect the enclosing boundary's bound material for
+  transparency signals (UsdPreviewSurface `opacity` < 1.0 / `opacityThreshold`;
+  MDL glass/transmission/`ior`; any `opacity`/`transmission`/`ior` input). Set
+  `enclosure_opaque: true` when provably opaque, `false` when a transparency
+  signal is found, and **omit it when opacity is not determinable from binding
+  metadata alone** — do not guess. Unknown opacity still schedules the probe; the
+  Tier-3 probe resolves it.
+- **Asset type context:** most actionable for equipment, machines, vehicles,
+  cabinets, housings, enclosures, pumps, motors, compressors — sealed assemblies
+  with opaque shells.
+- Emit each pair into `validation_scope.cross_component_pairs[]` as a boundary-ID
+  reference object. The Tier-3 probe runs unless the pair is *explicitly*
+  transparent (`enclosure_opaque: false`).
+- **bbox is confirmation-only and informational.** When authored `extentsHint` is
+  present, an enclosing-extent-contains-enclosed-extent check may *confirm* a
+  nominated pair (record `bbox_confirmed: true`). It **never** gates whether the
+  probe is scheduled, and a missing/non-overlapping bbox does not retract a
+  hash/semantics nomination.
+- Only nominate pairs and scope the probe — never confirm occlusion here. That
+  requires the expensive `findOccludedMeshes` geometry analysis in Phase 4.
 
-- Identify asset pairs where one asset's authored extent is fully enclosed
-  by another's. These are candidates for occlusion testing — the inner
-  asset may be invisible from the outside (e.g., piping inside a cabinet).
-- **Check enclosure opacity:** For each containment pair, inspect the
-  enclosing asset's bound material for transparency signals:
-  - UsdPreviewSurface: `opacity` < 1.0 or `opacityThreshold` present
-  - MDL: glass/transmission shader, `ior` parameter, alpha-blend mode
-  - Any material with `opacity`, `transmission`, or `ior` inputs
-  Set `enclosure_opaque: true` when the enclosing material is fully opaque.
-  Set `enclosure_opaque: false` when any transparency signal is detected.
-  This is a metadata read (material binding → shader attributes) — no
-  geometry access needed.
-- **Asset type context:** Containment is most actionable for equipment,
-  machines, vehicles, cabinets, housings, enclosures, pumps, motors,
-  compressors — sealed assemblies with opaque shells. Flag the asset type
-  when identifiable from prim names or kind metadata.
-- Only flag pairs, don't confirm occlusion — that requires expensive
-  geometry analysis via `findOccludedMeshes` in Phase 4.
-- Skip this check for prims without authored extents.
-
-### 2.3 Repetition detection
-
-- Identify assets with similar authored extent dimensions
-  that reference different source layers (when extentsHint is authored). These may be near-duplicates
-  that could share a common source via deduplication.
-- Distinguish from intentional instancing (same source, already shared).
-- Treat repeated CAD/BIM assembly names as a deep-tree signal, not just a
-  root-level signal. Clean root children or clean depth-2 groups do not rule
-  out duplicated modules nested under floor, discipline, category, or linked
-  model containers.
-- If the stage is monolithic, has no references/payloads, has low instance
-  count, or contains repeated CAD/BIM assembly names, invoke
-  `usd-hierarchy-dedupe-candidates` for subtree-hash candidate detection before
-  recommending mesh-level deduplication.
-
-### 2.4 Hierarchy depth analysis
+### 2.2 Hierarchy depth analysis
 
 - Flag deep nesting without kind boundaries (many Xform ancestors before
   reaching a component or assembly kind).
 - Flag flat hierarchies where a single prim has hundreds of direct children
   with geometry — may benefit from grouping into subcomponents.
 
-### 2.5 Prim count and mesh sizing interpretation
+### 2.3 Prim count and mesh sizing interpretation
 
 Use `summary_counts`, extents, and hierarchy context to explain scale before
 recommending a downstream validation or optimization path:
@@ -244,7 +216,7 @@ recommending a downstream validation or optimization path:
 - Any recommendation that may drop geometry, collapse hierarchy, or discard
   authored attrs/metadata requires explicit user confirmation downstream.
 
-### 2.6 Duplicate subtree detection
+### 2.4 Duplicate subtree detection
 
 Identify subtrees that are structurally identical and positioned at the same
 transform. This is common in BIM/Revit exports where linked models are
@@ -292,11 +264,55 @@ Recommendation:
 - Quantify the saving: removing N-1 copies of each group eliminates
   (N-1)/N of the scene's prims and associated prototypes.
 
-### 2.7 Asset boundary identification
+### 2.5 Asset boundary identification
 
 For monolithic stages, identify natural grouping levels that could become
 separate assets. Present candidates to the user rather than prescribing a
 specific level.
+
+**Boundary-inference re-entry (bounded recursive descent).** This §2.5 inference is
+re-run on EACH extracted asset after Phase 2f — assembly boundaries first, then
+component, then subcomponent boundaries within important sub-hierarchies — to a
+bounded depth. The descent contract, the `level`/`importance`/`articulated`/
+`archetype` target-tree tags, and the stopping rule live in `workflow.md`
+Phase 2g; the manifest carries the tags on each `phase4_targets[]` entry.
+Externalize via shared prototypes (`instanceable=true`), never N unshared
+per-node payloads, and never let layer count explode (the over-structuring
+pitfall the depth bound guards against).
+
+**Identity first, reuse second (the order that keeps parts addressable).** A
+boundary is a property of the asset's authored intent and real-world
+decomposition, not something read off the geometry. Recover it in priority order,
+and only then confirm reuse:
+
+1. **Authored `kind`.** `assembly` → `group` → `component` (smallest
+   separately-publishable model) → `subcomponent` (a named, addressable part). A
+   `component` / `subcomponent` boundary is a real boundary by default — it is the
+   intended unit of reference.
+2. **Namespace / naming.** A meaningful authored name (`assetInfo`, display name,
+   variant set) marks a "thing"; `Mesh_017` or a transform-only `Xform` is
+   plumbing. The transition from named typed scopes down to anonymous `Mesh`/`Gprim`
+   leaves is the **floor of the model hierarchy** — cross it and you have left the
+   parts and entered the geometry. For referenced/instanced assets, identity lives
+   on the referenced family / `kind`-tagged definition, not the leaf instance name;
+   and a generic family name (`Standard_124`) is *not* license to treat a real
+   family as anonymous geometry.
+3. **Semantic recognizability.** Does the subtree correspond to something a domain
+   expert names and services / swaps as one piece? This is the signal a structural
+   pass cannot see and the agent must deliberately use.
+
+Run the hierarchy hash (`usd-hierarchy-dedupe-candidates`) **only after** these
+signals have marked the meaningful candidates: it confirms which of them repeat and
+how exactly (variant vs identical), it does **not** choose the grain. Letting the
+hash choose the grain is the failure that over-shares at the mesh level. The single
+exception is a **fallback** where authored identity is entirely absent: the hash may
+propose the **coarsest repeating subtree** as the grain (record `grain_source =
+structural_fallback`), still stopping at that coarsest unit, never the leaves. The
+per-unit disposition matrix (identity × reuse → externalize / internal-share /
+keep-local, with the optional reduction route) lives in
+`references/instancing-readiness/references/instancing-tradeoffs.md`; the
+three-axes / nested-not-flat / repair-first framing lives in `workflow.md`
+Phase 2g.
 
 Analyze the existing hierarchy for repeating patterns:
 
@@ -332,8 +348,8 @@ boundaries. In that case:
 - Route to `restructure-decision` even when mesh optimization can proceed
   "as-is".
 - Ask whether the user wants loadable sub-assets (for example per-floor or
-  per-discipline-per-floor payloads), wants to optimize the monolith as-is, or
-  wants a diagnosis-only exit.
+  per-discipline-per-floor payloads) or wants to optimize the monolith as-is.
+  Both proceed into the optimization pipeline; there is no diagnosis-only exit.
 - Do not record `choice: optimize-as-is` without presenting that selective
   loading choice to the user.
 
@@ -359,14 +375,40 @@ monolithic, recommend running it before finalizing the boundary plan. The
 combined SA + dedupe-candidates output is what `restructure-decision` (Phase 2e
 in the tuning workflow) consumes when asking the user to confirm.
 
-### 2.8 Prototype library assessment
+#### Boundary records and semantics nomination (`asset_boundary_suggestions.boundaries[]`)
+
+Populate `asset_boundary_suggestions.boundaries[]` with the nominated
+enclosing/enclosed product boundaries that occlusion detection keys off. Each
+record carries a `boundary_id`, `prim_path`, `candidate_source`, and optionally
+`spatial_role`, `enclosure_opaque`, `semantic_label`. This is the **canonical
+definition** of the two nomination sources (§2.1 references it):
+
+- **`candidate_source: hash`** — the boundary aligns with a
+  `usd-hierarchy-dedupe-candidates` group (duplicate-count ≥ 2). The strong signal
+  for **repeated** modules (blades in a rack, identical aircon units). A hash
+  nomination is a candidate boundary only; on its own it does **not** imply
+  containment (hash groups are siblings/repeats, not shell/interior).
+- **`candidate_source: semantics`** — a **unique, one-off enclosed product** from
+  kind / naming / discipline-container signals (a single engine in a car, a
+  one-off compressor inside a skid). The hash finder cannot nominate a singleton
+  (needs duplicate-count ≥ 2), so semantics is the only path that surfaces it.
+  `semantic_label` (the driving signal) is **required** for this source.
+
+Set `spatial_role` (`enclosing` | `enclosed` | `standalone`) — required on any
+boundary referenced by a `cross_component_pair`. `enclosure_opaque` is an optional
+opacity hint on enclosing boundaries (omit when undetermined; see §2.1).
+`validation_scope.cross_component_pairs[]` references these boundaries by
+`boundary_id` to scope the Tier-3 occlusion probe. Hash-OR-semantics nomination is
+the primary occlusion signal; the old bbox containment sweep is confirmation-only.
+
+### 2.6 Prototype library assessment
 
 For scenes with explicit prototypes:
 
 - Identify the authored prototype hierarchy path (e.g., `/Root/Prototypes/`).
 - Count prototypes and assess whether they should be extracted into a shared
   library layer (per the VFI "component + subcomponent library packaging" pattern).
-- Assess whether the prototype pool is inflated by duplicate subtrees (see 2.6).
+- Assess whether the prototype pool is inflated by duplicate subtrees (see 2.4).
 
 Extraction recommendation:
 
@@ -416,7 +458,6 @@ Emit a structure assessment report containing:
     "well_structured": N,
     "manifest": ["path/to/A.geom.usd", ...],
   },
-  "layer_health": { "large_usda": [...], "tiny": N, ... },
   "instancing": { "instances": N, "prototypes": N, "candidates": N, "ratio": 0.0 },
   "hierarchy_dedupe": {
     "recommended": true,
@@ -425,36 +466,35 @@ Emit a structure assessment report containing:
       { "path_pattern": "...", "subtree_prims": 0, "copies": 0, "estimated_prim_savings": 0 }
     ]
   },
-  "scale_assessment": {
-    "prim_count_interpretation": "structural_reuse_needed | local_cleanup_first | acceptable",
-    "mesh_sizing_flags": ["small_mesh_detail", "large_overlap_candidate"],
-    "merge_posture": "prototype_local_preferred | whole_assembly_requires_user_confirmation"
-  },
   "asset_boundary_suggestions": {
     "candidate_levels": [
       { "level": "per-floor", "child_count": 8, "hash_matched_groups": 0, "promoted": false },
       { "level": "per-discipline-per-floor", "child_count": 56, "hash_matched_groups": 4, "promoted": true,
         "reason": "4 hash-matched assembly groups align with this cut - immediate dedupe wins on extraction" }
     ],
+    "boundaries": [
+      { "boundary_id": "b_car_body", "prim_path": "/World/Car/Body", "candidate_source": "semantics",
+        "spatial_role": "enclosing", "enclosure_opaque": true, "semantic_label": "Body/Shell" },
+      { "boundary_id": "b_engine", "prim_path": "/World/Car/Engine", "candidate_source": "semantics",
+        "spatial_role": "enclosed", "semantic_label": "Engine" }
+    ],
     "user_choice_required": true,
     "choice_reason": "payload_count is 0 and clear spatial/discipline boundaries exist; selective loading is a user decision even if geometry reuse is already strong",
     "consumed_by": "restructure-decision (Phase 2e)"
   },
-  "flagged_assets": [
-    { "asset": "...", "reason": "outlier_extent", "details": "..." },
-    { "asset": "...", "reason": "containment", "pair": "...", "enclosure_opaque": true, "details": "..." },
-    { "asset": "...", "reason": "repetition", "similar_to": "...", "details": "..." },
-  ],
   "validation_scope": {
     "per_asset": ["list of assets needing individual validation"],
-    "cross_component_pairs": ["list of (A,B) pairs needing spatial analysis"],
+    "cross_component_pairs": [
+      { "enclosing_boundary_id": "b_car_body", "enclosed_boundary_id": "b_engine",
+        "enclosure_opaque": true, "probe": "spatial_occluded" }
+    ],
     "skip": ["list of assets with no flags — low priority for deep validation"],
   },
   "phase_recommendation": "structuring | optimization | already_optimized"
 }
 ```
 
-The `validation_scope` section feeds directly into `so-run-validators` — it tells
+The `validation_scope` section feeds directly into `usd-optimize-run-validators` — it tells
 the agent which assets to validate and which to skip.
 
 The `summary_counts` section is the compact handoff consumed by
@@ -470,12 +510,12 @@ do not mistake it for a total arc-item count.
 
 The `phase_recommendation` indicates which phase of the three-phase pipeline
 (extraction → structuring → optimization) the scene is currently in, based on
-the structural evidence. This guides the edit-target planner and Scene Optimizer
+the structural evidence. This guides the edit-target planner and Usd Optimize
 handoff decisions.
 
 If `hierarchy_dedupe.recommended` is true, run
 `usd-hierarchy-dedupe-candidates` before `restructure-decision` or mesh-level
-`so-run-operations`. That skill is read-only and decides whether repeated
+`usd-optimize-run-operations`. That skill is read-only and decides whether repeated
 subtrees should be turned into shared prototype/reference assets before any
 mesh-level dedupe.
 
@@ -484,13 +524,11 @@ mesh-level dedupe.
 - Do not read geometry arrays (points, faceVertexCounts, normals). SA is
   structural only. Mesh-level stats belong to Phase 2c validators.
 - Do not run geometry validators in this reference; hand validation scope to
-  `usd-validation-runner` / `so-run-validators`.
+  `usd-validation-runner` / `usd-optimize-run-validators`.
 - Do not recommend operations based on structural heuristics alone — heuristics
   flag candidates for validation, not confirmed issues.
 - Report `summary_counts` explicitly. Asset counts are the primary scope metric;
   layer counts and arc counts are supporting evidence.
-- Report `scale_assessment` when prim count, mesh size, or merge strategy affects
-  the validation or optimization path.
 - Do not set `hierarchy_dedupe.recommended: false` from only a root-child or
   depth-2 name scan on CAD/BIM exports. Deep repeated names require a deeper
   normalized scan or `usd-hierarchy-dedupe-candidates` evidence.
@@ -499,9 +537,9 @@ mesh-level dedupe.
   strong and the mesh-optimization path is otherwise "optimize as-is".
 - Use the reference docs to distinguish assets from layers from arcs — conflating
   them leads to incorrect scope estimates.
-- Spatial heuristics (§2.1, §2.2, §2.3) use only authored `extentsHint`
-  attributes. If extents are not authored, skip the spatial check for that
-  prim — do not compute bounds to fill the gap.
+- The containment bbox-confirmation check (§2.1) uses only authored `extentsHint`
+  attributes. If extents are not authored, skip the confirmation — do not compute
+  bounds to fill the gap. The nomination itself does not depend on extents.
 
 ## Tools for asset extraction
 

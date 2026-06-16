@@ -17,13 +17,13 @@
     "so_build_date": {
       "type": "string",
       "format": "date-time",
-      "description": "ISO 8601 UTC date the SO extension was built or released. Used as the comparison key when filtering ops by since_version. Filled in manually after capture because the extension does not expose buildTime."
+      "description": "ISO 8601 UTC date the Usd Optimize extension was built or released. Used as the comparison key when filtering ops by since_version. Filled in manually after capture because the extension does not expose buildTime."
     },
     "operations_available": {
       "type": "array",
       "items": { "type": "string" },
       "uniqueItems": true,
-      "description": "Operation keys the SO runtime registers, as returned by the selected operation registry probe. Sorted alphabetically."
+      "description": "Operation keys the Usd Optimize runtime registers, as returned by the selected operation registry probe. Sorted alphabetically."
     },
     "probed_at": {
       "type": "string",

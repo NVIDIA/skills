@@ -15,9 +15,9 @@ copy of the upstream docs.
 
 ## Contents
 
-- [`usd-optimize.md`](usd-optimize.md) — Scene Optimizer operation mechanics and
+- [`usd-optimize.md`](usd-optimize.md) — Usd Optimize operation mechanics and
   prebuilt-package resolution (upstream
-  [usd-optimize](https://github.com/NVIDIA-omniverse/usd-optimize/)). Resolve
-  per-operation guides through `$SCENE_OPTIMIZER_PACKAGE_ROOT` / `$SO_HOME` or
+  [usd-optimize](https://github.com/NVIDIA-Omniverse/usd-optimize/)). Resolve
+  per-operation guides through `$USD_OPTIMIZE_ROOT` or
   the upstream `.agents/operations/<key>.md` path rather than duplicating them
   in this repo.

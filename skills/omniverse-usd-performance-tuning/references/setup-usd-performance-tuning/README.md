@@ -5,14 +5,17 @@
 
 ## When to Use
 
-Use this reference when runtime availability is unknown or the user explicitly asks to set up, verify, switch, or install the Kit, Scene Optimizer, or Asset Validator path.
+Minimum supported runtime: usd-optimize 1.0.x (GitHub release packages) with
+the usd-validation-nvidia pip package.
+
+Use this reference when standalone runtime availability is unknown or the user explicitly asks to set up, verify, or install the standalone Usd Optimize / usd-validation-nvidia path (or to set up the opt-in Kit→omniperf profiling adjunct).
 
 ## Instructions
 
 1. Check for an existing `setup-preflight.json` and verify whether it matches the current target and runtime intent.
-2. Probe available Kit, Scene Optimizer, Asset Validator, and standalone USD Python paths without silently choosing between viable alternatives.
-3. Ask the user before installing or switching runtimes when no verified path satisfies the request.
-4. Write or refresh the preflight artifact with runtime versions, paths, and available Scene Optimizer operations.
+2. Probe the standalone Usd Optimize, usd-validation-nvidia, and USD Python paths (plus any opt-in Kit profiling root) without silently choosing between viable alternatives.
+3. Ask the user before installing the standalone runtime when no verified path satisfies the request.
+4. Write or refresh the preflight artifact with runtime versions, paths, and available Usd Optimize operations.
 
 
 ## Pre-flight Checklist
@@ -25,7 +28,7 @@ Before executing setup/preflight, re-read and confirm:
 - [ ] Write `setup-preflight.json` conforming to `scripts/setup-preflight.schema.json`.
 ## Output Format
 
-Return the selected runtime route, any user decision needed, and the path to `setup-preflight.json`. The preflight artifact records Kit, Scene Optimizer, Asset Validator, USD Python, and `operationsAvailable` evidence.
+Return the selected runtime route, any user decision needed, and the path to `setup-preflight.json`. The preflight artifact records Kit, Usd Optimize, usd-validation-nvidia, USD Python, and `operationsAvailable` evidence.
 
 Use this reference before running validation, profiling, or optimization from this
 skill package in a fresh environment. The goal is to choose and verify one
@@ -35,7 +38,7 @@ runtime path before invoking the workflow skills.
 
 This reference is the **named entry skill** in an agent's response only when no
 runtime path is verified at all — that is, when the setup probe reports every
-candidate (Kit, standalone Scene Optimizer, standalone Asset Validator) as
+candidate (Kit, standalone Usd Optimize, standalone usd-validation-nvidia) as
 unavailable, missing, or unverified. In that case there is no way to route
 performance work, so resolving the runtime is the agent's first responsibility.
 
@@ -56,8 +59,16 @@ normal phase order regardless.
 
 ## Purpose
 
-Identify and verify a single Kit or standalone runtime path for profiling,
-validation, and Scene Optimizer execution before downstream references run.
+Verify the **standalone** runtime — the sole runtime for Usd Optimize
+execution and usd-validation-nvidia validation — before downstream references run.
+Kit is not an alternate optimization/validation runtime; it is retained only as
+an explicit opt-in render-profiling adjunct (Kit→omniperf), set up on request.
+
+Phase 0 **guarantees an importable `pxr` (USD Python)** as a precondition for the
+pipeline: every standalone route lands `pxr` (Kit and SO standalone provide it
+directly; a validator-only standalone venv installs `usd-core`). After Phase 0
+completes on any route, `import pxr` succeeds — downstream phases that author USD
+(e.g. `apply-restructure`) can rely on it.
 
 ## Prerequisites
 
@@ -68,7 +79,7 @@ validation, and Scene Optimizer execution before downstream references run.
 ## Examples
 
 - "Set up this repo before I run validation."
-- "Check whether my Kit path can run Scene Optimizer and Asset Validator."
+- "Check whether my Kit path can run Usd Optimize and usd-validation-nvidia."
 
 ## Runtime choices
 
@@ -84,27 +95,30 @@ for rule discovery — just ensure both are importable. Selected runs go through
 scope-note **canonical concept** to a rule class by identity.
 
 > Standalone achieves the same validator coverage as Kit: install
-> `omniverse-asset-validator` via pip into the same venv where the SO package
-> is on PYTHONPATH, and the `@register_rule` decorators register SO validators
+> `omniverse-asset-validator` via pip into the same venv where the Usd Optimize package
+> is on PYTHONPATH, and the `@register_rule` decorators register Usd Optimize validators
 > at import time.
 
-Fall back to Kit (USD Composer, Isaac Sim, or Kit SDK) when standalone packages
-are not available or the user explicitly requests it. Kit runs OAV and SO in
-one runtime and additionally supports render-time profiling. When taking the
-Kit path, validation must use `omni.asset_validator.core` from that same Kit
-runtime. Do not require `uv` or `omni_asset_validate` on `PATH` for the Kit
-path.
+Standalone is the only runtime for optimization and validation; there is no Kit
+optimization fallback. Kit (USD Composer, Isaac Sim, or Kit SDK) is retained
+**only as an opt-in render-time profiling adjunct** — the one way to capture the
+FPS / Hydra / RTX / VRAM / draw-call metrics required before claiming
+runtime wins. That profiling path is delegated to the external `NVIDIA/omniperf`
+skills; set it up only when the user explicitly asks for render-time profiling.
+Kit is never auto-selected as a silent fallback for SO/AV work.
 
 ## Requirement-to-skill map
 
-- Existing Kit or USD Composer runtime: verify in this reference; do not install.
-- Missing Kit runtime: invoke `install-kit`.
-- Scene Optimizer inside Kit: invoke `install-so-via-kit` when missing.
-- Standalone Scene Optimizer operations: invoke `install-so-standalone` when
-  the extracted `scene_optimizer_core_...release.zip` package is missing.
-- Standalone Omni Asset Validator: invoke `install-asset-validator-standalone`
-  when missing. SO validators auto-register when both packages share the same
+- Standalone Usd Optimize operations: invoke `install-usd-optimize-standalone` when
+  the extracted prebuilt Usd Optimize package is missing
+  (asset name + download: `references/upstreams/usd-optimize.md`).
+- Standalone Omni usd-validation-nvidia: invoke `install-usd-validation-nvidia-standalone`
+  when missing. Usd Optimize validators auto-register when both packages share the same
   Python environment.
+- Opt-in render profiling only: an existing/ user-supplied Kit or USD Composer
+  runtime is verified for the Kit→omniperf profiling adjunct (`install-kit` /
+  `install-usd-optimize-standalone` are profiling-setup helpers, not a default optimization
+  fallback). Do not install Kit just to run SO/AV work.
 
 ## Output workspace contract
 
@@ -116,6 +130,9 @@ Everything this reference writes goes under the user's `output_path` (see
   it under any other filename or location** (no `probe_result.json`, no
   `_work/`, no temp dirs). Downstream skills check this exact path; a
   different name leaves the session-start gate broken.
+  Include `cuda_available` when probed; the Phase-4 batch scheduler treats `false`
+  as a hard signal not to run `gpu_bound` operations through slow CPU fallback,
+  and treats `null`/missing as unknown (fail closed to CPU-only).
 - `<output_path>/scripts/probe_setup.py` — the generated Python probe
   driven through Step 3.
 - `<output_path>/scripts/probe_setup.log` and
@@ -135,7 +152,7 @@ to the working directory.
 The agent performs setup checks directly from the current shell. Do not rely on
 repo-local setup scripts or ask the user to run scripts.
 
-Check for standalone Scene Optimizer and Asset Validator packages first —
+Check for standalone Usd Optimize and usd-validation-nvidia packages first —
 they are the preferred runtime (lighter, no Kit overhead, deterministic).
 Follow `references/standalone-runtime.md` for discovery and verification.
 
@@ -143,52 +160,56 @@ If standalone packages are found and importable, set
 `runtime_route: "standalone"` in `<output_path>/setup-preflight.json` and
 continue to Step 1.6.
 
-If standalone packages are not found, fall through to Step 1.5 (Kit discovery).
+If standalone packages are not found, this is a runtime block: surface the
+missing-SO/AV install path (`install-usd-optimize-standalone` /
+`install-usd-validation-nvidia-standalone`). Do not fall back to Kit for optimization
+or validation — Kit is not an SO/AV runtime here.
 
-## Step 1.5 - Determine Kit candidates (fallback)
+## Step 1.5 - Opt-in Kit profiling discovery
 
-If standalone is unavailable, look for Kit installations. Follow
+Only when the user explicitly asks for render-time profiling, look for a Kit
+installation to drive the Kit→omniperf profiling adjunct. Follow
 `references/kit-discovery.md` for discovery order, path classification,
 auto-enumeration, and candidate records.
 
-Always ask before broad filesystem scanning. If one Kit candidate exists, write
-it to `runtime_context.kit` and continue. If multiple candidates exist, ask the
-user to choose; never silently pick one in an interactive session. The newest
-candidate is pre-selected.
+Always ask before broad filesystem scanning. Prefer a user-supplied Kit /
+USD Composer / Isaac Sim path; if exactly one candidate is discovered, write it
+to `runtime_context.kit`. If multiple candidates exist, ask the user to choose;
+never silently pick one. This path is for profiling only — it never becomes the
+optimization/validation runtime.
 
 Record the chosen candidate and `runtime_context.kit.chosen_by` as described in
 `references/kit-discovery.md`.
 
-## Step 1.6 - Probe the chosen Kit for SO and AV versions
+## Step 1.6 - Probe the runtime for SO and AV versions
 
-Once `runtime_context.kit` is set (or standalone is chosen), run the Python
-probe from the chosen launcher and write the probe result to
+Once the standalone runtime is confirmed (or an opt-in Kit profiling root is
+set), run the Python probe and write the probe result to
 `<output_path>/setup-preflight.json`. Follow `references/runtime-probe.md` for
 the launcher, import-mode, version-source, and `operationsAvailable` contract.
 
 The `runtime_context` object is the literal input to the header template in
 `references/runtime-context-header.md`. Downstream skills read from this object,
-not from the raw probe `kit` / `sceneOptimizer` / `assetValidator` source
+not from the raw probe `kit` / `usdOptimize` / `assetValidator` source
 fields.
 
-Downstream skills (`so-run-operations`, `omniverse-usd-performance-tuning`, every
-`so-interpret-validators` recommendation) cross-check `operationsAvailable`
+Downstream skills (`usd-optimize-run-operations`, `omniverse-usd-performance-tuning`, every
+`usd-optimize-interpret-validators` recommendation) cross-check `operationsAvailable`
 against the op key they intend to invoke and refuse to call any op the
 runtime does not register.
 
 ## Step 2 - Interpret status
 
-- `ready-standalone`: use standalone Scene Optimizer for operations and Omni Asset Validator from Python.
-- `ready-kit`: use Kit for Scene Optimizer and `omni.asset_validator.core` validation from the same Kit runtime.
-- `needs-runtime-choice`: stop and ask the user for a decision.
+- `ready-standalone`: use standalone Usd Optimize for operations and Omni usd-validation-nvidia from Python. This is the optimization+validation runtime.
+- `ready-profiling-kit`: an opt-in Kit→omniperf profiling root is available **in addition to** standalone; it is used only for render-time profiling, never for SO/AV work.
+- `needs-runtime-choice`: standalone SO/AV is not importable — stop and ask the user to supply the standalone package path or a pip-installable environment.
 
-When status is `needs-runtime-choice`, ask exactly for one of these paths:
+When status is `needs-runtime-choice`, ask for the standalone SO / AV package
+path or a pip-installable environment. (A Kit path does not resolve this; Kit is
+not an SO/AV runtime.)
 
-- Provide the path to standalone SO / AV packages or a pip-installable environment.
-- Provide the path to an existing Kit or USD Composer install.
-
-Do not continue to `so-run-validators`, `so-run-operations`, or deep validation
-until this choice is resolved.
+Do not continue to `usd-optimize-run-validators`, `usd-optimize-run-operations`, or deep validation
+until standalone SO/AV is resolved.
 
 ## Non-interactive (batch / CI) mode
 
@@ -199,17 +220,16 @@ agent must then proceed without blocking:
 
 - If `output_path`, a runtime preference, and any required candidate paths are
   all supplied, do not prompt.
-- When the preference is `auto`, resolve the runtime by deterministic policy:
-  1. Standalone Scene Optimizer + Asset Validator, if importable.
-  2. A user-supplied Kit / USD Composer / Isaac Sim path.
-  3. The newest auto-discovered Kit — only when a broad filesystem scan was
-     explicitly authorized for this run.
-- Record `runtime_context.kit.chosen_by: auto_policy` (or
-  `standalone_preferred`) in `setup-preflight.json` so downstream skills and the
-  report can show the runtime was selected unattended rather than confirmed by a
-  human.
-- If no runtime resolves under this policy, stop with `needs-runtime-choice` and
-  name the missing inputs — do not guess a runtime or scan without permission.
+- When the preference is `auto`, resolve the optimization runtime
+  deterministically: standalone Usd Optimize + usd-validation-nvidia, if importable.
+  There is no Kit optimization fallback in the policy. A user-supplied Kit path
+  is recorded only as the opt-in profiling adjunct, never as the SO/AV runtime.
+- Record `runtime_context.chosen_by: standalone_preferred` in
+  `setup-preflight.json` so downstream skills and the report can show the runtime
+  was selected unattended rather than confirmed by a human.
+- If standalone does not resolve under this policy, stop with
+  `needs-runtime-choice` and name the missing standalone inputs — do not guess a
+  runtime, fall back to Kit, or scan without permission.
 
 ## Step 3 - Verify standalone path
 
@@ -220,7 +240,7 @@ and handoff rules.
 
 ## Step 4 - Verify Kit path (fallback)
 
-For a Kit root (Step 1.5), verify Scene Optimizer and Omni Asset Validator core
+For a Kit root (Step 1.5), verify Usd Optimize and Omni usd-validation-nvidia core
 both load, and capture the runtime versions that Step 1.6 surfaces to the user.
 Use `references/runtime-probe.md` for the exact launcher, import, version, and
 log discipline.
@@ -236,7 +256,7 @@ After setup:
 1. `omniverse-usd-performance-tuning` for broad performance requests.
 2. `usd-structure-assessment` before choosing optimizations.
 3. `usd-validation-runner` for validation; its references own the specific `validate-*` command details.
-4. `so-run-validators`, `so-interpret-validators`, and `so-run-operations` only after runtime setup is ready.
+4. `usd-optimize-run-validators`, `usd-optimize-interpret-validators`, and `usd-optimize-run-operations` only after runtime setup is ready.
 
 Record the chosen runtime path in the response so later commands use the same
 Kit or standalone environment.
@@ -252,7 +272,7 @@ downstream references consume it from that exact path.
 The header has two formats:
 
 - **Format A (full block)** — required at this reference's runtime-choice prompt,
-  at the `restructure-decision` Phase 2e prompt, at the `so-run-operations`
+  at the `restructure-decision` Phase 2e prompt, at the `usd-optimize-run-operations`
   destructive-op confirmation, and at the first user-facing message of any
   session that starts mid-workflow.
 - **Format B (compact one-liner)** — used for routine status messages and
@@ -261,15 +281,15 @@ The header has two formats:
 When `runtime_context.kit` is set (single candidate or user has picked), print
 Format A once as the conclusion of this reference's interaction with the user, before the
 agent hands off to `omniverse-usd-performance-tuning`. The user must see exactly which Kit
-application, Scene Optimizer, and Asset Validator version will be in effect
+application, Usd Optimize, and usd-validation-nvidia version will be in effect
 for the rest of the session.
 
 ## Limitations
 
 - Does not install unless a dedicated install reference is invoked.
 - Does not choose optimization operations or validator scope.
-- Standalone SO validators auto-register via `@register_rule` decorators when
-  both `omniverse-asset-validator` and the SO package are importable in the
+- Standalone Usd Optimize validators auto-register via `@register_rule` decorators when
+  both `omniverse-asset-validator` and the Usd Optimize package are importable in the
   same Python 3.12 environment. Kit auto-registers them via its extension
   session.
 
@@ -277,5 +297,5 @@ for the rest of the session.
 
 - If standalone packages are found but the probe fails (import error, version mismatch), fall through to Kit discovery.
 - If multiple valid Kit installs are found, ask the user to choose or record the newest unattended choice.
-- If the Kit probe cannot import Scene Optimizer or Asset Validator, try another Kit path.
+- If the Kit probe cannot import Usd Optimize or usd-validation-nvidia, try another Kit path.
 - If standalone paths are incomplete, invoke the relevant install reference instead of reusing a bundled validator environment.

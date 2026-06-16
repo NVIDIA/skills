@@ -38,6 +38,27 @@ When the plan includes `dedupe`, follow
 
 - Use the candidate report from `usd-hierarchy-dedupe-candidates`.
 - Keep only user-approved, non-overlapping candidate groups.
+- **Author a bottom-up nested library by default** (`hierarchy-dedupe-rewrite-tool-spec.md`
+  §5a): parent prototypes *reference* child prototypes rather than inlining them.
+  Flat / outermost-only sharing is insufficient for multi-file disk recovery.
+  Honor the MINP inclusion floor, keep sub-floor leaves inline for later merge,
+  and on a mostly-identical-with-outliers group share the majority and recurse
+  only into the variant's differing branches.
+- **Mesh merge is a WITHIN-prototype prim-count reduction, not a sharing move.**
+  It is a first-class Phase-4 step that EXECUTES the manifest `merge` disposition
+  (not a "someday" option): run `merge` *inside* a prototype (merge once, benefit
+  N instances), never across an instance boundary. The payoff is a
+  scene-graph win — cheaper stage-open + composition/traversal + per-prim memory,
+  plus fewer draw calls — NOT a disk win (bytes ~= sum; the crate already
+  byte-dedups). It is intent-gated (it destroys per-part addressability) and gated
+  on bounds coherence and weak/none identity, with a conditional vertex-weld tail
+  whose reclaimed bytes are credited to the disk tier via the weld source. Full op-chain
+  + eligibility: `hierarchy-dedupe-rewrite-tool-spec.md` §9 (per-prototype op chain
+  + merge-eligibility guard).
+- **Read existing composition first** (§5b): when the input arrives already
+  instanced or BIM/CAD-exported, treat existing prototypes as the candidate set
+  at that level (collapsing byte-identical-but-separately-authored prototypes) and
+  resume the descent there rather than restarting from the top.
 - Prefer `external_prototype` unless the user explicitly chooses
   `internal_reference`.
 - Inline local material bindings and UsdShade networks that cross the boundary
@@ -127,6 +148,26 @@ Use:
 - `prim.SetActive(False)` only when deactivation is the chosen reversible
   alternative to deletion.
 
+## Edit-Target Invariant (never optimize through a reference)
+
+Usd Optimize authors into the stage's **current edit-target (root) layer**.
+If a prototype / library arrives via a reference and you run SO on the *composed
+assembly*, the edits land as **overrides on the assembly layer** while the
+referenced library keeps its heavy geometry — that is override bloat, not
+reduction. Therefore:
+
+- **Each library / sub-asset is opened as its OWN root layer** so SO's edit
+  target *is* that file's bytes. "Optimize the assembly in one pass" is wrong.
+  This is exactly the per-sub-asset parallel model the batch scheduler batches —
+  one target = one own-layer file = one job.
+- **De-class abstract `class` prototype namespaces (`Class → Def`) before the
+  chain, and restore after.** Optimizing an abstract `class` namespace silently
+  no-ops: a default-predicate stage walk returns 0 of its meshes (see the
+  zero-work diagnostic below).
+- **Every library file must resolve standalone** — its own material bindings and
+  nested children reachable via explicit asset paths — to be a valid independent
+  edit target.
+
 ## Authoring Requirements (Critical for Phase 4 Compatibility)
 
 - `Sdf.CopySpec` preserves the source specifier. If copying from an over-only
@@ -141,7 +182,7 @@ Use:
 
 ### Why Specifier Correctness Is Critical
 
-Scene Optimizer operations that use USD's default-predicate prim traversal
+Usd Optimize operations that use USD's default-predicate prim traversal
 (including `decimateMeshes`, `meshCleanup`, `fitPrimitives`, `removeSmallGeometry`)
 will **silently skip** all meshes under Over-spec ancestors. The operation returns
 `success=True` with zero work done — no error, no warning, no indication of failure.

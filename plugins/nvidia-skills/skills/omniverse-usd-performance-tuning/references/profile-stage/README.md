@@ -205,8 +205,10 @@ post-optimization warm open as a verdict.
   before comparing it to the baseline. Do not compare a first after-write open
   to a warmed baseline.
 - If warm samples are noisy (for example, max-min exceeds 15% of median) or the
-  before/after delta is within the measured spread, mark warm-load evidence as
-  inconclusive in `compare-profiles` rather than a regression.
+  before/after delta is within the measured spread, the warm-load evidence is
+  inconclusive: in `compare-profiles` classify that row's verdict as `neutral`
+  (the verdict enum has no `inconclusive` value) and record the inconclusive
+  timing context in the notes, rather than reporting a regression.
 
 ## Full Mode (Kit runtime, requires Isaac Sim + GPU)
 
@@ -223,7 +225,7 @@ quick mode plus:
 ### Prerequisites
 
 - Isaac Sim or Kit SDK with RTX renderer.
-- Kit `omni.kit.profiler.tracy` profiler extension (Tracy is a Kit profiler, not a Scene Optimizer component).
+- Kit `omni.kit.profiler.tracy` profiler extension (Tracy is a Kit profiler, not a Usd Optimize component).
 - GPU with display (headless with virtual display works).
 
 ### Usage
@@ -320,7 +322,7 @@ This separation enables `compare-profiles` to correctly classify tradeoffs
 ## What quick mode can and cannot prove (standalone-path caveat)
 
 Quick mode is the only available mode when the Phase 0 runtime is
-standalone Scene Optimizer (no Kit). The agent must be explicit in the
+standalone Usd Optimize (no Kit). The agent must be explicit in the
 final `optimization-report` about which claims quick-mode metrics support
 and which they do not.
 
@@ -366,4 +368,5 @@ unavailable)" and §"Quick-mode-only caveat" for the report wording.
 - If `pxr` imports fail, run setup to choose a Kit or standalone USD Python runtime.
 - If full mode cannot load Tracy, verify `omni.kit.profiler.tracy` is enabled in the selected Kit runtime.
 - If warm-open samples vary widely, rerun the protocol in fresh processes; if
-  variance persists, mark warm-load evidence inconclusive.
+  variance persists, treat warm-load evidence as inconclusive (verdict row
+  `neutral` + inconclusive context in notes).

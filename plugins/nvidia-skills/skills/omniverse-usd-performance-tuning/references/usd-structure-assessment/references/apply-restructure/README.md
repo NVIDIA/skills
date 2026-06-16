@@ -26,7 +26,8 @@ Return a concise status or report that names the input, selected runtime or evid
 
 Orchestrate USD reference rewriting in two cognate use cases that both reduce to "write USD files + rewrite references":
 
-- **`mode=restructure`** (Phase 2f, after `restructure-decision` returns `extract-as-assets` or `decompose-for-selective-loading`): materialize the asset boundaries identified by `usd-structure-assessment` §2.7 and the dedupe candidates from `usd-hierarchy-dedupe-candidates`. Hierarchy dedupe is implemented as a USD rewrite from the candidate report: write shared prototypes, replace duplicate local subtrees with references, and then validate the new assembly root.
+- **`mode=restructure`** (Phase 2f, after `restructure-decision` returns `extract-as-assets` or `decompose-for-selective-loading`): materialize the asset boundaries identified by `usd-structure-assessment` §2.5 and the dedupe candidates from `usd-hierarchy-dedupe-candidates`. Hierarchy dedupe is implemented as a USD rewrite from the candidate report: write shared prototypes, replace duplicate local subtrees with references, and then validate the new assembly root.
+  - **Bounded recursive descent.** Restructure is a bounded *descent*, not one cut: after extracting assemblies, the workflow re-runs boundary inference (§2.5) on each extracted asset to find component, then subcomponent boundaries, to a bounded depth (the stopping rule in `workflow.md` Phase 2g). Tag each `phase4_targets[]` entry with its target-tree tags — `level` (assembly/component/subcomponent = USD `kind`), `importance` / `articulated`, and `archetype` — per the manifest schema; Phase 4 reads them to gate the op chain and per-target tolerance. **Share, don't scatter:** every externalized node MUST be a shared prototype with `instanceable=true` references; N unshared per-node payloads are not the optimization win (the Phase-6 gate fails closed on a repack or unshared split). Articulated assets instance at rigid-body/link level, never whole-asset.
 - **`mode=ref_remap`** (Phase 5, after Phase 4 mesh ops): given a map of `original_path -> optimized_path` for each sub-asset Phase 4 produced, compute the parent-assembly impact set, copy each parent to a new path, rewrite its references to point at the optimized children, then run stage-level cleanup ops.
 
 Both modes share the same primitives (write USD, rewrite refs) so they live in one skill body.
@@ -35,7 +36,7 @@ Both modes share the same primitives (write USD, rewrite refs) so they live in o
 
 - A USD asset path that opens cleanly under the active runtime (Phase 0 chosen).
 - A writable `output_dir` distinct from the input stage's directory (no in-place overwrites by default).
-- USD Python access (`pxr.Usd`, `pxr.Sdf`, and `pxr.UsdUtils`) from the active runtime. Scene Optimizer is optional for later stage-level cleanup ops, but is not required for hierarchy dedupe.
+- USD Python access (`pxr.Usd`, `pxr.Sdf`, and `pxr.UsdUtils`) from the active runtime. Usd Optimize is optional for later stage-level cleanup ops, but is not required for hierarchy dedupe.
 - For `mode=restructure`: a `restructure_plan` packet from `restructure-decision` (boundary cut points + optional dedupe candidates).
 - For `mode=ref_remap`: an `optimized_targets` map (every `original_path` actually appears as a reference in the input stage; every `optimized_path` exists and opens cleanly).
 
@@ -95,6 +96,7 @@ Manifest schema:
   "input_stage": "<path>",
   "output_dir": "<path>",
   "new_assembly_root": "<path>",
+  "assembly_root": { "path": "<new_assembly_root>", "mesh_count": 0 },
   "outputs": [
     {
       "path": "<written file>",
@@ -170,12 +172,22 @@ only when this `mesh_count` is `0`, so a retained-mesh target cannot be silently
 - For `mode=restructure`: every extracted file has `defaultPrim` set to the
   root prim of the extracted sub-hierarchy. Validate with
   `Usd.Stage.Open(path).GetDefaultPrim().IsValid()`.
-- For `mode=restructure`: the manifest documents what mesh content remains on
-  the assembly root after extraction. If the assembly root has > 0 mesh prims,
-  include it in `phase4_targets[]` with `target_class: "assembly_root"` so
-  Phase 4 does not skip it. Downstream Phase 4 must process that entry through
-  the per-target mesh op chain for its retained meshes; it is not limited to
-  final stage-level cleanup operations.
+- For `mode=restructure`: **residual-mesh postcondition (fail loud).** With the
+  USD stage still open, measure the assembly root's default-predicate mesh count
+  after extraction and record it under the manifest's `assembly_root`
+  (`{ "path": <new_assembly_root>, "mesh_count": <count> }`). When that count is
+  `> 0`, the manifest MUST also include the same root in `phase4_targets[]` with
+  `target_class: "assembly_root"` and the identical authoritative `mesh_count`.
+  **Do not write a restructure manifest that records residual assembly-root
+  meshes without that `phase4_targets[]` entry — error out instead.** This check
+  lives here because only apply-restructure has the stage open to count residual
+  meshes; the report-time gate (`optimization-report/scripts/validate_report.py`)
+  only sees report↔manifest and cannot detect the residual itself. The manifest's
+  internal consistency is re-asserted by `validate_manifest_structure()` (in
+  `optimization-report/scripts/validate_report.py`): `assembly_root.mesh_count > 0`
+  with no matching `assembly_root` Phase-4 target fails. Downstream Phase 4 must
+  process that entry through the per-target mesh op chain for its retained meshes;
+  it is not limited to final stage-level cleanup operations.
 
 ---
 
@@ -213,7 +225,7 @@ High-level steps:
 2. Stop on cyclic reference graphs.
 3. Copy impacted parent layers and rewrite references to optimized children.
 4. Pick the new assembly root.
-5. Run lossless stage-level cleanup through `so-run-operations`.
+5. Run lossless stage-level cleanup through `usd-optimize-run-operations`.
 6. Validate written outputs and emit the manifest.
 
 ---
@@ -236,7 +248,7 @@ High-level steps:
 - `references/hierarchy-dedupe-rewrite-tool-spec.md` - hierarchy dedupe rewrite behavior.
 - `references/restructure-mode.md` - mode=`restructure` execution notes and internal-reference handling.
 - `references/ref-remap-mode.md` - mode=`ref_remap` parent rewrite and stage cleanup notes.
-- `skills/omniverse-usd-performance-tuning/references/so-run-operations/references/pipelines.md` - local handoff for Scene Optimizer operation chaining after hierarchy rewrite.
-- `references/upstreams/usd-optimize.md` - upstream Scene Optimizer mechanics, invocation docs, and prebuilt package resolution.
-- `usd-structure-assessment/README.md` §2.7 + "Tools for asset extraction" - boundary identification + USD API patterns this reference builds on.
+- `skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md` - local handoff for Usd Optimize operation chaining after hierarchy rewrite.
+- `references/upstreams/usd-optimize.md` - upstream Usd Optimize mechanics, invocation docs, and prebuilt package resolution.
+- `usd-structure-assessment/README.md` §2.5 + "Tools for asset extraction" - boundary identification + USD API patterns this reference builds on.
 - `usd-structure-assessment/references/usd-edit-target-planner/README.md` - per-asset optimization with reference remapping pattern (mode=`ref_remap` is a generalization of this).
