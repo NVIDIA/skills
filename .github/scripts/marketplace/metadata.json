@@ -1525,6 +1525,18 @@
       }
     },
     {
+      "path": "skills/tao-finetune-cosmos-embed",
+      "name": "tao-finetune-cosmos-embed",
+      "description": "Cosmos-Embed1 video-text embedding for text-to-video retrieval, video-to-video search, semantic deduplication, and fine-tuning. Use when the user asks to \"fine-tune Cosmos-Embed1\", \"run cosmos-embed inference\", \"export Cosmos-Embed1\", \"embed videos\", or \"search videos with text\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,data_scientist",
+        "discovery.activity_tags": "fine_tune,inference,evaluate,convert,train"
+      }
+    },
+    {
       "path": "skills/tao-finetune-cosmos-reason",
       "name": "tao-finetune-cosmos-reason",
       "description": "Cosmos-Reason2-8B video QA supervised fine-tuning with FSDP parallelism. Use when training or evaluating video question-answering models, fine-tuning Cosmos-Reason2 with SFT, or working with Cosmos-RL. Trigger phrases include \"fine-tune Cosmos-Reason\", \"Cosmos-RL SFT\", \"video QA fine-tune\", \"Cosmos-Reason2-8B training\".",

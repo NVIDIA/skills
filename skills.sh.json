@@ -66,6 +66,7 @@
         "tao-analyze-gaps-visual-changenet",
         "tao-analyze-gaps-vlm-bcq",
         "tao-finetune-clip",
+        "tao-finetune-cosmos-embed",
         "tao-generate-image-grounding",
         "tao-generate-referring-expressions",
         "tao-mine-aoi-images",
