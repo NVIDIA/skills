@@ -229,8 +229,8 @@ measured_results:
 minimal_example:
   docs_example: docs/training/cuda-graphs.md
   skill_example: skills/nemo-mbridge-perf-cuda-graphs/SKILL.md
-  test_path: tests/functional_tests/recipes/test_llama_recipes_pretrain_cuda_graphs.py
-  cli_path: scripts/performance/run_performance_workload.py
+  test_path: tests/functional_tests/test_groups/recipes/test_llama_recipes_pretrain_cuda_graphs.py
+  cli_path: scripts/performance/run_script.py
 failure_modes:
   - name: missing_te_rng_tracker
     symptom: provider assertion before training starts
@@ -284,7 +284,7 @@ evidence:
   - src/megatron/bridge/training/comm_overlap.py
   - scripts/performance/utils/overrides.py
   - tests/unit_tests/training/test_config.py
-  - tests/functional_tests/recipes/test_llama_recipes_pretrain_cuda_graphs.py
+  - tests/functional_tests/test_groups/recipes/test_llama_recipes_pretrain_cuda_graphs.py
 follow_up_validation:
   - Re-run GPT-OSS-20B pretrain with lower LR and/or larger GBS for a meaningful loss comparison.
   - Retry GPT-OSS packed-sequence SFT and LoRA on a newer TE/container build.

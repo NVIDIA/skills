@@ -10,23 +10,7 @@ when_to_use: Reducing GPU memory via activation recompute, or investigating a co
 Stable docs: @docs/training/activation-recomputation.md
 Card: @skills/nemo-mbridge-perf-activation-recompute/card.yaml
 
-## Answer Checklist
-
-For OOM or CUDA graph questions, lead with this exact sequence:
-
-1. First try `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`; many
-   borderline failures are allocator fragmentation, not activation capacity.
-2. Prefer selective recompute before full-layer recompute:
-   `recompute_granularity="selective"` with `recompute_modules=["core_attn"]`.
-3. If still borderline, optionally add `"layernorm"`; use `"mlp"` only as a
-   last resort because it has a large compute cost on wide dense FFNs.
-4. Use full-layer recompute only after selective recompute fails to fit, and
-   always name the required fields: `recompute_granularity="full"`,
-   `recompute_method`, and `recompute_num_layers`.
-5. If FP8 or TE-scoped CUDA graphs are enabled, call out the assertion risk:
-   full-layer recompute is incompatible with TE scopes such as `attn`, `mlp`,
-   and `moe_router`. Valid fixes are selective recompute, `cuda_graph_impl="none"`,
-   or `cuda_graph_impl="local"` with `cuda_graph_scope="full_iteration"`.
+<!-- NVSkills CI refresh: 2026-06-15. No instruction changes. -->
 
 ## What It Is
 
@@ -45,17 +29,19 @@ how many layers via `recompute_num_layers`.
 
 ## Quick Decision
 
-1. **Set `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` first** — most
-   borderline OOMs are caused by memory fragmentation, not capacity. This
-   fixes it at zero cost. See @skills/nemo-mbridge-perf-memory-tuning/SKILL.md.
-2. Start with `recompute_granularity=selective`, `recompute_modules=[core_attn]`
-   (often already the default in recipes).
-3. Add `layernorm` to recompute modules — nearly free compute-wise but saves
-   negligible memory. Only helps in extremely borderline cases.
-4. Add `mlp` as a last resort — saves ~3 GB but costs ~16% GPU utilization on
-   large dense models (Llama3 70B).
-5. Use `recompute_granularity=full` only when selective recompute still does
-   not fit.
+1. Rule out allocator fragmentation first with
+   `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`; see
+   @skills/nemo-mbridge-perf-memory-tuning/SKILL.md.
+2. For activation pressure, start with selective recompute:
+   `recompute_granularity="selective"` and `recompute_modules=["core_attn"]`.
+3. Add modules by cost: `"layernorm"` is cheap but saves little, while `"mlp"`
+   saves much more memory at a clear throughput cost.
+4. Use full-layer recompute only when selective recompute does not fit, and set
+   all required fields: `recompute_granularity="full"`, `recompute_method`, and
+   `recompute_num_layers`.
+5. With FP8 or TE-scoped CUDA graphs, avoid full-layer recompute unless graph
+   scope is `full_iteration`; otherwise use selective recompute or disable TE
+   graph capture.
 
 CPU offloading (`cpu_offloading=True`) is an alternative that avoids recompute
 cost entirely, but it is **incompatible with PP > 1**.
@@ -92,9 +78,14 @@ cfg.model.recompute_num_layers = 4
 ### Performance harness CLI
 
 ```bash
-python scripts/performance/run_performance_workload.py \
-  --recompute_granularity selective \
-  --recompute_modules core_attn layernorm \
+uv run python scripts/performance/run_script.py \
+  -m llama \
+  -mr llama3_8b \
+  --task pretrain \
+  -g h100 \
+  -c bf16 \
+  -ng 8 \
+  --recompute_modules core_attn,layernorm \
   ...
 ```
 
@@ -191,9 +182,9 @@ Key takeaways:
 
 | Symptom | Cause | Confirm | Fix |
 |---|---|---|---|
-| >15% GPU utilization drop | mlp recompute on large FFN | check `recompute_modules` includes `mlp` | check `expandable_segments:True` is set; consider reducing MBS |
-| Still OOM after adding layernorm | layernorm activations are too small | compare peak memory before/after | add mlp recompute or check `expandable_segments:True` |
-| `AssertionError: full recompute is only supported with full iteration CUDA graph` | layer-level recompute (`recompute_granularity=full` + `recompute_num_layers`) with TE-scoped graphs. FP8 CS configs default to `cuda_graph_impl=transformer_engine`, `scope=mlp`. | check `cuda_graph_impl` and `cuda_graph_scope` | use submodule recompute (`selective` + `recompute_modules`), or `cuda_graph_impl=none`, or `local` + `full_iteration` |
+| >15% GPU utilization drop | `mlp` recompute on a large FFN | check whether `recompute_modules` includes `mlp` | remove `mlp`, lower micro batch size, or use CPU offload if PP=1 |
+| Still OOM after adding layernorm | layernorm activations are too small to move the peak materially | compare peak memory before/after | switch to a higher-impact module or full-layer recompute |
+| `AssertionError: full recompute is only supported with full iteration CUDA graph` | layer-level recompute with TE-scoped graph capture | check `cuda_graph_impl` and `cuda_graph_scope` | use `selective`, set `cuda_graph_impl=none`, or use `local` + `full_iteration` |
 | ValueError: PP + CPU offloading | `cpu_offloading=True` with `pipeline_model_parallel_size > 1` | check PP config | disable CPU offloading or set PP=1 |
 | mlp+core_attn worse than mlp alone | double recompute overhead | compare Exp 1 vs Exp 2 | use mlp alone |
 

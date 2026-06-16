@@ -67,11 +67,21 @@ curl -s -X POST http://${HOST_IP}:${PORT}/v1/chat/completions \
 # List all indices with doc counts
 curl -s "http://${HOST_IP}:9200/_cat/indices?h=index,docs.count,store.size&v"
 
-# Count embeddings
+# Count uploaded video_file embeddings
 curl -s "http://${HOST_IP}:9200/mdx-embed-filtered-2025-01-01/_count"
 
-# Sample one embedding doc (without the vector)
+# Count RTSP embeddings for a source name; RTSP streams use date-based indices
+curl -s "http://${HOST_IP}:9200/mdx-embed-filtered-*,-mdx-embed-filtered-2025-01-01/_count" \
+  -H "Content-Type: application/json" \
+  -d '{"query": {"query_string": {"query": "*<sensor-name>*"}}}'
+
+# Sample one uploaded video_file embedding doc (without the vector)
 curl -s "http://${HOST_IP}:9200/mdx-embed-filtered-2025-01-01/_search?size=1&pretty" \
   -H "Content-Type: application/json" \
   -d '{"_source": {"excludes": ["embedding"]}, "query": {"match_all": {}}}'
+
+# Sample one RTSP embedding doc for a source name (without the vector)
+curl -s "http://${HOST_IP}:9200/mdx-embed-filtered-*,-mdx-embed-filtered-2025-01-01/_search?size=1&pretty" \
+  -H "Content-Type: application/json" \
+  -d '{"_source": {"excludes": ["embedding"]}, "query": {"query_string": {"query": "*<sensor-name>*"}}}'
 ```

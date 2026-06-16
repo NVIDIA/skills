@@ -1,6 +1,6 @@
 ---
 name: vss-generate-video-report
-description: Use this skill when producing a VSS analysis report — Mode A per-clip VLM, Mode B incident-range via video-analytics. Not for standalone video summarization, real-time alerts, or ad-hoc Q&A.
+description: Use this skill when producing a VSS analysis report — Mode A per-clip VLM, Mode B incident-range via video-analytics. Not for standalone video summarization, real-time alerts or ad-hoc Q&A.
 license: Apache-2.0
 metadata:
   version: "3.2.0"

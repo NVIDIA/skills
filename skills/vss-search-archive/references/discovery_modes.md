@@ -21,6 +21,7 @@ Typical follow-ups:
 When the camera location and time window are known. Reduces search space and returns faster, more relevant results.
 
 Specify camera names as the video sources in the user input. Set explicit time range, keep critic enabled.
+For RTSP camera streams, use the RTSP `messages` + `search_source_type` request shape from the main SKILL.md instead of the `input_message` shortcut.
 
 ```bash
 curl -s -X POST http://${HOST_IP}:8000/generate \

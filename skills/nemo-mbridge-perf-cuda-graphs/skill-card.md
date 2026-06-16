@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers reducing host-driver overhead in Megatron Bridge training workloads via CUDA graph capture, or diagnosing crashes and regressions related to CUDA graph configuration changes. <br>
+Developers and engineers reducing host-driver overhead via CUDA graphs in Megatron Bridge training workloads, or tracing crashes and regressions to CUDA graph configuration changes. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,6 +20,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [CUDA Graphs Training Documentation](docs/training/cuda-graphs.md) <br>
+- [Activation Recomputation Documentation](docs/training/activation-recomputation.md) <br>
 - [Performance Tuning Guide](docs/performance-guide.md) <br>
 
 
@@ -36,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive activation case, 0 negative) with 2 attempts per task; pass threshold 50%. NVSkills-Eval profile: external. <br>
+Evaluated against 1 evaluation task using the NVSkills-Eval external profile in astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,14 +61,19 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+0%) | 88% (+0%) |
-| Discoverability | 2 | 100% (+0%) | 62% (+0%) |
-| Effectiveness | 2 | 94% (-4%) | 91% (-2%) |
-| Efficiency | 2 | 92% (-0%) | 60% (-0%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+12%) |
+| Discoverability | 1 | 100% (+100%) | 97% (+46%) |
+| Effectiveness | 1 | 92% (+86%) | 96% (+20%) |
+| Efficiency | 1 | 93% (+67%) | 96% (+48%) |
+
+## Testing Completed: <br>
+**[x] Agent Red-Teaming** <br>
+**[ ] Network Security** <br>
+**[ ] Product Security** <br>
 
 ## Skill Version(s): <br>
-b0f64d72 (source: git SHA, committed 2026-06-02) <br>
+v0.2.0rc6-1622-g853062e4 (source: git describe) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

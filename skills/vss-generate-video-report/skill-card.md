@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 OR MIT <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to generate structured video analysis reports from recorded video clips (Mode A) or incident time-range queries (Mode B) within the NVIDIA Video Search and Summarization blueprint. <br>
+Developers and engineers use this skill to generate structured video analysis reports — either per-clip VLM analysis or incident-range narrative reports — from NVIDIA Video Search and Summarization (VSS) deployments. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,14 +19,15 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [NVIDIA AI Blueprint: Video Search and Summarization (GitHub)](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
 - [NVIDIA VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
-- [NVIDIA Vision Language Models NIM Documentation](https://docs.nvidia.com/nim/vision-language-models/1.6.0/introduction.html) <br>
-- [Video Search and Summarization GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
+- [Video Analysis Report Template](assets/video-analysis-report.md) <br>
+- [Incident Range Report Template](assets/incident-range-report.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, API Calls, Shell commands] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Analysis, Markdown report] <br>
+**Output Format:** [Markdown] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -37,7 +38,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 3 evaluation tasks (3 positive skill-activation cases) on the external NVSkills-Eval profile in the astra-sandbox environment. <br>
+Evaluated against 3 evaluation tasks in the `external` NVSkills-Eval profile (environment: astra-sandbox, 1 attempt per task, 50% pass threshold). Overall verdict: PASS. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +62,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 3 | 100% (+0%) | 100% (+33%) |
-| Correctness | 3 | 67% (+2%) | 56% (+3%) |
-| Discoverability | 3 | 29% (-15%) | 20% (-11%) |
-| Effectiveness | 3 | 71% (+14%) | 59% (+5%) |
-| Efficiency | 3 | 42% (-1%) | 32% (-12%) |
+| Security | 3 | 100% (+0%) | 100% (+0%) |
+| Correctness | 3 | 51% (+43%) | 27% (+23%) |
+| Discoverability | 3 | 11% (+3%) | 0% (+0%) |
+| Effectiveness | 3 | 61% (+60%) | 37% (+34%) |
+| Efficiency | 3 | 26% (-0%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 3.2.0 (source: frontmatter) <br>

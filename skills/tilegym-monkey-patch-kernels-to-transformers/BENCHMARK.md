@@ -7,14 +7,13 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tilegym-monkey-patch-kernels-to-transformers`
-- Evaluation date: 2026-06-09
+- Evaluation date: 2026-06-16
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 5 evaluation tasks
 - Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
-The skill should be reviewed before NVSkills-Eval publication. **Skill owners should address the applicable findings below and rerun NVSkills-Eval to refresh this benchmark.**
+- Overall verdict: PASS
 
 ## Agents Used
 
@@ -56,32 +55,25 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 5 | 100% (+0%) | 100% (+0%) |
-| Correctness | 5 | 97% (+0%) | 99% (+0%) |
-| Discoverability | 5 | 87% (+0%) | 94% (+0%) |
-| Effectiveness | 5 | 96% (-0%) | 100% (+1%) |
-| Efficiency | 5 | 81% (-0%) | 89% (+1%) |
+| Correctness | 5 | 100% (+12%) | 99% (+12%) |
+| Discoverability | 5 | 100% (+11%) | 94% (+2%) |
+| Effectiveness | 5 | 98% (+18%) | 100% (+19%) |
+| Efficiency | 5 | 96% (+13%) | 90% (+1%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 9 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 1 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_efficiency: Instructions lack clear action verbs (`skills/tilegym-monkey-patch-kernels-to-transformers/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/tilegym-monkey-patch-kernels-to-transformers/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description very long (325 chars, recommend 50-150) (`skills/tilegym-monkey-patch-kernels-to-transformers/SKILL.md`)
-- LOW QUALITY/quality_discoverability: No '## Purpose' section (`skills/tilegym-monkey-patch-kernels-to-transformers/SKILL.md`)
-- LOW QUALITY/quality_reliability: No mention of error handling or validation (`skills/tilegym-monkey-patch-kernels-to-transformers/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 1 total findings.
+This tier was not run or did not produce findings in this report.
 
-Top findings:
+## Publication Recommendation
 
-- HIGH DUPLICATE/duplicate: Duplicate content found within references/kernel-integration.md:
-  "# Integrate TileGym kernels to Transformers" in references/kernel-integration.md (lines 27-31)
-  vs "# Integrate TileGym kernels to Transformers" in references/kernel-integration.md (lines 32-35)
-  vs "# Integrate TileGym kernels to Transformers" in references/kernel-integration.md (lines 36-42) (`references/kernel-integration.md:27`)
+The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

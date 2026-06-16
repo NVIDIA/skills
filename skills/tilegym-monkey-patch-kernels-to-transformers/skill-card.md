@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to integrate TileGym CUDA Tile kernels into Hugging Face transformers models for optimized LLM training and inference, using a non-intrusive monkey-patch approach. <br>
+Developers and engineers integrating TileGym GPU kernels into Hugging Face transformers models for LLM training and inference performance improvements. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,26 +20,26 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [Environment Setup](references/environment-setup.md) <br>
-- [Kernel Integration Workflow](references/kernel-integration.md) <br>
+- [Kernel Integration](references/kernel-integration.md) <br>
 - [Auto Kernelize](references/auto-kernelize.md) <br>
 - [Kernel Inventory Schema](references/kernel-inventory-schema.md) <br>
-- [CUDA Tile IR Supported Architectures](https://docs.nvidia.com/cuda/tile-ir/latest/sections/stability.html#supported-architectures) <br>
+- [NVIDIA CUDA Tile IR Documentation](https://docs.nvidia.com/cuda/tile-ir/latest/) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Code, Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash and Python code blocks] <br>
+**Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`Opus-4.6`) <br>
-- Codex (`GPT-5.5`) <br>
+- Claude Code (`claude-code`) <br>
+- Codex (`codex`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 5 evaluation tasks (1 positive activation, 4 negative activation) in NVSkills-Eval `external` profile, `astra-sandbox` environment. <br>
+Evaluated against 5 tasks (1 positive skill-activation, 4 negative) in the NVSkills-Eval `external` profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -64,10 +64,10 @@ Underlying evaluation signals used in this run: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 5 | 100% (+0%) | 100% (+0%) |
-| Correctness | 5 | 97% (+0%) | 99% (+0%) |
-| Discoverability | 5 | 87% (+0%) | 94% (+0%) |
-| Effectiveness | 5 | 96% (-0%) | 100% (+1%) |
-| Efficiency | 5 | 81% (-0%) | 89% (+1%) |
+| Correctness | 5 | 100% (+12%) | 99% (+12%) |
+| Discoverability | 5 | 100% (+11%) | 94% (+2%) |
+| Effectiveness | 5 | 98% (+18%) | 100% (+19%) |
+| Efficiency | 5 | 96% (+13%) | 90% (+1%) |
 
 ## Skill Version(s): <br>
 2026.06.03 (source: frontmatter) <br>

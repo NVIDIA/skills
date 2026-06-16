@@ -1,6 +1,6 @@
 ---
 name: vss-search-archive
-description: Use to run top-level VSS fusion search on archived video, or to ingest video files / RTSP streams for search. Do NOT use for ad-hoc visual Q&A (use vss-ask-video), live captioning (use vss-deploy-dense-captioning), or video summarization and reports (use vss-summarize-video).
+description: Use this skill to run top-level VSS fusion search on archived video, or to ingest video files / RTSP streams for search. Do NOT use for ad-hoc visual Q&A (use vss-ask-video), live captioning (use vss-deploy-dense-captioning), or video summarization and reports (use vss-summarize-video).
 license: Apache-2.0
 metadata:
   author: "NVIDIA Video Search and Summarization team"
@@ -241,6 +241,8 @@ curl -s -X POST http://${HOST_IP}:8000/generate \
 
 ### More Examples
 
+Use the `messages` request shape when passing structured request options such as `search_source_type`; the `input_message` shortcut does not accept extra fields.
+
 ```bash
 # Search by object
 curl -s -X POST http://${HOST_IP}:8000/generate \
@@ -260,7 +262,7 @@ curl -s -X POST http://${HOST_IP}:8000/generate \
 # Consider only RTSP sources with `search_source_type` filter i.e. live camera streams
 curl -s -X POST http://${HOST_IP}:8000/generate \
   -H "Content-Type: application/json" \
-  -d '{"input_message": "find all instances of forklifts", "search_source_type": "rtsp"}' | jq .
+  -d '{"messages": [{"role": "user", "content": "find all instances of forklifts"}], "search_source_type": "rtsp"}' | jq .
 ```
 
 ### Advanced control knobs
