@@ -1,5 +1,6 @@
-# Mining Troubleshooting and Common Pitfalls
+# Troubleshooting and Common Pitfalls
 
+- **Passing `--user $(id -u):$(id -g)` to the container** — kills the run with `KeyError: 'getpwuid(): uid not found: <uid>'` during `transformers`' lazy import chain, before any embedding work starts. Drop the flag; chown outputs back to the host UID via a small `alpine` container afterward (see `references/setup.md`).
 - **Mismatched encoders between target and source embeddings** — the single most common cause of garbage mining output. Both embedding steps must consume the **same** `embedding_spec.yaml`, and any Hydra override that changes `model` / `model_path` / `batch_size` must be applied to *both* invocations or to neither. The hook checks for this.
 - **Skipping an embedding step** — the mining task requires both inputs to contain an embedding column; the raw filepath parquets cannot be fed to it directly.
 - **Missing `label` column with `filter_by_label=true`** — the filter silently no-ops with a warning rather than erroring. If the mined output looks too large or contains cross-label pairs, grep the docker log for the warning and confirm both embedding parquets carry `label`.

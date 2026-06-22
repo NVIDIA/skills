@@ -7,6 +7,7 @@ actions:
   train:
     command: clip train -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       dataset.train.datasets[0].image_dir:
         type: folder
@@ -46,6 +47,7 @@ actions:
   evaluate:
     command: clip evaluate -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       dataset.val.datasets[0].image_dir:
         type: folder
@@ -68,6 +70,7 @@ actions:
   inference:
     command: clip inference -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       inference.datasets[0].image_dir:
         type: folder
@@ -89,6 +92,7 @@ actions:
   export:
     command: clip export -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       export.checkpoint:
         type: file
@@ -99,14 +103,20 @@ actions:
     upload_excludes:
     - inputs/
   gen_trt_engine:
+    container_image: tao_toolkit.deploy
     command: clip gen_trt_engine -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       gen_trt_engine.onnx_file:
+        type: file
+      gen_trt_engine.trt_engine:
         type: file
     outputs:
       results_dir:
         type: folder
+      gen_trt_engine.trt_engine:
+        type: file
     upload_excludes:
     - inputs/
 data_sources:

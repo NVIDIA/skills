@@ -1,5 +1,5 @@
 ## Description: <br>
-Monocular depth estimation using Metric Depth Anything v2 or Relative Depth Anything architectures, predicting per-pixel depth from single RGB images via TAO training, evaluation, export, and inference workflows. <br>
+Monocular depth estimation using Metric Depth Anything v2 or Relative Depth Anything architectures, predicting per-pixel depth from single RGB images for training, evaluating, exporting, or running inference with NVIDIA TAO. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, or deploying monocular depth estimation models using NVIDIA TAO within agent-assisted workflows. <br>
+Developers and engineers training, evaluating, exporting, or deploying monocular depth estimation models using NVIDIA TAO Toolkit with docker-based GPU workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,12 +19,11 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [parameters.md](references/parameters.md) <br>
-- [finetuning.md](references/finetuning.md) <br>
-- [tao-deploy-depth-anything-v2.md](references/tao-deploy-depth-anything-v2.md) <br>
-- [spec-overrides.md](references/spec-overrides.md) <br>
-- [troubleshooting.md](references/troubleshooting.md) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
+- [Parameters Reference](references/parameters.md) <br>
+- [Finetuning Recipes](references/finetuning-recipes.md) <br>
+- [Spec Overrides](references/spec-overrides.md) <br>
+- [TAO Deploy Depth Anything V2](references/tao-deploy-depth-anything-v2.md) <br>
+- [Troubleshooting](references/troubleshooting.md) <br>
 
 
 ## Skill Output: <br>
@@ -40,7 +39,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive, 0 negative) in NVSkills-Eval external profile, astra-sandbox environment, with 2 attempts per task and a 50% pass threshold. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -64,11 +63,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+100%) | 58% (+58%) |
-| Discoverability | 2 | 85% (+85%) | 48% (+48%) |
-| Effectiveness | 2 | 92% (+82%) | 61% (+45%) |
-| Efficiency | 2 | 68% (+41%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+90%) | 20% (+20%) |
+| Discoverability | 1 | 88% (+88%) | 0% (+0%) |
+| Effectiveness | 1 | 100% (+72%) | 48% (+30%) |
+| Efficiency | 1 | 71% (+44%) | 28% (+0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

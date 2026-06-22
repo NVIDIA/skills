@@ -18,6 +18,24 @@ Full Phase 6 walkthrough — TAO Toolkit container inventory, container-based ta
 
 ## Phase 6 — Container Testing & End-to-End Validation
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Phase 6 — Container Testing & End-to-End Validation
+  - Local TAO Toolkit Image Tags
+  - Step 16 — Verify the Local Image Tags are Ready
+  - Step 17 — Test tao-core
+  - Step 18 — Test tao-pytorch
+  - Step 19 — Test tao-deploy
+  - Step 20 — Run Static Tests (Linting)
+  - Step 21 — Build Wheels
+  - Step 22 — End-to-End Pipeline Validation
+  - Step 23 — Cross-Check: Compare Native vs TRT Results
+  - Step 24 — Interactive Container for Debugging
+  - Step 25 — Build Release Docker Images (Optional)
+
+
 > **Mandatory — proceed immediately after Phase 5.** Do not wait for user instruction to start this phase. All TAO models ship as Docker images — code that only works outside a container is incomplete. Mount the source into the prepared TAO Toolkit containers, install it, run the tests, and validate the end-to-end pipeline now.
 
 **How TAO testing works:**
@@ -329,4 +347,3 @@ These release images bake the wheels into the container. They're what end-users 
 4. Once the specific test passes, re-run the full suite to check for regressions
 
 ---
-

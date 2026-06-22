@@ -16,12 +16,12 @@ wandb:
 dataset:
   dataset_name: StereoDataset
   normalize_depth: false
-  max_disparity: 416
+  max_disparity: 128
   baseline: 0.193001
   focal_x: 1998.842
   train_dataset:
-    data_sources: &id001
-    - dataset_name: ''
+    data_sources:
+    - dataset_name: Middlebury
       data_file: ''
     batch_size: 1
     workers: 8
@@ -36,8 +36,8 @@ dataset:
       - 0.224
       - 0.225
       crop_size:
-      - 518
-      - 518
+      - 128
+      - 128
       min_scale: -0.2
       max_scale: 0.4
       do_flip: false
@@ -65,7 +65,9 @@ dataset:
       hshift_prob: 0.5
       crop_min_valid_disp_ratio: 0.0
   val_dataset:
-    data_sources: *id001
+    data_sources:
+    - dataset_name: Middlebury
+      data_file: ''
     batch_size: 1
     workers: 8
     pin_memory: true
@@ -79,8 +81,8 @@ dataset:
       - 0.224
       - 0.225
       crop_size:
-      - 518
-      - 518
+      - 128
+      - 128
       min_scale: -0.2
       max_scale: 0.4
       do_flip: false
@@ -108,7 +110,9 @@ dataset:
       hshift_prob: 0.5
       crop_min_valid_disp_ratio: 0.0
   test_dataset:
-    data_sources: *id001
+    data_sources:
+    - dataset_name: Middlebury
+      data_file: ''
     batch_size: 1
     workers: 8
     pin_memory: true
@@ -122,8 +126,8 @@ dataset:
       - 0.224
       - 0.225
       crop_size:
-      - 518
-      - 518
+      - 128
+      - 128
       min_scale: -0.2
       max_scale: 0.4
       do_flip: false
@@ -151,7 +155,9 @@ dataset:
       hshift_prob: 0.5
       crop_min_valid_disp_ratio: 0.0
   infer_dataset:
-    data_sources: *id001
+    data_sources:
+    - dataset_name: Middlebury
+      data_file: ''
     batch_size: 1
     workers: 8
     pin_memory: true
@@ -165,8 +171,8 @@ dataset:
       - 0.224
       - 0.225
       crop_size:
-      - 518
-      - 518
+      - 128
+      - 128
       min_scale: -0.2
       max_scale: 0.4
       do_flip: false
@@ -196,7 +202,7 @@ dataset:
   quant_calibration_dataset:
     images_dir: ''
 model:
-  model_type: MetricDepthAnything
+  model_type: FoundationStereo
   mono_backbone:
     pretrained_path: ''
     use_bn: false
@@ -220,8 +226,8 @@ model:
   n_gru_layers: 3
   corr_levels: 2
   n_downsample: 2
-  encoder: vitl
-  max_disparity: 416
+  encoder: vits
+  max_disparity: 128
 evaluate:
   num_gpus: 1
   gpu_ids:

@@ -41,12 +41,12 @@ gen_trt_engine:
   trt_engine: /results/depth-net-mono.engine
   batch_size: -1
   tensorrt:
-    data_type: bf16   # bf16 recommended for mono on Ampere SM80+ hardware; use fp32 as fallback
-    workspace_size: 1024
+    data_type: fp32   # fresh-install safe default; bf16 is supported on Ampere SM80+ hardware
+    workspace_size: 4 # GiB in the current TAO Deploy image
     min_batch_size: 1
     opt_batch_size: 1
     max_batch_size: 4
-  verbose: true
+  verbose: false  # Set true only when collecting detailed TensorRT builder diagnostics.
   # Engine input H, W are pinned to the trace shape (from export.input_height /
   # export.input_width). Mono engines do not support H/W-dynamic profiles —
   # build a separate engine per (H, W) target.

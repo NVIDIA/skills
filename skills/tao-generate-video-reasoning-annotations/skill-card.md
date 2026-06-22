@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and data engineers who need to generate Chain-of-Thought video reasoning datasets from raw video corpora for training video understanding models. <br>
+Developers and engineers who need to generate Chain-of-Thought video QA training datasets from raw video collections, using VLM/LLM distillation to produce multi-level captions, structured descriptions, and reasoning-annotated question-answer pairs for video understanding models. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -23,13 +23,14 @@ Mitigation: Review and scan skill before deployment. <br>
 - [Domain Adaptation Guide](references/domain_adaptation.md) <br>
 - [Traffic Domain Prompts](references/prompts_traffic.py) <br>
 - [Warehouse Domain Prompts](references/prompts_warehouse.py) <br>
+- [Agent Skills Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Files, Shell commands, Configuration instructions] <br>
 **Output Format:** [JSON (tao-vl-reason-v1.0 envelope) and JSONL intermediate outputs] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Per-step JSONL intermediates; final step 4 produces up to 10 task-specific JSON files] <br>
+**Other Properties Related to Output:** [Per-step subdirectories; Step 4 produces up to 10 task-specific JSON files] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`claude-code`) <br>
@@ -38,7 +39,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the NVSkills-Eval `external` profile, `astra-sandbox` environment. <br>
+Evaluated against 1 evaluation task (positive skill-activation case) in the NVSkills-Eval external profile, astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,11 +63,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 92% (+55%) | 69% (+69%) |
-| Discoverability | 2 | 61% (+5%) | 31% (+31%) |
-| Effectiveness | 2 | 92% (+90%) | 77% (+62%) |
-| Efficiency | 2 | 49% (+6%) | 45% (+16%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 85% (+85%) | 97% (+97%) |
+| Effectiveness | 1 | 100% (+86%) | 90% (+66%) |
+| Efficiency | 1 | 70% (+42%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

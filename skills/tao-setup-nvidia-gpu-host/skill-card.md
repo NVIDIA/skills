@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers setting up or verifying NVIDIA GPU runtime environments on Linux hosts for TAO Docker or Kubernetes backends. <br>
+Developers and engineers use this skill to verify and prepare NVIDIA GPU host runtime environments for TAO Docker and Kubernetes workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -22,7 +22,7 @@ Mitigation: Review and scan skill before deployment. <br>
 - [NVIDIA CUDA Installation Guide for Linux](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/) <br>
 - [NVIDIA Container Toolkit Install Guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) <br>
 - [Docker Engine Install Guide](https://docs.docker.com/engine/install/) <br>
-- [Skill Info (skill_info.yaml)](references/skill_info.yaml) <br>
+- [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
@@ -38,7 +38,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the astra-sandbox environment using the external NVSkills-Eval profile. <br>
+Evaluated against 1 evaluation task using NVSkills-Eval external profile in astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,11 +62,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 50% (+50%) | 92% (+92%) |
-| Discoverability | 2 | 0% (+0%) | 80% (+80%) |
-| Effectiveness | 2 | 92% (+82%) | 76% (+66%) |
-| Efficiency | 2 | 27% (-0%) | 79% (+50%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 90% (+90%) | 88% (+50%) |
+| Discoverability | 1 | 100% (+100%) | 62% (+0%) |
+| Effectiveness | 1 | 60% (+46%) | 90% (+76%) |
+| Efficiency | 1 | 95% (+68%) | 61% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

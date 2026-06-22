@@ -1,6 +1,6 @@
 # Deformable DETR Deploy
 
-Deformable DETR deploy covers the TAO Deploy actions for an exported object detection model. Use the `deformable-detr` model skill for training, checkpoint evaluation, quantization, distillation, pruning, export, or non-TensorRT inference where those actions exist. Use this deploy workflow after export when the input artifact is an ONNX model and the desired output is a TensorRT engine or TensorRT-backed predictions.
+Deformable DETR deploy covers the TAO Deploy actions for an exported object detection model. Use the `deformable-detr` model skill for training, checkpoint evaluation, quantization, export, or non-TensorRT inference. Use this deploy workflow after export when the input artifact is an ONNX model and the desired output is a TensorRT engine or TensorRT-backed predictions.
 
 Supported actions: `gen_trt_engine`, `evaluate`, `inference`.
 
@@ -59,7 +59,6 @@ Direct TAO Launcher spelling is `tao deploy deformable_detr gen_trt_engine`, `ta
 | Action | Required artifact or data | Spec key |
 |---|---|---|
 | `gen_trt_engine` | Exported ONNX model | `gen_trt_engine.onnx_file` |
-| `gen_trt_engine` | Output engine path | `gen_trt_engine.trt_engine` |
 | `evaluate` | TensorRT engine | `evaluate.trt_engine` |
 | `evaluate` | COCO eval image folder | `dataset.test_data_sources.image_dir` |
 | `evaluate` | COCO eval annotations | `dataset.test_data_sources.json_file` |
@@ -67,7 +66,7 @@ Direct TAO Launcher spelling is `tao deploy deformable_detr gen_trt_engine`, `ta
 | `inference` | Inference image folder list | `dataset.infer_data_sources.image_dir` |
 | `inference` | Class map text file | `dataset.infer_data_sources.classmap` |
 
-For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine` where those actions are available.
+`gen_trt_engine.trt_engine` is the generated engine output path, not a required input artifact. For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine` where those actions are available.
 
 ## Spec Overrides
 
@@ -88,7 +87,8 @@ Model-specific notes:
 
 - Carry `dataset.num_classes` as object classes plus background, matching train/export.
 - Use FP16 for the starter-kit TensorRT engine path; INT8 requires a real calibration image folder and cache path.
-- Keep transformer structure fields such as `model.num_queries`, `model.num_feature_levels`, `model.enc_layers`, and `model.dec_layers` aligned with export.
+- Keep transformer structure fields such as `model.num_queries`, `model.num_select`, `model.num_feature_levels`, `model.enc_layers`, `model.dec_layers`, and `model.dim_feedforward` aligned with export.
+- Keep deploy input dimensions aligned with export. A small validation export that used 256x256 must use the same dimensions when building and running the TensorRT engine.
 
 ## Job Chain Mapping
 

@@ -322,7 +322,7 @@
       "skip_names": []
     },
     "results_dir": "",
-    "task": "segment",
+    "task": "classify",
     "train": {
       "checkpoint_interval": 1,
       "checkpoint_interval_unit": "epoch",
@@ -2145,7 +2145,7 @@
       "type": "string"
     },
     "task": {
-      "default": "segment",
+      "default": "classify",
       "enum": [
         "segment",
         "classify"

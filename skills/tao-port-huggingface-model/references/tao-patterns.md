@@ -16,6 +16,44 @@ limitations under the License.
 
 # TAO Toolkit Code Patterns
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- 1. Config Dataclasses (`tao-core`)
+  - Field types
+  - Base classes for sub-configs
+  - Top-level ExperimentConfig pattern
+  - Model parameters mapping
+- 2. Backbone (`tao-pytorch`)
+  - Required abstract methods on `BackboneBase`
+  - Already-registered backbones in `backbone_v2/`
+- 3. build_model() Pattern (`tao-pytorch`)
+  - StateDictAdapter for cross-model checkpoint loading
+- 4. PyTorch Lightning Module (`tao-pytorch`)
+  - TAOLightningModule provides
+  - Constructor pattern
+  - Callbacks (configure_callbacks)
+  - Status logging
+  - Checkpoint save identifier
+- 5. Script Entrypoints (`tao-pytorch` scripts)
+  - Decorator stack (all scripts use this)
+  - Train script (initialize_train_experiment)
+  - CLI Entrypoint (model-level CLI)
+- 6. ONNX Export (`tao-pytorch`)
+- 7. TensorRT Engine Builder (`tao-deploy`)
+  - Base class
+  - Task-specific builder
+  - Deploy script decorator stack (different from tao-pytorch!)
+  - Deploy inference classes
+- 8. L0 Tests
+  - Test directory layout
+  - Test markers
+  - Trainer dry-run pattern
+  - Deploy test pattern (subprocess)
+- 9. Packaging (`setup.py`)
+
+
 Canonical patterns extracted from the TAO submodules. Always read the actual source files before implementing — these are guides, not templates to copy blindly.
 
 ---

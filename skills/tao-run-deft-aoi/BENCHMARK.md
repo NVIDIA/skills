@@ -7,14 +7,13 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-run-deft-aoi`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-20
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
-The skill should be reviewed before NVSkills-Eval publication. **Skill owners should address the applicable findings below and rerun NVSkills-Eval to refresh this benchmark.**
+- Overall verdict: PASS
 
 ## Agents Used
 
@@ -55,32 +54,30 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 50% (+50%) | 92% (+92%) |
-| Discoverability | 2 | 0% (+0%) | 80% (+80%) |
-| Effectiveness | 2 | 96% (+86%) | 70% (+52%) |
-| Efficiency | 2 | 27% (-0%) | 79% (+50%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 88% (+88%) |
+| Discoverability | 1 | 83% (+83%) | 62% (+62%) |
+| Effectiveness | 1 | 90% (+76%) | 90% (+76%) |
+| Efficiency | 1 | 66% (+39%) | 61% (+33%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 29 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 7 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_correctness: No documented scripts in table format (`skills/applications/tao-run-deft-aoi/SKILL.md`)
-- MEDIUM QUALITY/quality_discoverability: Description uses first/second person (`skills/applications/tao-run-deft-aoi/SKILL.md`)
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/applications/tao-run-deft-aoi`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/applications/tao-run-deft-aoi/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/applications/tao-run-deft-aoi/SKILL.md`)
+- LOW SCHEMA/unexpected_file: Unexpected 'eval.slow-manual.config' in skill root (`skills/applications/tao-run-deft-aoi/eval.slow-manual.config`)
+- LOW SCHEMA/unexpected_file: Unexpected 'agents' in skill root (`skills/applications/tao-run-deft-aoi/agents`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 1 total findings.
+This tier was not run or did not produce findings in this report.
 
-Top findings:
+## Publication Recommendation
 
-- HIGH DUPLICATE/duplicate: Duplicate content found within references/stage-execution.md:
-  "## Agents" in references/stage-execution.md (lines 22-45)
-  vs "## Reports" in references/stage-execution.md (lines 91-95) (`references/stage-execution.md:22`)
+The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

@@ -107,7 +107,7 @@ train:
     monitor_name: val_loss
     optim: adamw
     lr: 6.0e-05
-    policy: linear
+    policy: step
     policy_params:
       step_size: 30
       gamma: 0.1

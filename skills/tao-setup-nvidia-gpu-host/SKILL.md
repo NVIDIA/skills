@@ -7,7 +7,9 @@ description: >-
   `--check-only` path works on any Linux distribution; `--install` automates
   debian-family (Ubuntu/Debian/Pop!_OS/Mint/Zorin/Raspbian), rhel-family
   (Fedora/RHEL/Rocky/AlmaLinux), and suse-family (openSUSE/SLES) hosts, and
-  prints actionable manual-install steps for everything else.
+  prints actionable manual-install steps for everything else. Use when the user
+  asks to "set up an NVIDIA GPU host", "check TAO Docker GPU runtime", or
+  prepare a Kubernetes GPU worker for TAO.
 license: Apache-2.0
 compatibility: Runs `--check-only` on any Linux distribution. `--install` automates Ubuntu 22.04/24.04 + Debian 12 (apt), Fedora + RHEL/Rocky/AlmaLinux 9/10 (dnf), and openSUSE Leap / SLES 15 (zypper). Requires sudo/root, internet access to NVIDIA package repositories (and download.docker.com on rhel-family), and an x86_64 or aarch64 (sbsa) host. Other distributions (Arch, Alpine, Gentoo, NixOS, …) get a clear error that names the version targets and the NVIDIA install-guide URL.
 metadata:
@@ -59,39 +61,26 @@ From the skill bank root:
 # Check the local Docker backend host.
 bash skills/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh --backend docker --check-only
 
-# Install or repair after user approval (prompts for confirmation; see the note below for non-interactive runs).
+# Install or repair after user approval.
 bash skills/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh --backend docker --install
 
 # Check a Kubernetes GPU worker host.
 bash skills/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh --backend kubernetes --check-only
 ```
 
-> ⚠️ **Note — running non-interactively (agent / skill runs):** a skill run has
-> no terminal, so the installer's `Continue? [y/N]` confirmation cannot be
-> answered. After running `--check-only` to preview what is missing and getting
-> the user's explicit approval, append the assume-yes flag (`--yes`) to the
-> `--install` command so it proceeds without a prompt. That auto-confirms
-> installation of system packages (NVIDIA driver branch 580, CUDA Toolkit 13.0,
-> NVIDIA Container Toolkit, and — for Docker backends — Docker) and modifies the
-> host: it adds NVIDIA package repositories, may restart Docker, and adds the
-> invoking user to the `docker` group, so only do this on a host you control and
-> have the privileges to change. When a person runs `--install` directly at a
-> terminal, the script instead prompts with the exact package list before making
-> any changes.
-
-In an installed plugin copy that exposes `skills/`, use:
-
-```bash
-bash skills/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh --backend docker --check-only
-```
+> ⚠️ **Note — running non-interactively (agent/skill runs):** a skill run has no terminal, so the
+> installer's `Continue? [y/N]` prompt cannot be answered. After running `--check-only` to preview and
+> getting the user's approval, append the assume-yes flag (`--yes`) to the `--install` command so it
+> proceeds without a prompt — this auto-confirms installation of system packages (NVIDIA driver, CUDA
+> Toolkit, NVIDIA Container Toolkit, and Docker for Docker backends) and modifies the host, so only do
+> this on a host you control. A person running `--install` directly at a terminal gets the prompt instead.
 
 ## Workflow Contract
 
 Docker and Kubernetes workflows must run the check before submitting GPU work:
 
 ```bash
-SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT:-$PWD}/skills/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
-[ -x "$SETUP_SCRIPT" ] || SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT:-$PWD}/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
+SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT:-$PWD}/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
 
 bash "$SETUP_SCRIPT" --backend docker --check-only || {
   echo "MISSING: TAO GPU host runtime is not ready."

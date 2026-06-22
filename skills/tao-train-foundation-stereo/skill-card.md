@@ -1,5 +1,5 @@
 ## Description: <br>
-Stereo depth estimation using FoundationStereo. Predicts disparity maps from stereo image pairs for 3D reconstruction. <br>
+Stereo depth estimation using FoundationStereo, predicting disparity maps from stereo image pairs for 3D reconstruction. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, or running inference on NVIDIA TAO FoundationStereo models for stereo depth estimation and 3D reconstruction workflows. <br>
+Developers and engineers training, evaluating, exporting, and running inference on NVIDIA TAO FoundationStereo models for stereo depth estimation and 3D reconstruction workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,11 +19,11 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [FoundationStereo Parameters](references/foundation-stereo-parameters.md) <br>
-- [FoundationStereo Export and TRT Hardware](references/foundation-stereo-export-trt-hardware.md) <br>
-- [FoundationStereo Spec Overrides](references/foundation-stereo-spec-overrides.md) <br>
-- [TAO Deploy FoundationStereo](references/tao-deploy-foundation-stereo.md) <br>
-- [FoundationStereo Troubleshooting](references/foundation-stereo-troubleshooting.md) <br>
+- [Spec Overrides — Foundation Stereo](references/spec-overrides-foundation-stereo.md) <br>
+- [Parameters — Foundation Stereo](references/parameters-foundation-stereo.md) <br>
+- [Checkpoint Inference Mappings — Foundation Stereo](references/checkpoint-inference-mappings-foundation-stereo.md) <br>
+- [TAO Deploy — Foundation Stereo](references/tao-deploy-foundation-stereo.md) <br>
+- [Troubleshooting — Foundation Stereo](references/troubleshooting-foundation-stereo.md) <br>
 
 
 ## Skill Output: <br>
@@ -39,7 +39,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task. Pass threshold: 50%. NVSkills-Eval profile: external. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile within the astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,16 +63,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 60% (+55%) | 58% (+58%) |
-| Discoverability | 2 | 42% (+42%) | 48% (+48%) |
-| Effectiveness | 2 | 66% (+49%) | 63% (+45%) |
-| Efficiency | 2 | 47% (+20%) | 62% (+34%) |
-
-## Testing Completed: <br>
-**[x] Agent Red-Teaming** <br>
-**[ ] Network Security** <br>
-**[ ] Product Security** <br>
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 100% (+100%) | 97% (+97%) |
+| Effectiveness | 1 | 66% (+56%) | 90% (+72%) |
+| Efficiency | 1 | 95% (+67%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

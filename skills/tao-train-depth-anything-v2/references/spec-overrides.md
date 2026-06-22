@@ -1,7 +1,5 @@
 # Typical Spec Overrides
 
-Per-action `spec_overrides` blocks for the `depth_net` mono actions.
-
 Data source overrides are **mandatory for every action** — the agent MUST construct data source paths from the Per-Action Dataset Requirements table in SKILL.md and include them in `spec_overrides`. Each `data_sources` entry is a dict with **two mandatory fields**: `data_file` and `dataset_name`.
 
 ```python
@@ -19,6 +17,9 @@ S3_EVAL = "aws://bucket/data/eval"
     "train.num_gpus": 1,
     "model.model_type": "RelativeDepthAnything",
     "model.encoder": "vitl",
+    "dataset.dataset_name": "MonoDataset",
+    "dataset.min_depth": None,
+    "dataset.max_depth": None,
     "dataset.train_dataset.batch_size": 4,
     "dataset.train_dataset.workers": 4,
     "dataset.train_dataset.augmentation.crop_size": [518, 518],
@@ -39,11 +40,15 @@ S3_EVAL = "aws://bucket/data/eval"
 ```python
 {
     "model.model_type": "RelativeDepthAnything",
+    "dataset.dataset_name": "MonoDataset",
+    "dataset.min_depth": None,
+    "dataset.max_depth": None,
     "dataset.test_dataset.batch_size": 1,
     "dataset.test_dataset.workers": 4,
     "dataset.test_dataset.data_sources": [
         {"data_file": f"{S3_EVAL}/annotations.txt", "dataset_name": "NYUDV2Relative"}
     ],
+    "evaluate.checkpoint": "<selected train/AutoML checkpoint>",
 }
 ```
 
@@ -51,6 +56,10 @@ S3_EVAL = "aws://bucket/data/eval"
 ```python
 {
     "model.model_type": "RelativeDepthAnything",
+    "dataset.dataset_name": "MonoDataset",
+    "dataset.min_depth": None,
+    "dataset.max_depth": None,
+    "export.checkpoint": "<selected train/AutoML checkpoint>",
     "export.input_channel": 3,
     "export.input_height": 518,
     "export.input_width": 518,
@@ -66,11 +75,15 @@ Defaults sourced from `nvidia_tao_pytorch/cv/depth_net/experiment_specs/experime
 ```python
 {
     "model.model_type": "RelativeDepthAnything",
+    "dataset.dataset_name": "MonoDataset",
+    "dataset.min_depth": None,
+    "dataset.max_depth": None,
     "dataset.infer_dataset.batch_size": 1,
     "dataset.infer_dataset.workers": 4,
     "dataset.infer_dataset.data_sources": [
         {"data_file": f"{S3_EVAL}/annotations.txt", "dataset_name": "RelativeMonoDataset"}
     ],
+    "inference.checkpoint": "<selected train/AutoML checkpoint>",
     "inference.save_raw_pfm": False,
 }
 ```
@@ -80,12 +93,19 @@ Defaults sourced from `nvidia_tao_pytorch/cv/depth_net/experiment_specs/experime
 **quantize (mandatory data sources):**
 ```python
 {
+    "model.model_type": "RelativeDepthAnything",
+    "dataset.dataset_name": "MonoDataset",
+    "dataset.min_depth": None,
+    "dataset.max_depth": None,
     "dataset.train_dataset.data_sources": [
         {"data_file": f"{S3_TRAIN}/annotations.txt", "dataset_name": "RelativeMonoDataset"}
     ],
     "dataset.val_dataset.data_sources": [
         {"data_file": f"{S3_EVAL}/annotations.txt", "dataset_name": "RelativeMonoDataset"}
     ],
-    "dataset.quant_calibration_dataset.images_dir": f"{S3_TRAIN}/images.tar.gz",
+    "dataset.quant_calibration_dataset.images_dir": f"{S3_TRAIN}/images",
+    "quantize.model_path": "<selected train/AutoML checkpoint>",
 }
 ```
+
+Known issue in `nvcr.io/nvstaging/tao/tao-toolkit-pyt:7.0.0-rc-226-multiarch`: mono `depth_net quantize` reaches the checkpoint load path and then fails inside the SDK with `MonoDepthNetPlModel` missing `load_state_dict_from_checkpoint`. Keep `quantize.model_path` wired to the selected checkpoint; do not replace it with a latest-file guess.

@@ -2,7 +2,9 @@
 name: tao-list-capabilities
 description: >-
   Answer what the TAO Skill Bank plugin can do by generating the response from
-  packaged application, data, model, AutoML, and platform manifests.
+  packaged application, data, model, AutoML, and platform manifests. Use when
+  the user asks "what can TAO Skill Bank do", "list TAO models", "which TAO
+  workflows are available", or "what supports AutoML".
 license: Apache-2.0
 compatibility: Requires the packaged TAO skill bank helper scripts.
 metadata:

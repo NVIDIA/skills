@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, or running inference on NVIDIA TAO MAL models for weakly-supervised segmentation tasks using minimal annotations. <br>
+Developers and engineers training, evaluating, or running inference on NVIDIA TAO MAL (Mask Auto-Label) models for weakly-supervised segmentation from minimal annotations. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,11 +19,11 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [Agent Skills Open Standard](https://agentskills.io) <br>
 - [skill_info.yaml](references/skill_info.yaml) <br>
 - [spec_template_train.yaml](references/spec_template_train.yaml) <br>
 - [spec_template_evaluate.yaml](references/spec_template_evaluate.yaml) <br>
 - [spec_template_inference.yaml](references/spec_template_inference.yaml) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
@@ -39,7 +39,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in NVSkills-Eval external profile. <br>
+Evaluated against 1 internal skill task in astra-sandbox environment using NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,11 +63,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 90% (+90%) | 97% (+97%) |
-| Discoverability | 2 | 100% (+100%) | 97% (+97%) |
-| Effectiveness | 2 | 64% (+54%) | 81% (+67%) |
-| Efficiency | 2 | 95% (+68%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 50% (+40%) | 97% (+97%) |
+| Discoverability | 1 | 0% (+0%) | 97% (+97%) |
+| Effectiveness | 1 | 66% (+28%) | 90% (+72%) |
+| Efficiency | 1 | 27% (+0%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

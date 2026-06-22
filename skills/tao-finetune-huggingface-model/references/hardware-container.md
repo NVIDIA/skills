@@ -16,6 +16,24 @@ limitations under the License.
 
 # Hardware Audit & Container Selection Reference
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- GPU Detection Commands
+- NGC Base Image Selection — Live Lookup
+  - Step: web search for the current support matrix
+  - What to look for in the result
+  - Write the result to phase1_hardware.yaml
+  - Fallback if web search is unavailable
+- VRAM Budget Guide
+- Container Verification Commands
+- Multi-GPU Configuration
+- Environment Variables for docker run
+- NGC Authentication (if image requires login)
+- write phase1_hardware.yaml
+
+
 Used in Phases 1–2 of tao-finetune-huggingface-model skill.
 
 ---
@@ -54,7 +72,7 @@ breaks transformers imports) without the agent knowing.
 
 ### Step: web search for the current support matrix
 
-Use WebSearch or WebFetch to retrieve the live NVIDIA support matrix:
+Use the available web or documentation retrieval tool to retrieve the live NVIDIA support matrix:
 
 ```
 URL: https://docs.nvidia.com/deeplearning/frameworks/support-matrix/index.html

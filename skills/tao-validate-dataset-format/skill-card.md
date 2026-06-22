@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to validate NVIDIA TAO DAFT dataset structure, schema, and cross-reference integrity before training or inference workflows. <br>
+Developers and engineers use this skill to validate NVIDIA TAO DAFT datasets for structure, schema, and cross-reference errors before training or deployment. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -35,7 +35,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive, 0 negative) with 2 attempts per task in the NVSkills-Eval `external` profile. <br>
+Evaluated against 1 evaluation task in a 3-Tier NVSkills-Eval benchmark (external profile, astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -59,14 +59,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 40% (+40%) | 87% (+68%) |
-| Discoverability | 2 | 0% (+0%) | 97% (+66%) |
-| Effectiveness | 2 | 74% (+64%) | 63% (+54%) |
-| Efficiency | 2 | 27% (-0%) | 96% (+51%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 50% (+50%) | 97% (+97%) |
+| Discoverability | 1 | 0% (+0%) | 97% (+97%) |
+| Effectiveness | 1 | 78% (+68%) | 90% (+80%) |
+| Efficiency | 1 | 27% (-0%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
-1.0.0 (source: frontmatter) <br>
+0.1.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

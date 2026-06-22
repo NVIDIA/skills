@@ -132,11 +132,18 @@ Recommended `evaluate` overrides:
     "dataset.batch_size": 1,
     "dataset.eval_class_ids": [1],
     "evaluate.conf_threshold": 0.0,
+    "model.num_select": "max(<trained_num_select>, 100)",
 }
 ```
 
 Set `dataset.eval_class_ids` to the COCO category ids you want scored. The
 template default `[1]` is only a placeholder.
+
+DINO TensorRT evaluation writes `num_detections=100` into the COCO metric input.
+For reduced smoke configs, keep `model.num_select >= 100` even if train/export
+used fewer selected boxes, provided `model.num_select <= model.num_queries *
+dataset.num_classes`. Otherwise evaluation can produce predictions and then fail
+while loading COCO results.
 
 Recommended `inference` overrides:
 
@@ -212,3 +219,8 @@ calibration images before invoking Docker.
 
 **No detections are drawn:** Check `inference.conf_threshold`, class-map order,
 and `dataset.num_classes`. For quick inspection, lower the threshold.
+
+**TensorRT evaluate fails with `IndexError: index ... is out of bounds`:** The
+deploy evaluator expects 100 detections per image. Set `model.num_select` to at
+least 100 in the deploy evaluate spec, and make sure it does not exceed
+`model.num_queries * dataset.num_classes`.

@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers generating phrase-grounded training data for referring-expression and grounding models from (image, caption) pairs using a VLM as a teacher annotator. <br>
+Developers and engineers who need to generate phrase-grounded training data for referring-expression and grounding models by using a VLM as a teacher annotator to extract expressions and localize them to bounding boxes. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -21,14 +21,14 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [Configuration Reference](references/configuration.md) <br>
 - [vLLM Server Setup](references/vllm_server.md) <br>
-- [Skill Info](references/skill_info.yaml) <br>
+- [vLLM Project](https://github.com/vllm-project/vllm) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Configuration instructions, Files] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Per-sample JSONL checkpoints enable resume on re-run] <br>
+**Other Properties Related to Output:** [JSONL annotation files with bounding boxes, confidence scores, and per-sample checkpoints] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`claude-code`) <br>
@@ -37,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in astra-sandbox environment using NVSkills-Eval external profile. Pass threshold: 50%. <br>
+Evaluated against 1 evaluation task in the `astra-sandbox` environment using the NVSkills-Eval `external` profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 67% (+57%) | 92% (+92%) |
-| Discoverability | 2 | 17% (+17%) | 80% (+80%) |
-| Effectiveness | 2 | 94% (+66%) | 86% (+68%) |
-| Efficiency | 2 | 26% (-1%) | 79% (+51%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 88% (+88%) | 97% (+97%) |
+| Effectiveness | 1 | 96% (+82%) | 90% (+62%) |
+| Efficiency | 1 | 70% (+43%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

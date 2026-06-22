@@ -1,5 +1,5 @@
 ## Description: <br>
-CenterPose for keypoint and pose estimation; detects object centers and regresses keypoint locations for 6-DoF object pose estimation. <br>
+CenterPose for keypoint and pose estimation that detects object centers and regresses keypoint locations for 6-DoF object pose estimation. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, or running inference with TAO CenterPose models for 6-DoF object pose estimation. <br>
+Developers and engineers training, evaluating, exporting, or running inference on CenterPose models for 6-DoF object pose estimation in robotics and computer vision applications. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,9 +20,11 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [skill_info.yaml](references/skill_info.yaml) <br>
-- [TAO Deploy CenterPose Reference](references/tao-deploy-centerpose.md) <br>
-- [Train Spec Template](references/spec_template_train.yaml) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
+- [tao-deploy-centerpose.md](references/tao-deploy-centerpose.md) <br>
+- [Train spec template](references/spec_template_train.yaml) <br>
+- [Export spec template](references/spec_template_export.yaml) <br>
+- [Evaluate spec template](references/spec_template_evaluate.yaml) <br>
+- [Inference spec template](references/spec_template_inference.yaml) <br>
 
 
 ## Skill Output: <br>
@@ -38,7 +40,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in NVSkills-Eval external profile, astra-sandbox environment. <br>
+Evaluated against 1 evaluation task in astra-sandbox environment using NVSkills-Eval external profile with pass threshold of 50%. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,11 +64,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 80% (+80%) | 68% (+50%) |
-| Discoverability | 2 | 93% (+92%) | 48% (+17%) |
-| Effectiveness | 2 | 62% (+50%) | 76% (+60%) |
-| Efficiency | 2 | 81% (+54%) | 62% (+19%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+50%) | 50% (+50%) |
+| Discoverability | 1 | 85% (+85%) | 0% (+0%) |
+| Effectiveness | 1 | 100% (+22%) | 88% (+60%) |
+| Efficiency | 1 | 68% (+41%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

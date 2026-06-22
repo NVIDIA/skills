@@ -16,6 +16,23 @@ limitations under the License.
 
 # TAO Repository Structure Guide
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- `tao-core` — Configuration Schemas
+- `tao-pytorch` — Training, Native Inference & Export
+- `tao-deploy` — TensorRT Engine Build, TRT Inference & Evaluation
+- `tao-dataservices` (conditional)
+- Tests
+- Packaging
+  - `tao-pytorch/setup.py`
+  - `tao-deploy/setup.py`
+- Git submodule relationships
+- Cross-repo import dependencies
+- Naming conventions
+
+
 How files for a new model `<model_name>` map across all four TAO repos.
 Use `<model_name>` = the `snake_case` identifier agreed upon in Phase 1 (e.g., `vit_base_p16`).
 Use `<ModelName>` = the `PascalCase` equivalent (e.g., `VitBaseP16`).

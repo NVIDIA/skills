@@ -1,5 +1,5 @@
 ## Description: <br>
-Run the full DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection models: baseline evaluate, RCA, ingestion of customer-supplied pre-generated AnomalyGen images, k-NN mining, retraining, and deployment gating until FAR / recall KPI targets are met. <br>
+Run the full DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection models: baseline evaluate, RCA, Cosmos AnomalyGen / AMP synthetic defects, k-NN mining, retraining, and deployment gating until FAR / recall KPI targets are met. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to iteratively improve NVIDIA TAO VisualChangeNet PCB inspection models through an automated data-improvement loop combining RCA, synthetic defect ingestion, k-NN mining, retraining, and deployment gating until quality KPI targets are met. <br>
+Developers and engineers use this skill to run the complete DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet PCB inspection models, iterating through baseline evaluation, root cause analysis, synthetic defect generation, data mining, and retraining until false-accept-rate and recall KPI targets are met. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,22 +19,19 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [pipeline.md](references/pipeline.md) <br>
-- [pre-flight.md](references/pre-flight.md) <br>
-- [visual-changenet.md](references/visual-changenet.md) <br>
-- [stage-execution.md](references/stage-execution.md) <br>
-- [state-logging.md](references/state-logging.md) <br>
-- [tao-analyze-gaps-visual-changenet.md](references/tao-analyze-gaps-visual-changenet.md) <br>
-- [tao-mine-aoi-images.md](references/tao-mine-aoi-images.md) <br>
-- [tao-route-visual-changenet-samples.md](references/tao-route-visual-changenet-samples.md) <br>
-- [prepare-for-inference.md](references/prepare-for-inference.md) <br>
+- [Pipeline and State](references/pipeline-and-state.md) <br>
+- [Pre-Flight Checks](references/preflight.md) <br>
+- [Visual ChangeNet](references/visual-changenet.md) <br>
+- [Data Layout](references/data-layout.md) <br>
+- [PAIDF AnomalyGen](references/paidf-anomalygen.md) <br>
+- [Scripts and Agents](references/scripts-and-agents.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Files, Configuration instructions] <br>
+**Output Type(s):** [Shell commands, HTML reports, JSON state files] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Produces trained model checkpoints, inference specs, HTML reports, and JSONL stage logs under the workspace results directory] <br>
+**Other Properties Related to Output:** [Produces DEFT_Loop_Report.html, deft_state.json, and loop_log.jsonl as persistent artifacts] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`claude-code`) <br>
@@ -43,7 +40,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task using NVSkills-Eval external profile in astra-sandbox environment. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -67,11 +64,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 50% (+50%) | 92% (+92%) |
-| Discoverability | 2 | 0% (+0%) | 80% (+80%) |
-| Effectiveness | 2 | 96% (+86%) | 70% (+52%) |
-| Efficiency | 2 | 27% (-0%) | 79% (+50%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 88% (+88%) |
+| Discoverability | 1 | 83% (+83%) | 62% (+62%) |
+| Effectiveness | 1 | 90% (+76%) | 90% (+76%) |
+| Efficiency | 1 | 66% (+39%) | 61% (+33%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

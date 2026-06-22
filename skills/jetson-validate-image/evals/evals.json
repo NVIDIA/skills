@@ -1,0 +1,36 @@
+[
+  {
+    "id": "jetson-validate-image-001",
+    "question": "I just finished /jetson-flash-image on my Orin AGX devkit and the dut_access.ssh block is wired up in the active profile. Run on-target validation and include the static initramfs coherence checks against bsp_image.",
+    "expected_skill": "jetson-validate-image",
+    "expected_script": null,
+    "ground_truth": "Read the active target, choose both static and on-target scope. Static checks: required artifacts under <bsp_image.root_path>/Linux_for_Tegra/, DTB/module checksums, partition layout vs. the per-board .conf, overlay-vs-bsp_image cross-check, and the three initramfs coherence invariants — kernel/Image == rootfs/boot/Image byte-for-byte, modules in bootloader/l4t_initrd.img and rootfs/boot/initrd match rootfs/lib/modules/<ver>/, and vermagic on every initramfs .ko matches UTS_RELEASE from kernel/Image. On-target: resolve dut_access:.ssh per references/dut-access.md, run the mandatory connection probe (uname -r + cat /etc/nv_tegra_release), confirm boot reached userspace, run the smoke/regression suite, check loaded-module srcversion drift via /sys/module/<name>/srcversion vs modinfo, compare /proc/version against strings on /boot/Image, and run dmesg under sudo because Ubuntu 22.04 sets kernel.dmesg_restrict=1. Summarize per-check pass/fail and where logs landed.",
+    "expected_behavior": [
+      "Read skills/jetson-validate-image/SKILL.md",
+      "Read the active target-platform profile and confirm bsp_image: is resolved",
+      "Choose both static and on-target validation scope",
+      "Run the static initramfs-coherence check: kernel/Image == rootfs/boot/Image, modules in l4t_initrd.img and rootfs/boot/initrd match rootfs/lib/modules/<ver>/, and vermagic matches UTS_RELEASE from kernel/Image",
+      "Resolve dut_access:.ssh per references/dut-access.md and run the mandatory connection probe (uname -r + cat /etc/nv_tegra_release)",
+      "Confirm boot reached userspace, then run the selected test suite",
+      "Compare loaded-module srcversion (/sys/module/<name>/srcversion vs modinfo) and /proc/version against strings on /boot/Image to catch stale-initramfs drift",
+      "Run any dmesg-based check with sudo because Ubuntu 22.04 sets kernel.dmesg_restrict=1",
+      "Print per-check pass/fail, overall verdict, and log/artifact locations"
+    ]
+  },
+  {
+    "id": "jetson-validate-image-002",
+    "question": "On-target validation refused with 'tty held by another process' (exit 3) when I picked the UART transport at /dev/ttyACM0. I had a minicom session open earlier — how do I unblock this?",
+    "expected_skill": "jetson-validate-image",
+    "expected_script": null,
+    "ground_truth": "Per the Troubleshooting table, exit 3 with 'tty held by another process' means scripts/uart_session.py was invoked with lock_strategy=refuse and fuser detected another holder (minicom, picocom, or getty). Either close the holding process — sudo fuser -k <tty> only when you know what is there — or rerun with lock_strategy=wait. Note from Limitations that transport=uart with lock_strategy=steal is intentionally not implemented because it would require sending control characters that could corrupt the holder's state. UART is also slow (byte-banged base64 ~10 KB/s on 115200 baud, 1–2 s login per subcommand invocation), so once the tty is freed consider switching to ssh transport for runs with >10 commands.",
+    "expected_behavior": [
+      "Read skills/jetson-validate-image/SKILL.md",
+      "Locate the Troubleshooting row 'tty held by another process (refuse, exit 3)'",
+      "Explain lock_strategy=refuse plus fuser detected another holder (minicom/picocom/getty)",
+      "Tell the user to close the holding process or rerun with lock_strategy=wait",
+      "Note from Limitations that lock_strategy=steal on UART is not implemented to avoid corrupting the holder's state",
+      "Suggest the SSH transport for higher throughput given UART's ~10 KB/s base64 transfer and per-call login cost",
+      "Reference references/dut-access.md UART implementation contract for full exit-code semantics"
+    ]
+  }
+]

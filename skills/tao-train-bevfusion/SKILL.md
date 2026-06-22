@@ -23,13 +23,19 @@ BEVFusion for multi-sensor 3D object detection. Fuses LiDAR point clouds and cam
 
 Set pretrained backbone paths for Swin image backbone.
 
+BEVFusion requires the BEVFusion-specific TAO container
+`nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt`. The shared TAO PyTorch 7.0 RC image
+does not package `mmdet3d` and fails before any BEVFusion action can parse its
+spec. The model-skill action is named `dataset_convert`, but the 5.5 container
+CLI subtask is `bevfusion convert -e <spec>`.
+
 ## Dataclass Schemas
 
 Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
 
 ## Train Action Policy
 
-This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only; otherwise default to `auto`. When `automl_policy: auto`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `tao-skill-bank:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
+This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Use `automl_policy: on` by default and only expose `on` / `off` in new launch prompts. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only. When `automl_policy: on`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `tao-skill-bank:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
 
 Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows stay in this model skill. The per-run `automl_policy` override does not change model metadata.
 
@@ -56,7 +62,18 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 Data source overrides are **mandatory for every action** — the agent MUST construct data source paths from the Per-Action Dataset Requirements table above and include them in `spec_overrides`.
 
 ```python
-S3_TRAIN = "s3://bucket/data/train"
+DATA_ROOT = "/path/to/kitti_root"
+CONVERTED = DATA_ROOT  # BEVFusion 5.5 writes info pickles into root_dir.
+DATA_PREFIX = {"pts": "training/velodyne_reduced", "img": "training/image_2"}
+```
+
+**dataset_convert (mandatory data sources):**
+```python
+{
+    "root_dir": DATA_ROOT,
+    "results_dir": DATA_ROOT,
+    "mode": "training",
+}
 ```
 
 **train (mandatory data sources):**
@@ -66,24 +83,26 @@ S3_TRAIN = "s3://bucket/data/train"
     "train.checkpoint_interval": 10,
     "train.validation_interval": 10,
     "train.num_gpus": 1,
-    "dataset.train_dataset": {"ann_file": f"{S3_TRAIN}/results/{dataset_convert_job_id}/kitti_person_infos_train.pkl"},
-    "dataset.val_dataset": {"ann_file": f"{S3_TRAIN}/results/{dataset_convert_job_id}/kitti_person_infos_val.pkl"},
-    "dataset.test_dataset": {"ann_file": f"{S3_TRAIN}/results/{dataset_convert_job_id}/kitti_person_infos_val.pkl"},
+    "dataset.root_dir": DATA_ROOT,
+    "dataset.train_dataset": {"ann_file": f"{CONVERTED}/kitti_person_infos_train.pkl", "data_prefix": DATA_PREFIX},
+    "dataset.val_dataset": {"ann_file": f"{CONVERTED}/kitti_person_infos_val.pkl", "data_prefix": DATA_PREFIX},
+    "dataset.test_dataset": {"ann_file": f"{CONVERTED}/kitti_person_infos_val.pkl", "data_prefix": DATA_PREFIX},
 }
 ```
 
 **evaluate (mandatory data sources):**
 ```python
 {
-    "dataset.test_dataset": {"ann_file": f"{S3_TRAIN}/results/{dataset_convert_job_id}/kitti_person_infos_val.pkl"},
+    "dataset.root_dir": DATA_ROOT,
+    "dataset.test_dataset": {"ann_file": f"{CONVERTED}/kitti_person_infos_val.pkl", "data_prefix": DATA_PREFIX},
 }
 ```
 
 **inference (mandatory data sources):**
 ```python
 {
-    "dataset.root_dir": f"{S3_TRAIN}",
-    "dataset.test_dataset": {"ann_file": f"{S3_TRAIN}/results/{dataset_convert_job_id}/kitti_person_infos_val.pkl"},
+    "dataset.root_dir": DATA_ROOT,
+    "dataset.test_dataset": {"ann_file": f"{CONVERTED}/kitti_person_infos_val.pkl", "data_prefix": DATA_PREFIX},
 }
 ```
 ## Eval Dataset
@@ -134,11 +153,55 @@ Minimum 2 GPU(s), recommended 4 GPU(s). 24GB+ (A100 recommended) VRAM per GPU. B
 
 ## Error Patterns
 
-**dataset_convert required**: Run dataset_convert before training to produce info pickle files.
+**dataset_convert required**: Run the model-skill `dataset_convert` action
+(`bevfusion convert -e <spec>` in the BEVFusion 5.5 container) before training
+to produce `kitti_person_infos_train.pkl`, `kitti_person_infos_val.pkl`, and
+`training/velodyne_reduced`. For direct local-docker 5.5 runs, set
+`results_dir` to the same mounted path as `root_dir`; the converter writes the
+info pickles there and later expects them under `root_dir` while reducing point
+clouds.
+
+**KITTI directory names**: The BEVFusion 5.5 converter writes reduced point
+clouds under `training/velodyne_reduced` and expects camera images under
+`training/image_2`. Do not use the stale `training/lidar_reduced` or
+`training/images/` defaults when chaining dataset_convert into train/evaluate or
+inference.
+
+**BEVFusion 5.5 config surface**: Use the 5.5 dataclass keys in packaged
+templates. Remove newer top-level/action keys such as `model_name`,
+`wandb.group`, `wandb.run_id`, `train.checkpoint_interval_unit`,
+`evaluate.trt_engine`, `evaluate.batch_size`, `inference.trt_engine`, and
+`inference.batch_size`. For train, evaluate, and inference specs, keep the
+non-running action stubs (`train`, `evaluate`, and `inference`) present with
+empty checkpoint strings where needed; the 5.5 runners materialize the full
+experiment config before running the selected action. Use YAML null, not an
+empty string, for `train.pretrained_checkpoint` and
+`train.resume_training_checkpoint_path` when no checkpoint is intended.
+
+**`ModuleNotFoundError: No module named 'mmdet3d'`**: The shared TAO PyTorch
+7.0 RC image does not include the BEVFusion `mmdet3d` dependency. Use
+`nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt`; it contains `mmdet3d` and exposes
+the BEVFusion `convert`, `train`, `evaluate`, and `inference` subtasks.
+
+**Post-evaluation SIGSEGV in BEVFusion 5.5**: Some local-docker runs can write
+checkpoints or prediction files and still finish with TAO `Execution status:
+FAIL` after `Signal 11 (SIGSEGV)` in `cuMemRetainAllocationHandle`. Do not mark
+the action successful from the Docker exit code alone; inspect the TAO log or
+`status.json`. If a checkpoint was produced before this failure, use only the
+exact intended checkpoint such as `epoch_1.pth` for downstream diagnostics and
+do not treat `last_checkpoint` as a best checkpoint unless the action explicitly
+requests the latest checkpoint.
 
 **Missing modality data**: Ensure both camera images and LiDAR point clouds are present if using multi-modal fusion.
 
 **Epoch numbering**: BEVFusion checkpoint epoch numbers may not follow standard zero-padded format.
+
+**Checkpoint handoff**: Use the SDK/model checkpoint resolver for parent-model
+selection. For direct local-docker chaining, inspect the train results and pass
+the exact intended checkpoint path such as `epoch_1.pth`; use `latest.pth` only
+when the user explicitly asks for latest. Resume/retrain must set
+`train.resume: true` and `train.resume_training_checkpoint_path` to the exact
+checkpoint being resumed.
 
 ## Spec Param / Parent Model Inference
 

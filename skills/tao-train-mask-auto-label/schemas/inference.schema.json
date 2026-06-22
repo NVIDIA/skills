@@ -364,7 +364,6 @@
         "arch": {
           "default": "vit-mae-base/16",
           "enum": [
-            "vit-deit-tiny/16",
             "vit-deit-small/16",
             "vit-mae-base/16",
             "vit-mae-large/16",

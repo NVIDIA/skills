@@ -18,6 +18,18 @@ Full Phase 0 commands and content for the `tao-port-huggingface-model` skill —
 
 ## Phase 0 — Prerequisites Check
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Phase 0 — Prerequisites Check
+  - Workflow-specific checks
+  - GPU host runtime — delegate to tao-setup-nvidia-gpu-host
+  - NGC registry login (TAO-Toolkit-specific)
+  - Ask the user for the TAO Toolkit container images
+  - Pull and prepare the TAO Toolkit images
+
+
 Before starting any work, verify the system has all required infrastructure. **Hard stop if any check fails — resolve before proceeding.**
 
 ### Workflow-specific checks
@@ -40,7 +52,6 @@ authorize the install, then re-run.
 ```bash
 TAO_SKILL_BANK_ROOT="${TAO_SKILL_BANK_PATH:-${TAO_SKILL_BANK_ROOT:-$PWD}}"
 SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT}/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
-[ -x "$SETUP_SCRIPT" ] || SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT}/skills/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
 
 bash "$SETUP_SCRIPT" --backend docker --check-only || {
   echo "MISSING: TAO GPU host runtime not ready."

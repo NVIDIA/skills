@@ -1,0 +1,35 @@
+[
+  {
+    "id": "jetson-customize-camera-001",
+    "question": "I just brought my Thor custom carrier up with /jetson-derive-carrier and now I need to enable a Hawk IMX sensor that NVIDIA already ships an in-tree DTSI for. Walk me through wiring it up.",
+    "expected_skill": "jetson-customize-camera",
+    "expected_script": null,
+    "ground_truth": "Run /jetson-customize-camera. Step 1 resolves the active target and opens the Camera Development Guide + Adaptation Guide §Camera. Step 2 globs bsp_sources/hardware/nvidia/<chip-dir>/nv-public/overlay/ for in-tree per-sensor dtbos and classifies the Hawk as DPHY-direct or GMSL. Step 3 cross-checks carrier + module support against the DTSI, schematic, SoC TRM, Module Design Guide and pinmap, then issues the confirm-or-customize gate. Step 5 cpp-expands tegra<soc>-camera-<sensor>*.dtsi, extracts its fragment@N body, appends exactly one /* custom-bsp: camera:<sensor> */ fragment to the composite custom overlay .dts, idempotently sets jetson-header-name on the composite root, and verifies with dtc + fdtoverlay before committing. Step 6 runs pin_verifier.py over cam_i2c_*, extperiph<m>_clk and reset/PWDN/PWR_EN GPIOs and routes mismatches to /jetson-customize-pinmux. /jetson-build-source then compiles the composite to .dtbo and registers OVERLAY_DTB_FILE+= in the carrier conf — this skill never edits ODMDATA or the flash conf.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-camera/SKILL.md",
+      "Verify prerequisites: active profile with reference_devkit + custom_carrier, Linux_for_Tegra/.git exists, /jetson-derive-carrier has run, bsp_sources/hardware/nvidia/<chip-dir>/nv-public/overlay/ contains the in-tree per-sensor .dtsi files",
+      "Step 2: glob in-tree per-platform camera dtbos to enumerate supported sensors and classify Hawk as DPHY-direct vs GMSL — never invent sensors",
+      "Step 3: cross-check support against DTSI, Camera Development Guide, Adaptation Guide §Camera, SoC TRM, Module Design Guide, schematic and carrier pinmap; render the wiring table first then issue the confirm-or-customize gate",
+      "Step 5: cpp-expand the in-tree tegra<soc>-camera-<sensor>*.dtsi, extract its fragment@N body, append exactly ONE /* custom-bsp: camera:<sensor> */ fragment to the composite custom overlay .dts, set jetson-header-name on the composite root idempotently, and verify with dtc + fdtoverlay (pre-compile single-fragment gate, post-compile deep-tree uniqueness gate)",
+      "Step 6: run pin_verifier.py for cam_i2c_*, extperiph<m>_clk and reset/PWDN/PWR_EN GPIOs, route mismatches to /jetson-customize-pinmux",
+      "Step 7: write the run-state JSON sidecar at <workspace>/target-platform/<profile-stem>.jetson-customize-camera.json and drive the next-step chain via sequential AskUserQuestion prompts",
+      "Hand off to /jetson-build-source to compile the composite .dtbo and own OVERLAY_DTB_FILE+= registration; do not touch ODMDATA or the carrier flash conf"
+    ]
+  },
+  {
+    "id": "jetson-customize-camera-002",
+    "question": "After /jetson-customize-camera my flash succeeds but v4l2-ctl --list-devices shows no tegra-capture-vi channels and dmesg has 'camera_common_regulator_get (null) ERR: -EINVAL'. What did I do wrong?",
+    "expected_skill": "jetson-customize-camera",
+    "expected_script": null,
+    "ground_truth": "The 'camera_common_regulator_get (null) ERR: -EINVAL' error means the overlay is missing avdd-reg / iovdd-reg / dvdd-reg regulator strings — almost always because a stub overlay was committed (tegra-capture-vi { status=\"okay\"; num-channels=<N>; } with no ports/sensor/nvcsi body) instead of splicing the FULL sensor body via cpp + dtc. Re-run /jetson-customize-camera Step 5 so it cpp-expands the in-tree tegra<soc>-camera-<sensor>*.dtsi and copies its fragment@N body verbatim — sensor mode tables (mode<N>, sensor_modes, pixel_phase) must be spliced, never hand-authored. Also confirm you didn't fall into the dual-fragment trap (two camera-tagged fragment@N entries cause dtc deep-merge of duplicate sibling subtrees like two tca9546@70 and silently drop the dtsi-supplied deep tree) and that you did NOT also append the in-tree per-sensor dtbo to OVERLAY_DTB_FILE — registering both your rendered overlay AND tegra<soc>-p3971-camera-<sensor>-overlay.dtbo produces a phantom subdev bind that bricks enumeration.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-camera/SKILL.md and consult the Gotchas section",
+      "Identify camera_common_regulator_get (null) ERR: -EINVAL as missing avdd-reg / iovdd-reg / dvdd-reg strings — splice the FULL sensor body via cpp + dtc, do not commit a stub overlay",
+      "Check for the dual-fragment trap: ensure exactly ONE /* custom-bsp: camera:<sensor> */ fragment@N is present in the composite custom overlay .dts",
+      "Verify the in-tree per-sensor dtbo (e.g. tegra<soc>-p3971-camera-<sensor>-overlay.dtbo) was NOT also appended to OVERLAY_DTB_FILE — registering both produces a phantom subdev bind",
+      "Confirm sensor mode tables (mode<N>, sensor_modes, pixel_phase) were spliced verbatim from the closest in-tree DTSI, not hand-authored",
+      "If cpp failed earlier with 'dt-bindings/gpio/gpio.h: No such file', re-run /jetson-init-source so Branch B's source_sync.sh fetches the macro headers",
+      "Re-run Step 5 with cpp-expansion of the in-tree DTSI, then re-verify with fdtoverlay before re-committing"
+    ]
+  }
+]

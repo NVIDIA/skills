@@ -1,0 +1,129 @@
+# Visual ChangeNet (VCN) classify — baseline_spec.yaml TEMPLATE for the DEFT AOI loop.
+#
+# Copy this to <workspace>/specs/baseline_spec.yaml and adjust for your data.
+# This file is the source of truth for model architecture, lighting layout,
+# image size, and the difference module — the loop derives every per-iteration
+# spec from it, so get it right once here.
+#
+# Container-side paths below assume the loop's standard mounts (see
+# references/visual-changenet.md → DEFT-Loop Mount Layout). Leave them as-is
+# unless you change those mounts.
+#
+# --- Epochs for small training sets -------------------------------------------
+# For a small seed training set (~200 rows, as is typical for a first DEFT run),
+# use num_epochs: 10. ChangeNet on a 150M-param C-RADIOv2-B backbone overfits a
+# few-hundred-row set quickly; beyond ~10 epochs val_loss climbs while train_loss
+# keeps falling, and FAR@recall=100% degrades. Raise epochs only as the combined
+# training CSV grows across iterations (mining + synthetic rows). 20 is reasonable
+# once you are in the low thousands of rows.
+# ------------------------------------------------------------------------------
+#
+# --- GPU memory ---------------------------------------------------------------
+# batch_size 16 fits a single 48 GB GPU. Drop to 8 on 24 GB. 64 OOMs on 48 GB.
+# ------------------------------------------------------------------------------
+
+encryption_key: tlt_encode
+task: classify
+train:
+  resume_training_checkpoint_path: null
+  pretrained_model_path: null
+  classify:
+    loss: "ce"
+    cls_weight: [1.0, 10.0]        # up-weight the NO_PASS (defect) class
+  num_epochs: 10                   # see "Epochs for small training sets" above
+  num_nodes: 1
+  validation_interval: 10
+  checkpoint_interval: 5           # must be <= num_epochs, else TAO asserts at startup
+  optim:
+    lr: 1e-5
+    optim: "adamw"
+    policy: "linear"
+    momentum: 0.9
+    weight_decay: 0.01
+  results_dir: "${results_dir}/train"
+  tensorboard:
+    enabled: True
+    infrequent_logging_frequency: 1
+results_dir: /results   # PLACEHOLDER — the loop MUST override this to ${RESULTS_DIR}=<workspace>/results/run_<TS> at launch; never leave as bare /results (writes outside <workspace>)
+model:
+  backbone:
+    type: "c_radio_v2_vit_base_patch16_224"
+    # Staged file (preferred) or HF fallback — see references/visual-changenet.md
+    # → ChangeNet backbone resolution. Pre-Flight rewrites this automatically.
+    pretrained_backbone_path: /data/pretrained_models/C-RADIOv2_B.pth
+    freeze_backbone: False
+  classify:
+    train_margin_euclid: 2.0
+    eval_margin: 0.3
+    embedding_vectors: 5
+    embed_dec: 30
+    difference_module: 'learnable'
+    learnable_difference_modules: 4
+  decode_head:
+    use_summary_token: True
+    feature_strides: [4, 8, 16, 32]
+dataset:
+  classify:
+    train_dataset:
+      csv_path: /data/datasets/NV_PCB_Siamese/csv/training_set.csv
+      images_dir: /data/datasets/NV_PCB_Siamese/images
+    validation_dataset:
+      csv_path: /data/datasets/NV_PCB_Siamese/csv/validation_set.csv
+      images_dir: /data/datasets/NV_PCB_Siamese/images
+    test_dataset:
+      csv_path: /data/datasets/NV_PCB_Siamese/csv/validation_set.csv
+      images_dir: /data/datasets/NV_PCB_Siamese/images
+    infer_dataset:
+      csv_path: /data/datasets/NV_PCB_Siamese/kpi/testing_set.csv
+      images_dir: /data/datasets/NV_PCB_Siamese/images
+    image_ext: .jpg
+    batch_size: 16                 # see "GPU memory" above
+    workers: 2
+    fpratio_sampling: 0.2
+    num_input: 1
+    input_map:
+      SolderLight: 0               # one row per lighting condition you capture
+    concat_type: linear
+    grid_map:
+      x: 2
+      y: 2
+    image_width: 224
+    image_height: 224
+    augmentation_config:
+      rgb_input_mean: [0.485, 0.456, 0.406]
+      rgb_input_std: [0.229, 0.224, 0.225]
+      random_flip:
+        vflip_probability: 0.5
+        hflip_probability: 0.5
+        enable: True
+      random_rotate:
+        rotate_probability: 0.5
+        angle_list: [90, 180, 270]
+        enable: True
+      random_color:
+        brightness: 0.3
+        contrast: 0.3
+        saturation: 0.3
+        hue: 0.3
+        enable: True
+      with_scale_random_crop:
+        enable: True
+      with_random_crop: True
+      with_random_blur: True
+      augment: True
+    num_classes: 2
+evaluate:
+  checkpoint: "${results_dir}/train/changenet_classify.pth"
+  trt_engine: "${results_dir}/gen_trt_engine/changenet-classify.trt"
+  batch_size: ${dataset.classify.batch_size}
+inference:
+  checkpoint: "${results_dir}/train/changenet_model_classify_latest.pth"
+  trt_engine: "${results_dir}/gen_trt_engine/changenet-classify.trt"
+  batch_size: ${dataset.classify.batch_size}
+export:
+  gpu_id: 0
+  checkpoint: "${results_dir}/train/changenet_classify.pth"
+  onnx_file: "${results_dir}/export/changenet-classify.onnx"
+  input_width: 224
+  input_height: 224
+  batch_size: ${dataset.classify.batch_size}

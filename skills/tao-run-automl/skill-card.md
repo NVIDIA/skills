@@ -1,5 +1,5 @@
 ## Description: <br>
-Run AutoML / hyperparameter optimization (HPO) for NVIDIA TAO networks using AutoMLRunner, handling algorithm selection, WandB experiment tracking, job execution on any TAO SDK platform, result interpretation, and per-rec custom evaluation hooks. <br>
+Run AutoML / hyperparameter optimization (HPO) for NVIDIA TAO networks using AutoMLRunner, handling algorithm selection, WandB experiment tracking, job execution on any TAO SDK platform, result interpretation, and per-recommendation custom evaluation hooks. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to automatically tune training hyperparameters for NVIDIA TAO networks across multiple compute backends (DGX Cloud, SLURM, Kubernetes, Brev, Docker) without manually configuring search spaces or managing trial orchestration. <br>
+Developers and ML engineers use this skill to run automated hyperparameter optimization for NVIDIA TAO models across multiple compute backends (Brev, SLURM, Kubernetes, Docker), selecting search algorithms and interpreting tuning results. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,23 +19,18 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [algorithms.md](references/algorithms.md) <br>
-- [automl-settings.md](references/automl-settings.md) <br>
-- [custom-param-ranges.md](references/custom-param-ranges.md) <br>
-- [examples.md](references/examples.md) <br>
-- [hooks-and-wandb.md](references/hooks-and-wandb.md) <br>
-- [intake-and-inputs.md](references/intake-and-inputs.md) <br>
-- [mandatory-rules.md](references/mandatory-rules.md) <br>
-- [monitoring-and-resume.md](references/monitoring-and-resume.md) <br>
-- [nl-config-and-research.md](references/nl-config-and-research.md) <br>
-- [pitfalls.md](references/pitfalls.md) <br>
-- [prerequisites.md](references/prerequisites.md) <br>
-- [results.md](references/results.md) <br>
+- [AutoML Preflight Concepts](references/automl-preflight-concepts.md) <br>
+- [AutoML Intent & Algorithms](references/automl-intent-algorithms.md) <br>
+- [AutoML Runner Configuration](references/automl-runner-configuration.md) <br>
+- [AutoML Advanced Monitoring](references/automl-advanced-monitoring.md) <br>
+- [AutoML Examples](references/automl-examples.md) <br>
+- [Detailed Guide](references/detailed-guide.md) <br>
+- [Skill Info](references/skill_info.yaml) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Shell commands, Python scripts, Configuration instructions] <br>
+**Output Format:** [Markdown with inline bash and Python code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -46,7 +41,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive skill-activation case) using the NVSkills-Eval `external` profile in an `astra-sandbox` environment with 2 attempts per task and a 50% pass threshold. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile on the astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -70,11 +65,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 75% (+75%) | 92% (+92%) |
-| Discoverability | 2 | 44% (+44%) | 97% (+97%) |
-| Effectiveness | 2 | 87% (+73%) | 71% (+57%) |
-| Efficiency | 2 | 51% (+24%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 90% (+90%) | 97% (+97%) |
+| Discoverability | 1 | 100% (+100%) | 72% (+72%) |
+| Effectiveness | 1 | 50% (+40%) | 90% (+76%) |
+| Efficiency | 1 | 95% (+68%) | 59% (+31%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

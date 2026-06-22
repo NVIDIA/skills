@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-train-sparse4d`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,29 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 70% (+70%) | 58% (+48%) |
-| Discoverability | 2 | 100% (+100%) | 48% (+48%) |
-| Effectiveness | 2 | 43% (+33%) | 61% (+34%) |
-| Efficiency | 2 | 95% (+68%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 50% (+50%) |
+| Discoverability | 1 | 92% (+92%) | 0% (+0%) |
+| Effectiveness | 1 | 100% (+90%) | 88% (+74%) |
+| Efficiency | 1 | 79% (+52%) | 28% (-0%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 15 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 5 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/models/tao-train-sparse4d`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/models/tao-train-sparse4d/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/models/tao-train-sparse4d/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SQP-2): The encryption_key field is defined as a plain-text string with no guidance on secure handling, masking, or storage. If  (`schemas/dataset_convert.schema.json:1141`)
-- MEDIUM SECURITY/Unknown (SQP-2): WandB (Weights & Biases) telemetry integration is enabled by default ('enable': true) without any user-facing warning th (`schemas/dataset_convert.schema.json:3652`)
+- LOW SCHEMA/unexpected_file: Unexpected 'schemas' in skill root (`skills/models/tao-train-sparse4d/schemas`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/models/tao-train-sparse4d/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 1 file(s)
-- Inter-Skill Deduplication: Parsed skill 'tao-train-sparse4d': 443 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

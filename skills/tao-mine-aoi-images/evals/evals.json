@@ -1,7 +1,7 @@
 [
   {
     "id": "tao-mine-aoi-images-basic",
-    "question": "A user request: \"Mine nearest-neighbor AOI images for a Visual ChangeNet DEFT iteration.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
+    "question": "A user request: \"Runs the DEFT embed-then-mine workflow for VCN AOI iterations \u2014 embeds the gap-analysis target parquet, embeds a source pool, and mines nearest-neighbour source images for downstream augmentation.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
     "expected_skill": "tao-mine-aoi-images",
     "expected_script": null,
     "ground_truth": "Identify tao-mine-aoi-images as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",

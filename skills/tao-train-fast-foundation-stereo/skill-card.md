@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, or running inference for TAO FastFoundationStereo (FFS) models for real-time stereo depth estimation in autonomous vehicle, robotics, and 3D perception pipelines. <br>
+Developers and engineers training, evaluating, exporting, or running inference for real-time stereo depth estimation models using NVIDIA TAO FastFoundationStereo. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,18 +19,18 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [parameters.md](references/parameters.md) <br>
-- [spec-overrides.md](references/spec-overrides.md) <br>
-- [export-trt-defaults.md](references/export-trt-defaults.md) <br>
-- [tao-deploy-fast-foundation-stereo.md](references/tao-deploy-fast-foundation-stereo.md) <br>
-- [parent-model-inference.md](references/parent-model-inference.md) <br>
-- [troubleshooting.md](references/troubleshooting.md) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
+- [Setup and Run Guide](references/setup-and-run.md) <br>
+- [Important Parameters](references/important-parameters.md) <br>
+- [Error Patterns](references/error-patterns.md) <br>
+- [Spec Overrides](references/spec-overrides.md) <br>
+- [Parent Model Inference](references/parent-model-inference.md) <br>
+- [TAO Deploy Fast Foundation Stereo](references/tao-deploy-fast-foundation-stereo.md) <br>
+- [Skill Info](references/skill_info.yaml) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Files] <br>
-**Output Format:** [Markdown with inline bash code blocks and YAML spec files] <br>
+**Output Type(s):** [Shell commands, Configuration instructions] <br>
+**Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -41,7 +41,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive skill-activation case) in astra-sandbox environment with NVSkills-Eval external profile, 2 attempts per task. <br>
+Evaluated against 1 positive skill-activation task in the NVSkills-Eval external profile on astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -65,11 +65,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 85% (+80%) | 58% (+58%) |
-| Discoverability | 2 | 93% (+92%) | 48% (+48%) |
-| Effectiveness | 2 | 70% (+53%) | 61% (+46%) |
-| Efficiency | 2 | 81% (+54%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 60% (+60%) | 20% (+20%) |
+| Discoverability | 1 | 100% (+100%) | 0% (+0%) |
+| Effectiveness | 1 | 38% (+24%) | 44% (+30%) |
+| Efficiency | 1 | 95% (+68%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

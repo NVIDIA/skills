@@ -7,10 +7,9 @@ actions:
   gen_trt_engine:
     command: nvdinov2 gen_trt_engine -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       gen_trt_engine.onnx_file:
-        type: file
-      gen_trt_engine.trt_engine:
         type: file
     outputs:
       results_dir:
@@ -27,12 +26,20 @@ spec_params:
 spec_shorthand_keys:
   trt_data_type: gen_trt_engine.tensorrt.data_type
   trt_engine: gen_trt_engine.trt_engine
-  batch_size: dataset.batch_size
+  batch_size: gen_trt_engine.batch_size
+  image_size: model.backbone.img_size
+  teacher_type: model.backbone.teacher_type
+  student_type: model.backbone.student_type
+  trt_min_batch_size: gen_trt_engine.tensorrt.min_batch_size
+  trt_opt_batch_size: gen_trt_engine.tensorrt.opt_batch_size
+  trt_max_batch_size: gen_trt_engine.tensorrt.max_batch_size
 description: NvDINOv2 deploy workflow for gen_trt_engine using TAO Deploy.
 spec_templates:
   gen_trt_engine: spec_template_deploy_gen_trt_engine.yaml
 notes:
-- TAO Deploy exposes `gen_trt_engine` for NvDINOv2; downstream evaluate and inference
-  remain in the workflow or consumer model.
+- TAO Deploy exposes `gen_trt_engine` for NvDINOv2; checkpoint inference remains
+  in the workflow, while TensorRT engines are for consumer runtimes.
 - Keep `model.backbone.img_size` aligned with the exported backbone, with 518 as the
   deploy template default.
+- Keep the TensorRT min/opt/max batch profile fixed at 1 unless the exported ONNX
+  graph has been verified with a wider dynamic profile.

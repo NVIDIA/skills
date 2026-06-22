@@ -48,45 +48,38 @@ The ChangeNet model compares a **test image** against a **golden image** (known-
 
 The investigation has 5 phases. Phase 1 (numbers) gives you hypotheses. Phase 2 (images) proves or disproves them. Phase 3 (cross-dimensional) finds hidden patterns. Phase 4 (config) explains the mechanism. Phase 5 (counterfactual) quantifies fixes. **Phase 2 is the core — spend the most effort there. Phase 5 is the most actionable — never skip it.**
 
-- **Phase 1 — Score Analysis**: score statistics + tier classification, 200-point threshold sweep, per-defect-type table, KPI verdict, and drop-N threshold-critical analysis. Establishes hypotheses.
-- **Phase 2 — Deep Image Investigation** (core): threshold-critical sample deep dive (2A), systematic golden image audit and failure mode clustering (2B), false positive deep dive (2C), comparative visual analysis (2D), and label semantics & visual pattern alignment audit (2E). Includes the image path construction rules.
+- **Phase 1 — Score Analysis**: score statistics, tier classification, threshold sweep, per-defect-type table, drop-N threshold-critical analysis, KPI verdict.
+- **Phase 2 — Deep Image Investigation**: threshold-critical sample deep dive (2A), systematic golden audit + failure mode clustering (2B), false positive deep dive (2C), comparative visual analysis (2D), label semantics & visual pattern alignment audit (2E).
 - **Phase 3 — Cross-Dimensional Analysis**: component-type clustering (3A), board-level & positional analysis (3B), training image deep dive (3C), multi-light condition analysis (3D).
 - **Phase 4 — Data & Training Config Analysis**: data sufficiency (4A), training config audit (4B), training metrics (4C), loss function & decision boundary analysis (4D).
-- **Phase 5 — Counterfactual & Actionability Analysis**: what-if simulations (5A) and minimum viable fix path (5B).
+- **Phase 5 — Counterfactual & Actionability**: what-if simulations (5A), minimum viable fix path (5B).
 
-See `references/phases.md` for the full step-by-step procedure of every phase and sub-phase, including all commands, scripts, thresholds, numeric values, image path construction rules, severity guidance, and required report outputs. Execute every step exactly as specified there.
-
----
-
-## Parallelization Strategy (USE SUBAGENTS)
-
-**You MUST use the Agent tool to run independent investigation tracks in parallel.** Run Phase 1 yourself in the main thread, then launch 6 subagents (Agents A–F) simultaneously for Phase 2–4 tracks, collect and synthesize their findings (paying special attention to exploratory Agents E and F), run Phase 5 yourself, and write the report. The report-writing step enforces a **mandatory Image Embedding Protocol** — every visual evidence table row must carry inline thumbnail columns or the hook will reject the report.
-
-See `references/parallelization.md` for the complete execution plan: the exact Phase 1 outputs to save, the per-agent checklists and inputs for Agents A–F, the synthesis cross-checks, the full mandatory Image Embedding Protocol with per-section rules and table format, the exploratory findings section, and the subagent prompt template including the required Thumbnail Map return format. Follow it exactly.
+See `references/investigation-phases.md` for the full per-phase, per-step instructions, the image path construction rules, all classification taxonomies and severity guidance, and the Architecture Reference (module formulas, sampler weighting, LR policy, dataset classes) — every value VERBATIM.
 
 ---
 
-## Architecture Reference
+## Execution: Parallelize With Subagents
 
-- **Learnable module**: `softmax(model(img1, img2), dim=1)[:, 1]` → score = P(defect). Higher = more defective.
-- **Euclidean module**: `F.pairwise_distance(embed1, embed2)` → score = distance. Higher = more different.
-- **WeightedRandomSampler**: `fail_wt = (num_pass / num_fail) * fpratio_sampling`. Defects sampled at fail_wt:1 rate.
-- **Image paths**: `{images_dir}/{input_path}/{object_name}_{light_condition}.{ext}`
-- **LR linear**: `lr * (1.0 - epoch / (num_epochs + 1))`
-- **Data loading**: `SiameseNetworkTRIDataset` for `num_golden=1`, `MultiGoldenDataset` for `num_golden>1`
+**You MUST use the Agent tool to run independent investigation tracks in parallel.** Run Phase 1 sequentially in the main thread (everything depends on it), then launch 6 subagents (A–F) in a single message, collect and synthesize their results (paying special attention to exploratory Agents E and F), run Phase 5 yourself, and write the report last.
 
----
+Before writing `RCA_Report.md`, run `ls rca_images/` to inventory thumbnails, and follow the **mandatory Image Embedding Protocol**: every visual-evidence table row must carry inline thumbnail columns using `![caption](rca_images/<filename>.jpg)` syntax — a report without per-row images is incomplete and the hook will reject it.
 
-## Report Structure
-
-Produce `RCA_Report.md` with 9 top-level sections: (1) Verdict, (2) Score Analysis, (3) Visual Evidence (with inline thumbnails throughout), (4) Cross-Dimensional Analysis, (5) Data Issues, (6) Training Config Issues, (7) Exploratory Findings, (8) Counterfactual Impact Analysis, and (9) Recommended Fixes (prioritized by impact × feasibility). Visual Evidence tables must embed thumbnails generated into `rca_images/`.
-
-See `references/report-structure.md` for the complete report skeleton with every section, subsection, table column layout, and inline-thumbnail requirement. Match it exactly.
+See `references/parallelization.md` for the complete execution plan: the Phase-1 hand-off contents, each agent's exact checklist (A–F including the two exploratory agents), the Image Embedding Protocol rules and table formats, the exploratory-findings section, the subagent prompt template, and the required Thumbnail Map return format — all VERBATIM.
 
 ---
 
-## Output Location
+## Report Structure and Output
 
-Always save into a timestamped folder under `<experiment_result_dir>/rca_results/YYYY-MM-DD_HHMMSS/` containing `RCA_Report.md`, the `rca_images/` thumbnail folder, the hook-populated `rca_config/`, and `claude_session.jsonl`. Get the real timestamp by running `date +%Y-%m-%d_%H%M%S` in Bash — never hardcode or guess it.
+Produce `RCA_Report.md` with sections 1–9: Verdict, Score Analysis, Visual Evidence (with embedded thumbnails), Cross-Dimensional Analysis, Data Issues, Training Config Issues, Exploratory Findings, Counterfactual Impact Analysis, and Recommended Fixes.
 
-See `references/output-and-deliverable.md` for the full directory tree and the exact ordered steps for creating the folder, writing thumbnails, and writing the report (which triggers the packaging hook). If the user specifies a custom path, use that instead but maintain the same structure.
+Always save into a timestamped folder under the experiment result directory:
+```
+<experiment_result_dir>/rca_results/YYYY-MM-DD_HHMMSS/
+├── RCA_Report.md
+├── rca_images/
+├── rca_config/
+└── claude_session.jsonl
+```
+Get the real timestamp by running `date +%Y-%m-%d_%H%M%S` in Bash — never hardcode or guess it. If the user specifies a custom path, use that instead but keep the same structure.
+
+See `references/output-structure.md` for the complete section-by-section report skeleton (every table header and summary line) and the full output layout with hook-copied contents — VERBATIM.

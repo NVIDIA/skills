@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, pruning, quantizing, retraining, or running inference on NVIDIA TAO OCDNet models for scene text detection in natural images. <br>
+Developers and engineers training, evaluating, exporting, pruning, quantizing, retraining, or running inference for TAO OCDNet scene text detection models. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,9 +19,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [TAO Deploy OCDNet Workflow](references/tao-deploy-ocdnet.md) <br>
-- [Skill Info (AutoML and Actions)](references/skill_info.yaml) <br>
-- [Train Spec Template](references/spec_template_train.yaml) <br>
+- [TAO Deploy OCDNet](references/tao-deploy-ocdnet.md) <br>
+- [Skill Info](references/skill_info.yaml) <br>
+- [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
@@ -37,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in an astra-sandbox environment using the NVSkills-Eval external profile. <br>
+Evaluated against 1 evaluation task via NVSkills-Eval with external profile in astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 55% (+25%) | 92% (+76%) |
-| Discoverability | 2 | 42% (+42%) | 97% (+69%) |
-| Effectiveness | 2 | 66% (-8%) | 75% (+54%) |
-| Efficiency | 2 | 47% (+20%) | 96% (+55%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 84% (+84%) | 97% (+77%) |
+| Discoverability | 1 | 34% (+34%) | 97% (+97%) |
+| Effectiveness | 1 | 100% (+90%) | 90% (+46%) |
+| Efficiency | 1 | 24% (-3%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

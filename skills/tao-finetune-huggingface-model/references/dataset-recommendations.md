@@ -16,6 +16,35 @@ limitations under the License.
 
 # Dataset Recommendations Reference
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- How to use this file
+- Image Classification
+  - Popular datasets
+  - Model-specific notes
+- Object Detection
+  - Popular datasets
+  - Model-specific notes
+- Semantic Segmentation
+  - Popular datasets
+  - Model-specific notes
+- Depth Estimation
+  - Popular datasets
+  - Model-specific notes
+- VLM / Image-Text-to-Text
+  - Popular datasets
+  - Model-specific notes
+- LLM / Text Generation
+  - SFT (Supervised Fine-Tuning)
+  - DPO (Direct Preference Optimization)
+  - GRPO
+  - Model-specific notes
+- Presenting to the user (recommended agent prompt)
+- Gated datasets note
+
+
 When the user provides only a `model_id` and no dataset, the agent presents 3–5 curated
 options from the tables below, matched to the model's task type (and where relevant, to
 the specific model family).

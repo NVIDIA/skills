@@ -1,5 +1,5 @@
 ## Description: <br>
-TAO Execution SDK for submitting and monitoring GPU training jobs on supported platforms (Lepton, Brev, SLURM, local Docker, Kubernetes). <br>
+TAO Execution SDK for submitting and monitoring GPU training jobs on supported platforms (Brev, SLURM, local Docker, Kubernetes). <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to submit, monitor, and manage GPU training jobs through the NVIDIA TAO SDK across multiple compute platforms including Lepton, Brev, SLURM, Kubernetes, and local Docker. <br>
+Developers and engineers who need to submit, monitor, and manage GPU training jobs through the TAO SDK, with job tracking, S3 I/O wrapping, multi-node distributed training, and platform-specific features. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,17 +19,16 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Job Construction](references/job-construction.md) <br>
-- [Orchestration Patterns](references/orchestration-patterns.md) <br>
-- [Platform Notes](references/platform-notes.md) <br>
-- [Error Patterns](references/error-patterns.md) <br>
-- [Outputs](references/outputs.md) <br>
-- [Examples](references/examples.md) <br>
-- [Scope](references/scope.md) <br>
+- [error-patterns.md](references/error-patterns.md) <br>
+- [orchestration-patterns.md](references/orchestration-patterns.md) <br>
+- [platform-notes.md](references/platform-notes.md) <br>
+- [scope.md](references/scope.md) <br>
+- [spec-construction.md](references/spec-construction.md) <br>
+- [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Python code, Configuration instructions] <br>
+**Output Type(s):** [Shell commands, Code, Configuration instructions] <br>
 **Output Format:** [Markdown with inline Python and bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -41,7 +40,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the astra-sandbox environment using the NVSkills-Eval external profile. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -65,14 +64,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 15% (+15%) | 92% (+92%) |
-| Discoverability | 2 | 0% (+0%) | 80% (+80%) |
-| Effectiveness | 2 | 45% (+35%) | 74% (+61%) |
-| Efficiency | 2 | 27% (-0%) | 79% (+50%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 80% (+80%) | 88% (+88%) |
+| Discoverability | 1 | 100% (+100%) | 62% (+62%) |
+| Effectiveness | 1 | 50% (+40%) | 90% (+66%) |
+| Efficiency | 1 | 95% (+68%) | 59% (+31%) |
 
 ## Skill Version(s): <br>
-0.2.0 (source: frontmatter) <br>
+0.1.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

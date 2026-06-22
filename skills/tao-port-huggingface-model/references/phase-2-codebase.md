@@ -18,6 +18,18 @@ Full Phase 2 walkthrough — task-type → reference-model mapping, reference-im
 
 ## Phase 2 — Codebase Exploration
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Phase 2 — Codebase Exploration
+  - 2.1 Determine the task type and find the closest existing TAO model
+  - 2.2 Read and understand the reference implementation
+  - 2.3 Check if the backbone already exists
+  - 2.4 Check `tao-dataservices` for data utilities
+  - Phase 2 Gate — Confirm before proceeding:
+
+
 Before writing any code, search the submodules for the closest existing model to the one being integrated. This determines which base classes, engine builders, and test patterns to reuse.
 
 ### 2.1 Determine the task type and find the closest existing TAO model
@@ -98,4 +110,3 @@ If the HF model requires a custom annotation format (COCO, KITTI, ODVG), check i
 - [ ] Dataservices coverage checked (existing converters vs. new needed)
 
 ---
-

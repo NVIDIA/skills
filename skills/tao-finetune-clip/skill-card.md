@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers fine-tuning CLIP models for domain-specific image-text retrieval, zero-shot classification, embedding extraction, and deploying trained models to ONNX or TensorRT. <br>
+Developers and engineers use this skill to fine-tune CLIP models on domain-specific image-caption data, run zero-shot classification, extract embeddings, and deploy optimized models via ONNX and TensorRT. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,9 +19,11 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [skill_info.yaml](references/skill_info.yaml) <br>
-- [TAO Deploy CLIP Reference](references/tao-deploy-clip.md) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
+- [Error Patterns](references/error-patterns.md) <br>
+- [Spec Param Inference](references/spec-param-inference.md) <br>
+- [TAO Deploy CLIP](references/tao-deploy-clip.md) <br>
+- [Skill Info](references/skill_info.yaml) <br>
+- [Agent Skills Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
@@ -37,7 +39,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive skill-activation case) using NVSkills-Eval external profile with 2 attempts per task. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,14 +63,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 95% (+95%) | 97% (+78%) |
-| Discoverability | 2 | 84% (+84%) | 97% (+66%) |
-| Effectiveness | 2 | 89% (+76%) | 76% (+69%) |
-| Efficiency | 2 | 68% (+41%) | 96% (+51%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 85% (+85%) | 97% (+97%) |
+| Effectiveness | 1 | 100% (+86%) | 90% (+66%) |
+| Efficiency | 1 | 68% (+41%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
-1.0.0 (source: frontmatter) <br>
+0.1.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

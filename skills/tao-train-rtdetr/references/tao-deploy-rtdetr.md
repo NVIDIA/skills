@@ -1,6 +1,6 @@
 # RT-DETR Deploy
 
-RT-DETR deploy covers the TAO Deploy actions for an exported real-time object detection model. Use the `rtdetr` model skill for training, checkpoint evaluation, quantization, distillation, pruning, export, or non-TensorRT inference where those actions exist. Use this deploy workflow after export when the input artifact is an ONNX model and the desired output is a TensorRT engine or TensorRT-backed predictions.
+RT-DETR deploy covers the TAO Deploy actions for an exported real-time object detection model. Use the `rtdetr` model skill for training, checkpoint evaluation, quantization, distillation, export, or non-TensorRT inference where those actions exist. Pruning is not advertised by the packaged RT-DETR model skill. Use this deploy workflow after export when the input artifact is an ONNX model and the desired output is a TensorRT engine or TensorRT-backed predictions.
 
 Supported actions: `gen_trt_engine`, `evaluate`, `inference`.
 
@@ -13,7 +13,7 @@ docker run --gpus all --rm --shm-size=16g \
   -v /path/to/specs:/specs \
   -v /path/to/export:/models \
   -v /path/to/results:/results \
-  nvcr.io/nvidia/tao/tao-toolkit:6.26.3-deploy \
+  <resolved tao_toolkit.deploy image> \
   rtdetr gen_trt_engine -e /specs/rtdetr_deploy_gen_trt_engine.yaml
 ```
 
@@ -24,7 +24,7 @@ docker run --gpus all --rm --shm-size=16g \
   -v /path/to/specs:/specs \
   -v /path/to/eval:/data \
   -v /path/to/results:/results \
-  nvcr.io/nvidia/tao/tao-toolkit:6.26.3-deploy \
+  <resolved tao_toolkit.deploy image> \
   rtdetr evaluate -e /specs/rtdetr_deploy_evaluate.yaml
 ```
 
@@ -35,7 +35,7 @@ docker run --gpus all --rm --shm-size=16g \
   -v /path/to/specs:/specs \
   -v /path/to/inference:/data \
   -v /path/to/results:/results \
-  nvcr.io/nvidia/tao/tao-toolkit:6.26.3-deploy \
+  <resolved tao_toolkit.deploy image> \
   rtdetr inference -e /specs/rtdetr_deploy_inference.yaml
 ```
 
@@ -79,8 +79,14 @@ Recommended starting overrides:
 {
     'gen_trt_engine.tensorrt.data_type': 'FP16',
     'dataset.num_classes': '<object classes> + 1 if background is included',
-    'gen_trt_engine.input_width': '<export input width>',
-    'gen_trt_engine.input_height': '<export input height>',
+    'model.num_queries': '<value used for export>',
+    'model.num_select': '<value used for export>',
+    'model.dec_layers': '<value used for export>',
+    'model.enc_layers': '<value used for export>',
+    'evaluate.input_width': '<export input width, evaluate only>',
+    'evaluate.input_height': '<export input height, evaluate only>',
+    'inference.input_width': '<export input width, inference only>',
+    'inference.input_height': '<export input height, inference only>',
 }
 ```
 
@@ -88,7 +94,8 @@ Model-specific notes:
 
 - Use FP16 for starter-kit TensorRT builds unless INT8 calibration is explicitly requested.
 - If quantized export is used, build the TensorRT engine from the quantized export ONNX artifact.
-- Carry `dataset.num_classes`, input width, input height, and channel count from train/export.
+- Carry `dataset.num_classes` and model structure settings from train/export.
+- Do not put `input_width` or `input_height` under `gen_trt_engine`; the RT-DETR deploy schema does not define those keys for engine generation. Engine input shape is inferred from the exported ONNX. Set input size under `evaluate.*` and `inference.*` for the deploy consumers.
 
 ## Job Chain Mapping
 
@@ -113,6 +120,8 @@ Model-specific notes:
 **Engine profile mismatch:** Runtime batch size for evaluate or inference must fit within the TensorRT min/opt/max profile used during `gen_trt_engine`.
 
 **Template class or shape mismatch:** Copy class count, input resolution, backbone, and post-processing settings from train/export before running TAO Deploy.
+
+**Unsupported `gen_trt_engine.input_width` / `gen_trt_engine.input_height`:** These fields are valid on deploy `evaluate` and `inference`, but not on deploy `gen_trt_engine`. Leaving them in the engine template causes Hydra schema rejection before TensorRT starts.
 
 **INT8 calibration missing:** INT8 builds need an extracted calibration image directory, a writable cache path, and enough images for `cal_batch_size * cal_batches`.
 

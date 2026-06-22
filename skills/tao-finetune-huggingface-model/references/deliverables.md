@@ -16,6 +16,23 @@ limitations under the License.
 
 # Deliverables & README Reference
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Final Directory Layout (what the user sees)
+- README.md Template (generated in Phase 4)
+- Edit .env — add HF_TOKEN and WANDB_API_KEY
+- Prepare data (one-time)
+- Zero-shot baseline (optional but recommended)
+- Train
+- Evaluate, run inference samples, build report
+- or: docker run ... pytest tests/ -v
+- scripts/run.sh Template — Tiered Workflow
+- .env.example Template
+- Phase 10 Update to README
+
+
 Describes the final directory layout the skill produces and the README.md template the user
 gets to run the pipeline. The skill writes README.md during Phase 4 and updates the "Results"
 section during Phase 10.
@@ -459,7 +476,7 @@ edited code. No `python -m build`, no reinstall.
 
 ```bash
 # Required — HuggingFace model/dataset access
-HF_TOKEN=hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+HF_TOKEN=<your-huggingface-token>
 
 # Required — Weights & Biases
 WANDB_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-run-on-brev`
-- Evaluation date: 2026-06-08
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,28 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 80% (+80%) | 87% (+87%) |
-| Discoverability | 2 | 92% (+92%) | 97% (+97%) |
-| Effectiveness | 2 | 65% (+55%) | 72% (+65%) |
-| Efficiency | 2 | 80% (+53%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 20% (+20%) | 20% (+20%) |
+| Discoverability | 1 | 0% (+0%) | 0% (+0%) |
+| Effectiveness | 1 | 48% (+38%) | 44% (+26%) |
+| Efficiency | 1 | 27% (-0%) | 28% (-0%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 14 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 4 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/platform/tao-run-on-brev`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/platform/tao-run-on-brev/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/platform/tao-run-on-brev/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SQP-2): The skill description and documentation do not warn users that invoking this skill may automatically provision GPU insta (`SKILL.md:100`)
-- MEDIUM SECURITY/Unknown (SQP-2): The skill handles multiple sensitive credentials (BREV_API_TOKEN, NGC_KEY, ACCESS_KEY, SECRET_KEY, HF_TOKEN) without war (`SKILL.md:68`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/platform/tao-run-on-brev/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 1 file(s)
-- Inter-Skill Deduplication: Parsed skill 'tao-run-on-brev': 304 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

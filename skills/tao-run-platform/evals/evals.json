@@ -1,7 +1,7 @@
 [
   {
     "id": "tao-run-platform-basic",
-    "question": "A user request: \"Launch a TAO train/evaluate/export job on an execution platform.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
+    "question": "A user request: \"Use the tao-run-platform skill.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
     "expected_skill": "tao-run-platform",
     "expected_script": null,
     "ground_truth": "Identify tao-run-platform as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",

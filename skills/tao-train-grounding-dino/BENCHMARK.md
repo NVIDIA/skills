@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-train-grounding-dino`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,29 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 90% (+28%) | 97% (+78%) |
-| Discoverability | 2 | 88% (+42%) | 97% (+66%) |
-| Effectiveness | 2 | 80% (+57%) | 74% (+58%) |
-| Efficiency | 2 | 71% (+40%) | 96% (+53%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 50% (+30%) |
+| Discoverability | 1 | 88% (+88%) | 0% (+0%) |
+| Effectiveness | 1 | 90% (+80%) | 76% (+44%) |
+| Efficiency | 1 | 71% (+44%) | 28% (-0%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 14 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 5 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/models/tao-train-grounding-dino`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/models/tao-train-grounding-dino/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/models/tao-train-grounding-dino/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SDI-4): The inference schema file requires 'quantize' as a mandatory field even though quantization is not relevant to inference (`schemas/inference.schema.json:1846`)
-- MEDIUM SECURITY/Unknown (SQP-2): The WandB (Weights & Biases) integration is enabled by default ('enable': true) in the schema. This means training runs  (`schemas/gen_trt_engine.schema.json:1812`)
+- LOW SCHEMA/unexpected_file: Unexpected 'schemas' in skill root (`skills/models/tao-train-grounding-dino/schemas`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/models/tao-train-grounding-dino/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 2 file(s)
-- Inter-Skill Deduplication: Parsed skill 'tao-train-grounding-dino': 454 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

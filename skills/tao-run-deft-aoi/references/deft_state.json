@@ -18,12 +18,15 @@
     "batch_size": 16,
     "num_epochs": 20,
     "anomalygen": {
-      "sub_skill": null,
-      "mode": "pregen_ingest",
-      "pregen_dir": "~/workspace/augmentation/anomalygen",
-      "reconstructed_image_dir": "~/workspace/augmentation/anomalygen/reconstructed_image",
-      "original_image_dir": "~/workspace/augmentation/anomalygen/original_image",
-      "defect_spec": "~/workspace/augmentation/anomalygen/defect_spec.jsonl"
+      "sub_skill": "paidf-anomalygen",
+      "mode": "inference_only",
+      "project": "nvpcb",
+      "defect_spec": "~/workspace/augmentation/anomalygen/datasets/nvpcb/defect_spec.jsonl",
+      "checkpoint_dir": "~/workspace/augmentation/anomalygen/checkpoints/nvpcb",
+      "dataset_dir_source": "~/workspace/augmentation/anomalygen/datasets/nvpcb",
+      "step": 14000,
+      "num_SDG": 20,
+      "container": "nvcr.io/nv-metropolis-dev/metropolis-sdg/paidf-anomalygen:1.0.0-26487d2d.main"
     },
     "mining_filter": {
       "sub_skill": "tao-mine-aoi-images",
@@ -36,6 +39,7 @@
   "_completed_step_values": [
     "evaluate",
     "rca",
+    "anomalygen_finetune",
     "anomalygen",
     "routing",
     "data_mining",

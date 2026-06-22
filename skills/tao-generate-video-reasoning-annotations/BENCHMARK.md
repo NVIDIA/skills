@@ -7,14 +7,13 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-generate-video-reasoning-annotations`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
-The skill should be reviewed before NVSkills-Eval publication. **Skill owners should address the applicable findings below and rerun NVSkills-Eval to refresh this benchmark.**
+- Overall verdict: PASS
 
 ## Agents Used
 
@@ -55,35 +54,29 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 92% (+55%) | 69% (+69%) |
-| Discoverability | 2 | 61% (+5%) | 31% (+31%) |
-| Effectiveness | 2 | 92% (+90%) | 77% (+62%) |
-| Efficiency | 2 | 49% (+6%) | 45% (+16%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 85% (+85%) | 97% (+97%) |
+| Effectiveness | 1 | 100% (+86%) | 90% (+66%) |
+| Efficiency | 1 | 70% (+42%) | 96% (+68%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 11 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 4 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/data/tao-generate-video-reasoning-annotations`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/data/tao-generate-video-reasoning-annotations/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/data/tao-generate-video-reasoning-annotations/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SQP-2): The quick-start example passes the API key directly as a command-line argument (`video_reasoning_annotation.vlm.gemini.a (`SKILL.md:98`)
-- MEDIUM SECURITY/Unknown (SQP-2): The skill transmits raw video content to third-party VLM/LLM APIs (Gemini, OpenAI-compatible endpoints) without any expl (`SKILL.md:30`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/data/tao-generate-video-reasoning-annotations/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 2 total findings.
+This tier was not run or did not produce findings in this report.
 
-Top findings:
+## Publication Recommendation
 
-- HIGH DUPLICATE/duplicate: Duplicate content found across references/prompts_traffic.py and references/prompts_warehouse.py:
-  "get_prompt()" in references/prompts_traffic.py (lines 1464-1471)
-  vs "get_prompt()" in references/prompts_warehouse.py (lines 1551-1558) (`references/prompts_traffic.py:1464`)
-- HIGH DUPLICATE/duplicate: Duplicate content found within SKILL.md:
-  "### 1. Videos" in SKILL.md (lines 27-31)
-  vs "## Inputs" in SKILL.md (lines 120-127) (`SKILL.md:27`)
+The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

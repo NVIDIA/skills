@@ -18,11 +18,11 @@ inference:
   input_height: 544
   color_map: {}
 model:
-  backbone: fan_small
+  backbone: resnet_50
   num_feature_levels: 4
   dec_layers: 6
   enc_layers: 6
   num_queries: 300
-  num_select: 100
+  num_select: 300
   dropout_ratio: 0.0
   dim_feedforward: 2048

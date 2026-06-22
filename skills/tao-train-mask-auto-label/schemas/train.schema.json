@@ -1,5 +1,8 @@
 {
-  "automl_default_parameters": [],
+  "automl_default_parameters": [
+    "train.lr",
+    "train.wd"
+  ],
   "automl_disabled_parameters": [
     "train.cudnn",
     "inference",
@@ -254,7 +257,6 @@
         "arch": {
           "default": "vit-mae-base/16",
           "enum": [
-            "vit-deit-tiny/16",
             "vit-deit-small/16",
             "vit-mae-base/16",
             "vit-mae-large/16",
@@ -498,9 +500,10 @@
           "type": "float"
         },
         "lr": {
+          "automl_enabled": true,
           "default": 1e-06,
-          "maximum": Infinity,
-          "minimum": 0.0,
+          "maximum": 1e-05,
+          "minimum": 1e-07,
           "type": "float"
         },
         "margin_rate": {
@@ -633,7 +636,10 @@
           "type": "int"
         },
         "wd": {
+          "automl_enabled": true,
           "default": 0.0005,
+          "maximum": 0.01,
+          "minimum": 1e-05,
           "type": "float"
         }
       },

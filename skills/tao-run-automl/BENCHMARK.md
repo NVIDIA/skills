@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-run-automl`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-20
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,35 +54,28 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 75% (+75%) | 92% (+92%) |
-| Discoverability | 2 | 44% (+44%) | 97% (+97%) |
-| Effectiveness | 2 | 87% (+73%) | 71% (+57%) |
-| Efficiency | 2 | 51% (+24%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 90% (+90%) | 97% (+97%) |
+| Discoverability | 1 | 100% (+100%) | 72% (+72%) |
+| Effectiveness | 1 | 50% (+40%) | 90% (+76%) |
+| Efficiency | 1 | 95% (+68%) | 59% (+31%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 14 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 4 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/applications/tao-run-automl`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/applications/tao-run-automl/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/applications/tao-run-automl/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SQP-2): The documentation describes sending hyperparameter search data (training specs, metric results, parameter ranges, and op (`references/automl-settings.md:98`)
-- MEDIUM SECURITY/Unknown (SQP-2): The example conversation demonstrates a user passing a plaintext API key ('sk-abc123') directly in chat input, which the (`references/examples.md:34`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/applications/tao-run-automl/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed with observations. NVSkills-Eval ran 2 checks and found 1 total findings.
-
-Top findings:
-
-- LOW DUPLICATE/duplicate: Duplicate content found within references/hooks-and-wandb.md:
-  "# or (when reinstalling tao-run-automl with the wandb extra — append ,wandb to your platform extra):" in references/hooks-and-wandb.md (lines 62-62)
-  vs "#   pip install "$("${TAO_SKILL_BANK_PATH:?}/scripts/resolve_versions_key.py" wheels.tao_automl_lepton | sed 's/]/,wandb]/')"" in references/hooks-and-wandb.md (lines 63-65) (`references/hooks-and-wandb.md:62`)
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

@@ -59,13 +59,13 @@ Direct TAO Launcher spelling is `tao deploy optical_inspection gen_trt_engine`, 
 | `gen_trt_engine` | Exported ONNX model | `gen_trt_engine.onnx_file` |
 | `gen_trt_engine` | Output engine path | `gen_trt_engine.trt_engine` |
 | `evaluate` | TensorRT engine | `evaluate.trt_engine` |
-| `evaluate` | Test CSV | `dataset.test_dataset.csv_path` |
-| `evaluate` | Image folder | `dataset.test_dataset.images_dir` |
+| `evaluate` | Evaluation CSV | `dataset.infer_dataset.csv_path` |
+| `evaluate` | Evaluation image folder | `dataset.infer_dataset.images_dir` |
 | `inference` | TensorRT engine | `inference.trt_engine` |
 | `inference` | Inference CSV | `dataset.infer_dataset.csv_path` |
 | `inference` | Image folder | `dataset.infer_dataset.images_dir` |
 
-For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine` where those actions are available.
+For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine` where those actions are available. The deploy evaluate implementation instantiates the same Optical Inspection dataloader as inference and reads `dataset.infer_dataset.*`; declare and override those keys even when the user calls the action "evaluate".
 
 ## Spec Overrides
 
@@ -76,7 +76,8 @@ Recommended starting overrides:
 ```python
 {
     'gen_trt_engine.tensorrt.data_type': 'fp16',
-    'dataset.batch_size': 32,
+    'dataset.batch_size': 1,
+    'evaluate.batch_size': 1,
     'inference.batch_size': '${dataset.batch_size}',
 }
 ```
@@ -85,6 +86,7 @@ Model-specific notes:
 
 - The starter-kit deploy flow uses FP16 for Optical Inspection TensorRT builds.
 - Keep `dataset.num_input`, `dataset.input_map`, `dataset.concat_type`, and grid layout aligned with the trained AOI model.
+- Default export produces a static-batch ONNX. Keep `evaluate.batch_size: 1` for TensorRT evaluate unless the ONNX was exported with a compatible batch size.
 
 ## Job Chain Mapping
 
@@ -106,6 +108,8 @@ Model-specific notes:
 ## Known Pitfalls
 
 **Engine profile mismatch:** Runtime batch size for evaluate or inference must fit within the TensorRT min/opt/max profile used during `gen_trt_engine`.
+
+**Evaluate reads inference dataset keys:** TAO Deploy Optical Inspection `evaluate` reads `dataset.infer_dataset.csv_path` and `dataset.infer_dataset.images_dir`. If only `dataset.test_dataset.*` is rewritten from S3 to local paths, evaluate fails inside the container with a file-not-found error for the raw S3 URI.
 
 **Template class or shape mismatch:** Copy class count, input resolution, backbone, and post-processing settings from train/export before running TAO Deploy.
 

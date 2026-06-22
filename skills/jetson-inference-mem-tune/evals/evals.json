@@ -1,0 +1,67 @@
+{
+  "skill_name": "jetson-inference-mem-tune",
+  "evals": [
+    {
+      "id": "jetson-inference-mem-tune-001",
+      "prompt": "vLLM keeps OOMing on my AGX Orin while serving a 7B model. What --gpu-memory-utilization and --max-model-len should I use?",
+      "expected_output": "The agent invoked the jetson-inference-mem-tune skill, ran scripts/recommend.py against a fresh jetson-memory-audit JSON with --runtime vllm --workload llm-server, and reported concrete --gpu-memory-utilization=<0.x> and --max-model-len=<number> values from the launch_flags array.",
+      "assertions": [
+        "The agent matched a vLLM OOM scenario to the jetson-inference-mem-tune skill",
+        "The agent obtained a current jetson-memory-audit JSON (from scripts/audit.sh) before recommending flags",
+        "The agent ran scripts/recommend.py --audit <audit.json> --runtime vllm --workload llm-server (with optional --target-mb)",
+        "The agent quoted concrete --gpu-memory-utilization=<value> and --max-model-len=<value> from the launch_flags JSON, not invented values",
+        "The agent reported the runtime and rationale fields from the recommend.py output",
+        "The agent did NOT start, stop, or restart the vLLM server (the skill emits flags only)",
+        "The agent did not invent flag values when launch_flags was empty or missing — it would re-run audit.sh or report the failure",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-inference-mem-tune",
+      "expected_script": "scripts/recommend.py"
+    },
+    {
+      "id": "jetson-inference-mem-tune-002",
+      "prompt": "I'm on Orin Nano 8 GB and want to run a 7B model with the smallest possible memory footprint. Which serving stack should I use and what flags?",
+      "expected_output": "The agent ran scripts/recommend.py with --runtime auto --workload llm-server, reported the script's selected runtime (likely llama-cpp on tight memory) along with its launch_flags, and explicitly mentioned the GGUF / 4-bit tradeoff if llama-cpp was selected.",
+      "assertions": [
+        "The agent ran scripts/recommend.py --runtime auto --workload llm-server against an audit JSON for the Orin Nano 8 GB target",
+        "The agent quoted the runtime, rationale, and launch_flags fields from the recommend.py output",
+        "If the script picked llama-cpp, the agent explicitly mentioned the GGUF / Q4_K_M / 4-bit tradeoff, and quoted -ngl, -c, and --no-mmap from launch_flags",
+        "The agent did NOT recommend NVFP4 on this Orin Nano scenario (NVFP4 is Thor-preferred per the quantization table)",
+        "The agent did not invent flag values — they came from the script's launch_flags",
+        "The agent did not start or restart any server",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-inference-mem-tune",
+      "expected_script": "scripts/recommend.py"
+    },
+    {
+      "id": "jetson-inference-mem-tune-003",
+      "prompt": "I'm using SGLang on Thor for a RAG workload. What memory-related flags should I pass at launch?",
+      "expected_output": "The agent ran scripts/recommend.py --runtime sglang against an audit JSON and quoted --mem-fraction-static, --max-running-requests, and any context/KV-cache notes from the launch_flags or notes fields.",
+      "assertions": [
+        "The agent matched the SGLang prompt to jetson-inference-mem-tune and ran scripts/recommend.py with --runtime sglang",
+        "The agent quoted --mem-fraction-static and --max-running-requests from the launch_flags array",
+        "The agent reported any context-length / KV-cache note from the script's notes field",
+        "The agent recognized this is a Thor target and did not push an Orin-specific NVIDIA-AI-IOT vLLM container at the user",
+        "The agent did not invent fallback flags when the script returned an empty launch_flags",
+        "The agent did not start or restart the SGLang server",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-inference-mem-tune",
+      "expected_script": "scripts/recommend.py"
+    },
+    {
+      "id": "jetson-inference-mem-tune-004",
+      "prompt": "I want to benchmark my deployed vLLM server on this Jetson — give me a TTFT/throughput sweep at concurrency 1 and 8.",
+      "expected_output": "The agent recognized that benchmarking is jetson-llm-benchmark's responsibility, did not invoke jetson-inference-mem-tune (which only emits flags), and either ran the matching jetson-llm-benchmark wrapper (bench_vllm.sh) or recommended it.",
+      "assertions": [
+        "The agent did NOT invoke jetson-inference-mem-tune (no scripts/recommend.py call) for a benchmarking ask",
+        "The agent identified jetson-llm-benchmark as the correct skill for TTFT / throughput / concurrency-sweep measurements",
+        "The agent invoked or recommended scripts/bench_vllm.sh from jetson-llm-benchmark with --concurrency 1,8",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-llm-benchmark",
+      "expected_script": "scripts/bench_vllm.sh"
+    }
+  ]
+}

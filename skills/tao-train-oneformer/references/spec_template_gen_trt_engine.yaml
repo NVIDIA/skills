@@ -223,7 +223,7 @@ train:
     steps:
     - 327778
     - 355092
-  precision: fp32
+  precision: "32"
   distributed_strategy: ddp
   verbose: false
   accumulate_grad_batches: 1

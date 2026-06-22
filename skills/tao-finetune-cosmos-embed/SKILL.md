@@ -29,7 +29,7 @@ Container image and per-action commands are in `references/skill_info.yaml`. Com
 
 ## Train Action Policy
 
-This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only; otherwise default to `auto`. When `automl_policy: auto`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `tao-skill-bank:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
+AutoML is not packaged for this model skill because there are no Cosmos-Embed schemas under `schemas/`. Always use the direct model skill actions for `train`, `evaluate`, `inference`, and `export`, even when a higher-level request includes `automl_policy: on`. Do not route Cosmos-Embed through workflow or AutoML skills until model-specific train schemas and templates are added.
 
 Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows stay in this model skill. The per-run `automl_policy` override does not change model metadata.
 
@@ -45,7 +45,7 @@ TAO_SKILL_BANK_PATH="${TAO_SKILL_BANK_PATH:-$PWD}"
 COSMOS_EMBED_IMAGE="${COSMOS_EMBED_IMAGE:-$(
   python "$TAO_SKILL_BANK_PATH/scripts/resolve_tao_image.py" \
     --skill-bank "$TAO_SKILL_BANK_PATH" \
-    --model cosmos-embed \
+    --model tao-finetune-cosmos-embed \
     --action train \
     --format json |
   python -c 'import json,sys; print(json.load(sys.stdin)["image"])'
@@ -80,7 +80,7 @@ TAO_SKILL_BANK_PATH="${TAO_SKILL_BANK_PATH:-$PWD}"
 COSMOS_EMBED_IMAGE="${COSMOS_EMBED_IMAGE:-$(
   python "$TAO_SKILL_BANK_PATH/scripts/resolve_tao_image.py" \
     --skill-bank "$TAO_SKILL_BANK_PATH" \
-    --model cosmos-embed \
+    --model tao-finetune-cosmos-embed \
     --action train \
     --format json |
   python -c 'import json,sys; print(json.load(sys.stdin)["image"])'
@@ -92,55 +92,68 @@ DOCKER_COMMON=(
   --ulimit memlock=-1
   --ulimit stack=67108864
   -e HF_TOKEN
+  -e WANDB_DISABLED=true
+  -e WANDB_MODE=disabled
+  -e HUGGINGFACE_HUB_CACHE=/hf_cache
   -v "$RUN_ROOT/data:/data:ro"
   -v "$RUN_ROOT/model:/model"
   -v "$RUN_ROOT/specs:/specs:ro"
   -v "$RUN_ROOT/results:/results"
+  -v "$RUN_ROOT/hf_cache:/hf_cache"
 )
 ```
+
+For Cosmos-Embed images that ship `protobuf==7.x`, run a small startup
+preamble before every action:
+
+```bash
+python -m pip install "protobuf<7"
+```
+
+The image contains `wandb==0.21.0` with `protobuf==7.x`; importing W&B fails before training/evaluation unless protobuf is pinned below 7. Use `WANDB_DISABLED=true` and `WANDB_MODE=disabled` for smoke or offline runs. Cosmos-Embed may still download the public `google-bert/bert-base-uncased` Q-Former component even when the model checkpoint is disabled, so pass `HF_TOKEN` as an environment variable or mount a persistent HuggingFace cache. Do not write the token into specs, logs, or reports.
 
 Train:
 
 ```bash
 docker run "${DOCKER_COMMON[@]}" "$COSMOS_EMBED_IMAGE" \
-  cosmos-embed1 train -e /specs/train.yaml results_dir=/results
+  bash -lc "python -m pip install 'protobuf<7' && cosmos-embed1 train -e /specs/train.yaml results_dir=/results"
 ```
 
 Evaluate:
 
 ```bash
 docker run "${DOCKER_COMMON[@]}" "$COSMOS_EMBED_IMAGE" \
-  cosmos-embed1 evaluate -e /specs/evaluate.yaml results_dir=/results
+  bash -lc "python -m pip install 'protobuf<7' && cosmos-embed1 evaluate -e /specs/evaluate.yaml results_dir=/results"
 ```
 
 Inference:
 
 ```bash
 docker run "${DOCKER_COMMON[@]}" "$COSMOS_EMBED_IMAGE" \
-  cosmos-embed1 inference -e /specs/inference.yaml \
-  'inference.query.input_texts=["a man is singing on stage"]' \
+  bash -lc "python -m pip install 'protobuf<7' && cosmos-embed1 inference -e /specs/inference.yaml \
+  'inference.query.input_texts=[\"a man is singing on stage\"]' \
   inference.k=5 \
-  results_dir=/results
+  results_dir=/results"
 ```
 
 Export ONNX:
 
 ```bash
 docker run "${DOCKER_COMMON[@]}" "$COSMOS_EMBED_IMAGE" \
-  cosmos-embed1 export -e /specs/export_onnx.yaml \
-  export.checkpoint=/results/train/cosmos_embed1_model_latest.pth \
+  bash -lc "python -m pip install 'protobuf<7' && cosmos-embed1 export -e /specs/export_onnx.yaml \
+  export.checkpoint=/results/train/checkpoints/iter_000000001.pt \
   export.onnx_file=/results/export/cosmos_embed1_combined.onnx \
-  results_dir=/results
+  results_dir=/results"
 ```
 
 Export HuggingFace format:
 
 ```bash
 docker run "${DOCKER_COMMON[@]}" "$COSMOS_EMBED_IMAGE" \
-  cosmos-embed1 export -e /specs/export_hf.yaml \
-  export.checkpoint=/results/train/cosmos_embed1_model_latest.pth \
+  bash -lc "python -m pip install 'protobuf<7' && cosmos-embed1 export -e /specs/export_hf.yaml \
+  export.checkpoint=/results/train/checkpoints/iter_000000001.pt \
   export.hf_output_dir=/results/export_hf/cosmos_embed1_hf \
-  results_dir=/results
+  results_dir=/results"
 ```
 
 ## Smoke Overrides
@@ -152,13 +165,21 @@ train.max_iter=1
 train.validation_iter=2
 train.checkpoint_iter=1
 train.optim.optim=adamw
+train.optim.warmup_steps=0
+train.optim.lr_decay_iters=1
 dataset.train_dataset.batch_size=1
 dataset.val_dataset.batch_size=1
 dataset.train_dataset.workers=0
 dataset.val_dataset.workers=0
 ```
 
-If no local Cosmos-Embed1 pretrained checkpoint or HuggingFace token is available, set `model.pretrained_model_path=null` for a plumbing-only smoke train. The model quality is meaningless in that mode, but the train/evaluate/inference/export action paths can still be exercised.
+When shortening the cosine scheduler for smoke runs, keep
+`train.optim.lr_decay_iters` greater than `train.optim.warmup_steps`, or set
+`train.optim.warmup_steps=0` as shown above. The scheduler divides by
+`lr_decay_iters - warmup_steps`, so equal values fail before the checkpoint is
+written.
+
+If no local Cosmos-Embed1 pretrained checkpoint is available, set `model.pretrained_model_path=null` for a plumbing-only smoke train. The model quality is meaningless in that mode, but the train/evaluate/inference/export action paths can still be exercised. In the current container, the Q-Former path can still fetch `google-bert/bert-base-uncased`; provide `HF_TOKEN` or a mounted HuggingFace cache for fresh ephemeral containers.
 
 For evaluation and inference smoke tests on a tiny subset:
 
@@ -196,7 +217,11 @@ The dataset loader derives the video id from the local `.mp4` filename and filte
 
 - Local HF directory: mount it under `/model` and set `model.pretrained_model_path=/model/Cosmos-Embed1-224p`.
 - HuggingFace repo: set `model.pretrained_model_path=nvidia/Cosmos-Embed1-224p` and pass `HF_TOKEN` if access is gated.
-- Fine-tuned checkpoint: downstream actions default to `/results/train/cosmos_embed1_model_latest.pth`.
+- Fine-tuned checkpoint: set downstream actions to the resolver-selected `/results/train/checkpoints/iter_#########.pt` file.
+
+Training writes full checkpoints under `results/train/checkpoints/iter_#########.pt`, updates `results/train/checkpoints/latest_checkpoint.txt`, and creates a `cosmos_embed1_model_latest.pth` symlink. For `evaluate.checkpoint`, `inference.checkpoint`, `export.checkpoint`, and `train.resume_training_checkpoint_path`, resolve and pass the exact `iter_#########.pt` file for the intended iteration. The action spec templates intentionally leave these checkpoint fields null so the model-skill runner or the user must provide the resolver-selected checkpoint. Use the latest symlink only when the user explicitly asks for latest.
+
+For single-GPU resume/retrain from a consolidated checkpoint, set `model.fsdp_shard_size: 1`. The container default is 8, which sends resumed training through an FSDP apply path that Cosmos-Embed1 does not implement for this model class.
 
 Variants:
 
@@ -281,6 +306,8 @@ results/
 |---|---|---|
 | `MSRVTTDataset: 0 videos found` | `mp4_urls` is not a local glob or metadata filenames do not match videos. | Mount data into the container and set `mp4_urls=/data/video/*.mp4`. |
 | HF download/auth failure | Missing or invalid `HF_TOKEN`, or model agreement not accepted. | Accept the model terms and pass `-e HF_TOKEN`. |
+| `cannot import name 'Imports' from 'wandb.proto.wandb_telemetry_pb2'` | `wandb==0.21.0` in the container is incompatible with `protobuf==7.x`. | Run `python -m pip install "protobuf<7"` in the container before invoking `cosmos-embed1`. |
+| Resume fails with `Model does not implement 'apply_fsdp'` | Single-GPU resume loaded a consolidated checkpoint while `model.fsdp_shard_size` stayed at the default 8. | Set `model.fsdp_shard_size=1` for local single-GPU resume/retrain. |
 | LoRA injection failure | Transformer Engine visual encoder is enabled. | Set `model.network.visual_encoder.transformer_engine=false`. |
 | ONNX/HF export complains about missing components | Export checkpoint is partial or adapter-only. | Use a full checkpoint or configure pretrained visual/text sources before export. |
 | CUDA OOM | Batch/resolution too high for the GPU. | Reduce batch size, use 224p, enable LoRA, or use more GPUs. |

@@ -16,6 +16,17 @@ limitations under the License.
 
 # PROGRESS.md Tracking Reference
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- When to update PROGRESS.md
+- PROGRESS.md Template
+- Entry format conventions
+- Minimal helper for updating PROGRESS.md
+- Minimum content per phase
+
+
 The skill maintains `PROGRESS.md` in `output_dir/` throughout the run. It is the living journal
 of what was done, what was attempted, and what broke — visible to the user in real time.
 

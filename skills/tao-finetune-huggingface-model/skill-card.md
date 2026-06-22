@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers who need to fine-tune HuggingFace models (full or LoRA) on local NVIDIA GPUs, producing reproducible training pipelines with evaluation, inference, and optional Hub publishing. <br>
+Developers and engineers who need to fine-tune HuggingFace computer-vision, VLM, or LLM models on local NVIDIA GPUs with a reproducible, containerized training pipeline. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,20 +19,20 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [reference-index.md](references/reference-index.md) <br>
-- [core-rules.md](references/core-rules.md) <br>
-- [execution-platform.md](references/execution-platform.md) <br>
-- [cv-scripts.md](references/cv-scripts.md) <br>
-- [vlm-scripts.md](references/vlm-scripts.md) <br>
-- [error-playbook.md](references/error-playbook.md) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
+- [Core Rules](references/core-rules.md) <br>
+- [Detailed Workflow](references/detailed-workflow.md) <br>
+- [Hardware & Container](references/hardware-container.md) <br>
+- [Error Playbook](references/error-playbook.md) <br>
+- [Model Discovery](references/model-discovery.md) <br>
+- [Dataset Patterns](references/dataset-patterns.md) <br>
+- [NVIDIA Deep Learning Frameworks Support Matrix](https://docs.nvidia.com/deeplearning/frameworks/support-matrix/index.html) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Code, Files] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Code, Shell commands, Configuration instructions, Files] <br>
+**Output Format:** [Markdown with inline bash code blocks and generated Python scripts] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Produces a complete training project directory (Dockerfile, Python scripts, config.yaml, trained model checkpoints) and optionally pushes to HuggingFace Hub] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`claude-code`) <br>
@@ -41,7 +41,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive skill-activation case) with 2 attempts per task, pass threshold 50%. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval `external` profile (`astra-sandbox` environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -65,11 +65,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 75% (+75%) | 97% (+97%) |
-| Discoverability | 2 | 44% (+44%) | 97% (+97%) |
-| Effectiveness | 2 | 89% (+75%) | 80% (+61%) |
-| Efficiency | 2 | 51% (+24%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 100% (+100%) | 97% (+97%) |
+| Effectiveness | 1 | 74% (+60%) | 90% (+62%) |
+| Efficiency | 1 | 95% (+68%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

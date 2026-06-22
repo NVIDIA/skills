@@ -1,5 +1,5 @@
 ## Description: <br>
-Recognizes text content from cropped text-region images using CTC and attention-based decoders for scene text recognition training, evaluation, export, pruning, quantization, and inference. <br>
+OCRNet for scene text recognition. Recognizes text content from cropped text-region images and supports CTC and attention-based decoders. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers training, evaluating, exporting, pruning, quantizing, and running inference on NVIDIA TAO OCRNet models for scene text recognition. <br>
+Developers and engineers training, evaluating, exporting, pruning, quantizing, retraining, or running inference on NVIDIA TAO OCRNet models for scene text recognition tasks. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,9 +19,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [TAO Deploy OCRNet Workflow](references/tao-deploy-ocrnet.md) <br>
-- [Skill Info (AutoML Config)](references/skill_info.yaml) <br>
-- [Train Spec Template](references/spec_template_train.yaml) <br>
+- [TAO Deploy OCRNet](references/tao-deploy-ocrnet.md) <br>
+- [Skill Info](references/skill_info.yaml) <br>
+- [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
@@ -37,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 task in the NVSkills-Eval external profile with 2 attempts per task in an astra-sandbox environment. <br>
+Evaluated against 1 evaluation task in NVSkills-Eval external profile (astra-sandbox environment). 1 positive activation task, 0 negative tasks. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 85% (+65%) | 97% (+82%) |
-| Discoverability | 2 | 100% (+100%) | 97% (+97%) |
-| Effectiveness | 2 | 47% (+12%) | 74% (+37%) |
-| Efficiency | 2 | 95% (+68%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 50% (+50%) | 20% (+0%) |
+| Discoverability | 1 | 0% (+0%) | 0% (+0%) |
+| Effectiveness | 1 | 88% (+78%) | 44% (+0%) |
+| Efficiency | 1 | 27% (-0%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

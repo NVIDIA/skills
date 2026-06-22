@@ -7,10 +7,9 @@ actions:
   gen_trt_engine:
     command: deformable_detr gen_trt_engine -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       gen_trt_engine.onnx_file:
-        type: file
-      gen_trt_engine.trt_engine:
         type: file
     outputs:
       results_dir:
@@ -22,6 +21,7 @@ actions:
   evaluate:
     command: deformable_detr evaluate -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       evaluate.trt_engine:
         type: file
@@ -37,6 +37,7 @@ actions:
   inference:
     command: deformable_detr inference -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       inference.trt_engine:
         type: file
@@ -75,4 +76,6 @@ notes:
 - Use FP16 for the starter-kit TensorRT engine path; INT8 requires a real calibration
   image folder and cache path.
 - Keep transformer structure fields such as `model.num_queries`, `model.num_feature_levels`,
-  `model.enc_layers`, and `model.dec_layers` aligned with export.
+  `model.num_select`, `model.enc_layers`, `model.dec_layers`, and `model.dim_feedforward`
+  aligned with export.
+- Keep deploy input dimensions aligned with export.

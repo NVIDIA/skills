@@ -11,7 +11,8 @@ gen_trt_engine:
     opt_batch_size: 1
     max_batch_size: 4
     calibration:
-      cal_image_dir: /data/calibration/images
+      cal_image_dir:
+      - /data/calibration/images
       cal_cache_file: /results/centerpose_calibration.cache
       cal_batch_size: 10
       cal_batches: 1000

@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-run-inference-service`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,27 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 57% (+57%) | 87% (+87%) |
-| Discoverability | 2 | 17% (+17%) | 84% (+84%) |
-| Effectiveness | 2 | 73% (+61%) | 74% (+60%) |
-| Efficiency | 2 | 25% (-2%) | 79% (+50%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 80% (+80%) | 97% (+97%) |
+| Discoverability | 1 | 100% (+100%) | 97% (+97%) |
+| Effectiveness | 1 | 40% (+30%) | 90% (+62%) |
+| Efficiency | 1 | 95% (+68%) | 96% (+68%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 11 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 3 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/applications/tao-run-inference-service`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/applications/tao-run-inference-service/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SQP-2): The credential handling instructions instruct the agent to never prompt the user for TAO_CLOUD_ACCESS_KEY and TAO_CLOUD_ (`references/skill_info.yaml:4`)
-- LOW QUALITY/quality_discoverability: Description very long (441 chars, recommend 50-150) (`skills/applications/tao-run-inference-service/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Broad description without negative triggers may cause over-triggering (`skills/applications/tao-run-inference-service/SKILL.md`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/applications/tao-run-inference-service/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 1 file(s)
-- Inter-Skill Deduplication: Parsed skill 'tao-run-inference-service': 442 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

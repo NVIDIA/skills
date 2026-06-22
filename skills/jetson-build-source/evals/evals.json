@@ -1,0 +1,32 @@
+[
+  {
+    "id": "jetson-build-source-001",
+    "question": "I just used /jetson-customize-pcie to commit a kernel-DT overlay change under Source/bsp_sources/. How do I rebuild the affected artifacts and prepare them for /jetson-promote-image?",
+    "expected_skill": "jetson-build-source",
+    "expected_script": null,
+    "ground_truth": "Invoke /jetson-build-source with no argument so the dirty-repo detector inspects bsp_sources/, auto-picks the 'dt' mode (only hardware/nvidia/* is dirty), rebuilds the composite .dtbo via the upstream nvidia-dtbs target, and writes .build-manifest.yaml under <source.root_path>/ for /jetson-promote-image to consume on the next promote.",
+    "expected_behavior": [
+      "Read skills/jetson-build-source/SKILL.md",
+      "Detect dirty source repos using the per-repo HEAD watermark in .build-state.yaml",
+      "Auto-pick dt mode because only hardware/nvidia/* (or kernel-devicetree) is dirty",
+      "Drive the upstream nvidia-dtbs make target against bsp_sources/, never duplicating its logic in shell",
+      "Emit .build-manifest.yaml listing only artifacts traceable to a dirty source repo (trace-to-dirty policy)",
+      "Update the watermark in .build-state.yaml on success",
+      "Suggest /jetson-promote-image as the next step"
+    ]
+  },
+  {
+    "id": "jetson-build-source-002",
+    "question": "I ran /jetson-build-source on a fresh Ubuntu host and it refused with 'host package missing: libssl-dev'. What do I need to install, and which other packages are hard-required versus warn-only?",
+    "expected_skill": "jetson-build-source",
+    "expected_script": null,
+    "ground_truth": "Install libssl-dev with 'sudo apt install libssl-dev' and re-invoke /jetson-build-source. flex, bison, and libssl-dev are hard prerequisites that refuse up-front because the kernel make chain fails at defconfig or link without them. git, build-essential, bc, and zstd are soft prerequisites that only emit a warning — the build will surface a clearer error if any are actually needed and missing.",
+    "expected_behavior": [
+      "Read skills/jetson-build-source/SKILL.md and locate the Prerequisites bullet",
+      "Identify that libssl-dev is in the hard-required set (refuses up-front), not the warn-only set",
+      "Instruct the user to run 'sudo apt install libssl-dev'",
+      "Note that flex and bison are also hard-required and worth installing in the same apt invocation if not already present",
+      "Re-invoke /jetson-build-source after the install completes"
+    ]
+  }
+]

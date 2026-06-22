@@ -1,5 +1,5 @@
 ## Description: <br>
-DINO (DETR with Improved DeNoising Anchor Boxes) for 2D object detection, a transformer-based detector with denoising training, multi-scale features, and optional distillation support. <br>
+DINO (DETR with Improved DeNoising Anchor Boxes) for 2D object detection — a transformer-based detector with denoising training, multi-scale features, and optional distillation support. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, distilling, quantizing, or running inference on DINO object detection models using NVIDIA TAO. <br>
+Developers and engineers training, evaluating, exporting, distilling, quantizing, or running inference for NVIDIA TAO DINO 2D object detectors. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,12 +19,12 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DINO Spec Overrides](references/spec_overrides.md) <br>
-- [DINO AutoML / HPO Notes](references/automl.md) <br>
-- [SDK Orchestration Internals](references/sdk_orchestration.md) <br>
+- [DINO Data Specs](references/dino-data-specs.md) <br>
+- [DINO Actions and Error Patterns](references/dino-actions-errors.md) <br>
+- [DINO AutoML and SDK](references/dino-automl-sdk.md) <br>
+- [DINO Tuning and Multi-GPU](references/dino-tuning-multigpu.md) <br>
 - [TAO Deploy DINO](references/tao-deploy-dino.md) <br>
-- [Troubleshooting](references/troubleshooting.md) <br>
-- [Skill Info](references/skill_info.yaml) <br>
+- [Detailed Guide Map](references/detailed-guide.md) <br>
 
 
 ## Skill Output: <br>
@@ -40,7 +40,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in NVSkills-Eval `external` profile, `astra-sandbox` environment. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile on the astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -64,11 +64,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+76%) | 53% (+53%) |
-| Discoverability | 2 | 88% (+62%) | 48% (+48%) |
-| Effectiveness | 2 | 95% (+83%) | 52% (+31%) |
-| Efficiency | 2 | 71% (+40%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+60%) | 97% (+97%) |
+| Discoverability | 1 | 88% (+88%) | 97% (+97%) |
+| Effectiveness | 1 | 100% (+30%) | 90% (+58%) |
+| Efficiency | 1 | 72% (+45%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

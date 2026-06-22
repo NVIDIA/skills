@@ -1,6 +1,6 @@
 # SegFormer Deploy
 
-SegFormer deploy covers the TAO Deploy actions for an exported semantic segmentation model. Use the `segformer` model skill for training, checkpoint evaluation, quantization, distillation, pruning, export, or non-TensorRT inference where those actions exist. Use this deploy workflow after export when the input artifact is an ONNX model and the desired output is a TensorRT engine or TensorRT-backed predictions.
+SegFormer deploy covers the TAO Deploy actions for an exported semantic segmentation model. Use the `segformer` model skill for training, checkpoint evaluation, quantization, export, or non-TensorRT inference where those actions exist. Distillation and pruning are not advertised by the packaged SegFormer model skill. Use this deploy workflow after export when the input artifact is an ONNX model and the desired output is a TensorRT engine or TensorRT-backed predictions.
 
 Supported actions: `gen_trt_engine`, `evaluate`, `inference`.
 
@@ -13,7 +13,7 @@ docker run --gpus all --rm --shm-size=16g \
   -v /path/to/specs:/specs \
   -v /path/to/export:/models \
   -v /path/to/results:/results \
-  nvcr.io/nvidia/tao/tao-toolkit:6.26.3-deploy \
+  <resolved tao_toolkit.deploy image> \
   segformer gen_trt_engine -e /specs/segformer_deploy_gen_trt_engine.yaml
 ```
 
@@ -24,7 +24,7 @@ docker run --gpus all --rm --shm-size=16g \
   -v /path/to/specs:/specs \
   -v /path/to/eval:/data \
   -v /path/to/results:/results \
-  nvcr.io/nvidia/tao/tao-toolkit:6.26.3-deploy \
+  <resolved tao_toolkit.deploy image> \
   segformer evaluate -e /specs/segformer_deploy_evaluate.yaml
 ```
 
@@ -35,7 +35,7 @@ docker run --gpus all --rm --shm-size=16g \
   -v /path/to/specs:/specs \
   -v /path/to/inference:/data \
   -v /path/to/results:/results \
-  nvcr.io/nvidia/tao/tao-toolkit:6.26.3-deploy \
+  <resolved tao_toolkit.deploy image> \
   segformer inference -e /specs/segformer_deploy_inference.yaml
 ```
 
@@ -62,12 +62,15 @@ Direct TAO Launcher spelling is `tao deploy segformer gen_trt_engine`, `tao depl
 | `gen_trt_engine` | Output engine path | `gen_trt_engine.trt_engine` |
 | `evaluate` | TensorRT engine | `evaluate.trt_engine` |
 | `evaluate` | Dataset root | `dataset.segment.root_dir` |
-| `evaluate` | Validation split | `dataset.segment.validation_split` |
+| `evaluate` | Validation split name | `dataset.segment.validation_split` |
 | `inference` | TensorRT engine | `inference.trt_engine` |
 | `inference` | Dataset root | `dataset.segment.root_dir` |
-| `inference` | Prediction split | `dataset.segment.predict_split` |
+| `inference` | Prediction split name | `dataset.segment.predict_split` |
 
 For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine` where those actions are available.
+The deploy `dataset.segment.root_dir` must point at the extracted SegFormer root
+containing `images/<split>` and `masks/<split>` directories, matching the parent
+train/export data layout.
 
 ## Spec Overrides
 
@@ -90,6 +93,8 @@ Model-specific notes:
 - The deploy gen_trt_engine template is stored from the local `export` deploy config because that is where SegFormer keeps the TensorRT profile block.
 - Use FP16 for the starter-kit TensorRT path and set `dataset.segment.batch_size: 1` for TensorRT inference.
 - Keep palette, label mapping, input size, and normalization aligned with the trained segmentation model.
+- `dataset.segment.validation_split` and `dataset.segment.predict_split` are split-name strings such as `val` or `test`, not file inputs.
+- Do not declare `gen_trt_engine.trt_engine` as a file output in runner metadata. The local runner should not pre-create the engine path; TensorRT writes it.
 
 ## Job Chain Mapping
 
@@ -117,3 +122,5 @@ Model-specific notes:
 **INT8 calibration missing:** INT8 builds need an extracted calibration image directory, a writable cache path, and enough images for `cal_batch_size * cal_batches`.
 
 **Mounted paths do not exist:** TAO Deploy checks local paths inside the container. Make sure every path in the spec has a matching Docker mount or job artifact mapping.
+
+**Engine target path already exists as a directory:** If a local runner pre-creates `gen_trt_engine.trt_engine`, TensorRT cannot write the engine file. The deploy metadata should only declare `results_dir` as the output and use `gen_trt_engine.trt_engine: create_engine_file` in `spec_params`.

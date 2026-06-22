@@ -16,6 +16,17 @@ limitations under the License.
 
 # HF Hub Push Reference
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Skip rule
+- Repo resolution
+- Checkpoint resolution
+- Full push script
+- What ends up in the repo
+
+
 Pushes the trained checkpoint, model card, and result deliverables to the Hugging
 Face Hub. Used in Step 6 of `tao-finetune-huggingface-model`.
 

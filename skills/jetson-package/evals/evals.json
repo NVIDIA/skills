@@ -1,0 +1,66 @@
+{
+  "skill_name": "jetson-package",
+  "evals": [
+    {
+      "id": "jetson-package-001",
+      "prompt": "Which Docker image should I use to run vLLM on this Jetson Orin, and where do I get matching PyTorch wheels?",
+      "expected_output": "The agent invoked the jetson-package skill, ran scripts/artifact_hints.sh to detect the Jetson generation / variant / l4t / cuda_sm_hint, and recommended the NVIDIA-AI-IOT GHCR vLLM image for Orin plus the matching Jetson AI Lab PyPI extra-index-url for PyTorch wheels.",
+      "assertions": [
+        "The agent matched the prompt to jetson-package",
+        "The agent ran scripts/artifact_hints.sh on the Jetson host (or {baseDir}/scripts/artifact_hints.sh)",
+        "The agent quoted detected fields from the JSON: generation, variant, l4t, cuda_sm_hint, plus the vLLM GHCR image hint",
+        "The agent recommended ghcr.io/nvidia-ai-iot/vllm:latest-jetson-orin for the Orin target",
+        "The agent recommended the Jetson AI Lab devpi index (pypi.jetson-ai-lab.io) for PyTorch wheels rather than plain PyPI",
+        "The agent matched the jp6/cu* (or equivalent) subtree to the detected JetPack / CUDA userland",
+        "The agent did NOT invent SKU, RAM, JetPack, CUDA, or SM target values; values came from artifact_hints.sh",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-package",
+      "expected_script": "scripts/artifact_hints.sh"
+    },
+    {
+      "id": "jetson-package-002",
+      "prompt": "I tried `pip install onnxruntime-gpu` on my Jetson Orin and it errored out with a CUDA/SM mismatch. What's the right install command?",
+      "expected_output": "The agent ran scripts/artifact_hints.sh, identified the Orin sm_87 target and matching JetPack / CUDA userland, and recommended pip install --extra-index-url https://pypi.jetson-ai-lab.io/jp6/cu126/+simple/ onnxruntime-gpu (or the jp* subtree matching the detected device), explicitly explaining that default PyPI wheels for GPU-native packages are usually wrong on Jetson.",
+      "assertions": [
+        "The agent matched the prompt to jetson-package",
+        "The agent ran scripts/artifact_hints.sh and quoted the detected generation = orin and cuda_sm_hint = sm_87",
+        "The agent recommended pip install --extra-index-url https://pypi.jetson-ai-lab.io/jp*/cu*/+simple/ onnxruntime-gpu (with the jp*/cu* subtree matching the detected JetPack / CUDA userland)",
+        "The agent explicitly explained why default PyPI onnxruntime-gpu fails on Jetson (kernels not compiled for sm_87 / sm_110)",
+        "The agent did NOT present plain `pip install onnxruntime-gpu` as an equivalent Jetson option",
+        "The agent did not invent CUDA / SM / JetPack values; they came from artifact_hints.sh",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-package",
+      "expected_script": "scripts/artifact_hints.sh"
+    },
+    {
+      "id": "jetson-package-003",
+      "prompt": "I can't find l4t-cuda on NGC anymore. What's the right CUDA base container for my Jetson now?",
+      "expected_output": "The agent identified l4t-cuda as the legacy Orin-era CUDA container line, redirected the user to the multi-arch nvcr.io/nvidia/cuda:<ver>-devel-ubuntu<ver> image, and (after running scripts/artifact_hints.sh) named the matching tag for the detected generation rather than recommending a third-party image.",
+      "assertions": [
+        "The agent matched the prompt to jetson-package",
+        "The agent identified l4t-cuda as the legacy Orin-era CUDA container line and redirected to nvcr.io/nvidia/cuda (multi-arch)",
+        "The agent ran scripts/artifact_hints.sh to detect the generation / l4t before naming a specific tag",
+        "The agent did NOT recommend a third-party arm64 CUDA image as a replacement",
+        "The agent did NOT recommend the legacy l4t-cuda tag",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-package",
+      "expected_script": "scripts/artifact_hints.sh"
+    },
+    {
+      "id": "jetson-package-004",
+      "prompt": "I picked the right NVIDIA-AI-IOT vLLM container for my Orin, started the server, and now I want to know how fast it actually serves a 7B model. Measure latency and throughput.",
+      "expected_output": "The agent recognized this as a benchmarking ask, did not invoke jetson-package (which is a packaging / catalog hints skill), and instead used jetson-llm-benchmark / scripts/bench_vllm.sh to measure the running server.",
+      "assertions": [
+        "The agent did NOT invoke jetson-package for a benchmarking ask",
+        "The agent identified jetson-llm-benchmark as the correct skill (per the 'Hand off to' section of jetson-package)",
+        "The agent invoked or recommended scripts/bench_vllm.sh from jetson-llm-benchmark",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-llm-benchmark",
+      "expected_script": "scripts/bench_vllm.sh"
+    }
+  ]
+}

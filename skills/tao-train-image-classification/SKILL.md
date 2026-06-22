@@ -29,7 +29,7 @@ Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with 
 
 ## Train Action Policy
 
-This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only; otherwise default to `auto`. When `automl_policy: auto`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `tao-skill-bank:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
+This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Use `automl_policy: on` by default and only expose `on` / `off` in new launch prompts. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only. When `automl_policy: on`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `tao-skill-bank:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
 
 Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows stay in this model skill. The per-run `automl_policy` override does not change model metadata.
 
@@ -66,9 +66,16 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 Data source overrides are **mandatory for every action** — the agent MUST construct data source paths from the Per-Action Dataset Requirements table above and include them in `spec_overrides`.
 
 ```python
-S3_TRAIN = "s3://bucket/data/train"
-S3_EVAL = "s3://bucket/data/eval"
+TRAIN_IMAGES_DIR = "/workspace/data/extracted/train/images_train"
+VAL_IMAGES_DIR = "/workspace/data/extracted/val/images_val"
+TEST_IMAGES_DIR = "/workspace/data/extracted/test/images_test"
+CLASSES_FILE = "/workspace/data/s3/classes.txt"
 ```
+
+For local Docker, download the S3 archives, extract them first, and point
+`dataset.*.images_dir` at the extracted class-root folder. Do not pass
+`images_train.tar.gz`, `images_val.tar.gz`, or `images_test.tar.gz` directly to
+local Docker specs; the skill metadata declares these inputs as folders.
 
 **train (mandatory data sources):**
 ```python
@@ -77,9 +84,9 @@ S3_EVAL = "s3://bucket/data/eval"
     "train.validation_interval": 2,
     "train.checkpoint_interval": 2,
     "train.num_gpus": 1,
-    "dataset.train_dataset.images_dir": f"{S3_TRAIN}/images_train.tar.gz",
-    "dataset.classes_file": f"{S3_TRAIN}/classes.txt",
-    "dataset.val_dataset.images_dir": f"{S3_EVAL}/images_val.tar.gz",
+    "dataset.train_dataset.images_dir": TRAIN_IMAGES_DIR,
+    "dataset.classes_file": CLASSES_FILE,
+    "dataset.val_dataset.images_dir": VAL_IMAGES_DIR,
 }
 ```
 
@@ -88,7 +95,7 @@ S3_EVAL = "s3://bucket/data/eval"
 {
     "export.input_height": 224,
     "export.input_width": 224,
-    "dataset.root_dir": f"{S3_TRAIN}",
+    "dataset.root_dir": "/workspace/data/extracted",
 }
 ```
 
@@ -103,42 +110,46 @@ S3_EVAL = "s3://bucket/data/eval"
 ```python
 {
     "dataset.batch_size": 1,
-    "dataset.val_dataset.images_dir": f"{S3_EVAL}/images_val.tar.gz",
-    "dataset.classes_file": f"{S3_EVAL}/classes.txt",
-    "dataset.test_dataset.images_dir": f"{S3_EVAL}/images_test.tar.gz",
+    "dataset.val_dataset.images_dir": VAL_IMAGES_DIR,
+    "dataset.classes_file": CLASSES_FILE,
+    "dataset.test_dataset.images_dir": TEST_IMAGES_DIR,
 }
 ```
 
 **distill (mandatory data sources):**
 ```python
 {
-    "dataset.train_dataset.images_dir": f"{S3_TRAIN}/images_train.tar.gz",
-    "dataset.classes_file": f"{S3_TRAIN}/classes.txt",
-    "dataset.val_dataset.images_dir": f"{S3_EVAL}/images_val.tar.gz",
+    "dataset.train_dataset.images_dir": TRAIN_IMAGES_DIR,
+    "dataset.classes_file": CLASSES_FILE,
+    "dataset.val_dataset.images_dir": VAL_IMAGES_DIR,
+    "train.optim.policy": "step",
 }
 ```
 
 **evaluate (mandatory data sources):**
 ```python
 {
-    "dataset.val_dataset.images_dir": f"{S3_EVAL}/images_val.tar.gz",
-    "dataset.classes_file": f"{S3_EVAL}/classes.txt",
-    "dataset.test_dataset.images_dir": f"{S3_EVAL}/images_test.tar.gz",
+    "dataset.val_dataset.images_dir": VAL_IMAGES_DIR,
+    "dataset.classes_file": CLASSES_FILE,
+    "dataset.test_dataset.images_dir": TEST_IMAGES_DIR,
 }
 ```
 
 **quantize (mandatory data sources):**
 ```python
 {
-    "dataset.train_dataset.images_dir": f"{S3_TRAIN}/images_train.tar.gz",
-    "dataset.classes_file": f"{S3_TRAIN}/classes.txt",
-    "dataset.val_dataset.images_dir": f"{S3_EVAL}/images_val.tar.gz",
-    "dataset.quant_calibration_dataset.images_dir": f"{S3_TRAIN}/images_train.tar.gz",
+    "dataset.train_dataset.images_dir": TRAIN_IMAGES_DIR,
+    "dataset.classes_file": CLASSES_FILE,
+    "dataset.val_dataset.images_dir": VAL_IMAGES_DIR,
+    "dataset.quant_calibration_dataset.images_dir": TRAIN_IMAGES_DIR,
 }
 ```
 ## Eval Dataset
 
 Optional. Validation images are provided as a separate tar alongside training images.
+For small smoke datasets that do not provide a separate `images_test.tar.gz`,
+set `dataset.test_dataset.images_dir` to the validation archive so evaluate and
+inference still exercise the checkpoint handoff.
 
 ## Important Parameters
 
@@ -176,6 +187,16 @@ Minimum 1 GPU(s), recommended 2 GPU(s). 16GB+ (V100 or A100) VRAM per GPU. Class
 
 **Empty class directory**: Every class in classes.txt must have at least one image in the corresponding subdirectory.
 
+**Distill scheduler default**: The bundled distill template and schema use
+`train.optim.policy: step`. Keep that setting for distill specs unless the
+container implementation is updated; the 7.0 PyT distiller does not assign a
+scheduler interval for `train.optim.policy: linear`.
+
+**Checkpoint handoff**: Training produces `model_epoch_*.pth` checkpoints and a
+`classifier_model_latest.pth` symlink. For evaluate, inference, export, quantize,
+distill, and resume, select the exact intended epoch checkpoint through the SDK
+resolver; use the latest symlink only when the user explicitly requests latest.
+
 ## Spec Param / Parent Model Inference
 
 Model-specific inference mappings belong in this MD file, not in `config.json`. Generated runners should read this section and apply the mappings with SDK helpers before `create_job()`. This mirrors the old microservices `infer_params.py` flow.
@@ -208,4 +229,4 @@ For `parent_model` or `parent_model_folder`, pass the upstream train/export/Auto
 
 ## Deployment
 
-- [tao-deploy-image-classification](references/tao-deploy-image-classification.md) — Classification PyT deploy workflow for TensorRT engine generation, TensorRT evaluation, and TensorRT inference using TAO Deploy.
+- [tao-deploy-image-classification](references/tao-deploy-image-classification.md)

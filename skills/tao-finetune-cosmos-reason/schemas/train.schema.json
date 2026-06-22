@@ -1,12 +1,12 @@
 {
   "automl_default_parameters": [
-    "custom.vision.fps",
     "policy.lora.r",
     "policy.lora.lora_alpha",
     "train.optm_lr",
+    "train.train_batch_per_replica",
+    "train.optm_weight_decay",
     "train.optm_decay_type",
-    "policy.lora.lora_dropout",
-    "train.epoch"
+    "policy.lora.lora_dropout"
   ],
   "automl_disabled_parameters": [
     "policy.parallelism",
@@ -36,7 +36,15 @@
       "system_prompt": "",
       "train_dataset": {
         "annotation_path": "data/sft/annotations.json",
-        "media_path": "data/sft/train2017"
+        "media_path": "data/sft/train2017",
+        "media_root": "data/sft/train2017",
+        "response_mode": "answer"
+      },
+      "val_dataset": {
+        "annotation_path": "data/sft/annotations.json",
+        "media_path": "data/sft/train2017",
+        "media_root": "data/sft/train2017",
+        "response_mode": "answer"
       },
       "vision": {
         "nframes": 8
@@ -67,8 +75,8 @@
         "use_rslora": false
       },
       "model_gradient_checkpointing": true,
-      "model_max_length": 4096,
-      "model_name_or_path": "nvidia/Cosmos-Reason2-8B",
+      "model_max_length": 40960,
+      "model_name_or_path": "hf_model://nvidia/Cosmos3-Nano",
       "parallelism": {
         "cp_rotate_method": "allgather",
         "cp_size": 1,
@@ -86,12 +94,12 @@
       "ckpt": {
         "enable_checkpoint": true,
         "export_safetensors": true,
-        "max_keep": 8,
-        "save_freq_in_epoch": 10,
+        "max_keep": 2,
+        "save_freq_in_epoch": 1,
         "save_mode": "sync"
       },
       "compile": false,
-      "epoch": 10,
+      "epoch": 2,
       "epsilon": 1e-08,
       "fp8": {
         "enable_fp8": false,
@@ -121,21 +129,21 @@
       "train_batch_per_replica": 1,
       "train_policy": {
         "conversation_column_name": "conversations",
-        "dataloader_num_workers": 8,
-        "dataloader_prefetch_factor": 8,
+        "dataloader_num_workers": 0,
+        "dataloader_prefetch_factor": 1,
         "dataset": {
-          "name": "its",
-          "test_size": 1
+          "name": "wts",
+          "test_size": 0
         },
-        "enable_dataset_cache": true,
-        "mini_batch": 4,
+        "enable_dataset_cache": false,
+        "mini_batch": 1,
         "type": "sft"
       }
     },
     "validation": {
-      "batch_size": 4,
-      "dataloader_num_workers": 8,
-      "dataloader_prefetch_factor": 8,
+      "batch_size": 1,
+      "dataloader_num_workers": 0,
+      "dataloader_prefetch_factor": 1,
       "dataset": {
         "name": "",
         "split": "train",
@@ -143,13 +151,13 @@
       },
       "enable": true,
       "enable_dataset_cache": false,
-      "freq_in_epoch": 10
+      "freq_in_epoch": 1
     }
   },
   "popular": {
     "train": {
       "compile": false,
-      "epoch": 10,
+      "epoch": 2,
       "train_batch_per_replica": 1
     }
   },
@@ -172,7 +180,15 @@
         "system_prompt": "",
         "train_dataset": {
           "annotation_path": "data/sft/annotations.json",
-          "media_path": "data/sft/train2017"
+          "media_path": "data/sft/train2017",
+          "media_root": "data/sft/train2017",
+          "response_mode": "answer"
+        },
+        "val_dataset": {
+          "annotation_path": "data/sft/annotations.json",
+          "media_path": "data/sft/train2017",
+          "media_root": "data/sft/train2017",
+          "response_mode": "answer"
         },
         "vision": {
           "nframes": 8
@@ -190,7 +206,9 @@
           "automl_enabled": false,
           "default": {
             "annotation_path": "data/sft/annotations.json",
-            "media_path": "data/sft/train2017"
+            "media_path": "data/sft/train2017",
+            "media_root": "data/sft/train2017",
+            "response_mode": "answer"
           },
           "description": "Training dataset config.",
           "properties": {
@@ -205,19 +223,71 @@
               "description": "Path to the media directory",
               "title": "Media directory path",
               "type": "string"
+            },
+            "media_root": {
+              "default": "data/sft/train2017",
+              "description": "Root directory for DAFT media references",
+              "title": "DAFT media root",
+              "type": "string"
+            },
+            "response_mode": {
+              "default": "answer",
+              "description": "DAFT response target to train on",
+              "enum": [
+                "think",
+                "answer",
+                "hybrid"
+              ],
+              "title": "DAFT response mode",
+              "type": "string"
             }
           },
           "type": "collection"
         },
         "val_dataset": {
           "automl_enabled": false,
+          "default": {
+            "annotation_path": "data/sft/annotations.json",
+            "media_path": "data/sft/train2017",
+            "media_root": "data/sft/train2017",
+            "response_mode": "answer"
+          },
           "description": "Validation dataset config (optional).",
+          "properties": {
+            "annotation_path": {
+              "default": "data/sft/annotations.json",
+              "description": "Path to the validation annotation file",
+              "title": "Validation annotation path",
+              "type": "string"
+            },
+            "media_path": {
+              "default": "data/sft/train2017",
+              "description": "Path to the validation media directory",
+              "title": "Validation media directory path",
+              "type": "string"
+            },
+            "media_root": {
+              "default": "data/sft/train2017",
+              "description": "Root directory for DAFT validation media references",
+              "title": "Validation DAFT media root",
+              "type": "string"
+            },
+            "response_mode": {
+              "default": "answer",
+              "description": "DAFT validation response target",
+              "enum": [
+                "think",
+                "answer",
+                "hybrid"
+              ],
+              "title": "Validation DAFT response mode",
+              "type": "string"
+            }
+          },
           "type": "collection"
         },
         "vision": {
-          "automl_default_parameters": [
-            "custom.vision.fps"
-          ],
+          "automl_default_parameters": [],
           "automl_enabled": false,
           "default": {
             "nframes": 8
@@ -325,8 +395,8 @@
           "use_rslora": false
         },
         "model_gradient_checkpointing": true,
-        "model_max_length": 4096,
-        "model_name_or_path": "nvidia/Cosmos-Reason2-8B",
+        "model_max_length": 40960,
+        "model_name_or_path": "hf_model://nvidia/Cosmos3-Nano",
         "parallelism": {
           "cp_rotate_method": "allgather",
           "cp_size": 1,
@@ -488,7 +558,7 @@
           "type": "bool"
         },
         "model_max_length": {
-          "default": 4096,
+          "default": 40960,
           "description": "Model max length.",
           "maximum": Infinity,
           "minimum": 1,
@@ -496,7 +566,7 @@
           "type": "int"
         },
         "model_name_or_path": {
-          "default": "nvidia/Cosmos-Reason2-8B",
+          "default": "hf_model://nvidia/Cosmos3-Nano",
           "description": "Model name or path.",
           "title": "Model name or path",
           "type": "string"
@@ -592,7 +662,6 @@
     },
     "train": {
       "automl_default_parameters": [
-        "train.epoch",
         "train.optm_lr",
         "train.optm_decay_type"
       ],
@@ -608,12 +677,12 @@
         "ckpt": {
           "enable_checkpoint": true,
           "export_safetensors": true,
-          "max_keep": 8,
-          "save_freq_in_epoch": 10,
+          "max_keep": 2,
+          "save_freq_in_epoch": 1,
           "save_mode": "sync"
         },
         "compile": false,
-        "epoch": 10,
+        "epoch": 2,
         "epsilon": 1e-08,
         "fp8": {
           "enable_fp8": false,
@@ -643,14 +712,14 @@
         "train_batch_per_replica": 1,
         "train_policy": {
           "conversation_column_name": "conversations",
-          "dataloader_num_workers": 8,
-          "dataloader_prefetch_factor": 8,
+          "dataloader_num_workers": 0,
+          "dataloader_prefetch_factor": 1,
           "dataset": {
-            "name": "its",
-            "test_size": 1
+            "name": "wts",
+            "test_size": 0
           },
-          "enable_dataset_cache": true,
-          "mini_batch": 4,
+          "enable_dataset_cache": false,
+          "mini_batch": 1,
           "type": "sft"
         }
       },
@@ -672,8 +741,8 @@
           "default": {
             "enable_checkpoint": true,
             "export_safetensors": true,
-            "max_keep": 8,
-            "save_freq_in_epoch": 10,
+            "max_keep": 2,
+            "save_freq_in_epoch": 1,
             "save_mode": "sync"
           },
           "description": "Train checkpoint config.",
@@ -728,7 +797,7 @@
         },
         "epoch": {
           "automl_enabled": true,
-          "default": 10,
+          "default": 2,
           "description": "The number of epochs.",
           "maximum": 20,
           "minimum": 1,
@@ -890,8 +959,8 @@
           "automl_enabled": true,
           "default": 1e-06,
           "description": "Learning rate for optimizer. Can be a single float (applied to whole model) or a list of 2-4 floats [llm_lr, vision_lr, projector_lr, lm_head_lr] for separate learning rates for each model part during full SFT finetuning. List length must match number of model parts (set via num_model_parts).",
-          "maximum": Infinity,
-          "minimum": 0.0,
+          "maximum": 0.001,
+          "minimum": 1e-06,
           "title": "Learning rate"
         },
         "optm_min_lr_factor": {
@@ -921,18 +990,20 @@
               "type": "number"
             }
           ],
+          "automl_enabled": true,
           "default": 0,
           "depends_on": "train.epoch",
           "description": "Number of warmup epochs for learning rate scheduler (epochs / 2).",
           "math_cond": "/ 2",
-          "maximum": Infinity,
+          "maximum": 5,
           "minimum": 0,
           "title": "Warmup epochs"
         },
         "optm_weight_decay": {
+          "automl_enabled": true,
           "default": 0.01,
           "description": "Weight decay.",
-          "maximum": Infinity,
+          "maximum": 0.1,
           "minimum": 0.0,
           "title": "Weight decay",
           "type": "float"
@@ -955,10 +1026,17 @@
           "type": "categorical"
         },
         "resume": {
+          "anyOf": [
+            {
+              "type": "bool"
+            },
+            {
+              "type": "string"
+            }
+          ],
           "default": false,
-          "description": "Whether to resume training.",
-          "title": "Resume",
-          "type": "bool"
+          "description": "Resume training. false disables resume; true resumes from the latest checkpoint under the output directory; a string resumes from the exact checkpoint policy folder.",
+          "title": "Resume"
         },
         "sync_weight_interval": {
           "default": 1,
@@ -969,9 +1047,10 @@
           "type": "int"
         },
         "train_batch_per_replica": {
+          "automl_enabled": true,
           "default": 1,
           "description": "The number of batches per replica during training.",
-          "maximum": Infinity,
+          "maximum": 32,
           "minimum": 1,
           "popular": true,
           "title": "Train batch per replica",
@@ -984,14 +1063,14 @@
           "automl_enabled": false,
           "default": {
             "conversation_column_name": "conversations",
-            "dataloader_num_workers": 8,
-            "dataloader_prefetch_factor": 8,
+            "dataloader_num_workers": 0,
+            "dataloader_prefetch_factor": 1,
             "dataset": {
-              "name": "its",
-              "test_size": 1
+              "name": "wts",
+              "test_size": 0
             },
-            "enable_dataset_cache": true,
-            "mini_batch": 4,
+            "enable_dataset_cache": false,
+            "mini_batch": 1,
             "type": "sft"
           },
           "description": "Train policy config.",
@@ -1021,8 +1100,8 @@
             "dataset": {
               "automl_enabled": false,
               "default": {
-                "name": "its",
-                "test_size": 1
+                "name": "wts",
+              "test_size": 0
               },
               "description": "Dataset config.",
               "properties": {
@@ -1078,9 +1157,9 @@
       ],
       "automl_enabled": false,
       "default": {
-        "batch_size": 4,
-        "dataloader_num_workers": 8,
-        "dataloader_prefetch_factor": 8,
+        "batch_size": 1,
+        "dataloader_num_workers": 0,
+        "dataloader_prefetch_factor": 1,
         "dataset": {
           "name": "",
           "split": "train",
@@ -1088,7 +1167,7 @@
         },
         "enable": true,
         "enable_dataset_cache": false,
-        "freq_in_epoch": 10
+        "freq_in_epoch": 1
       },
       "description": "Validation config.",
       "properties": {

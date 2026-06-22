@@ -30,7 +30,7 @@ Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with 
 
 ## Train Action Policy
 
-This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only; otherwise default to `auto`. When `automl_policy: auto`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `tao-skill-bank:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
+This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Use `automl_policy: on` by default and only expose `on` / `off` in new launch prompts. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only. When `automl_policy: on`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `tao-skill-bank:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
 
 Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows stay in this model skill. The per-run `automl_policy` override does not change model metadata.
 
@@ -45,7 +45,6 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 | Action | Spec Key | Source | Files | List? |
 |---|---|---|---|---|
 | evaluate | dataset.val_dataset | train_datasets | reference: metric_learning_recognition/retail-product-checkout-dataset_classification_demo/unknown_classes/reference.tar.gz, query: metric_learning_recognition/retail-product-checkout-dataset_classification_demo/unknown_classes/test.tar.gz | No |
-| gen_trt_engine | gen_trt_engine.tensorrt.calibration.cal_image_dir | calibration_dataset | metric_learning_recognition/retail-product-checkout-dataset_classification_demo/known_classes/test.tar.gz | Yes |
 | inference | dataset.val_dataset | train_datasets | reference: metric_learning_recognition/retail-product-checkout-dataset_classification_demo/unknown_classes/reference.tar.gz, query:  | No |
 | inference | inference.input_path | train_datasets | metric_learning_recognition/retail-product-checkout-dataset_classification_demo/unknown_classes/test.tar.gz | No |
 | train | dataset.train_dataset | train_datasets | metric_learning_recognition/retail-product-checkout-dataset_classification_demo/known_classes/train.tar.gz | No |
@@ -71,17 +70,10 @@ S3_TRAIN = "s3://bucket/data/train"
 }
 ```
 
-**gen_trt_engine (mandatory data sources):**
-```python
-{
-    "gen_trt_engine.tensorrt.data_type": "INT8",
-    "gen_trt_engine.tensorrt.calibration.cal_image_dir": [f"{S3_TRAIN}/metric_learning_recognition/retail-product-checkout-dataset_classification_demo/known_classes/test.tar.gz"],
-}
-```
-
 **evaluate (mandatory data sources):**
 ```python
 {
+    "evaluate.checkpoint": "<selected train/AutoML checkpoint>",
     "dataset.val_dataset": {"reference": f"{S3_TRAIN}/metric_learning_recognition/retail-product-checkout-dataset_classification_demo/unknown_classes/reference.tar.gz", "query": f"{S3_TRAIN}/metric_learning_recognition/retail-product-checkout-dataset_classification_demo/unknown_classes/test.tar.gz"},
 }
 ```
@@ -89,6 +81,7 @@ S3_TRAIN = "s3://bucket/data/train"
 **inference (mandatory data sources):**
 ```python
 {
+    "inference.checkpoint": "<selected train/AutoML checkpoint>",
     "dataset.val_dataset": {"reference": f"{S3_TRAIN}/metric_learning_recognition/retail-product-checkout-dataset_classification_demo/unknown_classes/reference.tar.gz"},
     "inference.input_path": f"{S3_TRAIN}/metric_learning_recognition/retail-product-checkout-dataset_classification_demo/unknown_classes/test.tar.gz",
 }
@@ -101,8 +94,8 @@ Required. Evaluation requires reference and query datasets for retrieval metrics
 
 - **model.backbone**: Default resnet_50. Options: resnet_50, resnet_101, fan_small, fan_base, fan_large, fan_tiny, nvdinov2_vit_large_legacy.
 - **model.feat_dim**: Embedding dimension. Default 256. Output feature vector size for similarity matching.
-- **train.batch_size**: Per-GPU batch size. Default 4. val_batch_size also 4.
-- **dataset.num_instance**: Instances per identity in a batch (P/K sampling). Default 4. Controls how many images of the same class appear together.
+- **train.batch_size**: Per-GPU batch size. Default 4. `val_batch_size` also 4. For training and AutoML search, `train.batch_size` must be divisible by `dataset.num_instance`.
+- **dataset.num_instance**: Instances per identity in a batch (P/K sampling). Default 4. Controls how many images of the same class appear together. If using a custom AutoML range for `train.batch_size`, use explicit options that are multiples of this value.
 - **train.optim.trunk.base_lr**: Learning rate for the trunk (backbone). Default 3.5e-4 (Adam).
 - **train.optim.embedder.base_lr**: Learning rate for the embedding head. Default 3.5e-4.
 - **train.optim.triplet_loss_margin**: Margin for triplet loss. Default 0.3. smooth_loss=True by default.
@@ -131,6 +124,13 @@ Minimum 1 GPU(s), recommended 2 GPU(s). 16GB+ VRAM per GPU. Metric learning bene
 
 **Reference/query mismatch**: Ensure reference and query datasets share compatible class namespaces for evaluation.
 
+**PyTorch 2.6 checkpoint load failure on checkpoint actions**: Current TAO
+ML-Recog checkpoints may contain OmegaConf objects. For checkpoints produced by
+the same trusted TAO train/AutoML workflow, set
+`TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1` in downstream evaluate, inference, export,
+or resume/retrain job env vars so Lightning can load the full checkpoint. Do not
+use this env var for untrusted checkpoints.
+
 ## Spec Param / Parent Model Inference
 
 Model-specific inference mappings belong in this MD file, not in `config.json`. Generated runners should read this section and apply the mappings with SDK helpers before `create_job()`. This mirrors the old microservices `infer_params.py` flow.
@@ -140,17 +140,11 @@ Inference mappings from TAO Core `ml_recog.config.json`:
 | Action | Spec Field | Inference Function | Meaning |
 |---|---|---|---|
 | evaluate | `evaluate.checkpoint` | `parent_model` | model file inferred from the parent job results folder |
-| evaluate | `evaluate.trt_engine` | `parent_model` | model file inferred from the parent job results folder |
 | evaluate | `results_dir` | `output_dir` | current job results directory |
 | export | `export.checkpoint` | `parent_model` | model file inferred from the parent job results folder |
 | export | `export.onnx_file` | `create_onnx_file` | output ONNX path |
 | export | `results_dir` | `output_dir` | current job results directory |
-| gen_trt_engine | `gen_trt_engine.onnx_file` | `parent_model` | model file inferred from the parent job results folder |
-| gen_trt_engine | `gen_trt_engine.tensorrt.calibration.cal_cache_file` | `create_cal_cache` | calibration cache path |
-| gen_trt_engine | `gen_trt_engine.trt_engine` | `create_engine_file` | output TensorRT engine path |
-| gen_trt_engine | `results_dir` | `output_dir` | current job results directory |
 | inference | `inference.checkpoint` | `parent_model` | model file inferred from the parent job results folder |
-| inference | `inference.trt_engine` | `parent_model` | model file inferred from the parent job results folder |
 | inference | `results_dir` | `output_dir` | current job results directory |
 | train | `model.pretrained_model_path` | `ptm_if_no_resume_model` | PTM when no resume checkpoint exists |
 | train | `results_dir` | `output_dir` | current job results directory |
@@ -160,4 +154,4 @@ For `parent_model` or `parent_model_folder`, pass the upstream train/export/Auto
 
 ## Deployment
 
-- [tao-deploy-metric-learning-recognition](references/tao-deploy-metric-learning-recognition.md) — MLRecog deploy workflow for TensorRT engine generation, TensorRT evaluation, and TensorRT inference using TAO Deploy.
+- [tao-deploy-metric-learning-recognition](references/tao-deploy-metric-learning-recognition.md)

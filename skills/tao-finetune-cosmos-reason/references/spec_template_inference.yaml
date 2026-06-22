@@ -1,0 +1,13 @@
+model_path: hf_model://nvidia/Cosmos3-Nano
+torch_dtype: auto
+device_map: auto
+num_gpus: 1
+type: video
+media: ''
+fps: 1
+total_pixels: 200704
+prompt: Describe this video briefly.
+max_new_tokens: 32
+results_dir: ''
+enable_lora: false
+base_model_path: hf_model://nvidia/Cosmos3-Nano

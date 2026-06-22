@@ -1,0 +1,43 @@
+[
+  {
+    "id": "jetson-download-bsp-001",
+    "question": "/jetson-quick-start picked Auto Setup and routed me to /jetson-download-bsp for an Orin AGX devkit. What does this skill stage and where do the files land?",
+    "expected_skill": "jetson-download-bsp",
+    "expected_script": null,
+    "ground_truth": "/jetson-download-bsp is download-only - it stages four NVIDIA-shipped artifacts plus two guides at the exact paths the next setup skills look in. After fetching the release list from https://developer.nvidia.com/embedded/jetson-linux-archive and resolving a concrete release token (e.g. R36.4.4 or 38.2 - never a family placeholder like R38.x, and never normalized by adding .0), it follows links from the selected release page (never string-concatenating NVIDIA URLs) and lands: Jetson_Linux_R<ver>_aarch64.tbz2 in <bsp_image.root_path or workspace/Image>/, Tegra_Linux_Sample-Root-Filesystem_R<ver>_aarch64.tbz2 in the same image root, public_sources.tbz2 in <workspace>/Downloads/ (where /jetson-init-source auto-discovers it for Branch A), x-tools.tbz2 in <workspace>/Downloads/ (auto-extracted to set source.toolchain), plus the Developer Guide and User Guide in <documents.root_path or workspace/Documents>/. Curl uses a .part temp path, --retry 3 --retry-all-errors, and disk space is verified at sum(Content-Length) x 1.2 against df. The skill never extracts, never edits the active profile - it hands back to /jetson-init-image, /jetson-init-source, /jetson-link-docs.",
+    "expected_behavior": [
+      "Read skills/jetson-download-bsp/SKILL.md",
+      "Resolve active profile per target-platform-contract.md; refuse if missing",
+      "Consume quick_start_prefill.mode + quick_start_prefill.download.bsp_release if present",
+      "Fetch release list from https://developer.nvidia.com/embedded/jetson-linux-archive and let the user pick a CONCRETE release token (never a family placeholder, never normalize by adding .0)",
+      "Use the 3-attempt discovery retry pattern (focused prompt -> verbatim link dump -> sibling page) for every WebFetch",
+      "Locate artifacts by following links from the selected release page - never string-concatenate NVIDIA URLs",
+      "Land the BSP tarball + sample rootfs in bsp_image.root_path (workspace/Image), NOT Downloads/",
+      "Land public_sources.tbz2 + x-tools.tbz2 in <workspace>/Downloads/ (auto-discovery paths for /jetson-init-source)",
+      "Land Developer Guide + User Guide in <documents.root_path or workspace/Documents>/",
+      "Print a fetch plan with selected release, source URLs, destinations, reuse markers; default to Download all unless an exception applies (override, missing artifact, overwrite, EULA, disk-space failure)",
+      "Verify disk space via curl -sI Content-Length sum x 1.2 vs. df -B1 --output=avail",
+      "Download via temporary .part path, mv on success, curl -fL --retry 3 --retry-all-errors --retry-delay 5",
+      "Validate filenames contain the EXACT R<ver> token from the official URL (no R38.2.0 inferred from R38.2); verify public_sources/x-tools are bzip2 via file -b",
+      "Hand back to /jetson-init-image, /jetson-init-source, /jetson-link-docs - do NOT extract, edit profile, or apply binaries"
+    ]
+  },
+  {
+    "id": "jetson-download-bsp-002",
+    "question": "Quick start prefilled bsp_release=R38.x for my Thor target. Will /jetson-download-bsp just substitute that with the latest supported R38 release, or is there friction?",
+    "expected_skill": "jetson-download-bsp",
+    "expected_script": null,
+    "ground_truth": "There is friction by design. R38.x is a family placeholder - the contract requires a concrete release token (optional leading R + two or three numeric dotted components like R38.2 or 38.2.1), so the skill stops, shows the supported concrete releases for the active platform sorted newest-first by dotted numeric order, and asks the user via the shared User input prompt style with three click-to-select actions: pick_supported_release, confirm_override (requires an override reason), or cancel. It will NEVER auto-substitute a requested release with a supported one even if there is only one option. The same prompt fires when the prefill is missing, blank, set to skip, or concrete-but-unsupported/ambiguous. Support is asserted only when the archive or linked release page explicitly lists the active platform - no inference. Any override reason is recorded in the final summary; cancel stops with no downloads.",
+    "expected_behavior": [
+      "Read skills/jetson-download-bsp/SKILL.md and locate the Resolve target release section",
+      "Recognize R38.x as a family placeholder (not concrete) - skill must stop before artifact discovery",
+      "Refuse to auto-substitute R38.x with the latest supported release, even when only one option exists",
+      "Show the active platform summary, requested release, supported concrete releases sorted newest-first, and source archive URL",
+      "Issue a click-to-select prompt with pick_supported_release / confirm_override / cancel using the shared User input prompt style",
+      "Require an override reason when the user picks confirm_override; record it in the final summary",
+      "Stop with no downloads on cancel",
+      "Only claim support when the archive or release page explicitly lists the active platform (no inference)",
+      "Preserve the chosen token EXACTLY as the official page presents it - no .0 suffix, no patch-component truncation"
+    ]
+  }
+]

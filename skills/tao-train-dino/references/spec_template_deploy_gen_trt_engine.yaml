@@ -7,12 +7,12 @@ dataset:
     input_mean: [0.485, 0.456, 0.406]
     input_std: [0.229, 0.224, 0.225]
 model:
-  backbone: fan_small
+  backbone: resnet_50
   num_feature_levels: 4
   dec_layers: 6
   enc_layers: 6
   num_queries: 300
-  num_select: 100
+  num_select: 300
   dropout_ratio: 0.0
   dim_feedforward: 2048
 gen_trt_engine:

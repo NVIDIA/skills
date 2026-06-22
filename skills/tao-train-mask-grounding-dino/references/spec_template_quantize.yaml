@@ -83,8 +83,6 @@ dataset:
   - image_dir: ''
     json_file: ''
     label_map: ''
-  - image_dir: ''
-    json_file: ''
   val_data_sources:
     image_dir: ''
     json_file: ''
@@ -99,6 +97,7 @@ dataset:
   quant_calibration_data_sources:
     image_dir: ''
     json_file: ''
+    label_map: ''
   batch_size: 4
   workers: 8
   pin_memory: true

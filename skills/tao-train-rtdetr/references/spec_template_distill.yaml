@@ -159,6 +159,72 @@ train:
   precision: fp32
   distributed_strategy: ddp
   activation_checkpoint: true
+distill:
+  teacher:
+    pretrained_backbone_path: ''
+    backbone: resnet_50
+    train_backbone: true
+    load_teacher_enc_dec: false
+    num_queries: 300
+    num_select: 300
+    num_feature_levels: 3
+    return_interm_indices:
+    - 1
+    - 2
+    - 3
+    feat_strides:
+    - 8
+    - 16
+    - 32
+    feat_channels:
+    - 256
+    - 256
+    - 256
+    use_encoder_idx:
+    - 2
+    hidden_dim: 256
+    nheads: 8
+    dropout_ratio: 0.0
+    enc_layers: 1
+    dim_feedforward: 1024
+    pe_temperature: 10000
+    expansion: 1
+    depth_mult: 1
+    enc_act: gelu
+    act: silu
+    dec_layers: 6
+    dn_number: 100
+    eval_idx: -1
+    vfl_loss_coef: 1.0
+    bbox_loss_coef: 5.0
+    giou_loss_coef: 2.0
+    class_cost: 2.0
+    bbox_cost: 5.0
+    giou_cost: 2.0
+    alpha: 0.75
+    gamma: 2.0
+    clip_max_norm: 0.1
+    aux_loss: true
+    loss_types:
+    - vfl
+    - boxes
+    backbone_names:
+    - backbone.0
+    linear_proj_names:
+    - reference_points
+    - sampling_offsets
+    distillation_loss_coef: 1.0
+    frozen_fm:
+      enabled: false
+      backbone: radio_v2-l
+      checkpoint: ''
+  pretrained_teacher_model_path: ???
+  bindings:
+  - student_module_name: srcs
+    teacher_module_name: srcs
+    criterion: IOU
+    weight: 1.0
+  results_dir: ''
 quantize:
   backend: torchao
   mode: weight_only_ptq

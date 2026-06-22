@@ -1,0 +1,34 @@
+[
+  {
+    "id": "jetson-init-target-001",
+    "question": "Fresh workspace, no profiles yet. I want to create a target profile for an Orin Nano devkit (default flash conf) without a custom carrier. Walk me through what /jetson-init-target will do.",
+    "expected_skill": "jetson-init-target",
+    "expected_script": null,
+    "ground_truth": "Because target-platform/ does not yet exist, the skill creates it and copies active_target_template.yaml to target-platform/active_target.yml, then enters the bootstrap case (no profiles exist). It loads platform_template.yaml as the field schema and reads bsp-platforms-catalogue.md for the Product/Chip/SKU/Flash Config Mapping table, prints the full grouped list, and asks you to pick a shortcut or type a numeric index (Type something is the only manual-entry path; no Other/Manual entry choice). For Orin Nano default conf you accept option 1; the custom-carrier intent question follows with add/skip and you pick skip. The suggested filename is the kebab-cased product name (e.g. jetson-orin-nano-developer-kit.yaml), written under target-platform/ via a round-tripping YAML writer; bootstrap auto-activates by setting active: in active_target.yml without prompting, and the summary suggests /jetson-init-image, /jetson-init-source, and optionally /jetson-link-docs and /jetson-generate-kb.",
+    "expected_behavior": [
+      "Read skills/jetson-init-target/SKILL.md",
+      "Create target-platform/ if missing and copy active_target_template.yaml to target-platform/active_target.yml (note .yml extension)",
+      "Recognize the bootstrap case (no *.yaml profiles) and skip the activation prompt - auto-activate at write time",
+      "Load platform_template.yaml as schema and parse the Product/Chip/SKU/Flash Config Mapping table from bsp-platforms-catalogue.md",
+      "Print the full numbered platform list grouped by chip family and offer first-row shortcuts plus the built-in Type something entry only",
+      "Use option 1 (Default flash conf) for the chosen Orin Nano row and ask the custom-carrier add/skip intent (default skip)",
+      "Write target-platform/jetson-orin-nano-developer-kit.yaml (kebab-cased product name) with reference_devkit: only, then set active: in active_target.yml using a round-tripping YAML writer",
+      "Print the summary and recommend /jetson-init-image, /jetson-init-source, and optionally /jetson-link-docs / /jetson-generate-kb"
+    ]
+  },
+  {
+    "id": "jetson-init-target-002",
+    "question": "I already have two profiles in target-platform/ and active_target.yml points at one of them. I just want to switch to the other - can I do that with /jetson-init-target?",
+    "expected_skill": "jetson-init-target",
+    "expected_script": null,
+    "ground_truth": "No - /jetson-init-target authors a new profile and is not the right entry point for switching. With profiles already present and a valid active pointer, the skill shows the active profile plus the full list and asks whether you want to (a) author a new profile alongside or (b) switch via /jetson-set-target; on (b) it stops and tells you to run /jetson-set-target. The Limitations and Troubleshooting sections are explicit: 'User asks to switch instead of author - refuse and route to jetson-set-target; do not re-author an existing profile.' The skill owns reference_devkit:, custom_carrier:, and the active_target.yml pointer; it refuses to write bsp_image:, source:, or documents:.",
+    "expected_behavior": [
+      "Read skills/jetson-init-target/SKILL.md",
+      "Survey target-platform/ and active_target.yml to detect the 'profiles exist + active names a present file' state",
+      "Confirm the user wants to switch (not author) and refuse to re-author an existing profile",
+      "Route the user to /jetson-set-target as documented in the Troubleshooting section and the When to invoke note",
+      "Cite the Limitations bullet that this skill owns only reference_devkit:, custom_carrier:, and the active_target.yml pointer",
+      "Stop without modifying any profile YAML or the active pointer"
+    ]
+  }
+]

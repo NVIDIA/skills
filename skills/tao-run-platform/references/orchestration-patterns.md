@@ -43,11 +43,11 @@ across context breaks. Decoupled from any specific platform.
 ```python
 from datetime import datetime
 from tao_sdk.action_workflow import ActionWorkflow
-from tao_sdk.platforms.lepton import LeptonSDK
+from tao_sdk.platforms.slurm import SlurmSDK
 
 ts = datetime.now().strftime("%Y%m%d_%H%M%S")
 workflow = ActionWorkflow(root_dir="./runs", run_name="dino-train", timestamp=ts)
-sdk = LeptonSDK(state_file=str(workflow.workspace / "tao_session_state.json"))
+sdk = SlurmSDK(state_file=str(workflow.workspace / "tao_session_state.json"))
 
 workflow.write_metadata(network="dino", action="train", dataset_uri="s3://bucket/coco/")
 job = sdk.create_job(image=..., command=..., gpu_count=8, ...)
@@ -65,4 +65,4 @@ The folder layout (`./runs/dino-train/<timestamp>/`):
 
 Re-attach later with `ActionWorkflow.from_workspace(path)`. Works with any
 SDK that has `get_job_status` / `get_job_logs` / `get_failure_analysis` —
-Lepton, Brev, Docker, SLURM, Kubernetes.
+Brev, Docker, SLURM, Kubernetes.

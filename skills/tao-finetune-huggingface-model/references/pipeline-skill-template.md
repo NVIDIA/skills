@@ -16,6 +16,22 @@ limitations under the License.
 
 # Pipeline Rerun Skill Template
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Path
+- Generation
+- Template
+- 1. Build image (once)
+- 2. Prepare data
+- 3. Smoke test (1 step on real data)
+- 4. Baseline (zero-shot) eval
+- 5. Full training
+- 6. Post-train eval + 5 inference samples
+- Sanity checks before returning
+
+
 Step 6 of `tao-finetune-huggingface-model` emits a self-contained "rerun this run" skill so the
 user (or any agent) can re-execute the pipeline without going through research +
 code generation again.
@@ -27,8 +43,8 @@ code generation again.
 ```
 
 `<output_dir>` resolves from `config.yaml`. The skill lives under `skills/`, not
-`.claude/skills/`, so it isn't tied to a specific agent runtime — anything that
-reads SKILL.md (Claude Code, a shell script, a human) can pick it up.
+an agent-runtime cache, so it is portable — anything that reads `SKILL.md` can
+pick it up.
 
 ## Generation
 

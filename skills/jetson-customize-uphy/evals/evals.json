@@ -1,0 +1,38 @@
+[
+  {
+    "id": "jetson-customize-uphy-001",
+    "question": "I'm bringing up a Thor custom carrier that needs uphy0-config-6 (clears BCT pinmux) plus disabling MGBE0. Walk me through what /jetson-customize-uphy will do.",
+    "expected_skill": "jetson-customize-uphy",
+    "expected_script": null,
+    "ground_truth": "/jetson-customize-uphy resolves the active profile (refusing without custom_carrier_schematic and custom_carrier_pinmux_xls), opens the Adaptation Guide's 'Configure the UPHY Lane' section, and cross-references the carrier schematic for UPHY net names (MGBE2_TX_P/N, PEX5_LN0+-, etc.). After AskUserQuestion gates on the chosen uphy0-config-6 (and uphy1-config-N, since Thor requires both surfaces emitted), it decompiles BPFDTB_FILE under <bsp_image.root_path>/Linux_for_Tegra/bootloader/generic/ to snapshot stock state, then writes ONE atomic ODMDATA= commit on the carrier flash-conf fork carrying: (a) both uphyX-config-N tokens, (b) per-controller tokens including mgbe0-speed-del (NOT mgbe0-speed-0 - missing 'del' triggers BL31 SError reboot loop because FMON arms on the controller's own clocks regardless of UPHY allocation), and (c) UPHY_CONFIG=\"\" clear required by uphy0-config-6. Then it builds the per-controller allocation table and dispatches /jetson-customize-pcie, /jetson-customize-mgbe, /jetson-customize-usb for kernel-DT overlays only - sub-skills MUST NOT touch ODMDATA.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-uphy/SKILL.md",
+      "Verify prerequisites: active profile, reference_devkit + custom_carrier, Linux_for_Tegra/.git, forked carrier conf, AND both documents.custom_carrier_schematic and documents.custom_carrier_pinmux_xls present",
+      "Locate 'Configure the UPHY Lane' in the Adaptation Guide and cross-check Module Design Guide + SoC TRM",
+      "Cross-reference carrier schematic for UPHY net names; flag zero-match nets as unrouted",
+      "Decompile BPFDTB_FILE under <bsp_image.root_path>/Linux_for_Tegra/bootloader/generic/ to snapshot stock state",
+      "AskUserQuestion gate per UPHY surface (Thor: emit both uphy0 AND uphy1 even if one matches the guide default)",
+      "Write ONE atomic ODMDATA= commit with surface tokens (uphy0 first, then uphy1, comma-separated), per-controller tokens, then UPHY_CONFIG=\"\" clear for uphy0-config-6",
+      "Emit mgbe0-speed-del on disable (NOT mgbe0-speed-0 or omitted - FMON SError reboot loop)",
+      "Build the per-controller allocation table BEFORE Step 6 commits (drives both ODMDATA tokens and sub-skill overlay decisions)",
+      "Dispatch /jetson-customize-pcie, /jetson-customize-mgbe, /jetson-customize-usb for kernel-DT overlays only - sub-skills MUST NOT touch ODMDATA",
+      "Emit the changes-summary table covering this skill's commit plus every dispatched sub-skill commit"
+    ]
+  },
+  {
+    "id": "jetson-customize-uphy-002",
+    "question": "After flashing my customized Orin BSP the board enters a cold boot reboot loop with BL31 plat_setup.c:726 'BPMP firmware is not ready'. I had selected uphy0-config-6. Where do I look?",
+    "expected_skill": "jetson-customize-uphy",
+    "expected_script": null,
+    "ground_truth": "uphy0-config-6 requires a UPHY_CONFIG=\"\" clear written to the carrier flash-conf fork (BCT pinmux clear per the Adaptation Guide). The likely cause is a later ^UPHY_CONFIG= line elsewhere in the carrier conf re-overriding the empty clear after /jetson-customize-uphy emitted it - the symptom is exactly the BL31 plat_setup.c:726 / 'BPMP firmware is not ready' reboot loop documented in the Troubleshooting section. The fix is to comment out the offending ^UPHY_CONFIG= line per references/procedure.md Step 6, re-run the atomic ODMDATA commit if needed, then rebuild and re-flash. Note this is distinct from the BL31 SError MGBE reboot loop, which is caused by a missing mgbeN-speed-del token.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-uphy/SKILL.md and locate the Troubleshooting section",
+      "Identify the symptom (BL31 plat_setup.c:726 / BPMP firmware is not ready) as the uphy0-config-6 clear-overridden case",
+      "Inspect the carrier flash-conf fork for any ^UPHY_CONFIG= line later than the emitted UPHY_CONFIG=\"\" clear",
+      "Comment out the offending line per references/procedure.md Step 6",
+      "Distinguish from the mgbeN-speed-del SError reboot loop (different root cause)",
+      "Confirm the ODMDATA= line still has surface tokens in uphy0-then-uphy1 order with the UPHY_CONFIG=\"\" clear last",
+      "Rebuild via /jetson-build-source and re-flash via /jetson-flash-image"
+    ]
+  }
+]

@@ -1,0 +1,35 @@
+[
+  {
+    "id": "jetson-link-docs-001",
+    "question": "I've put the Jetson Linux Developer Guide PDF, an Orin Nano data sheet, and a P3768 carrier schematic under <workspace>/Documents/ for my active Orin Nano profile (no custom carrier). Bind them into the profile so /jetson-generate-kb can pick them up.",
+    "expected_skill": "jetson-link-docs",
+    "expected_script": null,
+    "ground_truth": "Resolve the active profile, default documents.root_path to <workspace>/Documents (omit the field from the written profile because the default is in use), and load platform_template.yaml to drive the per-slot prompts. Skip custom_carrier_schematic and custom_carrier_pinmux_xls entirely because there is no custom_carrier: block. Look up the Product Token (e.g. *orin*nano*) from bsp-platforms-catalogue.md, then scan <workspace>/Documents one level deep using the SKU-keyed and product-token globs - bsp_developer_guide via *developer*guide*.pdf, module_data_sheet via *p3767*data*sheet*.pdf with <token>data*sheet*.pdf as fallback, carrier_schematic via *p3768*schem*.pdf with <token>carrier*schem*.pdf as fallback. Take the union deduped by absolute path; on exactly 1 unique hit prompt 'use this? (yes/no, default yes)'; on 2+ present a numbered list with skip/NA; on 0 fall through to manual prompts. Write the resolved fields back via a round-tripping YAML writer (ruamel.yaml), preserve other top-level blocks, and omit skipped/NA fields entirely.",
+    "expected_behavior": [
+      "Read skills/jetson-link-docs/SKILL.md",
+      "Resolve the active profile and load the documents: schema from ../../references/platform_template.yaml",
+      "Filter out custom_carrier_schematic and custom_carrier_pinmux_xls because the profile has no custom_carrier:",
+      "Resolve documents.root_path: use the recorded value, else <workspace>/Documents (omit from the written profile when default is taken)",
+      "Look up the Product Token (e.g. *orin*nano*) from bsp-platforms-catalogue.md for the reference_devkit.name row",
+      "Scan one level deep and apply both SKU-keyed and product-token globs per the Scan and auto-match table, taking the union deduped by absolute path",
+      "Apply the Match policy per field: 1 hit -> yes/no confirm; 2+ hits -> numbered list with skip/NA; 0 hits -> manual prompt; never silently bind",
+      "Write back via a round-tripping YAML writer (ruamel.yaml), preserve other blocks/comments, and omit skipped or NA fields entirely"
+    ]
+  },
+  {
+    "id": "jetson-link-docs-002",
+    "question": "My documents.root_path is /opt/nvidia-docs which is laid out as Schematics/, Design-Guides/, Pinmux/ subfolders. /jetson-link-docs auto-bound nothing even though all the right PDFs are in there. What's going on?",
+    "expected_skill": "jetson-link-docs",
+    "expected_script": null,
+    "ground_truth": "Auto-scan in v0.2 only walks documents.root_path one level deep, so PDFs nested under Schematics/, Design-Guides/, Pinmux/ subfolders return zero glob hits even when the right files exist. The skill detects this 'suspicious 0 hits' case (root exists but no fields auto-bound), surfaces the limitation, and offers to fall through to manual prompts where you can paste absolute paths per slot - Enter or NA skip a field, and user-provided paths are warned (not refused) when missing on disk. URLs starting with http://, https:// or ftp:// are accepted verbatim and not validated. The Troubleshooting section also documents that documents.* are filename-only globs - flatten the layout under documents.root_path or rely on manual binding for now. Re-runs are merge-safe: existing bindings are preserved unless you pick a new file or NA.",
+    "expected_behavior": [
+      "Read skills/jetson-link-docs/SKILL.md",
+      "Identify the v0.2 limitation that the auto-scan walks documents.root_path one level deep only",
+      "Note that the Scan and auto-match step surfaces the 'suspicious 0 hits' case to the user and offers manual fall-through",
+      "Walk the user through manual prompts using the platform_template.yaml marker descriptions as prompt text in document order",
+      "Accept Enter and NA interchangeably as skip; warn (not refuse) when a user-provided path does not exist; accept http://, https://, ftp:// URLs verbatim",
+      "Mention that re-runs are merge-safe (existing bindings preserved unless explicitly changed) and that flattening or moving files under the root would re-enable auto-bind",
+      "Cite the Glob matching is filename-only Limitation and the matching Troubleshooting bullets"
+    ]
+  }
+]

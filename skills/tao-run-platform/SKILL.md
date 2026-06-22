@@ -1,6 +1,6 @@
 ---
 name: tao-run-platform
-description: TAO Execution SDK for submitting and monitoring GPU training jobs on supported platforms (Lepton, Brev, SLURM,
+description: TAO Execution SDK for submitting and monitoring GPU training jobs on supported platforms (Brev, SLURM,
   local Docker, Kubernetes). Use when the user wants to run TAO jobs through the SDK, get job tracking, S3 I/O wrapping,
   multi-node distributed training, or platform-specific features that docker-run can't provide. Trigger phrases include
   "use the TAO SDK", "call tao_sdk", "AutoMLRunner", "ActionWorkflow", "Job handles", "S3 I/O wrapping", "TAO platform run".
@@ -8,7 +8,7 @@ license: Apache-2.0
 compatibility: Requires Python 3.10+ and the nvidia-tao-sdk package (pip install nvidia-tao-sdk[all]).
 metadata:
   author: NVIDIA Corporation
-  version: "0.2.0"
+  version: "0.1.0"
 allowed-tools: Read Bash
 tags:
 - platform
@@ -18,47 +18,42 @@ tags:
 
 # TAO Execution SDK
 
-The SDK is the **optional** Python layer for users who need job handles, S3 I/O wrapping, or platform-specific features (Lepton multi-node, SLURM/Lustre queues, Kubernetes Jobs, local Docker debugging, Brev instance reuse). Most TAO skills run with just `docker run` and don't need it. Reach for the SDK when:
+The SDK is the **optional** Python layer for users who need job handles, S3 I/O wrapping, or platform-specific features (SLURM/Lustre queues, Kubernetes Jobs, local Docker debugging, Brev instance reuse). Most TAO skills run with just `docker run` and don't need it. Reach for the SDK when:
 
 - You want a `Job` handle to poll status and stream logs over time.
-- The platform is API-only (Lepton has no docker-run equivalent).
 - You need S3-aware input download / output upload baked into the entrypoint.
 - You're chaining multiple jobs and want persisted state.
 
 ## Preflight
 
-Install `nvidia-tao-sdk[all]` before using this platform — the `[all]` extra pulls in every platform-specific dependency (Lepton, Brev, S3 utilities, etc.):
+Install `nvidia-tao-sdk[all]` before using this platform — the `[all]` extra pulls in every platform-specific dependency (Brev, S3 utilities, etc.). If it is missing, install it by default in the active Python environment and rerun the import check:
 
 ```bash
 python -c "import tao_sdk" 2>/dev/null || {
-  echo "MISSING: nvidia-tao-sdk not installed. Run:"
-  echo "  pip install nvidia-tao-sdk[all]"
-  exit 1
+  echo "Installing missing Python requirement: nvidia-tao-sdk[all]"
+  python -m pip install "nvidia-tao-sdk[all]"
 }
+python -c "import tao_sdk"
 ```
 
 The package index is environment-specific — the runner/container is expected to have a working `pip` configuration (e.g. `~/.pip/pip.conf`, `PIP_INDEX_URL`, `PIP_EXTRA_INDEX_URL`, or proxy). If the install fails for index/network reasons, that's a runner setup issue; this skill stays agnostic to the registry.
 
-If missing, the agent prompts the user to authorize the install via Bash, then re-runs the preflight. Never auto-install silently.
+Missing pip requirements are installed automatically by default and reported in the run log. Non-pip/system prerequisites still require a normal preflight failure and user-visible remediation.
 
 ## Setup
 
-Credentials come from **environment variables** — sourced from `~/.config/tao/.env` (auto-loaded by the skill bank's SessionStart hook).
+Credentials come from **environment variables** — read from the session environment (export them in your shell before launching).
 
 ```python
-from tao_sdk.platforms.lepton import LeptonSDK   # DGX Cloud
 from tao_sdk.platforms.brev   import BrevSDK     # Brev GPU instances
 
-sdk = LeptonSDK()    # reads LEPTON_WORKSPACE_ID, LEPTON_AUTH_TOKEN
-# or
 sdk = BrevSDK()      # reads BREV_API_TOKEN (optional — falls back to brev login)
 ```
 
-Both SDKs validate credentials lazily on first use and raise `CredentialError` with a clear message if a required env var is missing. Required env vars:
+The SDK validates credentials lazily on first use and raises `CredentialError` with a clear message if a required env var is missing. Required env vars:
 
 | Platform | Required | Optional |
 |---|---|---|
-| Lepton | `LEPTON_WORKSPACE_ID`, `LEPTON_AUTH_TOKEN` | — |
 | Brev | — (manual `brev login` works) | `BREV_API_TOKEN` |
 | S3 I/O (any platform) | `S3_BUCKET_NAME`, `ACCESS_KEY`, `SECRET_KEY` | `S3_ENDPOINT_URL`, `CLOUD_REGION` |
 | Container env | `NGC_KEY` | `HF_TOKEN` |
@@ -105,10 +100,10 @@ ${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_tao_models.py \
 ```
 
 If the selected model has `automl_enabled: true` and a valid train schema,
-route training through `skills/applications/tao-run-automl` by default. A workflow should
-only bypass AutoML when its run settings include `automl_policy: off`, the user
-explicitly asks for a plain run, or the model metadata says AutoML is enabled
-but the train schema is not packaged yet.
+route training through `skills/applications/tao-run-automl` by default with
+`automl_policy: on`. A workflow should only bypass AutoML when its run settings
+include `automl_policy: off`, the user explicitly asks for a plain run, or the
+model metadata says AutoML is enabled but the train schema is not packaged yet.
 
 After the platform is selected, get the credential filter:
 
@@ -119,8 +114,8 @@ ${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_tao_platforms.py \
 ```
 
 Ask only for credentials returned for the selected platform. For example, SLURM
-needs `SLURM_USER` and `SLURM_HOSTNAME`; it does not need Lepton credentials.
-Kubernetes and local Docker do not need Lepton or SLURM credentials. Ask storage
+needs `SLURM_USER` and `SLURM_HOSTNAME`; it does not need Brev credentials.
+Kubernetes and local Docker do not need Brev or SLURM credentials. Ask storage
 credentials such as S3 keys only when the selected platform and the data/result
 URIs require them.
 
@@ -139,18 +134,85 @@ sdk.check_path(remote_path) -> bool
 sdk.list_path(remote_path) -> list[str]
 ```
 
-Lepton-only:
-- `sdk.get_job_replicas(job_id)` — replica-level diagnostics for stuck-pending jobs.
-
 Brev-only:
 - `sdk.delete_instance(instance_id)` — clean up an ephemeral instance.
 - `sdk.list_instances()` — list active instances.
 
 ## Submitting a Job
 
-The agent always **constructs the container command via `build_entrypoint`** before calling `create_job`. The agent reads the action's schema from `skill_info.yaml` (`command`, `config_format`, `inputs`, `outputs`, `upload_excludes`) and passes those fields as kwargs. `build_entrypoint` bakes the in-container `script_runner` runtime (inlined as a base64 heredoc) and the CLI invocation that, at runtime, downloads declared inputs, writes the spec file at `{config_path}` with remote URIs rewritten to local paths, runs the user command, and uploads outputs. The platform SDK's `create_job` runs the resulting command **as-is** — no implicit wrapping.
+The agent always **constructs the container command via `build_entrypoint`** before calling `create_job`. The agent reads the action's schema from `skill_info.yaml` (`command`, `mode`, `config_format`, `inputs`, `outputs`, `upload_excludes`) and passes those fields as kwargs. `build_entrypoint` then bakes:
 
-`build_entrypoint` infers the mode (`config` / `args` / `passthrough`) from what you pass — you never pass `mode` explicitly. See [`references/job-construction.md`](references/job-construction.md) for the full entrypoint contract, the spec/args construction strategy per action `mode`, the mode-inference table, and `resolve_container_image()`. See [`references/outputs.md`](references/outputs.md) for where outputs land (the runtime destination tables and per-platform injection policy) and the critical "spec is nested dicts, not flat dotted keys" rule. See [`references/examples.md`](references/examples.md) for complete spec-driven and path-keyed `build_entrypoint` + `create_job` examples.
+1. The in-container `script_runner` runtime (inlined as a base64 heredoc — no need for `tao_sdk` to be installed in the container).
+2. The CLI invocation that, at runtime in the container, will: download declared inputs (S3 / HF-Hub / NGC), write the spec file at `{config_path}` with remote URIs rewritten to local paths, run the user command, and upload outputs.
+
+Output destinations are resolved at runtime from env vars the SDK injects (see "Where outputs go" below). The platform SDK's `create_job` runs the resulting command **as-is** — no inputs/outputs kwargs, no implicit wrapping. The data flow is visible in the agent's code.
+
+### Where outputs go (resolved at runtime — agents don't manage it)
+
+The SDK injects `TAO_JOB_ID` (matches `Job.id`) and, when a persistent mount is attached, `TAO_RESULTS_ROOT` into the container env. Inside the container, `script_runner` resolves output destinations:
+
+| Container env | Result |
+|---|---|
+| `TAO_RESULTS_ROOT` set (Lustre / PVC / bind / NFS) | Outputs at `{TAO_RESULTS_ROOT}/<job_id>/<key>/`; no upload |
+| `S3_BUCKET_NAME` set (cloud, no mount) | Outputs at `s3://{bucket}/results/<job_id>/<key>/`; uploaded at end of run |
+| Neither | Outputs at `/results/<job_id>/<key>/` (container-ephemeral) with a loud end-of-run warning |
+
+Per-platform policy:
+
+| SDK | What gets injected |
+|---|---|
+| `SlurmSDK` | `TAO_RESULTS_ROOT={SLURM_BASE_RESULTS_DIR}/results` (always — Lustre, never S3, avoids GPU-idle scheduler kill) |
+| `KubernetesSDK` / `DockerSDK` / `BrevSDK` | `TAO_RESULTS_ROOT=/results` if a mount targets `/results`; otherwise S3 fallback |
+
+Agents who want a custom destination can put an `s3://...` URI or absolute path directly at the output spec key — explicit values override the auto-fill. Otherwise, model-natural defaults like cosmos-rl's `output_dir: "output"` or DINO's empty `results_dir` are auto-rewritten by `script_runner`.
+
+### The spec is nested dicts, NOT flat dotted keys
+
+This is the most common mistake when constructing a spec. The dotted notation that appears in `skill_info.yaml`'s `inputs:` / `outputs:` blocks (e.g. `section.subsection.key`) is a **path into** a nested spec — `script_runner` looks values up at that path. It's not the spec's own shape. The spec mirrors whatever shape the model's container expects (typically a nested TOML/YAML).
+
+```python
+# ✓ CORRECT — nested dicts
+specs = {
+    "section": {
+        "subsection": {"key": "value"},
+    },
+}
+
+# ✗ WRONG — flat top-level key with dots. TOML/YAML emits this as a
+# quoted bare-string key, the model sees an empty `section` table, and
+# any input declared at "section.subsection.key" silently fails to
+# download because _get_nested(specs, "section.subsection.key") → None.
+specs = {
+    "section.subsection.key": "value",
+}
+```
+
+The two shapes look superficially similar but mean different things. When in doubt, open the model's `references/` directory (e.g. a default-spec TOML or YAML) — that's the literal nested structure the spec dict needs to mirror. The `inputs:` / `outputs:` declarations in `skill_info.yaml` are *paths into* the nested spec, not key names.
+
+### Constructing the spec / args
+
+The skill's action declares its config mechanism in `skill_info.yaml`'s `actions.<action>.mode` field. Treat missing `mode` as invalid metadata and fix the skill instead of inferring a default. Read `actions.<action>.mode` first, then pass the matching argument shape to `build_entrypoint`:
+
+| Declared mode | What the agent passes |
+|---|---|
+| `config` | `specs=...` with spec-keyed `inputs` / `outputs`; the helper writes the spec file, rewrites URIs, and runs the command |
+| `args` | `args=...` with optional spec-keyed `inputs` / `outputs`; the helper substitutes CLI args into the command template |
+| `passthrough` | path-keyed `inputs=...` and/or `outputs=...`; the helper downloads to listed paths, runs the command, and uploads listed outputs |
+
+Do not infer mode from missing metadata. Missing `mode` means the skill contract is stale.
+
+See [`references/spec-construction.md`](references/spec-construction.md) for the per-mode construction strategy, the recommended decision order, and worked `build_entrypoint` examples for spec-driven jobs (config file) and path-keyed jobs (no config file).
+
+## Resolving container images
+
+Skills declare images either by key (`tao_toolkit.pyt`) or as an absolute URI (`nvcr.io/...`). Use `resolve_container_image()` to handle both:
+
+```python
+from tao_sdk.versions import resolve_container_image
+image = resolve_container_image(skill_info["container_image"])
+```
+
+Behind the scenes it walks `versions.yaml` for keys; absolute URIs are returned as-is.
 
 ## Monitoring
 
@@ -161,18 +223,6 @@ print(status.message)  # platform-specific detail
 
 logs = sdk.get_job_logs(job.id, tail=200)
 print(logs)
-```
-
-For stuck-Pending Lepton jobs, replica diagnostics reveal the cause (image pull, scheduling, mount errors):
-
-```python
-for r in sdk.get_job_replicas(job.id):
-    issue = r["status"].get("readiness_issue")
-    if issue:
-        print(issue["reason"], issue["message"])
-        # e.g. "InProgress" / "Pulling image"  (normal for big images)
-        #      "Failed"     / "ImagePullBackOff" (NGC_KEY problem)
-        #      "ConfigError" / "Mount point not found" (bad node)
 ```
 
 On failure, `get_failure_analysis()` classifies the root cause:
@@ -245,12 +295,7 @@ specs["dataset"]["train_csv"] = f"{base}/train.csv"   # nested — see "spec is 
 
 ## Platform-specific notes
 
-Each backend (Lepton, Brev, SLURM, Kubernetes, local Docker) has its own import
-path, storage model, distributed-training options, credential scope, and
-`create_job` kwargs. See
-[`references/platform-notes.md`](references/platform-notes.md) for the
-per-platform details before generating or launching runner artifacts for a
-given backend.
+See [`references/platform-notes.md`](references/platform-notes.md) for per-platform behavior, kwargs, and credential scoping: Brev (`instance_id`/`gpu_type`/`cloud_cred_id`/`workspace_group_id`, ready-wait timeouts), SLURM (sbatch over SSH, Lustre paths, queue defaults), Kubernetes (kubeconfig, GPU Operator), and local Docker (single-host, multi-GPU).
 
 ## Error patterns
 
@@ -261,6 +306,4 @@ similar — the entries map exception text to the underlying cause.
 
 ## What the SDK does NOT do
 
-Scope guardrails (no skill-reading, no HPO, no spec opinions, no
-auto-platform-selection, no workflow orchestration) live in
-[`references/scope.md`](references/scope.md).
+The SDK does not read/interpret skills, run AutoML on its own, decide spec contents, select platforms, or orchestrate multi-step workflows — those stay the agent's responsibility. See [`references/scope.md`](references/scope.md) for the full scope guardrails, including the model-level AutoML policy (`automl_enabled: true` → `skills/applications/tao-run-automl` unless `automl_policy: off` or the user asks for a plain single run).

@@ -18,6 +18,18 @@ Full Phase 4 walkthrough — ONNX exporter, tao-deploy TensorRT engine builder +
 
 ## Phase 4 — Export, Deployment & TensorRT Integration
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Phase 4 — Export, Deployment & TensorRT Integration
+  - Step 8 — Implement Model Exporter (`tao-pytorch` → `tao-deploy`)
+  - Step 9 — Implement TensorRT Engine Builder (`tao-deploy`)
+  - Step 10 — TRT Engine Inference Endpoint (`tao-deploy`)
+  - Step 11 — TRT Engine Evaluation Endpoint (`tao-deploy`)
+  - Phase 3+4 Gate — Verify the core implementation works before packaging.
+
+
 ### Step 8 — Implement Model Exporter (`tao-pytorch` → `tao-deploy`)
 
 **File:** `tao-pytorch/nvidia_tao_pytorch/cv/<model_name>/scripts/export.py`
@@ -303,4 +315,3 @@ Temp files (`/tmp/test.onnx`) live inside the container and are automatically cl
 If any of these fail, fix before proceeding. These are the foundation — everything else builds on them.
 
 ---
-

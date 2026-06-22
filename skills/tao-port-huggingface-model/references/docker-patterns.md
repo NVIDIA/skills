@@ -16,6 +16,31 @@ limitations under the License.
 
 # Docker & Container Patterns Reference
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- 1. Dockerfile Locations
+- 2. TAO Toolkit Container Images
+- 3. Phase 0 Image Preparation Pattern
+- 4. Build Scripts
+- 5. Requirements Files
+- 6. Wheel Build Patterns
+- 7. Runner Scripts (Container Launchers)
+- 8. CI Pipeline Patterns
+  - GitLab CI (`.gitlab-ci.yml`)
+  - Static lint (vanilla `pylint` / `pydocstyle` / `flake8`)
+  - Functional tests (vanilla `pytest`)
+  - Generating the `docker run` prefix
+- 9. GPU & CUDA Environment Variables
+- 10. Cross-Platform Detection
+- 11. Container User Setup
+- 12. Security Cleanup (Release Images)
+- 13. TAO-Specific Environment Variables
+- 14. Pytest Configuration
+- 15. xformers / ONNX Runtime Build Memory Management
+
+
 Concrete patterns extracted from the TAO repos for running tests in containers, building wheels, and (optionally) building release Docker images.
 
 > **Note:** For testing, we run directly inside the prepared TAO Toolkit containers (image tags built in Phase 0) — no Docker build is involved in the test loop. Release Docker images are optional and only for distribution validation. All work must be **local only** (`--load`, not `--push`). Do NOT push images to any registry.

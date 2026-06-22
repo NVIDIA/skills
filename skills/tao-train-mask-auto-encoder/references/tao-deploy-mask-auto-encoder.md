@@ -34,9 +34,8 @@ Direct TAO Launcher spelling is `tao deploy mae gen_trt_engine`.
 | Action | Required artifact or data | Spec key |
 |---|---|---|
 | `gen_trt_engine` | Exported ONNX model | `gen_trt_engine.onnx_file` |
-| `gen_trt_engine` | Output engine path | `gen_trt_engine.trt_engine` |
 
-For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and create the engine artifact at `gen_trt_engine.trt_engine`.
+For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file`. The TensorRT engine is a generated output at `gen_trt_engine.trt_engine`, not an upstream input artifact.
 
 ## Spec Overrides
 

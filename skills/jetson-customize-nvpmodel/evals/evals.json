@@ -1,0 +1,36 @@
+[
+  {
+    "id": "jetson-customize-nvpmodel-001",
+    "question": "I downloaded a custom 30W nvpmodel.conf from the NVIDIA Power Estimator for my P3767-0001. Add it as ID 8 NAME 30W_CUSTOM and make it the boot default with /jetson-customize-nvpmodel.",
+    "expected_skill": "jetson-customize-nvpmodel",
+    "expected_script": null,
+    "ground_truth": "Resolve <active-sku> by reading the kernel DTB's root compatible string and replicating nvpower.sh's compatible→conf mapping BSP-side (or shortcut: filter <bsp_image.root_path>/Linux_for_Tegra/rootfs/etc/nvpmodel/ to nvpmodel_p3767_0001*.conf, picking _super if the flash conf is super-mode). Verify the file exists. Apply the Overlay edit recipe (pristine import + customization commit pair) under <source.root_path>/Linux_for_Tegra/rootfs/etc/nvpmodel/. Operation 1: insert the new < POWER_MODEL ID=8 NAME=30W_CUSTOM > block from the Power Estimator export AFTER the last < PARAM ... > declaration and BEFORE the trailing < PM_CONFIG ... > line; ID must be unique, NAME uppercase no whitespace, every numeric MAX_FREQ/MIN_FREQ value must come from the kernel's available_frequencies table for that clock (values not in the table get silently rounded), CORE_0 stays online, and PARAM names must match existing PARAM declarations verbatim (T234 Orin uses CPU_A78_<n>, T264 Thor uses a different convention). Operation 4: edit < PM_CONFIG DEFAULT=8 > at the bottom of the file. Apply the same edit to every sibling in the propagation set — reference-platform conf, carrier-derived siblings, and the _super sibling if present — porting only the structural change while preserving _super's elevated MAX_FREQ/MIN_FREQ caps. Customization-commit header: 'jetson-customize-nvpmodel: <summary>'. Deploy via /jetson-promote-image → /jetson-flash-image.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-nvpmodel/SKILL.md",
+      "Resolve <active-sku> via the kernel DTB root compatible + nvpower.sh mapping (or the shortcut filter on nvpmodel_p3767_0001*.conf, choosing _super if the flash conf is super-mode); verify the file exists",
+      "Apply the Overlay edit recipe (pristine import + customization commit pair) on rootfs/etc/nvpmodel/<conf> under <source.root_path>",
+      "Operation 1: insert the < POWER_MODEL ID=8 NAME=30W_CUSTOM > block from the Power Estimator export, AFTER the last < PARAM ... > line and BEFORE the trailing < PM_CONFIG ... > line",
+      "Validate ID is unique, NAME uppercase no whitespace, every MAX_FREQ/MIN_FREQ comes from the kernel's available_frequencies table, CORE_0 stays online, header lines start at column 0 with strict spacing, PARAM names match existing PARAM declarations verbatim (no inventing CPU_A78_<n> on Thor)",
+      "Operation 4: change the trailing < PM_CONFIG DEFAULT=8 > to point at the new ID",
+      "Resolve and update the propagation set: reference-platform conf, every carrier-derived nvpmodel conf, and _super siblings — preserve _super's elevated MAX_FREQ/MIN_FREQ caps and never blanket-copy",
+      "Commit with header 'jetson-customize-nvpmodel: <summary>' and deploy via /jetson-promote-image → /jetson-flash-image (or scp + 'sudo nvpmodel -m 8' on a live target)"
+    ]
+  },
+  {
+    "id": "jetson-customize-nvpmodel-002",
+    "question": "I tweaked GPU MAX_FREQ down by 200 MHz in nvpmodel by interpolating between the existing 15W and 30W modes, but the new value doesn't seem to take effect. What's the right way to do envelope edits with /jetson-customize-nvpmodel?",
+    "expected_skill": "jetson-customize-nvpmodel",
+    "expected_script": null,
+    "ground_truth": "Two issues. First, frequency values must come from the kernel's available_frequencies table for that clock — values outside the table get silently rounded, which is exactly what's happening. Second, per Operation 3 and the Limitations, any non-trivial envelope edit (CPU/GPU/EMC/PVA/DLA MAX_FREQ or MIN_FREQ change) must be re-grounded via the NVIDIA Power Estimator at https://jetson-tools.nvidia.com/powerestimator/ — interpolating or extrapolating between existing modes is explicitly out of scope. Re-run the Power Estimator with the exact module SKU and JetPack release, the desired workload (CPU cores, GPU, EMC, codecs, camera, display) and budget, download a fresh nvpmodel.conf, then apply the Overlay edit recipe and edit the parameter lines inside the existing < POWER_MODEL ... > block under <source.root_path>/Linux_for_Tegra/rootfs/etc/nvpmodel/<conf>. Replace the rounded MAX_FREQ with the nearest legal value from the running target's available_frequencies (or the Power Estimator output). Edits that only toggle core-online flags within an already-validated envelope, or only change NAME=, do not need a Power Estimator pass. Apply propagation: port the changed POWER_MODEL/PARAM lines to siblings (reference platform, carrier-derived, _super) without blanket overwrite — _super's elevated MAX_FREQ/MIN_FREQ caps must stay intact.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-nvpmodel/SKILL.md and consult Operation 3, the Rules and the Troubleshooting table",
+      "Identify the silent-rounding cause: GPU MAX_FREQ value is not in the kernel's available_frequencies table for that clock",
+      "Reject interpolation/extrapolation from existing modes — re-run the NVIDIA Power Estimator at https://jetson-tools.nvidia.com/powerestimator/ for the exact module SKU and JetPack release with the new workload/budget, download a fresh nvpmodel.conf",
+      "Apply the Overlay edit recipe (pristine import + customization commit pair) under <source.root_path>/Linux_for_Tegra/rootfs/etc/nvpmodel/<conf>",
+      "Operation 3: edit the parameter lines inside the existing < POWER_MODEL ... > block, replacing the rounded GPU MAX_FREQ with the nearest legal value from available_frequencies / Power Estimator output, keeping <param>/<arg> names matching the PARAM declarations",
+      "Validate per the Rules: clock values from available_frequencies, CORE_0 stays online, strict header formatting, PARAM names declared above",
+      "Propagate the changed POWER_MODEL/PARAM lines to siblings (reference platform, carrier-derived, _super) — preserve _super's elevated MAX_FREQ/MIN_FREQ caps, never blanket-copy",
+      "Deploy via /jetson-promote-image → /jetson-flash-image (or scp + 'sudo nvpmodel -m <id>' on a live target)"
+    ]
+  }
+]

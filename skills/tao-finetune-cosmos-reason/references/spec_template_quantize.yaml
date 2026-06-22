@@ -1,0 +1,17 @@
+results_dir: ''
+model:
+  model_path: hf_model://nvidia/Cosmos3-Nano
+  enable_lora: false
+  base_model_path: hf_model://nvidia/Cosmos3-Nano
+dataset:
+  dataset_id: ''
+  dataset_split: test[:1]
+  annotation_path: ''
+  media_dir: ''
+quantize:
+  num_calibration_samples: 1
+  max_sequence_length: 4096
+  quantization_scheme: W4A16
+  kv_precision: bf16
+  smoothing_strength: 0.8
+  skip_test_generation: true

@@ -248,7 +248,7 @@
         "momentum": 0.9,
         "monitor_name": "val_loss",
         "optim": "adamw",
-        "policy": "linear",
+        "policy": "step",
         "policy_params": {
           "gamma": 0.1,
           "step_size": 30
@@ -1687,7 +1687,7 @@
           "momentum": 0.9,
           "monitor_name": "val_loss",
           "optim": "adamw",
-          "policy": "linear",
+          "policy": "step",
           "policy_params": {
             "gamma": 0.1,
             "step_size": 30
@@ -1825,7 +1825,7 @@
             "momentum": 0.9,
             "monitor_name": "val_loss",
             "optim": "adamw",
-            "policy": "linear",
+            "policy": "step",
             "policy_params": {
               "gamma": 0.1,
               "step_size": 30

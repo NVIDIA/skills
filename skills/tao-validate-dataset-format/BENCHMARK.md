@@ -7,14 +7,13 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-validate-dataset-format`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
-The skill should be reviewed before NVSkills-Eval publication. **Skill owners should address the applicable findings below and rerun NVSkills-Eval to refresh this benchmark.**
+- Overall verdict: PASS
 
 ## Agents Used
 
@@ -55,34 +54,28 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 40% (+40%) | 87% (+68%) |
-| Discoverability | 2 | 0% (+0%) | 97% (+66%) |
-| Effectiveness | 2 | 74% (+64%) | 63% (+54%) |
-| Efficiency | 2 | 27% (-0%) | 96% (+51%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 50% (+50%) | 97% (+97%) |
+| Discoverability | 1 | 0% (+0%) | 97% (+97%) |
+| Effectiveness | 1 | 78% (+68%) | 90% (+80%) |
+| Efficiency | 1 | 27% (-0%) | 96% (+68%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 4 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 3 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/data/tao-validate-dataset-format`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/data/tao-validate-dataset-format/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description very long (270 chars, recommend 50-150) (`skills/data/tao-validate-dataset-format/SKILL.md`)
 - LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/data/tao-validate-dataset-format/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 1 total findings.
+This tier was not run or did not produce findings in this report.
 
-Top findings:
+## Publication Recommendation
 
-- HIGH DUPLICATE/duplicate: Duplicate content found within SKILL.md:
-  "## Quick start" in SKILL.md (lines 3-12)
-  vs "## Quick Start" in SKILL.md (lines 22-33)
-  vs "## Purpose" in SKILL.md (lines 34-47)
-  vs "### CLI conventions" in SKILL.md (lines 56-75)
-  vs "## Limitations" in SKILL.md (lines 94-103) (`SKILL.md:3`)
+The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

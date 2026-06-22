@@ -52,11 +52,11 @@ gen_trt_engine:
   batch_size: 1                          # static-shape deploy; -1 enables dynamic batch axis
   tensorrt:
     data_type: fp16                      # static-shape FFS = fp16 recommended; dynamic-shape = fp32 default or fp16 (see tao-deploy-fast-foundation-stereo.md)
-    workspace_size: 4096                 # MB; FFS needs more than the 1024 default
+    workspace_size: 4                    # DepthNet deploy passes this through as GiB in current images
     min_batch_size: 1
     opt_batch_size: 1
     max_batch_size: 1
-  verbose: true
+  verbose: false                         # Set true only when collecting detailed TensorRT builder diagnostics.
   # Optional dynamic H/W profile (dynamic-shape deploy; tensorrt.data_type can be fp32 or fp16).
   # Size max_height/max_width to ≥ the largest input you'll inference at;
   # the defaults below cover most variable-aspect public stereo datasets

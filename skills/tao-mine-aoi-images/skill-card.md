@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to mine visually similar source images from a candidate pool based on embedding similarity to a gap-analysis target set, for downstream training augmentation in VCN AOI workflows. <br>
+Developers and engineers expanding real-image augmentation queues for VCN AOI training iterations by mining nearest-neighbour source images from a pool against gap-analysis targets. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,9 +19,10 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Invocation Reference](references/invocation.md) <br>
-- [Reporting Specification](references/reporting_spec.md) <br>
-- [Troubleshooting Guide](references/troubleshooting.md) <br>
+- [Setup](references/setup.md) <br>
+- [Reference Invocation](references/reference-invocation.md) <br>
+- [Outputs and Reporting](references/outputs-and-reporting.md) <br>
+- [Troubleshooting](references/troubleshooting.md) <br>
 
 
 ## Skill Output: <br>
@@ -37,7 +38,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the astra-sandbox environment using the external NVSkills-Eval profile. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,14 +62,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 75% (+65%) | 87% (+87%) |
-| Discoverability | 2 | 44% (+44%) | 97% (+97%) |
-| Effectiveness | 2 | 94% (+68%) | 62% (+44%) |
-| Efficiency | 2 | 51% (+24%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+62%) | 20% (+20%) |
+| Discoverability | 1 | 88% (+42%) | 0% (+0%) |
+| Effectiveness | 1 | 90% (+90%) | 48% (+34%) |
+| Efficiency | 1 | 75% (+46%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
-0.2.0 (source: frontmatter) <br>
+0.1.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

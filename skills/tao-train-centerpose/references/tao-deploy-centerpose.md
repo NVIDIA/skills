@@ -54,6 +54,13 @@ Deploy action metadata is in `tao-deploy-centerpose.skill_info.yaml`. Deploy spe
 
 Direct TAO Launcher spelling is `tao deploy centerpose gen_trt_engine`, `tao deploy centerpose evaluate`, `tao deploy centerpose inference`.
 
+Treat engine generation as only the first deploy action. Use the deploy image
+resolved from `versions.yaml` or the selected platform. A successful
+`gen_trt_engine` run does not prove deploy `evaluate` or `inference` works;
+inspect those action exit codes and logs separately, especially for CenterPose
+postprocessor errors such as `TypeError: only 0-dimensional arrays can be
+converted to Python scalars`.
+
 ## Required Inputs
 
 | Action | Required artifact or data | Spec key |
@@ -114,3 +121,7 @@ Model-specific notes:
 **INT8 calibration missing:** INT8 builds need an extracted calibration image directory, a writable cache path, and enough images for `cal_batch_size * cal_batches`.
 
 **Mounted paths do not exist:** TAO Deploy checks local paths inside the container. Make sure every path in the spec has a matching Docker mount or job artifact mapping.
+
+**Calibration image dir type:** `gen_trt_engine.tensorrt.calibration.cal_image_dir`
+must be a list of directories, even for FP32 builds where calibration is not
+semantically used.

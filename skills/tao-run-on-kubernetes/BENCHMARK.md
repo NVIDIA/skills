@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-run-on-kubernetes`
-- Evaluation date: 2026-06-07
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,29 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 15% (+15%) | 97% (+97%) |
-| Discoverability | 2 | 0% (+0%) | 97% (+97%) |
-| Effectiveness | 2 | 43% (+29%) | 78% (+64%) |
-| Efficiency | 2 | 27% (-0%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 20% (+20%) |
+| Discoverability | 1 | 88% (+88%) | 0% (+0%) |
+| Effectiveness | 1 | 90% (+76%) | 44% (+30%) |
+| Efficiency | 1 | 74% (+47%) | 28% (-0%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 13 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 5 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/platform/tao-run-on-kubernetes`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/platform/tao-run-on-kubernetes/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/platform/tao-run-on-kubernetes/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SDI-2): The skill declares cloud storage credentials (ACCESS_KEY, SECRET_KEY, S3_ENDPOINT_URL, S3_BUCKET_NAME, CLOUD_REGION) and (`references/skill_info.yaml:17`)
-- MEDIUM SECURITY/Unknown (SQP-2): Credentials such as NGC_KEY, S3 access keys, and HF_TOKEN are passed directly as Kubernetes pod environment variables. E (`SKILL.md:100`)
+- LOW SCHEMA/unexpected_file: Unexpected 'config.json' in skill root (`skills/platform/tao-run-on-kubernetes/config.json`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/platform/tao-run-on-kubernetes/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 1 file(s)
-- Inter-Skill Deduplication: Parsed skill 'tao-run-on-kubernetes': 269 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

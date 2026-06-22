@@ -7,14 +7,13 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-route-visual-changenet-samples`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-20
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
-The skill should be reviewed before NVSkills-Eval publication. **Skill owners should address the applicable findings below and rerun NVSkills-Eval to refresh this benchmark.**
+- Overall verdict: PASS
 
 ## Agents Used
 
@@ -55,36 +54,30 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 45% (+45%) | 10% (+10%) |
-| Discoverability | 2 | 0% (+0%) | 0% (+0%) |
-| Effectiveness | 2 | 85% (+71%) | 40% (+22%) |
-| Efficiency | 2 | 27% (+0%) | 28% (-0%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 92% (+92%) | 97% (+97%) |
+| Effectiveness | 1 | 90% (+80%) | 90% (+76%) |
+| Efficiency | 1 | 79% (+52%) | 96% (+68%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 10 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 5 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/data/tao-route-visual-changenet-samples`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/data/tao-route-visual-changenet-samples/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/data/tao-route-visual-changenet-samples/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description very long (305 chars, recommend 50-150) (`skills/data/tao-route-visual-changenet-samples/SKILL.md`)
-- LOW QUALITY/quality_discoverability: No '## Purpose' section (`skills/data/tao-route-visual-changenet-samples/SKILL.md`)
+- LOW SCHEMA/unexpected_file: Unexpected 'hooks' in skill root (`skills/data/tao-route-visual-changenet-samples/hooks`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/data/tao-route-visual-changenet-samples/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 2 total findings.
+This tier was not run or did not produce findings in this report.
 
-Top findings:
+## Publication Recommendation
 
-- HIGH DUPLICATE/duplicate: Duplicate content found within SKILL.md:
-  "### Step 2 — Mining subset" in SKILL.md (lines 36-52)
-  vs "# Mining subset" in SKILL.md (lines 114-127) (`SKILL.md:36`)
-- HIGH DUPLICATE/duplicate: Duplicate content found within SKILL.md:
-  "### Step 3 — AnomalyGen subset" in SKILL.md (lines 53-63)
-  vs "## Reference Python Recipe" in SKILL.md (lines 101-113)
-  vs "# AnomalyGen subset" in SKILL.md (lines 128-133) (`SKILL.md:53`)
+The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

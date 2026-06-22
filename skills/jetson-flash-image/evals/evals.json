@@ -1,0 +1,41 @@
+[
+  {
+    "id": "jetson-flash-image-001",
+    "question": "I just ran /jetson-promote-image successfully on my Thor + custom carrier image. The DUT is on the bench. How does /jetson-flash-image actually flash it?",
+    "expected_skill": "jetson-flash-image",
+    "expected_script": null,
+    "ground_truth": "/jetson-flash-image resolves the active profile (refusing if bsp_image: is missing or Linux_for_Tegra/ is absent), picks the per-board .conf via active-block precedence (custom_carrier.flash_config takes priority over reference_devkit.flash_config), and binds <board> to the conf basename minus .conf. <boot-dev> comes from the profile or a user prompt. For T26x/Thor on NVMe/UFS the flow tool is l4t_initrd_flash.sh (T234/Orin uses flash.sh on eMMC/SD or l4t_initrd_flash.sh on NVMe/USB). The DUT is driven into RCM via the in-tree boardctl under tools/board_automation/ (or manual recovery+reset). Preflight runs in order: 5.1 host-side bsp_image readiness (apply_binaries.sh marker, kernel/Image vs rootfs/boot/Image cmp -s, l4t_initrd.img + rootfs/boot/initrd presence); 5.2 lsusb -d 0955: matching 0955:7026 for T26x (use 0955:7.23 regex for T23x); 5.3 EEPROM cross-check via sudo ./nvautoflash.sh --print_boardid (EEPROM is authoritative; only real non-empty disagreement refuses, empty values are valid); 5.4 default-user staging via l4t_create_default_user.sh --autologin --accept-license. After explicit user acceptance of the printed resolution (not a raw command), the flash invokes 'sudo ./<flow-tool> <board> <boot-dev>' from Linux_for_Tegra/. T26x/Thor REQUIRES a post-flash <boardctl> -t <target> reset because Thor does not auto-reboot from a freshly flashed image; T23x/Orin resets internally.",
+    "expected_behavior": [
+      "Read skills/jetson-flash-image/SKILL.md",
+      "Resolve active profile per target-platform-contract.md; refuse if bsp_image: is missing (route to /jetson-init-image)",
+      "Pick the flash conf via active-block precedence (custom_carrier.flash_config first), verify it exists under <bsp_image.root_path>/Linux_for_Tegra/, bind <board> = basename minus .conf",
+      "Resolve <boot-dev> from profile or prompt user with conf-supported choices (internal/external/nvme0n1p1/etc.)",
+      "Pick flow tool from the matrix: T26x/Thor on NVMe/UFS -> l4t_initrd_flash.sh",
+      "Drive DUT into RCM via in-tree boardctl under <bsp_image.root_path>/Linux_for_Tegra/tools/board_automation/ (preferred) or manual recovery+reset; bind <boardctl> path",
+      "Preflight 5.1 host-side: per-board conf exists, kernel/dtb/ + bootloader/ + bootloader/generic/BCT/ + rootfs/ populated, rootfs/etc/nv_tegra_release present (apply_binaries.sh marker), kernel/Image cmp -s rootfs/boot/Image, l4t_initrd.img + rootfs/boot/initrd present",
+      "Preflight 5.2 DUT in RCM: lsusb -d 0955: matches 0955:7026 for Thor (use 0955:7.23 regex for T23x)",
+      "Preflight 5.3 EEPROM cross-check: sudo ./nvautoflash.sh --print_boardid; refuse only on real non-empty disagreement, never on empty values",
+      "Preflight 5.4 default user staging via l4t_create_default_user.sh --autologin --accept-license (or skip)",
+      "Print the resolution (target, profile, bsp_image, flash conf, EEPROM vs profile reconciliation, boot-dev, flow tool, boardctl, RCM entry, post-flash, default user) and require explicit acceptance - never paste raw commands",
+      "Construct and run 'sudo ./<flow-tool> <board> <boot-dev>' from Linux_for_Tegra/; abort on first non-zero exit, no transient-error auto-retry",
+      "Run <boardctl> -t <target> reset on T26x/Thor; skip on T23x/Orin (resets internally)"
+    ]
+  },
+  {
+    "id": "jetson-flash-image-002",
+    "question": "/jetson-flash-image preflight refuses with an EEPROM cross-check failure: my profile says module.sku=0004 but the DUT EEPROM reports board_sku=0001. The profile was right when I authored it - can I just override?",
+    "expected_skill": "jetson-flash-image",
+    "expected_script": null,
+    "ground_truth": "No - EEPROM is authoritative over the profile, by design. The profile is an authoring-time prediction; the DUT's EEPROM is the truth at flash time, and flash.sh / l4t_initrd_flash.sh resolve DTB_FILE / BPFDTB_FILE / partition XML / MB1 BCTs / DRAM training tables from board_sku and board_FAB read off EEPROM in recovery mode. A real non-empty disagreement (0001 vs 0004) refuses precisely because it would otherwise pick the wrong artifacts at flash time. The fix is to update the profile via /jetson-set-target or /jetson-init-target so module.sku=0001 matches actual EEPROM - never override EEPROM from the profile. Note: empty EEPROM values are valid and NOT a refusal trigger - the cross-check only refuses on real non-empty disagreement. The skill also explicitly forbids a raw 'paste this command' bypass; the resolution-acceptance gate exists to keep stale doc snippets out of production flashes.",
+    "expected_behavior": [
+      "Read skills/jetson-flash-image/SKILL.md and locate the Preflight checks (5.3) plus Limitations and Troubleshooting sections",
+      "Confirm EEPROM is authoritative; profile is the authoring-time prediction reconciled at preflight",
+      "Explain why disagreement matters: flash.sh/l4t_initrd_flash.sh dispatch DTB_FILE/BPFDTB_FILE/partition XML/BCTs/DRAM training from EEPROM board_sku + board_FAB at flash time",
+      "Identify 0001 vs 0004 as a real non-empty disagreement (refusal trigger); empty EEPROM values would NOT trigger refusal",
+      "Direct the user to fix the profile via /jetson-set-target or /jetson-init-target so module.sku matches EEPROM",
+      "Refuse to override EEPROM from the profile",
+      "Refuse to fall back to a raw paste-this-command workflow; the resolution-acceptance gate is the only path",
+      "Re-run preflight (including 5.1 host-side, 5.2 lsusb 0955: VID/PID, 5.3 EEPROM via nvautoflash.sh --print_boardid) after the profile fix"
+    ]
+  }
+]

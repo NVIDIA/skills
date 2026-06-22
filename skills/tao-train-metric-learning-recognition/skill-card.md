@@ -1,5 +1,5 @@
 ## Description: <br>
-Metric-learning recognition (ml-recog) for fine-grained visual recognition that learns embeddings for retrieval-based matching (e.g., retail product recognition) using triplet and contrastive losses. <br>
+Metric-learning recognition (ml-recog) for fine-grained visual recognition that learns embeddings for retrieval-based matching (e.g., retail product recognition) using triplet/contrastive losses. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, or running inference on metric-learning recognition models for fine-grained visual recognition tasks such as retail product matching. <br>
+Developers and engineers training, evaluating, exporting, or running inference for TAO metric-learning recognition models used in fine-grained visual matching tasks such as retail product recognition. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,14 +19,14 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Skill Info (AutoML and action metadata)](references/skill_info.yaml) <br>
 - [TAO Deploy Metric Learning Recognition](references/tao-deploy-metric-learning-recognition.md) <br>
+- [Skill Info](references/skill_info.yaml) <br>
 - [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Format:** [Markdown with inline bash code blocks and YAML spec overrides] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -37,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (2 attempts per task, 50% pass threshold) in the NVSkills-Eval `external` profile. <br>
+Evaluated against 1 evaluation task (positive skill-activation case) in the NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 60% (+40%) | 92% (+73%) |
-| Discoverability | 2 | 50% (+50%) | 80% (+48%) |
-| Effectiveness | 2 | 61% (+26%) | 74% (+67%) |
-| Efficiency | 2 | 61% (+34%) | 79% (+36%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+50%) | 20% (+0%) |
+| Discoverability | 1 | 85% (+85%) | 0% (+0%) |
+| Effectiveness | 1 | 100% (+34%) | 44% (+4%) |
+| Efficiency | 1 | 68% (+41%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

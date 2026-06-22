@@ -18,6 +18,8 @@ actions:
     outputs:
       results-dir:
         type: folder
+    upload_excludes:
+    - inputs/
     args:
       results_dir: '{results_dir}'
       image_referring_expression.data.image_dir: '{image_dir}'

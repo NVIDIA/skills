@@ -29,6 +29,13 @@ dataset:
     data_path: ''
     label_path: ''
   num_classes: 6
+  label_map:
+    class_0: 0
+    class_1: 1
+    class_2: 2
+    class_3: 3
+    class_4: 4
+    class_5: 5
   random_choose: false
   random_move: false
   window_size: -1

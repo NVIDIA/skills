@@ -206,32 +206,6 @@ registry_write:
       }
       state["latest"] = job_id
 
-  lepton:
-    note: >
-      Poll sdk.get_job_status until Running, then retrieve the endpoint from the
-      Lepton console (Jobs → select job → Endpoint URL) or via `lep job get <job.id>`.
-    python: |
-      import time
-
-      while True:
-          status = sdk.get_job_status(job.id)
-          if status.status == "Running":
-              break
-          if status.status in ("Error", "Canceled"):
-              raise RuntimeError(f"Lepton job failed: {status.status}")
-          time.sleep(15)
-
-      lepton_endpoint = "<endpoint URL from Lepton console or lep CLI>"
-      state[job_id] = {
-          "job_id":          job_id,
-          "platform":        "lepton",
-          "platform_job_id": job.id,
-          "network_arch":    network_arch,
-          "host_url":        lepton_endpoint,
-          "started_at":      datetime.now(timezone.utc).isoformat(),
-      }
-      state["latest"] = job_id
-
   slurm:
     note: >
       After Running, find the allocated node via squeue and open an SSH port-forward

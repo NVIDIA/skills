@@ -1,5 +1,5 @@
 ## Description: <br>
-Standard single-step train/eval/export workflow for any TAO model, used when training a TAO model on a dataset without iterative data augmentation, AutoML, or DEFT loops. <br>
+Standard single-step train/eval/export workflow for any TAO model. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers training NVIDIA TAO models on custom datasets using a standard supervised fine-tuning workflow (train, evaluate, export) without iterative optimization loops. <br>
+Developers and engineers use this skill to run standard single-step training, evaluation, and export workflows for NVIDIA TAO models on labeled datasets. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,6 +20,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [skill_info.yaml](references/skill_info.yaml) <br>
+- [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
@@ -35,7 +36,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (positive skill-activation case) in the astra-sandbox environment with 2 attempts per task and a 50% pass threshold. <br>
+Evaluated against 1 internal skill task in astra-sandbox environment via NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -59,11 +60,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 84% (+74%) | 68% (+68%) |
-| Discoverability | 2 | 34% (+34%) | 48% (+48%) |
-| Effectiveness | 2 | 84% (+46%) | 76% (+66%) |
-| Efficiency | 2 | 24% (-3%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 84% (+84%) | 50% (+50%) |
+| Discoverability | 1 | 34% (+34%) | 0% (+0%) |
+| Effectiveness | 1 | 90% (+80%) | 84% (+70%) |
+| Efficiency | 1 | 24% (-3%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

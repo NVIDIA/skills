@@ -67,7 +67,7 @@ Direct TAO Launcher spelling is `tao deploy grounding_dino gen_trt_engine`, `tao
 | `inference` | Inference image folder list | `dataset.infer_data_sources.image_dir` |
 | `inference` | Prompt captions | `dataset.infer_data_sources.captions` |
 
-For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine` where those actions are available.
+For direct Docker runs, mount input folders at the same paths used in the spec. If the source data is packaged as `images.tar.gz`, extract it first and point `image_dir` at the extracted image folder. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine` where those actions are available. `gen_trt_engine.trt_engine` is the generated output path, not an upstream input artifact.
 
 ## Spec Overrides
 
@@ -87,7 +87,9 @@ Model-specific notes:
 
 - For inference, always set `dataset.infer_data_sources.captions`; these are the text prompts used for open-vocabulary detection.
 - Use FP16 for starter-kit TensorRT builds unless an explicit precision requirement says otherwise.
-- Carry transformer structure fields from export, including backbone, feature levels, encoder/decoder layers, and query count.
+- Carry transformer structure fields from export, including backbone, feature
+  levels, encoder/decoder layers, `num_queries`, `num_select`, and
+  `max_text_len`.
 
 ## Job Chain Mapping
 

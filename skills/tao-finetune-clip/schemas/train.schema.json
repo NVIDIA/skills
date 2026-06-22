@@ -1,5 +1,8 @@
 {
-  "automl_default_parameters": [],
+  "automl_default_parameters": [
+    "train.optim.text_lr",
+    "train.optim.vision_lr"
+  ],
   "automl_disabled_parameters": [
     "train.cudnn",
     "dataset.train.datasets",
@@ -67,8 +70,8 @@
       "canonicalize_text": false,
       "freeze_text_encoder": false,
       "freeze_vision_encoder": false,
-      "image_size": 256,
-      "type": "siglip2-so400m-patch16-256"
+      "image_size": 224,
+      "type": "ViT-L-14-SigLIP-CLIPA-224"
     },
     "model_name": "clip",
     "results_dir": "",
@@ -392,8 +395,8 @@
         "canonicalize_text": false,
         "freeze_text_encoder": false,
         "freeze_vision_encoder": false,
-        "image_size": 256,
-        "type": "siglip2-so400m-patch16-256"
+        "image_size": 224,
+        "type": "ViT-L-14-SigLIP-CLIPA-224"
       },
       "description": "Model config.",
       "properties": {
@@ -421,7 +424,7 @@
           "type": "bool"
         },
         "image_size": {
-          "default": 256,
+          "default": 224,
           "description": "Input image resolution for training transforms. Common values: 224 (RADIO/OpenCLIP), 384 (SigLIP2-g), 256 (SigLIP2-so400m). Must be a multiple of the model's patch size (typically 14 or 16).",
           "title": "Image Size",
           "type": "int"
@@ -437,8 +440,8 @@
           "type": "float"
         },
         "type": {
-          "default": "siglip2-so400m-patch16-256",
-          "description": "CLIP model type. C-RADIO: c-radio_v3-h, c-radio_v3-l, c-radio_v3-b, c-radio_v3-g; SigLIP2: siglip2-so400m-patch16-naflex (NaFlex), siglip2-so400m-patch14-224, siglip2-so400m-patch14-384, siglip2-so400m-patch16-256, siglip2-so400m-patch16-384, siglip2-so400m-patch16-512; OpenCLIP: ViT-L-14-SigLIP-CLIPA-224, ViT-L-14-SigLIP-CLIPA-336, ViT-H-14-SigLIP-CLIPA-224.",
+          "default": "ViT-L-14-SigLIP-CLIPA-224",
+          "description": "CLIP model type. C-RADIO: c-radio_v3-h, c-radio_v3-l, c-radio_v3-b, c-radio_v3-g; OpenCLIP/NV-CLIP: ViT-L-14-SigLIP-CLIPA-224, ViT-L-14-SigLIP-CLIPA-336, ViT-H-14-SigLIP-CLIPA-224, ViT-H-14-SigLIP-CLIPA-336, ViT-H-14-SigLIP-CLIPA-574.",
           "title": "Model Type",
           "type": "string"
         }
@@ -670,6 +673,7 @@
               "type": "categorical"
             },
             "text_lr": {
+              "automl_enabled": true,
               "default": 0.0001,
               "description": "Learning rate for the text encoder.",
               "maximum": Infinity,
@@ -678,6 +682,7 @@
               "type": "float"
             },
             "vision_lr": {
+              "automl_enabled": true,
               "default": 0.0001,
               "description": "Learning rate for the vision encoder.",
               "maximum": Infinity,

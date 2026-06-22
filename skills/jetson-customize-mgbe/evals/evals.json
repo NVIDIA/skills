@@ -1,0 +1,38 @@
+[
+  {
+    "id": "jetson-customize-mgbe-001",
+    "question": "I just ran /jetson-customize-uphy with uphy1-config-8 to allocate lanes for MGBE0 25G on my Thor custom carrier. Now bring up the per-controller side via /jetson-customize-mgbe.",
+    "expected_skill": "jetson-customize-mgbe",
+    "expected_script": null,
+    "ground_truth": "Run /jetson-customize-mgbe. Step 1 resolves the active target, validates custom_carrier, and locates the Adaptation Guide chapter and pinmap — both documents.custom_carrier_schematic AND documents.custom_carrier_pinmux_xls are required when custom_carrier: is present, refusing if either is missing. Step 2 drives the per-controller question loop via questions.json (controller, phy_mode, attach kind, I²C bus/addr, reset GPIO, compatible_list). Step 3 derives max-speed from phy_mode by decompiling the BPMP DTB to choose between sub-node and top-level token grammar (Thor stock BPMP DTB has no /mgbe/mgbe@N subtree, only mgbe<N>-speed under /uphy, so the top-level dashed form mgbe<N>-speed-25G is required). Step 4 runs pin_verifier.py over MDC/MDIO/RESET/INT and routes mismatches to /jetson-customize-pinmux. Step 5 records the BPMP DTB token-form inspection in notes[] but emits no ODMDATA — those tokens are owned by /jetson-customize-uphy. Step 6 appends one /* custom-bsp: mgbe:mgbeN */ fragment per controller into the composite custom overlay .dts in bsp_sources/, runs the cpp/dtc/fdtoverlay pre-flight, and commits one commit. Step 8 writes <profile-stem>.jetson-customize-mgbe.json and emits the one-line + table summary, then drives the downstream chain via sequential AskUserQuestion prompts. /jetson-build-source compiles the composite .dtbo and owns the OVERLAY_DTB_FILE+= registration — this skill never edits ODMDATA or the carrier flash conf.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-mgbe/SKILL.md",
+      "Step 1: validate active profile with reference_devkit + custom_carrier; require both documents.custom_carrier_schematic and documents.custom_carrier_pinmux_xls and refuse if either is missing",
+      "Cite uphy1-config-8 from /jetson-customize-uphy in run-summary notes[] (lanes for MGBE0..3 25G)",
+      "Step 2: run the per-controller AskUserQuestion loop driven by references/questions.json (Q-1..Q-8: controller, phy_mode, attach kind, I²C bus/addr, reset GPIO, compatible_list)",
+      "Step 3: decompile the BPMP DTB to detect that Thor stock has no /mgbe/mgbe@N subtree and use the top-level dashed token grammar (mgbe<N>-speed-25G); record the inspection in notes[]",
+      "Step 4: run pin_verifier.py over MDC/MDIO/RESET/INT and route mismatches to /jetson-customize-pinmux",
+      "Step 5: emit no ODMDATA edits — record only the BPMP DTB token-form inspection (sub-node vs top-level) in notes[] for audit",
+      "Step 6: append one /* custom-bsp: mgbe:mgbeN */ fragment per controller into the composite custom overlay .dts in bsp_sources/, ensure mdio child has both #address-cells = <1> AND #size-cells = <0> when phy_attach_kind=='phy', run cpp/dtc/fdtoverlay pre-flight and commit",
+      "Step 8: write <workspace>/target-platform/<profile-stem>.jetson-customize-mgbe.json and drive the downstream chain via sequential AskUserQuestion prompts",
+      "Hand off to /jetson-build-source for composite .dtbo compilation and OVERLAY_DTB_FILE+= registration; never touch ODMDATA or the carrier flash conf"
+    ]
+  },
+  {
+    "id": "jetson-customize-mgbe-002",
+    "question": "I ran /jetson-customize-mgbe and the flash succeeded but ip link show mgbe0 reports state DOWN with NO-CARRIER and dmesg says BL31 SError 'fmon_update_config: detected fault 0x80' on cold boot. What's wrong?",
+    "expected_skill": "jetson-customize-mgbe",
+    "expected_script": null,
+    "ground_truth": "The BL31 SError 'fmon_update_config: detected fault 0x80' is the documented failure when UPHY lane allocation does not include lanes for the target MGBE controller — UPHY allocation is /jetson-customize-uphy's job, not this skill's. Run /jetson-customize-uphy first to pick a uphy1-config-N that allocates the target MGBE controller's lanes (uphy1-config-8 on Thor for MGBE0..3 25G), and cite the chosen config in this skill's run-summary notes[]. Two adjacent failure modes to check: (a) a mismatched overlay root compatible — UEFI plugin-manager filters by compatible match, a mismatched overlay is silently skipped, flash succeeds, MGBE stays disabled, no error in dmesg; sanity-check against /proc/device-tree/compatible on a booted reference DUT and fix the composite root if needed. (b) Stock Thor BPMP DTB has no /mgbe/mgbe@N subtree, only mgbe<N>-speed under /uphy, so the mgbe<N>_status=disabled sub-node token is silently rejected and the whole ODMDATA line drops; always decompile BPMP DTB (Step 3) before emitting and use the top-level dashed form (mgbe<N>-speed-25G to set, mgbe<N>-speed-del to remove). Disable a stock-okay controller via the kernel-DT overlay (status=\"disabled\") only — never via ODMDATA alone. All edits land in <source.root_path>/bsp_sources/hardware/nvidia/, never in <bsp_image.root_path>.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-mgbe/SKILL.md and consult the Gotchas section",
+      "Identify BL31 SError 'fmon_update_config: detected fault 0x80' as a UPHY lane allocation gap and route to /jetson-customize-uphy first",
+      "Confirm /jetson-customize-uphy chose a uphy1-config-N that allocates lanes for the target MGBE controller (e.g. uphy1-config-8 on Thor for MGBE0..3 25G)",
+      "Cross-check overlay root compatible against /proc/device-tree/compatible on a booted reference DUT — UEFI plugin-manager silently skips mismatched overlays",
+      "Decompile the BPMP DTB before emitting; on stock Thor (no /mgbe/mgbe@N subtree) use the top-level dashed token grammar (mgbe<N>-speed-25G)",
+      "Never disable a stock-okay controller via ODMDATA alone — use status=\"disabled\" in the kernel-DT overlay only",
+      "Confirm all edits land in <source.root_path>/bsp_sources/hardware/nvidia/ under the pristine + customization commit pattern; never touch <bsp_image.root_path>",
+      "Re-run /jetson-customize-mgbe Step 6 to re-emit the composite overlay fragment and Step 8 to refresh the run-state sidecar"
+    ]
+  }
+]

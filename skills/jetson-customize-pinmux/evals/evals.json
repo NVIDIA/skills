@@ -1,0 +1,36 @@
+[
+  {
+    "id": "jetson-customize-pinmux-001",
+    "question": "I just finished /jetson-derive-carrier and edited the carrier's pinmux .xlsm to flip GPIO27 from a UART function to plain GPIO output, default-low. How do I get those edits into the BSP?",
+    "expected_skill": "jetson-customize-pinmux",
+    "expected_script": null,
+    "ground_truth": "Invoke /jetson-customize-pinmux. It resolves the .xlsm via documents.custom_carrier_pinmux_xls (falling back to ref_devkit_pinmux_xls), runs scripts/modify_pinmux.py probe to build the per-carrier pinmap JSON and a session.json shim, then walks Q1-Q3 (sfio, direction, initial_state) for the targeted pin via AskUserQuestion - skipping Q4-Q6 because they only fire when configurable: yes. modify_pinmux.py generate writes the three DTSIs (tegra<soc>-mb1-bct-{pinmux,gpio,padvoltage}-<carrier-key>.dtsi) into <source.root_path>/Linux_for_Tegra/bootloader/ where the carrier conf's PINMUX_CONFIG=/GPIOINT_CONFIG=/PMC_CONFIG= references already point. Then the .dts wrapper #include lines under bootloader/generic/BCT/ get repointed to the new bare basenames and everything lands in one batched customization commit.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-pinmux/SKILL.md",
+      "Confirm prerequisites: active profile with reference_devkit AND custom_carrier, Linux_for_Tegra/.git initialized, /jetson-derive-carrier already ran (PINMUX_CONFIG/GPIOINT_CONFIG/PMC_CONFIG references present)",
+      "Resolve XLSM via documents.custom_carrier_pinmux_xls precedence chain (custom_carrier_pinmux_xls -> ref_devkit_pinmux_xls -> single XLSM under documents.root_path -> prompt)",
+      "Run scripts/modify_pinmux.py probe to build pinmap JSON + session.json shim under the per-skill scratch dir",
+      "Run modify_pinmux.py lookup to surface configurable: yes/no before deciding which questions to ask",
+      "Drive Q1-Q3 via AskUserQuestion (sfio, direction, initial_state); derive tristate / e_input rather than asking",
+      "Run modify_pinmux.py generate --out-dir <source.root_path>/Linux_for_Tegra/bootloader/ (root, NOT bootloader/generic/BCT/)",
+      "Repoint each carrier .dts wrapper's #include to the new <CARRIER_KEY>.dtsi by bare basename (cpp -I bootloader/ resolves it)",
+      "Roll the three DTSIs plus wrapper #include edits into one batched customization commit through the commit-preview gate",
+      "Write the <profile-stem>.jetson-customize-pinmux.json sidecar plus session.json shim under <workspace>/target-platform/"
+    ]
+  },
+  {
+    "id": "jetson-customize-pinmux-002",
+    "question": "I asked /jetson-customize-pinmux to set pull=pull-up on a UPHYDS_RX0 pin and the script silently dropped it - the DTSI shows no pull change. What gives?",
+    "expected_skill": "jetson-customize-pinmux",
+    "expected_script": null,
+    "ground_truth": "UPHYDS_* is a fixed-function pad (alongside LP5XA_*, DP_SINGLE_*, BDMIPI16X_*, BDUSB2_*, OSCI27_*) and is silicon-fixed as configurable: no. Only BD* and BI* pads expose Q4-Q6 (pull / drive_type / open_drain); on a fixed-function pad those fields are silently dropped by modify_pinmux.py. The skill is supposed to run modify_pinmux.py lookup first and read configurable: yes/no off the row before prompting Q4-Q6. The fix is to skip Q4-Q6 entirely for UPHYDS_RX0 - Q1-Q3 (sfio / direction / initial_state) are the only valid edits; if a pull is genuinely needed, the pin selection is wrong.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-pinmux/SKILL.md and locate the Pad classification and Gotchas sections",
+      "Identify UPHYDS_* as fixed-function (configurable: no) - only BD*/BI* pads accept pull / drive_type / open_drain",
+      "Run modify_pinmux.py lookup for the pin and surface configurable: no",
+      "Explain that Q4-Q6 are gated on configurable: yes and silently dropped otherwise",
+      "Confirm tristate / e_input are derived from direction, never asked",
+      "Recommend re-running set-pin restricted to Q1-Q3, or selecting a BD*/BI* pad if a pull-up is actually required"
+    ]
+  }
+]

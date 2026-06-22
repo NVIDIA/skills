@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, quantizing, or running inference for Mask Grounding DINO open-set instance segmentation models using NVIDIA TAO Toolkit. <br>
+Developers and engineers training, evaluating, exporting, quantizing, or running inference on TAO Mask Grounding DINO models for open-set instance segmentation guided by text prompts. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -21,9 +21,7 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [TAO Deploy Mask Grounding DINO](references/tao-deploy-mask-grounding-dino.md) <br>
 - [Skill Info](references/skill_info.yaml) <br>
-- [Train Spec Template](references/spec_template_train.yaml) <br>
-- [Evaluate Spec Template](references/spec_template_evaluate.yaml) <br>
-- [Export Spec Template](references/spec_template_export.yaml) <br>
+- [Agent Skills Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
@@ -39,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task with 2 attempts per task in the external NVSkills-Eval profile, astra-sandbox environment. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile within the astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 90% (+66%) | 58% (+11%) |
-| Discoverability | 2 | 87% (+61%) | 48% (-14%) |
-| Effectiveness | 2 | 77% (+60%) | 61% (+42%) |
-| Efficiency | 2 | 70% (+38%) | 62% (+1%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+50%) | 20% (+0%) |
+| Discoverability | 1 | 88% (+88%) | 0% (+0%) |
+| Effectiveness | 1 | 100% (+12%) | 44% (-4%) |
+| Efficiency | 1 | 71% (+45%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

@@ -87,5 +87,6 @@ train:
 export:
   checkpoint: ???
   results_dir: ''
+  onnx_file: ''
   gpu_id: 0
   batch_size: 1

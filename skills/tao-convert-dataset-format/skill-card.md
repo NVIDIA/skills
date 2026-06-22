@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers converting NVIDIA TAO DAFT datasets between supported formats for VLM training and data preparation workflows. <br>
+Developers and engineers converting NVIDIA TAO DAFT datasets between supported formats for VLM training workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,12 +19,11 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [NVIDIA TAO Skill Bank Repository](https://github.com/NVIDIA-TAO/tao-skills-bank) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
+- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skills-bank) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
+**Output Type(s):** [Shell commands] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -36,7 +35,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (positive skill-activation case) with 2 attempts per task in astra-sandbox environment using NVSkills-Eval external profile. <br>
+Evaluated against 1 internal skill task covering format conversion workflow planning. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,14 +59,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 45% (+45%) | 97% (+97%) |
-| Discoverability | 2 | 0% (+0%) | 97% (+97%) |
-| Effectiveness | 2 | 69% (+59%) | 72% (+58%) |
-| Efficiency | 2 | 27% (-0%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 10% (+10%) | 97% (+97%) |
+| Discoverability | 1 | 0% (+0%) | 97% (+97%) |
+| Effectiveness | 1 | 42% (+32%) | 90% (+80%) |
+| Efficiency | 1 | 27% (-0%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
-1.0.0 (source: frontmatter) <br>
+0.1.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

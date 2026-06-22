@@ -75,8 +75,6 @@ dataset:
   - image_dir: ''
     json_file: ''
     label_map: ''
-  - image_dir: ''
-    json_file: ''
   val_data_sources:
     image_dir: ''
     json_file: ''

@@ -1,5 +1,5 @@
 ## Description: <br>
-NVDINOv2 for self-supervised visual representation learning that trains vision transformers via self-distillation (teacher-student) without labels and produces general-purpose visual features. <br>
+NVDINOv2 for self-supervised visual representation learning. Trains vision transformers via self-distillation (teacher-student) without labels and produces general-purpose visual features. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, distilling, exporting, or running inference on self-supervised vision transformer backbones using the NVIDIA TAO toolkit. <br>
+Developers and engineers who need to train, export, or run inference on NVDINOv2 vision transformer backbones for self-supervised visual representation learning using NVIDIA TAO Toolkit. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,11 +19,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [NVDINOv2 Skill Info](references/skill_info.yaml) <br>
+- [skill_info.yaml](references/skill_info.yaml) <br>
 - [TAO Deploy NVDINOv2](references/tao-deploy-nvdinov2.md) <br>
-- [Train Spec Template](references/spec_template_train.yaml) <br>
-- [Distill Spec Template](references/spec_template_distill.yaml) <br>
-- [Export Spec Template](references/spec_template_export.yaml) <br>
+- [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
@@ -39,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the astra-sandbox environment using the external NVSkills-Eval profile. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile within an astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 95% (+55%) | 97% (+97%) |
-| Discoverability | 2 | 85% (+85%) | 97% (+97%) |
-| Effectiveness | 2 | 90% (+37%) | 78% (+57%) |
-| Efficiency | 2 | 68% (+41%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+90%) | 88% (+88%) |
+| Discoverability | 1 | 85% (+85%) | 62% (+62%) |
+| Effectiveness | 1 | 100% (+58%) | 90% (+76%) |
+| Efficiency | 1 | 68% (+41%) | 61% (+33%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

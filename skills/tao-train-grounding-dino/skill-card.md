@@ -1,5 +1,5 @@
 ## Description: <br>
-Grounding DINO for open-set object detection — combines DINO-style detection with a BERT text encoder for language-guided detection, detecting objects described by text prompts without a fixed class vocabulary. <br>
+Grounding DINO for open-set object detection that combines DINO-style detection with a BERT text encoder for language-guided detection, enabling detection of objects described by text prompts without a fixed class vocabulary. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, quantizing, or running inference on NVIDIA TAO Grounding DINO models for open-vocabulary object detection tasks. <br>
+Developers and engineers training, evaluating, exporting, quantizing, or running inference for TAO Grounding DINO open-set object detection models using language-guided prompts. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,9 +19,10 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [TAO Deploy Grounding DINO Reference](references/tao-deploy-grounding-dino.md) <br>
-- [Skill Info Configuration](references/skill_info.yaml) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
+- [TAO Deploy Grounding DINO](references/tao-deploy-grounding-dino.md) <br>
+- [Skill Info (AutoML configuration)](references/skill_info.yaml) <br>
+- [Train Spec Template](references/spec_template_train.yaml) <br>
+- [Export Spec Template](references/spec_template_export.yaml) <br>
 
 
 ## Skill Output: <br>
@@ -37,7 +38,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in an astra-sandbox environment using the NVSkills-Eval external profile. <br>
+Evaluated against 1 evaluation task in the external NVSkills-Eval profile (astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +62,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 90% (+28%) | 97% (+78%) |
-| Discoverability | 2 | 88% (+42%) | 97% (+66%) |
-| Effectiveness | 2 | 80% (+57%) | 74% (+58%) |
-| Efficiency | 2 | 71% (+40%) | 96% (+53%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 50% (+30%) |
+| Discoverability | 1 | 88% (+88%) | 0% (+0%) |
+| Effectiveness | 1 | 90% (+80%) | 76% (+44%) |
+| Efficiency | 1 | 71% (+44%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

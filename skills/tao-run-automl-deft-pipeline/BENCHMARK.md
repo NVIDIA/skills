@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-run-automl-deft-pipeline`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-20
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,28 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 75% (+75%) | 92% (+73%) |
-| Discoverability | 2 | 44% (+44%) | 97% (+66%) |
-| Effectiveness | 2 | 88% (+76%) | 78% (+65%) |
-| Efficiency | 2 | 51% (+24%) | 96% (+51%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 88% (+88%) | 59% (+59%) |
+| Effectiveness | 1 | 90% (+76%) | 90% (+66%) |
+| Efficiency | 1 | 75% (+48%) | 42% (+14%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 15 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 4 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_discoverability: Description uses first/second person (`skills/applications/tao-run-automl-deft-pipeline/SKILL.md`)
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/applications/tao-run-automl-deft-pipeline`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/applications/tao-run-automl-deft-pipeline/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/applications/tao-run-automl-deft-pipeline/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SQP-2): The skill explicitly designs a single-gate confirmation model where autonomous, multi-phase execution (including file mu (`SKILL.md:87`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/applications/tao-run-automl-deft-pipeline/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 5 file(s)
-- Inter-Skill Deduplication: Parsed skill 'tao-run-automl-deft-pipeline': 978 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

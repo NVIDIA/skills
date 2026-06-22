@@ -7,10 +7,9 @@ actions:
   gen_trt_engine:
     command: classification_pyt gen_trt_engine -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       gen_trt_engine.onnx_file:
-        type: file
-      gen_trt_engine.trt_engine:
         type: file
     outputs:
       results_dir:
@@ -22,6 +21,7 @@ actions:
   evaluate:
     command: classification_pyt evaluate -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       evaluate.trt_engine:
         type: file
@@ -35,6 +35,7 @@ actions:
   inference:
     command: classification_pyt inference -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       inference.trt_engine:
         type: file
@@ -45,6 +46,17 @@ actions:
         type: folder
     upload_excludes:
     - inputs/
+data_sources:
+  evaluate:
+    dataset.test_dataset.images_dir:
+      source: inference_dataset
+      path: images_test.tar.gz
+      runtime: extracted_folder
+  inference:
+    dataset.test_dataset.images_dir:
+      source: inference_dataset
+      path: images_test.tar.gz
+      runtime: extracted_folder
 spec_params:
   gen_trt_engine:
     results_dir: output_dir
@@ -60,6 +72,7 @@ spec_shorthand_keys:
   trt_data_type: gen_trt_engine.tensorrt.data_type
   trt_engine: gen_trt_engine.trt_engine
   batch_size: dataset.batch_size
+  topk: model.head.topk
 description: Classification PyT deploy workflow for gen_trt_engine, evaluate, inference
   using TAO Deploy.
 spec_templates:
@@ -69,5 +82,5 @@ spec_templates:
 notes:
 - Use `fp16` for the starter-kit TensorRT engine path unless INT8 calibration is explicitly
   requested.
-- For TensorRT inference, set the runtime batch size to 1 unless the engine profile
-  was built for the larger batch.
+- For TensorRT inference and evaluation, set the runtime batch size to 1 unless
+  the engine profile was built for the larger batch.

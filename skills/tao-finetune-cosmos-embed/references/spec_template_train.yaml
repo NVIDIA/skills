@@ -36,6 +36,7 @@ train:
 model:
   pretrained_model_path: /model/Cosmos-Embed1-224p
   precision: bf16
+  fsdp_shard_size: 1
   lora:
     enabled: false
     lora_rank: 8

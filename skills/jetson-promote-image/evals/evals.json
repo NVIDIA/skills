@@ -1,0 +1,36 @@
+[
+  {
+    "id": "jetson-promote-image-001",
+    "question": "I just finished /jetson-customize-fan and committed the nvfancontrol.conf change in the overlay tracker, plus /jetson-build-source produced a new kernel Image and some module .ko files. Run /jetson-promote-image to stage everything into bsp_image.",
+    "expected_skill": "jetson-promote-image",
+    "expected_script": null,
+    "ground_truth": "Resolve the active profile, bind LFT_SRC to <source.root_path>/Linux_for_Tegra, LFT_DST to <bsp_image.root_path>/Linux_for_Tegra, and MANIFEST to <source.root_path>/.build-manifest.yaml. Validate both channels (overlay HEAD via git ls-files for nvfancontrol.conf, manifest artifacts[].{src,dst} for kernel Image and .ko files), run the build-source freshness gate against .build-state.yaml, and the overlay collision check. Diff-aware copy with overlay-first then manifest-wins precedence; cp -p for non-rootfs and sudo cp -p for rootfs/* destinations. Because the kernel Image and rootfs/lib/modules/* are touched, INITRD_DIRTY=1 — mirror kernel/Image to rootfs/boot/Image, then run tools/l4t_update_initrd.sh to rebuild bootloader/l4t_initrd.img and rootfs/boot/initrd. Print the Summary and suggest /jetson-flash-image.",
+    "expected_behavior": [
+      "Read skills/jetson-promote-image/SKILL.md",
+      "Resolve the active target-platform profile and bind LFT_SRC, LFT_DST, MANIFEST per the Resolve active target + paths step",
+      "Validate the two channels: overlay status --porcelain clean and .build-manifest.yaml parses as YAML",
+      "Run the build-source freshness gate against .build-state.yaml (refuse if any kernel-side bsp_sources/ repo is dirty)",
+      "Run the overlay pre-promote collision check (skip gracefully when no remote)",
+      "Enumerate sources via git ls-files for the overlay and artifacts[].{src,dst} for the manifest",
+      "Diff-aware copy with cp -p (sudo for rootfs/*), overlay-first then manifest-wins on dst collision; set INITRD_DIRTY=1 on kernel/Image or rootfs/lib/modules/* writes",
+      "Mirror kernel/Image to rootfs/boot/Image and run tools/l4t_update_initrd.sh from LFT_DST/ to refresh bootloader/l4t_initrd.img and rootfs/boot/initrd",
+      "Print the Summary (overlay scope, manifest scope, counts, kernel mirror, initramfs status) and suggest /jetson-flash-image as the next step"
+    ]
+  },
+  {
+    "id": "jetson-promote-image-002",
+    "question": "/jetson-promote-image just refused with 'Kernel-side source(s) changed since last /jetson-build-source'. I haven't built anything new — what is this gate checking and how do I get past it?",
+    "expected_skill": "jetson-promote-image",
+    "expected_script": null,
+    "ground_truth": "The Verify build-source freshness step refuses when .build-state.yaml shows any kernel-side repo under Source/bsp_sources/ as dirty since the last /jetson-build-source run — otherwise the diff-aware copy pass would silently ship stale artifacts that don't match the committed source. Per the Troubleshooting table, commit any pending customize-* edits in bsp_sources/, re-run /jetson-build-source so it rewrites .build-manifest.yaml and updates the .build-state.yaml watermark, then re-invoke /jetson-promote-image. The gate sets BUILD_FRESH=1 once it passes; manifest-channel scope reflects whatever the latest /jetson-build-source produced and there is no commit-range scope.",
+    "expected_behavior": [
+      "Read skills/jetson-promote-image/SKILL.md",
+      "Locate the Verify build-source freshness step and the matching Troubleshooting row",
+      "Explain that .build-state.yaml shows a kernel-side bsp_sources/ repo dirty since the last /jetson-build-source",
+      "Tell the user to commit pending edits under Source/bsp_sources/ first",
+      "Tell the user to re-run /jetson-build-source so .build-manifest.yaml and .build-state.yaml are refreshed",
+      "Re-invoke /jetson-promote-image once BUILD_FRESH=1 will be satisfied",
+      "Reference references/build-source-freshness-gate.md for the detection rules"
+    ]
+  }
+]

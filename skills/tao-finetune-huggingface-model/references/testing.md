@@ -16,6 +16,23 @@ limitations under the License.
 
 # Unit Testing Reference (Phase 4.5)
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Philosophy
+- Generated test files
+- conftest.py Template (shared fixtures)
+- test_dataset.py Template (CV)
+- test_dataset.py Template (VLM)
+- test_collator.py Template (CRITICAL for VLMs)
+- test_model.py Template
+- test_smoke.py Template (1-step training smoke)
+- Running Tests — Phase 4.5 Command
+- What the tests would have caught in past runs
+- Task-branch-specific fixtures
+
+
 Used in Phase 4.5 of tao-finetune-huggingface-model skill. Unit tests run against **fake data** inside the
 container before any GPU training. They catch shape/dtype/collation bugs that would otherwise
 only surface 5 minutes into a 2-hour training run.

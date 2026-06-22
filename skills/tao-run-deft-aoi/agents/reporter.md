@@ -44,6 +44,7 @@ Build a single Python dict of all `{{ ... }}` substitutions from disk state.
 - **Simple tokens** (`{{ GENERATED_DATE }}`, `{{ KPI_TARGET }}`, `{{ BEST_FAR }}`, …): scalar strings derived from state.
 - **`*_HTML` blocks**: assemble HTML in Python (`"\n".join(...)`); no template engine.
 - **`*_JSON` blocks**: dump compact JSON whose field names match the template's JavaScript exactly. See `REPORT_RENDERING.md` § *Chart data field names* and § *Table row schemas*. Wrong field names (e.g. `far` instead of `value`) silently render blank charts.
+- **Global context blocks** (`{{ PROBLEM_STATEMENT_HTML }}`, `{{ KPI_DATASET_HTML }}`, `{{ APPROACH_HTML }}`): build these on **every** render (including the very first, before any iteration completes) so the user always sees the run's framing. Bake concrete values (KPI target, max iterations, cosine threshold, dataset totals) directly into the HTML — these blocks are substituted with `.replace()` once, so any `{{ KPI_TARGET }}` left inside will not re-substitute. Schemas and disk sources are in `REPORT_RENDERING.md` § *Global context cards*.
 
 Apply the in-progress rules from `REPORT_RENDERING.md` when `trigger != "loop-end"`:
 - `{{ FINAL_KPI_STATUS }}` → `"IN PROGRESS"`, class → `""`
@@ -61,6 +62,8 @@ styling.
 ### Step 5 — Embed one representative sample pair as base64 thumbnails
 
 Emit **exactly one** `.sample-iter-block` containing **one** AnomalyGen input/output pair — not one per iteration. Pick the first existing pair (sorted by filename) from the best iteration; if the best iteration has no AnomalyGen output, fall back to the most recent iteration that does; if no iteration has output, emit two `<div class="sample-img-placeholder">No image</div>` cells.
+
+Column direction follows AnomalyGen-model semantics — **left column = AnomalyGen Input (OK / normal reference)** loaded from `synthetic_iter${N}_ok/`, **right column = AnomalyGen Output (synthetic NG)** loaded from `synthetic_iter${N}_ng/`. Do not swap these; reversing them makes the report read as "loop reconstructs OK from a defect", the opposite of the actual data flow. See `REPORT_RENDERING.md` § *Image embedding* for the canonical table.
 
 Resolve source paths per `REPORT_RENDERING.md` § *Image embedding*. Resize each image to **256×256** with `PIL.Image.thumbnail` and encode as `data:image/jpeg;base64,...`. When a source image does not exist for a column, emit `<div class="sample-img-placeholder">No image</div>` instead of `<img>`.
 

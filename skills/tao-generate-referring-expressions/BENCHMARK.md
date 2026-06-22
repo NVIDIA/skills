@@ -7,14 +7,13 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-generate-referring-expressions`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
-The skill should be reviewed before NVSkills-Eval publication. **Skill owners should address the applicable findings below and rerun NVSkills-Eval to refresh this benchmark.**
+- Overall verdict: PASS
 
 ## Agents Used
 
@@ -55,32 +54,28 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 75% (+65%) | 73% (+73%) |
-| Discoverability | 2 | 40% (+40%) | 48% (+48%) |
-| Effectiveness | 2 | 94% (+61%) | 84% (+70%) |
-| Efficiency | 2 | 43% (+17%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 82% (+82%) | 97% (+97%) |
+| Effectiveness | 1 | 90% (+76%) | 86% (+58%) |
+| Efficiency | 1 | 63% (+36%) | 96% (+68%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 13 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 3 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/data/tao-generate-referring-expressions`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/data/tao-generate-referring-expressions/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SQP-2): The skill collects API keys (GOOGLE_API_KEY, OpenAI-compatible keys) and transmits them as part of VLM endpoint configur (`SKILL.md:57`)
-- MEDIUM SECURITY/Unknown (SQP-2): The configuration reference shows API keys being stored in plaintext YAML files (e.g., `vlm.gemini.api_key`, `vlm.openai (`references/configuration.md:14`)
-- MEDIUM SECURITY/Unknown (SQP-2): The skill configures Gemini as the default VLM backend and will transmit user-provided images (and potentially sensitive (`references/skill_info.yaml:30`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/data/tao-generate-referring-expressions/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 1 total findings.
+This tier was not run or did not produce findings in this report.
 
-Top findings:
+## Publication Recommendation
 
-- HIGH DUPLICATE/duplicate: Duplicate content found within SKILL.md:
-  "# Image Referring Expression Pipeline" in SKILL.md (lines 1-4)
-  vs "## Purpose" in SKILL.md (lines 5-8) (`SKILL.md:1`)
+The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

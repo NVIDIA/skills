@@ -166,8 +166,8 @@ export:
   onnx_file: ???
   on_cpu: false
   input_channel: 3
-  input_width: 960
-  input_height: 544
+  input_width: 640
+  input_height: 640
   opset_version: 17
   batch_size: -1
   verbose: false

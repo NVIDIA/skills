@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers who need to integrate HuggingFace Computer Vision models into the NVIDIA TAO Toolkit for training, ONNX export, and TensorRT deployment. <br>
+Developers and engineers who need to integrate HuggingFace Computer Vision models into the NVIDIA TAO Toolkit for training, ONNX export, and TensorRT deployment across classification, detection, and segmentation tasks. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,26 +19,23 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Phase 0 - Prerequisites](references/phase-0-prereqs.md) <br>
-- [Phase 1 - HF Inspection](references/phase-1-inspection.md) <br>
-- [Phase 2 - Codebase Exploration](references/phase-2-codebase.md) <br>
-- [Phase 3 - Implementation](references/phase-3-implementation.md) <br>
-- [Phase 4 - Deploy](references/phase-4-deploy.md) <br>
-- [Phase 5 - Packaging](references/phase-5-packaging.md) <br>
-- [Phase 6 - Container Tests](references/phase-6-container-tests.md) <br>
-- [Phase 7 - Optimization](references/phase-7-optimization.md) <br>
-- [TAO Patterns](references/tao-patterns.md) <br>
-- [Repo Structure](references/repo-structure.md) <br>
-- [Task Type Guide](references/task-type-guide.md) <br>
-- [Execution and Debugging](references/execution-and-debugging.md) <br>
-- [Docker Patterns](references/docker-patterns.md) <br>
-- [HF Inspection Patterns](references/hf-inspection.md) <br>
-- [Workflow Consistency](references/workflow-consistency.md) <br>
+- [phase-0-prereqs.md](references/phase-0-prereqs.md) <br>
+- [phase-1-inspection.md](references/phase-1-inspection.md) <br>
+- [phase-2-codebase.md](references/phase-2-codebase.md) <br>
+- [phase-3-implementation.md](references/phase-3-implementation.md) <br>
+- [phase-4-deploy.md](references/phase-4-deploy.md) <br>
+- [phase-5-packaging.md](references/phase-5-packaging.md) <br>
+- [phase-6-container-tests.md](references/phase-6-container-tests.md) <br>
+- [phase-7-optimization.md](references/phase-7-optimization.md) <br>
+- [cross-cutting.md](references/cross-cutting.md) <br>
+- [tao-patterns.md](references/tao-patterns.md) <br>
+- [task-type-guide.md](references/task-type-guide.md) <br>
+- [workflow-consistency.md](references/workflow-consistency.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Files, Shell commands, Configuration instructions] <br>
-**Output Format:** [Python source files, YAML configuration, and Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Code, Shell commands, Configuration instructions, Files] <br>
+**Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -49,7 +46,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the astra-sandbox environment using the external NVSkills-Eval profile. Pass threshold: 50%. <br>
+Evaluated against 1 evaluation task (1 positive skill-activation case) via NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -73,11 +70,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 50% (+50%) | 97% (+97%) |
-| Discoverability | 2 | 0% (+0%) | 84% (+84%) |
-| Effectiveness | 2 | 91% (+77%) | 81% (+71%) |
-| Efficiency | 2 | 27% (-0%) | 79% (+50%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 90% (+90%) | 97% (+97%) |
+| Discoverability | 1 | 100% (+100%) | 97% (+97%) |
+| Effectiveness | 1 | 50% (+36%) | 90% (+66%) |
+| Efficiency | 1 | 95% (+68%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

@@ -16,6 +16,20 @@ limitations under the License.
 
 # VLM / LLM Pipeline Scripts Reference
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- config.yaml — VLM Template
+- model.py
+- dataset.py
+- train.py
+- merge_lora.py
+- run_eval.py (NOT `evaluate.py` — collides with HF `evaluate` library)
+- inference.py
+- VLM-Specific Gotchas
+
+
 > **How to use this file**
 >
 > This file defines two things:

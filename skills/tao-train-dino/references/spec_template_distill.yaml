@@ -156,6 +156,67 @@ train:
   precision: fp32
   distributed_strategy: ddp
   activation_checkpoint: true
+distill:
+  teacher:
+    pretrained_backbone_path: ''
+    backbone: fan_tiny
+    num_queries: 300
+    num_feature_levels: 4
+    cls_loss_coef: 2.0
+    bbox_loss_coef: 5.0
+    giou_loss_coef: 2.0
+    num_select: 300
+    interm_loss_coef: 1.0
+    no_interm_box_loss: false
+    pre_norm: false
+    two_stage_type: standard
+    decoder_sa_type: sa
+    embed_init_tgt: true
+    fix_refpoints_hw: -1
+    pe_temperatureH: 20
+    pe_temperatureW: 20
+    return_interm_indices:
+    - 1
+    - 2
+    - 3
+    - 4
+    use_dn: true
+    dn_number: 100
+    dn_box_noise_scale: 1.0
+    dn_label_noise_ratio: 0.5
+    focal_alpha: 0.25
+    clip_max_norm: 0.1
+    nheads: 8
+    dropout_ratio: 0.0
+    hidden_dim: 256
+    enc_layers: 6
+    dec_layers: 6
+    dim_feedforward: 2048
+    dec_n_points: 4
+    enc_n_points: 4
+    aux_loss: true
+    dilation: false
+    train_backbone: true
+    loss_types:
+    - labels
+    - boxes
+    backbone_names:
+    - backbone.0
+    linear_proj_names:
+    - reference_points
+    - sampling_offsets
+    distillation_loss_coef: 1.0
+  pretrained_teacher_model_path: ???
+  bindings:
+  - student_module_name: pred_logits
+    teacher_module_name: pred_logits
+    criterion: L2
+    weight: 1.0
+  - student_module_name: pred_boxes
+    teacher_module_name: pred_boxes
+    criterion: L1
+    weight: 1.0
+  results_dir: ''
 quantize:
   backend: torchao
   mode: weight_only_ptq

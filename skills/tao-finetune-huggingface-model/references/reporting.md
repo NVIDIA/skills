@@ -16,6 +16,17 @@ limitations under the License.
 
 # Report Generation Reference
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- report.py — Full Template
+- Install Requirements for Report
+- Expected Report Structure
+- wandb Artifacts Integration
+- Report Gotcha: Log parsing depends on HF Trainer format
+
+
 Used in Phase 10 of tao-finetune-huggingface-model skill.
 Generates report.pdf and report.html with training curves, eval metrics (including baseline
 vs post-training delta), sample predictions, and a summary table.

@@ -1,6 +1,6 @@
 # DepthNet Mono Deploy
 
-DepthNet Mono deploy covers the TAO Deploy actions for an exported monocular depth estimation model. Use the `depth-net-mono` model skill for training, checkpoint evaluation, quantization, distillation, pruning, export, or non-TensorRT inference where those actions exist. Use this deploy workflow after export when the input artifact is an ONNX model and the desired output is a TensorRT engine or TensorRT-backed predictions.
+DepthNet Mono deploy covers the TAO Deploy actions for an exported monocular depth estimation model. Use the `depth-net-mono` model skill for training, checkpoint evaluation, quantization, export, or non-TensorRT inference where those actions exist. Use this deploy workflow after export when the input artifact is an ONNX model and the desired output is a TensorRT engine or TensorRT-backed predictions.
 
 Supported actions: `gen_trt_engine`, `evaluate`, `inference`.
 Direct TAO Deploy command name: `depth_net`.
@@ -58,13 +58,12 @@ Direct TAO Launcher spelling is `tao deploy depth_net gen_trt_engine`, `tao depl
 | Action | Required artifact or data | Spec key |
 |---|---|---|
 | `gen_trt_engine` | Exported monocular ONNX model | `gen_trt_engine.onnx_file` |
-| `gen_trt_engine` | Output engine path | `gen_trt_engine.trt_engine` |
 | `evaluate` | TensorRT engine | `evaluate.trt_engine` |
 | `evaluate` | Depth annotation file | `dataset.test_dataset.data_sources[0].data_file` |
 | `inference` | TensorRT engine | `inference.trt_engine` |
 | `inference` | Depth annotation file | `dataset.infer_dataset.data_sources[0].data_file` |
 
-For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine`.
+`gen_trt_engine.trt_engine` is a generated output path, not an input artifact. For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine`.
 
 ## Spec Templates
 
@@ -97,7 +96,8 @@ dataset:
 Common to both variants:
 
 - The TAO Deploy command is `depth_net` for both mono and stereo DepthNet model skills.
-- Recommended TRT precision: `gen_trt_engine.tensorrt.data_type: bf16` (Ampere SM80+ required). `fp32` is supported as a fallback. `fp16` is not supported for the ViT-L mono backbone.
+- Fresh-install TRT precision: `gen_trt_engine.tensorrt.data_type: fp32`. BF16 is supported on Ampere SM80+ hardware, but keep validation smoke tests on FP32 unless the user requests BF16. `fp16` is not supported for the ViT-L mono backbone.
+- The current TAO Deploy image interprets `gen_trt_engine.tensorrt.workspace_size` as GiB. Use `4` for a 4 GiB workspace; values such as `1024` request a 1024 GiB workspace and may fail on ordinary systems.
 - For aspect-preserved inference (matching pyt evaluator on variable-aspect input), set `dataset.test_dataset.augmentation.crop_size` and `dataset.infer_dataset.augmentation.crop_size` to the dataset's keep-aspect target shape (e.g., NYU 480×640 → `[518, 686]` with `multiple_of=14`). The deploy runtime selects input H/W from `augmentation.crop_size`, not from `evaluate.input_height/input_width`; leaving `crop_size` unset falls back to tao-core's `[518, 518]` default and silently overrides the engine shape. The engine input shape must match `crop_size` exactly (mono engines are built static at the trace shape — only the batch axis can be dynamic).
 
 ## Spec filename invariant

@@ -7,14 +7,13 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-finetune-cosmos-reason`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
-The skill should be reviewed before NVSkills-Eval publication. **Skill owners should address the applicable findings below and rerun NVSkills-Eval to refresh this benchmark.**
+- Overall verdict: PASS
 
 ## Agents Used
 
@@ -55,35 +54,30 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+100%) | 58% (+40%) |
-| Discoverability | 2 | 86% (+86%) | 48% (+17%) |
-| Effectiveness | 2 | 86% (+59%) | 57% (+46%) |
-| Efficiency | 2 | 70% (+43%) | 62% (+17%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 20% (-18%) | 97% (+97%) |
+| Discoverability | 1 | 0% (-46%) | 97% (+97%) |
+| Effectiveness | 1 | 44% (+40%) | 90% (+72%) |
+| Efficiency | 1 | 27% (-3%) | 96% (+68%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 14 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 5 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_correctness: No documented scripts in table format (`skills/models/tao-finetune-cosmos-reason/SKILL.md`)
-- MEDIUM QUALITY/quality_correctness: Instructions don't mention 'run_script' (`skills/models/tao-finetune-cosmos-reason/SKILL.md`)
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/models/tao-finetune-cosmos-reason`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/models/tao-finetune-cosmos-reason/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/models/tao-finetune-cosmos-reason/SKILL.md`)
+- LOW SCHEMA/unexpected_file: Unexpected 'schemas' in skill root (`skills/models/tao-finetune-cosmos-reason/schemas`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/models/tao-finetune-cosmos-reason/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 2 total findings.
+This tier was not run or did not produce findings in this report.
 
-Top findings:
+## Publication Recommendation
 
-- HIGH DUPLICATE/duplicate: Duplicate content found across references/scripts/analyze_gaps.py and scripts/analyze_gaps.py:
-  "(module docstring)" in references/scripts/analyze_gaps.py (lines 1-11)
-  vs "(module docstring)" in scripts/analyze_gaps.py (lines 1-11) (`references/scripts/analyze_gaps.py:1`)
-- HIGH DUPLICATE/duplicate: Duplicate content found across references/scripts/analyze_gaps.py and scripts/analyze_gaps.py:
-  "_find_results_json()" in references/scripts/analyze_gaps.py (lines 33-54)
-  vs "_find_results_json()" in scripts/analyze_gaps.py (lines 33-54) (`references/scripts/analyze_gaps.py:33`)
+The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

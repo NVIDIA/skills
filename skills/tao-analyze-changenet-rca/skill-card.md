@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to investigate why NVIDIA TAO Visual ChangeNet classification models fail, diagnosing root causes of poor recall, FAR, or other metrics in AOI defect-detection pipelines. <br>
+Developers and engineers use this skill to perform root cause analysis on NVIDIA TAO Visual ChangeNet classification experiments, investigating model failures, poor recall/FAR/PASS metrics, and auditing visual inspection pipeline quality. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,17 +19,16 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Investigation Phases](references/phases.md) <br>
+- [Investigation Phases](references/investigation-phases.md) <br>
+- [Output Structure](references/output-structure.md) <br>
 - [Parallelization Strategy](references/parallelization.md) <br>
-- [Report Structure](references/report-structure.md) <br>
-- [Output and Deliverable Layout](references/output-and-deliverable.md) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Files] <br>
-**Output Format:** [Markdown with inline images] <br>
+**Output Format:** [Markdown report with embedded images and analysis tables] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Outputs RCA_Report.md with embedded thumbnails into a timestamped directory] <br>
+**Other Properties Related to Output:** [Timestamped output folder with RCA_Report.md, rca_images/, and rca_config/] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`claude-code`) <br>
@@ -38,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the astra-sandbox environment using the external NVSkills-Eval profile. <br>
+Evaluated against 1 evaluation task in the `astra-sandbox` environment using the NVSkills-Eval `external` profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 25% (+25%) | 92% (+92%) |
-| Discoverability | 2 | 0% (+0%) | 97% (+97%) |
-| Effectiveness | 2 | 51% (+41%) | 81% (+63%) |
-| Efficiency | 2 | 27% (-0%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 89% (+89%) | 97% (+97%) |
+| Effectiveness | 1 | 100% (+86%) | 90% (+66%) |
+| Efficiency | 1 | 73% (+46%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

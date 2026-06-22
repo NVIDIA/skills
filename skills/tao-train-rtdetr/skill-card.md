@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, distilling, quantizing, exporting, or running inference for RT-DETR real-time object detection models using NVIDIA TAO. <br>
+Developers and engineers training, evaluating, distilling, quantizing, exporting, or running inference on RT-DETR object detection models using NVIDIA TAO Toolkit. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,8 +19,14 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [TAO Deploy RT-DETR Reference](references/tao-deploy-rtdetr.md) <br>
-- [Skill Info (AutoML configuration)](references/skill_info.yaml) <br>
+- [TAO Deploy RT-DETR](references/tao-deploy-rtdetr.md) <br>
+- [Skill Info](references/skill_info.yaml) <br>
+- [Train Spec Template](references/spec_template_train.yaml) <br>
+- [Distill Spec Template](references/spec_template_distill.yaml) <br>
+- [Evaluate Spec Template](references/spec_template_evaluate.yaml) <br>
+- [Export Spec Template](references/spec_template_export.yaml) <br>
+- [Inference Spec Template](references/spec_template_inference.yaml) <br>
+- [Quantize Spec Template](references/spec_template_quantize.yaml) <br>
 - [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
@@ -37,7 +43,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task in the `external` NVSkills-Eval profile (2 attempts per task, 50% pass threshold). <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +67,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 95% (+90%) | 87% (+87%) |
-| Discoverability | 2 | 87% (+87%) | 80% (+80%) |
-| Effectiveness | 2 | 83% (+64%) | 75% (+45%) |
-| Efficiency | 2 | 68% (+42%) | 79% (+50%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+52%) | 97% (+97%) |
+| Discoverability | 1 | 88% (+40%) | 97% (+97%) |
+| Effectiveness | 1 | 100% (+82%) | 90% (+72%) |
+| Efficiency | 1 | 71% (+42%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

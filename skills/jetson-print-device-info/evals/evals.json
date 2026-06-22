@@ -1,0 +1,83 @@
+{
+  "skill_name": "jetson-print-device-info",
+  "evals": [
+    {
+      "id": "jetson-print-device-info-001",
+      "prompt": "Run the jetson-print-device-info skill on my connected Jetson device to get a summary of its configuration.",
+      "expected_output": "The agent invoked the jetson-print-device-info skill and produced a report containing the device model, L4T version, power mode, kernel version, uptime, and OS version from the Jetson target.",
+      "assertions": [
+        "The final output contains exactly 6 lines",
+        "Line 1 starts with 'Model'",
+        "Line 2 starts with 'L4T release'",
+        "Line 3 starts with 'Power mode'",
+        "Line 4 starts with 'Kernel'",
+        "Line 5 starts with 'Uptime'",
+        "Line 6 starts with 'OS version'",
+        "No extra lines or unrelated labels appear in the output",
+        "The agent identified and selected the jetson-print-device-info skill based on the explicit request",
+        "The agent read the jetson-print-device-info SKILL.md to understand the required steps",
+        "The agent executed or described the sequence of commands (reading /proc/device-tree/model, /etc/nv_tegra_release, nvpmodel -q, uname -r, uptime -p, lsb_release) to gather device info",
+        "The agent presented the output in the specified report format with labeled fields (Model, L4T release, Power mode, Kernel, Uptime, OS version)",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-print-device-info",
+      "expected_script": null
+    },
+    {
+      "id": "jetson-print-device-info-002",
+      "prompt": "I need to check what L4T version, kernel, and power mode my Jetson Orin is currently running. Can you pull that info from the device?",
+      "expected_output": "The agent used the jetson-print-device-info skill to query the Jetson Orin device and reported its L4T version, kernel version, power mode, model, uptime, and OS version.",
+      "assertions": [
+        "The final output contains exactly 6 lines",
+        "Line 1 starts with 'Model'",
+        "Line 2 starts with 'L4T release'",
+        "Line 3 starts with 'Power mode'",
+        "Line 4 starts with 'Kernel'",
+        "Line 5 starts with 'Uptime'",
+        "Line 6 starts with 'OS version'",
+        "No extra lines or unrelated labels appear in the output",
+        "The agent recognized the request as a device info retrieval task and matched it to the jetson-print-device-info skill",
+        "The agent executed commands to read the device-tree model, /etc/nv_tegra_release, nvpmodel, uname, and OS release information",
+        "The agent provided the results in a structured format showing the requested L4T version, kernel, and power mode along with other device details",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-print-device-info",
+      "expected_script": null
+    },
+    {
+      "id": "jetson-print-device-info-003",
+      "prompt": "I'm about to start a performance benchmark on my Jetson AGX Orin. Before I begin, I want to capture a baseline snapshot of the device's software stack and power configuration so I can include it in my test report. Can you help?",
+      "expected_output": "The agent used the jetson-print-device-info skill to capture a pre-benchmark baseline of the Jetson device, reporting the module model, L4T release, power mode, kernel version, uptime, and OS version for inclusion in the test report.",
+      "assertions": [
+        "The final output contains exactly 6 lines",
+        "Line 1 starts with 'Model'",
+        "Line 2 starts with 'L4T release'",
+        "Line 3 starts with 'Power mode'",
+        "Line 4 starts with 'Kernel'",
+        "Line 5 starts with 'Uptime'",
+        "Line 6 starts with 'OS version'",
+        "No extra lines or unrelated labels appear in the output",
+        "The agent identified the scenario as a baseline capture use case and selected the jetson-print-device-info skill",
+        "The agent read the SKILL.md to confirm the skill matches the user's need for a pre-benchmark device snapshot",
+        "The agent executed or outlined the commands to gather model, L4T version, nvpmodel power mode, kernel, uptime, and OS version",
+        "The agent formatted the output as a concise report suitable for inclusion in a test document",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-print-device-info",
+      "expected_script": null
+    },
+    {
+      "id": "jetson-print-device-info-004",
+      "prompt": "How do I flash a new L4T image onto my Jetson Orin using the NVIDIA SDK Manager?",
+      "expected_output": "The agent recognized this as a flashing/SDK Manager question unrelated to printing device info and did not invoke the jetson-print-device-info skill, instead providing general guidance or directing the user to NVIDIA flashing documentation.",
+      "assertions": [
+        "The agent did not select or invoke the jetson-print-device-info skill",
+        "The agent recognized the question is about flashing firmware rather than reading current device information",
+        "The agent provided relevant guidance about SDK Manager or L4T flashing procedures, or indicated it lacks a matching skill for this task",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

@@ -59,16 +59,17 @@ Direct TAO Launcher spelling is `tao deploy mask2former gen_trt_engine`, `tao de
 | Action | Required artifact or data | Spec key |
 |---|---|---|
 | `gen_trt_engine` | Exported ONNX model | `gen_trt_engine.onnx_file` |
-| `gen_trt_engine` | Output engine path | `gen_trt_engine.trt_engine` |
 | `evaluate` | TensorRT engine | `evaluate.trt_engine` |
-| `evaluate` | Validation annotation file | `dataset.val.annot_file` |
-| `evaluate` | Validation root directory | `dataset.val.root_dir` |
+| `evaluate` | COCO panoptic validation JSON | `dataset.val.panoptic_json` |
+| `evaluate` | COCO instance validation JSON | `dataset.val.instance_json` |
+| `evaluate` | Validation image directory | `dataset.val.img_dir` |
+| `evaluate` | Validation panoptic-mask directory | `dataset.val.panoptic_dir` |
 | `evaluate` | Label map | `dataset.label_map` |
 | `inference` | TensorRT engine | `inference.trt_engine` |
 | `inference` | Test image directory | `dataset.test.img_dir` |
 | `inference` | Label map | `dataset.label_map` |
 
-For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine` where those actions are available.
+For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file`; `gen_trt_engine.trt_engine` is the generated engine output path and is then mapped into `evaluate.trt_engine` or `inference.trt_engine`.
 
 ## Spec Overrides
 
@@ -79,17 +80,25 @@ Recommended starting overrides:
 ```python
 {
     'model.sem_seg_head.num_classes': '<train/export num_classes>',
+    'model.mode': 'semantic',
     'model.object_mask_threshold': 0.0,
-    'dataset.contiguous_id': True,
+    'dataset.contiguous_id': False,
+    'dataset.val.type': 'coco_panoptic',
+    'dataset.test.type': 'coco_panoptic',
     'gen_trt_engine.tensorrt.data_type': 'fp16',
 }
 ```
 
 Model-specific notes:
 
-- Carry `model.sem_seg_head.num_classes` from train/export; the starter-kit ADE-style path used 90 classes for one flow and the template default is only a placeholder.
+- Carry `model.mode`, `model.sem_seg_head.num_classes`, `dataset.contiguous_id`, and export input shape from train/export.
+- TensorRT `evaluate` supports semantic engines. Export with `model.mode: semantic` when validating the deploy evaluator.
+- The parent export template dimensions (`960x544`) are known to export and
+  build with TensorRT. Avoid carrying tiny smoke-test export sizes such as
+  `128x128` into deploy unless that shape has been verified separately.
 - For TensorRT inference, set `model.object_mask_threshold: 0.0` when you need all mask candidates forwarded for post-processing.
-- Set `dataset.contiguous_id` to match the dataset id layout used during training.
+- Do not set a top-level `dataset.type`; the deploy schema accepts `dataset.val.type` and `dataset.test.type`.
+- For COCO panoptic data with raw category ids, use `dataset.contiguous_id: False` and set `model.sem_seg_head.num_classes` above the maximum category id.
 
 ## Job Chain Mapping
 

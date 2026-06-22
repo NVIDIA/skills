@@ -58,11 +58,12 @@ Direct TAO Launcher spelling is `tao deploy ocrnet gen_trt_engine`, `tao deploy 
 |---|---|---|
 | `gen_trt_engine` | Exported ONNX model | `gen_trt_engine.onnx_file` |
 | `gen_trt_engine` | OCR character list | `dataset.character_list_file` |
+| `gen_trt_engine` | Extracted calibration image folder list, required for INT8 | `gen_trt_engine.tensorrt.calibration.cal_image_dir` |
 | `evaluate` | TensorRT engine | `evaluate.trt_engine` |
-| `evaluate` | Test dataset directory | `evaluate.test_dataset_dir` |
+| `evaluate` | Extracted test image directory | `evaluate.test_dataset_dir` |
 | `evaluate` | OCR character list | `dataset.character_list_file` |
 | `inference` | TensorRT engine | `inference.trt_engine` |
-| `inference` | Inference dataset directory | `inference.inference_dataset_dir` |
+| `inference` | Extracted inference image directory | `inference.inference_dataset_dir` |
 | `inference` | OCR character list | `dataset.character_list_file` |
 
 For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine` where those actions are available.
@@ -76,9 +77,12 @@ Recommended starting overrides:
 ```python
 {
     'gen_trt_engine.tensorrt.data_type': 'fp16',
-    'dataset.input_width': 100,
-    'dataset.input_height': 32,
-    'dataset.input_channel': 1,
+    'model.input_width': 100,
+    'model.input_height': 32,
+    'model.input_channel': 1,
+    'gen_trt_engine.tensorrt.min_batch_size': 1,
+    'gen_trt_engine.tensorrt.opt_batch_size': 1,
+    'gen_trt_engine.tensorrt.max_batch_size': 1,
 }
 ```
 
@@ -86,7 +90,9 @@ Model-specific notes:
 
 - OCRNet deploy uses the shared experiment spec for all three actions.
 - Use FP16 for the starter-kit TensorRT engine path when the target hardware supports it.
-- Keep `dataset.input_width`, `dataset.input_height`, `dataset.input_channel`, and `dataset.character_list_file` aligned with training/export.
+- Keep `model.input_width`, `model.input_height`, `model.input_channel`, and `dataset.character_list_file` aligned with training/export.
+- `gen_trt_engine.tensorrt.calibration.cal_image_dir` is a YAML list in the deploy schema. Use `[ "/path/to/images" ]` even when only one folder is supplied.
+- TensorRT `evaluate` and `inference` read raw cropped text images. They do not consume the train-time LMDB folders produced by `dataset_convert`.
 
 ## Job Chain Mapping
 

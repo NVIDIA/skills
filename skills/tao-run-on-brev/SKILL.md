@@ -20,11 +20,11 @@ tags:
 
 NVIDIA Brev provides on-demand GPU instances across multiple cloud providers. Instances come pre-loaded with NVIDIA drivers, CUDA, Docker, and NVIDIA Container Toolkit.
 
-Brev is instance-based (not job-based like Lepton). You create an instance, run commands on it via `brev exec`, and delete it when done. The TAO SDK's BrevHandler wraps this into the standard job interface.
+Brev is instance-based (not job-based). You create an instance, run commands on it via `brev exec`, and delete it when done. The TAO SDK's BrevHandler wraps this into the standard job interface.
 
 ## Preflight
 
-This skill needs the `brev` CLI, its companion agent skill (`brev-cli`), and an active login. Check before proceeding:
+This skill needs the `brev` CLI and an active login. Check before proceeding:
 
 ```bash
 # 1. brev CLI installed
@@ -34,10 +34,9 @@ command -v brev >/dev/null 2>&1 || {
   exit 1
 }
 
-# 2. brev-cli agent skill installed — provides the brev CLI's command reference to the agent
-[ -d "$HOME/.claude/skills/brev-cli" ] || [ -d ".claude/skills/brev-cli" ] || {
-  echo "MISSING: brev-cli agent skill not installed. Run:"
-  echo "  brev agent-skill install"
+# 2. brev command reference available.
+brev --help >/dev/null || {
+  echo "MISSING: brev CLI help unavailable; verify the brev installation."
   exit 1
 }
 
@@ -57,19 +56,19 @@ brev ls >/dev/null 2>&1 || {
   brev ls >/dev/null 2>&1 || {
     echo "MISSING: not logged in to brev. Run:"
     echo "  brev login                                    # interactive (opens browser)"
-    echo "  # or set BREV_API_TOKEN in ~/.config/tao/.env (then 'brev login --token \$BREV_API_TOKEN')"
+    echo "  # or export BREV_API_TOKEN in your shell before launching (then 'brev login --token \$BREV_API_TOKEN')"
     exit 1
   }
 }
 ```
 
-If any step fails, the agent prompts the user to authorize the fix via Bash, then re-runs the preflight before continuing. The TAO SDK is **not** required for Brev — `brev exec docker run …` is sufficient. Reach for the SDK only if you want Job handles, S3 I/O wrapping via `script_runner`, or state persistence; `nvidia-tao-sdk` is on public PyPI, install the pinned Brev extra from `versions.yaml`: `pip install "$("${TAO_SKILL_BANK_PATH:?}/scripts/resolve_versions_key.py" wheels.tao_sdk_brev)"`. **When going the SDK route, read `tao-skill-bank:tao-run-platform` for the `BrevSDK` kwarg reference, `build_entrypoint`, and `ActionWorkflow` patterns.**
+If any non-pip step fails, the agent prompts the user to authorize the fix via Bash, then re-runs the preflight before continuing. The TAO SDK is **not** required for Brev — `brev exec docker run …` is sufficient. Reach for the SDK only if you want Job handles, S3 I/O wrapping via `script_runner`, or state persistence; `nvidia-tao-sdk` is on public PyPI, install missing SDK requirements automatically from the pinned Brev extra in `versions.yaml`: `python -m pip install "$("${TAO_SKILL_BANK_PATH:?}/scripts/resolve_versions_key.py" wheels.tao_sdk_brev)"`. **When going the SDK route, read `tao-skill-bank:tao-run-platform` for the `BrevSDK` kwarg reference, `build_entrypoint`, and `ActionWorkflow` patterns.**
 
 ## Authentication
 
 Two options:
 
-1. **Automated (recommended)**: Get an API token from the Brev console settings page. Set `BREV_API_TOKEN` as an environment variable (e.g., in `~/.config/tao/.env`). The handler auto-authenticates via `brev login --token` on first use — same UX as Lepton.
+1. **Automated (recommended)**: Get an API token from the Brev console settings page. Set `BREV_API_TOKEN` as an environment variable (e.g., `export BREV_API_TOKEN=...` in your shell). The handler auto-authenticates via `brev login --token` on first use.
 
 2. **Manual**: Run `brev login` (opens browser). Tokens expire hourly — the handler refreshes automatically.
 
@@ -117,7 +116,7 @@ brev create my-instance \
   --workspace-group-id <workspaceGroupId>
 ```
 
-Discover the values once and stash them in `~/.config/tao/.env`:
+Discover the values once and export them in your shell before launching:
 
 ```bash
 brev ls --json | jq -r '.workspaces[0].workspaceGroupId'   # default group
@@ -150,7 +149,7 @@ Available via `brev search`:
 
 ## Storage
 
-No shared NFS/Lustre. All data flows through S3 via the script_runner's fsspec integration. Instance-local disk under the login user's home directory (`$HOME`) persists across stop/start but not across delete/create.
+No shared NFS/Lustre. All data flows through S3 via the script_runner's fsspec integration. Instance-local disk at `~/` persists across stop/start but not across delete/create.
 
 ## Docker on Brev
 
@@ -162,7 +161,7 @@ brev exec <instance> -- docker login nvcr.io -u '$oauthtoken' -p <NGC_KEY>
 
 # Run a TAO training job
 brev exec <instance> -- docker run --gpus all --rm \
-  -v $HOME/data:/data \
+  -v ~/data:/data \
   nvcr.io/nvidia/tao/tao-toolkit:6.26.3-pyt \
   visual_changenet train -e /data/spec.yaml
 ```
@@ -194,17 +193,6 @@ the SSH bring-up window and the container pull on a fresh instance. Use
 **≥ 600 s (10 min)** for the first exec on a new instance; the previous
 60–120 s default truncates remote startup and surfaces as a spurious
 `exec failed` even though the remote command is still progressing.
-
-## Mixed-Platform Workflows
-
-Brev can be mixed with Lepton in the same workflow. Per-stage platform assignment:
-
-```json
-{"skill": "vcn-gap-analysis", "action": "analyze", "platform": "brev"},
-{"skill": "visual-changenet", "action": "train", "platform": "lepton"}
-```
-
-CPU stages (gap analysis, data merge) run cheaply on Brev. GPU stages (training) run on Lepton H100s.
 
 ## Cleanup
 

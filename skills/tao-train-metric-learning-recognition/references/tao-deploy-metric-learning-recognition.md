@@ -59,16 +59,15 @@ Direct TAO Launcher spelling is `tao deploy ml_recog gen_trt_engine`, `tao deplo
 | Action | Required artifact or data | Spec key |
 |---|---|---|
 | `gen_trt_engine` | Exported ONNX model | `gen_trt_engine.onnx_file` |
-| `gen_trt_engine` | Output engine path | `gen_trt_engine.trt_engine` |
 | `gen_trt_engine` | Calibration images for INT8 | `gen_trt_engine.tensorrt.calibration.cal_image_dir` |
 | `evaluate` | TensorRT engine | `evaluate.trt_engine` |
 | `evaluate` | Reference set | `dataset.val_dataset.reference` |
 | `evaluate` | Query set | `dataset.val_dataset.query` |
 | `inference` | TensorRT engine | `inference.trt_engine` |
 | `inference` | Reference set | `dataset.val_dataset.reference` |
-| `inference` | Query set | `dataset.val_dataset.query` |
+| `inference` | Input/query image folder | `inference.input_path` |
 
-For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine` where those actions are available.
+For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file`; `gen_trt_engine.trt_engine` is the generated engine output path and is then mapped into `evaluate.trt_engine` or `inference.trt_engine`.
 
 ## Spec Overrides
 
@@ -88,6 +87,10 @@ Model-specific notes:
 
 - The starter-kit deploy flow builds MLRecog engines with INT8, so provide real calibration images and a writable calibration cache path.
 - Keep reference and query sets paired consistently between evaluate and inference.
+- Use `batch_size: 1` for deploy `evaluate` and `inference` when validating
+  small or non-divisible datasets. Larger batch sizes can silently drop the
+  final partial batch in TAO Deploy MLRecog evaluation/inference, so only raise
+  this value after confirming the full input count is preserved.
 
 ## Job Chain Mapping
 
@@ -98,6 +101,7 @@ Model-specific notes:
 | `gen_trt_engine` INT8 | calibration image/cache fields | calibration dataset and new cache output |
 | `evaluate` | `evaluate.trt_engine` | engine job output |
 | `inference` | `inference.trt_engine` | engine job output |
+| `inference` | `inference.input_path` | input/query image folder |
 
 ## Outputs
 
@@ -116,3 +120,12 @@ Model-specific notes:
 **INT8 calibration missing:** INT8 builds need an extracted calibration image directory, a writable cache path, and enough images for `cal_batch_size * cal_batches`.
 
 **Mounted paths do not exist:** TAO Deploy checks local paths inside the container. Make sure every path in the spec has a matching Docker mount or job artifact mapping.
+
+**Deploy inference input missing:** `ml_recog inference` in TAO Deploy requires
+`inference.input_path`. `dataset.val_dataset.query` alone is not consumed by the
+deploy inference entrypoint.
+
+**Tail batch dropped:** If deploy evaluation or inference processes fewer query
+images than exist under the input folder, lower `evaluate.batch_size` or
+`inference.batch_size` to `1`. The TensorRT profile still needs
+`min_batch_size: 1`.

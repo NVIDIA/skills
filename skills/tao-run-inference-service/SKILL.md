@@ -12,7 +12,7 @@ license: Apache-2.0
 compatibility: The inference service has no cloud-storage dependency — model weights come from the HuggingFace Hub (HF_TOKEN env var for gated models) or a local container path. Platform prerequisites are checked by each platform skill.
 metadata:
   author: NVIDIA Corporation
-  version: "0.3.0"
+  version: "0.1.0"
 allowed-tools: Read Bash Write
 tags:
 - inference
@@ -63,7 +63,7 @@ tags:
 |--------|------|
 | **`network_arch`** | Chooses container image, the per-arch inner command shape (`references/service.yaml` → `container_commands.<network_arch>`), and `neural_network_name` in the job JSON when applicable. Must match a basename in `valid_network_arch_config_basenames` in `references/service.yaml` (e.g. `cosmos-rl`, `cosmos-predict2.5`). |
 | **`model_path`** | The trained model checkpoint. Valid forms: `hf_model://<org>/<model>` (HuggingFace Hub — set `HF_TOKEN` for gated models) or a local container filesystem path. Cloud URIs (`s3://`, `gs://`, `az://`) are NOT supported — the inference service has no cloud-storage dependency. Always ask the user; never substitute a placeholder. See `references/service.yaml` → `model_path_protocols`. |
-| **`platform`** | Compute platform: `local-docker`, `brev`, `lepton`, `slurm`, or `kubernetes`. |
+| **`platform`** | Compute platform: `local-docker`, `brev`, `slurm`, or `kubernetes`. |
 | **`num_gpus`** | Defaults to **1**; minimum **1** for inference. |
 
 ---
@@ -91,7 +91,6 @@ Set these in `env_payload` before encoding `env_json`. Do **not** set `TAO_LOGGI
 |----------|-------------------------------|
 | local-docker | `local-docker` |
 | brev | `local-docker` |
-| lepton | `lepton` |
 | slurm | `slurm` |
 | kubernetes | `local-k8s` |
 
@@ -109,7 +108,7 @@ The job payload and inner command (Sections 1–3) are **platform-agnostic**. Fo
 
 ### 4.1 Build the inner command (per arch)
 
-The inner-command shape is **per `network_arch`** — there is no uniform template. Look up the per-arch entry in `references/service.yaml` → `container_commands.<network_arch>`; if not present, the arch is unsupported — stop and ask. Pick the matching sub-block in `references/code-templates.yaml` → `job_payload_builder.<network_arch>`. Prefix the command with `umask 0 &&` and keep it **identical across platforms** (local-docker, brev, lepton, slurm, kubernetes).
+The inner-command shape is **per `network_arch`** — there is no uniform template. Look up the per-arch entry in `references/service.yaml` → `container_commands.<network_arch>`; if not present, the arch is unsupported — stop and ask. Pick the matching sub-block in `references/code-templates.yaml` → `job_payload_builder.<network_arch>`. Prefix the command with `umask 0 &&` and keep it **identical across platforms** (local-docker, brev, slurm, kubernetes).
 
 Common across arches:
 
@@ -143,13 +142,12 @@ Read **`skills/platform/<platform>/SKILL.md`** and follow it to start the contai
 |----------|------------------|
 | **local-docker** | None beyond base |
 | **brev** | `instance_id` (optional — reuse an existing instance); on multi-credential / multi-workspace accounts also `cloud_cred_id` and `workspace_group_id` for first-create — see `skills/platform/tao-run-on-brev/SKILL.md` |
-| **lepton** | `resource_shape` (GPU shape ID, e.g. `gpu.8xh100-sxm`); `dedicated_node_group` (optional) |
 | **slurm** | `partition` and `account` — check `SLURM_PARTITION`/`SLURM_ACCOUNT` env vars; ask user if unset |
 | **kubernetes** | `namespace` (default: `default`); `image_pull_secret` (required for `nvcr.io` images) |
 
 **Port binding (local-docker and brev):** use **direct docker run** (not DockerSDK) so that `-p <host_port>:8080` can be passed and the container name equals `job_id` exactly.
 
-**Port allocation rule (local-docker and brev, REQUIRED for concurrent services):** Before starting a service, read the registry (`/tmp/tao-inf-ms-state.json`) and collect the set of `host_port` values from every existing entry on the same platform (and, for brev, the same `instance_id`). Pick the **lowest free port starting from 8080** that is not in that set — e.g. `host_port = next(p for p in range(8080, 8200) if p not in used_ports)`. The default `8080` only applies when no other service is running. This is what makes "start 3 services, each reachable at a distinct `host_url`" work; without it, services 2 and 3 fail with `bind: address already in use`. Lepton, SLURM, and kubernetes get distinct endpoints from their own platform mechanisms and do not need this step.
+**Port allocation rule (local-docker and brev, REQUIRED for concurrent services):** Before starting a service, read the registry (`/tmp/tao-inf-ms-state.json`) and collect the set of `host_port` values from every existing entry on the same platform (and, for brev, the same `instance_id`). Pick the **lowest free port starting from 8080** that is not in that set — e.g. `host_port = next(p for p in range(8080, 8200) if p not in used_ports)`. The default `8080` only applies when no other service is running. This is what makes "start 3 services, each reachable at a distinct `host_url`" work; without it, services 2 and 3 fail with `bind: address already in use`. SLURM and kubernetes get distinct endpoints from their own platform mechanisms and do not need this step.
 
 ### 4.3 After start: service registry and endpoint
 
@@ -161,7 +159,6 @@ See `references/code-templates.yaml` → `registry_write.<platform>` for the Pyt
 |----------|-----------|-------------------|--------------------------|
 | **local-docker** | `http://localhost:{host_port}` | — | None |
 | **brev** | `http://{brev_ip}:{host_port}` | — | `brev ls` → get instance IP (`localhost` is invalid on remote VM) |
-| **lepton** | Lepton endpoint URL | `job.id` | Poll `sdk.get_job_status` until Running; get endpoint from console or `lep job get <job.id>` |
 | **slurm** | `http://localhost:{host_port}` | SLURM scheduler job ID | Wait until Running; SSH port-forward `localhost:{host_port}→{node}:8080` |
 | **kubernetes** | `http://{external_ip}:8080` | k8s job name | `kubectl expose job … --type=LoadBalancer`; wait for external IP |
 
@@ -187,7 +184,6 @@ Ask the user for the `job_id` to stop. If they don't provide one, default to `st
 |----------|--------------------|---------------|
 | **local-docker** | `job_id_to_stop` — container name | None |
 | **brev** | `job_id_to_stop` — container name | None |
-| **lepton** | `entry["platform_job_id"]` — Lepton job ID | None |
 | **slurm** | `entry["platform_job_id"]` — SLURM job ID | `pkill -f "ssh.*-L.*{entry['host_port']}"` |
 | **kubernetes** | `entry["platform_job_id"]` — k8s job name | `kubectl delete svc {entry["platform_job_id"]} -n <namespace>` |
 
@@ -217,7 +213,7 @@ After resolving, read the endpoint from the registry (`references/code-templates
 
 ### 6.1 Sampling parameters — REQUIRED user prompt before each request
 
-Before constructing the request body, you **MUST** explicitly prompt the user for the vLLM-style sampling parameters. Do **not** silently apply defaults. Use a structured prompt (e.g. `AskUserQuestion` in Claude Code, one question per field) that:
+Before constructing the request body, you **MUST** explicitly prompt the user for the vLLM-style sampling parameters. Do **not** silently apply defaults. Use a structured prompt, one question per field, that:
 
 1. Lists every applicable field with its **type** and **default value**.
 2. Lets the user skip / accept any field to take that field's default — entering a value is never required.

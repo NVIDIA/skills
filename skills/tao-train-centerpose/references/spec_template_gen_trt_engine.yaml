@@ -147,7 +147,8 @@ gen_trt_engine:
     layers_precision: []
     data_type: FP32
     calibration:
-      cal_image_dir: ???
+      cal_image_dir:
+      - ???
       cal_cache_file: ???
       cal_batch_size: 1
       cal_batches: 1

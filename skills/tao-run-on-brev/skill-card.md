@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to run NVIDIA TAO training, evaluation, or inference workloads on Brev managed GPU instances, managing instance lifecycle and dispatching jobs through the Brev CLI. <br>
+Developers and ML engineers running NVIDIA TAO training, evaluation, or inference workloads on Brev managed GPU instances via the Brev CLI. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,7 +19,7 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Brev CLI](https://github.com/brevdev/brev-cli) <br>
+- [Brev CLI (GitHub)](https://github.com/brevdev/brev-cli) <br>
 - [NVIDIA Brev Documentation](https://docs.nvidia.com/brev/) <br>
 - [Agent Skills Open Standard](https://agentskills.io) <br>
 
@@ -37,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 internal skill-activation task with 2 attempts per task in the astra-sandbox environment using NVSkills-Eval external profile. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval `external` profile within an `astra-sandbox` environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 80% (+80%) | 87% (+87%) |
-| Discoverability | 2 | 92% (+92%) | 97% (+97%) |
-| Effectiveness | 2 | 65% (+55%) | 72% (+65%) |
-| Efficiency | 2 | 80% (+53%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 20% (+20%) | 20% (+20%) |
+| Discoverability | 1 | 0% (+0%) | 0% (+0%) |
+| Effectiveness | 1 | 48% (+38%) | 44% (+26%) |
+| Efficiency | 1 | 27% (-0%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

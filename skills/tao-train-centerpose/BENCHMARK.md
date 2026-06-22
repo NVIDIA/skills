@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-train-centerpose`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,29 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 80% (+80%) | 68% (+50%) |
-| Discoverability | 2 | 93% (+92%) | 48% (+17%) |
-| Effectiveness | 2 | 62% (+50%) | 76% (+60%) |
-| Efficiency | 2 | 81% (+54%) | 62% (+19%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+50%) | 50% (+50%) |
+| Discoverability | 1 | 85% (+85%) | 0% (+0%) |
+| Effectiveness | 1 | 100% (+22%) | 88% (+60%) |
+| Efficiency | 1 | 68% (+41%) | 28% (-0%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 14 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 5 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/models/tao-train-centerpose`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/models/tao-train-centerpose/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/models/tao-train-centerpose/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SQP-2): The encryption_key field is exposed as a plain-text configurable parameter with an empty string default and no sensitivi (`schemas/inference.schema.json:638`)
-- MEDIUM SECURITY/Unknown (SQP-2): The encryption_key field is defined as a plain string with an empty default and no guidance on secure handling. If a use (`schemas/train.schema.json:615`)
+- LOW SCHEMA/unexpected_file: Unexpected 'schemas' in skill root (`skills/models/tao-train-centerpose/schemas`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/models/tao-train-centerpose/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 2 file(s)
-- Inter-Skill Deduplication: Parsed skill 'tao-train-centerpose': 337 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

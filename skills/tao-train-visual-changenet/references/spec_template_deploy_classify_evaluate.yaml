@@ -1,14 +1,16 @@
 encryption_key: tlt_encode
 results_dir: /results
+task: classify
 evaluate:
   trt_engine: /results/visual-changenet.engine
-  batch_size: 4
+  batch_size: 1
 model:
   backbone:
-    type: fan_small_12_p4_hybrid
+    type: c_radio_v2_vit_base_patch16_224
   classify:
     eval_margin: 0.3
-    diff_module: euclidean
+    difference_module: learnable
+    embed_dec: 30
 dataset:
   classify:
     train_dataset:
@@ -24,21 +26,18 @@ dataset:
       csv_path: /data/metadata.csv
       images_dir: /data/images
     image_ext: .jpg
-    batch_size: 32
-    workers: 64
+    batch_size: 1
+    workers: 0
     fpratio_sampling: 0.1
-    num_input: 4
+    num_input: 1
     input_map:
-      LowAngleLight: 0
-      SolderLight: 1
-      UniformLight: 2
-      WhiteLight: 3
+      SolderLight: 0
     concat_type: linear
     grid_map:
       x: 2
       y: 2
-    image_width: 128
-    image_height: 128
+    image_width: 224
+    image_height: 224
     augmentation_config:
       rgb_input_mean:
       - 0.485

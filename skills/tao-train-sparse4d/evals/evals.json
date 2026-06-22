@@ -1,7 +1,7 @@
 [
   {
     "id": "tao-train-sparse4d-basic",
-    "question": "A user request: \"Train Sparse4D\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
+    "question": "A user request: \"Sparse4D for multi-camera temporal 3D object detection and tracking.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
     "expected_skill": "tao-train-sparse4d",
     "expected_script": null,
     "ground_truth": "Identify tao-train-sparse4d as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",

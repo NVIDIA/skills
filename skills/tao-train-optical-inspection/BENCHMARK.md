@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-train-optical-inspection`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,29 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 80% (+80%) | 20% (+20%) |
-| Discoverability | 2 | 100% (+100%) | 0% (+0%) |
-| Effectiveness | 2 | 49% (+37%) | 48% (+34%) |
-| Efficiency | 2 | 94% (+67%) | 28% (-0%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 80% (+30%) | 20% (+20%) |
+| Discoverability | 1 | 100% (+100%) | 0% (+0%) |
+| Effectiveness | 1 | 44% (-34%) | 44% (+12%) |
+| Efficiency | 1 | 95% (+68%) | 28% (+0%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 12 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 5 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/models/tao-train-optical-inspection`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/models/tao-train-optical-inspection/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/models/tao-train-optical-inspection/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description very long (415 chars, recommend 50-150) (`skills/models/tao-train-optical-inspection/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Broad description without negative triggers may cause over-triggering (`skills/models/tao-train-optical-inspection/SKILL.md`)
+- LOW SCHEMA/unexpected_file: Unexpected 'schemas' in skill root (`skills/models/tao-train-optical-inspection/schemas`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/models/tao-train-optical-inspection/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 2 file(s)
-- Inter-Skill Deduplication: Parsed skill 'tao-train-optical-inspection': 415 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

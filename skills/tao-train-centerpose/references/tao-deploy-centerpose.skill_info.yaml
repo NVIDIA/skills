@@ -7,6 +7,7 @@ actions:
   gen_trt_engine:
     command: centerpose gen_trt_engine -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       gen_trt_engine.onnx_file:
         type: file
@@ -22,11 +23,12 @@ actions:
   evaluate:
     command: centerpose evaluate -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       evaluate.trt_engine:
         type: file
       dataset.test_data:
-        type: file
+        type: folder
     outputs:
       results_dir:
         type: folder
@@ -35,11 +37,12 @@ actions:
   inference:
     command: centerpose inference -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       inference.trt_engine:
         type: file
       dataset.inference_data:
-        type: file
+        type: folder
     outputs:
       results_dir:
         type: folder

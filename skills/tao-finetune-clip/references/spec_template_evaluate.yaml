@@ -14,10 +14,10 @@ wandb:
   name: TAO Toolkit Training
   run_id: ''
 model:
-  type: siglip2-so400m-patch16-256
+  type: ViT-L-14-SigLIP-CLIPA-224
   freeze_vision_encoder: false
   freeze_text_encoder: false
-  image_size: 256
+  image_size: 224
   canonicalize_text: false
 dataset:
   train:

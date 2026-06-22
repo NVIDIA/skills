@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-train-single-step`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,28 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 84% (+74%) | 68% (+68%) |
-| Discoverability | 2 | 34% (+34%) | 48% (+48%) |
-| Effectiveness | 2 | 84% (+46%) | 76% (+66%) |
-| Efficiency | 2 | 24% (-3%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 84% (+84%) | 50% (+50%) |
+| Discoverability | 1 | 34% (+34%) | 0% (+0%) |
+| Effectiveness | 1 | 90% (+80%) | 84% (+70%) |
+| Efficiency | 1 | 24% (-3%) | 28% (-0%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 15 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 4 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/applications/tao-train-single-step`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/applications/tao-train-single-step/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/applications/tao-train-single-step/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SDI-1): The skill's manifest description explicitly states it operates 'without iterative data augmentation, AutoML, or DEFT loo (`SKILL.md:3`)
-- MEDIUM SECURITY/Unknown (SDI-4): The document's own title ('Normal Train') and top-level description promise a plain single-step training workflow, but t (`SKILL.md:19`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/applications/tao-train-single-step/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 1 file(s)
-- Inter-Skill Deduplication: Parsed skill 'tao-train-single-step': 453 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

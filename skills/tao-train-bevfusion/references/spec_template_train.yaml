@@ -1,18 +1,15 @@
-model_name: ''
 encryption_key: ''
 results_dir: ''
 wandb:
   enable: true
   project: TAO Toolkit
   entity: ''
-  group: ''
   tags:
   - tao-toolkit
   reinit: false
   sync_tensorboard: false
   save_code: false
   name: TAO Toolkit Training
-  run_id: ''
 default_scope: mmdet3d
 default_hooks:
   timer:
@@ -327,8 +324,8 @@ dataset:
   point_cloud_dim: 4
   train_dataset:
     data_prefix: &id001
-      pts: training/lidar_reduced
-      img: training/images/
+      pts: training/velodyne_reduced
+      img: training/image_2
     sampler: DefaultSampler
     batch_size: 4
     num_workers: 8
@@ -356,14 +353,13 @@ train:
     deterministic: true
   num_epochs: 10
   checkpoint_interval: 1
-  checkpoint_interval_unit: epoch
   validation_interval: 1
-  resume_training_checkpoint_path: ''
+  resume_training_checkpoint_path: null
   results_dir: ''
   by_epoch: true
   logging_interval: 1
   resume: false
-  pretrained_checkpoint: ''
+  pretrained_checkpoint: null
   optimizer:
     type: AdamW
     lr: 0.0002
@@ -397,3 +393,19 @@ train:
     begin: 2.4
     end: 10
     by_epoch: true
+evaluate:
+  num_gpus: 1
+  gpu_ids:
+  - 0
+  num_nodes: 1
+  checkpoint: ''
+  results_dir: ''
+inference:
+  num_gpus: 1
+  gpu_ids:
+  - 0
+  num_nodes: 1
+  checkpoint: ''
+  results_dir: ''
+  conf_threshold: 0.5
+  show: false

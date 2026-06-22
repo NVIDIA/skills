@@ -18,6 +18,21 @@ Full Phase 3 walkthrough — tao-core config schema, tao-pytorch native implemen
 
 ## Phase 3 — TAO Core Configuration & Native Implementation
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Phase 3 — TAO Core Configuration & Native Implementation
+  - Task-Type-Specific Implementation Notes
+  - Step 1 — Define Model Spec & Hyperparameter Schema (`tao-core`)
+  - Step 2 — Implement Base Trainer (`tao-pytorch`)
+  - Step 3 — Multi-GPU/Multi-Node Support (conditional)
+  - Step 4 — Native Inference Endpoint (`tao-pytorch`)
+  - Step 5 — Native Evaluation Endpoint (`tao-pytorch`)
+  - Step 6 — Enable MLOps & Visualization for Training
+  - Step 7 — Enable MLOps & Visualization for Eval/Infer
+
+
 > Use `<model_name>` as the `snake_case` short-name from Phase 1. Use `<ModelName>` as the `PascalCase` equivalent.
 
 ### Task-Type-Specific Implementation Notes
@@ -803,4 +818,3 @@ Extend status logging to the **standalone** eval and inference scripts (not just
 - The `@monitor_status` decorator also saves `experiment.yaml` to results_dir for reproducibility
 
 ---
-

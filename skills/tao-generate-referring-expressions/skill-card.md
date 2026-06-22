@@ -1,5 +1,5 @@
 ## Description: <br>
-Four-step image referring-expression pipeline: turns images plus KITTI bounding-box labels into region descriptions, scene captions, grounded referring expressions, and (optionally) verified expressions via VLM distillation. <br>
+Four-step image referring-expression pipeline that turns images plus KITTI bounding-box labels into region descriptions, scene captions, grounded referring expressions, and optionally verified expressions via VLM distillation. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to generate rich, grounded referring-expression annotations from images with KITTI-format bounding-box labels for training or evaluating object-grounding and referring-expression models. <br>
+Developers and engineers who need to auto-generate referring-expression annotations from images with KITTI-format bounding-box labels for autonomous driving or scene-understanding datasets. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,10 +25,10 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Files, Shell commands, Configuration instructions] <br>
-**Output Format:** [JSONL annotations with per-step outputs and optional legacy text format] <br>
+**Output Type(s):** [Files, Shell commands] <br>
+**Output Format:** [JSONL (one annotation object per line) with optional legacy .txt format] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Per-step outputs cached and resumable; supports jsonl, legacy, or both output formats] <br>
+**Other Properties Related to Output:** [Per-step incremental outputs; supports resume on re-run] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`claude-code`) <br>
@@ -37,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive skill-activation case) with 2 attempts per task in the NVSkills-Eval external profile. <br>
+Evaluated against 1 task in the NVSkills-Eval `external` profile on the `astra-sandbox` environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 75% (+65%) | 73% (+73%) |
-| Discoverability | 2 | 40% (+40%) | 48% (+48%) |
-| Effectiveness | 2 | 94% (+61%) | 84% (+70%) |
-| Efficiency | 2 | 43% (+17%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 82% (+82%) | 97% (+97%) |
+| Effectiveness | 1 | 90% (+76%) | 86% (+58%) |
+| Efficiency | 1 | 63% (+36%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

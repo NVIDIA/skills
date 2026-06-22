@@ -20,7 +20,10 @@ CLI:
         --kpi-target "FAR < 10% at recall=100%" \
         --max-iterations 2 \
         --num-gpus 4 \
-        --num-epochs 20
+        --num-epochs 20 \
+        --num-sdg 20 \
+        --project nvpcb \
+        --step 14000
 
 The output schema mirrors `references/deft_state.json` exactly.
 """
@@ -39,6 +42,7 @@ import tempfile
 _COMPLETED_STEP_VALUES = [
     "evaluate",
     "rca",
+    "anomalygen_finetune",
     "anomalygen",
     "routing",
     "data_mining",
@@ -48,15 +52,15 @@ _COMPLETED_STEP_VALUES = [
 _STATUS_VALUES = ["pending", "in_progress", "complete", "failed"]
 
 
-def _resolve_train_container_from_versions_yaml() -> str | None:
-    """Return the resolved tao_toolkit.pyt image URI from versions.yaml.
+def _resolve_image_from_versions_yaml(*path: str) -> str | None:
+    """Return a resolved image URI from versions.yaml at the given key path.
 
     Looks at TAO_SKILL_BANK_PATH (exported by the plugin's session_start
     hook). Returns None if the env var is unset, the file is missing, the
     key path is absent, or PyYAML is unavailable. In that case the caller
-    must pass --train-container explicitly; the script intentionally has no
-    hardcoded fallback tag so versions.yaml remains the single source of
-    truth.
+    must pass the corresponding CLI flag explicitly; the script intentionally
+    has no hardcoded fallback tag so versions.yaml remains the single source
+    of truth.
     """
     sb = os.environ.get("TAO_SKILL_BANK_PATH")
     if not sb:
@@ -70,12 +74,20 @@ def _resolve_train_container_from_versions_yaml() -> str | None:
         return None
     try:
         data = yaml.safe_load(vy.read_text())
-        return str(data["images"]["tao_toolkit"]["pyt"])
+        node = data
+        for p in path:
+            node = node[p]
+        return str(node)
     except (KeyError, TypeError, yaml.YAMLError):
         return None
 
 
-_DEFAULT_TRAIN_CONTAINER = _resolve_train_container_from_versions_yaml()
+_DEFAULT_TRAIN_CONTAINER = _resolve_image_from_versions_yaml(
+    "images", "tao_toolkit", "pyt"
+)
+_DEFAULT_AG_CONTAINER = _resolve_image_from_versions_yaml(
+    "images", "metropolis_sdg", "paidf_anomalygen"
+)
 
 
 def build_state(args: argparse.Namespace) -> dict:
@@ -103,22 +115,37 @@ def build_state(args: argparse.Namespace) -> dict:
             "batch_size": args.batch_size,
             "num_epochs": args.num_epochs,
             "anomalygen": {
-                # EA variant: ingest pre-generated NG/OK pairs from the
-                # customer-supplied directory every iter; synth and real are
-                # mined together via k-NN (no SDG bypass, no per-iter cap).
-                # See SKILL.md Pipeline step 3.
-                "sub_skill": None,
-                "mode": "pregen_ingest",
-                "pregen_dir": str(ws / "augmentation" / "anomalygen"),
-                "reconstructed_image_dir": str(
-                    ws / "augmentation" / "anomalygen" / "reconstructed_image"
-                ),
-                "original_image_dir": str(
-                    ws / "augmentation" / "anomalygen" / "original_image"
-                ),
+                "sub_skill": "paidf-anomalygen",
+                "mode": "inference_only",
+                "project": args.project,
+                # defect_spec lives under `datasets/<project>/` (sibling of
+                # `checkpoints/<project>/`), per references/paidf-anomalygen.md.
                 "defect_spec": str(
-                    ws / "augmentation" / "anomalygen" / "defect_spec.jsonl"
+                    ws
+                    / "augmentation"
+                    / "anomalygen"
+                    / "datasets"
+                    / args.project
+                    / "defect_spec.jsonl"
                 ),
+                # ag_checkpoint_dir: the directory holding ag_config.yaml +
+                # checkpoints/{latest_checkpoint.txt, model/iter_<step>.pt, ...}.
+                # The underlying skill takes this as `ag_checkpoint_dir`.
+                "checkpoint_dir": str(
+                    ws
+                    / "augmentation"
+                    / "anomalygen"
+                    / "checkpoints"
+                    / args.project
+                ),
+                # dataset_dir: parent-staged pool root; not the raw datasets/.
+                # Resolved per-iteration to `${RESULTS_DIR}/iter${N}/pool_anomalygen/inputs/`.
+                "dataset_dir_source": str(
+                    ws / "augmentation" / "anomalygen" / "datasets" / args.project
+                ),
+                "step": args.step,
+                "num_SDG": args.num_sdg,
+                "container": args.ag_container,
             },
             "mining_filter": {
                 "sub_skill": "tao-mine-aoi-images",
@@ -167,6 +194,9 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-iterations", required=True, type=int)
     parser.add_argument("--num-gpus", required=True, type=int)
     parser.add_argument("--num-epochs", required=True, type=int)
+    parser.add_argument("--num-sdg", required=True, type=int)
+    parser.add_argument("--project", required=True, help="AnomalyGen project name (e.g. nvpcb)")
+    parser.add_argument("--step", required=True, type=int, help="AnomalyGen checkpoint step")
     parser.add_argument("--batch-size", default=16, type=int)
     parser.add_argument("--top-k-per-target", default=5, type=int)
     parser.add_argument(
@@ -189,6 +219,15 @@ def _build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--ag-container",
+        default=_DEFAULT_AG_CONTAINER,
+        help=(
+            "Cosmos AnomalyGen container URI. Defaults to "
+            "versions.yaml::images.metropolis_sdg.paidf_anomalygen "
+            "(resolved via TAO_SKILL_BANK_PATH). Required when versions.yaml is not reachable."
+        ),
+    )
+    parser.add_argument(
         "--force",
         action="store_true",
         help="Overwrite an existing deft_state.json. Off by default to protect resume state.",
@@ -202,6 +241,13 @@ def main(argv: list[str] | None = None) -> int:
         print(
             "init_deft_state: --train-container is required because versions.yaml "
             "could not be resolved (set TAO_SKILL_BANK_PATH or pass --train-container).",
+            file=sys.stderr,
+        )
+        return 2
+    if not args.ag_container:
+        print(
+            "init_deft_state: --ag-container is required because versions.yaml "
+            "could not be resolved (set TAO_SKILL_BANK_PATH or pass --ag-container).",
             file=sys.stderr,
         )
         return 2

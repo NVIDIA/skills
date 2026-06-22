@@ -1,6 +1,6 @@
 # DepthNet Stereo Deploy
 
-DepthNet Stereo deploy covers the TAO Deploy actions for an exported FoundationStereo model. Use the `depth-net-stereo` model skill for training, checkpoint evaluation, quantization, distillation, pruning, export, or non-TensorRT inference where those actions exist. Use this deploy workflow after export when the input artifact is an ONNX model and the desired output is a TensorRT engine or TensorRT-backed predictions.
+DepthNet Stereo deploy covers the TAO Deploy actions for an exported FoundationStereo model. Use the `depth-net-stereo` model skill for training, checkpoint evaluation, quantization, export, or non-TensorRT inference where those actions exist. Use this deploy workflow after export when the input artifact is an ONNX model and the desired output is a TensorRT engine or TensorRT-backed predictions.
 
 Supported actions: `gen_trt_engine`, `evaluate`, `inference`.
 Direct TAO Deploy command name: `depth_net`.
@@ -58,13 +58,12 @@ Direct TAO Launcher spelling is `tao deploy depth_net gen_trt_engine`, `tao depl
 | Action | Required artifact or data | Spec key |
 |---|---|---|
 | `gen_trt_engine` | Exported FoundationStereo ONNX model | `gen_trt_engine.onnx_file` |
-| `gen_trt_engine` | Output engine path | `gen_trt_engine.trt_engine` |
 | `evaluate` | TensorRT engine | `evaluate.trt_engine` |
 | `evaluate` | Stereo annotation file (3-col with GT, 4-col adds occlusion mask) | `dataset.test_dataset.data_sources[0].data_file` |
 | `inference` | TensorRT engine | `inference.trt_engine` |
 | `inference` | Stereo annotation file (2-col left+right, no GT) | `dataset.infer_dataset.data_sources[0].data_file` |
 
-For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine`.
+`gen_trt_engine.trt_engine` is a generated output path, not an input artifact. For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine`.
 
 ## Spec Template
 
@@ -80,7 +79,8 @@ Adjustments by use case:
 Common:
 
 - The TAO Deploy command is `depth_net` for both mono and stereo DepthNet model skills.
-- Recommended TRT precision: `fp16` on every supported deploy path (static-shape and batch-only-dynamic). Engine input H/W are pinned to the trace shape on every path.
+- Fresh-install TRT precision: `fp32`. `fp16` is supported on the static-shape and batch-only-dynamic deploy paths, but use FP32 for validation smoke tests unless the user requests FP16. Engine input H/W are pinned to the trace shape on every path.
+- The current TAO Deploy image interprets `gen_trt_engine.tensorrt.workspace_size` as GiB. Use `4` for a 4 GiB workspace; values such as `1024` request a 1024 GiB workspace and may fail on ordinary systems.
 
 ## Deploy paths
 
@@ -96,8 +96,8 @@ gen_trt_engine:
   trt_engine: <out engine path>
   batch_size: 1
   tensorrt:
-    data_type: fp16
-    workspace_size: 1024
+    data_type: fp32
+    workspace_size: 4
 evaluate:
   trt_engine: <built engine>
   input_height: 576
@@ -141,8 +141,8 @@ gen_trt_engine:
   trt_engine: <out engine>
   batch_size: -1
   tensorrt:
-    data_type: fp16
-    workspace_size: 1024
+    data_type: fp32
+    workspace_size: 4
     min_batch_size: 1
     opt_batch_size: 1
     max_batch_size: 4
@@ -216,5 +216,7 @@ The spec yaml's basename (modulo `.yaml`) must match the action verb passed on t
 **Aspect-stretched predictions on variable-aspect datasets**: forcing the engine input H/W to a single fixed shape distorts samples whose native aspect differs from that shape, degrading disparity quality. Build a separate engine per dataset (H, W) target close to the dataset's median aspect, multiple of 32. Per-image variable shape is not supported on the engine side.
 
 **Stereo inference 2-col GenericDataset**: 2-column (left + right, no GT) annotation with `dataset_name: GenericDataset` is the supported inference path. Dataset-specific classes (`Middlebury` / `Kitti` / `Eth3d` / `FSD` / `IsaacRealDataset` / `Crestereo`) require 3-column input.
+
+**Deploy evaluate scalar conversion failure**: In the current TAO Deploy image, TRT `evaluate` can complete prediction generation and then fail in `stereo_evaluator.py` with `TypeError: only 0-dimensional arrays can be converted to Python scalars`. Treat this as a deploy evaluator issue; the engine and inference handoff may still be valid.
 
 **Mounted paths do not exist**: TAO Deploy checks local paths inside the container. Make sure every path in the spec has a matching Docker mount or job artifact mapping.

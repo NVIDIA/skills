@@ -16,6 +16,26 @@ limitations under the License.
 
 # Compatibility Workarounds Registry
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Entry format
+- Registry
+  - 1. `idefics3-llama-generate`
+  - 2. `pytorch-2.5-sdpa-gqa`
+  - 3. `hf-hub-xet-hang`
+  - 4. `vlm-heterogeneous-pixel-values`
+  - 5. `script-name-evaluate`
+  - 6. `vlm-image-token-truncation`
+  - 7. `pip-cache-purge-ngc`
+  - 8. `wheel-find-packages-empty`
+- Phase 0.5 runner (pseudocode)
+- Phase 4.3 Dockerfile injection (pseudocode)
+- Invariants
+- When to add to this registry
+
+
 Known HuggingFace / PyTorch / NVIDIA ecosystem incompatibilities with auto-detection rules.
 Consulted in **Phase 0.5** to write `meta/phase0_compat.yaml`. Phase 4.3 reads that file and
 injects only the applicable fixes into the generated Dockerfile or config.

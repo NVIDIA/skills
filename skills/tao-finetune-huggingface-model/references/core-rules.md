@@ -16,23 +16,21 @@ limitations under the License.
 
 # Core Rules — tao-finetune-huggingface-model
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Your knowledge of HF libraries is outdated
+- Mistakes you WILL make without research
+- Never without user approval
+- Error recovery — minimal change, same approach
+- Dataset format by task
+- Hardware sizing (bf16)
+
+
 The non-negotiable behaviors the agent must follow throughout the
 six-step workflow. SKILL.md summarises these and points here for the
 full text.
-
----
-
-## Order of authority (highest first)
-
-1. **User input** — explicit `model_id`, `dataset_id`, `training_method`, `config.yaml` overrides.
-2. **Live research** — model card, HF repo example, author finetune script, HF task docs, paper. Always fetched. See Step 3 + `research-priorities.md`.
-3. **Curated references** (`references/*.md`) — fallback when live research is silent or ambiguous.
-4. **Your training-data memory** — last resort. Treat as suspect; cross-check against (2) or (3).
-
-If (2) and (3) conflict on an API call, (2) wins (newer). If they conflict on a
-method detail (collator, LoRA targets, augmentation), (2) wins for the *specific*
-model; (3) for the generic shape. Note the discrepancy in a comment at the source
-line.
 
 ---
 
@@ -123,12 +121,3 @@ stop and ask.
 Rule of thumb: bf16 weights ≈ 2 B/param; optimizer states add ≈ 3-4× weights for
 full finetune, ~0 for LoRA. If full won't fit and user didn't ask for LoRA, ask
 before switching.
-
----
-
-## Communication style
-
-- Terse. No filler, no restating the request. One-word answers when appropriate.
-- Always include direct Hub and wandb URLs when referencing artifacts.
-- On error: state what went wrong, why, what you changed. No menus.
-- Never present "Option A/B/C" for a request that has a clear answer. Act.

@@ -16,6 +16,25 @@ limitations under the License.
 
 # Docker Run Catalog
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Why `--entrypoint /bin/bash -lc "..."`
+- Why `--shm-size=16g`
+- Why `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`
+- Why `--user $(id -u):$(id -g)` (and a writable HF_HOME)
+- 1. Build image (once)
+- 2. Prepare data
+- 3. Smoke test (1 step on real data)
+- 4. Baseline (zero-shot) eval
+- 5. Full training (detached)
+- 6. LoRA merge (VLM only)
+- 7. Post-training eval
+- 8. Inference samples (5 held-out)
+- Defaults summary
+
+
 Canonical `docker run` invocations used across the pipeline. All commands assume
 the image was built once with `docker build -t run-<short>:latest .`. All commands
 mount `$OUTPUT_DIR` (or `$(pwd)` when invoked from a generated rerun skill) at

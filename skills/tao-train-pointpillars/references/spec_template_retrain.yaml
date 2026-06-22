@@ -297,4 +297,5 @@ train:
   gpu_ids:
   - 0
 local_rank: 0
+key: tlt_encode
 results_dir: ''

@@ -300,4 +300,5 @@ prune:
   model: ''
   pruning_thresh: 0.1
 local_rank: 0
+key: tlt_encode
 results_dir: ''

@@ -7,14 +7,13 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-train-fast-foundation-stereo`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
-The skill should be reviewed before NVSkills-Eval publication. **Skill owners should address the applicable findings below and rerun NVSkills-Eval to refresh this benchmark.**
+- Overall verdict: PASS
 
 ## Agents Used
 
@@ -55,44 +54,29 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 85% (+80%) | 58% (+58%) |
-| Discoverability | 2 | 93% (+92%) | 48% (+48%) |
-| Effectiveness | 2 | 70% (+53%) | 61% (+46%) |
-| Efficiency | 2 | 81% (+54%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 60% (+60%) | 20% (+20%) |
+| Discoverability | 1 | 100% (+100%) | 0% (+0%) |
+| Effectiveness | 1 | 38% (+24%) | 44% (+30%) |
+| Efficiency | 1 | 95% (+68%) | 28% (-0%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 8 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 4 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/models/tao-train-fast-foundation-stereo`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/models/tao-train-fast-foundation-stereo/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/models/tao-train-fast-foundation-stereo/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description very long (457 chars, recommend 50-150) (`skills/models/tao-train-fast-foundation-stereo/SKILL.md`)
-- LOW QUALITY/quality_discoverability: No '## Purpose' section (`skills/models/tao-train-fast-foundation-stereo/SKILL.md`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/models/tao-train-fast-foundation-stereo/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 6 total findings.
+This tier was not run or did not produce findings in this report.
 
-Top findings:
+## Publication Recommendation
 
-- HIGH DUPLICATE/duplicate: Duplicate content found across references/tao-deploy-fast-foundation-stereo.md and references/troubleshooting.md:
-  "## Common errors" in references/tao-deploy-fast-foundation-stereo.md (lines 265-265)
-  vs "# FastFoundationStereo Troubleshooting" in references/troubleshooting.md (lines 4-4) (`references/tao-deploy-fast-foundation-stereo.md:265`)
-- HIGH DUPLICATE/duplicate: Duplicate content found across references/tao-deploy-fast-foundation-stereo.md and references/troubleshooting.md:
-  "## Common errors" in references/tao-deploy-fast-foundation-stereo.md (lines 271-271)
-  vs "# FastFoundationStereo Troubleshooting" in references/troubleshooting.md (lines 13-13) (`references/tao-deploy-fast-foundation-stereo.md:271`)
-- HIGH DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/parent-model-inference.md:
-  "## Spec Param / Parent Model Inference" in SKILL.md (lines 192-196)
-  vs "# FastFoundationStereo Spec Param / Parent Model Inference" in references/parent-model-inference.md (lines 30-30) (`SKILL.md:192`)
-- HIGH DUPLICATE/duplicate: Duplicate content found within references/tao-deploy-fast-foundation-stereo.md:
-  "### Recommended deployment paths" in references/tao-deploy-fast-foundation-stereo.md (lines 178-186)
-  vs "### Implication for fp16 deploy" in references/tao-deploy-fast-foundation-stereo.md (lines 187-193) (`references/tao-deploy-fast-foundation-stereo.md:178`)
-- HIGH DUPLICATE/duplicate: Duplicate content found within references/tao-deploy-fast-foundation-stereo.md:
-  "## Common errors" in references/tao-deploy-fast-foundation-stereo.md (lines 267-270)
-  vs "## Common errors" in references/tao-deploy-fast-foundation-stereo.md (lines 272-275) (`references/tao-deploy-fast-foundation-stereo.md:267`)
+The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

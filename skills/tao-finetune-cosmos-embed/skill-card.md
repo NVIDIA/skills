@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to fine-tune, evaluate, export, and run inference with NVIDIA Cosmos-Embed1 video-text embedding models for text-to-video retrieval, video-to-video search, and semantic deduplication tasks. <br>
+Developers and engineers who need to fine-tune, evaluate, export, or run inference with Cosmos-Embed1 video-text embedding models for text-to-video retrieval, video-to-video search, and semantic deduplication tasks. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -40,7 +40,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the astra-sandbox environment using the external NVSkills-Eval profile. <br>
+Evaluated against 1 evaluation task (positive skill-activation case) through NVSkills-Eval 3-Tier Evaluation with external profile in astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -64,11 +64,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 95% (+95%) | 92% (+73%) |
-| Discoverability | 2 | 81% (+81%) | 80% (+48%) |
-| Effectiveness | 2 | 78% (+64%) | 77% (+66%) |
-| Efficiency | 2 | 62% (+36%) | 79% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 83% (+83%) | 97% (+97%) |
+| Effectiveness | 1 | 90% (+76%) | 90% (+76%) |
+| Efficiency | 1 | 66% (+39%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

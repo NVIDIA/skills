@@ -103,7 +103,10 @@
       "spec_template": "references/spec_template_inference.yaml"
     },
     "train": {
-      "automl_default_parameters": [],
+      "automl_default_parameters": [
+        "train.lr",
+        "train.wd"
+      ],
       "automl_disabled_parameters": [
         "dataset",
         "evaluate",

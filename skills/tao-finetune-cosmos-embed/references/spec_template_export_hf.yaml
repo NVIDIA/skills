@@ -1,7 +1,7 @@
 results_dir: /results
 
 export:
-  checkpoint: /results/train/cosmos_embed1_model_latest.pth
+  checkpoint: null
   mode: huggingface
   hf_output_dir: /results/export_hf/cosmos_embed1_hf
   on_cpu: true
@@ -9,6 +9,7 @@ export:
 model:
   pretrained_model_path: null
   precision: fp32
+  fsdp_shard_size: 1
   input_hw: [224, 224]
   network:
     embed_dim: 256

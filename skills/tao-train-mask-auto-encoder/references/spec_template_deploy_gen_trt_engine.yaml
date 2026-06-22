@@ -9,8 +9,9 @@ model:
 train:
   pretrained_model_path: path/to/your/model.pt
 dataset:
-  segment:
-    num_classes: 1000
+  batch_size: 1
+  augmentation:
+    input_size: 224
 export:
   gpu_id: 0
   on_cpu: false

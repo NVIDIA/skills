@@ -1,7 +1,7 @@
 results_dir: /results
 
 evaluate:
-  checkpoint: ${results_dir}/train/cosmos_embed1_model_latest.pth
+  checkpoint: null
   load_dataset_pkl: null
   save_dataset_pkl: null
   num_gpus: 1
@@ -14,6 +14,7 @@ evaluate:
 model:
   pretrained_model_path: null
   precision: bf16
+  fsdp_shard_size: 1
   input_hw: [224, 224]
   network:
     embed_dim: 256

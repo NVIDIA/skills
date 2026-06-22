@@ -114,8 +114,8 @@
       "test_dataset": {
         "batch_size": 4,
         "data_prefix": {
-          "img": "training/images/",
-          "pts": "training/lidar_reduced"
+          "img": "training/image_2",
+          "pts": "training/velodyne_reduced"
         },
         "num_workers": 8,
         "pin_memory": true,
@@ -124,8 +124,8 @@
       "train_dataset": {
         "batch_size": 4,
         "data_prefix": {
-          "img": "training/images/",
-          "pts": "training/lidar_reduced"
+          "img": "training/image_2",
+          "pts": "training/velodyne_reduced"
         },
         "num_workers": 8,
         "pin_memory": true,
@@ -135,8 +135,8 @@
       "val_dataset": {
         "batch_size": 4,
         "data_prefix": {
-          "img": "training/images/",
-          "pts": "training/lidar_reduced"
+          "img": "training/image_2",
+          "pts": "training/velodyne_reduced"
         },
         "num_workers": 8,
         "pin_memory": true,
@@ -170,15 +170,13 @@
     "default_scope": "mmdet3d",
     "encryption_key": "",
     "evaluate": {
-      "batch_size": -1,
       "checkpoint": "???",
       "gpu_ids": [
         0
       ],
       "num_gpus": 1,
       "num_nodes": 1,
-      "results_dir": "",
-      "trt_engine": ""
+      "results_dir": ""
     },
     "input_modality": {
       "use_camera": true,
@@ -528,12 +526,10 @@
         0.1
       ]
     },
-    "model_name": "",
     "results_dir": "",
     "train": {
       "by_epoch": true,
       "checkpoint_interval": 1,
-      "checkpoint_interval_unit": "epoch",
       "cudnn": {
         "benchmark": false,
         "deterministic": true
@@ -590,26 +586,35 @@
         "weight_decay": 0.01,
         "wrapper_type": "OptimWrapper"
       },
-      "pretrained_checkpoint": "",
+      "pretrained_checkpoint": null,
       "results_dir": "",
       "resume": false,
-      "resume_training_checkpoint_path": "",
+      "resume_training_checkpoint_path": null,
       "seed": 1234,
       "validation_interval": 1
     },
     "wandb": {
       "enable": true,
       "entity": "",
-      "group": "",
       "name": "TAO Toolkit Training",
       "project": "TAO Toolkit",
       "reinit": false,
-      "run_id": "",
       "save_code": false,
       "sync_tensorboard": false,
       "tags": [
         "tao-toolkit"
       ]
+    },
+    "inference": {
+      "checkpoint": "",
+      "conf_threshold": 0.5,
+      "gpu_ids": [
+        0
+      ],
+      "num_gpus": 1,
+      "num_nodes": 1,
+      "results_dir": "",
+      "show": false
     }
   },
   "popular": {
@@ -679,8 +684,8 @@
         "test_dataset": {
           "batch_size": 4,
           "data_prefix": {
-            "img": "training/images/",
-            "pts": "training/lidar_reduced"
+            "img": "training/image_2",
+            "pts": "training/velodyne_reduced"
           },
           "num_workers": 8,
           "pin_memory": true,
@@ -689,8 +694,8 @@
         "train_dataset": {
           "batch_size": 4,
           "data_prefix": {
-            "img": "training/images/",
-            "pts": "training/lidar_reduced"
+            "img": "training/image_2",
+            "pts": "training/velodyne_reduced"
           },
           "num_workers": 8,
           "pin_memory": true,
@@ -700,8 +705,8 @@
         "val_dataset": {
           "batch_size": 4,
           "data_prefix": {
-            "img": "training/images/",
-            "pts": "training/lidar_reduced"
+            "img": "training/image_2",
+            "pts": "training/velodyne_reduced"
           },
           "num_workers": 8,
           "pin_memory": true,
@@ -814,8 +819,8 @@
           "default": {
             "batch_size": 4,
             "data_prefix": {
-              "img": "training/images/",
-              "pts": "training/lidar_reduced"
+              "img": "training/image_2",
+              "pts": "training/velodyne_reduced"
             },
             "num_workers": 8,
             "pin_memory": true,
@@ -840,8 +845,8 @@
             "data_prefix": {
               "automl_enabled": false,
               "default": {
-                "img": "training/images/",
-                "pts": "training/lidar_reduced"
+                "img": "training/image_2",
+                "pts": "training/velodyne_reduced"
               },
               "description": "Corresponding data prefix for points and images",
               "title": "data prefix for points and images",
@@ -888,8 +893,8 @@
           "default": {
             "batch_size": 4,
             "data_prefix": {
-              "img": "training/images/",
-              "pts": "training/lidar_reduced"
+              "img": "training/image_2",
+              "pts": "training/velodyne_reduced"
             },
             "num_workers": 8,
             "pin_memory": true,
@@ -914,8 +919,8 @@
             "data_prefix": {
               "automl_enabled": false,
               "default": {
-                "img": "training/images/",
-                "pts": "training/lidar_reduced"
+                "img": "training/image_2",
+                "pts": "training/velodyne_reduced"
               },
               "description": "Corresponding data prefix for points and images",
               "title": "data prefix for points and images",
@@ -973,8 +978,8 @@
           "default": {
             "batch_size": 4,
             "data_prefix": {
-              "img": "training/images/",
-              "pts": "training/lidar_reduced"
+              "img": "training/image_2",
+              "pts": "training/velodyne_reduced"
             },
             "num_workers": 8,
             "pin_memory": true,
@@ -999,8 +1004,8 @@
             "data_prefix": {
               "automl_enabled": false,
               "default": {
-                "img": "training/images/",
-                "pts": "training/lidar_reduced"
+                "img": "training/image_2",
+                "pts": "training/velodyne_reduced"
               },
               "description": "Corresponding data prefix for points and images",
               "title": "data prefix for points and images",
@@ -1086,15 +1091,13 @@
       ],
       "automl_enabled": false,
       "default": {
-        "batch_size": -1,
         "checkpoint": "???",
         "gpu_ids": [
           0
         ],
         "num_gpus": 1,
         "num_nodes": 1,
-        "results_dir": "",
-        "trt_engine": ""
+        "results_dir": ""
       },
       "description": "Configurable parameters to construct the evaluator for a BEVFusion experiment.",
       "popular": [
@@ -1103,13 +1106,6 @@
         "gpu_ids"
       ],
       "properties": {
-        "batch_size": {
-          "default": -1,
-          "description": "The batch size of the input Tensor. This is important if batch_size > 1 for large dataset.",
-          "minimum": -1,
-          "title": "batch size",
-          "type": "int"
-        },
         "checkpoint": {
           "default": "???",
           "description": "Path to the checkpoint used for evaluation.",
@@ -1146,12 +1142,6 @@
           "default": "",
           "description": "\n        Path to where all the assets generated from a task are stored.\n        ",
           "title": "Results directory",
-          "type": "string"
-        },
-        "trt_engine": {
-          "default": "",
-          "description": "Path to the TensorRT engine to be used for evaluation.\n                    This only works with :code:`tao-deploy`.",
-          "title": "TensorRT Engine",
           "type": "string"
         }
       },
@@ -2911,12 +2901,6 @@
       },
       "type": "collection"
     },
-    "model_name": {
-      "default": "",
-      "description": "Name of model if invoking task via :code:`model_agnostic`",
-      "title": "Model name",
-      "type": "string"
-    },
     "results_dir": {
       "default": "",
       "description": "\n        Path to where all the assets generated from a task are stored.\n        ",
@@ -2934,7 +2918,6 @@
       "default": {
         "by_epoch": true,
         "checkpoint_interval": 1,
-        "checkpoint_interval_unit": "epoch",
         "cudnn": {
           "benchmark": false,
           "deterministic": true
@@ -2991,10 +2974,10 @@
           "weight_decay": 0.01,
           "wrapper_type": "OptimWrapper"
         },
-        "pretrained_checkpoint": "",
+        "pretrained_checkpoint": null,
         "results_dir": "",
         "resume": false,
-        "resume_training_checkpoint_path": "",
+        "resume_training_checkpoint_path": null,
         "seed": 1234,
         "validation_interval": 1
       },
@@ -3021,16 +3004,6 @@
           "popular": true,
           "title": "Checkpoint interval",
           "type": "int"
-        },
-        "checkpoint_interval_unit": {
-          "default": "epoch",
-          "description": "The unit of the checkpoint interval.",
-          "enum": [
-            "epoch",
-            "step"
-          ],
-          "title": "Checkpoint interval unit",
-          "type": "categorical"
         },
         "cudnn": {
           "automl_enabled": false,
@@ -3201,7 +3174,7 @@
           "type": "collection"
         },
         "pretrained_checkpoint": {
-          "default": "",
+          "default": null,
           "description": "Path to a pre-trained BEVFusion model to initialize the current training from.",
           "type": "string"
         },
@@ -3218,7 +3191,7 @@
           "type": "bool"
         },
         "resume_training_checkpoint_path": {
-          "default": "",
+          "default": null,
           "description": "Path to the checkpoint to resume training from.",
           "title": "Resume checkpoint path",
           "type": "string"
@@ -3250,11 +3223,9 @@
       "default": {
         "enable": true,
         "entity": "",
-        "group": "",
         "name": "TAO Toolkit Training",
         "project": "TAO Toolkit",
         "reinit": false,
-        "run_id": "",
         "save_code": false,
         "sync_tensorboard": false,
         "tags": [
@@ -3270,10 +3241,6 @@
           "default": "",
           "type": "string"
         },
-        "group": {
-          "default": "",
-          "type": "string"
-        },
         "name": {
           "default": "TAO Toolkit Training",
           "type": "string"
@@ -3285,10 +3252,6 @@
         "reinit": {
           "default": false,
           "type": "bool"
-        },
-        "run_id": {
-          "default": "",
-          "type": "string"
         },
         "save_code": {
           "default": false,
@@ -3304,6 +3267,82 @@
             "tao-toolkit"
           ],
           "type": "list"
+        }
+      },
+      "type": "collection"
+    },
+    "inference": {
+      "automl_disabled_parameters": [
+        "inference.gpu_ids"
+      ],
+      "automl_enabled": false,
+      "default": {
+        "checkpoint": "",
+        "conf_threshold": 0.5,
+        "gpu_ids": [
+          0
+        ],
+        "num_gpus": 1,
+        "num_nodes": 1,
+        "results_dir": "",
+        "show": false
+      },
+      "description": "Configurable parameters to construct the inferencer for a BEVFusion experiment.",
+      "popular": [
+        "num_gpus",
+        "num_nodes",
+        "gpu_ids"
+      ],
+      "properties": {
+        "checkpoint": {
+          "default": "???",
+          "description": "Path to the checkpoint used for inference.",
+          "title": "Checkpoint path",
+          "type": "string"
+        },
+        "conf_threshold": {
+          "default": 0.5,
+          "description": "Confidence Threshold",
+          "title": "conf threshold",
+          "type": "float"
+        },
+        "gpu_ids": {
+          "automl_enabled": false,
+          "default": [
+            0
+          ],
+          "description": "\n        List of GPU IDs to run the inference on. The length of this list\n        must be equal to the number of gpus in inference.num_gpus.",
+          "popular": true,
+          "title": "GPU IDs",
+          "type": "list"
+        },
+        "num_gpus": {
+          "default": 1,
+          "description": "The number of GPUs to run the inference job.",
+          "minimum": 1,
+          "popular": true,
+          "title": "Number of GPUs",
+          "type": "int"
+        },
+        "num_nodes": {
+          "default": 1,
+          "description": "Number of nodes to run the inference on. If > 1, then multi-node is enabled.",
+          "minimum": 1,
+          "popular": true,
+          "title": "Number of nodes",
+          "type": "int"
+        },
+        "results_dir": {
+          "default": "",
+          "description": "\n        Path to where all the assets generated from a task are stored.\n        ",
+          "title": "Results directory",
+          "type": "string"
+        },
+        "show": {
+          "default": false,
+          "description": "Whether to show the 3D visualizaiton on screen",
+          "title": "show 3D visualization",
+          "type": "bool"
         }
       },
       "type": "collection"

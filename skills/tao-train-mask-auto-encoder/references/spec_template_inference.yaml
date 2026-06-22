@@ -17,6 +17,7 @@ dataset:
   batch_size: 1
   train_data_sources: ''
   val_data_sources: ''
+  test_data_sources: ''
   num_workers_per_gpu: 2
   augmentation:
     input_size: 224

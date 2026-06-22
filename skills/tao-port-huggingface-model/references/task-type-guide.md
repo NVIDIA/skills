@@ -16,6 +16,44 @@ limitations under the License.
 
 # CV Task Type Guide
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Quick Reference
+- 1. Image Classification
+  - Architecture
+  - Implementation Notes
+  - Config Specifics
+  - Dataset Structure
+  - ONNX Export
+  - TRT Deploy
+- 2. Object Detection (DETR-based)
+  - Architecture
+  - Implementation Notes
+  - Config Specifics
+  - Dataset Structure
+  - Loss Functions
+  - ONNX Export
+  - TRT Deploy
+  - Metrics
+- 3. Semantic Segmentation
+  - Architecture
+  - Implementation Notes
+  - Config Specifics
+  - Dataset Structure
+  - Loss Functions
+  - ONNX Export
+  - TRT Deploy
+  - Metrics
+- 4. Instance Segmentation
+  - Architecture
+  - Implementation Notes
+  - Config Specifics
+  - ONNX Export
+  - Post-Processing
+
+
 How to adapt the TAO implementation for each Computer Vision task type. The HF model's `pipeline_tag` determines which patterns to follow.
 
 ---

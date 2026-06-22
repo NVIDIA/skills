@@ -53,6 +53,7 @@ train:
 evaluate:
   gpu_ids:
   - 0
+  batch_size: 1
   checkpoint: <required>
   trt_engine: /results/optical-inspection.engine
 export:

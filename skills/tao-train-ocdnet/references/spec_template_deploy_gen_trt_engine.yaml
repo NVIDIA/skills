@@ -1,4 +1,5 @@
 gen_trt_engine:
+  results_dir: /results
   width: 1280
   height: 736
   img_mode: BGR
@@ -15,3 +16,4 @@ gen_trt_engine:
       cal_cache_file: /results/ocdnet_calibration.cache
       cal_batch_size: 8
       cal_batches: 2
+results_dir: /results

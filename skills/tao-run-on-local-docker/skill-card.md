@@ -1,5 +1,5 @@
 ## Description: <br>
-Local Docker execution for TAO SDK job containers using the host Docker daemon and NVIDIA GPU runtime. <br>
+Local or remote Docker execution for TAO SDK job containers using a Docker daemon with NVIDIA GPU runtime. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers running TAO model training, evaluation, or inference jobs locally via Docker containers on GPU-equipped machines. <br>
+Developers and engineers who need to run TAO training, evaluation, or inference jobs on a local or remote Docker host with NVIDIA GPUs, for development, debugging, and single-node workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -36,7 +36,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (positive skill-activation case) with 2 attempts per task in astra-sandbox environment. <br>
+Evaluated against 1 evaluation task in NVSkills-Eval external profile on astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,14 +60,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 47% (+47%) | 97% (+97%) |
-| Discoverability | 2 | 17% (+17%) | 97% (+97%) |
-| Effectiveness | 2 | 62% (+52%) | 76% (+66%) |
-| Efficiency | 2 | 26% (-1%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 50% (+10%) | 47% (+47%) |
+| Discoverability | 1 | 88% (+88%) | 97% (+97%) |
+| Effectiveness | 1 | 60% (+4%) | 60% (+50%) |
+| Efficiency | 1 | 75% (+48%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
-0.2.0 (source: frontmatter) <br>
+0.1.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

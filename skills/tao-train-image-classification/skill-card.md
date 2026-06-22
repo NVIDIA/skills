@@ -1,5 +1,5 @@
 ## Description: <br>
-PyTorch-based TAO image classification skill supporting a wide range of backbones (FAN, EfficientNet, ResNet, etc.) with distillation and quantization for deployment. <br>
+PyTorch-based TAO image classification supporting a wide range of backbones (FAN, EfficientNet, ResNet, etc.) with distillation and quantization for deployment. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, distilling, quantizing, exporting, or running inference on TAO image-classification models using PyTorch backbones. <br>
+Developers and engineers training, evaluating, distilling, quantizing, exporting, or running inference on TAO image classification models using PyTorch. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,7 +20,6 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [TAO Deploy Image Classification](references/tao-deploy-image-classification.md) <br>
-- [Skill Info](references/skill_info.yaml) <br>
 - [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
@@ -37,7 +36,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive skill-activation case) with 2 attempts per task in the astra-sandbox environment using the NVSkills-Eval external profile. <br>
+Evaluated against 1 internal skill evaluation task in astra-sandbox environment using NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +60,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 95% (+95%) | 48% (+48%) |
-| Discoverability | 2 | 88% (+88%) | 48% (+48%) |
-| Effectiveness | 2 | 88% (+78%) | 57% (+43%) |
-| Efficiency | 2 | 71% (+44%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 92% (+92%) | 97% (+97%) |
+| Effectiveness | 1 | 100% (+90%) | 90% (+80%) |
+| Efficiency | 1 | 79% (+52%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

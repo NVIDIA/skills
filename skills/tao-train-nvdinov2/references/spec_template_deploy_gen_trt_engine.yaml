@@ -1,7 +1,10 @@
 encryption_key: tlt_encode
+results_dir: /results
 model:
   backbone:
-    type: vit_l
+    teacher_type: vit_l
+    student_type: vit_l
+    num_register_tokens: 0
     drop_path_rate: 0.4
     patch_size: 14
     img_size: 518
@@ -18,5 +21,5 @@ gen_trt_engine:
     data_type: FP32
     workspace_size: 1024
     min_batch_size: 1
-    opt_batch_size: 10
-    max_batch_size: 10
+    opt_batch_size: 1
+    max_batch_size: 1

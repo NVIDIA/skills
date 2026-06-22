@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to submit and manage TAO training, evaluation, and inference jobs on on-prem or DGX SLURM GPU clusters via an agent-assisted workflow. <br>
+Developers and engineers who need to submit TAO training, evaluation, or inference jobs to on-premises or DGX SLURM GPU clusters over SSH. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,10 +19,11 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [multi-node.md](references/multi-node.md) <br>
-- [sdk-usage.md](references/sdk-usage.md) <br>
-- [ssh-setup.md](references/ssh-setup.md) <br>
-- [troubleshooting.md](references/troubleshooting.md) <br>
+- [slurm-ssh-credentials.md](references/slurm-ssh-credentials.md) <br>
+- [slurm-container-execution.md](references/slurm-container-execution.md) <br>
+- [slurm-preflight-storage.md](references/slurm-preflight-storage.md) <br>
+- [slurm-execution-sdk.md](references/slurm-execution-sdk.md) <br>
+- [detailed-guide.md](references/detailed-guide.md) <br>
 - [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
@@ -39,7 +40,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive activation case) with 2 attempts per task using NVSkills-Eval external profile. <br>
+Evaluated against 1 internal skill task in the NVSkills-Eval external profile (astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,14 +64,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 20% (+20%) | 48% (+48%) |
-| Discoverability | 2 | 0% (+0%) | 48% (+48%) |
-| Effectiveness | 2 | 44% (+34%) | 57% (+43%) |
-| Efficiency | 2 | 27% (-0%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 83% (+83%) | 97% (+97%) |
+| Effectiveness | 1 | 90% (+80%) | 90% (+66%) |
+| Efficiency | 1 | 66% (+39%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
-0.2.0 (source: frontmatter) <br>
+0.1.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

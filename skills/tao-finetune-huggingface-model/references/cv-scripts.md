@@ -16,6 +16,21 @@ limitations under the License.
 
 # CV Pipeline Scripts Reference
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- requirements.txt — CV Template
+- config.yaml — CV Template
+- model.py
+- dataset.py
+- train.py
+- run_eval.py (NOT `evaluate.py` — collides with HF `evaluate` library)
+- inference.py
+- Detection-Specific Gotchas
+- Per-Task Metrics Summary
+
+
 > **How to use this file**
 >
 > This file defines two things:

@@ -1,6 +1,6 @@
-# FastFoundationStereo Spec Param / Parent Model Inference
+# Spec Param / Parent Model Inference
 
-Model-specific inference mappings for FastFoundationStereo (FFS). Generated runners should read this section and apply the mappings with SDK helpers before `create_job()`.
+Model-specific inference mappings belong in this MD file, not in `config.json`. Generated runners should read this section and apply the mappings with SDK helpers before `create_job()`.
 
 | Action | Spec Field | Inference Function | Meaning |
 |---|---|---|---|

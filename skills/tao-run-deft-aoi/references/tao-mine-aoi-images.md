@@ -53,6 +53,16 @@ Required files:
 - `target_embeddings.parquet` — Step 1 output (reusable across future mining runs against the same targets)
 - `source_embeddings.parquet` — Step 2 output (reusable against the same source pool)
 
+## Mined rows → ChangeNet CSV
+
+`mined.parquet` holds source **file** paths (e.g. `images/BOARD/comp_SolderLight.jpg`). ChangeNet's siamese dataloader does **not** open that path directly — it builds `{images_dir}/{input_path}/{object_name}_{light}{image_ext}`, so when turning a mined filepath into a training row:
+
+- `input_path` = the **directory** of the file (`images/BOARD/`), not the file itself.
+- `object_name` + `{light}` + `{image_ext}` must reconstruct the file's basename (`comp_SolderLight.jpg`). Carry `object_name` from the source pool row, or derive it by stripping the trailing `_{light}{image_ext}`.
+- `golden_path` = the paired golden **directory**, rewritten to be workspace-root-relative (the per-iter training spec sets `images_dir` to the workspace root).
+
+Both `input_path` and `golden_path` need this file→directory collapse — not just `golden_path`. `scripts/validate_training_csv.py` reconstructs the full siamese path and hard-stops if a row doesn't resolve, so a missed conversion is caught before training rather than mid-run.
+
 ## Pool Composition Requirement
 
 `augmentation/mining_pool/mining_pool.csv` must contain **NG samples** for every defect type listed in the KPI testing set — not just PASS samples. The mining stage retrieves nearest neighbours by SigLIP embedding similarity, so if the pool has zero NG examples for a defect type, no candidate ever crosses the configured `min_similarity` threshold and the iteration silently contributes no real-image augmentation for that type. Document defect-type coverage in the workspace setup; do not work around in code. Past production pools have been missing `SHIFT`, `LIFTED_LEAD`, `UPSIDE_DOWN`, `TOMBSTONE`, and `POLARITY` simultaneously, which leaves 5/8 KPI defect types with no augmentation path.

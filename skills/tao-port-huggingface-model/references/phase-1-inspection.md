@@ -18,6 +18,21 @@ Full Phase 1 walkthrough for the `tao-port-huggingface-model` skill — credenti
 
 ## Phase 1 — Information Gathering & Validation
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Phase 1 — Information Gathering & Validation
+  - 1.1 Gather credentials, targets, and locate repos
+  - 1.2 Create a consistent working branch across all repos
+  - 1.3 Set up an isolated environment for HF inspection
+  - 1.4 Validate that the model is a Computer Vision model
+  - 1.5 Fetch the model architecture and checkpoint
+  - 1.6 Verify ONNX exportability
+  - 1.7 Clean up Phase 1 environment
+  - Phase 1 Gate — Confirm before proceeding:
+
+
 ### 1.1 Gather credentials, targets, and locate repos
 Ask the user for:
 - **HuggingFace Model ID** — e.g., `google/vit-base-patch16-224`
@@ -205,4 +220,3 @@ rm -rf ./.phase1
 **Present findings to the user and get confirmation before proceeding to implementation.**
 
 ---
-

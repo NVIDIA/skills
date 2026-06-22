@@ -16,6 +16,22 @@ limitations under the License.
 
 # Dataset Validation & Preparation Reference
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- prepare_data.py — Universal Template
+- Column Schema Requirements by Task
+  - image-classification
+  - object-detection
+  - semantic-segmentation
+  - image-text-to-text (VLM)
+  - text-generation (LLM SFT)
+- Arrow PIL Bug Fix
+- Sample Size Recommendations
+- Config Fields for Dataset
+
+
 Used in Phase 3 of tao-finetune-huggingface-model skill.
 
 ---

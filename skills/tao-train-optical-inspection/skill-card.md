@@ -1,5 +1,5 @@
 ## Description: <br>
-Optical inspection for defect detection using Siamese networks, comparing image pairs to detect manufacturing defects, anomalies, or quality issues. <br>
+Optical Inspection for defect detection using Siamese networks. Compares image pairs to detect manufacturing defects, anomalies, or quality issues. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, or running inference for TAO Optical Inspection models on AOI and quality-control data for manufacturing defect detection. <br>
+Developers and engineers training, evaluating, exporting, or running inference for TAO Optical Inspection models on AOI and quality-control datasets for manufacturing defect detection. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,9 +19,8 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [skill_info.yaml](references/skill_info.yaml) <br>
 - [TAO Deploy Optical Inspection](references/tao-deploy-optical-inspection.md) <br>
-- [Train Spec Template](references/spec_template_train.yaml) <br>
+- [Skill Info](references/skill_info.yaml) <br>
 - [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
@@ -38,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the astra-sandbox environment using the NVSkills-Eval external profile. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile within an astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 80% (+80%) | 20% (+20%) |
-| Discoverability | 2 | 100% (+100%) | 0% (+0%) |
-| Effectiveness | 2 | 49% (+37%) | 48% (+34%) |
-| Efficiency | 2 | 94% (+67%) | 28% (-0%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 80% (+30%) | 20% (+20%) |
+| Discoverability | 1 | 100% (+100%) | 0% (+0%) |
+| Effectiveness | 1 | 44% (-34%) | 44% (+12%) |
+| Efficiency | 1 | 95% (+68%) | 28% (+0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

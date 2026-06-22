@@ -34,6 +34,9 @@ model:
 dataset:
   train_dataset_dir: ''
   val_dataset_dir: ''
+  label_map:
+    catch: 0
+    smile: 1
   batch_size: 2
   workers: 8
   clips_per_video: 1

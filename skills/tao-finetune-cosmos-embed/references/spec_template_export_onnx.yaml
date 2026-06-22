@@ -1,7 +1,7 @@
 results_dir: /results
 
 export:
-  checkpoint: /results/train/cosmos_embed1_model_latest.pth
+  checkpoint: null
   onnx_file: /results/export/cosmos_embed1_combined.onnx
   mode: combined
   opset_version: 17
@@ -13,6 +13,7 @@ export:
 model:
   pretrained_model_path: null
   precision: fp32
+  fsdp_shard_size: 1
   input_hw: [224, 224]
   network:
     embed_dim: 256

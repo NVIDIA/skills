@@ -124,7 +124,9 @@
           "cal_batch_size": 1,
           "cal_batches": 1,
           "cal_cache_file": "???",
-          "cal_image_dir": "???"
+          "cal_image_dir": [
+            "???"
+          ]
         },
         "data_type": "FP32",
         "layers_precision": [],
@@ -656,7 +658,9 @@
             "cal_batch_size": 1,
             "cal_batches": 1,
             "cal_cache_file": "???",
-            "cal_image_dir": "???"
+            "cal_image_dir": [
+              "???"
+            ]
           },
           "data_type": "FP32",
           "layers_precision": [],
@@ -715,7 +719,9 @@
               "cal_batch_size": 1,
               "cal_batches": 1,
               "cal_cache_file": "???",
-              "cal_image_dir": "???"
+              "cal_image_dir": [
+                "???"
+              ]
             },
             "data_type": "FP32",
             "layers_precision": [],
@@ -741,7 +747,9 @@
                 "cal_batch_size": 1,
                 "cal_batches": 1,
                 "cal_cache_file": "???",
-                "cal_image_dir": "???"
+                "cal_image_dir": [
+                  "???"
+                ]
               },
               "description": "The configuration elements to define the\n                    TensorRT calibrator for int8 PTQ.",
               "popular": [
@@ -773,7 +781,9 @@
                 },
                 "cal_image_dir": {
                   "automl_enabled": false,
-                  "default": "???",
+                  "default": [
+                    "???"
+                  ],
                   "description": "List of image directories to be used for calibration\n                    when running Post Training Quantization using TensorRT.",
                   "title": "Calibration image directories",
                   "type": "list"

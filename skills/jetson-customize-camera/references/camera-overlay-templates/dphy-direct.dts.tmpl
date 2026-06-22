@@ -1,0 +1,205 @@
+/*
+ * SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * dphy-direct.dts.tmpl — agentic template for DPHY-direct cameras.
+ *
+ * Use when the carrier wires the sensor's MIPI CSI-2 lanes directly
+ * to the SoC's NVCSI ports (no GMSL serializer/deserializer chain).
+ *
+ * Placeholders (substituted by /jetson-modify-camera step 6):
+ *
+ *   <<OVERLAY_NAME>>          — human-readable label, e.g. "Jetson Camera Dual-IMX274"
+ *   <<JETSON_HEADER_NAME>>    — "Jetson AGX CSI Connector" (read from devkit ref overlay)
+ *   <<COMPATIBLE_LIST>>       — \0-joined compatible strings, must match
+ *                               /proc/device-tree/compatible on the DUT;
+ *                               read from session.platform_compatible_list
+ *                               or the reference DTB root compatible
+ *   <<EEPROM_ID>>             — board_config.ids string, e.g. "LPRD-dual-imx274-002";
+ *                               read from connector EEPROM if present, else user-provided
+ *
+ *   For each sensor (port-index 0..N-1):
+ *   <<NUM_PORTS>>             — number of CSI ports populated (1 / 2 / 4)
+ *   <<PORT_INDEX_<n>>>        — NVCSI port index used by sensor n (CSI0=0, CSI2=2, …)
+ *   <<BUS_WIDTH_<n>>>         — number of CSI lanes the sensor outputs (1, 2, 4)
+ *   <<VC_ID_<n>>>             — virtual-channel id (usually 0 for DPHY-direct)
+ *   <<I2C_BUS_NODE_<n>>>      — /aliases label of the I2C controller, e.g. "i2c@810c6d0000"
+ *   <<I2C_ADDR_<n>>>          — sensor I2C address, e.g. 0x1a
+ *   <<SENSOR_COMPATIBLE_<n>>> — driver compatible string, e.g. "sony,imx274"
+ *   <<RESET_GPIO_<n>>>        — reset GPIO triplet <controller-phandle pin flags>
+ *   <<PWDN_GPIO_<n>>>         — power-down GPIO triplet (omit fragment if not wired)
+ *   <<PWR_EN_GPIO_<n>>>       — power-enable GPIO triplet (omit fragment if not wired)
+ *   <<MCLK_NODE_<n>>>         — extperiph clock controller phandle for sensor MCLK
+ *   <<MCLK_RATE_HZ_<n>>>      — MCLK frequency in Hz (e.g. 24000000 for 24 MHz)
+ *
+ *   Optional I2C mux (set <<HAS_MUX>> = 1 when the carrier puts the sensors
+ *   behind a TCA9546 / PCA9546 / similar):
+ *   <<MUX_COMPATIBLE>>        — e.g. "nxp,pca9546"
+ *   <<MUX_NODE>>              — node label, e.g. "tca9546"
+ *   <<MUX_ADDR_HEX>>          — 0x70..0x77
+ *   <<MUX_CHANNEL_<n>>>       — 0-3, which mux output the sensor sits behind
+ *
+ * Sensor-specific register tables (mode_type, pixel_phase, sensor-mode
+ * rows, modeN_a/b property bags) MUST come from the closest in-tree
+ * tegra<soc>-p3971-camera-<sensor>-overlay.dtbo decompiled with `dtc`.
+ * The agent splices those into the sensor@<addr> subnode after
+ * substituting the placeholders above. Hand-coding mode tables is
+ * wrong — they encode sensor silicon timings that NVIDIA validated.
+ */
+
+/dts-v1/;
+
+/ {
+    overlay-name = "<<OVERLAY_NAME>>";
+    jetson-header-name = "<<JETSON_HEADER_NAME>>";
+    compatible = "<<COMPATIBLE_LIST>>";
+
+    fragment@0 {
+        target-path = "/";
+
+        board_config {
+            ids = "<<EEPROM_ID>>";
+            sw-modules = "kernel";
+        };
+
+        __overlay__ {
+
+            tegra-capture-vi {
+                status = "okay";
+                num-channels = <<<NUM_PORTS>>>;
+
+                ports {
+                    status = "okay";
+
+                    /*
+                     * REPEAT this port@<n> block for n = 0..<<NUM_PORTS>>-1.
+                     * Substitute <<PORT_INDEX_n>>, <<BUS_WIDTH_n>>, <<VC_ID_n>>.
+                     * remote-endpoint phandles resolve at compile time via labels.
+                     */
+                    port@0 {
+                        status = "okay";
+
+                        endpoint {
+                            status = "okay";
+                            port-index = <<<PORT_INDEX_0>>>;
+                            bus-width = <<<BUS_WIDTH_0>>>;
+                            vc-id = <<<VC_ID_0>>>;
+                            remote-endpoint = <&csi_chan0_in>;
+                        };
+                    };
+                };
+            };
+
+            tegra-camera-platform {
+                compatible = "nvidia, tegra-camera-platform";
+                num_csi_lanes = <<<BUS_WIDTH_0>>>;
+                max_lane_speed = <0x10c8e0>;          /* 1.10592 GHz default */
+                min_bits_per_pixel = <0x0a>;
+                vi_peak_byte_per_pixel = <0x02>;
+                vi_bw_margin_pct = <0x19>;
+                max_pixel_rate = <0x33dc8>;
+                isp_peak_byte_per_pixel = <0x05>;
+                isp_bw_margin_pct = <0x19>;
+
+                /* Stub modules{} block — agent fills one entry per sensor */
+                modules {
+                    /* module<n> { badge = ...; position = ...; orientation = ...; drivernode0 { ... }; }; */
+                };
+            };
+        };
+    };
+
+    /*
+     * fragment@1 — sensor + (optional) mux on the chosen I2C bus.
+     * The agent rewrites target-path to the carrier's I2C controller
+     * (session.camera.connector.i2c_controller_node).
+     */
+    fragment@1 {
+        target-path = "/<<I2C_BUS_NODE_0>>";
+
+        __overlay__ {
+            #address-cells = <0x01>;
+            #size-cells = <0x00>;
+
+            /*
+             * If <<HAS_MUX>> == 1, wrap the sensor entries below in
+             *   <<MUX_NODE>>: <<MUX_NODE>>@<<MUX_ADDR_HEX>> {
+             *       compatible = "<<MUX_COMPATIBLE>>";
+             *       reg = <<<MUX_ADDR_HEX>>>;
+             *       #address-cells = <0x01>;
+             *       #size-cells = <0x00>;
+             *       i2c@<<MUX_CHANNEL_0>> { reg = <<<MUX_CHANNEL_0>>>; sensor@... { ... }; };
+             *   };
+             * If <<HAS_MUX>> == 0, place the sensor@... subnodes directly.
+             */
+
+            sensor_a@<<I2C_ADDR_0>> {
+                compatible = "<<SENSOR_COMPATIBLE_0>>";
+                reg = <<<I2C_ADDR_0>>>;
+                reset-gpios  = <<<RESET_GPIO_0>>>;
+                /* Conditional fragments — emit only when wired on carrier: */
+                pwdn-gpios   = <<<PWDN_GPIO_0>>>;
+                pwr-en-gpios = <<<PWR_EN_GPIO_0>>>;
+
+                clocks = <<<MCLK_NODE_0>>>;
+                clock-names = "extperiph1";
+                clock-frequency = <<<MCLK_RATE_HZ_0>>>;
+
+                /*
+                 * Sensor-specific properties (mode_type, pixel_phase,
+                 * mode<n>_a/_b, sensor_modes children) are spliced in
+                 * from the in-tree reference DTBO for this sensor.
+                 * DO NOT hand-write these — they encode silicon
+                 * timings that NVIDIA validated.
+                 */
+
+                ports {
+                    #address-cells = <0x01>;
+                    #size-cells = <0x00>;
+
+                    port@0 {
+                        reg = <0x00>;
+                        sensor_a_out: endpoint {
+                            port-index = <<<PORT_INDEX_0>>>;
+                            bus-width = <<<BUS_WIDTH_0>>>;
+                            remote-endpoint = <&csi_chan0_in>;
+                        };
+                    };
+                };
+            };
+        };
+    };
+
+    /*
+     * fragment@2 — NVCSI port@<n> in-endpoint label so VI can find the
+     * sensor's data-stream. NVIDIA's reference overlays use phandle
+     * labels (csi_chan0_in, csi_chan1_in, …) — keep them stable so the
+     * remote-endpoint references above resolve at compile time.
+     */
+    fragment@2 {
+        target-path = "/host1x@1300000/nvcsi@8c00000";
+
+        __overlay__ {
+            num-channels = <<<NUM_PORTS>>>;
+            #address-cells = <0x01>;
+            #size-cells = <0x00>;
+
+            channel@0 {
+                reg = <<<PORT_INDEX_0>>>;
+                ports {
+                    #address-cells = <0x01>;
+                    #size-cells = <0x00>;
+
+                    port@0 {
+                        reg = <0x00>;
+                        csi_chan0_in: endpoint@0 {
+                            port-index = <<<PORT_INDEX_0>>>;
+                            bus-width = <<<BUS_WIDTH_0>>>;
+                            remote-endpoint = <&sensor_a_out>;
+                        };
+                    };
+                };
+            };
+        };
+    };
+};

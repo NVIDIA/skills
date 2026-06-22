@@ -1,5 +1,5 @@
 ## Description: <br>
-Performs gap analysis on NVIDIA TAO Visual ChangeNet (VCN) Classify experiments by invoking the data-services container directly via docker run to pick the optimal decision threshold, rank per-sample weakness, and emit a top-K weakest parquet expanded per-lighting for downstream augmentation. <br>
+Performs gap analysis on NVIDIA TAO VCN Classify (Visual Component Net) experiments by invoking the data-services container directly via docker run — picks the optimal decision threshold, ranks per-sample weakness, and emits a top-K weakest parquet expanded per-lighting for downstream augmentation. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers analyzing VCN classification failures, picking SDA augmentation targets, auditing PASS/NO_PASS boundary cases, or running DEFT gap analysis on an AOI ChangeNet model. <br>
+Developers and engineers analyzing VCN classification failures, picking SDA augmentation targets, or auditing PASS/NO_PASS boundary cases in NVIDIA TAO Visual ChangeNet pipelines. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,15 +19,16 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Parameters and Artifacts](references/parameters-and-artifacts.md) <br>
-- [RCA Report Structure](references/rca-report-structure.md) <br>
-- [Recipe](references/recipe.md) <br>
-- [Troubleshooting](references/troubleshooting.md) <br>
+- [container-setup.md](references/container-setup.md) <br>
+- [output-template.md](references/output-template.md) <br>
+- [pitfalls.md](references/pitfalls.md) <br>
+- [visual-spot-check.md](references/visual-spot-check.md) <br>
+- [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Shell commands, Files] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Format:** [Markdown report with inline bash code blocks and Parquet data output] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -38,7 +39,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive skill-activation case, 2 attempts per task) via NVSkills-Eval external profile. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval `external` profile (`astra-sandbox` environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,14 +63,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 50% (+50%) | 97% (+97%) |
-| Discoverability | 2 | 0% (+0%) | 97% (+97%) |
-| Effectiveness | 2 | 91% (+77%) | 81% (+66%) |
-| Efficiency | 2 | 27% (-0%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 50% (+50%) | 97% (+97%) |
+| Discoverability | 1 | 0% (+0%) | 97% (+97%) |
+| Effectiveness | 1 | 100% (+76%) | 90% (+62%) |
+| Efficiency | 1 | 27% (-0%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
-0.3.0 (source: frontmatter) <br>
+0.1.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

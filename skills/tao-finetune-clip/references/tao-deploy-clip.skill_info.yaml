@@ -7,6 +7,7 @@ actions:
   gen_trt_engine:
     command: clip gen_trt_engine -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       gen_trt_engine.onnx_file:
         type: file
@@ -22,13 +23,14 @@ actions:
   evaluate:
     command: clip evaluate -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       evaluate.trt_engine:
         type: file
       dataset.val.datasets[0].image_dir:
         type: folder
       dataset.val.datasets[0].caption_dir:
-        type: file
+        type: folder
     outputs:
       results_dir:
         type: folder
@@ -37,9 +39,16 @@ actions:
   inference:
     command: clip inference -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       inference.trt_engine:
         type: file
+      inference.datasets[0].image_dir:
+        type: folder
+        optional: true
+      inference.text_file:
+        type: file
+        optional: true
     outputs:
       results_dir:
         type: folder

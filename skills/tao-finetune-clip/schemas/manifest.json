@@ -115,7 +115,10 @@
       "spec_template": "references/spec_template_export.yaml"
     },
     "train": {
-      "automl_default_parameters": [],
+      "automl_default_parameters": [
+        "train.optim.text_lr",
+        "train.optim.vision_lr"
+      ],
       "automl_disabled_parameters": [
         "dataset",
         "dataset.augmentation",

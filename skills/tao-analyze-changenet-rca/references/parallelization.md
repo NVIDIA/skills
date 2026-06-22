@@ -1,6 +1,6 @@
 # Parallelization Strategy (USE SUBAGENTS)
 
-**You MUST use the Agent tool to run independent investigation tracks in parallel.** This dramatically speeds up the RCA. Follow this execution plan:
+**You MUST use the Agent tool to run independent investigation tracks in parallel.** This dramatically speeds up the RCA. Follow this execution plan.
 
 ## Step 1: Phase 1 — Run sequentially (everything depends on this)
 Run Phase 1 yourself in the main thread. Save the results:
@@ -69,7 +69,7 @@ Then run Phase 5 (counterfactual) yourself, because it needs findings from ALL a
 
 **BEFORE writing RCA_Report.md**, run `ls rca_images/` to inventory all available thumbnails. You need exact filenames for inline embedding.
 
-**Image Embedding Protocol (MANDATORY)**:
+### Image Embedding Protocol (MANDATORY)
 Every visual evidence table row MUST have inline thumbnail columns using `![caption](rca_images/<filename>.jpg)` syntax. A report without per-row images is incomplete — the hook will reject it.
 
 Rules:

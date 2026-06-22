@@ -1,5 +1,5 @@
 ## Description: <br>
-SegFormer for semantic segmentation: lightweight transformer-based architecture with hierarchical feature extraction, efficient for real-time segmentation tasks. <br>
+SegFormer for semantic segmentation — lightweight transformer-based architecture with hierarchical feature extraction, efficient for real-time segmentation tasks. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers training, evaluating, exporting, quantizing, or running inference on NVIDIA TAO SegFormer semantic segmentation models. <br>
+Developers and engineers training, evaluating, exporting, quantizing, or running inference on NVIDIA TAO SegFormer models for semantic segmentation tasks. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,8 +19,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [tao-deploy-segformer.md](references/tao-deploy-segformer.md) <br>
-- [skill_info.yaml](references/skill_info.yaml) <br>
+- [TAO Deploy SegFormer](references/tao-deploy-segformer.md) <br>
+- [Skill Info (AutoML configuration)](references/skill_info.yaml) <br>
+- [Training Spec Template](references/spec_template_train.yaml) <br>
 - [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
@@ -37,7 +38,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the astra-sandbox environment using NVSkills-Eval external profile. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +62,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 95% (+90%) | 97% (+78%) |
-| Discoverability | 2 | 88% (+88%) | 97% (+66%) |
-| Effectiveness | 2 | 88% (+62%) | 78% (+62%) |
-| Efficiency | 2 | 71% (+44%) | 96% (+51%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+52%) | 20% (+20%) |
+| Discoverability | 1 | 85% (+35%) | 0% (+0%) |
+| Effectiveness | 1 | 100% (+82%) | 32% (+4%) |
+| Efficiency | 1 | 68% (+35%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

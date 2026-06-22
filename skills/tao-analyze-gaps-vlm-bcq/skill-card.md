@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to identify false-positive and false-negative failure cases from VLM binary-classification evaluations to drive DEFT root cause analysis iterations. <br>
+Developers and engineers use this skill to extract false-positive and false-negative failure cases from VLM binary-classification-question predictions for downstream DEFT root-cause analysis iterations. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -24,8 +24,8 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Files] <br>
-**Output Format:** [JSONL and plain text report files] <br>
+**Output Type(s):** [Analysis, Files] <br>
+**Output Format:** [JSONL gap records and plain-text summary report] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -36,7 +36,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the astra-sandbox environment using the external NVSkills-Eval profile. <br>
+Evaluated against 1 internal skill evaluation task in the astra-sandbox environment using the NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,11 +60,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 92% (+55%) | 72% (+72%) |
-| Discoverability | 2 | 61% (+15%) | 97% (+97%) |
-| Effectiveness | 2 | 100% (+96%) | 65% (+53%) |
-| Efficiency | 2 | 50% (+20%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 84% (+84%) | 97% (+97%) |
+| Discoverability | 1 | 34% (+34%) | 97% (+97%) |
+| Effectiveness | 1 | 100% (+90%) | 90% (+76%) |
+| Efficiency | 1 | 24% (-3%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

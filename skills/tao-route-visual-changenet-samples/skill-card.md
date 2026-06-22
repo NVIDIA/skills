@@ -1,5 +1,5 @@
 ## Description: <br>
-Routes the weakest VCN samples (output of `tao-analyze-gaps-visual-changenet`) into per-augmentation-module subsets — one parquet for k-NN mining, one for AnomalyGen (Cosmos SDG) — based on each module's label eligibility. <br>
+Routes the weakest VCN samples (output of `tao-analyze-gaps-visual-changenet`) into per-augmentation-module subsets based on each module's label eligibility. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers routing weak Visual ChangeNet samples from DEFT gap analysis into per-augmentation-module subsets for k-NN mining and AnomalyGen (Cosmos SDG) in a VCN AOI SDA pipeline iteration. <br>
+Developers and engineers preparing the next step after DEFT gap analysis in a VCN AOI SDA iteration, splitting weak-sample routing decisions into per-augmentation-module subsets for k-NN Mining and AnomalyGen. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,13 +20,14 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [Agent Skills Open Standard](https://agentskills.io) <br>
+- [NVIDIA TAO Skill Bank Repository](https://github.com/NVIDIA-TAO/tao-skills-bank) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Files, Analysis] <br>
 **Output Format:** [Parquet data files and Markdown report] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Produces mining_gaps.parquet, anomalygen_gaps.parquet, routing_summary.txt, and Routing_Report.md] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`claude-code`) <br>
@@ -35,7 +36,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the astra-sandbox environment using the external NVSkills-Eval profile. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval `external` profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -59,11 +60,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 45% (+45%) | 10% (+10%) |
-| Discoverability | 2 | 0% (+0%) | 0% (+0%) |
-| Effectiveness | 2 | 85% (+71%) | 40% (+22%) |
-| Efficiency | 2 | 27% (+0%) | 28% (-0%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 92% (+92%) | 97% (+97%) |
+| Effectiveness | 1 | 90% (+80%) | 90% (+76%) |
+| Efficiency | 1 | 79% (+52%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

@@ -1,5 +1,5 @@
 ## Description: <br>
-Sparse4D for multi-camera temporal 3D object detection and tracking, using sparse queries with deformable attention across camera views and time for end-to-end 3D perception with an instance bank for temporal tracking. <br>
+Sparse4D for multi-camera temporal 3D object detection and tracking using sparse queries with deformable attention across camera views and time for end-to-end 3D perception, with an instance bank for temporal tracking. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, quantizing, or running inference on NVIDIA TAO Sparse4D models for multi-camera temporal 3D object detection and tracking. <br>
+Developers and engineers training, evaluating, exporting, quantizing, or running inference for TAO Sparse4D multi-camera temporal 3D object detection and tracking models. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,13 +19,10 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [skill_info.yaml](references/skill_info.yaml) <br>
-- [spec_template_train.yaml](references/spec_template_train.yaml) <br>
-- [spec_template_evaluate.yaml](references/spec_template_evaluate.yaml) <br>
-- [spec_template_export.yaml](references/spec_template_export.yaml) <br>
-- [spec_template_inference.yaml](references/spec_template_inference.yaml) <br>
-- [spec_template_quantize.yaml](references/spec_template_quantize.yaml) <br>
-- [spec_template_dataset_convert.yaml](references/spec_template_dataset_convert.yaml) <br>
+- [Local Docker Conversion Guide](references/local_docker_conversion.md) <br>
+- [Skill Info (AutoML config)](references/skill_info.yaml) <br>
+- [Spec Param Inference Mappings](references/spec_param_inference.md) <br>
+- [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
@@ -41,7 +38,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive, 0 negative) in NVSkills-Eval external profile with 2 attempts per task at 50% pass threshold. <br>
+Evaluated against 1 evaluation task in the external NVSkills-Eval profile (astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -65,11 +62,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 70% (+70%) | 58% (+48%) |
-| Discoverability | 2 | 100% (+100%) | 48% (+48%) |
-| Effectiveness | 2 | 43% (+33%) | 61% (+34%) |
-| Efficiency | 2 | 95% (+68%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 50% (+50%) |
+| Discoverability | 1 | 92% (+92%) | 0% (+0%) |
+| Effectiveness | 1 | 100% (+90%) | 88% (+74%) |
+| Efficiency | 1 | 79% (+52%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

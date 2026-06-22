@@ -1,0 +1,27 @@
+model_name: pose_classification
+encryption_key: ''
+results_dir: ''
+wandb:
+  enable: false
+  project: TAO Toolkit
+  entity: ''
+  group: ''
+  tags:
+  - tao-toolkit
+  reinit: false
+  sync_tensorboard: false
+  save_code: false
+  name: TAO Toolkit Dataset Convert
+  run_id: ''
+dataset_convert:
+  results_dir: ''
+  data: ''
+  pose_type: 3dbp
+  num_joints: 34
+  input_width: 1920
+  input_height: 1080
+  focal_length: 1200.0
+  sequence_length_max: 300
+  sequence_length_min: 10
+  sequence_length: 100
+  sequence_overlap: 0.5

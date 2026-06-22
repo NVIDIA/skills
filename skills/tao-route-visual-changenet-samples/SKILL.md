@@ -1,8 +1,8 @@
 ---
 name: tao-route-visual-changenet-samples
 description: Routes the weakest VCN samples (output of `tao-analyze-gaps-visual-changenet`) into per-augmentation-module
-  subsets — one parquet for k-NN mining, one for AnomalyGen (Cosmos SDG) — based on each module's label eligibility. Use as the
-  immediate next step after DEFT gap analysis in a VCN AOI SDA iteration.
+  subsets based on each module's label eligibility. Use when the user asks to "route VCN gap samples", "split AOI gaps for
+  k-NN mining and AnomalyGen", or prepare the immediate next step after DEFT gap analysis in a VCN AOI SDA iteration.
 license: Apache-2.0
 compatibility: Standalone — no external runtime requirements.
 metadata:
@@ -183,7 +183,7 @@ print(summary_text.strip())
 
 ## Outputs
 
-Write everything into a timestamped folder. The packaging hook will copy `routing_config/` and `claude_session.jsonl` automatically when `Routing_Report.md` is written.
+Write everything into a timestamped folder. Any runtime packaging hook may add `routing_config/` and session-capture artifacts after `Routing_Report.md` is written.
 
 ```
 <output_dir>/routing_results/YYYY-MM-DD_HHMMSS/
@@ -192,7 +192,7 @@ Write everything into a timestamped folder. The packaging hook will copy `routin
 ├── anomalygen_gaps.parquet     # Subset routed to AnomalyGen (Cosmos SDG)
 ├── routing_summary.txt         # Plain-text per-label breakdown
 ├── routing_config/             # Auto-copied by hook
-└── claude_session.jsonl        # Auto-copied by hook
+└── session log/artifacts       # Optional, runtime-dependent packaging capture
 ```
 
 At the start of the run, get the real timestamp by running `date +%Y-%m-%d_%H%M%S` in Bash. If the user specifies a custom output path, use it directly but maintain the internal layout.

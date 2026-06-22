@@ -65,7 +65,7 @@ Direct TAO Launcher spelling is `tao deploy classification_pyt gen_trt_engine`, 
 | `inference` | TensorRT engine | `inference.trt_engine` |
 | `inference` | Image classification test folder | `dataset.test_dataset.images_dir` |
 
-For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine` where those actions are available.
+For direct Docker runs, mount input folders at the same paths used in the spec. If the source data is packaged as `images_test.tar.gz`, extract it first and point `dataset.test_dataset.images_dir` at the extracted class-root folder. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine` where those actions are available. `gen_trt_engine.trt_engine` is the generated output path, not an upstream input artifact.
 
 ## Spec Overrides
 
@@ -75,8 +75,10 @@ Recommended starting overrides:
 
 ```python
 {
+    'dataset.batch_size': 1,
     'gen_trt_engine.tensorrt.data_type': 'fp16',
     'inference.batch_size': 1,
+    'evaluate.batch_size': 1,
     'gen_trt_engine.tensorrt.min_batch_size': 1,
     'gen_trt_engine.tensorrt.opt_batch_size': 1,
     'gen_trt_engine.tensorrt.max_batch_size': 8,
@@ -86,7 +88,11 @@ Recommended starting overrides:
 Model-specific notes:
 
 - Use `fp16` for the starter-kit TensorRT engine path unless INT8 calibration is explicitly requested.
-- For TensorRT inference, set the runtime batch size to 1 unless the engine profile was built for the larger batch.
+- For TensorRT inference and evaluation, set both `dataset.batch_size` and the
+  action batch size to 1 unless the engine profile was built for the larger
+  batch. The default Classification PyT ONNX export uses a static batch-1 input,
+  so TensorRT evaluation can still try batch 8 and fail with a static dimension
+  mismatch if only `evaluate.batch_size` is overridden.
 
 ## Job Chain Mapping
 
@@ -108,7 +114,10 @@ Model-specific notes:
 
 ## Known Pitfalls
 
-**Engine profile mismatch:** Runtime batch size for evaluate or inference must fit within the TensorRT min/opt/max profile used during `gen_trt_engine`.
+**Engine profile mismatch:** Runtime batch size for evaluate or inference must
+fit within the TensorRT min/opt/max profile used during `gen_trt_engine`. If the
+ONNX input is static batch 1, keep `dataset.batch_size`,
+`evaluate.batch_size`, and `inference.batch_size` at 1.
 
 **Template class or shape mismatch:** Copy class count, input resolution, backbone, and post-processing settings from train/export before running TAO Deploy.
 

@@ -2,6 +2,10 @@
 
 Model-specific inference mappings belong in this MD file, not in `config.json`. Generated runners should read this section and apply the mappings with SDK helpers before `create_job()`. This mirrors the old microservices `infer_params.py` flow.
 
+DepthNet Mono training writes checkpoint files under `<results_dir>/train/` using `model_epoch_<epoch>_step_<step>.pth` and a `dn_model_latest.pth` symlink. For `evaluate`, `inference`, `export`, `quantize`, and resume/retrain, select checkpoints through the SDK/model resolver so a requested best, epoch, or step checkpoint resolves to that exact file. Use `dn_model_latest.pth` only when the user explicitly asks for latest.
+
+Parent PyT `gen_trt_engine` is intentionally not used because the current `depth_net` PyT entrypoint rejects it. The `gen_trt_engine` metadata selects the TAO Deploy container, and the deploy workflow owns the TensorRT-only action details.
+
 Inference mappings from TAO Core `depth_net_mono.config.json`:
 
 | Action | Spec Field | Inference Function | Meaning |
@@ -14,10 +18,6 @@ Inference mappings from TAO Core `depth_net_mono.config.json`:
 | export | `export.checkpoint` | `parent_model` | model file inferred from the parent job results folder |
 | export | `export.onnx_file` | `create_onnx_file` | output ONNX path |
 | export | `results_dir` | `output_dir` | current job results directory |
-| gen_trt_engine | `dataset.dataset_name` | `MonoDataset` | MonoDataset |
-| gen_trt_engine | `gen_trt_engine.onnx_file` | `parent_model` | model file inferred from the parent job results folder |
-| gen_trt_engine | `gen_trt_engine.trt_engine` | `create_engine_file` | output TensorRT engine path |
-| gen_trt_engine | `results_dir` | `output_dir` | current job results directory |
 | inference | `dataset.dataset_name` | `MonoDataset` | MonoDataset |
 | inference | `inference.checkpoint` | `parent_model` | model file inferred from the parent job results folder |
 | inference | `inference.trt_engine` | `parent_model` | model file inferred from the parent job results folder |

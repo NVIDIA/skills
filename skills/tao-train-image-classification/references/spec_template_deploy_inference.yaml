@@ -3,5 +3,6 @@ inference:
   trt_engine: /results/classification-pyt.engine
   batch_size: 1
 dataset:
+  batch_size: 1
   test_dataset:
     images_dir: /data/images

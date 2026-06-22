@@ -1,5 +1,18 @@
 # Video Reasoning Annotation — Full Configuration Reference
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Complete YAML Structure
+- Key Configuration Decisions
+- Model / Endpoint Configuration
+  - Gemini (default)
+  - OpenAI-compatible endpoints
+- All Parameters
+- Error Patterns
+
+
 ## Complete YAML Structure
 
 Generate a default experiment spec with `auto_label default_specs results_dir=/results module_name=auto_label`, then set `autolabel_type: "video_reasoning_annotation"`.

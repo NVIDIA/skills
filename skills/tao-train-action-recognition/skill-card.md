@@ -1,5 +1,5 @@
 ## Description: <br>
-Action recognition from video sequences, supporting RGB, optical flow, and joint (multi-stream) input types for classifying temporal actions in video clips. <br>
+Action recognition from video sequences. Supports RGB, optical flow, and joint (multi-stream) input types for classifying temporal actions in video clips. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, or running inference on action recognition models from video sequences using NVIDIA TAO Toolkit. <br>
+Developers and engineers training, evaluating, exporting, or running inference on NVIDIA TAO action-recognition models for video action classification tasks. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -24,6 +24,7 @@ Mitigation: Review and scan skill before deployment. <br>
 - [spec_template_evaluate.yaml](references/spec_template_evaluate.yaml) <br>
 - [spec_template_export.yaml](references/spec_template_export.yaml) <br>
 - [spec_template_inference.yaml](references/spec_template_inference.yaml) <br>
+- [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
@@ -39,7 +40,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task with 2 attempts per task, evaluated in astra-sandbox environment using NVSkills-Eval external profile with 50% pass threshold. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,11 +64,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 75% (+22%) | 97% (+87%) |
-| Discoverability | 2 | 100% (+51%) | 97% (+97%) |
-| Effectiveness | 2 | 46% (+20%) | 72% (+38%) |
-| Efficiency | 2 | 95% (+61%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 50% (+0%) | 20% (+20%) |
+| Discoverability | 1 | 0% (+0%) | 0% (+0%) |
+| Effectiveness | 1 | 90% (+12%) | 44% (+26%) |
+| Efficiency | 1 | 27% (+0%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

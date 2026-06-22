@@ -1,0 +1,19 @@
+schema_version: 1
+profiles: []
+required_profile_fields:
+  - name
+  - train_annotation_path
+  - train_media_path
+  - eval_annotation_path
+  - eval_media_path
+  - source
+policy:
+  empty_profiles_behavior: stop_and_request_dataset_source
+  placeholder_uris_forbidden: true
+  accepted_sources:
+    - product_docs
+    - scope_deck
+    - user_request
+notes:
+  - Add only product-approved, externally accessible Cosmos-RL demo datasets here.
+  - Do not use placeholder s3://bucket/... values as demo profiles.

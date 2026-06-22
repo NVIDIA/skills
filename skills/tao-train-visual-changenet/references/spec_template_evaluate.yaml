@@ -15,37 +15,23 @@ wandb:
   run_id: ''
 model:
   backbone:
-    type: fan_small_12_p4_hybrid
-    feat_downsample: false
+    type: c_radio_v2_vit_base_patch16_224
     pretrained_backbone_path: ''
     freeze_backbone: false
   decode_head:
-    in_channels:
-    - 128
-    - 256
-    - 384
-    - 384
-    in_index:
-    - 0
-    - 1
-    - 2
-    - 3
     feature_strides:
     - 4
     - 8
     - 16
-    - 16
-    align_corners: false
-    decoder_params:
-      embed_dim: 256
-    use_summary_token: false
+    - 32
+    use_summary_token: true
   classify:
     train_margin_euclid: 2.0
-    eval_margin: 2.0
+    eval_margin: 0.3
     embedding_vectors: 5
-    embed_dec: 5
+    embed_dec: 30
     learnable_difference_modules: 4
-    difference_module: euclidean
+    difference_module: learnable
 dataset:
   segment:
     root_dir: ''
@@ -121,12 +107,9 @@ dataset:
     batch_size: 8
     workers: 1
     fpratio_sampling: 0.1
-    num_input: 4
+    num_input: 1
     input_map:
-      LowAngleLight: 0
-      SolderLight: 1
-      UniformLight: 2
-      WhiteLight: 3
+      SolderLight: 0
     grid_map:
       x: 2
       y: 2
@@ -196,7 +179,7 @@ train:
     weight_decay: 0.01
   pretrained_model_path: ''
   classify:
-    loss: contrastive
+    loss: ce
     cls_weight:
     - 1.0
     - 10.0
@@ -234,4 +217,4 @@ quantize:
   results_dir: ''
   backend_kwargs: {}
   device: cuda
-task: segment
+task: classify

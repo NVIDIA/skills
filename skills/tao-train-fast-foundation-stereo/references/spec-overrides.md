@@ -1,10 +1,6 @@
-# FastFoundationStereo Spec Overrides
+# Typical Spec Overrides
 
-Per-action spec override blocks for FastFoundationStereo (FFS). Data source overrides are **mandatory for every action**. Each `data_sources` entry is a dict with **two mandatory fields**: `data_file` and `dataset_name`. The `model.*` width fields in `FFS_MODEL_BLOCK` are also mandatory.
-
-The spec templates at `references/spec_template_*.yaml` carry the bp2 width block as the canonical source.
-
-## Shared bp2 model block
+Data source overrides are **mandatory for every action**. Each `data_sources` entry is a dict with **two mandatory fields**: `data_file` and `dataset_name`. The `model.*` width fields below are also mandatory — see Step 3 in SKILL.md.
 
 ```python
 S3_TRAIN = "aws://bucket/data/train"
@@ -42,8 +38,7 @@ FFS_MODEL_BLOCK = {
 }
 ```
 
-## train (finetune from bp2)
-
+**train (finetune from bp2):**
 ```python
 {
     **FFS_MODEL_BLOCK,
@@ -68,8 +63,7 @@ FFS_MODEL_BLOCK = {
 }
 ```
 
-## evaluate (raw bp2 — no train job parent)
-
+**evaluate (raw bp2 — no train job parent):**
 ```python
 {
     **FFS_MODEL_BLOCK,
@@ -83,8 +77,7 @@ FFS_MODEL_BLOCK = {
 }
 ```
 
-## inference (raw bp2 — 2-col annotations, no GT)
-
+**inference (raw bp2 — 2-col annotations, no GT):**
 ```python
 {
     **FFS_MODEL_BLOCK,
@@ -97,8 +90,7 @@ FFS_MODEL_BLOCK = {
 }
 ```
 
-## export (raw bp2)
-
+**export (raw bp2):**
 ```python
 {
     **FFS_MODEL_BLOCK,
@@ -111,4 +103,4 @@ FFS_MODEL_BLOCK = {
 }
 ```
 
-For finetuned-ckpt actions (post-train), drop the explicit `<action>.checkpoint` and let the SDK resolve it from `parent_job_id` via `parent_model` (see "Spec Param / Parent Model Inference" in `references/parent-model-inference.md`).
+For finetuned-ckpt actions (post-train), drop the explicit `<action>.checkpoint` and let the SDK resolve it from `parent_job_id` via `parent_model` (see **Spec Param / Parent Model Inference** in `references/parent-model-inference.md`).

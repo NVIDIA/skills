@@ -1,5 +1,5 @@
 ## Description: <br>
-Run the canonical NVIDIA AOI three-phase training pipeline — Phase 1 AutoML baseline (HPO), Phase 2 DEFT loop (RCA, SDG, mining, plain-train retrain), Phase 3 AutoML refinement on the DEFT-augmented dataset. <br>
+Run the canonical NVIDIA AOI three-phase training pipeline — Phase 1 AutoML baseline (HPO), Phase 2 DEFT loop (RCA → SDG → mining → plain-train retrain), Phase 3 AutoML refinement on the DEFT-augmented dataset. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers who need to fine-tune NVIDIA TAO models end-to-end using an automated AutoML + DEFT pipeline for AOI (Automated Optical Inspection) or similar computer vision workflows. <br>
+Developers and ML engineers who need to run an end-to-end three-phase training pipeline (AutoML baseline, DEFT iterative data-improvement loop, AutoML refinement) on NVIDIA TAO models for AOI inspection and other DEFT applications. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,10 +19,10 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Handoff Reference](references/handoff.md) <br>
-- [Pitfalls Guide](references/pitfalls.md) <br>
-- [Pre-Flight Reference](references/preflight.md) <br>
-- [Quick Start Guide](references/quick-start.md) <br>
+- [Consolidated Pre-Flight](references/consolidated-preflight.md) <br>
+- [Phase Handoffs](references/phase-handoffs.md) <br>
+- [Pitfalls and Quality Checks](references/pitfalls-and-quality-checks.md) <br>
+- [Quick Start Example](references/quick-start-example.md) <br>
 - [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
@@ -39,7 +39,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive activation case, 0 negative cases) in the astra-sandbox environment using the NVSkills-Eval external profile with 2 attempts per task. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval `external` profile (`astra-sandbox` environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,14 +63,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 75% (+75%) | 92% (+73%) |
-| Discoverability | 2 | 44% (+44%) | 97% (+66%) |
-| Effectiveness | 2 | 88% (+76%) | 78% (+65%) |
-| Efficiency | 2 | 51% (+24%) | 96% (+51%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 88% (+88%) | 59% (+59%) |
+| Effectiveness | 1 | 90% (+76%) | 90% (+66%) |
+| Efficiency | 1 | 75% (+48%) | 42% (+14%) |
 
 ## Skill Version(s): <br>
-0.4.0 (source: frontmatter) <br>
+0.1.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -1,5 +1,5 @@
 ## Description: <br>
-NVPanoptix3D for panoptic 3D scene reconstruction from posed RGB images, producing 3D panoptic segmentation (semantic, instance, and panoptic masks) with occupancy completion, built on a VGGT backbone with a Mask2Former-style head and 3D frustum reconstruction. <br>
+NVPanoptix3D for panoptic 3D scene reconstruction from posed RGB images, producing 3D panoptic segmentation (semantic, instance, and panoptic masks) with occupancy completion. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, or running inference for TAO NVPanoptix3D models for panoptic 3D scene reconstruction from posed RGB images. <br>
+Developers and engineers training, evaluating, exporting, or running inference on TAO NVPanoptix3D models for panoptic 3D scene reconstruction from posed RGB images. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -24,6 +24,7 @@ Mitigation: Review and scan skill before deployment. <br>
 - [spec_template_evaluate.yaml](references/spec_template_evaluate.yaml) <br>
 - [spec_template_export.yaml](references/spec_template_export.yaml) <br>
 - [spec_template_inference.yaml](references/spec_template_inference.yaml) <br>
+- [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
@@ -39,7 +40,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 task with 2 attempts per task in the astra-sandbox environment using the external NVSkills-Eval profile. <br>
+Evaluated against 1 evaluation task (positive skill-activation case) using NVSkills-Eval external profile in astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,11 +64,16 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 80% (+80%) | 53% (+53%) |
-| Discoverability | 2 | 92% (+92%) | 48% (+48%) |
-| Effectiveness | 2 | 53% (+39%) | 58% (+44%) |
-| Efficiency | 2 | 80% (+53%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 10% (+10%) | 97% (+97%) |
+| Discoverability | 1 | 0% (+0%) | 97% (+97%) |
+| Effectiveness | 1 | 42% (+28%) | 90% (+76%) |
+| Efficiency | 1 | 27% (-0%) | 96% (+68%) |
+
+## Testing Completed: <br>
+**[x] Agent Red-Teaming** <br>
+**[ ] Network Security** <br>
+**[ ] Product Security** <br>
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

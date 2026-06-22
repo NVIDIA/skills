@@ -56,13 +56,12 @@ Direct TAO Launcher spelling is `tao deploy depth_net gen_trt_engine`, `tao depl
 | Action | Required artifact or data | Spec key |
 |---|---|---|
 | `gen_trt_engine` | Exported FFS ONNX model | `gen_trt_engine.onnx_file` |
-| `gen_trt_engine` | Output engine path | `gen_trt_engine.trt_engine` |
 | `evaluate` | TensorRT engine | `evaluate.trt_engine` |
 | `evaluate` | Stereo annotation file (3-col with GT, 4-col adds occlusion mask) | `dataset.test_dataset.data_sources[0].data_file` |
 | `inference` | TensorRT engine | `inference.trt_engine` |
 | `inference` | Stereo annotation file (2-col left+right, no GT) | `dataset.infer_dataset.data_sources[0].data_file` |
 
-For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine`.
+`gen_trt_engine.trt_engine` is the generated engine output path, not a required input artifact. For direct Docker runs, mount input folders at the same paths used in the spec. For chained jobs, map exported ONNX artifacts into `gen_trt_engine.onnx_file` and map the engine artifact into `evaluate.trt_engine` or `inference.trt_engine`.
 
 ## Spec Template
 
@@ -106,7 +105,7 @@ gen_trt_engine:
   batch_size: 1
   tensorrt:
     data_type: fp16                      # static-shape FFS supports fp16
-    workspace_size: 4096                 # FFS needs more than the 1024 default
+    workspace_size: 4                    # DepthNet deploy passes this through as GiB in current images
     min_batch_size: 1
     opt_batch_size: 1
     max_batch_size: 1
@@ -145,7 +144,7 @@ gen_trt_engine:
   max_width: 1536                        # ≥ widest expected input
   tensorrt:
     data_type: fp32                      # fp32 default; fp16 also supported (see deployment matrix)
-    workspace_size: 4096
+    workspace_size: 4
 evaluate:
   trt_engine: <built engine>
   # Do NOT enable evaluate.native_padded with a TRT 10.13 dynamic engine —
@@ -255,6 +254,16 @@ The spec yaml's basename (modulo `.yaml`) must match the action verb passed on t
 ## Common errors
 
 **Engine profile mismatch**: Runtime batch size for `evaluate` or `inference` must fit within the TensorRT min/opt/max profile used during `gen_trt_engine`. Default profile in the spec template is `min=1 / opt=1 / max=1` (FFS-bp2 deploy uses static batch=1).
+
+**Deploy evaluate metric reduction fails after predictions**: In
+`tao-toolkit-deploy:7.0.0-rc-171`, FFS TensorRT evaluate can complete
+prediction generation and then fail in
+`nvidia_tao_deploy.cv.depth_net.evaluation.stereo_evaluator.compute()` with
+`TypeError: only 0-dimensional arrays can be converted to Python scalars`. The
+evaluator accumulates NumPy one-element arrays and casts them with `float()`,
+which is rejected by the NumPy version in the container. Until the deploy image
+contains the scalar extraction fix, use PyT `evaluate` for metrics and treat TRT
+`inference` plus generated predictions as the deploy smoke test.
 
 **Aspect-stretched predictions on variable-aspect inputs**: Forcing the engine input H/W to a fixed shape distorts samples whose source aspect ratio differs from the engine shape, inflating EPE vs pyt baseline. Recommended approach: dynamic-shape engine sized per "Sizing the profile" above, with each input pre-padded / resized to a stride-32 multiple before evaluation. `evaluate.native_padded: True` would conceptually fit this case but currently triggers a TRT 10.13 Cask Pooling Runner failure — see below.
 

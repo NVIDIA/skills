@@ -1,5 +1,5 @@
 ## Description: <br>
-Masked Auto-Encoder (MAE) for self-supervised pretraining and fine-tuning; masks random patches and reconstructs them to learn visual representations, supporting pretrain and finetune stages. <br>
+Masked Auto-Encoder (MAE) for self-supervised pretraining and fine-tuning that masks random patches and reconstructs them to learn visual representations, supporting pretrain and finetune stages with train, evaluate, export, and inference actions. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, or running inference for TAO MAE backbones using self-supervised visual representation learning. <br>
+Developers and engineers use this skill to train, evaluate, export, and run inference on Masked Auto-Encoder (MAE) models for self-supervised visual representation learning using NVIDIA TAO Toolkit. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,8 +19,8 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [TAO Deploy Mask Auto-Encoder](references/tao-deploy-mask-auto-encoder.md) <br>
-- [Skill Info (model metadata)](references/skill_info.yaml) <br>
+- [TAO Deploy Mask Auto Encoder](references/tao-deploy-mask-auto-encoder.md) <br>
+- [Skill Info](references/skill_info.yaml) <br>
 - [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
@@ -37,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (positive skill-activation case) with 2 attempts per task in the NVSkills-Eval external profile. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). Pass threshold: 50%. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 50% (+50%) | 58% (+58%) |
-| Discoverability | 2 | 0% (+0%) | 48% (+48%) |
-| Effectiveness | 2 | 72% (+60%) | 63% (+45%) |
-| Efficiency | 2 | 27% (-0%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+80%) | 88% (+88%) |
+| Discoverability | 1 | 100% (+100%) | 62% (+62%) |
+| Effectiveness | 1 | 68% (+14%) | 90% (+68%) |
+| Efficiency | 1 | 95% (+68%) | 61% (+33%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

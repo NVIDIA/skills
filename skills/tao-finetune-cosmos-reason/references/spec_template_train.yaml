@@ -1,6 +1,6 @@
 train:
   resume: false
-  epoch: 10
+  epoch: 2
   compile: false
   train_batch_per_replica: 1
   output_dir: output
@@ -25,38 +25,38 @@ train:
   sync_weight_interval: 1
   ckpt:
     enable_checkpoint: true
-    save_freq_in_epoch: 10
+    save_freq_in_epoch: 1
     save_mode: sync
-    max_keep: 8
+    max_keep: 2
     export_safetensors: true
   train_policy:
     type: sft
-    mini_batch: 4
-    enable_dataset_cache: true
-    dataloader_num_workers: 8
-    dataloader_prefetch_factor: 8
+    mini_batch: 1
+    enable_dataset_cache: false
+    dataloader_num_workers: 0
+    dataloader_prefetch_factor: 1
     conversation_column_name: conversations
     dataset:
-      name: its
-      test_size: 1
+      name: wts
+      test_size: 0
   fp8:
     enable_fp8: false
     fp8_recipe: dynamic_scaling
     quant_recipe: rowwise
 validation:
   enable: true
-  freq_in_epoch: 10
+  freq_in_epoch: 1
   dataset:
     name: ''
     subset: ''
     split: train
-  batch_size: 4
-  dataloader_num_workers: 8
-  dataloader_prefetch_factor: 8
+  batch_size: 1
+  dataloader_num_workers: 0
+  dataloader_prefetch_factor: 1
   enable_dataset_cache: false
 policy:
-  model_name_or_path: nvidia/Cosmos-Reason2-8B
-  model_max_length: 4096
+  model_name_or_path: hf_model://nvidia/Cosmos3-Nano
+  model_max_length: 40960
   model_gradient_checkpointing: true
   parallelism:
     n_init_replicas: 1
@@ -90,6 +90,13 @@ custom:
   train_dataset:
     annotation_path: data/sft/annotations.json
     media_path: data/sft/train2017
+    media_root: data/sft/train2017
+    response_mode: answer
+  val_dataset:
+    annotation_path: data/sft/annotations.json
+    media_path: data/sft/train2017
+    media_root: data/sft/train2017
+    response_mode: answer
   vision:
     nframes: 8
   system_prompt: ''

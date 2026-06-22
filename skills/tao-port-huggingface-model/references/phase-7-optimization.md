@@ -18,6 +18,20 @@ Full Phase 7 walkthrough — diagnose accuracy / TRT-vs-native gap / training sp
 
 ## Phase 7 — Optimization & Tuning (conditional)
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Phase 7 — Optimization & Tuning (conditional)
+  - Step 26 — Diagnose What Needs Improvement
+  - Step 27 — Hyperparameter Tuning
+  - Step 28 — Quantization (INT8)
+  - Step 29 — Pruning (reduce model size)
+  - Step 30 — Knowledge Distillation (transfer knowledge)
+  - Step 31 — Resolution & Input Size Tuning
+  - Optimization Decision Tree
+
+
 > Enter this phase only if the implementation is functionally correct (Phase 6 passes) but accuracy, latency, or resource usage needs improvement. Ask the user what their target metrics are before optimizing.
 
 ### Step 26 — Diagnose What Needs Improvement
@@ -195,4 +209,3 @@ Model too large?
 ```
 
 ---
-

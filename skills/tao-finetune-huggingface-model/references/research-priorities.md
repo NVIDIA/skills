@@ -16,6 +16,22 @@ limitations under the License.
 
 # Research Priorities Reference
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Priority ladder
+  - Priority 1 — Model card usage example *(always fetch)*
+  - Priority 2 — HF repo example script for the task
+  - Priority 3 — Author finetune script / notebook linked from the model card
+  - Priority 4 — HF task documentation *(always fetch as cross-check)*
+  - Priority 5 — Paper methodology *(only if hyperparameters still unclear)*
+  - Priority 6 — GitHub search fallback *(last resort)*
+- Extract and record
+- Resolving source conflicts
+- Stop criteria
+
+
 The live-fetch ladder for Step 3 (Research). Walk priorities in order, stop once
 you have enough to write the code. The ordering is deliberate: API-fresh sources
 come first (they track current `transformers`); method-specific sources fill in
@@ -48,7 +64,8 @@ task-specific details.
 ### Priority 3 — Author finetune script / notebook linked from the model card
 
 - For `https://github.com/<owner>/<repo>/blob/<ref>/<path>`, rewrite to
-  `https://raw.githubusercontent.com/<owner>/<repo>/<ref>/<path>` and `WebFetch`.
+  `https://raw.githubusercontent.com/<owner>/<repo>/<ref>/<path>` and fetch it
+  with the available web or source-control tool.
   Notebooks (`.ipynb`) are JSON — parse and extract code cells.
 - Extract: method-specific recipe the HF repo script doesn't cover — custom
   collator, LoRA target modules, loss-masking scheme, learning rate / warmup /
@@ -81,10 +98,10 @@ task-specific details.
 Only if no card example, no HF repo script, no author link, no paper exists.
 
 ```
-WebSearch "site:github.com huggingface <model_type> fine-tune train.py"
+Search the web or GitHub for "site:github.com huggingface <model_type> fine-tune train.py"
 ```
 
-then `WebFetch` the top result's raw URL. Quality varies; cross-check anything
+then fetch the top result's raw URL. Quality varies; cross-check anything
 you extract.
 
 ---

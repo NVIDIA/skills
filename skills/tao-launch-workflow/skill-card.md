@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to launch TAO training, evaluation, inference, export, or AutoML workflows on supported execution platforms (SLURM, Lepton, Brev, Kubernetes, local Docker) with guided preflight validation and credential management. <br>
+Developers and engineers who need to launch TAO model training, evaluation, inference, export, TensorRT engine generation, or AutoML workflows on supported execution platforms such as SLURM, Brev, Kubernetes, or local Docker. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -36,7 +36,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the astra-sandbox environment using the NVSkills-Eval external profile. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval `external` profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,11 +60,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 84% (+84%) | 92% (+92%) |
-| Discoverability | 2 | 34% (+34%) | 97% (+97%) |
-| Effectiveness | 2 | 88% (+78%) | 77% (+65%) |
-| Efficiency | 2 | 24% (-3%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 88% (+88%) | 97% (+97%) |
+| Effectiveness | 1 | 90% (+76%) | 90% (+66%) |
+| Efficiency | 1 | 73% (+46%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

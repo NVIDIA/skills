@@ -16,6 +16,17 @@ limitations under the License.
 
 # Model Discovery & Validation Reference
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Full Task Type → AutoModel Mapping
+- Rejection Criteria
+- Transformers Integration Check Procedure
+- Model Config Fields to Extract
+- Ambiguous Cases
+
+
 Used in Phase 0 of tao-finetune-huggingface-model skill.
 
 ---

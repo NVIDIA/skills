@@ -7,10 +7,9 @@ actions:
   gen_trt_engine:
     command: mask2former gen_trt_engine -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       gen_trt_engine.onnx_file:
-        type: file
-      gen_trt_engine.trt_engine:
         type: file
     outputs:
       results_dir:
@@ -22,12 +21,17 @@ actions:
   evaluate:
     command: mask2former evaluate -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       evaluate.trt_engine:
         type: file
-      dataset.val.annot_file:
+      dataset.val.panoptic_json:
         type: file
-      dataset.val.root_dir:
+      dataset.val.instance_json:
+        type: file
+      dataset.val.img_dir:
+        type: folder
+      dataset.val.panoptic_dir:
         type: folder
       dataset.label_map:
         type: file
@@ -39,11 +43,12 @@ actions:
   inference:
     command: mask2former inference -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       inference.trt_engine:
         type: file
       dataset.test.img_dir:
-        type: file
+        type: folder
       dataset.label_map:
         type: file
     outputs:
@@ -51,6 +56,33 @@ actions:
         type: folder
     upload_excludes:
     - inputs/
+data_sources:
+  evaluate:
+    dataset.val.panoptic_json:
+      source: eval_dataset
+      path: annotations_panoptic.json
+    dataset.val.instance_json:
+      source: eval_dataset
+      path: annotations.json
+    dataset.val.img_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val.panoptic_dir:
+      source: eval_dataset
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.label_map:
+      source: eval_dataset
+      path: label_map_panoptic.json
+  inference:
+    dataset.test.img_dir:
+      source: inference_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.label_map:
+      source: train_datasets
+      path: label_map_panoptic.json
 spec_params:
   gen_trt_engine:
     results_dir: output_dir
@@ -65,7 +97,12 @@ spec_params:
 spec_shorthand_keys:
   trt_data_type: gen_trt_engine.tensorrt.data_type
   trt_engine: gen_trt_engine.trt_engine
-  batch_size: dataset.batch_size
+  batch_size: dataset.val.batch_size
+  test_batch_size: dataset.test.batch_size
+  mode: model.mode
+  num_classes: model.sem_seg_head.num_classes
+  contiguous_id: dataset.contiguous_id
+  object_mask_threshold: model.object_mask_threshold
 description: Mask2Former deploy workflow for gen_trt_engine, evaluate, inference using
   TAO Deploy.
 spec_templates:
@@ -75,6 +112,9 @@ spec_templates:
 notes:
 - Carry `model.sem_seg_head.num_classes` from train/export; the starter-kit ADE-style
   path used 90 classes for one flow and the template default is only a placeholder.
+- Carry the verified export input shape into deploy. The packaged `960x544`
+  export shape builds successfully; tiny smoke-test export shapes such as
+  `128x128` can fail during PyTorch ONNX shape inference before engine build.
 - 'For TensorRT inference, set `model.object_mask_threshold: 0.0` when you need all
   mask candidates forwarded for post-processing.'
-- Set `dataset.contiguous_id` to match the dataset id layout used during training.
+- "For COCO panoptic deploy evaluation, set `dataset.val.type: coco_panoptic` and provide `dataset.val.panoptic_json`, `dataset.val.img_dir`, and `dataset.val.panoptic_dir`. Do not set a top-level `dataset.type`."

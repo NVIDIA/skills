@@ -1,8 +1,8 @@
 ---
 name: tao-analyze-gaps-vlm-bcq
 description: Extract false-positive and false-negative gaps from VLM binary-classification-question (BCQ, yes/no) predictions.
-  Use after running VLM evaluation when you have a predictions JSON and need to identify failure cases for DEFT root cause
-  analysis on a binary-classification VLM workflow.
+  Use when the user asks to "analyze VLM BCQ gaps", "extract VLM false positives and false negatives", or identify failure
+  cases from a predictions JSON for DEFT root-cause analysis on a binary-classification VLM workflow.
 license: Apache-2.0
 compatibility: Requires docker + nvidia-container-toolkit.
 metadata:

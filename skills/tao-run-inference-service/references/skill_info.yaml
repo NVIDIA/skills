@@ -27,7 +27,7 @@ prerequisites:
   - name: platform
     description: >-
       Compute backend where the container will run. One of: local-docker, brev,
-      lepton, slurm, kubernetes.
+      slurm, kubernetes.
 
   optional:
   - name: num_gpus

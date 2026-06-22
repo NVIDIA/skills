@@ -51,6 +51,7 @@ _VALID_STATUSES = {"ok", "error"}
 _VALID_STAGES = {
     "evaluate",
     "rca",
+    "anomalygen_finetune",
     "anomalygen",
     "routing",
     "data_mining",

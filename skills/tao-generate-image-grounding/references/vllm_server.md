@@ -1,5 +1,22 @@
 # vLLM Server Setup for Vision-Language Models
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- 1. Prerequisites
+- 2. Install vLLM
+  - Option A — Docker (default, recommended)
+  - Option B — `pip` (host install, advanced)
+- 3. Pick a VLM checkpoint
+- 4. Launch the server
+  - Option A — Docker (default, recommended)
+  - Option B — `pip` install (host launch, advanced)
+- 5. Verify the endpoint
+- 6. Wire the server into the pipeline
+- Common issues
+
+
 This guide walks the user through standing up a self-hosted [vLLM](https://github.com/vllm-project/vllm) server that exposes an OpenAI-compatible `/v1/chat/completions` endpoint for vision-language models (VLMs). Once the server is running, point the pipeline at it with `vlm.backend: "openai"` and the matching `base_url` / `model_name` / `api_key` values.
 
 ## 1. Prerequisites

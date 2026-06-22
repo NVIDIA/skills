@@ -1,0 +1,36 @@
+[
+  {
+    "id": "jetson-customize-fan-001",
+    "question": "On my P3767-0000 Orin Nano dev kit I'd like to add a new aggressive fan profile {0:255, 40:150, 80:0} and make it the boot default. Walk me through it with /jetson-customize-fan.",
+    "expected_skill": "jetson-customize-fan",
+    "expected_script": null,
+    "ground_truth": "Resolve the per-board file as Linux_for_Tegra/rootfs/etc/nvpower/nvfancontrol/nvfancontrol_p3767_0000.conf in <bsp_image.root_path> (read-only) and <source.root_path> (overlay write target). Apply the Overlay edit recipe (pristine import + customization commit pair) on rootfs/etc/nvpower/nvfancontrol/nvfancontrol_p3767_0000.conf. Operation 1: inside the <FAN 1> block add a new FAN_PROFILE aggressive { ... } with 4-column TEMP HYST PWM RPM tuples sorted ascending by TEMP, ending with a tuple above GROUP_MAX_TEMP so over-temp behavior is defined; validate every TEMP is within 0..GROUP_MAX_TEMP, PWM in [0,255], and RPM ≤ tach-reported max. Operation 4: edit the trailing FAN_DEFAULT_PROFILE line in the same <FAN 1> block to reference 'aggressive'. Apply the same edit to every sibling in the propagation set (the reference platform's nvfancontrol conf and any carrier-derived siblings on the same module SKU) — port only the changed FAN_PROFILE / control lines, never blanket-copy, since siblings may carry carrier-specific THERMAL_GROUP coefficients or RPM ceilings. Customization-commit header per the skill: 'jetson-customize-fan: <summary>'. Deploy via /jetson-promote-image → /jetson-flash-image (or scp + 'sudo systemctl restart nvfancontrol.service' for live).",
+    "expected_behavior": [
+      "Read skills/jetson-customize-fan/SKILL.md",
+      "Resolve <active-sku> by filtering <bsp_image.root_path>/Linux_for_Tegra/rootfs/etc/nvpower/nvfancontrol/ to nvfancontrol_p3767_0000.conf and verify the file exists",
+      "Apply the Overlay edit recipe (pristine import + customization commit pair) under <source.root_path>/Linux_for_Tegra/rootfs/etc/nvpower/nvfancontrol/nvfancontrol_p3767_0000.conf",
+      "Operation 1: insert FAN_PROFILE aggressive { ... } inside <FAN 1> with 4-column TEMP HYST PWM RPM tuples ascending by TEMP, ending with a row above GROUP_MAX_TEMP",
+      "Validate every TEMP within 0..GROUP_MAX_TEMP of the THERMAL_GROUP, PWM in [0,255], RPM <= tach-reported max",
+      "Operation 4: change FAN_DEFAULT_PROFILE to 'aggressive' inside the same <FAN 1> block",
+      "Resolve and update the propagation set (reference-platform conf + carrier-derived siblings on the same module SKU) — port only the changed FAN_PROFILE / control lines, never blanket-copy",
+      "Commit with header 'jetson-customize-fan: <summary>' and deploy via /jetson-promote-image → /jetson-flash-image"
+    ]
+  },
+  {
+    "id": "jetson-customize-fan-002",
+    "question": "I removed the 'quiet' FAN_PROFILE from my nvfancontrol conf and now nvfancontrol.service won't start. How do I recover?",
+    "expected_skill": "jetson-customize-fan",
+    "expected_script": null,
+    "ground_truth": "Per Operation 2 and the Troubleshooting table, FAN_DEFAULT_PROFILE must reference an existing FAN_PROFILE block in the same <FAN N>; nvfancontrol fails to start when the default names a missing profile. Edit the per-board file under <source.root_path>/Linux_for_Tegra/rootfs/etc/nvpower/nvfancontrol/nvfancontrol_<active-sku>.conf and point FAN_DEFAULT_PROFILE at a remaining FAN_PROFILE name in the same <FAN N> block. Also grep for hard-coded references in the rootfs ('grep -rn \"nvfancontrol.*profile\\|FAN_PROFILE\" Linux_for_Tegra/rootfs/etc') before declaring the change safe. Make sure the edit was applied through the Overlay edit recipe under <source.root_path>, not <bsp_image.root_path> (the latter is read-only and is rewritten by /jetson-promote-image — hand-edits there are silently lost on the next /jetson-init-image re-extract). Apply the same fix to every sibling in the propagation set (reference platform conf + carrier-derived siblings) by porting only the FAN_DEFAULT_PROFILE line. Deploy via /jetson-promote-image → /jetson-flash-image, or scp + 'sudo systemctl restart nvfancontrol.service' on a running target.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-fan/SKILL.md and consult Operation 2 plus the Troubleshooting table",
+      "Identify the cause: FAN_DEFAULT_PROFILE references a deleted profile so nvfancontrol.service fails to start",
+      "Apply the Overlay edit recipe (pristine import + customization commit) on the per-board nvfancontrol_<active-sku>.conf under <source.root_path>",
+      "Update FAN_DEFAULT_PROFILE in the same <FAN N> block to reference an existing FAN_PROFILE name",
+      "Run 'grep -rn \"nvfancontrol.*profile\\|FAN_PROFILE\" Linux_for_Tegra/rootfs/etc' to find any remaining hard-coded references",
+      "Verify the edit lands under <source.root_path>, never <bsp_image.root_path> (which is read-only and rewritten by /jetson-promote-image)",
+      "Propagate the same FAN_DEFAULT_PROFILE fix to every sibling conf (reference platform + carrier-derived) without blanket-copying",
+      "Deploy via /jetson-promote-image → /jetson-flash-image (or scp + 'sudo systemctl restart nvfancontrol.service' on a live target)"
+    ]
+  }
+]

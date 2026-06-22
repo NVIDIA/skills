@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tao-run-platform`
-- Evaluation date: 2026-06-07
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,28 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 15% (+15%) | 92% (+92%) |
-| Discoverability | 2 | 0% (+0%) | 80% (+80%) |
-| Effectiveness | 2 | 45% (+35%) | 74% (+61%) |
-| Efficiency | 2 | 27% (-0%) | 79% (+50%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 80% (+80%) | 88% (+88%) |
+| Discoverability | 1 | 100% (+100%) | 62% (+62%) |
+| Effectiveness | 1 | 50% (+40%) | 90% (+66%) |
+| Efficiency | 1 | 95% (+68%) | 59% (+31%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 11 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 4 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_efficiency: Deeply nested references in job-construction.md (`skills/platform/tao-run-platform/SKILL.md`)
 - MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/platform/tao-run-platform`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/platform/tao-run-platform/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/platform/tao-run-platform/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description very long (470 chars, recommend 50-150) (`skills/platform/tao-run-platform/SKILL.md`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/platform/tao-run-platform/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 8 file(s)
-- Inter-Skill Deduplication: Parsed skill 'tao-run-platform': 470 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

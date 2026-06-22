@@ -1,5 +1,19 @@
 # Video Reasoning Annotation — Domain Adaptation Guide
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Overview
+- Consultation Process
+  - Phase 1 — Understand the annotation goals
+  - Phase 2 — Infer caption requirements
+  - Phase 3 — Write prompts
+- Placeholder Reference
+- Iterative Prompt Tuning
+- Reference Prompt Modules
+
+
 ## Overview
 
 The default prompts in `nvidia_tao_ds.auto_label.video_reasoning_annotation.prompts` work for general video content. For domain-specific datasets, customize the prompts via the template module to get significantly better caption accuracy, description quality, and QA relevance.

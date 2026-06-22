@@ -20,7 +20,7 @@ CenterPose for keypoint / pose estimation. Detects object centers and regresses 
 
 Set model.backbone.pretrained_backbone_path.
 
-For TAO Deploy TensorRT actions (`gen_trt_engine`, TensorRT `evaluate`, and TensorRT `inference`), read `references/tao-deploy-centerpose.md` first. Deploy spec templates live in this skill's `references/` folder with the `spec_template_deploy_*.yaml` prefix.
+For TAO Deploy TensorRT actions (`gen_trt_engine`, TensorRT `evaluate`, and TensorRT `inference`), use the deploy spec templates packaged in this skill's `references/` folder with the `spec_template_deploy_*.yaml` prefix.
 
 ## Dataclass Schemas
 
@@ -28,7 +28,7 @@ Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with 
 
 ## Train Action Policy
 
-This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only; otherwise default to `auto`. When `automl_policy: auto`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `tao-skill-bank:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
+This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Use `automl_policy: on` by default and only expose `on` / `off` in new launch prompts. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only. When `automl_policy: on`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `tao-skill-bank:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
 
 Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows stay in this model skill. The per-run `automl_policy` override does not change model metadata.
 
@@ -53,8 +53,11 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 Data source overrides are **mandatory for every action** — the agent MUST construct data source paths from the Per-Action Dataset Requirements table above and include them in `spec_overrides`.
 
 ```python
-S3_TRAIN = "s3://bucket/data/train"
-S3_EVAL = "s3://bucket/data/eval"
+TRAIN_DIR = "/path/to/extracted/train"
+VAL_DIR = "/path/to/extracted/val"
+TEST_DIR = "/path/to/extracted/test"
+INFER_DIR = VAL_DIR
+CAL_IMAGE_DIRS = ["/path/to/extracted/train/<sequence_or_image_dir>"]
 ```
 
 **train (mandatory data sources):**
@@ -66,8 +69,8 @@ S3_EVAL = "s3://bucket/data/eval"
     "train.num_gpus": 1,
     "dataset.category": "bike",
     "dataset.batch_size": 4,
-    "dataset.train_data": f"{S3_TRAIN}/train.tar.gz",
-    "dataset.val_data": f"{S3_EVAL}/val.tar.gz",
+    "dataset.train_data": TRAIN_DIR,
+    "dataset.val_data": VAL_DIR,
 }
 ```
 
@@ -75,7 +78,7 @@ S3_EVAL = "s3://bucket/data/eval"
 ```python
 {
     "dataset.category": "bike",
-    "dataset.test_data": f"{S3_EVAL}/test.tar.gz",
+    "dataset.test_data": TEST_DIR,
 }
 ```
 
@@ -83,14 +86,14 @@ S3_EVAL = "s3://bucket/data/eval"
 ```python
 {
     "dataset.category": "bike",
-    "dataset.inference_data": f"{S3_EVAL}/val.tar.gz",
+    "dataset.inference_data": INFER_DIR,
 }
 ```
 
 **gen_trt_engine (mandatory data sources):**
 ```python
 {
-    "gen_trt_engine.tensorrt.calibration.cal_image_dir": [f"{S3_TRAIN}/train.tar.gz"],
+    "gen_trt_engine.tensorrt.calibration.cal_image_dir": CAL_IMAGE_DIRS,
 }
 ```
 ## Eval Dataset
@@ -128,8 +131,6 @@ Optional. Val and test datasets are provided as separate tarballs.
 - TRT data types: FP32, FP16, INT8
 - TRT opt_batch_size: 4, max_batch_size: 8
 
-Full TAO Deploy reference: [tao-deploy-centerpose](references/tao-deploy-centerpose.md).
-
 ## Hardware
 
 Minimum 1 GPU(s), recommended 2 GPU(s). 16GB+ VRAM per GPU. CenterPose is moderately memory-intensive depending on input resolution and number of keypoints.
@@ -137,6 +138,24 @@ Minimum 1 GPU(s), recommended 2 GPU(s). 16GB+ VRAM per GPU. CenterPose is modera
 ## Error Patterns
 
 **num_joints mismatch**: Ensure dataset.num_joints matches the keypoint count in your annotations.
+
+**Extract S3 tarballs for local Docker**: The starter-kit S3 data is packaged as
+`train.tar.gz`, `val.tar.gz`, and `test.tar.gz`, but the CenterPose TAO actions
+consume extracted folders. Extract each archive and set `dataset.train_data`,
+`dataset.val_data`, `dataset.test_data`, and `dataset.inference_data` to the
+extracted split directories.
+
+**Checkpoint handoff**: CenterPose training writes concrete checkpoints such as
+`model_epoch_000_step_00008.pth` and a `centerpose_model_latest.pth` symlink.
+Use the SDK/model checkpoint resolver or the exact epoch/step checkpoint for
+evaluate, inference, export, and resume. Use the symlink only when the user
+explicitly asks for latest.
+
+**TAO Deploy postprocessor compatibility**: Use the deploy image resolved from
+`versions.yaml` or the selected platform. A successful `gen_trt_engine` run does
+not prove deploy `evaluate` or `inference` works; inspect those action exit codes
+and logs separately, especially for CenterPose postprocessor errors such as
+`TypeError: only 0-dimensional arrays can be converted to Python scalars`.
 
 ## Spec Param / Parent Model Inference
 
@@ -169,3 +188,7 @@ Inference mappings from TAO Core `centerpose.config.json`:
 | train | `train.resume_training_checkpoint_path` | `resume_model` | model file inferred from the current job results folder |
 
 For `parent_model` or `parent_model_folder`, pass the upstream train/export/AutoML child job id as `parent_job_id`. The SDK lists the parent result folder, filters checkpoint artifacts, and returns the selected model file or folder. Do not add these mappings back to `config.json` and do not patch generated runner scripts to guess checkpoint paths.
+
+## Deployment
+
+- [tao-deploy-centerpose](references/tao-deploy-centerpose.md)

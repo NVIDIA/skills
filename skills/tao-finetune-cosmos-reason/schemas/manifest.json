@@ -23,15 +23,33 @@
       "schema_action": "evaluate",
       "spec_template": "references/spec_template_evaluate.yaml"
     },
+    "inference": {
+      "automl_default_parameters": [],
+      "automl_disabled_parameters": [],
+      "core_module": "cosmos-rl",
+      "path": "schemas/inference.schema.json",
+      "popular": {},
+      "schema_action": "inference",
+      "spec_template": "references/spec_template_inference.yaml"
+    },
+    "quantize": {
+      "automl_default_parameters": [],
+      "automl_disabled_parameters": [],
+      "core_module": "cosmos-rl",
+      "path": "schemas/quantize.schema.json",
+      "popular": {},
+      "schema_action": "quantize",
+      "spec_template": "references/spec_template_quantize.yaml"
+    },
     "train": {
       "automl_default_parameters": [
-        "custom.vision.fps",
         "policy.lora.lora_alpha",
         "policy.lora.lora_dropout",
         "policy.lora.r",
-        "train.epoch",
+        "train.optm_weight_decay",
         "train.optm_decay_type",
-        "train.optm_lr"
+        "train.optm_lr",
+        "train.train_batch_per_replica"
       ],
       "automl_disabled_parameters": [
         "custom",
@@ -62,6 +80,8 @@
         "train": {
           "compile": false,
           "epoch": 10,
+          "optm_warmup_epochs": 0,
+          "optm_weight_decay": 0.01,
           "train_batch_per_replica": 1
         }
       },

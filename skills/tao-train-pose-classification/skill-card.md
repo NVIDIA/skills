@@ -1,5 +1,5 @@
 ## Description: <br>
-Pose classification using ST-GCN (Spatial Temporal Graph Convolutional Network) that classifies skeleton sequences into action categories from pose keypoint data. <br>
+Pose classification using ST-GCN (Spatial Temporal Graph Convolutional Network) that classifies skeleton sequences into action categories from pose-keypoint data. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, or running inference for pose classification models using NVIDIA TAO Toolkit. <br>
+Developers and engineers training, evaluating, exporting, or running inference on TAO pose-classification models for skeleton-based action recognition from pose-keypoint data. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,16 +19,18 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [Agent Skills Open Standard](https://agentskills.io) <br>
 - [skill_info.yaml](references/skill_info.yaml) <br>
 - [spec_template_train.yaml](references/spec_template_train.yaml) <br>
 - [spec_template_evaluate.yaml](references/spec_template_evaluate.yaml) <br>
 - [spec_template_export.yaml](references/spec_template_export.yaml) <br>
 - [spec_template_inference.yaml](references/spec_template_inference.yaml) <br>
+- [spec_template_dataset_convert.yaml](references/spec_template_dataset_convert.yaml) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Format:** [Markdown with inline bash and Python code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -39,7 +41,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task with 2 attempts per task in astra-sandbox environment, evaluated with NVSkills-Eval external profile. Pass threshold 50%. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,11 +65,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+75%) | 58% (+58%) |
-| Discoverability | 2 | 85% (+85%) | 48% (+48%) |
-| Effectiveness | 2 | 88% (+35%) | 63% (+49%) |
-| Efficiency | 2 | 69% (+43%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 88% (+88%) | 97% (+97%) |
+| Effectiveness | 1 | 90% (+80%) | 90% (+68%) |
+| Efficiency | 1 | 75% (+48%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

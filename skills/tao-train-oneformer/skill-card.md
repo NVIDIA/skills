@@ -1,5 +1,5 @@
 ## Description: <br>
-OneFormer for universal image segmentation — unifies panoptic, instance, and semantic segmentation with a single architecture using task-conditioned queries. <br>
+OneFormer for universal image segmentation — unifies panoptic, instance, and semantic segmentation with a single architecture using task-conditioned queries for training, evaluating, exporting, quantizing, and running inference on TAO OneFormer models. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers training, evaluating, exporting, quantizing, or running inference for TAO OneFormer universal segmentation models using agent-assisted Docker workflows. <br>
+Developers and engineers training, evaluating, exporting, quantizing, or running inference on OneFormer universal image segmentation models using NVIDIA TAO Toolkit within an agent-assisted workflow. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,9 +20,8 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [TAO Deploy OneFormer](references/tao-deploy-oneformer.md) <br>
-- [Skill Info (AutoML config)](references/skill_info.yaml) <br>
+- [Skill Info](references/skill_info.yaml) <br>
 - [Swin Transformer Pretrained Backbone](https://github.com/SwinTransformer/storage/releases/download/v1.0.8/swin_tiny_patch4_window7_224_22k.pth) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
@@ -38,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive skill-activation case) with 2 attempts per task in the NVSkills-Eval external profile. <br>
+Evaluated against 1 positive skill-activation task using the NVSkills-Eval external profile in an astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+100%) | 92% (+73%) |
-| Discoverability | 2 | 91% (+91%) | 97% (+66%) |
-| Effectiveness | 2 | 72% (+62%) | 71% (+50%) |
-| Efficiency | 2 | 75% (+48%) | 96% (+53%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+97%) |
+| Discoverability | 1 | 83% (+83%) | 97% (+97%) |
+| Effectiveness | 1 | 100% (+86%) | 90% (+72%) |
+| Efficiency | 1 | 67% (+40%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

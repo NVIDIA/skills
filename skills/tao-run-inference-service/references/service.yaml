@@ -194,7 +194,7 @@ service_registry:
   state_file: /tmp/tao-inf-ms-state.json
   entry_schema:
     job_id: UUID string (TAO-generated)
-    platform: "local-docker" | "brev" | "lepton" | "slurm" | "kubernetes"
+    platform: "local-docker" | "brev" | "slurm" | "kubernetes"
     platform_job_id: platform-native job identifier (omitted for local-docker/brev where job_id is the container name)
     network_arch: string
     host_url: reachable URL from agent host (varies by platform)
@@ -252,7 +252,6 @@ allowed_docker_env_var_names:
   - ORCHESTRATION_API_NETWORK
   - ORCHESTRATION_API_ACTION
   - CUDA_OVERRIDE_VERSION
-  - LEPTON_SHARED_MEMORY_SIZE
 
 secrets_handling:
   secret_env_vars:

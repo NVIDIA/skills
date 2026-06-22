@@ -62,6 +62,106 @@
           </div>
         </div>
 
+  {{ PROBLEM_STATEMENT_HTML }}
+      Pre-rendered HTML for the "Problem Statement" card — mirrors § 1 of the
+      gap-analysis report style. Covers (1) the task and target model, (2) how
+      the KPI is measured (FAR @ 100% Recall math one-liner), and (3) the
+      failure modes the loop targets. Bake the concrete KPI target into the
+      copy — do not leave it as a `{{ KPI_TARGET }}` token inside this block,
+      because the .replace() pass treats this string as already final. Example:
+        <p class="info-text">
+          We are given a pre-trained <strong>Visual ChangeNet</strong> binary
+          classifier for PCB AOI inspection (PASS vs NO_PASS) and tasked with
+          reducing its False Alarm Rate (FAR) on the customer's KPI evaluation
+          set <em>without missing a single real defect</em>. Target:
+          <strong>FAR &lt; 10% @ 100% Recall</strong>.
+        </p>
+        <div class="insight">
+          <strong>How FAR @ 100% Recall is measured:</strong> we sweep the
+          decision threshold on the model's NO_PASS probability and pick the
+          lowest threshold for which every NO_PASS sample in the validation
+          set is still caught. FAR is then the percentage of <code>PASS</code>
+          components the same threshold misclassifies as <code>NO_PASS</code>.
+          Lower FAR = fewer good boards flagged for human re-review.
+        </div>
+        <p class="info-text" style="margin-top:16px">
+          <strong>What needs to improve.</strong> Closing the FAR gap at 100%
+          recall means shrinking the score-overlap region where rare hard-PASS
+          samples score above the cleanest NO_PASS samples. We target this gap
+          by:
+        </p>
+        <ul class="context-list">
+          <li><strong>Real-image mining</strong> — k-NN search from an unlabeled
+            pool for PASS components visually similar to the model's hardest
+            false alarms.</li>
+          <li><strong>Synthetic NG/OK pairs</strong> — AnomalyGen produces
+            paired defective / golden component crops for rare defect modes
+            the mining pool cannot cover.</li>
+          <li><strong>Iterative fine-tune</strong> — retrain ChangeNet on the
+            augmented set and re-pick the 100%-recall threshold each round
+            until FAR meets the KPI ceiling.</li>
+        </ul>
+
+  {{ KPI_DATASET_HTML }}
+      Pre-rendered HTML for the "KPI Dataset Characteristics" card — mirrors
+      § 3 of the gap-analysis report style. Covers (1) totals (component
+      crops, PASS vs NO_PASS counts), (2) component categories present, (3)
+      per-defect-type breakdown within NO_PASS, (4) lighting variants, and
+      (5) any imbalance worth calling out. Source: KPI eval manifest under
+      ${results_dir}/baseline/ and RCA defect-type CSV. Example:
+        <p class="info-text">
+          The KPI evaluation set contains <strong>12,480 component crops</strong>
+          across <strong>3 board categories</strong> and <strong>4 lighting
+          variants</strong>, split <strong>11,920 PASS / 560 NO_PASS</strong>
+          (4.5% NO_PASS). NO_PASS is dominated by <code>solder_bridge</code>
+          and <code>missing_component</code>; <code>misalignment</code> is
+          rare (&lt; 5% of NO_PASS) and drives most of the residual FAR.
+        </p>
+        <table class="data-table">
+          <thead><tr>
+            <th>Component Category</th>
+            <th>PASS</th>
+            <th>NO_PASS</th>
+            <th>Lighting Variants</th>
+            <th>Top Defect Modes</th>
+          </tr></thead>
+          <tbody>
+            <tr><td><strong>cap_0402</strong></td>
+                <td class="num">4,820</td>
+                <td class="num">220</td>
+                <td class="num">4</td>
+                <td>solder_bridge, missing</td></tr>
+            … one row per category …
+          </tbody>
+        </table>
+
+  {{ APPROACH_HTML }}
+      Pre-rendered HTML for the "Approach" card — mirrors § 5 of the gap-
+      analysis report style. Covers (1) the DEFT iterative recipe (baseline →
+      score-distribution RCA → data routing → AnomalyGen synthetic + k-NN
+      mining → ChangeNet fine-tune → re-evaluate), (2) the cosine similarity
+      floor used to filter mined images, and (3) per-iteration knobs the user
+      chose for this run. Example:
+        <p class="info-text">
+          Each iteration runs five stages: <strong>evaluate</strong> the
+          current ChangeNet checkpoint on the KPI val set and pick the
+          100%-recall threshold; <strong>RCA</strong> ranks PASS samples by
+          NO_PASS score to surface the worst false-alarm candidates;
+          <strong>route</strong> those candidates to k-NN mining (real PASS
+          lookalikes from an unlabeled pool, cosine similarity &ge; 0.9) and
+          AnomalyGen (synthetic NG/OK pairs on defect modes mining cannot
+          cover); <strong>fine-tune</strong> on the augmented training set;
+          <strong>re-evaluate</strong> and stop when FAR meets the KPI ceiling
+          or after <strong>3 iterations</strong>.
+        </p>
+        <div class="insight">
+          <strong>This run's headline lever:</strong> k-NN mining at
+          <code>cos &ge; 0.9</code> contributes the bulk of the augmentation
+          volume; AnomalyGen targets the
+          <code>misalignment</code> defect class where the mining pool is
+          empty.
+        </div>
+
   {{ ITERATION_TABLE_ROWS_HTML }}
       One <tr> per iteration. Row template:
         <tr class="best|regress|''">
@@ -119,18 +219,27 @@
       Exactly ONE .sample-iter-block with ONE input/output pair. Do not emit a
       block per iteration — pick a single representative pair from the best
       iteration (the more samples we show, the more odd-looking crops the user
-      notices; one clean pair is the entire point). Block template:
+      notices; one clean pair is the entire point).
+
+      Direction is AnomalyGen-model semantics: the OK / normal reference crop
+      is the **input** the generator was conditioned on, and the synthetic NG
+      crop is its **output** with the defect added. Do not reverse this — the
+      previous version had the columns flipped and made it look like the loop
+      was reconstructing a clean image from a defect, which is the opposite of
+      what AnomalyGen does.
+
+      Block template:
         <div class="sample-iter-block">
           <div class="sample-strip">
             <div class="sample-col">
-              <div class="sample-col-title">AnomalyGen Input</div>
-              <img class="sample-img" src="..." alt="AG input">
+              <div class="sample-col-title">AnomalyGen Input (OK / normal)</div>
+              <img class="sample-img" src="..." alt="AG input (OK)">
               [or placeholder when no image — use this div instead of img:]
               <div class="sample-img-placeholder">No image</div>
             </div>
             <div class="sample-col">
-              <div class="sample-col-title">AnomalyGen Output</div>
-              <img class="sample-img" src="..." alt="AG output">
+              <div class="sample-col-title">AnomalyGen Output (synthetic NG)</div>
+              <img class="sample-img" src="..." alt="AG output (synthetic NG)">
             </div>
           </div>
         </div>
@@ -138,13 +247,15 @@
       since each image now gets twice the screen area) so the file opens offline:
         src="data:image/jpeg;base64,<b64>"
       If a source image doesn't exist for a column, emit the .sample-img-placeholder div instead.
-      Columns and order: AnomalyGen Input | AnomalyGen Output
+      Columns and order: AnomalyGen Input (OK / normal) | AnomalyGen Output (synthetic NG)
       Source path guide per column (best iteration only):
-        AnomalyGen Input → anomalygen/inputs/pool_b/dataset/<cat>/anomaly_image/<any>.jpg
-        AnomalyGen Output→ anomalygen/pool_b/original/reconstructed_image/<any>.png
-      Selection rule: take the first existing pair by filename sort. If the best
-      iteration has no AnomalyGen output, fall back to the most recent iteration
-      that does; if none, emit the block with two .sample-img-placeholder divs.
+        Input  (OK / normal)    → ${RESULTS_DIR}/iter${N}/dataset/images/synthetic_iter${N}_ok/<any>.{jpg,png}
+        Output (synthetic NG)   → ${RESULTS_DIR}/iter${N}/dataset/images/synthetic_iter${N}_ng/<any>.{jpg,png}
+      Selection rule: take the first existing pair by filename sort (the OK and
+      NG filenames are aligned, so the same sort key picks the matched pair).
+      If the best iteration has no synthetic NG output, fall back to the most
+      recent iteration that does; if none, emit the block with two
+      .sample-img-placeholder divs.
 
   {{ ITER_CARDS_HTML }}
       One .iter-card div per iteration (excluding baseline). Card template:
@@ -543,6 +654,37 @@
     color: #5dade2;
   }
 
+  /* ── Context bullet list (Problem Statement / Approach cards) ── */
+  .context-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 8px;
+  }
+  .context-list li {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    padding: 5px 0 5px 22px;
+    position: relative;
+  }
+  .context-list li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    top: 5px;
+    color: var(--nvidia-green);
+    font-size: 13px;
+  }
+  .context-list li strong { color: var(--text-primary); font-weight: 600; }
+  .context-list li code {
+    background: rgba(255,255,255,0.08);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 14px;
+    color: var(--nvidia-green);
+  }
+
   /* ── Iteration cards ── */
   .iter-grid {
     display: grid;
@@ -789,6 +931,39 @@
   </div>
 
   {{ KPI_BANNER_HTML }}
+</div>
+
+<!-- ════════════ PROBLEM STATEMENT ════════════ -->
+<div class="card">
+  <div class="header">
+    <div>
+      <div class="chart-title">Problem Statement</div>
+      <div class="chart-subtitle">What we are solving, how accuracy is measured, and what needs to improve</div>
+    </div>
+  </div>
+  {{ PROBLEM_STATEMENT_HTML }}
+</div>
+
+<!-- ════════════ KPI DATASET CHARACTERISTICS ════════════ -->
+<div class="card">
+  <div class="header">
+    <div>
+      <div class="chart-title">KPI Dataset Characteristics</div>
+      <div class="chart-subtitle">Composition of the evaluation set used to score every iteration</div>
+    </div>
+  </div>
+  {{ KPI_DATASET_HTML }}
+</div>
+
+<!-- ════════════ APPROACH ════════════ -->
+<div class="card">
+  <div class="header">
+    <div>
+      <div class="chart-title">Approach</div>
+      <div class="chart-subtitle">How the DEFT loop systematically closes the FAR gap at 100% recall</div>
+    </div>
+  </div>
+  {{ APPROACH_HTML }}
 </div>
 
 <!-- ════════════ PROGRESS OVERVIEW ════════════ -->

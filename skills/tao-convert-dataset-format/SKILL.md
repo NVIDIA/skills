@@ -6,7 +6,7 @@ license: Apache-2.0
 compatibility: Requires Python 3.10+ and the nvidia-tao-sdk package (pip install nvidia-tao-daft).
 metadata:
   author: NVIDIA Corporation
-  version: "1.0.0"
+  version: "0.1.0"
 allowed-tools: Read Bash
 tags:
 - tao-daft

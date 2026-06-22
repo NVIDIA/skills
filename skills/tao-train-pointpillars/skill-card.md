@@ -1,5 +1,5 @@
 ## Description: <br>
-PointPillars for 3D object detection from LiDAR point clouds, encoding point clouds into a pseudo-image via a pillar-based representation then applying 2D detection for autonomous driving and robotics. <br>
+PointPillars for 3D object detection from LiDAR point clouds — encodes point clouds into a pseudo-image via a pillar-based representation, then applies 2D detection; used in autonomous driving and robotics. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, pruning, and running inference for PointPillars 3D object detection models from LiDAR point cloud data for autonomous driving and robotics applications. <br>
+Developers and engineers training, evaluating, exporting, pruning, retraining, or running inference for TAO PointPillars 3D object detection models from LiDAR point clouds in autonomous driving and robotics workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,9 +19,8 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [TAO Deploy PointPillars Workflow](references/tao-deploy-pointpillars.md) <br>
-- [Skill Info (model metadata)](references/skill_info.yaml) <br>
-- [Train Spec Template](references/spec_template_train.yaml) <br>
+- [TAO Deploy PointPillars](references/tao-deploy-pointpillars.md) <br>
+- [Skill Info](references/skill_info.yaml) <br>
 
 
 ## Skill Output: <br>
@@ -37,7 +36,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in astra-sandbox environment using NVSkills-Eval external profile. <br>
+Evaluated against 1 internal skill evaluation task (positive activation) via NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +60,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+100%) | 92% (+82%) |
-| Discoverability | 2 | 93% (+92%) | 80% (+80%) |
-| Effectiveness | 2 | 81% (+71%) | 81% (+47%) |
-| Efficiency | 2 | 81% (+54%) | 79% (+50%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 50% (+0%) | 20% (+0%) |
+| Discoverability | 1 | 0% (+0%) | 0% (+0%) |
+| Effectiveness | 1 | 90% (+6%) | 44% (+0%) |
+| Efficiency | 1 | 27% (+0%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

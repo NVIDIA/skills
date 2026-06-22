@@ -1,0 +1,38 @@
+[
+  {
+    "id": "jetson-customize-pcie-001",
+    "question": "/jetson-customize-uphy just switched my Thor carrier from uphy0-config-7 to uphy0-config-6, enabling PCIe C3 with a 4-lane Gen4 slot. Now bring up the per-controller side via /jetson-customize-pcie.",
+    "expected_skill": "jetson-customize-pcie",
+    "expected_script": null,
+    "ground_truth": "Run /jetson-customize-pcie. Step 1 resolves the active target and opens the carrier pinmap, reference DTB and <uphy-state> sidecar — refuse if <uphy-state> is missing — and require both documents.custom_carrier_schematic AND documents.custom_carrier_pinmux_xls when custom_carrier: is present. Step 2 diffs the PCIe topology by decompiling <ref-dtb> and grepping the schematic for PEX<N>_* net labels. Step 3 issues an AskUserQuestion (multiSelect) for which controllers to customize. Step 4 runs pin_verifier.py for PE<N>_CLKREQ_L, PE<N>_RST_L and optional PE<N>_WAKE_L; mismatches route (with operator confirmation) to /jetson-customize-pinmux. Step 5 auto-derives the per-controller plan: enable from <uphy-state> (mandatorily okay for UPHY-allocated, mandatorily disabled otherwise), lanes/speed from the Adaptation Guide, mode hard-pinned to 'rc' (only emit 'ep' when the operator passes mode_override='ep'), then runs the confirm-or-customize gate. Step 6 appends per-controller fragment@N blocks marked /* custom-bsp: pcie:pcie@<addr> */ into the composite custom overlay .dts in bsp_sources/ per references/bsp-customization-kernel-dtb.md, runs the dtc + fdtoverlay pre-flight and commits via the workflow's preview gate. The skill MUST NOT edit ODMDATA — pcie@N_status=…, pcie@N_max-link-speed, pcie@N_pcie-mode, pcie@N_clk-scheme and pcie-cN-endpoint-enable are owned by /jetson-customize-uphy in its single atomic ODMDATA commit. Step 8 cross-checks ODMDATA vs overlay consistency and on contradiction stops to ask the user — never running 'git reset --hard' autonomously. Step 9 writes <profile-stem>.jetson-customize-pcie.json and drives the downstream next-step chain via sequential AskUserQuestion prompts. /jetson-build-source compiles the composite .dtbo and owns OVERLAY_DTB_FILE+= registration.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-pcie/SKILL.md",
+      "Step 1: validate active profile with reference_devkit + custom_carrier and refuse if <uphy-state> at <workspace>/target-platform/<profile-stem>.jetson-customize-uphy.json is missing; require both documents.custom_carrier_schematic and documents.custom_carrier_pinmux_xls",
+      "Step 2: diff PCIe topology — devkit vs custom carrier — by decompiling <ref-dtb> and grepping the schematic for PEX<N>_* net labels",
+      "Step 3: AskUserQuestion (multiSelect) for which controllers to customize",
+      "Step 4: run pin_verifier.py for PE<N>_CLKREQ_L, PE<N>_RST_L and optional PE<N>_WAKE_L; route mismatches (with operator confirmation) to /jetson-customize-pinmux",
+      "Step 5: derive per-controller plan from <uphy-state> (UPHY-allocated => okay, non-allocated => disabled), pull lanes/speed from the Adaptation Guide, hard-pin mode to 'rc' (only 'ep' on explicit mode_override), then run the confirm-or-customize gate",
+      "Step 6: append per-controller fragment@N blocks marked /* custom-bsp: pcie:pcie@<addr> */ into the composite custom overlay .dts in bsp_sources/, run dtc + fdtoverlay pre-flight and commit via the preview gate",
+      "Do NOT edit ODMDATA — pcie@N_status, pcie@N_max-link-speed, pcie@N_pcie-mode, pcie@N_clk-scheme and pcie-cN-endpoint-enable are owned by /jetson-customize-uphy",
+      "Step 8: cross-check ODMDATA vs overlay consistency; on contradiction stop and ask the operator, never run 'git reset --hard' autonomously",
+      "Step 9: write <workspace>/target-platform/<profile-stem>.jetson-customize-pcie.json and drive the downstream chain via sequential AskUserQuestion prompts; hand off to /jetson-build-source for composite .dtbo compilation and OVERLAY_DTB_FILE+= registration"
+    ]
+  },
+  {
+    "id": "jetson-customize-pcie-002",
+    "question": "After /jetson-customize-pcie my PCIe slot enumerates but the link trains at x2 instead of the expected x4, and dmesg shows pcie controller link timeouts on a controller I thought I disabled. What's going on?",
+    "expected_skill": "jetson-customize-pcie",
+    "expected_script": null,
+    "ground_truth": "Two-surface mismatch. Each PCIe controller's runtime behavior is determined by both ODMDATA (BPMP DTB /pcie/pcie@N: UPHY lane power, refclk gating, controller-side rails) and the kernel-DT overlay on &pcieN (kernel probe, lane width, link speed, RC/EP mode); skipping the kernel overlay on a disable lets the kernel probe a powered-down PHY (the link timeouts you see in dmesg), and skipping the ODMDATA token on a disable leaves BPMP holding the PHY hot. For the x2-instead-of-x4 case, confirm /jetson-customize-uphy's <uphy-state> sidecar allocates the expected lane count for that controller — the kernel fragment's num-lanes must match. For the link timeouts, ensure the kernel-DT overlay fragment for the disabled controller is present (status=\"disabled\") in the composite custom overlay .dts; do not rely on ODMDATA alone. Run Step 8's ODMDATA-vs-overlay consistency cross-check; on a contradictory row STOP and ask the user how to recover the two commits — never run 'git reset --hard' autonomously. Also check the composite overlay root compatible — UEFI plugin-manager silently skips on mismatch; fix the composite root, not the fragment. All edits stay in <source.root_path>/Linux_for_Tegra/ and <source.root_path>/bsp_sources/.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-pcie/SKILL.md and consult the Overview two-surface table plus the Troubleshooting list",
+      "Recognize the two-surface invariant: ODMDATA owns UPHY lane power/refclk/rails on /pcie/pcie@N in BPMP DTB, the kernel-DT overlay on &pcieN owns kernel probe/lane width/link speed/RC-EP mode — both required",
+      "Diagnose the link timeouts as a missing kernel-DT overlay status=\"disabled\" fragment letting the kernel probe a powered-down PHY",
+      "Diagnose the x2 vs x4 link-width as <uphy-state>'s allocation not matching the kernel fragment's num-lanes; confirm UPHY config in <uphy-state> allocates the expected lane count and that num-lanes matches",
+      "Run Step 8's ODMDATA-vs-overlay consistency cross-check; on a contradictory row stop and ask the user how to recover the two commits — never auto-run 'git reset --hard'",
+      "Sanity-check the composite overlay root compatible (fix the composite root, not the fragment) — UEFI plugin-manager silently skips on mismatch",
+      "Do NOT edit ODMDATA from this skill (owned by /jetson-customize-uphy); re-run /jetson-customize-uphy if the ODMDATA side needs to change",
+      "Re-emit the per-controller /* custom-bsp: pcie:pcie@<addr> */ fragments via Step 6 with dtc + fdtoverlay pre-flight, refresh <profile-stem>.jetson-customize-pcie.json and hand off to /jetson-build-source"
+    ]
+  }
+]

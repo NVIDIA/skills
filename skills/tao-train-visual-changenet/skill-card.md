@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, and running inference for PCB defect detection and visual inspection, comparing image pairs for PASS/NO_PASS classification or producing change-segmentation masks. <br>
+Developers and engineers training, evaluating, and deploying Visual ChangeNet models for automated optical inspection (AOI) defect detection and PCB visual inspection tasks. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,10 +19,12 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Dataset and Spec Overrides](references/dataset-and-specs.md) <br>
-- [Local Docker Invocation](references/local-docker-invocation.md) <br>
-- [Parameters and Troubleshooting](references/parameters-and-troubleshooting.md) <br>
+- [Data Formats](references/data-formats.md) <br>
+- [Tuning Parameters](references/tuning-parameters.md) <br>
+- [Troubleshooting](references/troubleshooting.md) <br>
+- [Local Docker Usage](references/local-docker.md) <br>
 - [TAO Deploy Visual ChangeNet](references/tao-deploy-visual-changenet.md) <br>
+- [Parent Model Inference](references/parent-model-inference.md) <br>
 
 
 ## Skill Output: <br>
@@ -38,7 +40,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the NVSkills-Eval external profile. <br>
+Evaluated against 1 internal skill evaluation task (positive activation). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,11 +64,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 95% (+95%) | 97% (+97%) |
-| Discoverability | 2 | 85% (+85%) | 97% (+97%) |
-| Effectiveness | 2 | 91% (+81%) | 78% (+50%) |
-| Efficiency | 2 | 68% (+41%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+50%) | 97% (+77%) |
+| Discoverability | 1 | 100% (+100%) | 97% (+97%) |
+| Effectiveness | 1 | 64% (-2%) | 86% (+42%) |
+| Efficiency | 1 | 95% (+68%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

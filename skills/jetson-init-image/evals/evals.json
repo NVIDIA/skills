@@ -1,0 +1,35 @@
+[
+  {
+    "id": "jetson-init-image-001",
+    "question": "I've staged Jetson_Linux_R36.4.0_aarch64.tbz2 and Tegra_Linux_Sample-Root-Filesystem_R36.4.0_aarch64.tbz2 in my workspace and just finished /jetson-init-target for an AGX Orin profile. How do I extract the BSP and get bsp_image: written into my profile?",
+    "expected_skill": "jetson-init-image",
+    "expected_script": null,
+    "ground_truth": "Invoke /jetson-init-image; with no bsp_image: block in the profile it asks once for the path (Enter accepts the default <workspace>/Image and omits root_path from the profile). Module p3701 derives the nvgpu stack from the catalogue so apply_binaries.sh runs without --openrm. The skill searches <bsp_image.root_path>/, <workspace>/, and the cwd for the matching R36.4.0 tarballs, refuses if the R<ver> tokens disagree, then runs tar xjf for the BSP, sudo tar xpjf for the rootfs into Linux_for_Tegra/rootfs, cd Linux_for_Tegra, sudo ./apply_binaries.sh. Finally it writes bsp_image.version: \"36.4.0\" into the active profile via a round-tripping YAML writer and suggests /jetson-init-source.",
+    "expected_behavior": [
+      "Read skills/jetson-init-image/SKILL.md",
+      "Resolve the active profile and confirm reference_devkit is present; refuse otherwise",
+      "Ask once for bsp_image.root_path; on Enter use <workspace>/Image and omit root_path from the written profile",
+      "Use the chip-family table to derive the GPU stack: p3701 -> nvgpu, no --openrm flag",
+      "Locate both R<ver> tarballs across <bsp_image.root_path>/, <workspace>/, and cwd; refuse if R<ver> tokens differ",
+      "Run tar xjf for the BSP, sudo tar xpjf for the sample rootfs into Linux_for_Tegra/rootfs, then sudo ./apply_binaries.sh from Linux_for_Tegra",
+      "Persist bsp_image.version: \"36.4.0\" with a round-tripping YAML writer (e.g. ruamel.yaml) preserving comments and quoting",
+      "Report extracted vs reused state, GPU stack, derived version, profile update status, and suggest /jetson-init-source"
+    ]
+  },
+  {
+    "id": "jetson-init-image-002",
+    "question": "My profile already records bsp_image.root_path: /opt/jetson/Image with version \"36.3.0\" but Linux_for_Tegra/ at that path now reports R36.4.0 in nv_tegra_release. What does /jetson-init-image do, and how do I avoid losing my custom root_path?",
+    "expected_skill": "jetson-init-image",
+    "expected_script": null,
+    "ground_truth": "Because Linux_for_Tegra/ already exists, the skill does not extract over it without explicit user direction. It derives the on-disk version from Linux_for_Tegra/nv_tegra_release (36.4.0) and asks before replacing the recorded 36.3.0 - trust the parsed value over filenames. It also probes the GPU stack via INSTALL_TYPE in nv_tegra_release first, then falls back to find -name nvgpu.ko, then to the catalogue expectation; conflicts with the active target are refused. The recorded root_path is honoured (\"different recorded root_path: refuse automatic rewrite\"), so /opt/jetson/Image is not silently changed - only version is updated in place, with quoting preserved, after you confirm.",
+    "expected_behavior": [
+      "Read skills/jetson-init-image/SKILL.md",
+      "Identify that Linux_for_Tegra/ already exists, so the Reuse-or-extract path applies and the skill does not extract over it without explicit user direction",
+      "Parse Linux_for_Tegra/nv_tegra_release for the on-disk version and trust it over tarball filenames",
+      "Ask before replacing the recorded bsp_image.version with the new derived 36.4.0 value",
+      "Run the GPU-stack detection ladder (nv_tegra_release INSTALL_TYPE -> find -name nvgpu.ko -> catalogue fallback) and refuse if it conflicts with the active target",
+      "Refuse to silently overwrite a different recorded root_path; preserve /opt/jetson/Image and quote the version on update",
+      "Cite the matching Troubleshooting bullets for nv_tegra_release / version disagreement / different recorded root_path"
+    ]
+  }
+]

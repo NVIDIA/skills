@@ -23,7 +23,7 @@ Standard supervised fine-tuning: train a model on a labeled dataset, optionally 
 ## Steps
 
 1. **train** — executed through AutoML when the selected model has
-   `automl_enabled: true` and `automl_policy` is `auto`; set
+   `automl_enabled: true` and `automl_policy` is `on`; set
    `automl_policy=off` for a plain single training run
 2. **eval** — executed if `eval_dataset_uri` is resolved
 3. **export** — optional, on user request after training
@@ -42,7 +42,7 @@ Standard supervised fine-tuning: train a model on a labeled dataset, optionally 
 ### Optional
 - **eval_dataset_uri**: Some model skills mark this as required — check the resolved model skill before treating it as optional.
 - **base_checkpoint**: If not provided, defaults to the NGC pretrained checkpoint listed in the model skill, or trains from scratch if no NGC checkpoint exists.
-- **automl_policy**: `auto` by default; set `off` to bypass model-level AutoML for this run while leaving model metadata unchanged.
+- **automl_policy**: `on` by default; set `off` to bypass model-level AutoML for this run while leaving model metadata unchanged. Use only `on` / `off` in new launch settings.
 - **image override**: Use `image=<override>` to pin a specific TAO toolkit build
   after reviewing the resolved default.
 

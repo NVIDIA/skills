@@ -16,6 +16,26 @@ limitations under the License.
 
 # Dataset Source Handling Reference
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- Source Detection Logic
+- Option A: HuggingFace Hub (see dataset-patterns.md)
+- Option B: User-Provided Local Dataset
+  - Format auto-detection
+  - B.1: ImageFolder (classification)
+  - B.2: COCO JSON (detection / instance segmentation)
+  - B.3: Pascal VOC XML (detection)
+  - B.4: Semantic Segmentation Folder
+  - B.5: JSONL (VLM / LLM)
+  - B.6: Arrow (HF save_to_disk output)
+  - B.7: CSV/Parquet
+- Option C: No Dataset Provided (agent must recommend)
+- Universal prepare_data.py (handles all sources)
+- Validation checklist
+
+
 Used in Phase 3 of tao-finetune-huggingface-model skill. Datasets can come from THREE sources:
 
 1. **HuggingFace Hub** — user provides `dataset_id` like `lmms-lab/VQAv2`

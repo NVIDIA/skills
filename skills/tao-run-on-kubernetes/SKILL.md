@@ -35,8 +35,7 @@ Operator/device plugin present.
 # driver/toolkit lifecycle is owned by the cloud provider or GPU Operator policy.
 if [ "${TAO_K8S_SKIP_NODE_RUNTIME_CHECK:-0}" != "1" ]; then
   TAO_SKILL_BANK_ROOT="${TAO_SKILL_BANK_ROOT:-$PWD}"
-  SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT}/skills/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
-  [ -x "$SETUP_SCRIPT" ] || SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT}/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
+  SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT}/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
 
   bash "$SETUP_SCRIPT" --backend kubernetes --check-only || {
     echo "MISSING: TAO Kubernetes GPU node runtime is not ready."
@@ -51,15 +50,14 @@ fi
 # nvidia-tao-sdk is on public PyPI; pin lives in versions.yaml (wheels.tao_sdk_kubernetes).
 PIN=$("${TAO_SKILL_BANK_PATH:?}/scripts/resolve_versions_key.py" wheels.tao_sdk_kubernetes)
 python -c "import tao_sdk" 2>/dev/null || {
-  echo "MISSING: nvidia-tao-sdk not installed. Run:"
-  echo "  pip install \"$PIN\""
-  exit 1
+  echo "Installing missing Python requirement: $PIN"
+  python -m pip install "$PIN"
 }
 python -c "import kubernetes" 2>/dev/null || {
-  echo "MISSING: kubernetes extra not installed. Run:"
-  echo "  pip install \"$PIN\""
-  exit 1
+  echo "Installing missing Python requirement: $PIN"
+  python -m pip install "$PIN"
 }
+python -c "import tao_sdk, kubernetes"
 
 # 2. Cluster reachable (kubeconfig OR in-cluster service account)
 python -c "from kubernetes import config; config.load_kube_config()" 2>/dev/null || \
@@ -100,7 +98,7 @@ GPU capacity before submitting.
 - **NGC_KEY** (optional): for nvcr.io image pulls. If you've pre-created an image-pull secret in the target namespace, pass its name to `create_job` via the `image_pull_secret` argument.
 - **ACCESS_KEY / SECRET_KEY / S3_BUCKET_NAME / S3_ENDPOINT_URL** (optional): for S3 dataset I/O via the SDK's `inputs`/`outputs` script_runner wrapping.
 
-Do not ask for Lepton, Brev, or SLURM credentials for Kubernetes runs. Ask for
+Do not ask for Brev or SLURM credentials for Kubernetes runs. Ask for
 S3 credentials only when the selected workflow uses `s3://` inputs or outputs,
 and ask for model-specific credentials such as `HF_TOKEN` only when the selected
 model requires them. Before launch, verify the selected namespace can create
@@ -245,7 +243,7 @@ The capacity check sums across nodes: `gpu_count × num_nodes` ≤ cluster's all
 - PyTorch distributed (env-var rendezvous): <https://pytorch.org/docs/stable/elastic/run.html>
 - NCCL networking tuning (NCCL_SOCKET_IFNAME, NCCL_IB_HCA): <https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/env.html>
 
-### When to use a Kubernetes operator instead
+### Kubernetes operator alternatives
 
 For more sophisticated topologies (gang scheduling, PyTorch elastic / fault-tolerant training, MPI / Horovod, RDMA setup), reach for an operator instead of plain Indexed Job:
 
@@ -280,4 +278,4 @@ kubectl create secret docker-registry ngc-pull-secret \
 - **Gang scheduling.** Indexed Job pods are scheduled independently — no all-or-nothing. Multi-node training will *partially* start if only some pods can be scheduled (rank-0 will hang waiting for peers). For all-or-nothing scheduling on shared clusters, use Volcano or Kueue.
 - **MPI / Horovod.** Use the MPI Operator. The Indexed Job path here is PyTorch-distributed-shaped (env-var rendezvous on `MASTER_ADDR:MASTER_PORT`).
 - **Persistent volumes for shared storage.** S3 only via the script_runner. PVC support is a follow-up.
-- **Auto-creating image-pull secrets from `$NGC_KEY`.** You pre-create the secret in the target namespace and pass the name. Lepton does this auto; we don't here because k8s namespace conventions vary widely.
+- **Auto-creating image-pull secrets from `$NGC_KEY`.** You pre-create the secret in the target namespace and pass the name. K8s namespace conventions vary widely, so we keep secret creation explicit.

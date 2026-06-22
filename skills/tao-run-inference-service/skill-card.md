@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to deploy, query, and manage TAO model inference microservices across multiple compute platforms (local Docker, Brev, Lepton, SLURM, Kubernetes). <br>
+Developers and engineers who need to deploy TAO model inference as a containerized microservice, send inference requests, and manage service lifecycle across multiple compute platforms (local Docker, Brev, Slurm, Kubernetes). <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -27,7 +27,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Code, Configuration instructions] <br>
-**Output Format:** [Markdown with inline Python and bash code blocks] <br>
+**Output Format:** [Markdown with inline bash and Python code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -38,7 +38,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive skill-activation case) via NVSkills-Eval external profile in astra-sandbox environment. <br>
+Evaluated against 1 internal skill evaluation task using the NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,14 +62,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 57% (+57%) | 87% (+87%) |
-| Discoverability | 2 | 17% (+17%) | 84% (+84%) |
-| Effectiveness | 2 | 73% (+61%) | 74% (+60%) |
-| Efficiency | 2 | 25% (-2%) | 79% (+50%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 80% (+80%) | 97% (+97%) |
+| Discoverability | 1 | 100% (+100%) | 97% (+97%) |
+| Effectiveness | 1 | 40% (+30%) | 90% (+62%) |
+| Efficiency | 1 | 95% (+68%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
-0.3.0 (source: frontmatter) <br>
+0.1.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

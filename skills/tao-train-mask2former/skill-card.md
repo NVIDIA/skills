@@ -1,5 +1,5 @@
 ## Description: <br>
-Mask2Former for universal image segmentation (panoptic, instance, and semantic) — a transformer-based architecture with masked attention for high-quality segmentation results that supports training, evaluating, exporting, quantizing, and running inference for TAO Mask2Former models. <br>
+Mask2Former for universal image segmentation (panoptic, instance, and semantic), providing training, evaluation, export, quantization, and inference workflows for TAO Mask2Former models. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers who need to train, evaluate, export, quantize, or run inference on Mask2Former segmentation models using NVIDIA TAO within containerized GPU environments. <br>
+Developers and engineers who need to train, evaluate, export, quantize, or run inference on Mask2Former universal segmentation models using NVIDIA TAO Toolkit. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,10 +19,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [TAO Deploy Mask2Former Reference](references/tao-deploy-mask2former.md) <br>
-- [Skill Info](references/skill_info.yaml) <br>
-- [Train Spec Template](references/spec_template_train.yaml) <br>
-- [Swin Tiny Pretrained Weights](https://github.com/SwinTransformer/storage/releases/download/v1.0.8/swin_tiny_patch4_window7_224_22k.pth) <br>
+- [TAO Deploy Mask2Former](references/tao-deploy-mask2former.md) <br>
+- [Skill Info (AutoML configuration)](references/skill_info.yaml) <br>
+- [Swin Transformer Pretrained Weights](https://github.com/SwinTransformer/storage/releases/download/v1.0.8/swin_tiny_patch4_window7_224_22k.pth) <br>
 
 
 ## Skill Output: <br>
@@ -38,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive skill-activation case) using the NVSkills-Eval external profile in astra-sandbox environment with 2 attempts per task. <br>
+Evaluated against 1 evaluation task in NVSkills-Eval `external` profile on `astra-sandbox` environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,11 +61,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+100%) | 92% (+92%) |
-| Discoverability | 2 | 89% (+89%) | 97% (+97%) |
-| Effectiveness | 2 | 85% (+75%) | 75% (+49%) |
-| Efficiency | 2 | 72% (+45%) | 96% (+68%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+90%) | 97% (+77%) |
+| Discoverability | 1 | 88% (+88%) | 97% (+97%) |
+| Effectiveness | 1 | 100% (+72%) | 90% (+46%) |
+| Efficiency | 1 | 70% (+43%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

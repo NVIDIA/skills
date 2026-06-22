@@ -21,7 +21,10 @@ tags:
 
 Sparse4D for multi-camera temporal 3D object detection and tracking. Uses sparse queries with deformable attention across camera views and time for end-to-end 3D perception. Includes instance bank for temporal tracking.
 
-Requires pretrained ResNet-101 backbone. Set train.pretrained_model_path.
+Use a pretrained ResNet-101 backbone when one is available by setting
+`train.pretrained_model_path`. For local smoke validation, Sparse4D training
+can run with an empty `train.pretrained_model_path`, but production runs should
+still use a compatible PTM.
 
 ## Dataclass Schemas
 
@@ -29,7 +32,7 @@ Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with 
 
 ## Train Action Policy
 
-This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only; otherwise default to `auto`. When `automl_policy: auto`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `tao-skill-bank:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
+This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Use `automl_policy: on` by default and only expose `on` / `off` in new launch prompts. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only. When `automl_policy: on`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `tao-skill-bank:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
 
 Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows stay in this model skill. The per-run `automl_policy` override does not change model metadata.
 
@@ -38,6 +41,15 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 - **Dataset type:** sparse4d
 - **Formats:** ovpkl
 - **Monitoring metric:** val_mAP
+- Current TAO Sparse4D training emits this value in status/logs as
+  `img_bbox_NuScenes/mAP` and `mAP`; AutoML metric
+  extractors should treat those emitted keys as aliases for `val_mAP`.
+  Multi-fidelity AutoML algorithms such as Hyperband, ASHA, and BOHB may
+  promote a checkpoint to a resume job that completes without emitting a fresh
+  `val_mAP` alias. In that case, compare AutoML's carried metric to the source
+  rung job that emitted `img_bbox_NuScenes/mAP` or `mAP`, while still verifying
+  that the promoted job resumed from the explicit epoch/step checkpoint,
+  produced a real checkpoint, and is usable for evaluate/inference.
 
 ### Per-Action Dataset Requirements
 
@@ -74,65 +86,74 @@ Data source overrides are **mandatory for every action** — the agent MUST cons
 ```python
 S3_TRAIN = "s3://bucket/data/train"
 S3_EVAL = "s3://bucket/data/eval"
+CONVERTED_SCENE = "<scene-from-converter>"  # e.g. "subsetscene+bev-sensor-random-0"
 ```
 
 **train (mandatory data sources):**
 ```python
+CONVERTED = "s3://bucket/results/<dataset_convert_job_id>"
 {
     "train.num_epochs": 30,
     "train.checkpoint_interval": 10,
     "train.validation_interval": 10,
     "train.num_gpus": 1,
     "dataset.sequences.split_num": 90,
-    "train_dataset.sequences_split_num": 90,
-    "dataset.data_root": {"spec": f"{S3_TRAIN}/aicity.split)"},
-    "model.head.instance_bank.anchor": f"{S3_TRAIN}//results/{dataset_convert_job_id}/anchor_init.npy",
-    "dataset.train_dataset.ann_file": {"spec": f"{S3_TRAIN}/aicity.split)"},
-    "dataset.val_dataset.ann_file": {"spec": f"{S3_EVAL}/aicity.split)"},
-    "dataset.test_dataset.ann_file": {"spec": f"{S3_EVAL}/aicity.split)"},
+    "dataset.train_dataset.sequences_split_num": 90,
+    "dataset.data_root": f"{S3_TRAIN}/train",
+    "model.head.instance_bank.anchor": f"{CONVERTED}/anchor_init.npy",
+    "dataset.train_dataset.ann_file": f"{CONVERTED}/train/{CONVERTED_SCENE}_infos_train.pkl",
+    "dataset.val_dataset.ann_file": f"{CONVERTED}/val/{CONVERTED_SCENE}_infos_val.pkl",
+    "dataset.test_dataset.ann_file": f"{CONVERTED}/test/{CONVERTED_SCENE}_infos_test.pkl",
 }
 ```
 
 **evaluate (mandatory data sources):**
 ```python
+CONVERTED = "s3://bucket/results/<dataset_convert_job_id>"
 {
-    "dataset.data_root": {"spec": f"{S3_EVAL}/aicity.split)"},
-    "model.head.instance_bank.anchor": f"{S3_TRAIN}//results/{dataset_convert_job_id}/anchor_init.npy",
-    "dataset.train_dataset.ann_file": {"spec": f"{S3_TRAIN}/aicity.split)"},
-    "dataset.val_dataset.ann_file": {"spec": f"{S3_EVAL}/aicity.split)"},
-    "dataset.test_dataset.ann_file": {"spec": f"{S3_EVAL}/aicity.split)"},
+    "dataset.data_root": f"{S3_EVAL}/val",
+    "model.head.instance_bank.anchor": f"{CONVERTED}/anchor_init.npy",
+    "dataset.train_dataset.ann_file": f"{CONVERTED}/train/{CONVERTED_SCENE}_infos_train.pkl",
+    "dataset.val_dataset.ann_file": f"{CONVERTED}/val/{CONVERTED_SCENE}_infos_val.pkl",
+    "dataset.test_dataset.ann_file": f"{CONVERTED}/test/{CONVERTED_SCENE}_infos_test.pkl",
 }
 ```
 
 **export (mandatory data sources):**
 ```python
+CONVERTED = "s3://bucket/results/<dataset_convert_job_id>"
 {
-    "model.head.instance_bank.anchor": f"{S3_TRAIN}//results/{dataset_convert_job_id}/anchor_init.npy",
+    "model.head.instance_bank.anchor": f"{CONVERTED}/anchor_init.npy",
 }
 ```
 
 **inference (mandatory data sources):**
 ```python
+CONVERTED = "s3://bucket/results/<dataset_convert_job_id>"
 {
-    "dataset.data_root": {"spec": f"{S3_EVAL}/aicity.split)"},
-    "model.head.instance_bank.anchor": f"{S3_TRAIN}//results/{dataset_convert_job_id}/anchor_init.npy",
-    "dataset.train_dataset.ann_file": {"spec": f"{S3_TRAIN}/aicity.split)"},
-    "dataset.val_dataset.ann_file": {"spec": f"{S3_EVAL}/aicity.split)"},
-    "dataset.test_dataset.ann_file": {"spec": f"{S3_EVAL}/aicity.split)"},
+    "dataset.data_root": f"{S3_EVAL}/test",
+    "model.head.instance_bank.anchor": f"{CONVERTED}/anchor_init.npy",
+    "dataset.train_dataset.ann_file": f"{CONVERTED}/train/{CONVERTED_SCENE}_infos_train.pkl",
+    "dataset.val_dataset.ann_file": f"{CONVERTED}/val/{CONVERTED_SCENE}_infos_val.pkl",
+    "dataset.test_dataset.ann_file": f"{CONVERTED}/test/{CONVERTED_SCENE}_infos_test.pkl",
 }
 ```
 
 **quantize (mandatory data sources):**
 ```python
+CONVERTED = "s3://bucket/results/<dataset_convert_job_id>"
 {
-    "dataset.data_root": {"spec": f"{S3_TRAIN}/aicity.split)"},
-    "model.head.instance_bank.anchor": f"{S3_TRAIN}//results/{dataset_convert_job_id}/anchor_init.npy",
-    "dataset.train_dataset.ann_file": {"spec": f"{S3_TRAIN}/aicity.split)"},
-    "dataset.val_dataset.ann_file": {"spec": f"{S3_EVAL}/aicity.split)"},
-    "dataset.test_dataset.ann_file": {"spec": f"{S3_EVAL}/aicity.split)"},
+    "dataset.data_root": f"{S3_TRAIN}/train",
+    "model.head.instance_bank.anchor": f"{CONVERTED}/anchor_init.npy",
+    "dataset.train_dataset.ann_file": f"{CONVERTED}/train/{CONVERTED_SCENE}_infos_train.pkl",
+    "dataset.val_dataset.ann_file": f"{CONVERTED}/val/{CONVERTED_SCENE}_infos_val.pkl",
+    "dataset.test_dataset.ann_file": f"{CONVERTED}/test/{CONVERTED_SCENE}_infos_test.pkl",
     "dataset.quant_calibration_dataset.images_dir": f"{S3_TRAIN}",
 }
 ```
+
+See `references/local_docker_conversion.md` for local-docker conversion roots and mounts, H5 depth-path normalization, converted annotation filenames, smoke-run `max_num_cams`/anchor contracts for export compatibility, and converted-artifact verification before train/evaluate/inference.
+
 ## Eval Dataset
 
 Optional. Val/test splits configured via dataset ann_file paths.
@@ -183,35 +204,41 @@ Minimum 2 GPU(s), recommended 8 GPU(s). 40GB+ (A100 recommended) VRAM per GPU. M
 
 **dataset_convert required**: Must run dataset_convert first to produce annotation pickles and anchor_init.npy.
 
+**dataset_convert container/command**: Sparse4D conversion is an AICity to
+OVPKL annotations conversion. Launch `dataset_convert` with the action-level
+`tao_toolkit.data_services` image and `annotations convert -e {config_path}`;
+do not use the PyTorch `sparse4d` CLI for conversion. Train/evaluate/export/
+inference still use the model-level PyTorch image.
+
+**Stable raw-data path**: The AICity to OVPKL converter writes image paths into
+the generated pickle files. Keep `aicity.root` at `/data/aicity_root` during
+conversion, then point `dataset.data_root` at the split folder, for example
+`/data/aicity_root/train` for training or `/data/aicity_root/val` for
+evaluation. This preserves the converter's absolute RGB paths and relative
+depth paths.
+
+**H5 depth tuple mismatch**: If training fails with an H5 path error where the
+trainer tries to open a camera directory such as
+`/data/aicity_root/train/<scene>/Camera`, run
+`models/sparse4d/scripts/normalize_depth_paths.py --data-root <host-aicity-root>/train <converted-ann-dir>`
+after `dataset_convert` and before train/evaluate/inference. The helper rewrites
+converted `depth_map_path` tuples to point at
+`<scene>/depth_maps/<camera>.h5` with the H5 dataset key basename.
+
 **Missing anchor file**: Set model.head.instance_bank.anchor to the anchor_init.npy path from dataset_convert results.
 
 **Temporal OOM**: Reduce dataset.num_frames or dataset.batch_size if running out of memory during temporal training.
 
+**Quantize image compatibility**: The model-skill wiring should pass
+`quantize.model_path` through the parent-model resolver, and checkpoint handoff
+should select the exact epoch/step checkpoint just like evaluate, inference,
+export, and resume. TorchAO checkpoint quantization passes in the
+`validation-fixes-20260525` PyT image and writes
+`quantized_model_torchao.pth`. Older 7.0.0-rc PyT images may fail inside the
+Sparse4D quantize entrypoint or lack ONNX quantization dependencies; do not
+remove or skip the advertised `quantize` action if that occurs. Report the
+container/image failure and keep the exact checkpoint path visible.
+
 ## Spec Param / Parent Model Inference
 
-Model-specific inference mappings belong in this MD file, not in `config.json`. Generated runners should read this section and apply the mappings with SDK helpers before `create_job()`. This mirrors the old microservices `infer_params.py` flow.
-
-Inference mappings from TAO Core `sparse4d.config.json`:
-
-| Action | Spec Field | Inference Function | Meaning |
-|---|---|---|---|
-| dataset_convert | `results_dir` | `output_dir` | current job results directory |
-| evaluate | `encryption_key` | `key` | encryption key |
-| evaluate | `evaluate.checkpoint` | `parent_model` | model file inferred from the parent job results folder |
-| evaluate | `results_dir` | `output_dir` | current job results directory |
-| export | `encryption_key` | `key` | encryption key |
-| export | `export.checkpoint` | `parent_model` | model file inferred from the parent job results folder |
-| export | `export.onnx_file` | `create_onnx_file` | output ONNX path |
-| export | `results_dir` | `output_dir` | current job results directory |
-| inference | `encryption_key` | `key` | encryption key |
-| inference | `inference.checkpoint` | `parent_model` | model file inferred from the parent job results folder |
-| inference | `results_dir` | `output_dir` | current job results directory |
-| quantize | `encryption_key` | `key` | encryption key |
-| quantize | `quantize.model_path` | `parent_model` | model file inferred from the parent job results folder |
-| quantize | `results_dir` | `output_dir` | current job results directory |
-| train | `encryption_key` | `key` | encryption key |
-| train | `results_dir` | `output_dir` | current job results directory |
-| train | `train.pretrained_model_path` | `ptm_if_no_resume_model` | PTM when no resume checkpoint exists |
-| train | `train.resume_training_checkpoint_path` | `resume_model` | model file inferred from the current job results folder |
-
-For `parent_model` or `parent_model_folder`, pass the upstream train/export/AutoML child job id as `parent_job_id`. The SDK lists the parent result folder, filters checkpoint artifacts, and returns the selected model file or folder. Do not add these mappings back to `config.json` and do not patch generated runner scripts to guess checkpoint paths.
+See `references/spec_param_inference.md` for the model-specific inference mappings from TAO Core `sparse4d.config.json` (the per-action spec-field to inference-function table) and the `parent_model`/`parent_job_id` checkpoint-resolution rules that generated runners apply with SDK helpers before `create_job()`.

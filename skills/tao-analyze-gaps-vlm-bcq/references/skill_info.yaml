@@ -16,6 +16,8 @@ actions:
     outputs:
       results-dir:
         type: folder
+    upload_excludes:
+    - inputs/
     args:
       results_dir: '{results_dir}'
       predictions_json: '{predictions_json}'

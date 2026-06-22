@@ -25,13 +25,15 @@ Typically trained from scratch. Provide train.resume_training_checkpoint_path to
 
 For TAO Deploy TensorRT actions (`gen_trt_engine`, TensorRT `evaluate`, and TensorRT `inference`), read `references/tao-deploy-pointpillars.md` first. Deploy spec templates live in this skill's `references/` folder with the `spec_template_deploy_*.yaml` prefix.
 
+The packaged PyTorch PointPillars CLI supports `dataset_convert`, `train`, `evaluate`, `inference`, `export`, and `prune`. It does not expose a parent-model `gen_trt_engine` action; TensorRT engine generation is deploy-only. It also does not expose a separate `retrain` subcommand. Retraining from a pruned model uses `pointpillars train -e ...` with `train.pruned_model_path` populated.
+
 ## Dataclass Schemas
 
 Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
 
 ## Train Action Policy
 
-This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only; otherwise default to `auto`. When `automl_policy: auto`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `tao-skill-bank:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
+This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Use `automl_policy: on` by default and only expose `on` / `off` in new launch prompts. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only. When `automl_policy: on`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `tao-skill-bank:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
 
 Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows stay in this model skill. The per-run `automl_policy` override does not change model metadata.
 
@@ -47,25 +49,30 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 |---|---|---|---|---|
 | dataset_convert | dataset.data_path | id |  | No |
 | evaluate | dataset.data_path | train_datasets |  | No |
-| evaluate | dataset.data_info_path | train_datasets | /results/{dataset_convert_job_id}/data_info/ | No |
+| evaluate | dataset.data_info_path | train_datasets | /results/{dataset_convert_job_id}/results_dir/data_info/ | No |
 | export | dataset.data_path | train_datasets |  | No |
-| export | dataset.data_info_path | train_datasets | /results/{dataset_convert_job_id}/data_info/ | No |
+| export | dataset.data_info_path | train_datasets | /results/{dataset_convert_job_id}/results_dir/data_info/ | No |
 | inference | dataset.data_path | train_datasets |  | No |
-| inference | dataset.data_info_path | train_datasets | /results/{dataset_convert_job_id}/data_info/ | No |
+| inference | dataset.data_info_path | train_datasets | /results/{dataset_convert_job_id}/results_dir/data_info/ | No |
 | prune | dataset.data_path | train_datasets |  | No |
-| prune | dataset.data_info_path | train_datasets | /results/{dataset_convert_job_id}/data_info/ | No |
+| prune | dataset.data_info_path | train_datasets | /results/{dataset_convert_job_id}/results_dir/data_info/ | No |
 | retrain | dataset.data_path | train_datasets |  | No |
-| retrain | dataset.data_info_path | train_datasets | /results/{dataset_convert_job_id}/data_info/ | No |
+| retrain | dataset.data_info_path | train_datasets | /results/{dataset_convert_job_id}/results_dir/data_info/ | No |
 | train | dataset.data_path | train_datasets |  | No |
-| train | dataset.data_info_path | train_datasets | /results/{dataset_convert_job_id}/data_info/ | No |
+| train | dataset.data_info_path | train_datasets | /results/{dataset_convert_job_id}/results_dir/data_info/ | No |
 
 ### Typical Spec Overrides
 
 Data source overrides are **mandatory for every action** — the agent MUST construct data source paths from the Per-Action Dataset Requirements table above and include them in `spec_overrides`.
 
 ```python
-S3_TRAIN = "s3://bucket/data/train"
+DATA_ROOT = "s3://bucket/data/pointpillars"
+DATA_INFO = "/results/{dataset_convert_job_id}/results_dir/data_info"
+CHECKPOINT = "/results/{train_job_id}/results_dir/checkpoint_epoch_1.pth"
+PRUNED_MODEL = "/results/{prune_job_id}/results_dir/pruned_0.1.tlt"
 ```
+
+The raw PointPillars data root must be an extracted folder containing matching `train/lidar`, `train/label`, `val/lidar`, and `val/label` subfolders before `dataset_convert` runs. If the source dataset is packaged as separate train/val archives, extract both under the same mounted data root and point `dataset.data_path` at that root.
 
 **train (mandatory data sources):**
 ```python
@@ -74,50 +81,69 @@ S3_TRAIN = "s3://bucket/data/train"
     "train.checkpoint_interval": 10,
     "train.validation_interval": 10,
     "train.num_gpus": 1,
-    "dataset.data_path": f"{S3_TRAIN}",
-    "dataset.data_info_path": f"{S3_TRAIN}//results/{dataset_convert_job_id}/data_info/",
+    "dataset.data_path": DATA_ROOT,
+    "dataset.data_info_path": DATA_INFO,
+}
+```
+
+**resume train (mandatory checkpoint):**
+```python
+{
+    "dataset.data_path": DATA_ROOT,
+    "dataset.data_info_path": DATA_INFO,
+    "train.resume_training_checkpoint_path": CHECKPOINT,
 }
 ```
 
 **evaluate (mandatory data sources):**
 ```python
 {
-    "dataset.data_path": f"{S3_TRAIN}",
-    "dataset.data_info_path": f"{S3_TRAIN}//results/{dataset_convert_job_id}/data_info/",
+    "dataset.data_path": DATA_ROOT,
+    "dataset.data_info_path": DATA_INFO,
+    "evaluate.checkpoint": CHECKPOINT,
 }
 ```
 
 **export (mandatory data sources):**
 ```python
 {
-    "dataset.data_path": f"{S3_TRAIN}",
-    "dataset.data_info_path": f"{S3_TRAIN}//results/{dataset_convert_job_id}/data_info/",
+    "dataset.data_path": DATA_ROOT,
+    "dataset.data_info_path": DATA_INFO,
+    "export.checkpoint": CHECKPOINT,
+    "export.onnx_file": "/results/{export_job_id}/results_dir/pointpillars.onnx",
 }
 ```
 
 **inference (mandatory data sources):**
 ```python
 {
-    "dataset.data_path": f"{S3_TRAIN}",
-    "dataset.data_info_path": f"{S3_TRAIN}//results/{dataset_convert_job_id}/data_info/",
+    "dataset.data_path": DATA_ROOT,
+    "dataset.data_info_path": DATA_INFO,
+    "inference.checkpoint": CHECKPOINT,
 }
 ```
 
 **prune (mandatory data sources):**
 ```python
 {
-    "dataset.data_path": f"{S3_TRAIN}",
-    "dataset.data_info_path": f"{S3_TRAIN}//results/{dataset_convert_job_id}/data_info/",
+    "dataset.data_path": DATA_ROOT,
+    "dataset.data_info_path": DATA_INFO,
+    "prune.model": CHECKPOINT,
 }
 ```
 
 **retrain (mandatory data sources):**
 ```python
 {
-    "dataset.data_path": f"{S3_TRAIN}",
-    "dataset.data_info_path": f"{S3_TRAIN}//results/{dataset_convert_job_id}/data_info/",
+    "dataset.data_path": DATA_ROOT,
+    "dataset.data_info_path": DATA_INFO,
+    "train.pruned_model_path": PRUNED_MODEL,
 }
 ```
+
+For local Docker, `DATA_INFO` must be visible inside every train/evaluate/export/prune/retrain container. Use the dataset_convert job from the same results root, or mount/copy the converted `results_dir/data_info` folder into the current run and set `dataset.data_info_path` to that mounted container path. If the host scratch root is mounted at `/results` and the conversion artifacts live under host `scratch/results/<job_id>/results_dir/data_info`, the direct-job container path is `/results/results/<job_id>/results_dir/data_info`. Do not reuse a `/results/<job_id>/...` path from another run root unless that folder is mounted into the current job.
+
+For AutoML train workflows, perform this as a launch preflight before calling `AutoMLRunner.run`: create or materialize the `dataset_convert` output under the current run's `RESULTS_ROOT`, set `dataset.data_info_path` to that current-run container path, and verify `dbinfos_train.pkl`, `infos_train.pkl`, and `infos_val.pkl` are present from the train container's point of view. If a runner is cloned or adapted from a prior AutoML algorithm, update the conversion artifact in the new run root; a stale `CONVERT_JOB_ID` from another results mount is not valid.
 ## Eval Dataset
 
 Optional. Validation data (val.tar.gz) is separate from training. Used for mAP evaluation.
@@ -162,11 +188,19 @@ Minimum 1 GPU(s), recommended 4 GPU(s). 16GB+ (V100 or A100) VRAM per GPU. Point
 
 ## Error Patterns
 
-**dataset_convert required**: Training will fail if data_info_path is not populated from a prior dataset_convert job. Always run convert first.
+**dataset_convert required**: Training will fail if `dataset.data_info_path` is not populated from a prior `dataset_convert` job. Always run convert first, and verify the train container can see `dbinfos_train.pkl` and `infos_train.pkl` under `dataset.data_info_path`. A common local-Docker failure is a stale `/results/<old_job_id>/...` path from a different results root.
 
 **Point cloud range mismatch**: If point_cloud_range does not match the actual sensor data extent, detections will be poor or empty.
 
 **Epoch numbering**: PointPillars checkpoint epoch numbers may be offset by 1 from status.json reported epochs.
+
+**Checkpoint selection**: PointPillars training emits checkpoints named like `checkpoint_epoch_1.pth`. For evaluation, inference, export, prune, and resume, select the intended checkpoint through the model/job checkpoint resolver and pass that exact file to `evaluate.checkpoint`, `inference.checkpoint`, `export.checkpoint`, `prune.model`, or `train.resume_training_checkpoint_path`. Do not guess by taking the newest `model.pth`; this model does not use that filename.
+
+**Prune/retrain key**: PointPillars prune writes an encrypted `.tlt` artifact. Keep a non-empty `key` in the prune and retrain specs; the packaged templates use the TAO default `tlt_encode`. If `key` is omitted or `null`, the toolkit can still exit with a container success code while logging a passphrase error and creating an empty `pruned_0.1.tlt`. Always verify the pruned model is nonzero before using it for retrain.
+
+**Status files matter**: Some PointPillars failures can be followed by `Execution status: PASS` in the entrypoint footer and a Docker exit code of 0. Check `results_dir/status.json` and the expected artifact before marking an action as passed.
+
+**Local results_dir wiring**: For direct local-Docker specs, set the top-level `results_dir` as well as any action-specific `*.results_dir` field. If only `evaluate.results_dir` is set and the top-level field is left blank, evaluate can try to write under `/opt/nvidia/eval` and then still print the generic PASS footer. Treat that as a failed action unless the expected result directory and status/artifact files exist.
 
 ## Spec Param / Parent Model Inference
 
@@ -185,10 +219,6 @@ Inference mappings from TAO Core `pointpillars.config.json`:
 | export | `export.save_engine` | `create_engine_file` | output TensorRT engine path |
 | export | `key` | `key` | encryption key |
 | export | `results_dir` | `output_dir` | current job results directory |
-| gen_trt_engine | `gen_trt_engine.onnx_file` | `parent_model` | model file inferred from the parent job results folder |
-| gen_trt_engine | `gen_trt_engine.save_engine` | `create_engine_file` | output TensorRT engine path |
-| gen_trt_engine | `key` | `key` | encryption key |
-| gen_trt_engine | `results_dir` | `output_dir` | current job results directory |
 | inference | `inference.checkpoint` | `parent_model` | model file inferred from the parent job results folder |
 | inference | `inference.trt_engine` | `parent_model` | model file inferred from the parent job results folder |
 | inference | `key` | `key` | encryption key |
@@ -208,4 +238,4 @@ For `parent_model` or `parent_model_folder`, pass the upstream train/export/Auto
 
 ## Deployment
 
-- [tao-deploy-pointpillars](references/tao-deploy-pointpillars.md) — PointPillars deploy workflow for TensorRT engine generation, TensorRT evaluation, and TensorRT inference using TAO Deploy.
+- [tao-deploy-pointpillars](references/tao-deploy-pointpillars.md)

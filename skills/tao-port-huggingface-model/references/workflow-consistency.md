@@ -16,6 +16,44 @@ limitations under the License.
 
 # TAO Workflow Consistency Guide
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- 1. CLI Invocation Pattern
+- 2. Entrypoint Dispatch Flow
+  - `launch()` in tao-pytorch:
+  - `launch()` in tao-deploy:
+- 3. Hydra Config Resolution
+- 4. ExperimentConfig Hierarchy
+  - Inherited from CommonExperimentConfig:
+  - Standard TrainConfig fields (base for all TrainExpConfig):
+  - Standard EvaluateConfig / InferenceConfig fields:
+  - Standard ExportConfig fields:
+  - Standard GenTrtEngineConfig fields:
+- 5. Experiment Spec YAML Structure
+  - Classification example:
+  - Detection (DINO-style) differences:
+  - Segmentation (Segformer-style) differences:
+- 6. Deploy Spec YAMLs
+  - gen_trt_engine.yaml:
+  - inference.yaml:
+  - evaluate.yaml:
+- 7. Results Directory Structure & Cross-Phase Data Flow
+  - Cross-phase references (how outputs chain):
+- 8. Checkpoint Naming Conventions
+- 9. Dataset Directory Convention
+  - Classification:
+  - Detection (COCO format):
+  - Segmentation:
+- 10. Augmentation Config Consistency
+- 11. Multi-GPU Configuration Flow
+- 12. Train Script → initialize_train_experiment() Contract
+- 13. Evaluate/Inference Script Contract
+- 14. Export Script Contract
+- 15. Deploy gen_trt_engine Script Contract
+
+
 How the user-facing TAO CLI works end-to-end, and what the agent's generated code must be consistent with.
 
 ---

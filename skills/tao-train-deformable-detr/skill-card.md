@@ -1,5 +1,5 @@
 ## Description: <br>
-Trains, evaluates, exports, quantizes, and runs inference on Deformable DETR 2D object detection models using NVIDIA TAO with efficient deformable attention for multi-scale feature processing. <br>
+Deformable DETR for 2D object detection using deformable attention for efficient multi-scale feature processing, lighter than DINO with competitive accuracy. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, quantizing, and running inference on Deformable DETR object detection models using the NVIDIA TAO toolkit and docker-based GPU workflows. <br>
+Developers and engineers training, evaluating, exporting, quantizing, or running inference on Deformable DETR object detection models using NVIDIA TAO Toolkit. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -38,7 +38,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive activation case) in astra-sandbox environment with 2 attempts per task and 50% pass threshold. <br>
+Evaluated against 1 evaluation task (1 positive skill-activation case) using NVSkills-Eval `external` profile in `astra-sandbox` environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,11 +62,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 90% (+85%) | 35% (-2%) |
-| Discoverability | 2 | 88% (+88%) | 0% (-62%) |
-| Effectiveness | 2 | 90% (+61%) | 60% (+56%) |
-| Efficiency | 2 | 71% (+44%) | 28% (-33%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+50%) | 20% (+0%) |
+| Discoverability | 1 | 85% (+85%) | 0% (+0%) |
+| Effectiveness | 1 | 100% (+12%) | 48% (+4%) |
+| Efficiency | 1 | 68% (+41%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

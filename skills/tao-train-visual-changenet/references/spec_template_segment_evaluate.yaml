@@ -15,7 +15,7 @@ wandb:
   run_id: ''
 model:
   backbone:
-    type: fan_small_12_p4_hybrid
+    type: vit_large_nvdinov2
     feat_downsample: false
     pretrained_backbone_path: ''
     freeze_backbone: false
@@ -34,7 +34,7 @@ model:
     - 4
     - 8
     - 16
-    - 16
+    - 32
     align_corners: false
     decoder_params:
       embed_dim: 256
@@ -50,12 +50,12 @@ dataset:
   segment:
     root_dir: ''
     label_transform: norm
-    data_name: LEVIR
+    data_name: custom
     dataset: CNDataset
     multi_scale_train: true
     multi_scale_infer: false
     num_classes: 2
-    img_size: 224
+    img_size: 256
     batch_size: 8
     workers: 1
     shuffle: true

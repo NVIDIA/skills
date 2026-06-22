@@ -1,5 +1,5 @@
 ## Description: <br>
-BEVFusion for multi-sensor 3D object detection. Fuses LiDAR point clouds and camera images in bird's-eye-view (BEV) space, used in autonomous driving for robust 3D perception. <br>
+BEVFusion for multi-sensor 3D object detection that fuses LiDAR point clouds and camera images in bird's-eye-view (BEV) space, used in autonomous driving for robust 3D perception. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, and running inference on NVIDIA TAO BEVFusion models for multi-sensor 3D object detection in autonomous driving pipelines. <br>
+Developers and engineers training, evaluating, and running inference on BEVFusion multi-sensor 3D object detection models for autonomous driving applications. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,11 +19,11 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Skill Info](references/skill_info.yaml) <br>
-- [Train Spec Template](references/spec_template_train.yaml) <br>
-- [Evaluate Spec Template](references/spec_template_evaluate.yaml) <br>
-- [Inference Spec Template](references/spec_template_inference.yaml) <br>
-- [Dataset Convert Spec Template](references/spec_template_dataset_convert.yaml) <br>
+- [skill_info.yaml](references/skill_info.yaml) <br>
+- [spec_template_train.yaml](references/spec_template_train.yaml) <br>
+- [spec_template_evaluate.yaml](references/spec_template_evaluate.yaml) <br>
+- [spec_template_inference.yaml](references/spec_template_inference.yaml) <br>
+- [spec_template_dataset_convert.yaml](references/spec_template_dataset_convert.yaml) <br>
 
 
 ## Skill Output: <br>
@@ -39,7 +39,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task in the `astra-sandbox` environment using the `external` NVSkills-Eval profile. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,11 +63,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 60% (+60%) | 82% (+72%) |
-| Discoverability | 2 | 42% (+42%) | 80% (+80%) |
-| Effectiveness | 2 | 69% (+59%) | 66% (+32%) |
-| Efficiency | 2 | 46% (+19%) | 79% (+50%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 90% (+50%) | 20% (+20%) |
+| Discoverability | 1 | 100% (+100%) | 0% (+0%) |
+| Effectiveness | 1 | 50% (-10%) | 48% (+16%) |
+| Efficiency | 1 | 95% (+68%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

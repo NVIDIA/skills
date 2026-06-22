@@ -7,10 +7,9 @@ actions:
   gen_trt_engine:
     command: mae gen_trt_engine -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       gen_trt_engine.onnx_file:
-        type: file
-      gen_trt_engine.trt_engine:
         type: file
     outputs:
       results_dir:
@@ -28,6 +27,9 @@ spec_shorthand_keys:
   trt_data_type: gen_trt_engine.tensorrt.data_type
   trt_engine: gen_trt_engine.trt_engine
   batch_size: dataset.batch_size
+  arch: model.arch
+  num_classes: model.num_classes
+  image_size: dataset.augmentation.input_size
 description: MAE deploy workflow for gen_trt_engine using TAO Deploy.
 spec_templates:
   gen_trt_engine: spec_template_deploy_gen_trt_engine.yaml

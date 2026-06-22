@@ -16,6 +16,20 @@ limitations under the License.
 
 # HuggingFace Model Inspection Guide
 
+Use this reference only when the parent `SKILL.md` points here for the current task. If this file conflicts with current `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current authoritative source wins.
+
+## Contents
+
+- 1. Authenticate
+- 2. Validate model type
+- 3. Inspect the model config
+- 4. Inspect the state_dict
+- 5. Identify the task head
+- 6. Verify ONNX exportability
+- 7. Check for existing backbone coverage
+- 8. Summary checklist
+
+
 How to gather the information needed from a HuggingFace model before writing any TAO code.
 
 ---

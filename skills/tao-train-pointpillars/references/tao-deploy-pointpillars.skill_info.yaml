@@ -7,10 +7,9 @@ actions:
   gen_trt_engine:
     command: pointpillars gen_trt_engine -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       gen_trt_engine.onnx_file:
-        type: file
-      gen_trt_engine.save_engine:
         type: file
     outputs:
       results_dir:
@@ -22,13 +21,14 @@ actions:
   evaluate:
     command: pointpillars evaluate -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       evaluate.trt_engine:
         type: file
       dataset.data_path:
         type: folder
       dataset.data_info_path:
-        type: file
+        type: folder
     outputs:
       results_dir:
         type: folder
@@ -37,13 +37,14 @@ actions:
   inference:
     command: pointpillars inference -e {config_path}
     config_format: yaml
+    mode: config
     inputs:
       inference.trt_engine:
         type: file
       dataset.data_path:
         type: folder
       dataset.data_info_path:
-        type: file
+        type: folder
     outputs:
       results_dir:
         type: folder
@@ -61,9 +62,14 @@ spec_params:
     results_dir: output_dir
     inference.trt_engine: parent_model
 spec_shorthand_keys:
-  trt_data_type: gen_trt_engine.tensorrt.data_type
+  trt_data_type: gen_trt_engine.data_type
   trt_engine: gen_trt_engine.save_engine
-  batch_size: dataset.batch_size
+  trt_batch_size: gen_trt_engine.batch_size
+  trt_workspace_size: gen_trt_engine.workspace_size
+  evaluate_batch_size: evaluate.batch_size
+  inference_batch_size: inference.batch_size
+  num_workers: dataset.num_workers
+  score_thresh: model.post_processing.score_thresh
 description: PointPillars deploy workflow for gen_trt_engine, evaluate, inference
   using TAO Deploy.
 spec_templates:
@@ -77,3 +83,7 @@ notes:
   by the deploy script.
 - Keep class names, point cloud range, voxel settings, and post-processing config
   aligned with the exported model.
+- For smoke validation with a low-quality checkpoint, raise
+  `model.post_processing.score_thresh` if TensorRT evaluate or inference becomes
+  CPU-bound. The deploy CPU NMS path filters by score before NMS but does not honor
+  `nms_pre_max_size`.

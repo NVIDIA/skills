@@ -1,7 +1,7 @@
 [
   {
     "id": "tao-train-metric-learning-recognition-basic",
-    "question": "A user request: \"Train metric learning\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
+    "question": "A user request: \"Metric-learning recognition (ml-recog) for fine-grained visual recognition.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
     "expected_skill": "tao-train-metric-learning-recognition",
     "expected_script": null,
     "ground_truth": "Identify tao-train-metric-learning-recognition as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",

@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to train, evaluate, export, or run inference for TAO person re-identification models that learn cross-camera person matching embeddings. <br>
+Developers and engineers training, evaluating, exporting, or running inference on TAO person re-identification models for cross-camera person matching in video analytics pipelines. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,12 +19,12 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [skill_info.yaml](references/skill_info.yaml) <br>
+- [Agent Skills Open Standard](https://agentskills.io) <br>
 - [spec_template_train.yaml](references/spec_template_train.yaml) <br>
 - [spec_template_evaluate.yaml](references/spec_template_evaluate.yaml) <br>
 - [spec_template_export.yaml](references/spec_template_export.yaml) <br>
 - [spec_template_inference.yaml](references/spec_template_inference.yaml) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
+- [skill_info.yaml](references/skill_info.yaml) <br>
 
 
 ## Skill Output: <br>
@@ -40,7 +40,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive skill-activation case) with 2 attempts per task in the astra-sandbox environment using the NVSkills-Eval external profile. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). Positive skill-activation task with pass threshold 50%. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -64,11 +64,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 85% (+65%) | 58% (+58%) |
-| Discoverability | 2 | 91% (+91%) | 48% (+48%) |
-| Effectiveness | 2 | 56% (+17%) | 57% (+27%) |
-| Efficiency | 2 | 78% (+51%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 84% (+84%) | 20% (+20%) |
+| Discoverability | 1 | 34% (+34%) | 0% (+0%) |
+| Effectiveness | 1 | 90% (+80%) | 44% (+16%) |
+| Efficiency | 1 | 24% (-3%) | 28% (-0%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

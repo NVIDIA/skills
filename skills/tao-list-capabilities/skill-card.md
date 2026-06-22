@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to discover TAO Skill Bank capabilities, available models, supported workflows, and AutoML support from packaged manifests. <br>
+Developers and engineers use this skill to discover which TAO training, evaluation, inference, and AutoML workflows are available in the TAO Skill Bank plugin. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,10 +20,11 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [Agent Skills Open Standard](https://agentskills.io) <br>
+- [BENCHMARK.md](BENCHMARK.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Analysis] <br>
+**Output Type(s):** [Analysis, Shell commands] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -35,7 +36,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive skill-activation case, 2 attempts per task, 50% pass threshold). <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval `external` profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -59,11 +60,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 35% (+35%) | 68% (+68%) |
-| Discoverability | 2 | 0% (+0%) | 48% (+48%) |
-| Effectiveness | 2 | 79% (+69%) | 77% (+63%) |
-| Efficiency | 2 | 27% (-0%) | 62% (+34%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 90% (+90%) | 97% (+97%) |
+| Discoverability | 1 | 100% (+100%) | 97% (+97%) |
+| Effectiveness | 1 | 56% (+46%) | 90% (+72%) |
+| Efficiency | 1 | 95% (+68%) | 96% (+68%) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>
