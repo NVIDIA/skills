@@ -35,6 +35,26 @@
         "hsb-flash",
         "hsb-setup",
         "hsb-test",
+        "jetson-build-source",
+        "jetson-customize-camera",
+        "jetson-customize-fan",
+        "jetson-customize-nvpmodel",
+        "jetson-customize-uphy",
+        "jetson-customize-usb",
+        "jetson-derive-carrier",
+        "jetson-diagnostic",
+        "jetson-download-bsp",
+        "jetson-flash-image",
+        "jetson-init-image",
+        "jetson-init-source",
+        "jetson-init-target",
+        "jetson-link-docs",
+        "jetson-memory-audit",
+        "jetson-package",
+        "jetson-print-bsp-info",
+        "jetson-print-device-info",
+        "jetson-quick-start",
+        "jetson-set-target",
         "omniverse-cad-to-simready",
         "omniverse-realtime-viewer",
         "omniverse-usd-performance-tuning",
@@ -42,6 +62,15 @@
         "physical-ai-infrastructure-setup-and-resilient-scaling",
         "physical-ai-neural-reconstruction",
         "physical-ai-video-data-augmentation"
+      ]
+    },
+    {
+      "title": "Robotics",
+      "description": "Build, deploy, test, and operate robotic systems, robot policies, robot applications, and robot development workflows.",
+      "skills": [
+        "jetson-customize-pcie",
+        "jetson-customize-pinmux",
+        "jetson-validate-image"
       ]
     },
     {
@@ -216,6 +245,10 @@
         "dynamo-recipe-runner",
         "dynamo-router-starter",
         "dynamo-troubleshoot",
+        "jetson-inference-mem-tune",
+        "jetson-llm-benchmark",
+        "jetson-llm-serve",
+        "jetson-speculative-decoding",
         "tao-run-inference-service"
       ]
     },
@@ -268,11 +301,23 @@
         "holoscan-install-source",
         "holoscan-install-wheel",
         "holoscan-setup",
+        "jetson-customize-clocks",
+        "jetson-generate-kb",
+        "jetson-headless-mode",
+        "jetson-optimize-memory",
+        "jetson-promote-image",
         "tao-run-on-brev",
         "tao-run-on-kubernetes",
         "tao-run-on-lepton",
         "tao-run-on-slurm",
         "tao-setup-nvidia-gpu-host"
+      ]
+    },
+    {
+      "title": "Networking",
+      "description": "Configure, operate, optimize, and troubleshoot networking workflows for data centers, clusters, edge systems, and accelerated infrastructure.",
+      "skills": [
+        "jetson-customize-mgbe"
       ]
     }
   ]

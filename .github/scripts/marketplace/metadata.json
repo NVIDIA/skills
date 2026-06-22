@@ -601,6 +601,402 @@
       }
     },
     {
+      "path": "skills/jetson-build-source",
+      "name": "jetson-build-source",
+      "description": "Use when you need to rebuild the BSP overlay — DT, OOT modules, or kernel — from changes under bsp_sources/. Triggers: build bsp, rebuild dtb, rebuild kernel.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,developer,robotics_developer,hands_on_builder",
+        "discovery.activity_tags": "configure,package,integrate,debug"
+      }
+    },
+    {
+      "path": "skills/jetson-customize-camera",
+      "name": "jetson-customize-camera",
+      "description": "Enable MIPI/GMSL camera sensors on a Jetson Thor or Orin custom carrier by rendering a kernel-DT overlay from the in-tree sensor DTSI. Do NOT use for UPHY lane allocation or ODMDATA edits.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,platform_engineer,hands_on_builder,robotics_developer",
+        "discovery.activity_tags": "configure,integrate,generate,validate,deploy"
+      }
+    },
+    {
+      "path": "skills/jetson-customize-clocks",
+      "name": "jetson-customize-clocks",
+      "description": "Use to lock/cap Jetson CPU/GPU/EMC clocks, toggle EMC/CPU DVFS, or change cpufreq governors by editing BPMP DTB and nvpower.sh pre-flash. Do NOT use for live tuning or nvpmodel edits.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "infrastructure",
+        "audience": "platform_engineer,developer,robotics_developer,hands_on_builder",
+        "discovery.activity_tags": "configure,optimize,deploy,test"
+      }
+    },
+    {
+      "path": "skills/jetson-customize-fan",
+      "name": "jetson-customize-fan",
+      "description": "Use when you need to add, remove, edit, list, or change the boot default of an nvfancontrol fan profile on a Jetson/Tegra (Orin, Thor) target. Triggers: edit fan profile, tune fan curve.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,developer,hands_on_builder,robotics_developer",
+        "discovery.activity_tags": "configure,optimize,inspect,operate"
+      }
+    },
+    {
+      "path": "skills/jetson-customize-mgbe",
+      "name": "jetson-customize-mgbe",
+      "description": "Enable Jetson Thor 25G/10G/1G MGBE QSFP via kernel-DT overlay. Do NOT use for UPHY lane allocation or ODMDATA edits.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "networking",
+        "audience": "platform_engineer,developer,hands_on_builder",
+        "discovery.activity_tags": "configure,generate,integrate,validate,deploy"
+      }
+    },
+    {
+      "path": "skills/jetson-customize-nvpmodel",
+      "name": "jetson-customize-nvpmodel",
+      "description": "Use when you need to add, remove, edit, list, or change the boot default of an nvpmodel power mode on a Jetson/Tegra (Orin, Thor) target. Triggers: edit power mode, tune frequency caps.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,developer,hands_on_builder",
+        "discovery.activity_tags": "configure,optimize,inspect,operate"
+      }
+    },
+    {
+      "path": "skills/jetson-customize-pcie",
+      "name": "jetson-customize-pcie",
+      "description": "Per-controller PCIe enable / disable / lanes / link-speed for a Jetson Thor or Orin custom carrier via ODMDATA + kernel-DT overlay. Do NOT use for UPHY lane allocation or endpoint-mode bring-up.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "robotics",
+        "audience": "platform_engineer,developer,robotics_developer,hands_on_builder",
+        "discovery.activity_tags": "configure,integrate,deploy,validate,debug"
+      }
+    },
+    {
+      "path": "skills/jetson-customize-pinmux",
+      "name": "jetson-customize-pinmux",
+      "description": "Per-pin SFIO / direction / initial-state configurator for a Jetson Orin or Thor custom carrier from the pinmux XLSM. Do NOT use for kernel-DT overlay or ODMDATA edits.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "robotics",
+        "audience": "platform_engineer,developer,hands_on_builder,robotics_developer",
+        "discovery.activity_tags": "configure,generate,integrate,validate"
+      }
+    },
+    {
+      "path": "skills/jetson-customize-uphy",
+      "name": "jetson-customize-uphy",
+      "description": "Configure Jetson UPHY lane allocation (uphy0/uphy1-config) on Orin/Thor custom carriers. Do NOT use for pinmux or PCIe-only edits.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,developer,hands_on_builder",
+        "discovery.activity_tags": "configure,integrate,validate,debug"
+      }
+    },
+    {
+      "path": "skills/jetson-customize-usb",
+      "name": "jetson-customize-usb",
+      "description": "Enable/disable Jetson USB2/USB3 SS ports via kernel-DT overlay. Do NOT use for UPHY lane allocation or ODMDATA edits.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,developer,hands_on_builder,robotics_developer",
+        "discovery.activity_tags": "configure,integrate,validate,debug,deploy"
+      }
+    },
+    {
+      "path": "skills/jetson-derive-carrier",
+      "name": "jetson-derive-carrier",
+      "description": "Bootstrap a custom carrier board by forking carrier files and scaffolding a DT overlay from the reference devkit. Use after jetson-init-source; not for module-level or kernel-DTB changes.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,developer,hands_on_builder,robotics_developer",
+        "discovery.activity_tags": "configure,get_started,integrate,generate"
+      }
+    },
+    {
+      "path": "skills/jetson-diagnostic",
+      "name": "jetson-diagnostic",
+      "description": "Read-only Jetson health snapshot for identity, memory, GPU, thermal, power, storage, services, and top processes.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,platform_engineer,devops_engineer,it_operations,robotics_developer",
+        "discovery.activity_tags": "troubleshoot,monitor,inspect,profile,debug"
+      }
+    },
+    {
+      "path": "skills/jetson-download-bsp",
+      "name": "jetson-download-bsp",
+      "description": "Download NVIDIA Jetson Linux BSP artifacts (BSP tarball, sample rootfs, public_sources, x-tools, guides) for the active target. Use for Auto Setup; not for extraction or profile edits.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,platform_engineer,application_developer,devops_engineer,hands_on_builder",
+        "discovery.activity_tags": "get_started,configure,integrate,deploy"
+      }
+    },
+    {
+      "path": "skills/jetson-flash-image",
+      "name": "jetson-flash-image",
+      "description": "Use to flash a promoted BSP image to a Jetson DUT in RCM mode via flash.sh or l4t_initrd_flash.sh. Do NOT use for BSP customization, image promotion, or carrier derivation.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,developer,robotics_developer,hands_on_builder",
+        "discovery.activity_tags": "deploy,configure,validate,recover"
+      }
+    },
+    {
+      "path": "skills/jetson-generate-kb",
+      "name": "jetson-generate-kb",
+      "description": "Build a per-target knowledge-base markdown next to the active profile by walking the BSP root and source tree. Use after init-image / init-source; not for editing profile fields.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "infrastructure",
+        "audience": "platform_engineer,developer,devops_engineer",
+        "discovery.activity_tags": "generate,inspect,summarize,synthesize,extract"
+      }
+    },
+    {
+      "path": "skills/jetson-headless-mode",
+      "name": "jetson-headless-mode",
+      "description": "Plan and apply safe Jetson headless-mode changes to reclaim GUI and daemon memory.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "infrastructure",
+        "audience": "platform_engineer,devops_engineer,it_operations,developer,application_developer",
+        "discovery.activity_tags": "configure,optimize,operate,deploy,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/jetson-inference-mem-tune",
+      "name": "jetson-inference-mem-tune",
+      "description": "Pick the serving stack and per-runtime memory flags (vLLM, SGLang, llama.cpp, TensorRT Edge-LLM) for an LLM/VLM workload on any NVIDIA Jetson.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "application_developer,ml_engineer,ai_engineer,solutions_architect,developer",
+        "discovery.activity_tags": "select,configure,optimize,inference,deploy"
+      }
+    },
+    {
+      "path": "skills/jetson-init-image",
+      "name": "jetson-init-image",
+      "description": "Extract Jetson Linux + sample-rootfs tarballs and run apply_binaries.sh for the active target, then record bsp_image in the profile. Use after jetson-init-target; not for source-tree setup.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,developer,robotics_developer,devops_engineer,hands_on_builder",
+        "discovery.activity_tags": "extract,configure,get_started,deploy,package"
+      }
+    },
+    {
+      "path": "skills/jetson-init-source",
+      "name": "jetson-init-source",
+      "description": "Set up the BSP source workspace: Linux_for_Tegra overlay tracker, bsp_sources, Crosstool-NG toolchain. Use after jetson-init-image; not for fetching inputs.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,developer,devops_engineer,robotics_developer",
+        "discovery.activity_tags": "get_started,configure,integrate,extend"
+      }
+    },
+    {
+      "path": "skills/jetson-init-target",
+      "name": "jetson-init-target",
+      "description": "Author a new Jetson target-platform profile (reference_devkit + optional custom_carrier) and update the active pointer. Use to create a target; not for switching existing profiles.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,developer,hands_on_builder,robotics_developer",
+        "discovery.activity_tags": "configure,generate,select,integrate"
+      }
+    },
+    {
+      "path": "skills/jetson-link-docs",
+      "name": "jetson-link-docs",
+      "description": "Bind pre-downloaded Jetson reference docs (developer guide, design guide, pinmux, schematics) into the active profile documents block. Use after staging docs on disk; not for downloading.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,developer,robotics_developer,hands_on_builder",
+        "discovery.activity_tags": "configure,integrate,get_started"
+      }
+    },
+    {
+      "path": "skills/jetson-llm-benchmark",
+      "name": "jetson-llm-benchmark",
+      "description": "Benchmark Jetson LLM/VLM serving performance across vLLM, llama.cpp, and Ollama with structured JSON output.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ai_engineer,ml_engineer,application_developer,developer,platform_engineer",
+        "discovery.activity_tags": "benchmark,measure,compare,optimize,evaluate"
+      }
+    },
+    {
+      "path": "skills/jetson-llm-serve",
+      "name": "jetson-llm-serve",
+      "description": "Stand up vLLM or SGLang serving on Jetson, using upstream vLLM on Thor and Orin JetPack 7.2+, and NVIDIA-AI-IOT vLLM on older Orin.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "application_developer,ai_engineer,ml_engineer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "deploy,configure,inference,operate,integrate"
+      }
+    },
+    {
+      "path": "skills/jetson-memory-audit",
+      "name": "jetson-memory-audit",
+      "description": "Measure Jetson DRAM/NvMap usage and verify before/after memory reclamation with live audit data.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,developer,robotics_developer,devops_engineer",
+        "discovery.activity_tags": "measure,monitor,profile,troubleshoot,validate"
+      }
+    },
+    {
+      "path": "skills/jetson-optimize-memory",
+      "name": "jetson-optimize-memory",
+      "description": "Reclaim DRAM by disabling unused subsystems across MB1 BCT, MB2 BCT, kernel reserved-memory, and SWIOTLB. Use for headless or no-camera Jetson deployments; not for CPU/GPU frequency tuning.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "infrastructure",
+        "audience": "platform_engineer,developer,devops_engineer,hands_on_builder",
+        "discovery.activity_tags": "optimize,configure,deploy,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/jetson-package",
+      "name": "jetson-package",
+      "description": "Pick Jetson-compatible containers, vLLM runtime images, and Jetson AI Lab PyPI indexes; maps Orin SM 8.7 vs Thor SM 11.0 and JetPack-specific package choices.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "application_developer,ml_engineer,ai_engineer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "package,select,configure,deploy,inference"
+      }
+    },
+    {
+      "path": "skills/jetson-print-bsp-info",
+      "name": "jetson-print-bsp-info",
+      "description": "Use when you need to print Jetson BSP info (L4T version, board configs, rootfs state) from a Linux_for_Tegra root on the host PC. This is an example skill.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,platform_engineer,hands_on_builder",
+        "discovery.activity_tags": "inspect,validate,troubleshoot,configure"
+      }
+    },
+    {
+      "path": "skills/jetson-print-device-info",
+      "name": "jetson-print-device-info",
+      "description": "Use when you need to print Jetson device info (module model, L4T version, kernel, OS version, current power mode) from a running Jetson target. This is an example skill.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,platform_engineer,robotics_developer,application_developer,devops_engineer",
+        "discovery.activity_tags": "inspect,troubleshoot,validate,test,debug"
+      }
+    },
+    {
+      "path": "skills/jetson-promote-image",
+      "name": "jetson-promote-image",
+      "description": "Use to promote overlay files and built artifacts into the staged BSP image. Do NOT use to flash or build. Triggers: promote bsp image.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "infrastructure",
+        "audience": "platform_engineer,developer,devops_engineer",
+        "discovery.activity_tags": "deploy,configure,integrate,package"
+      }
+    },
+    {
+      "path": "skills/jetson-quick-start",
+      "name": "jetson-quick-start",
+      "description": "Entry skill for Jetson / IGX BSP customization. Asks one core click-to-select setup questionnaire and passes prefilled answers to downstream setup skills.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,developer,hands_on_builder,robotics_developer,devops_engineer",
+        "discovery.activity_tags": "get_started,configure,select,deploy,integrate"
+      }
+    },
+    {
+      "path": "skills/jetson-set-target",
+      "name": "jetson-set-target",
+      "description": "Switch the active Jetson target-platform pointer to an existing profile YAML. Use before customize/build/flash to change target; not for authoring profiles — use jetson-init-target instead.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,developer,application_developer,robotics_developer,devops_engineer",
+        "discovery.activity_tags": "configure,select,deploy"
+      }
+    },
+    {
+      "path": "skills/jetson-speculative-decoding",
+      "name": "jetson-speculative-decoding",
+      "description": "Add EAGLE-3 or draft-model speculative decoding to a Jetson vLLM server when TPOT is the bottleneck.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ai_engineer,application_developer,ml_engineer,platform_engineer,developer",
+        "discovery.activity_tags": "optimize,configure,inference,deploy,benchmark"
+      }
+    },
+    {
+      "path": "skills/jetson-validate-image",
+      "name": "jetson-validate-image",
+      "description": "Use after jetson-flash-image to run static BSP checks, on-target smoke/regression tests on a flashed DUT, or both. Not for build or flash steps. Triggers: validate bsp, on-target validation.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "robotics",
+        "audience": "developer,platform_engineer,devops_engineer,robotics_developer",
+        "discovery.activity_tags": "validate,test,inspect,debug,deploy"
+      }
+    },
+    {
       "path": "skills/launch-nemo-rl",
       "name": "launch-nemo-rl",
       "description": "Playbook for launching, monitoring, stopping, and debugging NeMo-RL recipes on a Kubernetes cluster via the nrl-k8s CLI. Covers ephemeral vs long-lived RayCluster modes, iterating on runs, and debugging hung or failed training jobs.",
@@ -1479,7 +1875,7 @@
     {
       "path": "skills/tao-analyze-gaps-visual-changenet",
       "name": "tao-analyze-gaps-visual-changenet",
-      "description": "Performs gap analysis on NVIDIA TAO Visual ChangeNet (VCN) Classify experiments by invoking the data-services container (`tao_toolkit.data_services` from `versions.yaml`) directly via `docker run … gap_analysis vcn_aoi …` — picks the optimal decision threshold, ranks per-sample weakness, and emits a top-K weakest parquet expanded per-lighting for downstream augmentation. Use when analyzing VCN classification failures, picking SDA augmentation targets, auditing PASS/NO_PASS boundary cases, or running DEFT gap analysis on an AOI ChangeNet model.",
+      "description": "Performs gap analysis on NVIDIA TAO VCN Classify (Visual Component Net) experiments by invoking the data-services container (`tao_toolkit.data_services` from `versions.yaml`) directly via `docker run … gap_analysis vcn_aoi …` — picks the optimal decision threshold, ranks per-sample weakness, and emits a top-K weakest parquet expanded per-lighting for downstream augmentation. Use when analyzing VCN classification failures, picking SDA augmentation targets, or auditing PASS/NO_PASS boundary cases.",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -1491,7 +1887,7 @@
     {
       "path": "skills/tao-analyze-gaps-vlm-bcq",
       "name": "tao-analyze-gaps-vlm-bcq",
-      "description": "Extract false-positive and false-negative gaps from VLM binary-classification-question (BCQ, yes/no) predictions. Use after running VLM evaluation when you have a predictions JSON and need to identify failure cases for DEFT root cause analysis on a binary-classification VLM workflow.",
+      "description": "Extract false-positive and false-negative gaps from VLM binary-classification-question (BCQ, yes/no) predictions. Use when the user asks to \"analyze VLM BCQ gaps\", \"extract VLM false positives and false negatives\", or identify failure cases from a predictions JSON for DEFT root-cause analysis on a binary-classification VLM workflow.",
       "metadata": {
         "product.primary": "TAO",
         "classification.category.primary": "ai_and_machine_learning",
@@ -1539,7 +1935,7 @@
     {
       "path": "skills/tao-finetune-cosmos-reason",
       "name": "tao-finetune-cosmos-reason",
-      "description": "Cosmos-Reason2-8B video QA supervised fine-tuning with FSDP parallelism. Use when training or evaluating video question-answering models, fine-tuning Cosmos-Reason2 with SFT, or working with Cosmos-RL. Trigger phrases include \"fine-tune Cosmos-Reason\", \"Cosmos-RL SFT\", \"video QA fine-tune\", \"Cosmos-Reason2-8B training\".",
+      "description": "Cosmos3-Nano video QA supervised fine-tuning with FSDP parallelism. Use when training or evaluating video question-answering models, fine-tuning Cosmos3-Nano or compatible Cosmos Reason models with SFT/LoRA, or working with Cosmos-RL. Trigger phrases include \"fine-tune Cosmos\", \"Cosmos3 Nano Reasoner\", \"Cosmos-RL SFT\", \"video QA fine-tune\", \"Cosmos3-Nano training\".",
       "metadata": {
         "product.primary": "Cosmos",
         "classification.category.primary": "ai_and_machine_learning",
@@ -1611,7 +2007,7 @@
     {
       "path": "skills/tao-list-capabilities",
       "name": "tao-list-capabilities",
-      "description": "Answer what the TAO Skill Bank plugin can do by generating the response from packaged application, data, model, AutoML, and platform manifests.",
+      "description": "Answer what the TAO Skill Bank plugin can do by generating the response from packaged application, data, model, AutoML, and platform manifests. Use when the user asks \"what can TAO Skill Bank do\", \"list TAO models\", \"which TAO workflows are available\", or \"what supports AutoML\".",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -1647,7 +2043,7 @@
     {
       "path": "skills/tao-route-visual-changenet-samples",
       "name": "tao-route-visual-changenet-samples",
-      "description": "Routes the weakest VCN samples (output of `tao-analyze-gaps-visual-changenet`) into per-augmentation-module subsets — one parquet for k-NN mining, one for AnomalyGen (Cosmos SDG) — based on each module's label eligibility. Use as the immediate next step after DEFT gap analysis in a VCN AOI SDA iteration.",
+      "description": "Routes the weakest VCN samples (output of `tao-analyze-gaps-visual-changenet`) into per-augmentation-module subsets based on each module's label eligibility. Use when the user asks to \"route VCN gap samples\", \"split AOI gaps for k-NN mining and AnomalyGen\", or prepare the immediate next step after DEFT gap analysis in a VCN AOI SDA iteration.",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -1659,7 +2055,7 @@
     {
       "path": "skills/tao-run-automl",
       "name": "tao-run-automl",
-      "description": "Run AutoML / hyperparameter optimization (HPO) for NVIDIA TAO networks using AutoMLRunner. Handles algorithm selection (bayesian, hyperband, asha, bohb, llm, hybrid, autoresearch), WandB experiment tracking, job execution on any TAO SDK platform, result interpretation, and per-rec custom evaluation hooks. Use when the user mentions TAO AutoML, hyperparameter optimization, HPO, automl, automl_settings, AutoMLRunner, tao_automl, bayesian search, hyperband, ASHA, LLM-guided search, autoresearch, or wants to tune training hyperparameters for any TAO network. Platform-agnostic — runs on any SDK (Lepton, Brev, SLURM, Kubernetes, Docker).",
+      "description": "Run AutoML / hyperparameter optimization (HPO) for NVIDIA TAO networks using AutoMLRunner. Handles algorithm selection (bayesian, hyperband, asha, bohb, llm, hybrid, autoresearch), WandB experiment tracking, job execution on any TAO SDK platform, result interpretation, and per-rec custom evaluation hooks. Use when the user mentions TAO AutoML, hyperparameter optimization, HPO, automl, automl_settings, AutoMLRunner, tao_automl, bayesian search, hyperband, ASHA, LLM-guided search, autoresearch, or wants to tune training hyperparameters for any TAO network. Platform-agnostic — runs on any SDK (Brev, SLURM, Kubernetes, Docker).",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -1671,7 +2067,7 @@
     {
       "path": "skills/tao-run-automl-deft-pipeline",
       "name": "tao-run-automl-deft-pipeline",
-      "description": "Run the canonical NVIDIA AOI three-phase training pipeline — Phase 1 AutoML baseline (HPO), Phase 2 DEFT loop (RCA → SDG → mining → plain-train retrain), Phase 3 AutoML refinement on the DEFT-augmented dataset. This is the default entry point for any \"run the AOI workflow\", \"fine-tune my PCB AOI model end-to-end\", \"improve my AOI ChangeNet model\", or \"AOI workflow with AutoML\" request — route here instead of tao-run-deft-aoi directly unless the user explicitly asks for the DEFT loop ONLY (e.g. \"run JUST the DEFT loop\", \"skip AutoML, only DEFT\"). Also handles the same three-phase pattern for non-AOI DEFT applications — AutoML baseline then DEFT loop warm-started from AutoML's winning HPs then post-DEFT AutoML refinement on the iteration-augmented dataset. Trigger phrases include \"run the AOI workflow\", \"AOI end-to-end\", \"AutoML + DEFT\", \"AutoML then DEFT\", \"tune hyperparameters then DEFT\", \"DEFT with AutoML at both ends\", \"warm-start DEFT\", \"improve my AOI model\".\n",
+      "description": "Run the canonical NVIDIA AOI three-phase training pipeline — Phase 1 AutoML baseline (HPO), Phase 2 DEFT loop (RCA → SDG → mining → plain-train retrain), Phase 3 AutoML refinement on the DEFT-augmented dataset. Use when the user asks to \"run the AOI workflow\", \"fine-tune my PCB AOI model end-to-end\", \"improve my AOI ChangeNet model\", or \"AOI workflow with AutoML\" request — route here instead of tao-run-deft-aoi directly unless the user explicitly asks for the DEFT loop ONLY (e.g. \"run JUST the DEFT loop\", \"skip AutoML, only DEFT\"). Also handles the same three-phase pattern for non-AOI DEFT applications — AutoML baseline then DEFT loop warm-started from AutoML's winning HPs then post-DEFT AutoML refinement on the iteration-augmented dataset. Trigger phrases include \"run the AOI workflow\", \"AOI end-to-end\", \"AutoML + DEFT\", \"AutoML then DEFT\", \"tune hyperparameters then DEFT\", \"DEFT with AutoML at both ends\", \"warm-start DEFT\", \"improve my AOI model\".\n",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -1683,7 +2079,7 @@
     {
       "path": "skills/tao-run-deft-aoi",
       "name": "tao-run-deft-aoi",
-      "description": "Run the full DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection models: baseline evaluate, RCA, ingestion of customer-supplied pre-generated AnomalyGen images, k-NN mining, retraining, and deployment gating until FAR / recall KPI targets are met. EA variant — does not run AnomalyGen inline; the customer pre-generates synthetic NG/OK pairs out-of-band and the loop ingests them. Use for prompts like \"run the DEFT loop\", \"fine-tune until FAR below 0.1% at recall=100%\", or \"improve my AOI ChangeNet model with RCA and pre-generated synthetic defects\"; do not use for standalone TAO training, one-off inference, generic anomaly generation, or RCA-only analysis.\n",
+      "description": "Run the full DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection models: baseline evaluate, RCA, Cosmos AnomalyGen / AMP synthetic defects, k-NN mining, retraining, and deployment gating until FAR / recall KPI targets are met. Use for prompts like \"run the DEFT loop\", \"fine-tune until FAR below 0.1% at recall=100%\", or \"improve my AOI ChangeNet model with RCA and synthetic defects\"; do not use for standalone TAO training, one-off inference, generic anomaly generation, or RCA-only analysis.\n",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -1743,7 +2139,7 @@
     {
       "path": "skills/tao-run-on-local-docker",
       "name": "tao-run-on-local-docker",
-      "description": "Local Docker execution for TAO SDK job containers using the host Docker daemon and NVIDIA GPU runtime. Use when running TAO jobs on the current machine or a directly attached Docker host. Trigger phrases include \"run locally\", \"local Docker\", \"use my GPU\", \"run on my machine\", \"host Docker daemon\".",
+      "description": "Local or remote Docker execution for TAO SDK job containers using a Docker daemon with NVIDIA GPU runtime. Use when running TAO jobs on the current machine, a directly attached Docker host, or a remote GPU box exposed through DOCKER_HOST. Trigger phrases include \"run locally\", \"local Docker\", \"remote Docker\", \"use my GPU\", \"run on my machine\", \"host Docker daemon\".",
       "metadata": {
         "product.primary": "TAO",
         "classification.category.primary": "ai_and_machine_learning",
@@ -1767,7 +2163,7 @@
     {
       "path": "skills/tao-run-platform",
       "name": "tao-run-platform",
-      "description": "TAO Execution SDK for submitting and monitoring GPU training jobs on supported platforms (Lepton, Brev, SLURM, local Docker, Kubernetes). Use when the user wants to run TAO jobs through the SDK, get job tracking, S3 I/O wrapping, multi-node distributed training, or platform-specific features that docker-run can't provide. Trigger phrases include \"use the TAO SDK\", \"call tao_sdk\", \"AutoMLRunner\", \"ActionWorkflow\", \"Job handles\", \"S3 I/O wrapping\", \"TAO platform run\".",
+      "description": "TAO Execution SDK for submitting and monitoring GPU training jobs on supported platforms (Brev, SLURM, local Docker, Kubernetes). Use when the user wants to run TAO jobs through the SDK, get job tracking, S3 I/O wrapping, multi-node distributed training, or platform-specific features that docker-run can't provide. Trigger phrases include \"use the TAO SDK\", \"call tao_sdk\", \"AutoMLRunner\", \"ActionWorkflow\", \"Job handles\", \"S3 I/O wrapping\", \"TAO platform run\".",
       "metadata": {
         "product.primary": "TAO Toolkit API",
         "classification.category.primary": "ai_and_machine_learning",
@@ -1779,7 +2175,7 @@
     {
       "path": "skills/tao-setup-nvidia-gpu-host",
       "name": "tao-setup-nvidia-gpu-host",
-      "description": "Host setup for TAO GPU backends. Checks and, after user approval, installs NVIDIA driver branch 580, CUDA Toolkit 13.0, and NVIDIA Container Toolkit 1.19.0 for Docker/local-Docker and Kubernetes GPU worker hosts. The `--check-only` path works on any Linux distribution; `--install` automates debian-family (Ubuntu/Debian/Pop!_OS/Mint/Zorin/Raspbian), rhel-family (Fedora/RHEL/Rocky/AlmaLinux), and suse-family (openSUSE/SLES) hosts, and prints actionable manual-install steps for everything else.",
+      "description": "Host setup for TAO GPU backends. Checks and, after user approval, installs NVIDIA driver branch 580, CUDA Toolkit 13.0, and NVIDIA Container Toolkit 1.19.0 for Docker/local-Docker and Kubernetes GPU worker hosts. The `--check-only` path works on any Linux distribution; `--install` automates debian-family (Ubuntu/Debian/Pop!_OS/Mint/Zorin/Raspbian), rhel-family (Fedora/RHEL/Rocky/AlmaLinux), and suse-family (openSUSE/SLES) hosts, and prints actionable manual-install steps for everything else. Use when the user asks to \"set up an NVIDIA GPU host\", \"check TAO Docker GPU runtime\", or prepare a Kubernetes GPU worker for TAO.",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "infrastructure",
@@ -1971,7 +2367,7 @@
     {
       "path": "skills/tao-train-nvdinov2",
       "name": "tao-train-nvdinov2",
-      "description": "NVDINOv2 for self-supervised visual representation learning. Trains vision transformers via self-distillation (teacher-student) without labels and produces general-purpose visual features. Use when training, distilling, exporting, or running inference for a TAO NVDINOv2 backbone. Trigger phrases include \"train NVDINOv2\", \"self-supervised ViT pretraining\", \"DINOv2 backbone\", \"visual representation learning\".",
+      "description": "NVDINOv2 for self-supervised visual representation learning. Trains vision transformers via self-distillation (teacher-student) without labels and produces general-purpose visual features. Use when training, exporting, or running inference for a TAO NVDINOv2 backbone. Trigger phrases include \"train NVDINOv2\", \"self-supervised ViT pretraining\", \"DINOv2 backbone\", \"visual representation learning\".",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
