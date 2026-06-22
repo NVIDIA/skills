@@ -2319,7 +2319,7 @@
     {
       "path": "skills/vss-generate-video-report",
       "name": "vss-generate-video-report",
-      "description": "Use this skill when producing a VSS analysis report — Mode A per-clip VLM, Mode B incident-range via video-analytics. Not for standalone video summarization, real-time alerts, or ad-hoc Q&A.",
+      "description": "Use this skill when producing a VSS analysis report — Mode A per-clip VLM, Mode B incident-range via video-analytics. Not for standalone video summarization, real-time alerts or ad-hoc Q&A.",
       "metadata": {
         "product.primary": "Video Search and Summarization (VSS)",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2367,7 +2367,7 @@
     {
       "path": "skills/vss-search-archive",
       "name": "vss-search-archive",
-      "description": "Use to run top-level VSS fusion search on archived video, or to ingest video files / RTSP streams for search. Do NOT use for ad-hoc visual Q&A (use vss-ask-video), live captioning (use vss-deploy-dense-captioning), or video summarization and reports (use vss-summarize-video).",
+      "description": "Use this skill to run top-level VSS fusion search on archived video, or to ingest video files / RTSP streams for search. Do NOT use for ad-hoc visual Q&A (use vss-ask-video), live captioning (use vss-deploy-dense-captioning), or video summarization and reports (use vss-summarize-video).",
       "metadata": {
         "product.primary": "Video Search and Summarization (VSS)",
         "classification.category.primary": "ai_and_machine_learning",
