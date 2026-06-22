@@ -14,8 +14,8 @@ The component answer scopes which part of the codebase to read first and which b
 
 ## Setup walk-through (conceptual)
 
-1. **Clone** the cuOpt repo (and submodules, if any).
-2. **Pre-flight checks** — CUDA driver compatibility, conda env selection and activation, `PARALLEL_LEVEL`, dataset setup. Walk through these before the first build using SKILL.md → [Pre-flight Checks](../SKILL.md#pre-flight-checks-required-before-first-build-or-test). Skipping any of them surfaces as confusing build- or runtime errors later.
+1. **Clone** the cuOpt repo (and submodules, if any). If the machine has no conda yet, bootstrap miniforge into the user's home directory first (no `sudo` — user-space install only).
+2. **Pre-flight checks** — CUDA driver compatibility, conda env creation + activation, `PARALLEL_LEVEL`, dataset setup. Creating the env from `conda/environments/all_cuda-*.yaml` is allowed and expected here, not something to hand off to the user. Walk through these before the first build using SKILL.md → [Pre-flight Checks](../SKILL.md#pre-flight-checks-required-before-first-build-or-test). Skipping any of them surfaces as confusing build- or runtime errors later.
 3. **First build** — once the env is active, run `./build.sh` (or a component-scoped variant). Targets and `PARALLEL_LEVEL` tuning live in [build_and_test.md](build_and_test.md).
 4. **First test run** — fetch datasets per `CONTRIBUTING.md` first, then run the C++/Python test suites from [build_and_test.md](build_and_test.md). A passing build + test confirms the env is wired up correctly.
 5. **Optional** — `pre-commit install` to run style checks on every `git commit` (see [contributing.md](contributing.md)).

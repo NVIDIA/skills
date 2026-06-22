@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `cuopt-developer`
-- Evaluation date: 2026-06-08
+- Evaluation date: 2026-06-22
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 3 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,29 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 6 | 100% (+0%) | 100% (+0%) |
-| Correctness | 6 | 78% (-1%) | 90% (+5%) |
-| Discoverability | 6 | 62% (+11%) | 66% (+7%) |
-| Effectiveness | 6 | 81% (-3%) | 93% (+10%) |
-| Efficiency | 6 | 61% (+15%) | 59% (+7%) |
+| Security | 3 | 100% (+0%) | 100% (+0%) |
+| Correctness | 3 | 82% (+25%) | 93% (+34%) |
+| Discoverability | 3 | 67% (+50%) | 88% (+52%) |
+| Effectiveness | 3 | 91% (+27%) | 86% (+27%) |
+| Efficiency | 3 | 71% (+46%) | 84% (+40%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 9 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 5 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_efficiency: Deeply nested references in contributing.md (`skills/cuopt-developer/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/cuopt-developer/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/cuopt-developer/SKILL.md`)
-- LOW QUALITY/quality_discoverability: No '## Purpose' section (`skills/cuopt-developer/SKILL.md`)
-- LOW QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/cuopt-developer/SKILL.md`)
+- LOW SCHEMA/unexpected_file: Unexpected 'resources' in skill root (`skills/cuopt-developer/resources`)
+- LOW SCHEMA/unexpected_file: Unexpected 'benchmark' in skill root (`skills/cuopt-developer/benchmark`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/cuopt-developer/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 9 file(s)
-- Inter-Skill Deduplication: Parsed skill 'cuopt-developer': 148 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

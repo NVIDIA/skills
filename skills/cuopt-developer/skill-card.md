@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who contribute to or modify the NVIDIA cuOpt codebase, covering C++/CUDA solver internals, Python bindings, server endpoints, CI pipelines, and documentation. <br>
+Developers and engineers who modify, build, test, debug, and contribute to the NVIDIA cuOpt solver codebase, including C++/CUDA engine internals, Python bindings, server endpoints, CI pipelines, and documentation. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -21,14 +21,14 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
 - [cuOpt GitHub Repository](https://github.com/NVIDIA/cuopt) <br>
-- [Build and Test Guide](references/build_and_test.md) <br>
+- [Build and Test Reference](references/build_and_test.md) <br>
 - [Contributing Guide](references/contributing.md) <br>
 - [Coding Conventions](references/conventions.md) <br>
 - [First-Time Setup](references/first_time_setup.md) <br>
-- [Python Bindings](references/python_bindings.md) <br>
+- [Python Bindings Architecture](references/python_bindings.md) <br>
 - [Troubleshooting](references/troubleshooting.md) <br>
-- [VRP Dimension Skills](references/vrp_skills.md) <br>
-- [Numerical Debugging](resources/numerical_debugging.md) <br>
+- [VRP Dimension Internals](references/vrp_skills.md) <br>
+- [Numerical Debugging Methodology](resources/numerical_debugging.md) <br>
 
 
 ## Skill Output: <br>
@@ -38,13 +38,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- `claude-code` <br>
-- `codex` <br>
+- claude-code <br>
+- codex <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 3 internal skill-activation tasks (2 attempts each, 50% pass threshold) in NVSkills-Eval external profile. <br>
+Evaluated against 3 internal evaluation tasks in astra-sandbox environment using NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -68,11 +68,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 6 | 100% (+0%) | 100% (+0%) |
-| Correctness | 6 | 78% (-1%) | 90% (+5%) |
-| Discoverability | 6 | 62% (+11%) | 66% (+7%) |
-| Effectiveness | 6 | 81% (-3%) | 93% (+10%) |
-| Efficiency | 6 | 61% (+15%) | 59% (+7%) |
+| Security | 3 | 100% (+0%) | 100% (+0%) |
+| Correctness | 3 | 82% (+25%) | 93% (+34%) |
+| Discoverability | 3 | 67% (+50%) | 88% (+52%) |
+| Effectiveness | 3 | 91% (+27%) | 86% (+27%) |
+| Efficiency | 3 | 71% (+46%) | 84% (+40%) |
 
 ## Skill Version(s): <br>
 26.08.00 (source: frontmatter) <br>

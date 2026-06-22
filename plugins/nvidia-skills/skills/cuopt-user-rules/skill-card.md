@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers using NVIDIA cuOpt for vehicle routing (VRP/TSP/PDP), linear programming, mixed-integer programming, and quadratic programming tasks across Python, C, CLI, and server interfaces. <br>
+Developers and engineers using NVIDIA cuOpt who need structured guidance for problem formulation, environment setup, API usage, and result verification across routing, LP, MILP, and QP optimization interfaces. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,13 +25,19 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Configuration instructions, Code, Analysis] <br>
+**Output Type(s):** [Code, Configuration instructions, Analysis] <br>
 **Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
+## Evaluation Agents Used: <br>
+- claude-code <br>
+- codex <br>
+
+
+
 ## Evaluation Tasks: <br>
-Evaluated against 1 internal skill eval case (NVSkills-Eval, profile: external). Overall verdict: PASS. <br>
+Evaluated against 1 evaluation task (positive skill-activation case) in the NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -41,7 +47,25 @@ Reported benchmark dimensions: <br>
 - Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
+Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
+- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
+- `accuracy`: Grades final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
+- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `token_efficiency`: Compares token usage with and without the skill. <br>
 
+
+
+## Evaluation Results: <br>
+| Dimension | Num | `claude-code` | `codex` |
+|---|---:|---:|---:|
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 55% (+20%) | 97% (+39%) |
+| Discoverability | 1 | 25% (+0%) | 58% (+5%) |
+| Effectiveness | 1 | 42% (+12%) | 92% (+65%) |
+| Efficiency | 1 | 25% (+0%) | 34% (-9%) |
 
 ## Skill Version(s): <br>
 26.08.00 (source: frontmatter) <br>
