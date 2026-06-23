@@ -1,5 +1,5 @@
 ## Description: <br>
-End-to-end orchestration of defect image generation, augmentation, and labeling pipelines for AOI (Automated Optical Inspection) datasets on NVIDIA OSMO. <br>
+Orchestrates end-to-end defect image generation, augmentation, and labeling pipelines for Automated Optical Inspection (AOI) datasets using NVIDIA Cosmos AnomalyGen on OSMO for PCBA, metal surface, and glass inspection. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers generating labeled synthetic defect and clean images for automated optical inspection (AOI) model training using NVIDIA OSMO pipelines. <br>
+Developers and engineers use this skill to orchestrate synthetic defect image generation pipelines for Automated Optical Inspection (AOI) training datasets, covering cold-start (Day 0) and real-image inference (Day 1) workflows across PCBA, metal surface, and glass inspection use cases. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -21,10 +21,9 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [NVIDIA OSMO](https://developer.nvidia.com/osmo) <br>
 - [Skill Definition (SKILL.md)](SKILL.md) <br>
+- [Knob Mapping Reference](references/knob_mapping.md) <br>
 - [Preconditions](references/preconditions.md) <br>
-- [Knob Mapping](references/knob_mapping.md) <br>
-- [GPU Sizing](references/gpu_sizing.md) <br>
-- [Troubleshooting](references/troubleshooting.md) <br>
+- [Troubleshooting Guide](references/troubleshooting.md) <br>
 
 
 ## Skill Output: <br>
@@ -40,7 +39,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 6 internal skill-activation tasks, 2 attempts per task, 50% pass threshold. NVSkills-Eval profile: external. <br>
+Evaluated against 6 internal evaluation tasks (all positive skill-activation cases) via NVSkills-Eval external profile in an astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -64,14 +63,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+0%) | 100% (+0%) |
-| Correctness | 8 | 90% (+10%) | 75% (+2%) |
-| Discoverability | 8 | 87% (+24%) | 65% (-2%) |
-| Effectiveness | 8 | 69% (-0%) | 53% (+0%) |
-| Efficiency | 8 | 71% (+20%) | 48% (+2%) |
+| Security | 6 | 100% (+0%) | 100% (+0%) |
+| Correctness | 6 | 94% (+71%) | 94% (+52%) |
+| Discoverability | 6 | 95% (+70%) | 79% (+33%) |
+| Effectiveness | 6 | 79% (+77%) | 90% (+76%) |
+| Efficiency | 6 | 78% (+51%) | 69% (+33%) |
 
 ## Skill Version(s): <br>
-1.0.0 (source: frontmatter) <br>
+1.0.1 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

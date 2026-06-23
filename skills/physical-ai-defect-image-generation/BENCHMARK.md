@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `physical-ai-defect-image-generation`
-- Evaluation date: 2026-05-31
+- Evaluation date: 2026-06-23
 - NVSkills-Eval profile: `external`
-- Environment: `local`
+- Environment: `astra-sandbox`
 - Dataset: 6 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,27 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+0%) | 100% (+0%) |
-| Correctness | 8 | 90% (+10%) | 75% (+2%) |
-| Discoverability | 8 | 87% (+24%) | 65% (-2%) |
-| Effectiveness | 8 | 69% (-0%) | 53% (+0%) |
-| Efficiency | 8 | 71% (+20%) | 48% (+2%) |
+| Security | 6 | 100% (+0%) | 100% (+0%) |
+| Correctness | 6 | 94% (+71%) | 94% (+52%) |
+| Discoverability | 6 | 95% (+70%) | 79% (+33%) |
+| Effectiveness | 6 | 79% (+77%) | 90% (+76%) |
+| Efficiency | 6 | 78% (+51%) | 69% (+33%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 122 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 3 total findings.
 
 Top findings:
 
-- MEDIUM PII/phone_numbers: US phone number pattern (`assets/configs/texture_defect_generation_day0.yaml:896`)
-- MEDIUM PII/phone_numbers: US phone number pattern (`assets/configs/good_image_generation.yaml:379`)
-- MEDIUM PII/phone_numbers: US phone number pattern (`assets/configs/structural_defect_generation.yaml:370`)
-- MEDIUM PII/phone_numbers: US phone number pattern (`assets/configs/structural_defect_generation.yaml:380`)
-- MEDIUM PII/phone_numbers: US phone number pattern (`assets/configs/texture_defect_generation_day1_real_alignment.yaml:881`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/physical-ai-defect-image-generation/SKILL.md`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/physical-ai-defect-image-generation/SKILL.md`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/physical-ai-defect-image-generation/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 24 file(s)
-- Inter-Skill Deduplication: Parsed skill 'physical-ai-defect-image-generation': 823 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 
