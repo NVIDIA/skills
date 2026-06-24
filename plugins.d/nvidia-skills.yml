@@ -42,7 +42,6 @@ include_skills:
   - skills/aiq-deploy/
   - skills/aiq-research/
   # NeMoClaw
-  - skills/nemoclaw-user-get-started/
   # Dynamo
   - skills/dynamo-router-starter/
   - skills/dynamo-interconnect-check/
