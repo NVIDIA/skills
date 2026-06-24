@@ -167,7 +167,7 @@ run, report the run as blocked/incomplete, not complete.
 
 Every request runs the full pipeline — there is no diagnose-and-exit or
 validate-and-stop mode. The one legitimate stage-less ending is the
-**runtime-forced degraded path** (Scene Optimizer unavailable and the user
+**runtime-forced degraded path** (Usd Optimize unavailable and the user
 declines install/setup): set `workflow_mode: "structural_only"`, a verdict such
 as `no_optimized_stage_written`, the blocked/missing-optimizer evidence, and a
 `next_profile_capture` note for later runtime profiling.

@@ -13,6 +13,8 @@ version: "0.1.0"
 
 # USD Performance Tuning Skill Map
 
+> **"SO" / "Scene Optimizer" = Usd Optimize** (the `omni.scene.optimizer.core` extension). The Kit-bundled extension uses the 110.x version line (e.g. 110.0.4); the standalone package uses the 1.0.x line (e.g. 1.0.4). Both refer to the same Usd Optimize; the extension id and the 110.x versions are retained intentionally as the real runtime identifiers.
+
 > Compact navigation aid for the agent-facing catalog. Detailed phase
 > choreography lives with the owning entry skill:
 > `skills/omniverse-usd-performance-tuning/references/workflow.md`.

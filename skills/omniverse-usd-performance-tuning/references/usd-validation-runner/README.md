@@ -615,7 +615,7 @@ phase scoping so Phase 6 and Phase 7 can reproduce or narrow it.
 
 - If `omni_asset_validate` is unavailable, record it as missing rather than
   fabricating a pass.
-- If Usd Optimize validator imports fail, do not report SO-specific results.
+- If Usd Optimize validator imports fail, do not report Usd Optimize validator results.
 - If the bundled `validator-venv` is slow or lacks dependencies, prefer a Kit or
   project-managed usd-validation-nvidia environment.
 - Named validator unavailable: record the gap and choose the nearest supported
