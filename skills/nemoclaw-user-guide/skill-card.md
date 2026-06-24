@@ -1,5 +1,5 @@
 ## Description: <br>
-LP, MILP, QP — concepts, problem-text parsing, and formulation patterns (parameters, constraints, decisions, objective). Concepts only; no API. <br>
+Guides human users' AI agents to the NemoClaw docs MCP server and canonical Fern documentation in Markdown form. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to parse optimization problem descriptions and formulate them as LP, MILP, or QP models with correct parameters, constraints, decision variables, and objectives before solving with cuOpt. <br>
+Developers and engineers using AI coding assistants who need to install, configure, operate, troubleshoot, or secure NemoClaw sandboxed AI agents. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,24 +19,26 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
-- [cuOpt Examples](https://github.com/NVIDIA/cuopt-examples) <br>
+- [NemoClaw Docs MCP Server](https://docs.nvidia.com/nemoclaw/_mcp/server) <br>
+- [NemoClaw AI Documentation Index (llms.txt)](https://docs.nvidia.com/nemoclaw/llms.txt) <br>
+- [OpenClaw Quickstart](https://docs.nvidia.com/nemoclaw/latest/user-guide/openclaw/get-started/quickstart.md) <br>
+- [Hermes Quickstart](https://docs.nvidia.com/nemoclaw/latest/user-guide/hermes/get-started/quickstart.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Code] <br>
-**Output Format:** [Markdown with mathematical formulations] <br>
+**Output Type(s):** [Documentation routing, Configuration instructions, Shell commands] <br>
+**Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- `claude-code` <br>
-- `codex` <br>
+- Claude Code (`claude-code`) <br>
+- Codex (`codex`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 3 internal evaluation tasks (all positive skill-activation cases) via NVSkills-Eval external profile. <br>
+Evaluated against 5 internal skill-activation tasks in the NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,19 +62,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 3 | 100% (+0%) | 100% (+0%) |
-| Correctness | 3 | 83% (+33%) | 33% (-7%) |
-| Discoverability | 3 | 67% (+67%) | 0% (+0%) |
-| Effectiveness | 3 | 98% (+5%) | 67% (-11%) |
-| Efficiency | 3 | 72% (+45%) | 28% (-0%) |
-
-## Testing Completed: <br>
-**[x] Agent Red-Teaming** <br>
-**[ ] Network Security** <br>
-**[ ] Product Security** <br>
+| Security | 5 | 90% (-10%) | 100% (+10%) |
+| Correctness | 5 | 90% (+68%) | 86% (+47%) |
+| Discoverability | 5 | 86% (+67%) | 67% (+22%) |
+| Effectiveness | 5 | 80% (+74%) | 87% (+64%) |
+| Efficiency | 5 | 71% (+45%) | 57% (+15%) |
 
 ## Skill Version(s): <br>
-26.08.00 (source: frontmatter) <br>
+0.1.0 (source: package.json) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

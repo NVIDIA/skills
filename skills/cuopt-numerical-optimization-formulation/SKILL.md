@@ -13,6 +13,7 @@ metadata:
     - concepts
 ---
 
+
 # Numerical Optimization Formulation
 
 Concepts and workflow for going from a problem description to a clear formulation across LP, MILP, and QP. No API code here.
@@ -28,14 +29,14 @@ Concepts and workflow for going from a problem description to a clear formulatio
 | Property | LP | MILP | QP |
 |---|---|---|---|
 | Objective | Linear | Linear | Quadratic (xᵀQx + cᵀx) |
-| Constraints | Linear | Linear | Linear (no quadratic constraints) |
+| Constraints | Linear | Linear | Linear + convex quadratic (inequality only) via second-order cones |
 | Variables | Continuous | Mixed: continuous + integer/binary | Continuous |
 | Sense | min or max | min or max | **minimize only** (negate to max) |
-| Duals / sensitivity | Shadow prices + reduced costs | **None** (integer optima) | Shadow prices + reduced costs |
+| Duals / sensitivity | Dual values + reduced costs | **None** (integer optima) | Dual values + reduced costs |
 
 If the objective is purely linear, prefer LP/MILP — do not artificially introduce quadratic terms. If any variable is integer or binary, the problem is MILP regardless of the rest.
 
-**Post-solve sensitivity (LP / QP only).** Continuous LP and QP solutions expose **dual values** (shadow prices — the marginal objective change per unit a binding constraint is relaxed: *where to invest to improve the outcome*) and **reduced costs** (for a variable the optimizer left at zero, how far it must improve to enter the solution: a *near-miss*). **MILP solutions have no duals** — integer optima are not continuous, so there are none to return. See the language-specific API skills for how to retrieve them after a solve.
+**Post-solve sensitivity (LP / QP only).** Continuous LP and QP solutions expose **dual values** (the marginal objective change per unit a binding constraint is relaxed: *where to invest to improve the outcome*) and **reduced costs** (for a variable the optimizer left at zero, how far it must improve to enter the solution: a *near-miss*). **MILP solutions have no duals** — integer optima are not continuous, so there are none to return. Duals are also unavailable when the model includes quadratic constraints — the second-order cone path returns primal values only. See the language-specific API skills for how to retrieve them after a solve.
 
 ## Required formulation questions
 
@@ -43,7 +44,7 @@ Ask these if not already clear:
 
 1. **Decision variables** — What are they? Bounds?
 2. **Objective** — Minimize or maximize? Linear or quadratic? For QP: any squared or cross terms (x², x·y)? If maximize a quadratic, the user must negate and minimize.
-3. **Constraints** — Linear inequalities/equalities? (Quadratic constraints are not supported.)
+3. **Constraints** — Linear inequalities/equalities? Convex quadratic constraints (inequality only) are also supported, handled as second-order cones; non-convex or equality quadratic constraints are not.
 4. **Variable types** — All continuous (LP / QP) or some integer/binary (MILP)?
 5. **Convexity (QP only)** — For minimization, the quadratic form (matrix Q) should be positive semi-definite for well-posed problems.
 

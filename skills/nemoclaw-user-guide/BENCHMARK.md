@@ -1,16 +1,16 @@
 # Evaluation Report
 
-Evaluation of the `cuopt-numerical-optimization-formulation` skill before publication through NVSkills-Eval.
+Evaluation of the `nemoclaw-user-guide` skill before publication through NVSkills-Eval.
 
 This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
 
 ## Evaluation Summary
 
-- Skill: `cuopt-numerical-optimization-formulation`
-- Evaluation date: 2026-06-23
+- Skill: `nemoclaw-user-guide`
+- Evaluation date: 2026-06-24
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
-- Dataset: 3 evaluation tasks
+- Dataset: 5 evaluation tasks
 - Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
@@ -42,9 +42,9 @@ Underlying evaluation signals used in this run:
 
 ## Test Tasks
 
-The benchmark dataset contained 3 evaluation tasks:
+The benchmark dataset contained 5 evaluation tasks:
 
-- Positive tasks: 3 tasks where the skill was expected to activate.
+- Positive tasks: 5 tasks where the skill was expected to activate.
 - Negative tasks: 0 tasks where no skill was expected.
 - Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
 
@@ -54,11 +54,11 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 3 | 100% (+0%) | 100% (+0%) |
-| Correctness | 3 | 83% (+33%) | 33% (-7%) |
-| Discoverability | 3 | 67% (+67%) | 0% (+0%) |
-| Effectiveness | 3 | 98% (+5%) | 67% (-11%) |
-| Efficiency | 3 | 72% (+45%) | 28% (-0%) |
+| Security | 5 | 90% (-10%) | 100% (+10%) |
+| Correctness | 5 | 90% (+68%) | 86% (+47%) |
+| Discoverability | 5 | 86% (+67%) | 67% (+22%) |
+| Effectiveness | 5 | 80% (+74%) | 87% (+64%) |
+| Efficiency | 5 | 71% (+45%) | 57% (+15%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
@@ -68,9 +68,9 @@ Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found
 
 Top findings:
 
-- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/cuopt-numerical-optimization-formulation/SKILL.md`)
-- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/cuopt-numerical-optimization-formulation/SKILL.md`)
-- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/cuopt-numerical-optimization-formulation/SKILL.md`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/nemoclaw-user-guide/SKILL.md`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nemoclaw-user-guide/SKILL.md`)
+- MEDIUM SCHEMA/author_missing: Author not specified in metadata (`skills/nemoclaw-user-guide/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
