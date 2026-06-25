@@ -41,7 +41,7 @@ include_skills:
   # AIQ / NeMo Agent Toolkit
   - skills/aiq-deploy/
   - skills/aiq-research/
-  # NeMoClaw
+  # NemoClaw
   - skills/nemoclaw-user-guide/
   # Dynamo
   - skills/dynamo-router-starter/
