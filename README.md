@@ -235,16 +235,18 @@ NVIDIA/skills/
 │   │                              synced from upstream product repos
 │   ├── README.md                 # Browser-facing install guidance
 │   ├── <product-prefix>-*/       # Flat layout — one dir per skill, product-prefixed
-│   │                               # e.g. aiq-*, cuopt-*, cupynumeric-*, dali-*,
-│   │                               # deepstream-*, digital-health-*, dynamo-*,
-│   │                               # earth2studio-*, launch-nemo-rl, mcore-*,
+│   │                               # e.g. aiq-*, cufolio, cuopt-*, cupynumeric-*,
+│   │                               # dali-*, deepstream-*, dicom-*, digital-health-*,
+│   │                               # dynamo-*, earth2studio-*, holoscan-*, hsb-*,
+│   │                               # jetson-*, launch-nemo-rl, mcore-*,
 │   │                               # nemo-automodel-*, nemo-data-designer-plugin,
 │   │                               # nemo-evaluator-plugin, nemo-mbridge-* (20 skills),
 │   │                               # nemo-retriever, nemo-rl-* (4 skills),
-│   │                               # nemoclaw-user-* (10 skills), nemotron-*,
-│   │                               # physicsnemo-*, rag-*, skill-card-generator,
-│   │                               # tilegym-*, vss-* (15 skills),
-│   │                               # accelerated-computing-cudf, cudaq-guide
+│   │                               # nemoclaw-user-guide, nemotron-*, nemotron-speech,
+│   │                               # nv-* (medical AI), physicsnemo-*, rag-*,
+│   │                               # skill-card-generator, tao-*, tilegym-*,
+│   │                               # vss-* (15 skills), accelerated-computing-cudf,
+│   │                               # cudaq-guide
 │   ├── omniverse-*/              # Physical AI — manually staged (see manual-components.yml)
 │   └── physical-ai-*/            # Physical AI — manually staged
 ├── components.d/                # Product registry — one file per component, teams onboard here
