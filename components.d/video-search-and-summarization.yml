@@ -1,6 +1,6 @@
 name: Video Search and Summarization
 repo: NVIDIA-AI-Blueprints/video-search-and-summarization
-ref: develop
+ref: main
 description: VSS Blueprint — deploy profiles, search and summarize video, generate analysis reports, manage alerts and incidents, query VIOS sensors, and use the RTVI VLM microservice.
 skills:
   - path: skills/vss-ask-video/
