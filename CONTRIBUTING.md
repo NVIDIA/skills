@@ -5,7 +5,7 @@
 
 This repository is a catalog of NVIDIA-verified agent skills. Skills are maintained by each product team in their own repos.
 
-To contribute to a skill or propose a new one, use the contributing guidelines in the relevant source repo. See the [Available Skills](README.md#available-skills) and [Getting Help & Contributing](README.md#getting-help--contributing) sections in the README for links.
+To contribute to a skill or propose a new one, use the contributing guidelines in the relevant source repo. See the [Skill Catalog](README.md#skill-catalog) and [Getting Help & Contributing](README.md#getting-help--contributing) sections in the README for links.
 
 For changes to the catalog itself (fixing links, adding a new product listing), open a [pull request](../../pulls). For catalog-level bug reports, feature proposals, or documentation problems, file an [issue](../../issues/new/choose) using one of the catalog issue templates (Bug Report, Feature Request, Documentation Request or Correction). Questions and general discussion belong in [Discussions](../../discussions); security vulnerabilities follow the disclosure process in [SECURITY.md](SECURITY.md).
 
