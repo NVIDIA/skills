@@ -266,7 +266,7 @@
     },
     "validation_scope": {
       "type": "object",
-      "description": "Feeds directly into so-run-validators. Strict: these arrays are the handoff contract.",
+      "description": "Feeds directly into usd-optimize-run-validators. Strict: these arrays are the handoff contract.",
       "required": [
         "per_asset",
         "cross_component_pairs",
@@ -282,8 +282,40 @@
         },
         "cross_component_pairs": {
           "type": "array",
+          "description": "Enclosing/enclosed boundary pairs that scope the Tier-3 occlusion/overlap probe, referenced by boundary_id (see asset_boundary_suggestions.boundaries[] and usd-structure-assessment README §2.1 for how pairs are nominated and gated).",
           "items": {
-            "type": "string"
+            "type": "object",
+            "required": [
+              "enclosing_boundary_id",
+              "enclosed_boundary_id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "enclosing_boundary_id": {
+                "type": "string",
+                "description": "boundary_id of the enclosing boundary (spatial_role: enclosing)."
+              },
+              "enclosed_boundary_id": {
+                "type": "string",
+                "description": "boundary_id of the enclosed boundary (spatial_role: enclosed)."
+              },
+              "enclosure_opaque": {
+                "type": "boolean",
+                "description": "Optional opacity hint, not a required assertion. true = opaque enclosure (probe); false = transparent (skip — internals are visible); absent = unknown, in which case the pair is still probed and opacity is resolved during the Tier-3 material/geometry probe. SA must not assert this boolean when opacity is not determinable from material-binding metadata alone — omit it instead."
+              },
+              "probe": {
+                "type": "string",
+                "enum": ["spatial_occluded", "spatial_overlapping", "spatial_coinciding"],
+                "description": "Which Tier-3 spatial concept this pair scopes. Defaults to spatial_occluded."
+              },
+              "bbox_confirmed": {
+                "type": "boolean",
+                "description": "Optional informational confirmation that authored-extent overlap corroborated the nomination. Never gates whether the probe runs; absence does not retract the nomination."
+              },
+              "notes": {
+                "type": "string"
+              }
+            }
           }
         },
         "skip": {
@@ -307,28 +339,58 @@
       "type": "object",
       "additionalProperties": true
     },
-    "layer_health": {
-      "type": "object",
-      "additionalProperties": true
-    },
-    "scale_assessment": {
-      "type": "object",
-      "additionalProperties": true
-    },
     "asset_boundary_suggestions": {
       "type": "object",
-      "additionalProperties": true
-    },
-    "flagged_assets": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": true
+      "description": "Candidate asset/sub-asset boundaries for restructuring AND the boundary records occlusion nomination keys off. candidate_levels[] stay permissive; boundaries[] carries the nominated enclosing/enclosed product boundaries cross_component_pairs references by id. See usd-structure-assessment README §2.1 for the nomination model.",
+      "additionalProperties": true,
+      "properties": {
+        "boundaries": {
+          "type": "array",
+          "description": "Nominated boundaries (candidate_source 'hash' for repeated modules, 'semantics' for unique one-off enclosed products). Nomination is the primary occlusion signal; a hash nomination does NOT by itself create a pair — pairing requires an enclosing+enclosed spatial_role established from semantics/hierarchy (see README §2.1).",
+          "items": {
+            "type": "object",
+            "required": ["boundary_id", "prim_path", "candidate_source"],
+            "additionalProperties": true,
+            "allOf": [
+              {
+                "if": {
+                  "properties": { "candidate_source": { "const": "semantics" } },
+                  "required": ["candidate_source"]
+                },
+                "then": { "required": ["semantic_label"] }
+              }
+            ],
+            "properties": {
+              "boundary_id": {
+                "type": "string",
+                "description": "Stable id referenced by cross_component_pairs[].enclosing_boundary_id / enclosed_boundary_id."
+              },
+              "prim_path": {
+                "type": "string",
+                "description": "USD prim path of the nominated boundary root."
+              },
+              "candidate_source": {
+                "type": "string",
+                "enum": ["hash", "semantics"],
+                "description": "'hash' = subtree-hash dedupe group (duplicate-count >= 2). 'semantics' = kind/naming/discipline-container signal for a one-off enclosed product (requires semantic_label)."
+              },
+              "spatial_role": {
+                "type": "string",
+                "enum": ["enclosing", "enclosed", "standalone"],
+                "description": "Containment role. Required on any boundary referenced by a cross_component_pair: 'enclosing' = shell/housing, 'enclosed' = interior product. 'standalone' = no containment relationship."
+              },
+              "enclosure_opaque": {
+                "type": "boolean",
+                "description": "Optional opacity hint for an enclosing boundary (true=opaque, false=transparent, absent=unknown). Omit when opacity is not determinable from material-binding metadata alone; the Tier-3 probe resolves unknown opacity."
+              },
+              "semantic_label": {
+                "type": "string",
+                "description": "The kind/name/discipline signal that drove a candidate_source: semantics nomination (e.g. 'Engine', 'pump_housing', 'HVAC'). Required when candidate_source is 'semantics'."
+              }
+            }
+          }
+        }
       }
-    },
-    "variants_and_payloads": {
-      "type": "object",
-      "additionalProperties": true
     },
     "kind_hierarchy": {
       "type": "object",
@@ -343,12 +405,6 @@
       "items": {
         "type": "object",
         "additionalProperties": true
-      }
-    },
-    "recommended_next_actions": {
-      "type": "array",
-      "items": {
-        "type": "string"
       }
     }
   }

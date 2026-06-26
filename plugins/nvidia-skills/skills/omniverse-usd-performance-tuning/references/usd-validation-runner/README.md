@@ -5,21 +5,24 @@
 
 ## When to Use
 
-Use this reference for validation-only requests or when the performance workflow
-reaches Phase 2c, Phase 4d, Phase 6b, or an iteration that needs validation
-evidence.
+Use this reference when the performance workflow reaches Phase 2c (Tier 1
+whole-stage), Phase 4 (per-target Tier 2/3 + 4d re-verify), Phase 6b, or an
+iteration that needs validation evidence. Validators always run as phases of the
+one optimize+validate pipeline; there is no validate-and-stop entry.
 
 ## Instructions
 
-1. Identify whether the request is validation-only or a validation phase inside
-   the optimization workflow.
+1. Confirm which validation phase of the optimization workflow this is (Phase
+   2c, Phase 4, Phase 6b, or an iteration); validators run inside the pipeline,
+   not as a standalone validation-only request.
 2. Use structure assessment and profile evidence before selecting validators.
-   Do not instantiate a validator engine, import Scene Optimizer validators, or
+   Do not instantiate a validator engine, import Usd Optimize validators, or
    enumerate/run rules until a selected validation plan exists.
 3. Select the smallest validation stack that can change the user-visible
    decision or operation plan.
-4. Ask before any full Asset Validator sweep, Tier 3 expensive probe, or
-   expanded iteration scope.
+4. Ask before any full usd-validation-nvidia sweep, full-stage (un-scoped) Tier 3
+   probe, or expanded iteration scope. Scoped Tier 3 probes run without approval
+   (see the Tier 3 coverage rule and Hard Rule 4).
 5. Route execution to the owning validation reference or skill and preserve
    evidence paths for later reporting.
 
@@ -28,22 +31,22 @@ evidence.
 This runner is the single owner for validation scoping, full-sweep approval,
 large-stage thresholds, masked-stage spot-check policy, and selected-probe
 planning. Downstream validator references such as
-`references/validate-usd-asset-validator.md` consume the scope note and own
+`references/validate-usd-validation-nvidia.md` consume the scope note and own
 runtime invocation details only.
 
 ## Pre-flight Checklist
 
 Before running validators, confirm:
 
-- [ ] The workflow has SA `summary_counts`, `phase_recommendation`,
-   `validation_scope`, and `flagged_assets` unless this is a direct
-   validation-only request.
+- [ ] The workflow has SA `summary_counts`, `phase_recommendation`, and
+   `validation_scope` (always available, since validation runs as a pipeline
+   phase downstream of structural assessment).
 - [ ] The stage is classified for validation planning as small or large using
    the thresholds below.
 - [ ] The plan names selected rules and probes, why they were selected, why a
    full sweep was skipped or approved, and artifact paths.
 - [ ] Expensive checks and full sweeps have explicit user approval when needed.
-- [ ] Findings will be routed to `so-interpret-validators` for op-chain
+- [ ] Findings will be routed to `usd-optimize-interpret-validators` for op-chain
    construction; do not map findings to ops yourself.
 
 ## Output Format
@@ -52,7 +55,8 @@ Return a scoped validation plan or validation summary naming the selected
 validator stack, selected rules and probes, skipped expensive checks, approval
 gates, artifact paths, and findings that affect the optimization plan.
 
-For Phase 2c, also write a compact scope note matching
+For Phase 2c (whole-stage Tier 1) and for each Phase 4 target (per-target Tier
+2/3), write a compact scope note matching
 `scripts/validation-scope-note.schema.json`. Validators are named by **canonical
 concept**, not runtime class name:
 
@@ -93,13 +97,12 @@ skill attempts runtime probing or stage open.
 ## Prerequisites
 
 - Target stage or asset paths and resolver context.
-- Available validator runtime (Omni Asset Validator inside Kit, project-managed
-  AV install, or installed Scene Optimizer APIs).
+- Available validator runtime (Omni usd-validation-nvidia inside Kit, project-managed
+  AV install, or installed Usd Optimize APIs).
 - Artifact directory for logs, CSV/JSON findings, and provider summaries.
 - Baseline, waiver, or failure policy for pre/post processing gates.
 - For performance-stack scoping: `usd-structure-assessment` report with
-  `summary_counts`, `phase_recommendation`, `validation_scope`, and
-  `flagged_assets`.
+  `summary_counts`, `phase_recommendation`, and `validation_scope`.
 
 ## Session-start runtime gate
 
@@ -118,23 +121,33 @@ session, skip the gate and proceed.
 
 ---
 
-## Phase 2c Order: Scope Before Code
+## Validation placement: 2c (whole-stage) vs Phase 4 (per target)
 
-Phase 2c is **Phase-aware validation scope + selected probes**. It is not a
-default validator sweep.
+Validation is split by granularity, not run all at once:
 
-Required order:
+- **Phase 2c — whole-stage, pre-restructure.** Tier 1 cheap whole-stage
+  stats/probes plus the minimum-openability/structural checks that classify the
+  stage and feed the 2e restructure decision. This is not a default validator
+  sweep.
+- **Phase 4 — per target, post-restructure.** Tier 2 (per `phase4_targets[]`
+  entry) and Tier 3 (per flagged cross-component pair) run inside Phase 4's
+  per-target loop, on the actual restructured artifact, scoped to one
+  target/pair by construction. This is the primary model for per-target/per-pair
+  concepts — see **Post-Restructure / Post-Decompose Validation Strategy**.
+  (A pre-restructure Tier 2/3 diagnosis runs only on explicit user request.)
+
+Required order at 2c:
 
 1. Read Phase 1 profile and `usd-structure-assessment` output.
 2. Classify the asset as small or large for validation planning.
-3. Build the selected validation plan from `summary_counts`,
-   `phase_recommendation`, `validation_scope`, and `flagged_assets`.
+3. Build the Tier 1 + structural plan from `summary_counts`,
+   `phase_recommendation`, and `validation_scope`.
 4. Record the scope note/artifact.
-5. Only then run the selected rules or probes.
+5. Only then run the selected Tier 1 rules/probes.
 
 For monolithic `optimize-as-is`, the original stage remains the optimization
-target, but validation still follows this selected-scope policy. A monolithic
-target does not authorize a full sweep.
+target (Phase 4 target N=1), and its Tier 2/3 validation runs in the Phase 4
+loop like any other target. A monolithic target does not authorize a full sweep.
 
 ## Large for Validation Planning
 
@@ -149,7 +162,7 @@ Treat a stage as **large for validation planning** when any condition is true:
 
 Large-stage behavior:
 
-- Do not run a default full-stage Asset Validator or Scene Optimizer rule sweep.
+- Do not run a default full-stage usd-validation-nvidia or Usd Optimize rule sweep.
 - Ask before full sweep if the user explicitly wants exhaustive validation.
 - Prefer minimum-openability, Tier 1 cheap whole-stage stats/probes, targeted
   rules, Tier 2/3 subprocess runs with timeouts, or masked-stage
@@ -185,8 +198,8 @@ target; not a default AV all-rules sweep.
 
 ### Tier 2: Targeted Medium Probes
 
-Tier 2 registry concepts, run per flagged asset (or a bounded sample) in
-killable subprocesses.
+Tier 2 registry concepts, run per `phase4_targets[]` entry (or a bounded sample)
+in killable subprocesses, inside the Phase 4 per-target loop.
 
 ### Tier 3: Expensive Probes (evidence-gated, mandatory when flagged)
 
@@ -201,12 +214,22 @@ What is approval-gated is *cost*, not *coverage*:
 
 - **Scoped probe = default, no approval needed.** Restrict to the flagged
   paths/pairs with `paths=` / `Usd.Stage.OpenMasked()` and run in a bounded
-  subprocess with a timeout. This is the normal Tier 3 path.
+  subprocess with a timeout. This is the normal Tier 3 path — it runs in the
+  Phase 4 per-target loop, per flagged pair.
 - **Full-stage probe = approval-gated.** Only run the un-scoped, whole-stage
   version after the full-sweep approval gate.
 - **Timeout is a recorded disposition, not a skip.** If the scoped probe times
   out, record `timeout_recorded` and retry a masked/standalone sample — do not
   drop the target.
+
+**Analyze ≠ apply.** The scoped probe is *analysis* and is never gated on cost —
+it produces a candidate list only. That is the runner's own scoping rule, and it
+is all this section owns: scoped probes run without approval. Any destructive
+*apply* its findings motivate (e.g. `removePrims` of occluded interiors) is gated
+**separately** under the apply-authority model owned by
+`usd-optimize-run-operations/references/operation-safety.md` "Apply authority" — see that
+section for why the apply (not the probe) needs user intent and how it is
+surfaced. So "ask the user" attaches to the apply step, not to the probe.
 
 Every flagged Tier 3 target must end in a coverage-ledger disposition (see
 **Completion Gate**). "I skipped it because it was expensive" is not a valid
@@ -234,7 +257,7 @@ the structure-assessment and validator reports:
 | `usd-structure-assessment-report.schema.json` | `phase_recommendation` | Selects the default validation posture: `structuring`, `optimization`, or `already_optimized`. |
 | `usd-structure-assessment-report.schema.json` | `summary_counts.prim_count`, `summary_counts.mesh_count`, `summary_counts.prototype_count`, `summary_counts.instance_count`, `summary_counts.reference_count`, `summary_counts.payload_count` | Determines large-stage status and whether Tier 2/3 must run per target, sampled, or not at all. |
 | `usd-structure-assessment-report.schema.json` | `validation_scope.per_asset`, `validation_scope.cross_component_pairs`, `validation_scope.skip` | Defines the concrete target set for Tier 2 and Tier 3. |
-| `usd-structure-assessment-report.schema.json` | `flagged_assets`, `findings`, `hierarchy_dedupe.recommended`, `hierarchy_dedupe.top_candidates` | Supplies reasons to include targeted Tier 2 probes or to ask for Tier 3 probes. |
+| `usd-structure-assessment-report.schema.json` | `findings`, `hierarchy_dedupe.recommended`, `hierarchy_dedupe.top_candidates` | Supplies reasons to include targeted Tier 2 probes or to ask for Tier 3 probes. |
 | `validator-concepts.json` | `tier`, `cost_class`, `gpu_bound`, `scope_policy` per canonical concept | Single source of truth for a concept's tier and scope. Read it; do not restate tiers elsewhere. |
 | `rule-reference.md` | Validator signal → canonical concept → backing op | Interpretation map only (signal to concept to fix op). Carries no tier. |
 | `validation-report.schema.json` | `validators[].canonical_name`, `validators[].status`, `validators[].issues`, `summary.errorCount`, `coverage_ledger` | The canonical executor's own report — what ran (by canonical concept and resolved `(module, class_name)` identity) and what was found. Use it to narrow later iterations, not to widen scope silently. |
@@ -246,15 +269,15 @@ concept to a unique `(module, class_name)` identity at run time. Do not put
 runtime class names (`IndexedPrimvarChecker`), operation names, display labels,
 or category names (`Geometry`, `Usd:Performance`) in the plan — class names are
 not unique across providers and categories are lookup buckets, not approval
-scope. The registry's `preferred_provider` decides Scene Optimizer vs Asset
-Validator; performance tuning prefers the Scene Optimizer implementation.
+scope. The registry's `preferred_provider` decides Usd Optimize vs Asset
+Validator; performance tuning prefers the Usd Optimize implementation.
 
 ## Phase-Aware Defaults
 
 | `phase_recommendation` | Default scope |
 |---|---|
 | `structuring` | Minimum-openability + targeted structural blockers only. Do not validate geometry about to be restructured. |
-| `optimization` | Minimum-openability + Tier 1 cheap whole-stage stats/probes + Tier 2 on flagged targets or sample. Tier 3 scoped probes mandatory on flagged targets/pairs; full-stage Tier 3 after approval. |
+| `optimization` | **2c:** Minimum-openability + Tier 1 cheap whole-stage stats/probes. **Phase 4 (per target):** Tier 2 per `phase4_targets[]` entry; Tier 3 scoped probe mandatory per flagged cross-component pair. No full-stage Tier 2/3 default; whole-stage Tier 3 only on explicit user request. |
 | `already_optimized` | Minimum-openability + Tier 1 cheap whole-stage stats/probes only; ask before expanding. |
 | missing | Run structure assessment first. Do not begin with validators. |
 
@@ -268,20 +291,54 @@ add concepts that no row selects, and do not drop a concept a row selects. Tier
 and scope policy for each concept come from `validator-concepts.json` (the
 "Target" column states only the selection granularity, not the tier).
 
+**Execution phase follows the "Target" granularity:** **whole-stage** rows
+(the "Always" safety gate + the `optimization` whole-stage row) run at Phase 2c
+as Tier 1; **per-target / flagged-pair / flagged-subtree** rows run in the Phase
+4 per-target loop on the restructured artifact (target N=1 = the monolith when
+no restructure happened). The selection function is identical in both phases;
+only the artifact it runs against differs.
+
 | SA signal (condition) | Concepts selected | Target |
 |---|---|---|
 | Always (any `optimization`/`already_optimized` run) | `composition_missing_ref`, `material_path`, `material_dangling_binding`, `texture_bind`, `texture_normalmap` | whole-stage safety gate |
 | `phase_recommendation = optimization` | `material_duplicates`, `structure_empty_leaf`, `structure_invisible`, `structure_flat_hierarchy`, `extents_zero`, `perf_small_mesh`, `perf_sparse_mesh`, `perf_rtx_mesh_count`, `perf_redundant_timesamples`, `perf_high_vertex_count` | whole stage |
 | Asset posture is CAD / BIM / MEP / converted (e.g. Revit/HOOPS) | `primitive_fit` | per flagged target — **mandatory**, never dropped |
-| `flagged_assets[*]` primvar/UV signal | `primvar_indexability`, `primvar_unused` | per flagged asset |
-| `flagged_assets[*]` mesh-hygiene signal (welds/degenerate/winding) | `vertex_weld`, `topology_zero_area_faces`, `normals_winding` | per flagged asset |
+| Any `optimization` run — cheap, lossless/self-gating primvar cleanup (no flag required) | `primvar_indexability`, `primvar_unused` | per target or sample |
+| Any `optimization` run — geometry-intrinsic mesh hygiene (no flag required) | `vertex_weld`, `topology_zero_area_faces`, `normals_winding` | per target, executed at Phase 4 per `phase4_targets[]` |
 | `hierarchy_dedupe.recommended` or duplicate-geometry signal | `geom_duplicates` (+ `geom_duplicates_fuzzy` if near-duplicates) | flagged subtree |
-| `validation_scope.cross_component_pairs[*]` with `enclosure_opaque: true` | `spatial_occluded` | flagged pair — **mandatory** scoped probe |
+| `validation_scope.cross_component_pairs[*]` not explicitly transparent (`enclosure_opaque` true or unset) | `spatial_occluded` | flagged pair — **mandatory** scoped probe |
 | `validation_scope.cross_component_pairs[*]` (routing/overlap) | `spatial_overlapping`, `spatial_coinciding` | flagged pair — **mandatory** scoped probe |
 | Target is simulation-ready (physics/Boolean/3D-print), not visualization | `topology_manifold`, `normals_validity` | flagged target |
 
-If `validation_scope.skip` lists a target, it is excluded from all rows. If no
-asset is flagged, only the "Always" + whole-stage rows fire; ask before adding more.
+If `validation_scope.skip` lists a target, it is excluded from all rows. With
+**zero** flagged assets, the "Always" + whole-stage rows, the flag-independent
+per-target rows (cheap primvar cleanup, mesh hygiene), and the CAD/converted
+`primitive_fit` row all still fire; only the evidence-gated rows (Tier-3 spatial
+pairs, duplicate-geometry, sim-ready) stay empty when their signal is absent. Ask
+before adding concepts no row selects.
+
+**Why the primvar/mesh-hygiene rows are not flag-gated.**
+`primvar_unused`/`primvar_indexability` (lossless, self-gating UV/primvar cleanup)
+and the mesh-hygiene trio (`vertex_weld`, `topology_zero_area_faces`,
+`normals_winding`) are geometry-intrinsic, not spatial. SA is structural-only and
+reads no geometry arrays, so it cannot pre-flag a primvar/mesh-hygiene issue at
+all; gating their *selection* on any SA structural flag would make them
+unreachable on extent-only CAD — detection would silently never run. Selection is
+therefore
+evidence-independent (always, on any `optimization` run); the registry
+`cost_class: cheap` / `per_target_or_sample` policy still governs cost and
+granularity, and the *apply* step (lossless auto-apply for primvars;
+`meshCleanup` confirmation-gated) still governs whether a fix is written. The op
+being lossless is irrelevant if the concept is never selected to recommend it.
+
+`validation_scope.cross_component_pairs[*]` items are boundary-ID reference
+objects resolved through `asset_boundary_suggestions.boundaries[]`; SA owns how
+pairs are nominated (`candidate_source` hash OR semantics) and when `spatial_role`
+/ `enclosure_opaque` are set — see `usd-structure-assessment` §2.1. A pair is
+probed unless it is *explicitly* transparent (`enclosure_opaque: false`); `true`
+or unset (unknown) both schedule the mandatory Tier-3 probe, which resolves
+opacity. `bbox_confirmed` is informational confirmation only — it never gates
+whether the probe runs.
 
 ## Iteration Subtraction
 
@@ -303,20 +360,20 @@ silently disagree with an earlier one by re-expanding scope.
 ## Scoping Rules
 
 1. Structure assessment is the first filter. Use `summary_counts`,
-   duplicate-hierarchy candidates, `validation_scope`, and `flagged_assets` to
+   duplicate-hierarchy candidates, and `validation_scope` to
    decide which validators can change the optimization plan.
 2. **Which concepts to run is decided by Deterministic Selection above; tier and
    scope policy come from `validator-concepts.json`.** This section does not
    re-derive selection or tiering.
 3. Do not start performance work with a full default AV sweep.
-4. Keep SO analysis in the validation workflow. Importing SO validators makes
+4. Keep SO analysis in the validation workflow. Importing Usd Optimize validators makes
    rules discoverable; it does not authorize running all of them.
 5. For cross-component validators, use `Usd.Stage.OpenMasked()` covering only
    the flagged pair and dependency closures, or validate standalone target files.
 6. Do not run noisy/slow concepts globally in Phase 2c. Any registry concept
    that is `gpu_bound`, `cost_class: expensive`, or `stage_dependent` is scoped
    to flagged targets/pairs only — never a full-stage default.
-7. Category-scoped AV is still a scoped whole-stage traversal for that category.
+7. Category-scoped usd-validation-nvidia is still a scoped whole-stage traversal for that category.
    On large stages, ask before full sweep and prefer masked spot checks or
    bounded parallel subprocesses with timeouts.
 8. Prefer summaries over issue dumps. Apply
@@ -358,8 +415,8 @@ class_name)` via `references/validator-concepts.json`, enables exactly those
 rule classes (never `init_rules=True`), and opens the stage scoped. It is
 fail-closed by contract: unknown concept, ambiguous identity, unregistered rule,
 or missing runtime all raise — there is no bare-name lookup and no CLI fallback.
-This is what disambiguates the Scene Optimizer `IndexedPrimvarChecker` (fast
-triage) from the Asset Validator one (full audit) that share a class name.
+This is what disambiguates the Usd Optimize `IndexedPrimvarChecker` (fast
+triage) from the usd-validation-nvidia one (full audit) that share a class name.
 
 ```python
 from usd_validation_executor import (
@@ -449,6 +506,9 @@ tags, mesh coverage percentage, and evidence scope.
 
 ## Post-Restructure / Post-Decompose Validation Strategy
 
+This is the **primary model** for Tier 2/3 (per-target/per-pair) validation, not
+an exception: it runs inside the Phase 4 per-target loop after restructure.
+
 After `apply-restructure` or `decompose-for-selective-loading` produces an
 assembly root plus payload/prototype files, do not open the full composed stage
 with all payloads loaded for a blanket validator sweep.
@@ -467,9 +527,9 @@ with all payloads loaded for a blanket validator sweep.
 Each target re-enters this runner independently; approval gates and spot-check
 thresholds apply per target, not to the original composed stage.
 
-## Asset Validator Load Rules
+## usd-validation-nvidia Load Rules
 
-The Asset Validator's `ComplianceChecker` opens a new stage from the input's
+The usd-validation-nvidia's `ComplianceChecker` opens a new stage from the input's
 root layer with default `LoadAll` semantics. Caller `StageLoadRules` such as
 `LoadNone` are discarded. `StagePopulationMask` is preserved, so
 `Usd.Stage.OpenMasked()` is the reliable scoping mechanism.
@@ -478,7 +538,7 @@ Do not rely on `LoadNone` or `stage.Load(specific_path)` for validation
 scoping. Use `OpenMasked` or validate standalone payload/prototype files.
 
 For small/medium stages, use the standard selected validation plan via
-`so-run-validators`, but keep the same tier execution model: Tier 1 may batch;
+`usd-optimize-run-validators`, but keep the same tier execution model: Tier 1 may batch;
 Tier 2 and Tier 3 use bounded subprocesses.
 
 ## Validation Plan Shape
@@ -493,11 +553,20 @@ Checks**.
 
 | Intent | Stacks |
 |---|---|
-| Validate this USD before mutation | Pre-mutation USD stack: minimum-openability plus targeted Asset Validator coverage when needed. |
+| Validate this USD before mutation | Pre-mutation USD stack: minimum-openability plus targeted usd-validation-nvidia coverage when needed. |
 | Broad performance ask | `usd-structure-assessment` first, then selected performance stack per this runner. Add pre-mutation USD stack only when validity affects mutation safety. |
 | Run perf validators only | Performance stack only, selected from SA evidence or the user's explicit target list. |
-| Validate optimized output | Same or narrower stacks than Phase 2c for fair comparison unless the user approves expansion. |
-| Formal conformance/exhaustive validation | Ask before full sweep, then route through the selected AV/runtime with explicit timeout and artifacts. |
+| Validate optimized output | Phase 4 re-verify per target (4d) + the Phase 2c Tier 1 whole-stage re-run in Phase 6b for a fair stage-level comparison; same-or-narrower unless the user approves expansion. |
+| Formal conformance/exhaustive validation | Ask before full sweep, then route through the selected usd-validation-nvidia/runtime with explicit timeout and artifacts. |
+
+Doc ownership for each stack (read the owning doc before writing commands):
+
+- Pre-mutation USD stack -> `references/validate-usd-validation-nvidia.md`.
+- Performance stack (Usd Optimize validator execution) -> `references/usd-optimize-run-validators/README.md`.
+- Turning validator findings into operations -> `references/usd-optimize-interpret-validators/README.md`.
+- Concept selection / tiers / scope notes -> this README plus
+  `references/validator-concepts.json` (registry; tiers live only there).
+
 
 ## Required Gates
 
@@ -526,7 +595,7 @@ phase scoping so Phase 6 and Phase 7 can reproduce or narrow it.
 
 1. Never run all validators on all assets by default.
 2. Never use `ValidationEngine()` or `ValidationEngine(init_rules=True)` after
-   SO validator registration unless exhaustive validation was approved.
+   Usd Optimize validator registration unless exhaustive validation was approved.
 3. Never run Tier 3 without structural evidence from the assessment.
 4. When SA flags a Tier 3 target, the **scoped** probe is mandatory and needs no
    approval; ask only before the **full-stage** version. Silent omission of a
@@ -546,16 +615,16 @@ phase scoping so Phase 6 and Phase 7 can reproduce or narrow it.
 
 - If `omni_asset_validate` is unavailable, record it as missing rather than
   fabricating a pass.
-- If Scene Optimizer validator imports fail, do not report SO-specific results.
+- If Usd Optimize validator imports fail, do not report Usd Optimize validator results.
 - If the bundled `validator-venv` is slow or lacks dependencies, prefer a Kit or
-  project-managed Asset Validator environment.
+  project-managed usd-validation-nvidia environment.
 - Named validator unavailable: record the gap and choose the nearest supported
   source only when it answers the same scoped question.
 
 ## References
 
-- `references/validate-usd-asset-validator.md` - Asset Validator runtime
+- `references/validate-usd-validation-nvidia.md` - usd-validation-nvidia runtime
   invocation details.
-- `skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/so-run-validators/references/infrastructure.md` - SO validator infrastructure.
+- `skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-run-validators/references/infrastructure.md` - Usd Optimize validator infrastructure.
 - `skills/omniverse-usd-performance-tuning/references/workflow.md` - canonical
   7-phase flow context for where validation sits.

@@ -36,13 +36,13 @@ or had no measurable effect.
 Before reporting the verdict, prepend the **compact one-liner** from
 `skills/omniverse-usd-performance-tuning/references/setup-usd-performance-tuning/references/runtime-context-header.md` (Format B). The verdict is only
 reproducible against the runtime that produced it; users reading the verdict
-later need to know which Kit / Scene Optimizer / Asset Validator versions
+later need to know which Kit / Usd Optimize / usd-validation-nvidia versions
 were in effect. Read from the `runtime_context` block in
 `<output_path>/setup-preflight.json` (canonical location; see
 `skills/omniverse-usd-performance-tuning/references/setup-usd-performance-tuning/references/runtime-context-header.md` *Where artifacts live*).
 
 ```
-[Kit: {runtime_context.kit.application} {runtime_context.kit.version}  |  SO: {runtime_context.sceneOptimizer.version}  |  AV: {runtime_context.assetValidator.version}]
+[Kit: {runtime_context.kit.application} {runtime_context.kit.version}  |  SO: {runtime_context.usdOptimize.version}  |  AV: {runtime_context.assetValidator.version}]
 ```
 
 If a profile capture spans more than one runtime (rare — usually means the
@@ -144,7 +144,7 @@ If any metric regressed >5%:
 1. Report which metric regressed and by how much.
 2. Correlate with what changed — did file size grow? Did prim count increase?
 3. Check for known causes:
-   - Size regression after SO operations → likely USDC `Layer.Save()` bloat
+   - Size regression after Usd Optimize operations → likely USDC `Layer.Save()` bloat
      (see `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/usd-edit-target-planner/references/output-saving.md`).
    - Load time regression after adding instancing → unexpected, investigate
      prototype count vs instance count ratio.
@@ -163,7 +163,7 @@ omniverse-usd-performance-tuning
 → usd-validation-runner (master router; uses skills/omniverse-usd-performance-tuning/references/usd-validation-runner/README.md for tier detail and selected-probe policy)
 → restructure-decision (Phase 2e gate)
 → instancing-readiness (if applicable)
-→ SO operations / instancing
+→ Usd Optimize operations / instancing
 → apply-restructure (Phase 5 ref-remap)
 → profile-stage (AFTER)
 → compare-profiles

@@ -3,7 +3,7 @@
 
 # Runtime Artifact Token Budget
 
-Use this policy whenever a skill launches Kit, Asset Validator, Scene Optimizer,
+Use this policy whenever a skill launches Kit, usd-validation-nvidia, Usd Optimize,
 Tracy, or any helper wrapper that can produce large stdout, stderr, logs, CSVs,
 or traces.
 
@@ -15,8 +15,8 @@ logs or issue dumps into the agent context.
 High-risk artifacts include:
 
 - Kit launch stdout/stderr and extension startup logs.
-- Asset Validator CSVs with one row per issue.
-- Scene Optimizer `run.log`, verbose operation logs, and analysis payloads.
+- usd-validation-nvidia CSVs with one row per issue.
+- Usd Optimize `run.log`, verbose operation logs, and analysis payloads.
 - Tracy CSV exports, `.tracy` captures, and frame/zone dumps.
 - Any file that may contain thousands of rows, repeated prim paths, or stack
   traces.
@@ -81,7 +81,7 @@ operation parameters).
 ### Scope
 
 Applies to:
-- Scene Optimizer CLI / `run.py` invocations
+- Usd Optimize CLI / `run.py` invocations
 - Kit / `kit --exec` script launches
 - Standalone `python -m` USD processing scripts
 - Any subprocess where `from pxr import ...` is in play

@@ -79,7 +79,7 @@ Collect from prior steps:
   `<output_path>/setup-preflight.json` verbatim (canonical location; see
   `skills/omniverse-usd-performance-tuning/references/setup-usd-performance-tuning/references/runtime-context-header.md` *Where artifacts live*). The
   report must record exactly which Kit
-  application, Scene Optimizer version, and Asset Validator version produced
+  application, Usd Optimize version, and usd-validation-nvidia version produced
   the result so a later reader can reproduce or audit the run.
 - **Measurement context** — for the stage/composition measurements used in the
   score.
@@ -141,14 +141,14 @@ Structure:
       "path": "D:\\build\\chk\\usd_composer-fat\\110.1.0+main.…\\kit",
       "build": "110.1.0+main.10181.f4b28ef2.gl.windows-x86_64.release"
     },
-    "sceneOptimizer": {
+    "usdOptimize": {
       "extension": "omni.scene.optimizer.core",
       "version": "110.0.4"
     },
     "assetValidator": {
       "package": "omniverse-asset-validator",
       "version": "1.x.y",
-      "source": "kit-extension"
+      "source": "pip"
     }
   },
   "optimization_score": 7.8,
@@ -277,7 +277,7 @@ plus a `complete` boolean — to mirror the validation report rather than nestin
   or unresolved target keeps `complete` false and the report is not final.
 - `skipped_zero_meshes` is valid only when `mesh_count == 0` (the default-predicate
   count). A non-zero target cannot be skipped.
-- A diagnosis-only / optimize-as-is run with no Phase-4 work is valid with
+- A `no_op` / optimize-as-is run with no Phase-4 work is valid with
   `entries: []` and `complete: true`. A `monolith`-only run records its single
   target and needs no manifest.
 
@@ -317,6 +317,39 @@ NVIDIA/omniperf. This report is the consumer; the producer contract is:
   and any measurement caveat in `runtime_profiling.caveat`.
 - Keep these values out of `metric_groups[]` and `metrics[]` so the stage score
   stays composition-only while the runtime numbers remain visible in the report.
+
+## Footprint attribution (repack-normalized baseline)
+
+Disk-size headlines are only honest once the **free crate re-encode** is split
+out from the **structural optimization**. An in-place `Save()` does not compact
+a USDC; an `Export()` does — so any export already shrinks the file before a
+single mesh op runs. Attributing that whole compaction to dedupe/instancing
+double-counts the repack (on a large-asset run the apparent footprint headline
+was really a large free re-crate plus a smaller actual structural win off the
+re-crated baseline; a binding-only re-export with zero dedupe already accounted
+for a substantial fraction of the apparent saving).
+
+When the run makes any footprint claim, populate the optional top-level
+`footprint` block and **report all three sizes**:
+
+- `raw_input_bytes` — the input as delivered (total referenced footprint).
+- `repack_normalized_baseline_bytes` — the input losslessly re-crated to the
+  same target encoding / USD version with **zero dedupe**. This is the baseline.
+- `optimized_bytes` — the optimized output.
+
+and **attribute the split** with `repack_delta_pct` (raw → normalized; the free
+re-encode), `structural_delta_pct` (normalized → optimized; the real win), and
+optionally `raw_delta_pct` (raw → optimized; the total disk saving the user
+observes). Set `scored_against: "repack_normalized"`.
+
+**Score and gate against the normalized baseline.** The storage dimension of the
+Stage Optimization Score and the report's footprint scoring both measure
+`structural_delta_pct`, not the raw headline — so the report measures the
+*skill*, not USD's crate writer. `validate_report.py` checks the arithmetic and
+**fails closed** when the only reduction is the repack (structural shrink ≈ 0
+off the normalized baseline while raw → optimized shows a saving): presenting a
+repack — or an unshared disaggregation — as the optimization win is a
+fail-closed reporting error.
 
 ## Markdown template
 
@@ -408,6 +441,10 @@ present); Metric Evidence; Operations; and Validators.
   `layer_count`, `total_vertices`, `total_attributes`, material counts) as
   stage/composition evidence. Treat file size carefully: compare total
   referenced footprint, not root-layer size only.
+- For any footprint claim, normalize against the repack baseline (see *Footprint
+  attribution* above): score `structural_delta_pct` (vs the re-crated baseline),
+  not the raw headline, and never present a crate repack or an unshared
+  disaggregation as the optimization win.
 - Generate HTML by invoking `references/report-templates/render_preview.py`
   with `--fixture` pointing to the report JSON and `--output` for the HTML path.
   Never write HTML directly — always use the renderer (see *HTML Generation* above).

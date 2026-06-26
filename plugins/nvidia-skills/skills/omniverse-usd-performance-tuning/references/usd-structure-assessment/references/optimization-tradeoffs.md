@@ -114,9 +114,9 @@ Monolithic baseline
 
 3.7 GB ↓
 
-469158 ↓
+~470k ↓
 
-3664
+~3.7k
 
 Disaggregated Structure
 
@@ -128,9 +128,9 @@ Disaggregated Structure
 
 3.5 GB
 
-192479
+~190k
 
-11488
+~11k
 
 Component + subcomponent library packaging
 
@@ -142,7 +142,7 @@ Component + subcomponent library packaging
 
 3.5 GB ↑
 
-192455 ↑
+~190k ↑
 
 8 ↑
 

@@ -10,7 +10,7 @@ read-only output of `skills/omniverse-usd-performance-tuning/references/usd-stru
 ## 1. Purpose
 
 Rewrite repeated local USD sub-hierarchies into shared prototype assets and
-references. This is a USD authoring tool, not a Scene Optimizer operation.
+references. This is a USD authoring tool, not a Usd Optimize operation.
 
 Use this behavior spec to author the rewrite with `pxr.Sdf`, `pxr.Usd`, and,
 when running inside Kit, the same rule-pipeline discipline used by Isaac Sim
@@ -100,6 +100,46 @@ Use `Sdf.CopySpec` for spec copying and `Usd.Prim.GetReferences().AddReference`
 or direct `Sdf.Reference` list edits for references. Do not flatten the whole
 stage unless the user has accepted the loss of composition structure.
 
+## 5a. Nested prototype library is the default (not flat / outermost-only)
+
+Externalized sharing is authored **bottom-up as a nested library**: author each
+leaf/subcomponent prototype once, and have **parent prototypes *reference* their
+child prototypes rather than inlining them**. Flat or outermost-only sharing
+(every shared prototype a self-contained copy of its whole subtree) re-stores the
+shared children once per parent and is **explicitly insufficient** — on a large
+data-center assembly asset it left disk *larger* than the original, where the
+nested library instead recovered a substantial disk reduction. The
+`nested_parent_proto` manifest field records the parent→child link for each
+nested prototype.
+
+- **Inclusion floor.** Only units at/above the band-resolved minimum-prim floor
+  (`MINP`, evidence-seeded ≈20 prims with occurrence ≥2) join the nested library.
+- **Sub-floor leaves stay inline on purpose.** Tiny recurring leaves (screws,
+  connectors) are **kept inline** (`kept_inline_for_merge`) so a later
+  within-prototype mesh-merge can fuse them; instancing them finely bakes in a
+  granularity the merge pass would have to tear back down (see the
+  instancing-granularity-vs-merge rule). They are the irreducible cross-module
+  residual, not a defect.
+- **Variant / outlier behavior.** When a structural group is mostly identical
+  with a few real value-variants (e.g. `[17, 1]`), author **one prototype for the
+  identical majority** and keep the outlier distinct — then **recurse only into
+  the outlier's differing branches**, instancing the sub-modules it shares with
+  the majority so only its genuine difference stays distinct. Do not author N
+  distinct prototypes for N near-identical copies, and do not merge the real
+  variant into the majority.
+
+## 5b. Read the existing structure as input (resume, don't restart)
+
+Many inputs arrive **already partway down** the hierarchy — already-instanced
+scenes, BIM/CAD exports carrying authored prototypes, references, and `kind`.
+Before proposing a rewrite, **inspect the existing composition first**: existing
+instancing, prototypes, references, and `kind`. Treat **existing prototypes as
+the candidate set at that level** and apply the same value-variant grouping
+(one prototype per genuine variant) to them — including **collapsing prototypes
+that are byte-identical but were authored separately**. This is the *same*
+descent and the *same* dedup entered at the level the asset is already at, not a
+separate code path; the boundary and stop rules are unchanged from there.
+
 ## 6. Material Inlining
 
 Cross-boundary material relationships are common in CAD and digital twin
@@ -171,12 +211,73 @@ Report:
 - estimated prim-count reduction from the candidate report, clearly labeled as
   an estimate until post-write profiling confirms it
 
-## 9. Relationship to Scene Optimizer
+## 9. Relationship to Usd Optimize
 
-After the hierarchy rewrite, Scene Optimizer can still be used on the resulting
-prototype assets:
+After the hierarchy rewrite, Usd Optimize can still be used on the resulting
+prototype assets. **Open each prototype as its own root layer** (the edit-target
+invariant — see `restructure-mode.md`); SO's edit target must *be* that file's
+bytes, never the composed assembly.
 
-- Run `deduplicateGeometry` inside each prototype asset to catch mesh-level
-  duplicates.
-- Run `optimizeMaterials`, `computeExtents`, and other lossless cleanup on the
-  prototype assets or new assembly root as appropriate.
+- **Per-prototype op chain: `meshCleanup → deduplicateGeometry → computeExtents`.**
+  Run it inside each prototype asset (mesh-level dedup is last-mile cleanup, not
+  the structuring move).
+- **Within-prototype mesh merge (draw-call / scene-graph reduction), when intended.** A mesh merge
+  fuses many small meshes into one. It is a **draw-call / scene-graph**
+  win, NOT a disk win — merge concatenates geometry (bytes ~= sum, and
+  the crate already byte-dedups within a layer, so it can be *worse* for instanced
+  geometry). Run merge as a **within-prototype** operation (`merge once, benefit N
+  times` across every instance), never *across* an instance boundary. Op-chain
+  pattern: **`merge` (within-prototype) → vertex weld where geometry is contiguous
+  → `computeExtents`**. The weld tail is **conditional** (a no-op for dispersed
+  meshes), must respect **UV seams and hard normals** (weld only coincident verts
+  within tolerance), and any bytes it reclaims are credited to **the disk tier via the
+  measured weld/dedup source (`disk_win_source: vertex_weld`)** — **never** attributed
+  to the merge. See the **merge-eligibility guard** below before fusing anything.
+  The **(scope × material) grouping mechanic, the GeomSubset fallback, and the
+  archetype-gated merge depth** that execute the manifest `merge` disposition live
+  in the dedicated `mesh-merge-rewrite-spec.md` (sibling to
+  `point-instancer-rewrite-spec.md`); this section owns the per-prototype op-chain
+  placement and the eligibility guard it cites.
+- **`pruneLeaves` is stage-level cleanup, not part of the per-prototype chain.**
+  Guard it against **unloaded payloads**: a prim whose payload is not loaded
+  composes no children, so it presents as an empty leaf and is silently pruned.
+  Never run `pruneLeaves` over prims with unloaded payloads (load them first, or
+  scope the op away). See `operation-safety.md` § Caveat: `pruneLeaves` on unloaded
+  payloads, and `ref-remap-mode.md` § Stage-Level Cleanup.
+- **Persist with a compacting `Sdf.Layer.Export(tmp) + atomic replace`, not
+  `layer.Save()`.** `Save()` appends without garbage-collecting dedup-orphaned
+  arrays and silently grows the file; `Export` recompresses and GCs.
+- Run `optimizeMaterials` and other lossless cleanup on the prototype assets or
+  new assembly root as appropriate.
+- **Lossless dead-data removal (own pass after the geometry chain).** The
+  geometry chain shares duplicates but does not shrink disk; the disk lever is
+  removing data nothing consumes. The most common case is an **unused UV set**:
+  when no material samples a texture coordinate, `primvars:st` (and its indices)
+  is dead weight, and primvars usually dominate the bytes — removing it can be the
+  single biggest lossless saving. This step is **fail-closed**: delete a primvar
+  only after **proving zero consumers** (no `UsdUVTexture` / `UsdPrimvarReader`,
+  no MDL, no shader input reads it) and gate by archetype — a **textured or
+  scanned asset keeps its UVs**. Persist with the same `Export`-compact step.
+
+### Merge-eligibility guard (bounds coherence)
+
+Only merge **spatially-coherent clusters** of meshes. Do **NOT** merge spatially
+**dispersed** geometry: fusing dispersed meshes produces one oversized/overlapping
+AABB that **degrades BVH/raytracing** — false ray–box hits and worse culling — so
+the runtime gets *slower* even though the draw-call count dropped.
+
+Gate the decision on `merge_bounds_coherence` = merged-prim AABB surface area ÷
+Σ(member AABB surface area). A value near `1` means the members were adjacent (a
+real draw-call win); a value far above `1` means they were dispersed. **Do not
+merge when it would exceed `K` (default `2.0`).** This is the same threshold the
+report scoring enforces (the `MERGE_BOUNDS_COHERENCE_MAX` constant in the optimization-report scorer):
+a merge that lands `merge_bounds_coherence > K` earns **no scene-graph credit**, so a
+dispersed merge is both wrong to perform and unscored.
+
+Merge also requires **weak/none identity** (the disposition matrix's two
+identity-destroying rows). Never merge a strong-identity, addressable
+`component`/`subcomponent` — that destroys per-part selectability/serviceability
+and fails the preservation gate (`merge_identity_class` must be `weak` or
+`none`). `merge` (`mergeStaticMeshes`) is a cataloged, intent-gated Usd Optimize
+op; it stays available — this guidance bounds *when* it is eligible, it does not
+remove it.

@@ -5,14 +5,14 @@
   "timestamp": "2026-05-28T00:00:00Z",
   "verdict": "neutral",
   "workflow_mode": "structural_only",
-  "notes": "Scene Optimizer was unavailable in the selected runtime and the user declined install, so the workflow ran in structural-only mode: structure assessment plus pre-mutation USD validation only. No mesh operations executed and no optimized stage was written, so the verdict is neutral. FPS, frame time, and VRAM are unmeasured; re-run Phase 1a/6a in full mode under Kit / USD Composer / Isaac Sim to graduate the verdict.",
+  "notes": "Usd Optimize was unavailable in the selected runtime and the user declined install, so the workflow ran in structural-only mode: structure assessment plus pre-mutation USD validation only. No mesh operations executed and no optimized stage was written, so the verdict is neutral. FPS, frame time, and VRAM are unmeasured; re-run Phase 1a/6a in full mode under Kit / USD Composer / Isaac Sim to graduate the verdict.",
   "optimization_score": 5.0,
   "score_scope": "stage_optimization",
   "score_label": "neutral",
-  "reasoning": "Scene Optimizer could not be loaded, so no mutation was attempted. Structure assessment characterized the stage and pre-mutation USD validation ran, but without SO there is no optimized output to compare against the baseline. The score reflects a neutral, no-change result rather than a measured optimization win.\n\nThe report documents the runtime blocker and the next capture needed so a later full-mode run can produce a real before/after verdict.",
+  "reasoning": "Usd Optimize could not be loaded, so no mutation was attempted. Structure assessment characterized the stage and pre-mutation USD validation ran, but without Usd Optimize there is no optimized output to compare against the baseline. The score reflects a neutral, no-change result rather than a measured optimization win.\n\nThe report documents the runtime blocker and the next capture needed so a later full-mode run can produce a real before/after verdict.",
   "measurement_context": {
     "profile_mode": "quick USD composition profile",
-    "runtime": "standalone USD Python (no Scene Optimizer)",
+    "runtime": "standalone USD Python (no Usd Optimize)",
     "score_scope": "stage/composition metrics only"
   },
   "runtime_profiling": {
@@ -43,7 +43,7 @@
       "score": 5.0,
       "status": "measured",
       "weight": 50,
-      "summary": "Pre-mutation USD validation ran; SO performance rules skipped (SO unavailable)."
+      "summary": "Pre-mutation USD validation ran; SO performance rules skipped (Usd Optimize unavailable)."
     }
   ],
   "metrics": [

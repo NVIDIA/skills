@@ -84,7 +84,7 @@ mandatory defaults are:
 | Knob                          | Default       | Rationale                                      |
 | ---                           | ---           | ---                                            |
 | `ROOT`                        | `"/"`         | Whole stage; user almost always narrows it.    |
-| `HASH_LEVEL`                  | `3`           | Values matter for real dedup; samples don't usually distinguish identical assets. |
+| `HASH_LEVEL`                  | `2`           | Structure (types + names + attr names/types, no values) finds repeated NAMED subtrees cheaply for the broad Phase-2b sweep. Escalate to `3` to fold in values and CONFIRM / split near-duplicates (the value digest is byte-based, so level 3 is an affordable confirmation pass, not a whole-stage cost); `4` splits on samples / relationship targets. |
 | `MIN_SUBTREE_PRIMS`           | `3`           | Single-prim "groups" are noise.                |
 | `MIN_DUPLICATE_COUNT`         | `2`           | The minimum that "duplicate" can mean.         |
 | `TOP_N`                       | `25`          | Fits in one screen of console output.          |
@@ -200,6 +200,60 @@ substitution function must be:
   realistic USD content (sha256 or stronger).
 
 ## 6. Duplicate detection
+
+### 6.0 Identity first — the hash confirms reuse, it does not pick the grain
+
+This finder is a **read-only reuse-confirmation** pass, not a boundary finder.
+Run it on the **identity-marked candidate units** the agent has already
+identified — `kind`-tagged `component`/`subcomponent` scopes, meaningfully named
+scopes (`assetInfo` / display name / variant set), or the semantic real-world
+unit — *not* on raw subtrees chosen by the hash. The hash then **confirms** which
+of those meaningful units actually repeat and **partitions value-variants**
+(§6.3); it must never be the thing that *chooses* the grain. Letting the hash
+choose the grain is exactly the failure mode that over-shares at the mesh level
+(on a large data-center assembly asset this produced orders of magnitude more
+mesh arcs than the handful of named subcomponents that actually repeat).
+
+The one exception is a **structural fallback** for assets with no authored
+identity at all: where `kind`, names, and semantics are silent, the repetition
+pattern may *propose* the **coarsest repeating subtree** as a grain — recorded as
+`grain_source = structural_fallback` — while still stopping at that coarsest unit
+and **never descending the grain to leaves**. With identity present,
+`grain_source = identity`.
+
+The deterministic disposition step (externalization cutoff, value-variant
+partition, non-overlapping frontier, two-axis disposition, arc-count contrast)
+is shipped as a co-located script — `select_frontier.py` (alongside this finder in
+`scripts/`) — which consumes
+this finder's grouped, identity-marked candidates and emits the frontier targets
+that drop into the apply-restructure manifest. The finder hashes; the decision
+core decides; the agent authors.
+
+That handoff is executable, not just conceptual. Running the finder with
+`--emit-candidates` prints the `candidates[]` packet in exactly the schema
+`select_frontier.py` reads, so the two tools pipe directly:
+
+```
+python3 instance_candidate_finder.py <stage.usd> --emit-candidates \
+  | python3 select_frontier.py -
+```
+
+One reported group becomes one candidate. Because the candidate hash already
+folds in attribute values at `HASH_LEVEL >= 3`, genuine value-variants land in
+SEPARATE groups (one prototype per variant), so each candidate carries
+`structure_hash == value_hash`; lower the `HASH_LEVEL` to merge near-variants
+into one structural family. `identity_signal` is set from the AUTHORED USD
+`kind` on each group's root — absent any authored identity the candidate is
+emitted as the explicit `structural_fallback` grain (the §6.0 exception), never
+a hash-invented strong identity. The agent may refine `identity_signal` to
+`naming` / `semantic` on the emitted packet before the pipe.
+
+There is no separate "reuse analyzer" beyond this finder: the identity-first
+reuse analysis is just this finder run with `ROOT` set to each identity-marked
+candidate boundary, re-run as the descent re-enters each level (and *resuming*
+from the level an already-instanced / BIM-CAD input already sits at — see the
+recursive descent and resume-from-existing rules in
+`skills/omniverse-usd-performance-tuning/references/workflow.md` Phase 2).
 
 ### 6.1 Full hash
 Computed once per prim, post-order (children-first), and memoized so each
@@ -683,3 +737,12 @@ any framework.
   attribute author-order invariance, `INCLUDE_ATTRIBUTE_CONNECTIONS`
   monotonicity, unreadable attribute, and out-of-range config rejection.
 - **rev 1** — Initial draft.
+
+## Coverage limit (field-measured)
+
+Shallow subtree hashing misses depth-3+ duplicates. On a large data-center CAD
+stage (hundreds of MB, hundreds of thousands of prims), a shallow heuristic
+surfaced only a small fraction of the dedupe-candidate coverage that the
+full-tree (Merkle) pass in the shipped finder reached. Treat any non-full-tree
+shortcut as a triage signal only; candidate-quality claims must come from the
+full-tree pass.

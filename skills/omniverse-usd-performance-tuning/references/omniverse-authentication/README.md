@@ -21,7 +21,7 @@ Return a concise status or report that names the input, selected runtime or evid
 ## Purpose
 
 Use this before opening `omniverse://` assets from Kit, USD Python, validators,
-or Scene Optimizer operations.
+or Usd Optimize operations.
 
 Confirm the agent can access the remote stage and explain any authentication
 side effects. A browser window or SSO prompt is expected on first access and is

@@ -17,7 +17,7 @@ This is invoked as a section of `usd-structure-assessment` SA Stage 1 (compositi
 
 This reference is the canonical guidance for composition auditing. It produces findings consumed by:
 
-- The umbrella `usd-structure-assessment` JSON shape (the agent's day-to-day output) - composition findings appear under that report's `composition`, `assets`, and `layer_health` sections (see `usd-structure-assessment/README.md` Output section).
+- The umbrella `usd-structure-assessment` JSON shape (the agent's day-to-day output) - composition findings appear under that report's `composition` and `assets` sections (see `usd-structure-assessment/README.md` Output section).
 - The standalone `../scripts/audit-report.schema.json` shape, which is preserved for tools and pipelines that consume composition-only audit output without the full SA umbrella. Treat `audit-report.schema.json` as a sub-shape: the SA report is a superset that includes (and may inline) the audit-report fields.
 
 When in doubt, write the SA umbrella shape - the audit-report subset is recoverable from it.
@@ -38,7 +38,7 @@ When in doubt, write the SA umbrella shape - the audit-report subset is recovera
 
 - Treat unresolved asset paths, unloaded payloads, and ambiguous generated layers as blockers or open questions in the report.
 - If no safe edit target is obvious, hand off to `usd-edit-target-planner` instead of guessing.
-- For data-heavy `.usda` or runtime `.usdz` inputs, call out the packaging risk before Scene Optimizer handoff.
+- For data-heavy `.usda` or runtime `.usdz` inputs, call out the packaging risk before Usd Optimize handoff.
 
 ## Examples
 
@@ -68,8 +68,8 @@ When in doubt, write the SA umbrella shape - the audit-report subset is recovera
 - Processor blockers.
 - Candidate edit targets.
 - Payloads or variants requiring separate coverage.
-- Evidence needed before Scene Optimizer handoff.
-- **Referenced asset manifest** - a list of unique asset layer paths that contain geometry or material data via references or payloads. Downstream skills (`usd-edit-target-planner`, `apply-restructure`, Scene Optimizer handoff) need this list to plan per-asset optimization.
+- Evidence needed before Usd Optimize handoff.
+- **Referenced asset manifest** - a list of unique asset layer paths that contain geometry or material data via references or payloads. Downstream skills (`usd-edit-target-planner`, `apply-restructure`, Usd Optimize handoff) need this list to plan per-asset optimization.
 
 ## Output
 

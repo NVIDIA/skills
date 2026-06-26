@@ -1,0 +1,1443 @@
+{
+  "$comment": "SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.\nSPDX-License-Identifier: Apache-2.0",
+  "schema": "scene_optimizer_operation_catalog",
+  "source": "Usd Optimize operation catalog; single source of truth for op existence, routing metadata (manifest fields), and this-repo curation (status/rationale/wired_into). Replaces the former manifest.json + _curation.json + per-op <key>.md split.",
+  "operations": [
+    {
+      "key": "boxClip",
+      "title": "Box Clip",
+      "category": "transform",
+      "loss_class": "bounded-loss",
+      "risk_class": "high",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 11,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "clip",
+        "bounding-box",
+        "aabb",
+        "trim",
+        "crop"
+      ],
+      "source": "scene-optimizer-core/source/operations/boxClip/BoxClip.cpp",
+      "summary": "Box Clip removes or retains geometry based on an axis-aligned bounding box (AABB) region.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "computeExtents",
+      "title": "Compute Extents",
+      "category": "metadata",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 1,
+      "requires_mesh": true,
+      "pipelines": [
+        "safe-cleanup",
+        "load-time-reduction",
+        "data-quality-baseline"
+      ],
+      "keywords": [
+        "extent",
+        "bounding-box",
+        "metadata",
+        "culling"
+      ],
+      "source": "scene-optimizer-core/source/operations/computeExtents/ComputeExtentsPlugin.cpp",
+      "summary": "Compute Extents calculates and authors the `extent` attribute for meshes.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md"
+        ]
+      }
+    },
+    {
+      "key": "countVertices",
+      "title": "Count Vertices",
+      "category": "analysis",
+      "loss_class": "analysis-only",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 3,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "count",
+        "vertices",
+        "stats",
+        "analysis"
+      ],
+      "source": "scene-optimizer-core/source/operations/countVertices/CountVertices.cpp",
+      "summary": "Count Vertices is a hidden analysis utility that categorizes meshes by vertex count into high, very high, and extreme buckets.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "analysis",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "decimateMeshes",
+      "title": "Decimate Meshes",
+      "category": "geometry",
+      "loss_class": "bounded-loss",
+      "risk_class": "medium",
+      "requires_confirmation": true,
+      "apply_authority": "auto-within-tolerance",
+      "args_count": 8,
+      "requires_mesh": true,
+      "pipelines": [
+        "mesh-count-reduction"
+      ],
+      "keywords": [
+        "decimate",
+        "polygon-count",
+        "lod",
+        "qem",
+        "silhouette"
+      ],
+      "source": "scene-optimizer-core/source/operations/decimateMeshes/OmniMeshDecimate.cpp",
+      "summary": "Decimate Meshes reduces polygon count while preserving mesh shape as much as possible.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md",
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      },
+      "parameter_prerequisites": [
+        {
+          "field": "asset_physical_context.metersPerUnit",
+          "source": "sa_report.json",
+          "required": true
+        },
+        {
+          "elicit_from_user": "mm_tolerance",
+          "canonical_question": "What's the smallest surface detail (in mm) you need to preserve?",
+          "defaults": [
+            0.1,
+            0.5,
+            1.0,
+            2.0,
+            5.0
+          ],
+          "skip_option": "skip decimation",
+          "conversion": "maxMeanError = mm_tolerance / (metersPerUnit * 1000)"
+        }
+      ],
+      "recommendation_signals": [
+        {
+          "source": "SceneOptimizerMeshDensityChecker",
+          "signal": "High-density outlier meshes detected — meshes with triangle density disproportionate to their physical extent are strong candidates for decimation. This Phase-2c validator reads actual geometry and is the canonical over-tessellation signal (SA does not flag density; it reads no geometry arrays)."
+        },
+        {
+          "note": "maxMeanError is inherently scale-aware: over-tessellated meshes (e.g. a 1M-poly screw at 20mm) lose most triangles because nearly all vertices fall within the error budget. Under-tessellated meshes barely change. No per-mesh targeting is needed — apply uniformly to all meshes."
+        }
+      ],
+      "anti_patterns": [
+        "Do not frame as 'reduce by X%'. Rate-mode bypasses the silhouette-preserving error budget.",
+        "Do not ask which meshes to target. maxMeanError handles density differences automatically.",
+        "Do not offer triangle-count or percentage options unless the user explicitly provides a rate-based constraint."
+      ]
+    },
+    {
+      "key": "deduplicateGeometry",
+      "title": "De-duplicate Geometry",
+      "category": "geometry",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 9,
+      "requires_mesh": true,
+      "pipelines": [
+        "safe-cleanup",
+        "memory-reduction",
+        "mesh-count-reduction"
+      ],
+      "keywords": [
+        "dedup",
+        "instancing",
+        "memory",
+        "mesh"
+      ],
+      "source": "scene-optimizer-core/source/operations/deduplicateGeometry/DeduplicateGeometry.cpp",
+      "summary": "De-duplicate Geometry finds meshes that are geometrically identical (or near-identical) and replaces duplicates with instances of a single prototype.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md",
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      }
+    },
+    {
+      "key": "deduplicateHierarchies",
+      "title": "De-duplicate Hierarchies",
+      "category": "hierarchy",
+      "loss_class": "lossless",
+      "risk_class": "medium",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 0,
+      "requires_mesh": false,
+      "pipelines": [
+        "memory-reduction",
+        "mesh-count-reduction",
+        "instancing"
+      ],
+      "keywords": [
+        "dedup",
+        "instancing",
+        "hierarchy",
+        "prototype",
+        "reference"
+      ],
+      "source": "scene-optimizer-core/source/operations/deduplicateHierarchies/DeduplicateHierarchies.cpp",
+      "summary": "De-duplicate Hierarchies identifies structurally-identical sub-hierarchies and collapses them into shared prototypes with instanceable references at each original site.",
+      "since_version": "2026-04-17T00:00:00Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/restructure-decision/README.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      },
+      "notes": "Operates at the subtree level: collapses structurally-identical sub-hierarchies into shared prototypes referenced from each original site (referencing prims marked instanceable=true). Contrast deduplicateGeometry, which operates on individual mesh data. ADVISORY-ONLY for deep mid-level reuse: does not consolidate deeply-nested component/subcomponent reuse — author shared prototypes directly for that case; use this operator only to suggest candidates. The bounded recursive descent authors mid-level subcomponent sharing DIRECTLY via the value-hash nested-library rewrite (restructure-decision deduplicate-internally branch); use deduplicateHierarchies / organizePrototypes only as a CANDIDATE SUGGESTER, never as the authoring mechanism for mid-level reuse. deduplicateGeometry remains the last-mile leaf cleanup."
+    },
+    {
+      "key": "deleteHiddenPrims",
+      "title": "Delete Hidden Prims",
+      "category": "hierarchy",
+      "loss_class": "bounded-loss",
+      "risk_class": "medium",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 0,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "delete",
+        "hidden",
+        "visibility",
+        "prune"
+      ],
+      "source": "scene-optimizer-core/source/operations/deleteHiddenPrims/__init__.py",
+      "summary": "Delete Hidden Prims finds and deletes all prims that have their visibility set to `invisible`.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "deletePrims",
+      "title": "Delete Prims",
+      "category": "hierarchy",
+      "loss_class": "bounded-loss",
+      "risk_class": "high",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 1,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "delete",
+        "prim",
+        "prune"
+      ],
+      "source": "scene-optimizer-core/source/operations/deletePrims/DeletePrimsPlugin.cpp",
+      "summary": "Delete Prims is a hidden utility operation that permanently removes specified prims from the stage's edit target layer.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "diceMeshes",
+      "title": "Dice Meshes",
+      "category": "geometry",
+      "loss_class": "bounded-loss",
+      "risk_class": "medium",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 22,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "dice",
+        "subdivide",
+        "chunk",
+        "tile",
+        "streaming"
+      ],
+      "source": "scene-optimizer-core/source/operations/diceMeshes/DiceMeshes.cpp",
+      "summary": "Dice Meshes cuts meshes into smaller pieces along a 3D grid — like slicing a block of cheese with a wire grid.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "editStageMetrics",
+      "title": "Edit Stage Metrics",
+      "category": "metadata",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 4,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "stage",
+        "metrics",
+        "metersPerUnit",
+        "upAxis",
+        "metadata"
+      ],
+      "source": "scene-optimizer-core/source/operations/editStageMetrics/EditStageMetrics.cpp",
+      "summary": "Edit Stage Metrics modifies a stage's global metrics — up axis and linear units.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "findCoincidingGeometry",
+      "title": "Find Coinciding Geometry",
+      "category": "analysis",
+      "loss_class": "analysis-only",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 4,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "find",
+        "coinciding",
+        "overlap",
+        "analysis"
+      ],
+      "source": "scene-optimizer-core/source/operations/findCoincidingGeometry/FindCoincidingGeometry.cpp",
+      "summary": "Find Coinciding Geometry detects meshes that occupy the same space — overlapping or near-identical geometry that causes z-fighting and wasted rendering.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "analysis",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-interpret-validators/references/rule-reference.md",
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      }
+    },
+    {
+      "key": "findFlatHierarchies",
+      "title": "Find Flat Hierarchies",
+      "category": "analysis",
+      "loss_class": "analysis-only",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 3,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "find",
+        "hierarchy",
+        "flat",
+        "analysis"
+      ],
+      "source": "scene-optimizer-core/source/operations/findFlatHierarchies/FindFlatHierarchiesOperation.cpp",
+      "summary": "Find Flat Hierarchies identifies prims with an excessively large number of children — \"flat\" hierarchy patterns where a single prim has hundreds or thousands of direct children.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "analysis",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-interpret-validators/references/rule-reference.md",
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      }
+    },
+    {
+      "key": "findOccludedMeshes",
+      "title": "Find Occluded Meshes",
+      "category": "analysis",
+      "loss_class": "analysis-only",
+      "risk_class": "medium",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 7,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "find",
+        "occluded",
+        "interior",
+        "hidden",
+        "analysis",
+        "internal",
+        "enclosed"
+      ],
+      "source": "scene-optimizer-core/source/operations/findOccludedMeshes/FindOccludedMeshes.cpp",
+      "summary": "Find Occluded Meshes detects geometry that is completely hidden inside other geometry and therefore never visible.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "analysis",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-interpret-validators/references/rule-reference.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/config-from-evidence.md",
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      },
+      "parameter_prerequisites": {
+        "ordering": {
+          "position": "first",
+          "rationale": "Remove internal geometry before spending compute on meshCleanup, deduplicateGeometry, decimation, or any other op. Dead weight is removed first.",
+          "invariants": [
+            "findOccludedMeshes + removePrims BEFORE meshCleanup",
+            "findOccludedMeshes + removePrims BEFORE deduplicateGeometry",
+            "findOccludedMeshes + removePrims BEFORE decimateMeshes",
+            "findOccludedMeshes + removePrims BEFORE removeSmallGeometry"
+          ]
+        },
+        "scoping": {
+          "trigger": "SA validation_scope.cross_component_pairs not explicitly transparent (enclosure_opaque true or unset)",
+          "exclude": "Pairs where the enclosing geometry has a transparent/translucent material (opacity < 1.0, transmission shader, glass MDL, alpha-blend mode). Objects visible through transparent enclosures must NOT be removed.",
+          "asset_types": "Equipment, machines, vehicles, cabinets, housings, enclosures, pumps, motors, compressors, sealed assemblies — anything with an opaque shell/casing that could hide internal parts."
+        },
+        "fields": [
+          {
+            "field": "containment_pairs",
+            "source": "SA validation_scope.cross_component_pairs not explicitly transparent (enclosure_opaque true or unset)",
+            "required": true,
+            "description": "Enclosing/enclosed boundary-ID pairs from SA §2.1, derived from boundary nomination (candidate_source hash OR semantics) and resolved to prim paths via asset_boundary_suggestions.boundaries[]. Pairs explicitly marked transparent (enclosure_opaque: false) are excluded; true or unset qualify (unknown opacity is resolved by the probe). Without scoped pairs, findOccludedMeshes has no scope and must not run on the full stage."
+          }
+        ],
+        "elicit_from_user": [
+          {
+            "id": "confirm_removal",
+            "canonical_question": "These enclosed assets contain internal geometry invisible from outside. Remove the occluded prims found by the scoped probe? (you lose the internals)",
+            "context": "Present per asset on the Phase 7 iteration-2 opt-in menu, with the occluded-prim count and saving from the already-run scoped probe.",
+            "skip_option": "Keep internal geometry"
+          }
+        ],
+        "action_chain": {
+          "analysis_op": "findOccludedMeshes",
+          "action_op": "removePrims",
+          "pattern": "Run findOccludedMeshes in analysis mode on the scoped pairs in Phase 4 (scoped Tier 3 probe, no approval). It produces a list of fully-occluded prim paths. Feed those paths to removePrims; only the deletion step is intent-gated (Phase 7 iteration-2 opt-in)."
+        },
+        "apply_approval": {
+          "detection": "Scoped probe runs in Phase 4 without approval (bounded by scope + timeout_recorded).",
+          "deletion": "Removing the discovered occluded prims is intent-gated — offered per asset on the Phase 7 iteration-2 opt-in menu."
+        }
+      }
+    },
+    {
+      "key": "findOverlappingMeshes",
+      "title": "Find Overlapping Meshes",
+      "category": "analysis",
+      "loss_class": "analysis-only",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 4,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "find",
+        "overlap",
+        "intersect",
+        "analysis"
+      ],
+      "source": "scene-optimizer-core/source/operations/findOverlappingMeshes/FindOverlappingMeshesOperation.cpp",
+      "summary": "Find Overlapping Meshes detects interfering geometry — meshes whose surfaces intersect or penetrate each other.",
+      "since_version": "2026-05-08T22:40:32Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "analysis",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-interpret-validators/references/rule-reference.md",
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      }
+    },
+    {
+      "key": "fitPrimitives",
+      "title": "Fit Primitives",
+      "category": "geometry",
+      "loss_class": "bounded-loss",
+      "risk_class": "high",
+      "requires_confirmation": true,
+      "apply_authority": "auto-within-tolerance",
+      "args_count": 20,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "fit",
+        "primitive",
+        "cube",
+        "sphere",
+        "cylinder",
+        "approximate"
+      ],
+      "source": "scene-optimizer-core/source/operations/fitPrimitives/Primitive.cpp",
+      "summary": "Fit Primitives analyzes meshes and replaces them with simpler geometric primitives (spheres, cylinders, cones, cubes) when the mesh closely matches one of those shapes.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md"
+        ]
+      }
+    },
+    {
+      "key": "flattenHierarchy",
+      "title": "Flatten Hierarchy",
+      "category": "hierarchy",
+      "loss_class": "lossless",
+      "risk_class": "medium",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 2,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "flatten",
+        "hierarchy",
+        "scenegraph"
+      ],
+      "source": "scene-optimizer-core/source/operations/flattenHierarchy/FlattenHierarchy.cpp",
+      "summary": "Flatten Hierarchy removes redundant Xform prims from a stage's hierarchy, reducing prim count.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-interpret-validators/references/rule-reference.md"
+        ]
+      }
+    },
+    {
+      "key": "generateAtlasUVs",
+      "title": "generateAtlasUVs",
+      "category": "uv",
+      "loss_class": "lossless",
+      "risk_class": "medium",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 7,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "uv",
+        "atlas",
+        "unwrap",
+        "texture"
+      ],
+      "source": "scene-optimizer-core/source/operations/generateAtlasUVs/GenerateAtlasUVs.cpp",
+      "summary": "Auto UV Unwrap generates texture coordinates (UVs) by unfolding mesh surfaces into 2D.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "generateNormals",
+      "title": "Generate Normals",
+      "category": "geometry",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 6,
+      "requires_mesh": true,
+      "pipelines": [
+        "data-quality-baseline"
+      ],
+      "keywords": [
+        "normals",
+        "shading",
+        "smooth",
+        "regenerate"
+      ],
+      "source": "scene-optimizer-core/source/operations/generateNormals/GenerateNormals.cpp",
+      "summary": "Generate Normals computes and authors vertex normals for meshes.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md",
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      }
+    },
+    {
+      "key": "generateProjectionUVs",
+      "title": "Generate Projection UVs",
+      "category": "uv",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 7,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "uv",
+        "projection",
+        "planar",
+        "texture"
+      ],
+      "source": "scene-optimizer-core/source/operations/generateProjectionUVs/GenerateProjectionUVs.cpp",
+      "summary": "Generate Projection UVs creates texture coordinates by projecting them onto meshes using one of several projection methods (planar, cylindrical, spherical, cubic, or triplanar).",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "generateScene",
+      "title": "Generate Scene",
+      "category": "utility",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 12,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "generate",
+        "scene",
+        "synthetic",
+        "test",
+        "demo"
+      ],
+      "source": "scene-optimizer-core/source/operations/generateScene/GenerateScene.cpp",
+      "summary": "Generate Scene creates synthetic test scenes by procedurally placing meshes in a layout.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "manifoldMeshes",
+      "title": "Manifold Meshes",
+      "category": "geometry",
+      "loss_class": "bounded-loss",
+      "risk_class": "medium",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 1,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "manifold",
+        "watertight",
+        "close-holes",
+        "topology"
+      ],
+      "source": "scene-optimizer-core/source/operations/manifoldMeshes/Manifold.cpp",
+      "summary": "**Legacy command — use `meshCleanup` with `makeManifold: true` instead.** This operation exists for backward compatibility.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "deprecated",
+        "status_override": "deprecated",
+        "rationale": "deprecated: meshCleanup: legacy hole-closing command superseded by meshCleanup with makeManifold:true.",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "merge",
+      "title": "Merge Static Meshes",
+      "category": "transform",
+      "loss_class": "bounded-loss",
+      "risk_class": "high",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 14,
+      "requires_mesh": true,
+      "pipelines": [
+        "mesh-count-reduction"
+      ],
+      "keywords": [
+        "merge",
+        "combine",
+        "consolidate",
+        "instancing-conflict"
+      ],
+      "source": "scene-optimizer-core/source/operations/merge/Merge.cpp",
+      "summary": "Merge Static Meshes combines multiple meshes that share common properties into single merged meshes.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md",
+          "skills/omniverse-usd-performance-tuning/references/workflow.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/apply-restructure/references/hierarchy-dedupe-rewrite-tool-spec.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/apply-restructure/references/mesh-merge-rewrite-spec.md"
+        ],
+        "notes": "First-class but intent-gated Phase-4 step that EXECUTES the manifest `merge` disposition (usd-structure-assessment disposition matrix). Runs WITHIN a prototype only (merge once, benefit N instances), never across an instance boundary; ordered after occluded-geometry removal and ahead of the meshCleanup -> deduplicateGeometry -> computeExtents tail. Fails closed on strong-identity units (only weak/none identity may be fused) and on bounds-incoherent fusions (hierarchy-dedupe-rewrite-tool-spec.md §9 merge-eligibility guard). Credited as an axis-B prim-count / scene-graph reduction (traversal + stage-open + memory + draw calls), NEVER as a disk win; a conditional vertex-weld tail credits reclaimed bytes on axis C via disk_win_source=vertex_weld."
+      }
+    },
+    {
+      "key": "mergeVertices",
+      "title": "Merge Vertices",
+      "category": "geometry",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 5,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "weld",
+        "merge",
+        "vertices",
+        "tolerance"
+      ],
+      "source": "scene-optimizer-core/source/operations/mergeVertices/MergeVertices.cpp",
+      "summary": "**Legacy command — use `meshCleanup` instead.** This operation exists for backward compatibility.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "deprecated",
+        "status_override": "deprecated",
+        "rationale": "deprecated: meshCleanup: legacy standalone vertex welder superseded by meshCleanup.",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      }
+    },
+    {
+      "key": "meshCleanup",
+      "title": "Mesh Cleanup",
+      "category": "geometry",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 11,
+      "requires_mesh": true,
+      "pipelines": [
+        "mesh-count-reduction",
+        "data-quality-baseline"
+      ],
+      "keywords": [
+        "cleanup",
+        "degenerate",
+        "isolated",
+        "topology",
+        "fix"
+      ],
+      "source": "scene-optimizer-core/source/operations/meshCleanup/MeshCleanup.cpp",
+      "summary": "Mesh Cleanup performs a suite of mesh repair operations to fix common topological defects.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md",
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      }
+    },
+    {
+      "key": "optimizeMaterials",
+      "title": "Optimize Materials",
+      "category": "materials",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 4,
+      "requires_mesh": false,
+      "pipelines": [
+        "safe-cleanup",
+        "memory-reduction",
+        "load-time-reduction"
+      ],
+      "keywords": [
+        "materials",
+        "shader",
+        "dedup",
+        "consolidate"
+      ],
+      "source": "scene-optimizer-core/source/operations/optimizeMaterials/OptimizeMaterials.cpp",
+      "summary": "Optimize Materials reduces the number of materials in a scene by deduplicating identical materials and consolidating similar ones.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md"
+        ]
+      }
+    },
+    {
+      "key": "optimizePrimvars",
+      "title": "Optimize Primvars",
+      "category": "metadata",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 6,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "primvars",
+        "interpolation",
+        "constant",
+        "compress"
+      ],
+      "source": "scene-optimizer-core/source/operations/optimizePrimvars/OptimizePrimvars.cpp",
+      "summary": "Optimize Primvars reduces memory usage by optimizing how primvar (per-vertex/per-face attributes like UVs, colors) data is stored.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-interpret-validators/references/rule-reference.md"
+        ]
+      }
+    },
+    {
+      "key": "optimizeSkelRoots",
+      "title": "Optimize Skeleton Roots",
+      "category": "hierarchy",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 0,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "skeleton",
+        "skelroot",
+        "rigging",
+        "animation"
+      ],
+      "source": "scene-optimizer-core/source/operations/optimizeSkelRoots/OptimizeSkelRoots.cpp",
+      "summary": "Optimize Skeleton Roots merges all skinned meshes within each UsdSkelRoot to improve GPU skinning performance.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "optimizeTimeSamples",
+      "title": "Optimize Time Samples",
+      "category": "metadata",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 6,
+      "requires_mesh": false,
+      "pipelines": [
+        "safe-cleanup",
+        "load-time-reduction"
+      ],
+      "keywords": [
+        "time-samples",
+        "animation",
+        "compress",
+        "constant"
+      ],
+      "source": "scene-optimizer-core/source/operations/optimizeTimeSamples/OptimizeTimeSamples.cpp",
+      "summary": "Optimize Time Samples removes redundant time samples from animated attributes.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md"
+        ]
+      }
+    },
+    {
+      "key": "organizePrototypes",
+      "title": "Organize Prototypes",
+      "category": "hierarchy",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 2,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "prototypes",
+        "instanceable",
+        "organize",
+        "scenegraph"
+      ],
+      "source": "scene-optimizer-core/source/operations/organizePrototypes/OrganizePrototypes.cpp",
+      "summary": "Organize Prototypes moves internal scene-graph instance prototypes under a user-specified namespace (class prim).",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      }
+    },
+    {
+      "key": "pivot",
+      "title": "Compute Pivot",
+      "category": "transform",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 4,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "pivot",
+        "transform",
+        "origin",
+        "xform"
+      ],
+      "source": "scene-optimizer-core/source/operations/pivot/Pivot.cpp",
+      "summary": "Compute Pivot recalculates and sets pivot points (transform origins) for meshes or transforms.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "primitivesToMeshes",
+      "title": "Primitives to Meshes",
+      "category": "geometry",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 13,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "primitive",
+        "convert",
+        "tessellate",
+        "mesh"
+      ],
+      "source": "scene-optimizer-core/source/operations/primitivesToMeshes/PrimitiveToMesh.cpp",
+      "summary": "Primitives to Meshes converts USD geometric primitives (UsdGeomSphere, UsdGeomCylinder, UsdGeomCone, UsdGeomCube) into polygon mesh representations.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "specialty",
+        "status_override": "specialty",
+        "rationale": "specialty: escape-hatch — the only path to convert analytic primitives back to UsdGeomMesh for downstream tools that reject primitives (some renderers, physics, exporters). Recommend only when the downstream context explicitly requires mesh output.",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "printStats",
+      "title": "Print Stats",
+      "category": "analysis",
+      "loss_class": "analysis-only",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 3,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "stats",
+        "print",
+        "report",
+        "analysis"
+      ],
+      "source": "scene-optimizer-core/source/operations/printStats/PrintStats.cpp",
+      "summary": "Print Stats is a hidden diagnostic operation that outputs scene statistics including prim counts, mesh counts, vertex/face totals, and optionally primvar and timing information.",
+      "since_version": "2026-05-08T22:40:32Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "analysis",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      }
+    },
+    {
+      "key": "pruneLeaves",
+      "title": "Prune Leaves",
+      "category": "hierarchy",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 3,
+      "requires_mesh": false,
+      "pipelines": [
+        "safe-cleanup",
+        "memory-reduction",
+        "load-time-reduction"
+      ],
+      "keywords": [
+        "prune",
+        "empty",
+        "leaves",
+        "cleanup"
+      ],
+      "source": "scene-optimizer-core/source/operations/pruneLeaves/PruneLeaves.cpp",
+      "summary": "Prune Leaves finds and removes leaf grouping primitives — Xforms and Scopes that contain no meaningful children (or only other empty groups).",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md",
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      }
+    },
+    {
+      "key": "pythonScript",
+      "title": "Python Script",
+      "category": "utility",
+      "loss_class": "bounded-loss",
+      "risk_class": "high",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 1,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "python",
+        "script",
+        "custom",
+        "user-code"
+      ],
+      "source": "scene-optimizer-core/source/operations/pythonScript/__init__.py",
+      "summary": "Python Script executes a user-defined Python script as a Usd Optimize operation.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "specialty",
+        "status_override": "specialty",
+        "rationale": "specialty: escape-hatch op used by usd-optimize-create-proxy's USD-authoring recipes; not part of the general optimization flow.",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/usd-optimize-create-proxy/README.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md"
+        ]
+      }
+    },
+    {
+      "key": "remeshMeshes",
+      "title": "Remesh Meshes",
+      "category": "geometry",
+      "loss_class": "bounded-loss",
+      "risk_class": "high",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 4,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "remesh",
+        "retopology",
+        "uniform",
+        "regenerate"
+      ],
+      "source": "scene-optimizer-core/source/operations/remeshMeshes/Remesh.cpp",
+      "summary": "Remesh Meshes regenerates mesh topology to create a more uniform triangle distribution while preserving the original shape.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "removeAttributes",
+      "title": "Remove Attributes",
+      "category": "metadata",
+      "loss_class": "bounded-loss",
+      "risk_class": "medium",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 3,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "remove",
+        "attribute",
+        "metadata",
+        "cleanup"
+      ],
+      "source": "scene-optimizer-core/source/operations/removeAttributes/RemoveAttributes.cpp",
+      "summary": "Remove Attributes removes or blocks specified attributes from prims.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "removePrims",
+      "title": "Remove Prims",
+      "category": "hierarchy",
+      "loss_class": "bounded-loss",
+      "risk_class": "high",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 8,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "remove",
+        "prim",
+        "filter",
+        "delete"
+      ],
+      "source": "scene-optimizer-core/source/operations/removePrims/RemovePrimsPlugin.cpp",
+      "summary": "Remove Prims identifies and removes invisible prims and orphaned overs from a USD stage.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md"
+        ]
+      }
+    },
+    {
+      "key": "removeSmallGeometry",
+      "title": "Remove Small Geometry",
+      "category": "geometry",
+      "loss_class": "bounded-loss",
+      "risk_class": "medium",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 4,
+      "requires_mesh": true,
+      "pipelines": [
+        "mesh-count-reduction"
+      ],
+      "keywords": [
+        "remove",
+        "small",
+        "screen-space",
+        "lod",
+        "cleanup"
+      ],
+      "source": "scene-optimizer-core/source/operations/removeSmallGeometry/RemoveSmallGeometry.cpp",
+      "summary": "Remove Small Geometry finds and removes meshes that are below a size threshold.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md"
+        ]
+      }
+    },
+    {
+      "key": "removeUntypedPrims",
+      "title": "Remove Untyped Prims",
+      "category": "hierarchy",
+      "loss_class": "bounded-loss",
+      "risk_class": "low",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 0,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "remove",
+        "untyped",
+        "scope",
+        "cleanup"
+      ],
+      "source": "scene-optimizer-core/source/operations/removeUntypedPrims/__init__.py",
+      "summary": "Remove Untyped Prims deletes prims that have no USD schema type.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "removeUnusedUVs",
+      "title": "Remove Unused UVs",
+      "category": "uv",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 3,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "uv",
+        "unused",
+        "remove",
+        "cleanup"
+      ],
+      "source": "scene-optimizer-core/source/operations/removeUnusedUVs/RemoveUnusedUVs.cpp",
+      "summary": "Remove Unused UVs finds and removes texture coordinate (UV) attributes that are not referenced by any bound material.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "canonical",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md"
+        ]
+      }
+    },
+    {
+      "key": "rtxMeshCount",
+      "title": "RTX Mesh Count",
+      "category": "analysis",
+      "loss_class": "analysis-only",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 1,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "rtx",
+        "mesh-count",
+        "raytracing",
+        "stats"
+      ],
+      "source": "scene-optimizer-core/source/operations/rtxMeshCount/RtxMeshCount.cpp",
+      "summary": "RTX Mesh Count is a hidden analysis operation that counts the number of RTX acceleration structures, RTX meshes, and unique RTX meshes in the scene.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "analysis",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      }
+    },
+    {
+      "key": "shrinkwrap",
+      "title": "Shrinkwrap",
+      "category": "geometry",
+      "loss_class": "bounded-loss",
+      "risk_class": "high",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 7,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "shrinkwrap",
+        "wrap",
+        "proxy",
+        "lod"
+      ],
+      "source": "scene-optimizer-core/source/operations/shrinkwrap/Shrinkwrap.cpp",
+      "summary": "Shrinkwrap converts a polygon soup into a bounding watertight mesh, with controllable mechanisms to generate loose and tight surface proxies.",
+      "since_version": "2026-03-05T22:02:49Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "sparseMeshes",
+      "title": "Sparse Meshes",
+      "category": "geometry",
+      "loss_class": "bounded-loss",
+      "risk_class": "medium",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 0,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "sparse",
+        "decimate",
+        "reduce",
+        "geometry"
+      ],
+      "source": "scene-optimizer-core/source/operations/sparseMeshes/SparseMeshes.cpp",
+      "summary": "Sparse Meshes reduces meshes with poor spatial density — geometry that occupies a large bounding box relative to its actual surface area.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "specialty",
+        "status_override": "specialty",
+        "rationale": "specialty: bespoke triage — surfaced from usd-validation-runner Tier 2 sparse-mesh findings; reach for it on user request, not from a named pipeline.",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-interpret-validators/references/rule-reference.md",
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      }
+    },
+    {
+      "key": "splitMeshes",
+      "title": "Split Meshes",
+      "category": "geometry",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 16,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "split",
+        "partition",
+        "chunk",
+        "geometry"
+      ],
+      "source": "scene-optimizer-core/source/operations/splitMeshes/SplitMeshes.cpp",
+      "summary": "Split Meshes breaks meshes into smaller pieces based on geometric connectivity or spatial clustering.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "subdivideMeshes",
+      "title": "Subdivide Meshes",
+      "category": "geometry",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 5,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "subdivide",
+        "tessellate",
+        "smooth",
+        "geometry"
+      ],
+      "source": "scene-optimizer-core/source/operations/subdivideMeshes/Subdivide.cpp",
+      "summary": "Subdivide Meshes increases mesh polygon density by subdividing faces.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "triangulateMeshes",
+      "title": "Triangulate Meshes",
+      "category": "geometry",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 2,
+      "requires_mesh": true,
+      "pipelines": [],
+      "keywords": [
+        "triangulate",
+        "quad",
+        "topology",
+        "geometry"
+      ],
+      "source": "scene-optimizer-core/source/operations/triangulateMeshes/Triangulate.cpp",
+      "summary": "Triangulate Meshes converts all polygon faces to triangles.",
+      "since_version": "2026-02-11T07:51:19Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
+      }
+    },
+    {
+      "key": "utilityFunction",
+      "title": "Utility Function",
+      "category": "utility",
+      "loss_class": "lossless",
+      "risk_class": "low",
+      "requires_confirmation": false,
+      "apply_authority": "auto",
+      "args_count": 2,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "utility",
+        "helper",
+        "internal"
+      ],
+      "source": "scene-optimizer-core/source/operations/utilityFunction/UtilityFunction.cpp",
+      "summary": "Utility Function is a container for small one-off operations that don't merit their own plugin.",
+      "since_version": "2026-05-08T22:40:32Z",
+      "requires_extension": "omni.scene.optimizer.core",
+      "curation": {
+        "status": "specialty",
+        "status_override": "specialty",
+        "rationale": "specialty: bespoke ad-hoc SO scripting (Deinstance / Unbind Materials / Set Instanceable / Flatten Instances); recommend only when a recipe needs one of those structural sub-functions.",
+        "wired_into": [
+          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+        ]
+      }
+    }
+  ]
+}

@@ -21,7 +21,7 @@ Required top-level fields:
 |---|---|---|---|
 | `asset_name` | string | Phase 0 | Set early; the basename of the input asset usually suffices. |
 | `input_path` | string | Phase 0 | Optional in schema, but capture it for traceability. |
-| `output_path` | string | Phase 5 | Path to the optimized stage root from Phase 5d (or `null` for diagnosis-only / structural-only path). |
+| `output_path` | string | Phase 5 | Path to the optimized stage root from Phase 5d (or `null` for a `no_op` or runtime-forced `structural_only` run). |
 | `timestamp` | string (ISO 8601) | Phase 6d | Set when the report writes. |
 | `verdict` | enum: `improved \| neutral \| regressed \| mixed` | Phase 6c | From `compare-profiles`. Stays in this enum in every mode; use `neutral` when no metrics changed. Express degraded/no-op runs via `workflow_mode`, not new verdict values. |
 | `workflow_mode` | enum: `full \| structural_only \| no_op` | Phase 6d | Optional (default `full`). `structural_only` when SO was unavailable and only USD-structural work ran; `no_op` when SA reported `already_optimized`. |
@@ -32,6 +32,8 @@ Required top-level fields:
 | `reasoning` | string | Phase 6d | One to two paragraphs explaining why the agent chose this optimization approach for the asset, based on evidence and tradeoffs. |
 | `measurement_context` | object | Phases 0, 1a, 6a | Context for stage/composition measurements: runtime, cache policy, sample count, stage-open method. |
 | `runtime_profiling` | object | Phase 6d | Optional Omniperf/runtime-profiler handoff for RAM, VRAM, FPS, frame time, shader, renderer, and GPU metrics. |
+| `footprint` | object | Phases 1a + 6 | Optional repack-normalized disk-footprint attribution. When any footprint claim is made, report `raw_input_bytes`, `repack_normalized_baseline_bytes`, `optimized_bytes` and attribute `repack_delta_pct` / `structural_delta_pct`; `scored_against: "repack_normalized"`. The storage score measures `structural_delta_pct`, not the raw headline. |
+| `preservation` | object | Phases 1 + 6 | Preservation (silent-loss) gate. Required on any run that makes a structural/dedupe/instancing claim (omit only for a pure no_op with no preservation assertion). Emit `rendered_mesh_count` (must equal the asset's known pre-optimization rendered-mesh count — not authored prims), `distinct_geometry_bytes_preserved: true`, `bounds_preserved: true`, `dangling: 0`. Report scoring marks the run 0 if this block is missing or any gate changed: a "lossless" dedupe that drops rendered meshes, geometry bytes, bounds, or leaves dangling bindings is silent loss, caught here rather than by the disk number. |
 | `metric_groups[]` | array | Phase 6d | Stage headline areas such as composition load, structure, instancing, storage footprint, and validation. |
 | `artifacts` | object | Phase 6d | Paths to generated JSON, Markdown, and static HTML reports. |
 | `metrics[]` | array | Phases 1a + 6a | Each metric: `name`, `before`, `after`, `change_pct`, `verdict`. |
@@ -53,6 +55,12 @@ Populate immediately after the runtime is chosen:
 
 ### Phase 1 - Open and characterize
 
+- [ ] If a footprint/disk-size claim will be made, capture `raw_input_bytes` now
+  and compute `repack_normalized_baseline_bytes` by re-crating the input
+  losslessly (same target encoding / USD version, zero dedupe). The
+  `footprint.structural_delta_pct` reported in Phase 6 is measured against this
+  normalized baseline, not the raw input — never present the free crate
+  re-encode as the optimization. See `README.md § Footprint attribution`.
 - [ ] `metrics[]` - **baseline** entries with `before` populated, `after` left null until Phase 6.
   - Suggested baseline metrics:
     - `stage_open_seconds` (Phase 1a profile)
@@ -66,8 +74,8 @@ in `runtime_profiling`, ideally via Omniperf dashboard/artifacts.
 
 ### Phase 2 - Composition / discovery / restructure decision
 
-- [ ] `validators[]` - first entries (validator name + issue count from Phase 2c selected probes). One row per validator that ran.
-- [ ] If user takes the "exit" branch at Phase 2e gate: skip to Phase 6d and write a diagnosis-only report (`output_path: null`, empty `operations[]`).
+- [ ] `validators[]` - first entries (validator name + issue count from Phase 2c Tier 1 whole-stage probes). One row per validator that ran.
+- [ ] The Phase 2e gate never exits the pipeline; it only chooses how to optimize. The only `output_path: null` / empty `operations[]` report comes from a `no_op` run (already-optimized) or the runtime-forced `structural_only` degraded path (Usd Optimize unavailable + install declined), not a user-chosen exit.
 
 ### Phase 3 - Stage-level instancing
 
@@ -79,9 +87,10 @@ in `runtime_profiling`, ideally via Omniperf dashboard/artifacts.
 
 ### Phase 4 - Per-sub-asset mesh ops
 
+- [ ] `validators[]` - per-target Tier 2/3 entries from the Phase 4 validate→re-verify loop (4c/4d). Name the target in each entry and record its findings (before) and re-verify result (after).
 - [ ] `operations[]` - one entry per op per target. The `result` field is concise per-target outcome (e.g. `meshCleanup on prototype/A: 124 prims processed, 12% triangle reduction`).
-- [ ] Record the Phase 4 batch manifest path in `notes` or the Markdown summary. The manifest should include target weights, chosen concurrency per batch, resource observations, output/log paths, failures, and any adjustment or remainder-script decision.
-- [ ] If adaptive batch mode generated a remainder script, record it under `notes` with the script path and remaining target count.
+- [ ] Record the Phase 4 scheduler `status.json` path in `notes` or the Markdown summary. It should include target weights, chosen concurrency per batch, resource observations, output/log paths, failures, timeouts, and any adjustment or resume decision.
+- [ ] If the scheduler-backed batch paused, record the `status.json` path to resume from under `notes` with the remaining (non-terminal) target count.
 
 ### Phase 5 - Reference replacement and stage cleanup
 
@@ -91,7 +100,8 @@ in `runtime_profiling`, ideally via Omniperf dashboard/artifacts.
 ### Phase 6 - Verify and report
 
 - [ ] `metrics[]` - fill `after`, `change_pct`, and per-metric `verdict` from Phase 6a profile-after.
-- [ ] `validators[]` - second pass entries from Phase 6b re-validation. Compare against Phase 2c entries to surface dropped/persistent issues in the Markdown summary.
+- [ ] `preservation` - silent-loss gate (any structural/dedupe/instancing run). Record the post-optimization `rendered_mesh_count` and confirm it equals the asset's known pre-optimization count; set `distinct_geometry_bytes_preserved`, `bounds_preserved`, and `dangling` from the post-run measurement. Anything other than count-unchanged / `true` / `true` / `0` is silent loss and report scoring marks the run 0. Omit only for a pure `no_op`.
+- [ ] `validators[]` - second pass entries from Phase 6b Tier 1 whole-stage re-validation. Compare against Phase 2c (Tier 1) and Phase 4 (per-target) entries to surface dropped/persistent issues in the Markdown summary.
 - [ ] `verdict` - top-level verdict from `compare-profiles` (Phase 6c).
 - [ ] `timestamp` - written by `optimization-report`.
 - [ ] `optimization_score`, `score_scope`, `score_label`, and `metric_groups[]` - computed from stage/composition metrics only.
@@ -107,7 +117,7 @@ unclaimed, and keep the verdict no stronger than the remaining evidence allows.
 
 ## Special cases
 
-### Structural-only path (SO unavailable)
+### Structural-only path (Usd Optimize unavailable)
 
 When SO is unavailable and the user declines setup:
 
@@ -120,7 +130,7 @@ When SO is unavailable and the user declines setup:
 ### Quick-mode-only caveat (standalone runtime, no Kit)
 
 When Phase 1a profile-stage and Phase 6a profile-after ran in quick mode
-only (the standalone Scene Optimizer path has no Kit and no Tracy),
+only (the standalone Usd Optimize path has no Kit and no Tracy),
 **explicitly call out** in the report what was measured vs unmeasured:
 
 - The `metrics[]` array carries USD-level signal only: stage open
@@ -161,14 +171,24 @@ When the agent loops back from Phase 7:
   or delta probe; expanded validation scope requires explicit approval.
 - The final `verdict` reflects the cumulative comparison (first baseline vs latest after).
 
-### Diagnosis-only
+### No optimized stage written (no_op / runtime-forced structural_only)
 
-If the user's intent was diagnosis-only (no mutation):
+There is no user-chosen diagnosis-only mode — every optimization request runs the
+full pipeline. A report legitimately has no optimized stage in two cases:
+
+- **`no_op`** — the pipeline ran but Phases 3-5 found no work (already-optimized
+  stage).
+- **runtime-forced `structural_only`** — Usd Optimize was unavailable and the
+  user declined install/setup, so only structural assessment + pre-mutation
+  validation ran (an honest runtime block, not a chosen bypass).
+
+In both cases:
 
 - `output_path` is `null`.
 - `operations[]` is empty.
 - `validators[]` and baseline `metrics[]` are still populated.
-- `verdict` should be `neutral` and the Markdown summary should clearly state "diagnosis-only - no optimized stage written."
+- `verdict` stays within its enum (`neutral` when nothing changed); set
+  `workflow_mode` to `no_op` or `structural_only` accordingly.
 
 ## Schema reference
 

@@ -4,30 +4,30 @@ agent_routes:
   - omniverse-usd-performance-tuning
 agent_next:
   - README.md
-  - ../so-run-operations/README.md
+  - ../usd-optimize-run-operations/README.md
 freshness: 2026-05-20
 version: "0.1.0"
 ---
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 
-# Scene Optimizer Execution Reference
+# Usd Optimize Execution Reference
 
-This docs-class page summarizes how agents should invoke Scene Optimizer
+This docs-class page summarizes how agents should invoke Usd Optimize
 operations after the workflow has selected a runtime and an approved operation
 plan. Detailed executable guidance lives in the nested
-`so-run-operations` references; this page gives repo-root agents enough shape to
+`usd-optimize-run-operations` references; this page gives repo-root agents enough shape to
 avoid wrong turns before entering the skill bundle.
 
-Use setup preflight plus live `sceneOptimizer.operationsAvailable` before
+Use setup preflight plus live `usdOptimize.operationsAvailable` before
 execution. Per-operation files are routing stubs; upstream `usd-optimize` docs
 own parameters and defaults. Local invocation mechanics live in
-`../so-run-operations/references/invocation.md`; do not invent or duplicate
+`../usd-optimize-run-operations/references/invocation.md`; do not invent or duplicate
 Python call shapes here.
 
 ## Optional Helper Wrapper Shape
 
-Use these wrapper paths only when the selected Scene Optimizer environment or
+Use these wrapper paths only when the selected Usd Optimize environment or
 build checkout provides them. Do not assume a Kit or standalone install ships
 `tools/perf_operations`.
 
@@ -66,15 +66,15 @@ binding interface from
 `omni.scene.optimizer.core.bindings._omni_scene_optimizer_core`.
 
 Before invoking any planned operation, cross-check the operation key against
-`sceneOptimizer.operationsAvailable` in `<output_path>/setup-preflight.json`.
-If a key is missing, report `blocked_missing_so_operation` and do not silently
+`usdOptimize.operationsAvailable` in `<output_path>/setup-preflight.json`.
+If a key is missing, report `blocked_missing_usd_optimize_operation` and do not silently
 substitute another operation.
 
 The operation key comes from `references/operations/README.md`. Arguments come
 from the per-operation page's Parameters table and starting-config JSON. Invalid
 keys may warn or silently no-op; do not guess argument names.
 
-## Asset Validator Import Variant
+## usd-validation-nvidia Import Variant
 
 Inside Kit, use:
 
@@ -91,11 +91,11 @@ from omni.asset_validator import ValidationEngine
 Select the import that matches `<output_path>/setup-preflight.json`; do not mix
 Kit extension imports with standalone package runs.
 
-## Agent-Orchestrated Batch Mode
+## Scheduler-Backed Batch Mode
 
-Batch mode is an agent orchestration pattern, not a wrapper flag. The helper or
-API invocation still accepts one target; the agent runs independent targets in
-adaptive batches.
+Batch mode is scheduler-backed. The helper or API invocation still accepts one
+target; the agent writes a batch plan and runs independent targets through
+`usd-optimize-run-operations/scripts/run_batch.py`.
 
 Choose concurrency from target weight and available resources rather than a
 fixed target-count cap. File size, mesh/vertex/material counts, op-chain cost,
@@ -114,24 +114,32 @@ non-prototype mesh target before final stage-level cleanup; do not reduce it to
 
 For each target, include a stable hash of the absolute input path in optimized
 USD, summary, and log filenames. After every batch, verify that produced output
-count matches target count before declaring success. Record a batch manifest
-with targets, chosen concurrency, resource observations, output/log paths,
-failures, and any remainder-script decision.
+count matches target count before declaring success. Preserve the scheduler
+`status.json` artifact with targets, chosen concurrency, resource observations,
+output/log paths, failures, timeouts, GPU-fallback decisions, and any resume
+decision.
 
 ## Save Policy
 
-Scene Optimizer mutates the opened stage in memory. Default to exporting an
+Usd Optimize mutates the opened stage in memory. Default to exporting an
 optimized `.usdc` output under `output_path`. Use in-place `Save()` only for
 newly created layers or explicitly approved source edits, and use flattened
 stage export only when the user asks for a flattened deliverable.
 
 ## Rules
 
+- **Edit-target invariant:** open each target as its **own root layer** so SO's
+  edit target *is* that file's bytes. Never optimize a referenced library through
+  the composed assembly (the edits would land as overrides on the assembly layer
+  while the library keeps its heavy geometry). De-class abstract `class`
+  namespaces (`Class → Def`) before the chain and restore after; require each
+  library file to resolve standalone. See
+  `apply-restructure/references/restructure-mode.md` § Edit-Target Invariant.
 - Confirm bounded-loss/destructive operations before mutation.
 - Use selected targets from SA/validation evidence.
 - Store config, log, output stage, and summary artifacts.
 - If helper wrappers exist in the selected environment they may be used;
   otherwise use the Python/API executor from the invocation reference.
-- Do not pass a plain `pxr.Usd.Stage` directly to Scene Optimizer operation
+- Do not pass a plain `pxr.Usd.Stage` directly to Usd Optimize operation
   APIs. Attach it to `ExecutionContext` or use the standalone JSON helper as
   described in the invocation reference.
