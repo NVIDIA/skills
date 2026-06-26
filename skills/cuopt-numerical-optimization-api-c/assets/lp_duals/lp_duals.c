@@ -7,8 +7,8 @@
  * LP with dual values and reduced costs (C API).
  * Problem: Minimize 3x + 2y + 5z subject to x + y + z = 4, 2x + y + z = 5, x,y,z >= 0.
  */
-#include <cuopt/linear_programming/cuopt_c.h>
-#include <cuopt/linear_programming/constants.h>
+#include <cuopt/mathematical_optimization/cuopt_c.h>
+#include <cuopt/mathematical_optimization/constants.h>
 #include <stdio.h>
 #include <stdlib.h>
 

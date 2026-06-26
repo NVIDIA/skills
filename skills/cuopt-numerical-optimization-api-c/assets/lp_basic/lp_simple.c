@@ -7,8 +7,8 @@
  * Simple LP (C API): minimize -0.2*x1 + 0.1*x2
  * subject to 3*x1 + 4*x2 <= 5.4, 2.7*x1 + 10.1*x2 <= 4.9, x1,x2 >= 0
  */
-#include <cuopt/linear_programming/cuopt_c.h>
-#include <cuopt/linear_programming/constants.h>
+#include <cuopt/mathematical_optimization/cuopt_c.h>
+#include <cuopt/mathematical_optimization/constants.h>
 #include <stdio.h>
 #include <stdlib.h>
 

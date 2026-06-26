@@ -83,7 +83,7 @@ find ${CONDA_PREFIX:-/usr} -name "libcuopt.so" 2>/dev/null
 
 # Test compile (if gcc available)
 cat > /tmp/test_cuopt.c << 'EOF'
-#include <cuopt/linear_programming/cuopt_c.h>
+#include <cuopt/mathematical_optimization/cuopt_c.h>
 #include <stdio.h>
 int main() {
     printf("cuopt_c.h found and compilable\n");

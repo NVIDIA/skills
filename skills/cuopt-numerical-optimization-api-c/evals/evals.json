@@ -4,7 +4,7 @@
     "question": "I want to solve a small MILP (some integer variables, linear objective, linear constraints) with the cuOpt C API. List the C functions and structs I need in order — names only, one line each, no full source.",
     "expected_skill": "cuopt-numerical-optimization-api-c",
     "expected_script": null,
-    "ground_truth": "The agent produces an ordered list of C API entry points without writing a full source file: include cuopt/linear_programming/cuopt_c.h, then call cuOptCreateRangedProblem with sense CUOPT_MINIMIZE or CUOPT_MAXIMIZE, then cuOptSolve(problem, settings, &solution), then cuOptGetObjectiveValue.",
+    "ground_truth": "The agent produces an ordered list of C API entry points without writing a full source file: include cuopt/mathematical_optimization/cuopt_c.h, then call cuOptCreateRangedProblem with sense CUOPT_MINIMIZE or CUOPT_MAXIMIZE, then cuOptSolve(problem, settings, &solution), then cuOptGetObjectiveValue.",
     "expected_behavior": [
       "Lists C API call sequence without writing a complete source file",
       "Names cuOptCreateRangedProblem, cuOptSolve, cuOptGetObjectiveValue in order"

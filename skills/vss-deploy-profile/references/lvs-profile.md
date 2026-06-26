@@ -34,14 +34,6 @@ Container names below are the actual `container_name:` keys from `deploy/docker/
 
 Post-deploy readiness probe: `curl -sf http://${HOST_IP}:38111/v1/ready` should return exit 0 once `vss-lvs` is serving. The VSS Agent at `http://${HOST_IP}:8000/health` is the cross-profile readiness signal; this one confirms the LVS-specific microservice.
 
-For LVS with `LLM_MODE=local` or `LLM_MODE=local_shared`, also require:
-
-```bash
-curl -sf http://${HOST_IP}:${LLM_PORT:-30081}/v1/health/ready
-```
-
-This prevents a deploy from passing when the local LLM NIM is down.
-
 ## Default models
 
 | Role | `*_NAME` (env) | `*_NAME_SLUG` | Served by |
@@ -156,8 +148,6 @@ The RT-VLM container reads sizing knobs from `dev-profile-lvs/.env` with the `RT
 | `RT_VLM_DEVICE_ID` | (compose `device_ids`) | `${VLM_DEVICE_ID:-0}` | Which GPU RT-VLM pins to. In shared mode set this equal to `LLM_DEVICE_ID`. |
 
 The sizing flow is identical to base: pick the fraction with the formula in [`base.md`](base.md#sizing-math), write it into `dev-profile-lvs/generated.env` (one place — there is no per-hardware `hw-*.env` for RT-VLM), re-resolve the compose, deploy, watch the rtvi-vlm logs for `Maximum concurrency for X tokens per GPU: Y x` to confirm the KV-cache budget.
-
-**Skill deploy requirement:** when LVS runs RT-VLM on the same GPU as a local LLM (`LLM_MODE=local_shared` and `VLM_MODE=local_shared`), do not leave `RTVI_VLLM_GPU_MEMORY_UTILIZATION` empty. For H100 and RTXPRO6000BW shared deployments, write `RTVI_VLLM_GPU_MEMORY_UTILIZATION=0.40` into `generated.env` before resolving Compose.
 
 ## LVS-specific write location for the worked example
 

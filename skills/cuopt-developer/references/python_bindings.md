@@ -23,7 +23,7 @@ C++ Implementation (.hpp/.cu) ← Solver logic, CUDA kernels
 | Cython bindings | `python/cuopt/cuopt/linear_programming/data_model/data_model_wrapper.pyx` | Data model bridge |
 | Cython declarations | `python/cuopt/cuopt/linear_programming/solver/solver.pxd` | C++ interface declarations |
 | Cython declarations | `python/cuopt/cuopt/linear_programming/data_model/data_model.pxd` | C++ interface declarations |
-| C++ headers | `cpp/include/cuopt/linear_programming/` | Public API |
+| C++ headers | `cpp/include/cuopt/mathematical_optimization/` | Public API |
 | C++ implementation | `cpp/src/` | Solver internals |
 
 ## File Types
@@ -126,10 +126,10 @@ void solver_settings_t<i_t, f_t>::set_parameter_from_string(
 ### Declaring C++ classes in .pxd
 
 ```cython
-cdef extern from "cuopt/linear_programming/solver_settings.hpp" namespace "cuopt::linear_programming":
-    ctypedef enum pdlp_solver_mode_t "cuopt::linear_programming::pdlp_solver_mode_t":
-        Stable1 "cuopt::linear_programming::pdlp_solver_mode_t::Stable1"
-        Stable2 "cuopt::linear_programming::pdlp_solver_mode_t::Stable2"
+cdef extern from "cuopt/mathematical_optimization/solver_settings.hpp" namespace "cuopt::mathematical_optimization":
+    ctypedef enum pdlp_solver_mode_t "cuopt::mathematical_optimization::pdlp_solver_mode_t":
+        Stable1 "cuopt::mathematical_optimization::pdlp_solver_mode_t::Stable1"
+        Stable2 "cuopt::mathematical_optimization::pdlp_solver_mode_t::Stable2"
 
     cdef cppclass solver_settings_t[i_t, f_t]:
         solver_settings_t() except +

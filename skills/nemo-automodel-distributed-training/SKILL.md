@@ -17,6 +17,7 @@ metadata:
 NeMo AutoModel uses PyTorch-native distributed training.
 All parallelism is orchestrated through a single `MeshContext` object that
 holds device meshes, strategy configs, and axis names.
+<!-- NVSkills signature refresh requested for AM-519. -->
 
 ## Instructions
 
@@ -111,7 +112,7 @@ Quick MoE expert-parallel answer:
 ## YAML Config Structure
 
 The `distributed` section in the recipe YAML maps directly to
-`parse_distributed_section()` in `recipes/_dist_setup.py`:
+`parse_distributed_section()` in `recipes/_dist_utils.py`:
 
 ```yaml
 distributed:
@@ -148,11 +149,12 @@ dp_size = world_size / (tp_size * pp_size * cp_size)
 ## Infrastructure Flow
 
 ```
-YAML distributed section
-    -> parse_distributed_section()          [recipes/_dist_setup.py]
-    -> setup_distributed()                  [recipes/_dist_setup.py]
-        -> create_device_mesh()             [components/distributed/device_mesh.py]
-        -> MeshContext(...)                  [components/distributed/mesh.py]
+initialize_distributed()                       [components/distributed/init_utils.py]
+    -> initializes torch.distributed process group and returns DistInfo
+YAML distributed section + DistInfo.world_size
+    -> parse_distributed_section()          [recipes/_dist_utils.py]
+    -> create_distributed_setup_from_config()              [recipes/_dist_utils.py]
+        -> DistributedSetup.build()         [components/distributed/config.py]
     -> instantiate_infrastructure()         [_transformers/infrastructure.py]
         -> _instantiate_distributed()       -> FSDP2Manager / MegatronFSDPManager / DDPManager
         -> _instantiate_pipeline()          -> AutoPipeline (if pp_size > 1)
@@ -231,8 +233,9 @@ distributed:
   activation_checkpointing: true
 ```
 
-This is forwarded to the strategy config for non-EP models, or read from
-`MeshContext.activation_checkpointing` for EP models.
+This is a model-build/training behavior flag, not mesh topology. Dense
+strategies read it from the strategy config; EP/MoE paths pass the recipe-level
+flag directly into model infrastructure.
 
 ### Gradient Sync Deferral
 
@@ -291,7 +294,7 @@ distributed:
 
 checkpoint:
   model_save_format: safetensors
-  save_consolidated: true
+  save_consolidated: final
 ```
 
 ### How it works
@@ -441,14 +444,123 @@ scaling dimension:
 - Use PP or DP for cross-node scaling.
 - TP across InfiniBand degrades throughput severely.
 
+## Programmatic API (from_pretrained / from_config)
+
+When not using YAML recipes, configure distributed training via Python:
+
+```python
+from nemo_automodel.components.distributed import (
+    DistributedSetup,
+    FSDP2Config,
+    ParallelismSizes,
+    initialize_distributed,
+)
+
+dist_env = initialize_distributed("nccl")
+distributed_setup = DistributedSetup.build(
+    strategy=FSDP2Config(sequence_parallel=True),
+    parallelism_sizes=ParallelismSizes(tp_size=2),
+    activation_checkpointing=True,
+    world_size=dist_env.world_size,
+)
+```
+
+Or pass directly to `from_pretrained`:
+
+```python
+from nemo_automodel import NeMoAutoModelForCausalLM
+
+model = NeMoAutoModelForCausalLM.from_pretrained(
+    "meta-llama/Llama-3.2-1B",
+    distributed_setup=distributed_setup,
+)
+```
+
 ## Code Anchors
 
-- `components/distributed/config.py`: FSDP2Config, MegatronFSDPConfig, DDPConfig.
-- `components/distributed/mesh.py`: MeshContext, strategy map, and mesh sizes.
-- `components/distributed/device_mesh.py`: device mesh and `moe_mesh` creation.
-- `components/distributed/pipelining/config.py`: PipelineConfig fields.
-- `components/moe/config.py`: MoEParallelizerConfig and MoEConfig.
-- `recipes/_dist_setup.py`: YAML parsing and distributed setup.
+Strategy config dataclasses:
+
+```
+components/distributed/config.py
+    FSDP2Config       -- sequence_parallel, tp_plan, mp_policy, offload_policy,
+                         activation_checkpointing, defer_fsdp_grad_sync
+    MegatronFSDPConfig -- zero_dp_strategy, overlap_grad_reduce, overlap_param_gather, etc.
+    DDPConfig          -- activation_checkpointing only
+```
+
+MeshContext (single source of truth for parallelism):
+
+```
+components/distributed/mesh.py
+    MeshContext  -- device_mesh, moe_mesh
+                    Properties: tp_size, pp_size, cp_size, ep_size, dp_size, dp_replicate_size
+    MeshAxisName -- PP, DP, DP_REPLICATE, DP_SHARD, DP_SHARD_CP, DP_CP, CP, TP, EP, EP_SHARD
+```
+
+Mesh context and raw mesh creation:
+
+```
+components/distributed/config.py
+    DistributedSetup.build()      -- builds MeshContext from strategy + parallelism
+components/distributed/mesh_utils.py
+    _create_device_meshes()       -- routes to FSDP2/MegatronFSDP/DDP raw mesh creation
+    _create_fsdp2_device_mesh()   -- shape (pp, dp_replicate, dp_shard, cp, tp) + flattened submeshes
+    _create_megatron_fsdp_device_mesh() -- shape (dp, cp, tp)
+```
+
+Distributed managers:
+
+```
+components/distributed/fsdp2.py          -- FSDP2Manager.parallelize()
+components/distributed/megatron_fsdp.py  -- MegatronFSDPManager.parallelize()
+components/distributed/ddp.py            -- DDPManager
+```
+
+Pipeline parallelism:
+
+```
+components/distributed/pipelining/config.py        -- PipelineConfig dataclass
+components/distributed/pipelining/autopipeline.py  -- AutoPipeline orchestrator
+components/distributed/pipelining/functional.py    -- pipeline_model(), schedule creation
+components/distributed/pipelining/hf_utils.py      -- HF model validation for PP
+```
+
+Context parallelism:
+
+```
+components/distributed/cp_utils.py
+    make_cp_batch_and_ctx()            -- creates CP context manager + shards batch
+    create_context_parallel_ctx()      -- wraps torch.distributed.tensor.experimental.context_parallel
+    attach_context_parallel_hooks()    -- strips attention_mask, sets is_causal=True
+    make_cp_batch_for_te()             -- TE-specific CP batch sharding (THD format)
+```
+
+Infrastructure orchestration:
+
+```
+_transformers/infrastructure.py
+    instantiate_infrastructure()    -- config objects -> runtime objects
+    apply_model_infrastructure()    -- applies sharding, PEFT, checkpoints to model
+    _shard_pp()                     -- pipeline parallel path
+    _shard_ep_fsdp()                -- EP + FSDP path (non-PP)
+```
+
+YAML parsing:
+
+```
+recipes/_dist_utils.py
+    parse_distributed_section()  -- YAML dict -> typed configs + sizes
+    create_distributed_setup_from_config()  -- recipe adapter: parse + create DistributedSetup; does not init process group
+```
+
+MoE config:
+
+```
+components/distributed/config.py
+    MoEParallelizerConfig  -- reshard_after_forward, ignore_router_for_ac, wrap_outer_model, etc.
+components/moe/config.py
+    MoEConfig              -- n_routed_experts, n_activated_experts, score_func, etc.
+```
 
 ## Pitfalls
 
@@ -462,7 +574,8 @@ scaling dimension:
    (`interleaved_1f1b`) and smaller microbatches to reduce bubble time.
 
 4. **FSDP2 requires DTensor-aware state dict saving.** Use `safetensors` with
-   `save_consolidated: true` for checkpoint compatibility.
+   `save_consolidated: final` for final HF export, or `save_consolidated: false`
+   plus the generated `model/consolidate.sh` helper for offline export.
 
 5. **CP requires compatible attention.** SDPA (Flash Attention or Efficient
    Attention) or TE attention only. `SDPBackend.MATH` is not compatible with

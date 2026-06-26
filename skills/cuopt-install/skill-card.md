@@ -7,21 +7,26 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to install NVIDIA cuOpt (GPU-accelerated optimization engine) via pip, conda, or Docker and verify the installation for Python, C, or server deployments. <br>
+Developers and engineers installing the NVIDIA cuOpt GPU-accelerated optimization library for Python, C, or REST server deployment and verifying the installation. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>  
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Verification Examples](references/verification_examples.md) <br>
+- [verification_examples.md](references/verification_examples.md) <br>
 - [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
-- [cuOpt Examples](https://github.com/NVIDIA/cuopt-examples) <br>
 
 
 ## Skill Output: <br>
@@ -37,7 +42,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task (pass threshold: 50%). <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +66,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+0%) | 88% (+6%) |
-| Discoverability | 2 | 100% (+0%) | 62% (+19%) |
-| Effectiveness | 2 | 97% (+4%) | 100% (+0%) |
-| Efficiency | 2 | 93% (-0%) | 61% (+17%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+70%) | 97% (+22%) |
+| Discoverability | 1 | 100% (+100%) | 97% (+72%) |
+| Effectiveness | 1 | 100% (+74%) | 100% (+6%) |
+| Efficiency | 1 | 95% (+67%) | 96% (+69%) |
 
 ## Skill Version(s): <br>
 26.08.00 (source: frontmatter) <br>

@@ -6,8 +6,8 @@
 /*
  * Simple MILP (C API): same as LP but x1 is integer
  */
-#include <cuopt/linear_programming/cuopt_c.h>
-#include <cuopt/linear_programming/constants.h>
+#include <cuopt/mathematical_optimization/cuopt_c.h>
+#include <cuopt/mathematical_optimization/constants.h>
 #include <stdio.h>
 #include <stdlib.h>
 
