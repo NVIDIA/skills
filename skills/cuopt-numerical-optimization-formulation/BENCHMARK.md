@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `cuopt-numerical-optimization-formulation`
-- Evaluation date: 2026-06-23
+- Evaluation date: 2026-06-26
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 3 evaluation tasks
@@ -55,10 +55,10 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 3 | 100% (+0%) | 100% (+0%) |
-| Correctness | 3 | 83% (+33%) | 33% (-7%) |
-| Discoverability | 3 | 67% (+67%) | 0% (+0%) |
-| Effectiveness | 3 | 98% (+5%) | 67% (-11%) |
-| Efficiency | 3 | 72% (+45%) | 28% (-0%) |
+| Correctness | 3 | 67% (+23%) | 37% (+0%) |
+| Discoverability | 3 | 33% (+33%) | 0% (+0%) |
+| Effectiveness | 3 | 93% (+10%) | 71% (+1%) |
+| Efficiency | 3 | 49% (+22%) | 28% (-0%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 

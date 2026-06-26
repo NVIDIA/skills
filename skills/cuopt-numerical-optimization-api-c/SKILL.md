@@ -14,6 +14,7 @@ metadata:
 ---
 
 
+
 # cuOpt Numerical Optimization — C API
 
 Solve LP, MILP, and QP problems via the cuOpt C API. The same library, headers, build pattern, and core calls (`cuOptCreate*Problem`, `cuOptSolve`, `cuOptGetObjectiveValue`) apply across all three; QP extends the API with quadratic-objective creation calls.
@@ -24,11 +25,11 @@ This skill is **C only**.
 
 ## API Call Sequence
 
-For LP/MILP, the ordered C entry points are: `cuOptCreateRangedProblem` (sense `CUOPT_MINIMIZE` / `CUOPT_MAXIMIZE`, CSR constraint matrix as `row_offsets` / `col_indices` / `values`, `var_types` char array using `CUOPT_CONTINUOUS` / `CUOPT_INTEGER` macros) → `cuOptSolve(problem, settings, &solution)` → `cuOptGetObjectiveValue(solution, &obj_value)` → matching `cuOptDestroy*` calls. Include `<cuopt/linear_programming/cuopt_c.h>`. Full ordered code with build instructions in [references/examples.md](references/examples.md).
+For LP/MILP, the ordered C entry points are: `cuOptCreateRangedProblem` (sense `CUOPT_MINIMIZE` / `CUOPT_MAXIMIZE`, CSR constraint matrix as `row_offsets` / `col_indices` / `values`, `var_types` char array using `CUOPT_CONTINUOUS` / `CUOPT_INTEGER` macros) → `cuOptSolve(problem, settings, &solution)` → `cuOptGetObjectiveValue(solution, &obj_value)` → matching `cuOptDestroy*` calls. Include `<cuopt/mathematical_optimization/cuopt_c.h>`. Full ordered code with build instructions in [references/examples.md](references/examples.md).
 
 ## QP via C API (beta)
 
-QP uses the same library, include/lib paths, and build pattern as LP/MILP — only the problem-creation call differs (it accepts a quadratic objective). See the cuOpt C headers (`cpp/include/cuopt/linear_programming/`) for the QP-specific creation/solve calls and the repo docs at `docs/cuopt/source/cuopt-c/lp-qp-milp/` for end-to-end QP examples.
+QP uses the same library, include/lib paths, and build pattern as LP/MILP — only the problem-creation call differs (it accepts a quadratic objective). See the cuOpt C headers (`cpp/include/cuopt/mathematical_optimization/`) for the QP-specific creation/solve calls and the repo docs at `docs/cuopt/source/cuopt-c/lp-qp-milp/` for end-to-end QP examples.
 
 **QP rules:**
 - **MINIMIZE only** (`CUOPT_MINIMIZE`). To maximize `f(x)`, negate objective coefficients and Q entries.

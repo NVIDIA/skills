@@ -9,10 +9,16 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers using NVIDIA cuOpt who need structured guidance for problem formulation, environment setup, API usage, and result verification across routing, LP, MILP, and QP optimization interfaces. <br>
+Developers and engineers using NVIDIA cuOpt for optimization tasks (routing, LP, MILP, QP) who need guidance on correct API usage, installation, environment setup, and interaction patterns. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [No] <br>
+**Credential Type(s):** [None] <br>  
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
@@ -21,11 +27,12 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
 - [cuOpt API Reference](https://docs.nvidia.com/cuopt/user-guide/latest/api.html) <br>
-- [cuopt-examples Repository](https://github.com/NVIDIA/cuopt-examples) <br>
+- [cuopt-examples repo](https://github.com/NVIDIA/cuopt-examples) <br>
+- [Google Colab notebooks](https://colab.research.google.com/github/nvidia/cuopt-examples/) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Configuration instructions, Analysis] <br>
+**Output Type(s):** [Configuration instructions, Code, Analysis] <br>
 **Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -37,7 +44,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (positive skill-activation case) in the NVSkills-Eval external profile. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile within astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,10 +69,10 @@ Underlying evaluation signals used in this run: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 55% (+20%) | 97% (+39%) |
-| Discoverability | 1 | 25% (+0%) | 58% (+5%) |
-| Effectiveness | 1 | 42% (+12%) | 92% (+65%) |
-| Efficiency | 1 | 25% (+0%) | 34% (-9%) |
+| Correctness | 1 | 65% (+20%) | 94% (+36%) |
+| Discoverability | 1 | 25% (+0%) | 62% (+0%) |
+| Effectiveness | 1 | 43% (+12%) | 94% (+65%) |
+| Efficiency | 1 | 25% (+0%) | 48% (-12%) |
 
 ## Skill Version(s): <br>
 26.08.00 (source: frontmatter) <br>

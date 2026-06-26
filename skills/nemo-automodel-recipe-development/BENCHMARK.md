@@ -7,13 +7,13 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nemo-automodel-recipe-development`
-- Evaluation date: 2026-05-28
+- Evaluation date: 2026-06-26
 - NVSkills-Eval profile: `external`
-- Environment: `local`
+- Environment: `astra-sandbox`
 - Dataset: 3 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
+- Overall verdict: PASS
 
 ## Agents Used
 
@@ -32,6 +32,7 @@ Reported benchmark dimensions:
 
 Underlying evaluation signals used in this run:
 
+- `security` (Security): checks for unsafe operations, secret leakage, and unauthorized access.
 - `skill_execution` (Skill Execution): verifies that the agent loaded the expected skill and workflow.
 - `skill_efficiency` (Efficiency): checks routing quality, decoy avoidance, and redundant tool usage.
 - `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
@@ -53,35 +54,26 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 6 | 100% (+6%) | 89% (+25%) |
-| Correctness | 6 | 100% (+3%) | 95% (+9%) |
-| Discoverability | 6 | 100% (+11%) | 82% (+9%) |
-| Effectiveness | 6 | 97% (+2%) | 91% (+19%) |
-| Efficiency | 6 | 93% (+12%) | 76% (+12%) |
+| Security | 3 | 100% (+0%) | 100% (+0%) |
+| Correctness | 3 | 73% (+35%) | 95% (+41%) |
+| Discoverability | 3 | 67% (+58%) | 71% (+45%) |
+| Effectiveness | 3 | 72% (+29%) | 93% (+44%) |
+| Efficiency | 3 | 72% (+46%) | 59% (+27%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation reported findings. NVSkills-Eval ran 9 checks and found 8 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 1 total findings.
 
 Top findings:
 
-- LOW QUALITY/quality_discoverability: Description doesn't mention WHEN to use this skill (`skills/nemo-automodel-recipe-development/SKILL.md`)
-- LOW QUALITY/quality_discoverability: No '## Purpose' section (`skills/nemo-automodel-recipe-development/SKILL.md`)
-- LOW QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/nemo-automodel-recipe-development/SKILL.md`)
-- LOW QUALITY/quality_reliability: No limitations documented (`skills/nemo-automodel-recipe-development/SKILL.md`)
-- LOW QUALITY/quality_reliability: No troubleshooting section documented (`skills/nemo-automodel-recipe-development/SKILL.md`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/nemo-automodel-recipe-development/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 1 file(s)
-- Inter-Skill Deduplication: Parsed skill 'nemo-automodel-recipe-development': 121 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 
-The skill should be reviewed before NVSkills-Eval publication. Skill owners should address the findings above and rerun NVSkills-Eval to refresh this benchmark.
+The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

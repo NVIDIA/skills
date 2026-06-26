@@ -236,6 +236,8 @@ class NewModelForCausalLM(HFCheckpointingMixin, NewModelPreTrainedModel):
         # State dict adapter for HF<->custom conversion
         self.state_dict_adapter = NewModelStateDictAdapter(config=self.config)
         self.post_init()
+        if getattr(config, "tie_word_embeddings", False):
+            self.tie_weights()
 
     def get_input_embeddings(self):
         return self.model.embed_tokens
@@ -248,6 +250,10 @@ class NewModelForCausalLM(HFCheckpointingMixin, NewModelPreTrainedModel):
 
     def set_output_embeddings(self, new_embeddings):
         self.lm_head = new_embeddings
+
+    def tie_weights(self, *_args, **_kwargs):
+        if getattr(self.config, "tie_word_embeddings", False):
+            self.lm_head.weight = self.model.embed_tokens.weight
 
     def forward(self, input_ids=None, attention_mask=None, labels=None,
                 logits_to_keep=0, **kwargs):

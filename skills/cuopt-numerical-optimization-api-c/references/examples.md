@@ -3,8 +3,8 @@
 ## Required Headers
 
 ```c
-#include <cuopt/linear_programming/cuopt_c.h>   // Core API
-#include <cuopt/linear_programming/constants.h> // Parameter name macros (CUOPT_TIME_LIMIT, etc.)
+#include <cuopt/mathematical_optimization/cuopt_c.h>   // Core API
+#include <cuopt/mathematical_optimization/constants.h> // Parameter name macros (CUOPT_TIME_LIMIT, etc.)
 ```
 
 ## Parameter Setting Functions
@@ -30,8 +30,8 @@
  *                    2.7*x1 + 10.1*x2 <= 4.9
  *                    x1, x2 >= 0
  */
-#include <cuopt/linear_programming/cuopt_c.h>
-#include <cuopt/linear_programming/constants.h>
+#include <cuopt/mathematical_optimization/cuopt_c.h>
+#include <cuopt/mathematical_optimization/constants.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -139,8 +139,8 @@ cleanup:
 /*
  * Same as LP but x1 is integer
  */
-#include <cuopt/linear_programming/cuopt_c.h>
-#include <cuopt/linear_programming/constants.h>
+#include <cuopt/mathematical_optimization/cuopt_c.h>
+#include <cuopt/mathematical_optimization/constants.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -291,7 +291,7 @@ CUOPT_PDLP_SOLVER_MODE_FAST1        // 3
 CUOPT_PDLP_SOLVER_MODE_STABLE3      // 4
 ```
 
-> **Complete list:** See `cpp/include/cuopt/linear_programming/constants.h` for all 50+ parameter constants including termination status codes, constraint senses, and file format constants.
+> **Complete list:** See `cpp/include/cuopt/mathematical_optimization/constants.h` for all 50+ parameter constants including termination status codes, constraint senses, and file format constants.
 
 ---
 
@@ -301,8 +301,8 @@ For more complete C examples with full error handling, see:
 
 | Resource | Location |
 |----------|----------|
-| **Constants Header** | `cpp/include/cuopt/linear_programming/constants.h` |
-| C API Header | `cpp/include/cuopt/linear_programming/cuopt_c.h` |
+| **Constants Header** | `cpp/include/cuopt/mathematical_optimization/constants.h` |
+| C API Header | `cpp/include/cuopt/mathematical_optimization/cuopt_c.h` |
 | C API Documentation | `docs/cuopt/source/cuopt-c/lp-qp-milp/lp-qp-milp-c-api.rst` |
 | Simple LP Example | `docs/cuopt/source/cuopt-c/lp-qp-milp/examples/simple_lp_example.c` |
 | Simple MILP Example | `docs/cuopt/source/cuopt-c/lp-qp-milp/examples/simple_milp_example.c` |

@@ -14,6 +14,7 @@ metadata:
 ---
 
 
+
 # Numerical Optimization Formulation
 
 Concepts and workflow for going from a problem description to a clear formulation across LP, MILP, and QP. No API code here.

@@ -11,6 +11,7 @@ metadata:
 ---
 
 # NeMo AutoModel Recipe Development
+<!-- NVSkills signature refresh requested for AM-519. -->
 
 ## Instructions
 
@@ -88,10 +89,10 @@ All components are constructed through dedicated builder functions:
 - `build_model()` -- instantiates the model from config
 - `build_optimizer()` -- creates optimizer (AdamW, etc.)
 - `build_dataloader()` -- sets up train and validation dataloaders
-- `build_loss_fn()` -- creates the loss function
+- `build_loss_module()` -- creates the loss function
 - `build_lr_scheduler()` -- creates the learning rate scheduler
 - `build_step_scheduler()` -- creates the step scheduler controlling training progression
-- `build_checkpoint_config()` -- configures checkpointing
+- `CheckpointingConfig` -- configures checkpointing (built directly from the YAML `checkpoint:` block via `RecipeConfig.checkpoint`)
 
 ### Infrastructure Application Order
 

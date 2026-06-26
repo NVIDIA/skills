@@ -9,10 +9,16 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers creating or modifying NeMo AutoModel training and evaluation recipes, including YAML config structure, builder functions, CLI routing, and recipe execution flow. <br>
+Developers and engineers creating or modifying training, SFT, or evaluation recipes for NeMo AutoModel, including YAML config structure, builder functions, CLI routing, and recipe-specific tests. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>  
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
@@ -20,24 +26,23 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [NeMo AutoModel Documentation](https://docs.nvidia.com/nemo/automodel/latest/index.html) <br>
-- [YAML Configuration Guide](docs/guides/configuration.md) <br>
-- [Supervised Fine-Tuning (SFT) and PEFT](docs/guides/llm/finetune.md) <br>
+- [NeMo AutoModel GitHub Repository](https://github.com/NVIDIA-NeMo/Automodel) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Configuration instructions, Code, Shell commands] <br>
+**Output Type(s):** [Configuration instructions, Code] <br>
 **Output Format:** [Markdown with inline YAML and bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- claude-code <br>
+- codex <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 3 internal evaluation tasks (positive skill-activation cases) with 2 attempts per task. <br>
+Evaluated against 3 internal evaluation tasks in the astra-sandbox environment using the NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -48,6 +53,7 @@ Reported benchmark dimensions: <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
 Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
 - `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
@@ -60,11 +66,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 6 | 100% (+6%) | 89% (+25%) |
-| Correctness | 6 | 100% (+3%) | 95% (+9%) |
-| Discoverability | 6 | 100% (+11%) | 82% (+9%) |
-| Effectiveness | 6 | 97% (+2%) | 91% (+19%) |
-| Efficiency | 6 | 93% (+12%) | 76% (+12%) |
+| Security | 3 | 100% (+0%) | 100% (+0%) |
+| Correctness | 3 | 73% (+35%) | 95% (+41%) |
+| Discoverability | 3 | 67% (+58%) | 71% (+45%) |
+| Effectiveness | 3 | 72% (+29%) | 93% (+44%) |
+| Efficiency | 3 | 72% (+46%) | 59% (+27%) |
 
 ## Skill Version(s): <br>
 v1.2.1+7febc6e (source: pyproject.toml) <br>

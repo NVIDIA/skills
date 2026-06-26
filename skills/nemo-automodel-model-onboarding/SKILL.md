@@ -15,6 +15,7 @@ metadata:
 ## Purpose
 
 This skill guides implementation of new model architectures in NeMo AutoModel. Follow the five phases in order.
+<!-- NVSkills signature refresh requested for AM-519. -->
 
 ## Instructions
 
@@ -190,8 +191,17 @@ See the pattern files for detailed implementation guidance:
 - Dense LLM: [llm-patterns.md](./llm-patterns.md)
 - MoE: [moe-patterns.md](./moe-patterns.md)
 - VLM: [vlm-patterns.md](./vlm-patterns.md)
+- Capabilities and fp32 precision: [capabilities-and-precision.md](./capabilities-and-precision.md)
 
-### 2.3 MoE state-dict adapter checklist
+### 2.3 Causal LM weight tying
+
+For any CausalLM-style class whose config can enable `tie_word_embeddings`,
+make tying explicit: declare `_tied_weights_keys`, implement `tie_weights()`
+with the actual `lm_head` and input-embedding FQNs, and add tiny tests for
+tied and untied configs. Do not tie architectures with intentionally separate
+heads, asymmetric vocab sizes, or stages that do not own both tensors.
+
+### 2.4 MoE state-dict adapter checklist
 
 For MoE models, do not stop at generic loading. The adapter must explicitly map:
 
@@ -210,7 +220,7 @@ Do not use these shortcuts:
   and NeMo layouts require it and a test proves the conversion is reversible.
 - Do not skip router or shared-expert tests because dense-layer tests pass.
 
-### 2.4 VLM onboarding checklist
+### 2.5 VLM onboarding checklist
 
 For VLMs, confirm the Hugging Face config has `vision_config` and `text_config`
 and that `architectures` points to a conditional-generation class. Start from
@@ -225,7 +235,7 @@ The implementation should explicitly cover:
 - Registration of the `ForConditionalGeneration` class in `_transformers/registry.py`.
 - Tiny tests that exercise image-text inputs and verify the adapter round-trip.
 
-### 2.5 Register in registry
+### 2.6 Register in registry
 
 Add the model to `MODEL_ARCH_MAPPING` in `_transformers/registry.py`:
 
@@ -248,6 +258,19 @@ _CUSTOM_CONFIG_REGISTRATIONS: Dict[str, Tuple[str, str]] = {
     "new_model": ("nemo_automodel.components.models.new_model.configuration", "NewModelConfig"),
 }
 ```
+
+### 2.7 Declare capabilities and precision-sensitive params
+
+Every class registered in `MODEL_ARCH_MAPPING` must declare parallelism
+capabilities, either with a static nested `ModelCapabilities` dataclass or a
+variant-aware `get_capabilities(cls, config)` method. Pick exactly one pattern.
+Capabilities should reflect recipe YAMLs that have been validated end to end.
+
+If the model has precision-sensitive parameters such as Mamba `A_log` /
+`dt_bias`, MoE sigmoid gate bias, attention-sink bias, or per-head `scale`,
+declare `_keep_in_fp32_modules_strict` so sharding keeps those params in fp32
+compute. See [capabilities-and-precision.md](./capabilities-and-precision.md)
+for examples, variant dispatch rules, and frozen-submodule dtype guidance.
 
 ---
 
@@ -371,9 +394,11 @@ that only surface in a full parity comparison.
 - [ ] Implemented __init__.py with re-export
 - [ ] Registered in `MODEL_ARCH_MAPPING` in `_transformers/registry.py`
 - [ ] Registered custom config in `_CUSTOM_CONFIG_REGISTRATIONS` (if applicable)
+- [ ] Declared `ModelCapabilities` nested dataclass (static) OR `get_capabilities(cls, config)` classmethod (variant dispatch, e.g. ERNIE-4.5 MoE vs dense) — never both, never neither
 - [ ] Created example YAML config
 - [ ] Verified model loads via `NeMoAutoModelForCausalLM.from_pretrained()`
 - [ ] Created unit tests (forward shape, state_dict round-trip)
+- [ ] Declared `_keep_in_fp32_modules_strict` for every intrinsically-fp32 param (SSM `A_log`/`dt_bias`, Mamba `D` when reference-fp32, MoE gate bias, attention-sink bias, `scale`, …) — see §2.7
 - [ ] Created layer equivalence tests for every rewritten layer (matching model dtype)
 - [ ] Created functional tests (training loss decreases)
 - [ ] Updated docs/model-coverage page

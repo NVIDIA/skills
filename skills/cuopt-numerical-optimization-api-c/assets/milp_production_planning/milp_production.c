@@ -9,8 +9,8 @@
  * Constraints: 2*x1+x2 <= 100 (machine), x1+3*x2 <= 120 (labor), 4*x1+2*x2 <= 200 (material).
  * Objective: maximize 50*x1 + 30*x2  => minimize -50*x1 - 30*x2.
  */
-#include <cuopt/linear_programming/cuopt_c.h>
-#include <cuopt/linear_programming/constants.h>
+#include <cuopt/mathematical_optimization/cuopt_c.h>
+#include <cuopt/mathematical_optimization/constants.h>
 #include <stdio.h>
 #include <stdlib.h>
 
