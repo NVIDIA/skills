@@ -4,10 +4,10 @@ name: cuOpt
 repo: NVIDIA/cuopt
 description: GPU-accelerated optimization — vehicle routing, linear programming, quadratic programming, installation, server deployment, and developer tools.
 skills:
-  - path: skills/cuopt-developer/
-    catalog_dir: cuopt-developer
   - path: skills/cuopt-install/
     catalog_dir: cuopt-install
+  - path: skills/cuopt-multi-objective-exploration/
+    catalog_dir: cuopt-multi-objective-exploration
   - path: skills/cuopt-numerical-optimization-api-c/
     catalog_dir: cuopt-numerical-optimization-api-c
   - path: skills/cuopt-numerical-optimization-api-cli/
@@ -18,13 +18,5 @@ skills:
     catalog_dir: cuopt-numerical-optimization-formulation
   - path: skills/cuopt-routing-api-python/
     catalog_dir: cuopt-routing-api-python
-  - path: skills/cuopt-routing-formulation/
-    catalog_dir: cuopt-routing-formulation
   - path: skills/cuopt-server-api-python/
     catalog_dir: cuopt-server-api-python
-  - path: skills/cuopt-server-common/
-    catalog_dir: cuopt-server-common
-  - path: skills/cuopt-skill-evolution/
-    catalog_dir: cuopt-skill-evolution
-  - path: skills/cuopt-user-rules/
-    catalog_dir: cuopt-user-rules
