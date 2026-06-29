@@ -1,5 +1,5 @@
 ## Description: <br>
-Cosmos3-Nano video QA supervised fine-tuning with FSDP parallelism. <br>
+Trace and interpret the Pareto frontier across competing objectives using repeated single-objective cuOpt solves (weighted-sum and ε-constraint). <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers training or evaluating video question-answering models, fine-tuning Cosmos3-Nano or compatible Cosmos Reason models with SFT/LoRA. <br>
+Developers and engineers exploring tradeoffs between competing objectives in optimization problems, using cuOpt to trace the Pareto frontier and interpret exchange rates rather than collapsing to a single weighted answer. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Yes] <br>
-**Credential Type(s):** [API key] <br>  
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>  
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,28 +25,24 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [cosmos-reason-launch.md](references/cosmos-reason-launch.md) <br>
-- [cosmos-reason-evaluate.md](references/cosmos-reason-evaluate.md) <br>
-- [cosmos-reason-automl.md](references/cosmos-reason-automl.md) <br>
-- [cosmos-reason-parameters.md](references/cosmos-reason-parameters.md) <br>
-- [Cosmos3-Nano on Hugging Face](https://huggingface.co/nvidia/Cosmos3-Nano) <br>
-- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skills-bank) <br>
+- [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
+- [cuopt-examples](https://github.com/NVIDIA/cuopt-examples) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Analysis, Configuration instructions] <br>
+**Output Format:** [Markdown with inline formulations and solver-call patterns] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- claude-code <br>
+- codex <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 internal evaluation task via NVSkills-Eval (external profile). <br>
+Evaluated against 5 internal evaluation tasks (4 positive skill-activation, 1 negative). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -70,14 +66,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 100% (+100%) | 20% (+20%) |
-| Discoverability | 1 | 85% (+85%) | 0% (+0%) |
-| Effectiveness | 1 | 100% (+86%) | 48% (+34%) |
-| Efficiency | 1 | 68% (+41%) | 28% (-0%) |
+| Security | 5 | 100% (+0%) | 100% (+0%) |
+| Correctness | 5 | 90% (+0%) | 87% (-8%) |
+| Discoverability | 5 | 78% (-2%) | 73% (-22%) |
+| Effectiveness | 5 | 85% (-6%) | 85% (+2%) |
+| Efficiency | 5 | 75% (-3%) | 71% (-21%) |
 
 ## Skill Version(s): <br>
-0.1.0 (source: frontmatter) <br>
+26.08.00 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

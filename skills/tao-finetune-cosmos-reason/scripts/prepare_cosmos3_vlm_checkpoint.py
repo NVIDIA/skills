@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0
 """Prepare Cosmos3-Nano weights for Cosmos-RL Qwen3-VL loaders.
-
 The upstream Cosmos3-Nano checkpoint is a Cosmos3 Omni checkpoint. Cosmos-RL
 images that load Qwen3-VL models need the documented VLM safetensors conversion
 from NVIDIA/cosmos-framework.

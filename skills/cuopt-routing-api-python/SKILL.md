@@ -17,9 +17,17 @@ metadata:
 
 # cuOpt Routing — Python API
 
-Confirm problem type (TSP, VRP, PDP) and data (locations, orders, fleet, constraints) before coding.
-
 This skill is **Python only**. Routing has no C API in cuOpt.
+
+## Required questions
+
+Ask these if not already clear:
+
+1. **Problem type** — TSP, VRP, or PDP?
+2. **Locations** — How many? Depot(s)? Cost or distance between pairs (matrix or derived)?
+3. **Orders / tasks** — Which locations must be visited? Demand or service per stop?
+4. **Fleet** — Number of vehicles, capacity per vehicle (and per dimension if multiple), start/end locations?
+5. **Constraints** — Time windows (earliest/latest arrival), service times, precedence (order A before B)?
 
 ## Minimal VRP Example
 
