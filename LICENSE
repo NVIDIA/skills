@@ -1,13 +1,5 @@
-SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
-
-Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES.
-
-This project is licensed under a dual license:
-- Apache License 2.0 (for code and configuration)
-- Creative Commons Attribution 4.0 International (CC BY 4.0) (for documentation)
-
-You may use the contents of this repository under the terms of either license,
-or both, as applicable to the type of content.
+Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+This code is dual-licensed with documentation/skills under the CC-BY-4.0 AND source code under Apache-2.0 license terms.
 
 ================================================================================
                                  Apache License

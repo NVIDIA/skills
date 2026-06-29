@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0
 """
 Build plugin packages from plugins.d/ and per-plugin .skills-manifest.yml files.
 
