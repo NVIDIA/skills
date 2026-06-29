@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
-# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+# Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 """Generate metadata.json and skills.sh.json for the NVIDIA skills catalog.
 
 Pipeline:

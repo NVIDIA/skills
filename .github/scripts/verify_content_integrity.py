@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
-# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+# Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 """Verify that each skill's files still match its signed manifest.
 
 A ``skill.oms.sig`` is a Sigstore bundle wrapping a DSSE / in-toto statement

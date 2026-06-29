@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
 # Regenerate the README's Available Skills and Getting Help & Contributing
 # tables from components.d/*.yml. Used by the sync-skills workflow; can also
 # be run locally to preview the result.
