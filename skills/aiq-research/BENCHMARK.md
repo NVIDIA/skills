@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `aiq-research`
-- Evaluation date: 2026-05-29
+- Evaluation date: 2026-06-29
 - NVSkills-Eval profile: `external`
-- Environment: `local`
+- Environment: `astra-sandbox`
 - Dataset: 3 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,25 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 6 | 100% (+0%) | 92% (+8%) |
-| Correctness | 6 | 73% (+18%) | 77% (+3%) |
-| Discoverability | 6 | 69% (+27%) | 52% (-7%) |
-| Effectiveness | 6 | 58% (+3%) | 68% (+3%) |
-| Efficiency | 6 | 63% (+18%) | 49% (-7%) |
+| Security | 3 | 100% (+0%) | 100% (+33%) |
+| Correctness | 3 | 47% (+28%) | 71% (+28%) |
+| Discoverability | 3 | 33% (+25%) | 37% (+23%) |
+| Effectiveness | 3 | 42% (+24%) | 69% (+26%) |
+| Efficiency | 3 | 47% (+21%) | 43% (+14%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed. NVSkills-Eval ran 9 checks and found 0 total findings.
+Tier 1 validation passed. NVSkills-Eval ran 1 checks and found 0 total findings.
 
 Notable observations:
 
-- SECURITY: No security vulnerabilities detected (secrets, API keys, credentials)
 - SCHEMA: Found skill manifest: SKILL.md
-- VERSION: Valid semantic version: 2.1.0
-- PII: Scanning 2 files for PII
-- LICENSE: no findings reported.
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 2 file(s)
-- Inter-Skill Deduplication: Parsed skill 'aiq-research': 104 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 
