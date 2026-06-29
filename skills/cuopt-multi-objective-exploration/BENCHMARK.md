@@ -1,16 +1,16 @@
 # Evaluation Report
 
-Evaluation of the `tao-finetune-cosmos-reason` skill before publication through NVSkills-Eval.
+Evaluation of the `cuopt-multi-objective-exploration` skill before publication through NVSkills-Eval.
 
 This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
 
 ## Evaluation Summary
 
-- Skill: `tao-finetune-cosmos-reason`
+- Skill: `cuopt-multi-objective-exploration`
 - Evaluation date: 2026-06-29
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
-- Dataset: 1 evaluation tasks
+- Dataset: 5 evaluation tasks
 - Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
@@ -42,10 +42,10 @@ Underlying evaluation signals used in this run:
 
 ## Test Tasks
 
-The benchmark dataset contained 1 evaluation tasks:
+The benchmark dataset contained 5 evaluation tasks:
 
-- Positive tasks: 1 tasks where the skill was expected to activate.
-- Negative tasks: 0 tasks where no skill was expected.
+- Positive tasks: 4 tasks where the skill was expected to activate.
+- Negative tasks: 1 tasks where no skill was expected.
 - Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
 
 Task composition is derived from the evaluation dataset when possible. Entries with `expected_skill` set are treated as positive skill-activation cases, while entries with `expected_skill: null` are treated as negative activation cases.
@@ -54,25 +54,23 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 100% (+100%) | 20% (+20%) |
-| Discoverability | 1 | 85% (+85%) | 0% (+0%) |
-| Effectiveness | 1 | 100% (+86%) | 48% (+34%) |
-| Efficiency | 1 | 68% (+41%) | 28% (-0%) |
+| Security | 5 | 100% (+0%) | 100% (+0%) |
+| Correctness | 5 | 90% (+0%) | 87% (-8%) |
+| Discoverability | 5 | 78% (-2%) | 73% (-22%) |
+| Effectiveness | 5 | 85% (-6%) | 85% (+2%) |
+| Efficiency | 5 | 75% (-3%) | 71% (-21%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 5 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 3 total findings.
 
 Top findings:
 
-- MEDIUM SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/models/tao-finetune-cosmos-reason`)
-- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/models/tao-finetune-cosmos-reason/SKILL.md`)
-- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/models/tao-finetune-cosmos-reason/SKILL.md`)
-- LOW SCHEMA/unexpected_file: Unexpected 'schemas' in skill root (`skills/models/tao-finetune-cosmos-reason/schemas`)
-- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/models/tao-finetune-cosmos-reason/SKILL.md`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/cuopt-multi-objective-exploration/SKILL.md`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/cuopt-multi-objective-exploration/SKILL.md`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/cuopt-multi-objective-exploration/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 

@@ -9,10 +9,16 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers deploying, configuring, or calling the NVIDIA cuOpt REST server for vehicle routing (VRP, PDP), linear programming (LP), and mixed-integer linear programming (MILP) optimization workloads. <br>
+Developers and engineers deploying the cuOpt optimization server and calling its REST API from Python or curl for vehicle routing, LP, and MILP workloads. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>  
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
@@ -20,25 +26,25 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
-- [cuOpt Examples](https://github.com/NVIDIA/cuopt-examples) <br>
 - [cuOpt Docker Hub](https://hub.docker.com/r/nvidia/cuopt) <br>
-- [Runnable Assets (README)](assets/README.md) <br>
+- [cuOpt Examples](https://github.com/NVIDIA/cuopt-examples) <br>
+- [assets/README.md](assets/README.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [API Calls, Code, Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline Python and bash code blocks] <br>
+**Output Type(s):** [API Calls, Shell commands, Code] <br>
+**Output Format:** [Markdown with inline bash and Python code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- `claude-code` <br>
+- `codex` <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 internal evaluation task (positive skill-activation) with 2 attempts per task via NVSkills-Eval (external profile, local environment). Pass threshold: 50%. <br>
+Evaluated against 1 evaluation task (1 positive skill-activation case, 0 negative cases) in the NVSkills-Eval external profile, astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,11 +68,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+0%) | 97% (+0%) |
-| Discoverability | 2 | 100% (+0%) | 72% (+0%) |
-| Effectiveness | 2 | 100% (+0%) | 100% (+0%) |
-| Efficiency | 2 | 93% (-0%) | 56% (-1%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+70%) | 97% (+35%) |
+| Discoverability | 1 | 100% (+100%) | 97% (+69%) |
+| Effectiveness | 1 | 100% (+56%) | 100% (+40%) |
+| Efficiency | 1 | 95% (+68%) | 95% (+67%) |
 
 ## Skill Version(s): <br>
 26.08.00 (source: frontmatter) <br>

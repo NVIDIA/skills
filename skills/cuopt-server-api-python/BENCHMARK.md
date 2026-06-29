@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `cuopt-server-api-python`
-- Evaluation date: 2026-05-29
+- Evaluation date: 2026-06-29
 - NVSkills-Eval profile: `external`
-- Environment: `local`
+- Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,27 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+0%) | 97% (+0%) |
-| Discoverability | 2 | 100% (+0%) | 72% (+0%) |
-| Effectiveness | 2 | 100% (+0%) | 100% (+0%) |
-| Efficiency | 2 | 93% (-0%) | 56% (-1%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+70%) | 97% (+35%) |
+| Discoverability | 1 | 100% (+100%) | 97% (+69%) |
+| Effectiveness | 1 | 100% (+56%) | 100% (+40%) |
+| Efficiency | 1 | 95% (+68%) | 95% (+67%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 15 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 3 total findings.
 
 Top findings:
 
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`assets/lp_basic/client.py:40`)
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`assets/lp_basic/client.py:47`)
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`assets/lp_basic/client.py:51`)
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`assets/milp_basic/client.py:38`)
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`assets/milp_basic/client.py:44`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/cuopt-server-api-python/SKILL.md`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/cuopt-server-api-python/SKILL.md`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/cuopt-server-api-python/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 12 file(s)
-- Inter-Skill Deduplication: Parsed skill 'cuopt-server-api-python': 129 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 
