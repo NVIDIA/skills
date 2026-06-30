@@ -1,0 +1,6 @@
+name: NeMo Curator
+repo: NVIDIA-NeMo/Curator
+description: NeMo Curator - scalable data pre-processing and curation toolkit for LLM pre-training, fine-tuning, and evaluation datasets.
+skills:
+- path: .claude/skills/
+  catalog_dir: NeMo-Curator
