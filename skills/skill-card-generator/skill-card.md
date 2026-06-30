@@ -9,10 +9,16 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and skill owners generating governance skill cards for agent skills as part of NVCARPS or legal/safety review preparation. <br>
+Developers and engineers generating NVIDIA governance skill cards for existing agent skill directories before legal, safety, or owner review. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [No] <br>
+**Credential Type(s):** [None] <br>  
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
@@ -21,23 +27,23 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [Style Guide](references/style-guide.md) <br>
 - [Skill Card Template](references/skill-card.md.j2) <br>
-- [NVIDIA Trustworthy AI](https://www.nvidia.com/en-us/ai-data-science/trustworthy-ai/) <br>
+- [Skill Card Generator License](references/Skill Card Generator License.txt) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Files, Shell commands] <br>
+**Output Type(s):** [Files, Analysis] <br>
 **Output Format:** [Markdown] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- claude-code <br>
-- codex <br>
+- Claude Code (`claude-code`) <br>
+- Codex (`codex`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 7 evaluation tasks (4 positive skill-activation, 3 negative activation) with 2 attempts per task at 50% pass threshold. <br>
+Evaluated against 11 evaluation tasks (8 positive, 3 negative) through NVSkills-Eval with external profile in astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -48,6 +54,7 @@ Reported benchmark dimensions: <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
 Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
 - `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
@@ -60,14 +67,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 84% (+11%) | 87% (+23%) |
-| Correctness | 8 | 97% (+2%) | 92% (+4%) |
-| Discoverability | 8 | 96% (+8%) | 89% (+2%) |
-| Effectiveness | 8 | 92% (+4%) | 89% (+8%) |
-| Efficiency | 8 | 80% (+7%) | 82% (+6%) |
+| Security | 8 | 91% (+0%) | 55% (-45%) |
+| Correctness | 8 | 86% (+39%) | 85% (+34%) |
+| Discoverability | 8 | 77% (+41%) | 83% (+33%) |
+| Effectiveness | 8 | 83% (+37%) | 88% (+39%) |
+| Efficiency | 8 | 69% (+20%) | 76% (+17%) |
 
 ## Skill Version(s): <br>
-656a3a9 (source: git SHA, committed 2026-05-28) <br>
+7cc9bf6 (source: git SHA, committed 2026-06-30) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

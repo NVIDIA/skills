@@ -37,7 +37,7 @@ Create a draft NVIDIA governance skill card for an existing agent skill. The ski
 Use this when:
 - A skill directory already exists and needs a new governance card.
 - A changed skill needs its existing card refreshed.
-- A skill owner is preparing NVCARPS or legal/safety review material.
+- A skill owner is preparing legal/safety review material.
 
 Do NOT use for:
 - Explaining, listing, comparing, or discussing skills or skill capabilities.
@@ -61,10 +61,11 @@ Do NOT use for:
 3. Stay within the declared permission scope. Do not read `.env`, credential files, hidden auth folders, or unrelated repo files; do not write outside the target skill directory or `/tmp/`.
 4. Run `scripts/discover_assets.py` against the target. Use the structured signal summary first; if output is truncated, read only targeted files or small excerpts.
 5. Build a context JSON file from the structured signal summary first, then from extracted file contents only when needed.
-6. Follow `references/style-guide.md` for every context field. Use `HUMAN-REQUIRED` only when no source supports a truthful value.
-7. Render the card with `scripts/render_card.py` and fix any schema errors before proceeding.
-8. Review the card manually, remove resolved VERIFY and SELECT markers, then run `scripts/validate_submission.py`.
-9. Before finishing, confirm the rendered card has no unrendered `{{ ... }}` or `{% ... %}` template fragments.
+6. Populate `credential_requirements` with only two fields: `requires_api_key_or_credential` and `credential_types`. Ground the classification in SKILL.md prose documentation — not script inspection alone. For `credential_types`, use the controlled vocabulary in `references/style-guide.md`. Never include credential values, assignments, or raw environment variable names.
+7. Follow `references/style-guide.md` for every context field. Use `HUMAN-REQUIRED` only when no source supports a truthful value.
+8. Render the card with `scripts/render_card.py` and fix any schema errors before proceeding.
+9. Review the card manually, remove resolved VERIFY and SELECT markers, then run `scripts/validate_submission.py`.
+10. Before finishing, confirm the rendered card has no unrendered `{{ ... }}` or `{% ... %}` template fragments.
 
 ## Available Scripts
 

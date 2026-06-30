@@ -1,5 +1,5 @@
 ## Description
-The Skill Card Generator skill reads an agent skill's source files and surrounding repository context to produce a fully populated NVIDIA skill card and an accompanying human-review table. Given a target skill directory, it runs a discovery script, builds a Jinja-template context from extracted signals, renders the card deterministically, and flags every inferred or incomplete field for owner verification before submission to NVCARPS.
+The Skill Card Generator skill reads an agent skill's source files and surrounding repository context to produce a fully populated NVIDIA skill card and an accompanying human-review table. Given a target skill directory, it runs a discovery script, builds a Jinja-template context from extracted signals, renders the card deterministically, and flags every inferred or incomplete field for owner verification before final submission.
 
 This skill is ready for commercial/non-commercial use.
 

@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `physical-ai-video-data-augmentation`
-- Evaluation date: 2026-06-06
+- Evaluation date: 2026-06-30
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,27 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+75%) | 97% (+72%) |
-| Discoverability | 2 | 100% (+75%) | 97% (+72%) |
-| Effectiveness | 2 | 90% (+85%) | 100% (+84%) |
-| Efficiency | 2 | 94% (+69%) | 96% (+69%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+75%) | 97% (+72%) |
+| Discoverability | 1 | 100% (+75%) | 97% (+47%) |
+| Effectiveness | 1 | 100% (+90%) | 100% (+86%) |
+| Efficiency | 1 | 94% (+70%) | 96% (+36%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 11 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 3 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/physical-ai-video-data-augmentation/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description very long (282 chars, recommend 50-150) (`skills/physical-ai-video-data-augmentation/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Broad description without negative triggers may cause over-triggering (`skills/physical-ai-video-data-augmentation/SKILL.md`)
-- LOW QUALITY/quality_reliability: Scripts may lack error handling: generate_configs.py (`skills/physical-ai-video-data-augmentation/SKILL.md`)
-- LOW QUALITY/quality_reliability: No limitations documented (`skills/physical-ai-video-data-augmentation/SKILL.md`)
+- LOW SCHEMA/unexpected_file: Unexpected 'agents' in skill root (`skills/physical-ai-video-data-augmentation/agents`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/physical-ai-video-data-augmentation/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 44 file(s)
-- Inter-Skill Deduplication: Parsed skill 'physical-ai-video-data-augmentation': 282 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

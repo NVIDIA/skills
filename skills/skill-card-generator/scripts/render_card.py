@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 #!/usr/bin/env python3
 """
 render_card.py — Render a skill card from a validated context JSON
@@ -15,6 +18,7 @@ deterministic so two identical contexts always produce identical cards.
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -49,6 +53,7 @@ SCHEMA = {
     "license_verify_reason": (str, False),  # short explanation, shown in HTML comment
     "use_case": (str, True),
     "deployment_geography": (str, True),
+    "credential_requirements": (dict, False),  # optional for backward compatibility
     "references": (list, True),  # [{label, url}]
     "output": (dict, True),  # {types: [str], format, parameters, other_properties}
     "skill_version": (str, True),
@@ -57,6 +62,37 @@ SCHEMA = {
 
 VALID_USAGE = {"commercial", "research_dev", "demonstration"}
 VALID_OWNER_KINDS = {"nvidia", "third_party"}
+VALID_CREDENTIAL_STATUSES = {"yes", "no", "optional", "not specified"}
+VALID_CREDENTIAL_TYPES = {
+    "API key",
+    "OAuth Token",
+    "Cloud Credentials",
+    "Service Account",
+    "None",
+}
+SENSITIVE_CREDENTIAL_VALUE_PATTERNS = (
+    re.compile(
+        r"(?i)\b[A-Z][A-Z0-9_]*(?:API_KEY|TOKEN|SECRET|PASSWORD|"
+        r"PRIVATE_KEY|CLIENT_SECRET|ACCESS_KEY)[A-Z0-9_]*\s*[:=]\s*"
+        r"(?:[^\s\"'`]+|\"[^\"]*\"|'[^']*')"
+    ),
+    re.compile(
+        r"(?i)\b(?:password|passwd|pwd|secret|token|api[_-]?key|"
+        r"access[_-]?key|private[_-]?key|client[_-]?secret)\b\s*[:=]\s*"
+        r"(?:[^\s\"'`]+|\"[^\"]*\"|'[^']*')"
+    ),
+    re.compile(r"(?i)\bauthorization\s*:\s*bearer\s+[A-Za-z0-9._~+/=-]+"),
+    re.compile(
+        r"(?i)[?&](?:token|api_key|key|secret|password|access_token)="
+        r"[^&\s)>\]\"'`]+"
+    ),
+    re.compile(
+        r"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b|"
+        r"\b(?:sk|hf|ghp|glpat|nvapi)-?[A-Za-z0-9_=-]{20,}\b|"
+        r"\bgithub_pat_[A-Za-z0-9_]{20,}\b"
+    ),
+    re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
+)
 EVALUATION_STRING_FIELDS = ("agent", "tasks", "results_markdown")
 EVALUATION_METRIC_GROUPS = ("dimensions", "signals")
 TESTING_COMPLETED_FIELDS = (
@@ -71,6 +107,7 @@ def validate(ctx: dict) -> list[str]:
     _validate_schema(ctx, errors)
     _validate_usage(ctx, errors)
     _validate_owner(ctx, errors)
+    _validate_credential_requirements(ctx, errors)
     _validate_output(ctx, errors)
     _validate_evaluation(ctx, errors)
     _validate_references(ctx, errors)
@@ -116,6 +153,82 @@ def _validate_owner(ctx: dict, errors: list[str]) -> None:
                     errors.append(
                         f"'owner.{k}' required when owner.kind == 'third_party'"
                     )
+
+
+def _validate_credential_requirements(ctx: dict, errors: list[str]) -> None:
+    credentials = ctx.get("credential_requirements")
+    if credentials is None or not isinstance(credentials, dict):
+        return
+
+    for key in ("requires_api_key_or_credential", "credential_types"):
+        if key not in credentials:
+            errors.append(f"'credential_requirements.{key}' missing")
+
+    status = credentials.get("requires_api_key_or_credential")
+    if isinstance(status, str):
+        if status not in VALID_CREDENTIAL_STATUSES:
+            errors.append(
+                "'credential_requirements.requires_api_key_or_credential' must be "
+                f"one of {sorted(VALID_CREDENTIAL_STATUSES)}, got {status!r}"
+            )
+    elif status is not None:
+        errors.append(
+            "'credential_requirements.requires_api_key_or_credential' should be str, "
+            "got "
+            f"{type(status).__name__}"
+        )
+
+    _validate_string_list(
+        "credential_requirements.credential_types", credentials.get("credential_types"), errors
+    )
+
+    types = credentials.get("credential_types")
+    if isinstance(types, list):
+        for idx, t in enumerate(types):
+            if isinstance(t, str):
+                valid = (
+                    t in VALID_CREDENTIAL_TYPES
+                    or (t.startswith("Other [") and t.endswith("]"))
+                )
+                if not valid:
+                    errors.append(
+                        f"'credential_requirements.credential_types[{idx}]' must be one of "
+                        f"{sorted(VALID_CREDENTIAL_TYPES)} or 'Other [description]', got {t!r}"
+                    )
+
+
+def _validate_string_list(path: str, value: object, errors: list[str]) -> None:
+    if value is None:
+        return
+    if not isinstance(value, list):
+        errors.append(f"'{path}' should be list, got {type(value).__name__}")
+        return
+    for idx, item in enumerate(value):
+        if not isinstance(item, str):
+            errors.append(
+                f"'{path}[{idx}]' should be str, got {type(item).__name__}"
+            )
+
+
+def _validate_credential_string_list_values(
+    path: str, value: object, errors: list[str]
+) -> None:
+    if not isinstance(value, list):
+        return
+    for idx, item in enumerate(value):
+        if isinstance(item, str):
+            _validate_no_sensitive_credential_value(f"{path}[{idx}]", item, errors)
+
+
+def _validate_no_sensitive_credential_value(
+    path: str, value: str, errors: list[str]
+) -> None:
+    if any(pattern.search(value) for pattern in SENSITIVE_CREDENTIAL_VALUE_PATTERNS):
+        errors.append(
+            f"'{path}' must describe credential requirements without containing "
+            "credential values, assignments, bearer tokens, private keys, or "
+            "secret-like tokens"
+        )
 
 
 def _validate_output(ctx: dict, errors: list[str]) -> None:
@@ -262,6 +375,10 @@ def _apply_marker_defaults(ctx: dict) -> None:
     if isinstance(ctx.get("owner"), dict):
         ctx["owner"].setdefault("verify", False)
         ctx["owner"].setdefault("verify_reason", "")
+    credentials = ctx.setdefault("credential_requirements", {})
+    if isinstance(credentials, dict):
+        credentials.setdefault("requires_api_key_or_credential", "not specified")
+        credentials.setdefault("credential_types", [])
 
 
 def render(context_path: Path, template_path: Path, out_path: Path) -> None:

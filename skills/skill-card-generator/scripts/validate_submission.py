@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 #!/usr/bin/env python3
 """
 validate_submission.py — Fail if a rendered skill card still contains
@@ -19,7 +22,7 @@ The human reviewer is expected to:
 
 This script is a single-pass grep over the rendered markdown that
 exits non-zero if any marker (visual or machine-readable) remains.
-Run it as the pre-submission gate for NVCARPS.
+Run it as the pre-submission gate before final submission.
 
 Usage:
   python3 validate_submission.py <rendered-card.md>

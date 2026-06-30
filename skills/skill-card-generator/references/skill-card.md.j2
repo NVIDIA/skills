@@ -12,6 +12,9 @@ Verify markers:
     rendered card at submission time.
 -#}
 {%- set evaluation = evaluation | default({}) -%}
+{%- set credential_requirements = credential_requirements | default({}) -%}
+{%- set credential_status = credential_requirements.get("requires_api_key_or_credential", "not specified") -%}
+{%- set credential_types = credential_requirements.get("credential_types", []) -%}
 
 ## Description: <br>
 {{ description_sentence }} <br>
@@ -54,6 +57,12 @@ This skill is not owned or developed by NVIDIA. This skill has been developed an
 
 ### Deployment Geography for Use: <br>
 {{ deployment_geography }} <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [{{ credential_status | title }}] <br>
+**Credential Type(s):** [{% if credential_types %}{{ credential_types | join(", ") }}{% else %}None identified{% endif %}] <br>  
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. See skill body for more details. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>

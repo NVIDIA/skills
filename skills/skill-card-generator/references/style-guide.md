@@ -9,13 +9,15 @@ This guide defines every context field: its purpose, where to look for a value, 
 ```
 skill_name, skill_kind, description_sentence, usage_posture,
 owner, license_identifier, use_case,
-deployment_geography, references, output,
+deployment_geography, credential_requirements, references, output,
 skill_version, evaluation
 ```
 
 Every required key must be present. Lists may be empty. Strings may be `""` only if the field genuinely has no grounding in any source you were given. Otherwise write an informed value — even if uncertain — and mark it INFERRED in the review table. Writing "" or HUMAN-REQUIRED is a last resort, not a default.
 
 `evaluation` is optional. Include it only when source evidence or user-provided context supports at least one evaluation field. If no evaluation evidence exists, omit `evaluation` entirely so the optional evaluation sections do not render.
+
+`credential_requirements` is optional for backward compatibility with older contexts, but new or refreshed cards should include it.
 
 ## Verify markers (read this before filling in `owner` and `license_identifier`)
 
@@ -105,6 +107,94 @@ The template's default guidance: assume `"Global"` unless the skill's documentat
 - A specific country, if the skill states one.
 
 This is a business/legal decision; reviewers may adjust it. Writing `"Global"` is the correct default, not a placeholder.
+
+### `credential_requirements` (object, optional for backward compatibility)
+
+Runtime credential and secret-configuration requirements. Include this object for new and refreshed skill cards so reviewers can determine whether the skill needs an API key, token, cloud credential, service account, or other externally supplied credential before deployment.
+
+Shape:
+
+```json
+{
+  "requires_api_key_or_credential": "yes",
+  "credential_types": ["API key"]
+}
+```
+
+**`requires_api_key_or_credential`** — one of exactly:
+- `"yes"` — SKILL.md has an explicit setup, prerequisites, or authentication section documenting an auth credential requirement. MCP-authenticated skills: set `"yes"` — SSO/OAuth is a credential requirement even with no env var. File-based auth skills: set `"yes"`.
+- `"no"` — SKILL.md **explicitly** states no credentials are needed, or the skill's nature makes it unambiguous (e.g., a pure text-transformation tool with no external network calls, no API references, and no setup section).
+- `"optional"` — ONLY when SKILL.md explicitly documents a credential-free fallback path in prose. Do not infer optionality from script logic alone. Absence of an auth section is NOT evidence of optionality.
+- `"not specified"` — The correct honest default when SKILL.md has no setup/auth/prerequisites section and no credential references anywhere in skill-scope files. Records that credentials are not documented without asserting they definitely don't exist.
+
+**Classification must be grounded in SKILL.md prose, not inferred from script inspection alone.**
+
+**`credential_types`** — list, each item must be exactly one of:
+- `"API key"` — bearer token, PAT, or service key supplied as a string
+- `"OAuth Token"` — OAuth 2.0/2.1 flows, SSO-backed tokens
+- `"Cloud Credentials"` — AWS IAM, GCP service account JSON, Azure service principal
+- `"Service Account"` — dedicated non-human account credentials
+- `"None"` — no credential required; use when status is `"no"`
+- `"Other [description]"` — last resort for auth models that genuinely cannot be represented by any of the five named types, e.g. `"Other [credential file ~/.token.yaml]"` or `"Other [hardware token]"`
+
+**Choosing the right type — common cases:**
+- Personal Access Tokens (PATs) → `"API key"`. Examples: `JIRA_API_TOKEN`, `CONFLUENCE_PAT`, `GITLAB_PRIVATE_TOKEN`, `GITHUB_TOKEN` are all string tokens used to authenticate API calls — map them to `"API key"` regardless of the variable name.
+- OAuth 2.0/2.1 flows → `"OAuth Token"`, including MCP-mediated OAuth. When a MCP server handles the OAuth exchange on behalf of the skill (e.g. MaaS MCP browser login, NVIDIA SSO), the underlying auth type is still OAuth — use `"OAuth Token"`, not `"Other [...]"`.
+- Username + password pairs (Basic auth / HTTP Basic) → `"Other [Basic auth]"`. Do not map the password half to `"API key"` and do not split into separate entries.
+- Do not use `"Other [description]"` when a named type fits. Wrong: `"Other [MaaS MCP OAuth]"`. Right: `"OAuth Token"`.
+
+**Default when SKILL.md has no credential signals:**
+- If SKILL.md has no setup, prerequisites, authentication, or configuration section AND contains no environment variable references, API key mentions, or token references anywhere in skill-scope files → set `"not specified"` and `[]` (empty list).
+- `"not specified"` is the honest default: it records that credentials are not documented, without asserting they definitely don't exist.
+- `"no"` and `["None"]` are reserved for skills that explicitly confirm no credentials are needed — not for skills that simply don't mention credentials.
+- Example: a skill that renders files locally, no setup/auth section, no credential references → `"not specified"`, `[]`. Not `"optional"`, not `"no"`.
+
+**Implicit infrastructure credentials — treat these as `"yes"` even without an explicit token export:**
+
+Some skills require authentication without documenting an `export VAR=value` block or a dedicated "Prerequisites: API key" section. These implicit signals are still credential requirements and must be classified as `"yes"`:
+
+- **Private/internal VCS access** — any mention of cloning or pushing to a private GitLab instance, private GitHub repo, or internal monorepo (e.g. "Requires access to NVIDIA GitLab", "clone the internal repo", `git clone <internal-url>`). The VCS requires a PAT or SSH key regardless of whether the SKILL.md names one explicitly. → `"yes"` + `["API key"]` for PAT-based auth, or `["Other [SSH key]"]` if SSH is the documented mechanism.
+- **VPN-gated internal services** — any mention of "VPN required", "must be on VPN", or access to an internal host that is not reachable without a VPN. VPN itself counts as an infrastructure credential. → `"yes"` + `["Other [VPN / corporate network access]"]`.
+- **SSO-required internal systems** — any mention of "requires NVIDIA SSO", "must log in to <internal system>", or "sign in to the internal portal" where no public URL alternative is offered. → `"yes"` + `["OAuth Token"]` if the SSO flow is OAuth/SAML-backed (most corporate SSO), or `["Other [SSO / corporate login]"]` if the mechanism is unspecified.
+- **Closed-network tools where access requires entitlement** — any mention of "you must be granted access", "request access from the admin", or "requires repo membership". → `"yes"`; infer type from the service (GitLab PAT → `"API key"`, internal OAuth → `"OAuth Token"`).
+
+Do NOT downgrade these to `"not specified"` simply because no env var name appears in the SKILL.md text. The absence of an explicit `export TOKEN=...` line does not mean credentials are absent — it means the skill relies on the operator already having them configured (SSH agent, VPN client, SSO session).
+
+**Archetype quick-reference:**
+
+| Skill type | `requires_api_key_or_credential` | `credential_types` |
+|---|---|---|
+| Explicit setup/auth/prerequisites section in SKILL.md | `"yes"` | type(s) documented |
+| MCP-authenticated (MaaS MCP, SSO via MCP server) | `"yes"` | `["OAuth Token"]` |
+| Browser OAuth / interactive SSO login | `"yes"` | `["OAuth Token"]` |
+| Credential file (e.g. `~/.confluence_token.yaml`) | `"yes"` | `["Other [credential file]"]` |
+| Cloud provider credential (AWS IAM, GCP SA, Azure SP) | `"yes"` | `["Cloud Credentials"]` |
+| Private/internal VCS access (private GitLab, GitHub, internal monorepo) | `"yes"` | `["API key"]` (PAT) or `["Other [SSH key]"]` |
+| VPN-gated internal service | `"yes"` | `["Other [VPN / corporate network access]"]` |
+| SSO-required internal system | `"yes"` | `["OAuth Token"]` or `["Other [SSO / corporate login]"]` |
+| Skill explicitly documented as credential-free | `"no"` | `["None"]` |
+| Pure text/analysis, no scripts, no external URLs, no setup | `"no"` | `["None"]` |
+| Credential scanner — scans artifacts *for* credentials | `"no"` | `["None"]` |
+| Skill has an explicit credential-free fallback path in prose | `"optional"` | type(s) for the optional path |
+| No auth section, no credential signals anywhere in skill-scope files | `"not specified"` | `[]` |
+| Credential signals detected but no setup/auth documentation | `"not specified"` | `[]` |
+
+**Cross-field consistency — `credential_types` must agree with status:**
+- Status `"yes"` or `"optional"` → `credential_types` must not be empty and must not contain `"None"`.
+- Status `"no"` → `credential_types` must be `["None"]`.
+- Status `"not specified"` → `credential_types` must be `[]` (empty list).
+
+Anti-patterns to avoid:
+- Do not put environment variable names in `credential_types` (e.g. `"PD_API_KEY"` is wrong; `"API key"` is correct).
+- If a skill's purpose is to *detect* or *scan* credentials in artifacts (like a security scanner), those detected credential patterns are not runtime inputs — set `"no"` and `["None"]`.
+- Do not use `"optional"` as a default. It requires a positive prose statement of a credential-free path in SKILL.md — not merely an absent auth section.
+
+Where to look:
+- Read SKILL.md for any setup, prerequisites, configuration, or authentication sections.
+- Use the discovery report's **"Detected API-key / credential env vars"** block as a supporting signal only — do not use it as the sole basis for classification.
+- Do not read `.env`, credential files, hidden auth folders, key files, or unrelated repo files to fill this object.
+
+**Security constraint:** Do not include API key values, tokens, secrets, private keys, assignments, or example values anywhere in this object. Names and type labels only.
 
 ### `references` (list of `{label, url}`)
 Technical documentation, model cards, papers, and reference material. Includes:
@@ -196,7 +286,7 @@ Before finalizing the context, verify:
 
 ## What goes in the review table
 
-For every required context key, emit a row with: Section (card section name), Field (context key), Confidence (`HIGH` / `INFERRED` / `HUMAN-REQUIRED`), Review Needed (`Yes` / `No`), Reasoning (short sentence), Source Files (comma-separated relative paths, or `None`). If `evaluation` is present, emit rows for its populated subfields.
+For every required context key, emit a row with: Section (card section name), Field (context key), Confidence (`HIGH` / `INFERRED` / `HUMAN-REQUIRED`), Review Needed (`Yes` / `No`), Reasoning (short sentence), Source Files (comma-separated relative paths, or `None`). If `credential_requirements` or `evaluation` is present, emit rows for their populated subfields.
 
 Rules:
 - `HIGH` when the value is copied verbatim or structurally from a specific source (frontmatter key, LICENSE file, explicit URL).

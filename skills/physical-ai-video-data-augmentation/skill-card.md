@@ -9,10 +9,16 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers running video data augmentation and auto-labeling workflows on NVIDIA OSMO to generate labeled synthetic training data for physical AI perception models. <br>
+Developers and engineers running end-to-end video data augmentation and auto-labeling workflows on NVIDIA OSMO to generate labeled synthetic training data for physical AI perception models. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Yes] <br>
+**Credential Type(s):** [API key] <br>  
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
@@ -20,17 +26,17 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [NVIDIA OSMO](https://developer.nvidia.com/osmo) <br>
+- [Augmentation and Auto-Labeling Flow](references/flows/augmentation_and_al.md) <br>
+- [Auto-Labeling Flow](references/flows/auto_labeling.md) <br>
+- [E2E Flow](references/flows/e2e.md) <br>
+- [E2E Super Resolution Flow](references/flows/e2e_super_resolution.md) <br>
+- [NIM Endpoint Reference](references/nim/README.md) <br>
 - [Setup Guide](references/setup.md) <br>
 - [Troubleshooting](references/troubleshooting.md) <br>
-- [NIM Endpoint Reference](references/nim/README.md) <br>
-- [Flow: Augmentation and Auto-Labeling](references/flows/augmentation_and_al.md) <br>
-- [Flow: Auto-Labeling](references/flows/auto_labeling.md) <br>
-- [Flow: E2E](references/flows/e2e.md) <br>
-- [Flow: E2E Super Resolution](references/flows/e2e_super_resolution.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Monitoring output] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -42,7 +48,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (positive skill-activation case) in the astra-sandbox environment using the external NVSkills-Eval profile, with 2 attempts per task and a 50% pass threshold. <br>
+Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). 1 positive skill-activation task; pass threshold 50%. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -66,11 +72,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+75%) | 97% (+72%) |
-| Discoverability | 2 | 100% (+75%) | 97% (+72%) |
-| Effectiveness | 2 | 90% (+85%) | 100% (+84%) |
-| Efficiency | 2 | 94% (+69%) | 96% (+69%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+75%) | 97% (+72%) |
+| Discoverability | 1 | 100% (+75%) | 97% (+47%) |
+| Effectiveness | 1 | 100% (+90%) | 100% (+86%) |
+| Efficiency | 1 | 94% (+70%) | 96% (+36%) |
 
 ## Skill Version(s): <br>
 1.0.0 (source: frontmatter) <br>
