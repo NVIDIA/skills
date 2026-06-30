@@ -85,6 +85,18 @@
       }
     },
     {
+      "path": "skills/cuopt-multi-objective-exploration",
+      "name": "cuopt-multi-objective-exploration",
+      "description": "Trace and interpret the Pareto frontier across competing objectives using repeated single-objective cuOpt solves (weighted-sum and ε-constraint).",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "application_developer,data_scientist,solutions_architect,developer",
+        "discovery.activity_tags": "optimize,compare,evaluate,configure"
+      }
+    },
+    {
       "path": "skills/cuopt-numerical-optimization-api-c",
       "name": "cuopt-numerical-optimization-api-c",
       "description": "LP, MILP, and QP (beta) with cuOpt — C API only. Use when the user is embedding LP, MILP, or QP in C/C++.",

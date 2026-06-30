@@ -250,6 +250,7 @@
         "cufolio",
         "cuopt-developer",
         "cuopt-install",
+        "cuopt-multi-objective-exploration",
         "cuopt-numerical-optimization-api-c",
         "cuopt-numerical-optimization-api-cli",
         "cuopt-numerical-optimization-api-python",
