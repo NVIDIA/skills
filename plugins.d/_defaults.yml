@@ -35,9 +35,9 @@ capabilities:
   - Interactive
   - Write
 
-# Marketplace publishing flags default to true. To opt a plugin out of one
-# or both self-hosted marketplaces, set marketplace_enabled.{claude,codex}: false
-# in that plugin's yaml.
+# Marketplace publishing flags default to true. To opt a plugin out of any
+# of the self-hosted marketplaces, set
+# marketplace_enabled.{claude,codex,cursor}: false in that plugin's yaml.
 
 # How `include_skills` show up on disk under plugins/<name>/skills/.
 #   copy     - rsync each skill into the plugin tree. Real files. Required

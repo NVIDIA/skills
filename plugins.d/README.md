@@ -6,9 +6,11 @@ parses these files and (re)generates:
 
 - `plugins/<name>/.claude-plugin/plugin.json`
 - `plugins/<name>/.codex-plugin/plugin.json`
+- `plugins/<name>/.cursor-plugin/plugin.json`
 - `plugins/<name>/skills/<skill-basename>/` &nbsp;**symlinks** into the canonical `skills/` catalog
 - `.claude-plugin/marketplace.json` (top-level Claude marketplace registry)
 - `.agents/plugins/marketplace.json` (top-level Codex marketplace registry)
+- `.cursor-plugin/marketplace.json` (top-level Cursor marketplace registry)
 
 Files whose names start with `_` are treated as includes and are not
 themselves built into plugins. `_defaults.yml` provides shared author /
@@ -90,5 +92,5 @@ those users.
 A directory under `plugins/<name>/` that has its own
 `.skills-manifest.yml` instead of a `plugins.d/<name>.yml` is treated as
 a curated plugin: the build script only refreshes its `skills/` symlinks
-and otherwise leaves `.claude-plugin/`, `.codex-plugin/`, `assets/`, and
-the marketplace entries hand-edited.
+and otherwise leaves `.claude-plugin/`, `.codex-plugin/`,
+`.cursor-plugin/`, `assets/`, and the marketplace entries hand-edited.

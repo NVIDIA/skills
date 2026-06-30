@@ -13,8 +13,9 @@ Inputs (hand-maintained):
 
   plugins.d/<name>.yml
       Catalog plugin spec. Drives full regeneration of plugins/<name>/
-      (skills/ tree, .claude-plugin/plugin.json, .codex-plugin/plugin.json)
-      and its entry in both marketplace.json files.
+      (skills/ tree, .claude-plugin/plugin.json, .codex-plugin/plugin.json,
+      .cursor-plugin/plugin.json) and its entry in all three
+      marketplace.json files.
 
   plugins/<name>/.skills-manifest.yml
       Per-plugin skill manifest for hand-curated plugins. Only the skills/
@@ -28,8 +29,10 @@ Generated outputs (committed):
   plugins/<name>/skills/<skill>/    Real dir or symlink (see below)
   plugins/<name>/.claude-plugin/plugin.json   (catalog plugins only)
   plugins/<name>/.codex-plugin/plugin.json    (catalog plugins only)
+  plugins/<name>/.cursor-plugin/plugin.json   (catalog plugins only)
   .claude-plugin/marketplace.json   (catalog plugin entries; others preserved)
   .agents/plugins/marketplace.json  (catalog plugin entries; others preserved)
+  .cursor-plugin/marketplace.json   (catalog plugin entries; others preserved)
 
 How the skills/ tree gets populated is selected by `skill_files:` in
 plugins.d/<name>.yml (defaults to `copy` via plugins.d/_defaults.yml):
@@ -70,6 +73,7 @@ PLUGINS_DIR = REPO_ROOT / "plugins"
 SKILLS_DIR = REPO_ROOT / "skills"
 CLAUDE_MARKETPLACE = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 AGENTS_MARKETPLACE = REPO_ROOT / ".agents" / "plugins" / "marketplace.json"
+CURSOR_MARKETPLACE = REPO_ROOT / ".cursor-plugin" / "marketplace.json"
 
 # Default policy block written for every plugin entry in
 # .agents/plugins/marketplace.json. Mirrors the existing convention.
@@ -354,6 +358,48 @@ def render_codex_plugin_json(spec: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+def render_cursor_plugin_json(spec: dict[str, Any]) -> dict[str, Any]:
+    """Render plugins/<name>/.cursor-plugin/plugin.json.
+
+    Follows the Cursor plugin manifest schema
+    (https://cursor.com/docs/reference/plugins): only `name` is required;
+    everything else is optional. The `skills` field is intentionally
+    omitted so Cursor's folder-based discovery scans plugins/<name>/skills/
+    for each subdirectory containing a SKILL.md — the same tree the Claude
+    and Codex manifests point at. Cursor's author object is {name, email?},
+    so we project our {name, url} author down to just `name` (the url is
+    already carried by `homepage`/`repository`). The `logo` path drops the
+    leading "./" because Cursor resolves relative logo paths against
+    raw.githubusercontent.com.
+    """
+    out: dict[str, Any] = {
+        "name": spec["name"],
+        "version": str(spec.get("version", "1.0.0")),
+        "description": spec["description"],
+    }
+    author = spec.get("author")
+    if isinstance(author, dict):
+        cursor_author: dict[str, Any] = {}
+        if author.get("name"):
+            cursor_author["name"] = author["name"]
+        if author.get("email"):
+            cursor_author["email"] = author["email"]
+        if cursor_author:
+            out["author"] = cursor_author
+    if "homepage" in spec:
+        out["homepage"] = spec["homepage"]
+    if "repository" in spec:
+        out["repository"] = spec["repository"]
+    if "license" in spec:
+        out["license"] = spec["license"]
+    if "keywords" in spec:
+        out["keywords"] = list(spec["keywords"])
+    logo = spec.get("logo")
+    if isinstance(logo, str) and logo:
+        out["logo"] = logo[2:] if logo.startswith("./") else logo
+    return out
+
+
 def build_catalog_plugin(spec: dict[str, Any]) -> str:
     # `name` is already validated for kebab-case + uniqueness in discover()
     # before specs reach this function.
@@ -369,6 +415,8 @@ def build_catalog_plugin(spec: dict[str, Any]) -> str:
     log("  ✓ .claude-plugin/plugin.json")
     write_json(plugin_dir / ".codex-plugin" / "plugin.json", render_codex_plugin_json(spec))
     log("  ✓ .codex-plugin/plugin.json")
+    write_json(plugin_dir / ".cursor-plugin" / "plugin.json", render_cursor_plugin_json(spec))
+    log("  ✓ .cursor-plugin/plugin.json")
 
     asset_fields = ["logo", "composer_icon"]
     asset_paths: list[str] = [spec[f] for f in asset_fields if isinstance(spec.get(f), str)]
@@ -493,6 +541,38 @@ def upsert_agents_marketplace(
     log(f"  ✓ {AGENTS_MARKETPLACE.relative_to(REPO_ROOT)} ({len(new_plugins)} plugin(s))")
 
 
+def upsert_cursor_marketplace(
+    catalog_specs: dict[str, dict[str, Any]],
+    curated_names: set[str],
+) -> None:
+    if not CURSOR_MARKETPLACE.is_file():
+        die(f"missing {CURSOR_MARKETPLACE.relative_to(REPO_ROOT)}")
+    data = read_json(CURSOR_MARKETPLACE)
+    existing = data.get("plugins", [])
+    managed = set(catalog_specs.keys())
+
+    new_plugins: list[dict[str, Any]] = []
+    for entry in existing:
+        name = entry.get("name")
+        if name in managed:
+            continue
+        if name in curated_names:
+            new_plugins.append(entry)
+    for name in sorted(catalog_specs):
+        spec = catalog_specs[name]
+        if not is_marketplace_enabled(spec, "cursor"):
+            continue
+        new_plugins.append({
+            "name": name,
+            "source": f"./plugins/{name}",
+            "description": spec["description"],
+        })
+    new_plugins.sort(key=lambda p: p.get("name", ""))
+    data["plugins"] = new_plugins
+    write_json(CURSOR_MARKETPLACE, data)
+    log(f"  ✓ {CURSOR_MARKETPLACE.relative_to(REPO_ROOT)} ({len(new_plugins)} plugin(s))")
+
+
 # ---------------------------- main -------------------------------------------
 
 
@@ -583,6 +663,7 @@ def main(argv: list[str]) -> int:
     curated_names = {d.name for d in curated}
     upsert_claude_marketplace(catalog, curated_names)
     upsert_agents_marketplace(catalog, curated_names)
+    upsert_cursor_marketplace(catalog, curated_names)
 
     if args.check:
         log("── drift check ──")
@@ -594,6 +675,7 @@ def main(argv: list[str]) -> int:
                 "plugins/",
                 ".claude-plugin/marketplace.json",
                 ".agents/plugins/marketplace.json",
+                ".cursor-plugin/marketplace.json",
             ],
             cwd=REPO_ROOT,
             capture_output=True,

@@ -30,6 +30,7 @@ on:
       - "plugins/**"
       - ".claude-plugin/marketplace.json"
       - ".agents/plugins/marketplace.json"
+      - ".cursor-plugin/marketplace.json"
       - ".github/scripts/build-plugins.*"
       - ".github/scripts/version-plugins.*"
       - ".github/workflows/validate-plugins.yml"
@@ -110,5 +111,13 @@ jobs:
       #      from upstream openai/plugins samples.
       #   3. Skip — rely on the build script's schema parity and the
       #      drift check above.
+      #
+      # Cursor side: plugins are validated by the Cursor team at
+      # submission time (cursor.com/marketplace/publish); there is no
+      # local `plugin validate` CLI today. The generated
+      # .cursor-plugin/plugin.json + .cursor-plugin/marketplace.json are
+      # built to the published manifest schema
+      # (https://cursor.com/docs/reference/plugins) and covered by the
+      # drift check above. Revisit if Cursor ships a validator CLI.
       # Deferred for now to keep this workflow lean; revisit if we hit a
       # schema mismatch in the wild.

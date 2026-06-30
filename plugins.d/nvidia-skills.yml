@@ -62,7 +62,8 @@ include_skills:
 #   version, author, homepage, repository, license,
 #   brand_color, capabilities
 
-# By default this plugin is added (true) in both self-hosted marketplace.json files. Uncomment to opt out.
+# By default this plugin is added (true) in all self-hosted marketplace.json files. Uncomment to opt out.
 # marketplace_enabled:
 #   claude: false
 #   codex: false
+#   cursor: false
