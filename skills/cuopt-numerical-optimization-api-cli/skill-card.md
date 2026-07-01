@@ -1,5 +1,5 @@
 ## Description: <br>
-LP, MILP, and QP (beta) with cuOpt — CLI only (MPS files, cuopt_cli). Use when the user is solving LP, MILP, or QP from MPS via command line. <br>
+LP, MILP, and QP (beta) with cuOpt — CLI only (MPS/LP/QPS files, cuopt_cli). Use when the user is solving LP, MILP, or QP from an MPS or LP file via command line. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,21 +7,27 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers solving LP, MILP, and QP optimization problems from MPS files via the cuopt_cli command-line interface. <br>
+Developers and engineers solving LP, MILP, and QP optimization problems from MPS or LP files via command line using NVIDIA cuOpt's GPU-accelerated solver. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
-- [cuopt-examples](https://github.com/NVIDIA/cuopt-examples) <br>
-- [Sample MPS Assets](assets/README.md) <br>
+- [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/) <br>
+- [cuOpt Examples](https://github.com/NVIDIA/cuopt-examples) <br>
+- [cuOpt Releases](https://github.com/NVIDIA/cuopt/releases) <br>
 
 
 ## Skill Output: <br>
@@ -31,13 +37,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- claude-code <br>
+- codex <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task via NVSkills-Eval (external profile, local environment). Pass threshold: 50%. <br>
+Evaluated against 1 evaluation task (positive skill-activation case) in NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,11 +67,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+0%) | 97% (+5%) |
-| Discoverability | 2 | 100% (+0%) | 84% (+5%) |
-| Effectiveness | 2 | 78% (+2%) | 76% (+4%) |
-| Efficiency | 2 | 93% (-0%) | 78% (-0%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 30% (+0%) | 77% (+47%) |
+| Discoverability | 1 | 0% (+0%) | 84% (+84%) |
+| Effectiveness | 1 | 39% (-4%) | 41% (+4%) |
+| Efficiency | 1 | 27% (-0%) | 77% (+49%) |
 
 ## Skill Version(s): <br>
 26.08.00 (source: frontmatter) <br>
