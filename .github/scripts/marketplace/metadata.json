@@ -111,7 +111,7 @@
     {
       "path": "skills/cuopt-numerical-optimization-api-cli",
       "name": "cuopt-numerical-optimization-api-cli",
-      "description": "LP, MILP, and QP (beta) with cuOpt — CLI only (MPS files, cuopt_cli). Use when the user is solving LP, MILP, or QP from MPS via command line.",
+      "description": "LP, MILP, and QP (beta) with cuOpt — CLI only (MPS/LP/QPS files, cuopt_cli). Use when the user is solving LP, MILP, or QP from an MPS or LP file via command line.",
       "metadata": {
         "product.primary": "cuOpt",
         "classification.category.primary": "accelerated_computing",
@@ -1251,7 +1251,7 @@
     {
       "path": "skills/nemo-mbridge-perf-memory-tuning",
       "name": "nemo-mbridge-perf-memory-tuning",
-      "description": "Techniques for reducing peak GPU memory in Megatron Bridge — expandable segments, parallelism resizing, activation recompute, CPU offloading constraints, and common OOM fixes.",
+      "description": "Techniques for reducing peak GPU memory in Megatron Bridge — expandable segments, PEFT + SP input re-gather, parallelism resizing, activation recompute, CPU offloading constraints, and common OOM fixes.",
       "metadata": {
         "product.primary": "NeMo Megatron Bridge",
         "classification.category.primary": "ai_and_machine_learning",
