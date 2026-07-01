@@ -44,10 +44,14 @@ root and apply the same path-remap policy.
 ## Stage-Level Cleanup
 
 After references are stable, run lossless cleanup on the new assembly root via
-`so-run-operations`:
+`usd-optimize-run-operations`:
 
 - `computeExtents`
-- `pruneLeaves`
+- `pruneLeaves` — **guard against unloaded payloads.** A prim whose payload is not
+  loaded composes no children, so it presents as an empty leaf and `pruneLeaves`
+  silently removes it. Load payloads first, or scope the op away from prims with
+  unloaded payloads. See `operation-safety.md` § Caveat: `pruneLeaves` on unloaded
+  payloads.
 - `removePrims`
 
 Do not include bounded-loss operations such as `decimateMeshes` or
@@ -63,7 +67,7 @@ target. Per-prototype invocations cannot delete materials introduced through
 references.
 
 For the Python/API fallback path, use
-`skills/omniverse-usd-performance-tuning/references/so-run-operations/references/invocation.md`.
+`skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/invocation.md`.
 
 ## Instanceability
 

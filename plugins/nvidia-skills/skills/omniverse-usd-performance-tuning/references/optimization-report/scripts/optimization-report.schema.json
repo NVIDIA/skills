@@ -10,11 +10,9 @@
     "timestamp",
     "verdict",
     "optimization_score",
-    "score_scope",
     "score_label",
     "reasoning",
     "measurement_context",
-    "artifacts",
     "metric_groups",
     "metrics",
     "operations",
@@ -33,7 +31,7 @@
     },
     "output_path": {
       "type": ["string", "null"],
-      "description": "Path to the optimized output stage; null for diagnosis-only, no-op, or structural-only runs where no optimized stage was written."
+      "description": "Path to the optimized output stage; null for no_op (already-optimized) or runtime-forced structural_only runs where no optimized stage was written."
     },
     "timestamp": {
       "type": "string",
@@ -43,21 +41,25 @@
     "verdict": {
       "type": "string",
       "enum": ["improved", "neutral", "regressed", "mixed"],
-      "description": "Overall optimization verdict from compare-profiles. Stays within this enum regardless of workflow_mode; use 'neutral' when no metrics changed. Degraded (Scene Optimizer unavailable) and no-op runs are expressed via workflow_mode, not by inventing new verdict values."
+      "description": "Overall optimization verdict from compare-profiles. Stays within this enum regardless of workflow_mode; use 'neutral' when no metrics changed. Degraded (Usd Optimize unavailable) and no-op runs are expressed via workflow_mode, not by inventing new verdict values."
     },
     "workflow_mode": {
       "type": "string",
       "enum": ["full", "structural_only", "no_op"],
-      "description": "Execution mode for this run. 'full' = optimization/mutation ran (default when omitted); 'structural_only' = Scene Optimizer was unavailable so only USD-structural work ran and no mesh operations executed; 'no_op' = no optimization was needed (e.g., structure assessment reported already_optimized). The verdict stays in its own enum in every mode."
+      "description": "Execution mode for this run. 'full' = optimization/mutation ran (default when omitted); 'structural_only' = Usd Optimize was unavailable so only USD-structural work ran and no mesh operations executed; 'no_op' = no optimization was needed (e.g., structure assessment reported already_optimized). The verdict stays in its own enum in every mode."
     },
     "notes": {
       "type": "string",
       "description": "Free-form caveats the verdict and score cannot capture on their own: degraded-path explanation, the runtime or access blocker that prevented a stronger verdict, or the next profile capture needed to graduate it."
     },
+    "next_profile_capture": {
+      "type": "string",
+      "description": "Required by SKILL.md on the runtime-forced degraded path (workflow_mode: structural_only): which runtime profiling should be captured later (e.g. Kit/omniperf FPS, VRAM, frame-time on the optimized stage) to graduate the structural verdict into a runtime one. Optional in all other modes."
+    },
     "runtime_context": {
       "type": "object",
-      "description": "Snapshot of the Kit / Scene Optimizer / Asset Validator versions in effect for this run. Copied verbatim from setup-preflight.json so later readers can reproduce or audit the report. Mirrors the runtime-context fields defined in skills/omniverse-usd-performance-tuning/references/setup-usd-performance-tuning/references/runtime-context-header.md.",
-      "required": ["kit", "sceneOptimizer", "assetValidator"],
+      "description": "Snapshot of the Kit / Usd Optimize / usd-validation-nvidia versions in effect for this run. Copied verbatim from setup-preflight.json so later readers can reproduce or audit the report. Mirrors the runtime-context fields defined in skills/omniverse-usd-performance-tuning/references/setup-usd-performance-tuning/references/runtime-context-header.md.",
+      "required": ["kit", "usdOptimize", "assetValidator"],
       "properties": {
         "kit": {
           "type": "object",
@@ -81,7 +83,7 @@
             }
           }
         },
-        "sceneOptimizer": {
+        "usdOptimize": {
           "type": "object",
           "required": ["extension", "version"],
           "properties": {
@@ -109,8 +111,8 @@
             },
             "source": {
               "type": "string",
-              "enum": ["kit-extension", "pip", "standalone"],
-              "description": "Where Asset Validator was loaded from."
+              "enum": ["pip", "standalone"],
+              "description": "Where usd-validation-nvidia was loaded from."
             }
           }
         }
@@ -125,7 +127,7 @@
     "score_scope": {
       "type": "string",
       "enum": ["stage_optimization"],
-      "description": "Scope of optimization_score. This report scores stage/composition optimization effectiveness, not full runtime performance."
+      "description": "Optional. Scope of optimization_score: this report scores stage/composition optimization effectiveness, not full runtime performance. Single-value enum kept for explicitness; not rendered (the renderer uses score_scope_label) and not gated, so it is optional rather than required."
     },
     "score_label": {
       "type": "string",
@@ -147,6 +149,161 @@
         "type": ["string", "number", "boolean", "null"]
       }
     },
+    "footprint": {
+      "type": "object",
+      "description": "Repack-normalized disk-footprint attribution (report-contract correction). A USDC/crate repack is the free re-encode any Export achieves; it is NOT the optimization. Report all three sizes and attribute the split so a repack-inflated headline cannot masquerade as the structural win. The storage dimension of the Stage Optimization Score and any footprint claim are measured against repack_normalized_baseline_bytes, never the raw input. Example: a large input that re-crates losslessly to a much smaller baseline (a free re-encode) and only then shows a smaller dedupe-into-shared-prototypes win off that normalized baseline. Optional block; when present, validate_report.py checks the arithmetic and fails closed on a repack-only 'win'.",
+      "required": ["raw_input_bytes", "repack_normalized_baseline_bytes", "optimized_bytes", "structural_delta_pct", "scored_against"],
+      "additionalProperties": false,
+      "properties": {
+        "raw_input_bytes": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Raw input stage size on disk as delivered (total referenced footprint, not root-layer size only)."
+        },
+        "repack_normalized_baseline_bytes": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Input losslessly re-crated to the same target encoding / USD version with zero dedupe. The honest baseline the structural win is measured against; isolates the free crate re-encode from the optimization."
+        },
+        "optimized_bytes": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Optimized output stage size on disk (same referenced-footprint basis as the inputs)."
+        },
+        "repack_delta_pct": {
+          "type": "number",
+          "description": "raw_input -> repack_normalized_baseline percent change. The free re-encode delta (expected <= 0); explicitly NOT the optimization."
+        },
+        "structural_delta_pct": {
+          "type": "number",
+          "description": "repack_normalized_baseline -> optimized percent change. The actual structural optimization win (dedupe into shared prototypes + instancing); the number the score and the run-scoring oracle gate against."
+        },
+        "raw_delta_pct": {
+          "type": "number",
+          "description": "raw_input -> optimized percent change. The total disk saving the user observes; true and useful but must not be conflated with the structural win."
+        },
+        "scored_against": {
+          "type": "string",
+          "enum": ["repack_normalized"],
+          "description": "Pins that the storage dimension and any footprint claim score against the repack-normalized baseline, not the raw input. The only valid value; present so the contract is explicit and machine-checkable."
+        },
+        "disk_win_source": {
+          "type": "string",
+          "enum": ["none", "sharing", "sharing_only", "repack", "mesh_merge", "dead_data_removal", "unused_primvar_removal", "primvar_indexing", "layer_consolidation", "lossy_reduction", "decimation", "fit_primitive", "vertex_weld"],
+          "description": "What produced a claimed disk reduction. The run-scoring oracle (its _guard_sharing_only_disk_win check) fails closed when structural_delta_pct is a real win (< -1%) but the source is NOT a legitimate byte-reduction lever: 'sharing'/'sharing_only' (instancing/hierarchy dedup), 'mesh_merge', 'repack', 'none', or unset all FAIL — the crate already byte-deduplicates identical arrays within a layer, so sharing frees ~no bytes and a merge just concatenates geometry (bytes ~= sum). A genuine disk win must be data removal (dead_data_removal / unused_primvar_removal), primvar_indexing, cross-file layer_consolidation, a lossy op (lossy_reduction / decimation / fit_primitive), or a coincident-seam vertex_weld (welds out the duplicated boundary verts a per-face split introduced — real bytes, credited here and NEVER attributed to the merge that exposed them)."
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "structural_summary": {
+      "type": "object",
+      "description": "Scene-graph (axis-B) outcome the run-scoring oracle reads for the structural capture ratio and the measured-reuse gate. This is a RUNTIME / scene-graph claim (fewer composed prims, instancing, fewer draw calls from a within-prototype merge) and is flagged unverified-at-render until a runtime_profiling capture is attached; it is disk-neutral on its own (see footprint.disk_win_source for the disk axis).",
+      "additionalProperties": true,
+      "properties": {
+        "reuse_measured": {
+          "type": "boolean",
+          "description": "True only when the run MEASURED the reuse it collapsed (distinct vs total prototypes/units). The scorer scores no axis-B credit for an unmeasured consolidation claim when the oracle sets ceilings.structural.requires_measured_reuse."
+        },
+        "authored_prim_delta_pct": {
+          "type": "number",
+          "description": "Authored-prim count percent change (negative = reduction). The primary axis-B metric; from instancing/dedup into shared prototypes. Instance-expanded scope."
+        },
+        "unique_prototype_count": { "type": "integer", "minimum": 0, "description": "Number of distinct prototypes after restructure." },
+        "instance_ratio": { "type": "number", "minimum": 0, "description": "Instances / total occurrences; higher is more reuse, scored toward the ceiling." },
+        "prototype_rendered_mesh_delta_pct": {
+          "type": "number",
+          "description": "PROTOTYPE-scope rendered-mesh percent change (negative = reduction) from a within-prototype mesh merge — 'merge once, benefit N'. The scorer credits THIS (not the instance-expanded count) for the draw-call axis-B win, so it does not double-count with authored_prim_delta_pct / instanced reuse."
+        },
+        "merge_applied": {
+          "type": "boolean",
+          "description": "Optional signal flag: true when a within-prototype mesh merge was performed in this run. Declarative only — the run-scoring oracle does NOT read it; it credits the merge (axis B) via prototype_rendered_mesh_delta_pct + merge_bounds_coherence and guards it via merge_identity_class + preservation.rendered_mesh_merged_count / rendered_triangle_count. Emit it for human/audit readability, not for scoring."
+        },
+        "merge_identity_class": {
+          "type": "string",
+          "enum": ["weak", "none"],
+          "description": "Identity class of the units fused by the merge. A merge destroys per-part identity, so only 'weak' (anonymous, identity-not-wanted) or 'none' (identity-free fragments) units may be merged. A strong-identity (addressable component/subcomponent) unit must NOT be merged — the scorer's preservation gate fails any other value."
+        },
+        "merge_bounds_coherence": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Merged-prim AABB surface area / Sum(member AABB surface area). ~1 = the fused members were spatially adjacent (a legitimate draw-call merge). A value far above 1 means a merge of DISPERSED meshes that balloons the AABB and harms BVH/raytracing; the scorer grants NO draw-call credit when this exceeds MERGE_BOUNDS_COHERENCE_MAX (default 2.0), and the merge should not have been performed."
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "safety_gate": {
+      "type": "object",
+      "description": "Correctness-precondition state (e.g. dangling material bindings repaired BEFORE structuring). The run-scoring oracle fails closed on a status that is not resolved/clear/none/passed/not_required.",
+      "additionalProperties": true,
+      "properties": {
+        "status": { "type": "string", "description": "resolved | clear | none | passed | not_required (cleared) vs. unresolved | blocked | failed (the scorer zeroes the run)." },
+        "finding": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "fidelity": {
+      "type": "object",
+      "description": "Lossy-tier fidelity evidence. The run-scoring oracle fails closed when max_deviation_within_band is false (a run that 'beats' a ceiling by over-decimating beyond the per-target band).",
+      "additionalProperties": true,
+      "properties": {
+        "max_deviation_within_band": { "type": "boolean" },
+        "band": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "preservation": {
+      "type": "object",
+      "description": "Axis-A silent-loss block — the proof that an optimization (especially a 'lossless' dedupe/instancing pass) did not silently drop geometry. This is the hard gate the run-scoring oracle reads to catch a pass that shrank the disk or collapsed authored prims while quietly losing rendered meshes, geometry bytes, bounds, or binding integrity. Field names match exactly what the scorer consumes so the schema, scorer, and validator agree. Emit this block on any run that makes a structural/dedupe/instancing claim; a run whose oracle asserts axis-A scores 0 when the block is missing. Optional only for runs with no axis-A assertion (e.g. a pure no_op).",
+      "required": ["rendered_mesh_count", "distinct_geometry_bytes_preserved", "bounds_preserved", "dangling"],
+      "additionalProperties": false,
+      "properties": {
+        "rendered_mesh_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Rendered-mesh count after optimization. Must equal the asset's known pre-optimization rendered-mesh count; the scorer fails the run (silent loss) on any change. Counts rendered meshes, not authored prims — an authored-prim collapse from dedupe/instancing is expected and is NOT a change here."
+        },
+        "distinct_geometry_bytes_preserved": {
+          "type": "boolean",
+          "description": "True only when the total distinct geometry bytes (the unique mesh data, ignoring instanced repetition) are preserved across the optimization. The scorer treats anything other than true as silent loss."
+        },
+        "bounds_preserved": {
+          "type": "boolean",
+          "description": "True only when the stage/world bounds are unchanged (within tolerance) after optimization. The scorer treats anything other than true as silent loss."
+        },
+        "dangling": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of dangling relationships/bindings (e.g. material bindings pointing at removed prims) after optimization. Must be 0; the scorer fails the run when it exceeds the oracle's max_dangling (0 by default)."
+        },
+        "allow_merge": {
+          "type": "boolean",
+          "description": "Optional declaration: set true on a run that performed a within-prototype mesh merge. A merge fuses many small meshes into one, so the rendered_mesh_count legitimately DROPS by rendered_mesh_merged_count. NOTE: the run-scoring oracle relaxes the strict rendered-mesh-count equality based on the matching ORACLE's preservation.allow_merge (the golden config), NOT this report-side field — so this member is a human/audit-facing declaration, not a scorer input. The merge accounting itself is enforced via rendered_mesh_merged_count (rendered_mesh_count + rendered_mesh_merged_count == known); an unaccounted drop is still silent loss and fails closed."
+        },
+        "rendered_mesh_merged_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many rendered meshes the merge fused away (the declared drop). The scorer requires rendered_mesh_count + rendered_mesh_merged_count == the asset's known pre-merge count; distinct_geometry_bytes_preserved must still be true (a merge concatenates, it must not DROP geometry)."
+        },
+        "rendered_triangle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Renderable triangle total after optimization — the authoritative silent-loss invariant for a mesh merge. A merge fuses prims and welds coincident points, so rendered_mesh_count and distinct point counts legitimately change, but the renderable triangle total must not (a re-pack preserves every face). When the matching oracle asserts preservation.rendered_triangle_count, the scorer fails the run if this differs beyond the oracle's triangle_tolerance_pct — catching an over-coarse weld that collapses geometry even when the merge mesh-count accounting (rendered_mesh_count + rendered_mesh_merged_count == known) still balances. Emit it on any merge run."
+        },
+        "merge_locality_preserved": {
+          "type": "boolean",
+          "description": "Merge LOCALITY invariant: true only when every fused mesh stayed UNDER its named-component merge boundary — no geometry relocated to a shallower ancestor or the stage root. A single stage-wide merge buckets meshes by material across the whole stage and mergePoint=Parent resolves to their common ancestor (the root), dumping anonymous merged* blobs at the root and emptying the named kind-tagged components of their geometry. That is identity-destroying even when triangles and the mesh-count accounting balance, so on any allow_merge run the scorer fails closed unless this is true (and meshes_relocated_outside_boundary is 0). Compute it by checking each merged prim's parent against the expected boundary — kind-prim survival alone is NOT enough (the kind Xforms can survive while emptied). Scope one merge call per component to keep locality (mesh-merge-rewrite-spec.md §5)."
+        },
+        "meshes_relocated_outside_boundary": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Evidence for merge_locality_preserved: count of fused prims that ended up outside their named-component boundary (e.g. at the stage root). 0 == local. Any positive value fails the preservation gate."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional free-form note, e.g. how the rendered-mesh count and distinct-bytes/bounds were measured."
+        }
+      }
+    },
     "runtime_profiling": {
       "type": "object",
       "description": "Optional handoff section for runtime performance profiling. Use Omniperf or an equivalent runtime profiler for RAM, VRAM, FPS, frame time, renderer, shader, and GPU metrics instead of folding them into the Stage Optimization Score.",
@@ -165,8 +322,7 @@
     },
     "artifacts": {
       "type": "object",
-      "description": "Report artifact paths generated from this JSON source of truth.",
-      "required": ["json", "markdown", "html"],
+      "description": "Optional provenance: report artifact paths generated from this JSON source of truth. Self-referential paths — not rendered by the report templates and not read by any gate, so the block and its members are optional (emit for traceability). additionalProperties stays false so a typo'd artifact key is still caught when the block is present.",
       "additionalProperties": false,
       "properties": {
         "json": { "type": "string" },
@@ -270,7 +426,7 @@
     },
     "target_coverage": {
       "type": "object",
-      "description": "Phase-4 mesh-optimization coverage ledger, structurally parallel to the validation report's coverage_ledger. entries[] must cover the UNION of every iteration's apply-restructure manifest phase4_targets[]; complete is true only when every entry reached a resolved disposition. validate_report.py reconciles this against the upstream manifest(s) so a target that was never enumerated (e.g. an assembly_root dropped from a later iteration's manifest) fails closed instead of silently passing. Reconciliation is NOT optional once a restructure happened: if any entry has a restructure role (assembly_root | prototype | shared_layer | loadable_subasset) the gate requires a manifest, supplied via --manifest or recorded in source_manifests[]. A diagnosis-only / optimize-as-is-monolith run (no restructure roles) is manifest-free; an empty Phase-4 run is valid with entries: [] and complete: true.",
+      "description": "Phase-4 mesh-optimization coverage ledger, structurally parallel to the validation report's coverage_ledger. entries[] must cover the UNION of every iteration's apply-restructure manifest phase4_targets[]; complete is true only when every entry reached a resolved disposition. validate_report.py reconciles this against the upstream manifest(s) so a target that was never enumerated (e.g. an assembly_root dropped from a later iteration's manifest) fails closed instead of silently passing. Reconciliation is NOT optional once a restructure happened: if any entry has a restructure role (assembly_root | prototype | shared_layer | loadable_subasset) the gate requires a manifest, supplied via --manifest or recorded in source_manifests[]. A no_op / optimize-as-is-monolith run (no restructure roles) is manifest-free; an empty Phase-4 run is valid with entries: [] and complete: true.",
       "required": ["complete", "entries"],
       "additionalProperties": false,
       "properties": {
@@ -303,6 +459,11 @@
                 "type": "integer",
                 "minimum": 0,
                 "description": "Default-predicate mesh count for this target (echoed from the manifest's authoritative count). disposition 'skipped_zero_meshes' is valid only when this is 0."
+              },
+              "optimized_mesh_count": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "How many of this target's meshes the Phase-4 op chain actually touched/optimized. When disposition is 'optimized' and mesh_count > 0, an optimized_mesh_count of 0 is flagged as a no-op masquerading as optimized. Minimal effort signal: a single count, not a before/after op-audit trail."
               },
               "disposition": {
                 "type": "string",

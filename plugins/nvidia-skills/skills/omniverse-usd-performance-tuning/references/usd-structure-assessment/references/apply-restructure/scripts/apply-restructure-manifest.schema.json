@@ -2,7 +2,7 @@
   "$comment": "SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.\nSPDX-License-Identifier: Apache-2.0",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Apply-Restructure Manifest",
-  "description": "Contract for <output_dir>/apply-restructure-manifest.json, the Phase 2f -> Phase 4 handoff. phase4_targets[] is the authoritative list of files Phase 4 must mesh-optimize; the final optimization-report's target_coverage must cover the UNION of every iteration's phase4_targets (see validate_report.py --manifest). A mode=restructure manifest MUST carry a non-empty phase4_targets[], and every entry MUST declare its default-predicate mesh_count so a 'skipped_zero_meshes' disposition cannot be faked.",
+  "description": "Contract for <output_dir>/apply-restructure-manifest.json, the Phase 2f -> Phase 4 handoff. phase4_targets[] is the authoritative list of files Phase 4 must mesh-optimize; the final optimization-report's target_coverage must cover the UNION of every iteration's phase4_targets (see validate_report.py --manifest). A mode=restructure manifest MUST carry a non-empty phase4_targets[], and every entry MUST declare its default-predicate mesh_count so a 'skipped_zero_meshes' disposition cannot be faked. apply-restructure POSTCONDITION: when extraction leaves > 0 mesh prims on the assembly root, record the authoritative residual count under 'assembly_root' AND list that same root in phase4_targets[] as target_class 'assembly_root'. validate_manifest_structure() fails loud if assembly_root.mesh_count > 0 has no matching phase4_targets[] entry.",
   "type": "object",
   "required": ["mode", "phase4_targets"],
   "properties": {
@@ -13,6 +13,21 @@
     "input_stage": { "type": "string" },
     "output_dir": { "type": "string" },
     "new_assembly_root": { "type": "string" },
+    "assembly_root": {
+      "type": "object",
+      "description": "Residual-mesh state of the new assembly root after extraction, measured by apply-restructure with the USD stage open. When mesh_count > 0 the manifest MUST also list this root in phase4_targets[] with target_class 'assembly_root' (enforced by validate_manifest_structure), so a retained-mesh assembly root is never silently dropped from Phase 4.",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "The new assembly-root file path; matches the phase4_targets[] assembly_root entry path when residual meshes exist."
+        },
+        "mesh_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Authoritative default-predicate mesh count remaining on the assembly root after extraction (len of Usd.PrimRange.Stage(stage, Usd.PrimDefaultPredicate) filtered to UsdGeom.Mesh)."
+        }
+      }
+    },
     "outputs": {
       "type": "array",
       "items": {
@@ -32,7 +47,7 @@
     },
     "phase4_targets": {
       "type": "array",
-      "description": "Every written prototype/shared layer/loadable sub-asset that needs Phase 4 mesh optimization, PLUS the assembly root itself when it retains > 0 meshes after extraction.",
+      "description": "Every written prototype/shared layer/loadable sub-asset that needs Phase 4 mesh optimization, PLUS the assembly root itself when it retains > 0 meshes after extraction. ONLY path, target_class, and mesh_count are required output; all other members (copy_count, own_*, value_variant_*, arc_estimate, decision_reason, grain_source, package_group, descent_level, weight_hints, frontier.by_* rollups, etc.) are OPTIONAL decision/audit trail — select_frontier.py writes them and humans read them, but no machine gate consumes them, so they are never mandatory.",
       "items": {
         "type": "object",
         "required": ["path", "target_class", "mesh_count"],
@@ -54,12 +69,193 @@
             "type": "string",
             "enum": ["shared_first", "dependent_after", "independent"]
           },
+          "level": {
+            "type": "string",
+            "enum": ["assembly", "component", "subcomponent"],
+            "description": "Target-tree tag (= USD `kind`). Drives the bounded-descent stopping rule (workflow.md Phase 2g): descend while there are dedupe/semantic boundaries AND (level < component OR the node is important)."
+          },
+          "importance": {
+            "type": "string",
+            "enum": ["important", "normal"],
+            "description": "Target-tree tag. Descend to `subcomponent` only for `important` sub-hierarchies. Also a functional-tolerance signal input (with `articulated`) for the auto-within-tolerance lossy gate in operation-safety.md."
+          },
+          "articulated": {
+            "type": "boolean",
+            "description": "Target-tree tag. True for articulated / physics / variant-bearing nodes. Articulated assets instance at rigid-body/link level (factory guide Step 4), never whole-asset. Also a functional-tolerance signal that drops bounded-loss ops from auto-within-tolerance back to intent-gated."
+          },
+          "archetype": {
+            "type": "string",
+            "enum": ["large-spatial", "encapsulated-product", "piping", "generic"],
+            "description": "Target-tree tag, derived from semantic_label + structural signals. Selects which Phase-4 op-chain steps apply and the per-target scale-banded tolerance (see workflow.md op chain + usd-optimize-run-operations/references/units-and-tolerances.md)."
+          },
           "source": { "type": "string" },
+          "descent_level": {
+            "type": "string",
+            "enum": ["assembly", "component", "subcomponent", "detail"],
+            "description": "Descent frontier level. Carries the resume-from-existing-level entry point: when the input arrives already instanced / BIM-CAD-exported, the descent ENTERS at the level the asset is already at rather than restarting from the top."
+          },
+          "identity_disposition": {
+            "type": "string",
+            "enum": ["externalize_shared", "internal_share", "keep_local"],
+            "description": "Frontier Axis A (where the definition lives; identity preserved). externalize_shared = nested external referenced prototype reused across components; internal_share = shared inside one parent; keep_local = meaningful one-off cleaned in place."
+          },
+          "reduction_route": {
+            "type": "string",
+            "enum": ["point_instance", "merge", "fit_primitive", "mesh_cleanup_leaf", "none"],
+            "description": "Frontier Axis B (optional reduction). point_instance / merge are IDENTITY-LOSING (intent-gated, weak-identity units only). fit_primitive is identity-PRESERVING bounded-loss (the step-3 fitPrimitives op). mesh_cleanup_leaf is terminal lossless cleanup. none = placement only."
+          },
+          "identity_signal": {
+            "type": "string",
+            "enum": ["kind", "naming", "semantic", "structural_fallback", "none"],
+            "description": "Which signal set the grain (the queryable boundary basis). kind/naming/semantic = STRONG authored identity; structural_fallback = identity absent, the coarsest repeating subtree proposed the grain (never a leaf); none = anonymous geometry. REQUIRED on every shared (externalize_shared/internal_share) or identity-destroying (point_instance/merge) entry. A shared entry with identity_signal=none (landed on anonymous meshes) fails the contract; an identity-destroying route on a strong-identity unit (kind/naming/semantic) fails the contract."
+          },
+          "grain_source": {
+            "type": "string",
+            "enum": ["identity", "structural_fallback"],
+            "description": "Whether the grain came from authored identity (default) or the structural-fallback (coarsest repeating subtree where identity is absent)."
+          },
+          "value_variant_id": {
+            "type": ["string", "integer"],
+            "description": "Value-variant partition id within a structural group (one prototype per genuine variant, e.g. a group of 18 near-identical copies that partitions into 17 identical plus 1 real variant)."
+          },
+          "value_variant_count": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Number of genuine value-variants in this candidate's structural group."
+          },
+          "nested_parent_proto": {
+            "type": "string",
+            "description": "The parent prototype that references this one (the nested-library link; parents reference child prototypes, not inline copies)."
+          },
+          "parent_target_id": { "type": "string" },
+          "share_scope": {
+            "type": "string",
+            "enum": ["cross_component", "internal_parent", "none"]
+          },
+          "own_prims": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "NON-double-counted own prim count (a parent and its nested child do not both claim the same savings)."
+          },
+          "own_meshes": { "type": "integer", "minimum": 0 },
+          "own_points": { "type": "integer", "minimum": 0 },
+          "copy_count": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Number of occurrences of this unit across distinct parents."
+          },
+          "below_externalization_cutoff": {
+            "type": "boolean",
+            "description": "Input condition (not a disposition): the candidate did not pass the band-resolved externalization cutoff (copy_count / own-size). decision_reason carries the route taken."
+          },
+          "kept_inline_for_merge": {
+            "type": "boolean",
+            "description": "Sub-MINP leaf intentionally NOT instanced so a later within-prototype mesh-merge can fuse it (instancing finely bakes in granularity a merge pass would have to tear down)."
+          },
+          "non_double_counted_savings": { "type": "integer", "minimum": 0 },
+          "arc_estimate": {
+            "type": "object",
+            "description": "Load-bearing anti-failure evidence: arcs if shared at the frontier vs arcs at mesh level (empirically ~100-150 vs ~156,691). A descent that explodes arcs without reusing proportionally more DISTINCT data is too deep.",
+            "properties": {
+              "frontier": { "type": "integer", "minimum": 0 },
+              "mesh_level": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "package_group": {
+            "type": "string",
+            "description": "Advisory packaging grouping hint (discipline / system / family library) when externalized. Must not pull deployment packaging forward."
+          },
+          "frontier_estimate_basis": {
+            "type": "string",
+            "enum": ["exact", "spot_check"],
+            "description": "Set to spot_check when the cost guard degraded the frontier scan to a masked spot-check on a large stage."
+          },
+          "decision_reason": {
+            "type": "object",
+            "description": "Audit trail of the boundary call (NOT free text): which identity signal set the grain and which stop condition or descend trigger fired. Makes a too-deep or identity-destroying choice visible and reviewable rather than silent.",
+            "properties": {
+              "identity_signal": {
+                "type": "string",
+                "enum": ["kind", "naming", "semantic", "structural_fallback", "none"]
+              },
+              "stop_condition": {
+                "type": "string",
+                "enum": ["min_meaningful_unit", "arc_cost", "below_floor"]
+              },
+              "descend_trigger": {
+                "type": "string",
+                "enum": ["variant_outlier", "unique_container_shared_children"]
+              },
+              "note": { "type": "string" }
+            }
+          },
           "weight_hints": {
             "type": "object",
             "description": "Optional pre-extraction estimates for adaptive batching. NON-authoritative; mesh_count above is the authoritative count the gate uses."
           },
           "notes": { "type": "string" }
+        }
+      }
+    },
+    "frontier": {
+      "type": "object",
+      "description": "Descent frontier summary. Carries the MEASURED remaining reuse so a scene-graph / consolidation win can only be reported from measurement, never estimated. When any phase4_targets[] entry is a shared (externalize_shared / internal_share) disposition, reuse_measured MUST be true (a consolidation claim requires measurement). When measured reuse is low, the plan pivots to the disk tier rather than forcing more sharing.",
+      "properties": {
+        "reuse_measured": {
+          "type": "boolean",
+          "description": "True when the remaining reuse was MEASURED (distinct vs total prototypes/units), not estimated. Required true whenever a shared disposition is claimed."
+        },
+        "distinct_prototypes": { "type": "integer", "minimum": 0 },
+        "total_units": { "type": "integer", "minimum": 0 },
+        "descent_entry_level": {
+          "type": "string",
+          "enum": ["assembly", "component", "subcomponent", "detail"],
+          "description": "Resume-from-existing-level: the level the descent ENTERED at when the input arrived already partway down (already instanced / BIM-CAD). The stop/descend rules are unchanged from there."
+        },
+        "descent_converged": {
+          "type": "boolean",
+          "description": "Convergence gate: true only when a re-run of the reuse analyzer on the authored structure surfaced NO new shareable group above the inclusion floor (MINP, occurrence >=2) — the descent reached a fixpoint. The remaining residue is sub-MINP kept_inline_for_merge leaves, already-split value-variants, or unique content. Phase 4 geometry ops (decimation, within-prototype merge) must NOT run until this is true; otherwise geometry is reduced/merged on a structure further sharing would still have collapsed, and a merge runs before its kept_inline_for_merge leaves were reserved."
+        },
+        "final_rescan_new_groups_above_floor": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Evidence for descent_converged: the number of NEW shareable groups above the inclusion floor that the final convergence re-scan found. 0 == converged. A positive value with descent_converged=true is a contradiction the contract should reject."
+        },
+        "low_reuse_disk_tier_pivot": {
+          "type": "boolean",
+          "description": "True when measured reuse was low (e.g. parametric MEP geometry, mostly unique) and the plan pivoted to the disk tier (unused-primvar removal, primitive-fit, decimation) instead of forcing sharing."
+        },
+        "by_identity_signal": {
+          "type": "object",
+          "description": "Optional audit rollup: count of phase4_targets[] by their identity_signal. A quick read of how much of the frontier rests on strong authored identity (kind/naming/semantic) vs the structural_fallback grain vs anonymous (none). Additive; emitted by select_frontier.py.",
+          "properties": {
+            "kind": { "type": "integer", "minimum": 0 },
+            "naming": { "type": "integer", "minimum": 0 },
+            "semantic": { "type": "integer", "minimum": 0 },
+            "structural_fallback": { "type": "integer", "minimum": 0 },
+            "none": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "by_disposition": {
+          "type": "object",
+          "description": "Optional audit rollup: count of phase4_targets[] by their identity_disposition. Additive; emitted by select_frontier.py.",
+          "properties": {
+            "externalize_shared": { "type": "integer", "minimum": 0 },
+            "internal_share": { "type": "integer", "minimum": 0 },
+            "keep_local": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "by_stop_condition": {
+          "type": "object",
+          "description": "Optional audit rollup: count of phase4_targets[] by their decision_reason.stop_condition. Additive; emitted by select_frontier.py.",
+          "properties": {
+            "min_meaningful_unit": { "type": "integer", "minimum": 0 },
+            "below_floor": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "frontier_estimate_basis": {
+          "type": "string",
+          "enum": ["exact", "spot_check"]
         }
       }
     },

@@ -1,0 +1,66 @@
+{
+  "$comment": "SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.\nSPDX-License-Identifier: Apache-2.0",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Batch Scheduler Status",
+  "description": "Contract for <run_dir>/status.json emitted by the batch scheduler (usd-optimize-run-operations/scripts/run_batch.py). The status artifact IS the contract; CLI/dashboard views are derived from it. CRITICAL: target.state == 'done' is NOT coverage disposition 'optimized' — 'done' only proves the worker ran. The Phase-4e target_coverage.entries[]/coverage_ledger derive from target.disposition (computed from before/after deltas), never from bare 'done'. --resume re-runs only targets whose state is not terminal (done/skipped_gpu_unavailable).",
+  "type": "object",
+  "required": ["run_id", "started", "max_workers", "overall", "targets"],
+  "additionalProperties": true,
+  "properties": {
+    "run_id": { "type": "string" },
+    "started": { "type": "string" },
+    "max_workers": { "type": "integer", "minimum": 1 },
+    "cuda_available": {
+      "type": "boolean",
+      "description": "CUDA signal read from the setup preflight runtime_context (never from SO hasNvidiaGpu()). When false, gpu_bound targets are skipped (state skipped_gpu_unavailable), never silently entered into a long CPU fallback."
+    },
+    "overall": {
+      "type": "object",
+      "required": ["total", "done", "failed", "running", "queued"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "done": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "timeout": { "type": "integer", "minimum": 0 },
+        "running": { "type": "integer", "minimum": 0 },
+        "queued": { "type": "integer", "minimum": 0 },
+        "skipped": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "state", "disposition"],
+        "properties": {
+          "path": { "type": "string" },
+          "role": { "type": "string" },
+          "level": { "type": ["string", "null"], "enum": ["assembly", "component", "subcomponent", null] },
+          "archetype": { "type": ["string", "null"] },
+          "dep_group": { "type": "string", "enum": ["shared_first", "dependent_after", "independent"] },
+          "gpu_bound": { "type": "boolean" },
+          "state": {
+            "type": "string",
+            "enum": ["queued", "running", "done", "failed", "timeout", "skipped_gpu_unavailable"],
+            "description": "'timeout' is a worker killed by its per-target/per-op wall-clock budget (subprocess.run timeout) — distinct from 'failed' (worker ran to a non-zero exit or failed to spawn). Distinguishing them surfaces the per-rule-timeout hang the scheduler exists to bound."
+          },
+          "disposition": {
+            "type": "string",
+            "enum": ["optimized", "no_op", "unknown"],
+            "description": "Coverage disposition derived from before/after deltas, independent of state. 'done' worker with no recorded change is 'no_op'; missing summary is 'unknown' (keeps the coverage gate honest instead of fabricating 'optimized')."
+          },
+          "steps_applied": { "type": "array", "items": { "type": "string" } },
+          "started": { "type": ["string", "null"] },
+          "ended": { "type": ["string", "null"] },
+          "duration_seconds": { "type": ["number", "null"] },
+          "exit_code": { "type": ["integer", "null"], "description": "Worker process return code; null on timeout or spawn failure." },
+          "log_path": { "type": ["string", "null"] },
+          "summary_path": { "type": ["string", "null"] },
+          "before": { "type": ["object", "null"] },
+          "after": { "type": ["object", "null"] },
+          "error": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}

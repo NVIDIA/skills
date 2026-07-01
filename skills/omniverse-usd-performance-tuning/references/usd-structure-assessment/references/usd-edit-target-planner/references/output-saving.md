@@ -34,9 +34,9 @@ stage.Export("out.usdc")                   # flatten the composed stage to a new
   requested deliverable is a flattened file; it collapses composition structure
   and is not a generic save operation.
 
-## Scene Optimizer Outputs
+## Usd Optimize Outputs
 
-Scene Optimizer operations mutate the opened stage in memory. The safe default
+Usd Optimize operations mutate the opened stage in memory. The safe default
 is:
 
 ```python

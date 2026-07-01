@@ -3,6 +3,10 @@
   "input_stage": "/tmp/factory.usd",
   "output_dir": "/tmp/factory",
   "new_assembly_root": "/tmp/factory/factory.optimized.usdc",
+  "assembly_root": {
+    "path": "/tmp/factory/factory.optimized.usdc",
+    "mesh_count": 1840
+  },
   "phase4_targets": [
     {
       "path": "/tmp/factory/prototypes/rack_unit.usd",

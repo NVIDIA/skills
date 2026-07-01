@@ -179,6 +179,11 @@
       {% endfor %}
     </section>
 
+    {% if notes %}
+    <h2>Notes</h2>
+    <div class="note">{{ notes }}</div>
+    {% endif %}
+
     <h2>Stage Impact Areas</h2>
     <section class="grid impact-grid">
       {% for group in metric_groups %}
@@ -245,6 +250,22 @@
         {% endfor %}
       </tbody>
     </table>
+
+    {% if footprint %}
+    <h2>Storage Footprint (repack-normalized)</h2>
+    <div class="note">
+      A USDC/crate repack is the free re-encode any export achieves, not the optimization. The structural win is measured against the repack-normalized baseline, never the raw input.
+    </div>
+    <table>
+      <tbody>
+        <tr><th>Raw input</th><td>{{ footprint.raw_input_bytes }} bytes</td></tr>
+        <tr><th>Repack-normalized baseline</th><td>{{ footprint.repack_normalized_baseline_bytes }} bytes ({{ footprint.repack_delta_pct }}% re-encode, free)</td></tr>
+        <tr><th>Optimized</th><td>{{ footprint.optimized_bytes }} bytes</td></tr>
+        <tr><th>Structural win (vs normalized baseline)</th><td>{{ footprint.structural_delta_pct }}%</td></tr>
+        <tr><th>Total raw &rarr; optimized</th><td>{{ footprint.raw_delta_pct }}%</td></tr>
+      </tbody>
+    </table>
+    {% endif %}
 
     <h2>Operations</h2>
     <table>

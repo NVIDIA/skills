@@ -28,6 +28,14 @@ Produce a read-only candidate report for repeated subtrees that could be
 rewritten as shared prototype/reference assets. This is hierarchy-level analysis,
 not mesh-level deduplication, and it must not modify the stage.
 
+**Share, don't scatter.** Candidates feed the bounded recursive descent
+(`workflow.md` Phase 2g): the report runs again on each extracted asset to find
+deeper (component/subcomponent) repetition to a bounded depth. The win is always
+a SHARED prototype with `instanceable=true` references, never N unshared per-node
+payloads. Flag structurally identical subtrees (hash-confirmed) so the rewrite
+shares one prototype; a repack or unshared split is not the optimization win and
+fails the Phase-6 gate.
+
 ## Prerequisites
 
 - Run after `usd-structure-assessment` when possible.
@@ -125,9 +133,14 @@ For top candidates:
 2. Choose an edit target with `usd-edit-target-planner`.
 3. Use `restructure-decision` and `apply-restructure` to rewrite repeated
    hierarchy as references/payloads to shared prototype assets.
-4. Run `so-run-operations` on the new explicit prototypes or sub-assets.
+4. Run `usd-optimize-run-operations` on the new explicit prototypes or sub-assets.
 5. Run mesh-level `deduplicateGeometry` only inside remaining unique prototypes
    or scoped sub-assets.
 
 Do not claim savings as achieved until a rewrite is performed and after-profile
 metrics confirm it.
+
+Coverage note: candidate quality depends on full-tree hashing. Shallow
+subtree-hash shortcuts miss depth-3+ duplicates (a shallow heuristic covers
+only a small fraction of the full-tree pass's coverage on a large CAD stage) — see the finder spec's
+"Coverage limit" section.

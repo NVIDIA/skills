@@ -36,7 +36,7 @@ artifacts under the skill repo or the shell working directory.
 ```
 
 `setup-preflight.json` is the canonical session-scoped runtime configuration.
-The setup, validation, Scene Optimizer, compare, and report references all read
+The setup, validation, Usd Optimize, compare, and report references all read
 this exact filename from this exact location.
 
 ## Runtime Gate
@@ -53,8 +53,8 @@ probe.
 Kit application:    {runtime_context.kit.application} {runtime_context.kit.version}
   path:             {runtime_context.kit.path}
   build:            {runtime_context.kit.build}
-Scene Optimizer:    {runtime_context.sceneOptimizer.extension} {runtime_context.sceneOptimizer.version}
-Asset Validator:    {runtime_context.assetValidator.package} {runtime_context.assetValidator.version} via {runtime_context.assetValidator.source}
+Usd Optimize:    {runtime_context.usdOptimize.extension} {runtime_context.usdOptimize.version}
+usd-validation-nvidia:    {runtime_context.assetValidator.package} {runtime_context.assetValidator.version} via {runtime_context.assetValidator.source}
 ───────────────────────────────────────────────────────────────────────────
 ```
 

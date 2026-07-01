@@ -2,12 +2,12 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "setup-preflight.schema.json",
   "title": "Setup Preflight Configuration",
-  "description": "Runtime contract for setup-preflight.json. Strict on sceneOptimizer and assetValidator — downstream agents cross-check operationsAvailable against planned operations. A wrong field name means the operation check fails silently.",
+  "description": "Runtime contract for setup-preflight.json. Strict on usdOptimize and assetValidator — downstream agents cross-check operationsAvailable against planned operations. A wrong field name means the operation check fails silently.",
   "type": "object",
   "required": [
     "schemaVersion",
     "runtime_route",
-    "sceneOptimizer",
+    "usdOptimize",
     "assetValidator",
     "runtime_context",
     "probed_at"
@@ -19,11 +19,12 @@
     },
     "runtime_route": {
       "type": "string",
-      "enum": ["kit", "standalone"]
+      "enum": ["kit", "standalone"],
+      "description": "The optimization+validation runtime. This is 'standalone' for all optimization and validation work; Kit is no longer an optimization runtime. The 'kit' value is retained only for legacy/back-compat records — a Kit install used for the opt-in render-profiling adjunct is recorded under the top-level 'kit' object, not by setting runtime_route to 'kit'."
     },
     "kit": {
       "type": "object",
-      "description": "Present when runtime_route is 'kit'. Kit application metadata.",
+      "description": "Optional opt-in Kit→omniperf render-profiling root (user-supplied or discovered). Retained for the profiling adjunct only; it is never the SO/AV optimization runtime. Kit application metadata.",
       "additionalProperties": true,
       "properties": {
         "application": { "type": "string" },
@@ -32,9 +33,13 @@
         "build": { "type": "string" }
       }
     },
-    "sceneOptimizer": {
+    "cuda_available": {
+      "type": ["boolean", "null"],
+      "description": "Independent CUDA availability signal consumed by the Phase-4 batch scheduler (usd-optimize-run-operations/scripts/run_batch.py). Read from this preflight / runtime_context, NEVER from Usd Optimize's own hasNvidiaGpu(). false means gpu_bound operations must not silently fall back to slow CPU execution; null/missing means unknown and the scheduler fails closed (treats the host as CPU-only)."
+    },
+    "usdOptimize": {
       "type": "object",
-      "description": "Scene Optimizer runtime identity. Strict: operationsAvailable is the cross-check contract consumed by EXECUTION.md and so-run-operations.",
+      "description": "Usd Optimize runtime identity. Strict: operationsAvailable is the cross-check contract consumed by EXECUTION.md and usd-optimize-run-operations.",
       "required": ["extension", "version", "operationsAvailable", "source"],
       "additionalProperties": false,
       "properties": {
@@ -52,13 +57,13 @@
         },
         "source": {
           "type": "string",
-          "enum": ["kit-extension", "standalone-package"]
+          "enum": ["standalone-package"]
         }
       }
     },
     "assetValidator": {
       "type": "object",
-      "description": "Asset Validator runtime identity. Strict: source enum determines validation command patterns.",
+      "description": "usd-validation-nvidia runtime identity. Strict: source enum determines validation command patterns.",
       "required": ["package", "version", "source"],
       "additionalProperties": false,
       "properties": {
@@ -70,14 +75,14 @@
         },
         "source": {
           "type": "string",
-          "enum": ["kit-extension", "pip", "standalone"]
+          "enum": ["pip", "standalone"]
         }
       }
     },
     "runtime_context": {
       "type": "object",
-      "description": "Canonical runtime context block that downstream skills (optimization-report, the runtime-context-header) consume. The probe writes the chosen runtime here and the header prints from it; the source kit/sceneOptimizer/assetValidator fields above are the raw probe data. Inner shape matches the optimization-report schema's runtime_context definition exactly so the block can be copied verbatim into the report.",
-      "required": ["kit", "sceneOptimizer", "assetValidator"],
+      "description": "Canonical runtime context block that downstream skills (optimization-report, the runtime-context-header) consume. The probe writes the chosen runtime here and the header prints from it; the source kit/usdOptimize/assetValidator fields above are the raw probe data. Inner shape matches the optimization-report schema's runtime_context definition exactly so the block can be copied verbatim into the report.",
+      "required": ["kit", "usdOptimize", "assetValidator"],
       "properties": {
         "kit": {
           "type": "object",
@@ -101,7 +106,7 @@
             }
           }
         },
-        "sceneOptimizer": {
+        "usdOptimize": {
           "type": "object",
           "required": ["extension", "version"],
           "properties": {
@@ -129,10 +134,14 @@
             },
             "source": {
               "type": "string",
-              "enum": ["kit-extension", "pip", "standalone"],
-              "description": "Where Asset Validator was loaded from."
+              "enum": ["pip", "standalone"],
+              "description": "Where usd-validation-nvidia was loaded from."
             }
           }
+        },
+        "cuda_available": {
+          "type": ["boolean", "null"],
+          "description": "Optional copy of the top-level CUDA availability signal for downstream consumers that read only runtime_context (the scheduler's --preflight path reads it here)."
         }
       }
     },

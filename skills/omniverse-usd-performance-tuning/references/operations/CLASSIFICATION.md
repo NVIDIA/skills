@@ -13,79 +13,43 @@ version: "0.1.0"
 
 # Operation Classification Rubric
 
-Every entry in `references/operations/_curation.json` has a `status` field assigned by this rubric. Every entry's `rationale` field must cite the specific clause below it satisfies, with the format `<status>: <clause>: <one-sentence justification>`.
+Every operation's nested `curation` block in `references/operations/operations.json` has a `status` field. **`status` is DERIVED, not hand-authored**: it is computed by the upstream status-derivation rubric (run during skill development) and materialized onto each entry, the same way the index is regenerated from source. The development-time coverage audit rewrites any drifted statuses.
 
-This rubric is local routing policy only. Scene Optimizer operation mechanics
+**The upstream status-derivation rubric is the single source of truth for the algorithm** — the derivation precedence (deprecated/specialty overrides → destructive→specialty → read-only→analysis → refs-present→canonical → else documentary), the reference-evidence rule (`wired_into` non-empty OR `pipelines` non-empty), and the clause definitions (C1/C2, S1/S2, A1–A3, D1–D3, X1/X2). This file does NOT restate them; it explains what each tier *means* for agent behavior and the hand-authored override contract.
+
+This rubric is local routing policy only. Usd Optimize operation mechanics
 belong to upstream `usd-optimize`; use
 [`usd-optimize` upstream handoff](../upstreams/usd-optimize.md) for the central
 package and operation-guide resolution rule.
 
-## status: canonical
+## What each tier means for agent selection
 
-The op is part of the standard 7-phase optimization flow described in
-`skills/omniverse-usd-performance-tuning/references/workflow.md`. At
-least one local workflow reference routes to it, or upstream `usd-optimize`
-names it in a public pipeline that this workflow deliberately adopts. The
-agent reaches for canonical ops by default.
+The code computes the label; this is what the label means when the agent picks an op:
 
-Required evidence:
+- **`canonical`** — reach for it by default; part of the standard 7-phase optimization flow.
+- **`specialty`** — reach for it only on an explicit need or named workflow (e.g. proxy creation, restructure orchestration); not a default choice.
+- **`analysis`** — a read-only finding/report producer; surface it to inspect, never to mutate the stage.
+- **`documentary`** — recommend only when the user explicitly names the op or describes a use case it uniquely fits.
+- **`deprecated`** — warn before recommending, and name the replacement.
 
-- **C1.** The op has at least one `"operation": "<key>"` reference in the catalog skill or nested workflow references OR in an adopted upstream `usd-optimize` named pipeline, **and**
-- **C2.** The op is `loss_class: lossless` or `bounded-loss` (not `destructive`).
+## Overrides and `rationale`
 
-A `destructive` op is `specialty`, never `canonical`, regardless of how often it appears.
+`deprecated` and `specialty` are the only values `curation.status_override` may take — they are the two statuses the per-op data cannot express, so they are authored, not derived. Each override entry carries an authored `rationale` (forbidden on every other entry):
 
-## status: specialty
+- `deprecated` — `"deprecated: <replacement>: <one-sentence justification naming the recommended replacement>"`.
+- `specialty` (S2) — `"specialty: <one-sentence justification naming the narrow workflow / explicit-need constraint>"`.
 
-The op is gated behind explicit user confirmation in `so-run-operations`'s destructive-op table, or has narrow workflow-specific applicability (e.g., `pythonScript` used by `so-create-proxy` for USD authoring glue).
+Authored shape on an override entry:
 
-Required evidence:
+```json
+"curation": {
+  "status": "specialty",
+  "status_override": "specialty",
+  "rationale": "specialty: legacy standalone welder superseded by meshCleanup; reach for it only when the user explicitly needs the upstream-documented behavior.",
+  "wired_into": ["skills/.../workflow.md"]
+}
+```
 
-- **S1.** The op is `loss_class: destructive` and appears in the `so-run-operations` destructive-op confirmation table, **or**
-- **S2.** The op is referenced in a skill body that handles a specific workflow (proxy creation, restructure orchestration, etc.) and the rationale names that workflow.
+Non-override entries carry just the generated `status` and the authored `wired_into` evidence — no `rationale`.
 
-## status: analysis
-
-The op is read-only and produces a report/finding; used by `so-run-validators` or `so-interpret-validators`. Never mutates the stage.
-
-Required evidence:
-
-- **A1.** The op is `loss_class: lossless`, **and**
-- **A2.** The op produces a structured finding rather than a transformed stage (often a `find*`, `count*`, or `print*` op), **and**
-- **A3.** The op is either currently wired into `so-run-validators`/`so-interpret-validators` OR is a clear candidate for that wiring (`wired_into` may be empty for future-candidate analysis ops).
-
-## status: documentary
-
-The op has a local routing stub for completeness but no local workflow route reaches for it. The agent is allowed to recommend it only when the user explicitly names the op or describes a use case it uniquely fits.
-
-Required evidence:
-
-- **D1.** The op has zero `"operation": "<key>"` references in skill bodies, **and**
-- **D2.** The op is not in an adopted upstream `usd-optimize` pipeline for this workflow, **and**
-- **D3.** The op is not in the tuning workflow's recommended-ops sections.
-
-`documentary` ops MAY appear as a passing mention in the tuning workflow's
-op-role index without being recommended for use — that doesn't disqualify them
-from this tier.
-
-## status: deprecated
-
-The op exists upstream but this skill pack actively discourages its use. The agent should warn before recommending one.
-
-Required evidence:
-
-- **X1.** The op's upstream behavior is known to be replaced by a better-supported alternative documented in this repo, **and**
-- **X2.** The rationale names the recommended replacement.
-
----
-
-## How to cite a clause in `rationale`
-
-Format: `<status>: <clause>: <one-sentence justification>`. Examples:
-
-- `"canonical: C1+C2: invoked by so-run-operations destructive-op table; loss_class bounded-loss."`
-- `"specialty: S1: destructive; appears in so-run-operations destructive-op confirmation table."`
-- `"analysis: A1+A2: lossless finding-producer; candidate for so-interpret-validators wiring."`
-- `"documentary: D1+D2+D3: no JSON references, no pipeline, no workflow recommendation."`
-
-The schema at `scripts/operation-curation.schema.json` enforces that every entry's `rationale` starts with `<status>:` matching the entry's declared `status`. The coverage audit additionally verifies that `canonical`-status ops have a non-empty `wired_into`, and that each `wired_into` target file actually references the op.
+The schema at `scripts/operations.schema.json` describes the `curation` block (the `status` enum, the `status_override` enum, and the `rationale`-only-on-override rule). The coverage audit enforces it: it derives `status` (failing on any mismatch with the materialized value), requires a `rationale` starting with `<status>:` whenever `status_override` is set and forbids `rationale` otherwise, verifies `canonical`-status ops have a non-empty `wired_into`, and verifies each `wired_into` target file actually references the op.

@@ -1,6 +1,6 @@
 ---
 name: omniverse-usd-performance-tuning
-description: "Top-level workflow skill for USD performance diagnosis and optimization. Use for slow loading, high memory, low FPS, or 'optimize my scene' requests; delegates auth/runtime setup to Phase 0 owners."
+description: "Top-level workflow skill for USD performance diagnosis and optimization. Handles slow loading, high memory, low FPS, and broad scene-optimization requests; delegates auth/runtime setup to Phase 0 owners."
 version: "0.1.0"
 license: Apache-2.0
 tools:
@@ -8,7 +8,7 @@ tools:
   - Shell
   - Write
 compatibility: >
-  Orchestrator skill. Downstream phases may require Kit, Scene Optimizer, Asset Validator, USD Python, writable output paths, and omniverse:// authentication selected by setup-usd-performance-tuning.
+  Orchestrator skill. Downstream phases may require Kit, Usd Optimize, usd-validation-nvidia, USD Python, writable output paths, and omniverse:// authentication selected by setup-usd-performance-tuning.
 metadata:
   author: NVIDIA Omniverse
   tags:
@@ -28,11 +28,14 @@ metadata:
 ## When to Use
 
 Use this workflow for broad performance asks such as slow loading, high memory, low FPS, GPU crashes, conversion-quality triage, or generic requests to optimize a USD scene.
+Do not invoke this performance workflow for non-performance build requests such
+as viewer or application creation unless the user separately asks for USD
+performance diagnosis or optimization.
 
 ## Instructions
 
 1. Start from the mandatory runtime context gate before producing tuning output, unless the prompt is only asking for a static classification test.
-2. Classify broad optimization requests as `ready_to_plan`; reserve `approval_required` for prompts that explicitly name a destructive operation to execute before planning.
+2. Classify every optimization request as `ready_to_plan` and route it through the one full optimize+validate pipeline; never run a named operation, a validation-only pass, or a structure-only exit as a standalone bypass of structural assessment, validators, and the op chain. Destructive/lossy ops are gated where they execute by the apply-authority class in `operation-safety.md` (`intent-gated` → surface approval at the apply gate), not pre-authorized at plan time.
 3. Plan the full canonical chain through `optimization-report`, preserving the structured milestone order and the `profile-stage:baseline` / `profile-stage:after` labels when listing milestones. For broad optimization, default to 3 scoped iterations unless the user opts out, asks for a quick pass, or stop criteria apply.
 4. Invoke downstream skill bodies only when their phase is reached, and keep raw runtime artifacts on disk while reading compact summaries.
 
@@ -41,10 +44,9 @@ compatibility. NVCARPS discoverability fields live under `metadata`.
 
 ## Output Format
 
-Return a plan or status summary that names the selected entry skill, uses `ready_to_plan` for generic optimization requests, includes the full milestone chain through `optimization-report`, and labels profile phases as `profile-stage:baseline` and `profile-stage:after`. For structured outputs, the broad-optimization milestone subsequence is `omniverse-usd-performance-tuning` -> `profile-stage:baseline` -> `usd-structure-assessment` -> `usd-validation-runner` -> `restructure-decision` -> `apply-restructure` -> `so-run-validators` -> `so-interpret-validators` -> `so-run-operations` -> `profile-stage:after` -> `compare-profiles` -> `optimization-report`. End-to-end execution should produce an optimized stage when mutation runs and a report conforming to the `optimization-report` reference's schema (`scripts/optimization-report.schema.json` within that reference). Broad optimization should plan 3 scoped iterations by default; each iteration writes an interim report/update and later passes reuse prior evidence instead of restarting the full workflow.
-
-Use this workflow for broad performance asks such as slow loading, low FPS,
-high memory, GPU crashes, conversion quality, or "optimize my scene."
+<!-- The milestone subsequence below is duplicated in references/workflow.md
+     (Milestones section). Keep the two lists character-identical. -->
+Return a plan or status summary that names the selected entry skill, uses `ready_to_plan` for generic optimization requests, includes the full milestone chain through `optimization-report`, and labels profile phases as `profile-stage:baseline` and `profile-stage:after`. For structured outputs, the broad-optimization milestone subsequence is `omniverse-usd-performance-tuning` -> `profile-stage:baseline` -> `usd-structure-assessment` -> `usd-validation-runner` -> `restructure-decision` -> `apply-restructure` -> `usd-optimize-run-validators` -> `usd-optimize-interpret-validators` -> `usd-optimize-run-operations` -> `profile-stage:after` -> `compare-profiles` -> `optimization-report`. End-to-end execution should produce an optimized stage when mutation runs and a report conforming to the `optimization-report` reference's schema (`scripts/optimization-report.schema.json` within that reference). Broad optimization should plan 3 scoped iterations by default; each iteration writes an interim report/update and later passes reuse prior evidence instead of restarting the full workflow.
 
 ## Entry skill rule
 
@@ -54,9 +56,9 @@ agent has any verified way to do that work. Runtime probing details live in
 user-facing performance request.
 
 - If the setup probe shows **any** verified runtime path - Kit, standalone, or
-  even a partial stack such as Asset Validator only - enter here. If the
+  even a partial stack such as usd-validation-nvidia only - enter here. If the
   user's requested tool is missing, return the specific `blocked_code`
-  (`blocked_missing_scene_optimizer`, `blocked_missing_so_operation`, etc.)
+  (`blocked_missing_usd_optimize`, `blocked_missing_usd_optimize_operation`, etc.)
   instead of substituting another workflow.
 - Enter at `setup-usd-performance-tuning` only when **no** runtime path is
   verified and runtime choice/setup is the first unresolved problem.
@@ -68,7 +70,7 @@ The decision is about ownership, not order. Setup, authentication, and triage al
 ## Runtime context — session-start gate (mandatory)
 
 **Before any other tuning output**, follow the mandatory session-start gate in
-`skills/omniverse-usd-performance-tuning/references/setup-usd-performance-tuning/references/runtime-context-header.md`.
+`references/setup-usd-performance-tuning/references/runtime-context-header.md`.
 That reference owns `output_path`, the canonical `setup-preflight.json`
 location, Format A/Format B, and the "do not improvise a silent probe"
 anti-pattern.
@@ -82,12 +84,27 @@ Required outcomes:
   status.
 
 ```
-[Kit: {runtime_context.kit.application} {runtime_context.kit.version}  |  SO: {runtime_context.sceneOptimizer.version}  |  AV: {runtime_context.assetValidator.version}]
+[Kit: {runtime_context.kit.application} {runtime_context.kit.version}  |  SO: {runtime_context.usdOptimize.version}  |  AV: {runtime_context.assetValidator.version}]
 ```
+
+## Response robustness
+
+A setup or runtime gate blocks runtime *execution* — it never blanks out the
+response. Some models over-treat the gate as a reason to stop; do not.
+
+- **Always return a non-empty, routed response.** If preflight is missing,
+  invoke `setup-usd-performance-tuning` as Phase 0 and *still* emit the entry
+  skill, the `decision`, and the full planning skeleton through
+  `optimization-report` in the same response. Never make "waiting for setup" the
+  whole reply.
+- The gate blocks runtime *execution* — starting Kit, running Usd Optimize or
+  usd-validation-nvidia, profiling, log inspection. It does **not** block planning,
+  reading existing reports, detecting zero-work from before/after metrics, or
+  issuing approval prompts.
 
 ## Runtime artifact token budget
 
-Before reading Kit logs, Asset Validator CSVs, Scene Optimizer logs, Tracy CSVs,
+Before reading Kit logs, usd-validation-nvidia CSVs, Usd Optimize logs, Tracy CSVs,
 or other runtime output, follow
 `references/runtime-artifact-token-budget.md`. Keep raw artifacts on disk, read
 summary JSON first, and use bounded log snapshots instead of full dumps or live
@@ -95,31 +112,65 @@ streams.
 
 ## Plan-time vs execution-time approval
 
-`approval_required` at planning time is reserved for requests that explicitly name a destructive operation. Use the following rule when deciding between `ready_to_plan` and `approval_required`:
+Approval is an **apply-authority concern**, not a plan-time routing branch. Every
+optimization request — generic or naming a specific destructive op — is planned
+through the one full pipeline (structural assessment → validators → op chain).
+A named destructive op becomes an evidence-driven step gated where it executes
+(`operation-safety.md` apply-authority class); there is no "request names a
+destructive op → run just that op" shortcut, and a request never pre-authorizes
+an `intent-gated` operation.
 
-- **`approval_required` at planning time** — the user's request itself names a destructive operation: "flatten this stage", "decimate the meshes", "merge prototypes", "delete unused prims", or any specific named mutation that cannot be undone within the same workflow. In this case the agent's first response must be an approval prompt that names the operation, before the agent commits to a plan that executes it.
-- **`ready_to_plan` at planning time** — the user's request is general: "optimize this scene", "make it load faster", "reduce GPU memory", "improve interactivity". The agent lays out the full plan, including any destructive operations the plan would invoke (for example `so-run-operations` with `mergeMaterials`), without withholding the plan itself. **Approval for each destructive operation is requested alongside plan approval**.
+**The `decision` token is DERIVED from the response's own shape — never judged
+from whether the request mentioned a destructive op:**
 
-The distinction is between **authorising a plan** and **authorising a destructive action**. A general optimisation request authorises planning; it does not authorise execution of specific destructive operations.
+- `blocked` ⟺ a `blocked_code` applies: a runtime/auth obstacle stops every
+  committed step.
+- `approval_required` ⟺ **this response halts awaiting the user**: the
+  committed plan stops at a gate the response is surfacing now
+  (`approval_required_reason` names it) and `planned_phases` carries the
+  post-approval continuation.
+- `ready_to_plan` ⟺ otherwise: nothing in this response awaits the user.
+  Future gates — a later `restructure-decision` prompt, `intent-gated` ops
+  collected for the Phase 7 opt-in menu — belong in `gates_observed`, never in
+  `decision`.
+
+Derivation invariants (enforced by the runtime harness): `ready_to_plan` ⇒
+`committed_milestones` equals `planned_phases`; `approval_required` ⇒
+`committed_milestones` is a strict prefix of `planned_phases`. If your draft
+response violates an invariant, the `decision` value is wrong — recompute it
+from the lists, not the other way around.
+
+Before executing a destructive or lossy operation such as flattening,
+decimation, deletion, merge, quantization, primitive fitting, or topology edit,
+ask for approval. The approval prompt must name the intended output path, state
+that the source will not be overwritten unless in-place overwrite was requested,
+and summarize baseline assessment, pre-mutation validation, planned
+post-mutation validation, and operation-specific guardrails.
 
 For structured runtime-test responses and similar planning summaries:
 
-- A future `restructure-decision` prompt is a planned user-decision gate, not a reason to set the top-level response `decision` to `approval_required` for a generic optimization request.
-- For a generic optimization request, set `decision: "ready_to_plan"` and include the full intended chain in both `committed_milestones` and `planned_phases`, through `optimization-report`.
-- It is valid for `gates_observed` to include `asks_user_for_restructure_decision` while the top-level `decision` remains `ready_to_plan`.
+- Derive `decision` per *Plan-time vs execution-time approval* above; do not restate or re-judge it per scenario.
 - Whenever a chain names profile phases, use the exact labels `profile-stage:baseline` and `profile-stage:after`; do not emit the ambiguous bare `profile-stage` token.
 - Start structured milestone lists with `omniverse-usd-performance-tuning` as the owning entry skill. Include `setup-usd-performance-tuning` only as additional Phase 0 context, not as a replacement for the entry skill milestone.
 - For broad optimization requests, preserve the milestone subsequence from *Output Format* above exactly, with optional extra analysis steps inserted only where they do not reorder it.
-- Do not list `so-run-validators` or `so-interpret-validators` before `restructure-decision` in broad optimization milestone summaries. Phase-aware validator routing still happens through `usd-validation-runner`; the SO validator executor/interpreter milestones appear after the restructure decision path in the structured plan contract.
+- Do not list `usd-optimize-run-validators` or `usd-optimize-interpret-validators` before `restructure-decision` in broad optimization milestone summaries. Phase-aware validator routing still happens through `usd-validation-runner`; the Usd Optimize validator executor/interpreter milestones appear after the restructure decision path in the structured plan contract.
 
 ## Output expectation
 
-End-to-end optimization work should produce both an optimized USD stage, when
-mutation is executed, and a structured optimization report conforming to
-the `optimization-report` reference's `scripts/optimization-report.schema.json`. The HTML report must be rendered
-from `references/report-templates/optimization-report.html.template` via
-`render_preview.py` — never hand-write HTML. Diagnosis-only work should still
-end with a report or summary that states no optimized stage was written.
+End-to-end work produces an optimized USD stage (when mutation runs) and a
+structured report conforming to the `optimization-report` schema
+(`scripts/optimization-report.schema.json`); render the HTML from
+`references/report-templates/optimization-report.html.template` via
+`render_preview.py` (never hand-write HTML), and report the optimized-stage,
+JSON, Markdown, and HTML paths. If schema validation or HTML rendering did not
+run, report the run as blocked/incomplete, not complete.
+
+Every request runs the full pipeline — there is no diagnose-and-exit or
+validate-and-stop mode. The one legitimate stage-less ending is the
+**runtime-forced degraded path** (Usd Optimize unavailable and the user
+declines install/setup): set `workflow_mode: "structural_only"`, a verdict such
+as `no_optimized_stage_written`, the blocked/missing-optimizer evidence, and a
+`next_profile_capture` note for later runtime profiling.
 
 ## Purpose
 
@@ -129,8 +180,7 @@ optimization workflow while preserving evidence before mutation.
 ## Prerequisites
 
 - Stage path or enough context to identify the target asset.
-- User goal: diagnosis only, validation, profiling, or processor execution.
-- Runtime availability status from `setup-usd-performance-tuning` when not already known.
+- Runtime availability status from `setup-usd-performance-tuning` when not already known (standalone is the sole optimize+validate runtime; Kit→omniperf is an opt-in profiling adjunct).
 - Permission status for in-place mutation vs writing a separate optimized output.
 
 ## Examples
@@ -157,20 +207,20 @@ optimization workflow while preserving evidence before mutation.
    - Stage path and size.
    - Whether the stage is local, mounted, or `omniverse://` remote. For remote
      assets, route through `omniverse-authentication` before first open.
-   - Kit or USD runtime.
-   - Whether the workload is CAD, VFI, AIF, Isaac, or generic OpenUSD.
+   - Standalone USD runtime (the optimize+validate runtime); note separately if
+     the user explicitly wants the opt-in Kit→omniperf profiling adjunct.
+   - Whether the workload is CAD, VFI, a data-center digital twin, Isaac, or generic OpenUSD.
    - Whether in-place mutation is allowed.
-   - Whether the user wants diagnosis only or processor execution.
 
 3. Route:
-   - USD composition questions: `usd-structure-assessment` (composition is now part of the SA umbrella; deeper detail in `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/composition-audit.md`).
-   - Validation and content issues: `usd-validation-runner` (master router; routes to `validate-*` family or `so-run-validators` based on intent).
+   - USD composition questions: `usd-structure-assessment` (composition is now part of the SA umbrella; deeper detail in `references/usd-structure-assessment/references/composition-audit.md`).
+   - Validation and content issues: `usd-validation-runner` (master router; routes to `validate-*` family or `usd-optimize-run-validators` based on intent).
    - Edit/output decisions: `usd-edit-target-planner` (also owns variant/payload gates).
    - Repeated copied hierarchy or high mesh count with no instancing:
      `usd-hierarchy-dedupe-candidates`.
    - Restructure decision (monolithic stage, asset boundary materialization): `restructure-decision`.
    - CAD converter settings: read `references/cad-conversion/README.md` (niche pre-USD concern; see reference for details).
-   - Scene Optimizer: `so-run-validators`, `so-interpret-validators`, `so-run-operations`.
+   - Usd Optimize: `usd-optimize-run-validators`, `usd-optimize-interpret-validators`, `usd-optimize-run-operations`.
 
 ## Optimization ordering
 
@@ -181,6 +231,19 @@ operations last.** The workflow reference owns the full invariant list
 (meshCleanup before decimateMeshes, deduplication before decimation, never
 merge if instanced, etc.) and the analysis-only ops catalogue.
 
+### Large monolithic repeated-CAD pass
+
+For large monolithic CAD-style stages with many repeated meshes and low or no
+instancing, when the user asks for the safest useful optimization before
+decimation, follow the execution contract in
+[references/large-monolithic-cad-pass.md](references/large-monolithic-cad-pass.md):
+lossless hierarchy/geometry dedup or prototype/reference restructuring is the
+primary win (a repack is only secondary packaging); no decimation or other lossy
+op without explicit approval; write a separate optimized stage; record
+baseline/after metrics; run targeted (not full-sweep) validation; report all
+three repack-normalized footprint sizes and attribute the re-encode vs.
+structural split; and state which runtime metrics were not measured.
+
 ## Rules
 
 - Always run composition audit before mutation.
@@ -190,36 +253,34 @@ merge if instanced, etc.) and the analysis-only ops catalogue.
   checking for hierarchy-level reuse.
 - Do not recommend a fixed optimization stack without bottleneck evidence.
 - Do not invent numeric thresholds or expected percentage wins.
-- **Prefer canonical SO ops over specialty / documentary ones.** The op
-  curation in `references/operations/_curation.json` classifies every op
+- For decimation requests, decimate only eligible high-poly meshes, skip
+  already-simple meshes, preserve materials, UVs, and normals where possible,
+  record zero-work/no-op cases, and compare before/after mesh and file metrics.
+- Treat occlusion checks, cross-component duplicate sweeps, exhaustive
+  equivalence checks, and other broad expensive validation as opt-in work. Route
+  validation through `usd-validation-runner`, present the default targeted
+  validation that can run now, and ask for explicit approval before expensive
+  full-sweep or cross-component checks.
+- For standalone Usd Optimize or fixture-only runs, do not claim runtime
+  performance improved from file size, prim count, load proxy, or operation
+  report evidence alone. Runtime improvement is unconfirmed unless Kit,
+  Omniperf, or equivalent profiling captured FPS, frame time, VRAM, Hydra, RTX,
+  renderer, or draw-call metrics.
+- **Prefer canonical Usd Optimize ops over specialty/documentary ones.** The
+  `curation` block in `references/operations/operations.json` classifies every op
   as `canonical`, `specialty`, `analysis`, `documentary`, or `deprecated`.
-  When more than one op could resolve the same finding, recommend the
-  canonical one first and only reach for a specialty op when the user
-  explicitly asks or the rationale warrants it. Specifically:
-  - For vertex welding, prefer canonical `meshCleanup` with explicit flags
-    over the standalone `mergeVertices` op. The standalone op is a
-    legacy/specialty surface; use upstream `usd-optimize` for the operation
-    mechanics and local approval policy before mutating.
-  - For hierarchy dedupe, recommend `usd-hierarchy-dedupe-candidates` +
-    `apply-restructure` (the USD-authored rewrite path).
-  - For per-mesh dedupe, recommend `deduplicateGeometry` (canonical) over
-    `findCoincidingGeometry` (analysis — produces a report, not a change).
-  - Do not recommend `documentary`-status ops (e.g., `boxClip`,
-    `deletePrims`, `removeAttributes`, `removeUntypedPrims`,
-    `merge` outside its narrow non-instanced case) without an explicit
-    user request. Documentary ops survive in the per-op
-    `references/operations/<key>.md` routing stubs for completeness but are
-    excluded from agent-initiated recommendations.
-  - **Specialty ≠ documentary.** Ops classified as `specialty` in
-    `_curation.json` either (a) have validator-finding evidence that
-    wires them into the `so-interpret-validators` chain (e.g.
-    `sparseMeshes`, `optimizePrimvars`), or (b) are load-bearing escape
-    hatches needed for specific downstream contexts (e.g.
-    `primitivesToMeshes` when output must be `UsdGeomMesh`,
-    `utilityFunction` for instancing toggles and material rebinding,
-    `pythonScript` for `so-create-proxy` recipes). Recommend specialty
-    ops when their validator fires OR when their downstream context
-    applies — the suppression above only targets `documentary` ops.
+  Recommend the canonical op first: `meshCleanup` (with explicit flags) over the
+  legacy standalone `mergeVertices`; `deduplicateGeometry` over analysis-only
+  `findCoincidingGeometry` (which only produces a report); and
+  `usd-hierarchy-dedupe-candidates` + `apply-restructure` for hierarchy dedupe.
+  Never recommend `documentary`-status ops (`boxClip`, `deletePrims`,
+  `removeAttributes`, `removeUntypedPrims`, or `merge` outside its narrow
+  non-instanced case) without an explicit user request. Specialty ≠ documentary:
+  recommend a `specialty` op when its validator fires or its downstream context
+  applies — e.g. `sparseMeshes`/`optimizePrimvars` (validator-wired) or
+  `primitivesToMeshes`/`utilityFunction`/`pythonScript` (load-bearing escape
+  hatches). See `operations.json` and upstream `usd-optimize` for op mechanics
+  and local approval policy.
 
 ## Limitations
 
@@ -239,8 +300,8 @@ merge if instanced, etc.) and the analysis-only ops catalogue.
 
 Before routing, read:
 
-- `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/optimization-tradeoffs.md` — identify which pipeline phase the scene is in (extraction, structuring, or optimization). The right action depends on the phase.
-- `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/factory-level-structuring.md` — understand the three pillars (assets, aggregation, animation) and the seven-step structuring pattern.
+- `references/usd-structure-assessment/references/optimization-tradeoffs.md` — identify which pipeline phase the scene is in (extraction, structuring, or optimization). The right action depends on the phase.
+- `references/usd-structure-assessment/references/factory-level-structuring.md` — understand the three pillars (assets, aggregation, animation) and the seven-step structuring pattern.
 
 If you have network access, prefer the live URLs (noted in each reference file) for the most current version.
 
@@ -261,15 +322,12 @@ references.
 
 The final deliverable must come from `optimization-report`: save both the structured JSON report and the generated Markdown summary. Do not substitute an ad hoc `SUMMARY.md` or chat-only recap for the optimization report.
 
-For deeper subtopic guidance, consult the references:
-
-- `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/composition-audit.md`, `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/layer-health.md` - subtopic detail for SA's Phase 1 checklist.
-- `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/instancing-readiness/references/instancing-tradeoffs.md` - merge safety, decision tree for instancing choices.
-- `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/usd-edit-target-planner/references/variants-payloads.md` - deeper variant/payload trade-offs (gates are inline in usd-edit-target-planner).
-- `references/cad-conversion/README.md` - CAD converter settings.
-- `references/upstreams/usd-optimize.md` - upstream SO mechanics and prebuilt package resolution.
-- `skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/so-run-validators/references/infrastructure.md` - local handoff for SO validator infrastructure.
-- `skills/omniverse-usd-performance-tuning/references/usd-validation-runner/README.md` - tier 1/2/3 selected-probe plan, large-stage guardrails, full-sweep approval, and scene-aware adjustment.
-- `skills/omniverse-usd-performance-tuning/references/optimization-report/references/optimization-report-template.md` - the data contract every phase populates.
+For deeper subtopic guidance, `references/workflow.md` and
+`references/skill-map.md` route into the nested material:
+`usd-structure-assessment/` (composition-audit, layer-health,
+instancing-tradeoffs, variants-payloads), `cad-conversion/`,
+`upstreams/usd-optimize.md`, `usd-validation-runner/` (validator infrastructure
+and the tier 1/2/3 probe plan with large-stage guardrails), and
+`optimization-report/` (the data contract every phase populates).
 
 For full Kit runtime profiling (FPS, frame time, Hydra/RTX metrics), refer to the external profiling skills at NVIDIA/omniperf.

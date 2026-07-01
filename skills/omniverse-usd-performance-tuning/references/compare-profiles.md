@@ -59,7 +59,7 @@ terminal optimization report.
 ## Regression Handling
 
 When a metric regresses by more than 5%, name the metric, quantify the change,
-and correlate it with what changed. File-size growth after Scene Optimizer
+and correlate it with what changed. File-size growth after Usd Optimize
 operations may indicate USDC save behavior. Prim-count growth after instancing
 can be acceptable when instances compensate for added prototypes. Steady-state
 frame regressions are more serious than one-time startup regressions.
