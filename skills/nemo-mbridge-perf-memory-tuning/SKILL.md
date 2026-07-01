@@ -1,8 +1,8 @@
 ---
 name: nemo-mbridge-perf-memory-tuning
-description: Techniques for reducing peak GPU memory in Megatron Bridge — expandable segments, parallelism resizing, activation recompute, CPU offloading constraints, and common OOM fixes.
+description: Techniques for reducing peak GPU memory in Megatron Bridge — expandable segments, PEFT + SP input re-gather, parallelism resizing, activation recompute, CPU offloading constraints, and common OOM fixes.
 license: Apache-2.0
-when_to_use: GPU OOM errors, reducing peak memory, or tracing an OOM regression to a specific commit or config change; 'out of memory', 'OOM', 'memory fragmentation', 'expandable_segments', 'reduce GPU memory', 'PYTORCH_CUDA_ALLOC_CONF'.
+when_to_use: GPU OOM errors, reducing peak memory, reducing LoRA or PEFT activation memory with sequence parallelism, or tracing an OOM regression to a specific commit or config change; 'out of memory', 'OOM', 'memory fragmentation', 'expandable_segments', 'reduce GPU memory', 'LoRA memory', 'PEFT memory', 'sequence_parallel_input_regather', 'PYTORCH_CUDA_ALLOC_CONF'.
 ---
 
 # Memory Tuning
@@ -29,7 +29,7 @@ Beyond fragmentation, actual peak memory is determined by:
 - **Parameter + optimizer state memory** — controlled by TP, PP, DP sharding
   (distributed optimizer, FSDP)
 - **Activation memory** — controlled by activation recompute, sequence length,
-  micro-batch size
+  micro-batch size, and PEFT-specific retention of gathered inputs
 - **Temporary / workspace memory** — CUDA kernels, NCCL buffers, CUDA graphs
 
 For configuration planning, use the Bridge theoretical estimator before launching
@@ -53,15 +53,19 @@ When a training run OOMs or is close to the memory limit:
 1. **Set `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` first.** This fixes
    fragmentation-induced OOM with zero performance cost. Most Slurm launch
    templates already include it.
-2. **Add selective activation recompute** (`recompute_modules=[core_attn]`) if
+2. **For LoRA with sequence parallelism, enable input re-gather**
+   (`LoRA(sequence_parallel_input_regather=True)`). This avoids retaining the
+   full gathered LoRA-A input in every eligible layer; it has no effect when SP
+   is disabled.
+3. **Add selective activation recompute** (`recompute_modules=[core_attn]`) if
    not already enabled. See @skills/nemo-mbridge-perf-activation-recompute/SKILL.md.
-3. **Avoid increasing TP** as a memory fix — doubling TP dramatically increases
+4. **Avoid increasing TP** as a memory fix — doubling TP dramatically increases
    NVLink all-reduce volume and often kills throughput (-28% on Llama3 70B).
-4. **Avoid increasing PP at the cost of DP** — halving DP doubles gradient
+5. **Avoid increasing PP at the cost of DP** — halving DP doubles gradient
    accumulation steps and hurts throughput (~6%).
-5. Consider `mlp` recompute if still OOM. Saves ~3 GB but costs ~16% GPU
+6. Consider `mlp` recompute if still OOM. Saves ~3 GB but costs ~16% GPU
    utilization on large dense models (Llama3 70B).
-6. CPU offloading is **blocked when PP > 1**.
+7. CPU offloading is **blocked when PP > 1**.
 
 ## Enablement
 
@@ -98,6 +102,36 @@ If the model genuinely does not fit (not fragmentation), adjust parallelism:
 
 See @skills/nemo-mbridge-perf-activation-recompute/SKILL.md for full details.
 
+### PEFT + sequence-parallel input re-gather
+
+For `LoRA` training with sequence parallelism, eligible column-parallel
+`linear_qkv` and `linear_fc1` adapters consume a gathered LayerNorm output.
+Because LoRA-A is trainable, the default path retains that full gathered input
+until backward for the LoRA-A weight gradient.
+
+Enable input re-gather when constructing the PEFT config:
+
+```python
+from megatron.bridge.peft.lora import LoRA
+
+cfg.peft = LoRA(
+    # Keep the recipe's existing LoRA settings here.
+    sequence_parallel_input_regather=True,
+)
+```
+
+With this option, forward still materializes the full input temporarily for the
+LoRA-A GEMM, but MCore autograd retains only its sequence-local shard. Backward
+asynchronously gathers the full input again, overlaps the collective with
+dgrad when possible, computes the LoRA-A weight gradient, and then reuses the
+temporary communication buffer.
+
+This is a memory-for-communication tradeoff, not conventional activation
+checkpointing: no LayerNorm, attention, MLP, or LoRA GEMM is rerun. Some
+throughput degradation is expected, and the benefit grows with the amount of
+eligible LoRA-A activation retained. The option has no effect when sequence
+parallelism is disabled.
+
 ### CPU offloading
 
 ```python
@@ -132,6 +166,10 @@ not as a memory fix.
 - CPU offloading requires `pipeline_model_parallel_size = 1`.
 - Distributed optimizer requires `use_distributed_optimizer = True` in the
   optimizer config.
+- `sequence_parallel_input_regather` applies only to eligible non-expert
+  column-parallel LoRA-A projections. Row-parallel adapters, expert adapters,
+  TP=1, CUDA graphs, CPU activation offload, and overlapping full-layer or
+  selective MLP activation recompute fall back to the existing path.
 
 ## Measured Results
 
@@ -177,7 +215,33 @@ Selective activation recompute with `mlp` saved ~3 GB peak memory but cost
 ~16% GPU utilization on this workload. See
 @skills/nemo-mbridge-perf-activation-recompute/SKILL.md for full results.
 
+### LoRA + SP input re-gather
+
+Real-checkpoint H100 training with SQuAD showed lower peak memory in all tested
+configurations, with workload-dependent throughput cost:
+
+| Model/config | Baseline peak | Input re-gather peak | Memory saved | Throughput change |
+|---|---:|---:|---:|---:|
+| Qwen3-8B, TP2, seq 8192 | 47.545 GB | 42.814 GB | 4.731 GB (10.0%) | -6.74% |
+| Qwen3-30B-A3B, TP4/EP4 | 29.890 GB | 28.321 GB | 1.569 GB (5.2%) | -2.89% |
+| GPT-OSS-120B, TP2/EP8 | 52.185 GB | 51.371 GB | 0.814 GB (1.6%) | -0.34% |
+
+All runs had finite losses with zero skipped or NaN iterations. Two-rank BF16
+and FP32 checks matched the baseline for outputs, input gradients, LoRA-A and
+LoRA-B gradients, and two-microbatch fused `main_grad` accumulation.
+
 ## Code Anchors
+
+### LoRA sequence-parallel input re-gather
+
+```text
+src/megatron/bridge/peft/lora.py
+    LoRA.sequence_parallel_input_regather
+
+src/megatron/bridge/peft/utils.py
+    ParallelLinearAdapter._sequence_parallel_input_regather_eligibility()
+    ParallelLinearAdapter.forward()
+```
 
 ### CPU offloading PP incompatibility (MCore)
 
@@ -224,6 +288,7 @@ model_config = GPTModelProvider(
 | OOM on a single rank despite headroom on others | Memory fragmentation | check if `expandable_segments:True` is set | set `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` |
 | OOM with `expandable_segments` already set | Genuine capacity limit | check `nvidia-smi` for param/optimizer memory | increase PP, use distributed optimizer, or add recompute |
 | Estimated memory exceeds GPU capacity before launch | model state or activations genuinely too large | run `estimate_training_memory` and inspect the largest component | adjust PP/TP/CP/EP, distributed optimizer, or recompute before launching |
+| LoRA + SP retains unexpectedly high activation memory | full gathered LoRA-A inputs are retained until backward | check whether `cfg.peft.sequence_parallel_input_regather` is enabled and the target is eligible | set `LoRA(sequence_parallel_input_regather=True)`; verify fallback constraints |
 | `ValueError: PP + CPU offloading` | using cpu_offloading with PP > 1 | check PP config | disable CPU offloading or set PP=1 |
 | `RuntimeError` with `--use-nccl-ub` + expandable segments | NCCL UB incompatible with expandable allocator | check env vars | remove `expandable_segments:True` or disable `--use-nccl-ub` |
 
@@ -233,6 +298,8 @@ model_config = GPTModelProvider(
 - Parallelism resizing (TP/PP) often has significant throughput costs
 - The theoretical estimator is formula-based and does not replace runtime
   profiling or CUDA memory reports
+- LoRA input re-gather does not cover row-parallel or expert adapters and may
+  have negligible benefit when few eligible LoRA-A activations dominate memory
 
 ## Verification
 
@@ -245,3 +312,15 @@ assert "expandable_segments:True" in os.environ.get("PYTORCH_CUDA_ALLOC_CONF", "
 
 For Slurm jobs, verify the env var is exported before the training command
 in the launch script.
+
+For LoRA + SP input re-gather, run the focused configuration tests and the real
+two-rank MCore backward-parity test:
+
+```bash
+uv run python -m pytest \
+  tests/unit_tests/peft/test_utils.py -k "sequence_parallel_input_regather" \
+  tests/unit_tests/peft/test_lora.py -k "sequence_parallel_input_regather"
+
+uv run python -m torch.distributed.run --nproc_per_node=2 -m pytest \
+  tests/unit_tests/peft/test_lora_sp_input_regather_distributed.py
+```

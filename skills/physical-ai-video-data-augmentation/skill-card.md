@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers running end-to-end video data augmentation and auto-labeling workflows on NVIDIA OSMO to generate labeled synthetic training data for physical AI perception models. <br>
+Developers and engineers running video data augmentation and auto-labeling pipelines on NVIDIA OSMO to generate labeled synthetic training data for physical-AI perception models. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [Yes] <br>
-**Credential Type(s):** [API key] <br>  
+**Credential Type(s):** [API key] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -33,6 +33,7 @@ Mitigation: Review and scan skill before deployment. <br>
 - [NIM Endpoint Reference](references/nim/README.md) <br>
 - [Setup Guide](references/setup.md) <br>
 - [Troubleshooting](references/troubleshooting.md) <br>
+- [Container Images](references/container-images.md) <br>
 
 
 ## Skill Output: <br>
@@ -48,7 +49,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). 1 positive skill-activation task; pass threshold 50%. <br>
+Evaluated against 1 evaluation task in the astra-sandbox environment using NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -74,9 +75,9 @@ Underlying evaluation signals used in this run: <br>
 |---|---:|---:|---:|
 | Security | 1 | 100% (+0%) | 100% (+0%) |
 | Correctness | 1 | 100% (+75%) | 97% (+72%) |
-| Discoverability | 1 | 100% (+75%) | 97% (+47%) |
-| Effectiveness | 1 | 100% (+90%) | 100% (+86%) |
-| Efficiency | 1 | 94% (+70%) | 96% (+36%) |
+| Discoverability | 1 | 100% (+75%) | 97% (+72%) |
+| Effectiveness | 1 | 90% (+90%) | 100% (+86%) |
+| Efficiency | 1 | 94% (+69%) | 96% (+69%) |
 
 ## Skill Version(s): <br>
 1.0.0 (source: frontmatter) <br>

@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `physical-ai-video-data-augmentation`
-- Evaluation date: 2026-06-30
+- Evaluation date: 2026-07-01
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
@@ -56,9 +56,9 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 |---|---:|---:|---:|
 | Security | 1 | 100% (+0%) | 100% (+0%) |
 | Correctness | 1 | 100% (+75%) | 97% (+72%) |
-| Discoverability | 1 | 100% (+75%) | 97% (+47%) |
-| Effectiveness | 1 | 100% (+90%) | 100% (+86%) |
-| Efficiency | 1 | 94% (+70%) | 96% (+36%) |
+| Discoverability | 1 | 100% (+75%) | 97% (+72%) |
+| Effectiveness | 1 | 90% (+90%) | 100% (+86%) |
+| Efficiency | 1 | 94% (+69%) | 96% (+69%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 

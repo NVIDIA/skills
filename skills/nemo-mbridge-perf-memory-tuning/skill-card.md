@@ -1,5 +1,5 @@
 ## Description: <br>
-Techniques for reducing peak GPU memory in Megatron Bridge — expandable segments, parallelism resizing, activation recompute, CPU offloading constraints, and common OOM fixes. <br>
+Techniques for reducing peak GPU memory in Megatron Bridge — expandable segments, PEFT + SP input re-gather, parallelism resizing, activation recompute, CPU offloading constraints, and common OOM fixes. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,10 +9,16 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers diagnosing GPU out-of-memory failures during LLM training, reducing peak memory usage, or optimizing parallelism configurations in Megatron Bridge workloads. <br>
+Developers and engineers diagnosing GPU out-of-memory errors and tuning peak memory consumption during large-model training with Megatron Bridge. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [No] <br>
+**Credential Type(s):** [None] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
@@ -20,25 +26,25 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [Performance Tuning Guide](docs/performance-guide.md) <br>
-- [Parallelism Documentation](docs/parallelisms.md) <br>
+- [Parallelisms Documentation](docs/parallelisms.md) <br>
 - [Activation Recompute Skill](skills/nemo-mbridge-perf-activation-recompute/SKILL.md) <br>
 - [Megatron FSDP Skill](skills/nemo-mbridge-perf-megatron-fsdp/SKILL.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Configuration instructions, Shell commands, Analysis] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Configuration instructions, Analysis] <br>
+**Output Format:** [Markdown with inline bash and Python code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- claude-code <br>
-- codex <br>
+- `claude-code` <br>
+- `codex` <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task; pass threshold 50%. <br>
+Evaluated against 1 task (1 positive skill-activation case) using NVSkills-Eval external profile in astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,14 +68,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+0%) | 97% (+0%) |
-| Discoverability | 2 | 100% (+0%) | 72% (+0%) |
-| Effectiveness | 2 | 94% (-1%) | 93% (-4%) |
-| Efficiency | 2 | 92% (-0%) | 60% (-0%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+100%) | 97% (+72%) |
+| Discoverability | 1 | 100% (+100%) | 97% (+47%) |
+| Effectiveness | 1 | 98% (+86%) | 100% (+90%) |
+| Efficiency | 1 | 94% (+67%) | 96% (+35%) |
 
 ## Skill Version(s): <br>
-v0.2.0rc6-1528-gb0f64d72 (source: git describe) <br>
+1.0.0+9edee0c (source: pyproject.toml) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
