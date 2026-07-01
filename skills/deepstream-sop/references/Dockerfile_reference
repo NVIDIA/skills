@@ -1,0 +1,176 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+################################################################################
+# Reference Dockerfile for NVDS SOP Inference Microservice
+# Source: https://github.com/NVIDIA/sop-monitoring-blueprints/blob/main/microservices/sop-inference-bp/docker/Docker.build
+# Local:  sop-inference-bp/docker/Docker.build
+################################################################################
+
+# Stage 1: Extract DeepStream headers from any deepstream 8.0+ image
+ARG BASE_IMAGE="nvcr.io/nvidia/blueprint/vss-engine:2.4.1"
+FROM nvcr.io/nvidia/deepstream:9.0-triton-multiarch AS ds_dev
+
+# Stage 2: Build on VSS engine base (includes vLLM, PyTorch, DeepStream Python SDK)
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} AS base
+
+# System-level dependencies for building GStreamer plugins and pyservicemaker
+RUN apt update && apt install -y \
+    python3-pybind11 \
+    python3-dev \
+    libdlpack-dev \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    pkg-config \
+    gstreamer1.0-tools \
+    cmake \
+    protobuf-compiler=3.21.12-8.2ubuntu0.3
+
+# Python packages
+RUN pip install --no-cache-dir qwen-vl-utils==0.0.14 ipdb==0.13.13
+
+# =============================================================================
+# Basler Pylon SDK (v25.10.2)
+# NOTE: Subject to separate Basler license terms.
+# Download from: https://www.baslerweb.com/en/downloads/software/1932603569/
+# Place at: ./binaries/pylon-25.10.2_linux-x86_64_setup.tar.gz
+# =============================================================================
+ARG PYLON_SDK_URL=https://downloadbsl.blob.core.windows.net/software/pylon%2025.10.2/pylon-25.10.2_linux-x86_64_setup.tar.gz
+ARG PYLON_VER=25.10.2
+# The Basler Pylon SDK is a commercial, license-gated download. By default the
+# build does NOT auto-download it: if it is missing from ./binaries/ the build
+# stops with instructions. Set ALLOW_PYLON_CDN_DOWNLOAD=1 to accept the Basler
+# license terms and fetch it from the Basler CDN unattended.
+# NOTE: ./binaries/ must exist in the build context (keep it tracked with a
+# placeholder such as binaries/.gitkeep) or BuildKit fails to resolve this bind
+# mount with a cryptic exit 17 before any instruction below can run.
+ARG ALLOW_PYLON_CDN_DOWNLOAD=0
+
+RUN --mount=type=bind,source=./binaries,target=/tmp/pylon_setup,rw \
+    PYLON_TARBALL=/tmp/pylon_setup/pylon-${PYLON_VER}_linux-x86_64_setup.tar.gz && \
+    if [ ! -f "${PYLON_TARBALL}" ]; then \
+        if [ "${ALLOW_PYLON_CDN_DOWNLOAD}" = "1" ]; then \
+            echo "WARNING: Basler Pylon SDK not found in ./binaries/." >&2; \
+            echo "         Downloading the commercial Basler Pylon SDK ${PYLON_VER} from the" >&2; \
+            echo "         Basler CDN. By proceeding you accept the Basler Pylon SDK license" >&2; \
+            echo "         terms: https://www.baslerweb.com/en/downloads/software/" >&2; \
+            curl -fSL -o "${PYLON_TARBALL}" "${PYLON_SDK_URL}"; \
+        else \
+            echo "ERROR: Basler Pylon SDK version ${PYLON_VER} not found at" >&2; \
+            echo "       ./binaries/pylon-${PYLON_VER}_linux-x86_64_setup.tar.gz" >&2; \
+            echo "       It is a commercial, license-gated download. Register for and download" >&2; \
+            echo "       Basler Pylon SDK version ${PYLON_VER} from" >&2; \
+            echo "       https://www.baslerweb.com/en/downloads/software/ and place it at that path." >&2; \
+            echo "       Alternatively, rebuild with --build-arg ALLOW_PYLON_CDN_DOWNLOAD=1 to accept" >&2; \
+            echo "       the Basler license terms and auto-download version ${PYLON_VER} from the Basler CDN." >&2; \
+            exit 1; \
+        fi; \
+    fi && \
+    mkdir -p /tmp/pylon_setup/sdk && \
+    cd /tmp/pylon_setup && tar -C ./sdk -xvf "${PYLON_TARBALL}" && \
+    mkdir -p /opt/pylon && \
+    tar -C /opt/pylon -xzf sdk/pylon-*.tar.gz && \
+    chmod 755 /opt/pylon
+
+ENV PYLON_ROOT=/opt/pylon
+
+# =============================================================================
+# gst-plugin-pylon (Basler GStreamer plugin v1.0.0)
+# Enables pylonsrc element in GStreamer pipelines
+# IMPORTANT: DeepStream libs must be hidden during build to prevent conflicts
+# =============================================================================
+RUN apt remove meson ninja-build || true
+RUN pip install meson==1.10.0 ninja==1.13.0
+
+RUN --mount=type=bind,source=./binaries,target=/tmp/,rw \
+    if [ ! -d /tmp/gst-plugin-pylon ]; then \
+        git clone -b v1.0.0 --depth 1 \
+        https://github.com/basler/gst-plugin-pylon.git /tmp/gst-plugin-pylon; \
+    fi && \
+    cd /tmp/gst-plugin-pylon && \
+    export PYLON_ROOT=/opt/pylon && \
+    # Temporarily hide DeepStream libs to prevent meson from finding nvbufsurface
+    if [ -d /opt/nvidia/deepstream/deepstream/lib ]; then \
+        mv /opt/nvidia/deepstream/deepstream/lib /opt/nvidia/deepstream/deepstream/lib.tmp; \
+    fi && \
+    meson setup builddir --prefix /usr/ && \
+    ninja -C builddir && \
+    ninja -C builddir install && \
+    # Restore DeepStream libs
+    if [ -d /opt/nvidia/deepstream/deepstream/lib.tmp ]; then \
+        mv /opt/nvidia/deepstream/deepstream/lib.tmp /opt/nvidia/deepstream/deepstream/lib; \
+    fi
+
+# Additional Python packages
+RUN pip install playsound==1.3.0 confluent-kafka==2.12.2
+
+# ONNX deps for on-the-fly DDM TRT engine build at Triton init time
+# (see triton_model_repo/ddm/1/model.py TRT path). Only used when DDM_TRT_OPTIMIZATION=true.
+RUN pip install --no-cache-dir onnx==1.17.0 onnxscript==0.7.0 onnxruntime==1.19.2
+
+# =============================================================================
+# Application setup
+# =============================================================================
+WORKDIR /opt/nvidia/nvds_sop/
+ENV PYTHONPATH=/opt/nvidia/nvds_sop/
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/tritonserver/lib/
+
+# Copy DeepStream source headers (needed to compile custom_postprocess)
+COPY --from=ds_dev /opt/nvidia/deepstream/deepstream/sources/includes \
+    /opt/nvidia/deepstream/deepstream/sources/includes
+
+# Copy source code via script (excludes large files, build artifacts)
+RUN --mount=type=bind,source=.,target=/tmp/ds_sop \
+    cd /tmp/ds_sop && docker/copy_sources.sh ./ /opt/nvidia/nvds_sop/
+
+# License file served by the /v1/metadata endpoint (DS_SOP_LICENSE_PATH=/opt/mm/LICENSE)
+COPY license.txt /opt/mm/LICENSE
+
+# Compile protobuf .proto → *_pb2.py (source of truth is nv.proto + ext.proto)
+RUN cd /opt/nvidia/nvds_sop/nvds_action_detector/protos/ && \
+    protoc -I. --python_out=. nv.proto ext.proto && \
+    sed -i 's/^import nv_pb2 as/from . import nv_pb2 as/' ext_pb2.py
+
+# =============================================================================
+# DDM model (Temporal Action Detection from MCG-NJU)
+# Clones official DDM repo and applies PyTorch 2 compatibility patch
+# =============================================================================
+RUN --mount=type=bind,source=./docker,target=/patches \
+    git clone https://github.com/MCG-NJU/DDM.git /opt/nvidia/nvds_sop/3rdparty/DDM && \
+    cd /opt/nvidia/nvds_sop/3rdparty/DDM && \
+    git checkout 941e0fb595ab85dc86724a19ed0439ad6bc3632b && \
+    git apply /patches/ddm_pytorch2.patch
+
+# Compile custom postprocess plugin (C++ tensor output parser)
+RUN cd /opt/nvidia/nvds_sop/nvds_action_detector/custom_postprocess/ && make
+
+# =============================================================================
+# Non-root user setup (security best practice)
+# UID/GID 1001 matches docker-compose user setting
+# =============================================================================
+RUN groupadd --gid 1001 --non-unique ds_sop && \
+    useradd --home-dir /opt/nvidia/nvds_sop \
+            --no-create-home \
+            --shell /bin/bash \
+            --uid 1001 \
+            --non-unique \
+            --gid 1001 ds_sop && \
+    chown -R 1001:1001 /opt/nvidia/nvds_sop/ && \
+    chmod -R 755 /opt/nvidia/nvds_sop/
+
+USER ds_sop:1001
+
+ENTRYPOINT ["./start_server.sh"]

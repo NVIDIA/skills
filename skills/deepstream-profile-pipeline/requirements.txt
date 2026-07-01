@@ -1,0 +1,7 @@
+# deepstream-profile-pipeline — pure stdlib; no pip install required.
+#
+# scripts/capacity_report.py and tests/test_capacity_report.py depend
+# only on the Python standard library (argparse, csv, json, shutil,
+# subprocess, sys, pathlib, importlib.util, tempfile, unittest, textwrap).
+#
+# Required: Python >= 3.10

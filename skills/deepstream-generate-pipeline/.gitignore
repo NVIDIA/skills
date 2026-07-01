@@ -1,0 +1,10 @@
+# Auto-generated retriever cache (rebuilt automatically; keyed on data.csv mtime
+# and an internal schema version). Safe to delete at any time.
+data/*.cache.json
+# Legacy pickle cache from before the JSON migration — kept so any stale
+# local copies are still ignored.
+data/*.cache.pkl
+
+# Python build artifacts
+__pycache__/
+*.pyc

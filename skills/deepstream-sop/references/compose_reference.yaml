@@ -1,0 +1,192 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+################################################################################
+# Reference Docker Compose for NVDS SOP Inference Microservice
+# Source: https://github.com/NVIDIA/sop-monitoring-blueprints/blob/main/microservices/sop-inference-bp/deploy/compose.yaml
+# Local:  sop-inference-bp/deploy/compose.yaml
+################################################################################
+
+#### Usage ####
+# Start:  docker compose -f deploy/compose.yaml up -d
+# Attach: docker attach deploy-nvds-action-sop-1
+# Logs:   docker compose -f deploy/compose.yaml logs -f nvds-action-sop
+
+services:
+  nvds-action-sop:
+    image: ${NV_DS_SOP_IMAGE:-nvds-sop:latest}
+    build:
+      context: ..
+      dockerfile: docker/Docker.build
+    # Use user: "0:0" to debug as root
+    user: "${USER_ID:-1001}:${GROUP_ID:-1001}"
+    shm_size: '16gb'
+    runtime: nvidia
+    ports:
+      - "${API_SERVER_PORT:-8300}:${API_SERVER_PORT:-8300}"
+
+    volumes:
+      # Model cache (HuggingFace + vLLM cache)
+      - "${HOST_CACHE:-$HOME/.cache/ds_sop}:/opt/nvidia/nvds_sop/.cache"
+      - "${HOST_CACHE:-$HOME/.cache/ds_sop}:/root/.cache"
+      # DDM model checkpoint directory
+      - "${MODEL_ROOT_DIR:-/models}:${MODEL_ROOT_DIR:-/models}"
+      # Media storage for uploaded video files
+      - "${MEDIA_STORAGE_DIR:-/tmp/dummy}${MEDIA_STORAGE_DIR:+:/tmp/nvds_sop_storage}"
+      # Encoded chunk video output
+      - "${ENCODE_VIDEO_OUTPUT_DIR:-/tmp/dummy}${ENCODE_VIDEO_OUTPUT_DIR:+:/opt/nvidia/nvds_sop/chunks}"
+      # Alert sound file (for ENABLE_ALERT_SOUND=true)
+      - "${ALERT_SOUND_FILE:-/tmp/dummy}${ALERT_SOUND_FILE:+:/opt/nvidia/nvds_sop/stream/alert.wav}"
+      # Custom action config (optional override)
+      - "${ACTION_CONFIG_PATH:-/tmp/dummy}${ACTION_CONFIG_PATH:+:$ACTION_CONFIG_PATH}"
+      # Custom VLM prompt file (optional override)
+      - "${VLM_PROMPT_PATH:-/tmp/dummy}${VLM_PROMPT_PATH:+:$VLM_PROMPT_PATH}"
+      # Basler camera emulation source dir (mounted only when CAMERA_EMULATION_DIR is set)
+      - "${CAMERA_EMULATION_DIR:-/tmp/dummy}${CAMERA_EMULATION_DIR:+:/opt/nvidia/nvds_sop/streams/simulation}"
+      # PulseAudio for alert sounds
+      - ${XDG_RUNTIME_DIR:-/tmp/dummy}${XDG_RUNTIME_DIR:+/pulse}${XDG_RUNTIME_DIR:+:/run/pulse}
+
+    environment:
+      # GPU selection (comma-separated GPU IDs or "all")
+      NVIDIA_VISIBLE_DEVICES: "${NVIDIA_VISIBLE_DEVICES:-0}"
+      API_SERVER_PORT: ${API_SERVER_PORT:-8300}
+      # Set to "true" to bypass GPU models for API-only testing
+      API_DUMMY_TEST: "${API_DUMMY_TEST:-false}"
+      NGC_API_KEY: ${NGC_API_KEY:-}
+      INSTALL_PROPRIETARY_CODECS: "${INSTALL_PROPRIETARY_CODECS:-true}"
+
+      # DDM checkpoint path (must be mounted via MODEL_ROOT_DIR volume)
+      DDM_MODEL_PATH: "${DDM_MODEL_PATH:-/models/gbed_models/ddm/checkpoint.pth.tar}"
+
+      # Optional TensorRT path for the DDM Triton backend (built on the fly at Triton init when enabled).
+      # Engine is cached at DDM_TRT_ENGINE_OUTPUT_PATH; the default /tmp path rebuilds per container —
+      # point it under MODEL_ROOT_DIR to persist. Precision is NOT re-checked against a cached engine
+      # (delete the engine file to switch precision). Falls back to PyTorch if build/load fails.
+      DDM_TRT_OPTIMIZATION: "${DDM_TRT_OPTIMIZATION:-false}"
+      DDM_TRT_ENGINE_OUTPUT_PATH: "${DDM_TRT_ENGINE_OUTPUT_PATH:-/tmp/trt_opt/ddm.engine}"
+      DDM_TRT_PRECISION: "${DDM_TRT_PRECISION:-fp32}"
+      DDM_TRT_BUILD_WORKSPACE_GB: "${DDM_TRT_BUILD_WORKSPACE_GB:-4}"
+
+      # VLM model: HuggingFace ID or local path (embedded vLLM, lowest latency).
+      # Required — no usable default. Set to a fine-tuned checkpoint dir under
+      # MODEL_ROOT_DIR, or an HF repo id. Startup fails fast if empty.
+      VLLM_MODEL_PATH: "${VLLM_MODEL_PATH:-}"
+
+      # Basler camera defaults (used when the request payload omits them)
+      CAMERA_FORMAT: "${CAMERA_FORMAT:-RGB}"
+      CAMERA_FPS_NUM: "${CAMERA_FPS_NUM:-}"
+      CAMERA_FPS_DEN: "${CAMERA_FPS_DEN:-}"
+      CAMERA_WIDTH: "${CAMERA_WIDTH:-}"
+      CAMERA_HEIGHT: "${CAMERA_HEIGHT:-}"
+      # Emit EOS after N frames (camera emulation only; requires PYLON_CAMEMU=1)
+      CAMERA_NUM_BUFFERS: "${CAMERA_NUM_BUFFERS:-}"
+      # Basler pylon camera emulation (serial 0815-0000); defaults on
+      PYLON_CAMEMU: "${PYLON_CAMEMU:-1}"
+      # Host dir with emulation assets, mounted to /opt/nvidia/nvds_sop/streams/simulation
+      CAMERA_EMULATION_DIR: "${CAMERA_EMULATION_DIR:-}"
+
+      # Alert sound (requires ENABLE_ALERT_SOUND=true and mounted alert.wav)
+      ENABLE_ALERT_SOUND: "${ENABLE_ALERT_SOUND:-false}"
+      ALERT_SOUND_FILE: "/opt/nvidia/nvds_sop/stream/alert.wav"
+
+      # Kafka event publishing
+      ENABLE_MESSAGING: "${ENABLE_MESSAGING:-false}"
+      KAFKA_BROKER: "${KAFKA_BROKER:-localhost:9092}"
+      SOP_MESSAGING_SCHEMA: "${SOP_MESSAGING_SCHEMA:-JSON}"
+      DEFAULT_TOPIC: "${DEFAULT_TOPIC:-mdx-vlm-captions}"
+
+      # Video chunk encoding (saves chunk MP4s to ENCODE_VIDEO_OUTPUT_DIR)
+      ENCODE_VIDEO: "${ENCODE_VIDEO:-false}"
+
+      PULSE_SERVER: "unix:/run/pulse/native"
+      PYTHONPATH: "${PYTHONPATH:-/opt/nvidia/nvds_sop}"
+
+      # === SOP action config ===
+      ACTION_CONFIG_PATH: "${ACTION_CONFIG_PATH:-/opt/nvidia/nvds_sop/configs/actions.json}"
+      VLM_PROMPT_PATH: "${VLM_PROMPT_PATH:-/opt/nvidia/nvds_sop/configs/vlm_prompts.txt}"
+
+      # === DeepStream pipeline parameters ===
+      # Input resolution for DDM model (224 default, 384 for higher accuracy)
+      DS_ACTION_IN_RESOLUTION: "${DS_ACTION_IN_RESOLUTION:-224}"
+      # Resize method: nearest | bilinear | cubic | lanzos
+      DS_ACTION_IN_RESIZE_METHOD: "${DS_ACTION_IN_RESIZE_METHOD:-nearest}"
+      # Frame offset delay for boundary detection
+      BOUNDARY_DELAY_FRAME: "${BOUNDARY_DELAY_FRAME:-8}"
+      # DDM temporal window. FRAMES_PER_SIDE must match the checkpoint's temporal context;
+      # SEQUENCE_BATCH is runtime grouping/stride. Derived SLIDING_WINDOWS_SIZE = 2*FRAMES_PER_SIDE + SEQUENCE_BATCH.
+      FRAMES_PER_SIDE: "${FRAMES_PER_SIDE:-5}"
+      SEQUENCE_BATCH: "${SEQUENCE_BATCH:-8}"
+
+      # === vLLM parameters ===
+      VLLM_GPU_MEMORY_UTILIZATION: "${VLLM_GPU_MEMORY_UTILIZATION:-0.3}"
+      VLLM_MAX_MODEL_LEN: "${VLLM_MAX_MODEL_LEN:-20480}"
+      VLLM_MAX_NUM_SEQS: "${VLLM_MAX_NUM_SEQS:-16}"
+      VLM_MAX_TOKENS: "${VLM_MAX_TOKENS:-256}"
+      VLM_TEMPERATURE: "${VLM_TEMPERATURE:-0.2}"
+      # Frame pixel limits (0 = no limit)
+      VLM_MAX_PIXELS: "${VLM_MAX_PIXELS:-0}"
+      VLM_MAX_FRAMES: "${VLM_MAX_FRAMES:-0}"
+      VLM_RESIZED_HEIGHT: "${VLM_RESIZED_HEIGHT:-0}"
+      VLM_RESIZED_WIDTH: "${VLM_RESIZED_WIDTH:-0}"
+      VLM_MAX_TOTAL_PIXELS: "${VLM_MAX_TOTAL_PIXELS:-0}"
+      # Frame sampling rate for VLM inference
+      VLM_FPS: "${VLM_FPS:-8.0}"
+
+    working_dir: "${WORK_DIR_PATH:-/opt/nvidia/nvds_sop}"
+    entrypoint: "${ENTRYPOINT:-./start_server.sh}"
+    # Container runtime permissions. Runs UNPRIVILEGED by default: GPU comes from
+    # `runtime: nvidia` (above), and file / RTSP / Basler (GigE + emulation) inputs
+    # were all verified to work without `privileged: true`. The original privileged
+    # default was undocumented, so if a particular host or device setup runs into a
+    # file/device permission or shared-memory access issue, you may need to turn
+    # `privileged: true` back on (e.g. via a compose.override.yaml). host networking
+    # and ipc stay env-overridable:
+    #   network_mode: host  — low-latency RTSP / Basler streaming
+    #   ipc: host           — CUDA + Pylon GenICam shared memory across processes
+    network_mode: "${NETWORK_MODE:-host}"
+    cap_add:
+      - SYS_PTRACE
+    devices:
+      - "/dev/snd:/dev/snd"
+    depends_on:
+      kafka:
+        condition: service_started
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      stack: 67108864
+    ipc: "${IPC_MODE:-host}"
+    stdin_open: true
+    tty: true
+
+  kafka:
+    image: apache/kafka:3.7.0
+    container_name: kafka
+    environment:
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@localhost:9093
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - KAFKA_NUM_PARTITIONS=3
+    ports:
+      - "9092:9092"

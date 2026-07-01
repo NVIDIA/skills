@@ -1,0 +1,5 @@
+{
+  "name": "deepstream-generate-pipeline",
+  "description": "Build DeepStream GStreamer pipelines interactively. Collects input source, inference, tracker, and output preferences, then assembles a ready-to-run gst-launch-1.0 pipeline using BM25 retrieval over 270+ verified pipelines (zero external dependencies).",
+  "skills": "./"
+}

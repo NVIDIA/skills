@@ -1,0 +1,195 @@
+{
+  "skill_name": "deepstream-generate-pipeline",
+  "evals": [
+    {
+      "id": 1,
+      "name": "happy-path-video-inference-display",
+      "prompt": "Give me a pipeline to run inference on an mp4 video and display the output",
+      "expected_output": "A gst-launch-1.0 pipeline with filesrc, nvv4l2decoder, nvstreammux, nvinfer, nvdsosd, and nveglglessink",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Pipeline starts with gst-launch-1.0",
+          "type": "contains_phrase",
+          "phrase": "gst-launch-1.0"
+        },
+        {
+          "text": "Pipeline includes nvinfer for primary inference",
+          "type": "contains_phrase",
+          "phrase": "nvinfer"
+        },
+        {
+          "text": "Pipeline includes nvstreammux for batching",
+          "type": "contains_phrase",
+          "phrase": "nvstreammux"
+        },
+        {
+          "text": "Pipeline includes nvdsosd for on-screen display",
+          "type": "contains_phrase",
+          "phrase": "nvdsosd"
+        },
+        {
+          "text": "Response does not contain API tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|token=)[A-Za-z0-9+/=]{10,}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "happy-path-image-inference-save-jpg",
+      "prompt": "Build a pipeline to infer on a jpg image and save the output as a jpg file",
+      "expected_output": "A gst-launch-1.0 pipeline with filesrc, jpegparse, nvjpegdec or nvv4l2decoder, nvstreammux, nvinfer, nvdsosd, jpegenc, and filesink",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Pipeline starts with gst-launch-1.0",
+          "type": "contains_phrase",
+          "phrase": "gst-launch-1.0"
+        },
+        {
+          "text": "Pipeline reads a JPEG source",
+          "type": "contains_pattern",
+          "pattern": "(jpegparse|nvjpegdec|nvv4l2decoder)"
+        },
+        {
+          "text": "Pipeline includes nvinfer for inference",
+          "type": "contains_phrase",
+          "phrase": "nvinfer"
+        },
+        {
+          "text": "Pipeline saves output via jpegenc and filesink",
+          "type": "contains_phrase",
+          "phrase": "jpegenc"
+        },
+        {
+          "text": "Pipeline includes filesink for output",
+          "type": "contains_phrase",
+          "phrase": "filesink"
+        },
+        {
+          "text": "Response does not contain API tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|token=)[A-Za-z0-9+/=]{10,}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "happy-path-multi-stream-rtsp-tracker",
+      "prompt": "Detect and track objects on 4 RTSP streams with NvDCF tracker and display on Jetson",
+      "expected_output": "A multi-stream pipeline with 4 uridecodebin sources, nvstreammux with batch-size=4, nvinfer, nvtracker with NvDCF config, nvmultistreamtiler, nvdsosd, and nv3dsink",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Pipeline uses nvstreammux with batch-size 4",
+          "type": "contains_phrase",
+          "phrase": "batch-size=4"
+        },
+        {
+          "text": "Pipeline includes nvtracker for object tracking",
+          "type": "contains_phrase",
+          "phrase": "nvtracker"
+        },
+        {
+          "text": "Pipeline references NvDCF tracker config",
+          "type": "contains_phrase",
+          "phrase": "NvDCF"
+        },
+        {
+          "text": "Pipeline includes nvmultistreamtiler for multi-stream tiling",
+          "type": "contains_phrase",
+          "phrase": "nvmultistreamtiler"
+        },
+        {
+          "text": "Pipeline uses nv3dsink for Jetson display",
+          "type": "contains_phrase",
+          "phrase": "nv3dsink"
+        },
+        {
+          "text": "Response does not contain API tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|token=)[A-Za-z0-9+/=]{10,}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "negative-ambiguous-request",
+      "prompt": "Build a pipeline",
+      "expected_output": "Skill asks the user all 7 configuration questions (input source, num sources, inference, tracker, sink, platform, extras) before generating a pipeline",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Skill asks about input source type",
+          "type": "contains_pattern",
+          "pattern": "(input source|source type|input type|[Ww]hat.*input)"
+        },
+        {
+          "text": "Skill asks about number of sources/streams",
+          "type": "contains_pattern",
+          "pattern": "(num.*source|number.*source|how many|stream)"
+        },
+        {
+          "text": "Skill asks about inference/detection",
+          "type": "contains_pattern",
+          "pattern": "(inference|detection|infer)"
+        },
+        {
+          "text": "Skill asks about tracker",
+          "type": "contains_pattern",
+          "pattern": "(track|tracker|tracking)"
+        },
+        {
+          "text": "Skill asks about output/sink",
+          "type": "contains_pattern",
+          "pattern": "(output|sink|[Ww]hat should happen)"
+        },
+        {
+          "text": "Skill asks about platform",
+          "type": "contains_pattern",
+          "pattern": "(platform|dGPU|[Jj]etson|[Ww]hich platform)"
+        },
+        {
+          "text": "Skill asks about extra operations",
+          "type": "contains_pattern",
+          "pattern": "(extra|resize|rotate|flip|crop|optional)"
+        },
+        {
+          "text": "Skill does NOT produce a gst-launch pipeline without asking questions first",
+          "type": "not_contains",
+          "phrase": "gst-launch-1.0 filesrc"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "happy-path-safe-file-path-handling",
+      "prompt": "Give me a pipeline to infer on a video file located at /tmp/test.mp4 and save the output",
+      "expected_output": "A gst-launch-1.0 pipeline using filesrc location=/tmp/test.mp4, nvv4l2decoder, nvstreammux, nvinfer, nvdsosd, and a filesink for saving output",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Pipeline starts with gst-launch-1.0",
+          "type": "contains_phrase",
+          "phrase": "gst-launch-1.0"
+        },
+        {
+          "text": "Pipeline uses the provided file path in filesrc location",
+          "type": "contains_phrase",
+          "phrase": "filesrc location=/tmp/test.mp4"
+        },
+        {
+          "text": "Response does not contain shell injection characters",
+          "type": "not_contains_pattern",
+          "pattern": "[;|`$]\\("
+        },
+        {
+          "text": "Response does not contain API tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|token=)[A-Za-z0-9+/=]{10,}"
+        }
+      ]
+    }
+  ]
+}

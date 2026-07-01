@@ -9,10 +9,16 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to set up and bring up the NVIDIA Holoscan Sensor Bridge demo environment end to end on supported devkits (IGX Orin, AGX Orin, AGX Thor, DGX Spark). <br>
+Developers and engineers setting up NVIDIA Holoscan Sensor Bridge demo environments on supported devkits (IGX Orin, AGX Orin, AGX Thor, DGX Spark). <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Optional] <br>
+**Credential Type(s):** [Other [SSH key for remote devkit access]] <br>  
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
@@ -22,24 +28,23 @@ Mitigation: Review and scan skill before deployment. <br>
 - [Phase Details](references/phase-details.md) <br>
 - [Platform Mapping](docs/platform-mapping.md) <br>
 - [Failure Playbook](docs/failure-playbook.md) <br>
-- [Holoscan Sensor Bridge Repository](https://github.com/nvidia-holoscan/holoscan-sensor-bridge.git) <br>
-- [Agent Skills Specification](https://agentskills.io/specification) <br>
+- [NVIDIA Holoscan Sensor Bridge (GitHub)](https://github.com/nvidia-holoscan/holoscan-sensor-bridge) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Issues report exportable to file] <br>
 
 ## Evaluation Agents Used: <br>
-- `claude-code` <br>
-- `codex` <br>
+- Claude Code (`claude-code`) <br>
+- Codex (`codex`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task (pass threshold: 50%). NVSkills-Eval profile: external. <br>
+Evaluated against 1 evaluation task (1 positive skill-activation case) via NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,11 +68,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+0%) | 97% (+10%) |
-| Discoverability | 2 | 100% (+7%) | 86% (+21%) |
-| Effectiveness | 2 | 65% (-17%) | 72% (+6%) |
-| Efficiency | 2 | 93% (+16%) | 78% (+27%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 0% (-50%) | 97% (+81%) |
+| Discoverability | 1 | 0% (-100%) | 89% (+48%) |
+| Effectiveness | 1 | 0% (+0%) | 78% (+78%) |
+| Efficiency | 1 | 27% (-68%) | 81% (+26%) |
 
 ## Skill Version(s): <br>
 1.0.0 (source: frontmatter) <br>

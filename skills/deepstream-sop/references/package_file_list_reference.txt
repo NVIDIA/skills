@@ -1,0 +1,44 @@
+######################################################################################################
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+######################################################################################################
+nvds_action_detector/__init__.py
+nvds_action_detector/api_server.py
+nvds_action_detector/api_types.py
+nvds_action_detector/ds_3d_action_pipeline.py
+nvds_action_detector/ds_logger.py
+nvds_action_detector/ds_sop_process.py
+nvds_action_detector/messager.py
+nvds_action_detector/missing_number_detector.py
+nvds_action_detector/sop_step_checker.py
+nvds_action_detector/utils.py
+nvds_action_detector/vllm_inference.py
+nvds_action_detector/custom_postprocess/nvds_custom_postprocess_tensor.cpp
+nvds_action_detector/custom_postprocess/Makefile
+nvds_action_detector/protos/__init__.py
+nvds_action_detector/protos/nv.proto
+nvds_action_detector/protos/ext.proto
+nvds_action_detector/triton_model_repo/ddm/1/ddm_net.py
+nvds_action_detector/triton_model_repo/ddm/1/model.py
+nvds_action_detector/triton_model_repo/ddm/config_template.pbtxt
+scripts/tensorrt/export_ddm_to_tensorrt.py
+start_server.sh
+license.txt
+configs/actions.json
+configs/vlm_prompts.txt
+configs/nvds_inference_template.txt
+configs/nvds_preprocess_template.txt
+configs/Emulation_0815-0000.pfs
+tests/test_api_endpoints.py

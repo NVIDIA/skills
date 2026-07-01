@@ -1,0 +1,71 @@
+#
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+infer_config {
+  unique_id: 1
+  gpu_ids: [0]
+  max_batch_size: 1
+  backend {
+    triton {
+      model_name: "ddm"
+      version: -1
+
+      # model_repo block is enabled for Triton Server CAPI inference.
+      model_repo {
+        root: "../nvds_action_detector/triton_model_repo"
+        strict_model_config: true
+      }
+
+      # To run Triton client remote inference, users need enable 'grpc' block,
+      # and disalbe 'model_repo' block.
+      # Setup Tritonserver, goto current directory, run
+      # tritonserver --model-repository=triton_model_repo
+      #grpc {
+      #  url: "localhost:8001"
+      #}
+    }
+    inputs [
+      {
+        name: "input_0"
+        dims: [ 3, ${SLIDING_WINDOWS_SIZE}, ${DS_ACTION_IN_RESOLUTION}, ${DS_ACTION_IN_RESOLUTION} ]
+      }
+    ]
+    disable_warmup: true
+    output_mem_type: MEMORY_TYPE_DEFAULT
+  }
+
+  input_tensor_from_meta {
+    is_first_dim_batch: true
+  }
+
+  postprocess {
+    other {}
+  }
+
+  extra {
+    output_buffer_pool_size: 8
+    custom_process_funcion: "CreateInferServerCustomProcess"
+  }
+
+  custom_lib {
+    path: "../nvds_action_detector/custom_postprocess/libnvds_custom_postprocess_tensor.so"
+  }
+}
+
+output_control {
+  output_tensor_meta: true
+}

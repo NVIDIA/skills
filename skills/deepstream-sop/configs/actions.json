@@ -1,0 +1,18 @@
+{
+    "actions": [
+        "(1) installing the first fan by connecting the connector and then pressing the fan in place",
+        "(2) installing the second fan by connecting the connector and then pressing the fan in place",
+        "(3) installing the third fan by connecting the connector and then pressing the fan in place",
+        "(4) installing the forth fan by connecting the connector and then pressing the fan in place",
+        "(5) installing the fifth fan by connecting the connector and then pressing the fan in place",
+        "(6) installing the sixth fan by connecting the connector and then pressing the fan in place",
+        "(7) installing the first Power Supply by placing the power supply in its compartment and then firmly pressing it in its place until the latch clicks",
+        "(8) installing the second Power Supply by placing the power supply in its compartment and then firmly pressing it in its place until the latch clicks",
+        "(9) installing the server cover by placing it in its shown location on top of the server and then presses the black latch to lock the cover in place",
+        "(10) doing action not belong to the defined SOP"
+    ],
+    "actions_can_be_skipped": [
+        "(10) doing action not belong to the defined SOP"
+    ]
+}
+

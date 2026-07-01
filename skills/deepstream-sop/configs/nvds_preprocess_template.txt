@@ -1,0 +1,87 @@
+#
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+[property]
+enable=1
+target-unique-ids=1
+
+    # 0=process on objects 1=process on frames
+process-on-frame=1
+
+    # network-input-shape: batch, channel, sequence, height, width
+
+    # DDM temporal config.
+    # FRAMES_PER_SIDE must match the checkpoint's temporal context.
+    # SEQUENCE_BATCH is runtime grouping; each long window emits that many scores.
+
+network-input-shape= 1;3;${SLIDING_WINDOWS_SIZE};${DS_ACTION_IN_RESOLUTION};${DS_ACTION_IN_RESOLUTION}
+
+    # 0=RGB, 1=BGR, 2=GRAY
+network-color-format=0
+    # 0=NCHW, 1=NHWC, 2=CUSTOM
+network-input-order=2
+    # 0=FP32, 1=UINT8, 2=INT8, 3=UINT32, 4=INT32, 5=FP16
+tensor-data-type=0
+tensor-name=input_0
+
+processing-width=${DS_ACTION_IN_RESOLUTION}
+processing-height=${DS_ACTION_IN_RESOLUTION}
+
+    # 0=NVBUF_MEM_DEFAULT 1=NVBUF_MEM_CUDA_PINNED 2=NVBUF_MEM_CUDA_DEVICE
+    # 3=NVBUF_MEM_CUDA_UNIFIED  4=NVBUF_MEM_SURFACE_ARRAY(Jetson)
+scaling-pool-memory-type=2
+
+    # 0=NvBufSurfTransformCompute_Default 1=NvBufSurfTransformCompute_GPU
+    # 2=NvBufSurfTransformCompute_VIC(Jetson)
+scaling-pool-compute-hw=1
+
+    # Scaling Interpolation method
+    # 0=NvBufSurfTransformInter_Nearest 1=NvBufSurfTransformInter_Bilinear 2=NvBufSurfTransformInter_Algo1
+    # 3=NvBufSurfTransformInter_Algo2 4=NvBufSurfTransformInter_Algo3 5=NvBufSurfTransformInter_Algo4
+    # 6=NvBufSurfTransformInter_Default
+scaling-filter=${DS_ACTION_IN_RESIZE_METHOD_ENUM}
+
+    # model input tensor pool size
+tensor-buf-pool-size=8
+
+custom-lib-path=/opt/nvidia/deepstream/deepstream/lib/libnvds_custom_sequence_preprocess.so
+#custom-lib-path=./custom_sequence_preprocess/libnvds_custom_sequence_preprocess.so
+custom-tensor-preparation-function=CustomSequenceTensorPreparation
+
+# 3D conv custom params
+[user-configs]
+channel-scale-factors=0.017125;0.0175070;0.017429
+channel-mean-offsets=123.675;116.280;103.530
+
+# channel-scale-factors=0.003921569;0.003921569;0.003921569
+# channel-mean-offsets=0;0;0
+
+# Advance by SEQUENCE_BATCH because one long window emits that many scores.
+stride=${SEQUENCE_BATCH}
+
+subsample=0
+
+[group-0]
+src-ids=-1
+    #custom-input-transformation-function=CustomAsyncTransformation
+process-on-roi=0
+
+    # process-on-roi=1
+    # roi-params-src-0=0;0;1280;720
+    # roi-params-src-1=0;0;1280;720
+    # roi-params-src-2=0;0;1280;720
+    # roi-params-src-3=0;0;1280;720

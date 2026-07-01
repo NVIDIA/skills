@@ -1,0 +1,334 @@
+/*
+* SPDX-FileCopyrightText: Copyright (c) 2025-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+syntax = "proto3";
+
+package nv;
+
+option java_package = "nv.schema";
+
+import "google/protobuf/timestamp.proto";
+import "nv.proto";
+//import "struct.proto";
+
+
+/*
+ * represents locations array, for geo coodinates Array[Array[lon, lat]], for cartesian coordinates Array[Array[x,y]]
+ */
+message GeoLocation{
+  string type = 1;
+
+  /*
+  Array(x,y)
+   */
+  message Point{
+    repeated double point = 1;
+  }
+  /*
+  Array of points
+   */
+  repeated Point coordinates = 2;
+
+  //repeated google.protobuf.ListValue coordinates = 2;
+}
+
+/*
+ * represent object Behavior, and comprise of attributes from object movement + [[Object]] appearance
+ * with highest confidence + [[Sensor]] + [[Place]]
+ *  + [[Pose]] + [[LipActivity]] + [[Gaze]]
+ *
+ *
+ *
+ *
+ * the JSON representation of this object Behavior message  is stored in persistent store like Elasticsearch for search and indexing
+ *
+ *
+ */
+message Behavior{
+ /*
+ * object id, usually a combination of sensorId + objectId
+ */
+  string id = 1;
+
+  /*
+  * start timestamp
+  */
+  google.protobuf.Timestamp timestamp = 2;
+
+  /*
+  * end timestamp
+  */
+  google.protobuf.Timestamp end = 3;
+
+
+  // start timestamp
+
+  //google.protobuf.Timestamp timestamp = 4;
+
+  /*
+  * representing array of [lon,lat] or [x,y]
+  */
+  GeoLocation locations = 5;
+
+  /*
+  * representing smoothened array of [lon,lat] or [x,y]
+  */
+  GeoLocation smoothLocations = 6;
+
+  /*
+  * road network edges, only applicable for geo coordinates
+  */
+  repeated string edges = 7;
+
+  /*
+  * distance traveled in meters
+  */
+  double distance = 8;
+
+  /*
+  * avg speed in mph
+  */
+  double speed = 9;
+
+  /*
+  * speed over a period of the trajectory
+  */
+  repeated double speedOverTime = 10;
+
+  /*
+  * timeInterval, end time - start time
+  */
+  double timeInterval = 11;
+
+  /*
+  * bearing angle
+  */
+  double bearing = 12;
+
+  /*
+  * N, S, E or W based on bearing
+  */
+  string direction = 13;
+
+  /*
+  * number of raw coordinates
+  */
+  int32 length = 14;
+
+  /*
+  * where object was seen by the sensor
+  */
+  Place place = 15;
+
+  /*
+  * sensor details
+  */
+  Sensor sensor = 16;
+
+  /*
+  * AnalyticsModule
+  */
+  AnalyticsModule analyticsModule = 17;
+
+  /*
+  * object details, associated with this trajectory
+  */
+  Object object = 18;
+
+  /*
+  * event details
+  */
+  Event event = 19;
+
+  /*
+  * video url if available
+  */
+  string videoPath = 20;
+
+  /*
+  * Array of pose
+  */
+  repeated Pose poses = 21;
+
+  /*
+  * Array of LipActivity
+  */
+  repeated LipActivity lipActivities = 22;
+
+  /*
+  * Array of Gaze
+  */
+  repeated Gaze gazes = 23;
+
+  /*
+  * Array of embeddings
+  */
+  repeated Embedding embeddings = 24;
+
+  /*
+  * addition information, that may be needed by an application
+  */
+  map<string, string> info = 25;
+
+}
+
+message Incident{
+  /*
+  * sensor id
+  */
+  string sensorId = 1;
+
+  /*
+  * start timestamp
+  */
+  google.protobuf.Timestamp timestamp = 2;
+
+  /*
+  * end timestamp
+  */
+  google.protobuf.Timestamp end = 3;
+
+  /*
+  * Array of object IDs involved in the incident. If the array is not empty, then the first ID represents the primary object.
+  * May be empty for incidents that don't involve any specific objects.
+  */
+  repeated string objectIds = 4;
+
+  /*
+  * Array of frameIds when the incident took place (Optional)
+  */
+  repeated string frameIds = 5;
+
+  /*
+  * where object was seen by the sensor
+  */
+  Place place = 6;
+
+  /*
+  * AnalyticsModule: Module responsible for generating the Incident
+  */
+  AnalyticsModule analyticsModule = 7;
+
+  /*
+  * Category of the incident
+  */
+  string category = 8;
+
+  /*
+  * Embeddings can be related to object appearance or it could be representative of a scene description provided by VLM
+  */
+  repeated Embedding embeddings = 9;
+
+  /*
+  * Is the incident an anomaly
+  */
+  bool isAnomaly = 10;
+
+  /*
+  * LLM query, response, embeddings for incident analysis and anomaly detection
+  */
+  LLM llm = 12;
+
+  /*
+  * optional attributes
+  */
+  map<string, string> info = 11;
+}
+
+message SpaceUtilizationMetrics{
+  /*
+  * area size of the occupied space (in square meters)
+  */
+  double spaceOccupied = 1;
+
+  /*
+  * area size of the free space (in square meters)
+  */
+  double freeSpace = 2;
+
+  /*
+  * area size of the total space (in square meters)
+  */
+  double totalSpace = 3;
+
+  /*
+  * the ratio/percentage that the total space is utilized/occupied
+  */
+  double spaceUtilization = 4;
+
+  /*
+  * the max number of extra pallets that can fit into the free space
+  */
+  int32 numExtraPallets = 5;
+
+  /*
+  * area size of the utilizable free space
+  */
+  double utilizableFreeSpace = 6;
+
+  /*
+  * the ratio/percentage that the free space is utilizable
+  */
+  double freeSpaceQuality = 7;
+
+  /*
+  * flag to indicate if the space is safe
+  */
+  bool isUnsafe = 8;
+}
+
+
+message SpaceUtilizationLayouts{
+  /*
+  * layout of the free space
+  */
+  repeated Polygon freeSpace = 1;
+
+  /*
+  * layout of the utilizable free space
+  */
+  repeated Polygon utilizableFreeSpace = 2;
+}
+
+message SpaceUtilization{
+
+  /*
+  * ROI id
+  */
+  string id = 1;
+
+  /*
+   * timestamp in UTC format
+   */
+  google.protobuf.Timestamp timestamp = 2;
+
+  /*
+  * Metrics regarding utilization of space
+  */
+  SpaceUtilizationMetrics metrics = 3;
+
+  /*
+  * Sensors associated with the ROI
+  */
+  repeated string sensors = 4;
+
+  /*
+  * Layouts of free space and utilizable free space
+  */
+  SpaceUtilizationLayouts layouts = 5;
+
+}

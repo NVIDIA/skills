@@ -1,0 +1,73 @@
+[
+  {
+    "id": "create-datasource-eval-001-random-gaussian",
+    "question": "Implement a new Earth2Studio DataSource called `RandomGaussian` that generates random Gaussian data on a 1-degree global lat/lon grid. It should accept time and variable parameters and return an xr.DataArray. Don't connect to any remote store — just generate random data.\n\nWrite the source at `earth2studio/data/random_gaussian.py`, a full test file at `test/data/test_random_gaussian.py`, then run pytest and lint.",
+    "expected_skill": "earth2studio-create-datasource",
+    "expected_script": "evals/targets/eval_1_target.py",
+    "expected_test": "evals/targets/test/eval_1_test_target.py",
+    "ground_truth": "Creates a sync DataSource class that generates random Gaussian data on a global 1-degree grid (181x360). Uses prep_data_inputs, SPDX header, type hints, and a full parametrized test file covering shape, grid values, and reproducibility.",
+    "expected_behavior": [
+      "Activates earth2studio-create-datasource before implementing",
+      "Writes earth2studio/data/random_gaussian.py with SPDX Apache-2.0 license header",
+      "Implements DataSource with prep_data_inputs and __call__ returning xr.DataArray",
+      "Writes test/data/test_random_gaussian.py with parametrized pytest tests",
+      "Runs uv run pytest on the new test file",
+      "Runs make format && make lint before finishing",
+      "Does not read evals/targets/ ground-truth files"
+    ]
+  },
+  {
+    "id": "create-datasource-eval-002-random-forecast",
+    "question": "Implement a new Earth2Studio ForecastSource called `RandomForecast` that generates random uniform [0, 1] forecast data on a 2.5-degree global grid (73x144). It should accept time, lead_time, and variable parameters. No remote connection — just random data.\n\nWrite the source at `earth2studio/data/random_forecast.py`, a full test file at `test/data/test_random_forecast.py`, then run pytest and lint.",
+    "expected_skill": "earth2studio-create-datasource",
+    "expected_script": "evals/targets/eval_2_target.py",
+    "expected_test": "evals/targets/test/eval_2_test_target.py",
+    "ground_truth": "Creates a sync ForecastSource with prep_forecast_inputs, uniform [0,1] data on a 73x144 grid, SPDX header, type hints, and a full parametrized test file covering shape, grid, value range, and reproducibility.",
+    "expected_behavior": [
+      "Activates earth2studio-create-datasource before implementing",
+      "Writes earth2studio/data/random_forecast.py with SPDX Apache-2.0 license header",
+      "Implements ForecastSource with prep_forecast_inputs and __call__ returning xr.DataArray",
+      "Writes test/data/test_random_forecast.py with parametrized pytest tests",
+      "Runs uv run pytest on the new test file",
+      "Runs make format && make lint before finishing",
+      "Does not read evals/targets/ ground-truth files"
+    ]
+  },
+  {
+    "id": "create-datasource-eval-003-random-stations",
+    "question": "Implement a new Earth2Studio DataFrameSource called `RandomStations` that generates random weather station observations. It should produce 50 random stations per time/variable combination with columns like time, lat, lon, elevation, observation, variable. No remote connection — just random data.\n\nWrite the source at `earth2studio/data/random_stations.py`, a full test file at `test/data/test_random_stations.py`, then run pytest and lint.",
+    "expected_skill": "earth2studio-create-datasource",
+    "expected_script": "evals/targets/eval_3_target.py",
+    "expected_test": "evals/targets/test/eval_3_test_target.py",
+    "ground_truth": "Creates a DataFrameSource with pyarrow SCHEMA, prep_data_inputs, 50 rows per time/variable, SPDX header, type hints, and a full parametrized test file covering schema, row counts, field filtering, and reproducibility.",
+    "expected_behavior": [
+      "Activates earth2studio-create-datasource before implementing",
+      "Writes earth2studio/data/random_stations.py with SPDX Apache-2.0 license header",
+      "Defines pyarrow SCHEMA with time, lat, lon, elevation, observation, variable fields",
+      "Implements __call__(time, variable, fields) returning pd.DataFrame with 50 rows per time/variable",
+      "Writes test/data/test_random_stations.py with parametrized pytest tests",
+      "Runs uv run pytest on the new test file",
+      "Runs make format && make lint before finishing",
+      "Does not read evals/targets/ ground-truth files"
+    ]
+  },
+  {
+    "id": "create-datasource-eval-004-phoo-s3-async",
+    "question": "Implement a new Earth2Studio DataSource called `PhooAnalysis` that fetches global analysis data from an S3 bucket `s3://phoo-weather-data`. The bucket stores NetCDF files at path `analysis/{YYYY}/{MM}/{DD}/{HH}z/{variable}.nc` on a 1-degree global grid (181x360). Data is available at 6-hour intervals from 2020-01-01 to present. Create a lexicon with at least t2m, msl, u10m, v10m mappings.\n\nWrite the source, lexicon, and full Step 11 test suite at `test/data/test_phoo.py`, then run pytest and lint.",
+    "expected_skill": "earth2studio-create-datasource",
+    "expected_script": "evals/targets/eval_4_target.py",
+    "expected_test": "evals/targets/test/eval_4_test_target.py",
+    "ground_truth": "Creates an async S3 DataSource with lexicon, _sync_async, managed_session, gather_with_concurrency, async_retry, and pure async I/O. Test file follows Step 11 canonical names: slow/xfail fetch and cache tests, call_mock with patched network, exceptions, and available.",
+    "expected_behavior": [
+      "Activates earth2studio-create-datasource before implementing",
+      "Writes async S3 source and lexicon files under earth2studio/",
+      "Source uses _sync_async, managed_session, gather_with_concurrency, and async_retry",
+      "Writes test/data/test_phoo.py with Step 11 canonical test function names",
+      "Test file includes test_phoo_call_mock that patches network I/O",
+      "Test file includes slow/xfail fetch and cache tests plus exceptions and available tests",
+      "Runs uv run pytest on the new test file",
+      "Runs make format && make lint before finishing",
+      "Does not read evals/targets/ ground-truth files"
+    ]
+  }
+]

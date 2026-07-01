@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `hsb-setup`
-- Evaluation date: 2026-05-30
+- Evaluation date: 2026-06-30
 - NVSkills-Eval profile: `external`
-- Environment: `local`
+- Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,28 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+0%) | 97% (+10%) |
-| Discoverability | 2 | 100% (+7%) | 86% (+21%) |
-| Effectiveness | 2 | 65% (-17%) | 72% (+6%) |
-| Efficiency | 2 | 93% (+16%) | 78% (+27%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 0% (-50%) | 97% (+81%) |
+| Discoverability | 1 | 0% (-100%) | 89% (+48%) |
+| Effectiveness | 1 | 0% (+0%) | 78% (+78%) |
+| Efficiency | 1 | 27% (-68%) | 81% (+26%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 11 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 4 total findings.
 
 Top findings:
 
-- MEDIUM PII/ip_addresses: Non-RFC1918 IP address (`references/phase-details.md:392`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`team-skills/holoscan/holoscan-sensor-bridge/hsb-setup/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description very long (317 chars, recommend 50-150) (`team-skills/holoscan/holoscan-sensor-bridge/hsb-setup/SKILL.md`)
-- LOW QUALITY/quality_discoverability: No '## Purpose' section (`team-skills/holoscan/holoscan-sensor-bridge/hsb-setup/SKILL.md`)
-- LOW QUALITY/quality_reliability: No prerequisites/requirements documented (`team-skills/holoscan/holoscan-sensor-bridge/hsb-setup/SKILL.md`)
+- LOW SCHEMA/unexpected_file: Unexpected 'linux' in skill root (`team-skills/holoscan/holoscan-sensor-bridge/hsb-setup/linux`)
+- LOW SCHEMA/unexpected_file: Unexpected 'windows' in skill root (`team-skills/holoscan/holoscan-sensor-bridge/hsb-setup/windows`)
+- LOW SCHEMA/unexpected_file: Unexpected 'docs' in skill root (`team-skills/holoscan/holoscan-sensor-bridge/hsb-setup/docs`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 8 file(s)
-- Inter-Skill Deduplication: Parsed skill 'hsb-setup': 317 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

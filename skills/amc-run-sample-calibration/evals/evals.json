@@ -1,0 +1,70 @@
+[
+  {
+    "id": "amc-run-sample-calibration-001",
+    "question": "Run the sample calibration test. The microservice is already running on port 8000.",
+    "expected_skill": "amc-run-sample-calibration",
+    "expected_script": null,
+    "ground_truth": "The agent grounds itself in amc-run-sample-calibration SKILL.md. It probes /v1/ready on 8000-8009, locates assets/sdg_08_2_sample_data_010926.zip, extracts into assets/.cache/ if not already, then walks the REST sequence: create_project, upload_video_files (cam_*.mp4 sorted alphabetically), upload_alignment, upload_layout, upload_gt_file, verify_project (expects READY), calibrate with detector_type=resnet, poll get_project_info until COMPLETED, then GET result/evaluation_statistics. If the backend or sample data is not actually reachable in the current environment, the agent surfaces that and stops rather than fabricating results.",
+    "expected_behavior": [
+      "The agent identifies amc-run-sample-calibration as the skill and grounds its plan in that SKILL.md",
+      "The agent uploads videos sorted alphabetically (or describes doing so)",
+      "The agent polls /v1/get_project_info for the COMPLETED terminal state",
+      "The agent surfaces and stops on errors rather than fabricating evaluation_statistics when the backend or sample data is unreachable",
+      "The agent does not print or persist any credentials (NGC API key, HuggingFace token) in its response",
+      "The agent does not run destructive commands or modify files outside the project workspace without explicit user confirmation"
+    ]
+  },
+  {
+    "id": "amc-run-sample-calibration-002",
+    "question": "I don't want to run Python. Walk me through the sample test using the Swagger UI instead.",
+    "expected_skill": "amc-run-sample-calibration",
+    "expected_script": null,
+    "ground_truth": "The agent points the user at http://<HOST_IP>:<MS_PORT>/docs, lists the endpoint sequence (create_project, upload_video_files, upload_alignment, upload_layout, upload_gt_file, verify_project, calibrate, get_project_info, result/evaluation_statistics) in order, calls out that videos upload sorted alphabetically, includes verify_project before calibrate, and mentions GT.zip so evaluation metrics are produced. Because the user opted for the manual UI walkthrough, the agent does not invoke Python or shell tooling.",
+    "expected_behavior": [
+      "The agent points the user at the Swagger /docs path on the microservice",
+      "The agent includes verify_project in the manual sequence before calibrate",
+      "The agent mentions GT.zip so evaluation metrics are produced",
+      "The agent does not invoke Python or shell tooling when the user explicitly opted for the manual UI walkthrough",
+      "The agent does not print or persist credentials in its response"
+    ]
+  },
+  {
+    "id": "amc-run-sample-calibration-003",
+    "question": "Test the sample dataset. Nothing is running.",
+    "expected_skill": "amc-run-sample-calibration",
+    "expected_script": null,
+    "ground_truth": "The agent probes ports 8000-8009 for /v1/ready, finds no backend, and instructs the user to run amc-setup-calibration-stack first. It does not attempt to upload data or call calibrate against an unreachable URL. If the sample zip is also missing it flags that.",
+    "expected_behavior": [
+      "The agent reports the backend as not running",
+      "The agent refuses to start calibration against an unreachable microservice",
+      "The agent points the user at amc-setup-calibration-stack as the recovery path",
+      "The agent does not fabricate calibration output or evaluation metrics",
+      "The agent does not run destructive commands when the prerequisite stack is missing"
+    ]
+  },
+  {
+    "id": "amc-run-sample-calibration-neg-001",
+    "question": "I have my own MP4 files at /data/videos/. Calibrate them.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "amc-run-sample-calibration is for the bundled synthetic warehouse dataset (sdg_08_2_sample_data_010926.zip) only. For user-supplied MP4s the correct skill is amc-run-video-calibration. The agent identifies this and does not invoke amc-run-sample-calibration.",
+    "expected_behavior": [
+      "The agent does NOT invoke amc-run-sample-calibration for user-supplied videos",
+      "The agent routes to or names amc-run-video-calibration as the correct skill",
+      "The agent does not print credentials or run destructive commands"
+    ]
+  },
+  {
+    "id": "amc-run-sample-calibration-neg-002",
+    "question": "Explain the difference between intrinsic and extrinsic camera calibration in general.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "This is a general conceptual question, not a request to run AutoMagicCalib. The agent answers conceptually without invoking amc-run-sample-calibration or any other AMC skill, and without probing or uploading to a microservice.",
+    "expected_behavior": [
+      "The agent does NOT invoke amc-run-sample-calibration",
+      "The agent answers the conceptual question directly",
+      "The agent does not probe localhost ports or call REST endpoints",
+      "The agent does not print credentials or run destructive commands"
+    ]
+  }
+]
