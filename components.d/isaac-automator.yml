@@ -1,0 +1,6 @@
+name: Isaac Automator
+repo: isaac-sim/IsaacAutomator
+description: Deploy and operate cloud Isaac Workstations (Isaac Sim, Isaac Lab, Isaac Lab Arena) on AWS, GCP, Azure, or Alibaba Cloud via the Isaac Automator CLI.
+skills:
+  - path: skills/isaac-automator/
+    catalog_dir: isaac-automator
