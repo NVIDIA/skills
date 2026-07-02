@@ -1,0 +1,106 @@
+# Qwen Image Edit 2511 endpoint for PAS augmentation.
+#
+# Uses NIM Operator's generic spec.command / spec.args support to run a
+# `vllm serve ... --omni` invocation for the upstream Qwen/Qwen-Image-Edit-2511
+# model, while benefiting from operator-managed PVC, probes, service, and
+# lifecycle.
+#
+# IMPORTANT: the `--omni` flag is REQUIRED. vLLM-Omni only enables the
+# Qwen-Image-Edit diffusion serving path (and the OpenAI-compatible
+# /v1/chat/completions image-edit response the PAS worker consumes) when started
+# as `vllm serve <model> --omni`. The plain `vllm.entrypoints.openai.api_server`
+# entrypoint without --omni does NOT serve image editing.
+#
+# Do NOT substitute the Triton-based NVIDIA NIM
+# (nvcr.io/nim/qwen/qwen-image-edit): it exposes /v1/infer and /v1/images/edits
+# but not /v1/chat/completions, so the PAS worker's chat.completions calls 404.
+#
+# NIM Operator mounts spec.storage.pvc at /model-store in the container and
+# auto-sets NIM_CACHE_PATH=/model-store. We point HF_HOME at a subdir so model
+# weights persist on the PVC across pod restarts.
+apiVersion: apps.nvidia.com/v1alpha1
+kind: NIMService
+metadata:
+  name: qwen-image-edit-2511
+  namespace: osmo-nims
+  labels:
+    app.kubernetes.io/name: qwen-image-edit-2511
+    app.kubernetes.io/component: image-edit-endpoint
+spec:
+  labels:
+    app.kubernetes.io/name: qwen-image-edit-2511
+    app.kubernetes.io/component: image-edit-endpoint
+  image:
+    repository: vllm/vllm-omni
+    tag: "v0.20.0"
+    pullPolicy: IfNotPresent
+  authSecret: ngc-api-secret
+  command:
+    - vllm
+  args:
+    - serve
+    - Qwen/Qwen-Image-Edit-2511
+    - --omni
+    - --host
+    - 0.0.0.0
+    - --port
+    - "8000"
+  env:
+    - name: HF_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: hf-token-secret
+          key: HF_TOKEN
+    - name: HF_HOME
+      value: /model-store/huggingface
+  storage:
+    pvc:
+      create: true
+      size: "150Gi"
+      volumeAccessMode: ReadWriteMany
+    sharedMemorySizeLimit: "32Gi"
+  startupProbe:
+    enabled: true
+    probe:
+      httpGet:
+        path: /v1/models
+        port: 8000
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      failureThreshold: 120
+      timeoutSeconds: 5
+  readinessProbe:
+    enabled: true
+    probe:
+      httpGet:
+        path: /v1/models
+        port: 8000
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      failureThreshold: 120
+      timeoutSeconds: 5
+  livenessProbe:
+    enabled: true
+    probe:
+      tcpSocket:
+        port: 8000
+      initialDelaySeconds: 180
+      periodSeconds: 30
+      failureThreshold: 10
+      timeoutSeconds: 5
+  replicas: 1
+  userID: 0
+  groupID: 0
+  resources:
+    limits:
+      nvidia.com/gpu: 1
+      memory: 128Gi
+      ephemeral-storage: 50Gi
+    requests:
+      nvidia.com/gpu: 1
+      memory: 128Gi
+      ephemeral-storage: 50Gi
+  expose:
+    service:
+      type: ClusterIP
+      port: 8000

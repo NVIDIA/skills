@@ -151,6 +151,14 @@ python3 $SKILL_DIR/scripts/aiq.py research_poll <JOB_ID>
 Use `status` to inspect job status and saved artifacts. Use `report` when the job has already finished and you only need
 the final output. Use `research_poll` to keep waiting for completion.
 
+The final report may reference generated artifacts (charts, CSVs) as `artifact://<id>` links. To materialize them as local
+files, run `python3 $SKILL_DIR/scripts/aiq.py artifacts <JOB_ID> --download-dir ./aiq-artifacts`; it downloads each artifact
+and prints the local path. Do not expect base64 image data in the report itself.
+
+For a self-contained, shareable report, run `python3 $SKILL_DIR/scripts/aiq.py report <JOB_ID> --out-dir ./my-report`. It writes `report.md` plus an
+`artifacts/` folder and rewrites each `artifact://<id>` link to the matching local file, so the report renders (charts and
+all) in any markdown viewer without a running backend.
+
 ### Step 5 - Present the report
 
 When `research_poll` completes successfully, fetch and present the full report. Keep citations and source URLs intact.
@@ -237,7 +245,8 @@ If your Blueprint version is not compatible:
 | `scripts/aiq.py research_poll` | Resume polling an existing async job | `<job_id>` |
 | `scripts/aiq.py status` | Fetch job status plus `/state` artifacts | `<job_id>` |
 | `scripts/aiq.py state` | Fetch event-store artifacts only | `<job_id>` |
-| `scripts/aiq.py report` | Fetch the final report for a completed job | `<job_id>` |
+| `scripts/aiq.py report` | Fetch the final report; with `--out-dir DIR`, export a portable `report.md` + `artifacts/` folder with links rewritten to local files | `<job_id> [--out-dir DIR]` |
+| `scripts/aiq.py artifacts` | List durable artifacts; with `--download-dir DIR`, download them and print local paths | `<job_id> [--download-dir DIR]` |
 | `scripts/aiq.py stream` | Stream SSE events from a job | `<job_id>` |
 | `scripts/aiq.py cancel` | Cancel a running job | `<job_id>` |
 

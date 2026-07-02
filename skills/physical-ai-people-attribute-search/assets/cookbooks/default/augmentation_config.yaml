@@ -1,0 +1,54 @@
+# PAS augmentation pipeline config — image-edit with MCQ verification.
+# This config is passed to modules/cli.py inside the paidf-augmentation container.
+# Endpoint URLs and model names are overridden at runtime by the worker script.
+
+pipeline:
+  retry: 3
+
+data:
+  - inputs:
+      rgb: /app/data/out/panes/placeholder.jpg
+    output:
+      video: /app/data/out/augmented_outputs/placeholder/aug_0/output.jpg
+      caption: /app/data/out/augmented_outputs/placeholder/aug_0/output.txt
+      metadata: /app/data/out/augmented_outputs/placeholder/aug_0/output_metadata.json
+
+captioning:
+  llm:
+    text: "Change the person's clothing to a {top_outer_color} {top_outer_type}, with {bottom_color} {bottom_type}, and {shoe_color} {shoe_type}. Keep the person's pose, body shape, face, and background unchanged."
+    variables:
+      top_outer_color: ["red"]
+      top_outer_type: ["hoodie"]
+      bottom_color: ["black"]
+      bottom_type: ["leggings"]
+      shoe_color: ["white"]
+      shoe_type: ["sneakers"]
+    verification_options:
+      top_outer_color: ["red", "blue", "green", "yellow", "black", "white", "grey", "brown", "pink", "orange", "purple", "beige", "maroon"]
+      top_outer_type: ["hoodie", "cropped jacket", "sweater", "puffer jacket", "denim jacket", "blazer", "vest", "robe"]
+      bottom_type: ["jeans", "leggings", "shorts", "skirt", "cargo pants"]
+      bottom_color: ["black", "blue", "brown", "green", "grey", "khaki", "navy", "white"]
+
+augmentation:
+  model:
+    name: image-edit
+    executor_type: gradio
+
+endpoints:
+  image_edit:
+    url: ""
+    model: "Qwen/Qwen-Image-Edit-2511"
+    timeout: 300
+  vlm:
+    url: ""
+    model: "gemma-4-31b-it"
+    timeout: 300
+  llm:
+    url: ""
+    model: "nvidia/Llama-3.1-70B-Instruct-FP8"
+
+evaluators:
+  - attribute_verification:
+      exclude_variables:
+        - shoe_type
+        - shoe_color

@@ -1,16 +1,16 @@
 # Evaluation Report
 
-Evaluation of the `aiq-research` skill before publication through NVSkills-Eval.
+Evaluation of the `physical-ai-people-attribute-search` skill before publication through NVSkills-Eval.
 
 This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
 
 ## Evaluation Summary
 
-- Skill: `aiq-research`
+- Skill: `physical-ai-people-attribute-search`
 - Evaluation date: 2026-07-02
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
-- Dataset: 3 evaluation tasks
+- Dataset: 10 evaluation tasks
 - Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
@@ -42,10 +42,10 @@ Underlying evaluation signals used in this run:
 
 ## Test Tasks
 
-The benchmark dataset contained 3 evaluation tasks:
+The benchmark dataset contained 10 evaluation tasks:
 
-- Positive tasks: 3 tasks where the skill was expected to activate.
-- Negative tasks: 0 tasks where no skill was expected.
+- Positive tasks: 7 tasks where the skill was expected to activate.
+- Negative tasks: 3 tasks where no skill was expected.
 - Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
 
 Task composition is derived from the evaluation dataset when possible. Entries with `expected_skill` set are treated as positive skill-activation cases, while entries with `expected_skill: null` are treated as negative activation cases.
@@ -54,21 +54,22 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 3 | 67% (-33%) | 100% (+17%) |
-| Correctness | 3 | 93% (+6%) | 80% (+17%) |
-| Discoverability | 3 | 100% (-0%) | 54% (+16%) |
-| Effectiveness | 3 | 65% (-1%) | 69% (+14%) |
-| Efficiency | 3 | 85% (-3%) | 56% (+14%) |
+| Security | 8 | 100% (+0%) | 100% (+0%) |
+| Correctness | 8 | 84% (+3%) | 89% (+3%) |
+| Discoverability | 8 | 85% (-1%) | 82% (+0%) |
+| Effectiveness | 8 | 85% (+4%) | 95% (+2%) |
+| Efficiency | 8 | 78% (+0%) | 76% (+1%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed. NVSkills-Eval ran 1 checks and found 0 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 2 total findings.
 
-Notable observations:
+Top findings:
 
-- SCHEMA: Found skill manifest: SKILL.md
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/physical-ai-people-attribute-search/SKILL.md`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/physical-ai-people-attribute-search/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 

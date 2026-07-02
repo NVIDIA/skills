@@ -116,8 +116,8 @@ sort the survivors to form the frontier
 
 Practical notes:
 
-- **Warm-start LP sweeps.** For an LP frontier, carry the previous solve's PDLP warmstart data into the next to cut solve time. Per cuOpt this is **LP-only**: a MILP solve doesn't take a PDLP warmstart (you can optionally seed a MIP start instead). See `cuopt-numerical-optimization-api-python` for the calls.
-- **Cap each MILP solve.** Set a per-solve time limit on MILP sweeps (see `cuopt-numerical-optimization-api-python`) — a sweep is many solves, and branch-and-bound can over-spend certifying optimality past a tiny gap, while cuOpt sets no limit by default and won't warn. Report the points as optimal *to the gap you set*, not certified optimal.
+- **Warm-start LP sweeps.** For an LP frontier, carry the previous solve's PDLP warmstart data into the next to cut solve time. Per cuOpt this is **LP-only**: a MILP solve doesn't take a PDLP warmstart (you can optionally seed a MIP start instead). See `cuopt-numerical-optimization-api` for the calls.
+- **Cap each MILP solve.** Set a per-solve time limit on MILP sweeps (see `cuopt-numerical-optimization-api`) — a sweep is many solves, and branch-and-bound can over-spend certifying optimality past a tiny gap, while cuOpt sets no limit by default and won't warn. Report the points as optimal *to the gap you set*, not certified optimal.
 - **Filter dominated points.** A correct sweep can still emit dominated points (especially weighted-sum near the hull, or MILP). Drop them; they are not part of the frontier.
 - **Resolution is a budget.** Curve fidelity trades against solve count. Start coarse to see the shape, then refine the grid only where the curve bends.
 - **Spend the budget where the slope changes (LP/QP).** Because the ε-constraint dual is the frontier's local slope, compare it across solved points: where it barely changes, the curve is nearly straight — interpolate rather than add solves; where it jumps by more than the solve tolerance, the frontier bends between those points — refine there (smaller differences are solver noise, not curvature). This concentrates solves where the curve actually bends instead of spreading them over a uniform grid. On MILP, judge where to refine from the gaps between primal objective values instead.
@@ -134,5 +134,5 @@ Practical notes:
 
 This skill is solver- and interface-agnostic. The per-solve mechanics — building the objective, adding the ε constraints, passing a warm start, reading status — live in the API skills:
 
-- `cuopt-numerical-optimization-api-python` / `-api-c` / `-api-cli` — LP, MILP, QP solves.
+- `cuopt-numerical-optimization-api` — LP, MILP, QP solves (Python, C, CLI).
 - `cuopt-routing-api-python` — the same frontier workflow applies to routing tradeoffs (distance vs. vehicles vs. time).

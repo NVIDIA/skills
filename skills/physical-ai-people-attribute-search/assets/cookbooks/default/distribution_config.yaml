@@ -1,0 +1,97 @@
+# PAS default attribute distribution config (v1).
+# Controls which clothing/appearance attributes to augment and their sampling
+# probabilities. The config generator samples one combination per augmentation
+# index per person ID.
+
+data_dir: /app/data/out/panes
+n_augmentations: 3
+config_output: /app/data/out/generated_configs
+output_root: /app/data/out/augmented_outputs
+example_augmentation_config: /app/configs/config_image_edit_verification.yaml
+
+variables:
+  top_outer_color:
+    beige: 0.0769
+    black: 0.0769
+    blue: 0.0769
+    brown: 0.0769
+    green: 0.0769
+    grey: 0.0769
+    orange: 0.0769
+    pink: 0.0769
+    purple: 0.0769
+    red: 0.0769
+    white: 0.0769
+    yellow: 0.0769
+    maroon: 0.0772
+
+  top_outer_type:
+    hoodie: 0.1429
+    cropped jacket: 0.1429
+    sweater: 0.1429
+    puffer jacket: 0.1429
+    denim jacket: 0.1429
+    blazer: 0.1429
+    vest: 0.1423
+
+  bottom_type:
+    jeans: 0.2
+    leggings: 0.2
+    shorts: 0.2
+    skirt: 0.2
+    cargo pants: 0.2
+
+  bottom_color:
+    black: 0.125
+    blue: 0.125
+    brown: 0.125
+    green: 0.125
+    grey: 0.125
+    khaki: 0.125
+    navy: 0.125
+    white: 0.125
+
+conditional_variables:
+  shoe_color:
+    depends_on: shoe_type
+    distributions:
+      barefoot:
+        none: 1.0
+      sneakers:
+        white: 0.0833
+        black: 0.0833
+        red: 0.0833
+        blue: 0.0833
+        grey: 0.0833
+        green: 0.0833
+        pink: 0.0833
+        orange: 0.0833
+        brown: 0.0833
+        navy: 0.0833
+        yellow: 0.0833
+        purple: 0.0837
+      boots:
+        black: 0.25
+        brown: 0.25
+        tan: 0.25
+        grey: 0.25
+      sandals:
+        black: 0.25
+        brown: 0.25
+        white: 0.25
+        tan: 0.25
+      loafers:
+        black: 0.25
+        brown: 0.25
+        tan: 0.25
+        burgundy: 0.25
+
+  shoe_type:
+    depends_on: null
+    distributions:
+      default:
+        sneakers: 0.30
+        boots: 0.20
+        sandals: 0.15
+        loafers: 0.15
+        barefoot: 0.20
