@@ -6,5 +6,7 @@ skills:
     catalog_dir: physical-ai-defect-image-generation
   - path: skills/physical-ai-video-data-augmentation/
     catalog_dir: physical-ai-video-data-augmentation
+  - path: skills/physical-ai-people-attribute-search/
+    catalog_dir: physical-ai-people-attribute-search
 links:
   discussions: false
