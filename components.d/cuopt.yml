@@ -8,12 +8,8 @@ skills:
     catalog_dir: cuopt-install
   - path: skills/cuopt-multi-objective-exploration/
     catalog_dir: cuopt-multi-objective-exploration
-  - path: skills/cuopt-numerical-optimization-api-c/
-    catalog_dir: cuopt-numerical-optimization-api-c
-  - path: skills/cuopt-numerical-optimization-api-cli/
-    catalog_dir: cuopt-numerical-optimization-api-cli
-  - path: skills/cuopt-numerical-optimization-api-python/
-    catalog_dir: cuopt-numerical-optimization-api-python
+  - path: skills/cuopt-numerical-optimization-api/
+    catalog_dir: cuopt-numerical-optimization-api
   - path: skills/cuopt-numerical-optimization-formulation/
     catalog_dir: cuopt-numerical-optimization-formulation
   - path: skills/cuopt-routing-api-python/
