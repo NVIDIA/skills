@@ -1,4 +1,7 @@
 #!/bin/bash
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
 # Detect conda even when not on PATH (lazy-init shells, non-default install dirs).
 # Outputs:
 #   ✓ conda found: <version> at <path>

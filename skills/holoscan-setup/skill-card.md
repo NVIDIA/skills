@@ -9,34 +9,41 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers setting up the NVIDIA Holoscan SDK on Linux hosts, automating platform inspection and install-method selection across container, apt, pip, Conda, and source builds. <br>
+Developers and engineers setting up the Holoscan SDK on supported NVIDIA platforms, automating host inspection and install-method selection. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>  
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [Holoscan SDK GitHub](https://github.com/nvidia-holoscan/holoscan-sdk) <br>
 - [Holoscan SDK User Guide](https://docs.nvidia.com/holoscan/sdk-user-guide/) <br>
-- [Holoscan SDK GitHub Repository](https://github.com/nvidia-holoscan/holoscan-sdk) <br>
+- [AgentSkills.io Specification](https://agentskills.io/specification) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- `claude-code` <br>
+- `codex` <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 internal evaluation tasks (3 positive, 1 negative) with 2 attempts per task; pass threshold 50%. <br>
+Evaluated against 4 evaluation tasks (3 positive, 1 negative) using the NVSkills-Eval external profile in the astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -58,13 +65,13 @@ Underlying evaluation signals used in this run: <br>
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | Claude Code | Codex |
+| Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+0%) | 38% (-38%) |
-| Correctness | 8 | 99% (+0%) | 97% (+7%) |
-| Discoverability | 8 | 95% (+10%) | 81% (+17%) |
-| Effectiveness | 8 | 93% (+4%) | 89% (+3%) |
-| Efficiency | 8 | 86% (+16%) | 70% (+13%) |
+| Security | 4 | 100% (+0%) | 50% (-50%) |
+| Correctness | 4 | 97% (+49%) | 98% (+21%) |
+| Discoverability | 4 | 93% (+68%) | 82% (+34%) |
+| Effectiveness | 4 | 86% (+30%) | 92% (+16%) |
+| Efficiency | 4 | 82% (+38%) | 72% (+22%) |
 
 ## Skill Version(s): <br>
 1.0.0 (source: frontmatter) <br>

@@ -1,4 +1,7 @@
 #!/bin/bash
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
 # Usage: check_ngc_image.sh <tag-suffix>
 # Example: check_ngc_image.sh cuda13
 SUFFIX="${1:-cuda13}"

@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `holoscan-setup`
-- Evaluation date: 2026-05-31
+- Evaluation date: 2026-06-29
 - NVSkills-Eval profile: `external`
-- Environment: `local`
+- Environment: `astra-sandbox`
 - Dataset: 4 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,17 +54,17 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+0%) | 38% (-38%) |
-| Correctness | 8 | 99% (+0%) | 97% (+7%) |
-| Discoverability | 8 | 95% (+10%) | 81% (+17%) |
-| Effectiveness | 8 | 93% (+4%) | 89% (+3%) |
-| Efficiency | 8 | 86% (+16%) | 70% (+13%) |
+| Security | 4 | 100% (+0%) | 50% (-50%) |
+| Correctness | 4 | 97% (+49%) | 98% (+21%) |
+| Discoverability | 4 | 93% (+68%) | 82% (+34%) |
+| Effectiveness | 4 | 86% (+30%) | 92% (+16%) |
+| Efficiency | 4 | 82% (+38%) | 72% (+22%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 1 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 1 total findings.
 
 Top findings:
 
@@ -72,12 +72,7 @@ Top findings:
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 3 file(s)
-- Inter-Skill Deduplication: Parsed skill 'holoscan-setup': 160 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 
