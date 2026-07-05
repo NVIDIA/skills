@@ -1,0 +1,131 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+# components.d/doca.yml
+# Register the NVIDIA DOCA Agent Skills bundle with the NVIDIA/skills catalog.
+# Flat layout: one entry per signed skill; catalog_dir = unique top-level name.
+name: DOCA
+repo: NVIDIA-DOCA/doca-skills
+description: Teach AI agents to use the NVIDIA DOCA SDK on BlueField DPUs and ConnectX NICs — setup, libraries, services, tools, deployment, and debugging.
+skills:
+  - path: skills/doca-bare-metal-deployment/
+    catalog_dir: doca-bare-metal-deployment
+  - path: skills/doca-bf3-deployment/
+    catalog_dir: doca-bf3-deployment
+  - path: skills/doca-bf4-deployment/
+    catalog_dir: doca-bf4-deployment
+  - path: skills/doca-collectx-deployment/
+    catalog_dir: doca-collectx-deployment
+  - path: skills/doca-container-deployment/
+    catalog_dir: doca-container-deployment
+  - path: skills/doca-debug/
+    catalog_dir: doca-debug
+  - path: skills/doca-hardware-safety/
+    catalog_dir: doca-hardware-safety
+  - path: skills/doca-programming-guide/
+    catalog_dir: doca-programming-guide
+  - path: skills/doca-public-knowledge-map/
+    catalog_dir: doca-public-knowledge-map
+  - path: skills/doca-setup/
+    catalog_dir: doca-setup
+  - path: skills/doca-structured-tools-contract/
+    catalog_dir: doca-structured-tools-contract
+  - path: skills/doca-upgrade/
+    catalog_dir: doca-upgrade
+  - path: skills/doca-version/
+    catalog_dir: doca-version
+  - path: skills/libs/doca-aes-gcm/
+    catalog_dir: doca-aes-gcm
+  - path: skills/libs/doca-argp/
+    catalog_dir: doca-argp
+  - path: skills/libs/doca-comch/
+    catalog_dir: doca-comch
+  - path: skills/libs/doca-common/
+    catalog_dir: doca-common
+  - path: skills/libs/doca-compress/
+    catalog_dir: doca-compress
+  - path: skills/libs/doca-devemu/
+    catalog_dir: doca-devemu
+  - path: skills/libs/doca-dma/
+    catalog_dir: doca-dma
+  - path: skills/libs/doca-dpa/
+    catalog_dir: doca-dpa
+  - path: skills/libs/doca-dpdk-bridge/
+    catalog_dir: doca-dpdk-bridge
+  - path: skills/libs/doca-erasure-coding/
+    catalog_dir: doca-erasure-coding
+  - path: skills/libs/doca-eth/
+    catalog_dir: doca-eth
+  - path: skills/libs/doca-flow/
+    catalog_dir: doca-flow
+  - path: skills/libs/doca-flow-dpa-provider/
+    catalog_dir: doca-flow-dpa-provider
+  - path: skills/libs/doca-gpi/
+    catalog_dir: doca-gpi
+  - path: skills/libs/doca-gpunetio/
+    catalog_dir: doca-gpunetio
+  - path: skills/libs/doca-mgmt/
+    catalog_dir: doca-mgmt
+  - path: skills/libs/doca-pcc/
+    catalog_dir: doca-pcc
+  - path: skills/libs/doca-pcc-ztr-rttcc-algo/
+    catalog_dir: doca-pcc-ztr-rttcc-algo
+  - path: skills/libs/doca-rdma/
+    catalog_dir: doca-rdma
+  - path: skills/libs/doca-rdmi/
+    catalog_dir: doca-rdmi
+  - path: skills/libs/doca-rmax/
+    catalog_dir: doca-rmax
+  - path: skills/libs/doca-sha/
+    catalog_dir: doca-sha
+  - path: skills/libs/doca-sta/
+    catalog_dir: doca-sta
+  - path: skills/libs/doca-telemetry/
+    catalog_dir: doca-telemetry
+  - path: skills/libs/doca-telemetry-exporter/
+    catalog_dir: doca-telemetry-exporter
+  - path: skills/libs/doca-urom/
+    catalog_dir: doca-urom
+  - path: skills/libs/doca-verbs/
+    catalog_dir: doca-verbs
+  - path: skills/services/doca-argus/
+    catalog_dir: doca-argus
+  - path: skills/services/doca-dms/
+    catalog_dir: doca-dms
+  - path: skills/services/doca-firefly/
+    catalog_dir: doca-firefly
+  - path: skills/services/doca-urom-svc/
+    catalog_dir: doca-urom-svc
+  - path: skills/tools/doca-bench/
+    catalog_dir: doca-bench
+  - path: skills/tools/doca-bench-extension/
+    catalog_dir: doca-bench-extension
+  - path: skills/tools/doca-caps/
+    catalog_dir: doca-caps
+  - path: skills/tools/doca-comm-channel-admin/
+    catalog_dir: doca-comm-channel-admin
+  - path: skills/tools/doca-dpa-hl-tracer/
+    catalog_dir: doca-dpa-hl-tracer
+  - path: skills/tools/doca-flow-dpa-perf/
+    catalog_dir: doca-flow-dpa-perf
+  - path: skills/tools/doca-flow-grpc-server/
+    catalog_dir: doca-flow-grpc-server
+  - path: skills/tools/doca-flow-perf/
+    catalog_dir: doca-flow-perf
+  - path: skills/tools/doca-flow-tune/
+    catalog_dir: doca-flow-tune
+  - path: skills/tools/doca-gpunetio-ib-write-bw/
+    catalog_dir: doca-gpunetio-ib-write-bw
+  - path: skills/tools/doca-gpunetio-ib-write-lat/
+    catalog_dir: doca-gpunetio-ib-write-lat
+  - path: skills/tools/doca-pcc-counters/
+    catalog_dir: doca-pcc-counters
+  - path: skills/tools/doca-sha-offload-engine/
+    catalog_dir: doca-sha-offload-engine
+  - path: skills/tools/doca-socket-relay/
+    catalog_dir: doca-socket-relay
+  - path: skills/tools/doca-spcx-cc/
+    catalog_dir: doca-spcx-cc
+  - path: skills/tools/doca-telemetry-utils/
+    catalog_dir: doca-telemetry-utils
+links:
+  discussions: false
