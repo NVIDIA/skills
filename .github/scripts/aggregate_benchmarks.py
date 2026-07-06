@@ -39,6 +39,7 @@ def parse_benchmark(path: Path) -> dict:
     entry["agents"] = []
     entry["results"] = []
     section = None
+    agent_cols = {}  # results-table column index -> agent name, from the header row
 
     for raw in path.read_text(encoding="utf-8").splitlines():
         line = raw.strip()
@@ -64,22 +65,36 @@ def parse_benchmark(path: Path) -> dict:
 
         if section == "results" and line.startswith("|"):
             cells = [c.strip() for c in line.strip("|").split("|")]
-            if not cells or cells[0] in ("Dimension", "") or set(cells[0]) <= {"-", ":", " "}:
+            if not cells or set(cells[0]) <= {"-", ":", " "}:
                 continue
-            dimension, num = cells[0], cells[1] if len(cells) > 1 else None
+            if cells[0] == "Dimension":
+                # Key agent columns off the header row rather than assuming
+                # they match Agents Used order (columns may vary per report).
+                agent_cols = {
+                    i: c.strip("`")
+                    for i, c in enumerate(cells)
+                    if i > 0 and c.strip("`") and c != "Num"
+                }
+                continue
+            dimension = cells[0]
+            num = None
             scores = {}
-            for agent, cell in zip(entry["agents"], cells[2:]):
+            for i, cell in enumerate(cells[1:], start=1):
+                if i not in agent_cols:
+                    if num is None and cell.isdigit():
+                        num = int(cell)
+                    continue
                 m = CELL.search(cell)
                 if not m:
                     continue
-                scores[agent] = {
+                scores[agent_cols[i]] = {
                     "score_pct": float(m.group(1)),
                     "uplift_pct": float(m.group(2)) if m.group(2) is not None else None,
                 }
             if scores:
                 entry["results"].append({
                     "dimension": dimension,
-                    "num": int(num) if num and num.isdigit() else None,
+                    "num": num,
                     "agents": scores,
                 })
     return entry
@@ -113,23 +128,44 @@ def load_component_map(repo_root: Path) -> dict:
 def generate(root: Path) -> str:
     components = load_component_map(root)
     skills = []
+    rows = []
     skipped = []
     for bm in sorted(root.glob("skills/*/BENCHMARK.md")):
         catalog_dir = bm.parent.name
         entry = parse_benchmark(bm)
-        if not entry["results"]:
+        results = entry.pop("results")
+        if not results:
             skipped.append(catalog_dir)
+        component = components.get(catalog_dir)
+
+        # Flat measurement rows: one per skill x dimension x agent, so BI
+        # tools can load them as a table and join on catalog_dir.
+        for r in results:
+            for agent, s in r["agents"].items():
+                rows.append({
+                    "catalog_dir": catalog_dir,
+                    "component": component,
+                    "dimension": r["dimension"],
+                    "num": r["num"],
+                    "agent": agent,
+                    "score_pct": s["score_pct"],
+                    "uplift_pct": s["uplift_pct"],
+                })
+
         entry["catalog_dir"] = catalog_dir
-        entry["component"] = components.get(catalog_dir)
-        entry["average_uplift_pct"] = average_uplift(entry["results"])
+        entry["component"] = component
+        entry["has_results"] = bool(results)
+        entry["average_uplift_pct"] = average_uplift(results)
         skills.append(entry)
 
     out = {
-        "schema_version": 1,
+        "schema_version": 2,
         "source": "skills/*/BENCHMARK.md",
         "skill_count": len(skills),
+        "result_row_count": len(rows),
         "skills_without_results": sorted(skipped),
         "skills": skills,
+        "results": rows,
     }
     return json.dumps(out, indent=2) + "\n"
 
