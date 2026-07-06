@@ -37,6 +37,42 @@
       }
     },
     {
+      "path": "skills/amc-run-sample-calibration",
+      "name": "amc-run-sample-calibration",
+      "description": "Run end-to-end calibration on the shipped sample dataset (sdg_08_2_sample_data_010926.zip) against a running AMC microservice. Use when user says 'test sample dataset', 'run sample calibration', 'verify AMC install', or 'launch and test'.",
+      "metadata": {
+        "product.primary": "DeepStream SDK",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "validate,test,configure,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/amc-run-video-calibration",
+      "name": "amc-run-video-calibration",
+      "description": "Calibrate a new dataset from pre-recorded video files via the AutoMagicCalib REST API. Use when user has local MP4s and says 'calibrate my videos', 'run AMC on these videos', or similar.",
+      "metadata": {
+        "product.primary": "DeepStream SDK",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ai_engineer,ml_engineer,solutions_architect,developer",
+        "discovery.activity_tags": "configure,operate,validate,integrate"
+      }
+    },
+    {
+      "path": "skills/amc-setup-calibration-stack",
+      "name": "amc-setup-calibration-stack",
+      "description": "Launch AutoMagicCalib microservice and web UI from NGC release images via Docker Compose. Use when user says 'deploy auto calibration', 'launch auto calibration', 'launch AMC', 'start MS+UI', or 'set up auto-magic-calib'. Requires NGC API key.",
+      "metadata": {
+        "product.primary": "DeepStream SDK",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "devops_engineer,platform_engineer,application_developer,developer",
+        "discovery.activity_tags": "deploy,configure,get_started,operate"
+      }
+    },
+    {
       "path": "skills/cudaq-guide",
       "name": "cudaq-guide",
       "description": "CUDA-Q onboarding guide for installation, test programs, GPU simulation, QPU hardware, and quantum applications.",
@@ -301,6 +337,18 @@
       }
     },
     {
+      "path": "skills/deepstream-generate-pipeline",
+      "name": "deepstream-generate-pipeline",
+      "description": "Build DeepStream GStreamer pipelines interactively. Use when the user asks about pipelines for video/image inference, detection, tracking, or streaming — including natural phrases like 'pipeline to infer on image', 'run inference on video', 'detect objects in stream', 'save inference output', 'deepstream pipeline', 'gst-launch pipeline', 'process video with detection', 'build a pipeline', or any request involving GStreamer/DeepStream elements (nvinfer, nvstreammux, nvtracker, etc.).",
+      "metadata": {
+        "product.primary": "DeepStream SDK",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ai_engineer,ml_engineer,solutions_architect,developer",
+        "discovery.activity_tags": "generate,configure,inference,integrate,deploy"
+      }
+    },
+    {
       "path": "skills/deepstream-import-vision-model",
       "name": "deepstream-import-vision-model",
       "description": "Use this skill to bring any vision model from HuggingFace or NVIDIA NGC into an NVIDIA DeepStream pipeline with end-to-end automation: ONNX download, SafeTensors export, TRT engine build, custom nvinfer bbox parser, multi-stream benchmark, and PDF report. Object detection models only.\n",
@@ -310,6 +358,30 @@
         "catalog.subdomain": "vision-ai",
         "audience": "developer,application_developer,ai_engineer,ml_engineer",
         "discovery.activity_tags": "integrate,convert,benchmark,validate,deploy"
+      }
+    },
+    {
+      "path": "skills/deepstream-profile-pipeline",
+      "name": "deepstream-profile-pipeline",
+      "description": "Profile a DeepStream pipeline with Nsight Systems and derive its configs from the measurement. Use when the user asks for an efficient, performant, or profiled pipeline — or to benchmark, tune, or measure FPS.",
+      "metadata": {
+        "product.primary": "DeepStream SDK",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,developer,solutions_architect,ml_engineer,platform_engineer",
+        "discovery.activity_tags": "profile,benchmark,optimize,measure,configure"
+      }
+    },
+    {
+      "path": "skills/deepstream-sop",
+      "name": "deepstream-sop",
+      "description": "Use this skill when building, deploying, evaluating, debugging, or measuring latency for the DeepStream SOP Inference Microservice — a GPU-accelerated FastAPI service that detects whether operators perform assembly-line steps in order via event boundary detection (GEBD) plus VLM classification. Trigger even if the user does not name it: verify operator step sequence, detect missing or out-of-order SOP steps, score factory/work-cell video for procedure compliance, run VLM-based SOP checking on industrial cameras, or call /v1/chat/completions with a file, RTSP, or Basler camera. Also trigger for its internals: SOPVideoProcessor, DeepStream GEBD model (e.g. DDM) via Triton CAPI, nvds_custom_postprocess, Cosmos Reason 1/2 vLLM, SSE streaming, Kafka NvProto/JSON output, Basler/Pylon camera + emulation, Docker compose, chunk-level latency. Do NOT trigger for generic DeepStream pipelines, object detection/tracking, NIM imports, or video summarization.\n",
+      "metadata": {
+        "product.primary": "DeepStream SDK",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ai_engineer,ml_engineer,devops_engineer,solutions_architect",
+        "discovery.activity_tags": "inference,deploy,debug,evaluate,measure"
       }
     },
     {
@@ -442,6 +514,42 @@
         "catalog.subdomain": "inference-ai",
         "audience": "developer,devops_engineer,platform_engineer,ai_engineer",
         "discovery.activity_tags": "troubleshoot,debug,inspect,monitor,recover"
+      }
+    },
+    {
+      "path": "skills/earth2studio-create-datasource",
+      "name": "earth2studio-create-datasource",
+      "description": "Create and validate Earth2Studio data source wrappers (DataSource, ForecastSource, DataFrameSource, ForecastFrameSource) from remote stores. Do NOT use for fetching data with existing sources, model inference, or installation tasks.\n",
+      "metadata": {
+        "product.primary": "Earth2Studio",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "application_developer,data_engineer,developer,ml_engineer",
+        "discovery.activity_tags": "integrate,extend,validate,test,configure"
+      }
+    },
+    {
+      "path": "skills/earth2studio-create-diagnostic",
+      "name": "earth2studio-create-diagnostic",
+      "description": "Create Earth2Studio diagnostic model wrappers for single-step data transformations, including simple derived diagnostics, packaged AutoModel diagnostics, and generative or diffusion diagnostics. Do NOT use for prognostic time-stepping models, data sources, or installation.\n",
+      "metadata": {
+        "product.primary": "Earth2Studio",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "application_developer,simulation_engineer,ml_engineer,ai_engineer,data_scientist",
+        "discovery.activity_tags": "integrate,transform,generate,extend,validate"
+      }
+    },
+    {
+      "path": "skills/earth2studio-create-prognostic",
+      "name": "earth2studio-create-prognostic",
+      "description": "Create Earth2Studio prognostic (time-stepping forecast) model wrappers. Do NOT use for diagnostic models, data sources, or installation.\n",
+      "metadata": {
+        "product.primary": "Earth2Studio",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "application_developer,ml_engineer,ai_engineer,hpc_developer,simulation_engineer",
+        "discovery.activity_tags": "integrate,extend,generate,test,validate"
       }
     },
     {
@@ -1690,6 +1798,18 @@
         "catalog.subdomain": "physical-ai",
         "audience": "developer,simulation_engineer,ai_engineer",
         "discovery.activity_tags": "select,convert,generate,validate"
+      }
+    },
+    {
+      "path": "skills/physical-ai-people-attribute-search",
+      "name": "physical-ai-people-attribute-search",
+      "description": "Use when running people attribute search (PAS) image augmentation and auto-labeling workflows on OSMO: flow selection, preflight, submit-time interpolation, monitoring, and output retrieval. Trigger keywords: people attribute search, PAS, person augmentation, attribute search, person re-identification, clothing augmentation, person crop augmentation.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "ai_engineer,ml_engineer,data_engineer,developer,robotics_developer",
+        "discovery.activity_tags": "orchestrate,generate,monitor,validate,select"
       }
     },
     {

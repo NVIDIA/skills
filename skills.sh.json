@@ -52,6 +52,7 @@
         "physical-ai-defect-image-generation",
         "physical-ai-infrastructure-setup-and-resilient-scaling",
         "physical-ai-neural-reconstruction",
+        "physical-ai-people-attribute-search",
         "physical-ai-video-data-augmentation"
       ]
     },
@@ -68,8 +69,14 @@
       "title": "Vision AI",
       "description": "Build vision and video AI workflows for analytics, search, summarization, alerts, real-time understanding, and model integration.",
       "skills": [
+        "amc-run-sample-calibration",
+        "amc-run-video-calibration",
+        "amc-setup-calibration-stack",
         "deepstream-dev",
+        "deepstream-generate-pipeline",
         "deepstream-import-vision-model",
+        "deepstream-profile-pipeline",
+        "deepstream-sop",
         "dicom-metadata-extract",
         "dicom-series-preflight",
         "dicom-series-to-volume",
@@ -150,6 +157,9 @@
       "title": "Simulation and Modeling",
       "description": "Create, run, validate, and analyze simulation and modeling workflows for systems, environments, processes, and physical phenomena.",
       "skills": [
+        "earth2studio-create-datasource",
+        "earth2studio-create-diagnostic",
+        "earth2studio-create-prognostic",
         "earth2studio-data-fetch",
         "earth2studio-deterministic-forecast",
         "earth2studio-discover",
