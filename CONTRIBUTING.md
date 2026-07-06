@@ -19,6 +19,12 @@ Avoid agent-specific paths in the repo (`.claude/skills/`, `.codex/skills/`, `.c
 
 At install time, your tooling or packaging can copy or symlink from `skills/` into the appropriate agent discovery locations (for example `.agents/skills/`, `.claude/skills/`, `.codex/skills/`) as required by each tool.
 
+## Catalog Entry Checklist
+
+When adding a new skill, add a corresponding entry to `docs/.well-known/ai-catalog.json`. Use an existing entry as a template. The `displayName` must match the skill's directory name exactly; the integration tests enforce this.
+
+Write the `description` and `representativeQueries` for a search index. Be specific about what the skill does and what a user would type to need it.
+
 ## IP Review and License (External Skills)
 
 For skills published to `github.com/nvidia/skills`, NVIDIA contributors confirm three things per onboarding PR:

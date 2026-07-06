@@ -14,6 +14,7 @@ Long-form documentation for the NVIDIA Agent Skills catalog. Pages are authored 
 - `signing-agent-skills.mdx` — signature verification guide
 - `skill-cards.mdx` — Skill Card authoring guide
 - `release-checklist.mdx` — release process
+- `.well-known/ai-catalog.json` — Agentic Resource Discovery catalog for NVIDIA skills
 
 Navigation order and slugs are defined in [`../fern/docs.yml`](../fern/docs.yml).
 

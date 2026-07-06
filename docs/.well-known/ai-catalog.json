@@ -1,0 +1,3315 @@
+{
+  "$schema": "https://agentdiscovery.org/schemas/catalog/v1.json",
+  "name": "NVIDIA Agent Skills",
+  "description": "Skills for NVIDIA-related AI workflows, including GPU acceleration, model training, inference, robotics, simulation, video analytics, and optimization.",
+  "publisher": {
+    "name": "NVIDIA",
+    "url": "https://github.com/NVIDIA/skills"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:accelerated-computing-cudf",
+      "displayName": "accelerated-computing-cudf",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/accelerated-computing-cudf/SKILL.md",
+      "description": "Official NVIDIA-authored guidance for NVIDIA cuDF GPU DataFrames, pandas acceleration, dask-cuDF, ETL, joins, groupby, CSV/Parquet I/O, nullable semantics, and multi-GPU DataFrame workloads.",
+      "representativeQueries": [
+        "accelerated computing cudf",
+        "how do I use cuDF for accelerated computing cudf",
+        "help me with accelerated computing cudf",
+        "get started with cuDF accelerated computing cudf",
+        "accelerated computing cudf NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:aiq-deploy",
+      "displayName": "aiq-deploy",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/aiq-deploy/SKILL.md",
+      "description": "Use when asked to install, deploy, run, validate, troubleshoot, or stop NVIDIA AI-Q Blueprint infrastructure.",
+      "representativeQueries": [
+        "install, deploy, run, validate, troubleshoot, or stop NVIDIA AI-Q Blueprint infrastructure",
+        "how do I use NeMo Agent Toolkit for aiq deploy",
+        "help me with aiq deploy",
+        "deploy NeMo Agent Toolkit aiq deploy",
+        "aiq deploy NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:aiq-research",
+      "displayName": "aiq-research",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/aiq-research/SKILL.md",
+      "description": "Use when asked to run deep research or AI-Q research through a reachable NVIDIA AI-Q Blueprint backend.",
+      "representativeQueries": [
+        "run deep research or AI-Q research through a reachable NVIDIA AI-Q Blueprint backend",
+        "how do I use NeMo Agent Toolkit for aiq research",
+        "help me with aiq research",
+        "generate with NeMo Agent Toolkit aiq research",
+        "aiq research NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:amc-run-sample-calibration",
+      "displayName": "amc-run-sample-calibration",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/amc-run-sample-calibration/SKILL.md",
+      "description": "Run end-to-end calibration on the shipped sample dataset (sdg_08_2_sample_data_010926.zip) against a running AMC microservice.",
+      "representativeQueries": [
+        "amc run sample calibration",
+        "how do I use DeepStream SDK for amc run sample calibration",
+        "help me with amc run sample calibration",
+        "validate DeepStream SDK amc run sample calibration",
+        "amc run sample calibration NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:amc-run-video-calibration",
+      "displayName": "amc-run-video-calibration",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/amc-run-video-calibration/SKILL.md",
+      "description": "Calibrate a new dataset from pre-recorded video files via the AutoMagicCalib REST API.",
+      "representativeQueries": [
+        "amc run video calibration",
+        "how do I use DeepStream SDK for amc run video calibration",
+        "help me with amc run video calibration",
+        "configure DeepStream SDK amc run video calibration",
+        "amc run video calibration NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:amc-setup-calibration-stack",
+      "displayName": "amc-setup-calibration-stack",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/amc-setup-calibration-stack/SKILL.md",
+      "description": "Launch AutoMagicCalib microservice and web UI from NGC release images via Docker Compose.",
+      "representativeQueries": [
+        "amc setup calibration stack",
+        "how do I use DeepStream SDK for amc setup calibration stack",
+        "help me with amc setup calibration stack",
+        "deploy DeepStream SDK amc setup calibration stack",
+        "amc setup calibration stack NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cudaq-guide",
+      "displayName": "cudaq-guide",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cudaq-guide/SKILL.md",
+      "description": "CUDA-Q onboarding guide for installation, test programs, GPU simulation, QPU hardware, and quantum applications.",
+      "representativeQueries": [
+        "cUDA-Q onboarding guide for installation, test programs, GPU simulation, QPU hardware, and quantum applications",
+        "how do I use CUDA-Q for cudaq guide",
+        "help me with cudaq guide",
+        "get started with CUDA-Q cudaq guide",
+        "cudaq guide NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cufolio",
+      "displayName": "cufolio",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cufolio/SKILL.md",
+      "description": "Use when a user asks to build, optimize, backtest, rebalance, or analyze a stock portfolio with Mean-CVaR, efficient frontiers, scenario generation, or NVIDIA cuOpt.",
+      "representativeQueries": [
+        "cufolio",
+        "how do I use cuOpt for cufolio",
+        "help me with cufolio",
+        "optimize cuOpt cufolio",
+        "cufolio NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cuopt-developer",
+      "displayName": "cuopt-developer",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-developer/SKILL.md",
+      "description": "Modify, build, test, debug, and contribute to NVIDIA cuOpt (C++/CUDA, Python, server, CI).",
+      "representativeQueries": [
+        "cuopt developer",
+        "how do I use cuOpt for cuopt developer",
+        "help me with cuopt developer",
+        "test cuOpt cuopt developer",
+        "cuopt developer NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cuopt-install",
+      "displayName": "cuopt-install",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-install/SKILL.md",
+      "description": "Install cuOpt for Python, C, or server via pip, conda, or Docker; verify the install.",
+      "representativeQueries": [
+        "install cuOpt for Python, C, or server via pip, conda, or Docker; verify the install. For building cuOpt from source, see cuopt-developer",
+        "how do I use cuOpt for cuopt install",
+        "help me with cuopt install",
+        "get started with cuOpt cuopt install",
+        "cuopt install NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cuopt-multi-objective-exploration",
+      "displayName": "cuopt-multi-objective-exploration",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-multi-objective-exploration/SKILL.md",
+      "description": "Trace and interpret the Pareto frontier across competing objectives using repeated single-objective cuOpt solves (weighted-sum and \u03b5-constraint).",
+      "representativeQueries": [
+        "cuopt multi objective exploration",
+        "how do I use cuOpt for cuopt multi objective exploration",
+        "help me with cuopt multi objective exploration",
+        "optimize cuOpt cuopt multi objective exploration",
+        "cuopt multi objective exploration NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cuopt-numerical-optimization-api-c",
+      "displayName": "cuopt-numerical-optimization-api-c",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-numerical-optimization-api-c/SKILL.md",
+      "description": "LP, MILP, and QP (beta) with cuOpt \u2014 C API only.",
+      "representativeQueries": [
+        "lP, MILP, and QP (beta) with cuOpt \u2014 C API only. Use when the user is embedding LP, MILP, or QP in C/C++",
+        "how do I use cuOpt for cuopt numerical optimization api c",
+        "help me with cuopt numerical optimization api c",
+        "integrate cuOpt cuopt numerical optimization api c",
+        "cuopt numerical optimization api c NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cuopt-numerical-optimization-api-cli",
+      "displayName": "cuopt-numerical-optimization-api-cli",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-numerical-optimization-api-cli/SKILL.md",
+      "description": "LP, MILP, and QP (beta) with cuOpt \u2014 CLI only (MPS/LP/QPS files, cuopt_cli).",
+      "representativeQueries": [
+        "cuopt numerical optimization api cli",
+        "how do I use cuOpt for cuopt numerical optimization api cli",
+        "help me with cuopt numerical optimization api cli",
+        "configure cuOpt cuopt numerical optimization api cli",
+        "cuopt numerical optimization api cli NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cuopt-numerical-optimization-api-python",
+      "displayName": "cuopt-numerical-optimization-api-python",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-numerical-optimization-api-python/SKILL.md",
+      "description": "Solve LP, MILP, QP (beta) with cuOpt Python API \u2014 linear/quadratic objectives, integer variables, scheduling, portfolio, least squares.",
+      "representativeQueries": [
+        "solve LP, MILP, QP (beta) with cuOpt Python API \u2014 linear/quadratic objectives, integer variables, scheduling, portfolio, least squares",
+        "how do I use cuOpt for cuopt numerical optimization api python",
+        "help me with cuopt numerical optimization api python",
+        "configure cuOpt cuopt numerical optimization api python",
+        "cuopt numerical optimization api python NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cuopt-numerical-optimization-formulation",
+      "displayName": "cuopt-numerical-optimization-formulation",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-numerical-optimization-formulation/SKILL.md",
+      "description": "LP, MILP, QP \u2014 concepts, problem-text parsing, and formulation patterns (parameters, constraints, decisions, objective).",
+      "representativeQueries": [
+        "cuopt numerical optimization formulation",
+        "how do I use cuOpt for cuopt numerical optimization formulation",
+        "help me with cuopt numerical optimization formulation",
+        "optimize cuOpt cuopt numerical optimization formulation",
+        "cuopt numerical optimization formulation NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cuopt-routing-api-python",
+      "displayName": "cuopt-routing-api-python",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-routing-api-python/SKILL.md",
+      "description": "Vehicle routing (VRP, TSP, PDP) with cuOpt \u2014 Python API only.",
+      "representativeQueries": [
+        "vehicle routing (VRP, TSP, PDP) with cuOpt \u2014 Python API only. Use when the user is building or solving routing in Python",
+        "how do I use cuOpt for cuopt routing api python",
+        "help me with cuopt routing api python",
+        "configure cuOpt cuopt routing api python",
+        "cuopt routing api python NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cuopt-routing-formulation",
+      "displayName": "cuopt-routing-formulation",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-routing-formulation/SKILL.md",
+      "description": "Vehicle routing (VRP, TSP, PDP) \u2014 problem types and data requirements.",
+      "representativeQueries": [
+        "vehicle routing (VRP, TSP, PDP) \u2014 problem types and data requirements. Domain concepts; no API or interface",
+        "how do I use cuOpt for cuopt routing formulation",
+        "help me with cuopt routing formulation",
+        "optimize cuOpt cuopt routing formulation",
+        "cuopt routing formulation NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cuopt-server-api-python",
+      "displayName": "cuopt-server-api-python",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-server-api-python/SKILL.md",
+      "description": "cuOpt REST server \u2014 start server, endpoints, Python/curl client examples.",
+      "representativeQueries": [
+        "cuOpt REST server \u2014 start server, endpoints, Python/curl client examples. Use when the user is deploying or calling the REST API",
+        "how do I use cuOpt for cuopt server api python",
+        "help me with cuopt server api python",
+        "deploy cuOpt cuopt server api python",
+        "cuopt server api python NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cuopt-server-common",
+      "displayName": "cuopt-server-common",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-server-common/SKILL.md",
+      "description": "cuOpt REST server \u2014 what it does and how requests flow.",
+      "representativeQueries": [
+        "cuOpt REST server \u2014 what it does and how requests flow. Domain concepts; no deploy or client code",
+        "how do I use cuOpt for cuopt server common",
+        "help me with cuopt server common",
+        "configure cuOpt cuopt server common",
+        "cuopt server common NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cuopt-skill-evolution",
+      "displayName": "cuopt-skill-evolution",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-skill-evolution/SKILL.md",
+      "description": "After solving a non-trivial problem, detect generalizable learnings and propose skill updates.",
+      "representativeQueries": [
+        "after solving a non-trivial problem, detect generalizable learnings and propose skill updates. Always active \u2014 applies to every interaction",
+        "how do I use cuOpt for cuopt skill evolution",
+        "help me with cuopt skill evolution",
+        "evaluate cuOpt cuopt skill evolution",
+        "cuopt skill evolution NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cuopt-user-rules",
+      "displayName": "cuopt-user-rules",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-user-rules/SKILL.md",
+      "description": "Base rules for end users calling NVIDIA cuOpt (routing/LP/MILP/QP/install/server).",
+      "representativeQueries": [
+        "base rules for end users calling NVIDIA cuOpt (routing/LP/MILP/QP/install/server). Not for cuOpt internals \u2014 use cuopt-developer for those",
+        "how do I use cuOpt for cuopt user rules",
+        "help me with cuopt user rules",
+        "configure cuOpt cuopt user rules",
+        "cuopt user rules NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cupynumeric-hdf5",
+      "displayName": "cupynumeric-hdf5",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cupynumeric-hdf5/SKILL.md",
+      "description": "Read and write large cuPyNumeric arrays to HDF5 with Legate's parallel, distributed HDF5 I/O (legate.io.hdf5: to_file, from_file, from_file_batched).",
+      "representativeQueries": [
+        "cupynumeric hdf5",
+        "how do I use cuPyNumeric for cupynumeric hdf5",
+        "help me with cupynumeric hdf5",
+        "transform data with cuPyNumeric cupynumeric hdf5",
+        "cupynumeric hdf5 NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cupynumeric-install",
+      "displayName": "cupynumeric-install",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cupynumeric-install/SKILL.md",
+      "description": "Install and verify cuPyNumeric for Python \u2014 requirements, commands, verification.",
+      "representativeQueries": [
+        "install and verify cuPyNumeric for Python \u2014 requirements, commands, verification. Source builds are out of scope",
+        "how do I use cuPyNumeric for cupynumeric install",
+        "help me with cupynumeric install",
+        "get started with cuPyNumeric cupynumeric install",
+        "cupynumeric install NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cupynumeric-migration-readiness",
+      "displayName": "cupynumeric-migration-readiness",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cupynumeric-migration-readiness/SKILL.md",
+      "description": "Pre-migration readiness assessor for porting NumPy to cuPyNumeric.",
+      "representativeQueries": [
+        "cupynumeric migration readiness",
+        "how do I use cuPyNumeric for cupynumeric migration readiness",
+        "help me with cupynumeric migration readiness",
+        "migrate to cuPyNumeric cupynumeric migration readiness",
+        "cupynumeric migration readiness NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:cupynumeric-parallel-data-load",
+      "displayName": "cupynumeric-parallel-data-load",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cupynumeric-parallel-data-load/SKILL.md",
+      "description": "Load a sharded, on-disk dataset (sharded .npy, Parquet/Arrow, raw binary, sharded HDF5, custom layouts) into a distributed cuPyNumeric ndarray via a manual partition + leaf @task launch with CPU/OMP/GPU variants.",
+      "representativeQueries": [
+        "cupynumeric parallel data load",
+        "how do I use cuPyNumeric for cupynumeric parallel data load",
+        "help me with cupynumeric parallel data load",
+        "transform data with cuPyNumeric cupynumeric parallel data load",
+        "cupynumeric parallel data load NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:dali-dynamic-mode",
+      "displayName": "dali-dynamic-mode",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/dali-dynamic-mode/SKILL.md",
+      "description": "DALI imperative dynamic mode (`nvidia.dali.experimental.dynamic`, ndd): use when working on ndd code or migrating pipelines; skip pipeline-only tasks.",
+      "representativeQueries": [
+        "dali dynamic mode",
+        "how do I use DALI for dali dynamic mode",
+        "help me with dali dynamic mode",
+        "configure DALI dali dynamic mode",
+        "dali dynamic mode NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:data-designer",
+      "displayName": "data-designer",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/data-designer/SKILL.md",
+      "description": "Use when the user wants to create a dataset, generate synthetic data, or build a data generation pipeline.",
+      "representativeQueries": [
+        "the user wants to create a dataset, generate synthetic data, or build a data generation pipeline",
+        "how do I use NeMo for data designer",
+        "help me with data designer",
+        "generate with NeMo data designer",
+        "data designer NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:deepstream-dev",
+      "displayName": "deepstream-dev",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/deepstream-dev/SKILL.md",
+      "description": "NVIDIA DeepStream SDK 9.0 development with Python pyservicemaker API.",
+      "representativeQueries": [
+        "deepstream dev",
+        "how do I use DeepStream SDK for deepstream dev",
+        "help me with deepstream dev",
+        "configure DeepStream SDK deepstream dev",
+        "deepstream dev NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:deepstream-generate-pipeline",
+      "displayName": "deepstream-generate-pipeline",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/deepstream-generate-pipeline/SKILL.md",
+      "description": "Build DeepStream GStreamer pipelines interactively.",
+      "representativeQueries": [
+        "deepstream generate pipeline",
+        "how do I use DeepStream SDK for deepstream generate pipeline",
+        "help me with deepstream generate pipeline",
+        "generate with DeepStream SDK deepstream generate pipeline",
+        "deepstream generate pipeline NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:deepstream-import-vision-model",
+      "displayName": "deepstream-import-vision-model",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/deepstream-import-vision-model/SKILL.md",
+      "description": "Use this skill to bring any vision model from HuggingFace or NVIDIA NGC into an NVIDIA DeepStream pipeline with end-to-end automation: ONNX download, SafeTensors export, TRT engine build, custom nvinfer bbox parser, multi-stream...",
+      "representativeQueries": [
+        "deepstream import vision model",
+        "how do I use DeepStream SDK for deepstream import vision model",
+        "help me with deepstream import vision model",
+        "integrate DeepStream SDK deepstream import vision model",
+        "deepstream import vision model NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:deepstream-profile-pipeline",
+      "displayName": "deepstream-profile-pipeline",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/deepstream-profile-pipeline/SKILL.md",
+      "description": "Profile a DeepStream pipeline with Nsight Systems and derive its configs from the measurement.",
+      "representativeQueries": [
+        "deepstream profile pipeline",
+        "how do I use DeepStream SDK for deepstream profile pipeline",
+        "help me with deepstream profile pipeline",
+        "optimize DeepStream SDK deepstream profile pipeline",
+        "deepstream profile pipeline NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:deepstream-sop",
+      "displayName": "deepstream-sop",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/deepstream-sop/SKILL.md",
+      "description": "Use this skill when building, deploying, evaluating, debugging, or measuring latency for the DeepStream SOP Inference Microservice \u2014 a GPU-accelerated FastAPI service that detects whether operators perform assembly-line steps in order...",
+      "representativeQueries": [
+        "deepstream sop",
+        "how do I use DeepStream SDK for deepstream sop",
+        "help me with deepstream sop",
+        "deploy DeepStream SDK deepstream sop",
+        "deepstream sop NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:dicom-metadata-extract",
+      "displayName": "dicom-metadata-extract",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/dicom-metadata-extract/SKILL.md",
+      "description": "Used for extracting selected metadata from one DICOM file and flagging standard-tag PHI presence.",
+      "representativeQueries": [
+        "used for extracting selected metadata from one DICOM file and flagging standard-tag PHI presence. Not for anonymization or clinical use",
+        "how do I use MONAI for dicom metadata extract",
+        "help me with dicom metadata extract",
+        "validate MONAI dicom metadata extract",
+        "dicom metadata extract NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:dicom-series-preflight",
+      "displayName": "dicom-series-preflight",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/dicom-series-preflight/SKILL.md",
+      "description": "Used for header-only preflight of one DICOM series folder before conversion or inference.",
+      "representativeQueries": [
+        "used for header-only preflight of one DICOM series folder before conversion or inference. Not for de-identification or clinical clearance",
+        "how do I use MONAI for dicom series preflight",
+        "help me with dicom series preflight",
+        "validate MONAI dicom series preflight",
+        "dicom series preflight NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:dicom-series-to-volume",
+      "displayName": "dicom-series-to-volume",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/dicom-series-to-volume/SKILL.md",
+      "description": "Used for converting one CT DICOM series folder to a HU NIfTI volume with affine evidence.",
+      "representativeQueries": [
+        "used for converting one CT DICOM series folder to a HU NIfTI volume with affine evidence. Not for multi-frame DICOM or clinical use",
+        "how do I use MONAI for dicom series to volume",
+        "help me with dicom series to volume",
+        "transform data with MONAI dicom series to volume",
+        "dicom series to volume NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:digital-health-clinical-asr-build",
+      "displayName": "digital-health-clinical-asr-build",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/digital-health-clinical-asr-build/SKILL.md",
+      "description": "Stage 2 of the Clinical ASR Flywheel.",
+      "representativeQueries": [
+        "digital health clinical asr build",
+        "how do I use Nemotron for Digital Health for digital health clinical asr build",
+        "help me with digital health clinical asr build",
+        "generate with Nemotron for Digital Health digital health clinical asr build",
+        "digital health clinical asr build NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:digital-health-clinical-asr-eval",
+      "displayName": "digital-health-clinical-asr-eval",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/digital-health-clinical-asr-eval/SKILL.md",
+      "description": "Stage 3 of Clinical ASR Flywheel. Score a NeMo manifest, produce the five-section KER leaderboard (by-ipa_source diagnostic). Not for ASR auth (/riva-asr).",
+      "representativeQueries": [
+        "digital health clinical asr eval",
+        "how do I use Nemotron for Digital Health for digital health clinical asr eval",
+        "help me with digital health clinical asr eval",
+        "evaluate Nemotron for Digital Health digital health clinical asr eval",
+        "digital health clinical asr eval NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:digital-health-clinical-asr-finetune",
+      "displayName": "digital-health-clinical-asr-finetune",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/digital-health-clinical-asr-finetune/SKILL.md",
+      "description": "Stage 4 of the Clinical ASR Flywheel.",
+      "representativeQueries": [
+        "digital health clinical asr finetune",
+        "how do I use Nemotron for Digital Health for digital health clinical asr finetune",
+        "help me with digital health clinical asr finetune",
+        "train with Nemotron for Digital Health digital health clinical asr finetune",
+        "digital health clinical asr finetune NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:digital-health-clinical-asr-setup",
+      "displayName": "digital-health-clinical-asr-setup",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/digital-health-clinical-asr-setup/SKILL.md",
+      "description": "Stage 1 of Clinical ASR Flywheel. Use when bootstrapping a cycle: NVCF+MW disclosure, NVIDIA_API_KEY check, deps install, TTS+ASR smoke test.",
+      "representativeQueries": [
+        "stage 1 of Clinical ASR Flywheel. Use when bootstrapping a cycle: NVCF+MW disclosure, NVIDIA_API_KEY check, deps install, TTS+ASR smoke test",
+        "how do I use Nemotron for Digital Health for digital health clinical asr setup",
+        "help me with digital health clinical asr setup",
+        "get started with Nemotron for Digital Health digital health clinical asr setup",
+        "digital health clinical asr setup NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:dynamo-interconnect-check",
+      "displayName": "dynamo-interconnect-check",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/dynamo-interconnect-check/SKILL.md",
+      "description": "Validate that a Dynamo deployment's NIXL/UCX/NCCL interconnect is ready for disaggregated serving over RDMA/NVLink.",
+      "representativeQueries": [
+        "dynamo interconnect check",
+        "how do I use Dynamo for dynamo interconnect check",
+        "help me with dynamo interconnect check",
+        "validate Dynamo dynamo interconnect check",
+        "dynamo interconnect check NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:dynamo-recipe-runner",
+      "displayName": "dynamo-recipe-runner",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/dynamo-recipe-runner/SKILL.md",
+      "description": "Select, validate, patch, and deploy existing NVIDIA Dynamo Kubernetes recipes.",
+      "representativeQueries": [
+        "dynamo recipe runner",
+        "how do I use Dynamo for dynamo recipe runner",
+        "help me with dynamo recipe runner",
+        "deploy Dynamo dynamo recipe runner",
+        "dynamo recipe runner NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:dynamo-router-starter",
+      "displayName": "dynamo-router-starter",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/dynamo-router-starter/SKILL.md",
+      "description": "Start or patch Dynamo router modes and run router endpoint smoke checks.",
+      "representativeQueries": [
+        "dynamo router starter",
+        "how do I use Dynamo for dynamo router starter",
+        "help me with dynamo router starter",
+        "configure Dynamo dynamo router starter",
+        "dynamo router starter NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:dynamo-troubleshoot",
+      "displayName": "dynamo-troubleshoot",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/dynamo-troubleshoot/SKILL.md",
+      "description": "Diagnose failed or unhealthy Dynamo deployments.",
+      "representativeQueries": [
+        "dynamo troubleshoot",
+        "how do I use Dynamo for dynamo troubleshoot",
+        "help me with dynamo troubleshoot",
+        "troubleshoot Dynamo dynamo troubleshoot",
+        "dynamo troubleshoot NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:earth2studio-create-datasource",
+      "displayName": "earth2studio-create-datasource",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/earth2studio-create-datasource/SKILL.md",
+      "description": "Create and validate Earth2Studio data source wrappers (DataSource, ForecastSource, DataFrameSource, ForecastFrameSource) from remote stores.",
+      "representativeQueries": [
+        "earth2studio create datasource",
+        "how do I use Earth2Studio for earth2studio create datasource",
+        "help me with earth2studio create datasource",
+        "integrate Earth2Studio earth2studio create datasource",
+        "earth2studio create datasource NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:earth2studio-create-diagnostic",
+      "displayName": "earth2studio-create-diagnostic",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/earth2studio-create-diagnostic/SKILL.md",
+      "description": "Create Earth2Studio diagnostic model wrappers for single-step data transformations, including simple derived diagnostics, packaged AutoModel diagnostics, and generative or diffusion diagnostics.",
+      "representativeQueries": [
+        "earth2studio create diagnostic",
+        "how do I use Earth2Studio for earth2studio create diagnostic",
+        "help me with earth2studio create diagnostic",
+        "integrate Earth2Studio earth2studio create diagnostic",
+        "earth2studio create diagnostic NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:earth2studio-create-prognostic",
+      "displayName": "earth2studio-create-prognostic",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/earth2studio-create-prognostic/SKILL.md",
+      "description": "Create Earth2Studio prognostic (time-stepping forecast) model wrappers.",
+      "representativeQueries": [
+        "create Earth2Studio prognostic (time-stepping forecast) model wrappers. Do NOT use for diagnostic models, data sources, or installation",
+        "how do I use Earth2Studio for earth2studio create prognostic",
+        "help me with earth2studio create prognostic",
+        "integrate Earth2Studio earth2studio create prognostic",
+        "earth2studio create prognostic NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:earth2studio-data-fetch",
+      "displayName": "earth2studio-data-fetch",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/earth2studio-data-fetch/SKILL.md",
+      "description": "Fetch weather/climate data via Earth2Studio data sources for specific variables and times.",
+      "representativeQueries": [
+        "earth2studio data fetch",
+        "how do I use Earth2Studio for earth2studio data fetch",
+        "help me with earth2studio data fetch",
+        "transform data with Earth2Studio earth2studio data fetch",
+        "earth2studio data fetch NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:earth2studio-deterministic-forecast",
+      "displayName": "earth2studio-deterministic-forecast",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/earth2studio-deterministic-forecast/SKILL.md",
+      "description": "Build deterministic forecast scripts with Earth2Studio (model, data source, IO, inference).",
+      "representativeQueries": [
+        "earth2studio deterministic forecast",
+        "how do I use Earth2Studio for earth2studio deterministic forecast",
+        "help me with earth2studio deterministic forecast",
+        "configure Earth2Studio earth2studio deterministic forecast",
+        "earth2studio deterministic forecast NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:earth2studio-discover",
+      "displayName": "earth2studio-discover",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/earth2studio-discover/SKILL.md",
+      "description": "Find Earth2Studio models, data sources, and examples for a weather/climate use case.",
+      "representativeQueries": [
+        "earth2studio discover",
+        "how do I use Earth2Studio for earth2studio discover",
+        "help me with earth2studio discover",
+        "validate Earth2Studio earth2studio discover",
+        "earth2studio discover NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:earth2studio-install",
+      "displayName": "earth2studio-install",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/earth2studio-install/SKILL.md",
+      "description": "Guide installing Earth2Studio via uv or pip, selecting model extras, and configuring the environment.",
+      "representativeQueries": [
+        "earth2studio install",
+        "how do I use Earth2Studio for earth2studio install",
+        "help me with earth2studio install",
+        "get started with Earth2Studio earth2studio install",
+        "earth2studio install NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:holoscan-install-conda",
+      "displayName": "holoscan-install-conda",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/holoscan-install-conda/SKILL.md",
+      "description": "Install Holoscan SDK v4.3+ via Conda in a CUDA 13 environment.",
+      "representativeQueries": [
+        "install Holoscan SDK v4.3+ via Conda in a CUDA 13 environment. Use for Conda installs; redirect CUDA 12 hosts to container/wheel",
+        "how do I use Holoscan for holoscan install conda",
+        "help me with holoscan install conda",
+        "get started with Holoscan holoscan install conda",
+        "holoscan install conda NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:holoscan-install-container",
+      "displayName": "holoscan-install-container",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/holoscan-install-container/SKILL.md",
+      "description": "Install Holoscan SDK via the NGC Docker container.",
+      "representativeQueries": [
+        "install Holoscan SDK via the NGC Docker container. Use for container-based installs; not for native apt/pip/Conda installs",
+        "how do I use Holoscan for holoscan install container",
+        "help me with holoscan install container",
+        "get started with Holoscan holoscan install container",
+        "holoscan install container NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:holoscan-install-debian",
+      "displayName": "holoscan-install-debian",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/holoscan-install-debian/SKILL.md",
+      "description": "Install Holoscan SDK natively on Ubuntu via apt.",
+      "representativeQueries": [
+        "install Holoscan SDK natively on Ubuntu via apt. Use for C++ installs on Ubuntu; pair with /holoscan-install-wheel for Python",
+        "how do I use Holoscan for holoscan install debian",
+        "help me with holoscan install debian",
+        "get started with Holoscan holoscan install debian",
+        "holoscan install debian NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:holoscan-install-source",
+      "displayName": "holoscan-install-source",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/holoscan-install-source/SKILL.md",
+      "description": "Build Holoscan SDK from source via the in-tree ./run script.",
+      "representativeQueries": [
+        "build Holoscan SDK from source via the in-tree ./run script. Use only when published packages don't meet the user's needs",
+        "how do I use Holoscan for holoscan install source",
+        "help me with holoscan install source",
+        "configure Holoscan holoscan install source",
+        "holoscan install source NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:holoscan-install-wheel",
+      "displayName": "holoscan-install-wheel",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/holoscan-install-wheel/SKILL.md",
+      "description": "Install Holoscan SDK Python wheel via pip into a venv.",
+      "representativeQueries": [
+        "install Holoscan SDK Python wheel via pip into a venv. Use for Python installs; not for native C++/apt or Conda installs",
+        "how do I use Holoscan for holoscan install wheel",
+        "help me with holoscan install wheel",
+        "get started with Holoscan holoscan install wheel",
+        "holoscan install wheel NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:holoscan-setup",
+      "displayName": "holoscan-setup",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/holoscan-setup/SKILL.md",
+      "description": "Guides Holoscan SDK installation: inspects the host, assesses platform compatibility, recommends an install method, and delegates to the matching install skill.",
+      "representativeQueries": [
+        "holoscan setup",
+        "how do I use Holoscan for holoscan setup",
+        "help me with holoscan setup",
+        "configure Holoscan holoscan setup",
+        "holoscan setup NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:hsb-app",
+      "displayName": "hsb-app",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/hsb-app/SKILL.md",
+      "description": "Discover and run Holoscan Sensor Bridge example applications on a connected devkit.",
+      "representativeQueries": [
+        "hsb app",
+        "how do I use Holoscan for hsb app",
+        "help me with hsb app",
+        "get started with Holoscan hsb app",
+        "hsb app NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:hsb-flash",
+      "displayName": "hsb-flash",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/hsb-flash/SKILL.md",
+      "description": "Flash the FPGA on an HSB board connected to an NVIDIA devkit.",
+      "representativeQueries": [
+        "hsb flash",
+        "how do I use Holoscan for hsb flash",
+        "help me with hsb flash",
+        "configure Holoscan hsb flash",
+        "hsb flash NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:hsb-setup",
+      "displayName": "hsb-setup",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/hsb-setup/SKILL.md",
+      "description": "Clone the latest NVIDIA Holoscan Sensor Bridge repo, ask which supported devkit is being used, configure the host per platform, build the correct demo container, run it, and verify HSB connectivity by pinging 192.168.0.2.",
+      "representativeQueries": [
+        "hsb setup",
+        "how do I use Holoscan for hsb setup",
+        "help me with hsb setup",
+        "get started with Holoscan hsb setup",
+        "hsb setup NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:hsb-test",
+      "displayName": "hsb-test",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/hsb-test/SKILL.md",
+      "description": "Execute QA test plans on Holoscan Sensor Bridge hardware.",
+      "representativeQueries": [
+        "hsb test",
+        "how do I use Holoscan for hsb test",
+        "help me with hsb test",
+        "test Holoscan hsb test",
+        "hsb test NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-build-source",
+      "displayName": "jetson-build-source",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-build-source/SKILL.md",
+      "description": "Use when you need to rebuild the BSP overlay \u2014 DT, OOT modules, or kernel \u2014 from changes under bsp_sources/.",
+      "representativeQueries": [
+        "rebuild the BSP overlay \u2014 DT, OOT modules, or kernel \u2014 from changes under bsp_sources/. Triggers: build bsp, rebuild dtb, rebuild kernel",
+        "how do I use Jetson for jetson build source",
+        "help me with jetson build source",
+        "configure Jetson jetson build source",
+        "jetson build source NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-customize-camera",
+      "displayName": "jetson-customize-camera",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-customize-camera/SKILL.md",
+      "description": "Enable MIPI/GMSL camera sensors on a Jetson Thor or Orin custom carrier by rendering a kernel-DT overlay from the in-tree sensor DTSI.",
+      "representativeQueries": [
+        "jetson customize camera",
+        "how do I use Jetson for jetson customize camera",
+        "help me with jetson customize camera",
+        "configure Jetson jetson customize camera",
+        "jetson customize camera NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-customize-clocks",
+      "displayName": "jetson-customize-clocks",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-customize-clocks/SKILL.md",
+      "description": "Use to lock/cap Jetson CPU/GPU/EMC clocks, toggle EMC/CPU DVFS, or change cpufreq governors by editing BPMP DTB and nvpower.sh pre-flash.",
+      "representativeQueries": [
+        "jetson customize clocks",
+        "how do I use Jetson for jetson customize clocks",
+        "help me with jetson customize clocks",
+        "configure Jetson jetson customize clocks",
+        "jetson customize clocks NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-customize-fan",
+      "displayName": "jetson-customize-fan",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-customize-fan/SKILL.md",
+      "description": "Use when you need to add, remove, edit, list, or change the boot default of an nvfancontrol fan profile on a Jetson/Tegra (Orin, Thor) target.",
+      "representativeQueries": [
+        "jetson customize fan",
+        "how do I use Jetson for jetson customize fan",
+        "help me with jetson customize fan",
+        "configure Jetson jetson customize fan",
+        "jetson customize fan NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-customize-mgbe",
+      "displayName": "jetson-customize-mgbe",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-customize-mgbe/SKILL.md",
+      "description": "Enable Jetson Thor 25G/10G/1G MGBE QSFP via kernel-DT overlay.",
+      "representativeQueries": [
+        "enable Jetson Thor 25G/10G/1G MGBE QSFP via kernel-DT overlay. Do NOT use for UPHY lane allocation or ODMDATA edits",
+        "how do I use Jetson for jetson customize mgbe",
+        "help me with jetson customize mgbe",
+        "configure Jetson jetson customize mgbe",
+        "jetson customize mgbe NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-customize-nvpmodel",
+      "displayName": "jetson-customize-nvpmodel",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-customize-nvpmodel/SKILL.md",
+      "description": "Use when you need to add, remove, edit, list, or change the boot default of an nvpmodel power mode on a Jetson/Tegra (Orin, Thor) target.",
+      "representativeQueries": [
+        "jetson customize nvpmodel",
+        "how do I use Jetson for jetson customize nvpmodel",
+        "help me with jetson customize nvpmodel",
+        "configure Jetson jetson customize nvpmodel",
+        "jetson customize nvpmodel NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-customize-pcie",
+      "displayName": "jetson-customize-pcie",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-customize-pcie/SKILL.md",
+      "description": "Per-controller PCIe enable / disable / lanes / link-speed for a Jetson Thor or Orin custom carrier via ODMDATA + kernel-DT overlay.",
+      "representativeQueries": [
+        "jetson customize pcie",
+        "how do I use Jetson for jetson customize pcie",
+        "help me with jetson customize pcie",
+        "configure Jetson jetson customize pcie",
+        "jetson customize pcie NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-customize-pinmux",
+      "displayName": "jetson-customize-pinmux",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-customize-pinmux/SKILL.md",
+      "description": "Per-pin SFIO / direction / initial-state configurator for a Jetson Orin or Thor custom carrier from the pinmux XLSM.",
+      "representativeQueries": [
+        "jetson customize pinmux",
+        "how do I use Jetson for jetson customize pinmux",
+        "help me with jetson customize pinmux",
+        "configure Jetson jetson customize pinmux",
+        "jetson customize pinmux NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-customize-uphy",
+      "displayName": "jetson-customize-uphy",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-customize-uphy/SKILL.md",
+      "description": "Configure Jetson UPHY lane allocation (uphy0/uphy1-config) on Orin/Thor custom carriers.",
+      "representativeQueries": [
+        "configure Jetson UPHY lane allocation (uphy0/uphy1-config) on Orin/Thor custom carriers. Do NOT use for pinmux or PCIe-only edits",
+        "how do I use Jetson for jetson customize uphy",
+        "help me with jetson customize uphy",
+        "configure Jetson jetson customize uphy",
+        "jetson customize uphy NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-customize-usb",
+      "displayName": "jetson-customize-usb",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-customize-usb/SKILL.md",
+      "description": "Enable/disable Jetson USB2/USB3 SS ports via kernel-DT overlay.",
+      "representativeQueries": [
+        "enable/disable Jetson USB2/USB3 SS ports via kernel-DT overlay. Do NOT use for UPHY lane allocation or ODMDATA edits",
+        "how do I use Jetson for jetson customize usb",
+        "help me with jetson customize usb",
+        "configure Jetson jetson customize usb",
+        "jetson customize usb NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-derive-carrier",
+      "displayName": "jetson-derive-carrier",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-derive-carrier/SKILL.md",
+      "description": "Bootstrap a custom carrier board by forking carrier files and scaffolding a DT overlay from the reference devkit.",
+      "representativeQueries": [
+        "jetson derive carrier",
+        "how do I use Jetson for jetson derive carrier",
+        "help me with jetson derive carrier",
+        "configure Jetson jetson derive carrier",
+        "jetson derive carrier NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-diagnostic",
+      "displayName": "jetson-diagnostic",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-diagnostic/SKILL.md",
+      "description": "Read-only Jetson health snapshot for identity, memory, GPU, thermal, power, storage, services, and top processes.",
+      "representativeQueries": [
+        "read-only Jetson health snapshot for identity, memory, GPU, thermal, power, storage, services, and top processes",
+        "how do I use Jetson for jetson diagnostic",
+        "help me with jetson diagnostic",
+        "troubleshoot Jetson jetson diagnostic",
+        "jetson diagnostic NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-download-bsp",
+      "displayName": "jetson-download-bsp",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-download-bsp/SKILL.md",
+      "description": "Download NVIDIA Jetson Linux BSP artifacts (BSP tarball, sample rootfs, public_sources, x-tools, guides) for the active target.",
+      "representativeQueries": [
+        "jetson download bsp",
+        "how do I use Jetson for jetson download bsp",
+        "help me with jetson download bsp",
+        "get started with Jetson jetson download bsp",
+        "jetson download bsp NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-flash-image",
+      "displayName": "jetson-flash-image",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-flash-image/SKILL.md",
+      "description": "Use to flash a promoted BSP image to a Jetson DUT in RCM mode via flash.sh or l4t_initrd_flash.sh.",
+      "representativeQueries": [
+        "jetson flash image",
+        "how do I use Jetson for jetson flash image",
+        "help me with jetson flash image",
+        "deploy Jetson jetson flash image",
+        "jetson flash image NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-generate-kb",
+      "displayName": "jetson-generate-kb",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-generate-kb/SKILL.md",
+      "description": "Build a per-target knowledge-base markdown next to the active profile by walking the BSP root and source tree.",
+      "representativeQueries": [
+        "jetson generate kb",
+        "how do I use Jetson for jetson generate kb",
+        "help me with jetson generate kb",
+        "generate with Jetson jetson generate kb",
+        "jetson generate kb NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-headless-mode",
+      "displayName": "jetson-headless-mode",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-headless-mode/SKILL.md",
+      "description": "Plan and apply safe Jetson headless-mode changes to reclaim GUI and daemon memory.",
+      "representativeQueries": [
+        "plan and apply safe Jetson headless-mode changes to reclaim GUI and daemon memory",
+        "how do I use Jetson for jetson headless mode",
+        "help me with jetson headless mode",
+        "configure Jetson jetson headless mode",
+        "jetson headless mode NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-inference-mem-tune",
+      "displayName": "jetson-inference-mem-tune",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-inference-mem-tune/SKILL.md",
+      "description": "Pick the serving stack and per-runtime memory flags (vLLM, SGLang, llama.cpp, TensorRT Edge-LLM) for an LLM/VLM workload on any NVIDIA Jetson.",
+      "representativeQueries": [
+        "jetson inference mem tune",
+        "how do I use Jetson for jetson inference mem tune",
+        "help me with jetson inference mem tune",
+        "configure Jetson jetson inference mem tune",
+        "jetson inference mem tune NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-init-image",
+      "displayName": "jetson-init-image",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-init-image/SKILL.md",
+      "description": "Extract Jetson Linux + sample-rootfs tarballs and run apply_binaries.sh for the active target, then record bsp_image in the profile.",
+      "representativeQueries": [
+        "jetson init image",
+        "how do I use Jetson for jetson init image",
+        "help me with jetson init image",
+        "configure Jetson jetson init image",
+        "jetson init image NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-init-source",
+      "displayName": "jetson-init-source",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-init-source/SKILL.md",
+      "description": "Set up the BSP source workspace: Linux_for_Tegra overlay tracker, bsp_sources, Crosstool-NG toolchain.",
+      "representativeQueries": [
+        "jetson init source",
+        "how do I use Jetson for jetson init source",
+        "help me with jetson init source",
+        "get started with Jetson jetson init source",
+        "jetson init source NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-init-target",
+      "displayName": "jetson-init-target",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-init-target/SKILL.md",
+      "description": "Author a new Jetson target-platform profile (reference_devkit + optional custom_carrier) and update the active pointer.",
+      "representativeQueries": [
+        "jetson init target",
+        "how do I use Jetson for jetson init target",
+        "help me with jetson init target",
+        "configure Jetson jetson init target",
+        "jetson init target NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-link-docs",
+      "displayName": "jetson-link-docs",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-link-docs/SKILL.md",
+      "description": "Bind pre-downloaded Jetson reference docs (developer guide, design guide, pinmux, schematics) into the active profile documents block.",
+      "representativeQueries": [
+        "jetson link docs",
+        "how do I use Jetson for jetson link docs",
+        "help me with jetson link docs",
+        "configure Jetson jetson link docs",
+        "jetson link docs NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-llm-benchmark",
+      "displayName": "jetson-llm-benchmark",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-llm-benchmark/SKILL.md",
+      "description": "Benchmark Jetson LLM/VLM serving performance across vLLM, llama.cpp, and Ollama with structured JSON output.",
+      "representativeQueries": [
+        "benchmark Jetson LLM/VLM serving performance across vLLM, llama.cpp, and Ollama with structured JSON output",
+        "how do I use Jetson for jetson llm benchmark",
+        "help me with jetson llm benchmark",
+        "optimize Jetson jetson llm benchmark",
+        "jetson llm benchmark NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-llm-serve",
+      "displayName": "jetson-llm-serve",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-llm-serve/SKILL.md",
+      "description": "Stand up vLLM or SGLang serving on Jetson, using upstream vLLM on Thor and Orin JetPack 7.2+, and NVIDIA-AI-IOT vLLM on older Orin.",
+      "representativeQueries": [
+        "stand up vLLM or SGLang serving on Jetson, using upstream vLLM on Thor and Orin JetPack 7.2+, and NVIDIA-AI-IOT vLLM on older Orin",
+        "how do I use Jetson for jetson llm serve",
+        "help me with jetson llm serve",
+        "deploy Jetson jetson llm serve",
+        "jetson llm serve NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-memory-audit",
+      "displayName": "jetson-memory-audit",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-memory-audit/SKILL.md",
+      "description": "Measure Jetson DRAM/NvMap usage and verify before/after memory reclamation with live audit data.",
+      "representativeQueries": [
+        "measure Jetson DRAM/NvMap usage and verify before/after memory reclamation with live audit data",
+        "how do I use Jetson for jetson memory audit",
+        "help me with jetson memory audit",
+        "monitor Jetson jetson memory audit",
+        "jetson memory audit NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-optimize-memory",
+      "displayName": "jetson-optimize-memory",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-optimize-memory/SKILL.md",
+      "description": "Reclaim DRAM by disabling unused subsystems across MB1 BCT, MB2 BCT, kernel reserved-memory, and SWIOTLB.",
+      "representativeQueries": [
+        "jetson optimize memory",
+        "how do I use Jetson for jetson optimize memory",
+        "help me with jetson optimize memory",
+        "optimize Jetson jetson optimize memory",
+        "jetson optimize memory NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-package",
+      "displayName": "jetson-package",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-package/SKILL.md",
+      "description": "Pick Jetson-compatible containers, vLLM runtime images, and Jetson AI Lab PyPI indexes; maps Orin SM 8.7 vs Thor SM 11.0 and JetPack-specific package choices.",
+      "representativeQueries": [
+        "jetson package",
+        "how do I use Jetson for jetson package",
+        "help me with jetson package",
+        "configure Jetson jetson package",
+        "jetson package NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-print-bsp-info",
+      "displayName": "jetson-print-bsp-info",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-print-bsp-info/SKILL.md",
+      "description": "Use when you need to print Jetson BSP info (L4T version, board configs, rootfs state) from a Linux_for_Tegra root on the host PC.",
+      "representativeQueries": [
+        "print Jetson BSP info (L4T version, board configs, rootfs state) from a Linux_for_Tegra root on the host PC. This is an example skill",
+        "how do I use Jetson for jetson print bsp info",
+        "help me with jetson print bsp info",
+        "validate Jetson jetson print bsp info",
+        "jetson print bsp info NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-print-device-info",
+      "displayName": "jetson-print-device-info",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-print-device-info/SKILL.md",
+      "description": "Use when you need to print Jetson device info (module model, L4T version, kernel, OS version, current power mode) from a running Jetson target.",
+      "representativeQueries": [
+        "jetson print device info",
+        "how do I use Jetson for jetson print device info",
+        "help me with jetson print device info",
+        "troubleshoot Jetson jetson print device info",
+        "jetson print device info NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-promote-image",
+      "displayName": "jetson-promote-image",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-promote-image/SKILL.md",
+      "description": "Use to promote overlay files and built artifacts into the staged BSP image.",
+      "representativeQueries": [
+        "promote overlay files and built artifacts into the staged BSP image. Do NOT use to flash or build. Triggers: promote bsp image",
+        "how do I use Jetson for jetson promote image",
+        "help me with jetson promote image",
+        "deploy Jetson jetson promote image",
+        "jetson promote image NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-quick-start",
+      "displayName": "jetson-quick-start",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-quick-start/SKILL.md",
+      "description": "Entry skill for Jetson / IGX BSP customization.",
+      "representativeQueries": [
+        "jetson quick start",
+        "how do I use Jetson for jetson quick start",
+        "help me with jetson quick start",
+        "get started with Jetson jetson quick start",
+        "jetson quick start NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-set-target",
+      "displayName": "jetson-set-target",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-set-target/SKILL.md",
+      "description": "Switch the active Jetson target-platform pointer to an existing profile YAML.",
+      "representativeQueries": [
+        "jetson set target",
+        "how do I use Jetson for jetson set target",
+        "help me with jetson set target",
+        "configure Jetson jetson set target",
+        "jetson set target NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-speculative-decoding",
+      "displayName": "jetson-speculative-decoding",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-speculative-decoding/SKILL.md",
+      "description": "Add EAGLE-3 or draft-model speculative decoding to a Jetson vLLM server when TPOT is the bottleneck.",
+      "representativeQueries": [
+        "add EAGLE-3 or draft-model speculative decoding to a Jetson vLLM server when TPOT is the bottleneck",
+        "how do I use Jetson for jetson speculative decoding",
+        "help me with jetson speculative decoding",
+        "optimize Jetson jetson speculative decoding",
+        "jetson speculative decoding NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:jetson-validate-image",
+      "displayName": "jetson-validate-image",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/jetson-validate-image/SKILL.md",
+      "description": "Use after jetson-flash-image to run static BSP checks, on-target smoke/regression tests on a flashed DUT, or both.",
+      "representativeQueries": [
+        "jetson validate image",
+        "how do I use Jetson for jetson validate image",
+        "help me with jetson validate image",
+        "validate Jetson jetson validate image",
+        "jetson validate image NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:launch-nemo-rl",
+      "displayName": "launch-nemo-rl",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/launch-nemo-rl/SKILL.md",
+      "description": "Playbook for launching, monitoring, stopping, and debugging NeMo-RL recipes on a Kubernetes cluster via the nrl-k8s CLI.",
+      "representativeQueries": [
+        "launch nemo rl",
+        "how do I use NeMo RL for launch nemo rl",
+        "help me with launch nemo rl",
+        "deploy NeMo RL launch nemo rl",
+        "launch nemo rl NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:mcore-create-issue",
+      "displayName": "mcore-create-issue",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/mcore-create-issue/SKILL.md",
+      "description": "Investigate a failing GitHub Actions run or job and create a GitHub issue for the failure.",
+      "representativeQueries": [
+        "investigate a failing GitHub Actions run or job and create a GitHub issue for the failure",
+        "how do I use Megatron-Core for mcore create issue",
+        "help me with mcore create issue",
+        "troubleshoot Megatron-Core mcore create issue",
+        "mcore create issue NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:mcore-linting-and-formatting",
+      "displayName": "mcore-linting-and-formatting",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/mcore-linting-and-formatting/SKILL.md",
+      "description": "Linting and formatting for Megatron-LM.",
+      "representativeQueries": [
+        "linting and formatting for Megatron-LM. Covers running autoformat.sh, tools (ruff, black, isort, pylint, mypy), and code style rules",
+        "how do I use Megatron-Core for mcore linting and formatting",
+        "help me with mcore linting and formatting",
+        "test Megatron-Core mcore linting and formatting",
+        "mcore linting and formatting NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:mcore-run-on-slurm",
+      "displayName": "mcore-run-on-slurm",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/mcore-run-on-slurm/SKILL.md",
+      "description": "How to launch distributed Megatron-LM training jobs on a SLURM cluster.",
+      "representativeQueries": [
+        "mcore run on slurm",
+        "how do I use Megatron-Core for mcore run on slurm",
+        "help me with mcore run on slurm",
+        "train with Megatron-Core mcore run on slurm",
+        "mcore run on slurm NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:mcore-split-pr",
+      "displayName": "mcore-split-pr",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/mcore-split-pr/SKILL.md",
+      "description": "Split a PR into multiple PRs to reduce the number of required CODEOWNERS reviewer groups.",
+      "representativeQueries": [
+        "split a PR into multiple PRs to reduce the number of required CODEOWNERS reviewer groups",
+        "how do I use Megatron-Core for mcore split pr",
+        "help me with mcore split pr",
+        "configure Megatron-Core mcore split pr",
+        "mcore split pr NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:mcore-testing",
+      "displayName": "mcore-testing",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/mcore-testing/SKILL.md",
+      "description": "Test system for Megatron-LM. Covers test layout, recipe YAML structure, adding and running unit and functional tests, golden values, marker filters, and CI parity.",
+      "representativeQueries": [
+        "mcore testing",
+        "how do I use Megatron-Core for mcore testing",
+        "help me with mcore testing",
+        "test Megatron-Core mcore testing",
+        "mcore testing NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-automodel-distributed-training",
+      "displayName": "nemo-automodel-distributed-training",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-automodel-distributed-training/SKILL.md",
+      "description": "Guide for selecting and configuring distributed training strategies in NeMo AutoModel, including FSDP2, Megatron FSDP, DDP, and parallelism settings.",
+      "representativeQueries": [
+        "nemo automodel distributed training",
+        "how do I use NeMo Framework for nemo automodel distributed training",
+        "help me with nemo automodel distributed training",
+        "train with NeMo Framework nemo automodel distributed training",
+        "nemo automodel distributed training NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-automodel-launcher-config",
+      "displayName": "nemo-automodel-launcher-config",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-automodel-launcher-config/SKILL.md",
+      "description": "Configure NeMo AutoModel job launches for interactive runs, Slurm clusters, and SkyPilot cloud execution.",
+      "representativeQueries": [
+        "configure NeMo AutoModel job launches for interactive runs, Slurm clusters, and SkyPilot cloud execution",
+        "how do I use NeMo Framework for nemo automodel launcher config",
+        "help me with nemo automodel launcher config",
+        "configure NeMo Framework nemo automodel launcher config",
+        "nemo automodel launcher config NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-automodel-model-onboarding",
+      "displayName": "nemo-automodel-model-onboarding",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-automodel-model-onboarding/SKILL.md",
+      "description": "Guide for onboarding new model architectures into NeMo AutoModel, including architecture discovery, implementation patterns, registration, and validation.",
+      "representativeQueries": [
+        "nemo automodel model onboarding",
+        "how do I use NeMo Framework for nemo automodel model onboarding",
+        "help me with nemo automodel model onboarding",
+        "integrate NeMo Framework nemo automodel model onboarding",
+        "nemo automodel model onboarding NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-automodel-recipe-development",
+      "displayName": "nemo-automodel-recipe-development",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-automodel-recipe-development/SKILL.md",
+      "description": "Create and modify NeMo AutoModel training and evaluation recipes, including YAML structure, builders, and execution flow.",
+      "representativeQueries": [
+        "create and modify NeMo AutoModel training and evaluation recipes, including YAML structure, builders, and execution flow",
+        "how do I use NeMo Framework for nemo automodel recipe development",
+        "help me with nemo automodel recipe development",
+        "configure NeMo Framework nemo automodel recipe development",
+        "nemo automodel recipe development NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-data-designer-plugin",
+      "displayName": "nemo-data-designer-plugin",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-data-designer-plugin/SKILL.md",
+      "description": "Use when the user wants to create a dataset, generate synthetic data, or build a data generation pipeline.",
+      "representativeQueries": [
+        "the user wants to create a dataset, generate synthetic data, or build a data generation pipeline",
+        "how do I use NeMo for nemo data designer plugin",
+        "help me with nemo data designer plugin",
+        "generate with NeMo nemo data designer plugin",
+        "nemo data designer plugin NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-evaluator-plugin",
+      "displayName": "nemo-evaluator-plugin",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-evaluator-plugin/SKILL.md",
+      "description": "Use when working on the Evaluator plugin CLI, jobs, SDK-backed specs, metric types, or plugin-owned Evaluator skills.",
+      "representativeQueries": [
+        "working on the Evaluator plugin CLI, jobs, SDK-backed specs, metric types, or plugin-owned Evaluator skills",
+        "how do I use NeMo for nemo evaluator plugin",
+        "help me with nemo evaluator plugin",
+        "evaluate NeMo nemo evaluator plugin",
+        "nemo evaluator plugin NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-mlm-bridge-training",
+      "displayName": "nemo-mbridge-mlm-bridge-training",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-mlm-bridge-training/SKILL.md",
+      "description": "Run Megatron-LM (MLM) and Megatron Bridge training with mock or real data.",
+      "representativeQueries": [
+        "nemo mbridge mlm bridge training",
+        "how do I use NeMo Megatron Bridge for nemo mbridge mlm bridge training",
+        "help me with nemo mbridge mlm bridge training",
+        "train with NeMo Megatron Bridge nemo mbridge mlm bridge training",
+        "nemo mbridge mlm bridge training NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-multi-node-slurm",
+      "displayName": "nemo-mbridge-multi-node-slurm",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-multi-node-slurm/SKILL.md",
+      "description": "Convert single-node scripts to multi-node Slurm sbatch jobs and debug common multi-node failures.",
+      "representativeQueries": [
+        "nemo mbridge multi node slurm",
+        "how do I use NeMo Megatron Bridge for nemo mbridge multi node slurm",
+        "help me with nemo mbridge multi node slurm",
+        "configure NeMo Megatron Bridge nemo mbridge multi node slurm",
+        "nemo mbridge multi node slurm NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-activation-recompute",
+      "displayName": "nemo-mbridge-perf-activation-recompute",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-activation-recompute/SKILL.md",
+      "description": "Validate and use selective and full activation recompute in Megatron Bridge to reduce GPU memory usage at the cost of extra compute.",
+      "representativeQueries": [
+        "validate and use selective and full activation recompute in Megatron Bridge to reduce GPU memory usage at the cost of extra compute",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf activation recompute",
+        "help me with nemo mbridge perf activation recompute",
+        "optimize NeMo Megatron Bridge nemo mbridge perf activation recompute",
+        "nemo mbridge perf activation recompute NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-cpu-offloading",
+      "displayName": "nemo-mbridge-perf-cpu-offloading",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-cpu-offloading/SKILL.md",
+      "description": "Validate and use CPU offloading in Megatron Bridge, including layer-level activation offloading and fractional optimizer state offloading with HybridDeviceOptimizer.",
+      "representativeQueries": [
+        "nemo mbridge perf cpu offloading",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf cpu offloading",
+        "help me with nemo mbridge perf cpu offloading",
+        "optimize NeMo Megatron Bridge nemo mbridge perf cpu offloading",
+        "nemo mbridge perf cpu offloading NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-cuda-graphs",
+      "displayName": "nemo-mbridge-perf-cuda-graphs",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-cuda-graphs/SKILL.md",
+      "description": "Validate and use CUDA graph capture in Megatron Bridge, including local full-iteration graphs and Transformer Engine scoped graphs for attention, MLP, and MoE modules.",
+      "representativeQueries": [
+        "nemo mbridge perf cuda graphs",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf cuda graphs",
+        "help me with nemo mbridge perf cuda graphs",
+        "optimize NeMo Megatron Bridge nemo mbridge perf cuda graphs",
+        "nemo mbridge perf cuda graphs NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-expert-parallel-overlap",
+      "displayName": "nemo-mbridge-perf-expert-parallel-overlap",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-expert-parallel-overlap/SKILL.md",
+      "description": "Validate and use MoE expert-parallel communication overlap in Megatron-Bridge, including overlap_moe_expert_parallel_comm, delay_wgrad_compute, and flex dispatcher backends such as DeepEP and HybridEP.",
+      "representativeQueries": [
+        "nemo mbridge perf expert parallel overlap",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf expert parallel overlap",
+        "help me with nemo mbridge perf expert parallel overlap",
+        "optimize NeMo Megatron Bridge nemo mbridge perf expert parallel overlap",
+        "nemo mbridge perf expert parallel overlap NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-hierarchical-context-parallel",
+      "displayName": "nemo-mbridge-perf-hierarchical-context-parallel",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-hierarchical-context-parallel/SKILL.md",
+      "description": "Operational guide for enabling hierarchical context parallelism in Megatron-Bridge, including config knobs, code anchors, pitfalls, and verification.",
+      "representativeQueries": [
+        "nemo mbridge perf hierarchical context parallel",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf hierarchical context parallel",
+        "help me with nemo mbridge perf hierarchical context parallel",
+        "configure NeMo Megatron Bridge nemo mbridge perf hierarchical context parallel",
+        "nemo mbridge perf hierarchical context parallel NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-megatron-fsdp",
+      "displayName": "nemo-mbridge-perf-megatron-fsdp",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-megatron-fsdp/SKILL.md",
+      "description": "Operational guide for enabling Megatron FSDP in Megatron-Bridge, including config knobs, code anchors, pitfalls, and verification.",
+      "representativeQueries": [
+        "operational guide for enabling Megatron FSDP in Megatron-Bridge, including config knobs, code anchors, pitfalls, and verification",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf megatron fsdp",
+        "help me with nemo mbridge perf megatron fsdp",
+        "configure NeMo Megatron Bridge nemo mbridge perf megatron fsdp",
+        "nemo mbridge perf megatron fsdp NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-memory-tuning",
+      "displayName": "nemo-mbridge-perf-memory-tuning",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-memory-tuning/SKILL.md",
+      "description": "Techniques for reducing peak GPU memory in Megatron Bridge \u2014 expandable segments, PEFT + SP input re-gather, parallelism resizing, activation recompute, CPU offloading constraints, and common OOM fixes.",
+      "representativeQueries": [
+        "nemo mbridge perf memory tuning",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf memory tuning",
+        "help me with nemo mbridge perf memory tuning",
+        "optimize NeMo Megatron Bridge nemo mbridge perf memory tuning",
+        "nemo mbridge perf memory tuning NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-moe-comm-overlap",
+      "displayName": "nemo-mbridge-perf-moe-comm-overlap",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-moe-comm-overlap/SKILL.md",
+      "description": "MoE expert-parallel communication overlap in Megatron Bridge.",
+      "representativeQueries": [
+        "nemo mbridge perf moe comm overlap",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf moe comm overlap",
+        "help me with nemo mbridge perf moe comm overlap",
+        "optimize NeMo Megatron Bridge nemo mbridge perf moe comm overlap",
+        "nemo mbridge perf moe comm overlap NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-moe-dispatcher-selection",
+      "displayName": "nemo-mbridge-perf-moe-dispatcher-selection",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-moe-dispatcher-selection/SKILL.md",
+      "description": "Choose the right MoE token dispatcher (`alltoall`, DeepEP, or HybridEP) for the hardware, EP degree, and optimization stage.",
+      "representativeQueries": [
+        "nemo mbridge perf moe dispatcher selection",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf moe dispatcher selection",
+        "help me with nemo mbridge perf moe dispatcher selection",
+        "optimize NeMo Megatron Bridge nemo mbridge perf moe dispatcher selection",
+        "nemo mbridge perf moe dispatcher selection NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-moe-hardware-configs",
+      "displayName": "nemo-mbridge-perf-moe-hardware-configs",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-moe-hardware-configs/SKILL.md",
+      "description": "Representative MoE training playbooks by hardware platform and model family.",
+      "representativeQueries": [
+        "nemo mbridge perf moe hardware configs",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf moe hardware configs",
+        "help me with nemo mbridge perf moe hardware configs",
+        "optimize NeMo Megatron Bridge nemo mbridge perf moe hardware configs",
+        "nemo mbridge perf moe hardware configs NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-moe-long-context",
+      "displayName": "nemo-mbridge-perf-moe-long-context",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-moe-long-context/SKILL.md",
+      "description": "Long-context MoE training guidance for Megatron Bridge.",
+      "representativeQueries": [
+        "nemo mbridge perf moe long context",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf moe long context",
+        "help me with nemo mbridge perf moe long context",
+        "configure NeMo Megatron Bridge nemo mbridge perf moe long context",
+        "nemo mbridge perf moe long context NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-moe-optimization-workflow",
+      "displayName": "nemo-mbridge-perf-moe-optimization-workflow",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-moe-optimization-workflow/SKILL.md",
+      "description": "Systematic workflow for MoE training optimization in Megatron Bridge, based on the Megatron-Core MoE paper.",
+      "representativeQueries": [
+        "nemo mbridge perf moe optimization workflow",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf moe optimization workflow",
+        "help me with nemo mbridge perf moe optimization workflow",
+        "optimize NeMo Megatron Bridge nemo mbridge perf moe optimization workflow",
+        "nemo mbridge perf moe optimization workflow NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-moe-vlm-training",
+      "displayName": "nemo-mbridge-perf-moe-vlm-training",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-moe-vlm-training/SKILL.md",
+      "description": "Practical guidance for training MoE VLMs in Megatron Bridge.",
+      "representativeQueries": [
+        "nemo mbridge perf moe vlm training",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf moe vlm training",
+        "help me with nemo mbridge perf moe vlm training",
+        "train with NeMo Megatron Bridge nemo mbridge perf moe vlm training",
+        "nemo mbridge perf moe vlm training NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-parallelism-strategies",
+      "displayName": "nemo-mbridge-perf-parallelism-strategies",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-parallelism-strategies/SKILL.md",
+      "description": "Operational guide for choosing and combining parallelism strategies in Megatron Bridge, including sizing rules, hardware topology mapping, and combined parallelism configuration.",
+      "representativeQueries": [
+        "nemo mbridge perf parallelism strategies",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf parallelism strategies",
+        "help me with nemo mbridge perf parallelism strategies",
+        "configure NeMo Megatron Bridge nemo mbridge perf parallelism strategies",
+        "nemo mbridge perf parallelism strategies NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-sequence-packing",
+      "displayName": "nemo-mbridge-perf-sequence-packing",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-sequence-packing/SKILL.md",
+      "description": "Validate and use packed sequences and long-context training in Megatron-Bridge, distinguishing offline packed SFT for LLMs from in-batch packing for VLMs, and applying the right CP constraints.",
+      "representativeQueries": [
+        "nemo mbridge perf sequence packing",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf sequence packing",
+        "help me with nemo mbridge perf sequence packing",
+        "configure NeMo Megatron Bridge nemo mbridge perf sequence packing",
+        "nemo mbridge perf sequence packing NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-perf-tp-dp-comm-overlap",
+      "displayName": "nemo-mbridge-perf-tp-dp-comm-overlap",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-perf-tp-dp-comm-overlap/SKILL.md",
+      "description": "Operational guide for enabling TP, DP, and PP communication overlap in Megatron-Bridge, including config knobs, code anchors, pitfalls, and verification.",
+      "representativeQueries": [
+        "nemo mbridge perf tp dp comm overlap",
+        "how do I use NeMo Megatron Bridge for nemo mbridge perf tp dp comm overlap",
+        "help me with nemo mbridge perf tp dp comm overlap",
+        "configure NeMo Megatron Bridge nemo mbridge perf tp dp comm overlap",
+        "nemo mbridge perf tp dp comm overlap NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-recipe-recommender",
+      "displayName": "nemo-mbridge-recipe-recommender",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-recipe-recommender/SKILL.md",
+      "description": "Recommend and customize Megatron Bridge recipes for a user's model, GPU count, and training goal.",
+      "representativeQueries": [
+        "nemo mbridge recipe recommender",
+        "how do I use NeMo Megatron Bridge for nemo mbridge recipe recommender",
+        "help me with nemo mbridge recipe recommender",
+        "configure NeMo Megatron Bridge nemo mbridge recipe recommender",
+        "nemo mbridge recipe recommender NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-mbridge-resiliency",
+      "displayName": "nemo-mbridge-resiliency",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-mbridge-resiliency/SKILL.md",
+      "description": "Resiliency features in Megatron Bridge including fault tolerance, straggler detection, in-process restart, preemption, and re-run state machine.",
+      "representativeQueries": [
+        "nemo mbridge resiliency",
+        "how do I use NeMo Megatron Bridge for nemo mbridge resiliency",
+        "help me with nemo mbridge resiliency",
+        "configure NeMo Megatron Bridge nemo mbridge resiliency",
+        "nemo mbridge resiliency NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-retriever",
+      "displayName": "nemo-retriever",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-retriever/SKILL.md",
+      "description": "Use when the user wants to search, query, extract, transcribe, describe, quote, filter, or aggregate across documents \u2014 PDFs, scanned forms / images (`.jpg` `.png` `.tiff`), Office (`.docx` `.pptx`), text (`.html` `.txt`), audio (`.mp3`...",
+      "representativeQueries": [
+        "nemo retriever",
+        "how do I use NeMo Retriever for nemo retriever",
+        "help me with nemo retriever",
+        "summarize with NeMo Retriever nemo retriever",
+        "nemo retriever NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-rl-auto-research",
+      "displayName": "nemo-rl-auto-research",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-rl-auto-research/SKILL.md",
+      "description": "Autonomous NeMo-RL research agent workflow for directed hypothesis testing and open-ended discovery.",
+      "representativeQueries": [
+        "nemo rl auto research",
+        "how do I use NeMo RL for nemo rl auto research",
+        "help me with nemo rl auto research",
+        "train with NeMo RL nemo rl auto research",
+        "nemo rl auto research NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-rl-brev-etiquette",
+      "displayName": "nemo-rl-brev-etiquette",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-rl-brev-etiquette/SKILL.md",
+      "description": "Brev instance operating guidance for NeMo-RL agents working in /home/ubuntu/RL with limited workspace disk, a larger /ephemeral volume, and optional /home/ubuntu/RL/.env secrets.",
+      "representativeQueries": [
+        "nemo rl brev etiquette",
+        "how do I use NeMo RL for nemo rl brev etiquette",
+        "help me with nemo rl brev etiquette",
+        "configure NeMo RL nemo rl brev etiquette",
+        "nemo rl brev etiquette NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-rl-docs",
+      "displayName": "nemo-rl-docs",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-rl-docs/SKILL.md",
+      "description": "Documentation conventions for NeMo-RL.",
+      "representativeQueries": [
+        "nemo rl docs",
+        "how do I use NeMo RL for nemo rl docs",
+        "help me with nemo rl docs",
+        "validate NeMo RL nemo rl docs",
+        "nemo rl docs NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemo-rl-session-memory",
+      "displayName": "nemo-rl-session-memory",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemo-rl-session-memory/SKILL.md",
+      "description": "Manage durable working-session memory for coding agents.",
+      "representativeQueries": [
+        "nemo rl session memory",
+        "how do I use NeMo RL for nemo rl session memory",
+        "help me with nemo rl session memory",
+        "configure NeMo RL nemo rl session memory",
+        "nemo rl session memory NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemoclaw-user-guide",
+      "displayName": "nemoclaw-user-guide",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemoclaw-user-guide/SKILL.md",
+      "description": "Guides human users' AI agents to the NemoClaw docs MCP server and canonical Fern documentation in Markdown form.",
+      "representativeQueries": [
+        "nemoclaw user guide",
+        "how do I use NemoClaw for nemoclaw user guide",
+        "help me with nemoclaw user guide",
+        "get started with NemoClaw nemoclaw user guide",
+        "nemoclaw user guide NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemotron-customize",
+      "displayName": "nemotron-customize",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemotron-customize/SKILL.md",
+      "description": "Plan, configure, and chain repo-native Nemotron customization steps into single-step or multi-step pipelines: curation, translation, SFT/PEFT (AutoModel or Megatron-Bridge), pretraining/CPT, RL alignment (DPO/RLVR/GRPO/RLHF), BYOB/MCQ...",
+      "representativeQueries": [
+        "nemotron customize",
+        "how do I use Nemotron for nemotron customize",
+        "help me with nemotron customize",
+        "train with Nemotron nemotron customize",
+        "nemotron customize NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemotron-policy-generator",
+      "displayName": "nemotron-policy-generator",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemotron-policy-generator/SKILL.md",
+      "description": "Generates BYO custom safety policies for NVIDIA Nemotron content-safety guardrails \u2014 Nemotron-Content-Safety-Reasoning-4B (text) and multimodal Nemotron-3-Content-Safety.",
+      "representativeQueries": [
+        "nemotron policy generator",
+        "how do I use Nemotron for nemotron policy generator",
+        "help me with nemotron policy generator",
+        "generate with Nemotron nemotron policy generator",
+        "nemotron policy generator NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemotron-retrieval-recipes",
+      "displayName": "nemotron-retrieval-recipes",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemotron-retrieval-recipes/SKILL.md",
+      "description": "Use when planning, debugging, tuning, evaluating, exporting, or deploying public Nemotron `embed`/`rerank` retrieval recipes.",
+      "representativeQueries": [
+        "planning, debugging, tuning, evaluating, exporting, or deploying public Nemotron `embed`/`rerank` retrieval recipes",
+        "how do I use Nemotron for nemotron retrieval recipes",
+        "help me with nemotron retrieval recipes",
+        "train with Nemotron nemotron retrieval recipes",
+        "nemotron retrieval recipes NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nemotron-speech",
+      "displayName": "nemotron-speech",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nemotron-speech/SKILL.md",
+      "description": "Routes NVIDIA Nemotron Speech (Riva) NIM tasks \u2014 deploys, runs, and tests ASR, TTS, and NMT NIMs on build.nvidia.com or self-hosted.",
+      "representativeQueries": [
+        "routes NVIDIA Nemotron Speech (Riva) NIM tasks \u2014 deploys, runs, and tests ASR, TTS, and NMT NIMs on build.nvidia.com or self-hosted",
+        "how do I use Riva for nemotron speech",
+        "help me with nemotron speech",
+        "deploy Riva nemotron speech",
+        "nemotron speech NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nv-generate-ct-rflow",
+      "displayName": "nv-generate-ct-rflow",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nv-generate-ct-rflow/SKILL.md",
+      "description": "Used for generating synthetic CT volumes and masks with NV-Generate-CTMR rflow-ct.",
+      "representativeQueries": [
+        "used for generating synthetic CT volumes and masks with NV-Generate-CTMR rflow-ct. Not for production training data without review",
+        "how do I use MONAI for nv generate ct rflow",
+        "help me with nv generate ct rflow",
+        "generate with MONAI nv generate ct rflow",
+        "nv generate ct rflow NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nv-generate-mr",
+      "displayName": "nv-generate-mr",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nv-generate-mr/SKILL.md",
+      "description": "Used for generating synthetic body MRI volumes with NV-Generate-CTMR rflow-mr.",
+      "representativeQueries": [
+        "used for generating synthetic body MRI volumes with NV-Generate-CTMR rflow-mr. Not for paired masks or production training data",
+        "how do I use MONAI for nv generate mr",
+        "help me with nv generate mr",
+        "generate with MONAI nv generate mr",
+        "nv generate mr NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nv-generate-mr-brain",
+      "displayName": "nv-generate-mr-brain",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nv-generate-mr-brain/SKILL.md",
+      "description": "Used for generating synthetic brain MRI volumes with NV-Generate-CTMR rflow-mr-brain.",
+      "representativeQueries": [
+        "used for generating synthetic brain MRI volumes with NV-Generate-CTMR rflow-mr-brain. Not for production training data",
+        "how do I use MONAI for nv generate mr brain",
+        "help me with nv generate mr brain",
+        "generate with MONAI nv generate mr brain",
+        "nv generate mr brain NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nv-generate-mr-brain-finetune",
+      "displayName": "nv-generate-mr-brain-finetune",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nv-generate-mr-brain-finetune/SKILL.md",
+      "description": "Used for finetuning NV-Generate-CTMR MR-brain diffusion UNet from a NIfTI datalist.",
+      "representativeQueries": [
+        "used for finetuning NV-Generate-CTMR MR-brain diffusion UNet from a NIfTI datalist. Not for clinical or production data approval",
+        "how do I use MONAI for nv generate mr brain finetune",
+        "help me with nv generate mr brain finetune",
+        "train with MONAI nv generate mr brain finetune",
+        "nv generate mr brain finetune NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nv-generate-vae-finetune",
+      "displayName": "nv-generate-vae-finetune",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nv-generate-vae-finetune/SKILL.md",
+      "description": "Used for finetuning the NV-Generate-CTMR MAISI VAE from CT/MRI NIfTI datalists.",
+      "representativeQueries": [
+        "used for finetuning the NV-Generate-CTMR MAISI VAE from CT/MRI NIfTI datalists. Not for clinical or production data approval",
+        "how do I use MONAI for nv generate vae finetune",
+        "help me with nv generate vae finetune",
+        "train with MONAI nv generate vae finetune",
+        "nv generate vae finetune NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nv-reason-cxr",
+      "displayName": "nv-reason-cxr",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nv-reason-cxr/SKILL.md",
+      "description": "Used for command-shape or live NV-Reason-CXR chest X-ray reasoning smoke tests.",
+      "representativeQueries": [
+        "used for command-shape or live NV-Reason-CXR chest X-ray reasoning smoke tests. Not for diagnosis or clinical reporting",
+        "how do I use MONAI for nv reason cxr",
+        "help me with nv reason cxr",
+        "evaluate MONAI nv reason cxr",
+        "nv reason cxr NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nv-segment-ct",
+      "displayName": "nv-segment-ct",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nv-segment-ct/SKILL.md",
+      "description": "Used for running NV-Segment-CT VISTA3D on CT NIfTI volumes and recording label-map evidence.",
+      "representativeQueries": [
+        "used for running NV-Segment-CT VISTA3D on CT NIfTI volumes and recording label-map evidence",
+        "how do I use MONAI for nv segment ct",
+        "help me with nv segment ct",
+        "validate MONAI nv segment ct",
+        "nv segment ct NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nv-segment-ct-finetune",
+      "displayName": "nv-segment-ct-finetune",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nv-segment-ct-finetune/SKILL.md",
+      "description": "Used for smoke or dataset finetuning of NV-Segment-CT VISTA3D on CT NIfTI labels.",
+      "representativeQueries": [
+        "used for smoke or dataset finetuning of NV-Segment-CT VISTA3D on CT NIfTI labels. Not for clinical validation",
+        "how do I use MONAI for nv segment ct finetune",
+        "help me with nv segment ct finetune",
+        "train with MONAI nv segment ct finetune",
+        "nv segment ct finetune NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:nv-segment-ctmr",
+      "displayName": "nv-segment-ctmr",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/nv-segment-ctmr/SKILL.md",
+      "description": "Used for running NV-Segment-CTMR on CT or MRI NIfTI volumes and recording label-map evidence.",
+      "representativeQueries": [
+        "used for running NV-Segment-CTMR on CT or MRI NIfTI volumes and recording label-map evidence. Not for clinical interpretation",
+        "how do I use MONAI for nv segment ctmr",
+        "help me with nv segment ctmr",
+        "validate MONAI nv segment ctmr",
+        "nv segment ctmr NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:omniverse-cad-to-simready",
+      "displayName": "omniverse-cad-to-simready",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/omniverse-cad-to-simready/SKILL.md",
+      "description": "Coordinate the end-to-end CAD/source-asset to SimReady workflow.",
+      "representativeQueries": [
+        "omniverse cad to simready",
+        "how do I use Omniverse for omniverse cad to simready",
+        "help me with omniverse cad to simready",
+        "validate Omniverse omniverse cad to simready",
+        "omniverse cad to simready NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:omniverse-realtime-viewer",
+      "displayName": "omniverse-realtime-viewer",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/omniverse-realtime-viewer/SKILL.md",
+      "description": "Use as the top-level router for Omniverse Realtime Viewer USD app requests and focused viewer reference documents.",
+      "representativeQueries": [
+        "use as the top-level router for Omniverse Realtime Viewer USD app requests and focused viewer reference documents",
+        "how do I use Omniverse for omniverse realtime viewer",
+        "help me with omniverse realtime viewer",
+        "deploy Omniverse omniverse realtime viewer",
+        "omniverse realtime viewer NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:omniverse-usd-performance-tuning",
+      "displayName": "omniverse-usd-performance-tuning",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/omniverse-usd-performance-tuning/SKILL.md",
+      "description": "Top-level workflow skill for USD performance diagnosis and optimization.",
+      "representativeQueries": [
+        "omniverse usd performance tuning",
+        "how do I use Omniverse for omniverse usd performance tuning",
+        "help me with omniverse usd performance tuning",
+        "optimize Omniverse omniverse usd performance tuning",
+        "omniverse usd performance tuning NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:physical-ai-defect-image-generation",
+      "displayName": "physical-ai-defect-image-generation",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/physical-ai-defect-image-generation/SKILL.md",
+      "description": "Use when the user wants to orchestrate defect image generation with NVIDIA Cosmos AnomalyGen (Cosmos-Predict2-derived) on OSMO for PCBA, metal surface, and glass inspection.",
+      "representativeQueries": [
+        "physical ai defect image generation",
+        "how do I use Physical AI Dataset for physical ai defect image generation",
+        "help me with physical ai defect image generation",
+        "generate with Physical AI Dataset physical ai defect image generation",
+        "physical ai defect image generation NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:physical-ai-infrastructure-setup-and-resilient-scaling",
+      "displayName": "physical-ai-infrastructure-setup-and-resilient-scaling",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/physical-ai-infrastructure-setup-and-resilient-scaling/SKILL.md",
+      "description": "Use when the user wants to set up, scale, validate, or harden NVIDIA physical AI infrastructure for synthetic data generation workflows across local MicroK8s or Azure AKS, including Kubernetes clusters, inference endpoint deployment,...",
+      "representativeQueries": [
+        "physical ai infrastructure setup and resilient scaling",
+        "how do I use Physical AI Dataset for physical ai infrastructure setup and resilient scaling",
+        "help me with physical ai infrastructure setup and resilient scaling",
+        "deploy Physical AI Dataset physical ai infrastructure setup and resilient scaling",
+        "physical ai infrastructure setup and resilient scaling NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:physical-ai-neural-reconstruction",
+      "displayName": "physical-ai-neural-reconstruction",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/physical-ai-neural-reconstruction/SKILL.md",
+      "description": "Router for NVIDIA NuRec/NRE: USDZ rendering, NCore conversion, 3DGS, gRPC sensor sim, PhysicalAI HF datasets.",
+      "representativeQueries": [
+        "physical ai neural reconstruction",
+        "how do I use NuRec for physical ai neural reconstruction",
+        "help me with physical ai neural reconstruction",
+        "generate with NuRec physical ai neural reconstruction",
+        "physical ai neural reconstruction NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:physical-ai-people-attribute-search",
+      "displayName": "physical-ai-people-attribute-search",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/physical-ai-people-attribute-search/SKILL.md",
+      "description": "Use when running people attribute search (PAS) image augmentation and auto-labeling workflows on OSMO: flow selection, preflight, submit-time interpolation, monitoring, and output retrieval.",
+      "representativeQueries": [
+        "physical ai people attribute search",
+        "how do I use Physical AI Dataset for physical ai people attribute search",
+        "help me with physical ai people attribute search",
+        "generate with Physical AI Dataset physical ai people attribute search",
+        "physical ai people attribute search NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:physical-ai-video-data-augmentation",
+      "displayName": "physical-ai-video-data-augmentation",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/physical-ai-video-data-augmentation/SKILL.md",
+      "description": "Use when running video data augmentation and auto-labeling workflows on OSMO: flow selection, preflight, submit-time interpolation, monitoring, and output retrieval.",
+      "representativeQueries": [
+        "physical ai video data augmentation",
+        "how do I use Physical AI Dataset for physical ai video data augmentation",
+        "help me with physical ai video data augmentation",
+        "generate with Physical AI Dataset physical ai video data augmentation",
+        "physical ai video data augmentation NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:physicsnemo-discover",
+      "displayName": "physicsnemo-discover",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/physicsnemo-discover/SKILL.md",
+      "description": "Official NVIDIA-authored guidance for navigating PhysicsNeMo \u2014 pick the model, datapipe, or example for a SciML/AI4Science task (surrogates, forecasting, downscaling, physics-informed, inverse, generative).",
+      "representativeQueries": [
+        "physicsnemo discover",
+        "how do I use PhysicsNeMo for physicsnemo discover",
+        "help me with physicsnemo discover",
+        "validate PhysicsNeMo physicsnemo discover",
+        "physicsnemo discover NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:rag-blueprint",
+      "displayName": "rag-blueprint",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/rag-blueprint/SKILL.md",
+      "description": "NVIDIA RAG Blueprint \u2014 deploy, configure, troubleshoot, and manage.",
+      "representativeQueries": [
+        "rag blueprint",
+        "how do I use RAG for rag blueprint",
+        "help me with rag blueprint",
+        "deploy RAG rag blueprint",
+        "rag blueprint NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:rag-eval",
+      "displayName": "rag-eval",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/rag-eval/SKILL.md",
+      "description": "Filesystem RAG benchmarks: corpus/, train.json, evaluate_rag.py (RAGAS quality).",
+      "representativeQueries": [
+        "rag eval",
+        "how do I use RAG for rag eval",
+        "help me with rag eval",
+        "evaluate RAG rag eval",
+        "rag eval NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:rag-perf",
+      "displayName": "rag-perf",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/rag-perf/SKILL.md",
+      "description": "Performance benchmarking for a deployed NVIDIA RAG Blueprint server: profiling pass + aiperf load test driven by a single YAML config.",
+      "representativeQueries": [
+        "rag perf",
+        "how do I use RAG for rag perf",
+        "help me with rag perf",
+        "optimize RAG rag perf",
+        "rag perf NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:skill-card-generator",
+      "displayName": "skill-card-generator",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/skill-card-generator/SKILL.md",
+      "description": "Use only to generate or update a governance skill card for a specified existing agent skill directory.",
+      "representativeQueries": [
+        "skill card generator",
+        "how do I use Trustworthy AI for skill card generator",
+        "help me with skill card generator",
+        "generate with Trustworthy AI skill card generator",
+        "skill card generator NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-analyze-changenet-rca",
+      "displayName": "tao-analyze-changenet-rca",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-analyze-changenet-rca/SKILL.md",
+      "description": "Performs deep Root Cause Analysis (RCA) on NVIDIA TAO Visual ChangeNet classification experiments with image-evidence-driven investigation.",
+      "representativeQueries": [
+        "tao analyze changenet rca",
+        "how do I use TAO Toolkit for tao analyze changenet rca",
+        "help me with tao analyze changenet rca",
+        "troubleshoot TAO Toolkit tao analyze changenet rca",
+        "tao analyze changenet rca NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-analyze-gaps-visual-changenet",
+      "displayName": "tao-analyze-gaps-visual-changenet",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-analyze-gaps-visual-changenet/SKILL.md",
+      "description": "Performs gap analysis on NVIDIA TAO VCN Classify (Visual Component Net) experiments by invoking the data-services container (`tao_toolkit.data_services` from `versions.yaml`) directly via `docker run \u2026 gap_analysis vcn_aoi \u2026` \u2014 picks...",
+      "representativeQueries": [
+        "tao analyze gaps visual changenet",
+        "how do I use TAO Toolkit for tao analyze gaps visual changenet",
+        "help me with tao analyze gaps visual changenet",
+        "evaluate TAO Toolkit tao analyze gaps visual changenet",
+        "tao analyze gaps visual changenet NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-analyze-gaps-vlm-bcq",
+      "displayName": "tao-analyze-gaps-vlm-bcq",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-analyze-gaps-vlm-bcq/SKILL.md",
+      "description": "Extract false-positive and false-negative gaps from VLM binary-classification-question (BCQ, yes/no) predictions.",
+      "representativeQueries": [
+        "tao analyze gaps vlm bcq",
+        "how do I use TAO for tao analyze gaps vlm bcq",
+        "help me with tao analyze gaps vlm bcq",
+        "evaluate TAO tao analyze gaps vlm bcq",
+        "tao analyze gaps vlm bcq NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-convert-dataset-format",
+      "displayName": "tao-convert-dataset-format",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-convert-dataset-format/SKILL.md",
+      "description": "Run `tao-daft convert` to convert NVIDIA TAO DAFT datasets between supported formats.",
+      "representativeQueries": [
+        "tao convert dataset format",
+        "how do I use TAO for tao convert dataset format",
+        "help me with tao convert dataset format",
+        "transform data with TAO tao convert dataset format",
+        "tao convert dataset format NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-finetune-clip",
+      "displayName": "tao-finetune-clip",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-finetune-clip/SKILL.md",
+      "description": "CLIP vision-language model for image-text retrieval, zero-shot classification, embedding extraction, ONNX export, and TensorRT deployment.",
+      "representativeQueries": [
+        "tao finetune clip",
+        "how do I use TAO Toolkit for tao finetune clip",
+        "help me with tao finetune clip",
+        "train with TAO Toolkit tao finetune clip",
+        "tao finetune clip NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-finetune-cosmos-embed",
+      "displayName": "tao-finetune-cosmos-embed",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-finetune-cosmos-embed/SKILL.md",
+      "description": "Cosmos-Embed1 video-text embedding for text-to-video retrieval, video-to-video search, semantic deduplication, and fine-tuning.",
+      "representativeQueries": [
+        "tao finetune cosmos embed",
+        "how do I use TAO Toolkit for tao finetune cosmos embed",
+        "help me with tao finetune cosmos embed",
+        "evaluate TAO Toolkit tao finetune cosmos embed",
+        "tao finetune cosmos embed NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-finetune-cosmos-reason",
+      "displayName": "tao-finetune-cosmos-reason",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-finetune-cosmos-reason/SKILL.md",
+      "description": "Cosmos3-Nano video QA supervised fine-tuning with FSDP parallelism.",
+      "representativeQueries": [
+        "tao finetune cosmos reason",
+        "how do I use Cosmos for tao finetune cosmos reason",
+        "help me with tao finetune cosmos reason",
+        "train with Cosmos tao finetune cosmos reason",
+        "tao finetune cosmos reason NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-finetune-huggingface-model",
+      "displayName": "tao-finetune-huggingface-model",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-finetune-huggingface-model/SKILL.md",
+      "description": "Fine-tune any HuggingFace CV / VLM / LLM model on local NVIDIA GPUs inside an NGC PyTorch container.",
+      "representativeQueries": [
+        "tao finetune huggingface model",
+        "how do I use TAO Toolkit for tao finetune huggingface model",
+        "help me with tao finetune huggingface model",
+        "train with TAO Toolkit tao finetune huggingface model",
+        "tao finetune huggingface model NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-generate-image-grounding",
+      "displayName": "tao-generate-image-grounding",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-generate-image-grounding/SKILL.md",
+      "description": "Two-step image grounding pipeline: extracts referring expressions from (image, caption) pairs and grounds them to pixel-space bounding boxes via a VLM.",
+      "representativeQueries": [
+        "tao generate image grounding",
+        "how do I use TAO Toolkit for tao generate image grounding",
+        "help me with tao generate image grounding",
+        "generate with TAO Toolkit tao generate image grounding",
+        "tao generate image grounding NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-generate-referring-expressions",
+      "displayName": "tao-generate-referring-expressions",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-generate-referring-expressions/SKILL.md",
+      "description": "Four-step image referring-expression pipeline: turns images plus KITTI bounding-box labels into region descriptions, scene captions, grounded referring expressions, and (optionally) verified expressions via VLM distillation.",
+      "representativeQueries": [
+        "tao generate referring expressions",
+        "how do I use TAO Toolkit for tao generate referring expressions",
+        "help me with tao generate referring expressions",
+        "generate with TAO Toolkit tao generate referring expressions",
+        "tao generate referring expressions NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-generate-video-reasoning-annotations",
+      "displayName": "tao-generate-video-reasoning-annotations",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-generate-video-reasoning-annotations/SKILL.md",
+      "description": "Multi-step video annotation pipeline that turns raw videos into Chain-of-Thought training data \u2014 multi-level captions, structured descriptions, and QA pairs (MCQ, binary, open-ended) with reasoning traces, via VLM/LLM distillation.",
+      "representativeQueries": [
+        "tao generate video reasoning annotations",
+        "how do I use TAO for tao generate video reasoning annotations",
+        "help me with tao generate video reasoning annotations",
+        "generate with TAO tao generate video reasoning annotations",
+        "tao generate video reasoning annotations NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-launch-workflow",
+      "displayName": "tao-launch-workflow",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-launch-workflow/SKILL.md",
+      "description": "Shared launch intake for any TAO workflow or action.",
+      "representativeQueries": [
+        "tao launch workflow",
+        "how do I use TAO Toolkit for tao launch workflow",
+        "help me with tao launch workflow",
+        "train with TAO Toolkit tao launch workflow",
+        "tao launch workflow NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-list-capabilities",
+      "displayName": "tao-list-capabilities",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-list-capabilities/SKILL.md",
+      "description": "Answer what the TAO Skill Bank plugin can do by generating the response from packaged application, data, model, AutoML, and platform manifests.",
+      "representativeQueries": [
+        "tao list capabilities",
+        "how do I use TAO Toolkit for tao list capabilities",
+        "help me with tao list capabilities",
+        "summarize with TAO Toolkit tao list capabilities",
+        "tao list capabilities NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-mine-aoi-images",
+      "displayName": "tao-mine-aoi-images",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-mine-aoi-images/SKILL.md",
+      "description": "Runs the DEFT embed-then-mine workflow for VCN AOI iterations \u2014 embeds the gap-analysis target parquet, embeds a source pool, and mines nearest-neighbour source images for downstream augmentation.",
+      "representativeQueries": [
+        "tao mine aoi images",
+        "how do I use TAO Toolkit for tao mine aoi images",
+        "help me with tao mine aoi images",
+        "transform data with TAO Toolkit tao mine aoi images",
+        "tao mine aoi images NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-port-huggingface-model",
+      "displayName": "tao-port-huggingface-model",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-port-huggingface-model/SKILL.md",
+      "description": "Integrate a HuggingFace Computer Vision model into the NVIDIA TAO Toolkit ecosystem (tao-core config, tao-pytorch trainer, tao-deploy TensorRT pipeline).",
+      "representativeQueries": [
+        "tao port huggingface model",
+        "how do I use TAO Toolkit for tao port huggingface model",
+        "help me with tao port huggingface model",
+        "integrate TAO Toolkit tao port huggingface model",
+        "tao port huggingface model NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-route-visual-changenet-samples",
+      "displayName": "tao-route-visual-changenet-samples",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-route-visual-changenet-samples/SKILL.md",
+      "description": "Routes the weakest VCN samples (output of `tao-analyze-gaps-visual-changenet`) into per-augmentation-module subsets based on each module's label eligibility.",
+      "representativeQueries": [
+        "tao route visual changenet samples",
+        "how do I use TAO Toolkit for tao route visual changenet samples",
+        "help me with tao route visual changenet samples",
+        "transform data with TAO Toolkit tao route visual changenet samples",
+        "tao route visual changenet samples NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-run-automl",
+      "displayName": "tao-run-automl",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-run-automl/SKILL.md",
+      "description": "Run AutoML / hyperparameter optimization (HPO) for NVIDIA TAO networks using AutoMLRunner.",
+      "representativeQueries": [
+        "tao run automl",
+        "how do I use TAO Toolkit for tao run automl",
+        "help me with tao run automl",
+        "optimize TAO Toolkit tao run automl",
+        "tao run automl NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-run-automl-deft-pipeline",
+      "displayName": "tao-run-automl-deft-pipeline",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-run-automl-deft-pipeline/SKILL.md",
+      "description": "Run the canonical NVIDIA AOI three-phase training pipeline \u2014 Phase 1 AutoML baseline (HPO), Phase 2 DEFT loop (RCA \u2192 SDG \u2192 mining \u2192 plain-train retrain), Phase 3 AutoML refinement on the DEFT-augmented dataset.",
+      "representativeQueries": [
+        "tao run automl deft pipeline",
+        "how do I use TAO Toolkit for tao run automl deft pipeline",
+        "help me with tao run automl deft pipeline",
+        "train with TAO Toolkit tao run automl deft pipeline",
+        "tao run automl deft pipeline NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-run-deft-aoi",
+      "displayName": "tao-run-deft-aoi",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-run-deft-aoi/SKILL.md",
+      "description": "Run the full DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection models: baseline evaluate, RCA, Cosmos AnomalyGen / AMP synthetic defects, k-NN mining, retraining, and deployment gating until FAR /...",
+      "representativeQueries": [
+        "tao run deft aoi",
+        "how do I use TAO Toolkit for tao run deft aoi",
+        "help me with tao run deft aoi",
+        "train with TAO Toolkit tao run deft aoi",
+        "tao run deft aoi NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-run-inference-service",
+      "displayName": "tao-run-inference-service",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-run-inference-service/SKILL.md",
+      "description": "Start, query, and stop a network-specific TAO inference microservice ({network_arch}-inference-microservice) by delegating container execution to the appropriate platform skill.",
+      "representativeQueries": [
+        "tao run inference service",
+        "how do I use TAO Toolkit for tao run inference service",
+        "help me with tao run inference service",
+        "deploy TAO Toolkit tao run inference service",
+        "tao run inference service NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-run-on-brev",
+      "displayName": "tao-run-on-brev",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-run-on-brev/SKILL.md",
+      "description": "Brev managed GPU instances with Docker support.",
+      "representativeQueries": [
+        "tao run on brev",
+        "how do I use Brev for tao run on brev",
+        "help me with tao run on brev",
+        "deploy Brev tao run on brev",
+        "tao run on brev NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-run-on-kubernetes",
+      "displayName": "tao-run-on-kubernetes",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-run-on-kubernetes/SKILL.md",
+      "description": "Kubernetes execution platform \u2014 submits TAO container jobs as single-pod k8s Jobs with NVIDIA GPU scheduling.",
+      "representativeQueries": [
+        "tao run on kubernetes",
+        "how do I use TAO Toolkit for tao run on kubernetes",
+        "help me with tao run on kubernetes",
+        "deploy TAO Toolkit tao run on kubernetes",
+        "tao run on kubernetes NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-run-on-lepton",
+      "displayName": "tao-run-on-lepton",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-run-on-lepton/SKILL.md",
+      "description": "DGX Cloud Lepton managed GPU compute platform with run/status/cancel interface.",
+      "representativeQueries": [
+        "tao run on lepton",
+        "how do I use DGX Cloud for tao run on lepton",
+        "help me with tao run on lepton",
+        "deploy DGX Cloud tao run on lepton",
+        "tao run on lepton NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-run-on-local-docker",
+      "displayName": "tao-run-on-local-docker",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-run-on-local-docker/SKILL.md",
+      "description": "Local or remote Docker execution for TAO SDK job containers using a Docker daemon with NVIDIA GPU runtime.",
+      "representativeQueries": [
+        "tao run on local docker",
+        "how do I use TAO for tao run on local docker",
+        "help me with tao run on local docker",
+        "operate TAO tao run on local docker",
+        "tao run on local docker NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-run-on-slurm",
+      "displayName": "tao-run-on-slurm",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-run-on-slurm/SKILL.md",
+      "description": "Remote SLURM GPU cluster execution over SSH with sbatch/srun, Pyxis/Enroot containers, and Lustre-backed results.",
+      "representativeQueries": [
+        "tao run on slurm",
+        "how do I use TAO for tao run on slurm",
+        "help me with tao run on slurm",
+        "train with TAO tao run on slurm",
+        "tao run on slurm NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-run-platform",
+      "displayName": "tao-run-platform",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-run-platform/SKILL.md",
+      "description": "TAO Execution SDK for submitting and monitoring GPU training jobs on supported platforms (Brev, SLURM, local Docker, Kubernetes).",
+      "representativeQueries": [
+        "tao run platform",
+        "how do I use TAO Toolkit API for tao run platform",
+        "help me with tao run platform",
+        "train with TAO Toolkit API tao run platform",
+        "tao run platform NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-setup-nvidia-gpu-host",
+      "displayName": "tao-setup-nvidia-gpu-host",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-setup-nvidia-gpu-host/SKILL.md",
+      "description": "Host setup for TAO GPU backends. Checks and, after user approval, installs NVIDIA driver branch 580, CUDA Toolkit 13.0, and NVIDIA Container Toolkit 1.19.0 for Docker/local-Docker and Kubernetes GPU worker hosts. The `--check-only` path...",
+      "representativeQueries": [
+        "tao setup nvidia gpu host",
+        "how do I use TAO Toolkit for tao setup nvidia gpu host",
+        "help me with tao setup nvidia gpu host",
+        "configure TAO Toolkit tao setup nvidia gpu host",
+        "tao setup nvidia gpu host NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-action-recognition",
+      "displayName": "tao-train-action-recognition",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-action-recognition/SKILL.md",
+      "description": "Action recognition from video sequences.",
+      "representativeQueries": [
+        "tao train action recognition",
+        "how do I use TAO Toolkit for tao train action recognition",
+        "help me with tao train action recognition",
+        "train with TAO Toolkit tao train action recognition",
+        "tao train action recognition NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-bevfusion",
+      "displayName": "tao-train-bevfusion",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-bevfusion/SKILL.md",
+      "description": "BEVFusion for multi-sensor 3D object detection.",
+      "representativeQueries": [
+        "tao train bevfusion",
+        "how do I use TAO Toolkit for tao train bevfusion",
+        "help me with tao train bevfusion",
+        "train with TAO Toolkit tao train bevfusion",
+        "tao train bevfusion NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-centerpose",
+      "displayName": "tao-train-centerpose",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-centerpose/SKILL.md",
+      "description": "CenterPose for keypoint / pose estimation.",
+      "representativeQueries": [
+        "tao train centerpose",
+        "how do I use TAO Toolkit for tao train centerpose",
+        "help me with tao train centerpose",
+        "train with TAO Toolkit tao train centerpose",
+        "tao train centerpose NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-deformable-detr",
+      "displayName": "tao-train-deformable-detr",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-deformable-detr/SKILL.md",
+      "description": "Deformable DETR for 2D object detection.",
+      "representativeQueries": [
+        "tao train deformable detr",
+        "how do I use TAO Toolkit for tao train deformable detr",
+        "help me with tao train deformable detr",
+        "train with TAO Toolkit tao train deformable detr",
+        "tao train deformable detr NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-depth-anything-v2",
+      "displayName": "tao-train-depth-anything-v2",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-depth-anything-v2/SKILL.md",
+      "description": "Monocular depth estimation using Metric Depth Anything v2 or Relative Depth Anything architectures.",
+      "representativeQueries": [
+        "tao train depth anything v2",
+        "how do I use TAO Toolkit for tao train depth anything v2",
+        "help me with tao train depth anything v2",
+        "train with TAO Toolkit tao train depth anything v2",
+        "tao train depth anything v2 NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-dino",
+      "displayName": "tao-train-dino",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-dino/SKILL.md",
+      "description": "DINO (DETR with Improved DeNoising Anchor Boxes) for 2D object detection.",
+      "representativeQueries": [
+        "tao train dino",
+        "how do I use TAO Toolkit for tao train dino",
+        "help me with tao train dino",
+        "train with TAO Toolkit tao train dino",
+        "tao train dino NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-fast-foundation-stereo",
+      "displayName": "tao-train-fast-foundation-stereo",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-fast-foundation-stereo/SKILL.md",
+      "description": "Real-time stereo depth estimation using FastFoundationStereo (FFS), the distilled bp2 commercial variant of FoundationStereo.",
+      "representativeQueries": [
+        "tao train fast foundation stereo",
+        "how do I use TAO Toolkit for tao train fast foundation stereo",
+        "help me with tao train fast foundation stereo",
+        "train with TAO Toolkit tao train fast foundation stereo",
+        "tao train fast foundation stereo NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-foundation-stereo",
+      "displayName": "tao-train-foundation-stereo",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-foundation-stereo/SKILL.md",
+      "description": "Stereo depth estimation using FoundationStereo.",
+      "representativeQueries": [
+        "tao train foundation stereo",
+        "how do I use TAO Toolkit for tao train foundation stereo",
+        "help me with tao train foundation stereo",
+        "train with TAO Toolkit tao train foundation stereo",
+        "tao train foundation stereo NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-grounding-dino",
+      "displayName": "tao-train-grounding-dino",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-grounding-dino/SKILL.md",
+      "description": "Grounding DINO for open-set object detection.",
+      "representativeQueries": [
+        "tao train grounding dino",
+        "how do I use TAO Toolkit for tao train grounding dino",
+        "help me with tao train grounding dino",
+        "train with TAO Toolkit tao train grounding dino",
+        "tao train grounding dino NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-image-classification",
+      "displayName": "tao-train-image-classification",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-image-classification/SKILL.md",
+      "description": "PyTorch-based TAO image classification.",
+      "representativeQueries": [
+        "tao train image classification",
+        "how do I use TAO Toolkit for tao train image classification",
+        "help me with tao train image classification",
+        "train with TAO Toolkit tao train image classification",
+        "tao train image classification NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-mask-auto-encoder",
+      "displayName": "tao-train-mask-auto-encoder",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-mask-auto-encoder/SKILL.md",
+      "description": "Masked Auto-Encoder (MAE) for self-supervised pretraining and fine-tuning.",
+      "representativeQueries": [
+        "tao train mask auto encoder",
+        "how do I use TAO Toolkit for tao train mask auto encoder",
+        "help me with tao train mask auto encoder",
+        "train with TAO Toolkit tao train mask auto encoder",
+        "tao train mask auto encoder NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-mask-auto-label",
+      "displayName": "tao-train-mask-auto-label",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-mask-auto-label/SKILL.md",
+      "description": "MAL (Mask Auto-Label) for weakly-supervised segmentation.",
+      "representativeQueries": [
+        "tao train mask auto label",
+        "how do I use TAO Toolkit for tao train mask auto label",
+        "help me with tao train mask auto label",
+        "train with TAO Toolkit tao train mask auto label",
+        "tao train mask auto label NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-mask-grounding-dino",
+      "displayName": "tao-train-mask-grounding-dino",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-mask-grounding-dino/SKILL.md",
+      "description": "Mask Grounding DINO for grounded instance segmentation.",
+      "representativeQueries": [
+        "tao train mask grounding dino",
+        "how do I use TAO Toolkit for tao train mask grounding dino",
+        "help me with tao train mask grounding dino",
+        "train with TAO Toolkit tao train mask grounding dino",
+        "tao train mask grounding dino NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-mask2former",
+      "displayName": "tao-train-mask2former",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-mask2former/SKILL.md",
+      "description": "Mask2Former for universal image segmentation (panoptic, instance, and semantic).",
+      "representativeQueries": [
+        "tao train mask2former",
+        "how do I use TAO Toolkit for tao train mask2former",
+        "help me with tao train mask2former",
+        "train with TAO Toolkit tao train mask2former",
+        "tao train mask2former NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-metric-learning-recognition",
+      "displayName": "tao-train-metric-learning-recognition",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-metric-learning-recognition/SKILL.md",
+      "description": "Metric-learning recognition (ml-recog) for fine-grained visual recognition.",
+      "representativeQueries": [
+        "tao train metric learning recognition",
+        "how do I use TAO Toolkit for tao train metric learning recognition",
+        "help me with tao train metric learning recognition",
+        "train with TAO Toolkit tao train metric learning recognition",
+        "tao train metric learning recognition NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-nvdinov2",
+      "displayName": "tao-train-nvdinov2",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-nvdinov2/SKILL.md",
+      "description": "NVDINOv2 for self-supervised visual representation learning.",
+      "representativeQueries": [
+        "tao train nvdinov2",
+        "how do I use TAO Toolkit for tao train nvdinov2",
+        "help me with tao train nvdinov2",
+        "train with TAO Toolkit tao train nvdinov2",
+        "tao train nvdinov2 NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-nvpanoptix3d",
+      "displayName": "tao-train-nvpanoptix3d",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-nvpanoptix3d/SKILL.md",
+      "description": "NVPanoptix3D for panoptic 3D scene reconstruction from posed RGB images.",
+      "representativeQueries": [
+        "tao train nvpanoptix3d",
+        "how do I use TAO Toolkit for tao train nvpanoptix3d",
+        "help me with tao train nvpanoptix3d",
+        "train with TAO Toolkit tao train nvpanoptix3d",
+        "tao train nvpanoptix3d NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-ocdnet",
+      "displayName": "tao-train-ocdnet",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-ocdnet/SKILL.md",
+      "description": "OCDNet for scene text detection. Detects arbitrary-oriented text regions in natural images using a differentiable binarization approach. Use when training, evaluating, exporting, pruning, quantizing, retraining, or running inference for...",
+      "representativeQueries": [
+        "tao train ocdnet",
+        "how do I use TAO Toolkit for tao train ocdnet",
+        "help me with tao train ocdnet",
+        "train with TAO Toolkit tao train ocdnet",
+        "tao train ocdnet NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-ocrnet",
+      "displayName": "tao-train-ocrnet",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-ocrnet/SKILL.md",
+      "description": "OCRNet for scene text recognition. Recognizes text content from cropped text-region images and supports CTC and attention-based decoders. Use when training, evaluating, exporting, pruning, quantizing, retraining, or running inference...",
+      "representativeQueries": [
+        "tao train ocrnet",
+        "how do I use TAO Toolkit for tao train ocrnet",
+        "help me with tao train ocrnet",
+        "train with TAO Toolkit tao train ocrnet",
+        "tao train ocrnet NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-oneformer",
+      "displayName": "tao-train-oneformer",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-oneformer/SKILL.md",
+      "description": "OneFormer for universal image segmentation.",
+      "representativeQueries": [
+        "tao train oneformer",
+        "how do I use TAO Toolkit for tao train oneformer",
+        "help me with tao train oneformer",
+        "train with TAO Toolkit tao train oneformer",
+        "tao train oneformer NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-optical-inspection",
+      "displayName": "tao-train-optical-inspection",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-optical-inspection/SKILL.md",
+      "description": "Optical Inspection for defect detection using Siamese networks.",
+      "representativeQueries": [
+        "tao train optical inspection",
+        "how do I use TAO Toolkit for tao train optical inspection",
+        "help me with tao train optical inspection",
+        "train with TAO Toolkit tao train optical inspection",
+        "tao train optical inspection NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-pointpillars",
+      "displayName": "tao-train-pointpillars",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-pointpillars/SKILL.md",
+      "description": "PointPillars for 3D object detection from LiDAR point clouds.",
+      "representativeQueries": [
+        "tao train pointpillars",
+        "how do I use TAO Toolkit for tao train pointpillars",
+        "help me with tao train pointpillars",
+        "train with TAO Toolkit tao train pointpillars",
+        "tao train pointpillars NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-pose-classification",
+      "displayName": "tao-train-pose-classification",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-pose-classification/SKILL.md",
+      "description": "Pose classification using ST-GCN (Spatial Temporal Graph Convolutional Network).",
+      "representativeQueries": [
+        "tao train pose classification",
+        "how do I use TAO Toolkit for tao train pose classification",
+        "help me with tao train pose classification",
+        "train with TAO Toolkit tao train pose classification",
+        "tao train pose classification NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-reid",
+      "displayName": "tao-train-reid",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-reid/SKILL.md",
+      "description": "Person re-identification (ReID). Learns discriminative embeddings to match the same person across different camera views, based on metric learning. Use when training, evaluating, exporting, or running inference for a TAO person...",
+      "representativeQueries": [
+        "tao train reid",
+        "how do I use TAO Toolkit for tao train reid",
+        "help me with tao train reid",
+        "train with TAO Toolkit tao train reid",
+        "tao train reid NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-rtdetr",
+      "displayName": "tao-train-rtdetr",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-rtdetr/SKILL.md",
+      "description": "RT-DETR (Real-Time DEtection TRansformer) for 2D object detection.",
+      "representativeQueries": [
+        "tao train rtdetr",
+        "how do I use TAO Toolkit for tao train rtdetr",
+        "help me with tao train rtdetr",
+        "train with TAO Toolkit tao train rtdetr",
+        "tao train rtdetr NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-segformer",
+      "displayName": "tao-train-segformer",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-segformer/SKILL.md",
+      "description": "SegFormer for semantic segmentation.",
+      "representativeQueries": [
+        "tao train segformer",
+        "how do I use TAO Toolkit for tao train segformer",
+        "help me with tao train segformer",
+        "train with TAO Toolkit tao train segformer",
+        "tao train segformer NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-single-step",
+      "displayName": "tao-train-single-step",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-single-step/SKILL.md",
+      "description": "Standard single-step train/eval/export workflow for any TAO model.",
+      "representativeQueries": [
+        "tao train single step",
+        "how do I use TAO Toolkit for tao train single step",
+        "help me with tao train single step",
+        "train with TAO Toolkit tao train single step",
+        "tao train single step NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-sparse4d",
+      "displayName": "tao-train-sparse4d",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-sparse4d/SKILL.md",
+      "description": "Sparse4D for multi-camera temporal 3D object detection and tracking.",
+      "representativeQueries": [
+        "tao train sparse4d",
+        "how do I use TAO Toolkit for tao train sparse4d",
+        "help me with tao train sparse4d",
+        "train with TAO Toolkit tao train sparse4d",
+        "tao train sparse4d NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-train-visual-changenet",
+      "displayName": "tao-train-visual-changenet",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-train-visual-changenet/SKILL.md",
+      "description": "Visual ChangeNet for binary image classification and segmentation in AOI defect detection.",
+      "representativeQueries": [
+        "tao train visual changenet",
+        "how do I use TAO Toolkit for tao train visual changenet",
+        "help me with tao train visual changenet",
+        "train with TAO Toolkit tao train visual changenet",
+        "tao train visual changenet NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tao-validate-dataset-format",
+      "displayName": "tao-validate-dataset-format",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tao-validate-dataset-format/SKILL.md",
+      "description": "Run `tao-daft validate` to check NVIDIA TAO DAFT datasets for structure, schema, and cross-reference errors.",
+      "representativeQueries": [
+        "tao validate dataset format",
+        "how do I use TAO Toolkit for tao validate dataset format",
+        "help me with tao validate dataset format",
+        "validate TAO Toolkit tao validate dataset format",
+        "tao validate dataset format NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tilegym-adding-cutile-kernel",
+      "displayName": "tilegym-adding-cutile-kernel",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tilegym-adding-cutile-kernel/SKILL.md",
+      "description": "Add a new cuTile GPU kernel operator to TileGym.",
+      "representativeQueries": [
+        "tilegym adding cutile kernel",
+        "how do I use CUDA Tile for tilegym adding cutile kernel",
+        "help me with tilegym adding cutile kernel",
+        "integrate CUDA Tile tilegym adding cutile kernel",
+        "tilegym adding cutile kernel NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tilegym-converting-cutile-to-julia",
+      "displayName": "tilegym-converting-cutile-to-julia",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tilegym-converting-cutile-to-julia/SKILL.md",
+      "description": "Converts cuTile Python GPU kernels (@ct.kernel) to cuTile.jl Julia equivalents.",
+      "representativeQueries": [
+        "tilegym converting cutile to julia",
+        "how do I use CUDA Tile for tilegym converting cutile to julia",
+        "help me with tilegym converting cutile to julia",
+        "migrate to CUDA Tile tilegym converting cutile to julia",
+        "tilegym converting cutile to julia NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tilegym-converting-cutile-to-triton",
+      "displayName": "tilegym-converting-cutile-to-triton",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tilegym-converting-cutile-to-triton/SKILL.md",
+      "description": "Converts cuTile GPU kernels (@ct.kernel) to Triton (@triton.jit).",
+      "representativeQueries": [
+        "tilegym converting cutile to triton",
+        "how do I use CUDA Tile for tilegym converting cutile to triton",
+        "help me with tilegym converting cutile to triton",
+        "optimize CUDA Tile tilegym converting cutile to triton",
+        "tilegym converting cutile to triton NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tilegym-cutile-autotuning",
+      "displayName": "tilegym-cutile-autotuning",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tilegym-cutile-autotuning/SKILL.md",
+      "description": "Use when adding, modifying, optimizing, or debugging CuTile autotuning code.",
+      "representativeQueries": [
+        "tilegym cutile autotuning",
+        "how do I use CUDA Tile for tilegym cutile autotuning",
+        "help me with tilegym cutile autotuning",
+        "optimize CUDA Tile tilegym cutile autotuning",
+        "tilegym cutile autotuning NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tilegym-cutile-python",
+      "displayName": "tilegym-cutile-python",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tilegym-cutile-python/SKILL.md",
+      "description": "Expert cuTile programming assistant.",
+      "representativeQueries": [
+        "tilegym cutile python",
+        "how do I use CUDA Tile for tilegym cutile python",
+        "help me with tilegym cutile python",
+        "generate with CUDA Tile tilegym cutile python",
+        "tilegym cutile python NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tilegym-improve-cutile-kernel-perf",
+      "displayName": "tilegym-improve-cutile-kernel-perf",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tilegym-improve-cutile-kernel-perf/SKILL.md",
+      "description": "Iteratively optimize cuTile kernel performance through systematic profiling, bottleneck analysis, IR comparison, and targeted tuning.",
+      "representativeQueries": [
+        "tilegym improve cutile kernel perf",
+        "how do I use CUDA Tile for tilegym improve cutile kernel perf",
+        "help me with tilegym improve cutile kernel perf",
+        "optimize CUDA Tile tilegym improve cutile kernel perf",
+        "tilegym improve cutile kernel perf NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:tilegym-monkey-patch-kernels-to-transformers",
+      "displayName": "tilegym-monkey-patch-kernels-to-transformers",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/tilegym-monkey-patch-kernels-to-transformers/SKILL.md",
+      "description": "Integrate TileGym kernels into Hugging Face `transformers` models by replacing the library's submodule(s) and certain class(es)' implementations, and patching certain class(es)' init/forward/load weight methods prior to instantiating...",
+      "representativeQueries": [
+        "tilegym monkey patch kernels to transformers",
+        "how do I use CUDA Tile for tilegym monkey patch kernels to transformers",
+        "help me with tilegym monkey patch kernels to transformers",
+        "integrate CUDA Tile tilegym monkey patch kernels to transformers",
+        "tilegym monkey patch kernels to transformers NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-ask-video",
+      "displayName": "vss-ask-video",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-ask-video/SKILL.md",
+      "description": "Use this skill to ask the VSS agent's video_understanding tool a fresh visual question about a recorded clip.",
+      "representativeQueries": [
+        "vss ask video",
+        "how do I use Video Search and Summarization (VSS) for vss ask video",
+        "help me with vss ask video",
+        "summarize with Video Search and Summarization (VSS) vss ask video",
+        "vss ask video NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-deploy-dense-captioning",
+      "displayName": "vss-deploy-dense-captioning",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-deploy-dense-captioning/SKILL.md",
+      "description": "Use this skill when deploying standalone RT-VLM dense captioning or calling its REST API (uploads, captions, streams, chat-completions, Kafka).",
+      "representativeQueries": [
+        "vss deploy dense captioning",
+        "how do I use Video Search and Summarization (VSS) for vss deploy dense captioning",
+        "help me with vss deploy dense captioning",
+        "deploy Video Search and Summarization (VSS) vss deploy dense captioning",
+        "vss deploy dense captioning NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-deploy-detection-tracking-2d",
+      "displayName": "vss-deploy-detection-tracking-2d",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-deploy-detection-tracking-2d/SKILL.md",
+      "description": "Use this skill when the user wants to deploy, run, debug, tear down, or call the REST API of the RTVI-CV 2D detection / tracking microservice.",
+      "representativeQueries": [
+        "vss deploy detection tracking 2d",
+        "how do I use Video Search and Summarization (VSS) for vss deploy detection tracking 2d",
+        "help me with vss deploy detection tracking 2d",
+        "deploy Video Search and Summarization (VSS) vss deploy detection tracking 2d",
+        "vss deploy detection tracking 2d NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-deploy-detection-tracking-3d",
+      "displayName": "vss-deploy-detection-tracking-3d",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-deploy-detection-tracking-3d/SKILL.md",
+      "description": "Deploy and operate the RTVI-CV-3D microservice as MV3DT (`MODE=mv3dt`): per-camera DeepStream perception plus BEV Fusion over calibrated cameras.",
+      "representativeQueries": [
+        "vss deploy detection tracking 3d",
+        "how do I use Video Search and Summarization (VSS) for vss deploy detection tracking 3d",
+        "help me with vss deploy detection tracking 3d",
+        "deploy Video Search and Summarization (VSS) vss deploy detection tracking 3d",
+        "vss deploy detection tracking 3d NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-deploy-profile",
+      "displayName": "vss-deploy-profile",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-deploy-profile/SKILL.md",
+      "description": "Use to select, configure, deploy, verify, debug, or tear down a VSS profile (base, search, lvs, warehouse, edge).",
+      "representativeQueries": [
+        "vss deploy profile",
+        "how do I use Video Search and Summarization (VSS) for vss deploy profile",
+        "help me with vss deploy profile",
+        "deploy Video Search and Summarization (VSS) vss deploy profile",
+        "vss deploy profile NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-deploy-video-embedding",
+      "displayName": "vss-deploy-video-embedding",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-deploy-video-embedding/SKILL.md",
+      "description": "Use this skill when deploying, operating, or integrating the VSS 3.2 GA RT-Embed Video Embedding microservice.",
+      "representativeQueries": [
+        "vss deploy video embedding",
+        "how do I use Video Search and Summarization (VSS) for vss deploy video embedding",
+        "help me with vss deploy video embedding",
+        "deploy Video Search and Summarization (VSS) vss deploy video embedding",
+        "vss deploy video embedding NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-generate-video-calibration",
+      "displayName": "vss-generate-video-calibration",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-generate-video-calibration/SKILL.md",
+      "description": "Use to run AutoMagicCalib on local MP4s, RTSP, or the bundled sample dataset, and to deploy vss-auto-calibration when needed.",
+      "representativeQueries": [
+        "vss generate video calibration",
+        "how do I use Video Search and Summarization (VSS) for vss generate video calibration",
+        "help me with vss generate video calibration",
+        "generate with Video Search and Summarization (VSS) vss generate video calibration",
+        "vss generate video calibration NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-generate-video-report",
+      "displayName": "vss-generate-video-report",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-generate-video-report/SKILL.md",
+      "description": "Use this skill when producing a VSS analysis report \u2014 Mode A per-clip VLM, Mode B incident-range via video-analytics.",
+      "representativeQueries": [
+        "vss generate video report",
+        "how do I use Video Search and Summarization (VSS) for vss generate video report",
+        "help me with vss generate video report",
+        "generate with Video Search and Summarization (VSS) vss generate video report",
+        "vss generate video report NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-manage-alerts",
+      "displayName": "vss-manage-alerts",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-manage-alerts/SKILL.md",
+      "description": "Use for VSS alert workflows \u2014 real-time monitoring, Alert-Bridge subscriptions, Slack notifications, incident queries, camera onboarding.",
+      "representativeQueries": [
+        "vss manage alerts",
+        "how do I use Video Search and Summarization (VSS) for vss manage alerts",
+        "help me with vss manage alerts",
+        "monitor Video Search and Summarization (VSS) vss manage alerts",
+        "vss manage alerts NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-manage-video-io-storage",
+      "displayName": "vss-manage-video-io-storage",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-manage-video-io-storage/SKILL.md",
+      "description": "Use to call the VIOS REST API (sensor list, timelines, clip extraction, snapshots, add/delete sensors and streams).",
+      "representativeQueries": [
+        "call the VIOS REST API (sensor list, timelines, clip extraction, snapshots, add/delete sensors and streams). Not for VLM inference or search",
+        "how do I use Video Search and Summarization (VSS) for vss manage video io storage",
+        "help me with vss manage video io storage",
+        "operate Video Search and Summarization (VSS) vss manage video io storage",
+        "vss manage video io storage NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-query-analytics",
+      "displayName": "vss-query-analytics",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-query-analytics/SKILL.md",
+      "description": "Use this skill when reading video-analytics metrics, incidents, alerts, and sensor data via the VA-MCP server (port 9901).",
+      "representativeQueries": [
+        "vss query analytics",
+        "how do I use Video Search and Summarization (VSS) for vss query analytics",
+        "help me with vss query analytics",
+        "monitor Video Search and Summarization (VSS) vss query analytics",
+        "vss query analytics NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-search-archive",
+      "displayName": "vss-search-archive",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-search-archive/SKILL.md",
+      "description": "Use this skill to run top-level VSS fusion search on archived video, or to ingest video files / RTSP streams for search.",
+      "representativeQueries": [
+        "vss search archive",
+        "how do I use Video Search and Summarization (VSS) for vss search archive",
+        "help me with vss search archive",
+        "integrate Video Search and Summarization (VSS) vss search archive",
+        "vss search archive NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-setup-behavior-analytics",
+      "displayName": "vss-setup-behavior-analytics",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-setup-behavior-analytics/SKILL.md",
+      "description": "Use to deploy the vss-behavior-analytics service standalone (entrypoint, config-source, optional calibration).",
+      "representativeQueries": [
+        "deploy the vss-behavior-analytics service standalone (entrypoint, config-source, optional calibration). Not for the full warehouse deploy",
+        "how do I use Video Search and Summarization (VSS) for vss setup behavior analytics",
+        "help me with vss setup behavior analytics",
+        "deploy Video Search and Summarization (VSS) vss setup behavior analytics",
+        "vss setup behavior analytics NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-setup-video-analytics-api",
+      "displayName": "vss-setup-video-analytics-api",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-setup-video-analytics-api/SKILL.md",
+      "description": "Use to deploy the vss-video-analytics-api REST service standalone (config-source, data-log bind, Elasticsearch, optional Kafka).",
+      "representativeQueries": [
+        "vss setup video analytics api",
+        "how do I use Video Search and Summarization (VSS) for vss setup video analytics api",
+        "help me with vss setup video analytics api",
+        "deploy Video Search and Summarization (VSS) vss setup video analytics api",
+        "vss setup video analytics api NVIDIA skill"
+      ]
+    },
+    {
+      "identifier": "urn:air:github.com:nvidia:skills:vss-summarize-video",
+      "displayName": "vss-summarize-video",
+      "type": "application/ai-skill",
+      "url": "https://github.com/NVIDIA/skills/blob/main/skills/vss-summarize-video/SKILL.md",
+      "description": "Use to summarize a recorded video via the LVS summarization microservice (HITL-gated) with a VLM fallback.",
+      "representativeQueries": [
+        "vss summarize video",
+        "how do I use Video Search and Summarization (VSS) for vss summarize video",
+        "help me with vss summarize video",
+        "summarize with Video Search and Summarization (VSS) vss summarize video",
+        "vss summarize video NVIDIA skill"
+      ]
+    }
+  ]
+}

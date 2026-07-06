@@ -7,6 +7,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- Agentic Resource Discovery catalog at [`docs/.well-known/ai-catalog.json`](docs/.well-known/ai-catalog.json)
+- GitHub Pages publishing workflow for the AI catalog fallback endpoint
+- Integration tests and CI workflow to keep the AI catalog aligned with `skills/`
+
 ## [0.3.0] - 2025-05-21
 
 ### Added
