@@ -176,34 +176,6 @@
       ]
     },
     {
-      "identifier": "urn:air:github.com:nvidia:skills:cuopt-numerical-optimization-api-c",
-      "displayName": "cuopt-numerical-optimization-api-c",
-      "type": "application/ai-skill",
-      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-numerical-optimization-api-c/SKILL.md",
-      "description": "LP, MILP, and QP (beta) with cuOpt \u2014 C API only.",
-      "representativeQueries": [
-        "lP, MILP, and QP (beta) with cuOpt \u2014 C API only. Use when the user is embedding LP, MILP, or QP in C/C++",
-        "how do I use cuOpt for cuopt numerical optimization api c",
-        "help me with cuopt numerical optimization api c",
-        "integrate cuOpt cuopt numerical optimization api c",
-        "cuopt numerical optimization api c NVIDIA skill"
-      ]
-    },
-    {
-      "identifier": "urn:air:github.com:nvidia:skills:cuopt-numerical-optimization-api-cli",
-      "displayName": "cuopt-numerical-optimization-api-cli",
-      "type": "application/ai-skill",
-      "url": "https://github.com/NVIDIA/skills/blob/main/skills/cuopt-numerical-optimization-api-cli/SKILL.md",
-      "description": "LP, MILP, and QP (beta) with cuOpt \u2014 CLI only (MPS/LP/QPS files, cuopt_cli).",
-      "representativeQueries": [
-        "cuopt numerical optimization api cli",
-        "how do I use cuOpt for cuopt numerical optimization api cli",
-        "help me with cuopt numerical optimization api cli",
-        "configure cuOpt cuopt numerical optimization api cli",
-        "cuopt numerical optimization api cli NVIDIA skill"
-      ]
-    },
-    {
       "identifier": "urn:air:github.com:nvidia:skills:cuopt-numerical-optimization-api-python",
       "displayName": "cuopt-numerical-optimization-api-python",
       "type": "application/ai-skill",
