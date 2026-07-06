@@ -6,13 +6,14 @@ per-dimension results (skill-assisted score plus uplift vs. the no-skill
 baseline), and writes a single machine-readable benchmarks.json at the repo
 root for downstream dashboards and tooling.
 
-Usage: python3 .github/scripts/aggregate_benchmarks.py [--repo-root PATH]
+Usage:
+    python3 .github/scripts/aggregate_benchmarks.py [--repo-root PATH]
+    python3 .github/scripts/aggregate_benchmarks.py --check   # fail on drift
 """
 
 import argparse
 import json
 import re
-import subprocess
 import sys
 from pathlib import Path
 
@@ -109,12 +110,7 @@ def load_component_map(repo_root: Path) -> dict:
     return mapping
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--repo-root", default=".", type=Path)
-    args = ap.parse_args()
-    root = args.repo_root.resolve()
-
+def generate(root: Path) -> str:
     components = load_component_map(root)
     skills = []
     skipped = []
@@ -128,22 +124,46 @@ def main() -> int:
         entry["average_uplift_pct"] = average_uplift(entry["results"])
         skills.append(entry)
 
-    commit = subprocess.run(
-        ["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True
-    ).stdout.strip() or None
-
     out = {
         "schema_version": 1,
         "source": "skills/*/BENCHMARK.md",
-        "commit": commit,
         "skill_count": len(skills),
         "skills_without_results": sorted(skipped),
         "skills": skills,
     }
-    (root / "benchmarks.json").write_text(
-        json.dumps(out, indent=2) + "\n", encoding="utf-8"
+    return json.dumps(out, indent=2) + "\n"
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--repo-root", default=".", type=Path)
+    ap.add_argument(
+        "--check",
+        action="store_true",
+        help="Fail (exit 1) if the checked-in benchmarks.json does not match "
+        "what the BENCHMARK.md sources would generate.",
     )
-    print(f"Wrote benchmarks.json: {len(skills)} skills, {len(skipped)} without parseable results")
+    args = ap.parse_args()
+    root = args.repo_root.resolve()
+    target = root / "benchmarks.json"
+
+    payload = generate(root)
+    count = json.loads(payload)["skill_count"]
+
+    if args.check:
+        existing = target.read_text(encoding="utf-8") if target.exists() else None
+        if existing != payload:
+            print(
+                "benchmarks.json is out of date with skills/*/BENCHMARK.md.\n"
+                "Regenerate it with: python3 .github/scripts/aggregate_benchmarks.py",
+                file=sys.stderr,
+            )
+            return 1
+        print(f"benchmarks.json is up to date ({count} skills)")
+        return 0
+
+    target.write_text(payload, encoding="utf-8")
+    print(f"Wrote benchmarks.json: {count} skills")
     return 0
 
 
