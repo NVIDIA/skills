@@ -133,27 +133,15 @@
       }
     },
     {
-      "path": "skills/cuopt-numerical-optimization-api-c",
-      "name": "cuopt-numerical-optimization-api-c",
-      "description": "LP, MILP, and QP (beta) with cuOpt — C API only. Use when the user is embedding LP, MILP, or QP in C/C++.",
+      "path": "skills/cuopt-numerical-optimization-api",
+      "name": "cuopt-numerical-optimization-api",
+      "description": "LP, MILP, and QP (beta) with cuOpt — Python, C, and CLI. Use when the user is solving LP, MILP, or QP with any cuOpt interface.",
       "metadata": {
         "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
+        "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "decision-optimization",
-        "audience": "developer,application_developer,hpc_developer",
-        "discovery.activity_tags": "integrate,optimize,debug,validate"
-      }
-    },
-    {
-      "path": "skills/cuopt-numerical-optimization-api-cli",
-      "name": "cuopt-numerical-optimization-api-cli",
-      "description": "LP, MILP, and QP (beta) with cuOpt — CLI only (MPS/LP/QPS files, cuopt_cli). Use when the user is solving LP, MILP, or QP from an MPS or LP file via command line.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer,application_developer",
-        "discovery.activity_tags": "configure,optimize,troubleshoot,validate"
+        "audience": "application_developer,data_scientist,hpc_developer,solutions_architect,developer",
+        "discovery.activity_tags": "optimize,integrate,configure,get_started,benchmark"
       }
     },
     {
