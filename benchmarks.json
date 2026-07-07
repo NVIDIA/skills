@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 235,
-  "result_row_count": 2120,
+  "skill_count": 231,
+  "result_row_count": 2080,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -246,24 +246,6 @@
       "average_uplift_pct": 23.5
     },
     {
-      "skill": "cuopt-numerical-optimization-api-python",
-      "evaluation_date": "2026-06-10",
-      "profile": "external",
-      "environment": "astra-sandbox",
-      "tasks": 4,
-      "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
-      "verdict": "FAIL",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "catalog_dir": "cuopt-numerical-optimization-api-python",
-      "component": null,
-      "has_results": true,
-      "average_uplift_pct": 18.0
-    },
-    {
       "skill": "cuopt-numerical-optimization-formulation",
       "evaluation_date": "2026-06-26",
       "profile": "external",
@@ -300,24 +282,6 @@
       "average_uplift_pct": 45.5
     },
     {
-      "skill": "cuopt-routing-formulation",
-      "evaluation_date": "2026-05-28",
-      "profile": "external",
-      "environment": "local",
-      "tasks": 1,
-      "attempts_per_task": 2,
-      "pass_threshold_pct": 50.0,
-      "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "catalog_dir": "cuopt-routing-formulation",
-      "component": null,
-      "has_results": true,
-      "average_uplift_pct": 10.3
-    },
-    {
       "skill": "cuopt-server-api-python",
       "evaluation_date": "2026-06-29",
       "profile": "external",
@@ -334,42 +298,6 @@
       "component": "cuOpt",
       "has_results": true,
       "average_uplift_pct": 50.5
-    },
-    {
-      "skill": "cuopt-server-common",
-      "evaluation_date": "2026-05-28",
-      "profile": "external",
-      "environment": "local",
-      "tasks": 1,
-      "attempts_per_task": 2,
-      "pass_threshold_pct": 50.0,
-      "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "catalog_dir": "cuopt-server-common",
-      "component": null,
-      "has_results": true,
-      "average_uplift_pct": 7.6
-    },
-    {
-      "skill": "cuopt-skill-evolution",
-      "evaluation_date": "2026-05-29",
-      "profile": "external",
-      "environment": "local",
-      "tasks": 1,
-      "attempts_per_task": 2,
-      "pass_threshold_pct": 50.0,
-      "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "catalog_dir": "cuopt-skill-evolution",
-      "component": null,
-      "has_results": true,
-      "average_uplift_pct": 5.8
     },
     {
       "skill": "cuopt-user-rules",
@@ -5273,96 +5201,6 @@
       "uplift_pct": 28.0
     },
     {
-      "catalog_dir": "cuopt-numerical-optimization-api-python",
-      "component": null,
-      "dimension": "Security",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api-python",
-      "component": null,
-      "dimension": "Security",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api-python",
-      "component": null,
-      "dimension": "Correctness",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 65.0,
-      "uplift_pct": 29.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api-python",
-      "component": null,
-      "dimension": "Correctness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 64.0,
-      "uplift_pct": 8.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api-python",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 50.0,
-      "uplift_pct": 44.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api-python",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 44.0,
-      "uplift_pct": 25.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api-python",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 66.0,
-      "uplift_pct": 17.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api-python",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 56.0,
-      "uplift_pct": 3.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api-python",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 61.0,
-      "uplift_pct": 37.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api-python",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 44.0,
-      "uplift_pct": 17.0
-    },
-    {
       "catalog_dir": "cuopt-numerical-optimization-formulation",
       "component": "cuOpt",
       "dimension": "Security",
@@ -5543,96 +5381,6 @@
       "uplift_pct": 45.0
     },
     {
-      "catalog_dir": "cuopt-routing-formulation",
-      "component": null,
-      "dimension": "Security",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-formulation",
-      "component": null,
-      "dimension": "Security",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-formulation",
-      "component": null,
-      "dimension": "Correctness",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-formulation",
-      "component": null,
-      "dimension": "Correctness",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 23.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-formulation",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-formulation",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 48.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-formulation",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 97.0,
-      "uplift_pct": -2.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-formulation",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 98.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-formulation",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": -0.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-formulation",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 78.0,
-      "uplift_pct": 34.0
-    },
-    {
       "catalog_dir": "cuopt-server-api-python",
       "component": "cuOpt",
       "dimension": "Security",
@@ -5721,186 +5469,6 @@
       "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 67.0
-    },
-    {
-      "catalog_dir": "cuopt-server-common",
-      "component": null,
-      "dimension": "Security",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-server-common",
-      "component": null,
-      "dimension": "Security",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 50.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-server-common",
-      "component": null,
-      "dimension": "Correctness",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 8.0
-    },
-    {
-      "catalog_dir": "cuopt-server-common",
-      "component": null,
-      "dimension": "Correctness",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 69.0,
-      "uplift_pct": 5.0
-    },
-    {
-      "catalog_dir": "cuopt-server-common",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 33.0
-    },
-    {
-      "catalog_dir": "cuopt-server-common",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 59.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-server-common",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 98.0,
-      "uplift_pct": 1.0
-    },
-    {
-      "catalog_dir": "cuopt-server-common",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 50.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-server-common",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": 35.0
-    },
-    {
-      "catalog_dir": "cuopt-server-common",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 43.0,
-      "uplift_pct": -6.0
-    },
-    {
-      "catalog_dir": "cuopt-skill-evolution",
-      "component": null,
-      "dimension": "Security",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-skill-evolution",
-      "component": null,
-      "dimension": "Security",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-skill-evolution",
-      "component": null,
-      "dimension": "Correctness",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": -5.0
-    },
-    {
-      "catalog_dir": "cuopt-skill-evolution",
-      "component": null,
-      "dimension": "Correctness",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-skill-evolution",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 12.0
-    },
-    {
-      "catalog_dir": "cuopt-skill-evolution",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 12.0
-    },
-    {
-      "catalog_dir": "cuopt-skill-evolution",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 60.0,
-      "uplift_pct": -1.0
-    },
-    {
-      "catalog_dir": "cuopt-skill-evolution",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 66.0,
-      "uplift_pct": 2.0
-    },
-    {
-      "catalog_dir": "cuopt-skill-evolution",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": 19.0
-    },
-    {
-      "catalog_dir": "cuopt-skill-evolution",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 76.0,
-      "uplift_pct": 19.0
     },
     {
       "catalog_dir": "cuopt-user-rules",
