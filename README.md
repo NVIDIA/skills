@@ -36,10 +36,10 @@ The skill is available the next time your agent loads skills and encounters a re
 Use this when you already know the skill name and want to skip prompts.
 
 ```bash
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --yes
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api --yes
 ```
 
-Replace `cuopt-numerical-optimization-api-python` with any skill name from the [Skill Catalog](#skill-catalog).
+Replace `cuopt-numerical-optimization-api` with any skill name from the [Skill Catalog](#skill-catalog).
 
 ### Install for a Specific Agent
 
@@ -48,37 +48,47 @@ Use `--agent` to target a specific AI coding agent. Initially, we'll support com
 **Claude Code**
 
 ```bash
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent claude-code
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api --agent claude-code
 ```
 
 **Codex**
 
 ```bash
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent codex
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api --agent codex
 ```
 
 **Cursor**
 
 ```bash
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent cursor
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api --agent cursor
 ```
 
 **Kiro**
 
 ```bash
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent kiro-cli
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api --agent kiro-cli
 ```
 
 Use `--agent` more than once to install the same skill into multiple agents.
 
 ```bash
 npx skills add nvidia/skills \
-  --skill cuopt-numerical-optimization-api-python \
+  --skill cuopt-numerical-optimization-api \
   --agent claude-code \
   --agent codex \
   --agent cursor \
   --agent kiro-cli
 ```
+
+### Keep Skills Up to Date
+
+New skills land continuously, and existing ones are revised, renamed, or consolidated as the catalog evolves. Refresh what you have installed with:
+
+```bash
+npx skills update
+```
+
+Run it interactively and the CLI also flags skills that were removed or merged upstream (for example, when several skills are consolidated into one) and offers to remove the stale local copies. Use `npx skills list` to see what is installed and `npx skills check` to preview what is out of date first.
 
 ### Browse the Catalog
 

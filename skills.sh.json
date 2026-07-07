@@ -262,13 +262,9 @@
         "cuopt-install",
         "cuopt-multi-objective-exploration",
         "cuopt-numerical-optimization-api",
-        "cuopt-numerical-optimization-api-python",
         "cuopt-numerical-optimization-formulation",
         "cuopt-routing-api-python",
-        "cuopt-routing-formulation",
         "cuopt-server-api-python",
-        "cuopt-server-common",
-        "cuopt-skill-evolution",
         "cuopt-user-rules"
       ]
     },
