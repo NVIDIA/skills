@@ -10,7 +10,7 @@
 # consistently assume deregistration removes the catalog copy (Dynamo,
 # TAO/tao-run-on-lepton, and cuOpt all hit this), so this step makes that
 # assumption true: any top-level skills/ dir that is neither declared in
-# components.d nor listed in components.d/catalog-exceptions.yml is
+# components.d nor listed in catalog-exceptions.yml is
 # removed as part of the sync commit, where the deletion is visible in
 # the sync PR diff.
 #
@@ -29,7 +29,7 @@
 set -euo pipefail
 
 PRUNE_CAP="${PRUNE_CAP:-5}"
-EXCEPTIONS_FILE="components.d/catalog-exceptions.yml"
+EXCEPTIONS_FILE="catalog-exceptions.yml"
 pruned="${PRUNED_OUT:-/tmp/pruned-orphans.txt}"
 overflow="${PRUNED_OVERFLOW_OUT:-/tmp/pruned-orphans-overflow.txt}"
 : > "$pruned"
@@ -39,7 +39,6 @@ expected=$(mktemp "${PRUNE_TMPDIR:-/tmp}/prune-expected.XXXXXX")
 
 # 1. Declared set — every catalog_dir across components.d/*.yml.
 for f in components.d/*.yml; do
-  case "$f" in *catalog-exceptions.yml) continue ;; esac
   if ! yq e 'true' "$f" > /dev/null 2>&1; then
     echo "::warning::${f} failed to parse — skipping orphan pruning this run"
     exit 0

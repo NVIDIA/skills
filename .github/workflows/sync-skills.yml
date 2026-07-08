@@ -359,7 +359,7 @@ jobs:
         # Teams consistently assume deregistering also removes the catalog
         # copy (Dynamo, TAO, cuOpt all hit this) — this step makes that
         # true. Capped + parse-guarded; see the script header for the
-        # safety rails, and components.d/catalog-exceptions.yml for dirs
+        # safety rails, and catalog-exceptions.yml for dirs
         # that are intentionally unregistered.
         run: |
           bash .github/scripts/prune-orphans.sh
