@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 231,
-  "result_row_count": 2080,
+  "skill_count": 230,
+  "result_row_count": 2070,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -3091,24 +3091,6 @@
       "component": "TAO Toolkit",
       "has_results": true,
       "average_uplift_pct": 36.1
-    },
-    {
-      "skill": "tao-run-on-lepton",
-      "evaluation_date": "2026-06-07",
-      "profile": "external",
-      "environment": "astra-sandbox",
-      "tasks": 1,
-      "attempts_per_task": 2,
-      "pass_threshold_pct": 50.0,
-      "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "catalog_dir": "tao-run-on-lepton",
-      "component": null,
-      "has_results": true,
-      "average_uplift_pct": 32.3
     },
     {
       "skill": "tao-run-on-local-docker",
@@ -17709,96 +17691,6 @@
       "agent": "codex",
       "score_pct": 28.0,
       "uplift_pct": -0.0
-    },
-    {
-      "catalog_dir": "tao-run-on-lepton",
-      "component": null,
-      "dimension": "Security",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-run-on-lepton",
-      "component": null,
-      "dimension": "Security",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-run-on-lepton",
-      "component": null,
-      "dimension": "Correctness",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 20.0,
-      "uplift_pct": 20.0
-    },
-    {
-      "catalog_dir": "tao-run-on-lepton",
-      "component": null,
-      "dimension": "Correctness",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 87.0,
-      "uplift_pct": 73.0
-    },
-    {
-      "catalog_dir": "tao-run-on-lepton",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 0.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-run-on-lepton",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 70.0
-    },
-    {
-      "catalog_dir": "tao-run-on-lepton",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 48.0,
-      "uplift_pct": 38.0
-    },
-    {
-      "catalog_dir": "tao-run-on-lepton",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 74.0,
-      "uplift_pct": 65.0
-    },
-    {
-      "catalog_dir": "tao-run-on-lepton",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 27.0,
-      "uplift_pct": -0.0
-    },
-    {
-      "catalog_dir": "tao-run-on-lepton",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 96.0,
-      "uplift_pct": 57.0
     },
     {
       "catalog_dir": "tao-run-on-local-docker",
