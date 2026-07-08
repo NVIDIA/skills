@@ -44,6 +44,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 DEFAULT_MODEL = "nvidia/NV-Reason-CXR-3B"
+DEFAULT_MODEL_REVISION = "056bd0383b35226554da9dc5866e095df174ae19"
 HF_SPACE_URL = "https://nvidia-nv-reason-cxr.hf.space"
 HF_SPACE_API_TIMEOUT_SECONDS = 300
 DEFAULT_PROMPT = "Find abnormalities and support devices."
@@ -499,6 +500,13 @@ def _run_transformers_inference(
     device = _select_device(device_request, allow_cpu=allow_cpu)
     dtype = _select_torch_dtype(torch, torch_dtype_name, device)
     token = os.environ.get("HF_TOKEN") or None
+    revision = DEFAULT_MODEL_REVISION if model_id == DEFAULT_MODEL else None
+    load_kwargs: dict[str, Any] = {
+        "local_files_only": local_files_only,
+        "token": token,
+    }
+    if revision is not None:
+        load_kwargs["revision"] = revision
 
     try:
         image = Image.open(image_path).convert("RGB")
@@ -510,8 +518,7 @@ def _run_transformers_inference(
             model = AutoModelForImageTextToText.from_pretrained(
                 model_id,
                 dtype=dtype,
-                local_files_only=local_files_only,
-                token=token,
+                **load_kwargs,
             ).eval()
         except TypeError as e:
             if "dtype" not in str(e):
@@ -519,15 +526,13 @@ def _run_transformers_inference(
             model = AutoModelForImageTextToText.from_pretrained(
                 model_id,
                 torch_dtype=dtype,
-                local_files_only=local_files_only,
-                token=token,
+                **load_kwargs,
             ).eval()
         model = model.to(device)
         processor = AutoProcessor.from_pretrained(
             model_id,
             use_fast=True,
-            local_files_only=local_files_only,
-            token=token,
+            **load_kwargs,
         )
         messages = [
             {
@@ -562,6 +567,7 @@ def _run_transformers_inference(
         "torch_version": getattr(torch, "__version__", None),
         "generated_tokens": generated_tokens,
         "truncated_by_max_new_tokens": generated_tokens >= max_new_tokens,
+        "model_revision": revision,
     }
     return generated_text, runtime
 
@@ -864,6 +870,9 @@ def main(argv: list[str] | None = None) -> int:
                 "torch_version": None,
                 "generated_tokens": 0,
                 "truncated_by_max_new_tokens": False,
+                "model_revision": (
+                    DEFAULT_MODEL_REVISION if args.model_id == DEFAULT_MODEL else None
+                ),
             }
             mode = "mock"
         elif args.backend == "local":
@@ -917,6 +926,7 @@ def main(argv: list[str] | None = None) -> int:
                 "torch_version": runtime_extra["torch_version"],
                 "generated_tokens": runtime_extra["generated_tokens"],
                 "truncated_by_max_new_tokens": runtime_extra["truncated_by_max_new_tokens"],
+                "model_revision": runtime_extra.get("model_revision"),
             },
             "limitations": LIMITATIONS,
         }

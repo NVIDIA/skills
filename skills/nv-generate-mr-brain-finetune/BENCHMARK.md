@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nv-generate-mr-brain-finetune`
-- Evaluation date: 2026-05-31
+- Evaluation date: 2026-07-08
 - NVSkills-Eval profile: `external`
-- Environment: `local`
+- Environment: `astra-sandbox`
 - Dataset: 2 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,41 +54,29 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 4 | 100% (+50%) | 100% (+0%) |
-| Correctness | 4 | 95% (-1%) | 95% (+57%) |
-| Discoverability | 4 | 89% (+11%) | 71% (+10%) |
-| Effectiveness | 4 | 77% (+10%) | 72% (+62%) |
-| Efficiency | 4 | 65% (+15%) | 54% (+5%) |
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 98% (+75%) | 85% (+63%) |
+| Discoverability | 2 | 93% (+57%) | 86% (+48%) |
+| Effectiveness | 2 | 58% (+51%) | 60% (+53%) |
+| Efficiency | 2 | 74% (+38%) | 75% (+31%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 8 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 5 total findings.
 
 Top findings:
 
-- MEDIUM SECURITY/subprocess module call (AST4): Dangerous Code Execution:     return subprocess.run(
-        command,
-        cwd=str(upstream_root),
-        env=env,
-        capture_output=True,
-        text=True,
-        check=False,
-    ) (`scripts/run_mr_brain_finetune.py:431`)
-- MEDIUM SECURITY/Unknown (LP3): MCP Least Privilege: The skill uses Bash and performs environment variable access, file reads/writes, and shell execution, but does not decla (`SKILL.md:1`)
-- LOW SCHEMA/unexpected_file: Unexpected 'fixtures' in skill root (`skills/nv-generate-mr-brain-finetune/fixtures`)
-- LOW SCHEMA/unexpected_file: Unexpected 'skill_manifest.yaml' in skill root (`skills/nv-generate-mr-brain-finetune/skill_manifest.yaml`)
 - LOW SCHEMA/unexpected_file: Unexpected 'validators' in skill root (`skills/nv-generate-mr-brain-finetune/validators`)
+- LOW SCHEMA/unexpected_file: Unexpected 'skill_manifest.yaml' in skill root (`skills/nv-generate-mr-brain-finetune/skill_manifest.yaml`)
+- LOW SCHEMA/unexpected_file: Unexpected 'fixtures' in skill root (`skills/nv-generate-mr-brain-finetune/fixtures`)
+- LOW SCHEMA/unexpected_file: Unexpected 'tests' in skill root (`skills/nv-generate-mr-brain-finetune/tests`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/nv-generate-mr-brain-finetune/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 4 file(s)
-- Inter-Skill Deduplication: Parsed skill 'nv-generate-mr-brain-finetune': 129 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

@@ -1,5 +1,5 @@
 ## Description: <br>
-Used for generating synthetic brain MRI volumes with NV-Generate-CTMR rflow-mr-brain. <br>
+Used for generating synthetic brain MRI volumes with NV-Generate-CTMR rflow-mr-brain. Not for production training data. <br>
 
 This skill is for research and development only. <br>
 
@@ -7,37 +7,43 @@ This skill is for research and development only. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers generating synthetic brain MRI volumes for research, development, and engineering verification using the NV-Generate-CTMR rflow-mr-brain pipeline. <br>
+Developers and researchers use this skill to generate synthetic brain MRI volumes for research and engineering verification workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [NV-Generate-CTMR MR Brain Image Generation](https://github.com/NVIDIA-Medtech/NV-Generate-CTMR#22-mr-brain-image-generation) <br>
-- [NV-Generate-MR-Brain Model Weights](https://huggingface.co/nvidia/NV-Generate-MR-Brain) <br>
-- [FOV and Downloads Reference](references/fov-and-downloads.md) <br>
+- [NV-Generate-CTMR upstream repository (pinned commit)](https://github.com/NVIDIA-Medtech/NV-Generate-CTMR/tree/61c4ec709b84cad468852243c48e250bec732074) <br>
+- [NV-Generate-MR-Brain model weights (Hugging Face)](https://huggingface.co/nvidia/NV-Generate-MR-Brain) <br>
+- [FOV and Downloads reference](references/fov-and-downloads.md) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Files, Analysis] <br>
-**Output Format:** [NIfTI volumes with JSON summary] <br>
+**Output Format:** [JSON result summary with generated NIfTI volume files] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Output volumes are synthetic; not safe as production training data without independent quality review] <br>
+**Other Properties Related to Output:** [Output volumes are synthetic and not safe as production training data without independent quality review.] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- claude-code <br>
+- codex <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 2 evaluation tasks (2 positive skill-activation cases, 2 attempts per task, 50% pass threshold). <br>
+Evaluated against 2 internal evaluation tasks (2 positive skill-activation cases, NVSkills-Eval external profile). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,14 +67,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 4 | 100% (+25%) | 100% (+0%) |
-| Correctness | 4 | 78% (-13%) | 93% (+49%) |
-| Discoverability | 4 | 58% (-36%) | 79% (+16%) |
-| Effectiveness | 4 | 75% (+13%) | 79% (+57%) |
-| Efficiency | 4 | 45% (-31%) | 68% (+16%) |
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 60% (+48%) | 74% (+64%) |
+| Discoverability | 2 | 100% (+81%) | 84% (+66%) |
+| Effectiveness | 2 | 13% (+8%) | 40% (+33%) |
+| Efficiency | 2 | 94% (+61%) | 80% (+44%) |
 
 ## Skill Version(s): <br>
-b3fea63 (source: git SHA, committed 2026-05-31) <br>
+24f0910 (source: git SHA, committed 2026-07-08) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

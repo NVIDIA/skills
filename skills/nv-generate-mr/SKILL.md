@@ -52,7 +52,7 @@ metadata:
 | Validation gate failure | Output violated a declared engineering invariant. | Keep the failed evidence pack and use the gate message to repair inputs or wrapper code. |
 
 Wraps the upstream
-[`NVIDIA-Medtech/NV-Generate-CTMR`](https://github.com/NVIDIA-Medtech/NV-Generate-CTMR#25-mr-image-generation)
+[`NVIDIA-Medtech/NV-Generate-CTMR`](https://github.com/NVIDIA-Medtech/NV-Generate-CTMR/tree/61c4ec709b84cad468852243c48e250bec732074)
 MR image-only generation workflow. The wrapper does not reimplement diffusion
 sampling or autoencoder decoding. It stages config overrides, runs the
 documented `python -m scripts.diff_model_infer` command for `rflow-mr`, then
@@ -65,7 +65,7 @@ For user run commands in a fresh benchmark environment, use this setup plus
 repo-root wrapper command exactly:
 
 ```bash
-export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-.workbench_data/upstreams/NV-Generate-CTMR}" && \
+export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7}" && \
 python -m pip install -r "$NV_GENERATE_ROOT/requirements.txt" && \
 python skills/nv-generate-mr/scripts/run_mr.py PATH_TO_MR_CONFIG.json --output-dir OUT_DIR --modality mri_t1 --random-seed 0
 ```
@@ -74,15 +74,19 @@ Do not invent `generate.sh`, `infer.py`, `Medical AI Skills run`, or `python -m 
 
 ## Preconditions
 
-Clone and install the upstream repo once. In this Medical AI Skills checkout, prefer
-the repo-local cache path when it exists:
+If `NV_GENERATE_ROOT` already names a local checkout, the wrapper uses it and
+records its current commit in the result. Otherwise, create the recommended
+pinned default checkout once:
 
 ```bash
-mkdir -p .workbench_data/upstreams
-test -d .workbench_data/upstreams/NV-Generate-CTMR/.git || \
-  git clone https://github.com/NVIDIA-Medtech/NV-Generate-CTMR.git \
-    .workbench_data/upstreams/NV-Generate-CTMR
-export NV_GENERATE_ROOT=.workbench_data/upstreams/NV-Generate-CTMR
+if [ -z "${NV_GENERATE_ROOT:-}" ]; then
+  export NV_GENERATE_COMMIT=61c4ec709b84cad468852243c48e250bec732074
+  export NV_GENERATE_ROOT="$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7"
+  if [ ! -d "$NV_GENERATE_ROOT/.git" ]; then
+    git clone https://github.com/NVIDIA-Medtech/NV-Generate-CTMR.git "$NV_GENERATE_ROOT"
+    git -C "$NV_GENERATE_ROOT" checkout --detach "$NV_GENERATE_COMMIT"
+  fi
+fi
 pip install -r "$NV_GENERATE_ROOT/requirements.txt"
 ```
 
@@ -97,7 +101,7 @@ Runtime needs an NVIDIA GPU with at least 16 GB VRAM. There is no CPU
 fallback in the upstream path.
 
 The wrapper also searches `.workbench_data/upstreams/NV-Generate-CTMR` if
-`NV_GENERATE_ROOT` is unset or points at a stale clone.
+`NV_GENERATE_ROOT` is unset or does not have the required upstream layout.
 
 For agent-generated user run commands, use the command in Usage. Do not prepend
 clone or model-download setup steps when the repo-local upstream cache already
@@ -110,7 +114,7 @@ weights do not imply cached Python packages. If setup requires `cd "$NV_GENERATE
 ## Usage
 
 ```bash
-export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-.workbench_data/upstreams/NV-Generate-CTMR}" && \
+export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7}" && \
 python -m pip install -r "$NV_GENERATE_ROOT/requirements.txt" && \
 python skills/nv-generate-mr/scripts/run_mr.py \
   PATH_TO_MR_CONFIG.json \

@@ -42,7 +42,12 @@ if str(_SKILLS_DIR) not in sys.path:
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
 
-from wrapper_utils import emit, file_sha256_safe, git_commit, tail  # noqa: E402
+from wrapper_utils import (  # noqa: E402
+    emit,
+    file_sha256_safe,
+    git_commit,
+    tail,
+)
 
 SKILL_NAME = "nv_generate_ct_rflow_ct_from_mask"
 MODEL_REPO = "https://github.com/NVIDIA-Medtech/NV-Generate-CTMR"

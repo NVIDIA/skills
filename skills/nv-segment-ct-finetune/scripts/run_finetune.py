@@ -63,8 +63,10 @@ import typer
 SKILL_DIR = Path(__file__).resolve().parent.parent
 BUNDLE_DIR = SKILL_DIR / "bundle"
 LABEL_DICT = BUNDLE_DIR / "label_dict.json"
+UPSTREAM_CTMR_COMMIT = "f9f5f51b589e5dc9c23c453cf5138398e4084056"
+HF_MODEL_REVISION = "afb51518689f71e6abb367ee6301b2cd0225c66a"
 LABEL_DICT_URL = (
-    "https://raw.githubusercontent.com/NVIDIA-Medtech/NV-Segment-CTMR/main/"
+    f"https://raw.githubusercontent.com/NVIDIA-Medtech/NV-Segment-CTMR/{UPSTREAM_CTMR_COMMIT}/"
     "NV-Segment-CT/configs/label_dict.json"
 )
 SMOKE_FIXTURE = SKILL_DIR / "fixtures" / "spleen_micro"
@@ -218,7 +220,7 @@ def require_bundle_files() -> None:
         "bundle setup is incomplete; missing: "
         + ", ".join(rel_missing)
         + "\nFrom skills/nv-segment-ct-finetune, run:\n"
-        + "  hf download nvidia/NV-Segment-CT --local-dir bundle/\n"
+        + f"  hf download nvidia/NV-Segment-CT --revision {HF_MODEL_REVISION} --local-dir bundle/\n"
         + '  python -c "import urllib.request; '
         + f"urllib.request.urlretrieve('{LABEL_DICT_URL}', "
         + "'bundle/label_dict.json')\"\n"
@@ -387,6 +389,7 @@ def prepare_bundle_files() -> list[str]:
             return notes
         snapshot_download(
             repo_id="nvidia/NV-Segment-CT",
+            revision=HF_MODEL_REVISION,
             local_dir=str(BUNDLE_DIR),
             local_dir_use_symlinks=False,
         )
@@ -902,7 +905,7 @@ def resolve_mapping(
     if not LABEL_DICT.exists():
         raise typer.BadParameter(
             f"label_dict.json missing at {LABEL_DICT}; "
-            f"run `hf download nvidia/NV-Segment-CT` first"
+            f"run `hf download nvidia/NV-Segment-CT --revision {HF_MODEL_REVISION}` first"
         )
     d = {
         str(k).strip().lower(): int(v)

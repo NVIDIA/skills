@@ -34,7 +34,7 @@ metadata:
 Validate and stage a preflight finetune check from an input bundle (the recommended first step — no GPU, no training). This is the single canonical command; replace `INPUT_BUNDLE` and `OUT_DIR` with your paths:
 
 ```bash
-export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-.workbench_data/upstreams/NV-Generate-CTMR}" && \
+export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7}" && \
 python skills/nv-generate-vae-finetune/scripts/run_vae_finetune.py \
   INPUT_BUNDLE/preflight_datalist.json \
   --data-base-dir INPUT_BUNDLE/preflight_dataset \
@@ -51,12 +51,28 @@ For real GPU finetuning and other variations, see [Usage](#2-usage-one-line-trai
 | `scripts/run_vae_finetune.py` | Primary entrypoint declared by `skill_manifest.yaml`. | `DATALIST.json --data-base-dir DATA_DIR --output-dir OUT_DIR [--epochs N] [--modality mri] [--patch-size 64,64,64] [--preflight]` |
 
 ## Prerequisites
-- `NV_GENERATE_ROOT` may point to a current checkout of `https://github.com/NVIDIA-Medtech/NV-Generate-CTMR` containing `configs/config_maisi_vae_train.json`, `scripts/transforms.py`, and `scripts/utils.py`.
+- An explicit `NV_GENERATE_ROOT` may point to the caller's local checkout and
+  must contain `configs/config_maisi_vae_train.json`, `scripts/transforms.py`,
+  and `scripts/utils.py`. The result records its current commit.
 - If `NV_GENERATE_ROOT` is unset, the wrapper searches `.workbench_data/upstreams/NV-Generate-CTMR`.
 - `CUDA_VISIBLE_DEVICES` is optional and can be used to select the GPU for real training.
 - Runtime requirements: NVIDIA CUDA GPU for real training, Python packages from the upstream `requirements.txt`, `lpips`, and downloaded VAE weights unless using `--train-from-scratch`.
 - Side effects: writes staged configs, checkpoints, TensorBoard logs, and run summaries under the caller-provided `--output-dir`; may write model caches under the upstream checkout, `~/.cache/huggingface/`, and `~/.cache/torch/`; may contact `https://huggingface.co`, `https://github.com`, and `https://download.pytorch.org`.
 - The datalist is a MONAI-style JSON object with non-empty `training[]` and `validation[]` or `testing[]`. Each entry has an `image` path relative to `--data-base-dir` and optional `class` or `modality` of `ct` or `mri`.
+
+When no local checkout is supplied, create the recommended pinned default
+checkout once:
+
+```bash
+if [ -z "${NV_GENERATE_ROOT:-}" ]; then
+  export NV_GENERATE_COMMIT=61c4ec709b84cad468852243c48e250bec732074
+  export NV_GENERATE_ROOT="$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7"
+  if [ ! -d "$NV_GENERATE_ROOT/.git" ]; then
+    git clone https://github.com/NVIDIA-Medtech/NV-Generate-CTMR.git "$NV_GENERATE_ROOT"
+    git -C "$NV_GENERATE_ROOT" checkout --detach "$NV_GENERATE_COMMIT"
+  fi
+fi
+```
 
 ## 1. Config and environment JSON (adapt to your data)
 
@@ -102,7 +118,7 @@ For an end-to-end reference including example data download, see the upstream tu
 Preflight only:
 
 ```bash
-export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-.workbench_data/upstreams/NV-Generate-CTMR}" && \
+export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7}" && \
 python skills/nv-generate-vae-finetune/scripts/run_vae_finetune.py \
   PATH_TO_DATALIST.json \
   --data-base-dir PATH_TO_DATA_ROOT \
@@ -113,7 +129,7 @@ python skills/nv-generate-vae-finetune/scripts/run_vae_finetune.py \
 Preflight bundle input:
 
 ```bash
-export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-.workbench_data/upstreams/NV-Generate-CTMR}" && \
+export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7}" && \
 python skills/nv-generate-vae-finetune/scripts/run_vae_finetune.py \
   PATH_TO_INPUT_BUNDLE/preflight_datalist.json \
   --data-base-dir PATH_TO_INPUT_BUNDLE/preflight_dataset \
@@ -124,7 +140,7 @@ python skills/nv-generate-vae-finetune/scripts/run_vae_finetune.py \
 GPU finetuning:
 
 ```bash
-export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-.workbench_data/upstreams/NV-Generate-CTMR}" && \
+export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7}" && \
 python -m pip install -r "$NV_GENERATE_ROOT/requirements.txt" && \
 python -m pip install lpips tensorboard && \
 python skills/nv-generate-vae-finetune/scripts/run_vae_finetune.py \

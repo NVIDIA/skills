@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nv-generate-vae-finetune`
-- Evaluation date: 2026-05-31
+- Evaluation date: 2026-07-08
 - NVSkills-Eval profile: `external`
-- Environment: `local`
+- Environment: `astra-sandbox`
 - Dataset: 2 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,29 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 4 | 100% (+50%) | 100% (+0%) |
-| Correctness | 4 | 91% (-3%) | 86% (+34%) |
-| Discoverability | 4 | 89% (+8%) | 78% (+23%) |
-| Effectiveness | 4 | 60% (-31%) | 50% (+24%) |
-| Efficiency | 4 | 67% (+9%) | 63% (+22%) |
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 85% (+62%) | 76% (+56%) |
+| Discoverability | 2 | 89% (+57%) | 61% (+25%) |
+| Effectiveness | 2 | 60% (+55%) | 61% (+56%) |
+| Efficiency | 2 | 69% (+37%) | 58% (+17%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 8 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 5 total findings.
 
 Top findings:
 
-- MEDIUM SECURITY/Unknown (LP3): MCP Least Privilege: The skill uses Bash and exercises environment variable access, file reads/writes, and shell execution without declaring  (`SKILL.md:1`)
-- MEDIUM SECURITY/Unknown (SQP-2): The skill contacts external hosts (huggingface.co, github.com, download.pytorch.org) and writes to user home-directory c (`SKILL.md:58`)
 - LOW SCHEMA/unexpected_file: Unexpected 'validators' in skill root (`skills/nv-generate-vae-finetune/validators`)
 - LOW SCHEMA/unexpected_file: Unexpected 'skill_manifest.yaml' in skill root (`skills/nv-generate-vae-finetune/skill_manifest.yaml`)
 - LOW SCHEMA/unexpected_file: Unexpected 'fixtures' in skill root (`skills/nv-generate-vae-finetune/fixtures`)
+- LOW SCHEMA/unexpected_file: Unexpected 'tests' in skill root (`skills/nv-generate-vae-finetune/tests`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/nv-generate-vae-finetune/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 4 file(s)
-- Inter-Skill Deduplication: Parsed skill 'nv-generate-vae-finetune': 125 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

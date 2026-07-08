@@ -140,6 +140,14 @@ Decision rule: prefer formal original-spacing pre/post scores when present; reje
 ## Limitations
 
 - Thin wrapper. Training, validation, transforms, and checkpointing are delegated to the upstream bundle in `bundle/`.
+- Reproduction record only: the successful five-epoch Task06 run used Python
+  `3.12.3`, PyTorch `2.12.0+cu130` with CUDA `13.0`, MONAI `1.4.0`, NumPy
+  `1.26.4`, PyTorch-Ignite `0.5.4`, NiBabel `5.4.2`, SciPy `1.16.0`, einops
+  `0.8.2`, Fire `0.7.1`, Hugging Face Hub `0.36.2`, Transformers `4.57.6`,
+  Typer `0.25.1`, PyYAML `6.0.3`, and MLflow `3.14.0` on one NVIDIA RTX 6000
+  Ada 48 GB GPU. These versions document the evidence environment; they are
+  not additional package constraints or a claim that other versions cannot
+  work.
 - The auto-derived plan is heuristic; caller-provided `--patch-size`, `--cache-rate`, `--epochs`, and `--learning-rate` win.
 - The Task06 sanity recipe intentionally forces single-GPU execution to match the DFW reference. Multi-GPU mode for other datasets requires host `torchrun` support.
 - The paired verifier is CPU-only and audits the evidence pack; it does not re-run GPU segmentation.

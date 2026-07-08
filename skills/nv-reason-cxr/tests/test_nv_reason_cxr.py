@@ -62,6 +62,7 @@ def test_json_fixture_mock_generates_valid_output(tmp_path: Path) -> None:
     assert payload["runtime"]["mock"] is True
     assert payload["runtime"]["mode"] == "mock"
     assert payload["runtime"]["model"] == "nvidia/NV-Reason-CXR-3B"
+    assert payload["runtime"]["model_revision"] == ("056bd0383b35226554da9dc5866e095df174ae19")
     assert payload["runtime"]["generated_tokens"] == 0
     assert payload["runtime"]["truncated_by_max_new_tokens"] is False
     assert payload["input"]["image"]["source"] == "generated_fixture"

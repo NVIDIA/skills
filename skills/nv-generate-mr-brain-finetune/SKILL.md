@@ -33,7 +33,7 @@ metadata:
 Validate and stage a preflight finetune check from an input bundle (the recommended first step — no GPU, no training). This is the single canonical command; replace `INPUT_BUNDLE` and `OUT_DIR` with your paths:
 
 ```bash
-export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-.workbench_data/upstreams/NV-Generate-CTMR}" && \
+export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7}" && \
 python skills/nv-generate-mr-brain-finetune/scripts/run_mr_brain_finetune.py \
   INPUT_BUNDLE/preflight_datalist.json \
   --data-base-dir INPUT_BUNDLE/preflight_dataset \
@@ -50,12 +50,29 @@ For real GPU finetuning and other variations, see [Usage](#2-usage-one-line-trai
 | `scripts/run_mr_brain_finetune.py` | Primary entrypoint declared by `skill_manifest.yaml`. | `DATALIST.json --data-base-dir DATA_DIR --output-dir OUT_DIR [--epochs N] [--modality mri_t1] [--num-gpus N] [--no-amp] [--model-config FILE] [--run-inference] [--preflight]` |
 
 ## Prerequisites
-- `NV_GENERATE_ROOT` may point to a current checkout of `https://github.com/NVIDIA-Medtech/NV-Generate-CTMR` containing `scripts/diff_model_create_training_data.py`, `scripts/diff_model_train.py`, and `scripts/diff_model_infer.py`.
+- An explicit `NV_GENERATE_ROOT` may point to the caller's local checkout and
+  must contain `scripts/diff_model_create_training_data.py`,
+  `scripts/diff_model_train.py`, and `scripts/diff_model_infer.py`. The result
+  records its current commit.
 - If `NV_GENERATE_ROOT` is unset, the wrapper searches `.workbench_data/upstreams/NV-Generate-CTMR`.
 - `CUDA_VISIBLE_DEVICES` is optional and can be used to select the GPU for real training.
 - Runtime requirements: NVIDIA CUDA GPU for real training, Python packages from the upstream `requirements.txt`, and downloaded MR-brain weights.
 - Side effects: writes staged configs, embeddings, checkpoints, optional inference images, and logs under the caller-provided `--output-dir`; may write model caches under the upstream checkout and `~/.cache/huggingface/`; may contact `https://huggingface.co` for model assets and `https://github.com` for the upstream checkout.
 - The datalist is a MONAI-style JSON object with `training[].image` paths relative to `--data-base-dir`. `training[].modality` is optional and defaults to `mri_t1`.
+
+When no local checkout is supplied, create the recommended pinned default
+checkout once:
+
+```bash
+if [ -z "${NV_GENERATE_ROOT:-}" ]; then
+  export NV_GENERATE_COMMIT=61c4ec709b84cad468852243c48e250bec732074
+  export NV_GENERATE_ROOT="$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7"
+  if [ ! -d "$NV_GENERATE_ROOT/.git" ]; then
+    git clone https://github.com/NVIDIA-Medtech/NV-Generate-CTMR.git "$NV_GENERATE_ROOT"
+    git -C "$NV_GENERATE_ROOT" checkout --detach "$NV_GENERATE_COMMIT"
+  fi
+fi
+```
 
 ## 1. Config and environment JSON (adapt to your data)
 
@@ -100,7 +117,7 @@ For an end-to-end reference including example data download and checkpoint loadi
 Preflight only:
 
 ```bash
-export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-.workbench_data/upstreams/NV-Generate-CTMR}" && \
+export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7}" && \
 python skills/nv-generate-mr-brain-finetune/scripts/run_mr_brain_finetune.py \
   PATH_TO_DATALIST.json \
   --data-base-dir PATH_TO_DATA_ROOT \
@@ -111,7 +128,7 @@ python skills/nv-generate-mr-brain-finetune/scripts/run_mr_brain_finetune.py \
 Preflight bundle input:
 
 ```bash
-export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-.workbench_data/upstreams/NV-Generate-CTMR}" && \
+export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7}" && \
 python skills/nv-generate-mr-brain-finetune/scripts/run_mr_brain_finetune.py \
   PATH_TO_INPUT_BUNDLE/preflight_datalist.json \
   --data-base-dir PATH_TO_INPUT_BUNDLE/preflight_dataset \
@@ -122,7 +139,7 @@ python skills/nv-generate-mr-brain-finetune/scripts/run_mr_brain_finetune.py \
 GPU finetuning:
 
 ```bash
-export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-.workbench_data/upstreams/NV-Generate-CTMR}" && \
+export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7}" && \
 python -m pip install -r "$NV_GENERATE_ROOT/requirements.txt" && \
 python skills/nv-generate-mr-brain-finetune/scripts/run_mr_brain_finetune.py \
   PATH_TO_DATALIST.json \

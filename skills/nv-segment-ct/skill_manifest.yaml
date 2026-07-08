@@ -14,12 +14,17 @@
 # limitations under the License.
 
 id: medagent.nv_segment_ct
-version: 0.2.0
+version: 0.2.1
 upstream_refs:
   - kind: huggingface_repo
     name: nvidia/NV-Segment-CT
     repo_id: nvidia/NV-Segment-CT
     revision: afb51518689f71e6abb367ee6301b2cd0225c66a
+  - kind: github_repo
+    name: NVIDIA-Medtech/NV-Segment-CTMR requirements
+    repo_url: https://github.com/NVIDIA-Medtech/NV-Segment-CTMR
+    git_commit: f9f5f51b589e5dc9c23c453cf5138398e4084056
+    notes: Recommended default source for NV-Segment-CT/requirements.txt when NV_SEGMENT_CT_REQUIREMENTS is unset.
 license: Apache-2.0
 # Benchmarks this skill participates in (optional). Each entry must name a
 # manifest under benchmarks/<id>.benchmark.yaml. Consumed by
@@ -51,7 +56,7 @@ outputs:
   schema: validators/output_schema.json
 runtime:
   language: python
-  python: '>=3.10'
+  python: '>=3.10,<3.12'
   entrypoint: scripts/run_vista3d.py
   args:
     - "${python}"
@@ -60,28 +65,32 @@ runtime:
   dependencies:
     monai: '>=1.4'
     torch: '>=2.0'
-    transformers: '>=4.40,<5'
+    transformers: '==4.46.3'
     nibabel: '>=4.0'
-    numpy: '>=1.23'
-    huggingface_hub: '*'
+    numpy: '>=1.24,<2'
+    einops: '>=0.6,<1'
+    huggingface_hub: '>=0.23,<1'
     safetensors: '>=0.4'
     typer: '>=0.9'
   side_effects:
     pip_packages:
       - monai>=1.4
       - torch>=2.0
-      - "transformers>=4.40,<5"
-      - huggingface_hub
+      - transformers==4.46.3
+      - "huggingface_hub>=0.23,<1"
       - nibabel>=4.0
-      - numpy>=1.23
+      - "numpy>=1.24,<2"
+      - "einops>=0.6,<1"
       - safetensors>=0.4
       - typer>=0.9
     local_writes:
       - {path: skills/nv-segment-ct/bundle/, approx_mb_max: 1000}
     home_writes:
       - {path: ~/.cache/huggingface/, approx_mb_max: 1500}
+      - {path: ~/.cache/nvidia-skills/venvs/nv-segment-ct-f9f5f51/, approx_mb_max: 5000}
     network_endpoints:
       - https://huggingface.co
+      - https://raw.githubusercontent.com
       - https://msd-for-monai.s3-us-west-2.amazonaws.com
     requires_docker: false
     requires_gpu: cuda
@@ -94,21 +103,19 @@ runtime:
     environment:
       clean_environment_required: false
       clean_environment_recommended: true
-      modifies_active_python_environment: true
+      modifies_active_python_environment: false
       user_environment_modification_ok: true
-      recommended_isolation: fresh venv or container for benchmarks; caller-selected env for interactive use
+      recommended_isolation: dedicated Python 3.10 venv at the documented cache path
       notes: >
-        Runtime setup commands may install packages into the active Python
-        environment. That is acceptable only when the caller chooses that
-        environment; benchmark and evidence runs should use a fresh per-run
-        environment.
+        Runtime setup creates a dedicated venv and installs the model packages
+        from NV-Segment-CT/requirements.txt at the pinned NVIDIA-Medtech commit.
     env_required: []
   external_assets:
   - kind: huggingface_repo
     repo_id: nvidia/NV-Segment-CT
     size_mb_approx: 832
     install_path: bundle/
-    install_command: huggingface-cli download nvidia/NV-Segment-CT --local-dir skills/nv-segment-ct/bundle/
+    install_command: hf download nvidia/NV-Segment-CT --revision afb51518689f71e6abb367ee6301b2cd0225c66a --local-dir skills/nv-segment-ct/bundle/
     contains:
     - hugging_face_pipeline.py
     - vista3d_pipeline.py

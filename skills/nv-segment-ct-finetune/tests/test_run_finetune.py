@@ -48,7 +48,6 @@ def test_prepare_bundle_files_stages_train_configs_from_local_upstream(tmp_path,
     monkeypatch.setattr(mod, "SKILL_DIR", tmp_path / "skill")
     monkeypatch.setattr(mod, "_REPO_ROOT", tmp_path)
     monkeypatch.setattr(mod, "LABEL_DICT", bundle / "label_dict.json")
-
     notes = mod.prepare_bundle_files()
 
     for name in (
@@ -93,11 +92,20 @@ def test_prepare_bundle_files_restores_drifted_train_configs(tmp_path, monkeypat
     monkeypatch.setattr(mod, "SKILL_DIR", tmp_path / "skill")
     monkeypatch.setattr(mod, "_REPO_ROOT", tmp_path)
     monkeypatch.setattr(mod, "LABEL_DICT", bundle / "label_dict.json")
-
     notes = mod.prepare_bundle_files()
 
     assert (bundle / "configs" / "evaluate.json").read_text() == '{"canonical": "evaluate.json"}\n'
     assert "restored configs/evaluate.json from local upstream cache" in notes
+
+
+def test_upstream_config_dirs_accept_explicit_local_checkout(tmp_path, monkeypatch):
+    config_dir = (
+        tmp_path / ".workbench_data" / "upstreams" / "NV-Segment-CTMR" / "NV-Segment-CT" / "configs"
+    )
+    config_dir.mkdir(parents=True)
+    monkeypatch.setattr(mod, "_REPO_ROOT", tmp_path)
+
+    assert config_dir in mod._upstream_config_dirs()
 
 
 def test_build_override_defines_bundle_image_and_label_keys(tmp_path):

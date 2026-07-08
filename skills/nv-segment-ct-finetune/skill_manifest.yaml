@@ -24,7 +24,7 @@ upstream_refs:
     name: NVIDIA-Medtech/NV-Segment-CTMR
     repo_url: https://github.com/NVIDIA-Medtech/NV-Segment-CTMR
     git_commit: f9f5f51b589e5dc9c23c453cf5138398e4084056
-    notes: compatibility source for staged training configs
+    notes: Recommended compatibility source for missing staged training configs; an explicit local checkout is accepted.
 license: Apache-2.0
 intended_use:
   summary: >
@@ -181,7 +181,7 @@ runtime:
       repo_id: nvidia/NV-Segment-CT
       size_mb_approx: 832
       install_path: bundle/
-      install_command: huggingface-cli download nvidia/NV-Segment-CT --local-dir skills/nv-segment-ct-finetune/bundle/
+      install_command: hf download nvidia/NV-Segment-CT --revision afb51518689f71e6abb367ee6301b2cd0225c66a --local-dir skills/nv-segment-ct-finetune/bundle/
       contains:
         - configs/train.json
         - configs/train_continual.json

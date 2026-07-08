@@ -7,29 +7,41 @@ This skill is for research and development only. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers running automated CT or MRI NIfTI volume segmentation to produce label-map evidence for engineering verification workflows. <br>
+Developers and engineers use this skill to run CT or MRI segmentation inference on NIfTI medical volumes and produce structured label-map evidence for engineering verification. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [NV-Segment-CTMR upstream MONAI bundle](https://github.com/NVIDIA-Medtech/NV-Segment-CTMR/tree/main/NV-Segment-CTMR) <br>
+- [NVIDIA-Medtech/NV-Segment-CTMR upstream bundle](https://github.com/NVIDIA-Medtech/NV-Segment-CTMR/tree/f9f5f51b589e5dc9c23c453cf5138398e4084056/NV-Segment-CTMR) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [JSON, Files] <br>
-**Output Format:** [JSON with paired NIfTI label-map file] <br>
+**Output Type(s):** [Shell commands, JSON] <br>
+**Output Format:** [JSON] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
+## Evaluation Agents Used: <br>
+- Claude Code (`claude-code`) <br>
+- Codex (`codex`) <br>
+
+
+
 ## Evaluation Tasks: <br>
-Evaluated via NVSkills-Eval `external` profile with Tier 1 (9 static validation checks) and Tier 2 (2 deduplication checks). Overall verdict: PASS. <br>
+Evaluated against 2 evaluation tasks (2 positive skill-activation cases) using the NVSkills-Eval external profile in the astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -39,10 +51,28 @@ Reported benchmark dimensions: <br>
 - Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
+Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
+- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
+- `accuracy`: Grades final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
+- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `token_efficiency`: Compares token usage with and without the skill. <br>
 
+
+
+## Evaluation Results: <br>
+| Dimension | Num | `claude-code` | `codex` |
+|---|---:|---:|---:|
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 63% (+52%) | 82% (+56%) |
+| Discoverability | 2 | 39% (+24%) | 72% (+36%) |
+| Effectiveness | 2 | 54% (+32%) | 76% (+58%) |
+| Efficiency | 2 | 42% (+13%) | 62% (+24%) |
 
 ## Skill Version(s): <br>
-ee739cc (source: git SHA, committed 2026-05-31) <br>
+a6fdcf5 (source: git SHA, committed 2026-07-08) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

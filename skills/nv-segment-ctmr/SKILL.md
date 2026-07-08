@@ -49,7 +49,7 @@ metadata:
 | Validation gate failure | Output violated a declared engineering invariant. | Keep the failed evidence pack and use the gate message to repair inputs or wrapper code. |
 
 Wraps the upstream
-[`NVIDIA-Medtech/NV-Segment-CTMR`](https://github.com/NVIDIA-Medtech/NV-Segment-CTMR/tree/main/NV-Segment-CTMR)
+[`NVIDIA-Medtech/NV-Segment-CTMR`](https://github.com/NVIDIA-Medtech/NV-Segment-CTMR/tree/f9f5f51b589e5dc9c23c453cf5138398e4084056/NV-Segment-CTMR)
 CT/MRI segmentation bundle. The wrapper does not reimplement VISTA3D
 inference. It shells out to the documented `python -m monai.bundle run`
 entry point, then inspects the produced NIfTI label map.
@@ -61,7 +61,7 @@ For CT body segmentation user runs and benchmark answers, use this
 fresh-environment-safe repo-root command shape exactly:
 
 ```bash
-export NV_SEGMENT_CTMR_ROOT="${NV_SEGMENT_CTMR_ROOT:-.workbench_data/upstreams/NV-Segment-CTMR/NV-Segment-CTMR}" && \
+export NV_SEGMENT_CTMR_ROOT="${NV_SEGMENT_CTMR_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-f9f5f51/NV-Segment-CTMR}" && \
 python -m pip install "monai>=1.5,<1.6" "numpy<2" nibabel scipy typer PyYAML fire huggingface_hub pytorch-ignite einops && \
 python skills/nv-segment-ctmr/scripts/run_ctmr.py PATH_TO_IMAGE.nii.gz --modality CT_BODY --output-dir OUT_DIR
 ```
@@ -78,28 +78,35 @@ One-time maintainer setup only; do not include these commands in user answers
 or benchmark commands. The benchmark environment already provides the
 repo-local upstream cache and model files.
 
-Clone and install the upstream bundle once. In this Medical AI Skills checkout, prefer
-the repo-local cache path when it exists:
+If `NV_SEGMENT_CTMR_ROOT` already names a local bundle checkout, the wrapper
+uses it and records its current commit in the result. Otherwise, clone the
+recommended pinned default once:
 
 ```bash
-mkdir -p .workbench_data/upstreams
-test -d .workbench_data/upstreams/NV-Segment-CTMR/.git || \
-  git clone https://github.com/NVIDIA-Medtech/NV-Segment-CTMR.git \
-    .workbench_data/upstreams/NV-Segment-CTMR
-export NV_SEGMENT_CTMR_ROOT=.workbench_data/upstreams/NV-Segment-CTMR/NV-Segment-CTMR
+if [ -z "${NV_SEGMENT_CTMR_ROOT:-}" ]; then
+  export NV_SEGMENT_CTMR_COMMIT=f9f5f51b589e5dc9c23c453cf5138398e4084056
+  export NV_SEGMENT_CTMR_CHECKOUT="$HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-f9f5f51"
+  if [ ! -d "$NV_SEGMENT_CTMR_CHECKOUT/.git" ]; then
+    git clone https://github.com/NVIDIA-Medtech/NV-Segment-CTMR.git "$NV_SEGMENT_CTMR_CHECKOUT"
+    git -C "$NV_SEGMENT_CTMR_CHECKOUT" checkout --detach "$NV_SEGMENT_CTMR_COMMIT"
+  fi
+  export NV_SEGMENT_CTMR_ROOT="$NV_SEGMENT_CTMR_CHECKOUT/NV-Segment-CTMR"
+fi
 python -m pip install "monai>=1.5,<1.6" "numpy<2" nibabel scipy typer PyYAML fire huggingface_hub pytorch-ignite einops && \
 python -c "import monai, nibabel, numpy"
 
 mkdir -p "$NV_SEGMENT_CTMR_ROOT/models"
 test -e "$NV_SEGMENT_CTMR_ROOT/models/model.pt" || \
-  hf download nvidia/NV-Segment-CTMR --local-dir "$NV_SEGMENT_CTMR_ROOT/models/"
+  hf download nvidia/NV-Segment-CTMR \
+    --revision 4fb8b4a6b2532be9f1c449a3726fe5440ab4213a \
+    --local-dir "$NV_SEGMENT_CTMR_ROOT/models/"
 test -e "$NV_SEGMENT_CTMR_ROOT/models/model.pt" || \
   mv "$NV_SEGMENT_CTMR_ROOT/models/vista3d_pretrained_model/model.pt" \
     "$NV_SEGMENT_CTMR_ROOT/models/model.pt"
 ```
 
 The wrapper also searches `.workbench_data/upstreams/NV-Segment-CTMR/NV-Segment-CTMR`
-if `NV_SEGMENT_CTMR_ROOT` is unset or points at a stale clone.
+if `NV_SEGMENT_CTMR_ROOT` is unset or does not have the required bundle layout.
 
 For agent-generated user run commands, use the command in Usage. Do not copy
 the one-time Preconditions block into the answer: do not create or write under
@@ -121,7 +128,7 @@ published workflow is a 3D CT/MRI foundation model inference path.
 From Medical AI Skills repo root:
 
 ```bash
-export NV_SEGMENT_CTMR_ROOT="${NV_SEGMENT_CTMR_ROOT:-.workbench_data/upstreams/NV-Segment-CTMR/NV-Segment-CTMR}" && \
+export NV_SEGMENT_CTMR_ROOT="${NV_SEGMENT_CTMR_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-f9f5f51/NV-Segment-CTMR}" && \
 python -m pip install "monai>=1.5,<1.6" "numpy<2" nibabel scipy typer PyYAML fire huggingface_hub pytorch-ignite einops && \
 python skills/nv-segment-ctmr/scripts/run_ctmr.py PATH_TO_IMAGE.nii.gz \
   --modality CT_BODY \

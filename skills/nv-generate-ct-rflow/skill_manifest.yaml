@@ -20,6 +20,7 @@ upstream_refs:
     name: NVIDIA-Medtech/NV-Generate-CTMR
     repo_url: https://github.com/NVIDIA-Medtech/NV-Generate-CTMR
     git_commit: 61c4ec709b84cad468852243c48e250bec732074
+    notes: Recommended default for a new checkout; an explicit caller-provided NV_GENERATE_ROOT is accepted.
   - kind: huggingface_repo
     name: nvidia/NV-Generate-CT
     repo_id: nvidia/NV-Generate-CT
@@ -74,14 +75,14 @@ runtime:
     - "${out}/samples"
   dependencies:
     nibabel: ">=4.0"
-    numpy: ">=1.23"
+    numpy: ">=1.24"
     typer: ">=0.9"
     torch: ">=2.1"
     monai: ">=1.5"
   side_effects:
     pip_packages:
       - nibabel>=4.0
-      - numpy>=1.23
+      - numpy>=1.24
       - typer>=0.9
       - torch>=2.1
       - "monai>=1.5"
@@ -123,9 +124,10 @@ runtime:
   external_assets:
     - kind: upstream_repo
       repo_url: https://github.com/NVIDIA-Medtech/NV-Generate-CTMR
-      install_path: $NV_GENERATE_ROOT
+      install_path: ~/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7
       install_command: >
         git clone https://github.com/NVIDIA-Medtech/NV-Generate-CTMR.git $NV_GENERATE_ROOT &&
+        git -C $NV_GENERATE_ROOT checkout --detach 61c4ec709b84cad468852243c48e250bec732074 &&
         pip install -r $NV_GENERATE_ROOT/requirements.txt
       contains:
         - scripts/inference.py

@@ -57,7 +57,7 @@ metadata:
 | Empty or schema-invalid output | Wrong input path, unsupported modality, or upstream failure. | Re-run with a known fixture and inspect the wrapper JSON plus stderr. |
 | Validation gate failure | Output violated a declared engineering invariant. | Keep the failed evidence pack and use the gate message to repair inputs or wrapper code. |
 
-Runs NVIDIA-Medtech [`NV-Reason-CXR-3B`](https://github.com/NVIDIA-Medtech/NV-Reason-CXR)
+Runs NVIDIA-Medtech [`NV-Reason-CXR-3B`](https://github.com/NVIDIA-Medtech/NV-Reason-CXR/tree/83a4d51c9fbbff68156a5f01796f04e26519b6ad)
 for chest X-ray image interpretation through either the documented local
 Hugging Face Transformers inference path or the public Hugging Face Space API.
 The wrapper does not reimplement the model, image preprocessing, or decoding.
@@ -100,8 +100,10 @@ that will run the skill:
 pip install torch==2.7.1 torchvision==0.22.1 transformers==4.56.1 Pillow
 ```
 
-The model weights are loaded from `nvidia/NV-Reason-CXR-3B` through
-Transformers. They may download to the Hugging Face cache on first use.
+The model weights and remote model code are loaded from
+`nvidia/NV-Reason-CXR-3B` revision
+`056bd0383b35226554da9dc5866e095df174ae19` through Transformers. They may
+download to the Hugging Face cache on first use.
 Set `TRANSFORMERS_OFFLINE=1` or pass `--local-files-only` only after the
 weights are already cached.
 

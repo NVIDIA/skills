@@ -58,7 +58,7 @@ metadata:
 | Validation gate failure | Output violated a declared engineering invariant. | Keep the failed evidence pack and use the gate message to repair inputs or wrapper code. |
 
 Wraps the upstream
-[`NVIDIA-Medtech/NV-Generate-CTMR`](https://github.com/NVIDIA-Medtech/NV-Generate-CTMR)
+[`NVIDIA-Medtech/NV-Generate-CTMR`](https://github.com/NVIDIA-Medtech/NV-Generate-CTMR/tree/61c4ec709b84cad468852243c48e250bec732074)
 rectified-flow synthesis pipeline. The wrapper does not reimplement diffusion,
 sampling, or autoencoder decoding — it shells out to the upstream
 `scripts.inference` entry point exactly as the project's README documents and
@@ -66,13 +66,20 @@ inspects the produced image/mask pairs.
 
 ## Preconditions
 
-1. Clone the upstream repo and point `NV_GENERATE_ROOT` at it (one-time):
+1. If `NV_GENERATE_ROOT` already names a local checkout, the wrapper uses it
+   and records its current commit in the result. Otherwise, create the
+   recommended pinned default checkout (one-time):
 
    ```bash
-   test -d "$HOME/nv-generate-ctmr/.git" || \
-     git clone https://github.com/NVIDIA-Medtech/NV-Generate-CTMR.git $HOME/nv-generate-ctmr
-   export NV_GENERATE_ROOT=$HOME/nv-generate-ctmr
-   pip install -r "$NV_GENERATE_ROOT/requirements.txt"
+   if [ -z "${NV_GENERATE_ROOT:-}" ]; then
+     export NV_GENERATE_COMMIT=61c4ec709b84cad468852243c48e250bec732074
+     export NV_GENERATE_ROOT="$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7"
+     if [ ! -d "$NV_GENERATE_ROOT/.git" ]; then
+       git clone https://github.com/NVIDIA-Medtech/NV-Generate-CTMR.git "$NV_GENERATE_ROOT"
+       git -C "$NV_GENERATE_ROOT" checkout --detach "$NV_GENERATE_COMMIT"
+     fi
+   fi
+   python -m pip install -r "$NV_GENERATE_ROOT/requirements.txt"
    ```
 
 2. Download the `rflow-ct` weights **and** the mask-candidate datasets
@@ -94,7 +101,7 @@ inspects the produced image/mask pairs.
 For agent-generated user run commands, prefer the short wrapper command in
 Usage. Do not prepend clone or model-download setup steps when `NV_GENERATE_ROOT`
 or the repo-local upstream cache is already present. In a fresh Python
-environment, still include `pip install -r "$NV_GENERATE_ROOT/requirements.txt"`
+environment, still include `python -m pip install -r "$NV_GENERATE_ROOT/requirements.txt"`
 before the wrapper unless the active environment has already proven those
 imports are available; cached weights do not imply cached Python packages. Run
 the wrapper from the medical-AI-skills repo root. If setup requires `cd "$NV_GENERATE_ROOT"`, return to the Medical AI Skills repo before invoking
@@ -103,7 +110,7 @@ the wrapper from the medical-AI-skills repo root. If setup requires `cd "$NV_GEN
 ## Usage
 
 ```bash
-export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/nv-generate-ctmr}" && \
+export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7}" && \
 python -m pip install -r "$NV_GENERATE_ROOT/requirements.txt" && \
 python skills/nv-generate-ct-rflow/scripts/run_rflow_ct.py \
   PATH_TO_CONFIG_INFER.json \
@@ -140,7 +147,7 @@ python skills/nv-generate-ct-rflow/scripts/list_anatomies.py --controllable
 python skills/nv-generate-ct-rflow/scripts/list_anatomies.py --filter tumor
 
 # Validate a fixture and preview cost without launching inference.
-NV_GENERATE_ROOT=$HOME/nv-generate-ctmr \
+NV_GENERATE_ROOT=$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7 \
   python skills/nv-generate-ct-rflow/scripts/run_rflow_ct.py \
     skills/nv-generate-ct-rflow/fixtures/abdomen_liver_spleen.json \
     --output-dir runs/preview --preflight-only

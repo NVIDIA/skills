@@ -1,5 +1,5 @@
 title: packed_sequences_long_context
-validated_on: "2026-03-15"
+validated_on: "2026-07-06"
 summary: >
   Megatron-Bridge currently supports two distinct packing paths: offline packed
   SFT for text-only finetuning and in-batch packing for some VLM finetuning
@@ -17,6 +17,8 @@ validation_status:
     - code_verified
   vlm_packing_helper_behavior:
     - code_verified
+  mapped_padding_loss_mask_behavior:
+    - code_verified
   packed_cp_functional_smoke_in_tree:
     - recipe_verified
   long_context_llama_recipe_coverage:
@@ -30,8 +32,8 @@ feature_meaning:
     Pre-tokenized packed finetuning datasets built through PackedSequenceSpecs
     and consumed through THD packed-sequence metadata.
   vlm_in_batch_packing: >
-    Runtime batch concatenation path for some VLM training flows controlled by
-    pack_sequences_in_batch=True.
+    Collate-time batch concatenation path for supported VLM training flows,
+    controlled by enable_in_batch_packing=True and emitted in MCore THD form.
   long_context_training: >
     Training at longer sequence lengths, primarily enabled through context
     parallelism plus recipe-specific long-context presets and memory tuning
@@ -40,13 +42,14 @@ recommended_path:
   llm_packed_sft:
     train.micro_batch_size: 1
     dataset.dataset_kwargs.pad_to_max_length: true
-    dataset.packed_sequence_specs.packed_sequence_size: match_seq_length
+    dataset.enable_offline_packing: true
+    dataset.offline_packing_specs.packed_sequence_size: match_seq_length
   cp_finetuning:
     model.calculate_per_token_loss: true
     ddp.average_in_collective: false
-    dataset.packed_sequence_specs.pad_seq_to_mult: 2 * context_parallel_size
+    dataset.offline_packing_specs.pad_seq_to_mult: 2 * context_parallel_size
   vlm_in_batch_packing:
-    dataset.pack_sequences_in_batch: true
+    dataset.enable_in_batch_packing: true
     train.micro_batch_size: ">1"
 known_constraints:
   - seq_length must be divisible by 2 * context_parallel_size when CP > 1.
@@ -55,12 +58,13 @@ known_constraints:
   - For finetuning with CP > 1, calculate_per_token_loss must be true.
   - For finetuning with CP > 1, ddp.average_in_collective must be false.
   - pad_cu_seqlens=true also requires pad_to_max_length=true.
+  - Synthetic padding rows must retain an all-zero loss mask after samples_mapping remaps their indices.
   - Fine-tuning sequence packing is documented as unsupported with MTP.
 known_limitations:
   - Packing support is model-family-specific rather than universal.
   - Qwen3-Next SFT disables packed sequences.
   - GLM-4.5 SFT and PEFT disable packed sequences.
-  - Qwen3.5-VL disables pack_sequences_in_batch.
+  - Qwen3.5-VL disables enable_in_batch_packing.
   - The repo does not contain checked-in benchmark results validating long-context throughput claims.
 evidence:
   - docs/training/packed-sequences.md
@@ -69,19 +73,24 @@ evidence:
   - docs/models/llama/llama3.md
   - docs/training/hierarchical-context-parallel.md
   - src/megatron/bridge/data/datasets/packed_sequence.py
+  - src/megatron/bridge/data/datasets/packed_parquet.py
   - src/megatron/bridge/data/datasets/sft.py
   - src/megatron/bridge/training/utils/packed_seq_utils.py
   - src/megatron/bridge/training/gpt_step.py
+  - src/megatron/bridge/data/sequence_batching.py
   - src/megatron/bridge/training/vlm_step.py
   - src/megatron/bridge/training/config.py
   - src/megatron/bridge/recipes/utils/finetune_utils.py
   - src/megatron/bridge/recipes/common.py
-  - src/megatron/bridge/recipes/llama/llama3.py
-  - src/megatron/bridge/recipes/qwen/qwen3_next.py
-  - src/megatron/bridge/recipes/glm/glm45.py
-  - src/megatron/bridge/recipes/qwen_vl/qwen35_vl.py
+  - src/megatron/bridge/recipes/llama/h100/llama3.py
+  - src/megatron/bridge/recipes/qwen/h100/qwen3_next.py
+  - src/megatron/bridge/recipes/glm/h100/glm45.py
+  - src/megatron/bridge/recipes/qwen_vl/h100/qwen35_vl.py
   - src/megatron/bridge/models/qwen_vl/modelling_qwen3_vl/model.py
-  - tests/functional_tests/training/test_seqpacking_cp_example.py
+  - tests/functional_tests/test_groups/training/test_seqpacking_cp_example.py
+  - tests/unit_tests/data/datasets/test_packed_parquet.py
+  - tests/unit_tests/data/datasets/test_sft.py
+  - tests/unit_tests/data/vlm_datasets/test_batching.py
   - tests/unit_tests/training/utils/test_packed_seq_utils.py
   - tests/unit_tests/training/test_config.py
   - tests/unit_tests/training/test_vlm_step.py

@@ -7,13 +7,13 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nv-generate-ct-rflow`
-- Evaluation date: 2026-05-31
+- Evaluation date: 2026-07-08
 - NVSkills-Eval profile: `external`
-- Environment: `local`
+- Environment: `astra-sandbox`
 - Dataset: 2 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
+- Overall verdict: PASS
 
 ## Agents Used
 
@@ -54,36 +54,30 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 88% (+10%) | 76% (+26%) |
-| Discoverability | 4 | 90% (-5%) | 70% (+14%) |
-| Effectiveness | 4 | 64% (+3%) | 55% (+36%) |
-| Efficiency | 4 | 69% (-5%) | 58% (+15%) |
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 80% (+50%) | 64% (+42%) |
+| Discoverability | 2 | 92% (+54%) | 62% (+28%) |
+| Effectiveness | 2 | 38% (+26%) | 36% (+29%) |
+| Efficiency | 2 | 78% (+37%) | 58% (+21%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 36 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 6 total findings.
 
 Top findings:
 
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`fixtures/ct_image_only_default.json:4`)
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`fixtures/ct_mask_lung_tumor.json:6`)
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/fov-and-downloads.md:16`)
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/fov-and-downloads.md:17`)
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/fov-and-downloads.md:18`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nv-generate-ct-rflow/SKILL.md`)
+- LOW SCHEMA/unexpected_file: Unexpected 'fixtures' in skill root (`skills/nv-generate-ct-rflow/fixtures`)
+- LOW SCHEMA/unexpected_file: Unexpected 'skill_manifest.yaml' in skill root (`skills/nv-generate-ct-rflow/skill_manifest.yaml`)
+- LOW SCHEMA/unexpected_file: Unexpected 'validators' in skill root (`skills/nv-generate-ct-rflow/validators`)
+- LOW SCHEMA/unexpected_file: Unexpected 'tests' in skill root (`skills/nv-generate-ct-rflow/tests`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 1 total findings.
-
-Top findings:
-
-- HIGH DUPLICATE/duplicate: Duplicate content found across scripts/run_ct_image.py and scripts/run_rflow_ct.py:
-  "_load_config_override()" in scripts/run_ct_image.py (lines 118-136)
-  vs "_load_config_override()" in scripts/run_rflow_ct.py (lines 112-131) (`scripts/run_ct_image.py:118`)
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 
-The skill should be reviewed before NVSkills-Eval publication. Skill owners should address the findings above and rerun NVSkills-Eval to refresh this benchmark.
+The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

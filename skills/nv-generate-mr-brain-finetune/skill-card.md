@@ -9,33 +9,40 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers who need to finetune the NV-Generate-CTMR MR-brain diffusion UNet from user-supplied NIfTI training volumes for medical imaging research and development. <br>
+Developers and engineers finetuning the NV-Generate-CTMR MR-brain diffusion UNet on custom NIfTI brain MRI volumes for research and development purposes. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [NV-Generate-CTMR (upstream model repository)](https://github.com/NVIDIA-Medtech/NV-Generate-CTMR) <br>
+- [NV-Generate-CTMR upstream repository](https://github.com/NVIDIA-Medtech/NV-Generate-CTMR) <br>
+- [BENCHMARK.md](BENCHMARK.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Files] <br>
-**Output Format:** [JSON result summary to stdout; checkpoint, embedding, and inference image files to output directory] <br>
+**Output Type(s):** [Shell commands, Configuration files, Files] <br>
+**Output Format:** [JSON result summary with file paths] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Writes staged configs, latent embeddings, checkpoints, optional inference images, and workflow summary under the caller-provided output directory] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- claude-code <br>
+- codex <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 2 evaluation tasks (2 positive skill-activation tasks, 2 attempts per task). Pass threshold: 50%. <br>
+Evaluated against 2 evaluation tasks (2 positive skill-activation cases) from the NVSkills-Eval external profile in astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -59,14 +66,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 4 | 100% (+50%) | 100% (+0%) |
-| Correctness | 4 | 95% (-1%) | 95% (+57%) |
-| Discoverability | 4 | 89% (+11%) | 71% (+10%) |
-| Effectiveness | 4 | 77% (+10%) | 72% (+62%) |
-| Efficiency | 4 | 65% (+15%) | 54% (+5%) |
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 98% (+75%) | 85% (+63%) |
+| Discoverability | 2 | 93% (+57%) | 86% (+48%) |
+| Effectiveness | 2 | 58% (+51%) | 60% (+53%) |
+| Efficiency | 2 | 74% (+38%) | 75% (+31%) |
 
 ## Skill Version(s): <br>
-a0da60d (source: git SHA, committed 2026-05-31) <br>
+0864914 (source: git SHA, committed 2026-07-08) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

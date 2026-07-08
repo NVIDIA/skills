@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `aiq-research`
-- Evaluation date: 2026-07-02
+- Evaluation date: 2026-07-08
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 3 evaluation tasks
@@ -54,11 +54,11 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 3 | 67% (-33%) | 100% (+17%) |
-| Correctness | 3 | 93% (+6%) | 80% (+17%) |
-| Discoverability | 3 | 100% (-0%) | 54% (+16%) |
-| Effectiveness | 3 | 65% (-1%) | 69% (+14%) |
-| Efficiency | 3 | 85% (-3%) | 56% (+14%) |
+| Security | 3 | 100% (+0%) | 100% (+0%) |
+| Correctness | 3 | 43% (+22%) | 74% (+31%) |
+| Discoverability | 3 | 33% (+23%) | 38% (+21%) |
+| Effectiveness | 3 | 43% (+23%) | 72% (+26%) |
+| Efficiency | 3 | 47% (+21%) | 43% (+14%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 

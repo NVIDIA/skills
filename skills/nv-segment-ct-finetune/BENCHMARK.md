@@ -7,13 +7,13 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nv-segment-ct-finetune`
-- Evaluation date: 2026-05-31
+- Evaluation date: 2026-07-08
 - NVSkills-Eval profile: `external`
-- Environment: `local`
+- Environment: `astra-sandbox`
 - Dataset: 2 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
+- Overall verdict: PASS
 
 ## Agents Used
 
@@ -54,40 +54,30 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 4 | 75% (+38%) | 100% (+0%) |
-| Correctness | 4 | 81% (-10%) | 79% (+15%) |
-| Discoverability | 4 | 91% (+5%) | 58% (+5%) |
-| Effectiveness | 4 | 68% (-17%) | 71% (+27%) |
-| Efficiency | 4 | 80% (+14%) | 42% (-0%) |
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 94% (+67%) | 88% (+59%) |
+| Discoverability | 2 | 83% (+49%) | 76% (+35%) |
+| Effectiveness | 2 | 78% (+68%) | 78% (+64%) |
+| Efficiency | 2 | 69% (+31%) | 69% (+25%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 7 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 5 total findings.
 
 Top findings:
 
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`scripts/run_finetune.py:880`)
 - LOW SCHEMA/unexpected_file: Unexpected 'fixtures' in skill root (`skills/nv-segment-ct-finetune/fixtures`)
 - LOW SCHEMA/unexpected_file: Unexpected 'skill_manifest.yaml' in skill root (`skills/nv-segment-ct-finetune/skill_manifest.yaml`)
 - LOW SCHEMA/unexpected_file: Unexpected 'validators' in skill root (`skills/nv-segment-ct-finetune/validators`)
 - LOW SCHEMA/unexpected_file: Unexpected 'tests' in skill root (`skills/nv-segment-ct-finetune/tests`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/nv-segment-ct-finetune/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 2 total findings.
-
-Top findings:
-
-- HIGH DUPLICATE/duplicate: Duplicate content found within SKILL.md:
-  "## Usage" in SKILL.md (lines 44-84)
-  vs "## Examples" in SKILL.md (lines 85-105) (`SKILL.md:44`)
-- HIGH DUPLICATE/duplicate: Duplicate content found across SKILL.md and scripts/run_finetune.py:
-  "## Purpose" in SKILL.md (lines 3-9)
-  vs "(module docstring)" in scripts/run_finetune.py (lines 1-20)
-  vs "main()" in scripts/run_finetune.py (lines 1273-1824) (`SKILL.md:3`)
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 
-The skill should be reviewed before NVSkills-Eval publication. Skill owners should address the findings above and rerun NVSkills-Eval to refresh this benchmark.
+The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

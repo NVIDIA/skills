@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nv-generate-mr`
-- Evaluation date: 2026-05-31
+- Evaluation date: 2026-07-08
 - NVSkills-Eval profile: `external`
-- Environment: `local`
+- Environment: `astra-sandbox`
 - Dataset: 2 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,29 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 4 | 100% (+25%) | 100% (+0%) |
-| Correctness | 4 | 93% (+5%) | 83% (+23%) |
-| Discoverability | 4 | 94% (-1%) | 91% (+15%) |
-| Effectiveness | 4 | 77% (-3%) | 63% (+31%) |
-| Efficiency | 4 | 76% (-4%) | 81% (+17%) |
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 60% (+22%) | 85% (+19%) |
+| Discoverability | 2 | 100% (+25%) | 90% (+17%) |
+| Effectiveness | 2 | 18% (+6%) | 57% (+17%) |
+| Efficiency | 2 | 94% (+22%) | 86% (+14%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 8 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 6 total findings.
 
 Top findings:
 
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/fov-and-downloads.md:14`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nv-generate-mr/SKILL.md`)
-- LOW SCHEMA/unexpected_file: Unexpected 'fixtures' in skill root (`skills/nv-generate-mr/fixtures`)
-- LOW SCHEMA/unexpected_file: Unexpected 'skill_manifest.yaml' in skill root (`skills/nv-generate-mr/skill_manifest.yaml`)
 - LOW SCHEMA/unexpected_file: Unexpected 'validators' in skill root (`skills/nv-generate-mr/validators`)
+- LOW SCHEMA/unexpected_file: Unexpected 'skill_manifest.yaml' in skill root (`skills/nv-generate-mr/skill_manifest.yaml`)
+- LOW SCHEMA/unexpected_file: Unexpected 'fixtures' in skill root (`skills/nv-generate-mr/fixtures`)
+- LOW SCHEMA/unexpected_file: Unexpected 'tests' in skill root (`skills/nv-generate-mr/tests`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 5 file(s)
-- Inter-Skill Deduplication: Parsed skill 'nv-generate-mr': 128 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

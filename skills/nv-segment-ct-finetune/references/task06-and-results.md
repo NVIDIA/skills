@@ -12,8 +12,10 @@ asset outside normal wrapper execution:
 
 ```bash
 cd skills/nv-segment-ct-finetune
-hf download nvidia/NV-Segment-CT --local-dir bundle/
-python -c "import urllib.request; urllib.request.urlretrieve('https://raw.githubusercontent.com/NVIDIA-Medtech/NV-Segment-CTMR/main/NV-Segment-CT/configs/label_dict.json', 'bundle/label_dict.json')"
+hf download nvidia/NV-Segment-CT \
+  --revision afb51518689f71e6abb367ee6301b2cd0225c66a \
+  --local-dir bundle/
+python -c "import urllib.request; urllib.request.urlretrieve('https://raw.githubusercontent.com/NVIDIA-Medtech/NV-Segment-CTMR/f9f5f51b589e5dc9c23c453cf5138398e4084056/NV-Segment-CT/configs/label_dict.json', 'bundle/label_dict.json')"
 ```
 
 Expected local files:

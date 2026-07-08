@@ -20,7 +20,7 @@ upstream_refs:
     name: NVIDIA-Medtech/NV-Generate-CTMR
     repo_url: https://github.com/NVIDIA-Medtech/NV-Generate-CTMR
     git_commit: 61c4ec709b84cad468852243c48e250bec732074
-    notes: uses existing upstream VAE configs plus scripts/transforms.py and scripts/utils.py; upstream has no scripts/train_vae.py entrypoint
+    notes: Recommended default for a new checkout; an explicit caller-provided NV_GENERATE_ROOT is accepted. Uses upstream VAE configs and helpers; upstream has no scripts/train_vae.py entrypoint.
 license: Apache-2.0
 intended_use:
   summary: >
@@ -119,9 +119,10 @@ runtime:
   external_assets:
     - kind: upstream_repo
       repo_url: https://github.com/NVIDIA-Medtech/NV-Generate-CTMR
-      install_path: $NV_GENERATE_ROOT
+      install_path: ~/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7
       install_command: >
         git clone https://github.com/NVIDIA-Medtech/NV-Generate-CTMR.git $NV_GENERATE_ROOT &&
+        git -C $NV_GENERATE_ROOT checkout --detach 61c4ec709b84cad468852243c48e250bec732074 &&
         pip install -r $NV_GENERATE_ROOT/requirements.txt
       contains:
         - scripts/download_model_data.py

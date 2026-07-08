@@ -64,7 +64,8 @@
         "inference_seconds",
         "local_files_only",
         "generated_tokens",
-        "truncated_by_max_new_tokens"
+        "truncated_by_max_new_tokens",
+        "model_revision"
       ],
       "properties": {
         "model": {"type": "string", "minLength": 1},
@@ -78,7 +79,8 @@
         "generated_tokens": {"type": ["integer", "null"], "minimum": 0},
         "truncated_by_max_new_tokens": {"type": ["boolean", "null"]},
         "transformers_version": {"type": ["string", "null"]},
-        "torch_version": {"type": ["string", "null"]}
+        "torch_version": {"type": ["string", "null"]},
+        "model_revision": {"type": ["string", "null"]}
       },
       "additionalProperties": false
     },

@@ -7,14 +7,18 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nv-segment-ctmr`
-- Evaluation date: 2026-05-31
+- Evaluation date: 2026-07-08
 - NVSkills-Eval profile: `external`
+- Environment: `astra-sandbox`
+- Dataset: 2 evaluation tasks
+- Attempts per task: 1
+- Pass threshold: 50%
 - Overall verdict: PASS
-- Tier 3 live agent evaluation: not available in this report
 
 ## Agents Used
 
-- Tier 3 agent details were not available in this report.
+- `claude-code`
+- `codex`
 
 ## Metrics Used
 
@@ -28,42 +32,51 @@ Reported benchmark dimensions:
 
 Underlying evaluation signals used in this run:
 
-- No Tier 3 evaluation signal details were available in this report.
+- `security` (Security): checks for unsafe operations, secret leakage, and unauthorized access.
+- `skill_execution` (Skill Execution): verifies that the agent loaded the expected skill and workflow.
+- `skill_efficiency` (Efficiency): checks routing quality, decoy avoidance, and redundant tool usage.
+- `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
+- `goal_accuracy` (Goal Accuracy): checks whether the overall user task completed successfully.
+- `behavior_check` (Behavior Check): verifies expected behavior steps, including safety expectations.
+- `token_efficiency` (Token Efficiency): compares token usage with and without the skill.
 
 ## Test Tasks
 
-Tier 3 evaluation task details were not available in this report.
+The benchmark dataset contained 2 evaluation tasks:
+
+- Positive tasks: 2 tasks where the skill was expected to activate.
+- Negative tasks: 0 tasks where no skill was expected.
+- Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
+
+Task composition is derived from the evaluation dataset when possible. Entries with `expected_skill` set are treated as positive skill-activation cases, while entries with `expected_skill: null` are treated as negative activation cases.
 
 ## Results
 
-Tier 3 dimension rollup was not available in this report.
+| Dimension | Num | `claude-code` | `codex` |
+|---|---:|---:|---:|
+| Security | 2 | 100% (+0%) | 100% (+0%) |
+| Correctness | 2 | 63% (+52%) | 82% (+56%) |
+| Discoverability | 2 | 39% (+24%) | 72% (+36%) |
+| Effectiveness | 2 | 54% (+32%) | 76% (+58%) |
+| Efficiency | 2 | 42% (+13%) | 62% (+24%) |
+
+Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 9 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 6 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nv-segment-ctmr/SKILL.md`)
-- MEDIUM SECURITY/subprocess module call (AST4): Dangerous Code Execution:         proc = subprocess.run(
-            cmd,
-            cwd=str(resolved_root),
-            env=run_env,
-            capture_output=True,
-            text=True,
-            timeout=timeout_seconds (`scripts/run_ctmr.py:541`)
-- MEDIUM SECURITY/Unknown (LP3): MCP Least Privilege: The skill uses Bash capabilities including environment variable manipulation, file reads/writes, and shell execution, bu (`SKILL.md:1`)
-- LOW SCHEMA/unexpected_file: Unexpected 'fixtures' in skill root (`skills/nv-segment-ctmr/fixtures`)
+- LOW SCHEMA/unexpected_file: Unexpected 'validators' in skill root (`skills/nv-segment-ctmr/validators`)
 - LOW SCHEMA/unexpected_file: Unexpected 'skill_manifest.yaml' in skill root (`skills/nv-segment-ctmr/skill_manifest.yaml`)
+- LOW SCHEMA/unexpected_file: Unexpected 'fixtures' in skill root (`skills/nv-segment-ctmr/fixtures`)
+- LOW SCHEMA/unexpected_file: Unexpected 'tests' in skill root (`skills/nv-segment-ctmr/tests`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 4 file(s)
-- Inter-Skill Deduplication: Parsed skill 'nv-segment-ctmr': 126 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

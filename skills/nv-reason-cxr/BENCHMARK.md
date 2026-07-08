@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nv-reason-cxr`
-- Evaluation date: 2026-06-14
+- Evaluation date: 2026-07-08
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 2 evaluation tasks
@@ -55,10 +55,10 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 73% (+61%) | 72% (+45%) |
-| Discoverability | 2 | 46% (+33%) | 92% (+67%) |
-| Effectiveness | 2 | 85% (+73%) | 76% (+47%) |
-| Efficiency | 2 | 51% (+27%) | 92% (+56%) |
+| Correctness | 2 | 74% (+47%) | 94% (+70%) |
+| Discoverability | 2 | 48% (+35%) | 88% (+49%) |
+| Effectiveness | 2 | 87% (+50%) | 100% (+84%) |
+| Efficiency | 2 | 54% (+28%) | 83% (+41%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 

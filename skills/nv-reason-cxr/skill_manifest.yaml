@@ -103,9 +103,10 @@ runtime:
       repo_id: nvidia/NV-Reason-CXR-3B
       install_command: >
         python -c "from transformers import AutoModelForImageTextToText,
-        AutoProcessor; AutoProcessor.from_pretrained('nvidia/NV-Reason-CXR-3B');
+        AutoProcessor; AutoProcessor.from_pretrained('nvidia/NV-Reason-CXR-3B',
+        revision='056bd0383b35226554da9dc5866e095df174ae19');
         AutoModelForImageTextToText.from_pretrained('nvidia/NV-Reason-CXR-3B',
-        torch_dtype='auto')"
+        revision='056bd0383b35226554da9dc5866e095df174ae19', torch_dtype='auto')"
     - kind: huggingface_space
       repo_id: nvidia/nv-reason-cxr
       public: true
@@ -117,7 +118,7 @@ runtime:
       - Pillow>=10.0
       - huggingface_hub>=0.30
     local_writes:
-      - {path: "<optional caller-provided --out-dir for generated fixture artifacts>", approx_mb_max: 5}
+      - {path: "<caller-provided --out-dir>", approx_mb_max: 5}
     home_writes:
       - {path: ~/.cache/huggingface/, approx_mb_max: 8000}
     network_endpoints:

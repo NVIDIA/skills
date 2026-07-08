@@ -20,6 +20,7 @@ upstream_refs:
     name: NVIDIA-Medtech/NV-Segment-CTMR
     repo_url: https://github.com/NVIDIA-Medtech/NV-Segment-CTMR
     git_commit: f9f5f51b589e5dc9c23c453cf5138398e4084056
+    notes: Recommended default for a new checkout; an explicit caller-provided NV_SEGMENT_CTMR_ROOT is accepted.
   - kind: huggingface_repo
     name: nvidia/NV-Segment-CTMR
     repo_id: nvidia/NV-Segment-CTMR
@@ -104,10 +105,11 @@ runtime:
   external_assets:
     - kind: upstream_repo
       repo_url: https://github.com/NVIDIA-Medtech/NV-Segment-CTMR
-      install_path: $NV_SEGMENT_CTMR_ROOT
+      install_path: ~/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-f9f5f51/NV-Segment-CTMR
       install_command: >
-        git clone https://github.com/NVIDIA-Medtech/NV-Segment-CTMR.git $HOME/NV-Segment-CTMR &&
-        export NV_SEGMENT_CTMR_ROOT=$HOME/NV-Segment-CTMR/NV-Segment-CTMR &&
+        git clone https://github.com/NVIDIA-Medtech/NV-Segment-CTMR.git $HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-f9f5f51 &&
+        git -C $HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-f9f5f51 checkout --detach f9f5f51b589e5dc9c23c453cf5138398e4084056 &&
+        export NV_SEGMENT_CTMR_ROOT=$HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-f9f5f51/NV-Segment-CTMR &&
         pip install -r $NV_SEGMENT_CTMR_ROOT/requirements.txt
       contains:
         - configs/inference.json
@@ -120,7 +122,7 @@ runtime:
       install_path: $NV_SEGMENT_CTMR_ROOT/models/
       install_command: >
         mkdir -p $NV_SEGMENT_CTMR_ROOT/models &&
-        hf download nvidia/NV-Segment-CTMR --local-dir $NV_SEGMENT_CTMR_ROOT/models/ &&
+        hf download nvidia/NV-Segment-CTMR --revision 4fb8b4a6b2532be9f1c449a3726fe5440ab4213a --local-dir $NV_SEGMENT_CTMR_ROOT/models/ &&
         mv $NV_SEGMENT_CTMR_ROOT/models/vista3d_pretrained_model/model.pt
         $NV_SEGMENT_CTMR_ROOT/models/model.pt
       contains:

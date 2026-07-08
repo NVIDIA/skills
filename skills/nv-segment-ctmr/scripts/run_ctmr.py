@@ -41,7 +41,11 @@ import typer
 app = typer.Typer(add_completion=False)
 
 SKILL_NAME = "nv_segment_ctmr"
-MODEL_REPO = "https://github.com/NVIDIA-Medtech/NV-Segment-CTMR/tree/main/NV-Segment-CTMR"
+DEFAULT_UPSTREAM_COMMIT = "f9f5f51b589e5dc9c23c453cf5138398e4084056"
+MODEL_REPO = (
+    "https://github.com/NVIDIA-Medtech/NV-Segment-CTMR/tree/"
+    f"{DEFAULT_UPSTREAM_COMMIT}/NV-Segment-CTMR"
+)
 SUPPORTED_MODALITIES = ("CT_BODY", "MRI_BODY", "MRI_BRAIN")
 GEOMETRY_TOLERANCE = float("1e-4")
 REPO_ROOT = Path(__file__).resolve().parents[int("3")]

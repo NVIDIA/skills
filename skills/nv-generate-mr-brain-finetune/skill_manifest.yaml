@@ -19,8 +19,8 @@ upstream_refs:
   - kind: github_repo
     name: NVIDIA-Medtech/NV-Generate-CTMR
     repo_url: https://github.com/NVIDIA-Medtech/NV-Generate-CTMR
-    git_commit: e247704679e29eca965bb1f45fd08a280900796b
-    notes: uses existing upstream scripts/diff_model_create_training_data.py, scripts/diff_model_train.py, and scripts/diff_model_infer.py
+    git_commit: 61c4ec709b84cad468852243c48e250bec732074
+    notes: Recommended default for a new checkout; an explicit caller-provided NV_GENERATE_ROOT is accepted. Uses the existing upstream training and inference scripts.
   - kind: huggingface_repo
     name: nvidia/NV-Generate-MR-Brain
     repo_id: nvidia/NV-Generate-MR-Brain
@@ -119,9 +119,10 @@ runtime:
   external_assets:
     - kind: upstream_repo
       repo_url: https://github.com/NVIDIA-Medtech/NV-Generate-CTMR
-      install_path: $NV_GENERATE_ROOT
+      install_path: ~/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7
       install_command: >
         git clone https://github.com/NVIDIA-Medtech/NV-Generate-CTMR.git $NV_GENERATE_ROOT &&
+        git -C $NV_GENERATE_ROOT checkout --detach 61c4ec709b84cad468852243c48e250bec732074 &&
         pip install -r $NV_GENERATE_ROOT/requirements.txt
       contains:
         - scripts/download_model_data.py

@@ -737,7 +737,6 @@ def main(
             }
         )
         raise typer.Exit(2)
-
     if output_dir is None:
         output_dir = upstream_root / "output"
     output_dir = output_dir.expanduser().resolve()

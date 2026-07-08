@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nv-segment-ct`
-- Evaluation date: 2026-05-31
+- Evaluation date: 2026-07-08
 - NVSkills-Eval profile: `external`
-- Environment: `local`
+- Environment: `astra-sandbox`
 - Dataset: 2 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -54,34 +54,29 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 4 | 100% (+0%) | 75% (-25%) |
-| Correctness | 4 | 93% (-5%) | 73% (-22%) |
-| Discoverability | 4 | 98% (+18%) | 69% (-15%) |
-| Effectiveness | 4 | 71% (-28%) | 65% (-19%) |
-| Efficiency | 4 | 93% (+30%) | 65% (-6%) |
+| Security | 2 | 100% (+50%) | 100% (+0%) |
+| Correctness | 2 | 100% (+32%) | 95% (+36%) |
+| Discoverability | 2 | 98% (+35%) | 89% (+21%) |
+| Effectiveness | 2 | 78% (+26%) | 80% (+37%) |
+| Efficiency | 2 | 90% (+33%) | 83% (+14%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 10 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 6 total findings.
 
 Top findings:
 
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`fixtures/generate_preflight_fixture.py:52`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nv-segment-ct/SKILL.md`)
-- MEDIUM SECURITY/Unknown (LP3): MCP Least Privilege: The skill performs file reads, file writes, and network operations (downloading ~832 MB model bundle from HuggingFace an (`SKILL.md:1`)
-- MEDIUM SECURITY/Unknown (SQP-2): The use of `tf.extract(member, path=dest_dir)` without path traversal protection means a maliciously crafted tar archive (`fixtures/fetch_spleen_fixture.py:93`)
 - LOW SCHEMA/unexpected_file: Unexpected 'validators' in skill root (`skills/nv-segment-ct/validators`)
+- LOW SCHEMA/unexpected_file: Unexpected 'skill_manifest.yaml' in skill root (`skills/nv-segment-ct/skill_manifest.yaml`)
+- LOW SCHEMA/unexpected_file: Unexpected 'fixtures' in skill root (`skills/nv-segment-ct/fixtures`)
+- LOW SCHEMA/unexpected_file: Unexpected 'tests' in skill root (`skills/nv-segment-ct/tests`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 5 file(s)
-- Inter-Skill Deduplication: Parsed skill 'nv-segment-ct': 92 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 
