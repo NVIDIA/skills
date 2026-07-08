@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 230,
+  "skill_count": 229,
   "result_row_count": 2070,
   "skills_without_results": [
     "deepstream-generate-pipeline",
@@ -18,7 +18,6 @@
     "mcore-run-on-slurm",
     "mcore-split-pr",
     "mcore-testing",
-    "nv-segment-ctmr",
     "omniverse-cad-to-simready",
     "omniverse-realtime-viewer",
     "omniverse-usd-performance-tuning",
@@ -67,7 +66,7 @@
     },
     {
       "skill": "aiq-research",
-      "evaluation_date": "2026-07-02",
+      "evaluation_date": "2026-07-08",
       "profile": "external",
       "environment": "astra-sandbox",
       "tasks": 3,
@@ -81,7 +80,7 @@
       "catalog_dir": "aiq-research",
       "component": "AIQ",
       "has_results": true,
-      "average_uplift_pct": 4.7
+      "average_uplift_pct": 18.1
     },
     {
       "skill": "amc-run-sample-calibration",
@@ -298,24 +297,6 @@
       "component": "cuOpt",
       "has_results": true,
       "average_uplift_pct": 50.5
-    },
-    {
-      "skill": "cuopt-user-rules",
-      "evaluation_date": "2026-06-26",
-      "profile": "external",
-      "environment": "astra-sandbox",
-      "tasks": 1,
-      "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
-      "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "catalog_dir": "cuopt-user-rules",
-      "component": null,
-      "has_results": true,
-      "average_uplift_pct": 12.1
     },
     {
       "skill": "cupynumeric-hdf5",
@@ -2077,11 +2058,11 @@
     },
     {
       "skill": "nemo-mbridge-perf-sequence-packing",
-      "evaluation_date": "2026-06-02",
+      "evaluation_date": "2026-07-06",
       "profile": "external",
-      "environment": "local",
+      "environment": "astra-sandbox",
       "tasks": 1,
-      "attempts_per_task": 2,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
       "verdict": "PASS",
       "agents": [
@@ -2091,7 +2072,7 @@
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "has_results": true,
-      "average_uplift_pct": -2.2
+      "average_uplift_pct": 45.1
     },
     {
       "skill": "nemo-mbridge-perf-tp-dp-comm-overlap",
@@ -2329,13 +2310,13 @@
     },
     {
       "skill": "nv-generate-ct-rflow",
-      "evaluation_date": "2026-05-31",
+      "evaluation_date": "2026-07-08",
       "profile": "external",
-      "environment": "local",
+      "environment": "astra-sandbox",
       "tasks": 2,
-      "attempts_per_task": 2,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
-      "verdict": "FAIL",
+      "verdict": "PASS",
       "agents": [
         "claude-code",
         "codex"
@@ -2343,15 +2324,15 @@
       "catalog_dir": "nv-generate-ct-rflow",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 9.4
+      "average_uplift_pct": 28.7
     },
     {
       "skill": "nv-generate-mr",
-      "evaluation_date": "2026-05-31",
+      "evaluation_date": "2026-07-08",
       "profile": "external",
-      "environment": "local",
+      "environment": "astra-sandbox",
       "tasks": 2,
-      "attempts_per_task": 2,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
       "verdict": "PASS",
       "agents": [
@@ -2361,15 +2342,15 @@
       "catalog_dir": "nv-generate-mr",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 10.8
+      "average_uplift_pct": 14.2
     },
     {
       "skill": "nv-generate-mr-brain",
-      "evaluation_date": "2026-05-31",
+      "evaluation_date": "2026-07-08",
       "profile": "external",
-      "environment": "local",
+      "environment": "astra-sandbox",
       "tasks": 2,
-      "attempts_per_task": 2,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
       "verdict": "PASS",
       "agents": [
@@ -2379,15 +2360,15 @@
       "catalog_dir": "nv-generate-mr-brain",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 9.6
+      "average_uplift_pct": 40.5
     },
     {
       "skill": "nv-generate-mr-brain-finetune",
-      "evaluation_date": "2026-05-31",
+      "evaluation_date": "2026-07-08",
       "profile": "external",
-      "environment": "local",
+      "environment": "astra-sandbox",
       "tasks": 2,
-      "attempts_per_task": 2,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
       "verdict": "PASS",
       "agents": [
@@ -2397,15 +2378,15 @@
       "catalog_dir": "nv-generate-mr-brain-finetune",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 21.9
+      "average_uplift_pct": 41.6
     },
     {
       "skill": "nv-generate-vae-finetune",
-      "evaluation_date": "2026-05-31",
+      "evaluation_date": "2026-07-08",
       "profile": "external",
-      "environment": "local",
+      "environment": "astra-sandbox",
       "tasks": 2,
-      "attempts_per_task": 2,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
       "verdict": "PASS",
       "agents": [
@@ -2415,11 +2396,11 @@
       "catalog_dir": "nv-generate-vae-finetune",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 13.6
+      "average_uplift_pct": 36.5
     },
     {
       "skill": "nv-reason-cxr",
-      "evaluation_date": "2026-06-14",
+      "evaluation_date": "2026-07-08",
       "profile": "external",
       "environment": "astra-sandbox",
       "tasks": 2,
@@ -2433,15 +2414,15 @@
       "catalog_dir": "nv-reason-cxr",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 40.9
+      "average_uplift_pct": 40.4
     },
     {
       "skill": "nv-segment-ct",
-      "evaluation_date": "2026-05-31",
+      "evaluation_date": "2026-07-08",
       "profile": "external",
-      "environment": "local",
+      "environment": "astra-sandbox",
       "tasks": 2,
-      "attempts_per_task": 2,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
       "verdict": "PASS",
       "agents": [
@@ -2451,17 +2432,17 @@
       "catalog_dir": "nv-segment-ct",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": -7.2
+      "average_uplift_pct": 28.4
     },
     {
       "skill": "nv-segment-ct-finetune",
-      "evaluation_date": "2026-05-31",
+      "evaluation_date": "2026-07-08",
       "profile": "external",
-      "environment": "local",
+      "environment": "astra-sandbox",
       "tasks": 2,
-      "attempts_per_task": 2,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
-      "verdict": "FAIL",
+      "verdict": "PASS",
       "agents": [
         "claude-code",
         "codex"
@@ -2469,22 +2450,25 @@
       "catalog_dir": "nv-segment-ct-finetune",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 7.7
+      "average_uplift_pct": 39.8
     },
     {
       "skill": "nv-segment-ctmr",
-      "evaluation_date": "2026-05-31",
+      "evaluation_date": "2026-07-08",
       "profile": "external",
-      "environment": null,
-      "tasks": null,
-      "attempts_per_task": null,
-      "pass_threshold_pct": null,
+      "environment": "astra-sandbox",
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
       "verdict": "PASS",
-      "agents": [],
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
       "catalog_dir": "nv-segment-ctmr",
       "component": "Medical AI Skills",
-      "has_results": false,
-      "average_uplift_pct": null
+      "has_results": true,
+      "average_uplift_pct": 29.5
     },
     {
       "skill": "omniverse-cad-to-simready",
@@ -4288,8 +4272,8 @@
       "dimension": "Security",
       "num": 3,
       "agent": "claude-code",
-      "score_pct": 67.0,
-      "uplift_pct": -33.0
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "aiq-research",
@@ -4298,7 +4282,7 @@
       "num": 3,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 17.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "aiq-research",
@@ -4306,8 +4290,8 @@
       "dimension": "Correctness",
       "num": 3,
       "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": 6.0
+      "score_pct": 43.0,
+      "uplift_pct": 22.0
     },
     {
       "catalog_dir": "aiq-research",
@@ -4315,8 +4299,8 @@
       "dimension": "Correctness",
       "num": 3,
       "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 17.0
+      "score_pct": 74.0,
+      "uplift_pct": 31.0
     },
     {
       "catalog_dir": "aiq-research",
@@ -4324,8 +4308,8 @@
       "dimension": "Discoverability",
       "num": 3,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": -0.0
+      "score_pct": 33.0,
+      "uplift_pct": 23.0
     },
     {
       "catalog_dir": "aiq-research",
@@ -4333,8 +4317,8 @@
       "dimension": "Discoverability",
       "num": 3,
       "agent": "codex",
-      "score_pct": 54.0,
-      "uplift_pct": 16.0
+      "score_pct": 38.0,
+      "uplift_pct": 21.0
     },
     {
       "catalog_dir": "aiq-research",
@@ -4342,8 +4326,8 @@
       "dimension": "Effectiveness",
       "num": 3,
       "agent": "claude-code",
-      "score_pct": 65.0,
-      "uplift_pct": -1.0
+      "score_pct": 43.0,
+      "uplift_pct": 23.0
     },
     {
       "catalog_dir": "aiq-research",
@@ -4351,8 +4335,8 @@
       "dimension": "Effectiveness",
       "num": 3,
       "agent": "codex",
-      "score_pct": 69.0,
-      "uplift_pct": 14.0
+      "score_pct": 72.0,
+      "uplift_pct": 26.0
     },
     {
       "catalog_dir": "aiq-research",
@@ -4360,8 +4344,8 @@
       "dimension": "Efficiency",
       "num": 3,
       "agent": "claude-code",
-      "score_pct": 85.0,
-      "uplift_pct": -3.0
+      "score_pct": 47.0,
+      "uplift_pct": 21.0
     },
     {
       "catalog_dir": "aiq-research",
@@ -4369,7 +4353,7 @@
       "dimension": "Efficiency",
       "num": 3,
       "agent": "codex",
-      "score_pct": 56.0,
+      "score_pct": 43.0,
       "uplift_pct": 14.0
     },
     {
@@ -5451,96 +5435,6 @@
       "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 67.0
-    },
-    {
-      "catalog_dir": "cuopt-user-rules",
-      "component": null,
-      "dimension": "Security",
-      "num": 1,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-user-rules",
-      "component": null,
-      "dimension": "Security",
-      "num": 1,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-user-rules",
-      "component": null,
-      "dimension": "Correctness",
-      "num": 1,
-      "agent": "claude-code",
-      "score_pct": 65.0,
-      "uplift_pct": 20.0
-    },
-    {
-      "catalog_dir": "cuopt-user-rules",
-      "component": null,
-      "dimension": "Correctness",
-      "num": 1,
-      "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 36.0
-    },
-    {
-      "catalog_dir": "cuopt-user-rules",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": 1,
-      "agent": "claude-code",
-      "score_pct": 25.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-user-rules",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": 1,
-      "agent": "codex",
-      "score_pct": 62.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-user-rules",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": 1,
-      "agent": "claude-code",
-      "score_pct": 43.0,
-      "uplift_pct": 12.0
-    },
-    {
-      "catalog_dir": "cuopt-user-rules",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": 1,
-      "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 65.0
-    },
-    {
-      "catalog_dir": "cuopt-user-rules",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": 1,
-      "agent": "claude-code",
-      "score_pct": 25.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-user-rules",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": 1,
-      "agent": "codex",
-      "score_pct": 48.0,
-      "uplift_pct": -12.0
     },
     {
       "catalog_dir": "cupynumeric-hdf5",
@@ -13286,7 +13180,7 @@
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 2,
+      "num": 1,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -13295,7 +13189,7 @@
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 2,
+      "num": 1,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -13304,73 +13198,73 @@
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 2,
+      "num": 1,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 2,
+      "num": 1,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 16.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-sequence-packing",
+      "component": "NeMo MBridge",
+      "dimension": "Discoverability",
+      "num": 1,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-sequence-packing",
+      "component": "NeMo MBridge",
+      "dimension": "Discoverability",
+      "num": 1,
+      "agent": "codex",
+      "score_pct": 80.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-sequence-packing",
+      "component": "NeMo MBridge",
+      "dimension": "Effectiveness",
+      "num": 1,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 95.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-sequence-packing",
+      "component": "NeMo MBridge",
+      "dimension": "Effectiveness",
+      "num": 1,
       "agent": "codex",
       "score_pct": 83.0,
-      "uplift_pct": -1.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-sequence-packing",
-      "component": "NeMo MBridge",
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-sequence-packing",
-      "component": "NeMo MBridge",
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 57.0,
-      "uplift_pct": -2.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-sequence-packing",
-      "component": "NeMo MBridge",
-      "dimension": "Effectiveness",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 4.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-sequence-packing",
-      "component": "NeMo MBridge",
-      "dimension": "Effectiveness",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 72.0,
-      "uplift_pct": -8.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-sequence-packing",
-      "component": "NeMo MBridge",
-      "dimension": "Efficiency",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 93.0,
       "uplift_pct": -0.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 2,
+      "num": 1,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-sequence-packing",
+      "component": "NeMo MBridge",
+      "dimension": "Efficiency",
+      "num": 1,
       "agent": "codex",
-      "score_pct": 39.0,
-      "uplift_pct": -15.0
+      "score_pct": 78.0,
+      "uplift_pct": 31.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-tp-dp-comm-overlap",
@@ -14546,7 +14440,7 @@
       "catalog_dir": "nv-generate-ct-rflow",
       "component": "Medical AI Skills",
       "dimension": "Security",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -14555,7 +14449,7 @@
       "catalog_dir": "nv-generate-ct-rflow",
       "component": "Medical AI Skills",
       "dimension": "Security",
-      "num": 4,
+      "num": 2,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -14564,514 +14458,514 @@
       "catalog_dir": "nv-generate-ct-rflow",
       "component": "Medical AI Skills",
       "dimension": "Correctness",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
-      "score_pct": 88.0,
-      "uplift_pct": 10.0
+      "score_pct": 80.0,
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "nv-generate-ct-rflow",
       "component": "Medical AI Skills",
       "dimension": "Correctness",
-      "num": 4,
+      "num": 2,
       "agent": "codex",
-      "score_pct": 76.0,
+      "score_pct": 64.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "nv-generate-ct-rflow",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 54.0
+    },
+    {
+      "catalog_dir": "nv-generate-ct-rflow",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 62.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "nv-generate-ct-rflow",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 38.0,
       "uplift_pct": 26.0
     },
     {
       "catalog_dir": "nv-generate-ct-rflow",
       "component": "Medical AI Skills",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": -5.0
-    },
-    {
-      "catalog_dir": "nv-generate-ct-rflow",
-      "component": "Medical AI Skills",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 70.0,
-      "uplift_pct": 14.0
-    },
-    {
-      "catalog_dir": "nv-generate-ct-rflow",
-      "component": "Medical AI Skills",
       "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 64.0,
-      "uplift_pct": 3.0
-    },
-    {
-      "catalog_dir": "nv-generate-ct-rflow",
-      "component": "Medical AI Skills",
-      "dimension": "Effectiveness",
-      "num": 4,
+      "num": 2,
       "agent": "codex",
-      "score_pct": 55.0,
-      "uplift_pct": 36.0
+      "score_pct": 36.0,
+      "uplift_pct": 29.0
     },
     {
       "catalog_dir": "nv-generate-ct-rflow",
       "component": "Medical AI Skills",
       "dimension": "Efficiency",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 69.0,
-      "uplift_pct": -5.0
-    },
-    {
-      "catalog_dir": "nv-generate-ct-rflow",
-      "component": "Medical AI Skills",
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 58.0,
-      "uplift_pct": 15.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr",
-      "component": "Medical AI Skills",
-      "dimension": "Security",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 25.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr",
-      "component": "Medical AI Skills",
-      "dimension": "Security",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr",
-      "component": "Medical AI Skills",
-      "dimension": "Correctness",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": 5.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr",
-      "component": "Medical AI Skills",
-      "dimension": "Correctness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 83.0,
-      "uplift_pct": 23.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr",
-      "component": "Medical AI Skills",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": -1.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr",
-      "component": "Medical AI Skills",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 91.0,
-      "uplift_pct": 15.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr",
-      "component": "Medical AI Skills",
-      "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 77.0,
-      "uplift_pct": -3.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr",
-      "component": "Medical AI Skills",
-      "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 63.0,
-      "uplift_pct": 31.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr",
-      "component": "Medical AI Skills",
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 76.0,
-      "uplift_pct": -4.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr",
-      "component": "Medical AI Skills",
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 81.0,
-      "uplift_pct": 17.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain",
-      "component": "Medical AI Skills",
-      "dimension": "Security",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 25.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain",
-      "component": "Medical AI Skills",
-      "dimension": "Security",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain",
-      "component": "Medical AI Skills",
-      "dimension": "Correctness",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
       "score_pct": 78.0,
-      "uplift_pct": -13.0
+      "uplift_pct": 37.0
     },
     {
-      "catalog_dir": "nv-generate-mr-brain",
+      "catalog_dir": "nv-generate-ct-rflow",
       "component": "Medical AI Skills",
-      "dimension": "Correctness",
-      "num": 4,
+      "dimension": "Efficiency",
+      "num": 2,
       "agent": "codex",
-      "score_pct": 93.0,
-      "uplift_pct": 49.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain",
-      "component": "Medical AI Skills",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "claude-code",
       "score_pct": 58.0,
-      "uplift_pct": -36.0
+      "uplift_pct": 21.0
     },
     {
-      "catalog_dir": "nv-generate-mr-brain",
-      "component": "Medical AI Skills",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 79.0,
-      "uplift_pct": 16.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain",
-      "component": "Medical AI Skills",
-      "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 75.0,
-      "uplift_pct": 13.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain",
-      "component": "Medical AI Skills",
-      "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 79.0,
-      "uplift_pct": 57.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain",
-      "component": "Medical AI Skills",
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 45.0,
-      "uplift_pct": -31.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain",
-      "component": "Medical AI Skills",
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 68.0,
-      "uplift_pct": 16.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain-finetune",
+      "catalog_dir": "nv-generate-mr",
       "component": "Medical AI Skills",
       "dimension": "Security",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "nv-generate-mr-brain-finetune",
+      "catalog_dir": "nv-generate-mr",
       "component": "Medical AI Skills",
       "dimension": "Security",
-      "num": 4,
+      "num": 2,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "nv-generate-mr-brain-finetune",
+      "catalog_dir": "nv-generate-mr",
       "component": "Medical AI Skills",
       "dimension": "Correctness",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": -1.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Correctness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 57.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 89.0,
-      "uplift_pct": 11.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 71.0,
-      "uplift_pct": 10.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 77.0,
-      "uplift_pct": 10.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 72.0,
-      "uplift_pct": 62.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 65.0,
-      "uplift_pct": 15.0
-    },
-    {
-      "catalog_dir": "nv-generate-mr-brain-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 54.0,
-      "uplift_pct": 5.0
-    },
-    {
-      "catalog_dir": "nv-generate-vae-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Security",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "nv-generate-vae-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Security",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nv-generate-vae-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Correctness",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 91.0,
-      "uplift_pct": -3.0
-    },
-    {
-      "catalog_dir": "nv-generate-vae-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Correctness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 86.0,
-      "uplift_pct": 34.0
-    },
-    {
-      "catalog_dir": "nv-generate-vae-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 89.0,
-      "uplift_pct": 8.0
-    },
-    {
-      "catalog_dir": "nv-generate-vae-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 78.0,
-      "uplift_pct": 23.0
-    },
-    {
-      "catalog_dir": "nv-generate-vae-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Effectiveness",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
       "score_pct": 60.0,
-      "uplift_pct": -31.0
-    },
-    {
-      "catalog_dir": "nv-generate-vae-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 50.0,
-      "uplift_pct": 24.0
-    },
-    {
-      "catalog_dir": "nv-generate-vae-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 67.0,
-      "uplift_pct": 9.0
-    },
-    {
-      "catalog_dir": "nv-generate-vae-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 63.0,
       "uplift_pct": 22.0
     },
     {
-      "catalog_dir": "nv-reason-cxr",
-      "component": "Medical AI Skills",
-      "dimension": "Security",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nv-reason-cxr",
-      "component": "Medical AI Skills",
-      "dimension": "Security",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nv-reason-cxr",
-      "component": "Medical AI Skills",
-      "dimension": "Correctness",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 73.0,
-      "uplift_pct": 61.0
-    },
-    {
-      "catalog_dir": "nv-reason-cxr",
+      "catalog_dir": "nv-generate-mr",
       "component": "Medical AI Skills",
       "dimension": "Correctness",
       "num": 2,
       "agent": "codex",
-      "score_pct": 72.0,
-      "uplift_pct": 45.0
+      "score_pct": 85.0,
+      "uplift_pct": 19.0
     },
     {
-      "catalog_dir": "nv-reason-cxr",
+      "catalog_dir": "nv-generate-mr",
       "component": "Medical AI Skills",
       "dimension": "Discoverability",
       "num": 2,
       "agent": "claude-code",
-      "score_pct": 46.0,
+      "score_pct": 100.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 17.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 18.0,
+      "uplift_pct": 6.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 57.0,
+      "uplift_pct": 17.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 22.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 86.0,
+      "uplift_pct": 14.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 60.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 74.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 81.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 84.0,
+      "uplift_pct": 66.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 13.0,
+      "uplift_pct": 8.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 40.0,
       "uplift_pct": 33.0
     },
     {
-      "catalog_dir": "nv-reason-cxr",
+      "catalog_dir": "nv-generate-mr-brain",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 61.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 80.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 63.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 57.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain-finetune",
       "component": "Medical AI Skills",
       "dimension": "Discoverability",
       "num": 2,
       "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 67.0
+      "score_pct": 86.0,
+      "uplift_pct": 48.0
     },
     {
-      "catalog_dir": "nv-reason-cxr",
+      "catalog_dir": "nv-generate-mr-brain-finetune",
       "component": "Medical AI Skills",
       "dimension": "Effectiveness",
       "num": 2,
       "agent": "claude-code",
-      "score_pct": 85.0,
-      "uplift_pct": 73.0
+      "score_pct": 58.0,
+      "uplift_pct": 51.0
     },
     {
-      "catalog_dir": "nv-reason-cxr",
+      "catalog_dir": "nv-generate-mr-brain-finetune",
       "component": "Medical AI Skills",
       "dimension": "Effectiveness",
       "num": 2,
       "agent": "codex",
+      "score_pct": 60.0,
+      "uplift_pct": 53.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 74.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "nv-generate-mr-brain-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "nv-generate-vae-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-generate-vae-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-generate-vae-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 85.0,
+      "uplift_pct": 62.0
+    },
+    {
+      "catalog_dir": "nv-generate-vae-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
       "score_pct": 76.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "nv-generate-vae-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 89.0,
+      "uplift_pct": 57.0
+    },
+    {
+      "catalog_dir": "nv-generate-vae-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 61.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "nv-generate-vae-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 60.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "nv-generate-vae-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 61.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "nv-generate-vae-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 69.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "nv-generate-vae-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 58.0,
+      "uplift_pct": 17.0
+    },
+    {
+      "catalog_dir": "nv-reason-cxr",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-reason-cxr",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-reason-cxr",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 74.0,
       "uplift_pct": 47.0
     },
     {
       "catalog_dir": "nv-reason-cxr",
       "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 70.0
+    },
+    {
+      "catalog_dir": "nv-reason-cxr",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 48.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "nv-reason-cxr",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "nv-reason-cxr",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 87.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "nv-reason-cxr",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 84.0
+    },
+    {
+      "catalog_dir": "nv-reason-cxr",
+      "component": "Medical AI Skills",
       "dimension": "Efficiency",
       "num": 2,
       "agent": "claude-code",
-      "score_pct": 51.0,
-      "uplift_pct": 27.0
+      "score_pct": 54.0,
+      "uplift_pct": 28.0
     },
     {
       "catalog_dir": "nv-reason-cxr",
@@ -15079,188 +14973,278 @@
       "dimension": "Efficiency",
       "num": 2,
       "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 56.0
+      "score_pct": 83.0,
+      "uplift_pct": 41.0
     },
     {
       "catalog_dir": "nv-segment-ct",
       "component": "Medical AI Skills",
       "dimension": "Security",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "nv-segment-ct",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nv-segment-ct",
       "component": "Medical AI Skills",
-      "dimension": "Security",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 75.0,
-      "uplift_pct": -25.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct",
-      "component": "Medical AI Skills",
       "dimension": "Correctness",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": -5.0
+      "score_pct": 100.0,
+      "uplift_pct": 32.0
     },
     {
       "catalog_dir": "nv-segment-ct",
       "component": "Medical AI Skills",
       "dimension": "Correctness",
-      "num": 4,
+      "num": 2,
       "agent": "codex",
-      "score_pct": 73.0,
-      "uplift_pct": -22.0
+      "score_pct": 95.0,
+      "uplift_pct": 36.0
     },
     {
       "catalog_dir": "nv-segment-ct",
       "component": "Medical AI Skills",
       "dimension": "Discoverability",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
       "score_pct": 98.0,
-      "uplift_pct": 18.0
+      "uplift_pct": 35.0
     },
     {
       "catalog_dir": "nv-segment-ct",
       "component": "Medical AI Skills",
       "dimension": "Discoverability",
-      "num": 4,
+      "num": 2,
       "agent": "codex",
-      "score_pct": 69.0,
-      "uplift_pct": -15.0
+      "score_pct": 89.0,
+      "uplift_pct": 21.0
     },
     {
       "catalog_dir": "nv-segment-ct",
       "component": "Medical AI Skills",
       "dimension": "Effectiveness",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
-      "score_pct": 71.0,
-      "uplift_pct": -28.0
+      "score_pct": 78.0,
+      "uplift_pct": 26.0
     },
     {
       "catalog_dir": "nv-segment-ct",
       "component": "Medical AI Skills",
       "dimension": "Effectiveness",
-      "num": 4,
+      "num": 2,
       "agent": "codex",
-      "score_pct": 65.0,
-      "uplift_pct": -19.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct",
-      "component": "Medical AI Skills",
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": 30.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct",
-      "component": "Medical AI Skills",
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 65.0,
-      "uplift_pct": -6.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Security",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 75.0,
-      "uplift_pct": 38.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Security",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Correctness",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 81.0,
-      "uplift_pct": -10.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Correctness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 79.0,
-      "uplift_pct": 15.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 91.0,
-      "uplift_pct": 5.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 58.0,
-      "uplift_pct": 5.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 68.0,
-      "uplift_pct": -17.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 71.0,
-      "uplift_pct": 27.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "claude-code",
       "score_pct": 80.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "nv-segment-ct",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "nv-segment-ct",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 83.0,
       "uplift_pct": 14.0
     },
     {
       "catalog_dir": "nv-segment-ct-finetune",
       "component": "Medical AI Skills",
-      "dimension": "Efficiency",
-      "num": 4,
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-segment-ct-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": 2,
       "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-segment-ct-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "nv-segment-ct-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 59.0
+    },
+    {
+      "catalog_dir": "nv-segment-ct-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 83.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "nv-segment-ct-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 76.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "nv-segment-ct-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 78.0,
+      "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "nv-segment-ct-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 78.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "nv-segment-ct-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 69.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "nv-segment-ct-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 69.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "nv-segment-ctmr",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-segment-ctmr",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-segment-ctmr",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 63.0,
+      "uplift_pct": 52.0
+    },
+    {
+      "catalog_dir": "nv-segment-ctmr",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 82.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "nv-segment-ctmr",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 39.0,
+      "uplift_pct": 24.0
+    },
+    {
+      "catalog_dir": "nv-segment-ctmr",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 72.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "nv-segment-ctmr",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 54.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "nv-segment-ctmr",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 76.0,
+      "uplift_pct": 58.0
+    },
+    {
+      "catalog_dir": "nv-segment-ctmr",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
       "score_pct": 42.0,
-      "uplift_pct": -0.0
+      "uplift_pct": 13.0
+    },
+    {
+      "catalog_dir": "nv-segment-ctmr",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 62.0,
+      "uplift_pct": 24.0
     },
     {
       "catalog_dir": "physical-ai-defect-image-generation",

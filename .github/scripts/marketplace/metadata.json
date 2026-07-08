@@ -181,18 +181,6 @@
       }
     },
     {
-      "path": "skills/cuopt-user-rules",
-      "name": "cuopt-user-rules",
-      "description": "Base rules for end users calling NVIDIA cuOpt (routing/LP/MILP/QP/install/server). Not for cuOpt internals — use cuopt-developer for those.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer,application_developer",
-        "discovery.activity_tags": "configure,validate,troubleshoot,deploy"
-      }
-    },
-    {
       "path": "skills/cupynumeric-hdf5",
       "name": "cupynumeric-hdf5",
       "description": "Read and write large cuPyNumeric arrays to HDF5 with Legate's parallel, distributed HDF5 I/O (legate.io.hdf5: to_file, from_file, from_file_batched). Use when a developer needs to save a cuPyNumeric array to an .h5/.hdf5 file, load an HDF5 dataset into a distributed cuPyNumeric array, read a large HDF5 dataset in chunks, hand arrays to an HPC pipeline as a single file, or accelerate HDF5 disk I/O with GPUDirect Storage (GDS). Do not use it for Parquet/cuDF/raw-binary or other sharded/custom layouts (see the cupynumeric-parallel-data-load skill), Zarr or object-store/S3 output, .npz or pickled archives, plain h5py without cuPyNumeric, or pure array compute such as FFT, matmul, or reductions.",
