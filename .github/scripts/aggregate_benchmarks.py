@@ -127,6 +127,17 @@ def load_component_map(repo_root: Path) -> dict:
             m = re.match(r"^-?\s*catalog_dir:\s*(.+)$", line.strip())
             if m:
                 mapping[m.group(1).strip()] = name
+    manual = repo_root / ".github" / "scripts" / "manual-components.yml"
+    if manual.exists():
+        name = None
+        for line in manual.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"^-?\s*name:\s*(.+)$", line.strip())
+            if m:
+                name = m.group(1).strip()
+                continue
+            m = re.match(r"^-\s*(\S+)\s*$", line.strip())
+            if m and name and m.group(1) not in mapping:
+                mapping[m.group(1)] = name
     exceptions = repo_root / "catalog-exceptions.yml"
     if exceptions.exists():
         current_dir = None

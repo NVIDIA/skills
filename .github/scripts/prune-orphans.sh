@@ -46,6 +46,17 @@ for f in components.d/*.yml; do
   yq -r '.skills[]?.catalog_dir // ""' "$f" | grep -v '^$' >> "$expected" || true
 done
 
+# 1b. Manually staged components — dirs declared in manual-components.yml
+#     (skills staged via direct PR; see that file's header).
+MANUAL_FILE=".github/scripts/manual-components.yml"
+if [ -f "$MANUAL_FILE" ]; then
+  if \! yq e 'true' "$MANUAL_FILE" > /dev/null 2>&1; then
+    echo "::warning::${MANUAL_FILE} failed to parse — skipping orphan pruning this run"
+    exit 0
+  fi
+  yq -r '.components[]?.catalog_dirs[]? // ""' "$MANUAL_FILE" | grep -v '^$' >> "$expected" || true
+fi
+
 # 2. Exceptions — dirs allowed to exist without a registration.
 if [ -f "$EXCEPTIONS_FILE" ]; then
   if ! yq e 'true' "$EXCEPTIONS_FILE" > /dev/null 2>&1; then
