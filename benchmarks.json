@@ -186,7 +186,7 @@
         "codex"
       ],
       "catalog_dir": "cuopt-developer",
-      "component": null,
+      "component": "cuOpt",
       "has_results": true,
       "average_uplift_pct": 23.7
     },
@@ -2481,7 +2481,7 @@
       "verdict": "FAIL",
       "agents": [],
       "catalog_dir": "omniverse-cad-to-simready",
-      "component": null,
+      "component": "Physical AI",
       "has_results": false,
       "average_uplift_pct": null
     },
@@ -2496,7 +2496,7 @@
       "verdict": "FAIL",
       "agents": [],
       "catalog_dir": "omniverse-realtime-viewer",
-      "component": null,
+      "component": "Physical AI",
       "has_results": false,
       "average_uplift_pct": null
     },
@@ -2511,7 +2511,7 @@
       "verdict": "FAIL",
       "agents": [],
       "catalog_dir": "omniverse-usd-performance-tuning",
-      "component": null,
+      "component": "Physical AI",
       "has_results": false,
       "average_uplift_pct": null
     },
@@ -2544,7 +2544,7 @@
       "verdict": "FAIL",
       "agents": [],
       "catalog_dir": "physical-ai-infrastructure-setup-and-resilient-scaling",
-      "component": null,
+      "component": "Physical AI",
       "has_results": false,
       "average_uplift_pct": null
     },
@@ -2559,7 +2559,7 @@
       "verdict": "PASS",
       "agents": [],
       "catalog_dir": "physical-ai-neural-reconstruction",
-      "component": null,
+      "component": "Physical AI",
       "has_results": false,
       "average_uplift_pct": null
     },
@@ -4808,7 +4808,7 @@
     },
     {
       "catalog_dir": "cuopt-developer",
-      "component": null,
+      "component": "cuOpt",
       "dimension": "Security",
       "num": 3,
       "agent": "claude-code",
@@ -4817,7 +4817,7 @@
     },
     {
       "catalog_dir": "cuopt-developer",
-      "component": null,
+      "component": "cuOpt",
       "dimension": "Security",
       "num": 3,
       "agent": "codex",
@@ -4826,7 +4826,7 @@
     },
     {
       "catalog_dir": "cuopt-developer",
-      "component": null,
+      "component": "cuOpt",
       "dimension": "Correctness",
       "num": 3,
       "agent": "claude-code",
@@ -4835,7 +4835,7 @@
     },
     {
       "catalog_dir": "cuopt-developer",
-      "component": null,
+      "component": "cuOpt",
       "dimension": "Correctness",
       "num": 3,
       "agent": "codex",
@@ -4844,7 +4844,7 @@
     },
     {
       "catalog_dir": "cuopt-developer",
-      "component": null,
+      "component": "cuOpt",
       "dimension": "Discoverability",
       "num": 3,
       "agent": "claude-code",
@@ -4853,7 +4853,7 @@
     },
     {
       "catalog_dir": "cuopt-developer",
-      "component": null,
+      "component": "cuOpt",
       "dimension": "Discoverability",
       "num": 3,
       "agent": "codex",
@@ -4862,7 +4862,7 @@
     },
     {
       "catalog_dir": "cuopt-developer",
-      "component": null,
+      "component": "cuOpt",
       "dimension": "Effectiveness",
       "num": 3,
       "agent": "claude-code",
@@ -4871,7 +4871,7 @@
     },
     {
       "catalog_dir": "cuopt-developer",
-      "component": null,
+      "component": "cuOpt",
       "dimension": "Effectiveness",
       "num": 3,
       "agent": "codex",
@@ -4880,7 +4880,7 @@
     },
     {
       "catalog_dir": "cuopt-developer",
-      "component": null,
+      "component": "cuOpt",
       "dimension": "Efficiency",
       "num": 3,
       "agent": "claude-code",
@@ -4889,7 +4889,7 @@
     },
     {
       "catalog_dir": "cuopt-developer",
-      "component": null,
+      "component": "cuOpt",
       "dimension": "Efficiency",
       "num": 3,
       "agent": "codex",

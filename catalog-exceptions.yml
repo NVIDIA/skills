@@ -8,18 +8,24 @@ exceptions:
   - dir: cuopt-developer
     reason: Contributor-facing skill, intentionally uncataloged (per cuOpt team, 2026-06-01)
     owner: rgsl888prabhu
+    component: cuOpt
   - dir: omniverse-cad-to-simready
     reason: Physical AI Hub skill, manually curated outside the sync workflow
     owner: alex-qi
+    component: Physical AI
   - dir: omniverse-realtime-viewer
     reason: Physical AI Hub skill, manually curated outside the sync workflow
     owner: alex-qi
+    component: Physical AI
   - dir: omniverse-usd-performance-tuning
     reason: Physical AI Hub skill, manually curated outside the sync workflow
     owner: alex-qi
+    component: Physical AI
   - dir: physical-ai-infrastructure-setup-and-resilient-scaling
     reason: Physical AI Hub skill, manually curated outside the sync workflow
     owner: alex-qi
+    component: Physical AI
   - dir: physical-ai-neural-reconstruction
     reason: Physical AI Hub skill, manually curated outside the sync workflow
     owner: alex-qi
+    component: Physical AI

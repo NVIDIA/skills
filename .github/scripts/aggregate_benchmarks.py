@@ -111,7 +111,12 @@ def average_uplift(results: list):
 
 
 def load_component_map(repo_root: Path) -> dict:
-    """Map catalog skill dir -> component (product) name from components.d/."""
+    """Map catalog skill dir -> component (product) name.
+
+    Primary source is components.d/ registrations. Skills that intentionally
+    exist without a registration (catalog-exceptions.yml) may declare a
+    display component there so downstream consumers can still group them.
+    """
     mapping = {}
     for yml in sorted((repo_root / "components.d").glob("*.yml")):
         name = None
@@ -122,6 +127,17 @@ def load_component_map(repo_root: Path) -> dict:
             m = re.match(r"^-?\s*catalog_dir:\s*(.+)$", line.strip())
             if m:
                 mapping[m.group(1).strip()] = name
+    exceptions = repo_root / "catalog-exceptions.yml"
+    if exceptions.exists():
+        current_dir = None
+        for line in exceptions.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"^-?\s*dir:\s*(.+)$", line.strip())
+            if m:
+                current_dir = m.group(1).strip()
+                continue
+            m = re.match(r"^component:\s*(.+)$", line.strip())
+            if m and current_dir and current_dir not in mapping:
+                mapping[current_dir] = m.group(1).strip()
     return mapping
 
 
