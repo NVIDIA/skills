@@ -120,7 +120,6 @@ uv run python scripts/performance/run_script.py \
   -ng 16 \
   -gn 8 \
   --max_steps 8 \
-  --config_variant v1 \
   --cuda_graph_impl none \
   --moe_flex_dispatcher_backend None \
   --moe_a2a_overlap false \

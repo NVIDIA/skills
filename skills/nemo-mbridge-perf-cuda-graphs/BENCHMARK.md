@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nemo-mbridge-perf-cuda-graphs`
-- Evaluation date: 2026-06-15
+- Evaluation date: 2026-07-08
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 1 evaluation tasks
@@ -55,10 +55,10 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 100% (+100%) | 97% (+12%) |
-| Discoverability | 1 | 100% (+100%) | 97% (+46%) |
-| Effectiveness | 1 | 92% (+86%) | 96% (+20%) |
-| Efficiency | 1 | 93% (+67%) | 96% (+48%) |
+| Correctness | 1 | 100% (+90%) | 97% (+25%) |
+| Discoverability | 1 | 100% (+100%) | 97% (+60%) |
+| Effectiveness | 1 | 98% (+88%) | 92% (+2%) |
+| Efficiency | 1 | 94% (+67%) | 96% (+53%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 

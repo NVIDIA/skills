@@ -232,9 +232,9 @@ def _delete_cuda_graphs(cuda_graph_helper):
 
 ### Positive recipe anchors
 
-- `scripts/performance/configs/deepseek/deepseek_workload_base_configs.py`
-- `scripts/performance/configs/qwen/qwen3_workload_base_configs.py`
-- `scripts/performance/configs/gpt_oss/gpt_oss_workload_base_configs.py`
+- `src/megatron/bridge/perf_recipes/deepseek/gb300/deepseek_v3.py`
+- `src/megatron/bridge/perf_recipes/qwen/gb300/qwen3_moe.py`
+- `src/megatron/bridge/perf_recipes/gpt_oss/gb300/gpt_oss.py`
 
 ### Tests
 
