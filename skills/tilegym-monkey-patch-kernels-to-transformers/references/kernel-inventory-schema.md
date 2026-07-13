@@ -52,10 +52,10 @@ Use FlashInfer Solution metadata with source paths:
 - `name`, `definition`, `author`, `spec`, and `sources` are required.
 - `spec.language` is `cuda-tile` for cuTile kernels.
 - `spec.entry_point` uses `{file_path}::{function_name}` and points at `kernels/<kernel_name>.py`.
-- `spec.target_hardware` lists supported GPUs, for example `NVIDIA_B200`.
+- `spec.target_hardware` lists supported CUDA compute capabilities, for example `SM100`.
 - `sources.path` references one or more repo-relative files containing the implementation.
 
-For Ocean in-repo inventory, `sources.content` is not required. If an external FlashInfer-Bench submission needs embedded file content, materialize it from `sources.path` at export time.
+For TileGym in-repo inventory, `sources.content` is not required. If an external FlashInfer-Bench submission needs embedded file content, materialize it from `sources.path` at export time.
 
 ## Agent workflow rules
 
