@@ -372,7 +372,7 @@
     },
     {
       "skill": "dali-dynamic-mode",
-      "evaluation_date": "2026-06-30",
+      "evaluation_date": "2026-07-13",
       "profile": "external",
       "environment": "astra-sandbox",
       "tasks": 12,
@@ -386,7 +386,7 @@
       "catalog_dir": "dali-dynamic-mode",
       "component": "DALI",
       "has_results": true,
-      "average_uplift_pct": 40.9
+      "average_uplift_pct": 36.7
     },
     {
       "skill": "data-designer",
@@ -3798,7 +3798,7 @@
     },
     {
       "skill": "tilegym-monkey-patch-kernels-to-transformers",
-      "evaluation_date": "2026-06-16",
+      "evaluation_date": "2026-07-13",
       "profile": "external",
       "environment": "astra-sandbox",
       "tasks": 5,
@@ -3812,7 +3812,7 @@
       "catalog_dir": "tilegym-monkey-patch-kernels-to-transformers",
       "component": "TileGym",
       "has_results": true,
-      "average_uplift_pct": 8.8
+      "average_uplift_pct": 12.0
     },
     {
       "skill": "vss-ask-video",
@@ -5812,7 +5812,7 @@
       "num": 6,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 8.0
     },
     {
       "catalog_dir": "dali-dynamic-mode",
@@ -5821,7 +5821,7 @@
       "num": 6,
       "agent": "claude-code",
       "score_pct": 92.0,
-      "uplift_pct": 48.0
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "dali-dynamic-mode",
@@ -5829,8 +5829,8 @@
       "dimension": "Correctness",
       "num": 6,
       "agent": "codex",
-      "score_pct": 81.0,
-      "uplift_pct": 27.0
+      "score_pct": 84.0,
+      "uplift_pct": 16.0
     },
     {
       "catalog_dir": "dali-dynamic-mode",
@@ -5847,8 +5847,8 @@
       "dimension": "Discoverability",
       "num": 6,
       "agent": "codex",
-      "score_pct": 91.0,
-      "uplift_pct": 66.0
+      "score_pct": 85.0,
+      "uplift_pct": 56.0
     },
     {
       "catalog_dir": "dali-dynamic-mode",
@@ -5857,7 +5857,7 @@
       "num": 6,
       "agent": "claude-code",
       "score_pct": 85.0,
-      "uplift_pct": 45.0
+      "uplift_pct": 36.0
     },
     {
       "catalog_dir": "dali-dynamic-mode",
@@ -5865,8 +5865,8 @@
       "dimension": "Effectiveness",
       "num": 6,
       "agent": "codex",
-      "score_pct": 69.0,
-      "uplift_pct": 25.0
+      "score_pct": 71.0,
+      "uplift_pct": 15.0
     },
     {
       "catalog_dir": "dali-dynamic-mode",
@@ -5883,8 +5883,8 @@
       "dimension": "Efficiency",
       "num": 6,
       "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 54.0
+      "score_pct": 77.0,
+      "uplift_pct": 47.0
     },
     {
       "catalog_dir": "data-designer",
@@ -21301,7 +21301,7 @@
       "num": 5,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 12.0
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "tilegym-monkey-patch-kernels-to-transformers",
@@ -21310,7 +21310,7 @@
       "num": 5,
       "agent": "codex",
       "score_pct": 99.0,
-      "uplift_pct": 12.0
+      "uplift_pct": 14.0
     },
     {
       "catalog_dir": "tilegym-monkey-patch-kernels-to-transformers",
@@ -21319,7 +21319,7 @@
       "num": 5,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 11.0
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "tilegym-monkey-patch-kernels-to-transformers",
@@ -21327,8 +21327,8 @@
       "dimension": "Discoverability",
       "num": 5,
       "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 2.0
+      "score_pct": 99.0,
+      "uplift_pct": 9.0
     },
     {
       "catalog_dir": "tilegym-monkey-patch-kernels-to-transformers",
@@ -21336,8 +21336,8 @@
       "dimension": "Effectiveness",
       "num": 5,
       "agent": "claude-code",
-      "score_pct": 98.0,
-      "uplift_pct": 18.0
+      "score_pct": 100.0,
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "tilegym-monkey-patch-kernels-to-transformers",
@@ -21345,8 +21345,8 @@
       "dimension": "Effectiveness",
       "num": 5,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 19.0
+      "score_pct": 99.0,
+      "uplift_pct": 17.0
     },
     {
       "catalog_dir": "tilegym-monkey-patch-kernels-to-transformers",
@@ -21363,8 +21363,8 @@
       "dimension": "Efficiency",
       "num": 5,
       "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 1.0
+      "score_pct": 97.0,
+      "uplift_pct": 7.0
     },
     {
       "catalog_dir": "vss-ask-video",
