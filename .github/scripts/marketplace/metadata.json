@@ -51,7 +51,7 @@
     {
       "path": "skills/amc-run-video-calibration",
       "name": "amc-run-video-calibration",
-      "description": "Calibrate a new dataset from pre-recorded video files via the AutoMagicCalib REST API. Use when user has local MP4s and says 'calibrate my videos', 'run AMC on these videos', or similar.",
+      "description": "Calibrate a new dataset from pre-recorded video files via the AutoMagicCalib REST API. Use when user has local MP4s and says 'calibrate my videos', 'run AMC on these videos', or similar. For RTSP/live streams, use amc-run-rtsp-calibration instead.",
       "metadata": {
         "product.primary": "DeepStream SDK",
         "classification.category.primary": "ai_and_machine_learning",
@@ -255,7 +255,7 @@
     {
       "path": "skills/deepstream-dev",
       "name": "deepstream-dev",
-      "description": "NVIDIA DeepStream SDK 9.0 development with Python pyservicemaker API. Use when building video analytics pipelines, GStreamer-based video processing, TensorRT inference integration, object detection/tracking, or Kafka/message broker integration.",
+      "description": "NVIDIA DeepStream SDK development with Python pyservicemaker API. Use when building video analytics pipelines, GStreamer-based video processing, TensorRT inference integration, object detection/tracking, or Kafka/message broker integration.",
       "metadata": {
         "product.primary": "DeepStream SDK",
         "classification.category.primary": "ai_and_machine_learning",
