@@ -477,6 +477,35 @@ Source -> Decoder -> Muxer -> PGIE -> SGIE1 -> SGIE2 -> Tracker -> OSD -> Render
 Source -> Decoder -> Muxer -> PGIE -> [SGIE1, SGIE2] -> Merger -> Tracker -> OSD -> Renderer
 ```
 
+#### URI Source Inference Pattern
+
+Use this source pattern when the input has already been resolved to a URI, such as `file://`,
+`http://`, `https://`, `rtsp://`, HLS, or MPEG-DASH, and the pipeline should write annotated
+MP4 output. For protocol constraints and local stream setup, see
+[streaming_sources.md](streaming_sources.md).
+
+| Item | Pattern |
+|---|---|
+| Pipeline chain | `nvurisrcbin -> nvstreammux -> nvinfer -> nvosdbin -> nvvideoconvert -> capsfilter -> nvv4l2h264enc -> h264parse -> qtmux -> filesink` |
+| Source link | `pipeline.link(("src", "mux"), ("", "sink_%u"))` |
+| Encoder caps | `video/x-raw(memory:NVMM), format=NV12` before `nvv4l2h264enc` |
+| Optional tracking | Add `nvtracker` only when tracking or persistent object IDs are requested |
+
+```python
+pipeline.add("nvurisrcbin", "src", {"uri": url, "gpu-id": 0})
+pipeline.add("nvstreammux", "mux", {
+    "batch-size": 1,
+    "width": 1280,
+    "height": 720,
+    "batched-push-timeout": 33000,
+    "gpu-id": 0,
+})
+pipeline.link(("src", "mux"), ("", "sink_%u"))
+pipeline.add("capsfilter", "enc_caps", {
+    "caps": "video/x-raw(memory:NVMM), format=NV12",
+})
+```
+
 ### Implementation Approaches
 
 #### Approach 1: Cascaded Detection + Classification

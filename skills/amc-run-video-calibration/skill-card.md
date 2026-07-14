@@ -9,22 +9,27 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to calibrate camera setups from pre-recorded MP4 video files using the AutoMagicCalib REST API. <br>
+Developers and engineers who need to calibrate cameras from pre-recorded MP4 video files using the AutoMagicCalib REST API without CLI scripts or Docker bind-mounts. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [run_video_calibration.py](scripts/run_video_calibration.py) <br>
 - [AgentSkills.io Specification](https://agentskills.io/specification) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [API Calls, Shell commands, Configuration instructions] <br>
+**Output Type(s):** [Shell commands, API Calls, Configuration instructions] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -36,7 +41,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 6 internal evaluation tasks (5 positive skill-activation, 1 negative) via the NVSkills-Eval internal profile. <br>
+Evaluated against 6 internal evaluation tasks (5 positive skill-activation cases, 1 negative activation case). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,11 +65,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 6 | 92% (-8%) | 92% (+0%) |
-| Correctness | 6 | 93% (+53%) | 67% (+25%) |
-| Discoverability | 6 | 94% (+45%) | 83% (+25%) |
-| Effectiveness | 6 | 64% (+41%) | 41% (+18%) |
-| Efficiency | 6 | 81% (+35%) | 73% (+22%) |
+| Security | 6 | 100% (+0%) | 100% (+8%) |
+| Correctness | 6 | 83% (+51%) | 66% (+30%) |
+| Discoverability | 6 | 92% (+50%) | 90% (+41%) |
+| Effectiveness | 6 | 57% (+37%) | 38% (+10%) |
+| Efficiency | 6 | 78% (+36%) | 84% (+33%) |
 
 ## Skill Version(s): <br>
 1.0.0 (source: frontmatter) <br>

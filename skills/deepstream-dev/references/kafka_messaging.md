@@ -1032,6 +1032,17 @@ pipeline.add("nvmsgconv", "msgconv", {
 | 2 | `PAYLOAD_DEEPSTREAM_PROTOBUF` | Protobuf encoded - multiple objects in single payload |
 | 256 | `PAYLOAD_CUSTOM` | Custom schema using msg2p-lib |
 
+### Segmentation Payload Contract
+
+When a consumer needs segmentation data:
+
+1. Declare whether the payload needs per-object masks, a full-frame mask, or both; preserve normal object metadata.
+2. Instance masks on object metadata are bbox-local. For a full-frame payload, give the serializer an explicit frame mask or preserved inference tensors in a declared frame grid; do not reconstruct it from tracker-updated objects unless that is the intended output.
+3. If the selected schema has no mask field, use a compatible serializer extension. Payload type is a consumer contract, not a shortcut for carrying masks.
+4. Decode a real payload and verify its objects, mask representation, dimensions, and coordinate space.
+
+Note that OSD can render instance-mask metadata, but `nvmsgconv` does not serialize it automatically.
+
 ### Pipeline Usage
 
 ```python
@@ -1810,8 +1821,8 @@ Multiple objects in single JSON payload:
 
 ```bash
 # Setup logger
-chmod u+x /opt/nvidia/deepstream/deepstream/sources/tools/nvds_logger/setup_nvds_logger.sh
-sudo /opt/nvidia/deepstream/deepstream/sources/tools/nvds_logger/setup_nvds_logger.sh
+chmod u+x <DS_ROOT>/src/utils/nvds_logger/setup_nvds_logger.sh
+sudo <DS_ROOT>/src/utils/nvds_logger/setup_nvds_logger.sh
 
 # View logs
 tail -f /tmp/nvds/ds.log

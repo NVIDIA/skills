@@ -834,7 +834,7 @@ except Exception as e:
 
 **Bad** - Pipeline stuck in PAUSED:
 ```python
-# ❌ WRONG - Only display sink has async=0, Kafka sink is missing it
+# WRONG - Only display sink has async=0, Kafka sink is missing it
 # Pipeline will be STUCK IN PAUSED STATE!
 
 # Tee split
@@ -857,7 +857,7 @@ pipeline.add("nveglglessink", "sink", {
 
 **Good** - All sinks have async=0:
 ```python
-# ✅ CORRECT - ALL sinks have async=0
+# CORRECT - ALL sinks have async=0
 
 # Tee split
 pipeline.add("tee", "tee")
@@ -987,10 +987,10 @@ TypeError: object of type 'iterator' has no len()
 
 **Bad Code**:
 ```python
-# ❌ WRONG - Causes crash
+# WRONG - Causes crash
 count = len(frame_meta.object_items)
 
-# ❌ WRONG - Second loop is empty (iterator already consumed)
+# WRONG - Second loop is empty (iterator already consumed)
 for obj in frame_meta.object_items:
     process(obj)
 for obj in frame_meta.object_items:
@@ -999,7 +999,7 @@ for obj in frame_meta.object_items:
 
 **Correct Code**:
 ```python
-# ✅ CORRECT - Count while iterating
+# CORRECT - Count while iterating
 obj_count = 0
 for obj in frame_meta.object_items:
     obj_count += 1
@@ -1017,17 +1017,17 @@ Configuration file parsing failed
 
 **Common Mistakes**:
 ```yaml
-# ❌ WRONG - Incorrect section name (should be 'property', not 'model')
+# WRONG - Incorrect section name (should be 'property', not 'model')
 model:
   model-engine-file: /path/to/model.engine
   batch-size: 1
 
-# ❌ WRONG - Mixing formats (YAML syntax in .txt file or vice versa)
+# WRONG - Mixing formats (YAML syntax in .txt file or vice versa)
 ```
 
 **Correct YAML Config** (`.yml`):
 ```yaml
-# ✅ CORRECT YAML format
+# CORRECT YAML format
 property:
   gpu-id: 0
   onnx-file: /opt/nvidia/deepstream/deepstream/samples/models/Primary_Detector/resnet18_trafficcamnet_pruned.onnx
@@ -1045,7 +1045,7 @@ class-attrs-all:
 
 **Correct INI-style Config** (`.txt`):
 ```ini
-# ✅ CORRECT INI-style format
+# CORRECT INI-style format
 [property]
 gpu-id=0
 onnx-file=/opt/nvidia/deepstream/deepstream/samples/models/Primary_Detector/resnet18_trafficcamnet_pruned.onnx
@@ -1074,7 +1074,7 @@ pre-cluster-threshold=0.2
 **Correct Model Paths**:
 ```
 /opt/nvidia/deepstream/deepstream/samples/models/Primary_Detector/
-├── resnet18_trafficcamnet_pruned.onnx    # ✅ Use this ONNX model
+├── resnet18_trafficcamnet_pruned.onnx    # Use this ONNX model
 ├── labels.txt                              # Class labels
 └── cal_trt.bin                            # INT8 calibration (optional)
 ```
@@ -1094,7 +1094,7 @@ labelfile-path=/opt/nvidia/deepstream/deepstream/samples/models/Primary_Detector
 
 **Unnecessary Code**:
 ```python
-# ❌ UNNECESSARY - nvv4l2decoder already outputs NVMM format
+# UNNECESSARY - nvv4l2decoder already outputs NVMM format
 pipeline.add("nvv4l2decoder", "decoder")
 pipeline.add("nvvideoconvert", "conv")  # Not needed!
 pipeline.add("nvstreammux", "mux")
@@ -1102,7 +1102,7 @@ pipeline.add("nvstreammux", "mux")
 
 **Correct Code**:
 ```python
-# ✅ CORRECT - Direct connection, no converter needed
+# CORRECT - Direct connection, no converter needed
 pipeline.add("nvv4l2decoder", "decoder")
 pipeline.add("nvstreammux", "mux")
 pipeline.link(("decoder", "mux"), ("", "sink_%u"))

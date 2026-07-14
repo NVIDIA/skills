@@ -7,13 +7,13 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `deepstream-import-vision-model`
-- Evaluation date: 2026-05-28
+- Evaluation date: 2026-06-12
 - NVSkills-Eval profile: `external`
-- Environment: `local`
+- Environment: `astra-sandbox`
 - Dataset: 5 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
+- Overall verdict: PASS
 
 ## Agents Used
 
@@ -32,6 +32,7 @@ Reported benchmark dimensions:
 
 Underlying evaluation signals used in this run:
 
+- `security` (Security): checks for unsafe operations, secret leakage, and unauthorized access.
 - `skill_execution` (Skill Execution): verifies that the agent loaded the expected skill and workflow.
 - `skill_efficiency` (Efficiency): checks routing quality, decoy avoidance, and redundant tool usage.
 - `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
@@ -53,60 +54,28 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 68% (+13%) | 72% (+18%) |
-| Correctness | 8 | 83% (-2%) | 89% (+13%) |
-| Discoverability | 8 | 61% (+0%) | 80% (+1%) |
-| Effectiveness | 8 | 80% (+2%) | 81% (+17%) |
-| Efficiency | 8 | 52% (+2%) | 70% (+2%) |
+| Security | 5 | 100% (+0%) | 100% (+0%) |
+| Correctness | 5 | 75% (+17%) | 88% (+18%) |
+| Discoverability | 5 | 67% (+22%) | 85% (+22%) |
+| Effectiveness | 5 | 82% (+18%) | 86% (+26%) |
+| Efficiency | 5 | 67% (+13%) | 78% (+22%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 12 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 3 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/deepstream-import-vision-model/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/deepstream-import-vision-model/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/deepstream-import-vision-model/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description very long (285 chars, recommend 50-150) (`skills/deepstream-import-vision-model/SKILL.md`)
-- LOW QUALITY/quality_discoverability: No '## Purpose' section (`skills/deepstream-import-vision-model/SKILL.md`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/deepstream-import-vision-model/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 7 total findings.
-
-Top findings:
-
-- HIGH DUPLICATE/duplicate: Duplicate content found across scripts/deepstream/benchmark-ds.sh and scripts/deepstream/ds-kitti-dump.sh and scripts/deepstream/ds-perf-run.sh and scripts/deepstream/ds-single-stream.sh and scripts/deepstream/ds-sweep.sh and scripts/deepstream/extract-frame.sh and scripts/engine/benchmark-trtexec.sh and scripts/model/cleanup.sh and scripts/model/hf-download-config.sh and scripts/model/hf-list-files.sh and scripts/model/ngc-download.sh and scripts/model/ngc-list-files.sh and scripts/model/safetensors-to-onnx.sh and scripts/report/md-to-pdf.sh:
-  "(comment)" in scripts/deepstream/benchmark-ds.sh (lines 3-16)
-  vs "(comment)" in scripts/deepstream/ds-kitti-dump.sh (lines 3-16)
-  vs "(comment)" in scripts/deepstream/ds-perf-run.sh (lines 3-16)
-  vs "(comment)" in scripts/deepstream/ds-single-stream.sh (lines 3-16)
-  vs "(comment)" in scripts/deepstream/ds-sweep.sh (lines 3-16)
-  vs "(comment)" in scripts/deepstream/extract-frame.sh (lines 3-16)
-  vs "(comment)" in scripts/engine/benchmark-trtexec.sh (lines 3-16)
-  vs "(comment)" in scripts/model/cleanup.sh (lines 3-16)
-  vs "(comment)" in scripts/model/hf-download-config.sh (lines 3-16)
-  vs "(comment)" in scripts/model/hf-list-files.sh (lines 3-16)
-  vs "(comment)" in scripts/model/ngc-download.sh (lines 3-16)
-  vs "(comment)" in scripts/model/ngc-list-files.sh (lines 3-16)
-  vs "(comment)" in scripts/model/safetensors-to-onnx.sh (lines 3-16)
-  vs "(comment)" in scripts/report/md-to-pdf.sh (lines 3-16) (`scripts/deepstream/benchmark-ds.sh:3`)
-- HIGH DUPLICATE/duplicate: Duplicate content found within references/pipeline-run.md:
-  "# Hard constraint: num_streams <= engine max batch size — always" in references/pipeline-run.md (lines 437-442)
-  vs "# Hard constraint: num_streams <= engine max batch size — always" in references/pipeline-run.md (lines 458-463) (`references/pipeline-run.md:437`)
-- HIGH DUPLICATE/duplicate: Duplicate content found across references/report-generation.md and scripts/deepstream/ds-perf-run.sh:
-  "# Capture stream-0 instantaneous FPS (\K after `**PERF:`) — 1 value per line — so" in references/report-generation.md (lines 136-136)
-  vs "(comment)" in scripts/deepstream/ds-perf-run.sh (lines 131-134) (`references/report-generation.md:136`)
-- HIGH DUPLICATE/duplicate: Duplicate content found within references/pipeline-run.md:
-  "# 2=DeepStream NMS (dense heads: YOLO, SSD). Use 4 if engine has fused NMS output" in references/pipeline-run.md (lines 225-244)
-  vs "# 2=DeepStream NMS (dense heads: YOLO, SSD). Use 4 if engine has fused NMS output" in references/pipeline-run.md (lines 401-414) (`references/pipeline-run.md:225`)
-- HIGH DUPLICATE/duplicate: Duplicate content found within references/model-acquire.md:
-  "#### 2b-vi: onnxsim — Run After Export When Needed" in references/model-acquire.md (lines 273-282)
-  vs "# Use the _sim.onnx for engine building if the original triggers ForeignNode errors" in references/model-acquire.md (lines 283-287) (`references/model-acquire.md:273`)
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 
-The skill should be reviewed before NVSkills-Eval publication. Skill owners should address the findings above and rerun NVSkills-Eval to refresh this benchmark.
+The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

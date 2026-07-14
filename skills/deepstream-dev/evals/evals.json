@@ -1,7 +1,7 @@
 [
   {
     "id": "deepstream-dev-001",
-    "question": "Using DeepStream SDK 9.0 and the pyservicemaker Python API, generate a pipeline that reads a local video file, runs primary inference with nvinfer using the ResNet18 TrafficCamNet detector shipped with DeepStream, draws bounding boxes with nvosdbin, and renders to the screen. The user did not ask for tracking or Kafka.",
+    "question": "Using DeepStream SDK and the pyservicemaker Python API, generate a pipeline that reads a local video file, runs primary inference with nvinfer using the ResNet18 TrafficCamNet detector shipped with DeepStream, draws bounding boxes with nvosdbin, and renders to the screen. The user did not ask for tracking or Kafka.",
     "expected_skill": "deepstream-dev",
     "expected_script": null,
     "ground_truth": "A minimal pipeline using nvurisrcbin, nvstreammux, nvinfer, nvosdbin, and a platform-appropriate sink. It must avoid nvtracker, secondary GIEs, nvmsgbroker, and other optional components that were not requested.",
@@ -16,7 +16,7 @@
   },
   {
     "id": "deepstream-dev-002",
-    "question": "Build a DeepStream 9.0 pyservicemaker pipeline that ingests two RTSP cameras, runs primary detection, tracks objects across frames, displays the result in a tiled view, and publishes detection metadata to a Kafka broker. Cover the live-source and tee-split requirements.",
+    "question": "Build a DeepStream pyservicemaker pipeline that ingests two RTSP cameras, runs primary detection, tracks objects across frames, displays the result in a tiled view, and publishes detection metadata to a Kafka broker. Cover the live-source and tee-split requirements.",
     "expected_skill": "deepstream-dev",
     "expected_script": null,
     "ground_truth": "The pipeline uses nvurisrcbin for each RTSP source, sets live-source=1 on nvstreammux, includes nvtracker because tracking was requested, splits display and broker output with tee, sends metadata to nvmsgbroker, and sets async=0 on sinks.",

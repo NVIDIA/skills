@@ -9,27 +9,27 @@ DeepStream Docker images are hosted on the NVIDIA NGC container registry (`nvcr.
 
 ---
 
-## Available Containers (DeepStream 9.0)
+## Available Containers
 
 ### dGPU (x86_64)
 
 | Container | Pull Command | Description |
 |-----------|-------------|-------------|
-| **Samples** | `docker pull nvcr.io/nvidia/deepstream:9.0-samples-multiarch` | Runtime libraries, GStreamer plugins, reference apps, sample streams, models, configs. Best for running demos and deploying applications. |
-| **Triton** | `docker pull nvcr.io/nvidia/deepstream:9.0-triton-multiarch` | Everything in samples + Triton Inference Server and dependencies + development environment. Use when Triton-based inference is needed or building custom DeepStream applications. |
+| **Samples** | `docker pull nvcr.io/nvidia/deepstream:9.1-samples-multiarch` | Runtime libraries, GStreamer plugins, reference apps, sample streams, models, configs. Best for running demos and deploying applications. |
+| **Triton** | `docker pull nvcr.io/nvidia/deepstream:9.1-triton-multiarch` | Everything in samples + Triton Inference Server and dependencies + development environment. Use when Triton-based inference is needed or building custom DeepStream applications. |
 
 ### Jetson (ARM64/aarch64)
 
 | Container | Pull Command | Description |
 |-----------|-------------|-------------|
-| **Samples** | `docker pull nvcr.io/nvidia/deepstream:9.0-samples-multiarch` | Runtime libraries, GStreamer plugins, reference apps, sample streams, models, configs. **Deployment only** — does not support development inside the container. |
-| **Triton** | `docker pull nvcr.io/nvidia/deepstream:9.0-triton-multiarch` | Samples contents + devel libraries + Triton Inference Server backends. |
+| **Samples** | `docker pull nvcr.io/nvidia/deepstream:9.1-samples-multiarch` | Runtime libraries, GStreamer plugins, reference apps, sample streams, models, configs. **Deployment only** — does not support development inside the container. |
+| **Triton** | `docker pull nvcr.io/nvidia/deepstream:9.1-triton-multiarch` | Samples contents + devel libraries + Triton Inference Server backends. |
 
 ### dGPU on ARM (GH200, GB200, SBSA)
 
 | Container | Pull Command | Description |
 |-----------|-------------|-------------|
-| **Triton ARM SBSA** | `docker pull nvcr.io/nvidia/deepstream:9.0-triton-arm-sbsa` | Triton Inference Server + development environment for ARM SBSA platforms. |
+| **Triton ARM SBSA** | `docker pull nvcr.io/nvidia/deepstream:9.1-triton-sbsa-dgx-spark` | Triton Inference Server + development environment for ARM SBSA platforms. |
 
 ---
 
@@ -37,10 +37,10 @@ DeepStream Docker images are hosted on the NVIDIA NGC container registry (`nvcr.
 
 | Use Case | Recommended Image |
 |----------|-------------------|
-| Running sample apps / demos | `9.0-samples-multiarch` |
-| pyservicemaker Python applications | `9.0-triton-multiarch` |
-| Triton Inference Server required | `9.0-triton-multiarch` |
-| Custom Dockerfile base image | `9.0-samples-multiarch` (minimal) or `9.0-triton-multiarch` (with Triton) |
+| Running sample apps / demos | `9.1-samples-multiarch` |
+| pyservicemaker Python applications | `9.1-triton-multiarch` |
+| Triton Inference Server required | `9.1-triton-multiarch` |
+| Custom Dockerfile base image | `9.1-samples-multiarch` (minimal) or `9.1-triton-multiarch` (with Triton) |
 
 ---
 
@@ -98,7 +98,7 @@ docker run -it --rm \
     --gpus all \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix/:/tmp/.X11-unix \
-    nvcr.io/nvidia/deepstream:9.0-triton-multiarch
+    nvcr.io/nvidia/deepstream:9.1-triton-multiarch
 ```
 
 ### Headless Run (no display)
@@ -106,7 +106,7 @@ docker run -it --rm \
 ```bash
 docker run -it --rm \
     --gpus all \
-    nvcr.io/nvidia/deepstream:9.0-triton-multiarch
+    nvcr.io/nvidia/deepstream:9.1-triton-multiarch
 ```
 
 > For headless mode, use `fakesink` instead of `nveglglessink`/`nv3dsink` in your pipeline, or output to a file with `filesink`.
@@ -119,7 +119,7 @@ docker run -it --rm \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix/:/tmp/.X11-unix \
     -v /path/to/videos:/data \
-    nvcr.io/nvidia/deepstream:9.0-triton-multiarch
+    nvcr.io/nvidia/deepstream:9.1-triton-multiarch
 ```
 
 ---
@@ -129,7 +129,7 @@ docker run -it --rm \
 Use a DeepStream image as the base for your application:
 
 ```dockerfile
-FROM nvcr.io/nvidia/deepstream:9.0-triton-multiarch
+FROM nvcr.io/nvidia/deepstream:9.1-triton-multiarch
 
 # Install pyservicemaker
 RUN pip install --break-system-packages \
@@ -168,7 +168,7 @@ docker run --rm --gpus all \
 
 ## Additional Packages
 
-DeepStream 9.0 containers do **not** include certain multimedia libraries by default. Install them if needed:
+DeepStream containers do **not** include certain multimedia libraries by default. Install them if needed:
 
 ### Audio/Codec Support
 
@@ -254,6 +254,27 @@ docker run --rm --gpus all \
 
 Or use `fakesink` / `filesink` for headless operation.
 
+### Pipeline exits early during non-interactive `docker exec`
+
+**Cause**: Running without stdin can attach `/dev/null`; the GLib main loop may observe EOF and
+stop after the first frames.
+
+**Fix**: Use `docker exec -i` for non-interactive pipeline scripts:
+
+```bash
+docker exec -i ds python3 /app/pipeline.py http://localhost:8080/sample.mp4
+```
+
+If the application must run without inherited stdin, install a pipe before importing
+`pyservicemaker`:
+
+```python
+import os
+_pipe_r, _pipe_w = os.pipe()
+os.dup2(_pipe_r, 0)
+os.close(_pipe_r)
+```
+
 ### `Failed to load plugin ... libnvds_kafka_proto.so`
 
 **Cause**: `librdkafka` not installed (not bundled in the container).
@@ -265,7 +286,7 @@ RUN apt-get update && apt-get install -y librdkafka-dev && rm -rf /var/lib/apt/l
 
 ### Warning about audio decoder not available
 
-**Cause**: Multimedia codec packages removed in DS 9.0 containers.
+**Cause**: Multimedia codec packages removed in DeepStream containers.
 
 **Fix**:
 ```dockerfile

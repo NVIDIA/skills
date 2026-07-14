@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `amc-setup-calibration-stack`
-- Evaluation date: 2026-06-10
+- Evaluation date: 2026-07-09
 - NVSkills-Eval profile: `internal`
 - Environment: `astra-sandbox`
 - Dataset: 6 evaluation tasks
@@ -54,34 +54,25 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 6 | 83% (+0%) | 83% (-17%) |
-| Correctness | 6 | 78% (+21%) | 87% (+25%) |
-| Discoverability | 6 | 63% (+6%) | 71% (+4%) |
-| Effectiveness | 6 | 75% (+31%) | 67% (+21%) |
-| Efficiency | 6 | 65% (+10%) | 64% (+1%) |
+| Security | 6 | 100% (+0%) | 83% (+0%) |
+| Correctness | 6 | 84% (+33%) | 91% (+33%) |
+| Discoverability | 6 | 92% (+36%) | 92% (+32%) |
+| Effectiveness | 6 | 70% (+25%) | 76% (+26%) |
+| Efficiency | 6 | 82% (+23%) | 85% (+25%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 6 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 1 total findings.
 
 Top findings:
 
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`team-skills/deepstream/amc-camera-calibration/amc-setup-calibration-stack/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SQP-2): The skill runs `sudo chown -R 1000:1000` on `projects/` and `models/` directories without adequately warning that if REP (`SKILL.md:265`)
-- MEDIUM SECURITY/Unknown (SQP-2): Docker login credentials (NGC API key) are stored in `~/.docker/config.json` on disk after `docker login`. The skill doe (`SKILL.md:122`)
-- LOW QUALITY/quality_discoverability: Description very long (243 chars, recommend 50-150) (`team-skills/deepstream/amc-camera-calibration/amc-setup-calibration-stack/SKILL.md`)
-- LOW QUALITY/quality_discoverability: No '## Purpose' section (`team-skills/deepstream/amc-camera-calibration/amc-setup-calibration-stack/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 1 file(s)
-- Inter-Skill Deduplication: Parsed skill 'amc-setup-calibration-stack': 243 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to import vision models from HuggingFace or NVIDIA NGC into NVIDIA DeepStream pipelines for object detection, including automated engine building, benchmarking, and performance report generation. <br>
+Developers and engineers who need to import object detection models from HuggingFace or NVIDIA NGC into NVIDIA DeepStream pipelines with automated engine building, multi-stream benchmarking, and PDF report generation. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -19,19 +19,19 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [engine-build.md](references/engine-build.md) <br>
-- [model-acquire.md](references/model-acquire.md) <br>
-- [pipeline-run.md](references/pipeline-run.md) <br>
-- [report-generation.md](references/report-generation.md) <br>
+- [Model Acquire Reference](references/model-acquire.md) <br>
+- [Engine Build Reference](references/engine-build.md) <br>
+- [Pipeline Run Reference](references/pipeline-run.md) <br>
+- [Report Generation Reference](references/report-generation.md) <br>
 - [NVIDIA DeepStream SDK](https://developer.nvidia.com/deepstream-sdk) <br>
-- [NVIDIA NGC DeepStream Container](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/deepstream) <br>
+- [DeepStream NGC Container](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/deepstream) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration files, Code, Files] <br>
+**Output Type(s):** [Shell commands, Code, Files, Configuration instructions] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Generates TensorRT engines, nvinfer configs, custom bbox parser C++ source, benchmark logs, and PDF reports] <br>
+**Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`claude-code`) <br>
@@ -40,7 +40,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 5 evaluation tasks (3 positive skill-activation, 2 negative) with 2 attempts per task via NVSkills-Eval external profile. <br>
+Evaluated against 5 tasks (3 positive skill-activation, 2 negative) via NVSkills-Eval external profile in astra-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -51,6 +51,7 @@ Reported benchmark dimensions: <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
 Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
 - `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
@@ -63,14 +64,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 68% (+13%) | 72% (+18%) |
-| Correctness | 8 | 83% (-2%) | 89% (+13%) |
-| Discoverability | 8 | 61% (+0%) | 80% (+1%) |
-| Effectiveness | 8 | 80% (+2%) | 81% (+17%) |
-| Efficiency | 8 | 52% (+2%) | 70% (+2%) |
+| Security | 5 | 100% (+0%) | 100% (+0%) |
+| Correctness | 5 | 75% (+17%) | 88% (+18%) |
+| Discoverability | 5 | 67% (+22%) | 85% (+22%) |
+| Effectiveness | 5 | 82% (+18%) | 86% (+26%) |
+| Efficiency | 5 | 67% (+13%) | 78% (+22%) |
 
 ## Skill Version(s): <br>
-1.2.1 (source: frontmatter) <br>
+1.2.2 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

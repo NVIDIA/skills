@@ -7,14 +7,13 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `tilegym-converting-cutile-to-triton`
-- Evaluation date: 2026-06-10
+- Evaluation date: 2026-07-14
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 5 evaluation tasks
 - Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
-The skill should be reviewed before NVSkills-Eval publication. **Skill owners should address the applicable findings below and rerun NVSkills-Eval to refresh this benchmark.**
+- Overall verdict: PASS
 
 ## Agents Used
 
@@ -56,41 +55,27 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 5 | 100% (+0%) | 100% (+0%) |
-| Correctness | 5 | 100% (+15%) | 99% (+12%) |
-| Discoverability | 5 | 100% (+15%) | 99% (+8%) |
-| Effectiveness | 5 | 100% (+18%) | 97% (+17%) |
-| Efficiency | 5 | 96% (+14%) | 97% (+6%) |
+| Correctness | 5 | 100% (+20%) | 99% (+9%) |
+| Discoverability | 5 | 100% (+20%) | 99% (+10%) |
+| Effectiveness | 5 | 98% (+17%) | 99% (+14%) |
+| Efficiency | 5 | 96% (+13%) | 96% (+6%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 16 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 3 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_efficiency: Deeply nested references in performance-gotchas.md (`skills/tilegym-converting-cutile-to-triton/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/tilegym-converting-cutile-to-triton/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description very long (505 chars, recommend 50-150) (`skills/tilegym-converting-cutile-to-triton/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Broad description without negative triggers may cause over-triggering (`skills/tilegym-converting-cutile-to-triton/SKILL.md`)
-- LOW QUALITY/quality_discoverability: No '## Purpose' section (`skills/tilegym-converting-cutile-to-triton/SKILL.md`)
+- LOW SCHEMA/unexpected_file: Unexpected 'examples' in skill root (`skills/tilegym-converting-cutile-to-triton/examples`)
+- LOW SCHEMA/unexpected_file: Unexpected 'translations' in skill root (`skills/tilegym-converting-cutile-to-triton/translations`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 4 total findings.
+This tier was not run or did not produce findings in this report.
 
-Top findings:
+## Publication Recommendation
 
-- HIGH DUPLICATE/duplicate: Duplicate content found within translations/workflow.md:
-  "### TMA Setup (Required Once)" in translations/workflow.md (lines 208-218)
-  vs "# TMA allocator (required once per kernel launch context)" in translations/workflow.md (lines 362-368) (`translations/workflow.md:208`)
-- HIGH DUPLICATE/duplicate: Duplicate content found across references/harness-integration.md and translations/workflow.md:
-  "# Testing & Validation (cuTile → Triton)" in references/harness-integration.md (lines 1-7)
-  vs "# Performance testing (Triton vs cuTile)" in translations/workflow.md (lines 168-170)
-  vs "### Step 1: Benchmark" in translations/workflow.md (lines 236-243) (`references/harness-integration.md:1`)
-- HIGH DUPLICATE/duplicate: Duplicate content found within translations/workflow.md:
-  "## TMA OPTIMIZATION (Phase c2t-4) {#tma-optimization-phase-c2t-4}" in translations/workflow.md (lines 178-181)
-  vs "### Performance Killer #1: Raw Pointer Arithmetic vs TMA Tensor Descriptors" in translations/workflow.md (lines 329-335) (`translations/workflow.md:178`)
-- LOW DUPLICATE/duplicate: Duplicate content found within translations/workflow.md:
-  "### Triton Debug / Profiling" in translations/workflow.md (lines 115-125)
-  vs "# Triton profiling / autotune visibility" in translations/workflow.md (lines 171-177) (`translations/workflow.md:115`)
+The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

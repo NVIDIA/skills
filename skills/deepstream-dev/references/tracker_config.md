@@ -831,7 +831,7 @@ The segmentation mask is stored in `mask_params` field of `NvDsObjectMeta`. Set 
 ```bash
 # peoplenet model
 mkdir -p PeopleNet
-cd PeopleNet; wget --no-check-certificate --content-disposition https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplenet/versions/deployable_quantized_onnx_v2.6.3/zip -O peoplenet_deployable_quantized_onnx_v2.6.3.zip; unzip peoplenet_deployable_quantized_onnx_v2.6.3.zip
+cd PeopleNet; wget --content-disposition https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplenet/versions/deployable_quantized_onnx_v2.6.3/zip -O peoplenet_deployable_quantized_onnx_v2.6.3.zip; unzip peoplenet_deployable_quantized_onnx_v2.6.3.zip
 ```
 
 The model files are now stored in PeopleNet directory as

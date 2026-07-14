@@ -27,17 +27,17 @@ DeepStream supports dynamic addition and removal of video sources at runtime thr
 
 ### Sink Element Configuration
 
-**⚠️ CRITICAL: When using dynamic sources, the sink element MUST have `async=0`**
+**CRITICAL: When using dynamic sources, the sink element MUST have `async=0`**
 
 ```python
-# ✅ CORRECT - Required for dynamic source state transitions
+# CORRECT - Required for dynamic source state transitions
 pipeline.add("nveglglessink", "sink", {
     "sync": 0,   # Don't sync to clock (required for live sources)
     "qos": 0,    # Disable QoS events
     "async": 0   # CRITICAL: Synchronous state changes for dynamic streams
 })
 
-# ❌ WRONG - Will cause state transition deadlock
+# WRONG - Will cause state transition deadlock
 pipeline.add("nveglglessink", "sink", {"sync": 0})  # Missing async=0
 ```
 
@@ -306,7 +306,7 @@ Could not send message. (Received end-of-file)
 
 ### Anti-Pattern: Implementing Custom REST Server
 
-**❌ WRONG - Do not implement a separate Flask/FastAPI server:**
+**WRONG - Do not implement a separate Flask/FastAPI server:**
 ```python
 # DON'T DO THIS
 from flask import Flask
@@ -318,7 +318,7 @@ def add_camera():
     pass
 ```
 
-**✅ CORRECT - Use the built-in REST server:**
+**CORRECT - Use the built-in REST server:**
 ```python
 # Just configure the port on nvmultiurisrcbin
 pipeline.add("nvmultiurisrcbin", "src", {
@@ -366,7 +366,7 @@ Common RTSP URL formats by manufacturer:
 | Dahua | `rtsp://user:pass@ip:554/cam/realmonitor?channel=1&subtype=0` |
 | Axis | `rtsp://user:pass@ip/axis-media/media.amp` |
 | Generic | `rtsp://user:pass@ip:554/stream1` |
-| NVIDIA Demo | `rtsp://nv-wowza-pdc.nvidia.com:1935/vod/concat_wh_52.mp4` |
+| NVIDIA Demo | `rtsp://<your-camera-ip>:554/stream` |
 
 ---
 

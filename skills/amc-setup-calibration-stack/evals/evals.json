@@ -46,7 +46,7 @@
   },
   {
     "id": "amc-setup-calibration-stack-004",
-    "question": "I tried launching AMC but docker compose up fails with 401 Unauthorized pulling nvcr.io/nvidia/auto-magic-calib:2.0.0.",
+    "question": "I tried launching AMC but docker compose up fails with 401 Unauthorized pulling the nvcr.io/nvidia/auto-magic-calib image tag from compose/ms/compose.yml.",
     "expected_skill": "amc-setup-calibration-stack",
     "expected_script": null,
     "ground_truth": "The agent identifies the NGC authentication failure, collects a valid NGC API key from the user using the host's question mechanism, or chat if unavailable, re-runs docker login nvcr.io with --password-stdin, then re-attempts docker compose up. It does not hardcode or echo the API key in its response.",

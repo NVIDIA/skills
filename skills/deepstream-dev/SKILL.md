@@ -1,9 +1,9 @@
 ---
 name: deepstream-dev
-description: NVIDIA DeepStream SDK 9.0 development with Python pyservicemaker API. Use when building video analytics pipelines, GStreamer-based video processing, TensorRT inference integration, object detection/tracking, or Kafka/message broker integration.
+description: NVIDIA DeepStream SDK development with Python pyservicemaker API. Use when building video analytics pipelines, GStreamer-based video processing, TensorRT inference integration, object detection/tracking, or Kafka/message broker integration.
 owner: NVIDIA CORPORATION
 service: deepstream
-version: 1.1.0
+version: 1.1.1
 reviewed: 2026-04-24
 license: CC-BY-4.0 AND Apache-2.0
 ---
@@ -14,7 +14,7 @@ When this skill is active, **ALWAYS read the relevant reference documents** befo
 
 ## SDK and Architecture Quick Reference
 
-### DeepStream SDK 9.0 Version Requirements
+### DeepStream SDK Version Requirements
 
 - **GStreamer**: 1.24.2
 - **NVIDIA Driver**: 590+
@@ -130,7 +130,7 @@ DeepStream uses NVIDIA Video Memory Manager (NVMM) for zero-copy GPU buffer tran
     ```
     **Symptom if missing**: `ModuleNotFoundError: No module named 'pyservicemaker'` when running the app inside the venv.
 
-## Key Paths (DeepStream 9.0)
+## Key Paths
 
 - Models: `/opt/nvidia/deepstream/deepstream/samples/models/`
 - Primary Detector: `/opt/nvidia/deepstream/deepstream/samples/models/Primary_Detector/resnet18_trafficcamnet_pruned.onnx`
@@ -147,6 +147,7 @@ DeepStream uses NVIDIA Video Memory Manager (NVMM) for zero-copy GPU buffer tran
 | [references/gstreamer_plugins.md](references/gstreamer_plugins.md) | Looking up plugin properties, ALL properties listed |
 | [references/service_maker_api.md](references/service_maker_api.md) | Using Pipeline/Flow API, metadata access, probes, EventMessageUserMetadata |
 | [references/use_cases_pipelines.md](references/use_cases_pipelines.md) | Building pipelines: simple playback, multi-inference, cascaded GIE |
+| [references/streaming_sources.md](references/streaming_sources.md) | Ingesting local files, HTTP MP4, HLS, MPEG-DASH, or RTSP sources with nvurisrcbin |
 | [references/kafka_messaging.md](references/kafka_messaging.md) | Kafka/message broker setup, nvmsgconv/nvmsgbroker config, msg2p-newapi |
 | [references/best_practices.md](references/best_practices.md) | Design patterns, common pitfalls, anti-patterns |
 | [references/buffer_apis.md](references/buffer_apis.md) | BufferProvider/Feeder (injection), BufferRetriever/Receiver (extraction) |
@@ -158,6 +159,7 @@ DeepStream uses NVIDIA Video Memory Manager (NVMM) for zero-copy GPU buffer tran
 | [references/rest_api_dynamic.md](references/rest_api_dynamic.md) | REST API, dynamic source add/remove, nvmultiurisrcbin |
 | [references/metamux_config.md](references/metamux_config.md) | nvdsmetamux config, parallel multi-model inference, metadata merging, source ID filtering |
 | [references/docker_containers.md](references/docker_containers.md) | Docker images, Dockerfile examples, pyservicemaker install, container run commands |
+| [references/nvds_msgapi_adapter.md](references/nvds_msgapi_adapter.md) | Building custom protocol adapters: nvds_msgapi |
 
 ## Quick Error Reference
 
@@ -177,4 +179,4 @@ DeepStream uses NVIDIA Video Memory Manager (NVMM) for zero-copy GPU buffer tran
 | `No module named 'pyservicemaker'` in venv | `pip install /opt/nvidia/deepstream/deepstream/service-maker/python/pyservicemaker*.whl pyyaml` inside the venv |
 | `AttributeError: object has no attribute 'obj_label'` | Use `obj_meta.label` not `obj_meta.obj_label` in pyservicemaker (C API name differs from Python binding) |
 
-<!-- Signing refresh marker.  -->
+<!-- Signing refresh marker. -->

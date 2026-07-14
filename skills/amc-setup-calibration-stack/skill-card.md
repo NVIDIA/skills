@@ -9,10 +9,16 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers deploying the AutoMagicCalib camera calibration stack for production or evaluation use via Docker Compose on GPU-enabled hosts. <br>
+Developers and engineers deploying the AutoMagicCalib camera calibration service from NVIDIA NGC container images for local or on-premises use. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Yes] <br>
+**Credential Type(s):** [API key] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
@@ -20,8 +26,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [AutoMagicCalib GitHub Repository](https://github.com/NVIDIA-AI-IOT/auto-magic-calib) <br>
-- [VGGT-1B-Commercial Model Card](https://huggingface.co/facebook/VGGT-1B-Commercial) <br>
-- [Docker Post-Install Guide](https://docs.docker.com/engine/install/linux-postinstall/) <br>
+- [VGGT-1B-Commercial Model](https://huggingface.co/facebook/VGGT-1B-Commercial) <br>
 
 
 ## Skill Output: <br>
@@ -61,11 +66,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 6 | 83% (+0%) | 83% (-17%) |
-| Correctness | 6 | 78% (+21%) | 87% (+25%) |
-| Discoverability | 6 | 63% (+6%) | 71% (+4%) |
-| Effectiveness | 6 | 75% (+31%) | 67% (+21%) |
-| Efficiency | 6 | 65% (+10%) | 64% (+1%) |
+| Security | 6 | 100% (+0%) | 83% (+0%) |
+| Correctness | 6 | 84% (+33%) | 91% (+33%) |
+| Discoverability | 6 | 92% (+36%) | 92% (+32%) |
+| Effectiveness | 6 | 70% (+25%) | 76% (+26%) |
+| Efficiency | 6 | 82% (+23%) | 85% (+25%) |
 
 ## Skill Version(s): <br>
 1.0.0 (source: frontmatter) <br>

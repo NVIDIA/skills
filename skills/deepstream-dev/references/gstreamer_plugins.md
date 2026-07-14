@@ -115,7 +115,7 @@ pipeline.add("nvmultiurisrcbin", "src", {
 # REST API automatically available at http://localhost:9000/api/v1/
 ```
 
-**⚠️ CRITICAL for Dynamic Sources**:
+**CRITICAL for Dynamic Sources**:
 When using dynamic source addition, the sink element MUST have `async=0`:
 ```python
 pipeline.add("nveglglessink", "sink", {

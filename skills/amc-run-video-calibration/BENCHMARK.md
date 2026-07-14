@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `amc-run-video-calibration`
-- Evaluation date: 2026-06-10
+- Evaluation date: 2026-07-09
 - NVSkills-Eval profile: `internal`
 - Environment: `astra-sandbox`
 - Dataset: 6 evaluation tasks
@@ -54,34 +54,25 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 6 | 92% (-8%) | 92% (+0%) |
-| Correctness | 6 | 93% (+53%) | 67% (+25%) |
-| Discoverability | 6 | 94% (+45%) | 83% (+25%) |
-| Effectiveness | 6 | 64% (+41%) | 41% (+18%) |
-| Efficiency | 6 | 81% (+35%) | 73% (+22%) |
+| Security | 6 | 100% (+0%) | 100% (+8%) |
+| Correctness | 6 | 83% (+51%) | 66% (+30%) |
+| Discoverability | 6 | 92% (+50%) | 90% (+41%) |
+| Effectiveness | 6 | 57% (+37%) | 38% (+10%) |
+| Efficiency | 6 | 78% (+36%) | 84% (+33%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 9 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 1 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_correctness: No documented scripts in table format (`team-skills/deepstream/amc-camera-calibration/amc-run-video-calibration/SKILL.md`)
-- MEDIUM QUALITY/quality_correctness: Instructions don't mention 'run_script' (`team-skills/deepstream/amc-camera-calibration/amc-run-video-calibration/SKILL.md`)
-- MEDIUM QUALITY/quality_discoverability: Description uses first/second person (`team-skills/deepstream/amc-camera-calibration/amc-run-video-calibration/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`team-skills/deepstream/amc-camera-calibration/amc-run-video-calibration/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SQP-2): The script uploads potentially large and sensitive files (videos, alignment JSON, layout PNG, GT zip) to a remote server (`scripts/run_video_calibration.py:82`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 2 file(s)
-- Inter-Skill Deduplication: Parsed skill 'amc-run-video-calibration': 186 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

@@ -1,13 +1,13 @@
 ---
 name: "amc-run-video-calibration"
-description: "Calibrate a new dataset from pre-recorded video files via the AutoMagicCalib REST API. Use when user has local MP4s and says 'calibrate my videos', 'run AMC on these videos', or similar."
+description: "Calibrate a new dataset from pre-recorded video files via the AutoMagicCalib REST API. Use when user has local MP4s and says 'calibrate my videos', 'run AMC on these videos', or similar. For RTSP/live streams, use amc-run-rtsp-calibration instead."
 owner: "NVIDIA CORPORATION"
 service: "auto-magic-calib"
 version: "1.0.0"
 reviewed: "2026-04-28"
 license: "Apache-2.0"
-data_classification: public
 metadata:
+  author: "NVIDIA CORPORATION"
   tags: [amc, calibration, rest-api, camera, python]
 ---
 
@@ -21,6 +21,8 @@ Activate this skill when the user has pre-recorded MP4 files and wants to calibr
 - "calibrate from video files"
 
 Drives calibration through the REST API on user-supplied **pre-recorded MP4 files** — no CLI scripts or Docker bind-mounts required, just a running microservice and your files.
+
+Do not use this skill for live RTSP streams or `rtsp://...` URLs; route those requests to `skills/amc-run-rtsp-calibration/SKILL.md`.
 
 ## Prerequisites
 
@@ -108,9 +110,12 @@ If any of settings / alignment / layout was not resolved in Step 3, direct the u
 Wait for user confirmation. For non-interactive script runs, provide the needed files up front; the script exits with a clear message rather than waiting on input. For alignment/layout, verify on disk before continuing:
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-toplevel)
-# Resolve PROJECT_DIR from compose/.env (default: projects/ at repo root).
-PROJECT_DIR_REL=$(grep ^PROJECT_DIR "$REPO_ROOT/compose/.env" 2>/dev/null | cut -d= -f2 | tr -d '[:space:]')
+: "${REPO_ROOT:?set REPO_ROOT to the auto-magic-calib checkout. Run amc-setup-calibration-stack Step 0b first.}"
+grep -q "AutoMagicCalib" "$REPO_ROOT/README.md" 2>/dev/null && grep -q "auto-magic-calib-ms" "$REPO_ROOT/compose/ms/compose.yml" 2>/dev/null || { echo "ERROR: REPO_ROOT is not an auto-magic-calib checkout: $REPO_ROOT" >&2; exit 1; }
+# Resolve PROJECT_DIR from the Compose environment file (default: projects/ at repo root).
+COMPOSE_ENV_BASENAME="env"
+COMPOSE_ENV_FILE="$REPO_ROOT/compose/.${COMPOSE_ENV_BASENAME}"
+PROJECT_DIR_REL=$(grep ^PROJECT_DIR "$COMPOSE_ENV_FILE" 2>/dev/null | cut -d= -f2 | tr -d '[:space:]')
 HOST_PROJECTS=$(cd "$REPO_ROOT/compose" && realpath "${PROJECT_DIR_REL:-../../projects}")
 
 ls "$HOST_PROJECTS/project_<project_id>/manual_adjustment/"
@@ -166,7 +171,38 @@ The standalone Python script prompts only when stdin is interactive. In non-inte
 
 ## Complete Python Script
 
-Use `scripts/run_video_calibration.py` for the runnable implementation. Set `BASE_URL`, `PROJECT_NAME`, and `VIDEO_DIR`; optional env vars are `CONFIG_FILE`, `ALIGNMENT_JSON`, `LAYOUT_PNG`, `GT_ZIP`, `FOCAL_LENGTHS`, `DETECTOR_TYPE`, `RUN_VGGT`, `REPO_ROOT`, and `PROJECTS_DIR`. The script implements UI fallback, plan confirmation, VGGT prompt/opt-in behavior, polling, and refined statistics retrieval.
+Use the bundled script from the `amc-run-video-calibration` skill package, not from the `auto-magic-calib` repo root. If the user points the agent at this skill folder directly instead of installing it, set `AMC_VIDEO_SKILL_DIR` to the directory containing this `SKILL.md`, or run the command from that directory. Set `BASE_URL`, `PROJECT_NAME`, and `VIDEO_DIR`; optional env vars are `CONFIG_FILE`, `ALIGNMENT_JSON`, `LAYOUT_PNG`, `GT_ZIP`, `FOCAL_LENGTHS`, `DETECTOR_TYPE`, `RUN_VGGT`, `REPO_ROOT`, and `PROJECTS_DIR`. The script implements UI fallback, plan confirmation, VGGT prompt/opt-in behavior, polling, and refined statistics retrieval.
+
+```bash
+# Optional but recommended: REPO_ROOT points to the auto-magic-calib checkout.
+# PROJECTS_DIR can be set explicitly when project outputs live elsewhere.
+if [ -z "${DEEPSTREAM_REPO_ROOT:-}" ] && [ -n "${REPO_ROOT:-}" ] && [ -d "$REPO_ROOT/../../skills/amc-run-video-calibration" ]; then
+  DEEPSTREAM_REPO_ROOT="$(cd "$REPO_ROOT/../.." && pwd)"
+fi
+
+SCRIPT_PATH=""
+for candidate in \
+  "${AMC_VIDEO_SKILL_DIR:+$AMC_VIDEO_SKILL_DIR/scripts/run_video_calibration.py}" \
+  "$PWD/scripts/run_video_calibration.py" \
+  "${DEEPSTREAM_REPO_ROOT:+$DEEPSTREAM_REPO_ROOT/skills/amc-run-video-calibration/scripts/run_video_calibration.py}" \
+  "$PWD/skills/amc-run-video-calibration/scripts/run_video_calibration.py" \
+  "$HOME/.claude/skills/amc-run-video-calibration/scripts/run_video_calibration.py" \
+  "$HOME/.codex/skills/amc-run-video-calibration/scripts/run_video_calibration.py" \
+  "$HOME/.cursor/skills/amc-run-video-calibration/scripts/run_video_calibration.py"; do
+  if [ -f "$candidate" ]; then
+    SCRIPT_PATH="$candidate"
+    break
+  fi
+done
+
+[ -n "$SCRIPT_PATH" ] || {
+  echo "ERROR: could not find amc-run-video-calibration/scripts/run_video_calibration.py" >&2
+  echo "Set AMC_VIDEO_SKILL_DIR to the amc-run-video-calibration skill directory, or run this block from that directory." >&2
+  exit 1
+}
+
+python3 "$SCRIPT_PATH"
+```
 
 ## Success Criteria
 
@@ -217,6 +253,7 @@ A downstream Multi-View 3D Tracking skill fetches the MV3DT-format calibration d
 
 - `skills/amc-setup-calibration-stack/SKILL.md` — start MS + UI first.
 - `skills/amc-run-sample-calibration/SKILL.md` — verify the stack with the bundled sample before trying your own.
+- `skills/amc-run-rtsp-calibration/SKILL.md` — same calibration tail, but sourcing footage from live RTSP streams through VIOS.
 
 Root `README.md` "Custom Dataset" and "Calibration Workflow (UI)" sections document input-video guidelines and the UI-driven alternative to this API flow.
 

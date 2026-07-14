@@ -16,14 +16,14 @@ This document provides a quick reference for common errors encountered when deve
 
 **Wrong Code**:
 ```python
-pipeline.attach("sink", "measure_fps_probe", "fps-probe")  # ❌ CRASH - sink has no src pad
+pipeline.attach("sink", "measure_fps_probe", "fps-probe")  # CRASH - sink has no src pad
 ```
 
 **Solution**:
 ```python
 # Attach to a processing element instead
-pipeline.attach("pgie", "measure_fps_probe", "fps-probe")   # ✅ Works
-pipeline.attach("osd", "measure_fps_probe", "fps-probe")     # ✅ Works
+pipeline.attach("pgie", "measure_fps_probe", "fps-probe")   # Works
+pipeline.attach("osd", "measure_fps_probe", "fps-probe")     # Works
 ```
 
 ---
@@ -36,7 +36,7 @@ pipeline.attach("osd", "measure_fps_probe", "fps-probe")     # ✅ Works
 
 **Wrong Code**:
 ```python
-count = len(frame_meta.object_items)  # ❌ CRASH
+count = len(frame_meta.object_items)  # CRASH
 ```
 
 **Solution**:
@@ -62,14 +62,14 @@ count = len(objects)
 
 **Wrong Code**:
 ```python
-pipeline.link((f"decoder{i}", "mux"), ("", f"sink_{i}"))  # ❌ FAILS
-pipeline.link((f"decoder{i}", "mux"), ("", "sink_0"))     # ❌ FAILS
+pipeline.link((f"decoder{i}", "mux"), ("", f"sink_{i}"))  # FAILS
+pipeline.link((f"decoder{i}", "mux"), ("", "sink_0"))     # FAILS
 ```
 
 **Solution**:
 ```python
 # Use pad template - GStreamer auto-assigns sink_0, sink_1, etc.
-pipeline.link((f"decoder{i}", "mux"), ("", "sink_%u"))  # ✅ CORRECT
+pipeline.link((f"decoder{i}", "mux"), ("", "sink_%u"))  # CORRECT
 ```
 
 ---
@@ -86,7 +86,7 @@ pipeline.link((f"decoder{i}", "mux"), ("", "sink_%u"))  # ✅ CORRECT
 **Wrong Code**:
 ```python
 from multiprocessing import Process
-from queue import Queue  # ❌ Wrong queue type
+from queue import Queue  # Wrong queue type
 
 class Processor:
     def __init__(self):
@@ -104,7 +104,7 @@ from multiprocessing import Process, Queue as MPQueue
 
 class Processor:
     def __init__(self):
-        self.batch_queue = MPQueue()  # ✅ Works across processes
+        self.batch_queue = MPQueue()  # Works across processes
 
 # Option 2: Use threading instead
 import threading
@@ -112,7 +112,7 @@ from queue import Queue
 
 class Processor:
     def __init__(self):
-        self.batch_queue = Queue()  # ✅ OK for threads
+        self.batch_queue = Queue()  # OK for threads
     
     def start(self):
         thread = threading.Thread(target=self._run, args=(self.batch_queue,))
@@ -151,33 +151,33 @@ pip install /opt/nvidia/deepstream/deepstream/service-maker/python/pyservicemake
 
 1. **Wrong section name in YAML**:
 ```yaml
-# ❌ WRONG
+# WRONG
 model:
   onnx-file: /path/to/model.onnx
 
-# ✅ CORRECT
+# CORRECT
 property:
   onnx-file: /path/to/model.onnx
 ```
 
 2. **Mixing YAML/INI syntax**:
 ```yaml
-# ❌ WRONG (INI syntax in .yml file)
+# WRONG (INI syntax in .yml file)
 [property]
 onnx-file=/path/to/model.onnx
 
-# ✅ CORRECT (YAML syntax)
+# CORRECT (YAML syntax)
 property:
   onnx-file: /path/to/model.onnx
 ```
 
 3. **Missing indentation in YAML**:
 ```yaml
-# ❌ WRONG
+# WRONG
 property:
 gpu-id: 0
 
-# ✅ CORRECT
+# CORRECT
 property:
   gpu-id: 0
 ```
@@ -198,7 +198,7 @@ if not os.path.exists(model_path):
     print(f"Model not found: {model_path}")
 ```
 
-**DeepStream 9.0 Model Locations**:
+**DeepStream Model Locations**:
 ```
 /opt/nvidia/deepstream/deepstream/samples/models/
 ├── Primary_Detector/
@@ -242,10 +242,10 @@ gst-inspect-1.0 nvinfer
 
 2. **Wrong element name**:
 ```python
-# ❌ Wrong
+# Wrong
 pipeline.add("nvv4ldecoder", "decoder")  # Typo
 
-# ✅ Correct
+# Correct
 pipeline.add("nvv4l2decoder", "decoder")
 ```
 
@@ -318,10 +318,10 @@ pipeline.link("element1", "convert", "element2")
 
 2. **Wrong pad names**:
 ```python
-# ❌ Wrong
+# Wrong
 pipeline.link(("src", "mux"), ("video", "sink"))
 
-# ✅ Correct - check actual pad names
+# Correct - check actual pad names
 pipeline.link(("src", "mux"), ("", "sink_%u"))
 ```
 
@@ -428,14 +428,14 @@ watch -n 1 nvidia-smi
 **Wrong Code**:
 ```python
 def consume(self, buffer):
-    tensor = buffer.extract(0)  # ❌ Direct use
+    tensor = buffer.extract(0)  # Direct use
     # Tensor may be reused/freed by pipeline
 ```
 
 **Solution**:
 ```python
 def consume(self, buffer):
-    tensor = buffer.extract(0).clone()  # ✅ Clone first
+    tensor = buffer.extract(0).clone()  # Clone first
     # Now safe for async processing
 ```
 
@@ -654,7 +654,7 @@ Unable to set the pipeline to the playing state.
 
 **Wrong Code**:
 ```python
-# ❌ WRONG - colon separator
+# WRONG - colon separator
 pipeline.add("nvmsgbroker", "msgbroker", {
     "conn-str": "localhost:9092",  # Wrong!
     # ...
@@ -663,7 +663,7 @@ pipeline.add("nvmsgbroker", "msgbroker", {
 
 **Solution**:
 ```python
-# ✅ CORRECT - semicolon separator
+# CORRECT - semicolon separator
 pipeline.add("nvmsgbroker", "msgbroker", {
     "conn-str": "localhost;9092",  # Correct: use semicolon
     # ...
@@ -683,7 +683,7 @@ pipeline.add("nvmsgbroker", "msgbroker", {
 
 **Wrong Code**:
 ```python
-# ❌ Without msg2p-newapi AND without EventMessageUserMetadata probe,
+# Without msg2p-newapi AND without EventMessageUserMetadata probe,
 # nvmsgconv has no input and produces no messages!
 pipeline.add("nvmsgconv", "msgconv", {
     "config": msgconv_config,
@@ -693,7 +693,7 @@ pipeline.add("nvmsgconv", "msgconv", {
 
 **Solution A** (simple): Set `msg2p-newapi: True` to use the new API that reads directly from `NvDsObjectMeta`:
 ```python
-# ✅ CORRECT - msg2p-newapi reads from NvDsObjectMeta directly
+# CORRECT - msg2p-newapi reads from NvDsObjectMeta directly
 pipeline.add("nvmsgconv", "msgconv", {
     "config": msgconv_config,
     "payload-type": 0,
@@ -776,13 +776,13 @@ pipeline.add("nvmsgbroker", "msgbroker", {
 
 **Wrong Code**:
 ```python
-# ❌ Wrong - msgbroker is a sink
+# Wrong - msgbroker is a sink
 pipeline.link("tracker", "msgconv", "msgbroker", "osd", "sink")
 ```
 
 **Solution**: Use tee to split pipeline:
 ```python
-# ✅ Correct - use tee to split
+# Correct - use tee to split
 pipeline.add("tee", "tee")
 pipeline.add("queue", "queue_msg")
 pipeline.add("queue", "queue_video")
@@ -889,14 +889,14 @@ dot -Tpng /tmp/dots/*.dot > pipeline.png
 
 **Solution**:
 ```python
-# ✅ CORRECT - async=0 is CRITICAL for dynamic sources
+# CORRECT - async=0 is CRITICAL for dynamic sources
 pipeline.add("nveglglessink", "sink", {
     "sync": 0,
     "qos": 0,
     "async": 0  # This is the fix
 })
 
-# ❌ WRONG - Will cause state transition deadlock
+# WRONG - Will cause state transition deadlock
 pipeline.add("nveglglessink", "sink", {"sync": 0})
 ```
 
@@ -932,7 +932,7 @@ rtsp://username:password@camera-ip/stream
 
 ### Anti-Pattern: Custom REST Server for Stream Management
 
-**❌ WRONG**: Implementing a separate Flask/FastAPI server for stream management.
+**WRONG**: Implementing a separate Flask/FastAPI server for stream management.
 
 ```python
 # Don't do this - adds complexity and potential bugs
@@ -944,7 +944,7 @@ def add_camera():
     # Custom implementation
 ```
 
-**✅ CORRECT**: Use nvmultiurisrcbin's built-in REST server.
+**CORRECT**: Use nvmultiurisrcbin's built-in REST server.
 
 ```python
 pipeline.add("nvmultiurisrcbin", "src", {

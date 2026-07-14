@@ -9,21 +9,26 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to verify that a freshly-launched AutoMagicCalib microservice works end-to-end by running calibration on the bundled synthetic sample dataset with ground truth. <br>
+Developers and engineers validating that a freshly-launched AutoMagicCalib microservice works end-to-end by running calibration against the bundled sample dataset with ground truth. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [AgentSkills.io Specification](https://agentskills.io/specification) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, API Calls, Evaluation metrics] <br>
+**Output Type(s):** [Shell commands, API Calls, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -35,7 +40,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 5 evaluation tasks (3 positive activation, 2 negative activation) in an astra-sandbox environment. <br>
+Evaluated against 5 evaluation tasks (3 positive skill-activation, 2 negative) in the NVSkills-Eval internal profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -57,13 +62,13 @@ Underlying evaluation signals used in this run: <br>
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`claude-code`) | Codex (`codex`) |
 |---|---:|---:|---:|
-| Security | 5 | 100% (+0%) | 80% (-20%) |
-| Correctness | 5 | 87% (+34%) | 95% (+41%) |
-| Discoverability | 5 | 83% (+7%) | 92% (+16%) |
-| Effectiveness | 5 | 81% (+43%) | 89% (+47%) |
-| Efficiency | 5 | 72% (+3%) | 86% (+15%) |
+| Security | 5 | 100% (+0%) | 100% (+0%) |
+| Correctness | 5 | 95% (+48%) | 97% (+52%) |
+| Discoverability | 5 | 82% (+14%) | 93% (+28%) |
+| Effectiveness | 5 | 93% (+51%) | 90% (+51%) |
+| Efficiency | 5 | 75% (+7%) | 84% (+19%) |
 
 ## Skill Version(s): <br>
 1.0.0 (source: frontmatter) <br>

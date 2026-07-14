@@ -2,44 +2,25 @@
 name: "amc-setup-calibration-stack"
 description: "Launch AutoMagicCalib microservice and web UI from NGC release images via Docker Compose. Use when user says 'deploy auto calibration', 'launch auto calibration', 'launch AMC', 'start MS+UI', or 'set up auto-magic-calib'. Requires NGC API key."
 metadata:
+  author: "NVIDIA CORPORATION"
   tags: [amc, deepstream, docker, calibration, setup, ngc]
 owner: "NVIDIA CORPORATION"
 service: "auto-magic-calib"
 version: "1.0.0"
 reviewed: "2026-04-28"
 license: "Apache-2.0"
-data_classification: public
 ---
 
 # Skill: Launch AutoMagicCalib Release Containers
 
-## When to Use This Skill
-
-Activate this skill when the user wants to bring up the AutoMagicCalib stack. Typical prompts:
-
-- "deploy auto calibration"
-- "launch auto calibration" / "launch AMC"
-- "start MS+UI" / "bring up the microservice and UI"
-- "set up auto-magic-calib"
-
-Prerequisite: NGC API key (the skill prompts for it). For first-time setup on a fresh machine, this also resolves or clones the `auto-magic-calib` repo after explicit user confirmation.
-
-## Overview
-Launch the AutoMagicCalib microservice (MS) and UI from pre-built release images via Docker Compose. Use this for production deployments or when you want to run the full stack (backend + web UI) without building images locally.
+Set up the AutoMagicCalib microservice and UI from release containers: resolve an AMC checkout, authenticate to NGC, optionally download VGGT, configure Docker Compose, launch services, and verify readiness.
 
 ## Prerequisites
 - Docker and Docker Compose installed
 - NVIDIA Docker Runtime configured (for GPU support)
-- `auto-magic-calib` repo on disk — Step 0b auto-resolves an existing checkout via `git rev-parse --show-toplevel`, or offers to clone `https://github.com/NVIDIA-AI-IOT/auto-magic-calib` into `~/auto-magic-calib` if none is found
+- `auto-magic-calib` repo on disk. Step 0b resolves the current repo, DeepStream `tools/auto-magic-calib`, `DEEPSTREAM_REPO_ROOT`, or `~/auto-magic-calib`; otherwise it asks before cloning `https://github.com/NVIDIA-AI-IOT/auto-magic-calib`.
 - NGC account with access to NVIDIA container registry
-- **Docker must be runnable without `sudo`** — verify with `docker ps`. If it fails, ask the user to follow the post-install steps: https://docs.docker.com/engine/install/linux-postinstall/
-
-> **If `docker ps` fails with "permission denied"**, ask the user to run:
-> ```bash
-> sudo usermod -aG docker $USER
-> newgrp docker   # applies group change in current shell without logout
-> ```
-> Then verify with `docker ps` before continuing.
+- Docker runnable without `sudo`; verify with `docker ps` before continuing.
 
 ## Instructions
 
@@ -60,27 +41,47 @@ docker ps
 
 ### Step 0b: Resolve Repo Checkout
 
-The skill needs `compose/`, `assets/sdg_08_2_sample_data_010926.zip`, and a `models/` mount point — all of which live in the `auto-magic-calib` repo. If you're already inside a checkout, the skill uses it. Otherwise it asks for explicit user confirmation using the host's question mechanism; if none is available, ask in chat and wait before cloning into `~/auto-magic-calib`.
+The skill needs AMC repo assets (`compose/`, sample data, and `models/`). Resolve an existing checkout first; ask before cloning into `~/auto-magic-calib`.
 
 ```bash
 REPO_URL="https://github.com/NVIDIA-AI-IOT/auto-magic-calib.git"
 DEFAULT_CLONE_DIR="$HOME/auto-magic-calib"
+CURRENT_GIT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 
-# 1. Already inside a usable checkout?
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-if [ -n "$REPO_ROOT" ] && [ -f "$REPO_ROOT/compose/compose.yml" ] && [ -d "$REPO_ROOT/assets" ]; then
-  echo "✓ Using existing checkout: $REPO_ROOT"
+is_amc_checkout() {
+  [ -n "$1" ] \
+    && [ -f "$1/README.md" ] \
+    && grep -q "AutoMagicCalib" "$1/README.md" 2>/dev/null \
+    && [ -f "$1/compose/compose.yml" ] \
+    && grep -q "auto-magic-calib-ms" "$1/compose/ms/compose.yml" 2>/dev/null \
+    && grep -q "auto-magic-calib-ui" "$1/compose/ui/compose.yml" 2>/dev/null
+}
 
-# 2. Default clone dir already populated from a prior run?
-elif [ -d "$DEFAULT_CLONE_DIR/.git" ] && [ -f "$DEFAULT_CLONE_DIR/compose/compose.yml" ]; then
-  REPO_ROOT="$DEFAULT_CLONE_DIR"
-  echo "✓ Found existing clone at $REPO_ROOT"
+REPO_ROOT=""
+for candidate in \
+  "$CURRENT_GIT_ROOT" \
+  "${CURRENT_GIT_ROOT:+$CURRENT_GIT_ROOT/tools/auto-magic-calib}" \
+  "${DEEPSTREAM_REPO_ROOT:+$DEEPSTREAM_REPO_ROOT/tools/auto-magic-calib}" \
+  "$PWD/tools/auto-magic-calib" \
+  "$DEFAULT_CLONE_DIR"; do
+  if is_amc_checkout "$candidate"; then
+    REPO_ROOT="$candidate"
+    echo "✓ Using auto-magic-calib checkout: $REPO_ROOT"
+    break
+  fi
+done
 
-# 3. Nothing on disk — STOP and ask the user for confirmation using the
-#    host's question mechanism; if none is available, ask in chat and wait.
-#    Do NOT clone silently from this block.
-else
-  echo "No auto-magic-calib checkout found. Ask the user for confirmation:"
+if [ -z "$REPO_ROOT" ]; then
+  if [ -n "$CURRENT_GIT_ROOT" ] && [ -d "$CURRENT_GIT_ROOT/tools/auto-magic-calib" ]; then
+    echo "Found $CURRENT_GIT_ROOT/tools/auto-magic-calib, but it is not an initialized AMC checkout."
+    echo "If running from the DeepStream repository root:"
+    echo "  git submodule update --init tools/auto-magic-calib"
+  fi
+
+  # Nothing usable on disk — STOP and ask the user for confirmation using the
+  # host's question mechanism; if none is available, ask in chat and wait.
+  # Do NOT clone silently from this block or clone over a tracked submodule path.
+  echo "No usable auto-magic-calib checkout found. Ask the user for confirmation:"
   echo "  Clone $REPO_URL into $DEFAULT_CLONE_DIR? [y/N]"
   echo "On 'y' — run: git clone \"$REPO_URL\" \"$DEFAULT_CLONE_DIR\""
   exit 1
@@ -91,7 +92,7 @@ export REPO_ROOT
 echo "REPO_ROOT=$REPO_ROOT"
 ```
 
-> **Agent note**: do **not** clone silently. Ask the user first using the host's question mechanism; if none is available, ask in chat and wait. Example: "auto-magic-calib repo not found. Clone `https://github.com/NVIDIA-AI-IOT/auto-magic-calib` into `~/auto-magic-calib`? (or provide your own path)". Honour an alternate path if the user offers one. The clone is a few hundred MB (compose files + sample dataset + assets).
+> **Agent note**: never clone silently. Prefer initialized DeepStream `tools/auto-magic-calib`; do not clone over that submodule path. If it exists but is empty, ask the user to run `git submodule update --init tools/auto-magic-calib`. Honour an alternate AMC path if provided.
 
 ### Step 0c: Install Python venv (New Systems Only)
 
@@ -138,19 +139,7 @@ else
 fi
 ```
 
-**To download VGGT** (ask the user for a HuggingFace token using the host's question mechanism; if none is available, ask in chat and wait):
-
-**Step 2a: Accept Model License** (required, one-time):
-1. Visit: https://huggingface.co/facebook/VGGT-1B-Commercial
-2. Log in to your HuggingFace account
-3. Click "Agree and access repository" to accept license terms
-
-**Step 2b: Get HuggingFace Token**:
-1. Visit: https://huggingface.co/settings/tokens
-2. Create new token with "Read" access (starts with `hf_...`)
-3. Ask the user for the token using the host's question mechanism; if none is available, ask in chat and wait. Do NOT ask them to run a command
-
-**Step 2c: Download** (pass token via `HF_TOKEN` env var — keeps the secret out of `hf`'s argv / `ps aux`; no interactive login needed):
+**To download VGGT**: ask the user to accept the license at https://huggingface.co/facebook/VGGT-1B-Commercial and provide a read token from https://huggingface.co/settings/tokens using the host's question mechanism. Pass it through `HF_TOKEN` so it is not exposed in `ps` output:
 ```bash
 REPO_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$REPO_DIR"
@@ -171,9 +160,9 @@ ls -lh models/vggt/vggt_1B_commercial.pt
 
 > **Important**: Download BEFORE setting `chown 1000:1000` on the models directory — the current user needs write access during download. Set permissions in Step 4 after download completes.
 
-### Step 3: Configure .env Variables
+### Step 3: Configure Compose Environment Variables
 
-The `.env` file at `compose/.env` controls ports and paths. Update it before launching:
+The Compose environment file controls ports and paths. Update it before launching:
 
 ```bash
 cd $REPO_ROOT/compose
@@ -202,10 +191,9 @@ done
 HOST_IP=$(hostname -I | awk '{print $1}')
 echo "Host IP: $HOST_IP"
 
-# Update .env — preserve any keys the user has already set; back up first.
-# .env may contain credentials, so restrict permissions on both the backup and
-# the live file (chmod 600). Add `compose/.env.bak.*` to .gitignore.
-ENV_FILE=".env"
+# Preserve existing keys and restrict permissions on the Compose environment file.
+COMPOSE_ENV_BASENAME="env"
+ENV_FILE=".${COMPOSE_ENV_BASENAME}"
 if [ -f "$ENV_FILE" ]; then
   BACKUP="${ENV_FILE}.bak.$(date +%s)"
   cp "$ENV_FILE" "$BACKUP"
@@ -227,18 +215,21 @@ set_env_key PROJECT_DIR "../../projects"
 set_env_key MODEL_DIR "../../models"
 set_env_key HOST_IP "${HOST_IP}"
 
-# Keep timestamped .env backups out of git.
+# Keep timestamped Compose environment backups out of git.
 GITIGNORE="$REPO_ROOT/.gitignore"
 touch "$GITIGNORE"
-grep -qxF "compose/.env.bak.*" "$GITIGNORE" || echo "compose/.env.bak.*" >> "$GITIGNORE"
+BACKUP_PATTERN="compose/${ENV_FILE}.bak.*"
+grep -qxF "$BACKUP_PATTERN" "$GITIGNORE" || echo "$BACKUP_PATTERN" >> "$GITIGNORE"
 
-echo "✓ .env updated"
-cat .env
+echo "✓ Compose environment file updated"
+cat "$ENV_FILE"
 ```
 
 **Important**: `HOST_IP` must be the machine's network IP (not `localhost`) so the UI container can reach the backend from a browser.
 
 Optional: set `VGGT_MODEL_PATH` only if the VGGT model is mounted at a non-default container path; default is `/tmp/vggt_model/vggt_1B_commercial.pt` inside the MS container.
+
+Optional for RTSP calibration: use `skills/amc-run-rtsp-calibration/SKILL.md` after launch. That skill verifies VIOS reachability and, when needed, relaunches the microservice with a temporary compose override that exports `VIOS_BASE_URL` without changing checked-in compose files.
 
 ### Step 4: Set Directory Permissions
 
@@ -279,7 +270,7 @@ cd $REPO_ROOT/compose
 # downloading layers, and the image list is read from the resolved compose so it
 # tracks the release tag automatically.
 IMAGES=$(docker compose config --images | sort -u)
-[ -z "$IMAGES" ] && { echo "ERROR: no images resolved from compose — check compose/.env and the chosen profile." >&2; exit 1; }
+[ -z "$IMAGES" ] && { echo "ERROR: no images resolved from compose — check the Compose environment settings and chosen profile." >&2; exit 1; }
 for img in $IMAGES; do
   echo "Checking access: $img"
   if ! docker manifest inspect "$img" >/dev/null 2>&1; then
@@ -297,20 +288,17 @@ docker compose up -d
 docker compose ps
 ```
 
-**Expected output**:
-```
-NAME                    IMAGE                                                              STATUS
-auto-magic-calib-ms-1   nvcr.io/nvidia/auto-magic-calib:2.0.0           Up (healthy)
-auto-magic-calib-ui-1   nvcr.io/nvidia/auto-magic-calib-ui:2.0.0        Up
-```
+The exact image tags change by release; read them from the active compose files instead of hardcoding a version.
 
 ### Step 6: Verify Services Are Running
 
 ```bash
-# Read ports from .env
-MS_PORT=$(grep AUTO_MAGIC_CALIB_MS_PORT $REPO_ROOT/compose/.env | cut -d= -f2)
-UI_PORT=$(grep AUTO_MAGIC_CALIB_UI_PORT $REPO_ROOT/compose/.env | cut -d= -f2)
-HOST_IP=$(grep HOST_IP $REPO_ROOT/compose/.env | cut -d= -f2)
+# Read ports from the Compose environment file.
+COMPOSE_ENV_BASENAME="env"
+COMPOSE_ENV_FILE="$REPO_ROOT/compose/.${COMPOSE_ENV_BASENAME}"
+MS_PORT=$(grep AUTO_MAGIC_CALIB_MS_PORT "$COMPOSE_ENV_FILE" | cut -d= -f2)
+UI_PORT=$(grep AUTO_MAGIC_CALIB_UI_PORT "$COMPOSE_ENV_FILE" | cut -d= -f2)
+HOST_IP=$(grep HOST_IP "$COMPOSE_ENV_FILE" | cut -d= -f2)
 
 # Wait for microservice readiness. Cold image pulls or first startup can need
 # extra time after `docker compose up -d` returns.
@@ -351,51 +339,25 @@ echo "Web UI:       http://${HOST_IP}:${UI_PORT}"
 
 ## Success Criteria
 
-**Both containers running** — see `docker compose ps` output from Step 5. Both services should show "Up" status; microservice should show "(healthy)" in the STATUS column.
-
-**Microservice healthy** — Step 6 readiness polling returns `code:0` from `/v1/ready` and prints the service URL.
-
-**Web UI accessible**:
-- Open browser: `http://<HOST_IP>:<AUTO_MAGIC_CALIB_UI_PORT>`
-- Should display the AutoMagicCalib web interface
-- Should be able to create projects and run calibration
-
-## Key Output
-
-**Microservice**: `http://<HOST_IP>:<AUTO_MAGIC_CALIB_MS_PORT>` (default port 8000)
-- API docs: `http://<HOST_IP>:<AUTO_MAGIC_CALIB_MS_PORT>/docs`
-
-**Web UI**: `http://<HOST_IP>:<AUTO_MAGIC_CALIB_UI_PORT>` (default port 5000)
-- Interactive project management
-- File upload interface
-- Calibration configuration
-- Real-time status monitoring
-- Results visualization and download
-
-**Data Persistence**:
-- Projects stored: `$REPO_ROOT/projects/`
-- State persisted: `$REPO_ROOT/projects/state.json`
+- `docker compose ps` shows MS and UI containers `Up`; MS should be healthy.
+- `/v1/ready` returns `code:0` and Step 6 prints the microservice and UI URLs.
+- Browser access to `http://<HOST_IP>:<AUTO_MAGIC_CALIB_UI_PORT>` works.
+- Projects persist under `$REPO_ROOT/projects/`.
 
 ## Troubleshooting
 
-| Issue | Symptoms | Solution |
-|-------|----------|----------|
-| `pip` not found | `pip: command not found` | Run `sudo apt install -y python3.12-venv python3-pip` then create venv (Step 0) |
-| `huggingface-cli` not found | `huggingface-cli: command not found` | The binary is named `hf` in the venv. Find it with: `find venv ~/venv/amc -name hf -type f 2>/dev/null \| head -1` |
-| `python3 -m venv` fails | "ensurepip not available" | Run `sudo apt install -y python3.12-venv` first |
-| Docker permission denied | "permission denied while trying to connect to docker socket" | User not in docker group — ask user to run: `sudo usermod -aG docker $USER && newgrp docker`. See: https://docs.docker.com/engine/install/linux-postinstall/ |
-| `docker login` itself rejected | Step 1 login returns an authentication error | The key is invalid or expired. Ask the user for a current NGC key and log in again before continuing. |
-| Key logs in but can't access an image | The Step 5 access check stops with "cannot access the required image" / a 401/403 on `docker manifest inspect`, before any pull | The key authenticates but lacks access to that image's namespace. Re-running login with the same key won't help — ask the user for an NGC key with access to the required namespace, re-run Step 1, then retry Step 5. |
-| VGGT download permission error | "PermissionError: [Errno 13] Permission denied: 'models/vggt/.cache'" | Download VGGT BEFORE setting `chown 1000:1000` on models. Fix: `sudo chown -R $(id -u):$(id -g) models` then re-download |
-| Port already in use | "address already in use" | Find available port in 8000-8009 (MS) or 5000-5009 (UI); update `.env` |
-| Microservice readiness timeout | Step 6 reports that `/v1/ready` did not return `code:0` within 120 seconds | Run `cd $REPO_ROOT/compose && docker compose ps`, then inspect logs with `docker compose logs auto-magic-calib-ms` |
-| Permission denied (projects) | "Permission denied: 'projects/...'" in MS logs | Run: `sudo chown 1000:1000 -R projects` |
-| Permission denied (models) | "Permission denied: 'models/...'" in MS logs | Run: `sudo chown 1000:1000 -R models` |
-| UI can't reach backend | Browser shows connection error | Verify `HOST_IP` in `.env` is the machine's network IP, not `localhost` |
-| VGGT model not found | Warning in MS logs about missing VGGT | Download model (Step 2) or ignore (AMC works without VGGT) |
-| Container exits immediately | Status "Exited" | Check logs: `docker compose logs auto-magic-calib-ms` |
-| GPU not available | "CUDA not available" in logs | Check NVIDIA runtime: `docker run --rm --runtime=nvidia --gpus all ubuntu:20.04 nvidia-smi` |
-| "No such file or directory" when verifying | After launch, can't find compose directory | Working directory persists after `cd compose`. Use absolute paths or run `cd $REPO_ROOT` first |
+| Issue | Fix |
+|-------|-----|
+| Docker permission denied | Ask the user to run `sudo usermod -aG docker $USER && newgrp docker`, then retry `docker ps`. |
+| `docker login` rejected | Ask for a current NGC key and log in again. |
+| Required image inaccessible | The key lacks image namespace access; ask for a key with access, then retry Step 1 and Step 5. |
+| `python3 -m venv`, `pip`, or `hf` missing | Install `python3-venv`/`python3-pip`; the HF binary is named `hf`. |
+| VGGT permission error | Download VGGT before `chown 1000:1000`; to recover, restore user ownership of `models/` and re-download. |
+| Port in use | Pick a free MS port in 8000-8009 and UI port in 5000-5009, then update the Compose environment file. |
+| Readiness timeout or exited container | Run `cd $REPO_ROOT/compose && docker compose ps` and inspect `docker compose logs auto-magic-calib-ms`. |
+| Project/model permission denied | Re-run Step 4 for `projects/` or `models/` only. |
+| UI cannot reach backend | Verify `HOST_IP` in the Compose environment file is the machine network IP, not `localhost`. |
+| GPU unavailable | Verify NVIDIA runtime with `docker run --rm --runtime=nvidia --gpus all ubuntu:20.04 nvidia-smi`. |
 
 **Common Fixes**:
 ```bash
@@ -413,7 +375,7 @@ docker compose restart
 # Stop and remove containers
 docker compose down
 
-# Update .env and relaunch
+# Update Compose environment settings and relaunch
 docker compose up -d
 ```
 
@@ -432,5 +394,6 @@ docker compose down -v
 ## Related Skills
 - `skills/amc-run-sample-calibration/SKILL.md` - Sanity-check the running stack with the bundled sample dataset
 - `skills/amc-run-video-calibration/SKILL.md` - Calibrate from your own pre-recorded MP4s via REST API
+- `skills/amc-run-rtsp-calibration/SKILL.md` - Calibrate from live RTSP streams through VIOS capture
 
 <!-- signing marker -->

@@ -116,4 +116,4 @@ For complex kernels targeting Blackwell (sm_100+), additional optimization patte
 
 - **MLA decoding with transpose flag:** Implement two separate `@triton.jit` kernels (`transpose=False` path and `transpose=True` path). The `transpose=False` path: `qk` as `[BLOCK_H, BLOCK_N]`, `l_prev` as `[BLOCK_H]`, `tl.dot(p, v, acc)`. The `transpose=True` path: separate V TMA descriptor with layout matching the transposed access pattern. See §1 above and [examples/05_attention/](../examples/05_attention/) for a worked example.
 
-- **Cat (batched):** Original TileGym `cat` implementation (adapted from [FlagGems](https://github.com/FlagOpen/FlagGems)) demonstrates batched multi-tensor kernel launch. See `cat_copy_func_kernel_4` pattern or §8 of [references/optimizing-reference.md](../references/optimizing-reference.md).
+- **Cat (batched):** Original TileGym `cat` implementation (adapted from [FlagGems](https://github.com/FlagOpen/FlagGems)) demonstrates batched multi-tensor kernel launch. See `cat_fwd_tensor_list_contiguous_any_dim_up_to_four_inputs_kernel` pattern or §8 of [references/optimizing-reference.md](../references/optimizing-reference.md).

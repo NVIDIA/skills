@@ -1,5 +1,5 @@
 ## Description: <br>
-NVIDIA DeepStream SDK 9.0 development with Python pyservicemaker API. Use when building video analytics pipelines, GStreamer-based video processing, TensorRT inference integration, object detection/tracking, or Kafka/message broker integration. <br>
+NVIDIA DeepStream SDK development with Python pyservicemaker API for building video analytics pipelines, GStreamer-based video processing, TensorRT inference integration, object detection/tracking, and Kafka/message broker integration. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers building real-time video analytics pipelines, integrating TensorRT inference, multi-object tracking, and message broker connectivity using the NVIDIA DeepStream SDK 9.0 Python API. <br>
+Developers and engineers building NVIDIA DeepStream video analytics pipelines, GStreamer-based video processing applications, and TensorRT inference integrations using AI coding assistants. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -20,15 +20,16 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [GStreamer Plugins Reference](references/gstreamer_plugins.md) <br>
-- [Service Maker API Reference](references/service_maker_api.md) <br>
+- [Service Maker API](references/service_maker_api.md) <br>
 - [Use Cases and Pipelines](references/use_cases_pipelines.md) <br>
-- [Kafka Messaging Integration](references/kafka_messaging.md) <br>
-- [Best Practices and Design Patterns](references/best_practices.md) <br>
+- [Streaming Sources](references/streaming_sources.md) <br>
+- [Kafka Messaging](references/kafka_messaging.md) <br>
+- [Best Practices](references/best_practices.md) <br>
 - [Buffer APIs](references/buffer_apis.md) <br>
 - [nvinfer Configuration](references/nvinfer_config.md) <br>
 - [Tracker Configuration](references/tracker_config.md) <br>
-- [Troubleshooting Guide](references/troubleshooting.md) <br>
-- [REST API and Dynamic Sources](references/rest_api_dynamic.md) <br>
+- [Troubleshooting](references/troubleshooting.md) <br>
+- [REST API Dynamic Sources](references/rest_api_dynamic.md) <br>
 - [Docker Containers](references/docker_containers.md) <br>
 - [NVIDIA DeepStream SDK](https://developer.nvidia.com/deepstream-sdk) <br>
 - [DeepStream NGC Container](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/deepstream) <br>
@@ -36,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Skill Output: <br>
 **Output Type(s):** [Code, Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline Python and bash code blocks] <br>
+**Output Format:** [Python code and YAML/INI configuration files with inline documentation] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -47,7 +48,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 7 internal evaluation tasks (5 positive skill-activation, 2 negative) with 2 attempts per task via NVSkills-Eval external profile. <br>
+Evaluated against 7 tasks (5 positive skill-activation, 2 negative) in the NVSkills-Eval `external` profile on `astra-sandbox` environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -58,6 +59,7 @@ Reported benchmark dimensions: <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
 Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
 - `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
@@ -70,14 +72,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 74% (+9%) | 57% (-2%) |
-| Correctness | 8 | 94% (+6%) | 88% (+9%) |
-| Discoverability | 8 | 86% (+11%) | 76% (+9%) |
-| Effectiveness | 8 | 81% (+6%) | 78% (+9%) |
-| Efficiency | 8 | 72% (+12%) | 64% (+9%) |
+| Security | 7 | 100% (+0%) | 93% (-7%) |
+| Correctness | 7 | 77% (+7%) | 84% (+13%) |
+| Discoverability | 7 | 68% (+21%) | 77% (+20%) |
+| Effectiveness | 7 | 85% (+4%) | 84% (+10%) |
+| Efficiency | 7 | 65% (+22%) | 65% (+13%) |
 
 ## Skill Version(s): <br>
-1.1.0 (source: frontmatter) <br>
+1.1.1 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

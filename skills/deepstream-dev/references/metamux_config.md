@@ -275,13 +275,13 @@ Filter which source streams should have their inference results included in the 
 
 **Problem**: Frames are not being matched correctly, resulting in missing metadata.
 
-**❌ Wrong**:
+**Wrong**:
 ```ini
 [property]
 pts-tolerance=1000  # Too small for variable latency
 ```
 
-**✅ Correct**:
+**Correct**:
 ```ini
 [property]
 pts-tolerance=60000  # 60ms tolerance
@@ -302,13 +302,13 @@ active-pad=sink_0  # Must match an existing sink pad
 
 **Problem**: Source ID filtering not working for a specific model.
 
-**❌ Wrong**:
+**Wrong**:
 ```ini
 [group-0]
 src-ids-model=0;1;2;3  # Missing unique-id suffix
 ```
 
-**✅ Correct**:
+**Correct**:
 ```ini
 [group-0]
 src-ids-model-1=0;1;2;3  # Include the GIE unique-id (1)
@@ -318,7 +318,7 @@ src-ids-model-1=0;1;2;3  # Include the GIE unique-id (1)
 
 **Problem**: Configuration file missing required sections.
 
-**❌ Wrong**:
+**Wrong**:
 ```ini
 [property]
 enable=1
@@ -327,7 +327,7 @@ active-pad=sink_0
 # Missing [user-configs] and [group-0] sections
 ```
 
-**✅ Correct**:
+**Correct**:
 ```ini
 [property]
 enable=1

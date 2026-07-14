@@ -503,14 +503,14 @@ if __name__ == "__main__":
 
 ### CRITICAL: Iterator Handling
 
-**⚠️ WARNING**: Properties like `frame_meta.object_items`, `frame_meta.tensor_items`, and `frame_meta.user_items` return **ITERATORS**, not lists!
+**WARNING**: Properties like `frame_meta.object_items`, `frame_meta.tensor_items`, and `frame_meta.user_items` return **ITERATORS**, not lists!
 
 **Common Mistakes to Avoid**:
 ```python
-# ❌ WRONG - Will crash with "TypeError: object of type 'iterator' has no len()"
+# WRONG - Will crash with "TypeError: object of type 'iterator' has no len()"
 count = len(frame_meta.object_items)
 
-# ❌ WRONG - Iterator can only be consumed once
+# WRONG - Iterator can only be consumed once
 for obj in frame_meta.object_items:
     process(obj)
 for obj in frame_meta.object_items:  # This loop will be empty!
@@ -519,13 +519,13 @@ for obj in frame_meta.object_items:  # This loop will be empty!
 
 **Correct Patterns**:
 ```python
-# ✅ CORRECT - Count by iterating
+# CORRECT - Count by iterating
 obj_count = 0
 for obj in frame_meta.object_items:
     obj_count += 1
     process(obj)
 
-# ✅ CORRECT - If you need to iterate multiple times, convert to list first
+# CORRECT - If you need to iterate multiple times, convert to list first
 # (only if you actually need multiple iterations)
 object_list = list(frame_meta.object_items)
 count = len(object_list)
@@ -587,9 +587,9 @@ class MyOperator(BatchMetadataOperator):
 - `tensor_items`: **ITERATOR** of TensorOutputUserMetadata objects (NOT a list - cannot use `len()`)
 - `segmentation_items`: **ITERATOR** of SegmentationUserMetadata objects (NOT a list - cannot use `len()`)
 - `nvdsanalytics_frame_items`: **ITERATOR** of AnalyticsFrameMeta objects (NOT a list - cannot use `len()`)
-**⚠️ IMPORTANT**: The `*_items` properties return iterators that can only be consumed once. See "CRITICAL: Iterator Handling" section above.
+**IMPORTANT**: The `*_items` properties return iterators that can only be consumed once. See "CRITICAL: Iterator Handling" section above.
 
-**⚠️ NOTE**: There is no `timestamp` property. Use `buffer_pts` for PTS timestamp or `ntp_timestamp` for NTP timestamp.
+**NOTE**: There is no `timestamp` property. Use `buffer_pts` for PTS timestamp or `ntp_timestamp` for NTP timestamp.
 
 **Methods**:
 - `append(meta)`: Add metadata to frame
@@ -610,7 +610,7 @@ class MyOperator(BatchMetadataOperator):
   - `border_color`: Border color (Color object)
 - `label`: String describing the object class
 - `text_params`: Text parameters for OSD display (NvOSD_TextParams)
-- `mask_params`: Mask parameters for object overlay (NvOSD_MaskParams)
+- `mask_params`: Bbox-local mask parameters for a per-object OSD overlay (`NvOSD_MaskParams`); it does not represent a full-frame segmentation map.
 - `classifier_items`: **ITERATOR** of ClassifierMetadata objects. (NOT a list - cannot use `len()`)
 - `tensor_items`: **ITERATOR** of TensorOutputUserMetadata objects. (NOT a list - cannot use `len()`)
 - `nvdsanalytics_obj_items`: **ITERATOR** of AnalyticsObjInfo objects. (NOT a list - cannot use `len()`)

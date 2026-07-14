@@ -68,7 +68,7 @@ VIDEO="${DS_VIDEO:-/opt/nvidia/deepstream/deepstream/samples/streams/sample_720p
 [ -f "$VIDEO" ] || {
   echo "ERROR: Video file not found: $VIDEO"
   echo "  Fix 1: Set DS_VIDEO=/path/to/sample_720p.mp4 before running"
-  echo "  Fix 2: Install DeepStream samples (replace 9.0 with your installed minor version): apt-get install deepstream-9.0-samples"
+  echo "  Fix 2: Install DeepStream samples"
   exit 1
 }
 

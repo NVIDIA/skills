@@ -8,7 +8,7 @@ description: >
 license: CC-BY-4.0 AND Apache-2.0
 metadata:
   author: NVIDIA CORPORATION
-  version: 1.2.1
+  version: 1.2.2
 ---
 
 # DeepStream Import Vision Model
@@ -92,7 +92,7 @@ mkdir -p models/$MODEL_NAME/{model,parser,config,scripts,benchmarks/engines,benc
 1. **Engine naming** — always `{model}_dynamic_b{MAX_BS}.engine`. Never bare `model_dynamic.engine`.
 2. **batch_size == num_streams** — in DS runs, `batch-size` and stream count are always equal.
 3. **Log filenames are fixed** — `trtexec_b1.log`, `trtexec_b${MAX_BS}.log`, `ds_s${N}_run1.log`, `ds_s${N}_run2.log`. No timestamps. Report generation reads exact paths.
-4. **Parser zero-init** — always `NvDsInferObjectDetectionInfo obj = {};`. Required for DS 9.0 OBB support; bare `obj;` leaves `rotation_angle` uninitialized, causing tilted bounding boxes.
+4. **Parser zero-init** — always `NvDsInferObjectDetectionInfo obj = {};`. Required for DeepStream OBB support; bare `obj;` leaves `rotation_angle` uninitialized, causing tilted bounding boxes.
 5. **KITTI validation gate** — do NOT proceed to Step 7 if KITTI frame count is zero or detection rate < 90%.
 6. **Shared venv** — `build/.venv_optimum` reused across all models. Never create per-model venvs.
 7. **trtexec `--noDataTransfers`** — GPU-only compute matches DeepStream's GPU-to-GPU data flow.
@@ -176,4 +176,4 @@ Located in `scripts/`.
 | Zero detections | Wrong `net-scale-factor` — check model family table in references/pipeline-run.md |
 | `No module named 'pyservicemaker'` | Install into venv: `pip install /opt/nvidia/deepstream/.../pyservicemaker*.whl` |
 
-<!-- Signing refresh marker.  -->
+<!-- Signing refresh marker. -->

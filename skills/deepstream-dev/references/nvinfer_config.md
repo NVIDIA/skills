@@ -78,7 +78,7 @@ property:
 
 **Purpose:** The first time nvinfer runs with an ONNX model, TensorRT builds an optimised engine file. This serialisation step can take **minutes**. By specifying `model-engine-file`, you tell nvinfer to load an already-built engine directly, **skipping the ONNX-to-engine conversion** on subsequent runs and dramatically reducing startup time.
 
-> **Agent guidance:** When generating nvinfer config files, **always include `model-engine-file`** alongside `onnx-file`. This avoids expensive re-compilation every time the pipeline starts. The engine file is specific to the batch size, GPU, and precision — if any of these change, a new engine must be generated (i.e. the first run without a matching engine file will trigger generation automatically).
+> **Agent guidance:** When generating nvinfer config files, **always include `model-engine-file`** alongside `onnx-file`. This avoids expensive re-compilation every time the pipeline starts. The engine file is specific to the batch size, GPU, and precision — if any of these change, a new engine must be generated (i.e. the first run without a matching engine file will trigger generation automatically). The engine-cache location must be writable.
 
 **Naming convention:** TensorRT engine files follow the pattern:
 
@@ -184,6 +184,8 @@ infer-dims=3;640;640
 maintain-aspect-ratio=1
 ```
 
+**Geometry contract for masks and boxes:** When postprocessing produces boxes or masks that will be used outside the model-input grid, declare the model-input, pipeline/mux, and final output coordinate spaces. If `maintain-aspect-ratio` or `symmetric-padding` is enabled, account for the resize scale and padding before projecting model output into the target space. Identify whether `nvinfer` or the custom parser owns each transform, and apply the resize/padding inversion exactly once. For a full-frame mask, project the box into the declared frame-mask grid before compositing its bbox-local mask; do not treat pipeline-space rectangles as source-frame rectangles.
+
 ### Detection Configuration
 
 | Parameter | Type | Description | Default |
@@ -208,6 +210,23 @@ property:
 > // ... fill classId, confidence, left/top/width/height ...
 > obj.rotation_angle = is_obb_model ? angle_from_model : 0.0f;
 > ```
+
+### Custom Instance-Segmentation Parsers
+
+Use this path only for a model that produces detections with one mask per detected object. It is distinct from semantic segmentation, which produces a full-frame class map.
+
+```yaml
+property:
+  network-type: 3
+  custom-lib-path: /path/to/libcustom_parser.so
+  parse-bbox-instance-mask-func-name: NvDsInferParseCustomInstanceMask
+  output-instance-mask: 1
+```
+
+- Use `parse-bbox-instance-mask-func-name`, not the ordinary `parse-bbox-func-name`, and implement the instance-mask parser ABI provided by the DeepStream SDK in the target image.
+- After thresholding and NMS, emit each retained box, class ID, confidence, and matching bbox-local object mask together.
+- When mask and final-box resolutions differ, resize or crop the mask into the final bbox-local geometry.
+- `output-instance-mask=1` exposes parsed object masks to DeepStream metadata and OSD. It does not create a frame-level output mask.
 
 ### Secondary GIE Configuration (process-mode: 2)
 
@@ -436,14 +455,14 @@ class-attrs-all:
 
 ### Pitfall 1: Wrong Section Name
 
-**❌ Wrong (using `model:` instead of `property:`)**:
+**Wrong (using `model:` instead of `property:`)**:
 ```yaml
 model:
   onnx-file: /path/to/model.onnx
   batch-size: 1
 ```
 
-**✅ Correct**:
+**Correct**:
 ```yaml
 property:
   onnx-file: /path/to/model.onnx
@@ -452,13 +471,13 @@ property:
 
 ### Pitfall 2: Missing Colons in YAML
 
-**❌ Wrong**:
+**Wrong**:
 ```yaml
 property
   gpu-id: 0
 ```
 
-**✅ Correct**:
+**Correct**:
 ```yaml
 property:
   gpu-id: 0
@@ -466,14 +485,14 @@ property:
 
 ### Pitfall 3: Wrong Indentation
 
-**❌ Wrong**:
+**Wrong**:
 ```yaml
 property:
 gpu-id: 0
 batch-size: 1
 ```
 
-**✅ Correct**:
+**Correct**:
 ```yaml
 property:
   gpu-id: 0
@@ -482,13 +501,13 @@ property:
 
 ### Pitfall 4: Using YAML syntax in INI file
 
-**❌ Wrong (YAML in .txt file)**:
+**Wrong (YAML in .txt file)**:
 ```ini
 property:
   gpu-id: 0
 ```
 
-**✅ Correct (INI format in .txt file)**:
+**Correct (INI format in .txt file)**:
 ```ini
 [property]
 gpu-id=0
@@ -496,14 +515,14 @@ gpu-id=0
 
 ### Pitfall 5: Incorrect process-mode for Secondary GIE
 
-**❌ Wrong (using process-mode=1 for secondary)**:
+**Wrong (using process-mode=1 for secondary)**:
 ```yaml
 property:
   process-mode: 1
   operate-on-gie-id: 1  # Won't work with process-mode=1
 ```
 
-**✅ Correct**:
+**Correct**:
 ```yaml
 property:
   process-mode: 2  # Must be 2 for secondary GIE
@@ -512,7 +531,7 @@ property:
 
 ### Pitfall 6: Missing `infer-dims` for Dynamic ONNX Models
 
-**❌ Wrong (no `infer-dims` with a dynamic-shape ONNX model)**:
+**Wrong (no `infer-dims` with a dynamic-shape ONNX model)**:
 ```yaml
 # Model exported with dynamic=True (e.g., Ultralytics YOLO)
 # ONNX input shape: [batch, 3, height, width] — all symbolic
@@ -524,7 +543,7 @@ property:
 
 **Error**: `IOptimizationProfile::setDimensions: Error Code 3: API Usage Error (Parameter check failed, condition: std::all_of(dims.d, dims.d + dims.nbDims, [](int32_t x) noexcept { return x >= 0; }))`
 
-**✅ Correct**:
+**Correct**:
 ```yaml
 property:
   onnx-file: yolo_model.onnx
@@ -536,13 +555,13 @@ property:
 
 ### Pitfall 7: Using Legacy `is-classifier` Instead of `network-type`
 
-**❌ Wrong (legacy key, produces deprecation warning)**:
+**Wrong (legacy key, produces deprecation warning)**:
 ```yaml
 property:
   is-classifier: 1
 ```
 
-**✅ Correct (use `network-type` in YAML configs)**:
+**Correct (use `network-type` in YAML configs)**:
 ```yaml
 property:
   network-type: 1  # 0=Detector, 1=Classifier, 2=Segmentation, 3=Instance Segmentation
@@ -552,13 +571,13 @@ For primary detectors, simply omit both keys — the default is detector (`netwo
 
 ### Pitfall 8: Using `min-boxes` Instead of `minBoxes`
 
-**❌ Wrong (kebab-case — not recognized, produces "unknown key" warning)**:
+**Wrong (kebab-case — not recognized, produces "unknown key" warning)**:
 ```yaml
 class-attrs-all:
   min-boxes: 3
 ```
 
-**✅ Correct (camelCase)**:
+**Correct (camelCase)**:
 ```yaml
 class-attrs-all:
   minBoxes: 3
@@ -568,9 +587,9 @@ Unlike most nvinfer config keys which use kebab-case, `minBoxes` uses camelCase.
 
 ---
 
-## DeepStream 9.0 Sample Model Paths
+## DeepStream Sample Model Paths
 
-DeepStream 9.0 includes sample models at:
+DeepStream includes sample models at:
 
 ```
 /opt/nvidia/deepstream/deepstream/samples/models/
