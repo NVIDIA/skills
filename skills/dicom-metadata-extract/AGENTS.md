@@ -12,7 +12,9 @@ Rules:
 Run:
 
 ```bash
-make run-skill SKILL=dicom_metadata_extract \
-  FIXTURE=skills/dicom-metadata-extract/fixtures/sample_ct.dcm \
-  OUT=runs/dicom_metadata_demo
+python skills/dicom-metadata-extract/fixtures/generate_sample.py
+mkdir -p runs/dicom_metadata_demo
+python skills/dicom-metadata-extract/scripts/extract_metadata.py \
+  skills/dicom-metadata-extract/fixtures/sample_ct.dcm \
+  --output runs/dicom_metadata_demo/result.json
 ```
