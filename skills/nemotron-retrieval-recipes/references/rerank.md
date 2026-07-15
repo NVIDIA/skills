@@ -142,7 +142,7 @@ Stage 5:
 - Start learning-rate sweeps near `1e-6`, `3e-6`, and `1e-5`.
 - Keep the Stage 2 `prompt_template` and Stage 3 eval `prompt_template` identical.
 - Inspect existing `output/rerank/` artifacts before rerunning a stage. Ask before deleting checkpoints, cached embeddings, or generated data.
-- For deploy handoff, include the exact deploy command, `detach=true` when background service ownership is expected, container name, host port, smoke test, and stop/replace instructions.
+- For deploy handoff, include the exact deploy command, `detach=true` when background service ownership is expected, container name, host port, smoke test, and container stop or replacement steps.
 
 ## Rerank NIM Eval Drift Checklist
 

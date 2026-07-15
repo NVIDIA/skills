@@ -1,6 +1,6 @@
 ---
 name: nemotron-retrieval-recipes
-version: "0.1.0"
+version: "0.2.0"
 author: "NVIDIA Nemotron Team <noreply@nvidia.com>"
 license: Apache-2.0
 tags:
@@ -38,7 +38,7 @@ Use it only for tasks tied to the public Nemotron `embed` or `rerank` recipe flo
 
 ## Security Notes
 
-Use `Bash` for repo-scoped inspection, help, dry-run, and user-approved execution commands. Do not run API, GPU, Docker, Slurm, NIM, or other long-running work unless the user explicitly asks for it. Never run broad environment dumps or commands that expose secret values. Prefer dotlist overrides and config review over editing recipe defaults.
+Use `Bash` for repo-scoped inspection, help, dry-run, and user-approved execution commands. Do not run API, GPU, Docker, Slurm, NIM, or other long-running work unless the user explicitly asks for it. Before Stage 0 SDG for either family, confirm the user's data-governance policy permits sending corpus content to the configured inference endpoints; otherwise use an approved private or air-gapped path. Never run broad environment dumps or commands that expose secret values. Prefer dotlist overrides and config review over editing recipe defaults.
 
 ## Source Priority
 
@@ -55,9 +55,9 @@ For runnable commands, treat the current checkout as authoritative. If a require
 
 - Repo environment: `uv sync --all-extras` or the smallest relevant extra documented by the checkout.
 - Stage 0 SDG: `NVIDIA_API_KEY`; never ask users to paste secret values.
-- Stage 1-4 GPU work: CUDA/NVIDIA driver availability and enough VRAM.
-- Stage 4 export: NeMo Export-Deploy container when using TensorRT.
-- Stage 5 deploy: Docker, NGC access, and `NGC_API_KEY`.
+- Stages 1–3 GPU work: CUDA/NVIDIA driver availability and enough VRAM.
+- Stage 4 export: NeMo Export-Deploy container when using TensorRT. The default Nemotron 3 Embed profile intentionally skips export.
+- Stage 5 deploy: Docker. Default Nemotron 3 Embed can use the checked-in vLLM path with `backend=vllm`, or a compatible `NEMOTRON3_EMBED_NIM_IMAGE` with `backend=nim`; Llama Embed and rerank deployment may require NGC access and `NGC_API_KEY`.
 - Remote execution: root `env.toml` profile for `--run` or `--batch`; load `references/remote.md` when remote scheduling, logs, or GPU placement matter.
 
 ## Instructions
@@ -66,41 +66,46 @@ For runnable commands, treat the current checkout as authoritative. If a require
    - Use `references/embed.md` for embedding, embed, bi-encoder, vector search, first-stage retrieval, low Recall@k, missing relevant documents, NIM embeddings, or `nemotron embed`.
    - Use `references/rerank.md` for rerank, reranker, cross-encoder, second-stage retrieval, acceptable recall but poor top-rank ordering, low nDCG with good Recall, or `nemotron rerank`.
    - Use both references only when the user asks about both families or asks which family to choose.
-2. Choose the model to tune from the retrieval failure mode.
+2. For `embed`, choose one model profile before composing stage commands.
+   - Run `uv run nemotron embed info` when the requested model is unclear.
+   - Use `-c default` for `nvidia/Nemotron-3-Embed-1B-BF16`.
+   - Use `-c llama` for `nvidia/llama-nemotron-embed-1b-v2` and its export path.
+   - Carry the selected profile and `artifact_root` through every stage; never combine artifacts from the two profiles.
+3. Choose the model family to tune from the retrieval failure mode.
    - Prefer embedding fine-tuning when relevant documents are absent from the candidate set.
    - Prefer reranker fine-tuning when relevant documents are retrieved but ordered poorly near the top.
    - For production retrieval stacks, remember that these are complementary: embed first, rerank candidates second.
-3. Identify the intent: plan a run, execute a stage, debug a failure, tune hyperparameters, interpret metrics, export/deploy a model, inspect configs, or propose dotlist overrides.
-4. Inspect the current public surface before acting:
+4. Identify the intent: plan a run, execute a stage, debug a failure, tune hyperparameters, interpret metrics, export/deploy a model, inspect configs, or propose dotlist overrides.
+5. Inspect the current public surface before acting:
    - Recipe files: `src/nemotron/recipes/<embed|rerank>/`
    - CLI files: `src/nemotron/cli/commands/<embed|rerank>/`
-   - Default configs: `src/nemotron/recipes/<family>/stage*/config/default.yaml`
-   - Help and dry runs: `uv run nemotron <family> --help`, `uv run nemotron <family> <stage> -c default -d`
+   - Configs: `src/nemotron/recipes/<family>/stage*/config/<profile>.yaml`
+   - Help and dry runs: `uv run nemotron <family> --help`, `uv run nemotron <family> <stage> -c <profile> -d`
 
 ## Safe Workflow
 
-1. Gather only context relevant to the task: corpus path, existing SDG/training/eval data, target stage range, output directory, checkpoint path, execution mode, GPU IDs, and whether required secrets are configured. Never ask users to paste secret values.
+1. Gather only context relevant to the task: recipe family, selected profile, corpus path, existing SDG/training/eval data, target stage range, artifact root, checkpoint path, execution mode, GPU IDs, and whether required secrets are configured. Never ask users to paste secret values.
 2. Start with cheap checks before expensive work:
    - `uv run nemotron <family> --help`
    - `uv run nemotron <family> <stage> --help`
-   - `uv run nemotron <family> <stage> -c default -d`
-   - `uv run nemotron <family> run -c default -d --from <stage> --to <stage>`
+   - `uv run nemotron <family> <stage> -c <profile> -d`
+   - `uv run nemotron <family> run -c <profile> -d --from <stage> --to <stage>`
    - `run --help` may omit inherited `-c` and `-d` options even though `run -c default -d ...` works; validate by running the dry-run when unsure.
    - In an already prepared checkout, `uv run --no-sync ... --help` or `uv run --no-sync ... -d` can avoid unexpected dependency sync during read-only checks.
 3. Check prerequisites for the requested stage:
    - Repo environment: `uv sync --all-extras` or the smallest relevant extra if documented by the repo.
    - Stage 0 SDG: `NVIDIA_API_KEY`.
-   - Stage 1-4 GPU work: CUDA/NVIDIA driver availability and enough VRAM.
-   - Stage 4 export: the NeMo Export-Deploy container when using TensorRT.
-   - Stage 5 deploy: Docker, NGC access, and `NGC_API_KEY`.
+   - Stages 1–3 GPU work: CUDA/NVIDIA driver availability and enough VRAM.
+   - Stage 4 export: the NeMo Export-Deploy container when using TensorRT. Default Nemotron 3 Embed skips this stage.
+   - Stage 5 deploy: Docker plus the selected backend's image and artifact contract; default Nemotron 3 may use the checked-in vLLM image without NIM credentials. Load the family reference before requiring NGC credentials.
    - Remote execution: root `env.toml` profile for `--run` or `--batch`; load `references/remote.md` when remote scheduling, logs, or GPU placement matter.
-4. Use dotlist overrides instead of editing defaults unless the user asks for reusable config changes. Keep sequence length, prefixes, pooling/normalization, prompt templates, and hard-negative counts consistent across stages.
+4. Use dotlist overrides instead of editing defaults unless the user asks for reusable config changes. Keep the selected profile, artifact root, sequence length, prefixes, pooling/normalization, prompt templates, and hard-negative counts consistent across stages.
 5. Avoid launching API, GPU, Docker, Slurm, NIM, or long-running jobs unless the user explicitly asked to run them. Offer or run dry-runs, config review, and small pilots first.
-6. If the user specifies GPU IDs, scope every stage command with `CUDA_VISIBLE_DEVICES=<ids>`.
-7. For multi-stage local runs, prefer `uv run nemotron <family> run -c default --from <stage> --to <stage>`. The default `run` target stops at `eval`; `export` and `deploy` are opt-in.
+6. For local execution, scope requested GPU IDs with `CUDA_VISIBLE_DEVICES=<ids>`. For `--run` or `--batch`, configure scheduler resources such as `gpus_per_node` in the selected `env.toml` profile and let the scheduler assign devices; do not assume submit-shell `CUDA_VISIBLE_DEVICES` propagates remotely.
+7. For multi-stage local runs, prefer `uv run nemotron <family> run -c <profile> --from <stage> --to <stage>`. Use `default` for rerank. The default `run` target stops at `eval`; `export` and `deploy` are opt-in.
 8. When evaluating quality, compare against the base model on a fixed held-out evaluation set before recommending deployment. Do not substitute a standalone public-benchmark eval for the recipe's own Stage 3 evaluation.
 9. For long-running SDG, prep, finetune, or eval work, start the process in a session-safe way and poll at human-scale intervals: roughly 60 seconds for small pilots and 120-300 seconds for larger runs.
-10. For failures, load `PITFALLS.md`, localize the failing stage, then inspect the stage config, expected inputs, output directory, and corresponding CLI wrapper or `run_uv.py`.
+10. For failures, localize the failing stage, then inspect the stage config, expected inputs, output directory, and corresponding CLI wrapper or `run_uv.py`.
 
 ## References
 
@@ -108,7 +113,6 @@ For runnable commands, treat the current checkout as authoritative. If a require
 - `references/rerank.md`: rerank recipe stages, commands, defaults, output paths, and operating patterns.
 - `references/evaluation.md`: metric interpretation, comparison hygiene, and deployment readiness checks.
 - `references/remote.md`: remote execution profiles, batch/run mode, GPU scoping, logs, and polling.
-- `PITFALLS.md`: common failures and recovery moves for SDG, prep, training, eval, export, deploy, and CLI setup.
 
 ## Examples
 
@@ -122,7 +126,7 @@ uv run nemotron rerank run -c default -d --from prep --to eval
 
 ## Troubleshooting
 
-For failures, load `PITFALLS.md` first. Localize the failing stage, then inspect the stage config, expected inputs, output directory, and corresponding CLI wrapper or `run_uv.py`.
+Localize the failing stage, then inspect the stage config, expected inputs, output directory, and corresponding CLI wrapper or `run_uv.py`.
 
 ## Limitations
 

@@ -7,11 +7,11 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nemotron-retrieval-recipes`
-- Evaluation date: 2026-05-29
+- Evaluation date: 2026-07-15
 - NVSkills-Eval profile: `external`
-- Environment: `local`
-- Dataset: 14 evaluation tasks
-- Attempts per task: 2
+- Environment: `astra-sandbox`
+- Dataset: 40 evaluation tasks
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
@@ -42,46 +42,31 @@ Underlying evaluation signals used in this run:
 
 ## Test Tasks
 
-The benchmark dataset contained 14 evaluation tasks:
-
-- Positive tasks: 12 tasks where the skill was expected to activate.
-- Negative tasks: 2 tasks where no skill was expected.
-- Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
-
-Task composition is derived from the evaluation dataset when possible. Entries with `expected_skill` set are treated as positive skill-activation cases, while entries with `expected_skill: null` are treated as negative activation cases.
+The benchmark included 40 recorded Tier 3 trials, but the source evaluation dataset was not available in this report payload.
 
 ## Results
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+11%) | 96% (+14%) |
-| Correctness | 8 | 85% (+3%) | 87% (+12%) |
-| Discoverability | 8 | 56% (+12%) | 63% (+8%) |
-| Effectiveness | 8 | 88% (+2%) | 90% (+23%) |
-| Efficiency | 8 | 48% (+12%) | 54% (+4%) |
+| Security | 8 | 100% (+0%) | 100% (+0%) |
+| Correctness | 8 | 96% (+45%) | 90% (+28%) |
+| Discoverability | 8 | 90% (+54%) | 84% (+42%) |
+| Effectiveness | 8 | 89% (+36%) | 85% (+24%) |
+| Efficiency | 8 | 83% (+40%) | 82% (+33%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed. NVSkills-Eval ran 9 checks and found 0 total findings.
+Tier 1 validation passed. NVSkills-Eval ran 1 checks and found 0 total findings.
 
 Notable observations:
 
-- SECURITY: No security vulnerabilities detected (secrets, API keys, credentials)
 - SCHEMA: Found skill manifest: SKILL.md
-- VERSION: No semantic version label present; resource will use commit-hash history (opting back out of an existing label is allowed)
-- PII: Scanning 5 files for PII
-- LICENSE: no findings reported.
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 5 file(s)
-- Inter-Skill Deduplication: Parsed skill 'nemotron-retrieval-recipes': 125 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

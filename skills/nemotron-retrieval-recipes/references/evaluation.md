@@ -6,7 +6,7 @@ Use Stage 3 metrics as the source of truth for recipe quality. Training loss is 
 
 - Compare base vs fine-tuned on the same held-out eval set.
 - Keep the Stage 1 `eval_beir/` split fixed across hyperparameter, SDG, and data-volume comparisons.
-- Inspect `output/embed/stage3_eval/eval_results.json` or `output/rerank/stage3_eval/eval_results.json`.
+- Inspect `${artifact_root}/stage3_eval/eval_results.json`: default Embed uses `output/embed/nemotron-3-1b`, Llama Embed uses `output/embed`, and rerank uses its configured artifact root.
 - Prioritize nDCG@10 for top-rank quality, then check the rest of the k values for consistency. For embed-vs-rerank routing, inspect first-stage candidate recall at the rerank candidate depth, usually `Recall@100` or the configured `top_k`, instead of treating `Recall@10` alone as candidate coverage.
 - Use at least 100 eval queries when possible; 200-500 is better for detecting small changes.
 - Treat less than roughly 5 absolute points of nDCG@10 improvement as a reason to inspect data quality, SDG coverage, hard negatives, and hyperparameters before deployment.

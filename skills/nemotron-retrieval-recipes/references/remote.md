@@ -20,7 +20,7 @@ Load this reference when the user mentions clusters, Slurm, `env.toml`, `--run`,
 ## Operating Pattern
 
 1. Render the config locally with `-d`.
-2. Scope GPUs with `CUDA_VISIBLE_DEVICES=<ids>` when the user gives GPU IDs.
+2. Use `CUDA_VISIBLE_DEVICES=<ids>` only for local execution. For `--run` or `--batch`, set scheduler resources such as `gpus_per_node` in the selected profile and let the scheduler assign devices; use profile `env_vars` only when an executor explicitly requires an environment override.
 3. Add dotlist overrides only after confirming the stage contract inputs and outputs.
 4. For multi-stage `rerank run --run` or `rerank run --batch`, verify the profile provides `remote_job_dir` or `env_vars.NEMO_RUN_DIR` so stage outputs share one run directory.
 5. Stop remote pipelines before `deploy`; deploy is local-only. For rerank, avoid `--stage` on `rerank run` and use the single-stage command with `--dry-run` instead.

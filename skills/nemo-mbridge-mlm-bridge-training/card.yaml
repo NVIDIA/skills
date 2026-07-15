@@ -28,7 +28,7 @@ recommended_path:
 known_constraints:
   - MLM requires --eval-iters and --eval-interval (no defaults).
   - Bridge scheduler asserts lr_warmup_iters < lr_decay_iters.
-  - Use dataset.sequence_length (not dataset.seq_length) in CLI overrides.
+  - Use dataset.seq_length in CLI overrides for both pretraining and fine-tuning datasets.
   - MLM requires PYTHONPATH to include 3rdparty/Megatron-LM.
   - Bridge auto-resumes from nemo_experiments/ if previous checkpoint exists.
 known_limitations:

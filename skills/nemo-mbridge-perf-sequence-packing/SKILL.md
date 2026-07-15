@@ -76,19 +76,22 @@ cfg.model.context_parallel_size = 2
 
 LLM packed SFT config surface:
 
-```110:125:src/megatron/bridge/recipes/utils/finetune_utils.py
-dataset_kwargs = {"chat": True, "use_hf_tokenizer_chat_template": True}
+```128:143:src/megatron/bridge/recipes/utils/dataset_utils.py
+dataset_kwargs = {}
 offline_packing_specs = None
-if packed_sequence:
+if enable_offline_packing:
     dataset_kwargs["pad_to_max_length"] = True
     offline_packing_specs = PackedSequenceSpecs(packed_sequence_size=seq_length, pad_seq_to_mult=pad_seq_to_mult)
 
-return _text_hf_dataset_provider(
-    ...
-    enable_offline_packing=packed_sequence,
+return _text_hf_dataset_config(
+    source=HFDatasetSourceConfig(dataset_name="squad"),
+    preprocessing=PromptCompletionSFTPreprocessingConfig(separator=" "),
+    seq_length=seq_length,
+    enable_offline_packing=enable_offline_packing,
     offline_packing_specs=offline_packing_specs,
     dataset_kwargs=dataset_kwargs,
-    ...
+    val_proportion=0.1,
+    num_workers=1,
 )
 ```
 
