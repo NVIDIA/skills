@@ -181,7 +181,7 @@ Use the checked-in unit coverage:
 ```bash
 uv run python -m pytest tests/unit_tests/training/utils/test_packed_seq_utils.py -v && \
 uv run python -m pytest tests/unit_tests/training/test_config.py -k "packed_sequence or enable_in_batch_packing or offline_and_in_batch_packing_are_mutually_exclusive or context_parallel_seq_length_divisibility or context_parallel_finetuning_validations" -v && \
-uv run python -m pytest tests/unit_tests/data/vlm_datasets/test_batching.py -v && \
+uv run python -m pytest tests/unit_tests/data/packing/test_in_batch.py -v && \
 uv run python -m pytest tests/unit_tests/training/test_vlm_step.py -k "deferred_in_batch_packing or packed_metadata" -v && \
 uv run python -m pytest tests/unit_tests/data/datasets/test_packed_parquet.py -k "negative_index_zeroes_loss_mask" -v && \
 uv run python -m pytest tests/unit_tests/data/datasets/test_sft.py -k "mapped_padding_rows_do_not_contribute_to_loss" -v

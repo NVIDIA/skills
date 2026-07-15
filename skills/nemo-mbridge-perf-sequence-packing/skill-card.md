@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers configuring sequence packing or long-context training in Megatron-Bridge for LLM and VLM finetuning workloads. <br>
+Developers and engineers enabling sequence packing or long-context SFT in Megatron-Bridge, or investigating commits that broke packing behavior. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,25 +25,24 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Packed Sequences Training Guide](docs/training/packed-sequences.md) <br>
 - [Performance Tuning Guide](docs/performance-guide.md) <br>
-- [NVIDIA Megatron Bridge Documentation](https://docs.nvidia.com/nemo/megatron-bridge/latest/) <br>
+- [Megatron Bridge Documentation](https://docs.nvidia.com/nemo/megatron-bridge/latest/) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Configuration instructions, Shell commands] <br>
+**Output Type(s):** [Configuration instructions, Code] <br>
 **Output Format:** [Markdown with inline Python code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- claude-code <br>
+- codex <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 positive skill-activation task via NVSkills-Eval 3-Tier Evaluation (external profile). <br>
+Evaluated against 1 internal skill evaluation task (positive activation case). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -68,15 +67,10 @@ Underlying evaluation signals used in this run: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 100% (+100%) | 88% (+16%) |
-| Discoverability | 1 | 100% (+100%) | 80% (+42%) |
-| Effectiveness | 1 | 95% (+95%) | 83% (-0%) |
-| Efficiency | 1 | 94% (+67%) | 78% (+31%) |
-
-## Testing Completed: <br>
-**[x] Agent Red-Teaming** <br>
-**[ ] Network Security** <br>
-**[ ] Product Security** <br>
+| Correctness | 1 | 100% (+100%) | 94% (+19%) |
+| Discoverability | 1 | 100% (+100%) | 81% (+44%) |
+| Effectiveness | 1 | 96% (+96%) | 89% (+7%) |
+| Efficiency | 1 | 94% (+67%) | 70% (+27%) |
 
 ## Skill Version(s): <br>
 1.0.0+b7643bd (source: pyproject.toml) <br>

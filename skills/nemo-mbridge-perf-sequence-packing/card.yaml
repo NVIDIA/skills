@@ -90,7 +90,7 @@ evidence:
   - tests/functional_tests/test_groups/training/test_seqpacking_cp_example.py
   - tests/unit_tests/data/datasets/test_packed_parquet.py
   - tests/unit_tests/data/datasets/test_sft.py
-  - tests/unit_tests/data/vlm_datasets/test_batching.py
+  - tests/unit_tests/data/packing/test_in_batch.py
   - tests/unit_tests/training/utils/test_packed_seq_utils.py
   - tests/unit_tests/training/test_config.py
   - tests/unit_tests/training/test_vlm_step.py
