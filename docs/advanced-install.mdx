@@ -8,6 +8,7 @@ Use this guide when you need more control than the root README quickstart: non-i
 ## Requirements
 
 - Node.js and npm available on your PATH. The examples use `npx`, which ships with npm.
+- A current `skills` CLI — **version 1.5.16 or newer**. Running via `npx skills@latest` always uses the latest. Versions 1.5.15 and earlier do not create the Claude Code skills link, so installed skills won't appear in Claude Code (Codex and other agents that read `.agents/skills/` directly are unaffected).
 - Access to `https://github.com/NVIDIA/skills`.
 - An AI agent that supports Agent Skills, such as Claude Code, Codex, Cursor, OpenCode, Windsurf, Gemini CLI, or another compatible agent.
 
@@ -106,3 +107,21 @@ Common global locations are:
 | Cursor | `~/.cursor/skills/` |
 
 Manual installs do not participate in `npx skills update`, so use them only as a fallback.
+
+## Troubleshooting
+
+### Installed skills don't appear in your agent
+
+1. **Check your CLI version first.** Run `npx skills --version`. If it is older than **1.5.16**, upgrade by installing via `npx skills@latest ...`. Versions 1.5.15 and earlier fail to link skills into Claude Code's `.claude/skills/` directory, so the files install but the agent never sees them.
+2. **Reload skills in your session.** In Claude Code, run `/reload-skills` (or restart the session) so newly installed skills are picked up.
+
+### Verify your agent can see an installed skill
+
+After installing `<skill-name>`, confirm it landed where your agent looks:
+
+| Agent | Check |
+|-------|-------|
+| Claude Code | `.claude/skills/<skill-name>/SKILL.md` resolves (project) or `~/.claude/skills/<skill-name>/SKILL.md` (global); the skill also appears in `/skills`. |
+| Codex | `.agents/skills/<skill-name>/SKILL.md` resolves — Codex reads `.agents/skills/` directly, so no per-agent link is needed. |
+
+If `.claude/skills/<skill-name>` is missing or empty on Claude Code, it is almost always the stale-CLI issue above — upgrade to 1.5.16+ and re-run the install.
