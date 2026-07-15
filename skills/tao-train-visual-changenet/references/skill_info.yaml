@@ -1,0 +1,321 @@
+network_arch: visual-changenet
+automl_enabled: true
+container_image: tao_toolkit.pyt
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: visual_changenet train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      model.backbone.pretrained_backbone_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+      dataset.classify.train_dataset.csv_path:
+        type: file
+      dataset.classify.train_dataset.images_dir:
+        type: file
+      dataset.classify.validation_dataset.csv_path:
+        type: file
+      dataset.classify.validation_dataset.images_dir:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: visual_changenet evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      model.backbone.pretrained_backbone_path:
+        type: file
+        optional: true
+      dataset.classify.validation_dataset.csv_path:
+        type: file
+      dataset.classify.validation_dataset.images_dir:
+        type: file
+      dataset.classify.test_dataset.csv_path:
+        type: file
+      dataset.classify.test_dataset.images_dir:
+        type: file
+      evaluate.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: visual_changenet inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      model.backbone.pretrained_backbone_path:
+        type: file
+        optional: true
+      dataset.classify.infer_dataset.csv_path:
+        type: file
+      dataset.classify.infer_dataset.images_dir:
+        type: file
+      inference.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: visual_changenet export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      model.backbone.pretrained_backbone_path:
+        type: file
+        optional: true
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  quantize:
+    command: visual_changenet quantize -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      model.backbone.pretrained_backbone_path:
+        type: file
+        optional: true
+      quantize.model_path:
+        type: file
+      dataset.classify.train_dataset.csv_path:
+        type: file
+        optional: true
+      dataset.classify.train_dataset.images_dir:
+        type: folder
+        optional: true
+      dataset.classify.validation_dataset.csv_path:
+        type: file
+        optional: true
+      dataset.classify.validation_dataset.images_dir:
+        type: folder
+        optional: true
+      dataset.classify.quant_calibration_dataset.images_dir:
+        type: folder
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  segment_train:
+    command: visual_changenet train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      model.backbone.pretrained_backbone_path:
+        type: file
+        optional: true
+      dataset.segment.root_dir:
+        type: folder
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  segment_evaluate:
+    command: visual_changenet evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.segment.root_dir:
+        type: folder
+      evaluate.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  segment_inference:
+    command: visual_changenet inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.segment.root_dir:
+        type: folder
+      inference.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.classify.train_dataset.csv_path:
+      source: train_datasets
+      path: dataset.csv
+    dataset.classify.train_dataset.images_dir:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.classify.validation_dataset.csv_path:
+      source: eval_dataset
+      path: dataset.csv
+    dataset.classify.validation_dataset.images_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+  evaluate:
+    dataset.classify.validation_dataset.csv_path:
+      source: eval_dataset
+      path: dataset.csv
+    dataset.classify.validation_dataset.images_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.classify.test_dataset.csv_path:
+      source: inference_dataset
+      path: dataset.csv
+    dataset.classify.test_dataset.images_dir:
+      source: inference_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+  inference:
+    dataset.classify.infer_dataset.csv_path:
+      source: inference_dataset
+      path: dataset.csv
+    dataset.classify.infer_dataset.images_dir:
+      source: inference_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+  quantize:
+    dataset.classify.train_dataset.csv_path:
+      source: train_datasets
+      path: dataset.csv
+    dataset.classify.train_dataset.images_dir:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.classify.validation_dataset.csv_path:
+      source: eval_dataset
+      path: dataset.csv
+    dataset.classify.validation_dataset.images_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.classify.quant_calibration_dataset.images_dir:
+      source: calibration_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+  segment_train:
+    dataset.segment.root_dir:
+      source: train_datasets
+      path: ''
+  segment_evaluate:
+    dataset.segment.root_dir:
+      source: eval_dataset
+      path: ''
+  segment_inference:
+    dataset.segment.root_dir:
+      source: inference_dataset
+      path: ''
+spec_params:
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    model.backbone.pretrained_backbone_path:
+      link: https://huggingface.co/nvidia/C-RADIOv2-B/resolve/main/model.safetensors
+      destination_path: /ptm/visual_changenet/C-RADIOv2_B.safetensors
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.checkpoint: parent_model
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.checkpoint: parent_model
+  export:
+    encryption_key: key
+    results_dir: output_dir
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+  quantize:
+    encryption_key: key
+    results_dir: output_dir
+    quantize.model_path: parent_model
+  segment_train:
+    encryption_key: key
+    results_dir: output_dir
+    train.resume_training_checkpoint_path: resume_model
+  segment_evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.checkpoint: parent_model
+  segment_inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.checkpoint: parent_model
+pretrained_models:
+  classify:
+    # HF source for staging; the spec field accepts only LOCAL paths. Download
+    # `nvidia/C-RADIOv2-B`/`model.safetensors` and mount it before training.
+    backbone: hf://nvidia/C-RADIOv2-B/model.safetensors
+    full_model: ngc://nvidia/tao/visual_changenet_classification:visual_changenet_nvpcb_trainable_v1.0
+  segment:
+    full_model: ngc://nvidia/tao/visual_changenet_segmentation_levircd:visual_changenet_levircd_trainable_v1.0
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  num_gpus: train.num_gpus
+  batch_size: dataset.classify.batch_size
+  learning_rate: train.optim.lr
+  classify_batch_size: dataset.classify.batch_size
+  segment_batch_size: dataset.segment.batch_size
+  classify_num_classes: dataset.classify.num_classes
+  segment_num_classes: dataset.segment.num_classes
+  classify_num_input: dataset.classify.num_input
+  classify_train_csv: dataset.classify.train_dataset.csv_path
+  classify_train_images: dataset.classify.train_dataset.images_dir
+  classify_val_csv: dataset.classify.validation_dataset.csv_path
+  classify_val_images: dataset.classify.validation_dataset.images_dir
+  classify_test_csv: dataset.classify.test_dataset.csv_path
+  classify_test_images: dataset.classify.test_dataset.images_dir
+  classify_infer_csv: dataset.classify.infer_dataset.csv_path
+  classify_infer_images: dataset.classify.infer_dataset.images_dir
+  calibration_images: dataset.classify.quant_calibration_dataset.images_dir
+  segment_root: dataset.segment.root_dir
+  segment_img_size: dataset.segment.img_size
+  num_workers: dataset.classify.workers
+  segment_workers: dataset.segment.workers
+  pretrained_backbone: model.backbone.pretrained_backbone_path
+  resume_checkpoint: train.resume_training_checkpoint_path
+  checkpoint: evaluate.checkpoint
+  inference_checkpoint: inference.checkpoint
+  export_checkpoint: export.checkpoint
+  quantize_model: quantize.model_path
+  input_width: export.input_width
+  input_height: export.input_height
+  export_onnx: export.onnx_file
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  inference: ../references/spec_template_inference.yaml
+  export: ../references/spec_template_export.yaml
+  quantize: ../references/spec_template_quantize.yaml
+  segment_train: ../references/spec_template_segment_train.yaml
+  segment_evaluate: ../references/spec_template_segment_evaluate.yaml
+  segment_inference: ../references/spec_template_segment_inference.yaml

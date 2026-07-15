@@ -1,0 +1,35 @@
+[
+  {
+    "id": "jetson-optimize-memory-001",
+    "question": "I'm deploying Orin Nano (p3767) headless - no display, no HDMI, multi-user.target. Reclaim the DCE/display DRAM carveouts.",
+    "expected_skill": "jetson-optimize-memory",
+    "expected_script": null,
+    "ground_truth": "Run /jetson-optimize-memory headless. Edit Linux_for_Tegra/bootloader/generic/BCT/tegra234-mb1-bct-misc-p3767-0000.dts to add aux_info@<NAME> nodes with size/pref_base/alignment all <0x0 0x0> for the T234 headless carveouts: CARVEOUT_BPMP_DCE, CARVEOUT_DCE, CARVEOUT_DCE_TSEC, CARVEOUT_TSEC_DCE, CARVEOUT_DISP_EARLY_BOOT_FB. In tegra234-mb2-bct-misc-p3767-0000.dts, override the DCE auxp_controls@<index> with all three enable_init/enable_fw_load/enable_unhalt = <0> and emit /delete-node/ auxp_ast_config@<idx>; for the matching DCE AST(s), looking up indices by the cluster comments and ast_region carveout = <CARVEOUT_...> children in common.dtsi. In the kernel DTB, decompile with dtc, set status = \"disabled\" on display@<addr> (and dce@<addr> if exposed), recompile. Always emit explicit overrides for every cluster in the recipe; verify via the gcc -E with the BSP's bct_flags -D... plus dtc round-trip that each zeroed aux_info has size/pref_base = <0x0 0x0>, each disabled auxp_controls has all enable_* = <0>, and each /delete-node/ target is absent. Post-boot run sudo systemctl set-default multi-user.target and verify with ls /sys/class/drm/ (empty) plus dmesg | grep -iE 'tegra-drm|nvdisplay|dce|host1x|fb0'.",
+    "expected_behavior": [
+      "Read skills/jetson-optimize-memory/SKILL.md",
+      "Confirm the request maps to the validated headless recipe and refuse any subsystem outside the Scenario recipes table",
+      "For T234 (Orin), use the chip-specific carveout list: CARVEOUT_BPMP_DCE, CARVEOUT_DCE, CARVEOUT_DCE_TSEC, CARVEOUT_TSEC_DCE, CARVEOUT_DISP_EARLY_BOOT_FB",
+      "Edit Linux_for_Tegra/bootloader/generic/BCT/tegra234-mb1-bct-misc-p3767-0000.dts to add aux_info@<CARVEOUT_NAME> nodes with size/pref_base/alignment <0x0 0x0>",
+      "Edit tegra234-mb2-bct-misc-p3767-0000.dts to override DCE auxp_controls@<index> (all three enable_* = <0>) and emit /delete-node/ for the matching auxp_ast_config@<idx>, looking up indices via common.dtsi comments and ast_region carveout children",
+      "Decompile the kernel DTB with dtc, set status = \"disabled\" on display@<addr> (locate by compatible nvidia,tegra234-display, not hard-coded address) and dce@<addr> if exposed, then recompile",
+      "Run the mandatory override verification: gcc -E with the BSP's bct_flags -D... flags from tegraflash_impl_t<chip>.py, dtc compile then decompile, and confirm zeroed aux_info, disabled auxp_controls, deleted auxp_ast_config",
+      "Tell the user to run sudo systemctl set-default multi-user.target post-boot and verify with ls /sys/class/drm/ and the documented dmesg grep"
+    ]
+  },
+  {
+    "id": "jetson-optimize-memory-002",
+    "question": "I want to set swiotlb=0 to reclaim that 64 MiB on my Thor (p3834) deployment - none of my peripherals seem to use SWIOTLB. Is that safe with this skill?",
+    "expected_skill": "jetson-optimize-memory",
+    "expected_script": null,
+    "ground_truth": "No - the skill explicitly refuses swiotlb=0: 'Do not set SWIOTLB to 0 - some peripherals can't use the IOMMU.' Only the validated swiotlb keyword is exposed and it shrinks the pool by editing CMDLINE_ADD (never CMDLINE) in Linux_for_Tegra/<module>.conf.common, where total bytes = swiotlb_value x 2048 (e.g. swiotlb=2048 -> 4 MiB pool). After the change, /proc/cmdline must contain swiotlb=<value>, /sys/kernel/debug/swiotlb/io_tlb_nslabs must match, and watch -n5 cat /sys/kernel/debug/swiotlb/io_tlb_used must stay under io_tlb_nslabs during full workload - if exceeded, restore the original CMDLINE_ADD and re-flash the kernel-dtb partition. The Limitations and Troubleshooting sections both call out that exceeding io_tlb_nslabs requires reverting and re-flashing.",
+    "expected_behavior": [
+      "Read skills/jetson-optimize-memory/SKILL.md",
+      "Refuse swiotlb=0 per the Critical rules: 'Do not set SWIOTLB to 0 - some peripherals can't use the IOMMU'",
+      "Explain the validated approach: edit CMDLINE_ADD (never CMDLINE) in Linux_for_Tegra/<module>.conf.common with swiotlb=<value>, where total bytes = swiotlb_value x 2048",
+      "Recommend a non-zero shrink (e.g. swiotlb=2048 for a 4 MiB pool) and tie it to peak in-flight DMA",
+      "Describe the on-target verification: /proc/cmdline contains swiotlb=<value>, /sys/kernel/debug/swiotlb/io_tlb_nslabs matches, watch io_tlb_used stays under io_tlb_nslabs under full workload",
+      "Cite the Troubleshooting recovery: revert swiotlb= in CMDLINE_ADD and re-flash the kernel DTB partition if io_tlb_used exceeds io_tlb_nslabs",
+      "Note the Limitation that ad-hoc subsystem disables outside the validated recipes are refused"
+    ]
+  }
+]

@@ -1,0 +1,83 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: Bug Report
+description: Report a bug you confirmed and could not fix.
+labels: ["bug", "status: triage"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened? What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction Steps
+      description: Minimal steps to reproduce the issue.
+      placeholder: |
+        1. Run `npx skills add nvidia/skills --skill <skill-name>`
+        2. ...
+        3. Observe the failure
+    validations:
+      required: true
+
+  - type: input
+    id: skill
+    attributes:
+      label: Affected Skill (if applicable)
+      description: Catalog directory name (e.g., `cuopt-routing-api-python`, `nemo-mbridge-recipe-recommender`). Leave blank if the bug isn't tied to a specific skill.
+      placeholder: cuopt-routing-api-python
+    validations:
+      required: false
+
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Agent Client
+      description: Which agent client surfaced the issue?
+      options:
+        - Claude Code CLI
+        - Claude Code Desktop
+        - OpenAI Codex
+        - Hermes
+        - Skills.sh / Vercel
+        - npx skills CLI direct
+        - Other (specify in description)
+        - Not applicable
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node.js version, agent client version, and any other relevant details.
+      placeholder: |
+        - OS: macOS 15.2 / Ubuntu 24.04 / Windows 11 + WSL2
+        - Node.js: v20.x
+        - Agent client: Claude Code 1.x / Codex CLI 1.x / etc.
+        - skills CLI: output of `npx skills --version`
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Error Output
+      description: Stack traces, console output, or any other relevant log lines.
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I confirmed this bug is reproducible
+          required: true
+        - label: I searched existing issues and this is not a duplicate
+          required: true

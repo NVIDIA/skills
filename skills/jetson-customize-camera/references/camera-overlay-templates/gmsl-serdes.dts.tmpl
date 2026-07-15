@@ -1,0 +1,215 @@
+/*
+ * SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * gmsl-serdes.dts.tmpl — agentic template for GMSL-based cameras.
+ *
+ * Use when each sensor sits behind a MAX9295/MAX96717 serializer over
+ * coax, terminated on the carrier by a MAX96712 (4-link) or MAX9296
+ * (2-link) deserializer that fans out to the SoC's NVCSI ports.
+ *
+ * Architecture (per sensor link):
+ *
+ *   sensor (e.g. AR0234, OX03A10) ──I²C/MIPI──> MAX9295 serializer
+ *           │
+ *           coax ──> MAX96712 link@<i> ──> NVCSI port@<n>
+ *
+ * The deserializer typically lives behind a TCA9546-class I²C mux on
+ * the carrier, with one mux channel per GMSL link for serializer +
+ * sensor address space isolation.
+ *
+ * Placeholders (substituted by /jetson-modify-camera step 6):
+ *
+ *   <<OVERLAY_NAME>>          — e.g. "Jetson Camera p3762-a00 4Hawk"
+ *   <<JETSON_HEADER_NAME>>    — "Jetson AGX CSI Connector"
+ *   <<COMPATIBLE_LIST>>       — \0-joined; must match /proc/device-tree/compatible
+ *   <<EEPROM_ID>>             — daughter-card EEPROM id (read at probe)
+ *
+ *   <<NUM_LINKS>>             — number of sensor+serializer pairs (1..4)
+ *   <<DESER_COMPATIBLE>>      — "maxim,max96712" or "maxim,max9296"
+ *   <<DESER_I2C_BUS_NODE>>    — /aliases label of the deserializer's I2C bus
+ *   <<DESER_ADDR>>            — deserializer I2C address (0x29 typical for 96712)
+ *   <<DESER_RESET_GPIO>>      — GPIO triplet driving the deserializer reset
+ *
+ *   <<MUX_COMPATIBLE>>        — "nxp,pca9546" / "ti,tca9546" etc.
+ *   <<MUX_NODE>>              — node label, e.g. "tca9546"
+ *   <<MUX_ADDR_HEX>>          — 0x70..0x77
+ *
+ *   For each link i = 0..<<NUM_LINKS>>-1:
+ *   <<MUX_CHANNEL_<i>>>       — mux output channel for this link
+ *   <<PORT_INDEX_<i>>>        — NVCSI port the deserializer feeds
+ *   <<BUS_WIDTH_<i>>>         — CSI lanes per link (typically 4 on 96712)
+ *   <<VC_ID_<i>>>             — virtual-channel id (0..3 — must be unique on a shared CSI port)
+ *   <<SER_ADDR_<i>>>          — serializer I2C address as seen by deserializer (e.g. 0x40)
+ *   <<SENSOR_COMPATIBLE_<i>>> — "onnn,ar0234" / "ovti,ox03a10" / etc.
+ *   <<SENSOR_ADDR_<i>>>       — sensor I2C address as seen behind the link
+ *   <<MCLK_NODE_<i>>>         — extperiph clock controller phandle (typically driven by serializer or onboard XO)
+ *   <<MCLK_RATE_HZ_<i>>>      — MCLK frequency in Hz
+ *
+ * Sensor-specific register tables come from the closest in-tree
+ * tegra<soc>-p3971-camera-p3762-a00-<config>-overlay.dtbo decompiled
+ * with `dtc`. The agent splices those into the per-link sensor@<addr>
+ * subnode.
+ */
+
+/dts-v1/;
+
+/ {
+    overlay-name = "<<OVERLAY_NAME>>";
+    jetson-header-name = "<<JETSON_HEADER_NAME>>";
+    compatible = "<<COMPATIBLE_LIST>>";
+
+    fragment@0 {
+        target-path = "/";
+
+        board_config {
+            ids = "<<EEPROM_ID>>";
+            sw-modules = "kernel";
+        };
+
+        __overlay__ {
+            tegra-capture-vi {
+                status = "okay";
+                num-channels = <<<NUM_LINKS>>>;
+
+                ports {
+                    status = "okay";
+
+                    /*
+                     * REPEAT this port@<i> block for i = 0..<<NUM_LINKS>>-1.
+                     * Each maps to one GMSL link arriving on NVCSI port <<PORT_INDEX_i>>.
+                     */
+                    port@0 {
+                        status = "okay";
+                        endpoint {
+                            status = "okay";
+                            port-index = <<<PORT_INDEX_0>>>;
+                            bus-width = <<<BUS_WIDTH_0>>>;
+                            vc-id = <<<VC_ID_0>>>;
+                            remote-endpoint = <&deser_out_link0>;
+                        };
+                    };
+                };
+            };
+
+            tegra-camera-platform {
+                compatible = "nvidia, tegra-camera-platform";
+                num_csi_lanes = <<<BUS_WIDTH_0>>>;
+                max_lane_speed = <0x10c8e0>;
+                min_bits_per_pixel = <0x0a>;
+                vi_peak_byte_per_pixel = <0x02>;
+                vi_bw_margin_pct = <0x19>;
+
+                modules {
+                    /* One module<i> entry per link — agent fills from session.camera.sensors[] */
+                };
+            };
+        };
+    };
+
+    /*
+     * fragment@1 — I²C bus subtree: mux → mux-channel → deserializer → serializer → sensor.
+     * Every GMSL link gets its own mux-channel subtree to isolate the
+     * serializer's I²C address space (multiple cameras can otherwise
+     * collide on the same default 0x40).
+     */
+    fragment@1 {
+        target-path = "/<<DESER_I2C_BUS_NODE>>";
+
+        __overlay__ {
+            #address-cells = <0x01>;
+            #size-cells = <0x00>;
+
+            <<MUX_NODE>>: <<MUX_NODE>>@<<MUX_ADDR_HEX>> {
+                compatible = "<<MUX_COMPATIBLE>>";
+                reg = <<<MUX_ADDR_HEX>>>;
+                #address-cells = <0x01>;
+                #size-cells = <0x00>;
+
+                /*
+                 * REPEAT this i2c@<i> subtree for each link i.
+                 */
+                i2c@0 {
+                    reg = <<<MUX_CHANNEL_0>>>;
+                    #address-cells = <0x01>;
+                    #size-cells = <0x00>;
+
+                    deser_link0: deserializer@<<DESER_ADDR>> {
+                        compatible = "<<DESER_COMPATIBLE>>";
+                        reg = <<<DESER_ADDR>>>;
+                        reset-gpios = <<<DESER_RESET_GPIO>>>;
+
+                        /*
+                         * Serializer subnode — one per GMSL link the
+                         * deserializer is bonded to.
+                         */
+                        serializer@<<SER_ADDR_0>> {
+                            compatible = "maxim,max9295";
+                            reg = <<<SER_ADDR_0>>>;
+                        };
+
+                        /*
+                         * Sensor subnode behind the serializer.
+                         * Sensor-specific mode tables spliced in from the
+                         * in-tree p3762 reference DTBO.
+                         */
+                        sensor@<<SENSOR_ADDR_0>> {
+                            compatible = "<<SENSOR_COMPATIBLE_0>>";
+                            reg = <<<SENSOR_ADDR_0>>>;
+                            clocks = <<<MCLK_NODE_0>>>;
+                            clock-names = "extperiph1";
+                            clock-frequency = <<<MCLK_RATE_HZ_0>>>;
+
+                            ports {
+                                #address-cells = <0x01>;
+                                #size-cells = <0x00>;
+
+                                port@0 {
+                                    reg = <0x00>;
+                                    sensor_link0_out: endpoint {
+                                        port-index = <<<PORT_INDEX_0>>>;
+                                        bus-width = <<<BUS_WIDTH_0>>>;
+                                        remote-endpoint = <&deser_out_link0>;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+
+    /*
+     * fragment@2 — Deserializer-output endpoint label so VI can find
+     * each link's data-stream. NVIDIA's p3762 reference overlays use
+     * `deser_out_linkN` labels — keep them stable so the
+     * remote-endpoint references above resolve at compile time.
+     */
+    fragment@2 {
+        target-path = "/host1x@1300000/nvcsi@8c00000";
+
+        __overlay__ {
+            num-channels = <<<NUM_LINKS>>>;
+            #address-cells = <0x01>;
+            #size-cells = <0x00>;
+
+            channel@0 {
+                reg = <<<PORT_INDEX_0>>>;
+                ports {
+                    #address-cells = <0x01>;
+                    #size-cells = <0x00>;
+
+                    port@0 {
+                        reg = <0x00>;
+                        deser_out_link0: endpoint@0 {
+                            port-index = <<<PORT_INDEX_0>>>;
+                            bus-width = <<<BUS_WIDTH_0>>>;
+                            remote-endpoint = <&sensor_link0_out>;
+                        };
+                    };
+                };
+            };
+        };
+    };
+};

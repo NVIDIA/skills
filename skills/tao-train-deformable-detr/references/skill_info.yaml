@@ -1,0 +1,170 @@
+name: tao-train-deformable-detr
+network_arch: deformable_detr
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: coco
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: deformable_detr train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_data_sources[0].image_dir:
+        type: folder
+      dataset.train_data_sources[0].json_file:
+        type: file
+      dataset.val_data_sources[0].image_dir:
+        type: folder
+      dataset.val_data_sources[0].json_file:
+        type: file
+      model.pretrained_backbone_path:
+        type: file
+        optional: true
+      train.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  quantize:
+    command: deformable_detr quantize -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_data_sources[0].image_dir:
+        type: folder
+      dataset.train_data_sources[0].json_file:
+        type: file
+      dataset.val_data_sources[0].image_dir:
+        type: folder
+      dataset.val_data_sources[0].json_file:
+        type: file
+      dataset.quant_calibration_data_sources.image_dir:
+        type: folder
+      dataset.quant_calibration_data_sources.json_file:
+        type: file
+      quantize.model_path:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: deformable_detr evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.test_data_sources.image_dir:
+        type: folder
+      dataset.test_data_sources.json_file:
+        type: file
+      evaluate.checkpoint:
+        type: file
+        optional: true
+      evaluate.trt_engine:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: deformable_detr export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  gen_trt_engine:
+    container_image: tao_toolkit.deploy
+    command: deformable_detr gen_trt_engine -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      gen_trt_engine.onnx_file:
+        type: file
+      gen_trt_engine.tensorrt.calibration.cal_image_dir:
+        type: folder
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+      gen_trt_engine.trt_engine:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: deformable_detr inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.infer_data_sources.image_dir:
+        type: folder
+      dataset.infer_data_sources.classmap:
+        type: file
+      inference.checkpoint:
+        type: file
+        optional: true
+      inference.trt_engine:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources: {}
+spec_params:
+  train:
+    encryption_key: key
+    model.pretrained_backbone_path: ptm_if_no_resume_model
+    results_dir: output_dir
+    train.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  quantize:
+    encryption_key: key
+    quantize.model_path: parent_model
+    results_dir: output_dir
+  evaluate:
+    encryption_key: key
+    evaluate.checkpoint: parent_model
+    evaluate.trt_engine: parent_model
+    results_dir: output_dir
+  export:
+    encryption_key: key
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+    results_dir: output_dir
+  gen_trt_engine:
+    encryption_key: key
+    gen_trt_engine.onnx_file: parent_model
+    gen_trt_engine.tensorrt.calibration.cal_cache_file: create_cal_cache
+    gen_trt_engine.trt_engine: create_engine_file
+    results_dir: output_dir
+  inference:
+    encryption_key: key
+    inference.checkpoint: parent_model
+    inference.trt_engine: parent_model
+    results_dir: output_dir
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.batch_size
+  learning_rate: train.optim.lr
+description: Deformable DETR for 2D object detection. Uses deformable attention for efficient multi-scale feature processing.
+  Lighter than DINO with competitive accuracy.

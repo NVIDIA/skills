@@ -22,7 +22,7 @@ Use this when you want to inspect the catalog before selecting a skill.
 ## Install One Skill
 
 ```bash
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api
 ```
 
 Use the skill name from the `name:` field in the skill's `SKILL.md`. In this catalog, names usually match the leaf folder under `skills/<product>/`.
@@ -30,16 +30,16 @@ Use the skill name from the `name:` field in the skill's `SKILL.md`. In this cat
 ## Install to a Specific Agent
 
 ```bash
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent codex
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent claude-code
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python --agent cursor
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api --agent codex
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api --agent claude-code
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api --agent cursor
 ```
 
 You can pass `--agent` more than once:
 
 ```bash
 npx skills add nvidia/skills \
-  --skill cuopt-numerical-optimization-api-python \
+  --skill cuopt-numerical-optimization-api \
   --agent codex \
   --agent claude-code
 ```
@@ -49,14 +49,14 @@ npx skills add nvidia/skills \
 Project installs are the default. They place links under the current project's agent-specific skills directory so the skills travel with that project.
 
 ```bash
-npx skills add nvidia/skills --skill cuopt-numerical-optimization-api-python
+npx skills add nvidia/skills --skill cuopt-numerical-optimization-api
 ```
 
 Global installs make the skill available across projects for the selected agent:
 
 ```bash
 npx skills add nvidia/skills \
-  --skill cuopt-numerical-optimization-api-python \
+  --skill cuopt-numerical-optimization-api \
   --agent codex \
   --global
 ```
@@ -67,7 +67,7 @@ Use `--yes` when scripting setup or bootstrapping a development environment:
 
 ```bash
 npx skills add nvidia/skills \
-  --skill cuopt-numerical-optimization-api-python \
+  --skill cuopt-numerical-optimization-api \
   --agent codex \
   --global \
   --yes
@@ -86,7 +86,7 @@ npx skills check
 npx skills update
 
 # Remove a skill
-npx skills remove cuopt-numerical-optimization-api-python
+npx skills remove cuopt-numerical-optimization-api
 ```
 
 ## Manual Fallback

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "numopt-form-eval-001-parse-production-planning",
+    "question": "A factory operates 3 production lines and employs 50 workers. It plans to produce products A, B, and C next month. Each product has a known per-unit cost and revenue. Determine the monthly production plan. Classify each sentence as parameter, constraint, decision, or objective, and state the (possibly implicit) objective.",
+    "expected_skill": "cuopt-numerical-optimization-formulation",
+    "expected_script": null,
+    "ground_truth": "The agent classifies each sentence with the four-label framework (parameter / constraint / decision / objective), treats the fixed facts (3 production lines, 50 workers, known cost and revenue) as parameters and the production plan as the decision, and identifies the implicit objective as maximize profit (since both costs and revenues are given) \u2014 not minimize cost. Does not produce code.",
+    "expected_behavior": [
+      "Classifies each sentence using the four labels (parameter / constraint / decision / objective)",
+      "Identifies the implicit objective as maximize profit (revenue \u2212 cost), not minimize cost, since both costs and revenues are given",
+      "Does not produce code or an API call sequence \u2014 this skill is concepts only"
+    ]
+  },
+  {
+    "id": "numopt-form-eval-002-cutting-stock-objective",
+    "question": "I am modeling a cutting stock problem. I have several cutting patterns, each with a different waste width. To minimize material waste, I plan to use this objective: minimize sum_j (waste_width_j * x_j), where x_j is the length cut using pattern j. Is this the correct objective? If not, what is wrong and what should I use instead?",
+    "expected_skill": "cuopt-numerical-optimization-formulation",
+    "expected_script": null,
+    "ground_truth": "The proposed objective is incorrect. Using sum_j (waste_width_j * x_j) only captures trim loss \u2014 the unused strip width within each cutting pattern. It ignores over-production: excess strips produced beyond actual demand are also waste material, but are not penalized by this objective. The solver will over-produce narrow orders to fill patterns efficiently and appear to minimize waste while actually consuming more total material. The correct objective is to minimize total material area consumed: minimize sum_j (roll_width_j * x_j). Since the total useful area demanded is a fixed constant, minimizing total material area is equivalent to minimizing all waste (trim loss plus over-production). The waste can then be computed as: waste = total_material_area_consumed \u2212 required_useful_area, where required_useful_area = sum_i (order_width_i * order_length_i). The agent does not produce code.",
+    "expected_behavior": [
+      "Identifies the proposed objective as incorrect",
+      "Explains that sum_j(waste_width_j * x_j) only captures trim loss and ignores over-production",
+      "States that the correct objective is minimize sum_j(roll_width_j * x_j) \u2014 total material area consumed",
+      "Explains that waste = total_material_area_consumed minus required_useful_area",
+      "Does not produce code \u2014 this skill is formulation concepts only"
+    ]
+  },
+  {
+    "id": "numopt-form-eval-003-goal-programming-integer-decisions",
+    "question": "I am using goal programming to optimize worker scheduling across two priority levels: first minimize overtime hours, then minimize idle time. I introduced deviation variables d_minus and d_plus for each goal. A colleague says all variables in goal programming are continuous because the deviation variables are continuous. Should the worker count variables also be continuous?",
+    "expected_skill": "cuopt-numerical-optimization-formulation",
+    "expected_script": null,
+    "ground_truth": "The colleague is wrong. Deviation variables (d_minus, d_plus) are always continuous \u2014 they measure how much a goal is under- or over-achieved, which can be fractional. However, decision variables that represent discrete or countable quantities must remain INTEGER regardless of the goal programming structure. Worker counts are a discrete quantity (you cannot hire 2.7 workers), so those variables must be declared as INTEGER. Making them continuous because of the deviation variables is a formulation error: the LP relaxation may yield fractional worker counts that are infeasible in practice and produce a different (lower) objective than the true integer optimum. The agent also describes the standard goal programming pattern: write each goal as an equality with deviation variables (expression + d_minus - d_plus = target), then solve sequentially per priority, fixing higher-priority deviations before optimizing lower ones. Does not produce code.",
+    "expected_behavior": [
+      "States the colleague is wrong \u2014 deviation variables being continuous does not make all variables continuous",
+      "Explains that decision variables representing discrete/countable quantities (like worker counts) must be INTEGER",
+      "States that making worker counts continuous is a formulation error that can yield fractional (infeasible) solutions",
+      "Describes the goal programming pattern: deviation variables in equality constraints, solved sequentially by priority",
+      "Does not produce code \u2014 this skill is formulation concepts only"
+    ]
+  }
+]

@@ -1,0 +1,46 @@
+{
+    "metrics": [
+        {
+            "bundle_kind": "metric-bundle",
+            "bundle_format_version": "v1",
+            "metric_type": "exact-match",
+            "metadata": {
+                "description": null,
+                "labels": {}
+            },
+            "outputs": [
+                {
+                    "name": "exact-match",
+                    "description": null,
+                    "value_json_schema": {
+                        "description": "Continuous numeric metric value.",
+                        "title": "ContinuousScore",
+                        "type": "number"
+                    }
+                }
+            ],
+            "secrets": {},
+            "payload": {
+                "python_version": "3.11.15",
+                "cloudpickle_version": "3.1.2",
+                "pickle_protocol": 5,
+                "blob": "gAWVuQEAAAAAAACMJm5lbW9fZXZhbHVhdG9yX3Nkay5tZXRyaWNzLmV4YWN0X21hdGNolIwQRXhhY3RNYXRjaE1ldHJpY5STlCmBlH2UKIwIX19kaWN0X1-UfZQojAR0eXBllIwYbmVtb19ldmFsdWF0b3Jfc2RrLmVudW1zlIwKTWV0cmljVHlwZZSTlIwLZXhhY3QtbWF0Y2iUhZRSlIwLZGVzY3JpcHRpb26UTowGbGFiZWxzlH2UjBNzdXBwb3J0ZWRfam9iX3R5cGVzlF2UKIwgbmVtb19ldmFsdWF0b3Jfc2RrLnZhbHVlcy5jb21tb26UjBFTdXBwb3J0ZWRKb2JUeXBlc5STlIwGb25saW5llIWUUpRoFYwHb2ZmbGluZZSFlFKUZYwJcmVmZXJlbmNllIwRe3tpdGVtLmV4cGVjdGVkfX2UjAljYW5kaWRhdGWUjBV7e2l0ZW0ubW9kZWxfb3V0cHV0fX2UdYwSX19weWRhbnRpY19leHRyYV9flE6MF19fcHlkYW50aWNfZmllbGRzX3NldF9flI-UKGgeaBxoB5CMFF9fcHlkYW50aWNfcHJpdmF0ZV9flE51Yi4=",
+                "digest": "38050e2438a5eef8865ee2ef0bc2ccdaff6991b5d91bd9fb94a8155e759a26a5",
+                "kind": "cloudpickle"
+            }
+        }
+    ],
+    "dataset": [
+        {
+            "expected": "blue",
+            "model_output": "Blue"
+        },
+        {
+            "expected": "Jupiter",
+            "model_output": "Saturn"
+        }
+    ],
+    "params": {
+        "parallelism": 2
+    }
+}

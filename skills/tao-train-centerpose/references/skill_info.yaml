@@ -1,0 +1,130 @@
+name: tao-train-centerpose
+network_arch: centerpose
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: default
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: centerpose train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_data:
+        type: folder
+      dataset.val_data:
+        type: folder
+      model.backbone.pretrained_backbone_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: centerpose evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.test_data:
+        type: folder
+      evaluate.checkpoint:
+        type: file
+        optional: true
+      evaluate.trt_engine:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: centerpose export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: centerpose inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.inference_data:
+        type: folder
+      inference.checkpoint:
+        type: file
+        optional: true
+      inference.trt_engine:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  gen_trt_engine:
+    container_image: tao_toolkit.deploy
+    command: centerpose gen_trt_engine -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      gen_trt_engine.onnx_file:
+        type: file
+      gen_trt_engine.tensorrt.calibration.cal_image_dir:
+        type: folder
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+      gen_trt_engine.trt_engine:
+        type: file
+    upload_excludes:
+    - inputs/
+data_sources: {}
+spec_params:
+  train:
+    encryption_key: key
+    model.backbone.pretrained_backbone_path: ptm_if_no_resume_model
+    results_dir: output_dir
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    evaluate.checkpoint: parent_model
+    evaluate.trt_engine: parent_model
+    results_dir: output_dir
+  export:
+    encryption_key: key
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+    results_dir: output_dir
+  gen_trt_engine:
+    encryption_key: key
+    gen_trt_engine.onnx_file: parent_model
+    gen_trt_engine.tensorrt.calibration.cal_cache_file: create_cal_cache
+    gen_trt_engine.trt_engine: create_engine_file
+    results_dir: output_dir
+  inference:
+    encryption_key: key
+    inference.checkpoint: parent_model
+    inference.trt_engine: parent_model
+    results_dir: output_dir
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.batch_size
+  learning_rate: train.optim.lr
+description: CenterPose for keypoint / pose estimation. Detects object centers and regresses keypoint locations. Used for
+  6-DoF object pose estimation.

@@ -1,0 +1,39 @@
+[
+  {
+    "id": "jetson-customize-usb-001",
+    "question": "My Thor custom carrier exposes only one USB3 SS receptacle (usb3-0) plus two USB2 host ports - the rest of the stock SS lanes are unrouted. How do I disable the unused SS ports and leave usb3-0 enabled?",
+    "expected_skill": "jetson-customize-usb",
+    "expected_script": null,
+    "ground_truth": "Invoke /jetson-customize-usb after /jetson-customize-uphy has settled SS lane allocation (its sidecar at <workspace>/target-platform/<profile-stem>.jetson-customize-uphy.json is consulted for SS lane allocation). The skill builds the USB topology + companion graph from the in-tree DTB, then for each SS port being disabled it flips the THREE places in lockstep: (1) xusb_padctl/pads/usb3/lanes/usb3-N status, (2) xusb_padctl/ports/usb3-N status, AND (3) the host xHCI bus@0/usb@<addr> phys + phy-names arrays - missing any one returns -ENODEV from the xHCI probe and leaves lsusb empty on every port. Rule A says lane and port flip together; Rule B says the companion cascade through nvidia,usb2-companion must be honored. Output is one commit to the composite custom overlay .dts in bsp_sources/, validated with fdtoverlay and the three post-merge invariants. ODMDATA is NOT touched - that's owned by /jetson-customize-uphy.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-usb/SKILL.md",
+      "Verify prerequisites: active profile, Linux_for_Tegra/.git, /jetson-derive-carrier ran, /jetson-customize-uphy ran with sidecar present, dtc + fdtoverlay on PATH, custom_carrier_schematic + custom_carrier_pinmux_xls present",
+      "Build USB topology + companion graph from the in-tree DTB (Step 2)",
+      "AskUserQuestion for ports to disable and surface companion cascade + on-carrier hub fan-out explicitly (Step 3)",
+      "Run pin_verifier.py for VBUS-EN / OC / CC GPIO wiring (Step 4)",
+      "Render the kernel-DT overlay flipping all THREE places in lockstep: lane status, port status, host xHCI phys + phy-names",
+      "Honor Rule A (lane + port pair) and Rule B (companion cascade through nvidia,usb2-companion)",
+      "Append usb:padctl, usb:xhci (and optional usb:xudc) fragments to the composite custom overlay .dts in bsp_sources/",
+      "Run fdtoverlay plus the three post-merge invariants before committing",
+      "Refuse to touch ODMDATA - /jetson-customize-uphy owns that surface",
+      "Write the run-state JSON sidecar and chain into the next-step prompts"
+    ]
+  },
+  {
+    "id": "jetson-customize-usb-002",
+    "question": "After I ran /jetson-customize-usb to disable an internal USB2 hub, lsusb is empty on every port and dmesg shows 'tegra-xusb: failed to enable PHYs: -19'. What broke?",
+    "expected_skill": "jetson-customize-usb",
+    "expected_script": null,
+    "ground_truth": "The -19 (-ENODEV) signature is the canonical Rule B violation: a USB2 port was disabled without cascading to its USB3 SS companion. xusb_padctl/ports/usb3-N.nvidia,usb2-companion still references the now-disabled USB2 phandle, so the SS port still claims a USB2 PHY that no longer provides one and the entire xHCI host probe aborts (collateral damage to stock-okay ports - that's why lsusb is empty everywhere, not just on the disabled port). The fix is to re-run /jetson-customize-usb and disable the SS companion in lockstep - which means flipping its three places too: lane status, port status, and removing its phandle from the host xHCI phys + phy-names arrays. Element order must be preserved when editing phys; only elide disabled entries, never reorder kept ones.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-usb/SKILL.md and locate the Troubleshooting section",
+      "Identify -19 / failed to enable PHYs as the Rule B (companion cascade) violation",
+      "Explain that disabling a USB2 without cascading to its SS companion via nvidia,usb2-companion aborts the whole xHCI probe (collateral damage to stock-okay ports)",
+      "Re-run /jetson-customize-usb to disable the SS companion in lockstep",
+      "Apply the three-place pattern to the SS companion: lane status, port status, host xHCI phys + phy-names",
+      "Preserve host phys element order - elide disabled entries only, never reorder kept ones",
+      "Re-run fdtoverlay and the three post-merge invariants",
+      "Distinguish this signature from -ENODEV / Rule A violations and the FDT_ERR_NOTFOUND target-path issue"
+    ]
+  }
+]

@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: Documentation Request or Correction
+description: Report incorrect, missing, or unclear documentation in the catalog or its docs.
+labels: ["documentation", "status: triage"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is wrong, missing, or unclear in the docs?
+    validations:
+      required: true
+
+  - type: input
+    id: page
+    attributes:
+      label: Affected Page or File
+      description: URL or file path (e.g., `docs/index.mdx`, `docs/signing-agent-skills.mdx`, `README.md#skill-catalog`, or a specific skill's `SKILL.md`).
+      placeholder: docs/signing-agent-skills.mdx
+    validations:
+      required: false
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      options:
+        - "Inaccurate information"
+        - "Missing documentation"
+        - "Unclear or confusing"
+        - "Broken link or cross-reference"
+        - "Formatting or rendering problem"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Fix
+      description: If you know what the correct content should be, describe it here.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this is not a duplicate
+          required: true

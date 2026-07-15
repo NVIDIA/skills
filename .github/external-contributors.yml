@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# Reviewed external contributors.
+#
+# The verify-authors check requires an @nvidia.com or github-noreply
+# email on every commit. External (non-NVIDIA) contributions are
+# accepted only after a maintainer-run IP review of the contribution.
+# Once a contribution passes review, a maintainer records the
+# contributor here, and the authors check accepts their email for the
+# listed pull requests only.
+#
+# This file is always read from the tip of the target (base) branch by
+# CI, so a pull request cannot allowlist itself. After merging a new
+# entry, re-run the authors check on the contributor's PR to pick it up.
+#
+# This per-entry flow is a deliberate v1 while external contributions
+# are rare. If volume grows, revisit with a lower-toil mechanism (e.g.,
+# a maintainer-applied label) without weakening the review requirement.
+#
+# Entry fields:
+#   email        commit author/committer email to accept
+#   github       contributor's GitHub login
+#   prs          pull request numbers this entry applies to (required —
+#                entries are scoped per contribution, never blanket)
+#   reviewed_by  maintainer who ran the contribution review
+#   review_date  date the review was completed (YYYY-MM-DD)
+#   notes        one-line description of the contribution
+
+external_contributors:
+  - email: wenyuchiou12@gmail.com
+    github: WenyuChiou
+    prs: [76]
+    reviewed_by: mosheabr
+    review_date: "2026-07-13"
+    notes: One-line CONTRIBUTING.md anchor fix (dead README link). Review passed on all criteria.

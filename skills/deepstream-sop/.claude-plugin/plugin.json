@@ -1,0 +1,10 @@
+{
+  "name": "deepstream-sop",
+  "description": "DeepStream SOP compliance monitoring — 18-section reference covering GPU-accelerated event boundary detection (GEBD, e.g. DDM) + VLM-based SOP checking with Cosmos Reason 1 or 2, Triton CAPI, Basler GigE camera (Pylon SDK + emulation), Kafka/SSE output, and RTSP streaming output.",
+  "author": {
+    "name": "Wind Yuan",
+    "email": "windy@nvidia.com"
+  },
+  "license": "CC-BY-4.0 AND Apache-2.0",
+  "skills": "./"
+}

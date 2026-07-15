@@ -1,6 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: NemoClaw
 repo: NVIDIA/NemoClaw
-description: Secure agent sandboxing — run OpenClaw inside NVIDIA OpenShell with managed inference, policy management, remote deployment, sandbox monitoring, and contributor/maintainer workflows.
+description: Secure agent sandboxing — run OpenClaw inside NVIDIA OpenShell with managed inference, policy management, remote deployment, sandbox monitoring.
 skills:
-  - path: .agents/skills/
-    catalog_dir: NemoClaw
+  - path: skills/nemoclaw-user-guide/
+    catalog_dir: nemoclaw-user-guide

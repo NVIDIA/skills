@@ -1,0 +1,106 @@
+name: tao-train-action-recognition
+network_arch: action_recognition
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: default
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: action_recognition train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset_dir:
+        type: folder
+      dataset.val_dataset_dir:
+        type: folder
+      model.of_pretrained_model_path:
+        type: file
+        optional: true
+      model.rgb_pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: action_recognition evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.test_dataset_dir:
+        type: folder
+      evaluate.checkpoint:
+        type: file
+      evaluate.trt_engine:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: action_recognition export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: action_recognition inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.inference_dataset_dir:
+        type: folder
+      inference.checkpoint:
+        type: file
+      inference.trt_engine:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources: {}
+spec_params:
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    model.of_pretrained_model_path: ptm_if_no_resume_model
+    model.rgb_pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.checkpoint: parent_model
+  export:
+    encryption_key: key
+    results_dir: output_dir
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.checkpoint: parent_model
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.batch_size
+  learning_rate: train.optim.lr
+description: Action recognition from video sequences. Supports RGB, optical flow, and joint (multi-stream) input types for
+  classifying temporal actions in video clips.

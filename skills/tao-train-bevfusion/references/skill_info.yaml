@@ -1,0 +1,99 @@
+name: tao-train-bevfusion
+network_arch: bevfusion
+automl_enabled: true
+container_image: nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt
+data_format: default
+gpu_spec_key: train.num_gpus
+actions:
+  dataset_convert:
+    command: bevfusion convert -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      root_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  train:
+    command: bevfusion train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.root_dir:
+        type: folder
+      dataset.train_dataset.ann_file:
+        type: file
+      dataset.val_dataset.ann_file:
+        type: file
+      dataset.test_dataset.ann_file:
+        type: file
+      train.pretrained_checkpoint:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: bevfusion evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.root_dir:
+        type: folder
+      dataset.test_dataset.ann_file:
+        type: file
+      evaluate.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: bevfusion inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.root_dir:
+        type: folder
+      dataset.test_dataset.ann_file:
+        type: file
+      inference.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources: {}
+spec_params:
+  dataset_convert:
+    results_dir: output_dir
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    train.pretrained_checkpoint: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.checkpoint: parent_model
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.checkpoint: parent_model
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.batch_size
+  learning_rate: train.optim.lr
+description: BEVFusion for multi-sensor 3D object detection. Fuses LiDAR point clouds and camera images in bird's-eye-view
+  (BEV) space. Used in autonomous driving for robust 3D perception.

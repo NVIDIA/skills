@@ -1,15 +1,70 @@
 ---
-title: "Trust Controls for Agent Skills"
-description: "A practical series on scanning, signing, and documenting AI agent skills before enterprise deployment."
+title: "NVIDIA-Verified Agent Skills"
+description: "Capability governance for portable AI agent skills: what skills do, how to discover them, and how verification works."
 ---
 
-Agent skills are becoming a reusable software layer for AI agents. That makes them powerful, but it also means they need the same discipline we expect from other deployable artifacts: security review, provenance, ownership, and clear use boundaries.
+Agent skills are portable instruction sets that extend what an AI agent can do. They can teach an agent how to use NVIDIA CUDA-X libraries, AI Blueprints, Omniverse and Physical AI workflows, NeMo training and inference tools, and other platform components correctly.
 
-This series describes the trust controls behind **NVIDIA-Verified skills** — agent skills that have been scanned, documented in a Skills Card, and signed before publication. The pipeline has three layers:
+As skills become a reusable capability layer, teams need more than runtime guardrails. They need to know what capability entered the workflow, where it came from, whether it was reviewed for common risks, and whether it changed after publication. NVIDIA-verified skills provide that capability governance for the skill layer.
 
-1. Scan the skill before installation.
-2. Publish a skill card that states what the skill does and how it should be used.
-3. Sign the shipped directory so users can verify that what they received matches what was reviewed.
+For the current catalog, use [skills.sh](https://www.skills.sh/nvidia/skills) or [NVIDIA Build](https://build.nvidia.com/skills) as the source of truth. Install from the catalog with:
+
+```bash
+npx skills add nvidia/skills
+```
+
+## Works Across Agents
+
+NVIDIA skills build on the open Agent Skills specification, so they are designed to work across compatible agent clients rather than being tied to one runtime.
+
+Vercel's [`skills` CLI](https://github.com/vercel-labs/skills#supported-agents) is the delivery vehicle for bringing NVIDIA skills to agents beyond Claude Code and Codex, including OpenClaw, Kiro, Aider, Augment, and other compatible agents. See the CLI's supported agents list for the current targets. Developers can use the CLI to install from the NVIDIA catalog today:
+
+```bash
+npx skills add nvidia/skills --agent codex
+```
+
+Marketplace and hub discovery are additional distribution paths. Developers will be able to discover the NVIDIA skills plugin directly through the Claude Code and Codex marketplaces. NVIDIA skills are also planned for Hermes Skillhub and Clawhub as those partner channels come online.
+
+## What Skills Give Your Agent
+
+Install a skill once, and the agent can load product-specific procedures, references, scripts, and safety boundaries when a matching task comes up. With the right NVIDIA skills installed, an agent can:
+
+- Formulate and solve routing, scheduling, linear programming, and quadratic programming tasks, for example with cuOpt skills.
+- Deploy, configure, evaluate, and troubleshoot RAG, AI-Q, NemoClaw, and agent sandbox workflows.
+- Bring up inference and serving workflows, for example with Dynamo and NeMo Platform skills.
+- Build, validate, and tune distributed model training, for example with NeMo, Megatron-Core, DALI, and Nemotron skills.
+- Accelerate data and scientific workloads, for example with cuDF, cuPyNumeric, CUDA-Q, Earth2Studio, PhysicsNeMo, and TileGym skills.
+- Build vision, video, Physical AI, and Omniverse USD workflows, for example with DeepStream, Video Search and Summarization, CAD-to-SimReady conversion, realtime viewing, USD performance tuning, and neural reconstruction skills.
+
+## How Skills Are Discovered
+
+The catalogs group skills by the kind of work the user is trying to do, while this repository preserves product ownership and source provenance. Start with the workflow when you know the task; use skills.sh or NVIDIA Build when you need the current skill list.
+
+| Group | What it covers | Example skill areas |
+|---|---|---|
+| Agentic AI | RAG, AI-Q, sandboxing, policy, evaluation, and agent workflow automation | RAG Blueprint, AI-Q, NemoClaw |
+| Conversational AI | Speech NIMs, ASR/TTS/NMT deployment, ASR evaluation loops, and voice-agent workflows | Nemotron Speech (Riva ASR/TTS/NMT NIMs) and clinical ASR evaluation and fine-tuning workflows |
+| Data Science | Data preparation, exploration, and accelerated analytics workflows | cuDF and cuPyNumeric |
+| Decision Optimization | Routing, scheduling, and numerical optimization | cuOpt routing and numerical optimization |
+| GPU Development | CUDA-adjacent kernel work, framework integration, and performance tuning | TileGym kernel development |
+| Inference AI | Model serving, deployment bring-up, runtime validation, and day-2 troubleshooting | Dynamo and NeMo Platform |
+| Simulation and Modeling | Weather, climate, quantum, physics-ML, and simulation workflows | Earth2Studio, CUDA-Q, PhysicsNeMo |
+| Training AI | Distributed training, checkpoint conversion, parallelism, resiliency, and training-stack CI | NeMo, Megatron-Core, DALI, Nemotron |
+| Vision AI | Video analytics, search, summarization, perception pipelines, and model import | DeepStream and Video Search and Summarization |
+| Physical AI and Omniverse | USD asset workflows, SimReady conversion, realtime viewing, infrastructure, and neural reconstruction | Omniverse and Physical AI workflows |
+
+## Trust Controls
+
+NVIDIA-verified skills are also release artifacts. Before a skill is published, the catalog expects the same discipline we expect from deployable software: security review, provenance, ownership, clear use boundaries, and verification instructions.
+
+Verified means the skill is cataloged, scanned, signed, and documented with a skill card:
+
+- **Cataloged** from the product team or source repository that owns the capability.
+- **Scanned** before publication for software risks and agent-native risks such as hidden instructions, prompt injection, trigger abuse, excessive agency, and mismatches between declared purpose and bundled behavior.
+- **Signed** with a detached `skill.oms.sig` so users can verify that the downloaded skill is authentic and unchanged.
+- **Documented** with a skill card that records what the skill does, who owns it, how it is licensed, what it depends on, and what limitations or risks users should understand.
+
+Runtime controls govern what an agent can do during execution. Verified skills govern which capabilities enter the workflow in the first place.
 
 <Cards>
   <Card
@@ -41,4 +96,3 @@ This series describes the trust controls behind **NVIDIA-Verified skills** — a
     A practical skill-card template for owners, users, risk reviewers, and deployment teams.
   </Card>
 </Cards>
-

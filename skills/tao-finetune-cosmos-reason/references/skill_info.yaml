@@ -1,0 +1,245 @@
+network_arch: cosmos-rl
+aliases:
+- Cosmos Reason 3
+- Cosmos3 Nano Reasoner
+- Cosmos3-Nano
+- nvidia/Cosmos3-Nano
+automl_enabled: true
+container_image: tao_toolkit.cosmos_rl
+required_credentials:
+- HF_TOKEN
+data_format: llava
+gpu_spec_key: policy.parallelism.dp_shard_size
+node_spec_key: policy.parallelism.dp_replicate_size
+data_sources:
+  train:
+    custom.train_dataset.annotation_path:
+      source: train_datasets
+      multiple_sources: false
+      path: '{train_dataset_annotation}'
+    custom.train_dataset.media_path:
+      source: train_datasets
+      multiple_sources: false
+      path_from_format:
+        llava:
+        - images.tar.gz
+        - videos.tar.gz
+        '*': images.tar.gz
+    custom.val_dataset.annotation_path:
+      source: eval_dataset
+      multiple_sources: false
+      path: '{eval_dataset_annotation}'
+    custom.val_dataset.media_path:
+      source: eval_dataset
+      multiple_sources: false
+      path_from_format:
+        llava:
+        - images.tar.gz
+        - videos.tar.gz
+        '*': images.tar.gz
+  evaluate:
+    dataset.annotation_path:
+      source: eval_dataset
+      multiple_sources: false
+      path: '{eval_dataset_annotation}'
+    dataset.media_dir:
+      source: eval_dataset
+      multiple_sources: false
+      path_from_format:
+        llava:
+        - images.tar.gz
+        - videos.tar.gz
+        '*': videos.tar.gz
+  inference:
+    media:
+      source: inference_dataset
+      multiple_sources: false
+      path_from_format:
+        llava:
+        - videos.tar.gz
+        - images.tar.gz
+        '*': videos.tar.gz
+  quantize:
+    dataset.annotation_path:
+      source: calibration_dataset
+      multiple_sources: false
+      path: '{calibration_dataset_annotation}'
+    dataset.media_dir:
+      source: calibration_dataset
+      multiple_sources: false
+      path_from_format:
+        llava:
+        - videos.tar.gz
+        - images.tar.gz
+        '*': videos.tar.gz
+spec_params:
+  evaluate:
+    model.model_name: parent_model_folder
+    results_dir: output_dir
+  inference:
+    model_path: parent_model_folder
+    results_dir: output_dir
+  quantize:
+    model.model_path: parent_model_folder
+    results_dir: output_dir
+  train:
+    train.output_dir: output_dir
+    train.resume: resume_model
+actions:
+  evaluate:
+    command: cosmos-rl-evaluate --config {config_path}
+    config_format: toml
+    mode: config
+    inputs:
+      dataset.annotation_path:
+        type: file
+      dataset.media_dir:
+        type: folder
+        selective:
+          annotation: dataset.annotation_path
+          format: json
+          keys:
+          - video
+      model.model_name:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: |
+      python - {config_path} <<'PY'
+      import subprocess
+      import sys
+      import tomllib
+
+      cfg = tomllib.load(open(sys.argv[1], "rb"))
+      args = [
+          "cosmos-rl-inference",
+          "--model_path", cfg["model_path"],
+          "--torch_dtype", cfg.get("torch_dtype", "auto"),
+          "--device_map", cfg.get("device_map", "auto"),
+          "--type", cfg.get("type", "video"),
+          "--media", cfg["media"],
+          "--prompt", cfg["prompt"],
+          "--max_new_tokens", str(cfg.get("max_new_tokens", 4096)),
+          "--results_dir", cfg["results_dir"],
+          "--enable_lora", str(cfg.get("enable_lora", False)).lower(),
+      ]
+      if cfg.get("num_gpus") not in (None, ""):
+          args.extend(["--num_gpus", str(cfg["num_gpus"])])
+      if cfg.get("fps") not in (None, ""):
+          args.extend(["--fps", str(cfg["fps"])])
+      if cfg.get("total_pixels") not in (None, ""):
+          args.extend(["--total_pixels", str(cfg["total_pixels"])])
+      if cfg.get("base_model_path"):
+          args.extend(["--base_model_path", cfg["base_model_path"]])
+      raise SystemExit(subprocess.call(args))
+      PY
+    config_format: toml
+    mode: config
+    inputs:
+      model_path:
+        type: folder
+      media:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  quantize:
+    command: |
+      python - {config_path} <<'PY'
+      import sys
+      import tomllib
+      import types
+
+      cfg = tomllib.load(open(sys.argv[1], "rb"))
+      model = cfg.get("model", dict())
+      dataset = cfg.get("dataset", dict())
+      quantize = cfg.get("quantize", dict())
+
+      args = [
+          "--model_path", model["model_path"],
+          "--results_dir", cfg["results_dir"],
+          "--num_calibration_samples", str(quantize.get("num_calibration_samples", 512)),
+          "--max_sequence_length", str(quantize.get("max_sequence_length", 2048)),
+          "--quantization_scheme", quantize.get("quantization_scheme", "FP8_DYNAMIC"),
+          "--kv_precision", quantize.get("kv_precision", "bf16"),
+          "--smoothing_strength", str(quantize.get("smoothing_strength", 0.8)),
+          "--skip_test_generation", str(quantize.get("skip_test_generation", False)).lower(),
+          "--enable_lora", str(model.get("enable_lora", False)).lower(),
+      ]
+      if model.get("base_model_path"):
+          args.extend(["--base_model_path", model["base_model_path"]])
+      if dataset.get("dataset_id"):
+          args.extend(["--dataset_id", dataset["dataset_id"]])
+      if dataset.get("dataset_split"):
+          args.extend(["--dataset_split", dataset["dataset_split"]])
+      if dataset.get("annotation_path"):
+          args.extend(["--annotation_path", dataset["annotation_path"]])
+      if dataset.get("media_dir"):
+          args.extend(["--media_dir", dataset["media_dir"]])
+
+      sys.path.insert(0, "/opt/quantize_deps")
+      import compressed_tensors.utils.match as match
+      if not hasattr(match, "_match_name") and hasattr(match, "match_name"):
+          match._match_name = match.match_name
+      from compressed_tensors.config import CompressionFormat
+      format_mod = types.ModuleType("compressed_tensors.config.format")
+
+      def _get_quant_compression_format(input_activations=None, weights=None):
+          qtype = getattr(weights, "type", None) or getattr(input_activations, "type", None)
+          if str(qtype).lower() == "float":
+              return CompressionFormat.float_quantized
+          return CompressionFormat.int_quantized
+
+      format_mod._get_quant_compression_format = _get_quant_compression_format
+      sys.modules["compressed_tensors.config.format"] = format_mod
+      sys.argv = ["cosmos-rl-quantize"] + args
+      from cosmos_rl.quantization.quantize import main
+      raise SystemExit(main())
+      PY
+    config_format: toml
+    mode: config
+    inputs:
+      model.model_path:
+        type: folder
+      dataset.annotation_path:
+        type: file
+      dataset.media_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  train:
+    command: cosmos-rl --config {config_path} /opt/cosmos_rl/tao_sft_example.py
+    config_format: toml
+    mode: config
+    inputs:
+      custom.train_dataset.annotation_path:
+        type: file
+      custom.train_dataset.media_path:
+        type: folder
+      custom.val_dataset.annotation_path:
+        type: file
+      custom.val_dataset.media_path:
+        type: folder
+    outputs:
+      train.output_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+spec_shorthand_keys:
+  dp_shard_size: policy.parallelism.dp_shard_size
+  dp_replicate_size: policy.parallelism.dp_replicate_size
+  num_epochs: train.epoch
+  batch_size: train.train_batch_per_replica
+  learning_rate: train.optm_lr
+  mini_batch: train.train_policy.mini_batch
+  weight_decay: train.optm_weight_decay
+  warmup_epochs: train.optm_warmup_epochs

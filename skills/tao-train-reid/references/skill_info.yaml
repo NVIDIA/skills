@@ -1,0 +1,154 @@
+name: tao-train-reid
+network_arch: re_identification
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: default
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: re_identification train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset_dir:
+        type: folder
+      dataset.test_dataset_dir:
+        type: folder
+      dataset.query_dataset_dir:
+        type: folder
+      model.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: re_identification evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.test_dataset:
+        type: folder
+      evaluate.query_dataset:
+        type: folder
+      evaluate.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: re_identification export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: re_identification inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.test_dataset:
+        type: folder
+      inference.query_dataset:
+        type: folder
+      inference.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.train_dataset_dir:
+      source: train_datasets
+      path: sample_train.tar.gz
+      runtime: extracted_folder
+    dataset.test_dataset_dir:
+      source: train_datasets
+      path: sample_test.tar.gz
+      runtime: extracted_folder
+    dataset.query_dataset_dir:
+      source: train_datasets
+      path: sample_query.tar.gz
+      runtime: extracted_folder
+  evaluate:
+    evaluate.test_dataset:
+      source: train_datasets
+      path: sample_test.tar.gz
+      runtime: extracted_folder
+    evaluate.query_dataset:
+      source: train_datasets
+      path: sample_query.tar.gz
+      runtime: extracted_folder
+  inference:
+    inference.test_dataset:
+      source: train_datasets
+      path: sample_test.tar.gz
+      runtime: extracted_folder
+    inference.query_dataset:
+      source: train_datasets
+      path: sample_query.tar.gz
+      runtime: extracted_folder
+spec_params:
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    model.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.checkpoint: parent_model
+    evaluate.output_cmc_curve_plot: create_evaluate_cmc_plot_reid
+    evaluate.output_sampled_matches_plot: create_evaluate_matches_plot_reid
+  export:
+    encryption_key: key
+    results_dir: output_dir
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.checkpoint: parent_model
+    inference.output_file: create_inference_result_file_reid
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.batch_size
+  val_batch_size: dataset.val_batch_size
+  evaluate_batch_size: evaluate.batch_size
+  inference_batch_size: inference.batch_size
+  learning_rate: train.optim.base_lr
+  num_gpus: train.num_gpus
+  num_workers: dataset.num_workers
+  num_classes: dataset.num_classes
+  num_instances: dataset.num_instances
+  input_width: model.input_width
+  input_height: model.input_height
+  resume_checkpoint: train.resume_training_checkpoint_path
+  pretrained_model: model.pretrained_model_path
+  export_onnx: export.onnx_file
+  inference_output_file: inference.output_file
+  cmc_curve_plot: evaluate.output_cmc_curve_plot
+  sampled_matches_plot: evaluate.output_sampled_matches_plot
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  export: ../references/spec_template_export.yaml
+  inference: ../references/spec_template_inference.yaml
+description: Person re-identification. Learns discriminative embeddings to match the same person across different camera views.
+  Metric learning based.

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "io": "pinmux",
+  "questions": [
+    {
+      "id": "pin_lookup",
+      "header": "Pin / signal",
+      "question": "Type the pin to configure — accepts CVM ball (e.g. H10), Verilog name (PEX_L4_RST_N), DT pin name (pex_l4_rst_n_pd1), or carrier signal name from the schematic (PCIE4_RST_L, CAM0_I2C_SCL, GPIO47). The skill will resolve via `modify_pinmux.py lookup` — if 0 matches, you'll see candidates; if >1, you'll be asked to disambiguate by DT pin name.",
+      "freeform": true,
+      "multiSelect": false,
+      "validate_pattern": "^[A-Za-z0-9_/]{1,64}$",
+      "lookup_command": "modify_pinmux.py lookup --kb-dir <KB> --query <ANSWER>"
+    },
+    {
+      "id": "sfio",
+      "header": "SFIO",
+      "question": "Per pin, choose the SFIO (Special Function I/O). Options are filtered to what the silicon supports on this pin (the `sfio_options` list returned by `lookup`). The (suggested) tag marks the SFIO matching `customer_usage` from the pinmux xlsm.",
+      "ask_per_pin": true,
+      "options_source": "modify_pinmux.lookup::sfio_options",
+      "guidance": "Examples: spi5, i2c8, pe4_rst_l, pwm0, gpio. Picking `gpio` triggers an additional gpio-init entry in the gpio default-state DTSI on commit."
+    },
+    {
+      "id": "direction",
+      "header": "Direction",
+      "question": "Per pin, choose direction.",
+      "ask_per_pin": true,
+      "options": [
+        {"label": "input", "description": "configure as input (enable-input=ENABLE, tristate=DISABLE)"},
+        {"label": "output", "description": "configure as output (enable-input=DISABLE, tristate=DISABLE)"},
+        {"label": "bidirectional", "description": "open-drain or shared bus (enable-input=ENABLE, tristate=DISABLE)"},
+        {"label": "unused", "description": "park the pin tristated (enable-input=DISABLE, tristate=ENABLE) — recommended when the carrier doesn't route this signal"}
+      ]
+    },
+    {
+      "id": "initial_state",
+      "header": "Initial state",
+      "question": "Per pin, choose the initial state at boot.",
+      "ask_per_pin": true,
+      "options": [
+        {"label": "low", "description": "drive low at boot (output only)"},
+        {"label": "high", "description": "drive high at boot (output only)"},
+        {"label": "hi-z", "description": "leave high-impedance / tristated"},
+        {"label": "n/a", "description": "not applicable — use for non-output pins where the level isn't a property of the pin"}
+      ],
+      "applies_when": "direction in (input, output, bidirectional, unused)"
+    }
+  ]
+}

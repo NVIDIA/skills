@@ -1,0 +1,273 @@
+name: tao-train-sparse4d
+network_arch: sparse4d
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: ovpkl
+gpu_spec_key: train.num_gpus
+actions:
+  dataset_convert:
+    container_image: tao_toolkit.data_services
+    command: annotations convert -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      aicity.root:
+        type: folder
+        container_path: /data/aicity_root
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  train:
+    command: sparse4d train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.data_root:
+        type: folder
+        container_path: /data/aicity_root/train
+      model.head.instance_bank.anchor:
+        type: file
+      dataset.train_dataset.ann_file:
+        type: file
+      dataset.val_dataset.ann_file:
+        type: file
+      dataset.test_dataset.ann_file:
+        type: file
+      train.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  quantize:
+    command: sparse4d quantize -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.data_root:
+        type: folder
+        container_path: /data/aicity_root/train
+      model.head.instance_bank.anchor:
+        type: file
+      dataset.train_dataset.ann_file:
+        type: file
+      dataset.val_dataset.ann_file:
+        type: file
+      dataset.test_dataset.ann_file:
+        type: file
+      dataset.quant_calibration_dataset.images_dir:
+        type: folder
+      quantize.model_path:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: sparse4d evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.data_root:
+        type: folder
+        container_path: /data/aicity_root/val
+      model.head.instance_bank.anchor:
+        type: file
+      dataset.train_dataset.ann_file:
+        type: file
+      dataset.val_dataset.ann_file:
+        type: file
+      dataset.test_dataset.ann_file:
+        type: file
+      evaluate.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: sparse4d export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      model.head.instance_bank.anchor:
+        type: file
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: sparse4d inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.data_root:
+        type: folder
+        container_path: /data/aicity_root/test
+      model.head.instance_bank.anchor:
+        type: file
+      dataset.train_dataset.ann_file:
+        type: file
+      dataset.val_dataset.ann_file:
+        type: file
+      dataset.test_dataset.ann_file:
+        type: file
+      inference.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  dataset_convert:
+    aicity.root:
+      source: train_datasets
+      path: ''
+  train:
+    dataset.data_root:
+      source: train_datasets
+      path: ''
+    model.head.instance_bank.anchor:
+      source: train_datasets
+      path: anchor_init.npy
+    dataset.train_dataset.ann_file:
+      source: train_datasets
+      path: ''
+    dataset.val_dataset.ann_file:
+      source: eval_dataset
+      path: ''
+    dataset.test_dataset.ann_file:
+      source: inference_dataset
+      path: ''
+  quantize:
+    dataset.data_root:
+      source: train_datasets
+      path: ''
+    model.head.instance_bank.anchor:
+      source: train_datasets
+      path: anchor_init.npy
+    dataset.train_dataset.ann_file:
+      source: train_datasets
+      path: ''
+    dataset.val_dataset.ann_file:
+      source: eval_dataset
+      path: ''
+    dataset.test_dataset.ann_file:
+      source: inference_dataset
+      path: ''
+    dataset.quant_calibration_dataset.images_dir:
+      source: calibration_dataset
+      path: ''
+  evaluate:
+    dataset.data_root:
+      source: eval_dataset
+      path: ''
+    model.head.instance_bank.anchor:
+      source: train_datasets
+      path: anchor_init.npy
+    dataset.train_dataset.ann_file:
+      source: train_datasets
+      path: ''
+    dataset.val_dataset.ann_file:
+      source: eval_dataset
+      path: ''
+    dataset.test_dataset.ann_file:
+      source: inference_dataset
+      path: ''
+  export:
+    model.head.instance_bank.anchor:
+      source: train_datasets
+      path: anchor_init.npy
+  inference:
+    dataset.data_root:
+      source: inference_dataset
+      path: ''
+    model.head.instance_bank.anchor:
+      source: train_datasets
+      path: anchor_init.npy
+    dataset.train_dataset.ann_file:
+      source: train_datasets
+      path: ''
+    dataset.val_dataset.ann_file:
+      source: eval_dataset
+      path: ''
+    dataset.test_dataset.ann_file:
+      source: inference_dataset
+      path: ''
+spec_params:
+  dataset_convert:
+    results_dir: output_dir
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    train.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.checkpoint: parent_model
+  export:
+    encryption_key: key
+    results_dir: output_dir
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.checkpoint: parent_model
+  quantize:
+    encryption_key: key
+    results_dir: output_dir
+    quantize.model_path: parent_model
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  num_gpus: train.num_gpus
+  batch_size: dataset.batch_size
+  learning_rate: train.optim.lr
+  num_frames: dataset.num_frames
+  num_workers: dataset.num_workers
+  data_root: dataset.data_root
+  anchor: model.head.instance_bank.anchor
+  num_anchor: model.head.instance_bank.num_anchor
+  num_temp_instances: model.head.instance_bank.num_temp_instances
+  num_output: model.head.num_output
+  num_cams: model.head.deformable_model.num_cams
+  max_num_cams: model.head.deformable_model.max_num_cams
+  train_ann_file: dataset.train_dataset.ann_file
+  val_ann_file: dataset.val_dataset.ann_file
+  test_ann_file: dataset.test_dataset.ann_file
+  calibration_images: dataset.quant_calibration_dataset.images_dir
+  pretrained_model: train.pretrained_model_path
+  resume_checkpoint: train.resume_training_checkpoint_path
+  checkpoint: evaluate.checkpoint
+  inference_checkpoint: inference.checkpoint
+  export_checkpoint: export.checkpoint
+  quantize_model: quantize.model_path
+  input_width: export.input_width
+  input_height: export.input_height
+  export_onnx: export.onnx_file
+spec_templates:
+  dataset_convert: ../references/spec_template_dataset_convert.yaml
+  train: ../references/spec_template_train.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  inference: ../references/spec_template_inference.yaml
+  export: ../references/spec_template_export.yaml
+  quantize: ../references/spec_template_quantize.yaml
+description: Sparse4D for multi-camera temporal 3D object detection and tracking. Uses sparse queries with deformable attention
+  across camera views and time for end-to-end 3D perception. Includes instance bank for temporal tracking.

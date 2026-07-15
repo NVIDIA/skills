@@ -1,0 +1,68 @@
+{
+  "skill_name": "jetson-llm-serve",
+  "evals": [
+    {
+      "id": "jetson-llm-serve-001",
+      "prompt": "Run meta-llama/Llama-3.1-8B-Instruct as a vLLM server on my Jetson AGX Thor so I can hit it from Open WebUI.",
+      "expected_output": "The agent invoked the jetson-llm-serve skill, picked the Thor runtime path (upstream vLLM 0.20+ via vllm/vllm-openai:latest, or validated native vLLM 0.20+), set MAXN with nvpmodel -m 0 && jetson_clocks, and produced a complete docker run + vllm serve recipe with --host 0.0.0.0 --port 8000, ending with the OpenAI-compatible endpoint http://<jetson-ip>:8000/v1 and a curl /v1/models verification step.",
+      "assertions": [
+        "The agent matched the request to jetson-llm-serve",
+        "The agent sourced or referenced skills/jetson-diagnostic/scripts/detect_jetson.sh and read JETSON_GENERATION = thor",
+        "The agent picked the Thor runtime path (vllm/vllm-openai:latest upstream, or validated native vLLM 0.20+) and did NOT use ghcr.io/nvidia-ai-iot/vllm:latest-jetson-orin on Thor",
+        "The agent included sudo nvpmodel -m 0 && sudo jetson_clocks (MAXN) in the recipe",
+        "The agent produced a complete docker run + vllm serve command with --host 0.0.0.0 --port 8000",
+        "The agent reported the OpenAI-compatible endpoint http://<jetson-ip>:8000/v1",
+        "The agent included a verification step like curl http://localhost:8000/v1/models or wait for 'Application startup complete.'",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-llm-serve",
+      "expected_script": null
+    },
+    {
+      "id": "jetson-llm-serve-002",
+      "prompt": "Serve a 7B model on my Jetson Orin Nano 8 GB running JetPack 7.2 with vLLM. What's the right container and what flags should I start with?",
+      "expected_output": "The agent picked upstream vLLM 0.20+ via vllm/vllm-openai:latest for an Orin JetPack 7.2 / L4T r39+ target, used Orin Nano / NX defaults (--max-model-len 4096, --gpu-memory-utilization 0.85, --tensor-parallel-size 1), and produced a complete docker run + vllm serve command with the OpenAI endpoint and verification step.",
+      "assertions": [
+        "The agent matched the prompt to jetson-llm-serve",
+        "The agent identified the device as Orin (Orin Nano) on JetPack 7.2 / L4T r39+ and picked vllm/vllm-openai:latest",
+        "The agent did NOT recommend native upstream SGLang for Orin; this eval only changes the vLLM path",
+        "The agent used Orin Nano / NX defaults: --max-model-len 4096 and --gpu-memory-utilization 0.85 and --tensor-parallel-size 1",
+        "The agent included sudo nvpmodel -m 0 && sudo jetson_clocks (MAXN) in the recipe",
+        "The agent produced a docker run + vllm serve command with --host 0.0.0.0 --port 8000 and the http://<jetson-ip>:8000/v1 endpoint",
+        "The agent did not invent RAM, free-memory, or JetPack values; if capacity uncertainty was relevant the agent handed off to jetson-inference-mem-tune or jetson-memory-audit",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-llm-serve",
+      "expected_script": null
+    },
+    {
+      "id": "jetson-llm-serve-003",
+      "prompt": "I want to serve Qwen2-VL-7B as a VLM on my Jetson AGX Thor. Same vLLM flow as an LLM?",
+      "expected_output": "The agent answered 'yes — VLMs use the same vLLM serving flow as LLMs with a different vision-language checkpoint', produced a Thor-appropriate docker run + vllm serve command using the upstream vllm/vllm-openai:latest image, and pointed at the live-vlm-webui or Open WebUI options for the front-end.",
+      "assertions": [
+        "The agent explicitly stated the VLM uses the SAME vLLM serving flow as an LLM, just with a different checkpoint",
+        "The agent did NOT omit vLLM or the Jetson container path when answering the VLM prompt",
+        "The agent picked the Thor runtime path (vllm/vllm-openai:latest upstream, or validated native vLLM 0.20+)",
+        "The agent produced a docker run + vllm serve recipe targeting Qwen/Qwen2-VL-7B-Instruct (or the named VLM checkpoint) with --host 0.0.0.0 --port 8000",
+        "The agent mentioned a UI option such as live-vlm-webui or Open WebUI pointed at http://<jetson-ip>:8000/v1",
+        "The agent included MAXN setup (sudo nvpmodel -m 0 && sudo jetson_clocks)",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-llm-serve",
+      "expected_script": null
+    },
+    {
+      "id": "jetson-llm-serve-004",
+      "prompt": "I started a vLLM server on this Jetson 30 minutes ago. Run a benchmark and tell me TTFT and throughput at concurrency 1 and 8.",
+      "expected_output": "The agent recognized this as a benchmarking task, did not invoke jetson-llm-serve (which is for standing up a server, not measuring it), and instead used jetson-llm-benchmark / scripts/bench_vllm.sh to measure the running server.",
+      "assertions": [
+        "The agent did NOT invoke jetson-llm-serve for a benchmark request — that skill provides recipes, not measurements",
+        "The agent identified jetson-llm-benchmark as the correct skill",
+        "The agent invoked or recommended scripts/bench_vllm.sh from jetson-llm-benchmark with --concurrency 1,8",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-llm-benchmark",
+      "expected_script": "scripts/bench_vllm.sh"
+    }
+  ]
+}

@@ -1,6 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: cuOpt
 repo: NVIDIA/cuopt
 description: GPU-accelerated optimization — vehicle routing, linear programming, quadratic programming, installation, server deployment, and developer tools.
 skills:
-  - path: skills/
-    catalog_dir: cuopt
+  - path: skills/cuopt-install/
+    catalog_dir: cuopt-install
+  - path: skills/cuopt-multi-objective-exploration/
+    catalog_dir: cuopt-multi-objective-exploration
+  - path: skills/cuopt-numerical-optimization-api/
+    catalog_dir: cuopt-numerical-optimization-api
+  - path: skills/cuopt-numerical-optimization-formulation/
+    catalog_dir: cuopt-numerical-optimization-formulation
+  - path: skills/cuopt-routing-api-python/
+    catalog_dir: cuopt-routing-api-python
+  - path: skills/cuopt-server-api-python/
+    catalog_dir: cuopt-server-api-python

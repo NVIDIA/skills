@@ -1,0 +1,27 @@
+{
+  "skills": ["aiq-research"],
+  "resources": {
+    "platforms": {
+      "local": {
+        "modes": ["existing-server"]
+      }
+    }
+  },
+  "env": "Requires an AI-Q server reachable at AIQ_SERVER_URL, defaulting to http://localhost:8000. The server can be started with the aiq-deploy skill before running this eval. This smoke profile intentionally avoids model-generating /chat calls so it can verify the skill wrapper against a live server without consuming model credits.",
+  "expects": [
+    {
+      "query": "Use the aiq-research skill to check whether the local AI-Q server is healthy. Return a concise status and include the server URL you checked.",
+      "checks": [
+        "trajectory_contains:scripts/aiq.py health",
+        "json_command:python3 /skills/aiq-research/scripts/aiq.py health"
+      ]
+    },
+    {
+      "query": "Use the aiq-research skill to list the available async agent types. Return the result without truncating the JSON keys.",
+      "checks": [
+        "trajectory_contains:scripts/aiq.py agents",
+        "json_command:python3 /skills/aiq-research/scripts/aiq.py agents"
+      ]
+    }
+  ]
+}

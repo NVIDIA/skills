@@ -1,0 +1,111 @@
+workflow:
+  name: "{{dataset}}"
+  timeout:
+    exec_timeout: 24h
+    queue_timeout: 2h
+
+  resources:
+    config_gen:
+      cpu: 4
+      memory: 8Gi
+      storage: 20Gi
+      platform: "{{gpu_platform}}"
+    augmentation_worker:
+      cpu: 8
+      memory: 32Gi
+      storage: 100Gi
+      platform: "{{gpu_platform}}"
+
+  groups:
+
+  # =========================================================================
+  # GROUP 1: Setup
+  # =========================================================================
+  - name: setup_group
+    tasks:
+    - name: setup
+      image: nvcr.io/nvidia/base/ubuntu:22.04_20240212
+      resource: config_gen
+      credentials:
+        nvcr_io:
+          NGC_CLI_API_KEY: auth
+      inputs:
+      - url: "{{storage_url}}/datasets/{{dataset}}"
+      outputs:
+      - url: "{{storage_url}}/datasets/{{dataset}}-outputs/{{run_id}}/setup_b0"
+      environment:
+        RUN_ID: "{{run_id}}"
+      files:
+      - localpath: "{{skills_dir}}/scripts/augmentation_worker.sh"
+        path: /tmp/augmentation_worker.sh
+      - localpath: "{{skills_dir}}/scripts/endpoint_common.sh"
+        path: /tmp/endpoint_common.sh
+      - localpath: "{{skills_dir}}/assets/cookbooks/{{cookbook}}/distribution_config.yaml"
+        path: /tmp/pas/distribution_config.yaml
+      - localpath: "{{skills_dir}}/assets/cookbooks/{{cookbook}}/augmentation_config.yaml"
+        path: /tmp/pas/augmentation_config.yaml
+      - localpath: "{{skills_dir}}/assets/cookbooks/{{cookbook}}/README.md"
+        path: /tmp/pas/README.md
+      command: ["bash", "-c"]
+      args:
+      - |
+        set -euo pipefail
+        cp /tmp/*.sh "{{output}}/"
+        chmod +x "{{output}}"/*.sh
+        mkdir -p "{{output}}/configs"
+        cp -r /tmp/pas/. "{{output}}/configs/"
+        printf '%s\n' \
+          "ACCEPT_EULA=Y" \
+          "UV_NO_SYNC=1" \
+          "WAIT_FOR_VLM=1" \
+          "WAIT_FOR_LLM=1" \
+          "WAIT_FOR_IMAGE_EDIT=1" \
+          > "{{output}}/.env"
+        echo "Setup complete."
+
+  # =========================================================================
+  # GROUP 2: Augmentation (consumes in-cluster NIM endpoints; see references/nim/README.md)
+  # =========================================================================
+  - name: augmentation_group
+    tasks:
+
+    - name: augmentation_worker_0
+      lead: true
+      image: nvcr.io/nvidia/paidf-augmentation:1.0.0
+      resource: augmentation_worker
+      environment:
+        WORKER_ID: "0"
+        IMAGE_EDIT_URL: "{{image_edit_url}}"
+        VLM_URL: "{{vlm_url}}"
+        LLM_URL: "{{llm_url}}"
+        SETUP_DIR: "{{input:0}}"
+        DATA_INPUT: "{{input:1}}"
+        OUTPUT_DIR: "{{output}}"
+        N_AUGMENTATIONS: "{{n_augmentations}}"
+        ENDPOINT_WAIT_TIMEOUT_SECONDS: "1200"
+      credentials:
+        nvcr_io:
+          NGC_CLI_API_KEY: auth
+        hf_token:
+          HUGGING_FACE_HUB_TOKEN: HF_TOKEN
+      inputs:
+      - task: setup
+      - url: "{{storage_url}}/datasets/{{dataset}}"
+      outputs:
+      - url: "{{storage_url}}/datasets/{{dataset}}-outputs/{{run_id}}/outputs/augmented"
+      command: [bash]
+      args: ["{{input:0}}/augmentation_worker.sh"]
+
+default-values:
+  cookbook: "default"
+  n_augmentations: "3"
+
+  # In-cluster NIM endpoints (deployed via the inference NIM operator; see
+  # references/nim/README.md). Override via the same submit --set-string list
+  # for external/NVCF endpoints.
+  image_edit_url: "http://qwen-image-edit-2511.osmo-nims.svc.cluster.local:8000/v1"
+  vlm_url: "http://qwen3-vl.osmo-nims.svc.cluster.local:8000/v1"
+  llm_url: "http://qwen25-14b.osmo-nims.svc.cluster.local:8000/v1"
+
+  # Required at submit time:
+  #   storage_url, dataset, run_id, gpu_platform, skills_dir

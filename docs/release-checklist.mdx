@@ -54,8 +54,10 @@ model_signing verify certificate SKILL_DIR \
 The release packet should include:
 
 - Skill source or release artifact
-- Skill card
+- Skill card (`skill-card.md`)
 - SkillSpector report or CI link
-- Detached OMS signature
+- Tier-3 evaluation dataset — accepted at `evals/evals.json`, `evals/*.json`, `eval/*.json`, or `benchmark/evals.json`
+- `BENCHMARK.md` capturing the benchmark report from the evaluation run
+- Detached OMS signature (`skill.oms.sig`)
 - Verification instructions
 - Known limitations and support contact

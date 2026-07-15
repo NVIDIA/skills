@@ -1,0 +1,56 @@
+aicity:
+  anchor_init_config:
+    detection_range: -1.0
+    num_anchor: 900
+    output_file_name: anchor_init.npy
+    sample_ratio: -1
+  camera_grouping_mode: random
+  class_config:
+    ATTRIBUTE_DICT:
+      AgilityDigit: agility_digit.moving
+      FourierGR1T2: fourier_gr1_t2.moving
+      Person: person.moving
+      Transporter: transporter.moving
+    CLASS_LIST:
+    - Person
+    - FourierGR1T2
+    - AgilityDigit
+    - Transporter
+    CLASS_RANGE_DICT:
+      AgilityDigit: 40
+      FourierGR1T2: 40
+      Person: 40
+      Transporter: 40
+    MAP_CLASS_NAMES:
+      AgilityDigit: AgilityDigit
+      FourierGR1T2: FourierGR1T2
+      Person: Person
+      Transporter: Transporter
+    SUB_CLASS_DICT: {}
+  depth_format: h5
+  num_frames: 9000
+  recentering: true
+  rgb_format: mp4
+  root: ???
+  split: train
+  version: '2025'
+coco:
+  add_background: false
+  ann_file: <specify path to annotation file>
+  refine_box: false
+  use_all_categories: false
+data:
+  input_format: AICITY
+  output_format: OVPKL
+kitti:
+  image_dir: <specify image directory>
+  label_dir: <specify labels directory>
+  mapping: ''
+  no_skip: false
+  preserve_hierarchy: false
+  project: annotations
+odvg:
+  ann_file: <specify path to annotation file>
+  labelmap_file: <specify path to labelmap file>
+results_dir: ''
+verbose: false

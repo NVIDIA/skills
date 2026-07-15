@@ -1,0 +1,32 @@
+[
+  {
+    "id": "create-prognostic-eval-001-simple-identity",
+    "question": "Using the skill at /workspace/skills/earth2studio-create-prognostic/SKILL.md, implement a new Earth2Studio prognostic model called `IdentityModel` that simply returns its input unchanged (identity function). It should have a 6-hour time step, work on a 1-degree global grid (181x360), and support 4 variables: t2m, u10m, v10m, msl.",
+    "expected_skill": "earth2studio-create-prognostic",
+    "expected_script": "evals/targets/eval_1_target.py",
+    "expected_test": "evals/targets/test/eval_1_test_target.py",
+    "ground_truth": "Creates a prognostic model with triple inheritance (torch.nn.Module + AutoModelMixin + PrognosticMixin), canonical method ordering, SPDX header, type hints. Model returns input unchanged but increments lead_time by 6h. Test file includes mock tests for call, iter, and exceptions.",
+    "expected_behavior": [
+      "Reads /workspace/skills/earth2studio-create-prognostic/SKILL.md before implementing",
+      "Writes earth2studio/models/px/identity.py",
+      "Writes test/models/px/test_identity.py",
+      "Runs pytest on the new test file",
+      "Does not read evals/targets/ ground-truth files"
+    ]
+  },
+  {
+    "id": "create-prognostic-eval-002-additive-model",
+    "question": "Using the skill at /workspace/skills/earth2studio-create-prognostic/SKILL.md, implement a new Earth2Studio prognostic model called `AdditiveModel` that adds a small constant (0.01) to each variable at each time step. It should have a 6-hour time step and work on a 0.5-degree global grid (361x720). Include normalization buffers (center and scale) loaded from the package.",
+    "expected_skill": "earth2studio-create-prognostic",
+    "expected_script": "evals/targets/eval_2_target.py",
+    "expected_test": "evals/targets/test/eval_2_test_target.py",
+    "ground_truth": "Creates an additive prognostic model with register_buffer for center/scale, 361x720 grid (0.5 degree), 6h time step. load_model resolves center.npy and scale.npy from package. Test fixture creates dummy package with model.pt, center.npy, scale.npy. Test verifies accumulating additions.",
+    "expected_behavior": [
+      "Reads /workspace/skills/earth2studio-create-prognostic/SKILL.md before implementing",
+      "Writes earth2studio/models/px/additive.py",
+      "Writes test/models/px/test_additive.py",
+      "Runs pytest on the new test file",
+      "Does not read evals/targets/ ground-truth files"
+    ]
+  }
+]

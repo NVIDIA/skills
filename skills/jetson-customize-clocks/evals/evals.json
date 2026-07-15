@@ -1,0 +1,35 @@
+[
+  {
+    "id": "jetson-customize-clocks-001",
+    "question": "I want to pin my Orin AGX devkit to MAXN for an overnight stress run — lock CPU/GPU/EMC at their hard caps, disable EMC DVFS, and set governors to performance. What does /jetson-customize-clocks do for me?",
+    "expected_skill": "jetson-customize-clocks",
+    "expected_script": null,
+    "ground_truth": "Use the 'Recipe — pin everything to MAXN for stress / performance runs' which combines Operations 1 + 2 in a single protocol round. Operation 1 leaves max-rate-custom unset on every CPU/GPU/EMC clock and removes any existing lower max-rate-custom lines, then disables EMC DVFS by setting bwmgr.enabled=<0x00>, cactmon.enabled=<0x00>, and on T26x only adding /delete-node/ osp-controller (skip on T23x Orin since the node is absent — detect with 'dtc -I dtb -O dts <bpmp-dtb> | grep -c osp-controller'). All BPMP edits go through one protocol invocation per references/bsp-customization-bpmp-dtb.md and land in <source.root_path>/Linux_for_Tegra/bootloader/<BPFDTB_FILE>. Note: Orin AGX devkit confs are SKU-multiplexed via update_flash_args_common, so resolve BPFDTB_FILE by walking the dispatch with board_sku=<module.sku> and board_FAB=<module.revision>, not from the static .conf line. Operation 2 edits <source.root_path>/Linux_for_Tegra/rootfs/etc/systemd/nvpower.sh to set desired_cpufreq_gov=\"performance\" and desired_devfreq_gov=\"performance\" unconditionally and removes the GPU/nvjpg skip in set_devfreq_governor. Finally use /jetson-customize-nvpmodel to set MAXN as the boot-default mode (the per-clock nvpmodel cap clamps below max-rate-maxn regardless of BPMP DTB content). Deploy via /jetson-promote-image → /jetson-flash-image.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-clocks/SKILL.md and consult the MAXN Recipe",
+      "Resolve BPFDTB_FILE for the Orin AGX devkit via the dispatch chain (update_flash_args_common with board_sku=<module.sku>, board_FAB=<module.revision>) — not the static BPFDTB_FILE= line",
+      "Detect SoC family with 'dtc -I dtb -O dts <bpmp-dtb> | grep -c osp-controller' (zero hits = T23x Orin, skip /delete-node/ osp-controller)",
+      "Operation 1 inside one protocol Edit-the-DTS invocation: leave max-rate-custom unset on CPU/GPU/EMC; set bwmgr.enabled=<0x00> and cactmon.enabled=<0x00>; on T26x only add /delete-node/ osp-controller",
+      "Run the BPMP-DTB protocol's Recompile, Sanity-check, Stage and Cleanup steps once; commit '<BPMP_BASENAME>: jetson-customize-clocks — EMC DVFS disable (bwmgr + cactmon[+ osp-controller])'",
+      "Operation 2: apply the Off-skill edits recipe (pristine import + customization commit) on rootfs/etc/systemd/nvpower.sh, set desired_cpufreq_gov=\"performance\" and desired_devfreq_gov=\"performance\", remove the GPU/nvjpg skip in set_devfreq_governor",
+      "Hand off to /jetson-customize-nvpmodel to set boot-default mode to MAXN (nvpmodel cap clamps below max-rate-maxn)",
+      "Deploy via /jetson-promote-image → /jetson-flash-image so the overlay tracker copies into bsp_image and the new BPMP DTB + nvpower.sh take effect on the next boot"
+    ]
+  },
+  {
+    "id": "jetson-customize-clocks-002",
+    "question": "I capped GPU max-rate-custom on my Thor target via /jetson-customize-clocks but the GPU still ramps to max-rate-maxn under load. What did I miss?",
+    "expected_skill": "jetson-customize-clocks",
+    "expected_script": null,
+    "ground_truth": "On T23x the GPU clock is split across nafll_gpusys AND every nafll_gpcX partition; the cap binds only when applied to all of them. If only nafll_gpusys was edited, the nafll_gpcX partitions keep running at max-rate-maxn and dominate the effective ceiling. Fix: enumerate the GPC partitions with 'grep -nE \"^\\s*nafll_gpc[0-9]+\\s*:\" <decompiled.dts>' and apply the same max-rate-custom value to nafll_gpusys plus every nafll_gpcX node. Note that the runtime ceiling is also two-layer — min(BPMP cap, active-nvpmodel-mode cap) — so if a power-mode change resets the cap, the nvpmodel cap is binding and must be raised or removed via /jetson-customize-nvpmodel. Verify max-rate-custom is strictly below max-rate-maxn (BPMP refuses to load otherwise; if max-rate-maxn is absent, query 'cat /sys/kernel/debug/bpmp/debug/clk/<clock>/max_rate' on a running target). Apply the multi-node edit inside a single protocol Edit-the-DTS invocation, recompile, and commit '<BPMP_BASENAME>: jetson-customize-clocks — <clock-node> max-rate-custom = <value>'.",
+    "expected_behavior": [
+      "Read skills/jetson-customize-clocks/SKILL.md and consult the Limitations and Troubleshooting tables",
+      "Identify the T23x multi-node GPU cap limitation: the cap binds only when applied to nafll_gpusys AND every nafll_gpcX",
+      "Enumerate the nafll_gpcX partitions with 'grep -nE \"^\\s*nafll_gpc[0-9]+\\s*:\" <decompiled.dts>' against the decompiled BPMP DTB",
+      "Apply the same max-rate-custom (strictly below max-rate-maxn) to nafll_gpusys and every nafll_gpcX node inside a single Edit-the-DTS invocation of the BPMP-DTB protocol",
+      "Inspect the two-layer effective runtime ceiling per references/clock-control-model.md#effective-runtime-ceiling — if the active nvpmodel mode's per-clock cap binds, route to /jetson-customize-nvpmodel to raise/remove it",
+      "Run the protocol's Recompile, Sanity-check, Stage and Cleanup steps and commit per '<BPMP_BASENAME>: jetson-customize-clocks — <clock-node> max-rate-custom = <value>'",
+      "Deploy via /jetson-promote-image → /jetson-flash-image so the new BPMP DTB lands on the device"
+    ]
+  }
+]

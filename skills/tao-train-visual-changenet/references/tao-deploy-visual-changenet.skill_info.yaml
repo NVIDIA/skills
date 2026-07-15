@@ -1,0 +1,137 @@
+name: visual-changenet-deploy
+type: model
+network_arch: visual-changenet
+container_image: tao_toolkit.deploy
+data_format: default
+actions:
+  gen_trt_engine:
+    command: visual_changenet gen_trt_engine -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      gen_trt_engine.onnx_file:
+        type: file
+      gen_trt_engine.trt_engine:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      gen_trt_engine.trt_engine:
+        type: file
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: visual_changenet evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.trt_engine:
+        type: file
+      dataset.classify.test_dataset.csv_path:
+        type: file
+        optional: true
+      dataset.classify.test_dataset.images_dir:
+        type: folder
+        optional: true
+      dataset.segment.root_dir:
+        type: folder
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: visual_changenet inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.trt_engine:
+        type: file
+      dataset.classify.infer_dataset.csv_path:
+        type: file
+        optional: true
+      dataset.classify.infer_dataset.images_dir:
+        type: folder
+        optional: true
+      dataset.segment.root_dir:
+        type: folder
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  evaluate:
+    dataset.classify.test_dataset.csv_path:
+      source: eval_dataset
+      path: dataset.csv
+    dataset.classify.test_dataset.images_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.segment.root_dir:
+      source: eval_dataset
+      path: ''
+  inference:
+    dataset.classify.infer_dataset.csv_path:
+      source: inference_dataset
+      path: dataset.csv
+    dataset.classify.infer_dataset.images_dir:
+      source: inference_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.segment.root_dir:
+      source: inference_dataset
+      path: ''
+spec_params:
+  gen_trt_engine:
+    encryption_key: key
+    results_dir: output_dir
+    gen_trt_engine.onnx_file: parent_model
+    gen_trt_engine.trt_engine: create_engine_file
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.trt_engine: parent_model
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.trt_engine: parent_model
+spec_shorthand_keys:
+  trt_data_type: gen_trt_engine.tensorrt.data_type
+  trt_engine: gen_trt_engine.trt_engine
+  batch_size: dataset.classify.batch_size
+  classify_batch_size: dataset.classify.batch_size
+  segment_batch_size: dataset.segment.batch_size
+  classify_num_classes: dataset.classify.num_classes
+  segment_num_classes: dataset.segment.num_classes
+  classify_test_csv: dataset.classify.test_dataset.csv_path
+  classify_test_images: dataset.classify.test_dataset.images_dir
+  classify_infer_csv: dataset.classify.infer_dataset.csv_path
+  classify_infer_images: dataset.classify.infer_dataset.images_dir
+  segment_root: dataset.segment.root_dir
+  segment_img_size: dataset.segment.img_size
+  trt_min_batch_size: gen_trt_engine.tensorrt.min_batch_size
+  trt_opt_batch_size: gen_trt_engine.tensorrt.opt_batch_size
+  trt_max_batch_size: gen_trt_engine.tensorrt.max_batch_size
+  onnx_file: gen_trt_engine.onnx_file
+description: Visual ChangeNet deploy workflow for gen_trt_engine, evaluate, inference
+  using TAO Deploy.
+spec_templates:
+  classify:
+    gen_trt_engine: spec_template_deploy_classify_gen_trt_engine.yaml
+    evaluate: spec_template_deploy_classify_evaluate.yaml
+    inference: spec_template_deploy_classify_inference.yaml
+  segment:
+    gen_trt_engine: spec_template_deploy_segment_gen_trt_engine.yaml
+    evaluate: spec_template_deploy_segment_evaluate.yaml
+    inference: spec_template_deploy_segment_inference.yaml
+notes:
+- Visual ChangeNet deploy has classify and segment spec variants under the same TAO
+  Deploy command.
+- The starter-kit segment TensorRT path uses FP16; classify can use FP32 unless a
+  precision target is specified.
+- 'For segment inference, keep `dataset.segment.batch_size: 1`; for classify, keep
+  image maps, concat type, and grid map aligned with training.'

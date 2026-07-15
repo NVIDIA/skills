@@ -1,0 +1,744 @@
+/*
+* SPDX-FileCopyrightText: Copyright (c) 2025-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+syntax = "proto3";
+
+package nv;
+
+import "google/protobuf/timestamp.proto";
+
+/*
+represent metadata in a video frame
+*/
+message Frame {
+  /*
+  version
+  */
+  string version = 1;
+  /*
+   frame id
+   */
+  string id = 2;
+
+  /*
+   timestamp in UTC format
+   */
+  google.protobuf.Timestamp timestamp = 3;
+
+  /*
+   sensor id
+   */
+  string sensorId = 4;
+
+  /*
+  sequence of detected objects
+  */
+  repeated Object objects = 5;
+
+  /*
+  fov metrics
+  */
+  repeated TypeMetrics fov = 6;
+
+  /*
+  ROI based object count
+  */
+  repeated TypeMetrics rois = 7;
+
+  SD socialDistancing = 8;
+
+  /*
+  Panoptic segmentation mask
+  */
+  Segmentation segmentation = 9;
+
+  /*
+  interactions between objects
+  */
+  repeated Interaction interactions = 10;
+
+  /*
+  congestion on floors, etc
+  */
+  repeated Congestion congestions = 11;
+
+  /*
+  info, generic attr=value for any customization
+  */
+  map<string, string> info = 12;
+}
+
+/*
+represents detected object in a given frame, most of the attributes in an Object are optional
+and is dictated by the inference model pipeline. Object id, bbox, type and confidence is muust have, rest is optional
+*/
+message Object {
+  /*
+  object ID
+  */
+  string id = 1;
+
+  /*
+ detection bbox
+  */
+  Bbox bbox = 2;
+
+  /*
+  type of object, example Person, Vehicle, Face
+  */
+  string type = 3;
+
+  /*
+  confidence
+   */
+  float confidence = 4;
+
+  /*
+  map of attributes, name:value pair. example secondary attributes for vehicle would are color, make etc
+  when a person is detected it will height, eye-color etc.
+  */
+  map<string, string> info = 5;
+
+  /*
+  object appearance vector or embedding
+  */
+  Embedding embedding = 6;
+
+  /*
+  object pose, primarily provides array of keypoints
+     */
+  Pose pose = 7;
+
+  /*
+  gaze, direction and angle of gaze
+  */
+  Gaze gaze = 8;
+
+  /*
+  lip activity like speaking, silent
+  */
+  LipActivity lipActivity = 9;
+
+  /*
+  speed of object
+  */
+  float speed = 10;
+
+  /*
+  in direction x, y, z
+  */
+  repeated float dir = 11;
+
+  /*
+
+  cartesian coordinate
+  */
+  Coordinate coordinate = 12;
+
+  /*
+  lat, lon, alt
+  */
+  Location location = 13;
+
+  /*
+ bbox3d, represented using array of 12 coordinates
+  */
+  Bbox3d bbox3d = 14;
+}
+
+/*
+cartesian coordinates
+*/
+message Coordinate {
+  double x = 1;
+  double y = 2;
+  double z = 3;
+}
+
+/*
+geo location
+*/
+message Location {
+  double lat = 1;
+  double lon = 2;
+  double alt = 3;
+}
+
+/*
+top left corner + bottom right corner
+*/
+message Bbox {
+  float leftX = 1;
+  float topY = 2;
+  float rightX = 3;
+  float bottomY = 4;
+  /*
+  Typically there will be a single array of embeddings representing the characteristics seen in 2d bbox. But there may be situations where multiple embeddings may be used to represent different characteristics of the object
+  */
+  repeated Embedding embeddings = 5;
+  float confidence = 6;
+  map<string, string> info = 7;
+}
+
+/*
+type = Image or Camera
+for Image consider only (x,y), and for Camera (x,y,z)
+*/
+message Bbox3d {
+  /*
+  The double typed coordinate values will appear in the following order:
+  x, y, z, width, length, height, pitch, roll, yaw, vx, vy, vz
+   */
+  repeated double coordinates = 1;
+  /*
+  embeddings representing the characteristics as seen in 3d bbox
+  */
+  repeated Embedding embeddings = 2;
+  float confidence = 3;
+  map<string, string> info = 4;
+}
+
+/*
+Segmentation Mask
+*/
+message Segmentation {
+  repeated int32 mask = 1;
+  map<string, string> info = 2;
+}
+
+message TypeMetrics {
+  /*
+    roi or fov id, optional for fov
+     */
+  string id = 1;
+  /*
+  type of object
+   */
+  string type = 2;
+  /*
+  count of object
+   */
+  int32 count = 3;
+
+  /*
+  object coordinates
+  */
+  repeated Coordinate coordinates = 4;
+
+  /*
+  objects ids
+   */
+  repeated string objectIds = 5;
+
+  /*
+  optional attributes
+   */
+  map<string, string> info = 6;
+}
+
+/*
+Cluster, array of 2D points
+*/
+message Cluster {
+  repeated Point2D points = 1;
+}
+
+/*
+2D point, represented using x,y coordinates
+*/
+message Point2D {
+  double x = 1;
+  double y = 2;
+}
+
+/*
+social distancing
+*/
+message SD {
+  /*
+  cluster threshold
+   */
+  double threshold = 1;
+  /*
+  number of clusters violating social distancing
+   */
+  int32 proximityDetections = 2;
+  /*
+  2D point clusters
+   */
+  repeated Cluster clusters = 3;
+  /*
+  info, generic attr=value for any customization
+   */
+  map<string, string> info = 4;
+}
+
+/*
+definition of polygon geometry, equivalent to wkt format.
+*/
+message Polygon {
+  /*
+  Polygon boundary, equivalent to exterior in wkt format
+   */
+  repeated Point2D coordinates = 1;
+  /*
+  Polygon holes, equivalent to interiors in wkt format. Multiple holes can present for one polygon.
+   */
+  repeated PolygonHole holes = 2;
+}
+
+/*
+definition of polygon hole.
+*/
+message PolygonHole {
+  /*
+  polygon hole, equivalent to polygon's interior in wkt format
+   */
+  repeated Point2D coordinates = 1;
+}
+
+message Interaction {
+  /*
+    id
+     */
+  string id = 1;
+  /*
+  objects ids
+   */
+  repeated string objectIds = 2;
+
+  /*
+  object coordinates
+  */
+  repeated Coordinate coordinates = 3;
+
+  /*
+  description, example person interacting with a box
+   */
+  string description = 4;
+
+  /*
+  optional attributes
+   */
+  map<string, string> info = 5;
+}
+
+message Congestion {
+  /*
+    optional id
+     */
+  string id = 1;
+  /*
+  objects ids
+   */
+  repeated string objectIds = 2;
+
+  /*
+  amount values between 0 and 1, use segmentation mask to calculate
+   */
+  float amount = 3;
+  /*
+  optional attributes
+   */
+  map<string, string> info = 4;
+}
+
+/*
+  The type represent the  nature of the pose,
+  i.e., pose2D, pose25D or pose3D,
+
+  which is followed by several Keypoints or bodyparts.
+  Each Keypoint comprises of
+
+    -name,
+
+    -coordinate (x,y,z, confidence)
+
+    -quaternion (qx,qy,qz,qw), quaternion values are optional.
+
+    - e.g., |left-eye|x,y,z,0.75|qx,qy,qz,qw|.
+
+   -For pose3D, the coordinates (x,y,z) are in the world coordinate system with
+   respect to the camera (unit: mm).
+
+   -For pose2.5D, it shares the same format as pose3D,
+   however, the coordinates (x,y) are in the image plane (unit: pixel) and the z coordinate
+   stands for the metric depth relative to the root keypoint, i.e., pelvis (unit: mm).
+
+   -For pose2D, (x,y) are the image pixel coordinates and the z coordinate is ignored, e.g., |right-ear,x,y,0.0.0.80|.
+*/
+message Pose {
+  /*
+   pose2D or pose3D or pose25D
+   */
+  string type = 1;
+
+  /*
+  array of keypoints
+   */
+  repeated Keypoint keypoints = 2;
+
+  /*
+  array of pose actons with their probabilities or confidence
+   */
+  repeated Action actions = 3;
+
+  /*
+  optional attributes
+   */
+  map<string, string> info = 4;
+
+  /*
+  Keypoint + quaternion
+   */
+  message Keypoint {
+    //name of keypoint
+    string name = 1;
+
+    // Array comprising of (x,y,z, confidence)
+    repeated float coordinates = 2;
+
+    //Array comprising of (qx,qy,qz,qw)
+    repeated float quaternion = 3;
+  }
+
+  /*
+  Pose Action, like walking, running
+   */
+  message Action {
+    /*
+    type of action, standing, running etc
+     */
+    string type = 1;
+
+    /*
+    confidence of actions
+     */
+    float confidence = 2;
+  }
+}
+
+/*
+Gaze point of reference  x,y,z are in the camera coordinate system.
+theta, phi are angles
+*/
+message Gaze {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+  float theta = 4;
+  float phi = 5;
+}
+
+/*
+activity like silent speaking
+*/
+message LipActivity {
+  string classLabel = 1;
+}
+
+/*
+event like moving, parked, etc
+*/
+message Event {
+  /*
+  id
+   */
+  string id = 1;
+  /*
+  type
+   */
+  string type = 2;
+
+  /*
+  optional attributes
+   */
+  map<string, string> info = 5;
+}
+
+/*
+ *
+ * Analytics Module to be nested in every message, example below
+ *
+ * {{{
+ *
+ *
+ * "analyticsModule": {
+ * 			"id": "module-id",
+ * 			"description": "Vehicle Detection and License Plate Recognition",
+ * 			"source": "OpenALR",
+ * 			"version": "3.0"
+ * }
+ *
+ *
+ * }}}
+ *
+ */
+message AnalyticsModule {
+  /*
+  id
+   */
+  string id = 1;
+  /*
+  description
+   */
+  string description = 2;
+  /*
+  source
+   */
+  string source = 3;
+  /*
+  version
+   */
+  string version = 4;
+  /*
+  additional info
+   */
+  map<string, string> info = 5;
+}
+
+/*
+ *
+ * Sensor object to be nested in every message, example
+ *
+ * {{{
+ *
+ *
+ * "sensor": {
+ * 		"id": "string",
+ * 		"type": "Camera/Puck",
+ * 		"location": {
+ * 			  "lat": 45.99,
+ * 			  "lon": 35.54,
+ * 			  "alt": 79.03
+ *      },
+ *     "coordinate": {
+ * 			   "x": 5.2,
+ * 			  "y": 10.1,
+ * 			  "z": 11.2
+ *      },
+ *      "description": "Entrance of Endeavor Garage Right Lane"
+ * }
+ *
+ *
+ * }}}
+ *
+ */
+message Sensor {
+  /*
+   id
+   */
+  string id = 1;
+  /*
+   Camera or Puck
+ */
+  string type = 2;
+
+  /*
+  description
+   */
+  string description = 3;
+  /*
+ in lat, lon, alt
+  */
+  Location location = 4;
+  /*
+  in x,y,z
+   */
+  Coordinate coordinate = 5;
+  /*
+additional info
+ */
+  map<string, string> info = 6;
+}
+
+/*
+ *
+ * Describing a scene needs describing where the scene is happening – place,
+ * what is happening in terms of events, and who are the objects participating in the event.
+ * note coordinate(x,y,z) are in meters
+ *
+ * Json representation of Place
+ * {{{
+ *
+ *
+        "place": {
+            "id": "string",
+            "name": "endeavor",
+            "type": "building/garage",
+            "location": {
+                "lat": 37.37060687475246,
+                "lon": -121.9672466762127,
+                "alt": 0.00
+            }
+ *
+ *
+ * }}}
+ *
+ *
+ *
+ */
+message Place {
+  /*
+  Id
+   */
+  string id = 1;
+  /*
+  name
+   */
+  string name = 2;
+  /*
+  Parking Lot or Entrance or Room
+   */
+  string type = 3;
+  /*
+  in lat, lon, alt
+   */
+  Location location = 4;
+  /*
+  in x,y,z
+   */
+  Coordinate coordinate = 5;
+  /*
+additional info, example details of park lot
+ */
+  map<string, string> info = 6;
+}
+
+/*
+represents a single object detection
+*/
+message Message {
+  string messageid = 1;
+  string mdsversion = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  Place place = 4;
+  Sensor sensor = 5;
+  AnalyticsModule analyticsModule = 6;
+  Object object = 7;
+  Event event = 8;
+  string videoPath = 9;
+}
+
+/*
+Embedding
+*/
+message Embedding {
+  /*
+  vector
+  */
+  repeated float vector = 1 [packed = true];
+
+  /*
+  extra info if needed
+   */
+  map<string, string> info = 2;
+}
+
+enum ImageFormat {
+  RAW = 0;
+  JPG = 1;
+  JPEG = 2;
+  PNG = 3;
+}
+
+message ImageData {
+  ImageFormat format = 1;
+  string encoding = 2;  // RGB, Grayscale
+  string name = 3;
+  bytes data = 4;
+  // Optional/Custom additional information in Key, Value pair
+  map<string, string> info = 5;
+}
+
+message VisionLLM {
+  string version = 1;
+  /*
+  timestamp in UTC format
+  */
+  google.protobuf.Timestamp timestamp = 2;
+
+  /*
+   end timestamp in UTC format
+   */
+  google.protobuf.Timestamp end = 3;
+
+  /*
+  start frame id
+   */
+  string startFrameId = 4;
+  /*
+  end frame id
+   */
+  string endFrameId = 5;
+
+  /*
+  sensor, can be camera, video, etc.
+   */
+  Sensor sensor = 6;
+
+  /*
+  LLM query, response, embeddings
+   */
+  LLM llm = 7;
+
+  map<string, string> info = 8;
+
+  /*
+  frames associated with this response
+   */
+  repeated Frame frames = 9;
+}
+
+message LLM {
+  /*
+  details of LLM used, like name, version
+   */
+  map<string, string> info = 1;
+  /*
+  list of queries
+   */
+  repeated Query queries = 2;
+
+  /*
+  representative vision embeddings
+   */
+  repeated Embedding visionEmbeddings = 3;
+}
+
+message Query {
+  /*
+  id is optional
+   */
+  string id = 1;
+  /*
+  query params
+  */
+  map<string, string> params = 2;
+  /*
+  user/system prompts
+   */
+  map<string, string> prompts = 3;
+  /*
+  response to query
+   */
+  string response = 4;
+  /*
+  optional embedding for query and response
+   */
+  repeated Embedding embeddings = 5;
+}

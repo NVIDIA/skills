@@ -1,0 +1,317 @@
+name: tao-train-ocrnet
+network_arch: ocrnet
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: default
+gpu_spec_key: train.num_gpus
+actions:
+  dataset_convert:
+    command: ocrnet dataset_convert -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset_convert.input_img_dir:
+        type: folder
+      dataset_convert.gt_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  train:
+    command: ocrnet train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset_dir:
+        type: folder
+      dataset.train_gt_file:
+        type: file
+        optional: true
+      dataset.val_dataset_dir:
+        type: folder
+      dataset.val_gt_file:
+        type: file
+        optional: true
+      dataset.character_list_file:
+        type: file
+      train.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  quantize:
+    command: ocrnet quantize -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset_dir:
+        type: folder
+      dataset.val_dataset_dir:
+        type: folder
+      dataset.character_list_file:
+        type: file
+      dataset.quant_calibration_dataset.images_dir:
+        type: folder
+      quantize.model_path:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: ocrnet evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.character_list_file:
+        type: file
+      evaluate.test_dataset_dir:
+        type: folder
+      evaluate.test_dataset_gt_file:
+        type: file
+        optional: true
+      evaluate.checkpoint:
+        type: file
+      evaluate.trt_engine:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: ocrnet export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.character_list_file:
+        type: file
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  prune:
+    command: ocrnet prune -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.character_list_file:
+        type: file
+      prune.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      prune.pruned_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  retrain:
+    command: ocrnet train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset_dir:
+        type: folder
+      dataset.val_dataset_dir:
+        type: folder
+      dataset.character_list_file:
+        type: file
+      dataset.train_gt_file:
+        type: file
+        optional: true
+      dataset.val_gt_file:
+        type: file
+        optional: true
+      model.pruned_graph_path:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: ocrnet inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.character_list_file:
+        type: file
+      inference.inference_dataset_dir:
+        type: folder
+      inference.checkpoint:
+        type: file
+      inference.trt_engine:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  dataset_convert:
+    dataset_convert.input_img_dir:
+      source: train_datasets
+      path: train.tar.gz
+      runtime: extracted_folder
+    dataset_convert.gt_file:
+      source: train_datasets
+      path: train/gt_new.txt
+  train:
+    dataset.train_dataset_dir:
+      source: train_datasets
+      path: train.tar.gz
+      runtime: extracted_folder
+      list: true
+    dataset.train_gt_file:
+      source: train_datasets
+      path: train/gt_new.txt
+    dataset.val_dataset_dir:
+      source: eval_dataset
+      path: test.tar.gz
+      runtime: extracted_folder
+    dataset.val_gt_file:
+      source: eval_dataset
+      path: test/gt_new.txt
+    dataset.character_list_file:
+      source: eval_dataset
+      path: character_list
+  quantize:
+    dataset.train_dataset_dir:
+      source: train_datasets
+      path: train.tar.gz
+      runtime: extracted_folder
+      list: true
+    dataset.val_dataset_dir:
+      source: eval_dataset
+      path: test.tar.gz
+      runtime: extracted_folder
+    dataset.character_list_file:
+      source: eval_dataset
+      path: character_list
+    dataset.quant_calibration_dataset.images_dir:
+      source: calibration_dataset
+      path: train.tar.gz
+      runtime: extracted_folder
+  evaluate:
+    dataset.character_list_file:
+      source: eval_dataset
+      path: character_list
+    evaluate.test_dataset_dir:
+      source: eval_dataset
+      path: test.tar.gz
+      runtime: extracted_folder
+    evaluate.test_dataset_gt_file:
+      source: eval_dataset
+      path: test/gt_new.txt
+  export:
+    dataset.character_list_file:
+      source: eval_dataset
+      path: character_list
+  inference:
+    dataset.character_list_file:
+      source: eval_dataset
+      path: character_list
+    inference.inference_dataset_dir:
+      source: inference_dataset
+      path: test.tar.gz
+      runtime: extracted_folder
+  prune:
+    dataset.character_list_file:
+      source: eval_dataset
+      path: character_list
+  retrain:
+    dataset.train_dataset_dir:
+      source: train_datasets
+      path: train.tar.gz
+      runtime: extracted_folder
+      list: true
+    dataset.val_dataset_dir:
+      source: eval_dataset
+      path: test.tar.gz
+      runtime: extracted_folder
+    dataset.character_list_file:
+      source: eval_dataset
+      path: character_list
+spec_params:
+  dataset_convert:
+    encryption_key: key
+    results_dir: output_dir
+    dataset_convert.results_dir: output_dir
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    train.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.checkpoint: parent_model
+    evaluate.trt_engine: parent_model
+  export:
+    encryption_key: key
+    results_dir: output_dir
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.checkpoint: parent_model
+    inference.trt_engine: parent_model
+  prune:
+    encryption_key: key
+    results_dir: output_dir
+    prune.checkpoint: parent_model
+    prune.pruned_file: create_pth_file
+  quantize:
+    encryption_key: key
+    results_dir: output_dir
+    quantize.model_path: parent_model
+  retrain:
+    encryption_key: key
+    results_dir: output_dir
+    model.pruned_graph_path: parent_model
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.batch_size
+  learning_rate: train.optim.lr
+  workers: dataset.workers
+  resume_checkpoint: train.resume_training_checkpoint_path
+  pretrained_model: train.pretrained_model_path
+  character_list: dataset.character_list_file
+  input_width: model.input_width
+  input_height: model.input_height
+  input_channel: model.input_channel
+  pruned_graph_path: model.pruned_graph_path
+  pruned_file: prune.pruned_file
+  quant_backend: quantize.backend
+  quant_model_path: quantize.model_path
+  calibration_images: dataset.quant_calibration_dataset.images_dir
+spec_templates:
+  dataset_convert: ../references/spec_template_dataset_convert.yaml
+  train: ../references/spec_template_train.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  inference: ../references/spec_template_inference.yaml
+  export: ../references/spec_template_export.yaml
+  prune: ../references/spec_template_prune.yaml
+  quantize: ../references/spec_template_quantize.yaml
+  retrain: ../references/spec_template_retrain.yaml
+description: OCRNet for scene text recognition. Recognizes text content from cropped text region images. Supports CTC and
+  attention-based decoders.

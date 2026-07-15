@@ -1,0 +1,111 @@
+name: optical-inspection-deploy
+type: model
+network_arch: optical_inspection
+container_image: tao_toolkit.deploy
+data_format: default
+actions:
+  gen_trt_engine:
+    command: optical_inspection gen_trt_engine -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      gen_trt_engine.onnx_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: optical_inspection evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.trt_engine:
+        type: file
+      dataset.infer_dataset.csv_path:
+        type: file
+      dataset.infer_dataset.images_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: optical_inspection inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.trt_engine:
+        type: file
+      dataset.infer_dataset.csv_path:
+        type: file
+      dataset.infer_dataset.images_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  evaluate:
+    dataset.infer_dataset.csv_path:
+      source: eval_dataset
+      path: dataset.csv
+    dataset.infer_dataset.images_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+  inference:
+    dataset.infer_dataset.csv_path:
+      source: inference_dataset
+      path: dataset.csv
+    dataset.infer_dataset.images_dir:
+      source: inference_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+spec_params:
+  gen_trt_engine:
+    encryption_key: key
+    results_dir: output_dir
+    gen_trt_engine.onnx_file: parent_model
+    gen_trt_engine.trt_engine: create_engine_file
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.trt_engine: parent_model
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.trt_engine: parent_model
+spec_shorthand_keys:
+  trt_data_type: gen_trt_engine.tensorrt.data_type
+  trt_engine: gen_trt_engine.trt_engine
+  batch_size: dataset.batch_size
+  eval_batch_size: evaluate.batch_size
+  inference_batch_size: inference.batch_size
+  trt_min_batch_size: gen_trt_engine.tensorrt.min_batch_size
+  trt_opt_batch_size: gen_trt_engine.tensorrt.opt_batch_size
+  trt_max_batch_size: gen_trt_engine.tensorrt.max_batch_size
+  num_input: dataset.num_input
+  image_width: dataset.image_width
+  image_height: dataset.image_height
+  concat_type: dataset.concat_type
+description: Optical Inspection deploy workflow for gen_trt_engine, evaluate, inference
+  using TAO Deploy.
+spec_templates:
+  gen_trt_engine: spec_template_deploy_experiment.yaml
+  evaluate: spec_template_deploy_experiment.yaml
+  inference: spec_template_deploy_experiment.yaml
+notes:
+- The starter-kit deploy flow uses FP16 for Optical Inspection TensorRT builds.
+- Keep `dataset.num_input`, `dataset.input_map`, `dataset.concat_type`, and grid layout
+  aligned with the trained AOI model.
+- Deploy evaluate reads `dataset.infer_dataset.*`, not `dataset.test_dataset.*`;
+  override the inference dataset CSV and image root for both evaluate and inference.
+- Default export produces a static-batch ONNX in common smoke runs. Keep
+  `dataset.batch_size` and evaluate/inference batch sizes aligned with the TensorRT
+  optimization profile, usually batch size 1 unless exported otherwise.
+- Set gen_trt_engine.trt_engine explicitly in the spec; do not pre-create it as
+  a declared file output.

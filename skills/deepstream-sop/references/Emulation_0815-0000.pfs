@@ -1,0 +1,102 @@
+# {05D8C294-F295-4dfb-9D01-096BD04049F4}
+# GenApi persistence file (version 3.5.0)
+# Device = Basler::BaslerCamEmu -- Basler Cam Emu interface -- Device version = 1.0.1 -- Product GUID = B97DE549-CB9A-44f8-937D-64C48BDECFA3 -- Product version GUID = A2DCDE14-73E4-408a-AFA8-81852ECB5D9A
+GainRaw	192
+Gain	0.000e+00
+GainAuto	Off
+BlackLevel	0.000
+Gamma	1.0000
+DigitalShift	0
+ReverseX	0
+ReverseY	0
+BinningHorizontalMode	Average
+BinningHorizontal	1
+BinningVerticalMode	Sum
+BinningVertical	1
+WidthMax	4096
+HeightMax	4096
+Width	1280
+Height	720
+OffsetX	0
+OffsetY	0
+PixelFormat	RGB8Packed
+#PixelFormat	BGRA8Packed
+#PixelFormat	UYVY
+TestImageSelector	Off
+ImageFilename	./streams/simulation
+ImageFileMode	On
+ImageCompressionMode	Off
+ImageCompressionRateOption	Lossless
+ExposureTimeAbs	10000
+ExposureTimeBaseAbs	1
+ExposureTimeRaw	10000
+ExposureTime	10000.0
+AcquisitionMode	Continuous
+ExposureAuto	Off
+ExposureMode	Timed
+TriggerMode	{TriggerSelector=FrameBurstStart}	Off
+TriggerMode	{TriggerSelector=FrameBurstEnd}	Off
+TriggerMode	{TriggerSelector=FrameBurstActive}	Off
+TriggerMode	{TriggerSelector=FrameStart}	Off
+TriggerMode	{TriggerSelector=FrameEnd}	Off
+TriggerMode	{TriggerSelector=FrameActive}	Off
+TriggerMode	{TriggerSelector=ExposureStart}	Off
+TriggerMode	{TriggerSelector=ExposureEnd}	Off
+TriggerMode	{TriggerSelector=ExposureActive}	Off
+TriggerSelector	FrameStart
+TriggerSource	{TriggerSelector=FrameBurstStart}	Software
+TriggerSource	{TriggerSelector=FrameBurstEnd}	Software
+TriggerSource	{TriggerSelector=FrameBurstActive}	Software
+TriggerSource	{TriggerSelector=FrameStart}	Software
+TriggerSource	{TriggerSelector=FrameEnd}	Software
+TriggerSource	{TriggerSelector=FrameActive}	Software
+TriggerSource	{TriggerSelector=ExposureStart}	Software
+TriggerSource	{TriggerSelector=ExposureEnd}	Software
+TriggerSource	{TriggerSelector=ExposureActive}	Software
+TriggerSelector	FrameStart
+TriggerActivation	{TriggerSelector=FrameBurstStart}	RisingEdge
+TriggerActivation	{TriggerSelector=FrameBurstEnd}	RisingEdge
+TriggerActivation	{TriggerSelector=FrameBurstActive}	RisingEdge
+TriggerActivation	{TriggerSelector=FrameStart}	RisingEdge
+TriggerActivation	{TriggerSelector=FrameEnd}	RisingEdge
+TriggerActivation	{TriggerSelector=FrameActive}	RisingEdge
+TriggerActivation	{TriggerSelector=ExposureStart}	RisingEdge
+TriggerActivation	{TriggerSelector=ExposureEnd}	RisingEdge
+TriggerActivation	{TriggerSelector=ExposureActive}	RisingEdge
+TriggerSelector	FrameStart
+TriggerDelay	{TriggerSelector=FrameBurstStart}	0.0
+TriggerDelay	{TriggerSelector=FrameBurstEnd}	0.0
+TriggerDelay	{TriggerSelector=FrameBurstActive}	0.0
+TriggerDelay	{TriggerSelector=FrameStart}	0.0
+TriggerDelay	{TriggerSelector=FrameEnd}	0.0
+TriggerDelay	{TriggerSelector=FrameActive}	0.0
+TriggerDelay	{TriggerSelector=ExposureStart}	0.0
+TriggerDelay	{TriggerSelector=ExposureEnd}	0.0
+TriggerDelay	{TriggerSelector=ExposureActive}	0.0
+TriggerSelector	FrameStart
+AcquisitionFrameRateEnable	0
+LineInverter	{LineSelector=Line1}	0
+LineInverter	{LineSelector=Line2}	0
+LineInverter	{LineSelector=Line3}	0
+LineSelector	Line1
+LineMode	{LineSelector=Line1}	Input
+LineMode	{LineSelector=Line2}	Input
+LineMode	{LineSelector=Line3}	Input
+LineSelector	Line1
+LineSource	{LineSelector=Line1}	Off
+LineSource	{LineSelector=Line2}	Off
+LineSource	{LineSelector=Line3}	Off
+LineSelector	Line1
+UserOutputValue	{UserOutputSelector=UserOutput1}	0
+UserOutputValue	{UserOutputSelector=UserOutput2}	0
+UserOutputValue	{UserOutputSelector=UserOutput3}	0
+UserOutputSelector	UserOutput1
+DeviceUserID	GENICAM_EMPTY_STRING
+DeviceFirmwareVersionOverride	1.1
+DeviceDelayRegister	0
+ForceFailedBufferCount	100
+GevSCPSPacketSize	1500
+GevSCPD	0
+GevSCFTD	0
+GevSCBWR	10
+GevSCBWRA	10

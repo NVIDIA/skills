@@ -1,0 +1,183 @@
+name: tao-train-foundation-stereo
+network_arch: depth_net_stereo
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: FSD
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: depth_net train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset.data_sources[0].data_file:
+        type: file
+      dataset.val_dataset.data_sources[0].data_file:
+        type: file
+      model.stereo_backbone.depth_anything_v2_pretrained_path:
+        type: file
+        optional: true
+      model.stereo_backbone.edgenext_pretrained_path:
+        type: file
+        optional: true
+      train.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  quantize:
+    command: depth_net quantize -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      quantize.model_path:
+        type: file
+      dataset.train_dataset.data_sources[0].data_file:
+        type: file
+      dataset.val_dataset.data_sources[0].data_file:
+        type: file
+      dataset.quant_calibration_dataset.images_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: depth_net evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.test_dataset.data_sources[0].data_file:
+        type: file
+      evaluate.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: depth_net export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: depth_net inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.infer_dataset.data_sources[0].data_file:
+        type: file
+      inference.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.train_dataset.data_sources[0].data_file:
+      source: train_datasets
+      path: annotations.txt
+    dataset.val_dataset.data_sources[0].data_file:
+      source: eval_dataset
+      path: annotations.txt
+  quantize:
+    dataset.train_dataset.data_sources[0].data_file:
+      source: train_datasets
+      path: annotations.txt
+    dataset.val_dataset.data_sources[0].data_file:
+      source: eval_dataset
+      path: annotations.txt
+    dataset.quant_calibration_dataset.images_dir:
+      source: train_datasets
+      path: left
+  evaluate:
+    dataset.test_dataset.data_sources[0].data_file:
+      source: eval_dataset
+      path: annotations.txt
+  inference:
+    dataset.infer_dataset.data_sources[0].data_file:
+      source: inference_dataset
+      path: annotations.txt
+spec_params:
+  train:
+    dataset.dataset_name: StereoDataset
+    model.model_type: FoundationStereo
+    model.stereo_backbone.depth_anything_v2_pretrained_path:
+      link: https://huggingface.co/depth-anything/Depth-Anything-V2-Small/resolve/main/depth_anything_v2_vits.pth
+      destination_path: /ptm/depth_net/stereo_backbone/depth_anything_v2_vits.pth
+    results_dir: output_dir
+    train.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  quantize:
+    dataset.dataset_name: StereoDataset
+    model.model_type: FoundationStereo
+    quantize.model_path: parent_model
+    results_dir: output_dir
+  evaluate:
+    dataset.dataset_name: StereoDataset
+    evaluate.checkpoint: parent_model
+    model.model_type: FoundationStereo
+    results_dir: output_dir
+  export:
+    dataset.dataset_name: StereoDataset
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+    model.model_type: FoundationStereo
+    results_dir: output_dir
+  inference:
+    dataset.dataset_name: StereoDataset
+    inference.checkpoint: parent_model
+    model.model_type: FoundationStereo
+    results_dir: output_dir
+key_defaults:
+  model.model_type: FoundationStereo
+  model.encoder: vits
+  model.hidden_dims: [128, 128, 128]
+  model.corr_radius: 4
+  model.cv_group: 8
+  model.train_iters: 22
+  model.valid_iters: 22
+  model.volume_dim: 32
+  model.low_memory: 0
+  model.mixed_precision: false
+  model.n_gru_layers: 3
+  model.corr_levels: 2
+  model.n_downsample: 2
+  model.max_disparity: 128
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  train_batch_size: dataset.train_dataset.batch_size
+  infer_batch_size: dataset.infer_dataset.batch_size
+  learning_rate: train.optim.lr
+  resume_checkpoint: train.resume_training_checkpoint_path
+  train_ptm: train.pretrained_model_path
+  depth_anything_ptm: model.stereo_backbone.depth_anything_v2_pretrained_path
+  edgenext_ptm: model.stereo_backbone.edgenext_pretrained_path
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  quantize: ../references/spec_template_quantize.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  inference: ../references/spec_template_inference.yaml
+  export: ../references/spec_template_export.yaml
+description: Stereo depth estimation using FoundationStereo architecture. Predicts disparity maps from stereo image pairs
+  for 3D reconstruction. Mono and stereo share the unified `depth_net` CLI entrypoint;
+  model family is selected via `model.model_type`.

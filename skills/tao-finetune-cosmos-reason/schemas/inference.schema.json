@@ -1,0 +1,85 @@
+{
+  "automl_default_parameters": [],
+  "automl_disabled_parameters": [],
+  "default": {
+    "base_model_path": "hf_model://nvidia/Cosmos3-Nano",
+    "device_map": "auto",
+    "enable_lora": false,
+    "fps": 1,
+    "max_new_tokens": 32,
+    "media": "",
+    "model_path": "hf_model://nvidia/Cosmos3-Nano",
+    "num_gpus": 1,
+    "prompt": "Describe this video briefly.",
+    "results_dir": "",
+    "torch_dtype": "auto",
+    "total_pixels": 200704,
+    "type": "video"
+  },
+  "properties": {
+    "base_model_path": {
+      "default": "hf_model://nvidia/Cosmos3-Nano",
+      "type": "string"
+    },
+    "device_map": {
+      "default": "auto",
+      "type": "string"
+    },
+    "enable_lora": {
+      "default": false,
+      "type": "boolean"
+    },
+    "fps": {
+      "default": 1,
+      "type": "integer"
+    },
+    "max_new_tokens": {
+      "default": 32,
+      "type": "integer"
+    },
+    "media": {
+      "default": "",
+      "type": "string"
+    },
+    "model_path": {
+      "default": "hf_model://nvidia/Cosmos3-Nano",
+      "type": "string"
+    },
+    "num_gpus": {
+      "default": 1,
+      "type": "integer"
+    },
+    "prompt": {
+      "default": "Describe this video briefly.",
+      "type": "string"
+    },
+    "results_dir": {
+      "default": "",
+      "type": "string"
+    },
+    "torch_dtype": {
+      "default": "auto",
+      "type": "string"
+    },
+    "total_pixels": {
+      "default": 200704,
+      "type": "integer"
+    },
+    "type": {
+      "default": "video",
+      "enum": [
+        "video",
+        "image"
+      ],
+      "type": "categorical"
+    }
+  },
+  "required": [
+    "model_path",
+    "media",
+    "prompt",
+    "results_dir"
+  ],
+  "schema_action": "inference",
+  "schema_version": 1
+}

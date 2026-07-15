@@ -1,0 +1,30 @@
+results_dir: /results
+dataset:
+  label_map: /data/label_map_panoptic.json
+  contiguous_id: false
+  val:
+    type: coco_panoptic
+    name: coco_panoptic_val
+    panoptic_json: /data/annotations_panoptic.json
+    instance_json: /data/annotations.json
+    img_dir: /data/images
+    panoptic_dir: /data/images_panoptic
+    batch_size: 1
+    num_workers: 2
+  test:
+    type: coco_panoptic
+    name: coco_panoptic_test
+    img_dir: /data/images
+    batch_size: 1
+    num_workers: 2
+model:
+  mode: semantic
+  object_mask_threshold: 0.0
+  overlap_threshold: 0.8
+  sem_seg_head:
+    norm: GN
+    num_classes: 201
+inference:
+  trt_engine: /results/mask2former.engine
+evaluate:
+  trt_engine: /results/mask2former.engine

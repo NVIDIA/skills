@@ -1,0 +1,27 @@
+results_dir: /results
+dataset:
+  test_data_sources:
+    image_dir: /data/images
+    json_file: /data/annotations.json
+    data_type: OD
+  batch_size: 1
+  workers: 8
+evaluate:
+  trt_engine: /results/mask-grounding-dino.engine
+  input_width: 480
+  input_height: 480
+  conf_threshold: 0.25
+  text_threshold: 0.2
+  nms_threshold: 0.8
+model:
+  backbone: swin_tiny_224_1k
+  num_feature_levels: 4
+  dec_layers: 6
+  enc_layers: 6
+  num_queries: 900
+  num_select: 300
+  max_text_len: 256
+  num_region_queries: 100
+  has_mask: true
+  dropout_ratio: 0.0
+  dim_feedforward: 2048

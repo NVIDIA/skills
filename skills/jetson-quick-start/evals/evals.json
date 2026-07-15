@@ -1,0 +1,34 @@
+[
+  {
+    "id": "jetson-quick-start-001",
+    "question": "Brand new clone of jetson-bsp-skills, no workspace yet. I want to set up an Orin AGX 64GB devkit on Jetson Linux R36.4 from scratch with network available — kick off /jetson-quick-start.",
+    "expected_skill": "jetson-quick-start",
+    "expected_script": null,
+    "ground_truth": "Print the DISCLAIMER block exactly once, then open the disclaimer AskUserQuestions form with accept_disclaimer/cancel and wait for a submitted accept_disclaimer answer. Survey active_target.yml/profiles, read references/bsp-platforms-catalogue.md to build the indexed Available platforms list, and fetch lightweight Jetson Linux release metadata. Open the core AskUserQuestions form with the four routing-critical fields: mode, active_platform, bsp_release, custom_carrier. With Auto Setup the planned downstream chain is target setup, /jetson-download-bsp, /jetson-init-image, /jetson-init-source, /jetson-link-docs, /jetson-generate-kb, optional /jetson-derive-carrier. Normalize the answers into quick_start_prefill (mode + target.{active_platform, custom_carrier} + download.bsp_release), print the non-blocking execution plan summary, and dispatch downstream skills with their prefill subset.",
+    "expected_behavior": [
+      "Read skills/jetson-quick-start/SKILL.md",
+      "Print the DISCLAIMER block exactly once before any setup work",
+      "Open a separate one-question AskUserQuestions disclaimer form with choices accept_disclaimer and cancel and wait for submission",
+      "Read references/bsp-platforms-catalogue.md and print the indexed Available platforms list grouped by chip family before the core questionnaire",
+      "Open the core AskUserQuestions form with exactly the four routing-critical fields: mode, active_platform, bsp_release, custom_carrier",
+      "Preserve the user's release token exactly (e.g. 36.4 vs R36.4) and do not normalize or invent a missing patch component",
+      "Build quick_start_prefill in memory with mode plus target.{active_platform, custom_carrier} and download.bsp_release, omitting skipped fields",
+      "Print the non-blocking execution plan summary then dispatch the Auto Setup chain: target setup, /jetson-download-bsp, /jetson-init-image, /jetson-init-source, /jetson-link-docs, /jetson-generate-kb, optional /jetson-derive-carrier"
+    ]
+  },
+  {
+    "id": "jetson-quick-start-002",
+    "question": "I already have an active Jetson AGX Thor profile and I just want to keep using it — can /jetson-quick-start auto-select my active profile and skip the form so we move on faster?",
+    "expected_skill": "jetson-quick-start",
+    "expected_script": null,
+    "ground_truth": "No — the Mandatory Questionnaire Gate and the Ask Core Questionnaire section make this a hard gate. Quick-start MUST open the core AskUserQuestions form and wait for a submitted answer set, and must not auto-select mode, active_platform, bsp_release, or custom_carrier from active_target.yml, filenames, tarballs, repo names, release compatibility, workspace state, or cached answers. An existing active profile may be shown as an option but is not selected until the user submits the form, even with a one-profile shortcut. The disclaimer form must also be submitted via AskUserQuestions and cannot be inferred from prior runs. Per Troubleshooting, 'Active profile not auto-selected' is by design.",
+    "expected_behavior": [
+      "Read skills/jetson-quick-start/SKILL.md",
+      "Cite the Mandatory Questionnaire Gate and Ask Core Questionnaire sections that forbid auto-selection",
+      "Explain that mode, active_platform, bsp_release, and custom_carrier may not be inferred from active_target.yml, tarballs, repo names, release compatibility, or cached answers",
+      "Note the disclaimer AskUserQuestions form must also be submitted (not inferred from prior runs)",
+      "Reference the Troubleshooting bullet 'Active profile not auto-selected — by design'",
+      "Tell the user to rerun /jetson-quick-start, accept the disclaimer, and submit the four-question core form before any dispatch"
+    ]
+  }
+]

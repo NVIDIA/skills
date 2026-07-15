@@ -1,0 +1,21 @@
+encryption_key: tlt_encode
+results_dir: /results
+task: classify
+dataset:
+  classify:
+    batch_size: 1
+    num_classes: 2
+model:
+  backbone:
+    type: c_radio_v2_vit_base_patch16_224
+gen_trt_engine:
+  gpu_id: 0
+  onnx_file: /models/model.onnx
+  trt_engine: /results/visual-changenet.engine
+  batch_size: -1
+  tensorrt:
+    data_type: FP32
+    workspace_size: 1024
+    min_batch_size: 1
+    opt_batch_size: 1
+    max_batch_size: 1

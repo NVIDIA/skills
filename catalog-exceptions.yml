@@ -1,0 +1,17 @@
+# Catalog exceptions — skills/ dirs allowed to exist WITHOUT a
+# components.d registration. Everything else in skills/ must be declared
+# by a components.d/<slug>.yml entry, listed in
+# .github/scripts/manual-components.yml (manually staged, README-visible
+# skills), or listed here — otherwise the hourly sync prunes it
+# (see .github/scripts/prune-orphans.sh).
+#
+# Add an entry only with a documented reason and an owner.
+exceptions:
+  - dir: cuopt-developer
+    reason: Contributor-facing skill, intentionally uncataloged (per cuOpt team, 2026-06-01)
+    owner: rgsl888prabhu
+    component: cuOpt
+  - dir: nvidia-skill-finder
+    reason: Catalog infrastructure router skill; maintained via direct PR (no components.d upstream)
+    owner: jdudash
+    component: NVIDIA Skills

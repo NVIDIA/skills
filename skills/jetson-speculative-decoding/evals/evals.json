@@ -1,0 +1,67 @@
+{
+  "skill_name": "jetson-speculative-decoding",
+  "evals": [
+    {
+      "id": "jetson-speculative-decoding-001",
+      "prompt": "I'm running a vLLM server on my Jetson AGX Thor with a single-stream chat workload. TTFT looks fine but TPOT is too slow. Llama-3.1-8B-Instruct has an EAGLE-3 head published — how do I enable speculative decoding?",
+      "expected_output": "The agent invoked the jetson-speculative-decoding skill, confirmed the preconditions (Thor, single-stream / low concurrency, TPOT-bound, sufficient VRAM headroom, EAGLE-3 head available, baseline benchmark exists), and produced an updated vllm serve command that appends --speculative-config '{\"method\":\"eagle3\",\"model\":\"<eagle3-head-repo-id>\",\"num_speculative_tokens\":5,\"draft_tensor_parallel_size\":1}' on top of the jetson-llm-serve Thor recipe (upstream vLLM 0.20+).",
+      "assertions": [
+        "The agent matched the request to jetson-speculative-decoding",
+        "The agent confirmed the When-to-use preconditions (TPOT/ITL-bound, single-stream / low concurrency, Thor or AGX Orin family)",
+        "The agent appended --speculative-config '{\"method\":\"eagle3\",\"model\":\"<eagle3-head-repo-id>\",\"num_speculative_tokens\":5,\"draft_tensor_parallel_size\":1}' to the existing vllm serve command (Thor uses num_speculative_tokens=5)",
+        "The agent paired speculation with the SAME Thor runtime path used by jetson-llm-serve (upstream vllm/vllm-openai:latest 0.20+, or validated native vLLM 0.20+) — NOT the Orin NVIDIA-AI-IOT image",
+        "The agent dropped --gpu-memory-utilization by ~0.05 vs the non-speculative baseline to make headroom for the draft",
+        "The agent recommended baseline + post-change benchmarks via jetson-llm-benchmark at concurrency 1 to verify the change actually helps",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-speculative-decoding",
+      "expected_script": null
+    },
+    {
+      "id": "jetson-speculative-decoding-002",
+      "prompt": "vLLM is running fine on my AGX Orin. The model I'm serving doesn't have an EAGLE-3 head published, but I have a small same-family draft. Can I still use speculative decoding to bring down TPOT?",
+      "expected_output": "The agent recommended the draft-model fallback path with --speculative-config '{\"method\":\"draft_model\",\"model\":\"<small-draft-model-repo-id>\",\"num_speculative_tokens\":3,\"draft_tensor_parallel_size\":1}' on top of the AGX Orin jetson-llm-serve recipe (upstream vLLM on JetPack 7.2 / L4T r39+, NVIDIA-AI-IOT image on older JetPack), used the AGX Orin starting value of num_speculative_tokens=3, and warned about the VRAM headroom requirement.",
+      "assertions": [
+        "The agent matched the request to jetson-speculative-decoding",
+        "The agent picked the draft-model fallback path (method: draft_model) since no EAGLE-3 head exists",
+        "The agent used num_speculative_tokens=3 for the AGX Orin starting value (Thor would be 5)",
+        "The agent paired speculation with the Orin vLLM runtime from jetson-llm-serve: upstream vllm/vllm-openai:latest on JetPack 7.2 / L4T r39+, or NVIDIA-AI-IOT vLLM on older JetPack",
+        "The agent dropped --gpu-memory-utilization by ~0.05 vs the non-speculative baseline",
+        "The agent did NOT recommend training a new EAGLE-3 head ad-hoc as a fix",
+        "The agent recommended re-benchmarking via jetson-llm-benchmark at concurrency 1 before/after",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-speculative-decoding",
+      "expected_script": null
+    },
+    {
+      "id": "jetson-speculative-decoding-003",
+      "prompt": "I added --speculative-config to my vLLM server on Thor. How do I tell whether it actually made decoding faster?",
+      "expected_output": "The agent told the user to run jetson-llm-benchmark (vLLM path) at --concurrency 1 before and after enabling speculation, and to accept the change only if throughput_tok_s improves by ≥30% AND tpot_ms_p50 drops by ≥20%, with a fallback rule to disable speculation if improvement is <10% or throughput regresses at concurrency 8.",
+      "assertions": [
+        "The agent matched the request to jetson-speculative-decoding",
+        "The agent recommended running jetson-llm-benchmark scripts/bench_vllm.sh at --concurrency 1 BEFORE and AFTER enabling speculation",
+        "The agent named both acceptance thresholds: ≥30% improvement in throughput_tok_s AND ≥20% drop in tpot_ms_p50 at concurrency 1",
+        "The agent stated the disable rule: <10% improvement OR throughput regression at concurrency 8 → remove --speculative-config",
+        "The agent did not invent benchmark numbers — measurement is delegated to jetson-llm-benchmark",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-speculative-decoding",
+      "expected_script": null
+    },
+    {
+      "id": "jetson-speculative-decoding-004",
+      "prompt": "Should I enable EAGLE-3 speculative decoding on my Jetson Orin Nano 8 GB to speed up token generation?",
+      "expected_output": "The agent refused to recommend EAGLE-3 on Orin Nano / NX, explaining there is rarely enough VRAM headroom for both target and draft models on those devices and the server will OOM at startup, and suggested alternatives (smaller / better-quantized model, jetson-inference-mem-tune for memory-aware flags) instead.",
+      "assertions": [
+        "The agent did NOT recommend enabling EAGLE-3 / speculative decoding on Orin Nano / NX",
+        "The agent explained the VRAM-headroom reason from the When-to-use guidance ('rarely enough VRAM headroom to host both target and draft, you'll OOM at startup')",
+        "The agent suggested an alternative: a smaller or better-quantized model, or invoking jetson-inference-mem-tune for memory-aware launch flags",
+        "The agent did not invent benchmark numbers showing speculation working on Orin Nano",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

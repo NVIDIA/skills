@@ -1,0 +1,34 @@
+[
+  {
+    "id": "jetson-init-source-001",
+    "question": "I've finished /jetson-init-image on a fresh workspace and dropped public_sources.tbz2 and x-tools.tbz2 into <workspace>/Downloads/. Bootstrap the source workspace so I can move on to customize-* skills.",
+    "expected_skill": "jetson-init-source",
+    "expected_script": null,
+    "ground_truth": "Resolve the active profile, default <source.root_path> to <workspace>/Source silently (no profile write), and create the empty Linux_for_Tegra/ overlay tracker via git init - do not commit anything in it. For bsp_sources, the precedence ladder picks Branch A (Local archive extraction) because no source.repos.bsp_sources entry is set and Downloads/public_sources.tbz2 exists, applying the R36.x Tegra OOT Makefile force-replace from <bsp_image>/Linux_for_Tegra/source/Makefile. For the toolchain, Auto-discover finds nothing, so Auto-extract from Downloads/x-tools.tbz2 untars into <workspace>/toolchain/ and re-runs Auto-discover, expecting exactly one match under x-tools/aarch64-*-linux-gnu/bin/. Write source.toolchain: <prefix>- (absolute, with trailing dash) into the profile via a round-tripping YAML writer and report the resolved paths.",
+    "expected_behavior": [
+      "Read skills/jetson-init-source/SKILL.md",
+      "Resolve the active profile and refuse if <bsp_image.root_path>/Linux_for_Tegra/ is not present",
+      "Default <source.root_path> to <workspace>/Source silently and do not write source.root_path to the profile",
+      "Create <source.root_path>/Linux_for_Tegra/ and run git init; leave the tracker empty",
+      "Apply the bsp_sources precedence ladder and select Branch A because Downloads/public_sources.tbz2 exists and no url:/archive: entry is set, applying the R36.x Tegra OOT Makefile force-replace",
+      "Run toolchain Auto-discover, fall through to Auto-extract from Downloads/x-tools.tbz2, then re-run Auto-discover and require exactly one aarch64-*-linux-gnu match",
+      "Write source.toolchain (absolute prefix, trailing dash) using a round-tripping YAML writer once ${TC_PREFIX}gcc validates",
+      "Print the summary including branch selected, toolchain prefix and ${TC_PREFIX}gcc --version first line"
+    ]
+  },
+  {
+    "id": "jetson-init-source-002",
+    "question": "/jetson-init-source ran source_sync.sh and exited 0 but my bsp_sources/ tree looks empty and customize-kernel later refused. What happened and how should I recover?",
+    "expected_skill": "jetson-init-source",
+    "expected_script": null,
+    "ground_truth": "source_sync.sh exits 0 even when every clone failed, so the skill counts 'Failed to clone' lines in its output and refuses if non-zero - the most likely cause is blocked git egress to gitlab.com/nvidia/nv-tegra or nv-tegra.nvidia.com. Recovery is to switch to Branch A: download public_sources.tbz2 via /quick-start (or /jetson-download-bsp), drop it into <workspace>/Downloads/, and re-run /jetson-init-source so the precedence ladder picks the offline archive branch. Also confirm the -t jetson_<major.minor> tag (derived from bsp_image.version, e.g. 38.4.0 -> jetson_38.4) was not silently degraded to latest - the skill never falls back to unpinned latest; if both jetson_<major.minor> and the jetson_<bsp_image.version> fallback fail it surfaces the error and stops.",
+    "expected_behavior": [
+      "Read skills/jetson-init-source/SKILL.md",
+      "Explain that source_sync.sh's exit code is unreliable and the skill counts 'Failed to clone' lines to detect universal failure",
+      "Identify blocked git egress to gitlab.com/nvidia/nv-tegra / nv-tegra.nvidia.com as the most common root cause",
+      "Recommend obtaining public_sources.tbz2 via /quick-start or /jetson-download-bsp, staging it in <workspace>/Downloads/, and re-running so Branch A is selected",
+      "Confirm the source_sync.sh tag was derived as jetson_<major.minor> from bsp_image.version, with jetson_<bsp_image.version> as the only documented fallback - never 'latest'",
+      "Cite the matching Troubleshooting bullet (source_sync.sh cannot resolve jetson_<major.minor> tag) if bsp_image.version is suspect and route to /jetson-init-image to refresh it"
+    ]
+  }
+]

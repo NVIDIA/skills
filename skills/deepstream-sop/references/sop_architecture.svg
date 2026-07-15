@@ -1,0 +1,233 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 540" font-family="Segoe UI, Arial, sans-serif" font-size="8">
+  <defs>
+    <marker id="ag" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5Z" fill="#76b900"/></marker>
+    <marker id="aw" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5Z" fill="#bbb"/></marker>
+    <marker id="ad" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5Z" fill="#666"/></marker>
+    <marker id="am" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5Z" fill="#b88a00"/></marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="920" height="540" fill="#f0f0f0"/>
+
+  <!-- Title bar -->
+  <rect width="920" height="26" fill="#1a1a1a"/>
+  <text x="460" y="17" text-anchor="middle" font-size="13" font-weight="bold" fill="#76b900">NVIDIA DeepStream SOP Inference Microservice</text>
+
+  <!-- ===== INPUT SOURCES ===== -->
+  <g transform="translate(8,38)">
+    <text x="48" y="8" text-anchor="middle" font-size="9" font-weight="bold" fill="#444">Input Sources</text>
+    <rect x="4" y="14" width="88" height="22" rx="3" fill="#fff" stroke="#aaa" stroke-width="0.8"/>
+    <text x="48" y="29" text-anchor="middle" fill="#333">Video Files</text>
+    <text x="48" y="42" text-anchor="middle" font-size="6" fill="#999">(base64/file/uploaded)</text>
+    <rect x="4" y="50" width="88" height="22" rx="3" fill="#fff" stroke="#aaa" stroke-width="0.8"/>
+    <text x="48" y="65" text-anchor="middle" fill="#333">RTSP Streams</text>
+    <rect x="4" y="80" width="88" height="30" rx="3" fill="#fff" stroke="#aaa" stroke-width="0.8"/>
+    <text x="48" y="94" text-anchor="middle" fill="#333">Basler Camera</text>
+    <text x="48" y="105" text-anchor="middle" font-size="6" fill="#999">(pylon SDK)</text>
+    <!-- Arrows -->
+    <line x1="92" y1="25" x2="118" y2="25" stroke="#76b900" stroke-width="1.2" marker-end="url(#ag)"/>
+    <line x1="92" y1="61" x2="118" y2="61" stroke="#76b900" stroke-width="1.2" marker-end="url(#ag)"/>
+    <line x1="92" y1="95" x2="118" y2="95" stroke="#76b900" stroke-width="1.2" marker-end="url(#ag)"/>
+  </g>
+
+  <!-- ===== DOCKER CONTAINER ===== -->
+  <rect x="126" y="34" width="610" height="468" rx="4" fill="#1e1e1e" stroke="#76b900" stroke-width="2"/>
+  <text x="431" y="48" text-anchor="middle" font-size="10" font-weight="bold" fill="#76b900">Docker Container: nvds-action-sop</text>
+
+  <!-- FastAPI bar -->
+  <rect x="136" y="54" width="590" height="20" rx="3" fill="#76b900"/>
+  <text x="431" y="68" text-anchor="middle" font-size="9" font-weight="bold" fill="#fff">FastAPI Server (port 8300)</text>
+
+  <!-- Endpoints -->
+  <g transform="translate(136,78)">
+    <rect x="0" y="0" width="88" height="16" rx="2" fill="#3a3a3a" stroke="#555" stroke-width="0.5"/>
+    <text x="44" y="11" text-anchor="middle" font-size="6.5" fill="#ccc">/v1/chat/completions</text>
+    <rect x="92" y="0" width="52" height="16" rx="2" fill="#3a3a3a" stroke="#555" stroke-width="0.5"/>
+    <text x="118" y="11" text-anchor="middle" font-size="6.5" fill="#ccc">/v1/files</text>
+    <rect x="148" y="0" width="58" height="16" rx="2" fill="#3a3a3a" stroke="#555" stroke-width="0.5"/>
+    <text x="177" y="11" text-anchor="middle" font-size="6.5" fill="#ccc">/v1/models</text>
+    <rect x="210" y="0" width="66" height="16" rx="2" fill="#3a3a3a" stroke="#555" stroke-width="0.5"/>
+    <text x="243" y="11" text-anchor="middle" font-size="6.5" fill="#ccc">/v1/metadata</text>
+    <rect x="280" y="0" width="88" height="16" rx="2" fill="#3a3a3a" stroke="#555" stroke-width="0.5"/>
+    <text x="324" y="11" text-anchor="middle" font-size="6.5" fill="#ccc">/v1/live,startup,ready</text>
+    <rect x="372" y="0" width="62" height="16" rx="2" fill="#3a3a3a" stroke="#555" stroke-width="0.5"/>
+    <text x="403" y="11" text-anchor="middle" font-size="6.5" fill="#ccc">/v1/metrics</text>
+    <text x="460" y="11" font-size="6" fill="#888">Prometheus</text>
+  </g>
+
+  <!-- Middleware line -->
+  <rect x="136" y="98" width="590" height="14" rx="2" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <text x="431" y="108" text-anchor="middle" font-size="7" fill="#999">PrometheusMiddleware · ContentType Validation</text>
+
+  <!-- SOPProcessManager -->
+  <rect x="200" y="116" width="462" height="18" rx="3" fill="#2a5a00" stroke="#76b900" stroke-width="1"/>
+  <text x="431" y="129" text-anchor="middle" font-size="9" font-weight="bold" fill="#b5e655">SOPProcessManager</text>
+
+  <!-- ModelInitializer -->
+  <rect x="240" y="138" width="382" height="14" rx="2" fill="#333" stroke="#555" stroke-width="0.5"/>
+  <text x="431" y="149" text-anchor="middle" font-size="7" fill="#ccc">ModelInitializer: VLM warmup first, then DDM dummy pipeline</text>
+
+  <!-- Thread Pools -->
+  <text x="431" y="164" text-anchor="middle" font-size="7" fill="#888">4 Thread Pools: cv_pool(32), clip_pool(32), vlm_pool(64), vlm_req_pool(64)</text>
+
+  <!-- ===== SOPVideoProcessor ===== -->
+  <rect x="140" y="172" width="586" height="318" rx="4" fill="#222" stroke="#76b900" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="433" y="185" text-anchor="middle" font-size="9" font-weight="bold" fill="#76b900">SOPVideoProcessor (per-request)</text>
+
+  <!-- Stage 1: DeepStream Pipeline (GPU) — 92px tall to fit 3 rows -->
+  <rect x="150" y="192" width="566" height="92" rx="3" fill="#2a2a2a" stroke="#555" stroke-width="0.8"/>
+  <rect x="150" y="192" width="566" height="14" rx="3" fill="#3d6b00"/>
+  <text x="433" y="203" text-anchor="middle" font-size="8" font-weight="bold" fill="#d4ff80">Stage 1: DeepStream Pipeline (GPU)</text>
+
+  <!-- Row 1: Source → nvstreammux → tee1 -->
+  <rect x="158" y="210" width="44" height="16" rx="2" fill="#4a4a4a" stroke="#666" stroke-width="0.5"/>
+  <text x="180" y="221" text-anchor="middle" font-size="7" fill="#ddd">Source</text>
+  <line x1="202" y1="218" x2="210" y2="218" stroke="#bbb" stroke-width="0.8" marker-end="url(#aw)"/>
+
+  <rect x="210" y="210" width="62" height="16" rx="2" fill="#4a4a4a" stroke="#666" stroke-width="0.5"/>
+  <text x="241" y="221" text-anchor="middle" font-size="7" fill="#ddd">nvstreammux</text>
+  <line x1="272" y1="218" x2="280" y2="218" stroke="#bbb" stroke-width="0.8" marker-end="url(#aw)"/>
+
+  <rect x="280" y="210" width="34" height="16" rx="2" fill="#4a6a00" stroke="#76b900" stroke-width="0.8"/>
+  <text x="297" y="221" text-anchor="middle" font-size="7" fill="#d4ff80">tee1</text>
+
+  <!-- Vertical split line from tee1 right edge down to row 3 center -->
+  <line x1="314" y1="226" x2="314" y2="258" stroke="#bbb" stroke-width="0.8"/>
+  <!-- Horizontal arrow to inference branch (row 2, center y=238) -->
+  <line x1="314" y1="238" x2="322" y2="238" stroke="#bbb" stroke-width="0.8" marker-end="url(#aw)"/>
+  <!-- Horizontal arrow to frame branch (row 3, center y=258) -->
+  <line x1="314" y1="258" x2="322" y2="258" stroke="#b88a00" stroke-width="0.8" marker-end="url(#am)"/>
+
+  <!-- Row 2: Inference branch (top y=230, center y=238) -->
+  <rect x="322" y="230" width="36" height="16" rx="2" fill="#4a4a4a" stroke="#666" stroke-width="0.5"/>
+  <text x="340" y="241" text-anchor="middle" font-size="6.5" fill="#ddd">queue1</text>
+  <line x1="358" y1="238" x2="366" y2="238" stroke="#bbb" stroke-width="0.8" marker-end="url(#aw)"/>
+
+  <rect x="366" y="230" width="72" height="16" rx="2" fill="#4a4a4a" stroke="#666" stroke-width="0.5"/>
+  <text x="402" y="241" text-anchor="middle" font-size="7" fill="#ddd">nvdspreprocess</text>
+  <line x1="438" y1="238" x2="446" y2="238" stroke="#bbb" stroke-width="0.8" marker-end="url(#aw)"/>
+
+  <rect x="446" y="230" width="80" height="16" rx="2" fill="#4a4a4a" stroke="#666" stroke-width="0.5"/>
+  <text x="486" y="237" text-anchor="middle" font-size="6.5" fill="#ddd">nvinferserver</text>
+  <text x="486" y="244" text-anchor="middle" font-size="5.5" fill="#aaa">(Triton CAPI+DDM)</text>
+  <line x1="526" y1="238" x2="534" y2="238" stroke="#bbb" stroke-width="0.8" marker-end="url(#aw)"/>
+
+  <rect x="534" y="230" width="84" height="16" rx="2" fill="#4a4a4a" stroke="#666" stroke-width="0.5"/>
+  <text x="576" y="237" text-anchor="middle" font-size="5.5" fill="#ddd">InferenceOutput</text>
+  <text x="576" y="244" text-anchor="middle" font-size="5.5" fill="#ddd">TensorParser</text>
+  <line x1="618" y1="238" x2="626" y2="238" stroke="#bbb" stroke-width="0.8" marker-end="url(#aw)"/>
+
+  <rect x="626" y="230" width="68" height="16" rx="2" fill="#5a4000" stroke="#b88a00" stroke-width="0.5"/>
+  <text x="660" y="241" text-anchor="middle" font-size="7" fill="#ffd666">score_queue</text>
+
+  <!-- Row 3: Frame capture branch (top y=250, center y=258) -->
+  <rect x="322" y="250" width="32" height="16" rx="2" fill="#3d3000" stroke="#b88a00" stroke-width="0.5"/>
+  <text x="338" y="261" text-anchor="middle" font-size="6.5" fill="#ffd666">queue3</text>
+  <line x1="354" y1="258" x2="362" y2="258" stroke="#b88a00" stroke-width="0.8" marker-end="url(#am)"/>
+
+  <rect x="362" y="250" width="66" height="16" rx="2" fill="#3d3000" stroke="#b88a00" stroke-width="0.5"/>
+  <text x="395" y="261" text-anchor="middle" font-size="6.5" fill="#ffd666">nvvideoconvert</text>
+  <line x1="428" y1="258" x2="436" y2="258" stroke="#b88a00" stroke-width="0.8" marker-end="url(#am)"/>
+
+  <rect x="436" y="250" width="52" height="16" rx="2" fill="#3d3000" stroke="#b88a00" stroke-width="0.5"/>
+  <text x="462" y="261" text-anchor="middle" font-size="6.5" fill="#ffd666">capsfilter</text>
+  <line x1="488" y1="258" x2="496" y2="258" stroke="#b88a00" stroke-width="0.8" marker-end="url(#am)"/>
+
+  <rect x="496" y="250" width="44" height="16" rx="2" fill="#3d3000" stroke="#b88a00" stroke-width="0.5"/>
+  <text x="518" y="261" text-anchor="middle" font-size="6.5" fill="#ffd666">appsink</text>
+  <line x1="540" y1="258" x2="548" y2="258" stroke="#b88a00" stroke-width="0.8" marker-end="url(#am)"/>
+
+  <rect x="548" y="250" width="92" height="16" rx="2" fill="#3d3000" stroke="#b88a00" stroke-width="0.5"/>
+  <text x="594" y="258" text-anchor="middle" font-size="5.5" fill="#ffd666">DecodedFrameRetriever</text>
+  <text x="594" y="264" text-anchor="middle" font-size="5" fill="#b88a00">(GPU zero-copy)</text>
+  <line x1="640" y1="258" x2="648" y2="258" stroke="#b88a00" stroke-width="0.8" marker-end="url(#am)"/>
+
+  <rect x="648" y="250" width="64" height="16" rx="2" fill="#5a4000" stroke="#b88a00" stroke-width="0.5"/>
+  <text x="680" y="261" text-anchor="middle" font-size="7" fill="#ffd666">frame_queue</text>
+
+  <!-- Down arrow from Stage 1 to Stage 2 -->
+  <line x1="290" y1="284" x2="290" y2="294" stroke="#b88a00" stroke-width="1" marker-end="url(#am)"/>
+  <text x="300" y="291" font-size="5.5" fill="#999">boundary scores</text>
+
+  <!-- Stage 2: Clip Post-Process -->
+  <rect x="150" y="294" width="280" height="42" rx="3" fill="#2a2a2a" stroke="#555" stroke-width="0.8"/>
+  <rect x="150" y="294" width="280" height="13" rx="3" fill="#3d6b00"/>
+  <text x="290" y="304" text-anchor="middle" font-size="8" font-weight="bold" fill="#d4ff80">Stage 2: Clip Post-Process</text>
+  <text x="290" y="318" text-anchor="middle" font-size="7" fill="#ccc">Boundary detection → chunk segmentation</text>
+  <text x="290" y="329" text-anchor="middle" font-size="6" fill="#999">(file: batch / live: incremental)</text>
+
+  <!-- Arrow to Stage 3 -->
+  <line x1="290" y1="336" x2="290" y2="346" stroke="#999" stroke-width="1" marker-end="url(#aw)"/>
+  <text x="300" y="343" font-size="5.5" fill="#999">frames + ts</text>
+
+  <!-- Stage 3: VLM Inference -->
+  <rect x="150" y="346" width="280" height="48" rx="3" fill="#2a2a2a" stroke="#555" stroke-width="0.8"/>
+  <rect x="150" y="346" width="280" height="13" rx="3" fill="#3d6b00"/>
+  <text x="290" y="356" text-anchor="middle" font-size="8" font-weight="bold" fill="#d4ff80">Stage 3: VLM Inference</text>
+  <text x="290" y="370" text-anchor="middle" font-size="7" fill="#ccc">Embedded vLLM (Cosmos Reason1 7B)</text>
+  <text x="290" y="380" text-anchor="middle" font-size="6" fill="#999">VLM_FPS sampling → classification (Qwen3VL: patch=16)</text>
+  <text x="290" y="390" text-anchor="middle" font-size="5.5" fill="#777">or VLMInferenceClient (remote endpoint)</text>
+
+  <!-- Arrow to Stage 4 -->
+  <line x1="290" y1="394" x2="290" y2="404" stroke="#999" stroke-width="1" marker-end="url(#aw)"/>
+  <text x="300" y="401" font-size="5.5" fill="#999">action labels</text>
+
+  <!-- Stage 4: SOP Checker -->
+  <rect x="150" y="404" width="280" height="34" rx="3" fill="#2a2a2a" stroke="#555" stroke-width="0.8"/>
+  <rect x="150" y="404" width="280" height="13" rx="3" fill="#3d6b00"/>
+  <text x="290" y="414" text-anchor="middle" font-size="8" font-weight="bold" fill="#d4ff80">Stage 4: SOP Checker</text>
+  <text x="290" y="429" text-anchor="middle" font-size="7" fill="#ccc">Sequence validation → missing/misordered</text>
+
+  <!-- Arrow to final_queue -->
+  <line x1="290" y1="438" x2="290" y2="452" stroke="#999" stroke-width="1" marker-end="url(#aw)"/>
+
+  <!-- final_queue -->
+  <rect x="242" y="452" width="96" height="18" rx="2" fill="#5a4000" stroke="#b88a00" stroke-width="0.5"/>
+  <text x="290" y="464" text-anchor="middle" font-size="7.5" fill="#ffd666">final_queue</text>
+
+  <!-- Kafka box inside container -->
+  <rect x="440" y="400" width="230" height="40" rx="3" fill="#1a1a1a" stroke="#76b900" stroke-width="1"/>
+  <text x="555" y="414" text-anchor="middle" font-size="8" font-weight="bold" fill="#76b900">Kafka Messages (JSON)</text>
+  <text x="555" y="426" text-anchor="middle" font-size="6.5" fill="#ccc">topic: mdx-vlm-captions · JSON | NvProtoSchema</text>
+  <text x="555" y="436" text-anchor="middle" font-size="6" fill="#888">via create_producer()</text>
+
+  <!-- Dashed arrow from final_queue to Kafka -->
+  <line x1="338" y1="461" x2="440" y2="420" stroke="#b88a00" stroke-width="0.8" stroke-dasharray="3,2" marker-end="url(#am)"/>
+
+  <!-- ===== OUTPUT (right side) ===== -->
+  <g transform="translate(752,38)">
+    <text x="72" y="8" text-anchor="middle" font-size="9" font-weight="bold" fill="#444">Output</text>
+    <rect x="8" y="14" width="128" height="28" rx="3" fill="#fff" stroke="#76b900" stroke-width="1.2"/>
+    <text x="72" y="28" text-anchor="middle" font-size="8" font-weight="bold" fill="#333">SSE Stream</text>
+    <text x="72" y="38" text-anchor="middle" font-size="6" fill="#666">chat.completion.chunk</text>
+    <rect x="8" y="48" width="128" height="28" rx="3" fill="#fff" stroke="#aaa" stroke-width="0.8"/>
+    <text x="72" y="62" text-anchor="middle" font-size="8" fill="#333">Non-streaming</text>
+    <text x="72" y="72" text-anchor="middle" font-size="6" fill="#666">chat.completion</text>
+    <rect x="8" y="82" width="128" height="22" rx="3" fill="#fff" stroke="#aaa" stroke-width="0.8"/>
+    <text x="72" y="97" text-anchor="middle" font-size="7.5" fill="#333">Prometheus (/v1/metrics)</text>
+  </g>
+
+  <!-- Arrows from container to output -->
+  <line x1="736" y1="68" x2="760" y2="60" stroke="#76b900" stroke-width="1.2" marker-end="url(#ag)"/>
+  <line x1="736" y1="68" x2="760" y2="78" stroke="#999" stroke-width="0.8" marker-end="url(#ad)"/>
+  <line x1="736" y1="108" x2="760" y2="114" stroke="#999" stroke-width="0.8" marker-end="url(#ad)"/>
+
+  <!-- Kafka external container -->
+  <rect x="752" y="400" width="148" height="40" rx="3" fill="#fff" stroke="#aaa" stroke-width="0.8"/>
+  <text x="826" y="416" text-anchor="middle" font-size="8" font-weight="bold" fill="#333">Docker Container: kafka</text>
+  <text x="826" y="430" text-anchor="middle" font-size="6" fill="#999">(apache/kafka:3.7.0)</text>
+  <line x1="670" y1="420" x2="752" y2="420" stroke="#999" stroke-width="0.8" marker-end="url(#ad)"/>
+
+  <!-- ===== CONFIG FILES (bottom) ===== -->
+  <g transform="translate(148,493)">
+    <text x="0" y="10" font-size="6.5" fill="#888">configs/</text>
+    <rect x="38" y="0" width="110" height="14" rx="2" fill="#e8e8e8" stroke="#ccc" stroke-width="0.5"/>
+    <text x="93" y="10" text-anchor="middle" font-size="5.5" fill="#666">nvds_preprocess_template.txt</text>
+    <rect x="152" y="0" width="106" height="14" rx="2" fill="#e8e8e8" stroke="#ccc" stroke-width="0.5"/>
+    <text x="205" y="10" text-anchor="middle" font-size="5.5" fill="#666">nvds_inference_template.txt</text>
+    <rect x="262" y="0" width="62" height="14" rx="2" fill="#e8e8e8" stroke="#ccc" stroke-width="0.5"/>
+    <text x="293" y="10" text-anchor="middle" font-size="5.5" fill="#666">actions.json</text>
+    <rect x="328" y="0" width="72" height="14" rx="2" fill="#e8e8e8" stroke="#ccc" stroke-width="0.5"/>
+    <text x="364" y="10" text-anchor="middle" font-size="5.5" fill="#666">vlm_prompts.txt</text>
+  </g>
+</svg>

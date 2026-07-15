@@ -1,0 +1,17 @@
+{
+    "name": "nvidia-official",
+    "owner": {
+        "name": "NVIDIA"
+    },
+    "metadata": {
+        "description": "NVIDIA plugin marketplace — install the curated NVIDIA plugins and skills from this catalog repo.",
+        "version": "1.0.0"
+    },
+    "plugins": [
+        {
+            "name": "nvidia-skills",
+            "source": "./plugins/nvidia-skills",
+            "description": "Skills for NVIDIAs ecosystem spans GPU acceleration, CUDA, AI agents, inference, robotics, Physical AI, Omniverse, and simulation. This plugin helps you understand the pieces, choose a path, validate your setup, and build practical NVIDIA-powered workflows."
+        }
+    ]
+}

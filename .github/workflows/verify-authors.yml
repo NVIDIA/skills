@@ -13,6 +13,14 @@
 #
 # The automated/sync-skills branch is exempt — same reason as DCO:
 # it's the bot mirror, not a contributor.
+#
+# Reviewed external contributions are accepted via
+# .github/external-contributors.yml: a maintainer runs the contribution
+# review, records the contributor's email scoped to specific PR
+# numbers, and this check then accepts that email for those PRs only.
+# The allowlist is read from the tip of the BASE branch, never the PR
+# head, so a pull request cannot allowlist itself — and a re-run picks
+# up entries merged after the PR was opened.
 
 name: Verify Authors
 
@@ -36,8 +44,10 @@ jobs:
       - name: Verify all commit author emails are NVIDIA-affiliated
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
 
@@ -54,12 +64,53 @@ jobs:
           #                                   NVIDIA-org GitHub user)
           allowed='@(nvidia\.com|users\.noreply\.github\.com)$'
 
+          # The allowlist logic depends on the YAML parser. Fail loudly
+          # if it is unavailable — otherwise reviewed externals would be
+          # silently rejected with no clue why.
+          python3 -c 'import yaml'
+
+          # Reviewed-external allowlist, read from the TIP of the base
+          # branch so a PR cannot allowlist itself, and so a re-run
+          # picks up entries merged after the PR was opened. Produces
+          # "email" lines for entries whose prs list contains this PR's
+          # number. An unparsable allowlist fails the job loudly.
+          allowlist_ref="origin/$BASE_REF"
+          if git cat-file -e "$allowlist_ref:.github/external-contributors.yml" 2>/dev/null; then
+            reviewed_externals=$(git show "$allowlist_ref:.github/external-contributors.yml" \
+              | python3 -c '
+          import os, sys, yaml
+          try:
+              doc = yaml.safe_load(sys.stdin) or {}
+          except yaml.YAMLError as exc:
+              print(f"::error::.github/external-contributors.yml on the base branch is unparsable: {exc}", file=sys.stderr)
+              sys.exit(1)
+          pr = int(os.environ["PR_NUMBER"])
+          for entry in doc.get("external_contributors") or []:
+              email = str(entry.get("email", "")).strip().lower()
+              prs = entry.get("prs") or []
+              if email and isinstance(prs, list) and pr in prs:
+                  print(email)
+          ')
+          else
+            reviewed_externals=""
+          fi
+
+          is_reviewed_external() {
+            local email_lc
+            email_lc=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+            [ -n "$reviewed_externals" ] && echo "$reviewed_externals" | grep -qxF "$email_lc"
+          }
+
           violations=()
           while read -r sha; do
             author_email=$(git show --format='%ae' -s "$sha")
             committer_email=$(git show --format='%ce' -s "$sha")
             for email in "$author_email" "$committer_email"; do
               if ! echo "$email" | grep -qE "$allowed"; then
+                if is_reviewed_external "$email"; then
+                  echo "Accepting reviewed external contributor email $email for PR #$PR_NUMBER (see .github/external-contributors.yml)."
+                  continue
+                fi
                 subject=$(git show --format='%s' -s "$sha")
                 violations+=("${sha:0:7}  $email  $subject")
               fi
@@ -86,8 +137,10 @@ jobs:
             echo "           origin/main && git push --force-with-lease"
             echo ""
             echo "If you are not an NVIDIA employee, please contact a CODEOWNER."
-            echo "External contributions to catalog content require explicit OSRB"
-            echo "review before merge and cannot be self-served."
+            echo "External contributions are accepted after a maintainer-run"
+            echo "review; once cleared, a maintainer records your email in"
+            echo ".github/external-contributors.yml scoped to your PR and this"
+            echo "check will accept it. This cannot be self-served."
             exit 1
           fi
 

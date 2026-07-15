@@ -1,0 +1,29 @@
+encryption_key: tlt_encode
+results_dir: /results
+dataset:
+  infer_data_sources:
+    image_dir:
+    - /data/images
+    classmap: /data/label_map.txt
+  num_classes: 5
+  batch_size: 1
+  workers: 8
+inference:
+  trt_engine: /results/rtdetr.engine
+  conf_threshold: 0.5
+  input_width: 640
+  input_height: 640
+  color_map:
+    fire_extinguisher: green
+    cone: blue
+    cart: red
+    forklift: orange
+model:
+  backbone: resnet_50
+  num_feature_levels: 3
+  dec_layers: 6
+  enc_layers: 1
+  num_queries: 300
+  num_select: 300
+  dropout_ratio: 0.0
+  dim_feedforward: 1024

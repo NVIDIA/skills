@@ -1,0 +1,230 @@
+name: tao-train-ocdnet
+network_arch: ocdnet
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: default
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: ocdnet train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset.data_path:
+        type: folder
+      dataset.validate_dataset.data_path:
+        type: folder
+      model.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  quantize:
+    command: ocdnet quantize -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset.data_path:
+        type: folder
+      dataset.validate_dataset.data_path:
+        type: folder
+      dataset.quant_calibration_dataset.images_dir:
+        type: folder
+      quantize.model_path:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: ocdnet evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.validate_dataset.data_path:
+        type: folder
+      evaluate.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: ocdnet export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  prune:
+    command: ocdnet prune -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.validate_dataset.data_path:
+        type: folder
+      prune.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  retrain:
+    command: ocdnet train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset.data_path:
+        type: folder
+      dataset.validate_dataset.data_path:
+        type: folder
+      model.pruned_graph_path:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: ocdnet inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.input_folder:
+        type: folder
+      inference.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.train_dataset.data_path:
+      source: train_datasets
+      path: train.tar.gz
+      runtime: extracted_folder
+      list: true
+    dataset.validate_dataset.data_path:
+      source: eval_dataset
+      path: test.tar.gz
+      runtime: extracted_folder
+      list: true
+  quantize:
+    dataset.train_dataset.data_path:
+      source: train_datasets
+      path: train.tar.gz
+      runtime: extracted_folder
+      list: true
+    dataset.validate_dataset.data_path:
+      source: eval_dataset
+      path: test.tar.gz
+      runtime: extracted_folder
+      list: true
+    dataset.quant_calibration_dataset.images_dir:
+      source: train_datasets
+      path: train/img.tar.gz
+      runtime: extracted_folder
+  evaluate:
+    dataset.validate_dataset.data_path:
+      source: eval_dataset
+      path: test.tar.gz
+      runtime: extracted_folder
+      list: true
+  inference:
+    inference.input_folder:
+      source: inference_dataset
+      path: test/img.tar.gz
+      runtime: extracted_folder
+  prune:
+    dataset.validate_dataset.data_path:
+      source: eval_dataset
+      path: test.tar.gz
+      runtime: extracted_folder
+      list: true
+  retrain:
+    dataset.train_dataset.data_path:
+      source: train_datasets
+      path: train.tar.gz
+      runtime: extracted_folder
+      list: true
+    dataset.validate_dataset.data_path:
+      source: eval_dataset
+      path: test.tar.gz
+      runtime: extracted_folder
+      list: true
+spec_params:
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    model.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.checkpoint: parent_model
+  export:
+    encryption_key: key
+    results_dir: output_dir
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.checkpoint: parent_model
+  prune:
+    encryption_key: key
+    results_dir: output_dir
+    prune.checkpoint: parent_model
+  quantize:
+    encryption_key: key
+    results_dir: output_dir
+    quantize.model_path: parent_model
+  retrain:
+    encryption_key: key
+    results_dir: output_dir
+    model.pruned_graph_path: parent_model
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.train_dataset.loader.batch_size
+  val_batch_size: dataset.validate_dataset.loader.batch_size
+  learning_rate: train.optimizer.args.lr
+  warmup_epoch: train.lr_scheduler.args.warmup_epoch
+  resume_checkpoint: train.resume_training_checkpoint_path
+  pretrained_model: model.pretrained_model_path
+  load_pruned_graph: model.load_pruned_graph
+  pruned_graph_path: model.pruned_graph_path
+  inference_width: inference.width
+  inference_height: inference.height
+  export_width: export.width
+  export_height: export.height
+  quant_backend: quantize.backend
+  quant_model_path: quantize.model_path
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  inference: ../references/spec_template_inference.yaml
+  export: ../references/spec_template_export.yaml
+  prune: ../references/spec_template_prune.yaml
+  quantize: ../references/spec_template_quantize.yaml
+  retrain: ../references/spec_template_retrain.yaml
+description: OCDNet for scene text detection. Detects arbitrary-oriented text regions in natural images using a differentiable
+  binarization approach.

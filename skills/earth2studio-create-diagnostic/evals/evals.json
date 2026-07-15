@@ -1,0 +1,56 @@
+[
+  {
+    "id": "create-diagnostic-eval-001-simple-windspeed",
+    "question": "Read the skill at /workspace/skills/earth2studio-create-diagnostic/SKILL.md, then implement a new Earth2Studio diagnostic model called `WindSpeed` that computes wind speed from u10m and v10m components. It should work on a 0.25-degree global grid (721x1440) and output a single variable 'ws10m' (wind speed at 10m). This is a simple diagnostic with no checkpoints needed.",
+    "expected_skill": "earth2studio-create-diagnostic",
+    "expected_script": "evals/targets/eval_1_target.py",
+    "expected_test": "evals/targets/test/eval_1_test_target.py",
+    "ground_truth": "Creates a simple diagnostic model inheriting only from torch.nn.Module (no AutoModelMixin needed). Takes u10m and v10m as input, computes sqrt(u^2 + v^2) as output. Uses @batch_func and @batch_coords decorators. Test file includes mock tests for call and exceptions.",
+    "expected_behavior": [
+      "Reads /workspace/skills/earth2studio-create-diagnostic/SKILL.md before implementing",
+      "Classifies as Simple diagnostic (no checkpoints)",
+      "Writes earth2studio/models/dx/windspeed.py",
+      "Writes test/models/dx/test_windspeed.py",
+      "Runs pytest on the new test file",
+      "Does not read evals/targets/ ground-truth files",
+      "Uses the standard diagnostic wrapper structure and the correct Earth2Studio utilities as suggested in the skill and similar dx models",
+      "Creates a test file with the correct test structure and implementations matching the package and diagnostic wrapper file"
+    ]
+  },
+  {
+    "id": "create-diagnostic-eval-002-automodel-precip",
+    "question": "Read the skill at /workspace/skills/earth2studio-create-diagnostic/SKILL.md, then implement a new Earth2Studio diagnostic model called `PrecipEstimator` that estimates total precipitation from atmospheric variables. It should use AutoModelMixin to load weights from a package. Input variables: t2m, u10m, v10m, msl, tcwv (5 vars). Output: tp (total precipitation). Grid: 0.5-degree (361x720). Include center/scale normalization buffers.",
+    "expected_skill": "earth2studio-create-diagnostic",
+    "expected_script": "evals/targets/eval_2_target.py",
+    "expected_test": "evals/targets/test/eval_2_test_target.py",
+    "ground_truth": "Creates an AutoModel diagnostic with torch.nn.Module + AutoModelMixin inheritance. Implements load_default_package and load_model classmethods. Uses register_buffer for center/scale. Test fixture creates dummy package with model.pt, center.npy, scale.npy.",
+    "expected_behavior": [
+      "Reads /workspace/skills/earth2studio-create-diagnostic/SKILL.md before implementing",
+      "Classifies as AutoModel diagnostic",
+      "Writes earth2studio/models/dx/precip_estimator.py",
+      "Writes test/models/dx/test_precip_estimator.py",
+      "Runs pytest on the new test file",
+      "Does not read evals/targets/ ground-truth files",
+      "Uses the standard diagnostic wrapper structure and the correct Earth2Studio utilities as suggested in the skill and similar dx models",
+      "Creates a test file with the correct test structure and implementations matching the package and diagnostic wrapper file"
+    ]
+  },
+  {
+    "id": "create-diagnostic-eval-003-generative-superres",
+    "question": "Read the skill at /workspace/skills/earth2studio-create-diagnostic/SKILL.md, then implement a new Earth2Studio diagnostic model called `SuperResolution` that performs probabilistic super-resolution similar to CorrDiff. It should take 4 input variables (t2m, u10m, v10m, msl) on a coarse 2-degree grid (91x180) and output the same 4 variables on a fine 0.5-degree grid (361x720). The model should support generating multiple samples (number_of_samples parameter) and include a seed parameter for reproducibility. Output coords should include a 'sample' dimension.",
+    "expected_skill": "earth2studio-create-diagnostic",
+    "expected_script": "evals/targets/eval_3_target.py",
+    "expected_test": "evals/targets/test/eval_3_test_target.py",
+    "ground_truth": "Creates a generative diagnostic following CorrDiff patterns. Output_coords includes 'sample' dimension. Forward pass generates number_of_samples samples. Supports seed for reproducibility. Test includes test_samples to verify sample dimension and test_deterministic_seed for reproducibility.",
+    "expected_behavior": [
+      "Reads /workspace/skills/earth2studio-create-diagnostic/SKILL.md before implementing",
+      "Classifies as Generative diagnostic",
+      "Writes earth2studio/models/dx/super_resolution.py",
+      "Writes test/models/dx/test_super_resolution.py",
+      "Runs pytest on the new test file",
+      "Does not read evals/targets/ ground-truth files",
+      "Uses the standard diagnostic wrapper structure and the correct Earth2Studio utilities as suggested in the skill and similar dx models",
+      "Creates a test file with the correct test structure and implementations matching the package and diagnostic wrapper file"
+    ]
+  }
+]

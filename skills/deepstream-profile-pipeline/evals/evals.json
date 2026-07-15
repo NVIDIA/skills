@@ -1,0 +1,65 @@
+[
+  {
+    "id": "deepstream-profile-pipeline-001",
+    "question": "Build me an efficient DeepStream pipeline for ResNet18 detection on 4 RTSP streams.",
+    "expected_skill": "deepstream-profile-pipeline",
+    "expected_script": null,
+    "ground_truth": "Skill activates on the efficiency intent rather than deferring to deepstream-generate-pipeline, explains the 5-stage measurement flow, and applies Stage 0 perf-correct defaults: INT8 if calibration is available, NVMM memory, model-dim streammux, decoder surfaces, and fakesink unless a visible output was explicitly requested.",
+    "expected_behavior": [
+      "Activate on efficiency intent (the request mentions profile, profiling, benchmark, measure, microbench, or nsys).",
+      "Reference the Stage 0 preset-apply step that fires before pipeline generation.",
+      "Prefer INT8 inference (network-mode=1) when calibration is available.",
+      "Set NVMM memory (nvbuf-memory-type) on streammux and decoder.",
+      "Do not include bearer tokens, API keys, or credential-shaped strings in the response."
+    ]
+  },
+  {
+    "id": "deepstream-profile-pipeline-002",
+    "question": "Give me a pipeline that displays a video file with detection on screen.",
+    "expected_skill": "deepstream-generate-pipeline",
+    "expected_script": null,
+    "ground_truth": "The request has no efficiency intent, so the deepstream-profile-pipeline skill should defer to deepstream-generate-pipeline and avoid running a profiling sweep, microbench, or nsys capture.",
+    "expected_behavior": [
+      "Defer to deepstream-generate-pipeline because the request carries no profiling or efficiency intent.",
+      "Do not run a profiling sweep, microbench, or nsys profile capture.",
+      "Do not invoke any Stage 0–5 measurement flow for a plain build-me-a-pipeline request."
+    ]
+  },
+  {
+    "id": "deepstream-profile-pipeline-003",
+    "question": "How many streams of ResNet18 H264 1080p detection can this GPU drive at 30 fps?",
+    "expected_skill": "deepstream-profile-pipeline",
+    "expected_script": null,
+    "ground_truth": "Skill runs Stages 2 through 5, produces a capacity report that states the bound type, the max-streams number, and remediation that explicitly differentiates whether more compute or more decode is the right upgrade path.",
+    "expected_behavior": [
+      "State the max-streams capacity as a concrete number.",
+      "Report the bound type (DECODE_BOUND, COMPUTE_BOUND, MEMORY_BW_BOUND, or TRACKER_BOUND).",
+      "Differentiate compute-bound and decode-bound remediation: a compute-bound workload needs a larger or newer-architecture GPU; a decode-bound workload needs more NVDEC engines.",
+      "Do not recommend a faster compute GPU for a decode-bound workload, and do not recommend more NVDECs for a compute-bound workload."
+    ]
+  },
+  {
+    "id": "deepstream-profile-pipeline-004",
+    "question": "What container should I use to run this skill?",
+    "expected_skill": "deepstream-profile-pipeline",
+    "expected_script": null,
+    "ground_truth": "Skill recommends the nvcr.io/nvidia/deepstream:9.0-triton-multiarch container image and explicitly warns against the 9.0-samples-multiarch variant because that image strips the NVTX injector and produces empty per-plugin NVTX traces.",
+    "expected_behavior": [
+      "Recommend the nvcr.io/nvidia/deepstream:9.0-triton-multiarch container image.",
+      "Warn against the 9.0-samples-multiarch variant because it strips the NVTX injector and yields empty per-plugin NVTX traces."
+    ]
+  },
+  {
+    "id": "deepstream-profile-pipeline-005",
+    "question": "Profile a pipeline with the RT-DETR detector (rtdetr_2d_warehouse from NGC) on H265 4K input.",
+    "expected_skill": "deepstream-profile-pipeline",
+    "expected_script": null,
+    "ground_truth": "Skill applies the same measurement flow without making any specific-model assumption: it reads the model input dimensions from the user's nvinfer config (640x640 for this RT-DETR build), takes the codec and source resolution from the input parameters, and applies the codec/resolution-specific NVDEC ceiling.",
+    "expected_behavior": [
+      "Read the model input dimensions from the user's nvinfer config (infer-dims) rather than using a hard-coded model assumption.",
+      "Take codec and source resolution from the user's input parameters (H265, 4K, --codec, --source-res), not from a default assumption.",
+      "Do not substitute the user's RT-DETR model with TrafficCamNet, ResNet18, or any other model.",
+      "Treat RT-DETR as a standard nvinfer model with no special-casing or unsupported-model claim."
+    ]
+  }
+]

@@ -1,0 +1,129 @@
+name: tao-train-mask-auto-label
+network_arch: mal
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: default
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: mal train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_img_dir:
+        type: folder
+      dataset.train_ann_path:
+        type: file
+      dataset.val_img_dir:
+        type: folder
+      dataset.val_ann_path:
+        type: file
+      train.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: mal evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.checkpoint:
+        type: file
+      dataset.val_img_dir:
+        type: folder
+      dataset.val_ann_path:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: mal inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.checkpoint:
+        type: file
+      inference.img_dir:
+        type: folder
+      inference.ann_path:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      inference.label_dump_path:
+        type: file
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.train_img_dir:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.train_ann_path:
+      source: train_datasets
+      path: annotations.json
+    dataset.val_img_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val_ann_path:
+      source: eval_dataset
+      path: annotations.json
+  evaluate:
+    dataset.val_img_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val_ann_path:
+      source: eval_dataset
+      path: annotations.json
+  inference:
+    inference.img_dir:
+      source: inference_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    inference.ann_path:
+      source: inference_dataset
+      path: annotations.json
+spec_params:
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    train.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    evaluate.checkpoint: parent_model
+    results_dir: output_dir
+  inference:
+    encryption_key: key
+    inference.checkpoint: parent_model
+    inference.label_dump_path: create_inference_result_file_mal
+    results_dir: output_dir
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: train.batch_size
+  train_batch_size: train.batch_size
+  evaluate_batch_size: evaluate.batch_size
+  inference_batch_size: inference.batch_size
+  learning_rate: train.lr
+  arch: model.arch
+  crop_size: dataset.crop_size
+  resume_checkpoint: train.resume_training_checkpoint_path
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  inference: ../references/spec_template_inference.yaml
+description: MAL (Minimal Annotation Learning) for weakly-supervised segmentation. Produces segmentation masks from minimal
+  annotations (e.g., point or box annotations). Uses ViT-MAE backbone.

@@ -1,0 +1,69 @@
+{
+  "skill_name": "jetson-llm-benchmark",
+  "evals": [
+    {
+      "id": "jetson-llm-benchmark-001",
+      "prompt": "I have a vLLM OpenAI-compatible server running on this Jetson at localhost:8000 serving meta-llama/Llama-3.1-8B-Instruct. Benchmark TTFT, ITL, and throughput at concurrency 1 and 8.",
+      "expected_output": "The agent invoked the jetson-llm-benchmark skill, ran scripts/bench_vllm.sh --help first to confirm options, then ran scripts/bench_vllm.sh with --concurrency 1,8 against the running server using the served model ID, and reported the JSON output (envelope plus runs[] with TTFT / ITL / TPOT / throughput values).",
+      "assertions": [
+        "The agent matched the vLLM benchmark request to jetson-llm-benchmark and selected scripts/bench_vllm.sh (NOT bench_llama_cpp.sh or bench_ollama.sh)",
+        "The agent ran scripts/bench_vllm.sh --help (or {baseDir}/scripts/bench_vllm.sh --help) before composing the final command",
+        "The agent ran scripts/bench_vllm.sh with --model meta-llama/Llama-3.1-8B-Instruct (or the served model ID) and --concurrency 1,8",
+        "The agent did NOT call vllm bench serve, llama-bench, or curl /api/generate by hand",
+        "The agent reported the structured JSON envelope (skill, runtime=vllm, model, sku, generation, product_line, variant, l4t, container, warnings) and the runs[] array with ttft_ms_p50/p99, itl_ms_p50/p99, tpot_ms_p50, throughput_tok_s, e2e_latency_ms_p50",
+        "The agent did not hand-author or invent sku/variant/l4t/container fields — they came from the wrapper script",
+        "If warnings was non-empty (power mode not MAXN, thermal throttling, background GPU usage), the agent surfaced them",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-llm-benchmark",
+      "expected_script": "scripts/bench_vllm.sh"
+    },
+    {
+      "id": "jetson-llm-benchmark-002",
+      "prompt": "Benchmark my local llama.cpp GGUF model at /models/llama-3-8b-q4_k_m.gguf on this Jetson — 512 prompt tokens, 128 generated, all layers on GPU.",
+      "expected_output": "The agent ran scripts/bench_llama_cpp.sh --help, then ran scripts/bench_llama_cpp.sh --model /models/llama-3-8b-q4_k_m.gguf --n-prompt 512 --n-gen 128 --n-gpu-layers 99 through the NVIDIA-AI-IOT llama.cpp container, and reported the single-stream metrics JSON (ttft_ms_p50, itl_ms_p50, tpot_ms_p50, throughput_tok_s).",
+      "assertions": [
+        "The agent matched the GGUF / llama.cpp scenario to jetson-llm-benchmark and chose scripts/bench_llama_cpp.sh (NOT bench_vllm.sh or bench_ollama.sh)",
+        "The agent ran scripts/bench_llama_cpp.sh --help before composing the final command",
+        "The agent ran scripts/bench_llama_cpp.sh --model /models/llama-3-8b-q4_k_m.gguf --n-prompt 512 --n-gen 128 --n-gpu-layers 99",
+        "The agent told the user that Docker would pull and run the NVIDIA-AI-IOT llama.cpp container before executing it (Limitations section) — or otherwise warned about the external image pull",
+        "The agent did NOT call llama-bench directly outside the wrapper",
+        "The agent did NOT recommend building llama.cpp from source",
+        "The agent reported the JSON envelope plus the metrics object with ttft_ms_p50, itl_ms_p50, tpot_ms_p50, throughput_tok_s",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-llm-benchmark",
+      "expected_script": "scripts/bench_llama_cpp.sh"
+    },
+    {
+      "id": "jetson-llm-benchmark-003",
+      "prompt": "I have an Ollama daemon running on this Jetson with the llama3:8b model already pulled. Benchmark it — 20 prompts, 512 in / 128 out.",
+      "expected_output": "The agent ran scripts/bench_ollama.sh --help, then ran scripts/bench_ollama.sh --model llama3:8b --num-prompts 20 --input-len 512 --output-len 128 against the Ollama /api/generate endpoint, and reported the single-stream metrics JSON.",
+      "assertions": [
+        "The agent matched the Ollama scenario to jetson-llm-benchmark and chose scripts/bench_ollama.sh (NOT bench_vllm.sh or bench_llama_cpp.sh)",
+        "The agent ran scripts/bench_ollama.sh --help before composing the final command",
+        "The agent ran scripts/bench_ollama.sh --model llama3:8b --num-prompts 20 --input-len 512 --output-len 128",
+        "The agent did NOT call curl against /api/generate by hand",
+        "The agent recognized Ollama is single-stream by design and did NOT request a multi-concurrency sweep",
+        "The agent noted that Ollama results are not directly comparable to vLLM numbers",
+        "The agent reported the JSON envelope plus the metrics object (ttft_ms_p50/p99, itl_ms_p50/p99, tpot_ms_p50, throughput_tok_s, e2e_latency_ms_p50) with concurrency=1 in config",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-llm-benchmark",
+      "expected_script": "scripts/bench_ollama.sh"
+    },
+    {
+      "id": "jetson-llm-benchmark-004",
+      "prompt": "Benchmarked vLLM at concurrency 1 — TTFT looks fine but TPOT is way too slow. What can I do to fix the per-token decode speed?",
+      "expected_output": "The agent recognized this as a TPOT-bound single-stream decode problem and either invoked or recommended jetson-speculative-decoding (rather than re-running jetson-llm-benchmark, which only measures and does not tune).",
+      "assertions": [
+        "The agent did NOT invoke jetson-llm-benchmark again — benchmarking is the measurement skill, not a tuning skill",
+        "The agent identified jetson-speculative-decoding as the correct hand-off (per the 'Hand off to' section)",
+        "The agent referenced EAGLE-3 or draft-model speculative decoding via --speculative-config on the running vLLM server",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "jetson-speculative-decoding",
+      "expected_script": null
+    }
+  ]
+}

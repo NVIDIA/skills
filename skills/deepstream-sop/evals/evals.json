@@ -1,0 +1,88 @@
+[
+  {
+    "id": "deepstream-sop-explicit-001",
+    "question": "Use the deepstream-sop skill. Follow @references/example_sop_prompt.md to generate the SOP microservice in a folder named ds_sop_microservice. Produce the FastAPI server, SOPProcessManager wiring, the DeepStream pyservicemaker pipeline, the SOP-checker integration, and the Docker build files.",
+    "expected_skill": "deepstream-sop",
+    "expected_script": null,
+    "should_trigger": true,
+    "ground_truth": "The agent reads the deepstream-sop SKILL.md and the referenced example_sop_prompt.md, then generates the SOP microservice scaffold under ds_sop_microservice/. The generated code initializes SOPProcessManager in main() before uvicorn.run(), uses named keyword arguments for create_video_processor() and related factories, wires the SSE generator with try/finally cleanup that calls trigger_stop_processors on client disconnect, and copies the reference Python/C++/proto files from references/ verbatim where SKILL.md marks them as copy-verbatim. The Triton model repo, nvdspreprocess and nvinferserver config templates, and the Docker build files (docker/copy_sources.sh, docker/package_file_list.txt, docker/Docker.build, deploy/compose.yaml) are all produced.",
+    "expected_behavior": [
+      "The agent reads team-skills/deepstream/deepstream-sop/SKILL.md and the referenced example_sop_prompt.md before generating code.",
+      "Generated api_server.py initializes SOPProcessManager in main() before uvicorn.run() (not inside lifespan).",
+      "Generated code uses named keyword arguments for create_video_processor() and similar factories, not positional args.",
+      "Generated SSE generator wraps the streaming loop in try/finally and invokes trigger_stop_processors() on client disconnect or completion.",
+      "Generated code includes the deepstream pyservicemaker pipeline (ds_3d_action_pipeline.py) with InferOutputTensorParser and DecodedFrameRetriever wired in the order the SKILL.md prescribes.",
+      "Reference Python files (vllm_inference_reference.py, utils_reference.py, missing_number_detector_reference.py, sop_step_checker_reference.py, messager_reference.py) and the protobuf sources (nv.proto, ext.proto) are copied verbatim into the target package.",
+      "Triton model repo includes ddm/config_template.pbtxt and ddm/1/model.py + ddm_net.py based on the reference templates.",
+      "Docker build files (docker/copy_sources.sh, docker/package_file_list.txt, docker/Docker.build, deploy/compose.yaml) are produced from the reference templates and the manifest lists every needed source file.",
+      "The generated output does not contain hard-coded secrets, credentials, tokens, API keys, or passwords."
+    ]
+  },
+  {
+    "id": "deepstream-sop-explicit-002",
+    "question": "Use the deepstream-sop skill. Follow @references/eval_sop_prompt.md to evaluate the SOP microservice located in ds_sop_microservice. Run the test suite, report failures, and apply fixes so the suite passes.",
+    "expected_skill": "deepstream-sop",
+    "expected_script": null,
+    "should_trigger": true,
+    "ground_truth": "The agent reads the deepstream-sop SKILL.md and the referenced eval_sop_prompt.md, executes the project's test suite (tests/test_api_endpoints.py), reports which assertions fail, applies focused fixes to the generated service to match the SKILL.md critical rules (e.g., manager init ordering, named kwargs, try/finally cleanup, VLM-warmup-before-DDM, frame_retriever priority), and re-runs the suite until all 19 tests pass. The agent reports per-test pass/fail status and does not skip or weaken assertions to make tests pass.",
+    "expected_behavior": [
+      "The agent reads SKILL.md and eval_sop_prompt.md before evaluating the service.",
+      "The agent runs the project's test suite (tests/test_api_endpoints.py or equivalent) and reports per-test results.",
+      "The agent identifies failing tests and traces each failure to a specific critical rule in SKILL.md.",
+      "Applied fixes match the critical rules tagged in SKILL.md (MANAGER_INIT_IN_MAIN, NAMED_KWARGS, CLEANUP_ON_DISCONNECT, VLM_WARMUP_BEFORE_DDM, FRAME_RETRIEVER_PRIORITY, etc.) rather than weakening or skipping assertions.",
+      "The agent re-runs the test suite after applying fixes and reports the final pass count.",
+      "The agent does not delete, skip, or @pytest.mark.skip tests to make the suite green.",
+      "The final report explicitly mentions that tests pass (or remaining failures with root cause).",
+      "The agent does not leak secrets, credentials, tokens, API keys, or passwords in its output."
+    ]
+  },
+  {
+    "id": "deepstream-sop-implicit-001",
+    "question": "I have a Basler GigE Vision camera with serial number 40748152 attached to a host running our SOP inference microservice. How do I send a chat-completion request that uses the live camera feed as the input video source? What does the JSON payload look like, and are there any required fields I should know about?",
+    "expected_skill": "deepstream-sop",
+    "expected_script": null,
+    "should_trigger": true,
+    "ground_truth": "The agent recognizes this as a deepstream-sop API usage question without being told the skill name. It explains that the request body uses the OpenAI-compatible chat-completions format with an input_camera content item whose camera_id is set to the Basler camera serial number (40748152), and that stream must be set to true for live camera inputs. It notes that the endpoint returns HTTP 400 if stream is false for live sources (the LIVE_REQUIRES_STREAM_TRUE rule), references the Basler camera section of the skill for any environment configuration the user needs (e.g. PYLON_CAMEMU for emulation), and provides a concrete curl or Python request example showing the JSON payload with stream: true, model name, and the messages array containing the input_camera item.",
+    "expected_behavior": [
+      "The agent identifies deepstream-sop as the appropriate skill without being told.",
+      "The agent reads SKILL.md and the Basler camera reference (skill_08_basler_camera.md) before answering.",
+      "The response shows the request uses the OpenAI-compatible chat.completions endpoint with an input_camera content item.",
+      "The response sets camera_id to the supplied serial number (40748152 in this example) in the input_camera content item.",
+      "The response specifies stream: true and explicitly calls out that stream must be true for live camera inputs (LIVE_REQUIRES_STREAM_TRUE).",
+      "The response mentions the HTTP 400 response when stream is false for live sources.",
+      "The response includes a concrete payload example (curl or Python) showing the full JSON shape, not just prose.",
+      "The agent does not leak secrets, credentials, tokens, API keys, or passwords."
+    ]
+  },
+  {
+    "id": "deepstream-sop-negative-001",
+    "question": "I want a minimal DeepStream 9.0 pyservicemaker pipeline that reads a local mp4, runs the built-in ResNet18 TrafficCamNet detector with nvinfer, draws bounding boxes with nvosdbin, and renders to the screen. No tracker, no Kafka, no SOP checking — just car detection. Show me the pipeline.",
+    "expected_skill": null,
+    "expected_script": null,
+    "should_trigger": false,
+    "ground_truth": "The agent treats this as a generic DeepStream-development question (a fit for the deepstream-dev skill, not deepstream-sop), produces a minimal nvurisrcbin -> nvstreammux -> nvinfer -> nvosdbin -> sink pipeline using pyservicemaker, and does not introduce any SOPProcessManager, VLM, DDM, SOP checker, Triton CAPI, Basler camera, or SSE machinery. The response stays inside the scope the user asked for.",
+    "expected_behavior": [
+      "The agent does not activate the deepstream-sop skill.",
+      "The agent does not introduce SOPProcessManager, SOPVideoProcessor, GEBD (DDM), VLM, Cosmos Reason 1/2, Triton CAPI, Basler camera, or SSE streaming into the answer.",
+      "The agent does not reference deepstream-sop's references/ files (skill_06_sop_process_manager.md, vllm_inference_reference.py, etc.).",
+      "The pipeline shown uses nvurisrcbin -> nvstreammux -> nvinfer -> nvosdbin -> sink, matching what the user asked for.",
+      "The response does not produce a Kafka producer, a chat-completions endpoint, or any FastAPI server boilerplate.",
+      "The agent does not leak secrets, credentials, tokens, API keys, or passwords."
+    ]
+  },
+  {
+    "id": "deepstream-sop-negative-002",
+    "question": "What is the difference between a Standard Operating Procedure (SOP) and a Standard Work Instruction (SWI) in manufacturing process documentation? When should a team use each?",
+    "expected_skill": null,
+    "expected_script": null,
+    "should_trigger": false,
+    "ground_truth": "The agent treats this as a general manufacturing-process documentation question, not a software task. It explains that an SOP defines what to do and the order of steps at a process level, while a SWI is a more granular work-instruction document for a specific task (often including times, tools, and visual aids), and discusses when each is appropriate. It does not activate any code-generation skill.",
+    "expected_behavior": [
+      "The agent does not activate the deepstream-sop skill.",
+      "The agent does not read deepstream-sop/SKILL.md or any references/ file.",
+      "The agent does not produce DeepStream pipeline code, microservice scaffolding, or chat-completion API examples.",
+      "The response is prose about manufacturing/quality-process documentation, not software.",
+      "The agent does not leak secrets, credentials, tokens, API keys, or passwords."
+    ]
+  }
+]

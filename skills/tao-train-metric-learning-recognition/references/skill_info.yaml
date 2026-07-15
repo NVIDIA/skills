@@ -1,0 +1,152 @@
+name: tao-train-metric-learning-recognition
+network_arch: ml_recog
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: default
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: ml_recog train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset:
+        type: folder
+      dataset.val_dataset.reference:
+        type: folder
+      dataset.val_dataset.query:
+        type: folder
+      model.pretrained_model_path:
+        type: file
+        optional: true
+      model.pretrained_trunk_path:
+        type: file
+        optional: true
+      model.pretrained_embedder_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: ml_recog evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.checkpoint:
+        type: file
+      dataset.val_dataset.reference:
+        type: folder
+      dataset.val_dataset.query:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: ml_recog export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: ml_recog inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.checkpoint:
+        type: file
+      dataset.val_dataset.reference:
+        type: folder
+      inference.input_path:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.train_dataset:
+      source: train_datasets
+      path: metric_learning_recognition/retail-product-checkout-dataset_classification_demo/known_classes/train.tar.gz
+      runtime: extracted_folder
+    dataset.val_dataset.reference:
+      source: train_datasets
+      path: metric_learning_recognition/retail-product-checkout-dataset_classification_demo/known_classes/reference.tar.gz
+      runtime: extracted_folder
+    dataset.val_dataset.query:
+      source: train_datasets
+      path: metric_learning_recognition/retail-product-checkout-dataset_classification_demo/known_classes/val.tar.gz
+      runtime: extracted_folder
+  evaluate:
+    dataset.val_dataset.reference:
+      source: train_datasets
+      path: metric_learning_recognition/retail-product-checkout-dataset_classification_demo/unknown_classes/reference.tar.gz
+      runtime: extracted_folder
+    dataset.val_dataset.query:
+      source: train_datasets
+      path: metric_learning_recognition/retail-product-checkout-dataset_classification_demo/unknown_classes/test.tar.gz
+      runtime: extracted_folder
+  inference:
+    dataset.val_dataset.reference:
+      source: train_datasets
+      path: metric_learning_recognition/retail-product-checkout-dataset_classification_demo/unknown_classes/reference.tar.gz
+      runtime: extracted_folder
+    inference.input_path:
+      source: train_datasets
+      path: metric_learning_recognition/retail-product-checkout-dataset_classification_demo/unknown_classes/test.tar.gz
+      runtime: extracted_folder
+spec_params:
+  train:
+    encryption_key: key
+    model.pretrained_model_path: ptm_if_no_resume_model
+    results_dir: output_dir
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    evaluate.checkpoint: parent_model
+    results_dir: output_dir
+  export:
+    encryption_key: key
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+    results_dir: output_dir
+  inference:
+    encryption_key: key
+    inference.checkpoint: parent_model
+    results_dir: output_dir
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: train.batch_size
+  val_batch_size: train.val_batch_size
+  eval_batch_size: evaluate.batch_size
+  infer_batch_size: inference.batch_size
+  trunk_learning_rate: train.optim.trunk.base_lr
+  embedder_learning_rate: train.optim.embedder.base_lr
+  feat_dim: model.feat_dim
+  input_width: model.input_width
+  input_height: model.input_height
+  resume_checkpoint: train.resume_training_checkpoint_path
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  inference: ../references/spec_template_inference.yaml
+  export: ../references/spec_template_export.yaml
+description: Metric learning recognition for fine-grained visual recognition. Learns embeddings for retrieval-based matching
+  (e.g., retail product recognition). Uses triplet/contrastive losses.

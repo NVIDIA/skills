@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: Digital Health
+repo: NVIDIA/digital-health-examples
+description: Agent skills for the clinical ASR evaluation flywheel — term curation, synthetic clinical-speech benchmark generation, KER (Keyword Error Rate) scoring, and fine-tune guidance.
+skills:
+  - path: skills/digital-health-clinical-asr-setup/
+    catalog_dir: digital-health-clinical-asr-setup
+  - path: skills/digital-health-clinical-asr-build/
+    catalog_dir: digital-health-clinical-asr-build
+  - path: skills/digital-health-clinical-asr-eval/
+    catalog_dir: digital-health-clinical-asr-eval
+  - path: skills/digital-health-clinical-asr-finetune/
+    catalog_dir: digital-health-clinical-asr-finetune
+links:
+  discussions: false

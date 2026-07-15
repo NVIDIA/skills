@@ -1,0 +1,35 @@
+[
+  {
+    "id": "jetson-set-target-001",
+    "question": "My target-platform/ has jetson-agx-orin-32gb.yaml, jetson-agx-thor-devkit.yaml (currently active), and acme-vision-x1.yaml. I want to switch active to the Orin 32GB profile — run /jetson-set-target.",
+    "expected_skill": "jetson-set-target",
+    "expected_script": null,
+    "ground_truth": "Read target-platform/active_target.yml, list target-platform/*.yaml excluding active_target.yml, parse each profile's reference_devkit.name (or custom_carrier.name) plus flash_config, and print the alphabetically numbered profile list with (active) on jetson-agx-thor-devkit.yaml. Prompt the user to pick by number, bare filename, product substring, or cancel; resolve to jetson-agx-orin-32gb.yaml. Edit only the active: line in active_target.yml to active: jetson-agx-orin-32gb.yaml, preserving the header comment block verbatim. Print a summary with previous active, new active, the chosen profile's reference_devkit.name, and the reminder that downstream skills (jetson-customize-clocks, jetson-customize-nvpmodel, jetson-customize-fan, jetson-optimize-memory) now resolve to this target.",
+    "expected_behavior": [
+      "Read skills/jetson-set-target/SKILL.md",
+      "Read target-platform/active_target.yml (treat missing as active: NA)",
+      "List target-platform/*.yaml excluding active_target.yml itself",
+      "Parse each profile's reference_devkit.name (or custom_carrier.name) and flash_config for the one-line summary",
+      "Print the profiles alphabetically and numbered, marking jetson-agx-thor-devkit.yaml with (active)",
+      "Prompt for selection accepting number, bare filename, product substring, or cancel",
+      "Verify the chosen filename exists in target-platform/ before writing",
+      "Edit only the active: line in active_target.yml, preserving the header comment block verbatim",
+      "Print a confirmation summary with previous and new active values plus the downstream-skill reminder"
+    ]
+  },
+  {
+    "id": "jetson-set-target-002",
+    "question": "I asked to switch to my custom Acme Vision carrier target but /jetson-set-target refused saying 'no profiles found'. The directory has only active_target.yml in it. What is going on?",
+    "expected_skill": "jetson-set-target",
+    "expected_script": null,
+    "ground_truth": "Per the Survey the profiles directory step and the Troubleshooting 'no profiles found' refusal, this skill is the switcher side of the target-platform contract and only edits active_target.yml — it never authors profile YAMLs. When target-platform/ is missing, empty, or contains only active_target.yml, the skill stops and routes the user to /jetson-init-target, the sibling authoring skill. The Gotchas section reinforces that if the user names a target whose YAML is not on disk, the skill must refuse rather than silently fall through to authoring. Run /jetson-init-target to create acme-vision-x1.yaml, then re-run /jetson-set-target to switch the active pointer.",
+    "expected_behavior": [
+      "Read skills/jetson-set-target/SKILL.md",
+      "Cite the Survey the profiles directory table row 'No profile YAMLs exist — Refuse'",
+      "Reference the Troubleshooting 'no profiles found' bullet and the Gotchas 'No authoring here' rule",
+      "Explain that this skill only edits active_target.yml's active: line and never authors profile YAMLs",
+      "Route the user to /jetson-init-target to author the acme-vision-x1.yaml profile",
+      "Tell the user to re-invoke /jetson-set-target after the profile YAML exists in target-platform/"
+    ]
+  }
+]

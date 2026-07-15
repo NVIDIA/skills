@@ -1,0 +1,96 @@
+{
+    "metrics": [
+        {
+            "bundle_kind": "metric-bundle",
+            "bundle_format_version": "v1",
+            "metric_type": "exact-match",
+            "metadata": {
+                "description": null,
+                "labels": {}
+            },
+            "outputs": [
+                {
+                    "name": "exact-match",
+                    "description": null,
+                    "value_json_schema": {
+                        "description": "Continuous numeric metric value.",
+                        "title": "ContinuousScore",
+                        "type": "number"
+                    }
+                }
+            ],
+            "secrets": {},
+            "payload": {
+                "python_version": "3.11.15",
+                "cloudpickle_version": "3.1.2",
+                "pickle_protocol": 5,
+                "blob": "gAWVoQEAAAAAAACMJm5lbW9fZXZhbHVhdG9yX3Nkay5tZXRyaWNzLmV4YWN0X21hdGNolIwQRXhhY3RNYXRjaE1ldHJpY5STlCmBlH2UKIwIX19kaWN0X1-UfZQojAR0eXBllIwYbmVtb19ldmFsdWF0b3Jfc2RrLmVudW1zlIwKTWV0cmljVHlwZZSTlIwLZXhhY3QtbWF0Y2iUhZRSlIwLZGVzY3JpcHRpb26UTowGbGFiZWxzlH2UjBNzdXBwb3J0ZWRfam9iX3R5cGVzlF2UKIwgbmVtb19ldmFsdWF0b3Jfc2RrLnZhbHVlcy5jb21tb26UjBFTdXBwb3J0ZWRKb2JUeXBlc5STlIwGb25saW5llIWUUpRoFYwHb2ZmbGluZZSFlFKUZYwJcmVmZXJlbmNllIwSe3tpdGVtLnJlZmVyZW5jZX19lIwJY2FuZGlkYXRllE51jBJfX3B5ZGFudGljX2V4dHJhX1-UTowXX19weWRhbnRpY19maWVsZHNfc2V0X1-Uj5QoaBxoB5CMFF9fcHlkYW50aWNfcHJpdmF0ZV9flE51Yi4=",
+                "digest": "b6d94b6d5a4f304964652358cd55e8e1216664934a9712ac147d566b65ed3b5d",
+                "kind": "cloudpickle"
+            }
+        },
+        {
+            "bundle_kind": "metric-bundle",
+            "bundle_format_version": "v1",
+            "metric_type": "string-check",
+            "metadata": {
+                "description": null,
+                "labels": {}
+            },
+            "outputs": [
+                {
+                    "name": "string-check",
+                    "description": null,
+                    "value_json_schema": {
+                        "description": "Continuous numeric metric value.",
+                        "title": "ContinuousScore",
+                        "type": "number"
+                    }
+                }
+            ],
+            "secrets": {},
+            "payload": {
+                "python_version": "3.11.15",
+                "cloudpickle_version": "3.1.2",
+                "pickle_protocol": 5,
+                "blob": "gAWV5gEAAAAAAACMJ25lbW9fZXZhbHVhdG9yX3Nkay5tZXRyaWNzLnN0cmluZ19jaGVja5SMEVN0cmluZ0NoZWNrTWV0cmljlJOUKYGUfZQojAhfX2RpY3RfX5R9lCiMBHR5cGWUjBhuZW1vX2V2YWx1YXRvcl9zZGsuZW51bXOUjApNZXRyaWNUeXBllJOUjAxzdHJpbmctY2hlY2uUhZRSlIwLZGVzY3JpcHRpb26UTowGbGFiZWxzlH2UjBNzdXBwb3J0ZWRfam9iX3R5cGVzlF2UKIwgbmVtb19ldmFsdWF0b3Jfc2RrLnZhbHVlcy5jb21tb26UjBFTdXBwb3J0ZWRKb2JUeXBlc5STlIwGb25saW5llIWUUpRoFYwHb2ZmbGluZZSFlFKUZYwJb3BlcmF0aW9ulIwIY29udGFpbnOUjA1sZWZ0X3RlbXBsYXRllIwWe3tzYW1wbGUub3V0cHV0X3RleHR9fZSMDnJpZ2h0X3RlbXBsYXRllIwYe3tpdGVtLnJlcXVpcmVkX3BocmFzZX19lHWMEl9fcHlkYW50aWNfZXh0cmFfX5ROjBdfX3B5ZGFudGljX2ZpZWxkc19zZXRfX5SPlChoHmggaAdoHJCMFF9fcHlkYW50aWNfcHJpdmF0ZV9flE51Yi4=",
+                "digest": "5c7c5b74de79b3d84fdd7db4f52393633dee4370036266d088518b94a92b081b",
+                "kind": "cloudpickle"
+            }
+        }
+    ],
+    "dataset": [
+        {
+            "prompt": "Return exactly this word with no punctuation: Paris",
+            "reference": "Paris",
+            "required_phrase": "Paris"
+        },
+        {
+            "note": "Intentional failure case: prompt asks for 'Oslo' but reference/required_phrase are 'London' so both metrics should report a miss.",
+            "prompt": "Return exactly this word with no punctuation: Oslo",
+            "reference": "London",
+            "required_phrase": "London"
+        }
+    ],
+    "params": {
+        "parallelism": 4,
+        "limit_samples": 2,
+        "ignore_request_failure": false,
+        "request_timeout": 60,
+        "max_retries": 3
+    },
+    "target": {
+        "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        "name": "nvidia/nemotron-3-super-120b-a12b",
+        "api_key_secret": "NVIDIA_API_KEY",
+        "format": "nim"
+    },
+    "prompt_template": {
+        "messages": [
+            {
+                "role": "user",
+                "content": "{{item.prompt}}"
+            }
+        ]
+    }
+}

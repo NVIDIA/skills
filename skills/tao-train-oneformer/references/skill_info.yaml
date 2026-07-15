@@ -1,0 +1,349 @@
+name: tao-train-oneformer
+network_arch: oneformer
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: coco_panoptic
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: oneformer train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train.images:
+        type: folder
+      dataset.train.annotations:
+        type: file
+      dataset.label_map:
+        type: file
+      dataset.train.panoptic:
+        type: folder
+      dataset.val.images:
+        type: folder
+      dataset.val.annotations:
+        type: file
+      dataset.val.panoptic:
+        type: folder
+      dataset.test.images:
+        type: folder
+      train.pretrained_backbone:
+        type: file
+        optional: true
+      train.pretrained_model:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  quantize:
+    command: oneformer quantize -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train.images:
+        type: folder
+      dataset.train.annotations:
+        type: file
+      dataset.label_map:
+        type: file
+      dataset.train.panoptic:
+        type: folder
+      dataset.val.images:
+        type: folder
+      dataset.val.annotations:
+        type: file
+      dataset.val.panoptic:
+        type: folder
+      dataset.test.images:
+        type: folder
+      dataset.quant_calibration_dataset.images_dir:
+        type: folder
+      quantize.model_path:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: oneformer evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train.images:
+        type: folder
+      dataset.label_map:
+        type: file
+      dataset.train.annotations:
+        type: file
+      dataset.train.panoptic:
+        type: folder
+      dataset.val.images:
+        type: folder
+      dataset.val.annotations:
+        type: file
+      dataset.val.panoptic:
+        type: folder
+      dataset.test.images:
+        type: folder
+      dataset.test.annotations:
+        type: file
+      dataset.test.panoptic:
+        type: folder
+      evaluate.checkpoint:
+        type: file
+      evaluate.trt_engine:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: oneformer export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: oneformer inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train.images:
+        type: folder
+      dataset.label_map:
+        type: file
+      dataset.train.annotations:
+        type: file
+      dataset.train.panoptic:
+        type: folder
+      dataset.val.images:
+        type: folder
+      dataset.val.annotations:
+        type: file
+      dataset.val.panoptic:
+        type: folder
+      dataset.test.images:
+        type: folder
+      inference.images_dir:
+        type: folder
+      inference.checkpoint:
+        type: file
+      inference.trt_engine:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.train.images:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.train.annotations:
+      source: train_datasets
+      path: annotations.json
+    dataset.label_map:
+      source: train_datasets
+      path: label_map.json
+    dataset.train.panoptic:
+      source: train_datasets
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.val.images:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val.annotations:
+      source: eval_dataset
+      path: annotations.json
+    dataset.val.panoptic:
+      source: eval_dataset
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.test.images:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+  quantize:
+    dataset.train.images:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.train.annotations:
+      source: train_datasets
+      path: annotations.json
+    dataset.label_map:
+      source: train_datasets
+      path: label_map.json
+    dataset.train.panoptic:
+      source: train_datasets
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.val.images:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val.annotations:
+      source: eval_dataset
+      path: annotations.json
+    dataset.val.panoptic:
+      source: eval_dataset
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.test.images:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.quant_calibration_dataset.images_dir:
+      source: calibration_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+  evaluate:
+    dataset.train.images:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.label_map:
+      source: train_datasets
+      path: label_map.json
+    dataset.train.annotations:
+      source: train_datasets
+      path: annotations.json
+    dataset.train.panoptic:
+      source: train_datasets
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.val.images:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val.annotations:
+      source: eval_dataset
+      path: annotations.json
+    dataset.val.panoptic:
+      source: eval_dataset
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.test.images:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.test.annotations:
+      source: eval_dataset
+      path: annotations.json
+    dataset.test.panoptic:
+      source: eval_dataset
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+  inference:
+    dataset.train.images:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.label_map:
+      source: train_datasets
+      path: label_map.json
+    dataset.train.annotations:
+      source: train_datasets
+      path: annotations.json
+    dataset.train.panoptic:
+      source: train_datasets
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.val.images:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val.annotations:
+      source: eval_dataset
+      path: annotations.json
+    dataset.val.panoptic:
+      source: eval_dataset
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.test.images:
+      source: inference_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    inference.images_dir:
+      source: inference_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+spec_params:
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    train.pretrained_model: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.checkpoint: parent_model
+    evaluate.trt_engine: parent_model
+  export:
+    encryption_key: key
+    results_dir: output_dir
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.checkpoint: parent_model
+    inference.trt_engine: parent_model
+  quantize:
+    encryption_key: key
+    results_dir: output_dir
+    quantize.model_path: parent_model
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.train.batch_size
+  train_batch_size: dataset.train.batch_size
+  val_batch_size: dataset.val.batch_size
+  test_batch_size: dataset.test.batch_size
+  learning_rate: train.optim.lr
+  num_classes: model.sem_seg_head.num_classes
+  contiguous_id: dataset.contiguous_id
+  image_size: dataset.image_size
+  train_min_size: dataset.augmentation.train_min_size
+  train_max_size: dataset.augmentation.train_max_size
+  train_crop_size: dataset.augmentation.train_crop_size
+  test_min_size: dataset.augmentation.test_min_size
+  test_max_size: dataset.augmentation.test_max_size
+  pretrained_model: train.pretrained_model
+  pretrained_backbone: train.pretrained_backbone
+  resume_checkpoint: train.resume_training_checkpoint_path
+  export_onnx: export.onnx_file
+  export_width: export.input_width
+  export_height: export.input_height
+  export_task: export.task
+  inference_images: inference.images_dir
+  inference_mode: inference.mode
+  quant_backend: quantize.backend
+  quant_model_path: quantize.model_path
+  calibration_images: dataset.quant_calibration_dataset.images_dir
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  inference: ../references/spec_template_inference.yaml
+  export: ../references/spec_template_export.yaml
+  quantize: ../references/spec_template_quantize.yaml
+description: OneFormer for universal image segmentation. Unifies panoptic, instance, and semantic segmentation with a single
+  architecture using task-conditioned queries.

@@ -1,0 +1,33 @@
+[
+  {
+    "id": "jetson-print-bsp-info-001",
+    "question": "I just untarred a Jetson BSP into /home/dev/jetson/Linux_for_Tegra and want a one-shot summary of the L4T release, supported board configs, and whether the rootfs is populated before I flash. Can you do that?",
+    "expected_skill": "jetson-print-bsp-info",
+    "expected_script": null,
+    "ground_truth": "Set L4T_ROOT=/home/dev/jetson/Linux_for_Tegra and run jetson-print-bsp-info. The skill validates the directory by checking flash.sh and nv_tegra/, then extracts the first line of nv_tegra/nv_tegra_release for the L4T release header, lists *.conf board configs joined onto a comma-separated line via paste -sd, - and checks rootfs/etc/passwd as the populated-rootfs proxy. Output is the four-line report with L4T root, L4T release, Board configs, and Rootfs (populated|empty) sections.",
+    "expected_behavior": [
+      "Read skills/jetson-print-bsp-info/SKILL.md",
+      "Resolve L4T_ROOT to /home/dev/jetson/Linux_for_Tegra (fall back to $PWD if unset)",
+      "Validate the directory by checking that flash.sh and nv_tegra/ both exist; exit early otherwise",
+      "Run head -1 on nv_tegra/nv_tegra_release with a fallback to rootfs/etc/nv_tegra_release for the release header",
+      "List *.conf in L4T_ROOT and join via paste -sd, - for the Board configs line",
+      "Check rootfs/etc/passwd to print 'populated' or 'empty' for the Rootfs line",
+      "Print the four-line report exactly per the Output format section (L4T root / L4T release / Board configs / Rootfs)"
+    ]
+  },
+  {
+    "id": "jetson-print-bsp-info-002",
+    "question": "I pointed the skill at /tmp/my-bsp and it printed 'L4T release info not found' even though flash.sh and nv_tegra/ are present. What does that mean and how do I fix it?",
+    "expected_skill": "jetson-print-bsp-info",
+    "expected_script": null,
+    "ground_truth": "The skill's Error handling falls back to a clearly labeled 'L4T release info not found' string when neither nv_tegra/nv_tegra_release nor rootfs/etc/nv_tegra_release exists, which per the Troubleshooting section means the BSP tarball may be incomplete or apply_binaries.sh was never run. Re-extract the BSP tarball to restore nv_tegra/nv_tegra_release, or run apply_binaries.sh to populate the rootfs (which copies nv_tegra_release into rootfs/etc/). The skill is read-only and never errors out mid-report — only that one line is missing while Board configs and Rootfs status still print.",
+    "expected_behavior": [
+      "Read skills/jetson-print-bsp-info/SKILL.md",
+      "Locate the Troubleshooting entry for 'L4T release info not found'",
+      "Explain that neither nv_tegra/nv_tegra_release nor rootfs/etc/nv_tegra_release was found",
+      "Recommend re-extracting the BSP tarball or running apply_binaries.sh to populate the rootfs copy",
+      "Note that per Error handling the skill never errors out mid-report — other report lines still print",
+      "Reaffirm the skill is read-only and does not modify any files"
+    ]
+  }
+]

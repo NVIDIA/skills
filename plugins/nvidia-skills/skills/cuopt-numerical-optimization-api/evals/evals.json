@@ -1,0 +1,130 @@
+[
+  {
+    "id": "numopt-py-eval-001-lp-api-call-sequence",
+    "question": "I want to solve a small LP (continuous variables only, maximize a linear objective with linear constraints) using the cuOpt Python API. List the API calls in order \u2014 name each method, one line per method, no full runnable script.",
+    "expected_skill": "cuopt-numerical-optimization-api",
+    "expected_script": null,
+    "ground_truth": "The agent produces an ordered list of API calls without a runnable script. The list, in order: (1) Import Problem, CONTINUOUS, and MAXIMIZE from cuopt.linear_programming.problem, and SolverSettings from cuopt.linear_programming.solver_settings. (2) Construct Problem('name'). (3) For each decision variable, call problem.addVariable(lb=..., vtype=CONTINUOUS, name=...). (4) For each constraint, call problem.addConstraint(<linear expression> <= or >= or == <rhs>, name=...). (5) Call problem.setObjective(<linear expression>, sense=MAXIMIZE). (6) Construct SolverSettings(); call set_parameter('time_limit', ...) for time budget. (7) Call problem.solve(settings). (8) Check problem.Status.name in ['Optimal', 'PrimalFeasible'] (PascalCase status names \u2014 case-sensitive). (9) Read problem.ObjValue for the objective, and each variable's .getValue() for its optimal value. The agent uses LP (not MILP / QP) because all variables are continuous and the objective is linear. Mentions that status names are PascalCase (Optimal, not OPTIMAL or optimal) \u2014 case sensitivity matters.",
+    "expected_behavior": [
+      "Selects LP (not MILP or QP) given continuous variables and a linear objective",
+      "Lists the API calls in order without producing a full runnable script",
+      "Names Problem, addVariable (with vtype=CONTINUOUS), addConstraint, setObjective (sense=MAXIMIZE)",
+      "Names SolverSettings, set_parameter('time_limit', ...), and problem.solve(settings)",
+      "Names problem.Status.name and the PascalCase status values (Optimal / PrimalFeasible / FeasibleFound)",
+      "Names problem.ObjValue and variable.getValue() for reading results",
+      "Mentions that status names are case-sensitive (PascalCase)",
+      "Does not invent method names that are not in the skill"
+    ]
+  },
+  {
+    "id": "numopt-py-eval-002-status-case-sensitivity",
+    "question": "My cuOpt Python LP solve runs without error but the result block never executes. Here is the check I wrote: if problem.Status.name == 'OPTIMAL': print(problem.ObjValue). What is wrong and how do I fix it?",
+    "expected_skill": "cuopt-numerical-optimization-api",
+    "expected_script": null,
+    "ground_truth": "The check silently fails because cuOpt status names use PascalCase, not ALL_CAPS. The string 'OPTIMAL' never matches. The correct LP status values to check are 'Optimal' and 'PrimalFeasible'. The fixed check is: if problem.Status.name in ['Optimal', 'PrimalFeasible']: print(problem.ObjValue). For MILP the correct values are 'Optimal' and 'FeasibleFound'. This is a common silent bug \u2014 the solve completes successfully but the code path that reads results is skipped because the string comparison always returns False.",
+    "expected_behavior": [
+      "Identifies the bug as a case mismatch \u2014 'OPTIMAL' is wrong, 'Optimal' is correct",
+      "States that cuOpt status names are PascalCase, not ALL_CAPS",
+      "Gives the correct LP check: problem.Status.name in ['Optimal', 'PrimalFeasible']",
+      "Notes that for MILP the passing status is 'FeasibleFound' not 'FEASIBLE_FOUND' or 'FEASIBLEFOUND'",
+      "Explains why this is a silent failure \u2014 no exception is raised, the block just never executes"
+    ]
+  },
+  {
+    "id": "numopt-py-eval-003-integer-vs-continuous-workers",
+    "question": "I am modeling a staffing problem where I need to decide how many nurses to assign to each ward. Should the nurse count variables be INTEGER or CONTINUOUS in the cuOpt Python API, and what vtype constant do I use for each?",
+    "expected_skill": "cuopt-numerical-optimization-api",
+    "expected_script": null,
+    "ground_truth": "Nurse counts should be INTEGER because nurses are discrete countable entities \u2014 you cannot assign 2.7 nurses to a ward. The vtype constant is INTEGER (imported from cuopt.linear_programming.problem). The addVariable call would be: problem.addVariable(lb=0, vtype=INTEGER, name='ward_a_nurses'). This makes the problem a MILP, not an LP. CONTINUOUS would be wrong here because it allows fractional values, which are meaningless for headcounts. The rule is: 'how many things' (people, vehicles, machines) \u2192 INTEGER; 'how much of something' (hours, tonnes, dollars) \u2192 CONTINUOUS.",
+    "expected_behavior": [
+      "States nurse counts must be INTEGER because nurses are discrete countable entities",
+      "Names the correct vtype constant: INTEGER (imported from cuopt.linear_programming.problem)",
+      "Shows or describes the addVariable call with vtype=INTEGER",
+      "States this makes the problem MILP, not LP",
+      "Explains why CONTINUOUS is wrong \u2014 it allows fractional nurse counts",
+      "States the rule: countable things \u2192 INTEGER, measurable amounts \u2192 CONTINUOUS"
+    ]
+  },
+  {
+    "id": "numopt-py-eval-004-qp-maximize-workaround",
+    "question": "I want to maximize a quadratic objective using the cuOpt Python QP API. When I pass sense=MAXIMIZE to setObjective, I get an error. What is the correct approach?",
+    "expected_skill": "cuopt-numerical-optimization-api",
+    "expected_script": null,
+    "ground_truth": "The cuOpt QP solver only supports MINIMIZE \u2014 MAXIMIZE is rejected for quadratic objectives. The correct workaround is to negate all coefficients in the objective and minimize the negated expression. For example, to maximize -0.04*x1*x1 - 0.02*x2*x2 (a concave quadratic with NSD Q), minimize 0.04*x1*x1 + 0.02*x2*x2 with sense=MINIMIZE. The resulting problem.ObjValue will be the negated maximum; multiply by -1 to recover the true maximum. All variables must remain CONTINUOUS \u2014 integer QP is not supported. The Q matrix of the original maximization problem must be negative semi-definite (NSD) for the problem to be concave and have a finite maximum; after negation it becomes PSD, which is what the solver expects. Maximizing a convex quadratic (positive coefficients) is unbounded and not a meaningful use case.",
+    "expected_behavior": [
+      "States QP only supports MINIMIZE \u2014 MAXIMIZE is rejected",
+      "Gives the correct workaround: negate all objective coefficients and use sense=MINIMIZE",
+      "Notes that problem.ObjValue will be negated and must be multiplied by -1 to get the true maximum",
+      "Reminds that all variables must be CONTINUOUS \u2014 integer QP is not supported",
+      "Does not suggest a non-existent MAXIMIZE_QP or similar invented API"
+    ]
+  },
+  {
+    "id": "numopt-c-eval-001-milp-api-call-sequence",
+    "question": "I want to solve a small MILP (some integer variables, linear objective, linear constraints) with the cuOpt C API. List the C functions and structs I need in order \u2014 names only, one line each, no full source.",
+    "expected_skill": "cuopt-numerical-optimization-api",
+    "expected_script": null,
+    "ground_truth": "The agent produces an ordered list of C API entry points without writing a full source file: include cuopt/mathematical_optimization/cuopt_c.h, then call cuOptCreateRangedProblem with sense CUOPT_MINIMIZE or CUOPT_MAXIMIZE, then cuOptSolve(problem, settings, &solution), then cuOptGetObjectiveValue.",
+    "expected_behavior": [
+      "Lists C API call sequence without writing a complete source file",
+      "Names cuOptCreateRangedProblem, cuOptSolve, cuOptGetObjectiveValue in order"
+    ]
+  },
+  {
+    "id": "numopt-c-eval-002-parameter-function-wrong-name",
+    "question": "I am setting a time limit on my cuOpt C API solver with this call: cuOptSetIntParameter(settings, CUOPT_TIME_LIMIT, 60.0). My colleague says the function name is wrong. What is the correct function, and what other parameter-setting functions does the C API provide?",
+    "expected_skill": "cuopt-numerical-optimization-api",
+    "expected_script": null,
+    "ground_truth": "The function name cuOptSetIntParameter does not exist in the cuOpt C API \u2014 it is a common mistake. The correct function for float parameters (including CUOPT_TIME_LIMIT, tolerances) is cuOptSetFloatParameter. The C API provides three parameter-setting functions: cuOptSetFloatParameter for float params such as time limits and tolerances, cuOptSetIntegerParameter (not cuOptSetIntParameter) for integer params such as CUOPT_LOG_TO_CONSOLE and method selection, and cuOptSetParameter for string params. CUOPT_TIME_LIMIT is a float parameter so the correct call is cuOptSetFloatParameter(settings, CUOPT_TIME_LIMIT, 60.0).",
+    "expected_behavior": [
+      "Identifies cuOptSetIntParameter as a non-existent function \u2014 the correct name is cuOptSetIntegerParameter",
+      "States CUOPT_TIME_LIMIT is a float parameter requiring cuOptSetFloatParameter, not cuOptSetIntegerParameter",
+      "Names all three parameter functions: cuOptSetFloatParameter, cuOptSetIntegerParameter, cuOptSetParameter",
+      "Does not produce a full source file \u2014 answers the question about function names only"
+    ]
+  },
+  {
+    "id": "numopt-c-eval-003-csr-constraint-matrix",
+    "question": "I am building the constraint matrix for a cuOpt C LP. The problem has 2 constraints and 2 variables. Constraint 1: 3x1 + 4x2 <= 5.4. Constraint 2: 2.7x1 + 10.1x2 <= 4.9. Show me the row_offsets, col_indices, and values arrays for the CSR representation, and explain what each array means.",
+    "expected_skill": "cuopt-numerical-optimization-api",
+    "expected_script": null,
+    "ground_truth": "The CSR (Compressed Sparse Row) format uses three arrays. row_offsets has length num_constraints+1 = 3: {0, 2, 4}. Element i gives the starting index in col_indices/values for row i; the last element is the total number of nonzeros (4 here). col_indices = {0, 1, 0, 1}: the column index of each nonzero, ordered by row. values = {3.0, 4.0, 2.7, 10.1}: the nonzero values in the same order. Constraint upper bounds are {5.4, 4.9} and lower bounds are {-CUOPT_INFINITY, -CUOPT_INFINITY} since both constraints are <=. These arrays are passed to cuOptCreateRangedProblem.",
+    "expected_behavior": [
+      "Gives row_offsets = {0, 2, 4} and explains it as start indices per row plus total nnz at the end",
+      "Gives col_indices = {0, 1, 0, 1} matching the column of each nonzero by row",
+      "Gives values = {3.0, 4.0, 2.7, 10.1} in row-major order",
+      "Explains that constraint_lower_bounds should be -CUOPT_INFINITY for <= constraints",
+      "Names cuOptCreateRangedProblem as the function that receives these arrays"
+    ]
+  },
+  {
+    "id": "numopt-c-eval-004-qp-restrictions",
+    "question": "I want to solve a QP with integer variables using the cuOpt C API. A colleague says this is not supported. Is that correct, and what are the restrictions for QP in the cuOpt C API?",
+    "expected_skill": "cuopt-numerical-optimization-api",
+    "expected_script": null,
+    "ground_truth": "The colleague is correct \u2014 integer QP is not supported in the cuOpt C API. The QP restrictions are: (1) minimization only \u2014 CUOPT_MINIMIZE is required; to maximize a quadratic objective, negate all objective coefficients and Q matrix entries; (2) continuous variables only \u2014 all variables must use CUOPT_CONTINUOUS, integer variables are not supported for QP; (3) the Q matrix should be positive semi-definite (PSD) for a convex, well-posed problem. The same library, include paths, and build pattern as LP/MILP are used; only the problem-creation call differs for QP.",
+    "expected_behavior": [
+      "Confirms integer QP is not supported \u2014 all QP variables must be CUOPT_CONTINUOUS",
+      "States QP only supports CUOPT_MINIMIZE, not CUOPT_MAXIMIZE",
+      "Explains how to maximize: negate objective coefficients and Q entries",
+      "Mentions Q should be positive semi-definite (PSD) for a convex problem",
+      "Notes the same library/headers/build pattern as LP/MILP \u2014 only the problem creation call differs"
+    ]
+  },
+  {
+    "id": "numopt-cli-eval-001-mps-sections-and-cli-command",
+    "question": "I have an LP problem I want to solve with cuopt_cli from an MPS file, with a 60-second time limit and 1% MIP gap (in case I add integers later). List the MPS sections in required order, and the cuopt_cli command line.",
+    "expected_skill": "cuopt-numerical-optimization-api",
+    "expected_script": null,
+    "ground_truth": "The agent lists the MPS sections in the required order: NAME, ROWS (N row for the objective, L/G/E rows for constraints), COLUMNS (variable-name, row-name, coefficient triples), RHS (right-hand-side values), BOUNDS (optional \u2014 LO/UP/FX/BV/LI/UI), ENDATA. For integer variables, integer markers are 'MARKER' 'INTORG' before and 'MARKER' 'INTEND' after the integer columns. The cuopt_cli invocation is: cuopt_cli problem.mps --time-limit 60 --mip-relative-tolerance 0.01. The agent mentions cuopt_cli --help as the canonical source for all flags. Does not invent flags like --max-time or --gap that are not in the skill. Notes that cuopt_cli ships with the cuopt Python package (install via pip or conda first if not present).",
+    "expected_behavior": [
+      "Lists MPS sections in required order: NAME, ROWS, COLUMNS, RHS, [BOUNDS], ENDATA",
+      "Mentions N row for objective and L/G/E for constraint types",
+      "Mentions integer markers ('MARKER' 'INTORG' / 'INTEND') for integer columns",
+      "Gives the cuopt_cli command with --time-limit 60 and --mip-relative-tolerance 0.01",
+      "References cuopt_cli --help as the canonical flag source",
+      "Does not invent flag names that are not in the skill (e.g. --max-time, --gap)",
+      "Mentions that cuopt_cli ships with the cuopt Python package"
+    ]
+  }
+]

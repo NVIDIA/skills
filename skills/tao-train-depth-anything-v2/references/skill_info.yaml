@@ -1,0 +1,155 @@
+name: tao-train-depth-anything-v2
+network_arch: depth_net_mono
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: RelativeMonoDataset
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: depth_net train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset.data_sources[0].data_file:
+        type: file
+      dataset.val_dataset.data_sources[0].data_file:
+        type: file
+      model.mono_backbone.pretrained_path:
+        type: file
+        optional: true
+      train.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  quantize:
+    command: depth_net quantize -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      quantize.model_path:
+        type: file
+      dataset.train_dataset.data_sources[0].data_file:
+        type: file
+      dataset.val_dataset.data_sources[0].data_file:
+        type: file
+      dataset.quant_calibration_dataset.images_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: depth_net evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.test_dataset.data_sources[0].data_file:
+        type: file
+      evaluate.checkpoint:
+        type: file
+        optional: true
+      evaluate.trt_engine:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: depth_net export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: depth_net inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.infer_dataset.data_sources[0].data_file:
+        type: file
+      inference.checkpoint:
+        type: file
+        optional: true
+      inference.trt_engine:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  gen_trt_engine:
+    container_image: tao_toolkit.deploy
+    command: depth_net gen_trt_engine -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      gen_trt_engine.onnx_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      gen_trt_engine.trt_engine:
+        type: file
+    upload_excludes:
+    - inputs/
+data_sources: {}
+spec_params:
+  train:
+    dataset.dataset_name: MonoDataset
+    model.mono_backbone.pretrained_path:
+      link: https://dl.fbaipublicfiles.com/dinov2/dinov2_vitl14/dinov2_vitl14_pretrain.pth
+      destination_path: /ptm/depth_net/mono_backbone/dinov2_vitl14_pretrain.pth
+    results_dir: output_dir
+    train.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  quantize:
+    dataset.dataset_name: MonoDataset
+    quantize.model_path: parent_model
+    results_dir: output_dir
+  evaluate:
+    dataset.dataset_name: MonoDataset
+    evaluate.checkpoint: parent_model
+    evaluate.trt_engine: parent_model
+    results_dir: output_dir
+  export:
+    dataset.dataset_name: MonoDataset
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+    results_dir: output_dir
+  inference:
+    dataset.dataset_name: MonoDataset
+    inference.checkpoint: parent_model
+    inference.trt_engine: parent_model
+    results_dir: output_dir
+  gen_trt_engine:
+    gen_trt_engine.onnx_file: parent_model
+    gen_trt_engine.trt_engine: create_engine_file
+    results_dir: output_dir
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  train_batch_size: dataset.train_dataset.batch_size
+  infer_batch_size: dataset.infer_dataset.batch_size
+  learning_rate: train.optim.lr
+description: Monocular depth estimation using Metric Depth Anything v2 or Relative Depth Anything architectures. Predicts
+  per-pixel depth from single RGB images. Mono and stereo share the unified `depth_net` CLI entrypoint;
+  model family is selected via `model.model_type`.

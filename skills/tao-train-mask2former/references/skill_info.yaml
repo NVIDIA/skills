@@ -1,0 +1,352 @@
+name: tao-train-mask2former
+network_arch: mask2former
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: coco_panoptic
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: mask2former train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train.img_dir:
+        type: folder
+      dataset.label_map:
+        type: file
+      dataset.train.instance_json:
+        type: file
+      dataset.train.panoptic_json:
+        type: file
+      dataset.train.panoptic_dir:
+        type: folder
+      dataset.val.img_dir:
+        type: folder
+      dataset.val.instance_json:
+        type: file
+      dataset.val.panoptic_json:
+        type: file
+      dataset.val.panoptic_dir:
+        type: folder
+      dataset.test.img_dir:
+        type: folder
+      model.backbone.pretrained_weights:
+        type: file
+        optional: true
+      train.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  quantize:
+    command: mask2former quantize -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      quantize.model_path:
+        type: file
+      dataset.train.img_dir:
+        type: folder
+      dataset.label_map:
+        type: file
+      dataset.train.instance_json:
+        type: file
+      dataset.train.panoptic_json:
+        type: file
+      dataset.train.panoptic_dir:
+        type: folder
+      dataset.val.img_dir:
+        type: folder
+      dataset.val.instance_json:
+        type: file
+      dataset.val.panoptic_json:
+        type: file
+      dataset.val.panoptic_dir:
+        type: folder
+      dataset.test.img_dir:
+        type: folder
+      dataset.quant_calibration_dataset.images_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: mask2former evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.checkpoint:
+        type: file
+      dataset.train.img_dir:
+        type: folder
+      dataset.label_map:
+        type: file
+      dataset.train.instance_json:
+        type: file
+      dataset.train.panoptic_json:
+        type: file
+      dataset.train.panoptic_dir:
+        type: folder
+      dataset.val.img_dir:
+        type: folder
+      dataset.val.instance_json:
+        type: file
+      dataset.val.panoptic_json:
+        type: file
+      dataset.val.panoptic_dir:
+        type: folder
+      dataset.test.img_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: mask2former export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: mask2former inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.checkpoint:
+        type: file
+      dataset.train.img_dir:
+        type: folder
+      dataset.label_map:
+        type: file
+      dataset.train.instance_json:
+        type: file
+      dataset.train.panoptic_json:
+        type: file
+      dataset.train.panoptic_dir:
+        type: folder
+      dataset.val.img_dir:
+        type: folder
+      dataset.val.instance_json:
+        type: file
+      dataset.val.panoptic_json:
+        type: file
+      dataset.val.panoptic_dir:
+        type: folder
+      dataset.test.img_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.train.img_dir:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.label_map:
+      source: train_datasets
+      path: label_map_panoptic.json
+    dataset.train.instance_json:
+      source: train_datasets
+      path: annotations.json
+    dataset.train.panoptic_json:
+      source: train_datasets
+      path: annotations_panoptic.json
+    dataset.train.panoptic_dir:
+      source: train_datasets
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.val.img_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val.instance_json:
+      source: eval_dataset
+      path: annotations.json
+    dataset.val.panoptic_json:
+      source: eval_dataset
+      path: annotations_panoptic.json
+    dataset.val.panoptic_dir:
+      source: eval_dataset
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.test.img_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+  quantize:
+    dataset.train.img_dir:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.label_map:
+      source: train_datasets
+      path: label_map_panoptic.json
+    dataset.train.instance_json:
+      source: train_datasets
+      path: annotations.json
+    dataset.train.panoptic_json:
+      source: train_datasets
+      path: annotations_panoptic.json
+    dataset.train.panoptic_dir:
+      source: train_datasets
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.val.img_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val.instance_json:
+      source: eval_dataset
+      path: annotations.json
+    dataset.val.panoptic_json:
+      source: eval_dataset
+      path: annotations_panoptic.json
+    dataset.val.panoptic_dir:
+      source: eval_dataset
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.test.img_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.quant_calibration_dataset.images_dir:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+  evaluate:
+    dataset.train.img_dir:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.label_map:
+      source: train_datasets
+      path: label_map_panoptic.json
+    dataset.train.instance_json:
+      source: train_datasets
+      path: annotations.json
+    dataset.train.panoptic_json:
+      source: train_datasets
+      path: annotations_panoptic.json
+    dataset.train.panoptic_dir:
+      source: train_datasets
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.val.img_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val.instance_json:
+      source: eval_dataset
+      path: annotations.json
+    dataset.val.panoptic_json:
+      source: eval_dataset
+      path: annotations_panoptic.json
+    dataset.val.panoptic_dir:
+      source: eval_dataset
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.test.img_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+  inference:
+    dataset.train.img_dir:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.label_map:
+      source: train_datasets
+      path: label_map_panoptic.json
+    dataset.train.instance_json:
+      source: train_datasets
+      path: annotations.json
+    dataset.train.panoptic_json:
+      source: train_datasets
+      path: annotations_panoptic.json
+    dataset.train.panoptic_dir:
+      source: train_datasets
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.val.img_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val.instance_json:
+      source: eval_dataset
+      path: annotations.json
+    dataset.val.panoptic_json:
+      source: eval_dataset
+      path: annotations_panoptic.json
+    dataset.val.panoptic_dir:
+      source: eval_dataset
+      path: images_panoptic.tar.gz
+      runtime: extracted_folder
+    dataset.test.img_dir:
+      source: inference_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+spec_params:
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    train.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    evaluate.checkpoint: parent_model
+    results_dir: output_dir
+  export:
+    encryption_key: key
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+    results_dir: output_dir
+  inference:
+    encryption_key: key
+    inference.checkpoint: parent_model
+    results_dir: output_dir
+  quantize:
+    encryption_key: key
+    quantize.model_path: parent_model
+    results_dir: output_dir
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.train.batch_size
+  val_batch_size: dataset.val.batch_size
+  test_batch_size: dataset.test.batch_size
+  learning_rate: train.optim.lr
+  mode: model.mode
+  num_classes: model.sem_seg_head.num_classes
+  contiguous_id: dataset.contiguous_id
+  input_width: export.input_width
+  input_height: export.input_height
+  pretrained_backbone: model.backbone.pretrained_weights
+  resume_checkpoint: train.resume_training_checkpoint_path
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  inference: ../references/spec_template_inference.yaml
+  export: ../references/spec_template_export.yaml
+  quantize: ../references/spec_template_quantize.yaml
+description: Mask2Former for universal image segmentation (panoptic, instance, and semantic). Transformer-based with masked
+  attention for high-quality segmentation results.

@@ -1,0 +1,33 @@
+encryption_key: tlt_encode
+results_dir: /results
+dataset:
+  num_classes: 5
+  batch_size: 1
+model:
+  backbone: resnet_50
+  train_backbone: true
+  pretrained_backbone_path: ''
+  return_interm_indices:
+  - 1
+  - 2
+  - 3
+  dec_layers: 6
+  enc_layers: 1
+  num_queries: 300
+  num_select: 300
+gen_trt_engine:
+  gpu_id: 0
+  onnx_file: /models/model.onnx
+  trt_engine: /results/rtdetr.engine
+  batch_size: -1
+  tensorrt:
+    data_type: FP16
+    workspace_size: 1024
+    min_batch_size: 1
+    opt_batch_size: 1
+    max_batch_size: 4
+    calibration:
+      cal_image_dir: []
+      cal_cache_file: /results/rtdetr_calibration.cache
+      cal_batch_size: 1
+      cal_batches: 1

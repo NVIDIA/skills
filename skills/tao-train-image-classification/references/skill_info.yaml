@@ -1,0 +1,253 @@
+name: tao-train-image-classification
+network_arch: classification_pyt
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: classification_pyt
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: classification_pyt train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset.images_dir:
+        type: folder
+      dataset.classes_file:
+        type: file
+      dataset.val_dataset.images_dir:
+        type: folder
+      model.backbone.pretrained_backbone_path:
+        type: file
+        optional: true
+      train.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  distill:
+    command: classification_pyt distill -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset.images_dir:
+        type: folder
+      dataset.classes_file:
+        type: file
+      dataset.val_dataset.images_dir:
+        type: folder
+      distill.pretrained_teacher_model_path:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  quantize:
+    command: classification_pyt quantize -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset.images_dir:
+        type: folder
+      dataset.classes_file:
+        type: file
+      dataset.val_dataset.images_dir:
+        type: folder
+      dataset.quant_calibration_dataset.images_dir:
+        type: folder
+      quantize.model_path:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: classification_pyt evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.val_dataset.images_dir:
+        type: folder
+      dataset.classes_file:
+        type: file
+      dataset.test_dataset.images_dir:
+        type: folder
+      evaluate.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: classification_pyt export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: classification_pyt inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.val_dataset.images_dir:
+        type: folder
+      dataset.classes_file:
+        type: file
+      dataset.test_dataset.images_dir:
+        type: folder
+      inference.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  gen_trt_engine:
+    container_image: tao_toolkit.deploy
+    command: classification_pyt gen_trt_engine -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      gen_trt_engine.onnx_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      gen_trt_engine.trt_engine:
+        type: file
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.train_dataset.images_dir:
+      source: train_datasets
+      path: images_train.tar.gz
+      runtime: extracted_folder
+    dataset.classes_file:
+      source: train_datasets
+      path: classes.txt
+    dataset.val_dataset.images_dir:
+      source: eval_dataset
+      path: images_val.tar.gz
+      runtime: extracted_folder
+  distill:
+    dataset.train_dataset.images_dir:
+      source: train_datasets
+      path: images_train.tar.gz
+      runtime: extracted_folder
+    dataset.classes_file:
+      source: train_datasets
+      path: classes.txt
+    dataset.val_dataset.images_dir:
+      source: eval_dataset
+      path: images_val.tar.gz
+      runtime: extracted_folder
+  quantize:
+    dataset.train_dataset.images_dir:
+      source: train_datasets
+      path: images_train.tar.gz
+      runtime: extracted_folder
+    dataset.classes_file:
+      source: train_datasets
+      path: classes.txt
+    dataset.val_dataset.images_dir:
+      source: eval_dataset
+      path: images_val.tar.gz
+      runtime: extracted_folder
+    dataset.quant_calibration_dataset.images_dir:
+      source: calibration_dataset
+      path: images_train.tar.gz
+      runtime: extracted_folder
+  evaluate:
+    dataset.val_dataset.images_dir:
+      source: eval_dataset
+      path: images_val.tar.gz
+      runtime: extracted_folder
+    dataset.classes_file:
+      source: eval_dataset
+      path: classes.txt
+    dataset.test_dataset.images_dir:
+      source: inference_dataset
+      path: images_test.tar.gz
+      runtime: extracted_folder
+  inference:
+    dataset.val_dataset.images_dir:
+      source: eval_dataset
+      path: images_val.tar.gz
+      runtime: extracted_folder
+    dataset.classes_file:
+      source: eval_dataset
+      path: classes.txt
+    dataset.test_dataset.images_dir:
+      source: inference_dataset
+      path: images_test.tar.gz
+      runtime: extracted_folder
+spec_params:
+  train:
+    encryption_key: key
+    model.backbone.pretrained_backbone_path: ptm_if_no_resume_model
+    results_dir: output_dir
+    train.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  distill:
+    distill.pretrained_teacher_model_path: parent_model
+    encryption_key: key
+    results_dir: output_dir
+  quantize:
+    encryption_key: key
+    quantize.model_path: parent_model
+    results_dir: output_dir
+  evaluate:
+    encryption_key: key
+    evaluate.checkpoint: parent_model
+    results_dir: output_dir
+  export:
+    encryption_key: key
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+    results_dir: output_dir
+  inference:
+    encryption_key: key
+    inference.checkpoint: parent_model
+    results_dir: output_dir
+  gen_trt_engine:
+    encryption_key: key
+    gen_trt_engine.onnx_file: parent_model
+    gen_trt_engine.trt_engine: create_engine_file
+    results_dir: output_dir
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.batch_size
+  learning_rate: train.optim.lr
+  num_classes: dataset.num_classes
+  image_size: dataset.img_size
+  resume_checkpoint: train.resume_training_checkpoint_path
+  trt_data_type: gen_trt_engine.tensorrt.data_type
+  trt_engine: gen_trt_engine.trt_engine
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  distill: ../references/spec_template_distill.yaml
+  quantize: ../references/spec_template_quantize.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  export: ../references/spec_template_export.yaml
+  inference: ../references/spec_template_inference.yaml
+  gen_trt_engine: ../references/spec_template_gen_trt_engine.yaml
+description: PyTorch image classification. Supports a wide range of backbones (FAN, EfficientNet, ResNet, etc.) with distillation
+  and quantization for deployment.

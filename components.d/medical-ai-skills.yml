@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: Medical AI Skills
+repo: NVIDIA-Medtech/medical-AI-skills
+ref: dev
+description: Agent-ready medical AI skills built on MONAI for DICOM handling, NVIDIA-hosted medical imaging model workflows, segmentation, synthesis, and evidence-oriented evaluation.
+links:
+  discussions: false
+skills:
+  - path: skills/dicom-metadata-extract/
+    catalog_dir: dicom-metadata-extract
+  - path: skills/dicom-series-preflight/
+    catalog_dir: dicom-series-preflight
+  - path: skills/dicom-series-to-volume/
+    catalog_dir: dicom-series-to-volume
+  - path: skills/nv-generate-ct-rflow/
+    catalog_dir: nv-generate-ct-rflow
+  - path: skills/nv-generate-mr/
+    catalog_dir: nv-generate-mr
+  - path: skills/nv-generate-mr-brain/
+    catalog_dir: nv-generate-mr-brain
+  - path: skills/nv-generate-mr-brain-finetune/
+    catalog_dir: nv-generate-mr-brain-finetune
+  - path: skills/nv-generate-vae-finetune/
+    catalog_dir: nv-generate-vae-finetune
+  - path: skills/nv-reason-cxr/
+    catalog_dir: nv-reason-cxr
+  - path: skills/nv-segment-ct/
+    catalog_dir: nv-segment-ct
+  - path: skills/nv-segment-ct-finetune/
+    catalog_dir: nv-segment-ct-finetune
+  - path: skills/nv-segment-ctmr/
+    catalog_dir: nv-segment-ctmr

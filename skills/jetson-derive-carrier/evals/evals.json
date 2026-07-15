@@ -1,0 +1,40 @@
+[
+  {
+    "id": "jetson-derive-carrier-001",
+    "question": "I just finished /jetson-init-source and my profile has a custom_carrier block with id=p1234, sku=0000, flash_config=p1234.conf. What does /jetson-derive-carrier actually fork for me?",
+    "expected_skill": "jetson-derive-carrier",
+    "expected_script": null,
+    "ground_truth": "/jetson-derive-carrier runs ONE discovery pass over the in-tree BSP to capture flash-conf vars (DTB_FILE/TBCDTB_FILE/BPFDTB_FILE/PINMUX_CONFIG/PMC_CONFIG/GPIO_CONFIG/GPIOINT_CONFIG), the BCT .dts files at bootloader/generic/BCT/ (with their .dtsi siblings ONE LEVEL UP at bootloader/, NOT alongside), nvpmodel/nvfancontrol configs, and nvpower.sh anchors. It then forks (in one squashed overlay-tracker commit): the board flash-conf with carrier-id-sku rename + targeted RHS rewrites for PINMUX_CONFIG / PMC_CONFIG / GPIO_CONFIG / GPIOINT_CONFIG / MISC_CONFIG / MB2_BCT (NOT blanket - DTB_FILE/TBCDTB_FILE/SCR_CONFIG/PMIC_CONFIG/etc. stay at reference); the flash-conf symlink p1234.conf; the four MB1 BCT files (pinmux / GPIO / padvoltage / misc); MB2 BCT misc; the nvpmodel + nvfancontrol forks. Separate commits cover the nvpower.sh patch (4 insertions: cvb cascade, module-SKU branch, nvpmodel cascade, nvfancontrol cascade) and the OVERLAY_DTB_FILE+= wire-up. The DT overlay skeleton commits in bsp_sources/hardware/ at hardware/nvidia/<chip>/nv-public/overlay/<chip>-p1234-0000+<module-id>-<module-sku>.dts plus the per-dir Makefile dtbo-y += entry positioned BEFORE the $(addprefix $(makefile-path)/,$(dtbo-y)) line. Base kernel DTB is NOT forked - carrier deltas layer through the DT overlay. BPMP DTB is opt-in (default N). Since p1234 matches ^p[0-9]{4}$, <custom-id-file-token> is 1234.",
+    "expected_behavior": [
+      "Read skills/jetson-derive-carrier/SKILL.md",
+      "Verify prerequisites: active profile with custom_carrier block, source.root_path/Linux_for_Tegra/.git initialized, bsp_image.root_path populated, reference_devkit populated",
+      "Resolve <real-conf> via readlink on <bsp_image.root_path>/Linux_for_Tegra/<reference_devkit.flash_config>",
+      "Run ONE unclipped discovery pass (no head/tail/| head -N) capturing flash-conf vars, BCT .dts at bootloader/generic/BCT/ with .dtsi siblings ONE level up at bootloader/, nvpmodel/nvfancontrol/nvpower.sh anchors",
+      "Derive <custom-id-file-token>=1234 because p1234 matches ^p[0-9]{4}$",
+      "Squash template forks into ONE overlay-tracker commit: flash-conf fork (with TARGETED RHS rewrites for PINMUX_CONFIG/PMC_CONFIG/GPIO_CONFIG/GPIOINT_CONFIG/MISC_CONFIG/MB2_BCT only), symlink, MB1 BCT (pinmux/GPIO/padvoltage/misc), MB2 BCT misc, nvpmodel, nvfancontrol",
+      "Commit nvpower.sh patch separately with 4 insertions (cvb cascade, module-SKU branch, nvpmodel cascade, nvfancontrol cascade)",
+      "Commit the OVERLAY_DTB_FILE+= wire-up as a separate temporally-distinct commit",
+      "Create the DT overlay skeleton .dts and per-dir Makefile registration in bsp_sources/hardware/nvidia/<chip>/nv-public/overlay/, positioning dtbo-y += BEFORE the $(addprefix ...) prefix block",
+      "Skip base kernel DTB (not forked) and BPMP DTB (opt-in, default N)",
+      "Run commit-message preview gate before each git commit; never stage reference-named pristine files",
+      "Re-grep after every sed/patch (sed silently no-ops on miss); use Python str.replace for multi-line edits"
+    ]
+  },
+  {
+    "id": "jetson-derive-carrier-002",
+    "question": "/jetson-derive-carrier refuses with 'no custom_carrier: block' even though my reference devkit profile loads fine. Also, my carrier id is acme01, not pNNNN. Will the skill reject that?",
+    "expected_skill": "jetson-derive-carrier",
+    "expected_script": null,
+    "ground_truth": "The refusal is by design: the skill will not infer a custom_carrier block - declare {id, sku, flash_config, name} in the active profile before re-running. The id need not be NVIDIA pNNNN style; acme01 is fine and gets used verbatim in dash-form filenames and DT compatible strings. <custom-id-file-token> is derived as the p-stripped numeric only when the id matches ^p[0-9]{4}$; for acme01 the file token stays acme01 unchanged. The other refusal is missing source.root_path/Linux_for_Tegra/.git - run /jetson-init-source first. Note also that the fork plan materializes renamed forks even when bytes don't change (rename/copy-only rows still get created and tracked) and that the commit-message preview gate fires on each git commit; cancel leaves the index staged for manual resolution.",
+    "expected_behavior": [
+      "Read skills/jetson-derive-carrier/SKILL.md and locate the Prerequisites and Troubleshooting sections",
+      "Explain that the skill refuses to infer a custom_carrier: block - the user must declare id/sku/flash_config/name in the active profile",
+      "Confirm acme01 is accepted (no pNNNN requirement); used verbatim in filenames and DT compatible strings",
+      "Note <custom-id-file-token> = acme01 (unchanged) because it does not match ^p[0-9]{4}$",
+      "Verify source.root_path/Linux_for_Tegra/.git is initialized via /jetson-init-source - second refusal trigger",
+      "Mention that renamed/copy-only forks are still materialized (do not skip byte-identical rows)",
+      "Mention the commit-message preview gate fires before each git commit; cancel leaves the index staged",
+      "Warn that mandatory source files missing on this BSP become warn-and-skipped rows rather than failing the run"
+    ]
+  }
+]

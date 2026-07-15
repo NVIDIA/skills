@@ -1,0 +1,70 @@
+diff --git a/DDM-Net/modeling/resnetGEBD.py b/DDM-Net/modeling/resnetGEBD.py
+index 4ce3d24..5366e2a 100644
+--- a/DDM-Net/modeling/resnetGEBD.py
++++ b/DDM-Net/modeling/resnetGEBD.py
+@@ -4,7 +4,7 @@ import torch.nn.functional as F
+ import einops
+ import copy
+ import ipdb
+-from torchvision.models.utils import load_state_dict_from_url
++from torch.hub import load_state_dict_from_url
+ from .resnet import ResNet18
+ from .transformer import Transformer
+ from .co_transformer import Co_Transformer
+@@ -592,8 +592,9 @@ class resnetGEBD(nn.Module):
+         self.cross_transformer1 = Co_Transformer()
+         self.cross_transformer2 = Co_Transformer()
+
+-        self.pos = PositionEmbeddingSine()
+-        self.pos2 = PositionEmbeddingSine(num_locations=5)
++        assert type(self.frames_per_side) == int
++        num_locations = 2 * self.frames_per_side + 1 # center frame + frames_per_side frames on each side
++        self.pos = PositionEmbeddingSine(num_locations=num_locations)
+
+     def forward(self, x):
+         # (bs, num_frames, C, H, W)
+@@ -651,14 +652,14 @@ class resnetGEBD(nn.Module):
+                     self.proj_rgb(x4[:, :, t1]).unsqueeze(dim=1)
+                     + self.proj_ddm(ddm[:, :, t1, :])
+                 )
+-            ).squeeze()
++            ).squeeze(-1)
+             attn_weight = F.softmax(attn_weight, dim=1)
+
+             ddm = ddm.permute(0, 3, 1, 2)
+             # (bs, C, num_frames) * (bs, num_frames, 1)
+             ddm_feature_t = torch.bmm(
+                 ddm[:, :, t1, :], attn_weight.unsqueeze(dim=2)
+-            ).squeeze()
++            ).squeeze(-1)
+             ddm_feat.append(ddm_feature_t.unsqueeze(dim=2))
+         # (bs, C, num_frames)
+         ddm_feat = torch.cat(ddm_feat, dim=2)
+diff --git a/DDM-Net/utils/helper.py b/DDM-Net/utils/helper.py
+index 84081c3..97680f8 100644
+--- a/DDM-Net/utils/helper.py
++++ b/DDM-Net/utils/helper.py
+@@ -110,23 +110,3 @@ def update_summary(epoch, train_metrics, eval_metrics, filename, write_header=Fa
+             dw.writeheader()
+         dw.writerow(rowd)
+
+-
+-try:
+-    from utils.model_ema import ModelEma
+-except:
+-    from model_ema import ModelEma
+-
+-
+-def unwrap_model(model):
+-    if isinstance(model, ModelEma):
+-        return unwrap_model(model.ema)
+-    else:
+-        return model.module if hasattr(model, "module") else model
+-
+-
+-def model_parameters(model, exclude_head=False):
+-    if exclude_head:
+-        # FIXME this a bit of a quick and dirty hack to skip classifier head params based on ordering
+-        return [p for p in model.parameters()][:-2]
+-    else:
+-        return model.parameters()

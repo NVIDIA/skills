@@ -1,0 +1,248 @@
+name: tao-train-rtdetr
+network_arch: rtdetr
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: coco
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: rtdetr train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_data_sources[0].image_dir:
+        type: folder
+      dataset.train_data_sources[0].json_file:
+        type: file
+      dataset.val_data_sources.image_dir:
+        type: folder
+      dataset.val_data_sources.json_file:
+        type: file
+      model.pretrained_backbone_path:
+        type: file
+        optional: true
+      train.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  distill:
+    command: rtdetr distill -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_data_sources[0].image_dir:
+        type: folder
+      dataset.train_data_sources[0].json_file:
+        type: file
+      dataset.val_data_sources.image_dir:
+        type: folder
+      dataset.val_data_sources.json_file:
+        type: file
+      distill.pretrained_teacher_model_path:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  quantize:
+    command: rtdetr quantize -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_data_sources[0].image_dir:
+        type: folder
+      dataset.train_data_sources[0].json_file:
+        type: file
+      dataset.val_data_sources.image_dir:
+        type: folder
+      dataset.val_data_sources.json_file:
+        type: file
+      dataset.quant_calibration_data_sources.image_dir:
+        type: folder
+      dataset.quant_calibration_data_sources.json_file:
+        type: file
+      quantize.model_path:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: rtdetr evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.test_data_sources.image_dir:
+        type: folder
+      dataset.test_data_sources.json_file:
+        type: file
+      evaluate.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: rtdetr export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: rtdetr inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.infer_data_sources.image_dir:
+        type: folder
+      dataset.infer_data_sources.classmap:
+        type: file
+      inference.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.train_data_sources[0].image_dir:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.train_data_sources[0].json_file:
+      source: train_datasets
+      path: annotations.json
+    dataset.val_data_sources.image_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val_data_sources.json_file:
+      source: eval_dataset
+      path: annotations.json
+  distill:
+    dataset.train_data_sources[0].image_dir:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.train_data_sources[0].json_file:
+      source: train_datasets
+      path: annotations.json
+    dataset.val_data_sources.image_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val_data_sources.json_file:
+      source: eval_dataset
+      path: annotations.json
+  quantize:
+    dataset.train_data_sources[0].image_dir:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.train_data_sources[0].json_file:
+      source: train_datasets
+      path: annotations.json
+    dataset.val_data_sources.image_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val_data_sources.json_file:
+      source: eval_dataset
+      path: annotations.json
+    dataset.quant_calibration_data_sources.image_dir:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.quant_calibration_data_sources.json_file:
+      source: train_datasets
+      path: annotations.json
+  evaluate:
+    dataset.test_data_sources.image_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.test_data_sources.json_file:
+      source: eval_dataset
+      path: annotations.json
+  inference:
+    dataset.infer_data_sources.image_dir:
+      source: inference_dataset
+      path: images.tar.gz
+      list: true
+      runtime: extracted_folder
+    dataset.infer_data_sources.classmap:
+      source: inference_dataset
+      path: label_map.txt
+spec_params:
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    model.pretrained_backbone_path: ptm_if_no_resume_model
+    train.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  distill:
+    encryption_key: key
+    results_dir: output_dir
+    distill.pretrained_teacher_model_path: parent_model
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.checkpoint: parent_model
+  export:
+    encryption_key: key
+    results_dir: output_dir
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.checkpoint: parent_model
+  quantize:
+    encryption_key: key
+    results_dir: output_dir
+    quantize.model_path: parent_model
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.batch_size
+  learning_rate: train.optim.lr
+  num_classes: dataset.num_classes
+  eval_class_ids: dataset.eval_class_ids
+  num_gpus: train.num_gpus
+  num_workers: dataset.workers
+  resume_checkpoint: train.resume_training_checkpoint_path
+  pretrained_model: train.pretrained_model_path
+  pretrained_backbone: model.pretrained_backbone_path
+  teacher_model: distill.pretrained_teacher_model_path
+  quantize_model: quantize.model_path
+  export_onnx: export.onnx_file
+  input_width: export.input_width
+  input_height: export.input_height
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  distill: ../references/spec_template_distill.yaml
+  quantize: ../references/spec_template_quantize.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  export: ../references/spec_template_export.yaml
+  inference: ../references/spec_template_inference.yaml
+description: RT-DETR (Real-Time DEtection TRansformer) for 2D object detection. Designed for real-time inference with competitive
+  accuracy. Supports distillation and quantization for deployment optimization.

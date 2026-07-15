@@ -1,0 +1,111 @@
+name: mask-grounding-dino-deploy
+type: model
+network_arch: mask_grounding_dino
+container_image: tao_toolkit.deploy
+data_format: odvg
+actions:
+  gen_trt_engine:
+    command: mask_grounding_dino gen_trt_engine -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      gen_trt_engine.onnx_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      gen_trt_engine.trt_engine:
+        type: file
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: mask_grounding_dino evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.trt_engine:
+        type: file
+      dataset.test_data_sources.image_dir:
+        type: folder
+      dataset.test_data_sources.json_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: mask_grounding_dino inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.trt_engine:
+        type: file
+      dataset.infer_data_sources.image_dir:
+        type: folder
+      dataset.infer_data_sources.captions:
+        type: list
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  evaluate:
+    dataset.test_data_sources.image_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.test_data_sources.json_file:
+      source: eval_dataset
+      path: annotations.json
+  inference:
+    dataset.infer_data_sources.image_dir:
+      source: inference_dataset
+      path: images.tar.gz
+      list: true
+      runtime: extracted_folder
+spec_params:
+  gen_trt_engine:
+    results_dir: output_dir
+    encryption_key: key
+    gen_trt_engine.onnx_file: parent_model
+    gen_trt_engine.trt_engine: create_engine_file
+  evaluate:
+    results_dir: output_dir
+    encryption_key: key
+    evaluate.trt_engine: parent_model
+  inference:
+    results_dir: output_dir
+    encryption_key: key
+    inference.trt_engine: parent_model
+spec_shorthand_keys:
+  trt_data_type: gen_trt_engine.tensorrt.data_type
+  trt_engine: gen_trt_engine.trt_engine
+  batch_size: dataset.batch_size
+  backbone: model.backbone
+  num_feature_levels: model.num_feature_levels
+  enc_layers: model.enc_layers
+  dec_layers: model.dec_layers
+  num_queries: model.num_queries
+  num_select: model.num_select
+  max_text_len: model.max_text_len
+  num_region_queries: model.num_region_queries
+  has_mask: model.has_mask
+  input_width: inference.input_width
+  input_height: inference.input_height
+description: Mask Grounding DINO deploy workflow for gen_trt_engine, evaluate, inference
+  using TAO Deploy.
+spec_templates:
+  gen_trt_engine: spec_template_deploy_gen_trt_engine.yaml
+  evaluate: spec_template_deploy_evaluate.yaml
+  inference: spec_template_deploy_inference.yaml
+notes:
+- 'For object-detection style deploy data, set `dataset.infer_data_sources.data_type:
+  OD` and `dataset.test_data_sources.data_type: OD`.'
+- Use batch size 1 for TensorRT inference unless the engine profile and memory budget
+  are explicitly widened.
+- Keep prompt captions aligned with the target objects for open-vocabulary inference.
+- Carry transformer and mask structure fields from export, including backbone,
+  feature levels, encoder/decoder layers, `num_queries`, `num_select`, `max_text_len`,
+  `num_region_queries`, and `has_mask`.

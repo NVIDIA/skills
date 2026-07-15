@@ -1,0 +1,160 @@
+name: tao-train-pose-classification
+network_arch: pose_classification
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: default
+gpu_spec_key: train.num_gpus
+actions:
+  dataset_convert:
+    command: pose_classification dataset_convert -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset_convert.data:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  train:
+    command: pose_classification train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset.data_path:
+        type: file
+      dataset.train_dataset.label_path:
+        type: file
+      dataset.val_dataset.data_path:
+        type: file
+      dataset.val_dataset.label_path:
+        type: file
+      model.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: pose_classification evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.test_dataset.data_path:
+        type: file
+      evaluate.test_dataset.label_path:
+        type: file
+      evaluate.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: pose_classification export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: pose_classification inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.test_dataset.data_path:
+        type: file
+      inference.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.train_dataset.data_path:
+      source: train_datasets
+      path: train_data.npy
+    dataset.train_dataset.label_path:
+      source: train_datasets
+      path: train_label.pkl
+    dataset.val_dataset.data_path:
+      source: train_datasets
+      path: val_data.npy
+    dataset.val_dataset.label_path:
+      source: train_datasets
+      path: val_label.pkl
+  evaluate:
+    evaluate.test_dataset.data_path:
+      source: train_datasets
+      path: val_data.npy
+    evaluate.test_dataset.label_path:
+      source: train_datasets
+      path: val_label.pkl
+  inference:
+    inference.test_dataset.data_path:
+      source: train_datasets
+      path: test_data.npy
+    inference.test_dataset.label_path:
+      source: train_datasets
+      path: test_label.pkl
+spec_params:
+  dataset_convert:
+    dataset_convert.results_dir: output_dir
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    model.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.checkpoint: parent_model
+  export:
+    encryption_key: key
+    results_dir: output_dir
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.checkpoint: parent_model
+    inference.output_file: create_inference_result_file_pose
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.batch_size
+  evaluate_batch_size: evaluate.batch_size
+  inference_batch_size: inference.batch_size
+  learning_rate: train.optim.lr
+  num_gpus: train.num_gpus
+  num_workers: dataset.num_workers
+  num_classes: dataset.num_classes
+  graph_layout: model.graph_layout
+  resume_checkpoint: train.resume_training_checkpoint_path
+  pretrained_model: model.pretrained_model_path
+  export_onnx: export.onnx_file
+  inference_output_file: inference.output_file
+spec_templates:
+  dataset_convert: ../references/spec_template_dataset_convert.yaml
+  train: ../references/spec_template_train.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  export: ../references/spec_template_export.yaml
+  inference: ../references/spec_template_inference.yaml
+description: Pose classification using ST-GCN (Spatial Temporal Graph Convolutional Network). Classifies skeleton sequences
+  into action categories from pose keypoint data.

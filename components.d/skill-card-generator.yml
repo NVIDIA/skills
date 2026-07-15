@@ -1,0 +1,8 @@
+name: Skill Card Generator
+repo: NVIDIA/Trustworthy-AI
+description: Reads an agent skill's source files and produces a skill card plus a review table. Use when a skill directory exists and a governance card needs to be generated or updated.
+skills:
+  - path: skills/skill-card-generator/
+    catalog_dir: skill-card-generator
+links:
+  discussions: false

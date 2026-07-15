@@ -1,0 +1,123 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# Advisory checks on the generated plugin tree against plugins.d/ + skills/.
+#
+# Both steps below are advisory (continue-on-error). They surface plumbing
+# issues — drift between the source-of-truth (skills/ + plugins.d/) and
+# the generated tree (plugins/<name>/, plugin.json, marketplace JSONs),
+# and missing per-plugin version bumps — but do NOT block the PR from
+# merging. The reasoning:
+#
+#   - The skills layer is the product; the plugin packaging is plumbing.
+#   - Plumbing drift is eventually consistent: the cron-driven sync
+#     workflow (sync-skills.yml, twice daily at 06:00 + 18:00 UTC)
+#     regenerates plugins/ from source on every run, so any drift on
+#     main self-heals within ~12 hours.
+#   - Blocking skill-content PRs on plugin-layer concerns would create
+#     friction without preventing real harm.
+#
+# Reviewers and contributors should still pay attention to yellow ⚠️
+# results — they're real signals — but they aren't merge gates.
+
+name: Validate Plugins
+
+on:
+  pull_request:
+    paths:
+      - "plugins.d/**"
+      - "skills/**"
+      - "plugins/**"
+      - ".claude-plugin/marketplace.json"
+      - ".agents/plugins/marketplace.json"
+      - ".cursor-plugin/marketplace.json"
+      - ".github/scripts/build-plugins.*"
+      - ".github/scripts/version-plugins.*"
+      - ".github/workflows/validate-plugins.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-plugins-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # version-plugins.py materializes the PR's base ref via
+          # `git worktree add`, which needs the base commit to exist
+          # locally. Shallow checkouts only fetch the PR head, so fetch
+          # full history here.
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Plugin tree drift check (advisory)
+        # Advisory: rebuilds the plugin tree from plugins.d/ + skills/ and
+        # surfaces any drift (stale plugin/<name>/skills/<x>/, out-of-date
+        # plugin.json, marketplace JSON mismatch, hand-edited generated
+        # file). Self-serve fix: run `.github/scripts/build-plugins.sh`
+        # locally and commit the result. Drift on main self-heals via
+        # the next scheduled sync-skills.yml run.
+        continue-on-error: true
+        run: .github/scripts/build-plugins.sh --check
+
+      - name: Versioning policy check (advisory)
+        # Advisory: flags any catalog plugin whose payload moved since the
+        # PR base without a corresponding version bump. The script auto-
+        # resolves the base ref from GITHUB_BASE_REF on pull_request events.
+        # Self-serve fix: run
+        #   `.github/scripts/version-plugins.sh --apply --base origin/main`
+        # locally, then commit the bump. Bumps on main also self-heal via
+        # the next scheduled sync-skills.yml run.
+        continue-on-error: true
+        run: .github/scripts/version-plugins.sh --check
+
+      # TODO: add upstream CLI validation as a follow-up step.
+      #
+      # Claude side (ready to enable when we want it):
+      #   - name: Install Claude Code CLI
+      #     run: npm install -g @anthropic-ai/claude-code@2.1.145
+      #   - name: claude plugin validate
+      #     run: |
+      #       set -e
+      #       for d in plugins/*/; do claude plugin validate "$d"; done
+      #       claude plugin validate .claude-plugin/marketplace.json
+      #       # Verified locally on 2026-05-21 against claude 2.1.145; all
+      #       # four plugin manifests + .claude-plugin/marketplace.json pass.
+      #       # Do NOT pass .agents/plugins/marketplace.json — that is the
+      #       # Codex marketplace and uses a different schema.
+      #
+      # Codex side: the codex CLI has no `plugin validate` subcommand
+      # (only add/list/marketplace/remove). Three options if we decide we
+      # want CLI-level coverage:
+      #   1. Install-as-validator dry-run: `codex plugin marketplace add
+      #      ./.agents/plugins/marketplace.json` then `codex plugin add
+      #      <name>` for each generated plugin. Real install on the
+      #      runner; ephemeral so side effects are fine.
+      #   2. Hand-roll a JSON schema check (jsonschema in Python) derived
+      #      from upstream openai/plugins samples.
+      #   3. Skip — rely on the build script's schema parity and the
+      #      drift check above.
+      #
+      # Cursor side: plugins are validated by the Cursor team at
+      # submission time (cursor.com/marketplace/publish); there is no
+      # local `plugin validate` CLI today. The generated
+      # .cursor-plugin/plugin.json + .cursor-plugin/marketplace.json are
+      # built to the published manifest schema
+      # (https://cursor.com/docs/reference/plugins) and covered by the
+      # drift check above. Revisit if Cursor ships a validator CLI.
+      # Deferred for now to keep this workflow lean; revisit if we hit a
+      # schema mismatch in the wild.

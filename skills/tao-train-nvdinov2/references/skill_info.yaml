@@ -1,0 +1,98 @@
+name: tao-train-nvdinov2
+network_arch: nvdinov2
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: ssl
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: nvdinov2 train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset.images_dir:
+        type: folder
+      train.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: nvdinov2 export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: nvdinov2 inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.checkpoint:
+        type: file
+      dataset.test_dataset.images_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.train_dataset.images_dir:
+      source: train_datasets
+      path: images_train.tar.gz
+      runtime: extracted_folder
+  inference:
+    dataset.test_dataset.images_dir:
+      source: inference_dataset
+      path: images_test.tar.gz
+      runtime: extracted_folder
+spec_params:
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    train.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  export:
+    encryption_key: key
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+    results_dir: output_dir
+  inference:
+    encryption_key: key
+    inference.checkpoint: parent_model
+    results_dir: output_dir
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.batch_size
+  workers: dataset.workers
+  image_size: model.backbone.img_size
+  teacher_type: model.backbone.teacher_type
+  student_type: model.backbone.student_type
+  num_prototypes: train.num_prototypes
+  precision: train.precision
+  resume_checkpoint: train.resume_training_checkpoint_path
+  export_input_width: export.input_width
+  export_input_height: export.input_height
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  export: ../references/spec_template_export.yaml
+  inference: ../references/spec_template_inference.yaml
+description: NVDINOv2 for self-supervised visual representation learning. Trains vision transformers via self-distillation
+  (teacher-student) without labels. Produces general-purpose visual features.

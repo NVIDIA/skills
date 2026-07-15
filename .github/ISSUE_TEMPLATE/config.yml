@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# Controls the "Create new issue" picker on github.com/NVIDIA/skills/issues/new/choose.
+# - Blank issues disabled to keep every issue on a triageable template.
+# - "Questions" deliberately omitted — community questions belong in Discussions.
+# - Security vulnerabilities follow the disclosure process in SECURITY.md, not the
+#   public issue tracker.
+
+blank_issues_enabled: false
+
+contact_links:
+  - name: Question or discussion
+    url: https://github.com/NVIDIA/skills/discussions
+    about: >
+      Use Discussions for questions, ideas, or general conversation. The issue
+      tracker is for bug reports, feature proposals with a design, and
+      documentation issues.
+
+  - name: Security vulnerability
+    url: https://github.com/NVIDIA/skills/blob/main/SECURITY.md
+    about: >
+      Do not report security vulnerabilities through GitHub issues. Follow the
+      coordinated disclosure process documented in SECURITY.md.

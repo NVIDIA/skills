@@ -1,0 +1,163 @@
+name: tao-train-segformer
+network_arch: segformer
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: unet
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: segformer train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.segment.root_dir:
+        type: folder
+      model.backbone.pretrained_backbone_path:
+        type: file
+        optional: true
+      train.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  quantize:
+    command: segformer quantize -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.segment.root_dir:
+        type: folder
+      dataset.segment.quant_calibration_dataset.images_dir:
+        type: folder
+      quantize.model_path:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: segformer evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.segment.root_dir:
+        type: folder
+      evaluate.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: segformer export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.segment.root_dir:
+        type: folder
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: segformer inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.segment.root_dir:
+        type: folder
+      inference.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.segment.root_dir:
+      source: train_datasets
+      path: ''
+  quantize:
+    dataset.segment.root_dir:
+      source: train_datasets
+      path: ''
+    dataset.segment.quant_calibration_dataset.images_dir:
+      source: calibration_dataset
+      path: ''
+  evaluate:
+    dataset.segment.root_dir:
+      source: eval_dataset
+      path: ''
+  export:
+    dataset.segment.root_dir:
+      source: train_datasets
+      path: ''
+  inference:
+    dataset.segment.root_dir:
+      source: inference_dataset
+      path: ''
+spec_params:
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    model.backbone.pretrained_backbone_path: ptm_if_no_resume_model
+    train.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    results_dir: output_dir
+    evaluate.checkpoint: parent_model
+  export:
+    encryption_key: key
+    results_dir: output_dir
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+    inference.checkpoint: parent_model
+  quantize:
+    encryption_key: key
+    results_dir: output_dir
+    quantize.model_path: parent_model
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  num_gpus: train.num_gpus
+  batch_size: dataset.segment.batch_size
+  learning_rate: train.optim.lr
+  num_classes: dataset.segment.num_classes
+  img_size: dataset.segment.img_size
+  num_workers: dataset.segment.workers
+  root_dir: dataset.segment.root_dir
+  calibration_images: dataset.segment.quant_calibration_dataset.images_dir
+  pretrained_backbone: model.backbone.pretrained_backbone_path
+  pretrained_model: train.pretrained_model_path
+  resume_checkpoint: train.resume_training_checkpoint_path
+  checkpoint: evaluate.checkpoint
+  quantize_model: quantize.model_path
+  input_width: export.input_width
+  input_height: export.input_height
+  export_onnx: export.onnx_file
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  inference: ../references/spec_template_inference.yaml
+  export: ../references/spec_template_export.yaml
+  quantize: ../references/spec_template_quantize.yaml
+description: SegFormer for semantic segmentation. Lightweight transformer-based architecture with hierarchical feature extraction.
+  Efficient for real-time segmentation tasks.

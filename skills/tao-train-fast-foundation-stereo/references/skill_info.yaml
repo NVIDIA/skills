@@ -1,0 +1,149 @@
+name: tao-train-fast-foundation-stereo
+network_arch: depth_net_stereo
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: FSD
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: depth_net train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset.data_sources[0].data_file:
+        type: file
+      dataset.val_dataset.data_sources[0].data_file:
+        type: file
+      train.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: depth_net evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.test_dataset.data_sources[0].data_file:
+        type: file
+      evaluate.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: depth_net export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: depth_net inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.infer_dataset.data_sources[0].data_file:
+        type: file
+      inference.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.train_dataset.data_sources[0].data_file:
+      source: train_datasets
+      path: annotations.txt
+    dataset.val_dataset.data_sources[0].data_file:
+      source: eval_dataset
+      path: annotations.txt
+  evaluate:
+    dataset.test_dataset.data_sources[0].data_file:
+      source: eval_dataset
+      path: annotations.txt
+  inference:
+    dataset.infer_dataset.data_sources[0].data_file:
+      source: inference_dataset
+      path: annotations.txt
+spec_params:
+  train:
+    dataset.dataset_name: StereoDataset
+    model.model_type: FastFoundationStereo
+    results_dir: output_dir
+    train.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    dataset.dataset_name: StereoDataset
+    evaluate.checkpoint: parent_model
+    model.model_type: FastFoundationStereo
+    results_dir: output_dir
+  export:
+    dataset.dataset_name: StereoDataset
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+    model.model_type: FastFoundationStereo
+    results_dir: output_dir
+  inference:
+    dataset.dataset_name: StereoDataset
+    inference.checkpoint: parent_model
+    model.model_type: FastFoundationStereo
+    results_dir: output_dir
+key_defaults:
+  model.model_type: FastFoundationStereo
+  model.encoder: vitl
+  model.hidden_dims: [128]
+  model.n_gru_layers: 1
+  model.corr_radius: 4
+  model.corr_levels: 2
+  model.n_downsample: 2
+  model.max_disparity: 192
+  model.valid_iters: 8
+  model.train_iters: 22
+  model.volume_dim: 28
+  model.mixed_precision: false
+  model.gwc_feature_normalize: true
+  model.motion_encoder_widths: [56, 96, 16, 12]
+  model.motion_encoder_final: 48
+  model.gru_hidden: 60
+  model.gru_gating_conv_widths: [100, 168]
+  model.disp_head_input_dim: 60
+  model.disp_head_intermediate: 36
+  model.disp_head_pwconv1_widths: [212, 244]
+  model.mask_widths: [32, 16]
+  model.stem_2_widths: [12, 16]
+  model.spx_2_gru_widths: [16, 12, 16, 24]
+  model.spx_gru_out: 9
+  model.classifier_mid: 14
+  model.cnet_conv04_widths: [60, 48]
+  model.cam_mid_channels: 8
+  model.cost_agg_conv_patch_padding: [0, 0, 0]
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  train_batch_size: dataset.train_dataset.batch_size
+  infer_batch_size: dataset.infer_dataset.batch_size
+  learning_rate: train.optim.lr
+  bp2_ckpt: train.pretrained_model_path
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  inference: ../references/spec_template_inference.yaml
+  export: ../references/spec_template_export.yaml
+description: "Real-time stereo depth estimation using FastFoundationStereo (FFS) — distilled bp2 commercial variant of FoundationStereo. Selected via `model.model_type: FastFoundationStereo`; shares the unified `depth_net` CLI with depth-net-stereo and depth-net-mono."

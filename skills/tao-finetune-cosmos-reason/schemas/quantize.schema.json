@@ -1,0 +1,117 @@
+{
+  "automl_default_parameters": [],
+  "automl_disabled_parameters": [],
+  "default": {
+    "dataset": {
+      "annotation_path": "",
+      "dataset_id": "",
+      "dataset_split": "test[:1]",
+      "media_dir": ""
+    },
+    "model": {
+      "base_model_path": "hf_model://nvidia/Cosmos3-Nano",
+      "enable_lora": false,
+      "model_path": "hf_model://nvidia/Cosmos3-Nano"
+    },
+    "quantize": {
+      "kv_precision": "bf16",
+      "max_sequence_length": 4096,
+      "num_calibration_samples": 1,
+      "quantization_scheme": "W4A16",
+      "skip_test_generation": true,
+      "smoothing_strength": 0.8
+    },
+    "results_dir": ""
+  },
+  "properties": {
+    "dataset": {
+      "properties": {
+        "annotation_path": {
+          "default": "hf_model://nvidia/Cosmos3-Nano",
+          "type": "string"
+        },
+        "dataset_id": {
+          "default": "",
+          "type": "string"
+        },
+        "dataset_split": {
+          "default": "test[:1]",
+          "type": "string"
+        },
+        "media_dir": {
+          "default": "",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "model": {
+      "properties": {
+        "base_model_path": {
+          "default": "",
+          "type": "string"
+        },
+        "enable_lora": {
+          "default": false,
+          "type": "boolean"
+        },
+        "model_path": {
+          "default": "hf_model://nvidia/Cosmos3-Nano",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "quantize": {
+      "properties": {
+        "kv_precision": {
+          "default": "bf16",
+          "enum": [
+            "bf16",
+            "fp8"
+          ],
+          "type": "categorical"
+        },
+        "max_sequence_length": {
+          "default": 4096,
+          "type": "integer"
+        },
+        "num_calibration_samples": {
+          "default": 1,
+          "type": "integer"
+        },
+        "quantization_scheme": {
+          "default": "W4A16",
+          "enum": [
+            "FP8_DYNAMIC",
+            "NVFP4",
+            "FP8",
+            "W8A8",
+            "W8A16",
+            "W4A16"
+          ],
+          "type": "categorical"
+        },
+        "skip_test_generation": {
+          "default": true,
+          "type": "boolean"
+        },
+        "smoothing_strength": {
+          "default": 0.8,
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "results_dir": {
+      "default": "",
+      "type": "string"
+    }
+  },
+  "required": [
+    "model",
+    "results_dir"
+  ],
+  "schema_action": "quantize",
+  "schema_version": 1
+}

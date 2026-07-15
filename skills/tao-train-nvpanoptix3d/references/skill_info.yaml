@@ -1,0 +1,213 @@
+name: tao-train-nvpanoptix3d
+network_arch: nvpanoptix3d
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: front3d
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: python -m nvidia_tao_pytorch.cv.nvpanoptix3d.entrypoint.nvpanoptix3d train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.frustum_mask_path:
+        type: file
+      dataset.label_map:
+        type: file
+      dataset.train.json_path:
+        type: file
+      dataset.train.base_dir:
+        type: folder
+        extract_to_parent: true
+      dataset.val.json_path:
+        type: file
+      dataset.val.base_dir:
+        type: folder
+        extract_to_parent: true
+      dataset.test.json_path:
+        type: file
+      dataset.test.base_dir:
+        type: folder
+        extract_to_parent: true
+      train.checkpoint_2d:
+        type: file
+        optional: true
+      train.checkpoint_3d:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: python -m nvidia_tao_pytorch.cv.nvpanoptix3d.entrypoint.nvpanoptix3d evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.frustum_mask_path:
+        type: file
+      dataset.label_map:
+        type: file
+      dataset.val.json_path:
+        type: file
+      dataset.val.base_dir:
+        type: folder
+        extract_to_parent: true
+      dataset.test.json_path:
+        type: file
+      dataset.test.base_dir:
+        type: folder
+        extract_to_parent: true
+      evaluate.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: python -m nvidia_tao_pytorch.cv.nvpanoptix3d.entrypoint.nvpanoptix3d export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file_2d:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: python -m nvidia_tao_pytorch.cv.nvpanoptix3d.entrypoint.nvpanoptix3d inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.frustum_mask_path:
+        type: file
+      dataset.label_map:
+        type: file
+      inference.checkpoint:
+        type: file
+      inference.images_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.frustum_mask_path:
+      source: train_datasets
+      path: meta/frustum_mask.npz
+    dataset.label_map:
+      source: train_datasets
+      path: meta/colormap.json
+    dataset.train.json_path:
+      source: train_datasets
+      path: meta/train.json
+    dataset.train.base_dir:
+      source: train_datasets
+      path: data/images.tar.gz
+      runtime: extracted_folder
+    dataset.val.json_path:
+      source: eval_dataset
+      path: meta/val.json
+    dataset.val.base_dir:
+      source: eval_dataset
+      path: data/images.tar.gz
+      runtime: extracted_folder
+    dataset.test.json_path:
+      source: inference_dataset
+      path: meta/test.json
+    dataset.test.base_dir:
+      source: inference_dataset
+      path: data/images.tar.gz
+      runtime: extracted_folder
+  evaluate:
+    dataset.frustum_mask_path:
+      source: eval_dataset
+      path: meta/frustum_mask.npz
+    dataset.label_map:
+      source: eval_dataset
+      path: meta/colormap.json
+    dataset.val.json_path:
+      source: eval_dataset
+      path: meta/val.json
+    dataset.val.base_dir:
+      source: eval_dataset
+      path: data/images.tar.gz
+      runtime: extracted_folder
+    dataset.test.json_path:
+      source: inference_dataset
+      path: meta/test.json
+    dataset.test.base_dir:
+      source: inference_dataset
+      path: data/images.tar.gz
+      runtime: extracted_folder
+  inference:
+    dataset.frustum_mask_path:
+      source: inference_dataset
+      path: meta/frustum_mask.npz
+    dataset.label_map:
+      source: inference_dataset
+      path: meta/colormap.json
+    inference.images_dir:
+      source: inference_dataset
+      path: data/images.tar.gz
+      runtime: extracted_folder
+spec_params:
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    train.checkpoint_2d: parent_model_or_ptm
+    train.checkpoint_3d: ptm
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    evaluate.checkpoint: parent_model
+    results_dir: output_dir
+  export:
+    encryption_key: key
+    export.checkpoint: parent_model
+    export.onnx_file_2d: create_onnx_file_2d
+    results_dir: output_dir
+  inference:
+    encryption_key: key
+    inference.checkpoint: parent_model
+    results_dir: output_dir
+key_defaults: {}
+spec_shorthand_keys:
+  batch_size: dataset.train.batch_size
+  val_batch_size: dataset.val.batch_size
+  test_batch_size: dataset.test.batch_size
+  learning_rate: train.optim.lr
+  num_epochs: train.num_epochs
+  max_steps: train.optim.max_steps
+  num_classes: model.sem_seg_head.num_classes
+  contiguous_id: dataset.contiguous_id
+  enable_3d: dataset.enable_3d
+  num_object_queries: model.mask_former.num_object_queries
+  decoder_layers: model.mask_former.dec_layers
+  precision: train.precision
+  resume_checkpoint: train.resume_training_checkpoint_path
+  inference_images_dir: inference.images_dir
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  export: ../references/spec_template_export.yaml
+  inference: ../references/spec_template_inference.yaml
+notes:
+- "For train and evaluate, extracted scene archives must resolve as `<base_dir>/data/<scene_id>/...`;
+  keep the action input metadata `extract_to_parent: true` on the base_dir keys."
+- "For inference, the PyT dataloader scans only top-level RGB images under `inference.images_dir`.
+  If an extracted archive contains scene subdirectories, create or pass a flat RGB image folder before launch."
+description: NVPanoptix3D for panoptic 3D scene reconstruction from posed RGB images. Produces 3D panoptic segmentation (semantic,
+  instance, and panoptic masks) with occupancy completion. Built on VGGT backbone with Mask2Former-style head and 3D frustum
+  reconstruction.

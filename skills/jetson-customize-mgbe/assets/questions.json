@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "io": "mgbe",
+  "questions": [
+    {
+      "id": "controller_selection",
+      "header": "MGBE controllers",
+      "question": "Which MGBE controller(s) on the module are wired to the QSFP cage / 25G path? (multi-select)",
+      "multiSelect": true,
+      "options": [
+        {"label": "mgbe0", "description": "Thor MGBE0 (most common QSFP path on reference carriers)"},
+        {"label": "mgbe1", "description": "Thor MGBE1"},
+        {"label": "mgbe2", "description": "Thor MGBE2"},
+        {"label": "mgbe3", "description": "Thor MGBE3"}
+      ],
+      "guidance": "Check the carrier schematic — the QSFP cage's SerDes pair lands on exactly one MGBE controller. UPHY lane allocation for that controller is set at the platform/SKU level via the `uphy0-config-N` ODMDATA token (handled by /modify-uphy, not here). If the schematic ingest under <KB>/schematic/<carrier>_nets.json names the controller (e.g. `MGBE0_TX_*`/`MGBE0_RX_*` nets near the QSFP refdes), prefer that signal evidence."
+    },
+    {
+      "id": "phy_mode",
+      "header": "PHY mode",
+      "question": "Per controller, which PHY mode should the kernel negotiate?",
+      "per_controller": true,
+      "options": [
+        {"label": "25g-r", "description": "25 Gb/s SerDes (Recommended for QSFP 25G)"},
+        {"label": "10g-kr", "description": "10 Gb/s KR backplane"},
+        {"label": "1000base-x", "description": "1 Gb/s SerDes (legacy fiber path)"}
+      ]
+    },
+    {
+      "id": "phy_attach_kind",
+      "header": "PHY attach",
+      "question": "Per controller, is there an external board PHY in front of the cage, or is the SerDes wired directly to the QSFP cage?",
+      "per_controller": true,
+      "options": [
+        {"label": "phy", "description": "Board PHY between MGBE SerDes and the QSFP cage. Skill emits phy-handle, an `mdio { phy@<addr> { reg=<addr>; }; }` child node, and nvidia,phy-reset-gpios."},
+        {"label": "direct", "description": "MGBE SerDes wired straight to the QSFP cage (no MDIO PHY between). Skill omits phy-handle / mdio / phy-reset-gpios; phy-mode + nvidia,max-speed remain."}
+      ]
+    },
+    {
+      "id": "phy_i2c_bus",
+      "header": "PHY I²C bus",
+      "question": "Which I²C controller node is the PHY hung off? (only when phy_attach_kind == 'phy')",
+      "per_controller": true,
+      "ask_only_if": "phy_attach_kind == 'phy'",
+      "options": [
+        {"label": "i2c@3160000", "description": "Thor i2c0"},
+        {"label": "i2c@c240000",  "description": "Thor i2c1"},
+        {"label": "i2c@3180000",  "description": "Thor i2c2"},
+        {"label": "i2c@3190000",  "description": "Thor i2c3"},
+        {"label": "i2c@31a0000",  "description": "Thor i2c4"},
+        {"label": "i2c@31b0000",  "description": "Thor i2c5"},
+        {"label": "i2c@31c0000",  "description": "Thor i2c6"},
+        {"label": "i2c@c250000",  "description": "Thor i2c7"}
+      ],
+      "guidance": "Pick the I²C controller whose SDA/SCL nets reach the PHY refdes per the schematic. The node name is the unit-address of the I²C controller in the kernel DT — it appears under /bus@0/i2c@... at runtime."
+    },
+    {
+      "id": "phy_i2c_addr_hex",
+      "header": "PHY I²C address",
+      "question": "7-bit I²C address of the PHY in hex (e.g. 0x56). (only when phy_attach_kind == 'phy')",
+      "per_controller": true,
+      "ask_only_if": "phy_attach_kind == 'phy'",
+      "validation": "^0x[0-7][0-9a-fA-F]$",
+      "guidance": "Read the PHY datasheet section on strap pins — the address is set by ADDR0..ADDR2 strap resistors at power-on. Cross-check against `i2cdetect -y -r <bus>` on a working reference board."
+    },
+    {
+      "id": "phy_reset_gpio_offset",
+      "header": "PHY reset GPIO offset",
+      "question": "Per controller, GPIO offset (decimal) of the PHY reset line within the chosen bank.",
+      "per_controller": true,
+      "validation": "^[0-9]+$",
+      "guidance": "The offset is the integer that appears in the DT phandle expression `<&gpio_main OFFSET 0>` (or `&gpio_aon`). Look up the Thor pinmap (<KB>/pinmap/<carrier>.json or the Thor SoC pinmux spreadsheet) for the exact gpio offset matching the carrier net name."
+    },
+    {
+      "id": "phy_reset_gpio_bank",
+      "header": "PHY reset GPIO bank",
+      "question": "Per controller, which GPIO bank holds the PHY reset line?",
+      "per_controller": true,
+      "options": [
+        {"label": "gpio_main", "description": "Main GPIO controller (most carrier GPIOs)"},
+        {"label": "gpio_aon",  "description": "Always-on GPIO controller (AON domain pins)"}
+      ]
+    },
+    {
+      "id": "compatible_list",
+      "header": "Match boards",
+      "question": "Which root `compatible` strings should this overlay match? (Pick at least one that matches the live DUT's /proc/device-tree/compatible — UEFI plugin-manager will skip the overlay otherwise.)",
+      "multiSelect": true,
+      "key": "platform_compatible_list",
+      "options_source": "session.platform_compatible_list || this.platform_defaults[session.platform]",
+      "platform_defaults": {
+        "thor": [
+          "nvidia,p3971-0089+p3834-0008",
+          "nvidia,p3971-0050+p3834-0005",
+          "nvidia,p3971-0080+p3834-0008",
+          "nvidia,p3971-0080+p3834-0000"
+        ]
+      },
+      "required": true,
+      "must_match_live_compatible": true,
+      "guidance": "Mirrors modify-camera Q-CON-3 / modify-pcie compatible_list. Verify with `cat /proc/device-tree/compatible | tr '\\0' '\\n'` on the booted DUT before answering. When session.platform_compatible_list is already populated (from a prior /custom-bsp clone or /modify-camera run), reuse those values rather than re-asking.",
+      "ask_only_if": "session.platform_compatible_list is empty AND no platform_defaults match"
+    }
+  ]
+}

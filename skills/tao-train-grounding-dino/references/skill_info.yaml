@@ -1,0 +1,207 @@
+name: tao-train-grounding-dino
+network_arch: grounding_dino
+automl_enabled: true
+container_image: tao_toolkit.pyt
+data_format: odvg
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: grounding_dino train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_data_sources[0].image_dir:
+        type: folder
+      dataset.train_data_sources[0].json_file:
+        type: file
+      dataset.train_data_sources[0].label_map:
+        type: file
+      dataset.val_data_sources.image_dir:
+        type: folder
+      dataset.val_data_sources.json_file:
+        type: file
+      model.pretrained_backbone_path:
+        type: file
+        optional: true
+      train.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  quantize:
+    command: grounding_dino quantize -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      quantize.model_path:
+        type: file
+      dataset.train_data_sources[0].image_dir:
+        type: folder
+      dataset.train_data_sources[0].json_file:
+        type: file
+      dataset.train_data_sources[0].label_map:
+        type: file
+      dataset.val_data_sources.image_dir:
+        type: folder
+      dataset.val_data_sources.json_file:
+        type: file
+      dataset.quant_calibration_data_sources.image_dir:
+        type: folder
+      dataset.quant_calibration_data_sources.json_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: grounding_dino evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.checkpoint:
+        type: file
+      dataset.test_data_sources.image_dir:
+        type: folder
+      dataset.test_data_sources.json_file:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: grounding_dino export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: grounding_dino inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.checkpoint:
+        type: file
+      dataset.infer_data_sources.image_dir:
+        type: folder
+      dataset.infer_data_sources.captions:
+        type: list
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.train_data_sources[0].image_dir:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.train_data_sources[0].json_file:
+      source: train_datasets
+      path: annotations_odvg.jsonl
+    dataset.train_data_sources[0].label_map:
+      source: train_datasets
+      path: annotations_odvg_labelmap.json
+    dataset.val_data_sources.image_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val_data_sources.json_file:
+      source: eval_dataset
+      path: annotations.json
+  quantize:
+    dataset.train_data_sources[0].image_dir:
+      source: train_datasets
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.train_data_sources[0].json_file:
+      source: train_datasets
+      path: annotations_odvg.jsonl
+    dataset.train_data_sources[0].label_map:
+      source: train_datasets
+      path: annotations_odvg_labelmap.json
+    dataset.val_data_sources.image_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.val_data_sources.json_file:
+      source: eval_dataset
+      path: annotations.json
+    dataset.quant_calibration_data_sources.image_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.quant_calibration_data_sources.json_file:
+      source: eval_dataset
+      path: annotations.json
+  evaluate:
+    dataset.test_data_sources.image_dir:
+      source: eval_dataset
+      path: images.tar.gz
+      runtime: extracted_folder
+    dataset.test_data_sources.json_file:
+      source: eval_dataset
+      path: annotations.json
+  inference:
+    dataset.infer_data_sources.image_dir:
+      source: inference_dataset
+      path: images.tar.gz
+      list: true
+      runtime: extracted_folder
+spec_params:
+  train:
+    encryption_key: key
+    model.pretrained_backbone_path: ptm_if_no_resume_model
+    results_dir: output_dir
+    train.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  evaluate:
+    encryption_key: key
+    evaluate.checkpoint: parent_model
+    results_dir: output_dir
+  export:
+    encryption_key: key
+    export.checkpoint: parent_model
+    export.onnx_file: create_onnx_file
+    results_dir: output_dir
+  inference:
+    encryption_key: key
+    inference.checkpoint: parent_model
+    results_dir: output_dir
+  quantize:
+    encryption_key: key
+    quantize.model_path: parent_model
+    results_dir: output_dir
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.batch_size
+  learning_rate: train.optim.lr
+  num_queries: model.num_queries
+  num_select: model.num_select
+  max_text_len: model.max_text_len
+  resume_checkpoint: train.resume_training_checkpoint_path
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  evaluate: ../references/spec_template_evaluate.yaml
+  inference: ../references/spec_template_inference.yaml
+  export: ../references/spec_template_export.yaml
+  quantize: ../references/spec_template_quantize.yaml
+description: Grounding DINO for open-set object detection. Combines DINO-style detection with BERT text encoder for language-guided
+  detection. Detects objects described by text prompts without fixed class vocabulary.
