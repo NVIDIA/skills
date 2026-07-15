@@ -2058,7 +2058,7 @@
     },
     {
       "skill": "nemo-mbridge-perf-sequence-packing",
-      "evaluation_date": "2026-07-06",
+      "evaluation_date": "2026-07-14",
       "profile": "external",
       "environment": "astra-sandbox",
       "tasks": 1,
@@ -2072,7 +2072,7 @@
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "has_results": true,
-      "average_uplift_pct": 45.1
+      "average_uplift_pct": 46.0
     },
     {
       "skill": "nemo-mbridge-perf-tp-dp-comm-overlap",
@@ -13227,8 +13227,8 @@
       "dimension": "Correctness",
       "num": 1,
       "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 16.0
+      "score_pct": 94.0,
+      "uplift_pct": 19.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
@@ -13245,8 +13245,8 @@
       "dimension": "Discoverability",
       "num": 1,
       "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 42.0
+      "score_pct": 81.0,
+      "uplift_pct": 44.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
@@ -13254,8 +13254,8 @@
       "dimension": "Effectiveness",
       "num": 1,
       "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 95.0
+      "score_pct": 96.0,
+      "uplift_pct": 96.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
@@ -13263,8 +13263,8 @@
       "dimension": "Effectiveness",
       "num": 1,
       "agent": "codex",
-      "score_pct": 83.0,
-      "uplift_pct": -0.0
+      "score_pct": 89.0,
+      "uplift_pct": 7.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
@@ -13281,8 +13281,8 @@
       "dimension": "Efficiency",
       "num": 1,
       "agent": "codex",
-      "score_pct": 78.0,
-      "uplift_pct": 31.0
+      "score_pct": 70.0,
+      "uplift_pct": 27.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-tp-dp-comm-overlap",
