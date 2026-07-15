@@ -64,18 +64,23 @@ canonical defaults rather than guessing.
 **Request:**
 
 ```bash
-curl -s -X POST "${LVS_BACKEND_URL:-http://localhost:38111}/v1/summarize" \
+jq -n \
+  --arg url "<clip_url_from_vss_manage_video_io_storage>" \
+  --arg model "${VLM_NAME:-nim_nvidia_cosmos3-nano-reasoner_bf16-final}" \
+  --arg scenario "<scenario>" \
+  --argjson events '["<event1>", "<event2>"]' \
+  '{
+    url: $url,
+    model: $model,
+    scenario: $scenario,
+    events: $events,
+    chunk_duration: 10,
+    num_frames_per_second_or_fixed_frames_chunk: 20,
+    use_fps_for_chunking: false,
+    seed: 1
+  }' | curl -s -X POST "${LVS_BACKEND_URL:-http://localhost:38111}/v1/summarize" \
   -H "Content-Type: application/json" \
-  -d '{
-    "url": "<clip_url_from_vss_manage_video_io_storage>",
-    "model": "'"${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}"'",
-    "scenario": "<scenario>",
-    "events": ["<event1>", "<event2>"],
-    "chunk_duration": 10,
-    "num_frames_per_second_or_fixed_frames_chunk": 20,
-    "use_fps_for_chunking": false,
-    "seed": 1
-  }' | jq .
+  -d @- | jq .
 ```
 
 Omit `objects_of_interest` if the user did not provide any. Include it as a

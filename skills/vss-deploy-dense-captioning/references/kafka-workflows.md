@@ -298,12 +298,12 @@ done
 ```
 
 The standalone RT-VLM compose sets `KAFKA_BOOTSTRAP_SERVERS=${HOST_IP}:9092`; a
-`.env` value named `KAFKA_BOOTSTRAP_SERVERS` is ignored unless you edit the
+`rtvi-vlm.env` value named `KAFKA_BOOTSTRAP_SERVERS` is ignored unless you edit the
 compose. If Kafka was not reachable when RT-VLM started, or if you changed the
 broker advertised listener, restart/recreate RT-VLM before checking offsets:
 
 ```bash
-docker compose --env-file .env -f rtvi-vlm-docker-compose.yml \
+docker compose --env-file rtvi-vlm.env -f rtvi-vlm-docker-compose.yml \
   --profile bp_developer_alerts_2d_vlm up -d --force-recreate rtvi-vlm
 ```
 

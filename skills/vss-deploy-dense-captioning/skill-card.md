@@ -7,12 +7,18 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 OR MIT <br>
 ## Use Case: <br>
-Developers and engineers deploying the NVIDIA RT-VLM dense-captioning microservice as a standalone service and exercising its REST API for video upload, caption generation, RTSP stream management, and chat completions. <br>
+Developers and engineers deploying the standalone RT-VLM dense-captioning microservice and exercising its REST API for video upload, dense caption generation, RTSP stream management, chat completions, and Kafka-based alerting. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Yes] <br>
+**Credential Type(s):** [API key] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
@@ -20,26 +26,27 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [RT-VLM API Reference](https://docs.nvidia.com/vss/latest/real-time-vlm-api.html) <br>
-- [Video Search and Summarization Blueprint](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
+- [VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
+- [GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
 - [API Surface (26.05)](references/api-surface-26.05.md) <br>
 - [Deploy RT-VLM Service](references/deploy-rt-vlm-service.md) <br>
 - [Kafka Workflows](references/kafka-workflows.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, API Calls] <br>
+**Output Type(s):** [Shell commands, API Calls, Configuration instructions] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- `claude-code` <br>
-- `codex` <br>
+- claude-code <br>
+- codex <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 2 evaluation tasks (2 positive skill-activation cases) using the NVSkills-Eval external profile in an astra-sandbox environment with 2 attempts per task. <br>
+Evaluated against 2 evaluation tasks in the astra-sandbox environment using the external NVSkills-Eval profile with a 50% pass threshold. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,14 +70,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 4 | 25% (-25%) | 62% (+38%) |
-| Correctness | 4 | 90% (+8%) | 92% (+21%) |
-| Discoverability | 4 | 84% (+9%) | 63% (+7%) |
-| Effectiveness | 4 | 65% (+14%) | 57% (+19%) |
-| Efficiency | 4 | 66% (+8%) | 46% (+10%) |
+| Security | 2 | 100% (+0%) | 25% (-75%) |
+| Correctness | 2 | 83% (+53%) | 87% (+62%) |
+| Discoverability | 2 | 94% (+69%) | 90% (+49%) |
+| Effectiveness | 2 | 55% (+48%) | 57% (+54%) |
+| Efficiency | 2 | 83% (+59%) | 77% (+36%) |
 
 ## Skill Version(s): <br>
-3.2.0 (source: frontmatter) <br>
+3.2.1 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

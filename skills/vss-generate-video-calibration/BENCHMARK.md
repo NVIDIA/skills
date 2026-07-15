@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `vss-generate-video-calibration`
-- Evaluation date: 2026-06-10
+- Evaluation date: 2026-07-15
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 3 evaluation tasks
@@ -54,34 +54,25 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 3 | 100% (+0%) | 83% (-17%) |
-| Correctness | 3 | 79% (+42%) | 61% (+26%) |
-| Discoverability | 3 | 95% (+34%) | 62% (+10%) |
-| Effectiveness | 3 | 36% (+30%) | 30% (+26%) |
-| Efficiency | 3 | 80% (+23%) | 53% (+6%) |
+| Security | 3 | 100% (+0%) | 100% (+0%) |
+| Correctness | 3 | 60% (+32%) | 68% (+42%) |
+| Discoverability | 3 | 73% (+26%) | 86% (+43%) |
+| Effectiveness | 3 | 31% (+24%) | 33% (+26%) |
+| Efficiency | 3 | 64% (+12%) | 77% (+27%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 7 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 1 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.author' (`skills/vss-generate-video-calibration/SKILL.md`)
-- MEDIUM QUALITY/quality_efficiency: Deeply nested references in common-steps.md (`skills/vss-generate-video-calibration/SKILL.md`)
 - MEDIUM SCHEMA/author_missing: Author not specified in metadata (`skills/vss-generate-video-calibration/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SQP-2): The RTSP capture script sets ssl_verify=False when communicating with the MS endpoint and handles RTSP URLs that may con (`references/rtsp.md:227`)
-- MEDIUM SECURITY/Unknown (SQP-2): The skill automatically executes `curl -LsSf https://astral.sh/uv/install.sh | sh` without explicit user consent when th (`references/sample-dataset.md:132`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 7 file(s)
-- Inter-Skill Deduplication: Parsed skill 'vss-generate-video-calibration': 182 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

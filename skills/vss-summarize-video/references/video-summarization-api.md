@@ -111,7 +111,7 @@ Basic request:
 curl -s -X POST "$BASE_URL/v1/summarize" \
   -H "Content-Type: application/json" \
   -d "$(jq -n \
-    --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}" \
+    --arg model "${VLM_NAME:-nim_nvidia_cosmos3-nano-reasoner_bf16-final}" \
     --arg url "https://www.example.com/video.mp4" \
     --arg scenario "warehouse monitoring" \
     --argjson events '["boxes falling","forklift stuck"]' \
@@ -152,7 +152,7 @@ curl -s -X POST "$BASE_URL/v1/generate_captions" \
   -H "Content-Type: application/json" \
   -d "$(jq -n \
     --arg id "<stream_uuid>" \
-    --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}" \
+    --arg model "${VLM_NAME:-nim_nvidia_cosmos3-nano-reasoner_bf16-final}" \
     --arg scenario "traffic monitoring" \
     --argjson events '["accident","pedestrian crossing"]' \
     '{
@@ -175,7 +175,7 @@ curl -s -X POST "$BASE_URL/v1/stream_summarize" \
   -H "Content-Type: application/json" \
   -d "$(jq -n \
     --arg id "<stream_uuid>" \
-    --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}" \
+    --arg model "${VLM_NAME:-nim_nvidia_cosmos3-nano-reasoner_bf16-final}" \
     '{
       id: $id,
       model: $model,

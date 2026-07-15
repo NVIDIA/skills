@@ -234,7 +234,7 @@ Build the artifact list from the actual selected deployment:
 
 - `resolved.yml`: every `image:` under `nvcr.io/...` that Compose will pull.
 - `$ENV_GEN`: NGC-backed model/resource paths such as
-  `RTVI_VLM_MODEL_PATH=ngc:nim/nvidia/cosmos-reason2-8b:hf-1208`. Skip
+  `RTVI_VLM_MODEL_PATH=ngc:nim/nvidia/cosmos3-nano-reasoner:bf16-final`. Skip
   `none`, `git:...`, local paths, and remote endpoint URLs.
 - Profile staging steps: any NGC model/resource downloads documented in the
   profile reference, such as alerts/search perception model staging.

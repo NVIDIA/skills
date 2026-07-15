@@ -67,7 +67,7 @@ Example: register and embed a live RTSP stream. Live-stream requests **require**
 |---|---|---|---|
 | `RTVI_EMBED_PORT` | Host port mapped to container `8000`. | (unset; `${RTVI_EMBED_PORT?}` fails fast) | Yes |
 | `RTVI_EMBED_IMAGE` | Container image. | `nvcr.io/nvidia/vss-core/vss-rt-embed` | No |
-| `RTVI_EMBED_TAG` | Container image tag. | `3.2.0` | No |
+| `RTVI_EMBED_TAG` | Container image tag. | `3.2.1` | No |
 | `RT_EMBED_DEVICE_ID` | GPU device id used by the Compose `device_ids` reservation. | `0` | No |
 | `RTVI_EMBED_NVIDIA_VISIBLE_DEVICES` | Maps to `NVIDIA_VISIBLE_DEVICES` inside the container. | `all` | No |
 | `RTVI_EMBED_NUM_GPUS` | Sets `NUM_GPUS` inside the container. | (unset) | No |
@@ -149,7 +149,7 @@ export RTVI_EMBED_CLIP_STORAGE_CONTAINER_PATH="$(
 ```yaml
 services:
   rtvi-embed:
-    image: ${RTVI_EMBED_IMAGE:-nvcr.io/nvidia/vss-core/vss-rt-embed}:${RTVI_EMBED_TAG:-3.2.0}
+    image: ${RTVI_EMBED_IMAGE:-nvcr.io/nvidia/vss-core/vss-rt-embed}:${RTVI_EMBED_TAG:-3.2.1}
     container_name: vss-rtvi-embed
     user: "1001:1001"
     profiles: ["bp_developer_search_2d"]

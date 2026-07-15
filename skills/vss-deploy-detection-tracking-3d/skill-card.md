@@ -7,26 +7,32 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 OR MIT <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers deploying multi-camera 3D detection and tracking (MV3DT) for warehouse video analytics using the NVIDIA VSS blueprint. <br>
+Developers and engineers deploying multi-camera 3D detection and tracking (MV3DT) using the NVIDIA VSS warehouse blueprint without the full agent, LLM, or VLM stack. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Yes] <br>
+**Credential Type(s):** [API key] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [NVIDIA VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
-- [Video Search and Summarization GitHub](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
 - [Deploy RTVI-CV-3D Stack](references/deploy-rtvi-cv-3d-stack.md) <br>
 - [Calibration Workflow](references/calibration-workflow.md) <br>
 - [Configure Cameras](references/configure-cameras.md) <br>
 - [Verify and View](references/verify-and-view.md) <br>
-- [Troubleshooting](references/troubleshooting.md) <br>
 - [Teardown](references/teardown.md) <br>
+- [Troubleshooting](references/troubleshooting.md) <br>
+- [NVIDIA VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
+- [GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
 
 
 ## Skill Output: <br>
@@ -42,7 +48,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 3 internal evaluation tasks (positive skill-activation cases) in the NVSkills-Eval `external` profile on astra-sandbox environment. <br>
+Evaluated against 3 evaluation tasks in astra-sandbox environment using NVSkills-Eval external profile with 50% pass threshold. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -67,13 +73,13 @@ Underlying evaluation signals used in this run: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 3 | 100% (+0%) | 100% (+0%) |
-| Correctness | 3 | 83% (+40%) | 84% (+33%) |
-| Discoverability | 3 | 94% (+52%) | 72% (+24%) |
-| Effectiveness | 3 | 56% (+42%) | 57% (+24%) |
-| Efficiency | 3 | 82% (+52%) | 60% (+22%) |
+| Correctness | 3 | 100% (+75%) | 83% (+52%) |
+| Discoverability | 3 | 94% (+56%) | 87% (+47%) |
+| Effectiveness | 3 | 74% (+68%) | 63% (+48%) |
+| Efficiency | 3 | 80% (+42%) | 81% (+33%) |
 
 ## Skill Version(s): <br>
-3.2.0 (source: frontmatter) <br>
+3.2.1 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

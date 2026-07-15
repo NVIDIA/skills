@@ -9,7 +9,7 @@ description: >
   `vss-deploy-detection-tracking-2d` for single-camera 2D detection.
 license: Apache-2.0
 metadata:
-  version: "3.2.0"
+  version: "3.2.1"
   github-url: "https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization"
   tags: "nvidia blueprint rtvi-cv-3d mv3dt detection tracking 3d warehouse"
 ---

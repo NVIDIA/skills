@@ -40,8 +40,8 @@
 #    Multi-arch and SBSA tags publish at different cadences — keep separate.
 # ─────────────────────────────────────────────────────────────────────────────
 docker_image:
-  multi_arch: nvcr.io/nvidia/vss-core/vss-rt-cv:3.2.0      # x86_64 dGPU + aarch64 Jetson
-  sbsa:       nvcr.io/nvidia/vss-core/vss-rt-cv:3.2.0-sbsa # SBSA (Spark, Grace-Hopper)
+  multi_arch: nvcr.io/nvidia/vss-core/vss-rt-cv:3.2.1      # x86_64 dGPU + aarch64 Jetson
+  sbsa:       nvcr.io/nvidia/vss-core/vss-rt-cv:3.2.1-sbsa # SBSA (Spark, Grace-Hopper)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 2. In-container path layout (the image is built around these).

@@ -197,8 +197,8 @@ Then apply env overrides to `dev-profile-base/generated.env`:
 | `LLM_NAME_SLUG` | `none` | Remote mode skips local LLM compose services |
 | `HARDWARE_PROFILE` | `DGX-SPARK` | Selects the DGX Spark VLM env file |
 | `VLM_MODE` | `local_shared` | VLM stays local on the shared edge GPU |
-| `VLM_NAME` | `nvidia/cosmos-reason2-8b` | Default local VLM |
-| `VLM_NAME_SLUG` | `cosmos-reason2-8b` | Compose-managed VLM service |
+| `VLM_NAME` | `nvidia/cosmos3-nano-reasoner` | Default local VLM |
+| `VLM_NAME_SLUG` | `cosmos3-reasoner` | Compose-managed VLM service |
 | `LLM_DEVICE_ID` | `0` | Edge platforms share GPU 0 |
 | `VLM_DEVICE_ID` | `0` | Edge platforms share GPU 0 |
 
@@ -210,7 +210,7 @@ VSS_AGENT_CONFIG_FILE=./deploy/docker/developer-profiles/dev-profile-base/vss-ag
 ```
 
 Then follow `SKILL.md` Steps 3-5 (resolve compose, normalize, `up -d`). The
-`cosmos-reason2-8b` NIM compose automatically loads
+`cosmos3-reasoner` NIM compose automatically loads
 `hw-DGX-SPARK-shared.env`, which caps the VLM side for shared edge memory.
 
 ## Future compose-supported DGX Spark path
@@ -225,8 +225,8 @@ run the standalone NIM. Instead use the compose-managed local-shared path:
 | `LLM_NAME` | `nvidia/nvidia-nemotron-nano-9b-v2-dgx-spark` |
 | `LLM_NAME_SLUG` | `nvidia-nemotron-nano-9b-v2-dgx-spark` |
 | `LLM_MODE` | `local_shared` |
-| `VLM_NAME` | `nvidia/cosmos-reason2-8b` |
-| `VLM_NAME_SLUG` | `cosmos-reason2-8b` |
+| `VLM_NAME` | `nvidia/cosmos3-nano-reasoner` |
+| `VLM_NAME_SLUG` | `cosmos3-reasoner` |
 | `VLM_MODE` | `local_shared` |
 | `LLM_DEVICE_ID` | `0` |
 | `VLM_DEVICE_ID` | `0` |
@@ -237,11 +237,11 @@ sequence limits from the standalone recipe above.
 
 ## AGX Thor / IGX Thor - Edge 4B fallback + rtvi-vlm
 
-On Thor, the VLM falls back to **`rtvi-vlm` serving Cosmos Reason 2
+On Thor, the VLM falls back to **`rtvi-vlm` serving Cosmos Reason3 Nano BF16
 in-process**. The standalone `cosmos-reason2-8b` NIM service does not run on
-Thor. `rtvi-vlm` loads `ngc:nim/nvidia/cosmos-reason2-8b:hf-1208` itself and
+Thor. `rtvi-vlm` loads `ngc:nim/nvidia/cosmos3-nano-reasoner:bf16-final` itself and
 advertises it at `http://${HOST_IP}:8018/v1` under
-`VLM_NAME=nim_nvidia_cosmos-reason2-8b_hf-1208` with
+`VLM_NAME=nim_nvidia_cosmos3-nano-reasoner_bf16-final` with
 `VLM_NAME_SLUG=none`.
 
 Remote VLM and `--vlm` swaps are not supported on Thor for `base` or

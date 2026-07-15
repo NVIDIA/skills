@@ -3,7 +3,7 @@ name: vss-deploy-dense-captioning
 description: Use this skill when deploying standalone RT-VLM dense captioning or calling its REST API (uploads, captions, streams, chat-completions, Kafka). Not for VSS profile deploy or video-search ingestion.
 license: Apache-2.0
 metadata:
-  version: "3.2.0"
+  version: "3.2.1"
   github-url: "https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization"
   tags: "nvidia blueprint operational deployment"
 ---
@@ -41,7 +41,7 @@ Worked end-to-end examples are kept under `evals/` (each `*.json` manifest conta
   existing RT-VLM service reachable from the caller.
 - NGC-hosted models and NIMs may be subject to rate-limits, GPU memory requirements, and license restrictions.
 - Concurrency, GPU memory, and storage limits depend on the host hardware and the profile's compose file.
-- Keep `NGC_CLI_API_KEY`, `RTVI_VLM_API_KEY`, and `.env` files out of git and out of logs; do not echo credential values or include them in final responses.
+- Keep `NGC_CLI_API_KEY`, `RTVI_VLM_API_KEY`, and `rtvi-vlm.env` files out of git and out of logs; do not echo credential values or include them in final responses.
 - Docker group access and `sudo` are effectively root-level privileges. Use the non-interactive `sudo -n` guard in the deploy reference and stop for host-owner action when passwordless sudo is unavailable.
 
 ## Troubleshooting
@@ -53,7 +53,7 @@ Worked end-to-end examples are kept under `evals/` (each `*.json` manifest conta
 # Deploy and Use RT-VLM Dense Captioning (VSS 3.2)
 
 RT-VLM is NVIDIA's real-time vision-language microservice: decode video (file or
-RTSP), segment it into chunks, run a VLM (`cosmos-reason1`, `cosmos-reason2`, or any
+RTSP), segment it into chunks, run a VLM (`cosmos-reason1`, `cosmos-reason2`, `cosmos-reason3`, or any
 OpenAI-compatible model), stream dense captions back over SSE/HTTP, and publish
 captions, incident alerts, and errors to Kafka. Use this skill to deploy the
 standalone RT-VLM service when a full VSS profile is not already running, then call
@@ -84,11 +84,11 @@ Always follow this sequence. Never skip the dry-run.
 #    into any writable standalone working directory.
 # 2. Derive RTVI_VLM_IMAGE_TAG from that compose copy.
 # 3. Strip the standalone-only dangling depends_on block from the copy.
-# 4. Create a gitignored .env with the required RT-VLM values.
+# 4. Create a gitignored rtvi-vlm.env with the required RT-VLM values.
 # 5. Prepare host bind paths such as $VSS_DATA_DIR/data_log/vst/clip_storage.
 #    Use `sudo -n` for ownership fixes; if passwordless sudo is unavailable,
 #    stop and ask the host owner to run the printed command manually.
-# 6. docker compose --env-file .env -f rtvi-vlm-docker-compose.yml config --quiet
+# 6. docker compose --env-file rtvi-vlm.env -f rtvi-vlm-docker-compose.yml config --quiet
 # 7. docker pull the exact RT-VLM image tag.
 # 8. docker compose ... up -d rtvi-vlm, wait for ready, then smoke test.
 ```
@@ -121,7 +121,7 @@ If `docker pull` fails with a containerd snapshotter/unpack error on Docker 28+,
 apply the `/etc/docker/daemon.json` `containerd-snapshotter=false` fix in the
 standalone reference before retrying.
 
-Minimum standalone `.env` values:
+Minimum standalone `rtvi-vlm.env` values:
 
 | Host env var | Required when | Purpose |
 |---|---|---|
@@ -130,8 +130,8 @@ Minimum standalone `.env` values:
 | `RTVI_VLM_PORT` | Always | Host API port mapped to container `8000` |
 | `HOST_IP` | Always | Kafka bootstrap host (`${HOST_IP}:9092`) |
 | `VSS_DATA_DIR` | Always | Required clip-storage bind mount |
-| `RTVI_VLM_MODEL_TO_USE` | Always for standalone | Backend selector; use `cosmos-reason2` for the default local model or `openai-compat` for a remote/sibling endpoint |
-| `RTVI_VLM_MODEL_PATH` | Local self-hosted model | Source-backed Cosmos Reason 2 path: `ngc:nim/nvidia/cosmos-reason2-8b:hf-1208` |
+| `RTVI_VLM_MODEL_TO_USE` | Always for standalone | Backend selector; use `cosmos-reason3` for the default local model or `openai-compat` for a remote/sibling endpoint |
+| `RTVI_VLM_MODEL_PATH` | Local self-hosted model | Source-backed Cosmos Reason3 Nano BF16 path: `ngc:nim/nvidia/cosmos3-nano-reasoner:bf16-final` |
 | `RTVI_VLM_ENDPOINT` | `RTVI_VLM_MODEL_TO_USE=openai-compat` | Remote/sibling OpenAI-compatible VLM endpoint |
 | `VLM_NAME` | `RTVI_VLM_MODEL_TO_USE=openai-compat` | Model/deployment name exposed by that endpoint |
 
@@ -216,8 +216,8 @@ Core paths for VSS 3.2 are:
 - `POST /v1/files` for multipart media upload; pass the returned file `id` into
   caption generation and delete the file when finished.
 - `POST /v1/generate_captions` for file or stream captioning. Use the exact
-  model id returned by `GET /v1/models`; aliases such as `cosmos-reason2` are
-  backend selectors, not request model ids.
+  model id returned by `GET /v1/models`; aliases such as `cosmos-reason2` or
+  `cosmos-reason3` are backend selectors, not request model ids.
 - `POST /v1/streams/add`, `GET /v1/streams/get-stream-info`, and
   `DELETE /v1/streams/delete/{stream_id}` for RTSP lifecycle. Parse stream ids
   from `results[0].id`.

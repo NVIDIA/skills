@@ -7,12 +7,18 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 OR MIT <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to produce narrative summaries of recorded video clips via the LVS video summarization microservice with human-in-the-loop gating, or a direct VLM fallback when the service is unavailable. <br>
+Developers and engineers use this skill to produce narrative summaries of recorded video clips, leveraging the LVS summarization microservice with HITL gating or a VLM fallback. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
@@ -21,17 +27,17 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [Video Summarization API Reference](references/video-summarization-api.md) <br>
 - [Video Summarization Deployment](references/video-summarization-deployment.md) <br>
-- [Video Summarization Debugging](references/video-summarization-debugging.md) <br>
 - [Video Summarization Environment Variables](references/video-summarization-environment-variables.md) <br>
-- [HITL Prompts](references/hitl-prompts.md) <br>
+- [Video Summarization Debugging](references/video-summarization-debugging.md) <br>
 - [End-to-End Example](references/end-to-end-example.md) <br>
-- [GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
+- [HITL Prompts](references/hitl-prompts.md) <br>
 - [NVIDIA VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
+- [GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [API Calls, Shell commands] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Analysis, Shell commands] <br>
+**Output Format:** [Markdown with verbatim backend output] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -42,7 +48,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 task from the NVSkills-Eval external profile in the astra-sandbox environment. The dataset contained 1 positive skill-activation task with 1 attempt per task and a 50% pass threshold. Overall verdict: PASS. <br>
+Evaluated against 1 evaluation task (positive skill-activation case) in the astra-sandbox environment using the external NVSkills-Eval profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -66,14 +72,14 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 1 | 100% (+100%) | 100% (+100%) |
-| Correctness | 1 | 100% (+12%) | 97% (+36%) |
-| Discoverability | 1 | 100% (+6%) | 92% (+4%) |
-| Effectiveness | 1 | 72% (+10%) | 88% (+38%) |
-| Efficiency | 1 | 90% (+19%) | 83% (+7%) |
+| Security | 1 | 100% (+0%) | 100% (+0%) |
+| Correctness | 1 | 100% (+75%) | 67% (+45%) |
+| Discoverability | 1 | 100% (+50%) | 84% (+46%) |
+| Effectiveness | 1 | 76% (+56%) | 58% (+34%) |
+| Efficiency | 1 | 92% (+36%) | 77% (+30%) |
 
 ## Skill Version(s): <br>
-3.2.0 (source: frontmatter) <br>
+3.2.1 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

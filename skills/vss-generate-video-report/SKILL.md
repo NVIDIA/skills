@@ -237,11 +237,11 @@ print(json.dumps({
 ')
 )
 [ -n "${CFG_JSON}" ] || { echo "Failed to read video_understanding config from vss-agent"; exit 1; }
-jq -e . >/dev/null <<< "${CFG_JSON}" || { echo "Invalid config JSON from vss-agent"; exit 1; }
-MAX_FPS="$(jq -r '.max_fps' <<< "${CFG_JSON}")"
-MAX_FRAMES="$(jq -r '.max_frames' <<< "${CFG_JSON}")"
-MIN_PIXELS="$(jq -r '.min_pixels' <<< "${CFG_JSON}")"
-MAX_PIXELS="$(jq -r '.max_pixels' <<< "${CFG_JSON}")"
+printf '%s' "${CFG_JSON}" | jq -e . >/dev/null || { echo "Invalid config JSON from vss-agent"; exit 1; }
+MAX_FPS="$(printf '%s' "${CFG_JSON}" | jq -r '.max_fps')"
+MAX_FRAMES="$(printf '%s' "${CFG_JSON}" | jq -r '.max_frames')"
+MIN_PIXELS="$(printf '%s' "${CFG_JSON}" | jq -r '.min_pixels')"
+MAX_PIXELS="$(printf '%s' "${CFG_JSON}" | jq -r '.max_pixels')"
 
 # num_frames = min(int(clip_seconds) * max_fps, max_frames), min 1 — matches video_understanding.py.
 # clip_seconds (Step 1 endTime-startTime) may be fractional; truncate to integer seconds — bash $((...))
@@ -266,13 +266,13 @@ curl -s --connect-timeout 5 --max-time 120 -X POST "${VLM_ENDPOINT}/chat/complet
   -H "Content-Type: application/json" \
   -d @- <<EOF | jq -r '.choices[0].message.content'
 {
-  "model": $(jq -Rs . <<< "${VLM_MODEL}"),
+  "model": $(printf '%s' "${VLM_MODEL}" | jq -Rs .),
   "messages": [
     {
       "role": "user",
       "content": [
-        {"type": "text", "text": $(jq -Rs . <<< "${PROMPT}")},
-        {"type": "video_url", "video_url": {"url": $(jq -Rs . <<< "${VIDEO_URL}")}}
+        {"type": "text", "text": $(printf '%s' "${PROMPT}" | jq -Rs .)},
+        {"type": "video_url", "video_url": {"url": $(printf '%s' "${VIDEO_URL}" | jq -Rs .)}}
       ]
     }
   ],

@@ -45,13 +45,13 @@ The default `lvs` profile routes VLM calls through RT-VLM. Verify:
 curl -sf "http://${HOST_IP}:8018/v1/models" | jq -r '.data[].id'
 ```
 
-For the default integrated Cosmos Reason 2 path, `VLM_NAME` should be:
+For the default integrated Cosmos Reason3 Nano BF16 path, `VLM_NAME` should be:
 
 ```text
-nim_nvidia_cosmos-reason2-8b_hf-1208
+nim_nvidia_cosmos3-nano-reasoner_bf16-final
 ```
 
-Do not use `nvidia/cosmos-reason2-8b` unless the endpoint advertises that id.
+Do not use `nvidia/cosmos3-nano-reasoner` unless the endpoint advertises that id.
 
 ## Kafka / Logstash Path
 

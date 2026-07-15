@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `vss-deploy-detection-tracking-3d`
-- Evaluation date: 2026-06-10
+- Evaluation date: 2026-07-15
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 3 evaluation tasks
@@ -55,33 +55,24 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 3 | 100% (+0%) | 100% (+0%) |
-| Correctness | 3 | 83% (+40%) | 84% (+33%) |
-| Discoverability | 3 | 94% (+52%) | 72% (+24%) |
-| Effectiveness | 3 | 56% (+42%) | 57% (+24%) |
-| Efficiency | 3 | 82% (+52%) | 60% (+22%) |
+| Correctness | 3 | 100% (+75%) | 83% (+52%) |
+| Discoverability | 3 | 94% (+56%) | 87% (+47%) |
+| Effectiveness | 3 | 74% (+68%) | 63% (+48%) |
+| Efficiency | 3 | 80% (+42%) | 81% (+33%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 11 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 1 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.author' (`skills/vss-deploy-detection-tracking-3d/SKILL.md`)
-- MEDIUM QUALITY/quality_efficiency: Instructions lack clear action verbs (`skills/vss-deploy-detection-tracking-3d/SKILL.md`)
-- MEDIUM QUALITY/quality_efficiency: Deeply nested references in troubleshooting.md (`skills/vss-deploy-detection-tracking-3d/SKILL.md`)
 - MEDIUM SCHEMA/author_missing: Author not specified in metadata (`skills/vss-deploy-detection-tracking-3d/SKILL.md`)
-- MEDIUM SECURITY/Unknown (SQP-2): The 'Nuke option' section describes highly destructive operations including sudo rm -rf of project state, calibration da (`references/teardown.md:101`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 7 file(s)
-- Inter-Skill Deduplication: Parsed skill 'vss-deploy-detection-tracking-3d': 426 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

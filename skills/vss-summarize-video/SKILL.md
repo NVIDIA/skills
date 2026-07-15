@@ -3,7 +3,7 @@ name: vss-summarize-video
 description: Use to summarize a recorded video via the LVS summarization microservice (HITL-gated) with a VLM fallback. Not for report generation or live RTSP captioning.
 license: Apache-2.0
 metadata:
-  version: "3.2.0"
+  version: "3.2.1"
   author: "NVIDIA Video Search and Summarization team"
   github-url: "https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization"
   tags: "nvidia blueprint operational"
@@ -54,7 +54,7 @@ timestamped events when the LVS microservice path is reachable.
 |---|---|---|
 | `/v1/ready` returns 503 repeatedly | LVS service still warming up | Retry up to ~30 s as shown in *Setup*; if it never returns 200 the service may not be deployed |
 | Empty `video_summary` and `events` | Clip does not contain the requested events | Re-run with broader `scenario` or different `events` |
-| VLM returns `<think>` block | Cosmos Reason 2 reasoning mode | Strip everything up to `</think>` before rendering |
+| VLM returns `<think>` block | Cosmos reasoning mode | Strip everything up to `</think>` before rendering |
 | Empty stdout from `curl /v1/ready` | Service legitimately returns 200 with empty body | Always check HTTP status with `-o /dev/null -w '%{http_code}'`, never inspect the body |
 
 See [`references/video-summarization-debugging.md`](references/video-summarization-debugging.md) for deeper diagnostics.
@@ -141,9 +141,9 @@ other than 200 after the warmup retries, ask the user:
 Use env vars when set (strip trailing `/v1` from the VLM base — the skill appends it). Otherwise use the defaults. If neither works, ask the user — do not scan ports or read config files to guess.
 
 **Model name:** read `${VLM_NAME}` (default
-`nim_nvidia_cosmos-reason2-8b_hf-1208`). It must match the id RT-VLM
+`nim_nvidia_cosmos3-nano-reasoner_bf16-final`). It must match the id RT-VLM
 `/v1/models` advertises; do not substitute the friendly
-`nvidia/cosmos-reason2-8b`.
+`nvidia/cosmos3-nano-reasoner`.
 
 For endpoint schemas, optional fields, response envelopes, and error handling, see [`references/video-summarization-api.md`](references/video-summarization-api.md).
 
@@ -234,7 +234,7 @@ OBJECTS_JSON=''  # '' to omit, else '["forklifts","pallets","workers"]'
 curl -s --max-time 300 -X POST "$VIDEO_SUMMARIZATION_URL/v1/summarize" \
   -H "Content-Type: application/json" \
   -d "$(jq -n --arg url "<clip_url_from_vss_manage_video_io_storage>" \
-        --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}" \
+        --arg model "${VLM_NAME:-nim_nvidia_cosmos3-nano-reasoner_bf16-final}" \
         --arg scenario "$SCENARIO" \
         --argjson events "$EVENTS_JSON" \
         --argjson objects "${OBJECTS_JSON:-null}" '{
@@ -279,7 +279,7 @@ EXAMPLE:
 curl -s --max-time 300 -X POST "$VLM/v1/chat/completions" \
   -H "Content-Type: application/json" \
   -d "$(jq -n \
-        --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}" \
+        --arg model "${VLM_NAME:-nim_nvidia_cosmos3-nano-reasoner_bf16-final}" \
         --arg text "$PROMPT" \
         --arg url "<clip_url_from_vss_manage_video_io_storage>" \
         '{
@@ -299,7 +299,7 @@ curl -s --max-time 300 -X POST "$VLM/v1/chat/completions" \
 **Response:** standard OpenAI chat-completion envelope. The summary is in
 `choices[0].message.content`.
 
-**Cosmos-model notes:** Cosmos Reason 2 supports reasoning via
+**Cosmos-model notes:** Cosmos models may return reasoning via
 `<think>...</think><answer>...</answer>` blocks. Omit the reasoning
 instructions if you want a plain summary. Frame sampling and pixel limits
 are applied server-side; no client-side prep is required when you pass a
@@ -367,10 +367,14 @@ mixed into it.
   parses the JSON string inside `content`.
 - **Prefer `/v1/summarize` for 3.2 GA**; `/summarize` is a compatibility alias.
 - **Use the exact VLM model id advertised by the endpoint** (default
-  `nim_nvidia_cosmos-reason2-8b_hf-1208`).
+  `nim_nvidia_cosmos3-nano-reasoner_bf16-final`).
 - **Render output verbatim** — no paraphrasing, no reformatting, no rewriting
   the `video_summary` or `choices[0].message.content`.
 - **One call, one render.** No parallel hedging, no double renderings.
+- **Match the image tag to the host platform.** Use `LVS_TAG=3.2.1`
+  (and `RTVI_VLM_IMAGE_TAG=3.2.1`) on x86 / Jetson Thor, and
+  `LVS_TAG=3.2.1-sbsa` (and `RTVI_VLM_IMAGE_TAG=3.2.1-sbsa`)
+  on SBSA / DGX Spark / Grace (server-class ARM64) hosts.
 
 ## Cross-reference
 
@@ -381,4 +385,4 @@ mixed into it.
 - **video summarization API reference** — [`references/video-summarization-api.md`](references/video-summarization-api.md)
 - **video summarization service ops reference** — [`references/video-summarization-deployment.md`](references/video-summarization-deployment.md)
 
-bump:2
+bump:3

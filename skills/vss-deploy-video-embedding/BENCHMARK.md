@@ -7,7 +7,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `vss-deploy-video-embedding`
-- Evaluation date: 2026-06-09
+- Evaluation date: 2026-07-15
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 2 evaluation tasks
@@ -57,31 +57,24 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 | Security | 2 | 100% (+0%) | 100% (+0%) |
 | Correctness | 2 | 50% (+50%) | 50% (+50%) |
 | Discoverability | 2 | 0% (+0%) | 0% (+0%) |
-| Effectiveness | 2 | 92% (+80%) | 84% (+66%) |
+| Effectiveness | 2 | 88% (+75%) | 84% (+66%) |
 | Efficiency | 2 | 27% (-0%) | 28% (-0%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 10 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 3 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.author' (`skills/vss-deploy-video-embedding/SKILL.md`)
-- MEDIUM QUALITY/quality_efficiency: Deeply nested references in README.md (`skills/vss-deploy-video-embedding/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/vss-deploy-video-embedding/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/vss-deploy-video-embedding/SKILL.md`)
 - MEDIUM SCHEMA/author_missing: Author not specified in metadata (`skills/vss-deploy-video-embedding/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 7 file(s)
-- Inter-Skill Deduplication: Parsed skill 'vss-deploy-video-embedding': 341 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

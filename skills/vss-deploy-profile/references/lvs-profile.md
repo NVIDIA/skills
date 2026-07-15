@@ -9,9 +9,10 @@ Long-video summarization. The LLM stack is identical to `base` (`base.md`) — s
 - **No SDR, Envoy, or SDRC router.** VST sensor and ingress talk to **vss-vios-streamprocessing** on **:30001** directly (`STREAM_PROCESSOR_MODULE_ENDPOINT`, `VST_NGINX_MODE=vst-direct`). Alerts/search use **SDRC** on **:10000** instead.
 - **No standalone VLM NIM service.** The `vlm_local_*_<slug>` compose profile is *not* enabled for LVS. The VLM lives inside the `rtvi-vlm` container.
 - **`rtvi-vlm` (port 8018) is the VLM serving layer.** It can load a VLM checkpoint directly (integrated mode) or proxy to a remote OpenAI-compatible endpoint.
-- **RT-VLM image tags:** x86 / Jetson-Tegra uses `nvcr.io/nvidia/vss-core/vss-rt-vlm:3.2.0`; SBSA / DGX Spark / Grace uses `nvcr.io/nvidia/vss-core/vss-rt-vlm:3.2.0-sbsa`.
-- **Default integrated checkpoint:** `ngc:nim/nvidia/cosmos-reason2-8b:hf-1208`.
-- **`VLM_NAME` is the model basename, NOT the friendly NIM name.** For the default integrated path: `VLM_NAME=nim_nvidia_cosmos-reason2-8b_hf-1208` (production-confirmed; using `nvidia/cosmos-reason2-8b` causes vss-lvs to return 400). Same caveat as alerts. Detail in [Default models](#default-models) and [Hard rules](#hard-rules).
+- **RT-VLM image tags:** x86 / Jetson Thor uses `nvcr.io/nvidia/vss-core/vss-rt-vlm:3.2.1`; SBSA / DGX Spark / Grace uses `nvcr.io/nvidia/vss-core/vss-rt-vlm:3.2.1-sbsa`.
+- **LVS (video-summarization) image tags:** x86 / Jetson Thor uses `nvcr.io/nvidia/vss-core/vss-video-summarization:3.2.1` (`LVS_TAG=3.2.1`); SBSA / DGX Spark / Grace uses `nvcr.io/nvidia/vss-core/vss-video-summarization:3.2.1-sbsa` (`LVS_TAG=3.2.1-sbsa`).
+- **Default integrated checkpoint:** `ngc:nim/nvidia/cosmos3-nano-reasoner:bf16-final`.
+- **`VLM_NAME` is the model basename, NOT the friendly NIM name.** For the default integrated path: `VLM_NAME=nim_nvidia_cosmos3-nano-reasoner_bf16-final` (production-confirmed; using `nvidia/cosmos3-nano-reasoner` causes vss-lvs to return 400). Same caveat as alerts. Detail in [Default models](#default-models) and [Hard rules](#hard-rules).
 - **GPU device for VLM is `RT_VLM_DEVICE_ID`** (defaults to `${VLM_DEVICE_ID:-0}` via the rtvi-vlm compose), not the standalone `VLM_DEVICE_ID`. In shared mode, LLM and RT-VLM both pin to GPU 0.
 
 ## What gets deployed
@@ -34,14 +35,22 @@ Container names below are the actual `container_name:` keys from `deploy/docker/
 
 Post-deploy readiness probe: `curl -sf http://${HOST_IP}:38111/v1/ready` should return exit 0 once `vss-lvs` is serving. The VSS Agent at `http://${HOST_IP}:8000/health` is the cross-profile readiness signal; this one confirms the LVS-specific microservice.
 
+For LVS with `LLM_MODE=local` or `LLM_MODE=local_shared`, also require:
+
+```bash
+curl -sf http://${HOST_IP}:${LLM_PORT:-30081}/v1/health/ready
+```
+
+This prevents a deploy from passing when the local LLM NIM is down.
+
 ## Default models
 
 | Role | `*_NAME` (env) | `*_NAME_SLUG` | Served by |
 |---|---|---|---|
 | LLM | `nvidia/nvidia-nemotron-nano-9b-v2` | `nvidia-nemotron-nano-9b-v2` | NIM (port 30081) |
-| VLM | **`nim_nvidia_cosmos-reason2-8b_hf-1208`** | `cosmos-reason2-8b` | RT-VLM (port 8018), `MODEL_PATH=ngc:nim/nvidia/cosmos-reason2-8b:hf-1208` |
+| VLM | **`nim_nvidia_cosmos3-nano-reasoner_bf16-final`** | `none` | RT-VLM (port 8018), `MODEL_PATH=ngc:nim/nvidia/cosmos3-nano-reasoner:bf16-final` |
 
-> **`VLM_NAME` must be the basename of `RTVI_VLM_MODEL_PATH` — NOT the friendly NIM name.** RT-VLM advertises this exact string in `/v1/models`, and the LVS service / agent calls the model by that id. Setting `VLM_NAME=nvidia/cosmos-reason2-8b` (the friendly NIM name) reproduces a real production bug: vss-lvs returns `400 BadParameters: No such model 'nvidia/cosmos-reason2-8b'` and summarization fails. **Always set `VLM_NAME=nim_nvidia_cosmos-reason2-8b_hf-1208` for the default integrated path.** Same caveat as `alerts.md`.
+> **`VLM_NAME` must be the basename of `RTVI_VLM_MODEL_PATH` — NOT the friendly NIM name.** RT-VLM advertises this exact string in `/v1/models`, and the LVS service / agent calls the model by that id. Setting `VLM_NAME=nvidia/cosmos3-nano-reasoner` (the friendly NIM name) reproduces the same class of `400 BadParameters: No such model` failure. **Always set `VLM_NAME=nim_nvidia_cosmos3-nano-reasoner_bf16-final` for the default integrated path.** Same caveat as `alerts.md`.
 
 LLM alternates: same as base — `NVIDIA-Nemotron-Nano-9B-v2-FP8`, `nvidia/nvidia-nemotron-nano-9b-v2-dgx-spark` (DGX Spark only; see `edge.md`), `nemotron-3-nano`, `llama-3.3-nemotron-super-49b-v1.5`, `gpt-oss-20b`.
 
@@ -57,7 +66,7 @@ Use this when the requested VLM is one of the integrated-supported set:
 
 | VLM | `VLM_NAME` (must match `/v1/models` basename) | `VLM_NAME_SLUG` | `RTVI_VLM_MODEL_PATH` | `RTVI_VLM_MODEL_TO_USE` | Extra env |
 |---|---|---|---|---|---|
-| Cosmos Reason 2 8B (default) | `nim_nvidia_cosmos-reason2-8b_hf-1208` | `cosmos-reason2-8b` | `ngc:nim/nvidia/cosmos-reason2-8b:hf-1208` | `cosmos-reason` | — |
+| Cosmos Reason3 Nano BF16 (default) | `nim_nvidia_cosmos3-nano-reasoner_bf16-final` | `none` | `ngc:nim/nvidia/cosmos3-nano-reasoner:bf16-final` | `cosmos-reason3` | — |
 | Cosmos Reason 1 7B | `nim_nvidia_cosmos-reason1-7b_hf-<tag>` | `cosmos-reason1-7b` | `ngc:nim/nvidia/cosmos-reason1-7b:hf-<tag>` (confirm tag against rtvi-vlm release notes) | `cosmos-reason` | — |
 | **Nemotron Nano V3 Omni 30B** ([build.nvidia.com](https://build.nvidia.com/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning)) | confirm via `curl http://${HOST_IP}:8018/v1/models` after RT-VLM boots (HF git: paths don't transform via the `nim_…` rule) | `nemotron-3-nano-omni-30b-a3b-reasoning` | `git:https://huggingface.co/nvidia/Nemotron-Nano-V3-Omni-GA0420-FP8` | `vllm-compatible` | `VLM_MODEL_SUPPORTS_AUDIO=true`, `VLM_TRUST_REMOTE_CODE=true`, `ENABLE_AUDIO=true` |
 
@@ -133,6 +142,8 @@ This is "remote mode pointed at a local container" — keep `VLM_MODE=remote` so
 
 ## Sizing — RT-VLM-specific knobs
 
+> **TODO (BF16 migration):** The default VLM checkpoint changed from FP8 to BF16 (`bf16-final`). The `RTVI_VLLM_GPU_MEMORY_UTILIZATION` defaults and worked-example fractions were tuned for FP8 and may need re-validation with the BF16 variant's larger weight footprint. See the matching note in [`base.md`](base.md#vlms-compose-files-under-deploydockerservicesnim).
+
 For VLM **weight cost** (params × bits ÷ 8 × 1.3) and the general formula, see [`base.md` § Sizing math](base.md#sizing-math) — it applies unchanged. RT-VLM's own runtime is a thin wrapper around vLLM, so weights still dominate.
 
 The RT-VLM container reads sizing knobs from `dev-profile-lvs/.env` with the `RTVI_VLM_` / `RTVI_VLLM_` prefix; they propagate inside the container as the standard vLLM env vars (see `deploy/docker/services/rtvi/rtvi-vlm/rtvi-vlm-docker-compose.yml`).
@@ -148,6 +159,8 @@ The RT-VLM container reads sizing knobs from `dev-profile-lvs/.env` with the `RT
 | `RT_VLM_DEVICE_ID` | (compose `device_ids`) | `${VLM_DEVICE_ID:-0}` | Which GPU RT-VLM pins to. In shared mode set this equal to `LLM_DEVICE_ID`. |
 
 The sizing flow is identical to base: pick the fraction with the formula in [`base.md`](base.md#sizing-math), write it into `dev-profile-lvs/generated.env` (one place — there is no per-hardware `hw-*.env` for RT-VLM), re-resolve the compose, deploy, watch the rtvi-vlm logs for `Maximum concurrency for X tokens per GPU: Y x` to confirm the KV-cache budget.
+
+**Skill deploy requirement:** when LVS runs RT-VLM on the same GPU as a local LLM (`LLM_MODE=local_shared` and `VLM_MODE=local_shared`), do not leave `RTVI_VLLM_GPU_MEMORY_UTILIZATION` empty. For H100 and RTXPRO6000BW shared deployments, write `RTVI_VLLM_GPU_MEMORY_UTILIZATION=0.40` into `generated.env` before resolving Compose.
 
 ## LVS-specific write location for the worked example
 
@@ -171,10 +184,10 @@ For dedicated mode, set `LLM_DEVICE_ID=0`, `RT_VLM_DEVICE_ID=1`, leave `RTVI_VLL
 
 ## Hard rules
 
-- **`VLM_NAME` must equal RT-VLM's `/v1/models` basename.** This is the single most important field for LVS to function. For the default integrated Cosmos2: `VLM_NAME=nim_nvidia_cosmos-reason2-8b_hf-1208`. Using the friendly NIM name `nvidia/cosmos-reason2-8b` causes vss-lvs to return `400 BadParameters: No such model …` and summarization fails — confirmed in production (2026-05-10). Transformation rule for NGC NIM paths: `ngc:nim/<org>/<model>:<tag>` → `nim_<org>_<model>_<tag>`. For HF git paths or any custom MODEL_PATH, verify by `curl http://${HOST_IP}:8018/v1/models | jq` after RT-VLM boots and copy the `id` field.
+- **`VLM_NAME` must equal RT-VLM's `/v1/models` basename.** This is the single most important field for LVS to function. For the default integrated Cosmos3 Nano BF16: `VLM_NAME=nim_nvidia_cosmos3-nano-reasoner_bf16-final`. Using the friendly NIM name `nvidia/cosmos3-nano-reasoner` causes vss-lvs to return `400 BadParameters: No such model …` and summarization fails. Transformation rule for NGC NIM paths: `ngc:nim/<org>/<model>:<tag>` → `nim_<org>_<model>_<tag>`. For HF git paths or any custom MODEL_PATH, verify by `curl http://${HOST_IP}:8018/v1/models | jq` after RT-VLM boots and copy the `id` field.
 - **L40S (48 GB) cannot host the LLM + RT-VLM shared.** 23.4 + 20.8 = 44.2 GB > 40.8 GB usable. Use a 2-GPU L40S host (LLM on device 0, RT-VLM on device 1) or escalate to the user about a remote VLM (Path B).
-- **RT-VLM image tag must match the CPU platform.** x86 and Jetson-Tegra platforms, including AGX/IGX Thor, use `RTVI_VLM_IMAGE_TAG=3.2.0` (`nvcr.io/nvidia/vss-core/vss-rt-vlm:3.2.0`). SBSA server-ARM platforms, including DGX Spark and Grace, use `RTVI_VLM_IMAGE_TAG=3.2.0-sbsa` (`nvcr.io/nvidia/vss-core/vss-rt-vlm:3.2.0-sbsa`). LLM-side, follow `edge.md`: DGX Spark uses the standalone DGX Spark Nano 9B NIM, while AGX/IGX Thor still uses the Edge 4B fallback.
-- **Don't co-deploy a standalone Cosmos NIM with RT-VLM.** The standalone `vlm_local_*_cosmos-reason2-8b` profile must NOT be active for LVS. Verify by checking that `resolved.yml` doesn't have a `cosmos-reason2-8b` or `cosmos-reason2-8b-shared-gpu` service alongside `rtvi-vlm`.
+- **RT-VLM AND LVS image tags must match the CPU platform.** x86 and Jetson Thor platforms, including AGX/IGX Thor, use the non-sbsa tags: `RTVI_VLM_IMAGE_TAG=3.2.1` (`nvcr.io/nvidia/vss-core/vss-rt-vlm:3.2.1`) and `LVS_TAG=3.2.1` (`nvcr.io/nvidia/vss-core/vss-video-summarization:3.2.1`). SBSA server-ARM platforms, including DGX Spark and Grace, use the sbsa tags: `RTVI_VLM_IMAGE_TAG=3.2.1-sbsa` (`nvcr.io/nvidia/vss-core/vss-rt-vlm:3.2.1-sbsa`) and `LVS_TAG=3.2.1-sbsa` (`nvcr.io/nvidia/vss-core/vss-video-summarization:3.2.1-sbsa`). LLM-side, follow `edge.md`: DGX Spark uses the standalone DGX Spark Nano 9B NIM, while AGX/IGX Thor still uses the Edge 4B fallback.
+- **Don't co-deploy a standalone Cosmos NIM with RT-VLM.** Standalone `vlm_local_*_cosmos3-reasoner` or any other `vlm_local_*_<slug>` profile must NOT be active for LVS. Verify by checking that `resolved.yml` doesn't have the default standalone `cosmos3-reasoner` / `cosmos3-reasoner-shared-gpu` services, or any other standalone VLM NIM service, alongside `rtvi-vlm`.
 - **`VLM_MODE=remote` ⇒ `RTVI_VLM_MODEL_PATH=none`.** Forgetting this leaves RT-VLM trying to load weights AND proxy at the same time → startup hang or OOM.
 - **`/v1` suffix mismatch.** `VLM_BASE_URL` no `/v1`; `RTVI_VLM_ENDPOINT` yes `/v1`. The skill should always write both consistently when going remote.
 
@@ -208,7 +221,7 @@ deploy/docker/developer-profiles/dev-profile-lvs/generated.env
 ## Debugging
 
 - **`docker logs vss-rtvi-vlm`** — startup takes up to 20 min on first run (model download from NGC). Look for `Maximum concurrency for X tokens per GPU: Y x` to confirm vLLM is up and the KV-cache budget is what you set.
-- **`vss-lvs` returns `400 BadParameters: No such model '<id>'`** (summarization fails in the UI) — `VLM_NAME` doesn't match what RT-VLM advertises. Verify with `curl http://${HOST_IP}:8018/v1/models | jq`; the `id` field must equal `VLM_NAME` in `dev-profile-lvs/generated.env` (the deployed values). For the default integrated path that's `nim_nvidia_cosmos-reason2-8b_hf-1208` (NOT `nvidia/cosmos-reason2-8b`). Fix → `docker compose --env-file <env> -f resolved.yml up -d --no-deps --force-recreate vss-lvs vss-agent`. If the same UI chat thread is stuck in the failed-tool loop, refresh or start a fresh prompt.
+- **`vss-lvs` returns `400 BadParameters: No such model '<id>'`** (summarization fails in the UI) — `VLM_NAME` doesn't match what RT-VLM advertises. Verify with `curl http://${HOST_IP}:8018/v1/models | jq`; the `id` field must equal `VLM_NAME` in `dev-profile-lvs/generated.env` (the deployed values). For the default integrated path that's `nim_nvidia_cosmos3-nano-reasoner_bf16-final` (NOT `nvidia/cosmos3-nano-reasoner`). Fix → `docker compose --env-file <env> -f resolved.yml up -d --no-deps --force-recreate vss-lvs vss-agent`. If the same UI chat thread is stuck in the failed-tool loop, refresh or start a fresh prompt.
 - **VLM never produces summaries** — check that the topic `mdx-vlm-captions` is being written. `docker exec kafka kafka-console-consumer --bootstrap-server localhost:9092 --topic mdx-vlm-captions --max-messages 1`.
 - **Empty Kibana dashboards** — shared `logstash` may have failed to load the `mdx-lvs` pipeline or protobuf codec; `docker logs logstash` should show pipeline startup for `mdx-lvs-logstash.conf`.
 - **OOM in RT-VLM under load** — lower `RTVI_VLLM_GPU_MEMORY_UTILIZATION` by 0.05; if that doesn't help, drop `RTVI_VLM_MAX_MODEL_LEN` to `16384` and `RTVI_VLLM_MAX_NUM_SEQS` to `64`.

@@ -9,27 +9,25 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers deploying, configuring, and managing NVIDIA Video Search and Summarization (VSS) profiles on GPU-equipped hosts. <br>
+Developers and engineers deploying NVIDIA Video Search and Summarization (VSS) profiles on GPU-equipped hosts for video analytics workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Yes] <br>
+**Credential Type(s):** [API key] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [VSS Prerequisites](https://docs.nvidia.com/vss/3.2.0/prerequisites.html) <br>
 - [VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
 - [GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
-- [Base Profile](references/base.md) <br>
-- [Alerts Profile](references/alerts.md) <br>
-- [LVS Profile](references/lvs-profile.md) <br>
-- [Search Profile](references/search.md) <br>
-- [Warehouse Profile](references/warehouse.md) <br>
-- [Edge Deployment](references/edge.md) <br>
-- [Prerequisites](references/prerequisites.md) <br>
-- [Environment Overrides](references/env-overrides.md) <br>
-- [Troubleshooting](references/troubleshooting.md) <br>
 
 
 ## Skill Output: <br>
@@ -39,13 +37,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- claude-code <br>
-- codex <br>
+- `claude-code` <br>
+- `codex` <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 5 internal evaluation tasks using NVSkills-Eval external profile in astra-sandbox environment. <br>
+Evaluated against 5 evaluation tasks in astra-sandbox environment using NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -69,11 +67,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 5 | 100% (+0%) | 100% (+10%) |
-| Correctness | 5 | 94% (+69%) | 84% (+47%) |
-| Discoverability | 5 | 95% (+62%) | 78% (+19%) |
-| Effectiveness | 5 | 56% (+52%) | 54% (+48%) |
-| Efficiency | 5 | 79% (+46%) | 72% (+17%) |
+| Security | 5 | 100% (+0%) | 90% (+10%) |
+| Correctness | 5 | 96% (+81%) | 89% (+67%) |
+| Discoverability | 5 | 90% (+70%) | 92% (+51%) |
+| Effectiveness | 5 | 80% (+75%) | 70% (+64%) |
+| Efficiency | 5 | 71% (+40%) | 88% (+40%) |
 
 ## Skill Version(s): <br>
 3.2.0 (source: frontmatter) <br>

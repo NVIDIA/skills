@@ -30,7 +30,7 @@ if [ "$video_sum_code" = "200" ]; then
   curl -s --max-time 300 -X POST "$VIDEO_SUMMARIZATION_URL/v1/summarize" \
     -H "Content-Type: application/json" \
     -d "$(jq -n --arg url "$CLIP" \
-          --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}" \
+          --arg model "${VLM_NAME:-nim_nvidia_cosmos3-nano-reasoner_bf16-final}" \
           --arg scenario "$SCENARIO" \
           --argjson events "$EVENTS_JSON" \
           --argjson objects "${OBJECTS_JSON:-null}" '{
@@ -62,7 +62,7 @@ EXAMPLE:
   curl -s --max-time 300 -X POST "$VLM/v1/chat/completions" \
     -H "Content-Type: application/json" \
     -d "$(jq -n --arg url "$CLIP" --arg text "$PROMPT" \
-          --arg model "${VLM_NAME:-nim_nvidia_cosmos-reason2-8b_hf-1208}" '{
+          --arg model "${VLM_NAME:-nim_nvidia_cosmos3-nano-reasoner_bf16-final}" '{
       model: $model,
       temperature: 0.0,
       max_tokens: 1024,

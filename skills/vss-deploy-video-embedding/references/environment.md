@@ -19,7 +19,7 @@ Several host-side variables map to differently named container variables. The Co
 | Host variable | Container variable | Default |
 |---|---|---|
 | `RTVI_EMBED_IMAGE` | image base | `nvcr.io/nvidia/vss-core/vss-rt-embed` |
-| `RTVI_EMBED_TAG` | image tag | `3.2.0` |
+| `RTVI_EMBED_TAG` | image tag | `3.2.1` |
 | `RT_EMBED_DEVICE_ID` | `device_ids[0]` reservation | `0` |
 | `RTVI_EMBED_NVIDIA_VISIBLE_DEVICES` | `NVIDIA_VISIBLE_DEVICES` | `all` |
 | `RTVI_EMBED_NUM_GPUS` | `NUM_GPUS` | (unset) |
