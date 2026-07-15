@@ -1,2 +1,0 @@
-nvidia-dali-cuda130 ~= 2.2
-torch ~= 2.12

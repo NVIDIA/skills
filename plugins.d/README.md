@@ -89,8 +89,12 @@ those users.
 
 ## Curated (hand-maintained) plugins
 
-A directory under `plugins/<name>/` that has its own
-`.skills-manifest.yml` instead of a `plugins.d/<name>.yml` is treated as
-a curated plugin: the build script only refreshes its `skills/` symlinks
-and otherwise leaves `.claude-plugin/`, `.codex-plugin/`,
-`.cursor-plugin/`, `assets/`, and the marketplace entries hand-edited.
+> Legacy fallback — no plugins currently use this mode. Every plugin in
+> this repo is catalog-driven (defined by a `plugins.d/<name>.yml`).
+
+The build script still supports a hand-maintained mode: a directory under
+`plugins/<name>/` that has its own `.skills-manifest.yml` instead of a
+`plugins.d/<name>.yml` is treated as curated — the build only refreshes
+its `skills/` tree and otherwise leaves `.claude-plugin/`,
+`.codex-plugin/`, `.cursor-plugin/`, `assets/`, and the marketplace
+entries hand-edited.

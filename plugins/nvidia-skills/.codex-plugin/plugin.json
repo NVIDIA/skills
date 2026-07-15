@@ -1,7 +1,7 @@
 {
     "name": "nvidia-skills",
-    "version": "1.2.2",
-    "description": "Skills for NVIDIAs ecosystem spans GPU acceleration, CUDA, AI agents, inference, robotics, Physical AI, Omniverse, and simulation. This plugin helps you understand the pieces, choose a path, validate your setup, and build practical NVIDIA-powered workflows.",
+    "version": "1.3.0",
+    "description": "Skills for NVIDIAs ecosystem spans GPU acceleration, CUDA, AI agents, inference, robotics, Physical AI, Omniverse, and simulation. This plugin helps you find the right skills to help in building NVIDIA-powered workflows.",
     "author": {
         "name": "NVIDIA",
         "url": "https://github.com/NVIDIA/skills"
@@ -30,7 +30,7 @@
     "interface": {
         "displayName": "NVIDIA",
         "shortDescription": "Guided help for NVIDIA AI, GPU, robotics, simulation, and 3D workflows.",
-        "longDescription": "NVIDIAs ecosystem spans GPU acceleration, CUDA, AI agents, data loading, training, inference, robotics, Physical AI, Omniverse, and simulation. This plugin helps you understand the pieces, choose a path, validate your setup, and build practical NVIDIA-powered workflows.",
+        "longDescription": "NVIDIAs ecosystem spans GPU acceleration, CUDA, AI agents, data loading, training, inference, robotics, Physical AI, Omniverse, and simulation. This plugin helps you find the right skills to help in building NVIDIA-powered workflows.",
         "developerName": "NVIDIA",
         "category": "Coding",
         "capabilities": [
@@ -41,7 +41,7 @@
         "composerIcon": "./assets/nvidia.png",
         "brandColor": "#76b900",
         "defaultPrompt": [
-            "Research NVIDIA CUDA-X for me and explain which libraries matter for simulation and robotics",
+            "What NVIDIA skills can help me with simulation and robotics",
             "How I could turn real-world driving footage into a 3D neural scene for simulation",
             "Help me deploy a secure OpenClaw agent"
         ]
