@@ -3852,11 +3852,11 @@
     },
     {
       "skill": "vss-deploy-dense-captioning",
-      "evaluation_date": "2026-06-09",
+      "evaluation_date": "2026-07-15",
       "profile": "external",
       "environment": "astra-sandbox",
       "tasks": 2,
-      "attempts_per_task": 2,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
       "verdict": "PASS",
       "agents": [
@@ -3866,17 +3866,17 @@
       "catalog_dir": "vss-deploy-dense-captioning",
       "component": "Video Search and Summarization",
       "has_results": true,
-      "average_uplift_pct": 10.9
+      "average_uplift_pct": 35.5
     },
     {
       "skill": "vss-deploy-detection-tracking-2d",
-      "evaluation_date": "2026-06-08",
+      "evaluation_date": "2026-07-15",
       "profile": "external",
       "environment": "astra-sandbox",
       "tasks": 2,
-      "attempts_per_task": 2,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
-      "verdict": "FAIL",
+      "verdict": "PASS",
       "agents": [
         "claude-code",
         "codex"
@@ -3884,11 +3884,11 @@
       "catalog_dir": "vss-deploy-detection-tracking-2d",
       "component": "Video Search and Summarization",
       "has_results": true,
-      "average_uplift_pct": 22.9
+      "average_uplift_pct": 22.5
     },
     {
       "skill": "vss-deploy-detection-tracking-3d",
-      "evaluation_date": "2026-06-10",
+      "evaluation_date": "2026-07-15",
       "profile": "external",
       "environment": "astra-sandbox",
       "tasks": 3,
@@ -3902,11 +3902,11 @@
       "catalog_dir": "vss-deploy-detection-tracking-3d",
       "component": "Video Search and Summarization",
       "has_results": true,
-      "average_uplift_pct": 28.9
+      "average_uplift_pct": 42.1
     },
     {
       "skill": "vss-deploy-profile",
-      "evaluation_date": "2026-06-15",
+      "evaluation_date": "2026-07-15",
       "profile": "external",
       "environment": "astra-sandbox",
       "tasks": 5,
@@ -3920,11 +3920,11 @@
       "catalog_dir": "vss-deploy-profile",
       "component": "Video Search and Summarization",
       "has_results": true,
-      "average_uplift_pct": 37.0
+      "average_uplift_pct": 49.8
     },
     {
       "skill": "vss-deploy-video-embedding",
-      "evaluation_date": "2026-06-09",
+      "evaluation_date": "2026-07-15",
       "profile": "external",
       "environment": "astra-sandbox",
       "tasks": 2,
@@ -3938,11 +3938,11 @@
       "catalog_dir": "vss-deploy-video-embedding",
       "component": "Video Search and Summarization",
       "has_results": true,
-      "average_uplift_pct": 24.6
+      "average_uplift_pct": 24.1
     },
     {
       "skill": "vss-generate-video-calibration",
-      "evaluation_date": "2026-06-10",
+      "evaluation_date": "2026-07-15",
       "profile": "external",
       "environment": "astra-sandbox",
       "tasks": 3,
@@ -3956,11 +3956,11 @@
       "catalog_dir": "vss-generate-video-calibration",
       "component": "Video Search and Summarization",
       "has_results": true,
-      "average_uplift_pct": 18.0
+      "average_uplift_pct": 23.2
     },
     {
       "skill": "vss-generate-video-report",
-      "evaluation_date": "2026-06-15",
+      "evaluation_date": "2026-07-15",
       "profile": "external",
       "environment": "astra-sandbox",
       "tasks": 3,
@@ -3974,7 +3974,7 @@
       "catalog_dir": "vss-generate-video-report",
       "component": "Video Search and Summarization",
       "has_results": true,
-      "average_uplift_pct": 16.3
+      "average_uplift_pct": 15.8
     },
     {
       "skill": "vss-manage-alerts",
@@ -4086,7 +4086,7 @@
     },
     {
       "skill": "vss-summarize-video",
-      "evaluation_date": "2026-06-09",
+      "evaluation_date": "2026-07-15",
       "profile": "external",
       "environment": "astra-sandbox",
       "tasks": 1,
@@ -4100,7 +4100,7 @@
       "catalog_dir": "vss-summarize-video",
       "component": "Video Search and Summarization",
       "has_results": true,
-      "average_uplift_pct": 33.2
+      "average_uplift_pct": 37.2
     }
   ],
   "results": [
@@ -21568,133 +21568,133 @@
       "catalog_dir": "vss-deploy-dense-captioning",
       "component": "Video Search and Summarization",
       "dimension": "Security",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
-      "score_pct": 25.0,
-      "uplift_pct": -25.0
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "vss-deploy-dense-captioning",
       "component": "Video Search and Summarization",
       "dimension": "Security",
-      "num": 4,
+      "num": 2,
       "agent": "codex",
-      "score_pct": 62.0,
-      "uplift_pct": 38.0
+      "score_pct": 25.0,
+      "uplift_pct": -75.0
     },
     {
       "catalog_dir": "vss-deploy-dense-captioning",
       "component": "Video Search and Summarization",
       "dimension": "Correctness",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
+      "score_pct": 83.0,
+      "uplift_pct": 53.0
+    },
+    {
+      "catalog_dir": "vss-deploy-dense-captioning",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 87.0,
+      "uplift_pct": 62.0
+    },
+    {
+      "catalog_dir": "vss-deploy-dense-captioning",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "vss-deploy-dense-captioning",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
       "score_pct": 90.0,
-      "uplift_pct": 8.0
-    },
-    {
-      "catalog_dir": "vss-deploy-dense-captioning",
-      "component": "Video Search and Summarization",
-      "dimension": "Correctness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 21.0
-    },
-    {
-      "catalog_dir": "vss-deploy-dense-captioning",
-      "component": "Video Search and Summarization",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 84.0,
-      "uplift_pct": 9.0
-    },
-    {
-      "catalog_dir": "vss-deploy-dense-captioning",
-      "component": "Video Search and Summarization",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 63.0,
-      "uplift_pct": 7.0
+      "uplift_pct": 49.0
     },
     {
       "catalog_dir": "vss-deploy-dense-captioning",
       "component": "Video Search and Summarization",
       "dimension": "Effectiveness",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
-      "score_pct": 65.0,
-      "uplift_pct": 14.0
+      "score_pct": 55.0,
+      "uplift_pct": 48.0
     },
     {
       "catalog_dir": "vss-deploy-dense-captioning",
       "component": "Video Search and Summarization",
       "dimension": "Effectiveness",
-      "num": 4,
+      "num": 2,
       "agent": "codex",
       "score_pct": 57.0,
-      "uplift_pct": 19.0
+      "uplift_pct": 54.0
     },
     {
       "catalog_dir": "vss-deploy-dense-captioning",
       "component": "Video Search and Summarization",
       "dimension": "Efficiency",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
-      "score_pct": 66.0,
-      "uplift_pct": 8.0
+      "score_pct": 83.0,
+      "uplift_pct": 59.0
     },
     {
       "catalog_dir": "vss-deploy-dense-captioning",
       "component": "Video Search and Summarization",
       "dimension": "Efficiency",
-      "num": 4,
+      "num": 2,
       "agent": "codex",
-      "score_pct": 46.0,
-      "uplift_pct": 10.0
-    },
-    {
-      "catalog_dir": "vss-deploy-detection-tracking-2d",
-      "component": "Video Search and Summarization",
-      "dimension": "Security",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "vss-deploy-detection-tracking-2d",
-      "component": "Video Search and Summarization",
-      "dimension": "Security",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "vss-deploy-detection-tracking-2d",
-      "component": "Video Search and Summarization",
-      "dimension": "Correctness",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 69.0,
-      "uplift_pct": 33.0
-    },
-    {
-      "catalog_dir": "vss-deploy-detection-tracking-2d",
-      "component": "Video Search and Summarization",
-      "dimension": "Correctness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 96.0,
+      "score_pct": 77.0,
       "uplift_pct": 36.0
     },
     {
       "catalog_dir": "vss-deploy-detection-tracking-2d",
       "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "vss-deploy-detection-tracking-2d",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 50.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "vss-deploy-detection-tracking-2d",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 64.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "vss-deploy-detection-tracking-2d",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "vss-deploy-detection-tracking-2d",
+      "component": "Video Search and Summarization",
       "dimension": "Discoverability",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
       "score_pct": 97.0,
       "uplift_pct": 41.0
@@ -21703,46 +21703,46 @@
       "catalog_dir": "vss-deploy-detection-tracking-2d",
       "component": "Video Search and Summarization",
       "dimension": "Discoverability",
-      "num": 4,
+      "num": 2,
       "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 22.0
+      "score_pct": 90.0,
+      "uplift_pct": 26.0
     },
     {
       "catalog_dir": "vss-deploy-detection-tracking-2d",
       "component": "Video Search and Summarization",
       "dimension": "Effectiveness",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
-      "score_pct": 54.0,
-      "uplift_pct": 24.0
+      "score_pct": 52.0,
+      "uplift_pct": 32.0
     },
     {
       "catalog_dir": "vss-deploy-detection-tracking-2d",
       "component": "Video Search and Summarization",
       "dimension": "Effectiveness",
-      "num": 4,
+      "num": 2,
       "agent": "codex",
-      "score_pct": 74.0,
-      "uplift_pct": 29.0
+      "score_pct": 78.0,
+      "uplift_pct": 28.0
     },
     {
       "catalog_dir": "vss-deploy-detection-tracking-2d",
       "component": "Video Search and Summarization",
       "dimension": "Efficiency",
-      "num": 4,
+      "num": 2,
       "agent": "claude-code",
       "score_pct": 86.0,
-      "uplift_pct": 29.0
+      "uplift_pct": 26.0
     },
     {
       "catalog_dir": "vss-deploy-detection-tracking-2d",
       "component": "Video Search and Summarization",
       "dimension": "Efficiency",
-      "num": 4,
+      "num": 2,
       "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 15.0
+      "score_pct": 77.0,
+      "uplift_pct": 10.0
     },
     {
       "catalog_dir": "vss-deploy-detection-tracking-3d",
@@ -21768,17 +21768,17 @@
       "dimension": "Correctness",
       "num": 3,
       "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "vss-deploy-detection-tracking-3d",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "codex",
       "score_pct": 83.0,
-      "uplift_pct": 40.0
-    },
-    {
-      "catalog_dir": "vss-deploy-detection-tracking-3d",
-      "component": "Video Search and Summarization",
-      "dimension": "Correctness",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 33.0
+      "uplift_pct": 52.0
     },
     {
       "catalog_dir": "vss-deploy-detection-tracking-3d",
@@ -21787,7 +21787,7 @@
       "num": 3,
       "agent": "claude-code",
       "score_pct": 94.0,
-      "uplift_pct": 52.0
+      "uplift_pct": 56.0
     },
     {
       "catalog_dir": "vss-deploy-detection-tracking-3d",
@@ -21795,8 +21795,8 @@
       "dimension": "Discoverability",
       "num": 3,
       "agent": "codex",
-      "score_pct": 72.0,
-      "uplift_pct": 24.0
+      "score_pct": 87.0,
+      "uplift_pct": 47.0
     },
     {
       "catalog_dir": "vss-deploy-detection-tracking-3d",
@@ -21804,35 +21804,35 @@
       "dimension": "Effectiveness",
       "num": 3,
       "agent": "claude-code",
-      "score_pct": 56.0,
+      "score_pct": 74.0,
+      "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "vss-deploy-detection-tracking-3d",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 63.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "vss-deploy-detection-tracking-3d",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 80.0,
       "uplift_pct": 42.0
     },
     {
       "catalog_dir": "vss-deploy-detection-tracking-3d",
       "component": "Video Search and Summarization",
-      "dimension": "Effectiveness",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 57.0,
-      "uplift_pct": 24.0
-    },
-    {
-      "catalog_dir": "vss-deploy-detection-tracking-3d",
-      "component": "Video Search and Summarization",
-      "dimension": "Efficiency",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 82.0,
-      "uplift_pct": 52.0
-    },
-    {
-      "catalog_dir": "vss-deploy-detection-tracking-3d",
-      "component": "Video Search and Summarization",
       "dimension": "Efficiency",
       "num": 3,
       "agent": "codex",
-      "score_pct": 60.0,
-      "uplift_pct": 22.0
+      "score_pct": 81.0,
+      "uplift_pct": 33.0
     },
     {
       "catalog_dir": "vss-deploy-profile",
@@ -21849,7 +21849,7 @@
       "dimension": "Security",
       "num": 5,
       "agent": "codex",
-      "score_pct": 100.0,
+      "score_pct": 90.0,
       "uplift_pct": 10.0
     },
     {
@@ -21858,8 +21858,8 @@
       "dimension": "Correctness",
       "num": 5,
       "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 69.0
+      "score_pct": 96.0,
+      "uplift_pct": 81.0
     },
     {
       "catalog_dir": "vss-deploy-profile",
@@ -21867,8 +21867,8 @@
       "dimension": "Correctness",
       "num": 5,
       "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 47.0
+      "score_pct": 89.0,
+      "uplift_pct": 67.0
     },
     {
       "catalog_dir": "vss-deploy-profile",
@@ -21876,8 +21876,8 @@
       "dimension": "Discoverability",
       "num": 5,
       "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 62.0
+      "score_pct": 90.0,
+      "uplift_pct": 70.0
     },
     {
       "catalog_dir": "vss-deploy-profile",
@@ -21885,107 +21885,107 @@
       "dimension": "Discoverability",
       "num": 5,
       "agent": "codex",
-      "score_pct": 78.0,
-      "uplift_pct": 19.0
-    },
-    {
-      "catalog_dir": "vss-deploy-profile",
-      "component": "Video Search and Summarization",
-      "dimension": "Effectiveness",
-      "num": 5,
-      "agent": "claude-code",
-      "score_pct": 56.0,
-      "uplift_pct": 52.0
-    },
-    {
-      "catalog_dir": "vss-deploy-profile",
-      "component": "Video Search and Summarization",
-      "dimension": "Effectiveness",
-      "num": 5,
-      "agent": "codex",
-      "score_pct": 54.0,
-      "uplift_pct": 48.0
-    },
-    {
-      "catalog_dir": "vss-deploy-profile",
-      "component": "Video Search and Summarization",
-      "dimension": "Efficiency",
-      "num": 5,
-      "agent": "claude-code",
-      "score_pct": 79.0,
-      "uplift_pct": 46.0
-    },
-    {
-      "catalog_dir": "vss-deploy-profile",
-      "component": "Video Search and Summarization",
-      "dimension": "Efficiency",
-      "num": 5,
-      "agent": "codex",
-      "score_pct": 72.0,
-      "uplift_pct": 17.0
-    },
-    {
-      "catalog_dir": "vss-deploy-video-embedding",
-      "component": "Video Search and Summarization",
-      "dimension": "Security",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "vss-deploy-video-embedding",
-      "component": "Video Search and Summarization",
-      "dimension": "Security",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "vss-deploy-video-embedding",
-      "component": "Video Search and Summarization",
-      "dimension": "Correctness",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 50.0,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "vss-deploy-video-embedding",
-      "component": "Video Search and Summarization",
-      "dimension": "Correctness",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 50.0,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "vss-deploy-video-embedding",
-      "component": "Video Search and Summarization",
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 0.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "vss-deploy-video-embedding",
-      "component": "Video Search and Summarization",
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 0.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "vss-deploy-video-embedding",
-      "component": "Video Search and Summarization",
-      "dimension": "Effectiveness",
-      "num": 2,
-      "agent": "claude-code",
       "score_pct": 92.0,
-      "uplift_pct": 80.0
+      "uplift_pct": 51.0
+    },
+    {
+      "catalog_dir": "vss-deploy-profile",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": 5,
+      "agent": "claude-code",
+      "score_pct": 80.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "vss-deploy-profile",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": 5,
+      "agent": "codex",
+      "score_pct": 70.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "vss-deploy-profile",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": 5,
+      "agent": "claude-code",
+      "score_pct": 71.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "vss-deploy-profile",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": 5,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "vss-deploy-video-embedding",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "vss-deploy-video-embedding",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "vss-deploy-video-embedding",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 50.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "vss-deploy-video-embedding",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 50.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "vss-deploy-video-embedding",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 0.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "vss-deploy-video-embedding",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 0.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "vss-deploy-video-embedding",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 75.0
     },
     {
       "catalog_dir": "vss-deploy-video-embedding",
@@ -22029,8 +22029,8 @@
       "dimension": "Security",
       "num": 3,
       "agent": "codex",
-      "score_pct": 83.0,
-      "uplift_pct": -17.0
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "vss-generate-video-calibration",
@@ -22038,16 +22038,25 @@
       "dimension": "Correctness",
       "num": 3,
       "agent": "claude-code",
-      "score_pct": 79.0,
+      "score_pct": 60.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "vss-generate-video-calibration",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 68.0,
       "uplift_pct": 42.0
     },
     {
       "catalog_dir": "vss-generate-video-calibration",
       "component": "Video Search and Summarization",
-      "dimension": "Correctness",
+      "dimension": "Discoverability",
       "num": 3,
-      "agent": "codex",
-      "score_pct": 61.0,
+      "agent": "claude-code",
+      "score_pct": 73.0,
       "uplift_pct": 26.0
     },
     {
@@ -22055,18 +22064,9 @@
       "component": "Video Search and Summarization",
       "dimension": "Discoverability",
       "num": 3,
-      "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 34.0
-    },
-    {
-      "catalog_dir": "vss-generate-video-calibration",
-      "component": "Video Search and Summarization",
-      "dimension": "Discoverability",
-      "num": 3,
       "agent": "codex",
-      "score_pct": 62.0,
-      "uplift_pct": 10.0
+      "score_pct": 86.0,
+      "uplift_pct": 43.0
     },
     {
       "catalog_dir": "vss-generate-video-calibration",
@@ -22074,8 +22074,8 @@
       "dimension": "Effectiveness",
       "num": 3,
       "agent": "claude-code",
-      "score_pct": 36.0,
-      "uplift_pct": 30.0
+      "score_pct": 31.0,
+      "uplift_pct": 24.0
     },
     {
       "catalog_dir": "vss-generate-video-calibration",
@@ -22083,7 +22083,7 @@
       "dimension": "Effectiveness",
       "num": 3,
       "agent": "codex",
-      "score_pct": 30.0,
+      "score_pct": 33.0,
       "uplift_pct": 26.0
     },
     {
@@ -22092,8 +22092,8 @@
       "dimension": "Efficiency",
       "num": 3,
       "agent": "claude-code",
-      "score_pct": 80.0,
-      "uplift_pct": 23.0
+      "score_pct": 64.0,
+      "uplift_pct": 12.0
     },
     {
       "catalog_dir": "vss-generate-video-calibration",
@@ -22101,8 +22101,8 @@
       "dimension": "Efficiency",
       "num": 3,
       "agent": "codex",
-      "score_pct": 53.0,
-      "uplift_pct": 6.0
+      "score_pct": 77.0,
+      "uplift_pct": 27.0
     },
     {
       "catalog_dir": "vss-generate-video-report",
@@ -22128,7 +22128,7 @@
       "dimension": "Correctness",
       "num": 3,
       "agent": "claude-code",
-      "score_pct": 51.0,
+      "score_pct": 52.0,
       "uplift_pct": 43.0
     },
     {
@@ -22137,8 +22137,8 @@
       "dimension": "Correctness",
       "num": 3,
       "agent": "codex",
-      "score_pct": 27.0,
-      "uplift_pct": 23.0
+      "score_pct": 23.0,
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "vss-generate-video-report",
@@ -22146,8 +22146,8 @@
       "dimension": "Discoverability",
       "num": 3,
       "agent": "claude-code",
-      "score_pct": 11.0,
-      "uplift_pct": 3.0
+      "score_pct": 8.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "vss-generate-video-report",
@@ -22164,8 +22164,8 @@
       "dimension": "Effectiveness",
       "num": 3,
       "agent": "claude-code",
-      "score_pct": 61.0,
-      "uplift_pct": 60.0
+      "score_pct": 68.0,
+      "uplift_pct": 67.0
     },
     {
       "catalog_dir": "vss-generate-video-report",
@@ -22173,8 +22173,8 @@
       "dimension": "Effectiveness",
       "num": 3,
       "agent": "codex",
-      "score_pct": 37.0,
-      "uplift_pct": 34.0
+      "score_pct": 34.0,
+      "uplift_pct": 28.0
     },
     {
       "catalog_dir": "vss-generate-video-report",
@@ -22741,7 +22741,7 @@
       "num": 1,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 100.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "vss-summarize-video",
@@ -22750,7 +22750,7 @@
       "num": 1,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 100.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "vss-summarize-video",
@@ -22759,7 +22759,7 @@
       "num": 1,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 12.0
+      "uplift_pct": 75.0
     },
     {
       "catalog_dir": "vss-summarize-video",
@@ -22767,62 +22767,62 @@
       "dimension": "Correctness",
       "num": 1,
       "agent": "codex",
-      "score_pct": 97.0,
+      "score_pct": 67.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": 1,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": 1,
+      "agent": "codex",
+      "score_pct": 84.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": 1,
+      "agent": "claude-code",
+      "score_pct": 76.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": 1,
+      "agent": "codex",
+      "score_pct": 58.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": 1,
+      "agent": "claude-code",
+      "score_pct": 92.0,
       "uplift_pct": 36.0
     },
     {
       "catalog_dir": "vss-summarize-video",
       "component": "Video Search and Summarization",
-      "dimension": "Discoverability",
-      "num": 1,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 6.0
-    },
-    {
-      "catalog_dir": "vss-summarize-video",
-      "component": "Video Search and Summarization",
-      "dimension": "Discoverability",
-      "num": 1,
-      "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 4.0
-    },
-    {
-      "catalog_dir": "vss-summarize-video",
-      "component": "Video Search and Summarization",
-      "dimension": "Effectiveness",
-      "num": 1,
-      "agent": "claude-code",
-      "score_pct": 72.0,
-      "uplift_pct": 10.0
-    },
-    {
-      "catalog_dir": "vss-summarize-video",
-      "component": "Video Search and Summarization",
-      "dimension": "Effectiveness",
-      "num": 1,
-      "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 38.0
-    },
-    {
-      "catalog_dir": "vss-summarize-video",
-      "component": "Video Search and Summarization",
-      "dimension": "Efficiency",
-      "num": 1,
-      "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": 19.0
-    },
-    {
-      "catalog_dir": "vss-summarize-video",
-      "component": "Video Search and Summarization",
       "dimension": "Efficiency",
       "num": 1,
       "agent": "codex",
-      "score_pct": 83.0,
-      "uplift_pct": 7.0
+      "score_pct": 77.0,
+      "uplift_pct": 30.0
     }
   ]
 }
