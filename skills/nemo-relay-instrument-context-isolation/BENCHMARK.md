@@ -1,13 +1,13 @@
 # Evaluation Report
 
-Evaluation of the `physical-ai-neural-reconstruction` skill before publication through NVSkills-Eval.
+Evaluation of the `nemo-relay-instrument-context-isolation` skill before publication through NVSkills-Eval.
 
 This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
 
 ## Evaluation Summary
 
-- Skill: `physical-ai-neural-reconstruction`
-- Evaluation date: 2026-07-16
+- Skill: `nemo-relay-instrument-context-isolation`
+- Evaluation date: 2026-07-15
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
 - Dataset: 4 evaluation tasks
@@ -55,10 +55,10 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 93% (+52%) | 91% (+34%) |
-| Discoverability | 4 | 100% (+56%) | 95% (+51%) |
-| Effectiveness | 4 | 79% (+52%) | 81% (+36%) |
-| Efficiency | 4 | 95% (+43%) | 91% (+40%) |
+| Correctness | 4 | 100% (+65%) | 91% (+23%) |
+| Discoverability | 4 | 100% (+75%) | 84% (+31%) |
+| Effectiveness | 4 | 100% (+52%) | 98% (+34%) |
+| Efficiency | 4 | 95% (+51%) | 82% (+26%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
@@ -68,9 +68,9 @@ Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found
 
 Top findings:
 
-- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/physical-ai-neural-reconstruction/SKILL.md`)
-- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/physical-ai-neural-reconstruction/SKILL.md`)
-- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/physical-ai-neural-reconstruction/SKILL.md`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/nemo-relay-instrument-context-isolation/SKILL.md`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nemo-relay-instrument-context-isolation/SKILL.md`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/nemo-relay-instrument-context-isolation/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 

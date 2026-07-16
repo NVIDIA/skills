@@ -18,8 +18,6 @@ metadata:
     - physical-ai
     - nurec
     - neural-reconstruction
-    - router
-    - sensor-sim
   upstream:
     repo: https://github.com/NVIDIA/nurec-skills
     branch: main

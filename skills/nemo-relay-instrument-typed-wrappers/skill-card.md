@@ -1,5 +1,5 @@
 ## Description: <br>
-Router for NVIDIA NuRec/NRE: USDZ rendering, NCore conversion, 3DGS, gRPC sensor sim, PhysicalAI HF datasets. Do NOT use for SimReady or infra setup. <br>
+Use this skill when adding NeMo Relay typed wrappers, domain types, or provider codecs while preserving JSON middleware semantics and caller-visible behavior. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,16 +7,16 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers working with NVIDIA Neural Reconstruction (NuRec) workflows who need to identify and route requests to the correct upstream sibling skill for 3D scene rendering, sensor data conversion, dataset access, object harvesting, and reconstruction quality evaluation. <br>
+Developers and engineers adding typed wrappers, domain types, or provider codecs to NeMo Relay tool and LLM integrations while preserving JSON middleware interoperability. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Yes] <br>
-**Credential Type(s):** [API key] <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,31 +25,23 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [NVIDIA NuRec Skills (upstream)](https://github.com/NVIDIA/nurec-skills) <br>
-- [NCore converter](https://github.com/NVIDIA/ncore) <br>
-- [Asset Harvester](https://github.com/NVIDIA/asset-harvester) <br>
-- [DiffusionHarmonizer](https://huggingface.co/nvidia/DiffusionHarmonizer) <br>
-- [workflows.md](references/workflows.md) <br>
-- [mix-ups.md](references/mix-ups.md) <br>
-- [upstream-fetch.md](references/upstream-fetch.md) <br>
-- [teardown.md](references/teardown.md) <br>
-- [maintenance.md](references/maintenance.md) <br>
+- [NeMo Relay GitHub Repository](https://github.com/NVIDIA/NeMo-Relay/) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Configuration instructions, Shell commands] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Configuration instructions, Code] <br>
+**Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- claude-code <br>
+- codex <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 internal skill-activation tasks (3 positive, 1 negative) via NVSkills-Eval external profile in astra-sandbox environment. <br>
+Evaluated against 4 evaluation tasks (3 positive activation, 1 negative activation) in the astra-sandbox environment using the NVSkills-Eval external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -74,13 +66,13 @@ Underlying evaluation signals used in this run: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 93% (+52%) | 91% (+34%) |
-| Discoverability | 4 | 100% (+56%) | 95% (+51%) |
-| Effectiveness | 4 | 79% (+52%) | 81% (+36%) |
-| Efficiency | 4 | 95% (+43%) | 91% (+40%) |
+| Correctness | 4 | 100% (+60%) | 89% (+16%) |
+| Discoverability | 4 | 100% (+75%) | 81% (+32%) |
+| Effectiveness | 4 | 97% (+44%) | 94% (+18%) |
+| Efficiency | 4 | 95% (+50%) | 84% (+31%) |
 
 ## Skill Version(s): <br>
-0.3.0 (source: frontmatter, changelog) <br>
+e05cfbb8 (source: git SHA, committed 2026-07-15) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

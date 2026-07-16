@@ -1,0 +1,60 @@
+[
+  {
+    "id": "nemo-relay-plugin-build-001",
+    "question": "I want to use the nemo-relay-plugin-build skill to create a plugin that registers a sanitization guardrail. The plugin kind should be 'pii-sanitizer' and it needs config fields for 'patterns' (array of regex strings) and 'action' (either 'redact' or 'mask'). Can you walk me through building this?",
+    "expected_skill": "nemo-relay-plugin-build",
+    "expected_script": null,
+    "ground_truth": "The agent used nemo-relay-plugin-build to guide the user through creating a 'pii-sanitizer' plugin with a JSON-compatible config shape containing 'patterns' and 'action' fields, deterministic validation logic, registration through PluginContext, and rollback-safe behavior.",
+    "expected_behavior": [
+      "The agent read the nemo-relay-plugin-build SKILL.md before providing guidance",
+      "The agent defined a JSON-compatible config shape with 'patterns' (array of strings) and 'action' (enum of 'redact' or 'mask') fields",
+      "The agent provided validation logic that checks for missing fields, invalid regex patterns, and unsupported 'action' values without side effects",
+      "The agent returned error diagnostics and stopped before initialization or registration when validation failed",
+      "The agent showed registration of the guardrail through PluginContext with rollback handling for partial setup failures",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "nemo-relay-plugin-build-002",
+    "question": "I have a set of runtime guardrails and subscribers that multiple teams keep copy-pasting into their NeMo Relay application startup code. I want to package this as a reusable component that can be activated through shared configuration, validated before deployment, and safely rolled back if registration fails. How should I structure this?",
+    "expected_skill": "nemo-relay-plugin-build",
+    "expected_script": null,
+    "ground_truth": "The agent identified this as a plugin packaging use case and guided the user through the nemo-relay-plugin-build workflow: choosing a stable plugin kind, defining minimal JSON-compatible config, implementing side-effect-free validation with structured diagnostics, and registering behavior through PluginContext with rollback safety.",
+    "expected_behavior": [
+      "The agent recognized the need for a reusable config-activated plugin rather than scope-local middleware or direct instrumentation",
+      "The agent outlined the plugin document structure including version, components array with kind/enabled/config, and policy settings",
+      "The agent described validation requirements as deterministic and side-effect free, returning structured diagnostics before any runtime changes",
+      "The agent explicitly stopped initialization and registration when validation returned error diagnostics",
+      "The agent explained how PluginContext handles registration and rollback of partial setup on failure",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "nemo-relay-plugin-build-003",
+    "question": "Our platform team is rolling out a new compliance requirement: all NeMo Relay services must apply a content-filtering policy that can be toggled per environment (dev/staging/prod) through config. We need operators to get clear error messages if they misconfigure it, and we need the ability to disable it in dev without breaking validation. The filter should intercept requests before they reach the LLM. What's the best approach?",
+    "expected_skill": "nemo-relay-plugin-build",
+    "expected_script": null,
+    "ground_truth": "The agent applied the nemo-relay-plugin-build skill to design a content-filtering plugin with a request intercept surface, environment-aware config with an 'enabled' toggle, validation that runs even when disabled to catch config errors before rollout, and clear diagnostic messages for operators.",
+    "expected_behavior": [
+      "The agent selected request intercept as the runtime surface for pre-LLM content filtering",
+      "The agent designed config with an 'enabled' field and environment-specific settings while keeping the shape JSON-compatible",
+      "The agent specified that validation runs even for disabled components so operators discover config problems before production rollout",
+      "The agent provided examples of structured diagnostics for missing fields, unsupported environment values, and invalid field combinations",
+      "The agent returned validation errors without registering the request intercept, including when the component was disabled",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "nemo-relay-plugin-build-004",
+    "question": "I need to add some temporary logging for a specific tenant's requests in NeMo Relay. It should only apply to their session and I'll remove it after debugging. What's the best way to do this?",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The agent correctly identified that this is a scope-local middleware use case rather than a plugin, since the behavior is temporary, tenant-specific, and not reusable across applications or teams. The agent directed the user toward scope-local middleware or direct instrumentation instead of nemo-relay-plugin-build.",
+    "expected_behavior": [
+      "The agent did NOT invoke the nemo-relay-plugin-build skill for this temporary, tenant-scoped task",
+      "The agent explained that scope-local middleware is more appropriate for temporary per-tenant behavior",
+      "The agent suggested an alternative approach such as scope-local middleware or nemo-relay-instrument-calls for this use case",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  }
+]

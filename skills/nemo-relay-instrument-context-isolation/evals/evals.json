@@ -1,0 +1,57 @@
+[
+  {
+    "id": "nemo-relay-instrument-context-isolation-001",
+    "question": "I need help using the nemo-relay-instrument-context-isolation skill to set up isolated scope stacks for my Python async web server that handles multiple concurrent requests.",
+    "expected_skill": "nemo-relay-instrument-context-isolation",
+    "expected_script": null,
+    "ground_truth": "The agent used nemo-relay-instrument-context-isolation and provided guidance on leveraging Python's contextvars and get_scope_stack() to ensure each async request handler operates with its own isolated scope stack, preventing event cross-contamination between concurrent requests.",
+    "expected_behavior": [
+      "The agent read the nemo-relay-instrument-context-isolation SKILL.md before responding",
+      "The agent explained how Python's task-local behavior via contextvars provides automatic scope stack isolation for async tasks",
+      "The agent warned about common failures such as events from different requests appearing under one root UUID",
+      "The agent provided concrete guidance on using get_scope_stack() and explicit propagation when work leaves the current execution context",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "nemo-relay-instrument-context-isolation-002",
+    "question": "I'm building a Go service with a worker pool of goroutines processing NeMo Relay instrumented tasks. Events from different jobs keep getting mixed together under the same parent scope. How do I fix this?",
+    "expected_skill": "nemo-relay-instrument-context-isolation",
+    "expected_script": null,
+    "ground_truth": "The agent identified the issue as a scope stack isolation problem and provided guidance on using Go's NewScopeStack() and ScopeStack.Run(...) to give each goroutine its own isolated scope stack, resolving the event mixing issue.",
+    "expected_behavior": [
+      "The agent read the nemo-relay-instrument-context-isolation SKILL.md before responding",
+      "The agent diagnosed the problem as sharing one mutable scope stack across unrelated concurrent goroutines",
+      "The agent recommended using NewScopeStack() and ScopeStack.Run(...) for goroutine-safe isolation",
+      "The agent explained that each independent worker needs its own scope stack to prevent events from appearing under one root UUID",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "nemo-relay-instrument-context-isolation-003",
+    "question": "We have a multi-agent orchestration system in Node.js where 5 agents run concurrently in the same process. Some agents' tool call events are showing up in other agents' traces, and scope-local middleware registered for one agent is firing for another. What's going wrong and how do we architect this properly?",
+    "expected_skill": "nemo-relay-instrument-context-isolation",
+    "expected_script": null,
+    "ground_truth": "The agent identified the root cause as insufficient scope stack isolation between concurrent agents and provided an architecture using createScopeStack() and setThreadScopeStack(...) for each agent's execution path, explaining how scope-local registrations are tied to scope lifetime and will not leak when properly isolated.",
+    "expected_behavior": [
+      "The agent read the nemo-relay-instrument-context-isolation SKILL.md before responding",
+      "The agent identified both symptoms (event cross-contamination and middleware leaking) as consequences of shared scope stacks across agents",
+      "The agent recommended using createScopeStack() and setThreadScopeStack(...) to give each agent its own isolated scope stack in Node.js",
+      "The agent explained that scope-local registrations disappear when the owning scope closes, preventing cross-agent middleware leakage when isolation is correct",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "nemo-relay-instrument-context-isolation-004",
+    "question": "How do I configure NVIDIA TensorRT to optimize batch inference latency for my ResNet-50 model on an A100 GPU?",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The agent recognized this as a TensorRT optimization question unrelated to NeMo Relay context isolation and provided relevant guidance about TensorRT configuration without invoking the nemo-relay-instrument-context-isolation skill.",
+    "expected_behavior": [
+      "The agent did not read or reference the nemo-relay-instrument-context-isolation SKILL.md",
+      "The agent addressed the TensorRT batch inference optimization question on its own merits",
+      "The agent did not mention scope stacks, context isolation, or NeMo Relay scope management concepts",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  }
+]

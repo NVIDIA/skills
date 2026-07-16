@@ -1,0 +1,57 @@
+[
+  {
+    "id": "nemo-relay-debug-runtime-integration-001",
+    "question": "I need help with nemo-relay-debug-runtime-integration. My Python app fails to import the NeMo Relay native extension with a 'ModuleNotFoundError' even though I installed the package. How do I fix this?",
+    "expected_skill": "nemo-relay-debug-runtime-integration",
+    "expected_script": null,
+    "ground_truth": "The agent used nemo-relay-debug-runtime-integration to diagnose the Python native extension import failure, recommending rebuilding the virtual environment and native extension with `uv sync` and verifying the import from the same environment as the application.",
+    "expected_behavior": [
+      "The agent read the nemo-relay-debug-runtime-integration SKILL.md before providing guidance",
+      "The agent identified this as a Python import failure and referenced the troubleshooting matrix entry for rebuilding with `uv sync`",
+      "The agent recommended running a small Python test or import check from the same environment as the application",
+      "The agent suggested verifying the native extension was built correctly for the current platform",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "nemo-relay-debug-runtime-integration-002",
+    "question": "I'm instrumenting my Node.js agent with NeMo Relay but no lifecycle events appear even though my business logic callbacks execute successfully. The managed execute helpers aren't being used — we just call the underlying functions directly. What's going wrong?",
+    "expected_skill": "nemo-relay-debug-runtime-integration",
+    "expected_script": null,
+    "ground_truth": "The agent diagnosed the missing lifecycle events as caused by calling business callbacks directly without using managed execute helpers or balanced manual start/end APIs, and guided the user to adopt the correct API layer.",
+    "expected_behavior": [
+      "The agent identified the issue as matching the 'Callback succeeded but no lifecycle events appear' failure class from the troubleshooting matrix",
+      "The agent explained that the integration must use managed execute helpers or balanced manual start/end APIs rather than only calling the underlying business callback",
+      "The agent recommended switching to the managed execute API or adding explicit lifecycle start/end calls around the business logic",
+      "The agent referenced the choice between managed execute vs manual lifecycle vs typed wrappers as a key decision point",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "nemo-relay-debug-runtime-integration-003",
+    "question": "We have a Go microservice that handles concurrent requests. Each request creates a NeMo Relay scope, but we're seeing events from one request leaking into another request's trace. The scope stacks seem to be shared across goroutines. How do we isolate them?",
+    "expected_skill": "nemo-relay-debug-runtime-integration",
+    "expected_script": null,
+    "ground_truth": "The agent diagnosed the cross-request event leakage as a scope stack sharing problem across goroutines and recommended creating a fresh scope stack per independent request or agent to achieve proper isolation.",
+    "expected_behavior": [
+      "The agent identified the problem as 'Work leaks across requests' where separate requests share one scope stack",
+      "The agent explained that goroutine boundaries can cause the wrong scope stack to be active without explicit isolation",
+      "The agent recommended creating a fresh scope stack per independent request or agent",
+      "The agent referenced the nemo-relay-instrument-context-isolation skill as a related resource for further guidance",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "nemo-relay-debug-runtime-integration-004",
+    "question": "How do I configure Kubernetes horizontal pod autoscaling based on custom Prometheus metrics for my Flask application?",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The agent recognized this as a Kubernetes/infrastructure scaling question unrelated to NeMo Relay runtime integration debugging and provided general Kubernetes HPA guidance without invoking the nemo-relay-debug-runtime-integration skill.",
+    "expected_behavior": [
+      "The agent did not invoke or reference the nemo-relay-debug-runtime-integration skill",
+      "The agent addressed the Kubernetes HPA and Prometheus metrics question on its own merits",
+      "The agent provided guidance about custom metrics adapters or HPA configuration without conflating it with NeMo Relay concerns",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  }
+]

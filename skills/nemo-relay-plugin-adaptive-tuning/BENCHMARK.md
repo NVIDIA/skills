@@ -1,16 +1,16 @@
 # Evaluation Report
 
-Evaluation of the `physical-ai-neural-reconstruction` skill before publication through NVSkills-Eval.
+Evaluation of the `nemo-relay-plugin-adaptive-tuning` skill before publication through NVSkills-Eval.
 
 This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
 
 ## Evaluation Summary
 
-- Skill: `physical-ai-neural-reconstruction`
-- Evaluation date: 2026-07-16
+- Skill: `nemo-relay-plugin-adaptive-tuning`
+- Evaluation date: 2026-07-15
 - NVSkills-Eval profile: `external`
 - Environment: `astra-sandbox`
-- Dataset: 4 evaluation tasks
+- Dataset: 12 evaluation tasks
 - Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
@@ -42,10 +42,10 @@ Underlying evaluation signals used in this run:
 
 ## Test Tasks
 
-The benchmark dataset contained 4 evaluation tasks:
+The benchmark dataset contained 12 evaluation tasks:
 
-- Positive tasks: 3 tasks where the skill was expected to activate.
-- Negative tasks: 1 tasks where no skill was expected.
+- Positive tasks: 10 tasks where the skill was expected to activate.
+- Negative tasks: 2 tasks where no skill was expected.
 - Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
 
 Task composition is derived from the evaluation dataset when possible. Entries with `expected_skill` set are treated as positive skill-activation cases, while entries with `expected_skill: null` are treated as negative activation cases.
@@ -54,11 +54,11 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 93% (+52%) | 91% (+34%) |
-| Discoverability | 4 | 100% (+56%) | 95% (+51%) |
-| Effectiveness | 4 | 79% (+52%) | 81% (+36%) |
-| Efficiency | 4 | 95% (+43%) | 91% (+40%) |
+| Security | 8 | 100% (+0%) | 100% (+0%) |
+| Correctness | 8 | 96% (+63%) | 91% (+24%) |
+| Discoverability | 8 | 98% (+64%) | 85% (+45%) |
+| Effectiveness | 8 | 86% (+60%) | 95% (+31%) |
+| Efficiency | 8 | 89% (+46%) | 85% (+44%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
@@ -68,9 +68,9 @@ Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found
 
 Top findings:
 
-- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/physical-ai-neural-reconstruction/SKILL.md`)
-- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/physical-ai-neural-reconstruction/SKILL.md`)
-- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/physical-ai-neural-reconstruction/SKILL.md`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/nemo-relay-plugin-adaptive-tuning/SKILL.md`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nemo-relay-plugin-adaptive-tuning/SKILL.md`)
+- LOW SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/nemo-relay-plugin-adaptive-tuning/SKILL.md`)
 
 ## Tier 2: Deduplication Summary
 
