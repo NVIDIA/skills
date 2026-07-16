@@ -1770,11 +1770,11 @@
     },
     {
       "skill": "nemo-mbridge-mlm-bridge-training",
-      "evaluation_date": "2026-06-02",
+      "evaluation_date": "2026-07-15",
       "profile": "external",
-      "environment": "local",
+      "environment": "astra-sandbox",
       "tasks": 1,
-      "attempts_per_task": 2,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
       "verdict": "PASS",
       "agents": [
@@ -1784,7 +1784,7 @@
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
       "component": "NeMo MBridge",
       "has_results": true,
-      "average_uplift_pct": 0.0
+      "average_uplift_pct": 51.0
     },
     {
       "skill": "nemo-mbridge-multi-node-slurm",
@@ -2058,7 +2058,7 @@
     },
     {
       "skill": "nemo-mbridge-perf-sequence-packing",
-      "evaluation_date": "2026-07-14",
+      "evaluation_date": "2026-07-15",
       "profile": "external",
       "environment": "astra-sandbox",
       "tasks": 1,
@@ -2072,7 +2072,7 @@
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "has_results": true,
-      "average_uplift_pct": 46.0
+      "average_uplift_pct": 59.8
     },
     {
       "skill": "nemo-mbridge-perf-tp-dp-comm-overlap",
@@ -2274,11 +2274,11 @@
     },
     {
       "skill": "nemotron-retrieval-recipes",
-      "evaluation_date": "2026-05-29",
+      "evaluation_date": "2026-07-15",
       "profile": "external",
-      "environment": "local",
-      "tasks": 14,
-      "attempts_per_task": 2,
+      "environment": "astra-sandbox",
+      "tasks": 40,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
       "verdict": "PASS",
       "agents": [
@@ -2288,7 +2288,7 @@
       "catalog_dir": "nemotron-retrieval-recipes",
       "component": "Nemotron",
       "has_results": true,
-      "average_uplift_pct": 10.1
+      "average_uplift_pct": 30.2
     },
     {
       "skill": "nemotron-speech",
@@ -11758,7 +11758,7 @@
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 2,
+      "num": 1,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -11767,7 +11767,7 @@
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 2,
+      "num": 1,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -11776,52 +11776,52 @@
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 2,
+      "num": 1,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 2,
+      "num": 1,
       "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 0.0
+      "score_pct": 97.0,
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
       "component": "NeMo MBridge",
       "dimension": "Discoverability",
-      "num": 2,
+      "num": 1,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
       "component": "NeMo MBridge",
       "dimension": "Discoverability",
-      "num": 2,
+      "num": 1,
       "agent": "codex",
-      "score_pct": 62.0,
-      "uplift_pct": 0.0
+      "score_pct": 97.0,
+      "uplift_pct": 64.0
     },
     {
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
       "component": "NeMo MBridge",
       "dimension": "Effectiveness",
-      "num": 2,
+      "num": 1,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 95.0
     },
     {
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
       "component": "NeMo MBridge",
       "dimension": "Effectiveness",
-      "num": 2,
+      "num": 1,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -11830,19 +11830,19 @@
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 2,
+      "num": 1,
       "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": -0.0
+      "score_pct": 94.0,
+      "uplift_pct": 67.0
     },
     {
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 2,
+      "num": 1,
       "agent": "codex",
-      "score_pct": 60.0,
-      "uplift_pct": -0.0
+      "score_pct": 96.0,
+      "uplift_pct": 59.0
     },
     {
       "catalog_dir": "nemo-mbridge-multi-node-slurm",
@@ -13227,8 +13227,8 @@
       "dimension": "Correctness",
       "num": 1,
       "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 19.0
+      "score_pct": 97.0,
+      "uplift_pct": 42.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
@@ -13245,8 +13245,8 @@
       "dimension": "Discoverability",
       "num": 1,
       "agent": "codex",
-      "score_pct": 81.0,
-      "uplift_pct": 44.0
+      "score_pct": 97.0,
+      "uplift_pct": 69.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
@@ -13254,8 +13254,8 @@
       "dimension": "Effectiveness",
       "num": 1,
       "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 96.0
+      "score_pct": 95.0,
+      "uplift_pct": 95.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
@@ -13263,8 +13263,8 @@
       "dimension": "Effectiveness",
       "num": 1,
       "agent": "codex",
-      "score_pct": 89.0,
-      "uplift_pct": 7.0
+      "score_pct": 94.0,
+      "uplift_pct": 48.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
@@ -13281,8 +13281,8 @@
       "dimension": "Efficiency",
       "num": 1,
       "agent": "codex",
-      "score_pct": 70.0,
-      "uplift_pct": 27.0
+      "score_pct": 96.0,
+      "uplift_pct": 77.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-tp-dp-comm-overlap",
@@ -14281,7 +14281,7 @@
       "num": 8,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 11.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemotron-retrieval-recipes",
@@ -14289,62 +14289,62 @@
       "dimension": "Security",
       "num": 8,
       "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nemotron-retrieval-recipes",
+      "component": "Nemotron",
+      "dimension": "Correctness",
+      "num": 8,
+      "agent": "claude-code",
       "score_pct": 96.0,
-      "uplift_pct": 14.0
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "nemotron-retrieval-recipes",
       "component": "Nemotron",
       "dimension": "Correctness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 85.0,
-      "uplift_pct": 3.0
-    },
-    {
-      "catalog_dir": "nemotron-retrieval-recipes",
-      "component": "Nemotron",
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 87.0,
-      "uplift_pct": 12.0
-    },
-    {
-      "catalog_dir": "nemotron-retrieval-recipes",
-      "component": "Nemotron",
-      "dimension": "Discoverability",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 56.0,
-      "uplift_pct": 12.0
-    },
-    {
-      "catalog_dir": "nemotron-retrieval-recipes",
-      "component": "Nemotron",
-      "dimension": "Discoverability",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 63.0,
-      "uplift_pct": 8.0
-    },
-    {
-      "catalog_dir": "nemotron-retrieval-recipes",
-      "component": "Nemotron",
-      "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 88.0,
-      "uplift_pct": 2.0
-    },
-    {
-      "catalog_dir": "nemotron-retrieval-recipes",
-      "component": "Nemotron",
-      "dimension": "Effectiveness",
       "num": 8,
       "agent": "codex",
       "score_pct": 90.0,
-      "uplift_pct": 23.0
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "nemotron-retrieval-recipes",
+      "component": "Nemotron",
+      "dimension": "Discoverability",
+      "num": 8,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 54.0
+    },
+    {
+      "catalog_dir": "nemotron-retrieval-recipes",
+      "component": "Nemotron",
+      "dimension": "Discoverability",
+      "num": 8,
+      "agent": "codex",
+      "score_pct": 84.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "nemotron-retrieval-recipes",
+      "component": "Nemotron",
+      "dimension": "Effectiveness",
+      "num": 8,
+      "agent": "claude-code",
+      "score_pct": 89.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "nemotron-retrieval-recipes",
+      "component": "Nemotron",
+      "dimension": "Effectiveness",
+      "num": 8,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 24.0
     },
     {
       "catalog_dir": "nemotron-retrieval-recipes",
@@ -14352,8 +14352,8 @@
       "dimension": "Efficiency",
       "num": 8,
       "agent": "claude-code",
-      "score_pct": 48.0,
-      "uplift_pct": 12.0
+      "score_pct": 83.0,
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "nemotron-retrieval-recipes",
@@ -14361,8 +14361,8 @@
       "dimension": "Efficiency",
       "num": 8,
       "agent": "codex",
-      "score_pct": 54.0,
-      "uplift_pct": 4.0
+      "score_pct": 82.0,
+      "uplift_pct": 33.0
     },
     {
       "catalog_dir": "nemotron-speech",
