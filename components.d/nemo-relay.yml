@@ -1,0 +1,24 @@
+name: NeMo Relay
+repo: NVIDIA/NeMo-Relay
+description: Skills to help get started and use NeMo Relay - a runtime for instrumenting and controlling AI agents across harnesses, applications, and frameworks.
+skills:
+  - path: skills/nemo-relay-install/
+    catalog_dir: nemo-relay-install
+  - path: skills/nemo-relay-get-started/
+    catalog_dir: nemo-relay-get-started
+  - path: skills/nemo-relay-instrument-calls/
+    catalog_dir: nemo-relay-instrument-calls
+  - path: skills/nemo-relay-instrument-context-isolation/
+    catalog_dir: nemo-relay-instrument-context-isolation
+  - path: skills/nemo-relay-instrument-typed-wrappers/
+    catalog_dir: nemo-relay-instrument-typed-wrappers
+  - path: skills/nemo-relay-plugin-adaptive-tuning/
+    catalog_dir: nemo-relay-plugin-adaptive-tuning
+  - path: skills/nemo-relay-plugin-build/
+    catalog_dir: nemo-relay-plugin-build
+  - path: skills/nemo-relay-plugin-observability/
+    catalog_dir: nemo-relay-plugin-observability
+  - path: skills/nemo-relay-migrate-from-flow/
+    catalog_dir: nemo-relay-migrate-from-flow
+  - path: skills/nemo-relay-debug-runtime-integration/
+    catalog_dir: nemo-relay-debug-runtime-integration
