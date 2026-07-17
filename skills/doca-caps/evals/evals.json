@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-caps",
+  "evals": [
+    {
+      "id": "doca-caps.explicit-positive.v1",
+      "prompt": "Use the doca-caps skill to help me. I'm working on: the user wants to invoke the read-only doca_caps CLI to ask what DOCA sees on this host \u2014 listing DOCA devices and PCIe addresses, listing representor devices, asking which DOCA libraries are available on the current OS, checking per-device per-library capabilities, scoping output to a specific PCIe address, or capturing a side-effect-free capability snapshot for a debug session or install smoke-test.",
+      "expected_skill": "doca-caps",
+      "expected_output": "The agent selects the doca-caps skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-caps skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-caps.implicit-positive.v1",
+      "prompt": "I'm running into this: \"what does DOCA actually see on this box\". Can you walk me through it?",
+      "expected_skill": "doca-caps",
+      "expected_output": "The agent recognizes this as a doca-caps issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-caps skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-caps.implicit-positive.v2",
+      "prompt": "I'm running into this: \"is my BlueField PF visible to DOCA\". Can you walk me through it?",
+      "expected_skill": "doca-caps",
+      "expected_output": "The agent recognizes this as a doca-caps issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-caps skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-caps.negative.v1",
+      "prompt": "I actually need help with DOCA installation. Which skill should handle this, and why is it not doca-caps?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-caps; it explains that DOCA installation is out of doca-caps's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-caps is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-flow",
+  "evals": [
+    {
+      "id": "doca-flow.explicit-positive.v1",
+      "prompt": "Use the doca-flow skill to help me. I'm working on: DOCA Flow on a supported NVIDIA NIC/DPU \u2014 both for DOCA Flow application knowledge and for writing Flow applications: defining match/action pipes, bringing up ports / representors, forwarding with FWD_PORT (or another fwd target), reading flow counters, validating a pipe before hardware programming, picking the right Flow version against an installed DOCA, or debugging DOCA_ERROR_* from the Flow API.",
+      "expected_skill": "doca-flow",
+      "expected_output": "The agent selects the doca-flow skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-flow skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-flow.implicit-positive.v1",
+      "prompt": "I'm running into this: \"packets aren't reaching my representor\". Can you walk me through it?",
+      "expected_skill": "doca-flow",
+      "expected_output": "The agent recognizes this as a doca-flow issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-flow skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-flow.implicit-positive.v2",
+      "prompt": "I'm running into this: \"rule isn't matching on the BF\". Can you walk me through it?",
+      "expected_skill": "doca-flow",
+      "expected_output": "The agent recognizes this as a doca-flow issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-flow skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-flow.negative.v1",
+      "prompt": "I actually need help with non-Flow pipelines. Which skill should handle this, and why is it not doca-flow?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-flow; it explains that non-Flow pipelines is out of doca-flow's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-flow is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

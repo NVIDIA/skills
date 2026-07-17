@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-flow-grpc-server",
+  "evals": [
+    {
+      "id": "doca-flow-grpc-server.explicit-positive.v1",
+      "prompt": "Use the doca-flow-grpc-server skill to help me. I'm working on: bringing up, configuring, hardening, or debugging `doca_flow_grpc` \u2014 the DOCA-shipped gRPC remote-control surface in front of `doca-flow` that lets non-C++ clients (Python, Go, Rust, Java) program Flow pipes and entries over RPC instead of linking `libdoca_flow.so` directly.",
+      "expected_skill": "doca-flow-grpc-server",
+      "expected_output": "The agent selects the doca-flow-grpc-server skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-flow-grpc-server skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-flow-grpc-server.implicit-positive.v1",
+      "prompt": "I'm running into this: \"program Flow rules from Python on another host\". Can you walk me through it?",
+      "expected_skill": "doca-flow-grpc-server",
+      "expected_output": "The agent recognizes this as a doca-flow-grpc-server issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-flow-grpc-server skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-flow-grpc-server.implicit-positive.v2",
+      "prompt": "I'm running into this: \"remotely configure pipes on the BlueField\". Can you walk me through it?",
+      "expected_skill": "doca-flow-grpc-server",
+      "expected_output": "The agent recognizes this as a doca-flow-grpc-server issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-flow-grpc-server skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-flow-grpc-server.negative.v1",
+      "prompt": "I actually need help with the underlying doca-flow API. Which skill should handle this, and why is it not doca-flow-grpc-server?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-flow-grpc-server; it explains that the underlying doca-flow API is out of doca-flow-grpc-server's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-flow-grpc-server is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

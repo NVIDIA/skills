@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-pcc",
+  "evals": [
+    {
+      "id": "doca-pcc.explicit-positive.v1",
+      "prompt": "Use the doca-pcc skill to help me. I'm doing host-side DOCA PCC work to load a custom Programmable Congestion Control algorithm onto a BlueField — creating per-port doca_pcc contexts, loading a dpacc-compiled doca_pcc_app onto the doca_dev for the RoCE-bearing port, and walking triple-axis capability discovery.",
+      "expected_skill": "doca-pcc",
+      "expected_output": "The agent loads doca-pcc and answers from the documented host-side workflow — per-port doca_pcc contexts, loading the dpacc-compiled doca_pcc_app on the RoCE-bearing port's doca_dev, parameterization, and triple-axis capability discovery (DOCA cap-query + DPA-capable BlueField + firmware custom-PCC slot) — quoting only real symbols.",
+      "assertions": [
+        "The doca-pcc skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "The per-port context, doca_pcc_app load, and triple-axis capability discovery are used correctly.",
+        "Every symbol named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-pcc.implicit-positive.v1",
+      "prompt": "I'm running into this: \"I'm loading my own congestion control onto a BF port but I get DOCA_ERROR_NOT_PERMITTED on algorithm load\". Can you walk me through it?",
+      "expected_skill": "doca-pcc",
+      "expected_output": "The agent recognizes this as a doca-pcc task even though the skill is not named, loads it, and walks the NOT_PERMITTED capability/slot-enablement path grounded in the bundle.",
+      "assertions": [
+        "The doca-pcc skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer ties DOCA_ERROR_NOT_PERMITTED to the triple-axis capability / firmware slot enablement."
+      ]
+    },
+    {
+      "id": "doca-pcc.implicit-positive.v2",
+      "prompt": "I'm running into this: \"my custom rate-update loads fine but isn't affecting RoCE traffic — load succeeds but no on-wire change\". Can you walk me through it?",
+      "expected_skill": "doca-pcc",
+      "expected_output": "The agent loads doca-pcc and diagnoses the load-succeeds-but-no-effect path (port/algorithm binding and capability gating) from the bundle, grounded in real symbols.",
+      "assertions": [
+        "The doca-pcc skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer investigates the host-side load/bind path rather than the algorithm body."
+      ]
+    },
+    {
+      "id": "doca-pcc.negative.v1",
+      "prompt": "I need to design the DPA-side algorithm body itself, read pcc_counters from the CLI, and set up the RoCE traffic. Which skill should handle this and why is it not doca-pcc?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-pcc; it routes DPA-side algorithm-body design, the pcc_counters CLI, default factory PCC, and RDMA/RoCE traffic setup out to their proper skills.",
+      "assertions": [
+        "doca-pcc is not used as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) rather than forcing doca-pcc."
+      ]
+    }
+  ]
+}

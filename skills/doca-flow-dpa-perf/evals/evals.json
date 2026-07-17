@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-flow-dpa-perf",
+  "evals": [
+    {
+      "id": "doca-flow-dpa-perf.explicit-positive.v1",
+      "prompt": "Use the doca-flow-dpa-perf skill to help me. I'm working on: invoking doca_flow_dpa_perf on DPA-capable hardware (ConnectX-7+ or BlueField-3) to measure rule update / disable rates on the DPA-offloaded DOCA Flow path \u2014 picking the active / passive device split, choosing workload-shape axes (burst, queue, completion threshold, workers, hash pipe algo, PSL tables), or reading Kops/sec iteration stats and the optional self-test.",
+      "expected_skill": "doca-flow-dpa-perf",
+      "expected_output": "The agent selects the doca-flow-dpa-perf skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-flow-dpa-perf skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-flow-dpa-perf.implicit-positive.v1",
+      "prompt": "I'm running into this: \"how fast can the DPA program path-selector entries\". Can you walk me through it?",
+      "expected_skill": "doca-flow-dpa-perf",
+      "expected_output": "The agent recognizes this as a doca-flow-dpa-perf issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-flow-dpa-perf skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-flow-dpa-perf.implicit-positive.v2",
+      "prompt": "I'm running into this: \"baseline rule-update rate on ConnectX-8\". Can you walk me through it?",
+      "expected_skill": "doca-flow-dpa-perf",
+      "expected_output": "The agent recognizes this as a doca-flow-dpa-perf issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-flow-dpa-perf skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-flow-dpa-perf.negative.v1",
+      "prompt": "I actually need help with the host / DPU-CPU Flow path. Which skill should handle this, and why is it not doca-flow-dpa-perf?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-flow-dpa-perf; it explains that the host / DPU-CPU Flow path is out of doca-flow-dpa-perf's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-flow-dpa-perf is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

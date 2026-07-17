@@ -1,0 +1,125 @@
+[
+  {
+    "id": "nemotron-asr-orchestrate-scope-001",
+    "question": "I want to fine-tune ASR for my domain. Where do I start?",
+    "expected_skill": "nemotron-asr-finetune",
+    "expected_script": null,
+    "ground_truth": "The orchestrator should run the discovery/scoping questions before recommending a technique, then outline the staged workflow and the sub-skills it will delegate to.",
+    "expected_behavior": [
+      "Route to references/workflow.md and run Stage 1-2 discovery questions (real audio hours, domain text, eval set/target, latency/HW budget, deployment target).",
+      "Do not jump to a fine-tuning command before scoping and a baseline.",
+      "Explain the cheapest-sufficient-path approach and name the sub-skills for data, training, evaluation, and deployment.",
+      "Offer to answer cost/time/data questions along the way.",
+      "Announce steps (Step N/8)."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-path-001",
+    "question": "My Riva ASR model gets our German medical jargon wrong. What's the cheapest way to fix it?",
+    "expected_skill": "nemotron-asr-finetune",
+    "expected_script": null,
+    "ground_truth": "A known-vocabulary problem is the word-boosting rung. The orchestrator should recommend word boosting first and route configuration to the deployment sub-skill, not fine-tuning.",
+    "expected_behavior": [
+      "Route to references/path-selection.md and diagnose known-jargon as the boosting rung.",
+      "Recommend word boosting (runtime, no training) before an LM or fine-tune.",
+      "Hand runtime configuration off to the nemotron-speech sub-skill.",
+      "Avoid recommending fine-tuning for a bounded known-word problem.",
+      "Advise measuring baseline vs post-change WER."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-escalate-001",
+    "question": "Boosting and an n-gram LM didn't help — the model mishears our noisy call-center audio with strong accents. What now?",
+    "expected_skill": "nemotron-asr-finetune",
+    "expected_script": null,
+    "ground_truth": "An acoustic gap after cheaper rungs escalates to fine-tuning; the orchestrator delegates data and training to the sub-skills.",
+    "expected_behavior": [
+      "Route to references/path-selection.md and recognize accents+noise as an acoustic gap.",
+      "Escalate to fine-tuning; consider data via the SDG/Data sub-skill and train via nemo-speech-asr-finetune.",
+      "Confirm sufficient transcribed audio (100+ h ideal; ~10 h only if mixed to avoid catastrophic forgetting).",
+      "Delegate evaluation (normalized WER + forgetting check) to the evaluation stage of nemo-speech-asr-finetune.",
+      "Do not restart at boosting/LM since they were already shown insufficient."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-subskills-001",
+    "question": "Which sub-skills will you use to add Farsi support to our ASR, and what does each do?",
+    "expected_skill": "nemotron-asr-finetune",
+    "expected_script": null,
+    "ground_truth": "The orchestrator should map the stages to sub-skills (data-designer, nemo-speech-asr-finetune for training and evaluation, nemotron-speech) and flag the remaining data-profiling placeholder.",
+    "expected_behavior": [
+      "Route to references/sub-skills.md.",
+      "Map data generation to data-designer (+ nemotron-speech TTS), training to nemo-speech-asr-finetune, deployment to nemotron-speech.",
+      "Use nemo-speech-asr-finetune for evaluation; flag the data-profiling skill as a placeholder with interim guidance.",
+      "Note a new language may need cross-language transfer and lots of data.",
+      "Describe the handoff inputs/outputs between orchestrator and each sub-skill."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-planning-001",
+    "question": "How much data and how many GPU hours will it take to hit 10% WER, and should I use L40S or H100?",
+    "expected_skill": "nemotron-asr-finetune",
+    "expected_script": null,
+    "ground_truth": "The orchestrator should answer with ranges and assumptions, refuse a fabricated hours-to-WER number, recommend a pilot, and give GPU-choice guidance.",
+    "expected_behavior": [
+      "Route to references/planning-answers.md.",
+      "Explain there is no universal hours-to-WER mapping; establish baseline/target and run a small pilot to read the trend.",
+      "Give data guidance by rung (100+ h fine-tune; text-only for LM; little/none for boosting).",
+      "Give L40S vs H100 guidance based on model size, batch/precision, VRAM headroom, and cost.",
+      "State assumptions and prefer measured pilots over guesses."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-eval-001",
+    "question": "How should the orchestrator decide whether the fine-tune worked and whether to loop or ship?",
+    "expected_skill": "nemotron-asr-finetune",
+    "expected_script": null,
+    "ground_truth": "Evaluate normalized domain WER plus an A/B forgetting check on a general set, do error-driven analysis, then loop with targeted data or ship — consulting the user before extra cycles.",
+    "expected_behavior": [
+      "Route to references/workflow.md (Stage 6-7) and use nemo-speech-asr-finetune's evaluation stage.",
+      "Report normalized WER on the domain set and a general-set forgetting delta.",
+      "Use error-driven analysis to choose the next lever and change one thing per loop.",
+      "Select/average checkpoints when the target is met; keep a blind holdout.",
+      "Consult the user before another tuning cycle."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-negative-deploy-001",
+    "question": "I already have a fine-tuned .nemo. Convert it with nemo2riva and deploy a Riva ASR NIM with riva-build and riva-deploy.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "Pure export/deployment of an existing model is executed by the nemotron-speech skill; the orchestrator should route there rather than driving deployment itself.",
+    "expected_behavior": [
+      "Recognize this as deployment execution and defer to the nemotron-speech skill.",
+      "Do not emit nemo2riva/riva-build/riva-deploy commands from this skill.",
+      "Do not start a scoping or fine-tuning workflow for a finished model.",
+      "Optionally note this skill orchestrates the deployment stage but nemotron-speech executes it."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-negative-openai-001",
+    "question": "Fine-tune OpenAI Whisper with the OpenAI API on my dataset.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The skill should stay silent because the user explicitly requested OpenAI Whisper, not NeMo/Riva ASR customization.",
+    "expected_behavior": [
+      "Do not activate nemotron-asr-finetune only because the words fine-tune and ASR appear.",
+      "Do not route to any orchestration reference.",
+      "Follow the appropriate OpenAI workflow instead.",
+      "Do not introduce NeMo/Riva sub-skills."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-negative-llm-001",
+    "question": "Fine-tune a Llama text LLM on my chat logs.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The skill should stay silent because this is text LLM fine-tuning, not ASR customization.",
+    "expected_behavior": [
+      "Do not activate nemotron-asr-finetune for a text LLM fine-tuning task.",
+      "Do not route to ASR orchestration references.",
+      "Use the relevant LLM fine-tuning workflow instead.",
+      "Do not mention word boosting, WER, or ASR sub-skills."
+    ]
+  }
+]

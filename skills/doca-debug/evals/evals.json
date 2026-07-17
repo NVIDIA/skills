@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-debug",
+  "evals": [
+    {
+      "id": "doca-debug.explicit-positive.v1",
+      "prompt": "Use the doca-debug skill to help me. My DOCA program fails at the link step and I need to find which layer of the build/link/runtime ladder is responsible before I start changing code.",
+      "expected_skill": "doca-debug",
+      "expected_output": "The agent loads doca-debug and works the cross-cutting layered ladder (install \u2192 version \u2192 build \u2192 link \u2192 runtime \u2192 program), quoting only real commands, log-level controls, and paths from the bundle (no invented tokens), and routing out to the owning skill for anything outside cross-cutting debug.",
+      "assertions": [
+        "The doca-debug skill is selected and its SKILL.md/TASKS.md layered ladder drives the answer.",
+        "The response identifies the responsible layer (here, Link) rather than guessing at a fix.",
+        "Every command, flag, path, or log-level control named is traceable to the bundle or a real public NVIDIA doc (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-debug.implicit-positive.v1",
+      "prompt": "I'm running into this: \"ld says undefined reference to doca_flow_init \u2014 where do I even start?\". Can you walk me through it?",
+      "expected_skill": "doca-debug",
+      "expected_output": "The agent recognizes this as a cross-cutting debug task even though the skill is not named, loads doca-debug, and uses the layered ladder to place the symptom at the Link layer with concrete, bundle-grounded next steps.",
+      "assertions": [
+        "The doca-debug skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer places the symptom on the ladder and gives read-only-first, bundle-grounded steps rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-debug.implicit-positive.v2",
+      "prompt": "I'm running into this: \"my DOCA Flow program is silent and I can't tell what it's doing \u2014 how do I get more log output?\". Can you walk me through it?",
+      "expected_skill": "doca-debug",
+      "expected_output": "The agent loads doca-debug and answers from the observability surface (stderr logs, --sdk-log-level, DOCA_LOG_LEVEL, the doca-<lib>-trace build flavor), giving the run-with-verbosity workflow grounded in the bundle.",
+      "assertions": [
+        "The doca-debug skill is triggered from the implicit phrasing without the user naming it.",
+        "The verbosity controls named (--sdk-log-level, DOCA_LOG_LEVEL, doca-<lib>-trace) are quoted from the bundle, not invented."
+      ]
+    },
+    {
+      "id": "doca-debug.negative.v1",
+      "prompt": "My pkg-config cannot find doca-flow and my hugepages are not mounted. Which skill should handle this and why is it not doca-debug?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-debug; it recognizes these as env-class install/prerequisite symptoms and routes to doca-setup, explaining that doca-debug is the cross-cutting ladder env-class debug escalates to, not the owner of pkg-config/hugepages setup.",
+      "assertions": [
+        "doca-debug is not used as the primary skill for this out-of-scope env-class request.",
+        "The answer routes to the appropriate skill: doca-setup."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-dpa",
+  "evals": [
+    {
+      "id": "doca-dpa.explicit-positive.v1",
+      "prompt": "Use the doca-dpa skill to help me. I'm doing host-side DOCA DPA work — creating the doca_dpa Core context, loading a DPACC-compiled doca_dpa_app image, creating DPA threads, launching kernels via doca_dpa_kernel_launch_update_*, and draining doca_dpa_completion.",
+      "expected_skill": "doca-dpa",
+      "expected_output": "The agent loads doca-dpa and answers from the documented host-side workflow — doca_dpa context creation, loading the DPACC-compiled doca_dpa_app, DPA thread creation, doca_dpa_kernel_launch_update_* launches, doca_dpa_completion draining, and doca_dpa_cap_* discovery — quoting only real symbols.",
+      "assertions": [
+        "The doca-dpa skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "The DPACC image load and doca_dpa_kernel_launch_update_* / doca_dpa_completion flow are used correctly.",
+        "Every symbol named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-dpa.implicit-positive.v1",
+      "prompt": "I'm running into this: \"I want to run compute on the DPA from my host but my DPA kernel hangs and I never get a completion\". Can you walk me through it?",
+      "expected_skill": "doca-dpa",
+      "expected_output": "The agent recognizes this as a doca-dpa task even though the skill is not named, loads it, and walks the host-side launch + doca_dpa_completion draining path grounded in the bundle.",
+      "assertions": [
+        "The doca-dpa skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer ties the hang to completion draining / launch ordering rather than kernel-body logic."
+      ]
+    },
+    {
+      "id": "doca-dpa.implicit-positive.v2",
+      "prompt": "I'm running into this: \"DOCA_ERROR_DRIVER on launch and I suspect DOCA/DPACC version skew\". Can you walk me through it?",
+      "expected_skill": "doca-dpa",
+      "expected_output": "The agent loads doca-dpa and diagnoses the DRIVER error and version-skew path (doca_dpa_cap_* discovery and DPACC/DOCA compatibility) from the bundle, grounded in real symbols.",
+      "assertions": [
+        "The doca-dpa skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer connects DOCA_ERROR_DRIVER to capability discovery and DPACC/DOCA version compatibility."
+      ]
+    },
+    {
+      "id": "doca-dpa.negative.v1",
+      "prompt": "I need to write the DPA-side kernel body itself, and separately do host↔DPU messaging and host-side RDMA. Which skill should handle this and why is it not doca-dpa?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-dpa; it routes DPA-side kernel programming and DPACC internals out, host↔DPU messaging to doca-comch, host-side RDMA to doca-rdma, and GPU-initiated networking to doca-gpunetio.",
+      "assertions": [
+        "doca-dpa is not used as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s): doca-comch / doca-rdma / doca-gpunetio."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-upgrade",
+  "evals": [
+    {
+      "id": "doca-upgrade.explicit-positive.v1",
+      "prompt": "Use the doca-upgrade skill to help me. I'm on DOCA 3.1.0 and want to know whether a newer release exists and how to move to it safely.",
+      "expected_skill": "doca-upgrade",
+      "expected_output": "The agent loads doca-upgrade and follows the detect \u2192 report \u2192 ASK \u2192 only-then guided upgrade discipline: it routes version detection to doca-version, reports the gap, and STOPS for explicit confirmation before proposing any upgrade command, delegating hardware/firmware/reboot steps to doca-hardware-safety.",
+      "assertions": [
+        "The doca-upgrade skill is selected and the detect \u2192 report \u2192 ASK \u2192 only-then discipline drives the answer.",
+        "The agent does not issue an upgrade command without first reporting the gap and asking for explicit confirmation.",
+        "Version detection is routed to doca-version and any hardware/firmware/reboot step is routed to doca-hardware-safety (not redefined here)."
+      ]
+    },
+    {
+      "id": "doca-upgrade.implicit-positive.v1",
+      "prompt": "I'm running into this: \"I want the newest DOCA Flow features \u2014 can I just run apt upgrade in place right now?\". Can you walk me through it?",
+      "expected_skill": "doca-upgrade",
+      "expected_output": "The agent recognizes this as an upgrade task even though the skill is not named, loads doca-upgrade, and applies the never-auto rule and confirmation gate: it reports the gap and STOPS for explicit confirmation before any upgrade command runs.",
+      "assertions": [
+        "The doca-upgrade skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer enforces the never-upgrade-automatically rule and the explicit-confirmation gate rather than running apt upgrade."
+      ]
+    },
+    {
+      "id": "doca-upgrade.implicit-positive.v2",
+      "prompt": "I'm running into this: \"my apt upgrade aborted half-way and now dpkg reports an interrupted transaction\". Can you walk me through it?",
+      "expected_skill": "doca-upgrade",
+      "expected_output": "The agent loads doca-upgrade and uses the failed/partial-upgrade diagnosis (aborted-transaction / dpkg-interrupted rows) and recovery ladder, grounded in the bundle, re-routing version verification to doca-version.",
+      "assertions": [
+        "The doca-upgrade skill is triggered from the implicit phrasing without the user naming it.",
+        "The recovery steps are bundle-grounded and route version verification to doca-version rather than inventing commands."
+      ]
+    },
+    {
+      "id": "doca-upgrade.negative.v1",
+      "prompt": "I just got a fresh BlueField with no DOCA on it and want to install DOCA for the first time. Which skill should handle this and why is it not doca-upgrade?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-upgrade; it recognizes this as first-time install and routes to doca-setup, explaining that doca-upgrade only covers moving between existing releases, not initial install.",
+      "assertions": [
+        "doca-upgrade is not used as the primary skill for this out-of-scope first-install request.",
+        "The answer routes to the appropriate skill: doca-setup."
+      ]
+    }
+  ]
+}

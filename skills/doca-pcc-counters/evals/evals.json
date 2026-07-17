@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-pcc-counters",
+  "evals": [
+    {
+      "id": "doca-pcc-counters.explicit-positive.v1",
+      "prompt": "Use the doca-pcc-counters skill to help me. I'm working on: invoking the DOCA PCC Counters tool \u2014 the `pcc_counters.sh` bash script under the DOCA tools directory \u2014 to arm and read the fixed firmware/hardware PCC (Programmable Congestion Control) diagnostic counters (CNP, RTT, WRED-drop, etc.) on a ConnectX / BlueField device via mst + the mlx5 debugfs `diag_cnt` interface. The script takes two positional args \u2014 `set | query` and an mst device path \u2014 with no `--help` or subcommands.",
+      "expected_skill": "doca-pcc-counters",
+      "expected_output": "The agent selects the doca-pcc-counters skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-pcc-counters skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-pcc-counters.implicit-positive.v1",
+      "prompt": "I'm running into this: \"pcc_counters.sh\". Can you walk me through it?",
+      "expected_skill": "doca-pcc-counters",
+      "expected_output": "The agent recognizes this as a doca-pcc-counters issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-pcc-counters skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-pcc-counters.implicit-positive.v2",
+      "prompt": "I'm running into this: \"PCC counters\". Can you walk me through it?",
+      "expected_skill": "doca-pcc-counters",
+      "expected_output": "The agent recognizes this as a doca-pcc-counters issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-pcc-counters skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-pcc-counters.negative.v1",
+      "prompt": "I actually need help with writing a custom PCC algorithm. Which skill should handle this, and why is it not doca-pcc-counters?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-pcc-counters; it explains that writing a custom PCC algorithm is out of doca-pcc-counters's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-pcc-counters is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

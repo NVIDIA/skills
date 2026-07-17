@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-dpa-hl-tracer",
+  "evals": [
+    {
+      "id": "doca-dpa-hl-tracer.explicit-positive.v1",
+      "prompt": "Use the doca-dpa-hl-tracer skill to help me. I'm working on: the user runs doca_dpa_hl_tracer to capture/decode DPA-side traces at the programming-events layer (kernel entry/exit, sync points, comm primitive calls, RDMA WR submission, completion drain) \u2014 picking TRACE vs CRIT, tuning the JSON config (file-size limits + file_size_limit_policy, thread priorities/cores), decoding against the matching DPA-side ELF, or diagnosing empty/noisy captures.",
+      "expected_skill": "doca-dpa-hl-tracer",
+      "expected_output": "The agent selects the doca-dpa-hl-tracer skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-dpa-hl-tracer skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-dpa-hl-tracer.implicit-positive.v1",
+      "prompt": "I'm running into this: \"DPA kernel returns wrong result but host completions look clean\". Can you walk me through it?",
+      "expected_skill": "doca-dpa-hl-tracer",
+      "expected_output": "The agent recognizes this as a doca-dpa-hl-tracer issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-dpa-hl-tracer skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-dpa-hl-tracer.implicit-positive.v2",
+      "prompt": "I'm running into this: \"kernel-entry to first-comm latency is huge\". Can you walk me through it?",
+      "expected_skill": "doca-dpa-hl-tracer",
+      "expected_output": "The agent recognizes this as a doca-dpa-hl-tracer issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-dpa-hl-tracer skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-dpa-hl-tracer.negative.v1",
+      "prompt": "I actually need help with writing DPA kernels. Which skill should handle this, and why is it not doca-dpa-hl-tracer?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-dpa-hl-tracer; it explains that writing DPA kernels is out of doca-dpa-hl-tracer's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-dpa-hl-tracer is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

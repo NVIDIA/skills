@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-rdma",
+  "evals": [
+    {
+      "id": "doca-rdma.explicit-positive.v1",
+      "prompt": "Use the doca-rdma skill to help me. I'm working on: doing hands-on DOCA RDMA programming on a BlueField DPU, ConnectX NIC, or DOCA host \u2014 bringing up an RDMA context on a doca_dev, picking a connection method (RDMA CM, bridge/OOB, or gRPC exchange of doca_rdma_export()), enabling one of the eleven task types (Send/Receive/Send-Imm, Read/Write/Write-Imm, Atomic CmpSwap/FetchAdd, Get/Set/Add Remote Sync Event), setting matching mmap + RDMA permissions, sizing queues and connections, querying doca_rdma_cap_*, or debugging DOCA_ERROR_* from an RDMA call.",
+      "expected_skill": "doca-rdma",
+      "expected_output": "The agent selects the doca-rdma skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-rdma skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-rdma.implicit-positive.v1",
+      "prompt": "I'm running into this: \"one-sided read returns permission denied\". Can you walk me through it?",
+      "expected_skill": "doca-rdma",
+      "expected_output": "The agent recognizes this as a doca-rdma issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-rdma skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-rdma.implicit-positive.v2",
+      "prompt": "I'm running into this: \"completions never arrive after submit\". Can you walk me through it?",
+      "expected_skill": "doca-rdma",
+      "expected_output": "The agent recognizes this as a doca-rdma issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-rdma skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-rdma.negative.v1",
+      "prompt": "I actually need help with general RDMA / ibverbs theory. Which skill should handle this, and why is it not doca-rdma?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-rdma; it explains that general RDMA / ibverbs theory is out of doca-rdma's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-rdma is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

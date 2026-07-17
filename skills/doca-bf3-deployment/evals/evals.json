@@ -1,0 +1,36 @@
+{
+  "skill_name": "doca-bf3-deployment",
+  "evals": [
+    {
+      "id": "doca-bf3-deployment.explicit-positive.v1",
+      "prompt": "Use the doca-bf3-deployment skill to help me. Use this skill for BlueField-3 (BF3) day-1 platform bring-up via the classic RShim/BFB path: pushing a BlueField bundle (BFB) to the DPU over RShim with bfb-install from the host, the host-to-DPU TMFIFO management channel (tmfifo_net0, the ",
+      "expected_skill": "doca-bf3-deployment",
+      "expected_output": "The agent loads doca-bf3-deployment and answers strictly from that skill's documented workflow, quoting only real symbols, flags, paths, and commands from the bundle (no invented tokens) and routing out to other skills for anything out of doca-bf3-deployment's scope.",
+      "assertions": [
+        "The doca-bf3-deployment skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every command, flag, path, or symbol named is traceable to the bundle or a real public NVIDIA doc (no invented tokens).",
+        "Steps are given in a workable order with preconditions established before they are used."
+      ]
+    },
+    {
+      "id": "doca-bf3-deployment.implicit-positive.v1",
+      "prompt": "I need help with BlueField-3 (BF3) day-1 platform bring-up via the classic RShim/BFB path: pushing a BlueField bundle (BFB) to the DPU over RShim with bfb-install from the host,. How should I proceed?",
+      "expected_skill": "doca-bf3-deployment",
+      "expected_output": "The agent recognizes this as a doca-bf3-deployment task even though the skill is not named, loads doca-bf3-deployment, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The doca-bf3-deployment skill is triggered from the implicit phrasing without the user naming it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-bf3-deployment.negative.v1",
+      "prompt": "I need help with something doca-bf3-deployment explicitly says is out of scope (it should be handled by doca-hardware-safety). Which skill should handle it and why is it not doca-bf3-deployment?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-bf3-deployment; it recognizes the request is out of scope and routes to the correct skill (doca-hardware-safety), explaining the boundary.",
+      "assertions": [
+        "doca-bf3-deployment is not used as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s): doca-hardware-safety."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-pcc-ztr-rttcc-algo",
+  "evals": [
+    {
+      "id": "doca-pcc-ztr-rttcc-algo.explicit-positive.v1",
+      "prompt": "Use the doca-pcc-ztr-rttcc-algo skill to help me. I'm deploying and tuning the DOCA-shipped Zero-Touch RoCE RTT-based Congestion Control (ZTR RTTCC) reference algorithm on a BlueField-3 DPA — wiring doca_pcc_dev_ztr_rttcc_algo into the shipped PCC sample, picking a variant at DPACC build time, and tuning host-set parameters.",
+      "expected_skill": "doca-pcc-ztr-rttcc-algo",
+      "expected_output": "The agent loads doca-pcc-ztr-rttcc-algo and answers from the documented workflow — wiring doca_pcc_dev_ztr_rttcc_algo into the shipped DOCA PCC sample, picking a variant (vanilla / PM / RX-rate / multipath / window-probeless) at DPACC build time, tuning host-set parameters, and diagnosing DOCA_PCC_DEV_STATUS_FAIL — quoting only real symbols.",
+      "assertions": [
+        "The doca-pcc-ztr-rttcc-algo skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "The reference algorithm wiring, variant selection, and parameter tuning are used correctly.",
+        "Every symbol named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-pcc-ztr-rttcc-algo.implicit-positive.v1",
+      "prompt": "I'm running into this: \"my RoCE-v2 flows aren't being throttled and the PCC sample isn't dispatching to my algo\". Can you walk me through it?",
+      "expected_skill": "doca-pcc-ztr-rttcc-algo",
+      "expected_output": "The agent recognizes this as a doca-pcc-ztr-rttcc-algo task even though the skill is not named, loads it, and walks the sample-dispatch / algorithm-wiring path grounded in the bundle.",
+      "assertions": [
+        "The doca-pcc-ztr-rttcc-algo skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer ties the no-throttle symptom to sample dispatch and algorithm wiring."
+      ]
+    },
+    {
+      "id": "doca-pcc-ztr-rttcc-algo.implicit-positive.v2",
+      "prompt": "I'm running into this: \"set-params returns fail and the algorithm loaded but the counters are flat\". Can you walk me through it?",
+      "expected_skill": "doca-pcc-ztr-rttcc-algo",
+      "expected_output": "The agent loads doca-pcc-ztr-rttcc-algo and diagnoses the set-params failure and flat-counters path (host-set parameters and DOCA_PCC_DEV_STATUS_FAIL) from the bundle, grounded in real symbols.",
+      "assertions": [
+        "The doca-pcc-ztr-rttcc-algo skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer explains host-set parameter tuning and the DOCA_PCC_DEV_STATUS_FAIL path."
+      ]
+    },
+    {
+      "id": "doca-pcc-ztr-rttcc-algo.negative.v1",
+      "prompt": "I actually need to write a custom PCC algorithm from scratch, do read-only PCC counter inspection, and manage the host-side doca-pcc lifecycle. Which skill should handle this and why is it not doca-pcc-ztr-rttcc-algo?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-pcc-ztr-rttcc-algo; it routes custom-algorithm authoring, read-only counter inspection, the host-side doca-pcc lifecycle, and firmware-only pre-Programmable PCC out to their proper skills.",
+      "assertions": [
+        "doca-pcc-ztr-rttcc-algo is not used as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s): doca-pcc and others rather than forcing this reference-algo skill."
+      ]
+    }
+  ]
+}

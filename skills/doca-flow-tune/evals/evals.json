@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-flow-tune",
+  "evals": [
+    {
+      "id": "doca-flow-tune.explicit-positive.v1",
+      "prompt": "Use the doca-flow-tune skill to help me. I'm working on: tuning a live or captured `doca-flow` pipeline with `doca_flow_tune` \u2014 snapshotting pipe / counter / KPI state, picking a tuning axis (rule placement, resource hints / table sizing, HW-offload mode) and a matching measurement (rule-install rate, lookup latency, hardware-counter delta), running offline or online (read-only or state-changing) modes, reading the dumper CSV / analyze JSON / visualize mermaid, or applying a recommendation back into the Flow program.",
+      "expected_skill": "doca-flow-tune",
+      "expected_output": "The agent selects the doca-flow-tune skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-flow-tune skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-flow-tune.implicit-positive.v1",
+      "prompt": "I'm running into this: \"Flow rule-install rate is low on BlueField\". Can you walk me through it?",
+      "expected_skill": "doca-flow-tune",
+      "expected_output": "The agent recognizes this as a doca-flow-tune issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-flow-tune skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-flow-tune.implicit-positive.v2",
+      "prompt": "I'm running into this: \"table sizing looks wrong for this pipe\". Can you walk me through it?",
+      "expected_skill": "doca-flow-tune",
+      "expected_output": "The agent recognizes this as a doca-flow-tune issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-flow-tune skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-flow-tune.negative.v1",
+      "prompt": "I actually need help with measuring baseline numbers. Which skill should handle this, and why is it not doca-flow-tune?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-flow-tune; it explains that measuring baseline numbers is out of doca-flow-tune's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-flow-tune is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

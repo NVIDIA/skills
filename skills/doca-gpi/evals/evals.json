@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-gpi",
+  "evals": [
+    {
+      "id": "doca-gpi.explicit-positive.v1",
+      "prompt": "Use the doca-gpi skill to help me. I'm wiring a GPU-Packet-Initiator context so a CUDA kernel drives RDMA queues directly from GPU memory without host CPU mediation — the doca_gpi / domain / channel object model, the GPU-side handle handoff via doca_gpu_gpi_channel*, and attaching GPU memory to a GPI domain.",
+      "expected_skill": "doca-gpi",
+      "expected_output": "The agent loads doca-gpi and answers from the documented workflow — the doca_gpi / domain / channel object model, GPU-memory attachment to a GPI domain, and the GPU-side handle handoff (doca_gpu_gpi_channel*) — quoting only real symbols and helping pick GPI vs doca-gpunetio.",
+      "assertions": [
+        "The doca-gpi skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "The doca_gpi/domain/channel object model and GPU handle handoff are used correctly.",
+        "Every symbol named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-gpi.implicit-positive.v1",
+      "prompt": "I'm running into this: \"my CUDA kernel needs to post RDMA directly from GPU memory without the host CPU on the path\". Can you walk me through it?",
+      "expected_skill": "doca-gpi",
+      "expected_output": "The agent recognizes this as a doca-gpi task even though the skill is not named, loads it, and walks the GPU-initiated RDMA path grounded in the bundle.",
+      "assertions": [
+        "The doca-gpi skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer uses the GPI GPU-driven RDMA path rather than host-CPU-mediated posting."
+      ]
+    },
+    {
+      "id": "doca-gpi.implicit-positive.v2",
+      "prompt": "I'm running into this: \"DOCA_ERROR_* from doca_gpi_gpu_channel_get and I'm unsure how to hand a GPU handle to my CUDA kernel\". Can you walk me through it?",
+      "expected_skill": "doca-gpi",
+      "expected_output": "The agent loads doca-gpi and diagnoses the channel-get error and the GPU-side handle handoff from the bundle, grounded in real symbols.",
+      "assertions": [
+        "The doca-gpi skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer explains the doca_gpu_gpi_channel* handoff and the error path."
+      ]
+    },
+    {
+      "id": "doca-gpi.negative.v1",
+      "prompt": "I actually need the doca-gpunetio Send/Receive surface and the doca-rdma queue lifecycle, plus general CUDA programming help. Which skill should handle this and why is it not doca-gpi?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-gpi; it routes the Send/Receive surface to doca-gpunetio, the queue lifecycle to doca-rdma, DPA-side initiation to doca-rdmi, and CUDA programming out.",
+      "assertions": [
+        "doca-gpi is not used as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s): doca-gpunetio / doca-rdma / doca-rdmi."
+      ]
+    }
+  ]
+}

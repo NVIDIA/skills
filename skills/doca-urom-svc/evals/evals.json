@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-urom-svc",
+  "evals": [
+    {
+      "id": "doca-urom-svc.explicit-positive.v1",
+      "prompt": "Use the doca-urom-svc skill to help me. I'm working on: the DOCA UROM Service container on a BlueField Arm to run remote memory ops (puts, gets, atomics, collectives) that paired hosts enqueue via the host-side `doca-urom` library \u2014 pulling the NGC container, choosing UCX-component surface, sizing the enqueue queue, wiring Comch endpoint pairing with `doca-urom`, or pinning host-library + service versions per the DOCA Compatibility Policy.",
+      "expected_skill": "doca-urom-svc",
+      "expected_output": "The agent selects the doca-urom-svc skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-urom-svc skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-urom-svc.implicit-positive.v1",
+      "prompt": "I'm running into this: \"UCX collectives slow on host CPU, want BlueField offload\". Can you walk me through it?",
+      "expected_skill": "doca-urom-svc",
+      "expected_output": "The agent recognizes this as a doca-urom-svc issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-urom-svc skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-urom-svc.implicit-positive.v2",
+      "prompt": "I'm running into this: \"enqueue returns NOT_PERMITTED though doca_dev access is fine\". Can you walk me through it?",
+      "expected_skill": "doca-urom-svc",
+      "expected_output": "The agent recognizes this as a doca-urom-svc issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-urom-svc skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-urom-svc.negative.v1",
+      "prompt": "I actually need help with host-side app code. Which skill should handle this, and why is it not doca-urom-svc?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-urom-svc; it explains that host-side app code is out of doca-urom-svc's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-urom-svc is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

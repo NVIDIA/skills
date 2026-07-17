@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-aes-gcm",
+  "evals": [
+    {
+      "id": "doca-aes-gcm.explicit-positive.v1",
+      "prompt": "Use the doca-aes-gcm skill to help me. I'm configuring doca_aes_gcm_task_encrypt / _task_decrypt on a BlueField and need to query doca_aes_gcm_cap_* for the supported key types and size my buffers before submitting.",
+      "expected_skill": "doca-aes-gcm",
+      "expected_output": "The agent loads doca-aes-gcm and answers from the skill's documented workflow — querying doca_aes_gcm_cap_* for per-key-type support (only DOCA_AES_GCM_KEY_128 / _256; AES-192 unsupported), sizing plaintext against the max-buf cap, and setting src/dst mmap permissions — quoting only real symbols from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-aes-gcm skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Key-type support is checked via doca_aes_gcm_cap_* and only DOCA_AES_GCM_KEY_128/_256 are treated as valid (AES-192 rejected).",
+        "Every symbol, cap query, and permission named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-aes-gcm.implicit-positive.v1",
+      "prompt": "I'm running into this: \"my decrypt completion comes back IO_FAILED and the auth tag isn't verifying\". Can you walk me through it?",
+      "expected_skill": "doca-aes-gcm",
+      "expected_output": "The agent recognizes this as a doca-aes-gcm task even though the skill is not named, loads it, and treats the tag-verification-failed / IO_FAILED-on-decrypt path as the security-critical outcome, walking the documented debug steps grounded in the bundle.",
+      "assertions": [
+        "The doca-aes-gcm skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer handles the tag-verification-failed outcome as security-critical rather than generic error advice."
+      ]
+    },
+    {
+      "id": "doca-aes-gcm.implicit-positive.v2",
+      "prompt": "I'm running into this: \"is AES-192-GCM available on this BlueField?\". Can you walk me through it?",
+      "expected_skill": "doca-aes-gcm",
+      "expected_output": "The agent loads doca-aes-gcm and answers that AES-192 is not supported — only DOCA_AES_GCM_KEY_128 and _256 — and points to the doca_aes_gcm_cap_task_{encrypt,decrypt}_is_key_type_supported runtime check, without inventing a capability.",
+      "assertions": [
+        "The doca-aes-gcm skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer correctly states AES-192-GCM is unsupported and cites the runtime key-type cap query."
+      ]
+    },
+    {
+      "id": "doca-aes-gcm.negative.v1",
+      "prompt": "I need AES-CBC and AES-XTS encryption on the CPU with OpenSSL, plus key rotation via our KMS. Which skill should handle this and why is it not doca-aes-gcm?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-aes-gcm; it recognizes non-GCM AES modes (CBC/CTR/XTS, CPU OpenSSL) and key management (KMS/HSM/rotation) as out of scope and routes elsewhere, explaining doca-aes-gcm only covers hardware AES-GCM/AEAD.",
+      "assertions": [
+        "doca-aes-gcm is not used as the primary skill for this out-of-scope request.",
+        "The answer explains the boundary (non-GCM modes and key management are out of scope) and routes away."
+      ]
+    }
+  ]
+}

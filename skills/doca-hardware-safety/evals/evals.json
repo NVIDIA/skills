@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-hardware-safety",
+  "evals": [
+    {
+      "id": "doca-hardware-safety.explicit-positive.v1",
+      "prompt": "Use the doca-hardware-safety skill to help me. Use this skill whenever the agent is about to recommend or apply a change that touches DPU / NIC hardware state on a live system — mlxconfig firmware-parameter write, NIC firmware burn, BFB reflash, NIC ↔ DPU mode flip, SR-IOV or device-emu",
+      "expected_skill": "doca-hardware-safety",
+      "expected_output": "The agent loads doca-hardware-safety and answers strictly from that skill's documented workflow, quoting only real symbols, flags, paths, and commands from the bundle (no invented tokens) and routing out to other skills for anything out of doca-hardware-safety's scope.",
+      "assertions": [
+        "The doca-hardware-safety skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every command, flag, path, or symbol named is traceable to the bundle or a real public NVIDIA doc (no invented tokens).",
+        "Steps are given in a workable order with preconditions established before they are used."
+      ]
+    },
+    {
+      "id": "doca-hardware-safety.implicit-positive.v1",
+      "prompt": "I'm running into this: \"BlueField DPU hardware safety limits and thermal shutdown\". Can you walk me through it?",
+      "expected_skill": "doca-hardware-safety",
+      "expected_output": "The agent recognizes this as a doca-hardware-safety task even though the skill is not named, loads doca-hardware-safety, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The doca-hardware-safety skill is triggered from the implicit phrasing without the user naming it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-hardware-safety.implicit-positive.v2",
+      "prompt": "I'm running into this: \"flip BlueField mode over SSH\". Can you walk me through it?",
+      "expected_skill": "doca-hardware-safety",
+      "expected_output": "The agent recognizes this as a doca-hardware-safety task even though the skill is not named, loads doca-hardware-safety, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The doca-hardware-safety skill is triggered from the implicit phrasing without the user naming it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-hardware-safety.negative.v1",
+      "prompt": "I need help with something doca-hardware-safety explicitly says is out of scope (it should be handled by doca-debug). Which skill should handle it and why is it not doca-hardware-safety?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-hardware-safety; it recognizes the request is out of scope and routes to the correct skill (doca-debug, doca-programming-guide, doca-public-knowledge-map), explaining the boundary.",
+      "assertions": [
+        "doca-hardware-safety is not used as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s): doca-debug, doca-programming-guide, doca-public-knowledge-map."
+      ]
+    }
+  ]
+}

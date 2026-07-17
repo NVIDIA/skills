@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-dpdk-bridge",
+  "evals": [
+    {
+      "id": "doca-dpdk-bridge.explicit-positive.v1",
+      "prompt": "Use the doca-dpdk-bridge skill to help me. I have an existing DPDK app and want to bind a DPDK port id to a doca_dev (doca_dpdk_port_probe / doca_dpdk_port_as_dev) and convert rte_mbuf <-> doca_buf so I can add DOCA Flow steering in-place.",
+      "expected_skill": "doca-dpdk-bridge",
+      "expected_output": "The agent loads doca-dpdk-bridge and answers from the documented workflow — doca_dpdk_port_probe / doca_dpdk_port_as_dev to bind a DPDK port to a doca_dev, rte_mbuf <-> doca_buf conversion, and doca_dpdk_cap_is_rep_port_supported — quoting only real symbols (no invented tokens).",
+      "assertions": [
+        "The doca-dpdk-bridge skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "The bind path uses doca_dpdk_port_probe / doca_dpdk_port_as_dev and mbuf<->doca_buf conversion correctly.",
+        "Every symbol named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-dpdk-bridge.implicit-positive.v1",
+      "prompt": "I'm running into this: \"how do I add DOCA Flow to my existing DPDK app without rewriting the data plane?\". Can you walk me through it?",
+      "expected_skill": "doca-dpdk-bridge",
+      "expected_output": "The agent recognizes this as a doca-dpdk-bridge task even though the skill is not named, loads it, and walks the in-place bind-and-convert path (making the DPDK port visible to DOCA) grounded in the bundle.",
+      "assertions": [
+        "The doca-dpdk-bridge skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer uses the bridge to add DOCA in-place rather than recommending a DOCA-native rewrite."
+      ]
+    },
+    {
+      "id": "doca-dpdk-bridge.implicit-positive.v2",
+      "prompt": "I'm running into this: \"the bridge loads but every operation returns errors, and I get DOCA_ERROR_NOT_FOUND on port registration\". Can you walk me through it?",
+      "expected_skill": "doca-dpdk-bridge",
+      "expected_output": "The agent loads doca-dpdk-bridge and diagnoses the NOT_FOUND-on-port-registration / bridge-error path from the bundle (port probe order, matched-pair DPDK version), grounded in real symbols.",
+      "assertions": [
+        "The doca-dpdk-bridge skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer ties the errors to bridge setup (probe order / DPDK version pairing) rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-dpdk-bridge.negative.v1",
+      "prompt": "I want to build fresh DOCA-native packet I/O and program flow rules, and I still need to install DOCA and DPDK. Which skill should handle this and why is it not doca-dpdk-bridge?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-dpdk-bridge; it recognizes fresh DOCA-native packet I/O (doca-eth), flow-rule programming (doca-flow), and install (doca-setup) as out of scope and routes there, explaining the bridge only adapts an existing DPDK app to DOCA.",
+      "assertions": [
+        "doca-dpdk-bridge is not used as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s): doca-eth / doca-flow / doca-setup."
+      ]
+    }
+  ]
+}

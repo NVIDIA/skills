@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-dms",
+  "evals": [
+    {
+      "id": "doca-dms.explicit-positive.v1",
+      "prompt": "Use the doca-dms skill to help me. I'm working on: Use this skill for operating NVIDIA DOCA Management Service (DMS) on a BlueField, Arm host, x86 host, or K8s pod \u2014 bringing up `dmsd` frontend + `dmspe` backend, picking deployment shape, choosing auth (localhost / PAM / credentials / mTLS), wiring `-allowed_users` (gRPC client allow-list) + `dmsgroup` (Unix group for `dmspe`), issuing gNMI Get/Set on YANG paths, gNMI Subscribe for streaming telemetry (STREAM / SAMPLE 1s\u201360s, ONCE supported; POLL + Aggregation Unimplemented), gNOI for reboot/OS install/factory-reset/file transfer/`mlxconfig`/ `containerz`, or debugging frontend-vs-backend errors and logs.",
+      "expected_skill": "doca-dms",
+      "expected_output": "The agent selects the doca-dms skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-dms skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-dms.implicit-positive.v1",
+      "prompt": "I'm running into this: \"manage a remote BlueField over gRPC\". Can you walk me through it?",
+      "expected_skill": "doca-dms",
+      "expected_output": "The agent recognizes this as a doca-dms issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-dms skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-dms.implicit-positive.v2",
+      "prompt": "I'm running into this: \"gNOI reboot from orchestrator\". Can you walk me through it?",
+      "expected_skill": "doca-dms",
+      "expected_output": "The agent recognizes this as a doca-dms issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-dms skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-dms.negative.v1",
+      "prompt": "I need help installing DOCA on a fresh host and picking the right BFB \u2014 which skill should handle this, and why is it not doca-dms?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-dms; it routes install/bring-up to the setup skill and explains doca-dms is out of scope here.",
+      "assertions": [
+        "doca-dms is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

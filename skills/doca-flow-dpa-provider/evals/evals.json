@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-flow-dpa-provider",
+  "evals": [
+    {
+      "id": "doca-flow-dpa-provider.explicit-positive.v1",
+      "prompt": "Use the doca-flow-dpa-provider skill to help me. I'm exporting a doca-flow pipe and external resources into BlueField DPA address space so a DPACC kernel can read counters and mutate hash-pipe entries — walking per-port doca_flow_dpa_ctx, the three queue types, and the export handshake (_export_prepare -> add entries -> _export -> _get_device_addr).",
+      "expected_skill": "doca-flow-dpa-provider",
+      "expected_output": "The agent loads doca-flow-dpa-provider and answers from the documented export workflow — per-port doca_flow_dpa_ctx, the general/resources-write/resources-read queue types, and the order-sensitive _export_prepare -> add entries -> _export -> _get_device_addr handshake — quoting only real symbols.",
+      "assertions": [
+        "The doca-flow-dpa-provider skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "The order-sensitive export handshake and the three queue types are used correctly.",
+        "Every symbol named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-flow-dpa-provider.implicit-positive.v1",
+      "prompt": "I'm running into this: \"my DPA kernel never sees the entries in the exported pipe\". Can you walk me through it?",
+      "expected_skill": "doca-flow-dpa-provider",
+      "expected_output": "The agent recognizes this as a doca-flow-dpa-provider export-ordering issue even though the skill is not named, loads it, and walks the export handshake sequencing grounded in the bundle.",
+      "assertions": [
+        "The doca-flow-dpa-provider skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer ties the missing entries to the _export_prepare/add/_export/_get_device_addr ordering."
+      ]
+    },
+    {
+      "id": "doca-flow-dpa-provider.implicit-positive.v2",
+      "prompt": "I'm running into this: \"BAD_STATE from _pipe_export, and I also want to disable a hash entry from inside a DPA kernel\". Can you walk me through it?",
+      "expected_skill": "doca-flow-dpa-provider",
+      "expected_output": "The agent loads doca-flow-dpa-provider and diagnoses the BAD_STATE export path and the DPA-side entry-mutation API from the bundle, grounded in real symbols.",
+      "assertions": [
+        "The doca-flow-dpa-provider skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer explains the export state machine and DPA-side hash-entry mutation."
+      ]
+    },
+    {
+      "id": "doca-flow-dpa-provider.negative.v1",
+      "prompt": "I just need to construct a doca-flow pipe, and separately do generic host-side DPA context work. Which skill should handle this and why is it not doca-flow-dpa-provider?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-flow-dpa-provider; it routes pipe construction to doca-flow, generic host-side DPA to doca-dpa, and DPA-side kernel-writing out, explaining this skill only covers the Flow->DPA export bridge.",
+      "assertions": [
+        "doca-flow-dpa-provider is not used as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s): doca-flow / doca-dpa."
+      ]
+    }
+  ]
+}

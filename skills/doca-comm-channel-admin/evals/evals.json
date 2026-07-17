@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-comm-channel-admin",
+  "evals": [
+    {
+      "id": "doca-comm-channel-admin.explicit-positive.v1",
+      "prompt": "Use the doca-comm-channel-admin skill to help me. I'm working on: Use this skill to enumerate host\u2194DPU DOCA comch (formerly Comm Channel) servers and connections via the shipped doca_comm_channel_admin binary \u2014 listing comch-capable devices and decoding the per-device server / connection table (server name, PID, in-use / max, PCIe address). The shipped binary is a SINGLE-SHOT SCAN-AND-PRINT tool with no registered arguments \u2014 NO list / inspect / drain / restart subcommands; one inventory pass over every comch-capable doca_dev on this side. Channel reset / drain / restart go to doca-comch (program side), doca-setup / doca-hardware-safety (driver reload), or BFB / RShim \u2014 NOT to this binary.",
+      "expected_skill": "doca-comm-channel-admin",
+      "expected_output": "The agent selects the doca-comm-channel-admin skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-comm-channel-admin skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-comm-channel-admin.implicit-positive.v1",
+      "prompt": "I'm running into this: \"list comch servers\". Can you walk me through it?",
+      "expected_skill": "doca-comm-channel-admin",
+      "expected_output": "The agent recognizes this as a doca-comm-channel-admin issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-comm-channel-admin skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-comm-channel-admin.implicit-positive.v2",
+      "prompt": "I'm running into this: \"which channels are active on this BlueField\". Can you walk me through it?",
+      "expected_skill": "doca-comm-channel-admin",
+      "expected_output": "The agent recognizes this as a doca-comm-channel-admin issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-comm-channel-admin skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-comm-channel-admin.negative.v1",
+      "prompt": "I actually need help with the comch programming API. Which skill should handle this, and why is it not doca-comm-channel-admin?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-comm-channel-admin; it explains that the comch programming API is out of doca-comm-channel-admin's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-comm-channel-admin is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

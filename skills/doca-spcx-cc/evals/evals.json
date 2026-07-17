@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-spcx-cc",
+  "evals": [
+    {
+      "id": "doca-spcx-cc.explicit-positive.v1",
+      "prompt": "Use the doca-spcx-cc skill to help me. I'm working on: invoking `doca_spcx_cc` (the host-side CLI under /opt/mellanox/doca/tools/) to load, parameterize, start, observe, or stop a Programmable Congestion Control (SPCX) algorithm on a BlueField with a DPA processor against a live RDMA / RoCE fabric, or picking SPCX vs the established `doca-pcc` surface.",
+      "expected_skill": "doca-spcx-cc",
+      "expected_output": "The agent selects the doca-spcx-cc skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-spcx-cc skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-spcx-cc.implicit-positive.v1",
+      "prompt": "I'm running into this: \"I want to write a custom RTT-based CC algorithm for my RoCE fabric\". Can you walk me through it?",
+      "expected_skill": "doca-spcx-cc",
+      "expected_output": "The agent recognizes this as a doca-spcx-cc issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-spcx-cc skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-spcx-cc.implicit-positive.v2",
+      "prompt": "I'm running into this: \"my SPCX session loaded but throughput / latency didn't change\". Can you walk me through it?",
+      "expected_skill": "doca-spcx-cc",
+      "expected_output": "The agent recognizes this as a doca-spcx-cc issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-spcx-cc skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-spcx-cc.negative.v1",
+      "prompt": "I actually need help with DPA-side algorithm authoring detail. Which skill should handle this, and why is it not doca-spcx-cc?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-spcx-cc; it explains that DPA-side algorithm authoring detail is out of doca-spcx-cc's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-spcx-cc is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

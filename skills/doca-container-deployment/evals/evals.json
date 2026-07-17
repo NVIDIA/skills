@@ -1,0 +1,36 @@
+{
+  "skill_name": "doca-container-deployment",
+  "evals": [
+    {
+      "id": "doca-container-deployment.explicit-positive.v1",
+      "prompt": "Use the doca-container-deployment skill to help me. Use this skill when the user is hands-on deploying an in-bundle DOCA service container (Argus, DMS, Firefly, Flow-Inspector, OS-Inspector, UROM service) on a BlueField — kubelet standalone watching a static-pod manifests directory, YAML pod",
+      "expected_skill": "doca-container-deployment",
+      "expected_output": "The agent loads doca-container-deployment and answers strictly from that skill's documented workflow, quoting only real symbols, flags, paths, and commands from the bundle (no invented tokens) and routing out to other skills for anything out of doca-container-deployment's scope.",
+      "assertions": [
+        "The doca-container-deployment skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every command, flag, path, or symbol named is traceable to the bundle or a real public NVIDIA doc (no invented tokens).",
+        "Steps are given in a workable order with preconditions established before they are used."
+      ]
+    },
+    {
+      "id": "doca-container-deployment.implicit-positive.v1",
+      "prompt": "I'm running into this: \"DOCA container deployment on the BlueField DPU\". Can you walk me through it?",
+      "expected_skill": "doca-container-deployment",
+      "expected_output": "The agent recognizes this as a doca-container-deployment task even though the skill is not named, loads doca-container-deployment, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The doca-container-deployment skill is triggered from the implicit phrasing without the user naming it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-container-deployment.implicit-positive.v2",
+      "prompt": "I'm running into this: \"how do I run my built service on the BlueField?\". Can you walk me through it?",
+      "expected_skill": "doca-container-deployment",
+      "expected_output": "The agent recognizes this as a doca-container-deployment task even though the skill is not named, loads doca-container-deployment, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The doca-container-deployment skill is triggered from the implicit phrasing without the user naming it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    }
+  ]
+}

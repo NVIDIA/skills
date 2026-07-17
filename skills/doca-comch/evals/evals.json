@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-comch",
+  "evals": [
+    {
+      "id": "doca-comch.explicit-positive.v1",
+      "prompt": "Use the doca-comch skill to help me. I'm bringing up host <-> DPU PCIe control-plane messaging and need to pick server (DPU) vs client (host) roles and choose slow-path send-task/recv-callback vs fast-path producer/consumer.",
+      "expected_skill": "doca-comch",
+      "expected_output": "The agent loads doca-comch and answers from the documented workflow — server=DPU / client=host role selection, slow-path (send-task/recv-callback) vs fast-path (producer/consumer), and capability queries (max-msg-size, max-clients) — quoting only real symbols from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-comch skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Server(DPU)/client(host) roles and the slow-path vs fast-path distinction are correctly applied.",
+        "Every symbol and capability named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-comch.implicit-positive.v1",
+      "prompt": "I'm running into this: \"I need to send a control message from the host to the BlueField over PCIe\". Can you walk me through it?",
+      "expected_skill": "doca-comch",
+      "expected_output": "The agent recognizes this as a doca-comch task even though the skill is not named, loads it, and walks the host->DPU control-plane messaging setup grounded in the bundle.",
+      "assertions": [
+        "The doca-comch skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer uses the Comch control-plane path rather than generic networking advice."
+      ]
+    },
+    {
+      "id": "doca-comch.implicit-positive.v2",
+      "prompt": "I'm running into this: \"my connect callback never fires and task_send submit returns DOCA_ERROR_AGAIN\". Can you walk me through it?",
+      "expected_skill": "doca-comch",
+      "expected_output": "The agent loads doca-comch and diagnoses the connection-callback / AGAIN-on-submit path from the bundle's Comch error taxonomy and progress-engine expectations.",
+      "assertions": [
+        "The doca-comch skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer ties AGAIN/connect-callback to the documented Comch behavior, not generic advice."
+      ]
+    },
+    {
+      "id": "doca-comch.negative.v1",
+      "prompt": "I need to install DOCA and flash the BFB firmware on my BlueField before anything else. Which skill should handle this and why is it not doca-comch?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-comch; it recognizes installing DOCA and BFB/firmware bring-up as out of scope and routes to doca-setup / doca-hardware-safety, explaining doca-comch only covers host<->DPU Comch messaging.",
+      "assertions": [
+        "doca-comch is not used as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) (e.g., doca-setup / doca-hardware-safety)."
+      ]
+    }
+  ]
+}

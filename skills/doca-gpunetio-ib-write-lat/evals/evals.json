@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-gpunetio-ib-write-lat",
+  "evals": [
+    {
+      "id": "doca-gpunetio-ib-write-lat.explicit-positive.v1",
+      "prompt": "Use the doca-gpunetio-ib-write-lat skill to help me. I'm working on: measuring GPU-kernel-initiated RDMA WRITE latency through doca-gpunetio \u2014 building and running the `gpunetio_ib_write_lat` client + server pair under `doca/tools/gpunetio_ib_write_lat/`, checking GPU-NIC pairing, reading the half-iter / full-iter / CUDA-side usec columns, characterizing median / p99 / jitter for a real-time control loop, picking GPUNetIO vs GPI vs CPU-initiated `perftest`, or weighing the latency-vs-batching trade-off.",
+      "expected_skill": "doca-gpunetio-ib-write-lat",
+      "expected_output": "The agent selects the doca-gpunetio-ib-write-lat skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-gpunetio-ib-write-lat skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-gpunetio-ib-write-lat.implicit-positive.v1",
+      "prompt": "I'm running into this: \"GPU kernel RDMA latency benchmark\". Can you walk me through it?",
+      "expected_skill": "doca-gpunetio-ib-write-lat",
+      "expected_output": "The agent recognizes this as a doca-gpunetio-ib-write-lat issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-gpunetio-ib-write-lat skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-gpunetio-ib-write-lat.implicit-positive.v2",
+      "prompt": "I'm running into this: \"how fast can a CUDA kernel post a WRITE\". Can you walk me through it?",
+      "expected_skill": "doca-gpunetio-ib-write-lat",
+      "expected_output": "The agent recognizes this as a doca-gpunetio-ib-write-lat issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-gpunetio-ib-write-lat skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-gpunetio-ib-write-lat.negative.v1",
+      "prompt": "I actually need help with bandwidth runs. Which skill should handle this, and why is it not doca-gpunetio-ib-write-lat?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-gpunetio-ib-write-lat; it explains that bandwidth runs is out of doca-gpunetio-ib-write-lat's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-gpunetio-ib-write-lat is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

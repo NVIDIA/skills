@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-programming-guide",
+  "evals": [
+    {
+      "id": "doca-programming-guide.explicit-positive.v1",
+      "prompt": "Use the doca-programming-guide skill to help me. Use this skill when the user is writing their first DOCA app or asking a library-agnostic programming question — picking a shipped sample to copy and modify, wiring the canonical pkg-config doca-{library} + meson build (or FFI from Rust / G",
+      "expected_skill": "doca-programming-guide",
+      "expected_output": "The agent loads doca-programming-guide and answers strictly from that skill's documented workflow, quoting only real symbols, flags, paths, and commands from the bundle (no invented tokens) and routing out to other skills for anything out of doca-programming-guide's scope.",
+      "assertions": [
+        "The doca-programming-guide skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every command, flag, path, or symbol named is traceable to the bundle or a real public NVIDIA doc (no invented tokens).",
+        "Steps are given in a workable order with preconditions established before they are used."
+      ]
+    },
+    {
+      "id": "doca-programming-guide.implicit-positive.v1",
+      "prompt": "I'm running into this: \"DOCA programming guide\". Can you walk me through it?",
+      "expected_skill": "doca-programming-guide",
+      "expected_output": "The agent recognizes this as a doca-programming-guide task even though the skill is not named, loads doca-programming-guide, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The doca-programming-guide skill is triggered from the implicit phrasing without the user naming it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-programming-guide.implicit-positive.v2",
+      "prompt": "I'm running into this: \"write my first DOCA program\". Can you walk me through it?",
+      "expected_skill": "doca-programming-guide",
+      "expected_output": "The agent recognizes this as a doca-programming-guide task even though the skill is not named, loads doca-programming-guide, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
+      "assertions": [
+        "The doca-programming-guide skill is triggered from the implicit phrasing without the user naming it.",
+        "The response is concrete and grounded in the skill content rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-programming-guide.negative.v1",
+      "prompt": "I need help with something doca-programming-guide explicitly says is out of scope (it should be handled by doca-public-knowledge-map). Which skill should handle it and why is it not doca-programming-guide?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-programming-guide; it recognizes the request is out of scope and routes to the correct skill (doca-public-knowledge-map, doca-setup), explaining the boundary.",
+      "assertions": [
+        "doca-programming-guide is not used as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s): doca-public-knowledge-map, doca-setup."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-mgmt",
+  "evals": [
+    {
+      "id": "doca-mgmt.explicit-positive.v1",
+      "prompt": "Use the doca-mgmt skill to help me. I'm standing up a DOCA Management context (doca_mgmt_dev_ctx / doca_mgmt_dev_rep_ctx), querying device caps, toggling congestion-control global status, setting ICM quotas, and issuing a raw firmware command via doca_mgmt_raw_cmd with the right scope.",
+      "expected_skill": "doca-mgmt",
+      "expected_output": "The agent loads doca-mgmt and answers from the documented workflow — doca_mgmt_dev_ctx / doca_mgmt_dev_rep_ctx setup, cap queries, congestion-control toggles, ICM quotas, and doca_mgmt_raw_cmd with the correct CONFIGURATION / DEBUG_READ_ONLY / DEBUG_WRITE / DEBUG_WRITE_FULL scope — quoting only real symbols.",
+      "assertions": [
+        "The doca-mgmt skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "The management/representor contexts and doca_mgmt_raw_cmd scopes are used correctly.",
+        "Every symbol named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-mgmt.implicit-positive.v1",
+      "prompt": "I'm running into this: \"I need a fleet tool that walks every BlueField and reads device state, and toggles data-direct on a VF\". Can you walk me through it?",
+      "expected_skill": "doca-mgmt",
+      "expected_output": "The agent recognizes this as a doca-mgmt task even though the skill is not named, loads it, and walks the management-context device-state and data-direct toggle path grounded in the bundle.",
+      "assertions": [
+        "The doca-mgmt skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer uses the doca_mgmt device/representor context path."
+      ]
+    },
+    {
+      "id": "doca-mgmt.implicit-positive.v2",
+      "prompt": "I'm running into this: \"DOCA_ERROR_IO_FAILED from raw_cmd and I want to set an ICM quota per representor\". Can you walk me through it?",
+      "expected_skill": "doca-mgmt",
+      "expected_output": "The agent loads doca-mgmt and diagnoses the raw_cmd IO failure and the per-representor ICM quota path from the bundle, grounded in real symbols.",
+      "assertions": [
+        "The doca-mgmt skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer ties DOCA_ERROR_IO_FAILED to raw_cmd scope/usage and covers ICM quota setting."
+      ]
+    },
+    {
+      "id": "doca-mgmt.negative.v1",
+      "prompt": "I actually want to run mlxconfig directly, reflash a BFB / firmware, and stream telemetry. Which skill should handle this and why is it not doca-mgmt?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-mgmt; it routes mlxconfig, BFB/firmware reflash, streaming telemetry, doca_caps CLI snapshots, and DOCA install out to their proper skills.",
+      "assertions": [
+        "doca-mgmt is not used as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) rather than forcing doca-mgmt."
+      ]
+    }
+  ]
+}

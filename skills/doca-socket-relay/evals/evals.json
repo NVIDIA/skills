@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-socket-relay",
+  "evals": [
+    {
+      "id": "doca-socket-relay.explicit-positive.v1",
+      "prompt": "Use the doca-socket-relay skill to help me. I'm working on: the operator is driving the DOCA Socket Relay to bridge a socket-oriented host application onto a BlueField DPU peer without rewriting it \u2014 picking the deployment shape (in-process, sidecar, or BlueField service container), configuring the host-side socket and the DPU-side forwarding endpoint, walking the bind \u2192 connect \u2192 round-trip \u2192 admit-fleet smoke, or diagnosing a stuck/silent relay.",
+      "expected_skill": "doca-socket-relay",
+      "expected_output": "The agent selects the doca-socket-relay skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-socket-relay skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-socket-relay.implicit-positive.v1",
+      "prompt": "I'm running into this: \"move my socket app onto the BlueField without rewriting it\". Can you walk me through it?",
+      "expected_skill": "doca-socket-relay",
+      "expected_output": "The agent recognizes this as a doca-socket-relay issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-socket-relay skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-socket-relay.implicit-positive.v2",
+      "prompt": "I'm running into this: \"host app gets ECONNREFUSED on the relay\". Can you walk me through it?",
+      "expected_skill": "doca-socket-relay",
+      "expected_output": "The agent recognizes this as a doca-socket-relay issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-socket-relay skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-socket-relay.negative.v1",
+      "prompt": "I actually need help with the comch programming API. Which skill should handle this, and why is it not doca-socket-relay?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-socket-relay; it explains that the comch programming API is out of doca-socket-relay's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-socket-relay is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

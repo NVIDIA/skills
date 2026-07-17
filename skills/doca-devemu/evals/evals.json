@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-devemu",
+  "evals": [
+    {
+      "id": "doca-devemu.explicit-positive.v1",
+      "prompt": "Use the doca-devemu skill to help me. I'm working on: doing hands-on DOCA Device Emulation on a BlueField DPU \u2014 exposing a custom emulated PCIe device the host sees as a real peripheral while DPU-side code runs the backend, picking the sub-library (PCI Generic, virtio-net, virtio-fs), wiring the per-sub-library Core context plus doorbell / DMA primitives, querying `doca_devemu_*_cap_*`, or debugging DOCA_ERROR_* from a `doca_devemu_*` call.",
+      "expected_skill": "doca-devemu",
+      "expected_output": "The agent selects the doca-devemu skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-devemu skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-devemu.implicit-positive.v1",
+      "prompt": "I'm running into this: \"expose a custom PCIe device from BlueField to the host\". Can you walk me through it?",
+      "expected_skill": "doca-devemu",
+      "expected_output": "The agent recognizes this as a doca-devemu issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-devemu skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-devemu.implicit-positive.v2",
+      "prompt": "I'm running into this: \"host should see a virtio NIC backed by my DPU code\". Can you walk me through it?",
+      "expected_skill": "doca-devemu",
+      "expected_output": "The agent recognizes this as a doca-devemu issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-devemu skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-devemu.negative.v1",
+      "prompt": "I actually need help with the packaged DOCA SNAP / Virtio-net Services. Which skill should handle this, and why is it not doca-devemu?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-devemu; it explains that the packaged DOCA SNAP / Virtio-net Services is out of doca-devemu's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-devemu is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

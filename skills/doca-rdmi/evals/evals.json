@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-rdmi",
+  "evals": [
+    {
+      "id": "doca-rdmi.explicit-positive.v1",
+      "prompt": "Use the doca-rdmi skill to help me. I'm working on: doing hands-on DOCA RDMI (RDMA Initiator) programming \u2014 picking doca-rdmi vs doca-rdma for an accelerator-initiated one-sided RDMA flow, standing up a doca_rdmi_connection or doca_rdmi_poster, attaching a doca_dpa_completion or doca_verbs_cq before doca_ctx_start(), retrieving the DPA-side handle for a DPA kernel, auditing whether a doca_rdmi_* symbol is EXPERIMENTAL on this DOCA, or debugging DOCA_ERROR_* returns from RDMI calls.",
+      "expected_skill": "doca-rdmi",
+      "expected_output": "The agent selects the doca-rdmi skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-rdmi skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-rdmi.implicit-positive.v1",
+      "prompt": "I'm running into this: \"my DPA kernel needs to post RDMA writes to a remote responder\". Can you walk me through it?",
+      "expected_skill": "doca-rdmi",
+      "expected_output": "The agent recognizes this as a doca-rdmi issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-rdmi skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-rdmi.implicit-positive.v2",
+      "prompt": "I'm running into this: \"DPA kernel sees no completions\". Can you walk me through it?",
+      "expected_skill": "doca-rdmi",
+      "expected_output": "The agent recognizes this as a doca-rdmi issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-rdmi skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-rdmi.negative.v1",
+      "prompt": "I actually need help with two-sided. Which skill should handle this, and why is it not doca-rdmi?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-rdmi; it explains that two-sided is out of doca-rdmi's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-rdmi is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

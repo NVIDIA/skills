@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-urom",
+  "evals": [
+    {
+      "id": "doca-urom.explicit-positive.v1",
+      "prompt": "Use the doca-urom skill to help me. I'm working on: doing hands-on DOCA UROM library work from the host side \u2014 wiring doca-urom under an HPC / UCX / MPI stack to OFFLOAD remote memory operations (puts, gets, atomics, collectives) onto a BlueField DPU, creating a UROM Service context (doca_urom_service_*) and Worker contexts (doca_urom_worker_*) that run plugins on the DPU, discovering plugins via doca_urom_service_get_plugins_list, progressing completions, or debugging DOCA_ERROR_* from a doca_urom_* call.",
+      "expected_skill": "doca-urom",
+      "expected_output": "The agent selects the doca-urom skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-urom skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-urom.implicit-positive.v1",
+      "prompt": "I'm running into this: \"DOCA UROM\". Can you walk me through it?",
+      "expected_skill": "doca-urom",
+      "expected_output": "The agent recognizes this as a doca-urom issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-urom skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-urom.implicit-positive.v2",
+      "prompt": "I'm running into this: \"MPI all-reduce burning host CPU\". Can you walk me through it?",
+      "expected_skill": "doca-urom",
+      "expected_output": "The agent recognizes this as a doca-urom issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-urom skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-urom.negative.v1",
+      "prompt": "I actually need help with UROM Service deployment on the DPU side. Which skill should handle this, and why is it not doca-urom?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-urom; it explains that UROM Service deployment on the DPU side is out of doca-urom's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-urom is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

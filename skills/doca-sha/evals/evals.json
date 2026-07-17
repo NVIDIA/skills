@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-sha",
+  "evals": [
+    {
+      "id": "doca-sha.explicit-positive.v1",
+      "prompt": "Use the doca-sha skill to help me. I'm working on: doing hands-on DOCA SHA programming \u2014 offloading SHA-1, SHA-256, or SHA-512 hashing onto a BlueField DPU or ConnectX accelerator, picking between one-shot `doca_sha_task_hash` and incremental `doca_sha_task_partial_hash`, querying `doca_sha_cap_*` for algorithm support and min destination / max source buffer sizes, setting source / destination `doca_mmap` permissions, or decoding DOCA_ERROR_* returns from the SHA API.",
+      "expected_skill": "doca-sha",
+      "expected_output": "The agent selects the doca-sha skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-sha skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-sha.implicit-positive.v1",
+      "prompt": "I'm running into this: \"hash a multi-GiB file on the DPU\". Can you walk me through it?",
+      "expected_skill": "doca-sha",
+      "expected_output": "The agent recognizes this as a doca-sha issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-sha skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-sha.implicit-positive.v2",
+      "prompt": "I'm running into this: \"offload SHA-256 to the BlueField\". Can you walk me through it?",
+      "expected_skill": "doca-sha",
+      "expected_output": "The agent recognizes this as a doca-sha issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-sha skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-sha.negative.v1",
+      "prompt": "I actually need help with general cryptographic-hash theory. Which skill should handle this, and why is it not doca-sha?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-sha; it explains that general cryptographic-hash theory is out of doca-sha's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-sha is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

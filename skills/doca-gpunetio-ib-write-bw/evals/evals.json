@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-gpunetio-ib-write-bw",
+  "evals": [
+    {
+      "id": "doca-gpunetio-ib-write-bw.explicit-positive.v1",
+      "prompt": "Use the doca-gpunetio-ib-write-bw skill to help me. I'm working on: building, running, or interpreting the doca/tools/gpunetio_ib_write_bw client+server benchmark \u2014 a CUDA kernel on the server posts RDMA WRITE work requests through the doca-gpunetio device-side surface to measure sustained GPU-driven WRITE bandwidth on a GPU+IB-device pair.",
+      "expected_skill": "doca-gpunetio-ib-write-bw",
+      "expected_output": "The agent selects the doca-gpunetio-ib-write-bw skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-gpunetio-ib-write-bw skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-gpunetio-ib-write-bw.implicit-positive.v1",
+      "prompt": "I'm running into this: \"measure WRITE BW when the GPU posts the WRs\". Can you walk me through it?",
+      "expected_skill": "doca-gpunetio-ib-write-bw",
+      "expected_output": "The agent recognizes this as a doca-gpunetio-ib-write-bw issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-gpunetio-ib-write-bw skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-gpunetio-ib-write-bw.implicit-positive.v2",
+      "prompt": "I'm running into this: \"BW swings between runs on the same flags\". Can you walk me through it?",
+      "expected_skill": "doca-gpunetio-ib-write-bw",
+      "expected_output": "The agent recognizes this as a doca-gpunetio-ib-write-bw issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-gpunetio-ib-write-bw skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-gpunetio-ib-write-bw.negative.v1",
+      "prompt": "I actually need help with general doca-gpunetio library work. Which skill should handle this, and why is it not doca-gpunetio-ib-write-bw?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-gpunetio-ib-write-bw; it explains that general doca-gpunetio library work is out of doca-gpunetio-ib-write-bw's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-gpunetio-ib-write-bw is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-firefly",
+  "evals": [
+    {
+      "id": "doca-firefly.explicit-positive.v1",
+      "prompt": "Use the doca-firefly skill to help me. I'm working on: operating the DOCA Firefly Service container on BlueField \u2014 picking the four PTP configuration axes (role / profile / domain / interface), wiring the BlueField PHC + host follower + consumer workload pairing, deciding whether PTP-grade time is even needed (vs. chrony / NTP), or debugging a Firefly deployment where PTP isn't syncing or the host clock isn't following.",
+      "expected_skill": "doca-firefly",
+      "expected_output": "The agent selects the doca-firefly skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-firefly skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-firefly.implicit-positive.v1",
+      "prompt": "I'm running into this: \"container green but PTP never advances past LISTENING\". Can you walk me through it?",
+      "expected_skill": "doca-firefly",
+      "expected_output": "The agent recognizes this as a doca-firefly issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-firefly skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-firefly.implicit-positive.v2",
+      "prompt": "I'm running into this: \"Firefly says synced but the host clock still drifts\". Can you walk me through it?",
+      "expected_skill": "doca-firefly",
+      "expected_output": "The agent recognizes this as a doca-firefly issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-firefly skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-firefly.negative.v1",
+      "prompt": "I actually need help with installing DOCA. Which skill should handle this, and why is it not doca-firefly?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-firefly; it explains that installing DOCA is out of doca-firefly's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-firefly is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

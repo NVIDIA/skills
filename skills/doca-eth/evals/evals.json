@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-eth",
+  "evals": [
+    {
+      "id": "doca-eth.explicit-positive.v1",
+      "prompt": "Use the doca-eth skill to help me. I'm bringing up a doca_eth_rxq / doca_eth_txq on a port and need to pick among the four enum doca_eth_rxq_type values and size the burst/scatter-gather length against the _cap_* queries.",
+      "expected_skill": "doca-eth",
+      "expected_output": "The agent loads doca-eth and answers from the documented workflow — rxq/txq bring-up on a port/representor/SF, choosing among the four doca_eth_rxq_type values (_REGULAR/_CYCLIC/_MANAGED_MEMPOOL/_SHARED_MEMPOOL), sizing against _cap_* queries, and submitting doca_eth_txq_task_send/_lso_send carrying doca_bufs — quoting only real symbols (no invented tokens, no non-existent doca_eth_frame).",
+      "assertions": [
+        "The doca-eth skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "The queue type comes from the real four-value enum and packets are carried as doca_bufs (no invented doca_eth_frame struct).",
+        "Every symbol and cap query named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-eth.implicit-positive.v1",
+      "prompt": "I'm running into this: \"my RX queue is up but no packets arrive\". Can you walk me through it?",
+      "expected_skill": "doca-eth",
+      "expected_output": "The agent recognizes this as a doca-eth task even though the skill is not named, loads it, and walks the rxq no-ingress debug path grounded in the bundle.",
+      "assertions": [
+        "The doca-eth skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer uses the DOCA Ethernet rxq debug path rather than generic networking advice."
+      ]
+    },
+    {
+      "id": "doca-eth.implicit-positive.v2",
+      "prompt": "I'm running into this: \"which queue type should I use for fixed-MTU ingress?\". Can you walk me through it?",
+      "expected_skill": "doca-eth",
+      "expected_output": "The agent loads doca-eth and selects the appropriate doca_eth_rxq_type for fixed-MTU ingress from the real four-value enum, grounded in the bundle.",
+      "assertions": [
+        "The doca-eth skill is triggered from the implicit phrasing without the user naming it.",
+        "The recommended queue type is one of the real four enum values, chosen with a stated reason."
+      ]
+    },
+    {
+      "id": "doca-eth.negative.v1",
+      "prompt": "I need to program flow steering rules and also move data with RDMA. Which skill should handle this and why is it not doca-eth?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-eth; it recognizes flow-rule/steering (doca-flow) and RDMA data movement (doca-rdma) as out of scope and routes there, explaining doca-eth covers Ethernet packet queues only.",
+      "assertions": [
+        "doca-eth is not used as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s): doca-flow / doca-rdma."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-telemetry-utils",
+  "evals": [
+    {
+      "id": "doca-telemetry-utils.explicit-positive.v1",
+      "prompt": "Use the doca-telemetry-utils skill to help me. I'm working on: invoking `doca_telemetry_utils` on a host with DOCA installed \u2014 discovering the diagnostic-counter schema, translating counter names to binary Data IDs, validating per-device counter support before committing a DOCA Telemetry exporter config, or reverse-resolving a captured Data ID.",
+      "expected_skill": "doca-telemetry-utils",
+      "expected_output": "The agent selects the doca-telemetry-utils skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-telemetry-utils skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-telemetry-utils.implicit-positive.v1",
+      "prompt": "I'm running into this: \"my exporter ships but the collector sees nothing\". Can you walk me through it?",
+      "expected_skill": "doca-telemetry-utils",
+      "expected_output": "The agent recognizes this as a doca-telemetry-utils issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-telemetry-utils skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-telemetry-utils.implicit-positive.v2",
+      "prompt": "I'm running into this: \"this metric silently drops downstream\". Can you walk me through it?",
+      "expected_skill": "doca-telemetry-utils",
+      "expected_output": "The agent recognizes this as a doca-telemetry-utils issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-telemetry-utils skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-telemetry-utils.negative.v1",
+      "prompt": "I actually need help with developer-side collector / exporter library programming. Which skill should handle this, and why is it not doca-telemetry-utils?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-telemetry-utils; it explains that developer-side collector / exporter library programming is out of doca-telemetry-utils's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-telemetry-utils is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

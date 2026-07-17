@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-structured-tools-contract",
+  "evals": [
+    {
+      "id": "doca-structured-tools-contract.explicit-positive.v1",
+      "prompt": "Use the doca-structured-tools-contract skill to help me. Is there a single command that tells me everything about my DOCA install \u2014 version, devices, libraries, sample paths, drivers, hugepages \u2014 all at once?",
+      "expected_skill": "doca-structured-tools-contract",
+      "expected_output": "The agent loads doca-structured-tools-contract, runs the detection probe (command -v doca-env) first, prefers the structured doca-env --json output when present, otherwise walks the documented manual fallback chain, and always reports which path it took \u2014 quoting only fields/commands defined in the schema (no invented JSON fields).",
+      "assertions": [
+        "The doca-structured-tools-contract skill is selected and the detect \u2192 prefer \u2192 fall back \u2192 report loop drives the answer.",
+        "The agent reports whether the structured tool or the manual fallback chain was used.",
+        "Only schema-defined fields and real commands are named (no invented JSON fields or tools)."
+      ]
+    },
+    {
+      "id": "doca-structured-tools-contract.implicit-positive.v1",
+      "prompt": "I'm running into this: \"I want every PF, VF and SF visible on this BlueField with its PCIe address and link state in one shot\". Can you walk me through it?",
+      "expected_skill": "doca-structured-tools-contract",
+      "expected_output": "The agent recognizes this as a one-shot structured-state request even though the skill is not named, loads the contract, uses the collect-host-state / collect-dpu-state schema with the manual fallback (devlink dev show + lspci | grep Mellanox + ip -j link), and reports which path was used.",
+      "assertions": [
+        "The skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer uses the collect-state schema and its documented manual fallback rather than inventing a tool."
+      ]
+    },
+    {
+      "id": "doca-structured-tools-contract.implicit-positive.v2",
+      "prompt": "I'm running into this: \"how do I know my DOCA Flow pipe spec is valid before I commit it to hardware?\". Can you walk me through it?",
+      "expected_skill": "doca-structured-tools-contract",
+      "expected_output": "The agent loads the contract and applies the validate-before-commit schema, using the Flow-specific fallback (treat DOCA_ERROR_INVALID_VALUE / DOCA_ERROR_NOT_SUPPORTED from doca_flow_pipe_create as the validate signal) and explicitly does NOT invent a doca_flow_pipe_validate symbol.",
+      "assertions": [
+        "The skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer uses the validate-before-commit schema and does not invent a non-existent validate call (e.g., doca_flow_pipe_validate)."
+      ]
+    },
+    {
+      "id": "doca-structured-tools-contract.negative.v1",
+      "prompt": "Teach me how to write DOCA Flow code to build a pipe from scratch. Which skill should handle this and why is it not doca-structured-tools-contract?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-structured-tools-contract; it recognizes library API how-to as out of scope and routes to the matching library skill (doca-flow) / doca-programming-guide, explaining that the contract only governs preferring structured helper tools, not library coding.",
+      "assertions": [
+        "doca-structured-tools-contract is not used as the primary skill for this out-of-scope library-API request.",
+        "The answer routes to the appropriate skill(s): doca-flow / doca-programming-guide."
+      ]
+    }
+  ]
+}

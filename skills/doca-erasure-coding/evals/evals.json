@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-erasure-coding",
+  "evals": [
+    {
+      "id": "doca-erasure-coding.explicit-positive.v1",
+      "prompt": "Use the doca-erasure-coding skill to help me. I'm bringing up a doca_ec context, choosing among the create / recover / update tasks, picking matrix type / N / K / block size, and querying doca_ec_cap_* before sizing.",
+      "expected_skill": "doca-erasure-coding",
+      "expected_output": "The agent loads doca-erasure-coding and answers from the documented workflow — doca_ec context bring-up, create/recover/update task selection, matrix type / N / K / block-size choices, doca_ec_cap_* queries before sizing, and doca_mmap src/dst permissions — quoting only real symbols (no invented tokens).",
+      "assertions": [
+        "The doca-erasure-coding skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "The create/recover/update task family and doca_ec_cap_* queries are used correctly.",
+        "Every symbol and parameter named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-erasure-coding.implicit-positive.v1",
+      "prompt": "I'm running into this: \"a disk failed and 2 parity blocks are gone — can I rebuild?\". Can you walk me through it?",
+      "expected_skill": "doca-erasure-coding",
+      "expected_output": "The agent recognizes this as a doca-erasure-coding task even though the skill is not named, loads it, and walks the recover-task workflow (recoverability given N/K) grounded in the bundle.",
+      "assertions": [
+        "The doca-erasure-coding skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer uses the recover task and reasons about N+K recoverability rather than generic RAID advice."
+      ]
+    },
+    {
+      "id": "doca-erasure-coding.implicit-positive.v2",
+      "prompt": "I'm running into this: \"one data block changed — how do I refresh parity without re-encoding everything?\". Can you walk me through it?",
+      "expected_skill": "doca-erasure-coding",
+      "expected_output": "The agent loads doca-erasure-coding and points to the update task for incremental parity refresh, grounded in the bundle rather than recommending a full re-encode.",
+      "assertions": [
+        "The doca-erasure-coding skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer uses the update task for incremental parity refresh."
+      ]
+    },
+    {
+      "id": "doca-erasure-coding.negative.v1",
+      "prompt": "I want to use LDPC/fountain codes and network FEC, or maybe just replicate the data. Which skill should handle this and why is it not doca-erasure-coding?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-erasure-coding; it recognizes non-Reed-Solomon codes (fountain/LDPC/raptor), pure replication, and network FEC as out of scope and routes elsewhere, explaining doca-erasure-coding covers Reed-Solomon EC only.",
+      "assertions": [
+        "doca-erasure-coding is not used as the primary skill for this out-of-scope request.",
+        "The answer explains the boundary (Reed-Solomon only) and routes away."
+      ]
+    }
+  ]
+}

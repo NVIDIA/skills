@@ -1,0 +1,46 @@
+{
+  "skill_name": "doca-argp",
+  "evals": [
+    {
+      "id": "doca-argp.explicit-positive.v1",
+      "prompt": "Use the doca-argp skill to help me. I'm adding a new CLI flag to a shipped DOCA sample and need to wire doca_argp_init -> register params -> doca_argp_start -> doca_argp_destroy correctly and pick the right parameter type.",
+      "expected_skill": "doca-argp",
+      "expected_output": "The agent loads doca-argp and walks the init -> register -> start -> destroy lifecycle in order, picking a parameter type from the real six-value enum (DOCA_ARGP_TYPE_STRING/_INT/_BOOLEAN/_DEVICE/_DEVICE_REP/_DOUBLE) and preserving the standard --device/--representor/--json/--sdk-log-level surface, quoting only real symbols (no invented tokens).",
+      "assertions": [
+        "The doca-argp skill is selected and the init/start/destroy order is respected.",
+        "The parameter type comes from the real six-value enum (not a made-up type), and --json is used (not --json-config).",
+        "Every symbol and flag named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-argp.implicit-positive.v1",
+      "prompt": "I'm running into this: \"I want to add a custom flag to a DOCA sample — should I just use getopt here?\". Can you walk me through it?",
+      "expected_skill": "doca-argp",
+      "expected_output": "The agent recognizes this as a doca-argp task even though the skill is not named, loads it, and shows the doca_argp registration path (not raw getopt) grounded in the bundle.",
+      "assertions": [
+        "The doca-argp skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer uses the doca_argp API rather than recommending raw getopt."
+      ]
+    },
+    {
+      "id": "doca-argp.implicit-positive.v2",
+      "prompt": "I'm running into this: \"I get DOCA_ERROR_BAD_STATE when registering a new param\". Can you walk me through it?",
+      "expected_skill": "doca-argp",
+      "expected_output": "The agent loads doca-argp and diagnoses BAD_STATE as a lifecycle-order problem (params must be registered between doca_argp_init and doca_argp_start), grounded in the bundle's error taxonomy.",
+      "assertions": [
+        "The doca-argp skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer ties BAD_STATE to the register-before-start lifecycle rule rather than generic advice."
+      ]
+    },
+    {
+      "id": "doca-argp.negative.v1",
+      "prompt": "I need shell-completion generation and subcommand support for my CLI, plus DOCA Core context setup. Which skill should handle this and why is it not doca-argp?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-argp; it recognizes variadic-flag/subcommand/shell-completion features and DOCA Core/Log internals as out of scope and routes elsewhere, explaining doca-argp only covers the Arg Parser flag surface.",
+      "assertions": [
+        "doca-argp is not used as the primary skill for this out-of-scope request.",
+        "The answer explains the boundary and routes away."
+      ]
+    }
+  ]
+}

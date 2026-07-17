@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-argus",
+  "evals": [
+    {
+      "id": "doca-argus.explicit-positive.v1",
+      "prompt": "Use the doca-argus skill to help me. I'm working on: deploying or operating the DOCA Argus Service \u2014 the packaged BlueField-side runtime-security container that watches the BlueField and attached host for suspicious activity, integrity violations, and operational anomalies, and forwards findings to a SIEM (Splunk / ELK / Sentinel / syslog). Covers the four-axis config (detection policy, forwarding, sampling, host coverage), running the NGC container on BlueField Arm, and wiring the forwarder.",
+      "expected_skill": "doca-argus",
+      "expected_output": "The agent selects the doca-argus skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-argus skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-argus.implicit-positive.v1",
+      "prompt": "I'm running into this: \"container green but no findings arrive\". Can you walk me through it?",
+      "expected_skill": "doca-argus",
+      "expected_output": "The agent recognizes this as a doca-argus issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-argus skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-argus.implicit-positive.v2",
+      "prompt": "I'm running into this: \"false-positive flood in Splunk\". Can you walk me through it?",
+      "expected_skill": "doca-argus",
+      "expected_output": "The agent recognizes this as a doca-argus issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-argus skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-argus.negative.v1",
+      "prompt": "I actually need help with installing DOCA. Which skill should handle this, and why is it not doca-argus?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-argus; it explains that installing DOCA is out of doca-argus's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-argus is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}

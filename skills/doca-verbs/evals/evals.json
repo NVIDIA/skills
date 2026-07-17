@@ -1,0 +1,45 @@
+{
+  "skill_name": "doca-verbs",
+  "evals": [
+    {
+      "id": "doca-verbs.explicit-positive.v1",
+      "prompt": "Use the doca-verbs skill to help me. I'm working on: dropping below the higher-level DOCA libraries (doca-rdma / doca-eth / doca-rmax) into the raw-verbs escape hatch \u2014 managing QP / CQ / PD / MR / SRQ / AH / CC-group / Ethernet-SQ-RQ primitives inside DOCA Core, porting libibverbs code into the DOCA Core model, capability-querying a specific verb / opcode / WR flag / QP attribute via doca_verbs_query_device, or debugging DOCA_ERROR_* from doca_verbs_* calls.",
+      "expected_skill": "doca-verbs",
+      "expected_output": "The agent selects the doca-verbs skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-verbs skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-verbs.implicit-positive.v1",
+      "prompt": "I'm running into this: \"raw QP attribute the task API doesn't expose\". Can you walk me through it?",
+      "expected_skill": "doca-verbs",
+      "expected_output": "The agent recognizes this as a doca-verbs issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-verbs skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-verbs.implicit-positive.v2",
+      "prompt": "I'm running into this: \"keep my ibv_* code next to doca_* on the same QP\". Can you walk me through it?",
+      "expected_skill": "doca-verbs",
+      "expected_output": "The agent recognizes this as a doca-verbs issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The doca-verbs skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-verbs.negative.v1",
+      "prompt": "I actually need help with general doca-rdma / doca-eth / doca-rmax workloads. Which skill should handle this, and why is it not doca-verbs?",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-verbs; it explains that general doca-rdma / doca-eth / doca-rmax workloads is out of doca-verbs's scope and routes to the appropriate skill instead.",
+      "assertions": [
+        "doca-verbs is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s) instead."
+      ]
+    }
+  ]
+}
