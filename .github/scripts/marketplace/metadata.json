@@ -1429,6 +1429,102 @@
       }
     },
     {
+      "path": "skills/nemo-relay-debug-runtime-integration",
+      "name": "nemo-relay-debug-runtime-integration",
+      "description": "Use this skill when NeMo Relay is installed or imported but application-side runtime behavior is missing or incorrect, including load failures, inactive scopes, missing events, and plugin or adaptive wiring problems.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "application_developer,ai_engineer,ml_engineer,developer,platform_engineer",
+        "discovery.activity_tags": "troubleshoot,debug,integrate,configure,validate"
+      }
+    },
+    {
+      "path": "skills/nemo-relay-install",
+      "name": "nemo-relay-install",
+      "description": "Use this skill when choosing or running NeMo Relay installation for the CLI, Python, Node.js, Rust, OpenClaw, Hermes, or maintained framework integrations before runtime configuration or quick-start setup.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,ai_engineer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "get_started,integrate,select,configure,deploy"
+      }
+    },
+    {
+      "path": "skills/nemo-relay-instrument-calls",
+      "name": "nemo-relay-instrument-calls",
+      "description": "Use this skill when an application owns tool or LLM/provider call sites and needs to wrap them with NeMo Relay scopes and managed execution APIs for lifecycle events, middleware, or guardrails.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "application_developer,ai_engineer,developer,ml_engineer,platform_engineer",
+        "discovery.activity_tags": "integrate,configure,extend,monitor,orchestrate"
+      }
+    },
+    {
+      "path": "skills/nemo-relay-instrument-context-isolation",
+      "name": "nemo-relay-instrument-context-isolation",
+      "description": "Use this skill when concurrent requests, async tasks, threads, workers, goroutines, or agents need independent NeMo Relay scope stacks and correct ancestry propagation.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "application_developer,ai_engineer,platform_engineer,devops_engineer,developer",
+        "discovery.activity_tags": "configure,integrate,debug,monitor,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/nemo-relay-instrument-typed-wrappers",
+      "name": "nemo-relay-instrument-typed-wrappers",
+      "description": "Use this skill when adding NeMo Relay typed wrappers, domain types, or provider codecs while preserving JSON middleware semantics and caller-visible behavior.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,ai_engineer,platform_engineer",
+        "discovery.activity_tags": "extend,integrate,configure,validate,test"
+      }
+    },
+    {
+      "path": "skills/nemo-relay-migrate-from-flow",
+      "name": "nemo-relay-migrate-from-flow",
+      "description": "Use this skill when migrating applications, examples, integrations, documentation, manifests, or repository code from NeMo Flow to NeMo Relay across Python, Rust, Node.js, Go, C FFI, CLI, configuration, and observability surfaces.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "application_developer,developer,ai_engineer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "migrate,transform,integrate,configure,convert"
+      }
+    },
+    {
+      "path": "skills/nemo-relay-plugin-adaptive-tuning",
+      "name": "nemo-relay-plugin-adaptive-tuning",
+      "description": "Use this skill when baseline NeMo Relay instrumentation exists and the user wants to configure or evaluate adaptive plugin behavior, including telemetry, state, adaptive_hints, tool_parallelism, ACG, hint consumption, or measured rollout.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "ai_engineer,ml_engineer,developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "configure,evaluate,optimize,monitor,measure"
+      }
+    },
+    {
+      "path": "skills/nemo-relay-plugin-build",
+      "name": "nemo-relay-plugin-build",
+      "description": "Use this skill when building or packaging reusable NeMo Relay runtime behavior as a configuration-activated plugin with deterministic validation and rollback-safe registration.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,platform_engineer,devops_engineer,ai_engineer",
+        "discovery.activity_tags": "package,configure,validate,extend,integrate"
+      }
+    },
+    {
       "path": "skills/nemo-retriever",
       "name": "nemo-retriever",
       "description": "Use when the user wants to search, query, extract, transcribe, describe, quote, filter, or aggregate across documents — PDFs, scanned forms / images (`.jpg` `.png` `.tiff`), Office (`.docx` `.pptx`), text (`.html` `.txt`), audio (`.mp3` `.wav` `.m4a`), or video (`.mp4` `.mov`). Prefer this over native Read / Grep for multi-file or non-PDF corpora. Not for: editing files, web browsing, single-file plain-text lookups, fine-tuning.",
