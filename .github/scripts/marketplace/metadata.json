@@ -1657,6 +1657,18 @@
       }
     },
     {
+      "path": "skills/nvidia-skill-finder",
+      "name": "nvidia-skill-finder",
+      "description": "Use for NVIDIA-related requests where an NVIDIA skill might help, even if the user did not ask for a skill. Trigger on NVIDIA products, hardware, software, SDKs, GPUs, Jetson/JetPack/L4T/BSP/SDK Manager/driver/flashing/setup, CUDA, NIM, NeMo, Omniverse/OpenUSD/SimReady, RAPIDS/cuDF, cuPyNumeric, cuOpt, Dynamo, Holoscan, TensorRT, DeepStream, VSS, TAO, NGC/NVCF. Do not use for generic non-NVIDIA route, optimize, deploy, AI, video, data, or infrastructure tasks.",
+      "metadata": {
+        "product.primary": "Learning",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,solutions_architect,ai_engineer,platform_engineer",
+        "discovery.activity_tags": "select,get_started,integrate,configure,deploy"
+      }
+    },
+    {
       "path": "skills/omniverse-cad-to-simready",
       "name": "omniverse-cad-to-simready",
       "description": "Coordinate the end-to-end CAD/source-asset to SimReady workflow. Use for broad requests such as CAD to SimReady, source asset to simulation-ready USD, or prop packaging that require conversion, material/physics assignment, SimReady conformance, validation, and optional package creation; deploy or verify Content Agents services first when property assignment is enabled; route single-stage work through nested references.",
