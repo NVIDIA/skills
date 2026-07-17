@@ -6,3 +6,5 @@ links:
 skills:
   - path: skills/nemotron-speech/
     catalog_dir: nemotron-speech
+  - path: skills/nemotron-asr-finetune/
+    catalog_dir: nemotron-asr-finetune
