@@ -7,12 +7,9 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `nemo-data-designer-plugin`
-- Evaluation date: 2026-06-02
+- Evaluation date: 2026-07-17
 - NVSkills-Eval profile: `external`
-- Environment: `local`
-- Dataset: 4 evaluation tasks
-- Attempts per task: 2
-- Pass threshold: 50%
+- Environment: `astra-sandbox`
 - Overall verdict: PASS
 
 ## Agents Used
@@ -32,50 +29,38 @@ Reported benchmark dimensions:
 
 Underlying evaluation signals used in this run:
 
-- `security` (Security): checks for unsafe operations, secret leakage, and unauthorized access.
-- `skill_execution` (Skill Execution): verifies that the agent loaded the expected skill and workflow.
-- `skill_efficiency` (Efficiency): checks routing quality, decoy avoidance, and redundant tool usage.
-- `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
-- `goal_accuracy` (Goal Accuracy): checks whether the overall user task completed successfully.
-- `behavior_check` (Behavior Check): verifies expected behavior steps, including safety expectations.
-- `token_efficiency` (Token Efficiency): compares token usage with and without the skill.
+- No Tier 3 evaluation signal details were available in this report.
 
 ## Test Tasks
 
-The benchmark included 4 recorded Tier 3 trials, but the source evaluation dataset was not available in this report payload.
+The evaluation dataset was not available in this report payload.
 
 ## Results
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 97% (+0%) | 91% (+8%) |
-| Discoverability | 2 | 89% (+0%) | 82% (+2%) |
-| Effectiveness | 2 | 96% (+1%) | 91% (+26%) |
-| Efficiency | 2 | 73% (-0%) | 74% (-1%) |
+| Security | N/A | N/A | N/A |
+| Correctness | N/A | N/A | N/A |
+| Discoverability | N/A | N/A | N/A |
+| Effectiveness | N/A | N/A | N/A |
+| Efficiency | N/A | N/A | N/A |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 17 total findings.
+Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 4 total findings.
 
 Top findings:
 
-- MEDIUM QUALITY/quality_correctness: No documented scripts in table format (`skills/nemo-data-designer-plugin/SKILL.md`)
-- MEDIUM QUALITY/quality_correctness: Instructions don't mention 'run_script' (`skills/nemo-data-designer-plugin/SKILL.md`)
-- MEDIUM QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.author' (`skills/nemo-data-designer-plugin/SKILL.md`)
-- MEDIUM QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/nemo-data-designer-plugin/SKILL.md`)
 - MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/nemo-data-designer-plugin/SKILL.md`)
+- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nemo-data-designer-plugin/SKILL.md`)
+- MEDIUM SCHEMA/author_missing: Author not specified in metadata (`skills/nemo-data-designer-plugin/SKILL.md`)
+- LOW SCHEMA/unexpected_file: Unexpected 'workflows' in skill root (`skills/nemo-data-designer-plugin/workflows`)
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 8 file(s)
-- Inter-Skill Deduplication: Parsed skill 'nemo-data-designer-plugin': 106 char description
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 

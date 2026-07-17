@@ -4,7 +4,7 @@ This skill ships in the NeMo Platform data-designer plugin. The CLI surface is `
 
 ## `validate`: local + remote contexts
 
-Upstream `data-designer validate` runs a local-only engine compile check. The plugin's `validate` does that **and** verifies the config against NeMo Platform-specific constraints — Inference Gateway provider resolution, Files-service seed sources, Nemotron Personas filesets, the remote seed-type whitelist, etc.
+Upstream's `validate` command runs a local-only engine compile check. The plugin's `validate` does that **and** verifies the config against NeMo Platform-specific constraints — Inference Gateway provider resolution, Files-service seed sources, Nemotron Personas filesets, the remote seed-type whitelist, etc.
 
 By default it reports both contexts independently:
 
@@ -96,7 +96,7 @@ nemo data-designer personas download --list
 nemo data-designer personas download
 
 # Specific locales
-nemo data-designer personas download --locale en_US --locale ja_JP
+nemo data-designer personas download --locale en_US --locale fr_FR
 
 # All locales
 nemo data-designer personas download --all
