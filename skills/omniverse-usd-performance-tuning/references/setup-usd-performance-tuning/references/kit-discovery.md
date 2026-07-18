@@ -1,6 +1,3 @@
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
 # Kit Discovery
 
 Use this reference for setup Step 1 and Step 1.5. The setup skill body owns
@@ -41,7 +38,7 @@ A venv Kit runtime qualifies when it has `pyvenv.cfg` plus
 `Scripts/python.exe` or `bin/python`.
 
 Do not pre-check `exts/`, `extscache/`, or extension folders. The Python probe
-in `runtime-probe.md` is the authoritative Scene Optimizer and Asset Validator
+in `runtime-probe.md` is the authoritative Usd Optimize and usd-validation-nvidia
 availability test.
 
 ## Auto-Enumeration

@@ -16,6 +16,13 @@
     "sample_count": 5,
     "score_scope": "stage/composition metrics only"
   },
+  "preservation": {
+    "rendered_mesh_count": 2252,
+    "distinct_geometry_bytes_preserved": true,
+    "bounds_preserved": true,
+    "dangling": 0,
+    "notes": "Axis-A silent-loss gate: rendered-mesh count, distinct geometry bytes, world bounds, and binding integrity all preserved across the instanceable-reference conversion."
+  },
   "runtime_profiling": {
     "status": "not_run",
     "recommended_tool": "Omniperf",
@@ -151,7 +158,7 @@
     {
       "order": 2,
       "name": "computeExtents",
-      "method": "Scene Optimizer safe-cleanup pipeline",
+      "method": "Usd Optimize safe-cleanup pipeline",
       "result": "Authored extents for renderer culling."
     }
   ],
@@ -175,6 +182,7 @@
         "path": "/tmp/factory/prototypes/rack_unit.usd",
         "role": "prototype",
         "mesh_count": 412,
+        "optimized_mesh_count": 412,
         "disposition": "optimized",
         "operations": ["meshCleanup", "fitPrimitives", "deduplicateGeometry", "decimateMeshes", "optimizeMaterials", "computeExtents"]
       },
@@ -182,6 +190,7 @@
         "path": "/tmp/factory/factory.optimized.usdc",
         "role": "assembly_root",
         "mesh_count": 1840,
+        "optimized_mesh_count": 1792,
         "disposition": "optimized",
         "operations": ["meshCleanup", "fitPrimitives", "deduplicateGeometry", "decimateMeshes", "optimizeMaterials", "computeExtents"],
         "notes": "Assembly-root remainder (meshes left after extraction) processed through the per-target op chain, not left to stage-level cleanup."

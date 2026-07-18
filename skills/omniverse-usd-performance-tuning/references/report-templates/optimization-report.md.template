@@ -14,6 +14,12 @@
 
 {{ reasoning }}
 
+{% if notes %}
+## Notes
+
+{{ notes }}
+{% endif %}
+
 {% if runtime_context %}
 ## Runtime Context
 
@@ -22,8 +28,8 @@
 | Kit application | {{ runtime_context.kit.application }} {{ runtime_context.kit.version }} |
 | Kit path | {{ runtime_context.kit.path }} |
 | Kit build | {{ runtime_context.kit.build }} |
-| Scene Optimizer | {{ runtime_context.sceneOptimizer.extension }} {{ runtime_context.sceneOptimizer.version }} |
-| Asset Validator | {{ runtime_context.assetValidator.package }} {{ runtime_context.assetValidator.version }} (via {{ runtime_context.assetValidator.source }}) |
+| Usd Optimize | {{ runtime_context.usdOptimize.extension }} {{ runtime_context.usdOptimize.version }} |
+| usd-validation-nvidia | {{ runtime_context.assetValidator.package }} {{ runtime_context.assetValidator.version }} (via {{ runtime_context.assetValidator.source }}) |
 {% endif %}
 
 ## Stage Impact Areas
@@ -55,6 +61,22 @@
 {% for metric in metrics %}
 | {{ metric.display_name }} | {{ metric.before }} {{ metric.unit }} | {{ metric.after }} {{ metric.unit }} | {{ metric.change_pct }}% | {{ metric.evidence_type }} | {{ metric.verdict }} |
 {% endfor %}
+
+{% if footprint %}
+## Storage Footprint (repack-normalized)
+
+A USDC/crate repack is the free re-encode any export achieves, not the
+optimization. The structural win is measured against the repack-normalized
+baseline, never the raw input.
+
+| Footprint | Value |
+|---|---:|
+| Raw input | {{ footprint.raw_input_bytes }} bytes |
+| Repack-normalized baseline | {{ footprint.repack_normalized_baseline_bytes }} bytes ({{ footprint.repack_delta_pct }}% re-encode, free) |
+| Optimized | {{ footprint.optimized_bytes }} bytes |
+| Structural win (vs normalized baseline) | {{ footprint.structural_delta_pct }}% |
+| Total raw → optimized | {{ footprint.raw_delta_pct }}% |
+{% endif %}
 
 ## Operations
 

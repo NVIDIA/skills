@@ -1,6 +1,3 @@
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
 # USD Variants and Payloads - Strategy and Trade-offs
 
 > The day-to-day stop-gates (require loaded payloads, single-variant publish stop, mask coverage check, draw-mode preservation, output folder policy per variant) have been folded into `usd-edit-target-planner` as a "Variant and payload gates" subsection. This reference holds the deeper trade-off framing, payload/variant strategy bullets, output policy detail, and stop-conditions that the planner cites.

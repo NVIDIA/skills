@@ -1,19 +1,12 @@
 # Profile Stage
 
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
 ## When to Use
 
 Use when profiling a USD stage before/after optimization; do not use to interpret regressions alone.
 
 ## Instructions
 
-1. Confirm the target asset, artifact, or user intent and check the prerequisites listed below.
-2. Read only the referenced files needed for the current phase, failure mode, or output contract.
-3. Follow the workflow, rules, and safety gates in this reference before invoking downstream references or shell commands.
-4. Return the result using the Output Format section and name any blocked prerequisite or unresolved user decision.
-
+See `references/_shared/standard-instructions.md`.
 
 ## Pre-flight Checklist
 
@@ -27,7 +20,7 @@ Before running profile measurements, re-read and confirm:
 - [ ] For full mode: multi-sample warm protocol (discard first, average rest).
 ## Output Format
 
-Return a concise status or report that names the input, selected runtime or evidence source, actions planned or performed, artifacts written, blockers, and the next validation or user-decision step. When a schema or template is referenced below, conform to that contract.
+See `references/_shared/standard-output-format.md`.
 
 Use this reference to capture measurable performance data. Run it **before**
 optimization to establish a baseline, and **after** to verify improvement.
@@ -205,8 +198,10 @@ post-optimization warm open as a verdict.
   before comparing it to the baseline. Do not compare a first after-write open
   to a warmed baseline.
 - If warm samples are noisy (for example, max-min exceeds 15% of median) or the
-  before/after delta is within the measured spread, mark warm-load evidence as
-  inconclusive in `compare-profiles` rather than a regression.
+  before/after delta is within the measured spread, the warm-load evidence is
+  inconclusive: in `compare-profiles` classify that row's verdict as `neutral`
+  (the verdict enum has no `inconclusive` value) and record the inconclusive
+  timing context in the notes, rather than reporting a regression.
 
 ## Full Mode (Kit runtime, requires Isaac Sim + GPU)
 
@@ -223,7 +218,7 @@ quick mode plus:
 ### Prerequisites
 
 - Isaac Sim or Kit SDK with RTX renderer.
-- Kit `omni.kit.profiler.tracy` profiler extension (Tracy is a Kit profiler, not a Scene Optimizer component).
+- Kit `omni.kit.profiler.tracy` profiler extension (Tracy is a Kit profiler, not a Usd Optimize component).
 - GPU with display (headless with virtual display works).
 
 ### Usage
@@ -278,7 +273,6 @@ and `NVIDIA/omniperf/.agents/skills/nsys-analyze/SKILL.md`.
 }
 ```
 
-
 ## Full mode: startup vs runtime separation
 
 When capturing Tracy data, separate the zone report into two sections:
@@ -320,7 +314,7 @@ This separation enables `compare-profiles` to correctly classify tradeoffs
 ## What quick mode can and cannot prove (standalone-path caveat)
 
 Quick mode is the only available mode when the Phase 0 runtime is
-standalone Scene Optimizer (no Kit). The agent must be explicit in the
+standalone Usd Optimize (no Kit). The agent must be explicit in the
 final `optimization-report` about which claims quick-mode metrics support
 and which they do not.
 
@@ -366,4 +360,5 @@ unavailable)" and §"Quick-mode-only caveat" for the report wording.
 - If `pxr` imports fail, run setup to choose a Kit or standalone USD Python runtime.
 - If full mode cannot load Tracy, verify `omni.kit.profiler.tracy` is enabled in the selected Kit runtime.
 - If warm-open samples vary widely, rerun the protocol in fresh processes; if
-  variance persists, mark warm-load evidence inconclusive.
+  variance persists, treat warm-load evidence as inconclusive (verdict row
+  `neutral` + inconclusive context in notes).

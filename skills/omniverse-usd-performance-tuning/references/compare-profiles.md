@@ -7,8 +7,6 @@ agent_next:
 freshness: 2026-05-20
 version: "0.1.0"
 ---
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
 
 # Compare Profiles Contract
 
@@ -18,13 +16,10 @@ workflow reference remains
 
 ## Required Inputs
 
-- A baseline `profile-stage` JSON capture.
-- An after/optimized `profile-stage` JSON capture.
-- Matching profile mode: quick vs quick or full vs full.
-- Same hardware and runtime for full-mode comparisons unless the user
-  explicitly accepts cross-runtime comparison.
-- The operation chain, restructure step, or validation-driven fix applied
-  between the two captures.
+See [compare-profiles/README.md § Required Inputs](compare-profiles/README.md#required-inputs)
+for the authoritative input list (paired baseline/after `profile-stage` JSON,
+matching mode, same hardware/runtime for full mode, and the change applied
+between captures).
 
 ## Verdict Thresholds
 
@@ -59,7 +54,7 @@ terminal optimization report.
 ## Regression Handling
 
 When a metric regresses by more than 5%, name the metric, quantify the change,
-and correlate it with what changed. File-size growth after Scene Optimizer
+and correlate it with what changed. File-size growth after Usd Optimize
 operations may indicate USDC save behavior. Prim-count growth after instancing
 can be acceptable when instances compensate for added prototypes. Steady-state
 frame regressions are more serious than one-time startup regressions.

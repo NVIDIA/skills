@@ -1,13 +1,13 @@
 {
   "version": "0.1.0",
-  "skill": "omniverse-usd-performance-tuning",
-  "cases": [
+  "skill_name": "omniverse-usd-performance-tuning",
+  "evals": [
     {
       "id": "usd-performance-broad-optimization-flow",
       "question": "The main factory USD stage takes minutes to open in USD Composer and likely has repeated assemblies. Please optimize it so it loads faster and produces a clear report.",
       "expected_skill": "omniverse-usd-performance-tuning",
       "expected_script": null,
-      "ground_truth": "The agent should select the USD performance tuning workflow, start with runtime/auth bring-up, then plan baseline profiling, structure assessment, validation routing, restructure decision handling, Scene Optimizer operation planning when available, after-profile comparison, and the required optimization report.",
+      "ground_truth": "The agent should select the USD performance tuning workflow, start with runtime/auth bring-up, then plan baseline profiling, structure assessment, validation routing, restructure decision handling, Usd Optimize operation planning when available, after-profile comparison, and the required optimization report.",
       "expected_behavior": [
         "Reads the omniverse-usd-performance-tuning SKILL.md.",
         "Classifies the request as a broad USD performance optimization request rather than a direct single-operation command.",
@@ -66,22 +66,22 @@
       "ground_truth": "This is an application/viewer construction request, not a USD performance diagnosis or optimization workflow.",
       "expected_behavior": [
         "Does not select omniverse-usd-performance-tuning.",
-        "Does not run profiling, validation, Scene Optimizer operations, or optimization-report steps.",
+        "Does not run profiling, validation, Usd Optimize operations, or optimization-report steps.",
         "Routes to a viewer or application-building skill if one is available."
       ]
     },
     {
       "id": "usd-performance-structural-only-report",
-      "question": "Optimize /tmp/factory.usd, but Scene Optimizer is not installed in my runtime and I don't want to install anything right now. Still give me a report.",
+      "question": "Optimize /tmp/factory.usd, but Usd Optimize is not installed in my runtime and I don't want to install anything right now. Still give me a report.",
       "expected_skill": "omniverse-usd-performance-tuning",
       "expected_script": null,
-      "ground_truth": "With Scene Optimizer unavailable and install declined, the workflow runs in structural-only mode: structure assessment plus pre-mutation USD validation, no mesh operations. The final report keeps verdict within its enum (neutral if nothing changed), sets workflow_mode to structural_only, and records the Scene Optimizer blocker in notes. It must not invent a structural-only verdict value.",
+      "ground_truth": "With Usd Optimize unavailable and install declined, the workflow runs in structural-only mode: structure assessment plus pre-mutation USD validation, no mesh operations. The final report keeps verdict within its enum (neutral if nothing changed), sets workflow_mode to structural_only, and records the Usd Optimize blocker in notes. It must not invent a structural-only verdict value.",
       "expected_behavior": [
         "Reads the omniverse-usd-performance-tuning SKILL.md.",
-        "Recognizes Scene Optimizer is unavailable and install was declined, and continues in structural-only mode rather than halting or fabricating results.",
-        "Skips the Scene Optimizer mesh-operation phases.",
+        "Recognizes Usd Optimize is unavailable and install was declined, and continues in structural-only mode rather than halting or fabricating results.",
+        "Skips the Usd Optimize mesh-operation phases.",
         "Produces a report whose verdict stays within improved|neutral|regressed|mixed and sets workflow_mode to structural_only.",
-        "Records the Scene Optimizer blocker and the next profile capture needed in the report notes."
+        "Records the Usd Optimize blocker and the next profile capture needed in the report notes."
       ]
     },
     {
@@ -103,7 +103,7 @@
       "question": "Run mesh cleanup and decimation on /data/asset.usd to make it lighter.",
       "expected_skill": "omniverse-usd-performance-tuning",
       "expected_script": null,
-      "ground_truth": "Destructive Scene Optimizer operations must write a new optimized output path and must not overwrite the source asset in place. The agent should also ask for approval before the explicitly named destructive operations.",
+      "ground_truth": "Destructive Usd Optimize operations must write a new optimized output path and must not overwrite the source asset in place. The agent should also ask for approval before the explicitly named destructive operations.",
       "expected_behavior": [
         "Reads the omniverse-usd-performance-tuning SKILL.md.",
         "Asks for approval before the explicitly named destructive operations (mesh cleanup, decimation).",
@@ -116,7 +116,7 @@
       "question": "I ran the optimization and the operation report says it completed - did anything actually change?",
       "expected_skill": "omniverse-usd-performance-tuning",
       "expected_script": null,
-      "ground_truth": "A Scene Optimizer operation can return success while changing nothing (zero prims affected). The agent should detect a successful-but-no-op result by comparing before/after metrics, report it honestly as neutral, and not claim an improvement the metrics do not support.",
+      "ground_truth": "A Usd Optimize operation can return success while changing nothing (zero prims affected). The agent should detect a successful-but-no-op result by comparing before/after metrics, report it honestly as neutral, and not claim an improvement the metrics do not support.",
       "expected_behavior": [
         "Reads the omniverse-usd-performance-tuning SKILL.md.",
         "Compares before/after metrics rather than trusting the operation's success status alone.",

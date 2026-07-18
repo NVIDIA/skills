@@ -1,6 +1,3 @@
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
 # Restructure Mode
 
 Use this reference for `apply-restructure` mode=`restructure`, invoked when
@@ -33,11 +30,53 @@ Confirm:
 
 ## Dedupe Plan
 
-When the plan includes `dedupe`, follow
-`hierarchy-dedupe-rewrite-tool-spec.md` while materializing boundaries:
+When the plan includes `dedupe`, the mid-level instanceable-reference collapse is
+authored **per descent region by the native `deduplicateHierarchies` op**, driven
+by the identity-first frontier — not by a single global cut and not by a
+hand-authored rewrite of the whole candidate report. The frontier decision core
+(`usd-hierarchy-dedupe-candidates/scripts/select_frontier.py`) selects, at each
+level, the `paths` set and a **small per-region `maxDepth`**; the per-level driver
+invokes `deduplicateHierarchies(paths=[node], maxDepth=<small, per-region>)` on
+each descent node and recurses (the native form of Phase 2g's "re-run boundary
+inference on each extracted asset"). The op authors the internal instanceable
+references; the driver owns the identity gate and emits the restructure-role
+manifest (`kept_inline_for_merge` tagging, `descent_converged`,
+`final_rescan_new_groups_above_floor`). Do **not** set one stage-wide `maxDepth`
+and run once — named units sit at varying depths, so no single global cut lands on
+the ragged frontier (see the `deduplicateHierarchies` catalog entry in
+`operations/operations.json` for the measured depth→grain evidence). The
+hand-authored `Sdf` path stays permitted for what the native op does not cover:
+external-prototype materialization into payload files (below) and any boundary the
+op cannot author cleanly.
 
-- Use the candidate report from `usd-hierarchy-dedupe-candidates`.
+While materializing boundaries:
+
+- Use the candidate report from `usd-hierarchy-dedupe-candidates`; the frontier
+  (`select_frontier.py`) chooses the grain identity-first (`kind` → naming →
+  semantics; the hash only confirms reuse).
 - Keep only user-approved, non-overlapping candidate groups.
+- **Author a bottom-up nested library by default** (the "author nested, not flat"
+  rule in `workflow.md` Phase 2g): parent prototypes *reference* child prototypes
+  rather than inlining them. Flat / outermost-only sharing is insufficient for
+  multi-file disk recovery. Honor the MINP inclusion floor, keep sub-floor leaves
+  inline for later merge, and on a mostly-identical-with-outliers group share the
+  majority and recurse only into the variant's differing branches.
+- **Mesh merge is a WITHIN-prototype prim-count reduction, not a sharing move.**
+  It is a first-class Phase-4 step that EXECUTES the manifest `merge` disposition
+  (not a "someday" option): run `merge` *inside* a prototype (merge once, benefit
+  N instances), never across an instance boundary. The payoff is a
+  scene-graph win — cheaper stage-open + composition/traversal + per-prim memory,
+  plus fewer draw calls — NOT a disk win (bytes ~= sum; the crate already
+  byte-dedups). It is intent-gated (it destroys per-part addressability) and gated
+  on bounds coherence and weak/none identity, with a conditional vertex-weld tail
+  whose reclaimed bytes are credited to the disk tier via the weld source. Full op-chain
+  + eligibility: `mesh-merge-rewrite-spec.md` §9 (per-prototype op chain
+  + merge-eligibility guard).
+- **Read existing composition first**: when the input arrives already instanced or
+  BIM/CAD-exported, treat existing prototypes as the candidate set at that level
+  (collapsing byte-identical-but-separately-authored prototypes) and resume the
+  descent there rather than restarting from the top (`workflow.md` Phase 2g,
+  "resume the descent from the level the asset is already at").
 - Prefer `external_prototype` unless the user explicitly chooses
   `internal_reference`.
 - Inline local material bindings and UsdShade networks that cross the boundary
@@ -127,6 +166,156 @@ Use:
 - `prim.SetActive(False)` only when deactivation is the chosen reversible
   alternative to deletion.
 
+### Material-Network Closure at a Prototype Boundary
+
+The native `deduplicateHierarchies` op collapses structurally-identical subtrees
+and preserves their bindings, but it does **not** judge what counts as a *valid*
+prototype boundary when a material network crosses that boundary. That decision
+stays here: whenever a subtree is externalized as a prototype (native-op internal
+reference, hand-authored external prototype, or point-instancer prototype), decide
+material-network closure before the boundary is final.
+
+Cross-boundary material relationships are common in CAD and digital twin assets:
+duplicate equipment, furniture, or HVAC assemblies often bind geometry inside the
+candidate subtree to materials under a shared `/Looks`, `/Materials`, or similar
+scope outside that subtree. If those relationships are left pointing at the source
+stage, the prototype is harder to validate, version, move, and optimize
+independently.
+
+When `material_policy=inline_local_external` (the default), inline local material
+dependencies into each prototype:
+
+1. For the canonical source subtree, collect authored material bindings and
+   UsdShade connections whose targets are outside the selected subtree.
+2. Treat material targets as inlineable when the target prim is part of the input
+   stage or package and is not an explicit external material-library dependency.
+3. Build the material-network closure for each inlineable material: the Material
+   prim, Shader and NodeGraph descendants, and connected shader or nodegraph prims
+   required by that network.
+4. Copy each material network into the prototype, preferably under a stable child
+   scope such as `/<PrototypeRoot>/Looks`.
+5. Rewrite copied geometry bindings and copied shader connections so they target
+   the inlined material-network paths.
+6. Preserve texture and other asset-valued inputs, but validate that they still
+   resolve from the prototype layer. If a relative asset path would stop resolving,
+   rewrite it relative to the prototype layer or mark the group `blocked` until the
+   dependency move is explicit.
+
+Do not decide material equivalence by material prim name alone. If different copies
+bind to different material paths, compare the material-network closure or split the
+candidate group. If the material networks differ, skip the group or leave the
+affected sites uninstanceable; do not silently collapse distinct looks.
+
+When `material_policy=preserve_external`, keep external material targets and record
+them in the manifest. When `material_policy=block_on_external`, block any selected
+group with material bindings or shader connections that cross the prototype
+boundary.
+
+## Point-Instance Route
+
+Use this for the reduction frontier's **`reduction_route = point_instance`**
+decision (a scene-graph / draw-call win): replace many **anonymous, high-count
+repeated** prims with a single `UsdGeomPointInstancer` — one (or a few)
+prototype(s) plus `protoIndices`, `positions`, `orientations`, and `scales` arrays.
+
+**It is identity-losing and intent-gated.** Geometry is preserved, but per-prim
+path addressability collapses into instance indices. It is reserved for the
+disposition matrix's weak-identity row only:
+
+- **Eligible:** anonymous / `structural_fallback` units, in **very high counts**,
+  with **no path-level addressability need** (bolts, fasteners, vegetation,
+  repeated fixtures) — the `instancing-tradeoffs.md` "point instancer" row.
+- **Never:** an addressable / `kind` / named / semantic subcomponent, anything
+  articulated / physics-bearing / variant-bearing, or any unit a maintenance or
+  service twin must select per-instance. The manifest contract (`identity_signal`
+  in {kind, naming, semantic} with `reduction_route` point_instance) **fails** this
+  gate — enforced in `usd-hierarchy-dedupe-candidates/scripts/select_frontier.py`
+  and `validate_report.py` `validate_manifest_structure`.
+
+It is **intent-gated for all archetypes** — no fidelity tolerance can bound an
+identity loss (`operation-safety.md` § Apply authority). It is surfaced via the
+Phase-7 iteration-2 opt-in menu (the identity-losing batch), never run
+automatically. A `point_instance` candidate that has not been confirmed stays
+`kept_inline_for_merge` instead (preserving within-prototype merge-ability).
+
+**Mechanism.** For the confirmed, intent-gated route, the native
+`deduplicateGeometry(duplicateMethod=4)` op authors the `UsdGeomPointInstancer`
+directly (usd-optimize 1.0.4+; issue #169). Where the native op does not fit —
+notably external-prototype materialization into payload files — the hand-authored
+path stays permitted: author the `UsdGeomPointInstancer` directly via the USD API.
+That hand-authored path is a **USD authoring route**, **not a Usd Optimize
+operation**, so it does **not** require a `usdOptimize.operationsAvailable` check;
+its only precondition is an importable `pxr` (USD Python) runtime. Either way:
+open the target as its **own root layer** (edit-target invariant), partition
+occurrences into one value-variant per prototype, author the instancer at a stable
+parent path with the prototype under its `prototypes` rel, decompose each
+occurrence's transform into `positions` / `orientations` / `scales` with its
+`protoIndices` id, remove the now-redundant per-occurrence prims, recompute
+extents, and persist with the compacting `Sdf.Layer.Export` + atomic replace (not
+`Save()`).
+
+**Material boundary.** This route inherits the same material-boundary problem as
+hierarchy dedupe: bindings that cross the prototype boundary are silently dropped
+when geometry moves into a Point Instancer prototype. Run the
+[Material-Network Closure](#material-network-closure-at-a-prototype-boundary) step
+above before rewriting. A PI rewrite that has not run that collection step is not
+safe to apply.
+
+**Preserve the pre-instanced source.** Keep the pre-instanced source layer so an
+alternate merge-first (draw-call-bound) deliverable can still be produced.
+Point-instancing and mesh-merge optimize different axes; pick per target intent
+(memory-bound vs draw-call-bound). Record in the manifest `phase4_targets[]`:
+`reduction_route: point_instance`, `identity_signal` (must be weak —
+`none`/`structural_fallback`), `copy_count`, and the `arc_estimate` contrast. The
+scene-graph win is `unverified-at-render` until a Kit/omniperf profile exists.
+
+Do not use this route to convert addressable subcomponents (use references / the
+nested library) or to animate populations (clip-driven Point Instancers are a
+modeling choice, not this reduction route).
+
+## Post-Restructure Placement Check (mechanism-agnostic guardrail)
+
+Run the per-prim placement-drift gate after every restructure, **regardless of
+which mechanism authored the references** — native `deduplicateHierarchies`,
+hand-authored `Sdf`, or the point-instance route. It compares each mesh's
+placement before and after and fails the restructure if any prim moved beyond
+tolerance.
+
+Keep it for two honest reasons, and **not** because the native op drifts:
+
+- **The native op is transform-correct.** A dedicated drill-down measured it
+  placement-correct to sub-micron — max per-mesh world-centroid displacement
+  **0.00028 mm** across an **85,871-mesh automotive assembly**, by a path-based
+  1:1 comparison of every mesh; rendered mesh count preserved at every depth. The
+  op excludes the root `xformOp:*` from identity and preserves each duplicate's
+  local transform by construction, so no hand-rolled transform-correct placement
+  is needed.
+- **Cheap insurance over a still-permitted path.** The gate is cheap, and the
+  hand-authored `Sdf` paths remain permitted for what the op does not cover
+  (external-prototype materialization, material-network closure, direct
+  point-instancer authoring). A mechanism-agnostic check covers those paths too,
+  so the guardrail earns its keep without overstating native-op risk.
+
+## Edit-Target Invariant (never optimize through a reference)
+
+Usd Optimize authors into the stage's **current edit-target (root) layer**.
+If a prototype / library arrives via a reference and you run SO on the *composed
+assembly*, the edits land as **overrides on the assembly layer** while the
+referenced library keeps its heavy geometry — that is override bloat, not
+reduction. Therefore:
+
+- **Each library / sub-asset is opened as its OWN root layer** so SO's edit
+  target *is* that file's bytes. "Optimize the assembly in one pass" is wrong.
+  This is exactly the per-sub-asset parallel model the batch scheduler batches —
+  one target = one own-layer file = one job.
+- **De-class abstract `class` prototype namespaces (`Class → Def`) before the
+  chain, and restore after.** Optimizing an abstract `class` namespace silently
+  no-ops: a default-predicate stage walk returns 0 of its meshes (see the
+  zero-work diagnostic below).
+- **Every library file must resolve standalone** — its own material bindings and
+  nested children reachable via explicit asset paths — to be a valid independent
+  edit target.
+
 ## Authoring Requirements (Critical for Phase 4 Compatibility)
 
 - `Sdf.CopySpec` preserves the source specifier. If copying from an over-only
@@ -141,7 +330,7 @@ Use:
 
 ### Why Specifier Correctness Is Critical
 
-Scene Optimizer operations that use USD's default-predicate prim traversal
+Usd Optimize operations that use USD's default-predicate prim traversal
 (including `decimateMeshes`, `meshCleanup`, `fitPrimitives`, `removeSmallGeometry`)
 will **silently skip** all meshes under Over-spec ancestors. The operation returns
 `success=True` with zero work done — no error, no warning, no indication of failure.

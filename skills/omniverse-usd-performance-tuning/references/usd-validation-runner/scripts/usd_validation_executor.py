@@ -9,7 +9,7 @@ never enumerate rules, guess class names, or shell out to a CLI.
 Why this exists
 ---------------
 Bare rule names are not unique. ``IndexedPrimvarChecker`` is registered by both
-Scene Optimizer (0.3 s triage) and the Asset Validator (376 s full audit). A
+Usd Optimize (0.3 s triage) and the usd-validation-nvidia (376 s full audit). A
 name-only lookup picks one by registry order, so the same scope note produces
 different work and wildly different runtimes on different hosts. That is the
 root cause of "every run finds a different solution and it takes forever."
@@ -200,7 +200,7 @@ def iter_registered_rules(rule_registry: Any) -> Iterable[type]:
     to the differing registry shapes across runtimes but never collapses rules
     to bare names. Fail-closed: if no enumeration entry point is found, raises.
     """
-    # Scene Optimizer registers its rules on import for discovery.
+    # Usd Optimize registers its rules on import for discovery.
     try:
         import omni.scene.optimizer.validators  # type: ignore  # noqa: F401
     except ImportError:  # pragma: no cover - environment dependent
@@ -271,7 +271,7 @@ def open_scoped_stage(stage_path: str, mask_paths: list[str] | None = None) -> A
     """Open a stage, optionally masked to ``mask_paths`` (+ the default prim).
 
     ``Usd.Stage.OpenMasked()`` is the only reliable scoping mechanism for the
-    Asset Validator (it discards caller ``StageLoadRules`` but preserves the
+    usd-validation-nvidia (it discards caller ``StageLoadRules`` but preserves the
     population mask). Rejects an empty masked sample so the caller never reports
     a misleading "0 findings".
     """
