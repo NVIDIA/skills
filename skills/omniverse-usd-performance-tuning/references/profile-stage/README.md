@@ -1,12 +1,19 @@
 # Profile Stage
 
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 ## When to Use
 
 Use when profiling a USD stage before/after optimization; do not use to interpret regressions alone.
 
 ## Instructions
 
-See `references/_shared/standard-instructions.md`.
+1. Confirm the target asset, artifact, or user intent and check the prerequisites listed below.
+2. Read only the referenced files needed for the current phase, failure mode, or output contract.
+3. Follow the workflow, rules, and safety gates in this reference before invoking downstream references or shell commands.
+4. Return the result using the Output Format section and name any blocked prerequisite or unresolved user decision.
+
 
 ## Pre-flight Checklist
 
@@ -20,7 +27,7 @@ Before running profile measurements, re-read and confirm:
 - [ ] For full mode: multi-sample warm protocol (discard first, average rest).
 ## Output Format
 
-See `references/_shared/standard-output-format.md`.
+Return a concise status or report that names the input, selected runtime or evidence source, actions planned or performed, artifacts written, blockers, and the next validation or user-decision step. When a schema or template is referenced below, conform to that contract.
 
 Use this reference to capture measurable performance data. Run it **before**
 optimization to establish a baseline, and **after** to verify improvement.
@@ -272,6 +279,7 @@ and `NVIDIA/omniperf/.agents/skills/nsys-analyze/SKILL.md`.
   }
 }
 ```
+
 
 ## Full mode: startup vs runtime separation
 

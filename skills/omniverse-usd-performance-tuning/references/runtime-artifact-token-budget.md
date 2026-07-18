@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Runtime Artifact Token Budget
 
 Use this policy whenever a skill launches Kit, usd-validation-nvidia, Usd Optimize,

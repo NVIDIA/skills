@@ -1,5 +1,8 @@
 # Setup USD Performance Tuning
 
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 ## When to Use
 
 Minimum supported runtime: usd-optimize 1.0.x (GitHub release packages) with
@@ -13,6 +16,7 @@ Use this reference when standalone runtime availability is unknown or the user e
 2. Probe the standalone Usd Optimize, usd-validation-nvidia, and USD Python paths (plus any opt-in Kit profiling root) without silently choosing between viable alternatives.
 3. Ask the user before installing the standalone runtime when no verified path satisfies the request.
 4. Write or refresh the preflight artifact with runtime versions, paths, and available Usd Optimize operations.
+
 
 ## Pre-flight Checklist
 

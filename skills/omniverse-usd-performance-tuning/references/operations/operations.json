@@ -198,7 +198,7 @@
       "risk_class": "medium",
       "requires_confirmation": true,
       "apply_authority": "intent-gated",
-      "args_count": 4,
+      "args_count": 0,
       "requires_mesh": false,
       "pipelines": [
         "memory-reduction",
@@ -224,7 +224,7 @@
           "skills/omniverse-usd-performance-tuning/references/workflow.md"
         ]
       },
-      "notes": "Collapses structurally-identical sub-hierarchies into shared prototypes referenced from each original site (referencing prims marked instanceable=true). Contrast deduplicateGeometry, which operates on individual mesh data. paths starts the breadth-first walk at the CHILDREN of each listed frontier prim (empty = children of the default prim). maxDepth caps the TOTAL breadth-first levels descended, counting those children as level 1; 0 = unbounded — a global cap on the whole walk, not a per-prototype recursion budget. The remaining two args tune duplicate matching, not grain: tolerance (default 0.001 stage units; 0 = bitwise-exact) is the float slack for property-value comparison, and ignoreShaderOutputs (default true) skips shader output attributes in that comparison. Grain follows depth: a low maxDepth shares at coarse named components; unbounded lets the value-hash reach the finest leaf library, which over-shares below the named unit and dissolves part identity, so unbounded is not a default endpoint. Invoke it per frontier region — one call per region, paths scoped to that region, maxDepth chosen for that region's structure. A single stage-wide maxDepth applied to every branch is forbidden: named units sit at varying depths, so no one cut lands on them (issue #175, an 85,871-mesh automotive battery-assembly stage: maxDepth 3 → 1 prototype, 4 → 38, 5 → 3,061, while the real named-unit frontier of ~48 falls between depth 4 and depth 5). Measured depth→grain and placement (issue #168, gb300_tray.proto.usdc, 7,711 meshes): maxDepth 1 → 1 prototype / 1 instance / 7,700 authored meshes; 2 → 11 / 47 / 6,510; 0 (unbounded) → 623 / 3,072 / 6,220; rendered mesh count preserved 7,711 at every depth; world-translation drift 0.0 at every depth. Placement-correct by construction: root xformOp:* excluded from identity, the duplicate's local transform preserved (no hand-rolled transform-correct placement needed). Role: the op is the per-region authoring primitive for instanceable-reference collapse. Inside the Phase 2f/2g descent pipeline the phase contract binds (restructure-role manifest, frontier/identity gating, kept_inline_for_merge tagging, recorded convergence), so the deduplicate-internally branch routes through apply-restructure, whose per-level driver drives this op per descent region and emits that manifest. Passing paths + maxDepth directly with no manifest is canonical only for standalone, already-approved dedup runs outside the Phase 0-7 pipeline (usd-optimize-run-operations). deduplicateGeometry remains the last-mile per-mesh leaf cleanup after hierarchy dedup."
+      "notes": "Operates at the subtree level: collapses structurally-identical sub-hierarchies into shared prototypes referenced from each original site (referencing prims marked instanceable=true). Contrast deduplicateGeometry, which operates on individual mesh data. ADVISORY-ONLY for deep mid-level reuse: does not consolidate deeply-nested component/subcomponent reuse — author shared prototypes directly for that case; use this operator only to suggest candidates. The bounded recursive descent authors mid-level subcomponent sharing DIRECTLY via the value-hash nested-library rewrite (restructure-decision deduplicate-internally branch); use deduplicateHierarchies / organizePrototypes only as a CANDIDATE SUGGESTER, never as the authoring mechanism for mid-level reuse. deduplicateGeometry remains the last-mile leaf cleanup."
     },
     {
       "key": "deleteHiddenPrims",
@@ -717,9 +717,10 @@
           "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
           "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md",
           "skills/omniverse-usd-performance-tuning/references/workflow.md",
+          "skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/apply-restructure/references/hierarchy-dedupe-rewrite-tool-spec.md",
           "skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/apply-restructure/references/mesh-merge-rewrite-spec.md"
         ],
-        "notes": "First-class but intent-gated Phase-4 step that EXECUTES the manifest `merge` disposition (usd-structure-assessment disposition matrix). Runs WITHIN a prototype only (merge once, benefit N instances), never across an instance boundary; ordered after occluded-geometry removal and ahead of the meshCleanup -> deduplicateGeometry -> computeExtents tail. Fails closed on strong-identity units (only weak/none identity may be fused) and on bounds-incoherent fusions (mesh-merge-rewrite-spec.md §9 merge-eligibility guard). Credited as an axis-B prim-count / scene-graph reduction (traversal + stage-open + memory + draw calls), NEVER as a disk win; a conditional vertex-weld tail credits reclaimed bytes on axis C via disk_win_source=vertex_weld."
+        "notes": "First-class but intent-gated Phase-4 step that EXECUTES the manifest `merge` disposition (usd-structure-assessment disposition matrix). Runs WITHIN a prototype only (merge once, benefit N instances), never across an instance boundary; ordered after occluded-geometry removal and ahead of the meshCleanup -> deduplicateGeometry -> computeExtents tail. Fails closed on strong-identity units (only weak/none identity may be fused) and on bounds-incoherent fusions (hierarchy-dedupe-rewrite-tool-spec.md §9 merge-eligibility guard). Credited as an axis-B prim-count / scene-graph reduction (traversal + stage-open + memory + draw calls), NEVER as a disk win; a conditional vertex-weld tail credits reclaimed bytes on axis C via disk_win_source=vertex_weld."
       }
     },
     {
@@ -1078,8 +1079,7 @@
           "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/usd-optimize-create-proxy/README.md",
           "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md"
         ]
-      },
-      "notes": "SECURITY: executes arbitrary user-supplied Python code with the privileges of the running process. Never agent-initiated (specialty escape-hatch, see CLASSIFICATION.md); require a user-supplied or reviewed script and explicit confirmation before execution (operation-safety.md). Omitted from probe-snapshot operations_available captures (documented, not granted)."
+      }
     },
     {
       "key": "remeshMeshes",

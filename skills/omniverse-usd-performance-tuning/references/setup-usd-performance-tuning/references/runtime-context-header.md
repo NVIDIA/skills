@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Runtime context header
 
 > **Audience:** every agent that prompts the user inside the USD Performance Tuning workflow.
@@ -168,13 +171,6 @@ This file is the **single source of truth** for the Format B string. Any skill t
 
 ```
 [Kit: {runtime_context.kit.application} {runtime_context.kit.version}  |  SO: {runtime_context.usdOptimize.version}  |  AV: {runtime_context.assetValidator.version}]
-```
-
-On a standalone-only runtime there is no `runtime_context.kit`; drop the Kit
-segment entirely:
-
-```text
-[SO: {runtime_context.usdOptimize.version}  |  AV: {runtime_context.assetValidator.version}]
 ```
 
 Required at:

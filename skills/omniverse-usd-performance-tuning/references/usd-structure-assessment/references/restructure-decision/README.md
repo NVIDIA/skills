@@ -1,12 +1,19 @@
 # Restructure Decision
 
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 ## When to Use
 
 Use to decide whether a monolithic USD stage should be restructured (asset-boundary materialization + hierarchy dedupe) before optimization, or optimized as-is. Asks the user; invokes apply-restructure when the user confirms.
 
 ## Instructions
 
-See `references/_shared/standard-instructions.md`.
+1. Confirm the target asset, artifact, or user intent and check the prerequisites listed below.
+2. Read only the referenced files needed for the current phase, failure mode, or output contract.
+3. Follow the workflow, rules, and safety gates in this reference before invoking downstream references or shell commands.
+4. Return the result using the Output Format section and name any blocked prerequisite or unresolved user decision.
+
 
 ## Pre-flight Checklist
 
@@ -20,7 +27,7 @@ Before presenting the restructure gate, re-read and confirm:
    is no diagnose-and-exit option.
 ## Output Format
 
-See `references/_shared/standard-output-format.md`.
+Return a concise status or report that names the input, selected runtime or evidence source, actions planned or performed, artifacts written, blockers, and the next validation or user-decision step. When a schema or template is referenced below, conform to that contract.
 
 ## Purpose
 
@@ -32,11 +39,9 @@ skill is the user-confirm gate that decides whether to restructure the stage
 before optimization.
 
 This is a small decision-tier skill. It does not perform the rewrite - that's
-the execution-tier `apply-restructure`, which drives the per-region native
-`deduplicateHierarchies` op (and `pxr`/`Sdf` authoring for what the op does not
-cover) to materialize boundaries and apply the hierarchy dedupe described in
-`skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/apply-restructure/references/restructure-mode.md`
-§ Dedupe Plan.
+the execution-tier `apply-restructure`, which uses `pxr`/`Sdf` USD authoring to
+materialize boundaries and apply the hierarchy-dedupe rewrite described in
+`skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/apply-restructure/references/hierarchy-dedupe-rewrite-tool-spec.md`.
 
 **Bounded recursive descent.** This gate fires once per descent level:
 after the first restructure, boundary inference re-runs on each extracted asset
@@ -47,26 +52,34 @@ Phase 2g. Always prefer shared prototypes with `instanceable=true` references
 over N unshared per-node payloads; descend to `subcomponent` only for
 "important" (articulated / physics / variant-bearing) sub-hierarchies.
 
-**Descent convergence gate (confirm per level) — this reference is the per-level confirm point.**
-
-> **A low prototype count — or parts that "look like merge candidates" at a coarse level — means descend, not merge.** Within-prototype merge comes only after the descent is done.
-
-The full rule and the manifest fields to record live in `workflow.md` Phase 2g
-(the single source); this is where you run the per-level confirmation. In short:
-sharing happens in passes, biggest repeated pieces first, one level deeper each
-pass. After authoring a level, re-run the reuse scan one level down and
-**present the new worth-sharing groups to the user with their cost (more layers,
-parts less directly selectable), then ask whether to descend further or stop.** Always ask before
-crossing a named-part boundary or doing anything that destroys identity
-(point-instancing / merging); a plain lossless-sharing tail can be auto-finished
-if the user opts in. The descent is **done** when the user stops it, or when the
-re-scan finds nothing new worth sharing. Do **NOT** start Phase 4 geometry ops
-(decimation, within-prototype merge) until then, and record
-`descent_converged: true` + `final_rescan_new_groups_above_floor: 0` in the
-manifest — running geometry ops on an unfinished structure fuses or coarsens
-geometry that more sharing would have removed. Phase 7 `resume-descent` is the
-only exception (reuse that became visible after a transform, or a deliberately
-deferred level), and it re-confirms convergence before re-entering geometry ops.
+**Descent convergence gate (confirm per level; converge before Phase 4).** The
+per-node stop conditions (`min_meaningful_unit` / `arc_cost` / `below_floor`) say
+why a *single* node stopped; they do NOT establish that the *whole* descent has
+bottomed out — and **how deep to decompose is the user's call, not an autonomous
+plunge** (this gate is the per-level confirmation point; see "Bounded recursive
+descent"). So make the descent a **per-level checkpoint**: after authoring a level,
+re-run the reuse analyzer (`usd-hierarchy-dedupe-candidates`, the cheap HASH_LEVEL-2
+structural pass) on the result, **present what it finds one level down** (the new
+shareable groups above the inclusion floor — MINP, occurrence ≥2 — with the
+addressability / layer-count cost), and **ask whether to descend further or stop**.
+Keep the asks meaningful: the ones that matter are **crossing a named identity
+boundary** (descending into a component's internals changes what stays addressable)
+and any **identity-destroying route** (point-instance / merge); a routine
+lossless-sharing tail can be offered as "auto-finish the rest" so the user isn't
+prompted for every trivial sublevel. The descent is **complete** when the user
+stops it or the re-scan is dry above the floor (residue = sub-MINP
+`kept_inline_for_merge` leaves, already-split value-variants, or unique content).
+**Do NOT continue to Phase 4 geometry ops (decimation, within-prototype merge)
+until the descent is complete**, and record `descent_converged: true` plus
+`final_rescan_new_groups_above_floor` in the manifest. Structure must settle before
+geometry: decimating or merging an unconverged structure wastes work on geometry
+that further sharing would have collapsed, and a merge that runs before the descent
+reserved its `kept_inline_for_merge` leaves ends up fusing already-shared geometry
+(premature-merge inflation; see the merge-eligibility guard in
+`hierarchy-dedupe-rewrite-tool-spec.md` §9). Phase 7 `resume-descent`
+is the *exception* (reuse that only became visible after a transform, or a level
+deliberately deferred), not a license to run geometry ops on an incomplete descent;
+a resumed descent re-checkpoints before re-entering geometry ops.
 
 ## Prerequisites
 
@@ -111,25 +124,41 @@ Compute the recommended branch from the inputs, then **always present the choice
 
 Present exactly two restructure strategies (plus optimize-as-is):
 
-1. **Deduplicate hierarchies internally** — prototypes stay inside the single
-   stage (internal namespace), no per-asset Phase 4 fan-out. Appropriate when
-   selective loading is not needed. Full authoring contract: see
-   [§ deduplicate-internally](#deduplicate-internally) below.
+1. **Deduplicate hierarchies internally** — run the **same structured descent** as
+   the external path (`apply-restructure`, `mode: internal_reference`): the reuse
+   analyzer confirms which meaningful (kind/named/semantic) units repeat, one
+   prototype is authored per genuine value-variant, and each duplicate site is
+   rewritten as a reference marked `instanceable=true`. The only differences from
+   the external path are **materialization** — prototypes live in an internal
+   namespace (e.g. `/__HierarchyPrototypes`) inside the single stage rather than as
+   separate files — and **no parallel per-asset Phase 4** (one file). It still
+   produces the frontier and a restructure-role manifest (`identity_disposition:
+   internal_share`, sub-MINP leaves tagged `kept_inline_for_merge`). Authoring is
+   the **direct value-hash** rewrite, NOT a `deduplicateHierarchies` invocation:
+   on 1.0.x that operator authors a strong instanceable-reference collapse
+   (nested), but
+   without the frontier manifest, identity gating, or `kept_inline_for_merge`
+   tagging this branch's contract requires — it is used here only to *suggest*
+   candidates. Appropriate when selective
+   loading is not needed.
 
-2. **Extract duplicate hierarchies as payloaded, instanced assets** — each shared
-   prototype becomes an external asset file referenced via a payload arc, so the
-   monolith becomes an assembly root + independently loadable prototype assets.
-   Appropriate when selective loading matters (large scenes, collaborative
-   workflows, streaming). Full authoring contract: see
-   [§ extract-as-assets](#extract-as-assets) below.
+2. **Extract duplicate hierarchies as payloaded, instanced assets** — The
+   hierarchy-dedupe rewrite tool runs with `mode: external_prototype`, extracting
+   each shared prototype as an external asset file. Each instance site references
+   the prototype via a payload arc, making it independently loadable. This is
+   the full restructure: the monolith becomes an assembly root + prototype
+   assets. Appropriate when selective loading matters (large scenes,
+   collaborative workflows, streaming).
 
 Both strategies run the **same descent through `apply-restructure`** and produce
-instanced prototypes; the only differences are materialization (internal namespace
-vs external files) and whether Phase 4 fans out per-asset (external only). The
-shared-descent rationale and how the native `deduplicateHierarchies` op fits (a
-per-region authoring primitive the descent drives, with `apply-restructure`
-staying the phase executor that emits the manifest) are detailed once in
-[§ deduplicate-internally](#deduplicate-internally).
+instanced prototypes. The difference is only **materialization**: whether
+prototypes live inside the stage (internal namespace, `mode: internal_reference`)
+or as separate files (external payloaded assets, `mode: external_prototype`) — and
+whether Phase 4 can fan out per-asset in parallel (external only).
+`deduplicateHierarchies` is NOT the authoring mechanism for either — it
+authors an instanceable-reference collapse (nested on 1.0.4) without the
+manifest/identity contract, so it serves
+as a candidate source only.
 
 The boundary plan records:
 - `goal: deduplicate_internally` → hands off to `apply-restructure` with
@@ -201,17 +230,12 @@ User accepts the dedupe candidates but wants the stage to stay a single file.
 value-hash nested library into an internal namespace, rewrites each duplicate site
 as an `instanceable=true` reference, and returns a **restructure-role manifest**
 (`identity_disposition: internal_share`) — the same frontier, identity gate, and
-`kept_inline_for_merge` tagging as the external path. Do NOT hand this branch to
-`deduplicateHierarchies` on its own. The native op is the per-region authoring
-primitive for the instanceable-reference collapse (invoked per frontier region
-with `paths` + a per-region `maxDepth`), but on its own it emits no
-restructure-role manifest, frontier/identity gating, or `kept_inline_for_merge`
-tagging — the contract this phase requires. `apply-restructure` is the executor
-that fulfills that contract: its per-level driver calls the native op per descent
-region (`paths` scoped to that region, a small per-region `maxDepth`) and emits
-the manifest. Invoking `deduplicateHierarchies` with `paths` + `maxDepth`
-directly, with no manifest, is canonical only for standalone approved-chain dedup
-runs outside the Phase 0-7 pipeline (`usd-optimize-run-operations`). The last-mile
+`kept_inline_for_merge` tagging as the external path. It does NOT rely on
+`deduplicateHierarchies` for the mid-level merge — on 1.0.x that operator
+authors a strong instanceable-reference collapse (nested-instancing support
+landed in 1.0.4),
+but without the manifest/identity contract, so it remains a candidate source
+here. The last-mile
 `deduplicateGeometry` cleanup still runs inside the authored leaf prototypes
 (after any within-prototype merge).
 
@@ -221,7 +245,7 @@ descent decisions are identical. Skipping the frontier here is what leaves
 high-count tiny repeats un-instanced and drops the merge frontier: with no
 `kept_inline_for_merge` reservation, a later within-prototype merge runs *after*
 the dedup/instancing passes already shared the geometry, has to un-instance it to
-fuse, and inflates triangles/disk (the `mesh-merge-rewrite-spec.md` §9
+fuse, and inflates triangles/disk (the `hierarchy-dedupe-rewrite-tool-spec.md` §9
 failure). The `kept_inline_for_merge` tagging reserves sub-MINP merge-candidate
 leaves from the dedup/instancing passes so the merge runs **before** the
 geometry-dedup tail.
@@ -339,15 +363,13 @@ Record the user's choice in the optimization plan and emit it for downstream pha
 - Always present the selective-loading choice when SA reports `payload_count: 0`
   and clear asset-boundary candidates, even if hierarchy dedupe is not
   recommended and the asset is otherwise ready for mesh optimization.
-- If the user picks `deduplicate-internally`, run Phase 2f: `apply-restructure`
-  with `mode: internal_reference` — the same structured descent authored into an
-  internal namespace, producing the restructure-role manifest (`internal_share`,
-  `kept_inline_for_merge`). The native `deduplicateHierarchies` op is the
-  per-region authoring primitive the descent drives — the per-level driver in
-  `apply-restructure` calls it per region and emits the manifest; invoking it with
-  `paths` + `maxDepth` directly, with no manifest, is for standalone
-  approved-chain runs outside this pipeline, not this branch. Do NOT skip the
-  frontier.
+- If the user picks `deduplicate-internally`, run Phase 2f (`apply-restructure`,
+  `mode: internal_reference`) — the same structured descent as the external path,
+  authored into an internal namespace in the single stage. It produces the
+  restructure-role manifest (`internal_share`, `kept_inline_for_merge`); it does
+  NOT skip the frontier, and `deduplicateHierarchies` remains a candidate
+  source, not the authoring mechanism (it lacks the manifest/identity
+  contract).
 - If the user picks `extract-as-assets`, hand off to `apply-restructure` with
   the boundary plan and `goal: extract_as_assets`; do not perform writes from
   this reference.

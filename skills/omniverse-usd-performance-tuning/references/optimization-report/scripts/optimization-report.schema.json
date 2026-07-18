@@ -59,12 +59,11 @@
     "runtime_context": {
       "type": "object",
       "description": "Snapshot of the Kit / Usd Optimize / usd-validation-nvidia versions in effect for this run. Copied verbatim from setup-preflight.json so later readers can reproduce or audit the report. Mirrors the runtime-context fields defined in skills/omniverse-usd-performance-tuning/references/setup-usd-performance-tuning/references/runtime-context-header.md.",
-      "required": ["usdOptimize", "assetValidator"],
+      "required": ["kit", "usdOptimize", "assetValidator"],
       "properties": {
         "kit": {
           "type": "object",
           "required": ["application", "version", "path"],
-          "description": "Kit application context. OPTIONAL: omitted on a standalone-only runtime (Kit is an opt-in render-profiling adjunct). When present, application/version/path are required.",
           "properties": {
             "application": {
               "type": "string",
@@ -228,23 +227,6 @@
           "type": "number",
           "minimum": 0,
           "description": "Merged-prim AABB surface area / Sum(member AABB surface area). ~1 = the fused members were spatially adjacent (a legitimate draw-call merge). A value far above 1 means a merge of DISPERSED meshes that balloons the AABB and harms BVH/raytracing; the scorer grants NO draw-call credit when this exceeds MERGE_BOUNDS_COHERENCE_MAX (default 2.0), and the merge should not have been performed."
-        },
-        "frontier_descent_converged": {
-          "type": "boolean",
-          "description": "Report-side mirror of the apply-restructure manifest's frontier.descent_converged. Set true only when the bounded recursive de-duplication descent CONVERGED — a fresh one-level-down reuse re-scan found nothing new above the floor. validate_report.py's descent-convergence gate requires this true (with frontier_final_rescan_new_groups_above_floor == 0) OR a manifest frontier that records the same OR frontier_convergence_waived, before any Phase-4 geometry op (decimation / within-prototype merge / primitive-fit / quantization / topology edit) is permitted on a dedup/instancing run. Carry it here for manifest-less runs."
-        },
-        "frontier_final_rescan_new_groups_above_floor": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Report-side mirror of the manifest field: the count of new shareable groups (occurrence >= 2, above the MINP floor) the terminal one-level-down re-scan found. 0 == converged. > 0 together with frontier_descent_converged == true is a contradiction the gate rejects (the descent was declared complete while reuse remained one level down)."
-        },
-        "frontier_convergence_waived": {
-          "type": "boolean",
-          "description": "Optional explicit user opt-out: true when the user chose to stop the descent before it converged and proceed to geometry ops anyway. Requires frontier_convergence_waiver_reason. Silence is NOT a waiver — the gate fails closed on an unconverged frontier with no recorded waiver."
-        },
-        "frontier_convergence_waiver_reason": {
-          "type": "string",
-          "description": "Required when frontier_convergence_waived is true: the recorded reason the descent was stopped early (e.g. addressability cost, user time budget)."
         },
         "notes": { "type": "string" }
       }

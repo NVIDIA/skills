@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # usd-optimize / Usd Optimize Package Handoff
 
 Usd Optimize operation mechanics are owned by upstream `usd-optimize` and
@@ -9,16 +12,13 @@ policy, batch orchestration, and reporting.
 - Prebuilt packages: **GitHub Releases** on the repository above
   (`https://github.com/NVIDIA-Omniverse/usd-optimize/releases`). Each release
   carries Linux x86_64, Linux aarch64, and Windows x86_64 zips (~330-360 MB).
-- Package pattern: `usd_optimize_usd_<usd>_py_<python>@<version>.<platform>.release.zip`.
-  usd-optimize 1.0.4 is the minimum supported runtime for this skill; 1.1.x is
-  also supported. The two layouts differ only in where per-operation docs live:
-  1.1.x packages ship them at `docs/operations/<key>.rst`, 1.0.x packages at
-  `.agents/operations/<key>.md`. Operation inventory, arguments, and defaults are
-  the same across both.
+- Package pattern: `usd_optimize_usd_<usd>_py_<python>@<version>.<platform>.release.zip`
+  (1.0.x semver; usd-optimize 1.0.x is the minimum supported runtime for
+  this skill).
 - Download example:
   `gh release download v1.0.4 -R NVIDIA-Omniverse/usd-optimize -p '*manylinux*x86_64*'`
   (or pick the asset from the releases page in a browser).
-- Package operation guides: `docs/operations/<operation>.rst` (1.1.x) or `.agents/operations/<operation>.md` (1.0.x)
+- Package operation guides: `.agents/operations/<operation>.md`
 - Package operation runner skill: `.agents/skills/run-operations/SKILL.md`
 - Package validator runner skill: `.agents/skills/run-validators/SKILL.md`
 - Package validator interpretation skill: `.agents/skills/interpret-validators/SKILL.md`
@@ -29,28 +29,19 @@ policy, batch orchestration, and reporting.
 
 For any operation key listed in `references/operations/operations.json`, derive
 the upstream mechanics path instead of storing per-operation package details in
-this repo. Resolve it with a version-tolerant lookup under the selected package
-root (`$USD_OPTIMIZE_ROOT`), without cloning the source repo. This is the single
-place this rule is stated; other skill files point here.
+this repo:
 
-- Package path template (prefer): `$USD_OPTIMIZE_ROOT/docs/operations/<operation-key>.rst`
-  (1.1.x packages).
-- Fallback: `$USD_OPTIMIZE_ROOT/.agents/operations/<operation-key>.md` (1.0.x
-  packages, which predate the auto-generated docs tree).
-- Sidecars follow the same rule. Operation index: `docs/operations.rst` (1.1.x)
-  or `.agents/operations/INDEX.md` (1.0.x). Pipeline/preset guidance:
-  `docs/choosing-operations.rst` plus `config_presets/*.json` (1.1.x) or
-  `.agents/operations/PIPELINES.md` (1.0.x). Invocation: `docs/cli.rst` (1.1.x)
-  or `.agents/operations/INVOCATION.md` (1.0.x).
-- Upstream web URL template (1.1.x `main`):
-  `https://github.com/NVIDIA-Omniverse/usd-optimize/blob/main/docs/operations/<operation-key>.rst`.
-  To document the 1.0.x layout, pin the tag:
-  `https://github.com/NVIDIA-Omniverse/usd-optimize/blob/1.0.4/.agents/operations/<operation-key>.md`.
+- Package path template: `.agents/operations/<operation-key>.md`
+- Upstream web URL template: `https://github.com/NVIDIA-Omniverse/usd-optimize/blob/main/.agents/operations/<operation-key>.md`
+- Package operation index: `.agents/operations/INDEX.md`
 
-Each root above must contain the per-operation doc set — `docs/operations/` with
-`docs/operations.rst` (1.1.x) or `.agents/operations/INDEX.md` (1.0.x) — plus the
-runtime sentinels `python/`, `usdpy/`, `lib/`, and `extraLibs/` when it is also
-used for standalone execution. The package may include `.claude` and `.codex`
+Resolve local upstream guidance without cloning the source repo:
+
+1. `$USD_OPTIMIZE_ROOT`
+
+Each root above must contain `.agents/operations/INDEX.md` and the runtime
+sentinels `python/`, `usdpy/`, `lib/`, and `extraLibs/` when it is also used
+for standalone execution. The package may include `.claude` and `.codex`
 compatibility aliases, but handoffs should use `.agents` paths.
 
 If no package root exists, download and extract the published

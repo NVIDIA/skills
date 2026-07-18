@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # USD Layer Health
 
 > Layer-health checks are performed as a section of `usd-structure-assessment` Phase 1.3; this reference holds the deeper checklist, file-format guidance, asset-path hygiene, and flattening policy.

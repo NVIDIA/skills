@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Standalone Runtime Setup
 
 Use this reference when the user chooses standalone libraries instead of Kit or
@@ -42,18 +45,12 @@ first, then invoke `install-usd-optimize-standalone`.
 Usd Optimize standalone uses:
 
 ```text
-<USD_OPTIMIZE_ROOT>/docs/operations.rst          # per-op docs, 1.1.x packages
-<USD_OPTIMIZE_ROOT>/.agents/operations/INDEX.md  # per-op docs, 1.0.x packages
+<USD_OPTIMIZE_ROOT>/.agents/operations/INDEX.md
 <USD_OPTIMIZE_ROOT>/python
 <USD_OPTIMIZE_ROOT>/usdpy
 <USD_OPTIMIZE_ROOT>/lib
 <USD_OPTIMIZE_ROOT>/extraLibs
 ```
-
-The per-operation doc sentinel is version-tolerant: a root is valid when either
-`docs/operations.rst` (1.1.x packages) or `.agents/operations/INDEX.md` (1.0.x
-packages) exists. The runtime dirs (`python`, `usdpy`, `lib`, `extraLibs`) must
-be present regardless.
 
 Invoke `install-usd-optimize-standalone` when `USD_OPTIMIZE_ROOT`, `USD_OPTIMIZE_ROOT`,
 or `WU_SO_PACKAGE_DIR` is missing or does not point at an extracted package with

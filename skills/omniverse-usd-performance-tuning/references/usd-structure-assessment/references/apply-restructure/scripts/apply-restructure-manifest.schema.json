@@ -114,10 +114,6 @@
             "enum": ["identity", "structural_fallback"],
             "description": "Whether the grain came from authored identity (default) or the structural-fallback (coarsest repeating subtree where identity is absent)."
           },
-          "kind_untrusted": {
-            "type": "boolean",
-            "description": "Kind-trust preflight (finder spec §6.0.1, issue #172): true when this unit carried an authored kind that was demoted STAGE-WIDE because kind does not partition geometry (~1 mesh per component on monolithic CAD imports). The grain was re-derived structurally (grain_source=structural_fallback); the frontier.kind_trust block carries the sampled stats that justified the demotion."
-          },
           "value_variant_id": {
             "type": ["string", "integer"],
             "description": "Value-variant partition id within a structural group (one prototype per genuine variant, e.g. a group of 18 near-identical copies that partitions into 17 identical plus 1 real variant)."
@@ -260,40 +256,6 @@
         "frontier_estimate_basis": {
           "type": "string",
           "enum": ["exact", "spot_check"]
-        },
-        "kind_trust": {
-          "type": "object",
-          "description": "Optional audit block (finder spec §6.0.1, issue #172): the stage-wide meshes-per-kind preflight stats, so a sampled-and-REJECTED kind is auditable in the manifest (why kind-labeled units arrived as structural_fallback / kind_untrusted). Additive; emitted by the finder's --emit-candidates packet and passed through by select_frontier.py.",
-          "properties": {
-            "kind_trusted": {
-              "type": "boolean",
-              "description": "False when kind failed the preflight (single_mesh_fraction >= max_single_mesh_fraction OR median_meshes_per_kind <= 1) and kind-derived identity was demoted."
-            },
-            "sampled_kind_prims": {
-              "type": "integer",
-              "minimum": 0,
-              "description": "Stage-wide sample size: walked prims with an authored kind in {component, subcomponent, group}."
-            },
-            "single_mesh_fraction": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "description": "Fraction of sampled kind prims whose subtree holds <= 1 mesh."
-            },
-            "median_meshes_per_kind": {
-              "type": ["number", "null"],
-              "description": "Median subtree mesh count across the sample (null when the sample is empty)."
-            },
-            "max_single_mesh_fraction": {
-              "type": "number",
-              "description": "The KIND_TRUST_MAX_SINGLE_MESH_FRACTION threshold the run used (default 0.80)."
-            },
-            "articulation_check": {
-              "type": "string",
-              "enum": ["enabled", "unavailable"],
-              "description": "Whether the walk-up articulation stop could consult UsdPhysics; 'unavailable' means the guard was skipped gracefully."
-            }
-          }
         }
       }
     },

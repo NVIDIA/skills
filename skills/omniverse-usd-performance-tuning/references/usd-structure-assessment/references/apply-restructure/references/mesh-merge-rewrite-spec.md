@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Mesh-Merge Rewrite — Behavioral Specification
 
 Status: draft (rev 1)
@@ -10,10 +13,10 @@ This is the authoring route for the reduction frontier's **`reduction_route =
 merge`** decision (a scene-graph / draw-call win). It fuses a **fragmented fan of small sibling meshes**
 into far fewer `Mesh` prims, cutting the rendered (unique) mesh-prim count and the
 scene-graph weight (per-prim composition, traversal, stage-open, and per-mesh
-renderer overhead). This route collapses **distinct, same-material fragments**
-that recur only because a CAD/BIM/EDA converter authored one prim per modeled
-face. Its counterpart route — collapsing **repeated** subtrees by reference — is
-the point-instance route (`restructure-mode.md` § Point-Instance Route).
+renderer overhead). It is the counterpart to
+`point-instancer-rewrite-spec.md`: that route collapses **repeated** subtrees by
+reference; this route collapses **distinct, same-material fragments** that recur
+only because a CAD/BIM/EDA converter authored one prim per modeled face.
 
 The win is the **count of meshes, not bytes**. A merge concatenates geometry
 (stored bytes ≈ the sum of the members, and the crate already byte-deduplicates
@@ -21,8 +24,8 @@ identical arrays within a layer), so merge makes **no disk claim** — it is sco
 on the scene-graph axis, flagged `unverified-at-render` until a runtime
 profile confirms it. Only the optional coincident-seam **vertex weld** the merge
 enables is a small, legitimate disk credit (`disk_win_source = vertex_weld`),
-never attributed to the merge itself. See `tools/oracle/score_run.py` and §9
-below (the per-prototype op chain and merge-eligibility guard).
+never attributed to the merge itself. See `tools/oracle/score_run.py` and §9 of
+`hierarchy-dedupe-rewrite-tool-spec.md`.
 
 **It is geometrically lossless but identity-destroying.** The rendered result is
 unchanged (the same triangles, re-packaged), but a merged mesh can no longer be
@@ -125,7 +128,8 @@ their geometry. The per-material scoping also stops the **default material-colla
 from flattening distinct materials into one (an unscoped `merge` collapses all
 bound materials, which is lossy). If the prototype namespace is an abstract
 `class`, de-class it (Class→Def) so the op can author. Then run the conditional
-tail: `merge → vertex-weld-where-contiguous → computeExtents` (§9 below).
+tail: `merge → vertex-weld-where-contiguous → computeExtents` (§9 of
+`hierarchy-dedupe-rewrite-tool-spec.md`).
 
 **Direct-authoring fallback.** When the op does not fit (e.g. a GeomSubset-into-one
 result), author the fused `Mesh` directly: concatenate the members' `points`,
@@ -141,7 +145,7 @@ In both paths:
 - **Recompute extents** and verify bounds are preserved.
 
 **Eligibility guard (do not restate — apply it).** Before fusing, apply the
-**merge-eligibility guard** in §9 below:
+**merge-eligibility guard** in §9 of `hierarchy-dedupe-rewrite-tool-spec.md`:
 weak/none identity only, and `merge_bounds_coherence ≤ K` (default 2.0) — a
 dispersed merge balloons the AABB, harms the spatial structure, earns no scene-graph
 credit, and must not be performed.
@@ -190,8 +194,8 @@ until a runtime profile exists.
 ## 8. Non-goals
 
 - **Identical tiny repeats** (the same bolt ×10,000) → a **PointInstancer**
-  (preserves the prototype's identity; the point-instance route in
-  `restructure-mode.md` § Point-Instance Route), not a merge.
+  (preserves the prototype's identity; `point-instancer-rewrite-spec.md`), not a
+  merge.
 - **Tiny parts the consumer addresses** → leave them; prefer an identity-
   preserving mesh-count remedy (instancing of identical sub-parts, GeomSubset
   consolidation) over destroying identity.
@@ -200,73 +204,3 @@ until a runtime profile exists.
 - A disk-saving claim attributed to the merge (zeroed by the report's sharing-only
   guard — the merge is a scene-graph win; only the separate `vertex_weld` tail
   is a disk win).
-
-## 9. Relationship to Usd Optimize
-
-After the hierarchy rewrite, Usd Optimize can still be used on the resulting
-prototype assets. **Open each prototype as its own root layer** — the edit-target
-invariant ([restructure-mode.md § Edit-Target Invariant](restructure-mode.md#edit-target-invariant-never-optimize-through-a-reference)).
-
-- **Per-prototype op chain: `meshCleanup → deduplicateGeometry → computeExtents`.**
-  Run it inside each prototype asset (mesh-level dedup is last-mile cleanup, not
-  the structuring move).
-- **Within-prototype mesh merge (draw-call / scene-graph reduction), when intended.** A mesh merge
-  fuses many small meshes into one. It is a **draw-call / scene-graph**
-  win, NOT a disk win — merge concatenates geometry (bytes ~= sum, and
-  the crate already byte-dedups within a layer, so it can be *worse* for instanced
-  geometry). Run merge as a **within-prototype** operation (`merge once, benefit N
-  times` across every instance), never *across* an instance boundary. Op-chain
-  pattern: **`merge` (within-prototype) → vertex weld where geometry is contiguous
-  → `computeExtents`**. The weld tail is **conditional** (a no-op for dispersed
-  meshes), must respect **UV seams and hard normals** (weld only coincident verts
-  within tolerance), and any bytes it reclaims are credited to **the disk tier via the
-  measured weld/dedup source (`disk_win_source: vertex_weld`)** — **never** attributed
-  to the merge. See the **merge-eligibility guard** below before fusing anything.
-  The **(scope × material) grouping mechanic, the GeomSubset fallback, and the
-  archetype-gated merge depth** that execute the manifest `merge` disposition live
-  in §4 (the (scope × material) merge unit and GeomSubset fallback) and §2
-  (archetype-gated merge depth) of this spec; this section owns the per-prototype
-  op-chain placement and the eligibility guard it cites.
-- **`pruneLeaves` is stage-level cleanup, not part of the per-prototype chain.**
-  Guard it against **unloaded payloads**: a prim whose payload is not loaded
-  composes no children, so it presents as an empty leaf and is silently pruned.
-  Never run `pruneLeaves` over prims with unloaded payloads (load them first, or
-  scope the op away). See `operation-safety.md` § Caveat: `pruneLeaves` on unloaded
-  payloads, and `ref-remap-mode.md` § Stage-Level Cleanup.
-- **Persist with a compacting `Sdf.Layer.Export(tmp) + atomic replace`, not
-  `layer.Save()`.** `Save()` appends without garbage-collecting dedup-orphaned
-  arrays and silently grows the file; `Export` recompresses and GCs.
-- Run `optimizeMaterials` and other lossless cleanup on the prototype assets or
-  new assembly root as appropriate.
-- **Lossless dead-data removal (own pass after the geometry chain).** The
-  geometry chain shares duplicates but does not shrink disk; the disk lever is
-  removing data nothing consumes. The most common case is an **unused UV set**:
-  when no material samples a texture coordinate, `primvars:st` (and its indices)
-  is dead weight, and primvars usually dominate the bytes — removing it can be the
-  single biggest lossless saving. This step is **fail-closed**: delete a primvar
-  only after **proving zero consumers** (no `UsdUVTexture` / `UsdPrimvarReader`,
-  no MDL, no shader input reads it) and gate by archetype — a **textured or
-  scanned asset keeps its UVs**. Persist with the same `Export`-compact step.
-
-### Merge-eligibility guard (bounds coherence)
-
-Only merge **spatially-coherent clusters** of meshes. Do **NOT** merge spatially
-**dispersed** geometry: fusing dispersed meshes produces one oversized/overlapping
-AABB that **degrades BVH/raytracing** — false ray–box hits and worse culling — so
-the runtime gets *slower* even though the draw-call count dropped.
-
-Gate the decision on `merge_bounds_coherence` = merged-prim AABB surface area ÷
-Σ(member AABB surface area). A value near `1` means the members were adjacent (a
-real draw-call win); a value far above `1` means they were dispersed. **Do not
-merge when it would exceed `K` (default `2.0`).** This is the same threshold the
-report scoring enforces (the `MERGE_BOUNDS_COHERENCE_MAX` constant in the optimization-report scorer):
-a merge that lands `merge_bounds_coherence > K` earns **no scene-graph credit**, so a
-dispersed merge is both wrong to perform and unscored.
-
-Merge also requires **weak/none identity** (the disposition matrix's two
-identity-destroying rows). Never merge a strong-identity, addressable
-`component`/`subcomponent` — that destroys per-part selectability/serviceability
-and fails the preservation gate (`merge_identity_class` must be `weak` or
-`none`). `merge` (`mergeStaticMeshes`) is a cataloged, intent-gated Usd Optimize
-op; it stays available — this guidance bounds *when* it is eligible, it does not
-remove it.

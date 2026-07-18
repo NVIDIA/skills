@@ -1,16 +1,23 @@
 # Optimization Report
 
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 ## When to Use
 
 Use this reference only at the end of the workflow after profile comparison and validation evidence are available.
 
 ## Instructions
 
-See `references/_shared/standard-instructions.md`.
+1. Confirm the target asset, artifact, or user intent and check the prerequisites listed below.
+2. Read only the referenced files needed for the current phase, failure mode, or output contract.
+3. Follow the workflow, rules, and safety gates in this reference before invoking downstream references or shell commands.
+4. Return the result using the Output Format section and name any blocked prerequisite or unresolved user decision.
 
 Use this reference as the final step in the optimization flow — after
 `compare-profiles` has produced its verdict. This reference assembles the
 complete optimization story into a structured report.
+
 
 ## Pre-flight Checklist
 
@@ -399,10 +406,10 @@ present); Metric Evidence; Operations; and Validators.
 - Always present the markdown to the user in chat.
 - Always produce the static HTML report when writing report artifacts, and run
   `python3 scripts/validate_report.py` on the report JSON before finishing.
-  the scored static HTML report is an agent-asserted planning expectation when
-  planning this final report contract, not an automated gate. The automated
-  conformance check is `python3 scripts/validate_report.py` plus the repository
-  schema test.
+  `scored_static_html_report_required` is an agent-asserted planning guardrail —
+  list it in `phase_guardrails` when planning this final report contract — not an
+  automated gate. The automated conformance check is `python3 scripts/validate_report.py`
+  plus the repository schema test.
 - Always title the reader-facing report **USD Performance Tuning Report**.
 - Always include a dedicated `Reasoning` section with one to two concise
   paragraphs explaining why the selected optimizations fit the evidence.

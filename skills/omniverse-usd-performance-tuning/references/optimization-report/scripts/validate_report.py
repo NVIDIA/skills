@@ -47,21 +47,6 @@ integer ``rendered_mesh_count`` / ``dangling`` and boolean
 values actually pass (count unchanged, bounds/bytes preserved, dangling 0) is
 scored against the asset's oracle, not here.
 
-Descent-convergence gate (premature-merge / premature-decimate)
----------------------------------------------------------------
-A run that did hierarchy dedup / instancing must not run a Phase-4 geometry op
-(decimation, within-prototype merge, primitive-fit, quantization, topology edit)
-before the bounded recursive de-duplication descent has CONVERGED. The skill
-documents this descent and its convergence as prose plus the manifest fields
-``frontier.descent_converged`` / ``frontier.final_rescan_new_groups_above_floor``,
-but nothing enforced it. This gate fails closed, keyed on the output
-report/manifest (so a hand-authored rewrite is gated the same as a native
-``deduplicateHierarchies`` run), unless convergence is recorded in the manifest
-frontier block or the report ``structural_summary`` mirror keys
-(``frontier_descent_converged`` + ``frontier_final_rescan_new_groups_above_floor``
-== 0), or an explicit ``frontier.convergence_waived_by_user`` is set. It also
-rejects the ``descent_converged == true`` with residue-remaining contradiction.
-
 Usage:
     python3 validate_report.py <report.json> [--schema <schema.json>] \\
         [--manifest <apply-restructure-manifest.json> ...]
@@ -71,16 +56,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
 from typing import Any
-
-# The descent-convergence gate's pure decision functions + constants live in a
-# sibling module (they ship together in this scripts dir). Adding our own
-# directory to sys.path lets the plain ``import`` work when the validator is run
-# as a standalone script rather than a package.
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import descent_convergence_common as dcc  # noqa: E402
 
 DEFAULT_SCHEMA = Path(__file__).resolve().parent / "optimization-report.schema.json"
 
@@ -103,9 +80,10 @@ IDENTITY_DESTROYING_ROUTES = frozenset({"point_instance", "merge"})
 STRONG_IDENTITY_SIGNALS = frozenset({"kind", "naming", "semantic"})
 #: Coverage-entry roles that mean "a restructure happened", so a manifest is
 #: mandatory and reconciliation is not optional. The ``monolith`` role (an
-#: optimize-as-is N=1 target) and an empty ledger stay manifest-free. Shared with
-#: the descent-convergence gate (dcc.RESTRUCTURE_ROLES) so the two stay in lockstep.
-RESTRUCTURE_ROLES = dcc.RESTRUCTURE_ROLES
+#: optimize-as-is N=1 target) and an empty ledger stay manifest-free.
+RESTRUCTURE_ROLES = frozenset(
+    {"assembly_root", "prototype", "shared_layer", "loadable_subasset"}
+)
 
 
 def _type_ok(instance: Any, type_name: str) -> bool:
@@ -621,98 +599,6 @@ def reconcile_target_coverage(report: Any, manifests: list[Any] | None = None) -
     return errors
 
 
-def _collect_frontier_states(report: Any, manifests: list[Any]) -> list[tuple[str, dict]]:
-    """Gather ``(source_label, frontier_dict)`` from every manifest ``frontier`` block
-    and from the report's ``structural_summary`` mirror keys, so convergence can be
-    read from the manifest OR the report (a manifest-less run carries it in the report)."""
-    states: list[tuple[str, dict]] = []
-    for i, manifest in enumerate(manifests or []):
-        if isinstance(manifest, dict) and isinstance(manifest.get("frontier"), dict):
-            states.append((f"manifest[{i}].frontier", manifest["frontier"]))
-    if isinstance(report, dict):
-        ss = report.get("structural_summary")
-        if isinstance(ss, dict):
-            mirror: dict[str, Any] = {}
-            if "frontier_descent_converged" in ss:
-                mirror["descent_converged"] = ss.get("frontier_descent_converged")
-            if "frontier_final_rescan_new_groups_above_floor" in ss:
-                mirror["final_rescan_new_groups_above_floor"] = ss.get(
-                    "frontier_final_rescan_new_groups_above_floor"
-                )
-            if ss.get("frontier_convergence_waived"):
-                mirror["convergence_waived_by_user"] = ss.get("frontier_convergence_waived")
-                mirror["convergence_waiver_reason"] = ss.get(
-                    "frontier_convergence_waiver_reason"
-                )
-            if mirror:
-                states.append(("structural_summary", mirror))
-    return states
-
-
-def validate_descent_convergence(report: Any, manifests: list[Any] | None = None) -> list[str]:
-    """Gate: a Phase-4 geometry op must not run on an UNCONVERGED dedup frontier.
-
-    FF1 — if the run did hierarchy dedup / instancing AND ran a Phase-4 geometry op
-    (decimation, within-prototype merge, primitive-fit, quantization, topology edit),
-    the manifest ``frontier`` block OR the report ``structural_summary`` mirror must
-    record ``descent_converged == true`` with a dry terminal re-scan (or an explicit
-    recorded waiver with a reason). Otherwise the run may have stopped at a coarse
-    frontier and reduced geometry that further sharing would have collapsed
-    (premature-merge / premature-decimate inflation).
-
-    The gate keys on THIS-RUN dedup signals: an unambiguous dedup/instancing op
-    marker, an apply-restructure manifest, an ``instance_count`` increase, a
-    restructure-role coverage entry, or a measured-reuse flag (see
-    ``dcc.did_dedup``). It is therefore only as good as those recorded signals: a
-    run that dedup'd but recorded NONE of them is not detectable here (there is no
-    absolute post-state that proves dedup happened this run without one of these
-    signals). It is mechanism-agnostic across the signals it CAN see — a
-    hand-authored rewrite that records a dedup op-marker / manifest / instance
-    increase is gated the same as a native ``deduplicateHierarchies`` run.
-
-    FF2 — ``descent_converged == true`` together with
-    ``final_rescan_new_groups_above_floor > 0`` is the self-contradiction the
-    apply-restructure manifest schema names but never enforces; fail it.
-    """
-    errors: list[str] = []
-    manifests = manifests or []
-    states = _collect_frontier_states(report, manifests)
-
-    # FF2 — converged-but-residue contradiction (independent of Phase-4 ops)
-    for label, frontier in states:
-        rescan = frontier.get("final_rescan_new_groups_above_floor")
-        if (
-            frontier.get("descent_converged") is True
-            and isinstance(rescan, int)
-            and not isinstance(rescan, bool)
-            and rescan > 0
-        ):
-            errors.append(
-                f"{label}: descent_converged is true but "
-                f"final_rescan_new_groups_above_floor is {rescan} (> 0) — a converged "
-                "frontier must have a dry terminal re-scan; this contradiction means the "
-                "descent was declared complete while shareable reuse remained one level down"
-            )
-
-    # FF1 — geometry op ran on a dedup/instancing run with no recorded convergence
-    if dcc.did_dedup(report, manifests) and dcc.did_phase4_geom(report):
-        if not any(dcc.is_converged_or_waived(frontier) for _, frontier in states):
-            errors.append(
-                "descent-convergence gate: a Phase-4 geometry op (decimation / "
-                "within-prototype merge / primitive-fit / quantization / topology edit) "
-                "ran on a dedup/instancing run, but no converged de-duplication frontier "
-                "is recorded (no frontier.descent_converged == true with a dry terminal "
-                "re-scan, and no recorded waiver). Record convergence in the "
-                "apply-restructure manifest frontier block, or in report.structural_summary "
-                "(frontier_descent_converged + frontier_final_rescan_new_groups_above_floor "
-                "== 0), or set an explicit frontier.convergence_waived_by_user with a reason. "
-                "A low/coarse prototype count is the SIGNAL TO DESCEND, not to merge: "
-                "running geometry ops first fuses or coarsens geometry that further sharing "
-                "would have collapsed (premature-merge inflation)."
-            )
-    return errors
-
-
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("report", type=Path, help="Path to the report JSON to validate.")
@@ -747,7 +633,6 @@ def main() -> int:
     errors.extend(reconcile_target_coverage(report, manifests))
     errors.extend(validate_footprint(report))
     errors.extend(validate_preservation(report))
-    errors.extend(validate_descent_convergence(report, manifests))
 
     if errors:
         print(f"{args.report}: INVALID ({len(errors)} error(s))")

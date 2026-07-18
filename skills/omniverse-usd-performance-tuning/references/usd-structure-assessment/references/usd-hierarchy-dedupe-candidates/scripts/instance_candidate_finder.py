@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Instance-candidate finder — read-only duplicate-subtree analyzer.
 
-Implements `instance-candidate-finder-spec.md` (rev 4). Scans a USD
+Implements `instance-candidate-finder-spec.md` (rev 3). Scans a USD
 sub-hierarchy, reports sub-hierarchies that recur and could be made
 `instanceable`, and classifies how cleanly each group could become a shared
 prototype. It NEVER modifies the stage.
@@ -29,7 +29,6 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-import re
 import sys
 
 # ============================== KNOBS =====================================
@@ -51,35 +50,10 @@ COLLAPSE_NESTED = True
 CHECK_INSTANCEABILITY = True
 MAX_FINDINGS_PER_GROUP = 6
 INCLUDE_ATTRIBUTE_CONNECTIONS = False
-# Kind-trust preflight (issue #172). Stage-wide meshes-per-kind sample taken
-# during the walk over ALL prims with an authored kind in KIND_TRUST_KINDS
-# (never over candidate groups only — those are a biased sample of repeated
-# subtrees). Kind is UNTRUSTED for the whole stage when the fraction of
-# kind-tagged prims whose subtree holds <= 1 Mesh reaches this threshold, OR
-# the median meshes-per-kind is <= 1. Untrusted kind is demoted: candidates
-# fall to the structural-fallback grain and boundaries are re-derived at the
-# nearest multi-mesh parent / sibling name-base group (monolithic CAD imports
-# commonly tag ~every mesh kind=component, which makes kind a non-boundary).
-KIND_TRUST_MAX_SINGLE_MESH_FRACTION = 0.80
 # ==========================================================================
 
 _DIGEST_REPR_BYTES = 256
 _DIGEST_ARRAY_LEN = 16
-
-#: Kinds sampled by the kind-trust preflight: the "part-ish" kinds an exporter
-#: over-applies. `assembly` legitimately aggregates and is not sampled.
-KIND_TRUST_KINDS = ("component", "subcomponent", "group")
-
-#: One normalizer for all sibling name-base grouping in this tool — the §2.4
-#: sibling-name normalization from usd-structure-assessment (strip trailing
-#: numeric suffixes / generated copy suffixes: Station_01, Station-2,
-#: Station.003, Station001 -> Station). Do not add a second normalizer.
-_NAME_BASE_SUFFIX_RE = re.compile(r"(?:[_\-.]?\d+)+$")
-
-
-def _name_base(name: str) -> str:
-    base = _NAME_BASE_SUFFIX_RE.sub("", name)
-    return base or name
 
 
 # numpy gives a C-speed raw-byte view of Vt/array values; without it we fall back
@@ -179,43 +153,7 @@ class _Walker:
         self.cand = {}        # path -> candidate hash
         self.size = {}        # path -> subtree size
         self.mesh = {}        # path -> Mesh-typed prim count in subtree (own_meshes)
-        # Kind-trust preflight sample (issue #172): (path, kind, subtree mesh
-        # count) of EVERY fully-walked prim whose authored kind is in
-        # KIND_TRUST_KINDS. This is the STAGE-WIDE population, not the candidate
-        # groups (which only hold repeated subtrees and would bias the
-        # single-mesh fraction). kind_by_path supports the fine-grain-authoring
-        # exclusion (nearest kind-bearing ancestor lookup) in
-        # _filter_kind_trust_sample.
-        self.kind_samples = []
-        self.kind_by_path = {}
-        # Internal-motion signals for the boundary walk-up, bubbled like mesh
-        # counts, each with the set of prims carrying the signal directly (so
-        # the walk-up can distinguish AT-the-boundary from STRICTLY-below).
-        # PHYSICS: subtree RigidBodyAPI tally. Per the UsdPhysics schema,
-        # RigidBodyAPI engulfs its subtree (everything below moves rigidly
-        # with it), so a body AT a candidate boundary is the ideal instancing
-        # cut, while a body STRICTLY BELOW the boundary is an independent
-        # mover whose transform would freeze inside the prototype — jointed or
-        # free. Keying on bodies makes joint-prim location irrelevant (joints
-        # bind bodies via body0/body1 relationships wherever they live).
-        # ANIMATION: subtree tally of prims with time-varying xformOp
-        # attributes (authored time samples / clips). Same at-root vs
-        # strictly-below rule: animation ON the boundary rides the instance
-        # prim's writable transform; animation strictly below would collapse
-        # into the shared prototype (and level-2/3 hashes cannot see that the
-        # samples differ across copies). Works without UsdPhysics.
-        self.bodies = {}
-        self.body_self = set()
-        self.anim = {}
-        self.anim_self = set()
-        self._physics = _usd_physics()
         self._proxy_pred = Usd.TraverseInstanceProxies(Usd.PrimDefaultPredicate)
-
-    def _authored_kind(self, prim) -> str:
-        try:
-            return self._Usd.ModelAPI(prim).GetKind() or ""
-        except Exception:
-            return ""
 
     # -- eligibility / children ------------------------------------------
     def _eligible(self, prim):
@@ -291,8 +229,6 @@ class _Walker:
             self.cand[path] = h
             self.size[path] = 1
             self.mesh[path] = 0  # opaque instance leaf: not an own authored mesh
-            self.bodies[path] = 0  # subtree unwalked: body count unknown
-            self.anim[path] = 0  # subtree unwalked: animation unknown
             return
         kids = self._children(prim)
         for c in kids:
@@ -310,44 +246,6 @@ class _Walker:
         self.mesh[path] = (1 if str(prim.GetTypeName()) == "Mesh" else 0) + sum(
             self.mesh[c.GetPath().pathString] for c in kids
         )
-        # Subtree rigid-body tally (0 when UsdPhysics is unavailable, matching
-        # kind_trust.articulation_check='unavailable').
-        own_body = 0
-        if self._physics is not None:
-            try:
-                if prim.HasAPI(self._physics.RigidBodyAPI):
-                    own_body = 1
-                    self.body_self.add(path)
-            except Exception:
-                own_body = 0
-        self.bodies[path] = own_body + sum(
-            self.bodies[c.GetPath().pathString] for c in kids
-        )
-        # Subtree transform-animation tally (pure Usd — no UsdPhysics needed):
-        # a prim counts when any authored xformOp attribute is time-varying
-        # (samples or value clips). ValueMightBeTimeVarying is the cheap,
-        # conservative check designed for exactly this question.
-        own_anim = 0
-        try:
-            for a in prim.GetAttributes():
-                if (_is_xformop(a.GetName()) and a.HasAuthoredValue()
-                        and a.ValueMightBeTimeVarying()):
-                    own_anim = 1
-                    self.anim_self.add(path)
-                    break
-        except Exception:
-            own_anim = 0
-        self.anim[path] = own_anim + sum(
-            self.anim[c.GetPath().pathString] for c in kids
-        )
-        # Kind-trust sample: tally the subtree mesh count for every walked prim
-        # carrying an authored part-ish kind. Opaque instance leaves (early
-        # return above) are excluded — their subtree is not walked, so their
-        # mesh count is unknown, and they are already shared anyway.
-        k = self._authored_kind(prim)
-        if k in KIND_TRUST_KINDS:
-            self.kind_samples.append((path, k, self.mesh[path]))
-            self.kind_by_path[path] = k
         return
 
 
@@ -492,211 +390,6 @@ def _instanceability(stage, walker, copies, include_connections, max_findings):
     return verdict, findings, trailer
 
 
-def _kind_trust_stats(kind_mesh_counts, max_single_mesh_fraction):
-    """Kind-trust preflight (issue #172): stage-wide meshes-per-kind stats.
-
-    Input is the walker's stage-wide sample (subtree mesh count per authored
-    part-ish kind). Kind is UNTRUSTED when ``single_mesh_fraction >=
-    max_single_mesh_fraction`` OR ``median_meshes_per_kind <= 1`` — i.e. when
-    kind does not partition geometry into multi-mesh parts and the real reuse
-    unit is almost certainly a parent prim. An empty sample (no authored
-    part-ish kinds) leaves kind trivially trusted: there is nothing to demote.
-    """
-    counts = sorted(kind_mesh_counts)
-    sampled = len(counts)
-    if not sampled:
-        return {
-            "sampled_kind_prims": 0,
-            "single_mesh_fraction": 0.0,
-            "median_meshes_per_kind": None,
-            "max_single_mesh_fraction": max_single_mesh_fraction,
-            "kind_trusted": True,
-        }
-    single = sum(1 for c in counts if c <= 1)
-    fraction = single / float(sampled)
-    mid = sampled // 2
-    if sampled % 2:
-        median = float(counts[mid])
-    else:
-        median = (counts[mid - 1] + counts[mid]) / 2.0
-    trusted = not (fraction >= max_single_mesh_fraction or median <= 1)
-    return {
-        "sampled_kind_prims": sampled,
-        "single_mesh_fraction": round(fraction, 4),
-        "median_meshes_per_kind": median,
-        "max_single_mesh_fraction": max_single_mesh_fraction,
-        "kind_trusted": trusted,
-    }
-
-
-def _filter_kind_trust_sample(kind_samples, kind_by_path, mesh_by_path):
-    """Drop intentional fine-grain authoring from the kind-trust sample.
-
-    A single-mesh ``subcomponent`` nested under a multi-mesh kind-bearing
-    ancestor is the WELL-AUTHORED fine-grain pattern (individually addressable
-    parts for BOM / service selection under a real multi-mesh component), not
-    the junk-CAD signature — which tags single-mesh ``component``s with no
-    multi-mesh kind structure above them. Counting the former would falsely
-    demote kind stage-wide on well-authored assets. Model-hierarchy convention
-    keeps the two disjoint (components do not nest inside components), so this
-    exclusion cannot mask the junk pattern.
-
-    Returns ``(counts, excluded)``: the filtered mesh-count list for
-    ``_kind_trust_stats`` and the number of excluded fine-grain subcomponents
-    (reported for audit).
-    """
-    counts = []
-    excluded = 0
-    for path, kind, count in kind_samples:
-        if kind == "subcomponent" and count <= 1:
-            anc = path
-            nearest = None
-            while True:
-                anc = anc.rsplit("/", 1)[0]
-                if not anc or anc == "/":
-                    break
-                if anc in kind_by_path:
-                    nearest = anc
-                    break
-            if nearest is not None and mesh_by_path.get(nearest, 0) > 1:
-                excluded += 1
-                continue
-        counts.append(count)
-    return counts, excluded
-
-
-def _usd_physics():
-    """UsdPhysics, or None when unavailable (the articulation guard is then
-    skipped gracefully and noted in the kind_trust diagnostics)."""
-    try:
-        from pxr import UsdPhysics
-        return UsdPhysics
-    except Exception:
-        return None
-
-
-def _articulation_boundary(prim, usd_physics, bodies_below=0):
-    """True when landing the boundary walk-up ON ``prim`` would freeze internal
-    physics motion — instancing makes descendants read-only, so nothing inside
-    the prototype may need to move independently per instance.
-
-    PRIMARY signal — ``bodies_below``: RigidBodyAPI prims STRICTLY below
-    ``prim``. Per the UsdPhysics schema, RigidBodyAPI engulfs its subtree, so a
-    body strictly below the boundary is an independent mover (a jointed link OR
-    a free simulated part) whose transform would freeze inside the prototype.
-    A body AT the boundary itself is fine — that is the ideal instancing cut
-    (VFI factory-structuring: instance at the rigid-body level), because the
-    body's motion is expressed on the instance prim's own writable transform.
-    Keying on bodies also makes joint-prim LOCATION irrelevant: joints bind
-    their bodies via body0/body1 relationships wherever the joint prim lives
-    (joint prims are not Xformables; there is no placement convention).
-
-    EXPLICIT signal — ``ArticulationRootAPI`` on the prim: the author declared
-    a jointed mechanism here.
-
-    Transform ANIMATION (time samples / clips) is the non-physics analog and
-    is checked separately in the walk-up — it needs no UsdPhysics."""
-    if usd_physics is None or prim is None or not prim.IsValid():
-        return False
-    if bodies_below > 0:
-        return True
-    try:
-        return bool(prim.HasAPI(usd_physics.ArticulationRootAPI))
-    except Exception:
-        return False
-
-
-def _rederive_boundary_path(stage, walker, path, root_path, usd_physics):
-    """Walk UP from a demoted kind-labeled candidate root to the nearest
-    multi-mesh ancestor. Returns ``(boundary_path, stopped_by)`` with
-    ``stopped_by`` in ``{None, "animation", "articulation", "root"}``.
-
-    NO-COLLATERAL RULE: the walk terminates immediately at any node whose
-    subtree holds > 1 mesh — so a component that is ITSELF multi-mesh
-    re-derives to itself (it keeps its boundary and only loses the 'kind'
-    label as the identity signal, gaining structural_fallback at the SAME
-    prim). ARTICULATION STOP: the walk never crosses (or lands on) a prim
-    carrying an articulation/edit boundary — it stops BELOW it, so 1-mesh
-    links of a robot arm are never re-derived to the arm root.
-    """
-    current = path
-    stopped_by = None
-    while walker.mesh.get(current, 0) <= 1:
-        parent = current.rsplit("/", 1)[0] or "/"
-        if parent == current or parent == root_path or parent not in walker.mesh:
-            stopped_by = "root"
-            break
-        # Animation strictly below the landing target: an animated prim inside
-        # the prototype would collapse per-copy motion (and the level-2/3
-        # hashes cannot see that samples differ across copies). Animation ON
-        # the target itself is fine — it rides the instance prim's writable
-        # transform. Pure Usd: works with or without UsdPhysics.
-        anim_below = walker.anim.get(parent, 0) - (
-            1 if parent in walker.anim_self else 0)
-        if anim_below > 0:
-            stopped_by = "animation"
-            break
-        bodies_below = walker.bodies.get(parent, 0) - (
-            1 if parent in walker.body_self else 0)
-        if _articulation_boundary(stage.GetPrimAtPath(parent), usd_physics,
-                                  bodies_below):
-            stopped_by = "articulation"
-            break
-        current = parent
-    return current, stopped_by
-
-
-def _rederive_group(stage, walker, group, root_path, usd_physics):
-    """Structural boundary re-derivation for one demoted kind-labeled group.
-
-    Each occurrence walks up to its re-derived boundary
-    (`_rederive_boundary_path`). Distinct boundaries are then re-grouped:
-    first by candidate hash (the existing reuse confirmation — boundaries that
-    genuinely repeat), then hash-singletons by sibling name-base using the one
-    §2.4 normalizer (`_name_base`). Returns ``(rederived_groups, stopped_by)``
-    where each entry carries the re-derived paths and the walker's stats at
-    that boundary.
-    """
-    boundaries = set()
-    stopped_by = None
-    for p in group["paths"]:
-        b, stop = _rederive_boundary_path(stage, walker, p, root_path, usd_physics)
-        boundaries.add(b)
-        # Propagate internal-motion stop reasons ("articulation"/"animation");
-        # "root" is the ordinary end-of-walk and is not a finding.
-        if stop in ("articulation", "animation"):
-            stopped_by = stop
-    by_hash = {}
-    for b in sorted(boundaries):
-        by_hash.setdefault(walker.cand.get(b), []).append(b)
-    parts = []
-    singles = []
-    for _h, paths in by_hash.items():
-        if len(paths) >= 2:
-            parts.append((sorted(paths), "structure_hash"))
-        else:
-            singles.append(paths[0])
-    by_base = {}
-    for b in singles:
-        parent, _, name = b.rpartition("/")
-        by_base.setdefault((parent or "/", _name_base(name)), []).append(b)
-    for _key, paths in by_base.items():
-        parts.append((sorted(paths), "name_base" if len(paths) >= 2 else "self"))
-    out = []
-    for paths, basis in parts:
-        rep = paths[0]
-        out.append({
-            "paths": paths,
-            "copies": len(paths),
-            "hash": walker.cand.get(rep),
-            "subtree_prims": walker.size.get(rep, 0),
-            "subtree_meshes": walker.mesh.get(rep, 0),
-            "group_by": basis,
-        })
-    out.sort(key=lambda d: d["paths"][0])
-    return out, stopped_by
-
-
 def analyze(stage, *, root=ROOT, hash_level=HASH_LEVEL,
             min_subtree_prims=MIN_SUBTREE_PRIMS,
             min_duplicate_count=MIN_DUPLICATE_COUNT, top_n=TOP_N,
@@ -705,8 +398,7 @@ def analyze(stage, *, root=ROOT, hash_level=HASH_LEVEL,
             collapse_nested=COLLAPSE_NESTED,
             check_instanceability=CHECK_INSTANCEABILITY,
             max_findings_per_group=MAX_FINDINGS_PER_GROUP,
-            include_attribute_connections=INCLUDE_ATTRIBUTE_CONNECTIONS,
-            kind_trust_max_single_mesh_fraction=KIND_TRUST_MAX_SINGLE_MESH_FRACTION):
+            include_attribute_connections=INCLUDE_ATTRIBUTE_CONNECTIONS):
     """Read-only analysis. Returns a structured report dict (see render_report)."""
     from pxr import Usd
 
@@ -778,30 +470,6 @@ def analyze(stage, *, root=ROOT, hash_level=HASH_LEVEL,
                 kind = ""
         g["kind"] = kind
 
-    # Kind-trust preflight (issue #172): decide once, stage-wide, whether the
-    # authored kind is a reliable boundary. When it is not, annotate every
-    # kind-labeled group as demoted and re-derive its boundary structurally
-    # (nearest multi-mesh parent / sibling name-base group). Read-only: the
-    # re-derivation only reads the walker's memoized stats and the stage.
-    usd_physics = _usd_physics()
-    trust_counts, excluded_fine_grain = _filter_kind_trust_sample(
-        walker.kind_samples, walker.kind_by_path, walker.mesh)
-    kind_trust = _kind_trust_stats(trust_counts,
-                                   kind_trust_max_single_mesh_fraction)
-    kind_trust["excluded_fine_grain_subcomponents"] = excluded_fine_grain
-    kind_trust["articulation_check"] = (
-        "enabled" if usd_physics is not None else "unavailable")
-    if not kind_trust["kind_trusted"]:
-        for g in reported:
-            if not g["kind"]:
-                continue
-            g["kind_untrusted"] = True
-            rederived, stopped_by = _rederive_group(
-                stage, walker, g, root_path, usd_physics)
-            g["rederived"] = rederived
-            if stopped_by:
-                g["walkup_stopped_by"] = stopped_by
-
     total_savings = _eliminated_union_size(reported, walker)
     clean_savings = blocked_savings = None
     if check_instanceability:
@@ -816,7 +484,6 @@ def analyze(stage, *, root=ROOT, hash_level=HASH_LEVEL,
         "total_savings": total_savings, "clean_savings": clean_savings,
         "blocked_savings": blocked_savings, "check_instanceability": check_instanceability,
         "top_n": top_n, "show_paths_per_group": show_paths_per_group,
-        "kind_trust": kind_trust,
     }
 
 
@@ -869,15 +536,6 @@ def render_report(report) -> str:
     L.append("Duplicate groups: %d (MIN_SUBTREE_PRIMS=%d, MIN_DUPLICATE_COUNT=%d, HASH_LEVEL=%d)"
              % (report["total_groups"], report["min_subtree_prims"],
                 report["min_duplicate_count"], report["hash_level"]))
-    kt = report.get("kind_trust")
-    if kt and not kt.get("kind_trusted", True):
-        L.append("KIND-TRUST PREFLIGHT: authored kind does NOT partition geometry "
-                 "(single-mesh fraction %.0f%%, median meshes/kind %s, sampled %d) — "
-                 "kind-derived identity is demoted to structural_fallback and "
-                 "boundaries are re-derived structurally."
-                 % (100.0 * (kt.get("single_mesh_fraction") or 0.0),
-                    kt.get("median_meshes_per_kind"),
-                    kt.get("sampled_kind_prims") or 0))
     for i, g in enumerate(report["groups"][:report["top_n"]]):
         L.append("")
         L.append("[%d] hash=%s subtree_prims=%d copies=%d est_savings=%d"
@@ -941,107 +599,44 @@ def to_frontier_candidates(report) -> dict:
     spec §6.0 allows) — the hash never manufactures a strong identity. The agent
     may refine ``identity_signal`` (e.g. to ``naming`` / ``semantic``) on the
     emitted candidates before piping them to select_frontier.
-
-    KIND-TRUST PREFLIGHT (issue #172): when ``analyze()`` measured stage-wide
-    that authored kind does not partition geometry (``report["kind_trust"]
-    ["kind_trusted"] is False`` — e.g. a monolithic CAD import where ~every
-    kind=component subtree holds one mesh), a kind-labeled group is NOT emitted
-    with ``identity_signal='kind'``. It is demoted to the no-identity ladder
-    (``identity_signal='none'``, ``grain_source='structural_fallback'``) and
-    its boundary is the structurally re-derived one attached by ``analyze()``
-    (nearest multi-mesh parent / sibling name-base group), tagged
-    ``kind_untrusted: True`` with the sampled stats so the rejection is
-    auditable. Reports without a ``kind_trust`` block (synthetic inputs) keep
-    the trusted behavior unchanged.
     """
     if "error" in report:
         return {"error": report["error"]}
-    kind_trust = report.get("kind_trust") or {}
-    kind_demoted = bool(kind_trust) and not kind_trust.get("kind_trusted", True)
-    kind_trust_stats = {
-        k: kind_trust.get(k)
-        for k in ("single_mesh_fraction", "median_meshes_per_kind",
-                  "sampled_kind_prims")
-    } if kind_trust else {}
     candidates = []
-    seen_rederived = set()
     for g in report.get("groups", []):
         paths = list(g.get("paths", []))
         if not paths:
             continue
+        parents = sorted({(p.rsplit("/", 1)[0] or "/") for p in paths})
         kind = g.get("kind") or ""
-        if kind and kind_demoted:
-            # Demoted kind: emit at the re-derived boundary, never as 'kind'
-            # identity. Two source groups under the same parents re-derive to
-            # the same boundary set; emit that boundary once.
-            for part in (g.get("rederived") or
-                         [{"paths": paths, "copies": g["copies"], "hash": g["hash"],
-                           "subtree_prims": g["subtree_prims"],
-                           "subtree_meshes": g.get("subtree_meshes", 0),
-                           "group_by": "self"}]):
-                key = tuple(part["paths"])
-                if key in seen_rederived:
-                    continue
-                seen_rederived.add(key)
-                boundary_moved = list(part["paths"]) != paths
-                cand = _base_candidate(
-                    part["paths"], part["hash"], part["copies"],
-                    part["subtree_prims"], part["subtree_meshes"],
-                    # Verdict was computed for the ORIGINAL grain; it does not
-                    # transfer to a moved boundary.
-                    None if boundary_moved else g.get("verdict"),
-                )
-                cand["identity_signal"] = "none"
-                cand["grain_source"] = "structural_fallback"
-                cand["structural_fallback"] = True
-                cand["kind_untrusted"] = True
-                cand["kind_untrusted_source_kind"] = kind
-                cand["kind_trust"] = dict(kind_trust_stats)
-                cand["rederive_group_by"] = part.get("group_by")
-                if boundary_moved:
-                    cand["rederived_from"] = paths
-                if g.get("walkup_stopped_by"):
-                    cand["walkup_stopped_by"] = g["walkup_stopped_by"]
-                candidates.append(cand)
-            continue
         if kind:
             signal, grain = "kind", "identity"
         else:
             signal, grain = "none", "structural_fallback"
-        cand = _base_candidate(paths, g["hash"], g["copies"], g["subtree_prims"],
-                               g.get("subtree_meshes", 0), g.get("verdict"))
-        cand["identity_signal"] = signal
-        cand["grain_source"] = grain
+        cand = {
+            "id": paths[0],
+            "path": paths[0],
+            "target_class": "prototype",
+            "structure_hash": g["hash"],
+            "value_hash": g["hash"],
+            "copy_count": g["copies"],
+            "occurrences": paths,
+            "parents": parents,
+            "own_prims": g["subtree_prims"],
+            "own_meshes": g.get("subtree_meshes", 0),
+            "mesh_count": g.get("subtree_meshes", 0),
+            "identity_signal": signal,
+            "grain_source": grain,
+            "reduction_route": "none",
+            # Advisory only: select_frontier decides disposition by identity +
+            # cutoff; a RED group still needs external-ref review before the
+            # rewrite tool authors a prototype. Carried for the audit/report.
+            "instanceability_verdict": g.get("verdict"),
+        }
         if signal == "none":
             cand["structural_fallback"] = True
         candidates.append(cand)
-    out = {"candidates": candidates}
-    if kind_trust:
-        out["kind_trust"] = kind_trust
-    return out
-
-
-def _base_candidate(paths, group_hash, copies, own_prims, own_meshes, verdict):
-    """Shared candidate skeleton for ``to_frontier_candidates`` (identity
-    fields are filled in by the caller)."""
-    return {
-        "id": paths[0],
-        "path": paths[0],
-        "target_class": "prototype",
-        "structure_hash": group_hash,
-        "value_hash": group_hash,
-        "copy_count": copies,
-        "occurrences": list(paths),
-        "parents": sorted({(p.rsplit("/", 1)[0] or "/") for p in paths}),
-        "own_prims": own_prims,
-        "own_meshes": own_meshes,
-        "mesh_count": own_meshes,
-        "reduction_route": "none",
-        # Advisory only: select_frontier decides disposition by identity +
-        # cutoff; a RED group still needs external-ref review before the
-        # rewrite tool authors a prototype. Carried for the audit/report.
-        "instanceability_verdict": verdict,
-    }
+    return {"candidates": candidates}
 
 
 def _resolve_stage():
@@ -1092,8 +687,7 @@ def main():
         skip_existing_instances=SKIP_EXISTING_INSTANCES, collapse_nested=COLLAPSE_NESTED,
         check_instanceability=CHECK_INSTANCEABILITY,
         max_findings_per_group=MAX_FINDINGS_PER_GROUP,
-        include_attribute_connections=INCLUDE_ATTRIBUTE_CONNECTIONS,
-        kind_trust_max_single_mesh_fraction=KIND_TRUST_MAX_SINGLE_MESH_FRACTION)
+        include_attribute_connections=INCLUDE_ATTRIBUTE_CONNECTIONS)
     # --output <path>: write the full structured report (analysis groups plus
     # the select_frontier candidate packet) to disk, per the runtime-artifact
     # token-budget policy — keep raw artifacts on disk, read summaries.

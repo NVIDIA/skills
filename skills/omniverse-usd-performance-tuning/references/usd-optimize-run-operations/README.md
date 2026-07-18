@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # usd-optimize-run-operations - Local Execution Policy and Upstream Handoff
 
 This local reference preserves the digitaltwin workflow milestone. Scene
@@ -30,6 +33,7 @@ reads. Do not clone the source repo just to read upstream SO guidance.
   Python/API invocation shapes.
 - For Phase 4b multi-target optimization, use `references/batch-mode.md` for target enumeration, adaptive concurrency, prototype-first ordering, hash-based output names, resource observations, status artifacts, and resume prompts.
 - Preserve logical milestone name `usd-optimize-run-operations` and hand results to profile/compare/report phases.
+
 
 ## Pre-flight Checklist
 

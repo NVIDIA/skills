@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Invocation Reference
 
 How to execute Usd Optimize operations once the runtime is selected and the
@@ -15,11 +18,10 @@ Optimizer operations. Do not bootstrap `KitApp` to execute ops.
 ## Standalone Runtime
 
 When `setup-preflight.json` indicates standalone, invocation mechanics are
-owned by the Usd Optimize package itself. Resolve the upstream guide with the
-version-tolerant lookup stated in `references/upstreams/usd-optimize.md`:
+owned by the Usd Optimize package itself. Resolve the upstream guide:
 
-1. `$USD_OPTIMIZE_ROOT/docs/cli.rst` (1.1.x packages)
-2. `$USD_OPTIMIZE_ROOT/.agents/operations/INVOCATION.md` (1.0.x fallback)
+1. `$USD_OPTIMIZE_ROOT/.agents/operations/INVOCATION.md`
+2. `$USD_OPTIMIZE_ROOT/.agents/operations/INVOCATION.md`
 
 If no package root is available, download and extract the published
 the prebuilt Usd Optimize release package (asset name + download in
@@ -95,6 +97,6 @@ by upstream `usd-optimize`. The same package paths listed in the standalone
 section above contain the full operation reference. If GitHub raw fetch is
 available, the web URL below is acceptable for docs-only reads:
 
-- [https://github.com/NVIDIA-Omniverse/usd-optimize/blob/main/docs/cli.rst](https://github.com/NVIDIA-Omniverse/usd-optimize/blob/main/docs/cli.rst)
+- [https://github.com/NVIDIA-Omniverse/usd-optimize/blob/main/.agents/operations/INVOCATION.md](https://github.com/NVIDIA-Omniverse/usd-optimize/blob/main/.agents/operations/INVOCATION.md)
 
 Do not clone the source repo just to read docs.

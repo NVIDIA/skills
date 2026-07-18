@@ -11,7 +11,7 @@ analyzer. Given the agent's identity-marked candidate units (the named /
 occurrence sites), it:
 
 * partitions each structural group by full value-hash — **one prototype per
-  genuine value-variant** (e.g. 17 identical copies + 1 outlier -> ``[17, 1]``);
+  genuine value-variant** (the 1UTOPASSY ``[17, 1]`` case);
 * applies the band-resolved **externalization cutoff** (copy_count + own size)
   to pick a two-axis disposition (externalize_shared / internal_share /
   keep_local) and, for sub-MINP anonymous repeats, suggests an intent-gated
@@ -111,22 +111,6 @@ def select_frontier(payload: dict) -> dict:
 
     for c in candidates:
         cid = c.get("id") or c.get("path") or "<unknown>"
-        # Kind-trust defensive guard (issue #172). The real rejection lives
-        # upstream in the finder's preflight; this only catches a candidate
-        # that still ARRIVES claiming strong 'kind' identity while flagged
-        # kind_untrusted (kind measured stage-wide as not partitioning
-        # geometry, ~1 mesh per component). Coerce it onto the existing
-        # anonymous-grain / structural-fallback path — never let unreliable
-        # kind count as strong identity.
-        if c.get("identity_signal") == "kind" and c.get("kind_untrusted"):
-            c = dict(c)
-            c["identity_signal"] = "none"
-            c["grain_source"] = "structural_fallback"
-            diagnostics.append(
-                f"{cid}: identity_signal 'kind' arrived with kind_untrusted=true — "
-                "coerced to identity_signal 'none' / grain_source 'structural_fallback' "
-                "(stage-wide meshes-per-kind preflight rejected kind as a boundary)"
-            )
         copies = _occurrences(c)
         total_units += copies
         distinct_prototypes += 1  # one prototype authored per value-variant candidate
@@ -222,10 +206,6 @@ def select_frontier(payload: dict) -> dict:
             target["package_group"] = c["package_group"]
         if c.get("descent_level"):
             target["descent_level"] = c["descent_level"]
-        if c.get("kind_untrusted"):
-            # Audit passthrough (#172): the sampled-and-rejected kind stays
-            # visible on the manifest target.
-            target["kind_untrusted"] = True
         targets.append(target)
 
     shared = [t for t in targets if t["identity_disposition"] in ("externalize_shared", "internal_share")]
@@ -259,10 +239,6 @@ def select_frontier(payload: dict) -> dict:
     }
     if payload.get("descent_entry_level"):
         frontier["descent_entry_level"] = payload["descent_entry_level"]
-    if payload.get("kind_trust"):
-        # Audit passthrough (#172): stage-wide meshes-per-kind preflight stats,
-        # as emitted by the finder's --emit-candidates packet.
-        frontier["kind_trust"] = payload["kind_trust"]
     if low_reuse:
         diagnostics.append(
             "measured reuse is low (mostly-unique units) — pivot to the disk tier "

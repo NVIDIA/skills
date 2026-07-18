@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Config From Evidence
 
 Use this reference when the user has validator findings, structure assessment,
@@ -45,11 +48,9 @@ the source repo just to read SO guidance.
    cardinality measured by `rtxMeshCount`, GPU memory, triangle count, draw
    calls, open/load time, disk size, or validation blockers.
 4. **Choose an existing recipe or synthesize one.** Use
-   upstream `usd-optimize/docs/choosing-operations.rst` (with
-   `config_presets/*.json`; on 1.0.x packages `.agents/operations/PIPELINES.md`)
-   for operation roles and dependency ordering — see the resolution rule in
-   `references/upstreams/usd-optimize.md`. Keep only local evidence, target set,
-   approval state, and report fields here.
+   upstream `usd-optimize/.agents/operations/PIPELINES.md` for operation roles
+   and dependency ordering. Keep only local evidence, target set, approval
+   state, and report fields here.
 5. **Apply validator-tier discipline when validator findings are present.**
    Include Tier 1 rules with defaults, include Tier 2 only with an iteration
    note, and never auto-include Tier 3 rules without manual review.
@@ -60,11 +61,9 @@ the source repo just to read SO guidance.
    `removeSmallGeometry`, merge/resource-cardinality fixes, or structure
    changes first. Add decimation only after the user confirms the reduction
    goal.
-8. **Build the JSON config.** Read each operation's upstream per-op guide
-   (`usd-optimize/docs/operations/<key>.rst` on 1.1.x packages, or
-   `.agents/operations/<key>.md` on 1.0.x; resolution in
-   `references/upstreams/usd-optimize.md`) for parameter names, defaults, and
-   risky fields before emitting the final chain.
+8. **Build the JSON config.** Read each operation's upstream
+   `usd-optimize/.agents/operations/<key>.md` guide for parameter names,
+   defaults, and risky fields before emitting the final chain.
 9. **Prepare the user-facing rationale.** Name the evidence each step
    addresses, why the order matters, which steps are destructive or
    bounded-loss, and which before/after metrics will prove the recipe worked.
@@ -84,7 +83,5 @@ Before running, show:
 For execution-context flags, operation argument syntax, named pipelines, and
 analysis-mode mechanics, use upstream
 `usd-optimize/.agents/skills/run-operations/SKILL.md` and
-`usd-optimize/docs/cli.rst` (on 1.0.x packages `.agents/operations/INVOCATION.md`;
-resolution in `references/upstreams/usd-optimize.md`). For read-only "what would
-this do?" analysis, prefer `usd-optimize-run-validators` and upstream validator
-docs.
+`usd-optimize/.agents/operations/INVOCATION.md`. For read-only "what would this
+do?" analysis, prefer `usd-optimize-run-validators` and upstream validator docs.

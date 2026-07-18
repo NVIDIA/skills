@@ -8,10 +8,10 @@ agent_next:
 freshness: 2026-05-20
 version: "0.1.0"
 ---
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 
 # USD Performance Tuning Skill Map
-
-> **"SO" / "Scene Optimizer" = Usd Optimize** (the `omni.scene.optimizer.core` extension). The Kit-bundled extension uses the 110.x version line (e.g. 110.0.4); the standalone package uses the 1.0.x line (e.g. 1.0.4). Both refer to the same Usd Optimize; the extension id and the 110.x versions are retained intentionally as the real runtime identifiers.
 
 > Compact navigation aid for the agent-facing catalog. Detailed phase
 > choreography lives with the owning entry skill:
@@ -77,7 +77,7 @@ only when their phase is reached:
 | `usd-optimize-run-validators` | Loaded by validation routing for Usd Optimize validator execution. |
 | `usd-optimize-interpret-validators` | Loaded to turn validator findings into operation recommendations. |
 | `compare-profiles` | Loaded at Phase 6 to classify improvement, neutral, regression, or mixed outcomes. |
-| `install-kit`, `install-usd-optimize-standalone`, `install-usd-validation-nvidia-standalone` | Loaded only by setup dispatch. |
+| `install-kit`, `install-usd-optimize-standalone`, `install-usd-optimize-standalone`, `install-usd-validation-nvidia-standalone` | Loaded only by setup dispatch. |
 | `usd-optimize-create-proxy` | Specialty user-request reference, not part of the main optimization flow. |
 
 Validation command references are owned by
@@ -144,9 +144,9 @@ flowchart TD
 
 ## Reference-reading Policy
 
-See [workflow.md § Reference-reading policy](workflow.md#reference-reading-policy)
-for the rule: if a reference's header block carries a `Canonical URL`, prefer the
-live URL when network access is available (the local copy is a snapshot).
+Some workflow references are copied documentation snapshots. If a reference
+has a `Canonical URL`, prefer the live URL when network access is available;
+the local copy is a snapshot.
 
 ## Status Vocabulary
 

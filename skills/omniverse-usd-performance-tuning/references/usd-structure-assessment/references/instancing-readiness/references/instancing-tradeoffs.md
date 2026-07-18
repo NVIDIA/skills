@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # USD Instancing and Dedupe - Tradeoffs and Decision Tree
 
 > The actionable decisions in the agent flow are split between `usd-hierarchy-dedupe-candidates` (find candidate subtrees, read-only) and `instancing-readiness` (per-candidate safety gate). This reference holds the deeper trade-off framing, merge safety policy, and findings taxonomy that both skills cite.
@@ -102,8 +105,8 @@ keep and what you spend. Citing the OpenUSD content-reuse guidance:
   for anonymous high-count repeats (fasteners, vegetation, bolts) where identity is
   genuinely unwanted. Never for an addressable subcomponent. This is the
   `reduction_route = point_instance` landing; it is authored via the
-  point-instance route
-  (`apply-restructure/references/restructure-mode.md` § Point-Instance Route)
+  point-instancer authoring route
+  (`apply-restructure/references/point-instancer-rewrite-spec.md`)
   and is intent-gated.
 - **Merge.** Buys **draw calls** by fusing meshes, but **destroys per-part
   identity** and crosses boundaries. Only for identity-free static fragments.

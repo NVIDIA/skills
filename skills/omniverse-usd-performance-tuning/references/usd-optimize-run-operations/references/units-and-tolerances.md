@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Units and Tolerances
 
 Shared reference for any operation that converts user-specified mm tolerances
@@ -140,36 +143,6 @@ record locally:
   skips instanced prims. Decimate before dedupe, or use a non-instancing
   method and author `instanceable` afterwards. See the ordering-invariant
   caveat in `workflow.md § Operation ordering invariants`.
-
-## fitPrimitives parameter gotchas (primvar preservation)
-
-`fitPrimitives` replaces tessellated meshes with fitted primitives (cylinder,
-cone, cube, sphere). Two boolean parameters govern which meshes it touches. **The
-defaults are aggressive (fit more); override only to PRESERVE data, never
-reflexively.**
-
-- **`ignoreNonConstPrimvars` (default `true`).** At the default, fitPrimitives
-  fits a candidate mesh even when it carries non-constant primvars, **discarding
-  any non-`Normal` primvars (UVs, displayColors) on replacement**. Set it to
-  `false` — the RESTRICTIVE setting — to SKIP meshes whose validator analysis
-  reports non-constant non-`Normal` primvars, preserving those primvars intact.
-  Per upstream `Primitive.cpp:321-322`, `Normal` primvars are explicitly
-  allow-listed and never block fitting at any setting, so a scene whose only
-  non-constant primvar is `normals` fits identically with default args.
-- **`ignoreSubsets` (default `true`).** Analogous: the default fits meshes that
-  carry `GeomSubset` partitions; set `false` to skip them when subsets must
-  survive.
-
-**When to override.** Add `ignoreNonConstPrimvars: false` (and/or
-`ignoreSubsets: false`) only when BOTH hold: validator analysis reports
-`nonconstPrimvarMeshCount > 0`, AND the user has asked to preserve UVs /
-displayColors / subsets. Otherwise use default args.
-
-**Anti-pattern.** Do NOT reflexively set `ignoreNonConstPrimvars: false` on every
-CAD/BIM scene. The default already fits; the restrictive setting only narrows
-what gets fitted, and is justified only by an explicit preservation intent. This
-corrects a historic inverted-doc reading that told agents to set `false`
-everywhere.
 
 Each operation's `parameter_prerequisites` frontmatter specifies which fields
 it needs and what conversion applies. This file owns the shared formula;

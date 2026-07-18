@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Operation Safety
 
 Use this reference before running any Usd Optimize chain that may delete,
@@ -84,12 +87,12 @@ does, then ask for confirmation before invoking the runner.
 | Op | Risk | Confirmation focus |
 |---|---|---|
 | `findOccludedMeshes` → `removePrims` | Deletes internal geometry. | Two-stage, and the stages split on AUTHORITY not cost: (1) the scoped probe on SA containment pairs runs WITHOUT approval — cost is bounded by scope + `timeout_recorded`; (2) the deletion of discovered occluded prims is intent-gated (the agent cannot know whether the twin needs its internals), so present it on the opt-in menu. Exclude transparent enclosures. The scoped probe runs in Phase 4 (no approval); when the deletion is opted into, it runs FIRST among that target's applies. |
-| `deduplicateHierarchies` | Replaces subtrees with instanceable references to shared prototypes. | Confirm dedupe-candidate groups (from hierarchy-dedupe-candidates report). Lossless but structural — changes composition topology. Invoke per frontier region: `paths` scoped to that region plus a per-region `maxDepth` to control grain; never one stage-wide `maxDepth` across branches (see the `deduplicateHierarchies` operations catalog entry). Placement-correct by construction: root `xformOp:*` excluded from identity, duplicate local transform preserved. |
-| `decimateMeshes` | Drops vertices. | mm tolerance (maxMeanError); applied uniformly to all meshes. See upstream `docs/operations/decimateMeshes.rst`. |
-| `fitPrimitives` | Replaces mesh geometry with analytic primitives. | Analysis first and data-preservation intent; see upstream `docs/operations/fitPrimitives.rst`. |
-| `removeSmallGeometry` | Removes small meshes. | Threshold, visibility, user intent; see upstream `docs/operations/removeSmallGeometry.rst`. |
-| `meshCleanup` with `makeManifold: true` | Repairs topology. | Topology repair vs. simpler cleanup; see upstream `docs/operations/meshCleanup.rst`. |
-| `optimizeMaterials` with `convertToColor: true` | Replaces material networks with colors. | Only run on explicit flat-color requests; see upstream `docs/operations/optimizeMaterials.rst`. |
+| `deduplicateHierarchies` | Replaces subtrees with instanceable references to shared prototypes. | Confirm dedupe-candidate groups (from hierarchy-dedupe-candidates report). Lossless but structural — changes composition topology. |
+| `decimateMeshes` | Drops vertices. | mm tolerance (maxMeanError); applied uniformly to all meshes. See upstream `.agents/operations/decimateMeshes.md`. |
+| `fitPrimitives` | Replaces mesh geometry with analytic primitives. | Analysis first and data-preservation intent; see upstream `.agents/operations/fitPrimitives.md`. |
+| `removeSmallGeometry` | Removes small meshes. | Threshold, visibility, user intent; see upstream `.agents/operations/removeSmallGeometry.md`. |
+| `meshCleanup` with `makeManifold: true` | Repairs topology. | Topology repair vs. simpler cleanup; see upstream `.agents/operations/meshCleanup.md`. |
+| `optimizeMaterials` with `convertToColor: true` | Replaces material networks with colors. | Only run on explicit flat-color requests; see upstream `.agents/operations/optimizeMaterials.md`. |
 | `removePrims` / `deletePrims` / `removeUntypedPrims` / `deleteHiddenPrims` | Deletes prims. | Affected prim list, variant/runtime visibility, reversible alternatives; see the matching operation reference. |
 | `boxClip` | Removes or retains geometry by AABB. | Extent and keep-vs-clip mode; see the `boxClip` entry in `references/operations/README.md` and the upstream handoff. |
 | `diceMeshes`, `manifoldMeshes`, `remeshMeshes`, `shrinkwrap` | Regenerates or slices topology. | Grid/voxel settings, topology loss, preview scope. |
@@ -225,7 +228,7 @@ the win propagates to every instance. It is **not** a disk lever (merge
 concatenates geometry; bytes ~= sum, and the crate already byte-dedups within a
 layer), and it is only eligible on **spatially-coherent, weak/none-identity**
 clusters: merging dispersed meshes balloons the AABB and degrades BVH/raytracing.
-See `../../usd-structure-assessment/references/apply-restructure/references/mesh-merge-rewrite-spec.md`
+See `../../usd-structure-assessment/references/apply-restructure/references/hierarchy-dedupe-rewrite-tool-spec.md`
 §9 (op-chain `merge → conditional vertex-weld → computeExtents` and the
 bounds-coherence eligibility guard). Any bytes the weld tail reclaims are credited
 to the disk tier via the weld source, never attributed to the merge.

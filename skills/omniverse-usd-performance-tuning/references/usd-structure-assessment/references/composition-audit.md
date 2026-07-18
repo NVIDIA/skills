@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # USD Composition Audit
 
 > Composition audit is performed as part of `usd-structure-assessment` SA Stage 1; this reference holds the deeper checklist, findings taxonomy, and output schema mapping.
@@ -82,10 +85,9 @@ Emit composition findings into the `usd-structure-assessment` umbrella report (p
 
 ## References
 
-Before auditing, read the asset-structure references — `asset-structure-principles.md`
-and `factory-level-structuring.md` — to understand the distinction between assets,
-layers, and composition arcs. These are the same prerequisites listed in
-[usd-structure-assessment/README.md § References](../README.md#references), kept in
-one place there.
+Before auditing, read these to understand asset structure and the distinction between assets, layers, and composition arcs:
+
+- `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/asset-structure-principles.md` - what an asset is, interface/payload/geometry layers, the reference-payload pattern.
+- `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/factory-level-structuring.md` - how assets compose into assemblies, asset boundary identification.
 
 If you have network access, prefer the live URLs (noted in each reference file) for the most current version.

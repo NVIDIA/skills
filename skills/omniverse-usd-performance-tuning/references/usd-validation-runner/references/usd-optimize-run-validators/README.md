@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # usd-optimize-run-validators - Local Validation Policy and Upstream Handoff
 
 This local reference preserves the digitaltwin workflow milestone. Scene
@@ -25,8 +28,8 @@ when a user directly asks to run Usd Optimize validators on a USD asset.
 
 ## Output Format
 
-
-See `references/_shared/standard-output-format.md`.
+Return a concise status or report that names the input asset, selected runtime,
+artifacts written, blockers, and the next interpretation step.
 
 ## Upstream Source
 

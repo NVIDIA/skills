@@ -1,16 +1,22 @@
 # USD Structure Assessment
 
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 ## When to Use
 
 Use when scoping USD structural validation; do not use for fixes or validator execution.
 
 ## Instructions
 
-See `references/_shared/standard-instructions.md`.
+1. Confirm the target asset, artifact, or user intent and check the prerequisites listed below.
+2. Read only the referenced files needed for the current phase, failure mode, or output contract.
+3. Follow the workflow, rules, and safety gates in this reference before invoking downstream references or shell commands.
+4. Return the result using the Output Format section and name any blocked prerequisite or unresolved user decision.
 
 ## Output Format
 
-See `references/_shared/standard-output-format.md`.
+Return a concise status or report that names the input, selected runtime or evidence source, actions planned or performed, artifacts written, blockers, and the next validation or user-decision step. When a schema or template is referenced below, conform to that contract.
 
 ## Purpose
 
@@ -48,9 +54,10 @@ Before producing the SA report, re-read and confirm:
 
 ## Limitations
 
-- SA Stage 1 is purely structural (no geometry-array reads, no renderer/viewport/
-  BBoxCache); mesh-level stats are deferred to Phase 2c validators. The canonical
-  statement of this scope lives in [§ SA Stage 1](#sa-stage-1-structure-analysis-no-geometry-load).
+- SA Stage 1 is purely structural: metadata, composition arcs, prim traversal.
+  No geometry arrays (points, faceVertexCounts) are read. No renderer, viewport,
+  or BBoxCache computation. Mesh-level stats (triangle counts, density) are
+  deferred to Phase 2c validators (SO analysis mode).
 - SA Stage 2 heuristics flag validation candidates; they do not justify operations
   by themselves.
 - Density/over-tessellation outliers are not an SA concern: SA reads no geometry
@@ -128,13 +135,6 @@ Report:
 - Check that kind metadata is present and consistent (assembly → component → subcomponent).
 - Flag prims with geometry but no kind assignment.
 - Flag kind assignments that don't match the hierarchy (e.g., a component inside a component).
-- Sample meshes-per-kind while checking (kind-trust reliability): authored kind
-  is a reliable boundary only when components bound multi-mesh parts. When
-  ~every `kind=component` subtree holds <= 1 mesh (common on monolithic CAD
-  imports — exporters tag every mesh a component), the SA report must surface
-  "kind present but ~1 mesh/component — unreliable boundary" so downstream
-  frontier selection demotes it instead of trusting it (see the
-  `usd-hierarchy-dedupe-candidates` finder spec §6.0.1 kind-trust preflight).
 
 ## SA Stage 2: Structural Heuristics (metadata only, narrows validation scope)
 
@@ -288,11 +288,7 @@ and only then confirm reuse:
 1. **Authored `kind`.** `assembly` → `group` → `component` (smallest
    separately-publishable model) → `subcomponent` (a named, addressable part). A
    `component` / `subcomponent` boundary is a real boundary by default — it is the
-   intended unit of reference. Default, not unconditional: when the §1.4
-   meshes-per-kind sample shows kind does not bound multi-mesh parts (~1
-   mesh/component, the CAD-exporter artifact), DEMOTE authored kind and fall
-   through this ladder as if it were absent — the structural fallback below may
-   then propose the grain, flagged `kind_untrusted` (finder spec §6.0.1).
+   intended unit of reference.
 2. **Namespace / naming.** A meaningful authored name (`assetInfo`, display name,
    variant set) marks a "thing"; `Mesh_017` or a transform-only `Xform` is
    plumbing. The transition from named typed scopes down to anonymous `Mesh`/`Gprim`

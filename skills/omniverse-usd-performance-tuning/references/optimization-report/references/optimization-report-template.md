@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Optimization Report Template - Per-Phase Data Collection Checklist
 
 > **Source:** Derived from `../scripts/optimization-report.schema.json` (canonical contract). This reference is the agent's "first read" - it tells you which fields you must populate by end-of-flow so each phase can collect against the final data contract.
@@ -189,4 +192,4 @@ In both cases:
 
 ## Schema reference
 
-Full JSON Schema: `../scripts/optimization-report.schema.json`. (Why this template exists is covered in [§ Why this exists](#why-this-exists).)
+Full JSON Schema lives at `../scripts/optimization-report.schema.json`. The `optimization-report` skill is the producer; this template is the agent's pre-read so every phase collects the right data.

@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Ref Remap Mode
 
 Use this reference for `apply-restructure` mode=`ref_remap` after Phase 4 mesh
@@ -73,7 +76,5 @@ candidate path approved by `instancing-readiness`.
 
 ## Output Validation
 
-> See [Output Validation](restructure-mode.md#output-validation) in
-> `restructure-mode.md` for the shared rule (run the runner's minimum-openability
-> check on every written USD; record `pass | fail | skipped` in the manifest;
-> never delete failed outputs).
+Run the runner's minimum-openability check on every written USD. Record
+`pass | fail | skipped` in the manifest and never delete failed outputs.

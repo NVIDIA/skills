@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # usd-optimize-interpret-validators - Local Recommendation Policy and Upstream Handoff
 
 This local reference preserves the digitaltwin workflow milestone. Scene

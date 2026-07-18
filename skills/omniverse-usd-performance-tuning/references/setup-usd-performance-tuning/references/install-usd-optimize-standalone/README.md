@@ -1,16 +1,22 @@
 # Install Usd Optimize Standalone
 
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 ## When to Use
 
 Use when SO core operations or packaged Usd Optimize validator rules are needed outside Kit.
 
 ## Instructions
 
-See `references/_shared/standard-instructions.md`.
+1. Confirm the target asset, artifact, or user intent and check the prerequisites listed below.
+2. Read only the referenced files needed for the current phase, failure mode, or output contract.
+3. Follow the workflow, rules, and safety gates in this reference before invoking downstream references or shell commands.
+4. Return the result using the Output Format section and name any blocked prerequisite or unresolved user decision.
 
 ## Output Format
 
-See `references/_shared/standard-output-format.md`.
+Return a concise status or report that names the input, selected runtime or evidence source, actions planned or performed, artifacts written, blockers, and the next validation or user-decision step. When a schema or template is referenced below, conform to that contract.
 
 ## Purpose
 
@@ -182,10 +188,25 @@ project-managed venv with `install-usd-validation-nvidia-standalone` instead.
 
 ## SO Validator Auto-Registration
 
-See [so-validator-auto-registration.md](../so-validator-auto-registration.md) for
-the shared rule: the standalone SO package's `omni.scene.optimizer.validators`
-auto-register into OAV at import time when both packages share a Python
-environment, and category names confirm discovery only (not validation scope).
+The standalone SO package includes `omni.scene.optimizer.validators` — 25
+Python validator rules (mesh density, unused UVs, primitive fit, etc.) that
+use `@register_rule` decorators. When OAV and the Usd Optimize package share the same
+Python environment, importing the validators auto-registers them:
+
+```python
+import omni.scene.optimizer.validators  # triggers @register_rule decorators
+
+from omni.asset_validator import CategoryRuleRegistry
+registry = CategoryRuleRegistry()
+# Now includes "Usd:Performance" and "Omni:Geometry" categories
+```
+
+No `register_all()` call is needed for rule discovery. The rule registration
+decorators handle registration at import time. Do not treat category names as
+validation scope, and do not select rules by bare name — the canonical executor
+resolves a scope note's concepts to rule classes by identity (a bare
+`find_rule()` can't tell the Usd Optimize and usd-validation-nvidia rules that
+share a class name apart).
 
 To verify the install can run a scoped concept after `usd-validation-runner`
 has scoped the plan:
@@ -215,6 +236,8 @@ Current expected package family (Kit 110.1 parity):
 usd_optimize_usd_25.11_py_3.12 (version 1.0.4, <platform>.release.zip)
 ```
 
+The `<platform>` token and the build-specific suffix (a `<build>.<commit>.gl` tail appended after the `1.0.4` semver) vary per release; match the family name and the `1.0.4` semver on the GitHub release page.
+
 Expected layout after unpack:
 
 ```
@@ -233,8 +256,7 @@ Sentinel check (all runtime dirs plus agent docs must exist for a valid install)
 for sub in .agents python lib extraLibs usdpy; do
     [[ -d "$USD_OPTIMIZE_ROOT/$sub" ]] || echo "MISSING: $sub"
 done
-# Per-operation docs: docs/operations.rst (1.1.x packages) or .agents/operations/INDEX.md (1.0.x). Valid if either exists.
-[[ -f "$USD_OPTIMIZE_ROOT/docs/operations.rst" || -f "$USD_OPTIMIZE_ROOT/.agents/operations/INDEX.md" ]] || echo "MISSING: per-operation docs (docs/operations.rst or .agents/operations/INDEX.md)"
+[[ -f "$USD_OPTIMIZE_ROOT/.agents/operations/INDEX.md" ]] || echo "MISSING: .agents/operations/INDEX.md"
 ```
 
 ## Environment for Docker/CI

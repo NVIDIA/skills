@@ -1,3 +1,5 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 <!-- AUTO-GENERATED FROM references/operations/operations.json -->
 <!-- Source data lives in references/operations/operations.json. -->
 
@@ -12,9 +14,8 @@ behavior, parameters, defaults, and implementation gotchas.
 The package resolution rule is centralized once in
 [`usd-optimize` upstream handoff](../upstreams/usd-optimize.md): derive the
 upstream operation guide from the operation key as
-`docs/operations/<operation-key>.rst` (1.1.x packages), or
-`.agents/operations/<operation-key>.md` (1.0.x packages), then resolve it under
-the selected Usd Optimize package root. Do not duplicate package URLs, root fallbacks, or
+`.agents/operations/<operation-key>.md`, then resolve it under the selected
+Usd Optimize package root. Do not duplicate package URLs, root fallbacks, or
 upstream parameter/default tables here. Before executing any operation, consume
 `<output_path>/setup-preflight.json` and confirm the op appears in
 `usdOptimize.operationsAvailable`.
@@ -29,6 +30,7 @@ upstream parameter/default tables here. Before executing any operation, consume
 **Loss class.** `lossless` reorganizes / dedups / regenerates derived data only.
 `bounded-loss` removes or modifies authored content (the agent should confirm
 with the user before running). `analysis-only` is read-only (`context.analysisMode = 1`).
+
 
 ## Geometry
 | Operation | Key | Args | Loss | Risk | Confirm | Pipelines |
@@ -54,11 +56,11 @@ with the user before running). `analysis-only` is read-only (`context.analysisMo
 | Operation | Key | Args | Loss | Risk | Confirm | Pipelines |
 |---|---|---|---|---|---|---|
 | Remove Prims | `removePrims` | 8 | bounded-loss | high | yes | — |
-| De-duplicate Hierarchies | `deduplicateHierarchies` | 4 | lossless | medium | yes | `memory-reduction`, `mesh-count-reduction`, `instancing` |
 | Prune Leaves | `pruneLeaves` | 3 | lossless | low | no | `safe-cleanup`, `memory-reduction`, `load-time-reduction` |
 | Flatten Hierarchy | `flattenHierarchy` | 2 | lossless | medium | no | — |
 | Organize Prototypes | `organizePrototypes` | 2 | lossless | low | no | — |
 | Delete Prims | `deletePrims` | 1 | bounded-loss | high | yes | — |
+| De-duplicate Hierarchies | `deduplicateHierarchies` | 0 | lossless | medium | yes | `memory-reduction`, `mesh-count-reduction`, `instancing` |
 | Delete Hidden Prims | `deleteHiddenPrims` | 0 | bounded-loss | medium | yes | — |
 | Optimize Skeleton Roots | `optimizeSkelRoots` | 0 | lossless | low | no | — |
 | Remove Untyped Prims | `removeUntypedPrims` | 0 | bounded-loss | low | yes | — |
@@ -108,8 +110,6 @@ with the user before running). `analysis-only` is read-only (`context.analysisMo
 | Generate Scene | `generateScene` | 12 | lossless | low | no | — |
 | Utility Function | `utilityFunction` | 2 | lossless | low | no | — |
 | Python Script | `pythonScript` | 1 | bounded-loss | high | yes | — |
-
-> **Security warning — `pythonScript` executes arbitrary Python code** with the privileges of the running process. Never agent-initiated (specialty escape-hatch; see `CLASSIFICATION.md`): require a user-supplied or reviewed script and explicit confirmation before execution (`operation-safety.md`).
 
 ## Summary
 

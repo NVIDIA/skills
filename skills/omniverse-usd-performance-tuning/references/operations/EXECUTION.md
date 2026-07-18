@@ -8,6 +8,8 @@ agent_next:
 freshness: 2026-05-20
 version: "0.1.0"
 ---
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 
 # Usd Optimize Execution Reference
 
@@ -126,10 +128,13 @@ stage export only when the user asks for a flattened deliverable.
 
 ## Rules
 
-- **Edit-target invariant:** open each target as its own root layer; never
-  optimize a referenced library through the composed assembly. Full rule (own-layer
-  edit target, `Class → Def` de-classing, standalone-resolvable libraries):
-  [restructure-mode.md § Edit-Target Invariant](../usd-structure-assessment/references/apply-restructure/references/restructure-mode.md#edit-target-invariant-never-optimize-through-a-reference).
+- **Edit-target invariant:** open each target as its **own root layer** so SO's
+  edit target *is* that file's bytes. Never optimize a referenced library through
+  the composed assembly (the edits would land as overrides on the assembly layer
+  while the library keeps its heavy geometry). De-class abstract `class`
+  namespaces (`Class → Def`) before the chain and restore after; require each
+  library file to resolve standalone. See
+  `apply-restructure/references/restructure-mode.md` § Edit-Target Invariant.
 - Confirm bounded-loss/destructive operations before mutation.
 - Use selected targets from SA/validation evidence.
 - Store config, log, output stage, and summary artifacts.

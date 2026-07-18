@@ -82,12 +82,11 @@
     "runtime_context": {
       "type": "object",
       "description": "Canonical runtime context block that downstream skills (optimization-report, the runtime-context-header) consume. The probe writes the chosen runtime here and the header prints from it; the source kit/usdOptimize/assetValidator fields above are the raw probe data. Inner shape matches the optimization-report schema's runtime_context definition exactly so the block can be copied verbatim into the report.",
-      "required": ["usdOptimize", "assetValidator"],
+      "required": ["kit", "usdOptimize", "assetValidator"],
       "properties": {
         "kit": {
           "type": "object",
           "required": ["application", "version", "path"],
-          "description": "Kit application context. OPTIONAL: omitted on a standalone-only runtime (Kit is an opt-in render-profiling adjunct). When present, application/version/path are required.",
           "properties": {
             "application": {
               "type": "string",

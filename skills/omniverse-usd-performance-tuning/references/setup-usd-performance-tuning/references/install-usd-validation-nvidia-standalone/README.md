@@ -1,5 +1,8 @@
 # Install usd-validation-nvidia Standalone
 
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 ## When to Use
 
 Use when standalone Omni usd-validation-nvidia is needed outside Kit. This installs
@@ -17,7 +20,8 @@ packages share a Python environment — no manual enabling required.
 
 ## Output Format
 
-See [§ Output](#output) below for the value list to report.
+Return a concise status naming the environment path, Python executable,
+`omni_asset_validate` version, and `numpy` version.
 
 ## Purpose
 
@@ -82,13 +86,7 @@ omni_asset_validate --version
 
 ## SO Validator Auto-Registration
 
-See [so-validator-auto-registration.md](../so-validator-auto-registration.md) for
-the shared rule (auto-registration at import time when OAV and the Usd Optimize
-package share a Python environment; category names confirm discovery only, not
-validation scope).
-
-Once both OAV and the Usd Optimize package are importable in the same
-environment, this command lists the registered categories and rule count:
+Once both OAV and the Usd Optimize package are importable in the same environment:
 
 ```bash
 python -c "
@@ -102,7 +100,11 @@ print(f'Total rules: {len(list(registry.rules))}')
 ```
 
 Expected: `Usd:Performance` and `Omni:Geometry` categories appear with ~25
-additional rules.
+additional rules. No `register_all()` call is needed for rule discovery: the
+validator registration decorators handle registration at import time. Category
+names confirm discovery only; `usd-validation-runner` selects validators by
+canonical concept and resolves them to rule classes by identity (via
+`scripts/usd_validation_executor.py`) before calling `enable_rule()`.
 
 ## Output
 

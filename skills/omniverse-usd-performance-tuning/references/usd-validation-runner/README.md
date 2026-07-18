@@ -1,5 +1,8 @@
 # USD Validation Runner (master router)
 
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 ## When to Use
 
 Use this reference when the performance workflow reaches Phase 2c (Tier 1
@@ -563,6 +566,7 @@ Doc ownership for each stack (read the owning doc before writing commands):
 - Turning validator findings into operations -> `references/usd-optimize-interpret-validators/README.md`.
 - Concept selection / tiers / scope notes -> this README plus
   `references/validator-concepts.json` (registry; tiers live only there).
+
 
 ## Required Gates
 

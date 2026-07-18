@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # USD Performance Tuning Workflow
 
 > Canonical phase choreography for the `omniverse-usd-performance-tuning`
@@ -236,84 +239,68 @@ Five steps (2a-2d) feeding the gate at 2e, plus optional 2f if the user chooses 
            prototypes DIRECTLY via the value-hash nested-library rewrite (internal
            refs marked instanceable=true); the stage stays a single monolithic
            file (no external payloads).
-       Both branches route through apply-restructure, a direct USD-authored
-       rewrite. The native `deduplicateHierarchies` op is the per-region
-       authoring primitive for the instanceable-reference collapse: one
-       invocation per frontier region, with `paths` scoped to that region and
-       `maxDepth` chosen per region at the 2g per-level confirm. Never apply one
-       stage-wide depth (the operations catalog entry and issue #168 carry the
-       measured depth→grain and placement data). On usd-optimize 1.0.4 the op
-       authors nested instanceable internal references (verified 2026-06-11: a
-       222,513-prim CAD stage collapsed to 21,030 composed prims / 2,663
-       prototypes in 46 s, default args), but it emits no restructure-role
+       Either branch is a direct USD-authored rewrite, NOT an SO
+       deduplicateHierarchies invocation. On usd-optimize 1.0.x that operator
+       DOES author instanceable internal references, nested on 1.0.4 (verified 2026-06-11:
+       a 222,513-prim CAD stage collapsed to 21,030 composed prims / 2,663
+       prototypes in 46 s, default args) — but it produces no restructure-role
        manifest, frontier/identity gating, or `kept_inline_for_merge` tagging,
-       which this phase's contract requires. So Phase 2f drives it through
-       apply-restructure, whose per-level driver calls the op per descent region
-       and emits the manifest. Passing `paths` + `maxDepth` to
-       `deduplicateHierarchies` directly with no manifest is for standalone
-       approved-chain dedup runs outside this pipeline
-       (usd-optimize-run-operations), not Phase 2f. See
-       restructure-decision/README.md "When hierarchy_dedupe.recommended=true".
+       which this phase's contract requires (see restructure-decision/README.md
+       "When hierarchy_dedupe.recommended=true").
        Output: restructured stage ready for Phase 3.
 
-2g  CONVERGENCE GATE (confirm per level; converge before Phase 4).
-    Work in passes, biggest repeated pieces first (think nesting dolls).
-    A rack holds many near-identical blades; each blade holds many shared
-    parts. Instance the rack's blades first; THEN look inside the blades and
-    instance the parts they share — even across blades that were not themselves
-    identical. Each pass goes one level deeper. A low count after the first pass
-    is the SIGNAL TO GO DEEPER, not the finish line — and NOT a reason to merge:
-    merging now fuses geometry the next pass would have shared.
+2g  Bounded recursive descent — Phase 2 is a bounded DESCENT, not a
+    single gate. After 2f extracts assemblies, re-run boundary inference
+    (2b §2.5) on EACH extracted asset to find component, then subcomponent
+    boundaries, repeating 2b→2e per node to a bounded depth.
 
-    Run it per level, top-down:
-      1. Choose the level to share at — the coarsest named / `kind` unit,
-         never an individual mesh. Preflight the `kind` label before trusting
-         it as the stop level: confirm kind actually bounds multi-mesh parts
-         (the finder samples meshes-per-kind stage-wide). On CAD imports
-         components often sit at ~1-mesh grain — then `kind` is not a real
-         boundary; re-derive the stop level structurally (nearest multi-mesh
-         parent / sibling name-base group; the finder flags `kind_untrusted`
-         and falls to `structural_fallback`). Only go down to a moving subpart for
-         IMPORTANT ones (articulated / physics / variant-bearing); for
-         articulated assets, share at the moving-part (rigid-body / link)
-         level and reassemble with references — never instance the whole
-         asset (factory guide Step 4).
-      2. Author that level's shared prototypes (`instanceable=true`
-         references — see SHARE, DON'T SCATTER below). Tag each target in the
-         manifest `phase4_targets[]` with its level (assembly / component /
-         subcomponent = USD `kind`) and its asset type (architecture / product
-         / piping / generic — this picks which geometry ops apply later).
-      3. Re-scan one level down (the quick structure-only pass) and SHOW the
-         user the new repeated groups it finds that are worth sharing (roughly
-         20+ prims, appearing 2+ times), with the cost (more layers, parts
-         less directly selectable). ASK: go deeper, or stop? Always ask before
-         crossing a named-part boundary or doing anything that destroys
-         identity (point-instancing / merging). A plain lossless-sharing tail
-         can be auto-finished if the user opts in.
-      4. STOP when the user says stop, or when that re-scan finds nothing new
-         worth sharing (only leftovers remain: tiny parts left in place for a
-         later merge, already-split variants, or one-offs).
+    Target-tree tags (the spine the whole flow hangs off; carried in the
+    apply-restructure manifest `phase4_targets[]` and consumed by Phase 4):
+      - level: assembly | component | subcomponent  (= USD `kind`) — drives the
+        STOPPING RULE.
+      - importance / articulated: descend to `subcomponent` ONLY for "important"
+        sub-hierarchies (articulated / physics / variant-bearing). Articulated
+        assets instance at RIGID-BODY / LINK level and reassemble through
+        references (factory guide Step 4) — never whole-asset instancing.
+      - archetype: large-spatial(architecture) | encapsulated-product | piping |
+        generic — derived from `semantic_label` + structural signals; selects
+        which Phase-4 op-chain steps apply.
 
-    DONE = the loop above finished. Record it in the manifest's `frontier`
-    block: `descent_converged: true` and `final_rescan_new_groups_above_floor: 0`.
-    Do NOT start Phase 4 geometry ops (decimation, within-prototype merge)
-    until then. Reducing an unfinished structure wastes work on geometry that
-    more sharing would have removed; merging before those tiny leftover parts
-    are reserved fuses geometry that was about to be shared, so triangles and
-    disk GROW instead of shrink and the Phase 6 gate rejects the result.
+    STOPPING RULE: descend while there are dedupe/semantic boundaries AND
+      (level < component OR the node is "important"); otherwise STOP. The depth
+      bound caps layer COUNT — over-structuring (the over-structuring pitfall)
+      is a failure even with packaging deferred (over-structuring on factory-scale
+      VFI assets has produced layer counts in the five figures).
 
-    Don't over-split: each pass adds layers, so how deep you go caps the layer
-    COUNT. Exploding a factory asset into five-figure layer counts is a
-    failure, even with packaging deferred.
+    CONVERGENCE GATE (confirm per level; bottom out before Phase 4): the per-node
+      STOP says why ONE node stopped, not that the whole descent converged — and
+      how deep to decompose is the USER's call (restructure-decision is the
+      per-level confirm gate), not an autonomous plunge. After authoring a level,
+      RE-RUN the reuse analyzer (the cheap HASH_LEVEL-2 pass), PRESENT the new
+      shareable groups it finds one level down (above the floor: MINP, occurrence
+      >=2) with the addressability / layer-count cost, and ASK whether to descend
+      or stop. The asks that matter: crossing a named identity boundary and any
+      identity-destroying route (point-instance / merge); a routine lossless tail
+      can be auto-finished on opt-in. COMPLETE = user stopped, OR re-scan dry above
+      the floor (residue = sub-MINP kept_inline_for_merge / split value-variants /
+      unique). Do NOT proceed to Phase 4 geometry ops (decimation, within-prototype
+      merge) until complete; record frontier.descent_converged +
+      final_rescan_new_groups_above_floor. Reducing/merging an unconverged structure
+      wastes work on geometry further sharing would collapse, and a merge that runs
+      before its kept_inline_for_merge leaves are reserved fuses already-shared
+      geometry (premature-merge inflation: triangles + disk inflate, and the
+      report's preservation gate discards the result).
 
-    SHARE, DON'T SCATTER (hard rule): externalizing MUST use shared prototypes
-    with `instanceable=true` references — NOT N separate per-node payloads
-    presented as the win. Separate payloads are valid only when the goal is
-    selective loading / authoring separation, and then the report must call out
-    the load-time / layer-count tradeoff instead of presenting the split as the
-    optimization. A USDC repack or an unshared split is NOT a win — the Phase 6
-    gate fails closed on it (see footprint contract + optimization-report).
-    Depth caps layer count; sharing caps load time and memory.
+    SHARE, DON'T SCATTER (hard constraint, same default as the
+    lossless-dedupe contract): externalization MUST prefer the dedupe/instancing
+    path — shared prototypes with `instanceable=true` references — NOT N
+    independent per-node payloads as the reported win. Unique per-node payloads
+    are valid only when the goal is explicit selective loading / authoring
+    separation, and then the report must call out the load-time / layer-count
+    tradeoff instead of presenting the split as the optimization. A USDC/crate
+    repack or an unshared disaggregation is NOT an optimization win — the Phase-6
+    gate fails closed on it (see footprint contract + optimization-report). The
+    depth bound caps layer count; sharing caps load time and memory.
 ```
 
 #### The structure model the descent is serving (read before deciding a frontier)
@@ -350,12 +337,7 @@ context behind the mechanical rules above.
    failure that over-shares at the mesh level and dissolves every part's identity.
    Where authored identity is entirely absent, structure may *propose* the
    **coarsest repeating subtree** as a fallback grain (flag `grain_source =
-   structural_fallback`) — still never the individual mesh. Identity-first also
-   means *validating* the signal: authored `kind` is DEMOTED to that same
-   structural fallback — not only when absent — when it fails the meshes-per-kind
-   kind-trust check (~1 mesh per component, the CAD-exporter tagging artifact);
-   an unreliable label is treated exactly like a missing one, and the demotion
-   is flagged `kind_untrusted` so it stays auditable.
+   structural_fallback`) — still never the individual mesh.
 
 3. **Share at the coarsest unit that captures the reuse — the named subcomponent,
    never the mesh.** Mesh-level sharing produces enormous anonymous arc counts
@@ -529,7 +511,7 @@ see the "Post-Restructure / Post-Decompose Validation Strategy" in
        draw calls) — it is NOT a disk win (bytes ~= sum; the crate already
        byte-dedups). Apply the merge-eligibility guard (weak/none identity only;
        bounds-coherence ceiling) and the full op-chain from
-       `usd-structure-assessment/references/apply-restructure/references/mesh-merge-rewrite-spec.md`
+       `usd-structure-assessment/references/apply-restructure/references/hierarchy-dedupe-rewrite-tool-spec.md`
        §9 before fusing. **Group the fan by the `(scope × material) key`:** within
        the merge boundary (the nearest named/`kind` ancestor, preserved), fuse the
        same-material meshes into one `Mesh` per material; when materials must

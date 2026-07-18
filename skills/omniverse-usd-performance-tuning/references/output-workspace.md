@@ -7,6 +7,8 @@ agent_next:
 freshness: 2026-05-20
 version: "0.1.0"
 ---
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 
 # Output Workspace Contract
 

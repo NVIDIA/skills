@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Validator Follow-Up Queries
 
 Use the parsed JSON in context. Don't re-run the validator unless asked.
@@ -41,17 +44,15 @@ Look up the rule in the *Rule reference*. Then:
    > Save-vs-Export policy and digitaltwin workspace rules, see
    > `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/usd-edit-target-planner/references/output-saving.md`. For
    > generic multi-op pipelines organized by bottleneck, see upstream
-   > `usd-optimize/docs/choosing-operations.rst` (on 1.0.x packages
-   > `.agents/operations/PIPELINES.md`; resolution in
-   > `references/upstreams/usd-optimize.md`).
+   > `usd-optimize/.agents/operations/PIPELINES.md`.
 
-   Read the relevant upstream `usd-optimize/docs/operations/<op>.rst` guide (on
-   1.0.x packages `.agents/operations/<op>.md`) for starting params before
-   printing them. Don't duplicate the guide content here.
+   Read the relevant upstream `usd-optimize/.agents/operations/<op>.md` guide
+   for starting params before printing them. Don't duplicate the guide content
+   here.
 
 2. **T2** — Same as T1 but warn that defaults may not fully resolve the issue;
    the user should expect to tune parameters using the relevant upstream
-   `usd-optimize/docs/operations/<op>.rst` guide.
+   `usd-optimize/.agents/operations/<op>.md` guide.
 
 3. **T3** — Explain that the rule is analysis-only (or the fix is a manual
    hierarchy/DCC edit). Point at the operation guide and any related fix-mode

@@ -1,5 +1,8 @@
 # Upstream Source-of-Truth References
 
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 Pointers to the upstream repositories and prebuilt packages this skill delegates
 to instead of reimplementing. Operation mechanics, parameters, defaults, and
 package resolution live upstream; this skill owns only the digital twin workflow
@@ -15,7 +18,6 @@ copy of the upstream docs.
 - [`usd-optimize.md`](usd-optimize.md) — Usd Optimize operation mechanics and
   prebuilt-package resolution (upstream
   [usd-optimize](https://github.com/NVIDIA-Omniverse/usd-optimize/)). Resolve
-  per-operation guides through `$USD_OPTIMIZE_ROOT` with the version-tolerant
-  lookup stated in `usd-optimize.md` (`docs/operations/<key>.rst` on 1.1.x
-  packages, `.agents/operations/<key>.md` on 1.0.x) rather than duplicating
-  them in this repo.
+  per-operation guides through `$USD_OPTIMIZE_ROOT` or
+  the upstream `.agents/operations/<key>.md` path rather than duplicating them
+  in this repo.

@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Asset Modularity and Instancing
 
 > **Canonical URLs:**
@@ -131,21 +134,57 @@ scenario.usda
 ### By hierarchical inheritance
 Instances can be spatially varied because transformation operations in OpenUSD are hierarchical. Properties that have computed hierarchical inheritance are expected to work with instancing. For example, an instance with an “invisible” ancestor should never be imaged, regardless of the visibility state of the “prototype”.
 
-*`scenario.usda` — identical to the version shown earlier in this guide.*
+scenario.usda
+ 1#usda 1.0
+ 2
+ 3def Scope &quot;Factory&quot;
+ 4    (
+ 5        references = @./factory.usda@
+ 6    )
+ 7{
+ 8    over &quot;AssembledBarrels&quot; () {
+ 9        # Visibility is inherited from the ancestor prim into the instances
+10        token visibility = &quot;invisible&quot;
+11    }
+12}
 
 Properties that don’t have inheritance semantics must be varied through composition arcs to preserve instancing (see “refining instances” below).
 
 ### By parameterization
-Instance root prims are parameterized the same two ways as any asset entrypoint —
-primvars and variants. The mechanics, the `RaceCar` variant/primvar examples, and
-the public-interface conventions are documented once in
-[asset-structure-principles.md § Asset Parameterization](../../asset-structure-principles.md#asset-parameterization).
+There are two ways instance root prims can be parameterized: primvars and variants.
 
-Two points specific to instancing: variant selections that differ between
-instances generate new prototypes (one per unique selection), while primvars do
-not — so for single-property variation, primvars are the lighter parameterization
-on an instance, trading a little material-lookup cost for not multiplying
-prototypes.
+The example below applies parameterization to an instanced asset.
+
+The root prim of an asset will be the first place where a user goes to figure out if prims have discrete variants. Asset structures may enforce naming conventions and the presence of specific variants. For example, it may be expected that assets provide color_variant to describe supported albedo variations.
+
+def Xform &quot;RaceCar&quot; (
+        variantSets = [&quot;color_variant&quot;]
+    ) {
+        variantSet &quot;colorVariant&quot; = {
+
+            &quot;red&quot; { ... }
+            &quot;blue&quot; { ... }
+            &quot;green&quot; { ... }
+
+        }
+    }
+
+Some variation cannot be effectively or efficiently discretized into variants. For these cases, primvars can be used as another form of asset parameterization. Primvars are extra interpolatable parameters primarily for Gprim prims to provide additional data to shading contexts. In OpenUSD, primvars have inheritance semantics and can be authored on parent scopes, including the entrypoint of an instance. Materials can be constructed to read primvars:asset_base_color or other entrypoint primvars. In the event that multiple prims in a hierarchy author the same primvar, keep in mind that child opinions are stronger than parents. Below, we use `asset_` as a prefix to avoid namespace collisions.
+
+def Xform &quot;RaceCar&quot; {
+
+    color3f primvars:asset_base_color (
+        doc = &quot;primary paint color&quot;
+    )
+
+    color3f primvars:asset_accent_color (
+        doc = &quot;color of accent stripe&quot;
+    )
+}
+
+Unless otherwise documented or annotated as internal, variants and primvars authored on an asset entrypoint should be generally considered “public” and safe for downstream contexts to edit and set with an expectation of stability.
+
+Both variant selection and primvars on the asset entrypoint are compatible with scene graph instancing. Variations of variant selections will generate new prototypes for downstream contexts while primvars will not. This generally makes parameterization through primvars the lighter choice for single property parameters, providing upfront memory savings at the cost of additional lookups in materials.
 
 ### Explicit “Refinement Namespaces”
 OpenUSD’s prototypes are implicit and read only. However, because they are keyed off of composition, it is possible to construct arcs in a way that provide a namespace (prim) where explicit prototype edits can be placed. Depending on the use case, the specific placement and contents of the namespace might be different. For example, it may contain the entire definition of the asset or simply provide an opportunity for downstream consumers to add refining edits.
@@ -427,7 +466,20 @@ barrel.usda
 
 This allows downstream consumers to add edits into all Barrel instances in the stage, regardless of their depth of instancing.
 
-*`scenario.usda` — identical to the version shown earlier in this guide.*
+scenario.usda
+ 1#usda 1.0
+ 2
+ 3class Scope &quot;prototypes&quot; {
+ 4    over &quot;Barrel&quot; {
+ 5        over &quot;Geometry&quot; {
+ 6            over &quot;barrel&quot; {
+ 7                color3f[] primvars:displayColor = [(.6, .2, .2)]
+ 8            }
+ 9        }
+10    }
+11}
+12
+13def &quot;Factory&quot; (references = @./factory.usda@) {}
 
 At the point of assembly
 Specialize and inherit arcs are computationally more expensive than references and payloads (because they are evaluated “live”). Projects may also consume assets from external libraries, so it’s not always possible to add the arcs into the assets.
@@ -470,7 +522,20 @@ factory.usda
 33    }
 34}
 
-*`scenario.usda` — identical to the version shown earlier in this guide.*
+scenario.usda
+ 1#usda 1.0
+ 2
+ 3class Scope &quot;prototypes&quot; {
+ 4    over &quot;Barrel&quot; {
+ 5        over &quot;Geometry&quot; {
+ 6            over &quot;barrel&quot; {
+ 7                color3f[] primvars:displayColor = [(.6, .2, .2)]
+ 8            }
+ 9        }
+10    }
+11}
+12
+13def &quot;Factory&quot; (references = @./factory.usda@) {}
 
 This makes it possible to “inject” opinions into instanceable, externally referenced assets.
 
@@ -526,7 +591,20 @@ factory.usda
 38    }
 39}
 
-*`scenario.usda` — identical to the version shown earlier in this guide.*
+scenario.usda
+ 1#usda 1.0
+ 2
+ 3class Scope &quot;prototypes&quot; {
+ 4    over &quot;Barrel&quot; {
+ 5        over &quot;Geometry&quot; {
+ 6            over &quot;barrel&quot; {
+ 7                color3f[] primvars:displayColor = [(.6, .2, .2)]
+ 8            }
+ 9        }
+10    }
+11}
+12
+13def &quot;Factory&quot; (references = @./factory.usda@) {}
 
 ## Point Instancing
 Point instancing provides a vectorized representation of instances that share the same scene description but may differ in (potentially animated) attributes like position, orientation, or scale. Point Instancing is more efficient than scene graph instancing, as it does not require a prim for each instance and implicit prototypes do not need to be computed.

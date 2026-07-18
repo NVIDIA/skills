@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Scheduler-Backed Batch Mode
 
 This is Phase 4b of the canonical workflow. The deterministic mechanics are
@@ -54,14 +57,15 @@ per-target/per-op timeouts, the GPU-cliff guard, status emission, and `--resume`
 
 ## Edit-target invariant (why per-target parallelizes)
 
-The full rule — own-layer edit target, never optimize a referenced library
-through the composed assembly, `Class → Def` de-classing, standalone-resolvable
-libraries — lives in
-[restructure-mode.md § Edit-Target Invariant](../../usd-structure-assessment/references/apply-restructure/references/restructure-mode.md#edit-target-invariant-never-optimize-through-a-reference).
-
-What matters here: because each target is its own root layer, **one target = one
-own-layer file = one job**, and that is precisely *why* per-target work
-parallelizes. The scheduler fans these independent jobs out.
+Each target is **opened as its own root layer** so Usd Optimize's edit target
+*is* that file's bytes. Never run SO on the composed assembly to optimize a
+referenced library — the edits land as overrides on the assembly layer while the
+library keeps its heavy geometry (override bloat, not reduction). One target =
+one own-layer file = one job; this is precisely *why* per-target work
+parallelizes. De-class abstract `class` prototype namespaces (`Class → Def`)
+before the chain and restore after, and require every library file to resolve
+standalone. See `apply-restructure/references/restructure-mode.md` § Edit-Target
+Invariant.
 
 ## Targets
 

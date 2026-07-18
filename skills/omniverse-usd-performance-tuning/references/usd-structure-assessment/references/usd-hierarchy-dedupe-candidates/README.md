@@ -1,16 +1,22 @@
 # USD Hierarchy Dedupe Candidates
 
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 ## When to Use
 
 Use when finding repeated USD subtrees that may become shared prototypes or references before mesh-level dedupe.
 
 ## Instructions
 
-See `references/_shared/standard-instructions.md`.
+1. Confirm the target asset, artifact, or user intent and check the prerequisites listed below.
+2. Read only the referenced files needed for the current phase, failure mode, or output contract.
+3. Follow the workflow, rules, and safety gates in this reference before invoking downstream references or shell commands.
+4. Return the result using the Output Format section and name any blocked prerequisite or unresolved user decision.
 
 ## Output Format
 
-See `references/_shared/standard-output-format.md`.
+Return a concise status or report that names the input, selected runtime or evidence source, actions planned or performed, artifacts written, blockers, and the next validation or user-decision step. When a schema or template is referenced below, conform to that contract.
 
 Use this after `usd-structure-assessment` and before unscoped
 `deduplicateGeometry` when a stage appears monolithic or assembly repetition is
@@ -103,8 +109,7 @@ must distinguish candidates.
 For a precise behavior spec, read
 `references/instance-candidate-finder-spec.md` only when implementing or
 debugging the analyzer. For the follow-on rewrite behavior, read
-`skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/apply-restructure/references/restructure-mode.md`
-§ Dedupe Plan.
+`skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/apply-restructure/references/hierarchy-dedupe-rewrite-tool-spec.md`.
 
 ## Output
 

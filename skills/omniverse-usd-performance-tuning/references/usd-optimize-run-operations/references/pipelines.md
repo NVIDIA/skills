@@ -1,17 +1,19 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Pipeline Recipes - Upstream Handoff
 
 This local reference preserves the digitaltwin workflow milestone. Scene
 Optimizer mechanics for this step are owned by upstream `usd-optimize`.
 
 - Public repository: [https://github.com/NVIDIA-Omniverse/usd-optimize/](https://github.com/NVIDIA-Omniverse/usd-optimize/)
-- Package path: `docs/choosing-operations.rst` + `config_presets/*.json` (1.1.x packages), or `.agents/operations/PIPELINES.md` (1.0.x packages)
-- Upstream web URL: [https://github.com/NVIDIA-Omniverse/usd-optimize/blob/main/docs/choosing-operations.rst](https://github.com/NVIDIA-Omniverse/usd-optimize/blob/main/docs/choosing-operations.rst)
+- Package path: `.agents/operations/PIPELINES.md`
+- Upstream web URL: [https://github.com/NVIDIA-Omniverse/usd-optimize/blob/main/.agents/operations/PIPELINES.md](https://github.com/NVIDIA-Omniverse/usd-optimize/blob/main/.agents/operations/PIPELINES.md)
 
-Resolve the upstream guide without cloning the source repo, using the
-version-tolerant lookup stated in `references/upstreams/usd-optimize.md`:
+Resolve the upstream guide without cloning the source repo:
 
-1. `$USD_OPTIMIZE_ROOT/docs/choosing-operations.rst` (plus `config_presets/*.json`)
-2. `$USD_OPTIMIZE_ROOT/.agents/operations/PIPELINES.md` (1.0.x fallback)
+1. `$USD_OPTIMIZE_ROOT/.agents/operations/PIPELINES.md`
+2. `$USD_OPTIMIZE_ROOT/.agents/operations/PIPELINES.md`
 
 If no package root is available, download and extract the prebuilt Usd Optimize release package (current asset name + download: `references/upstreams/usd-optimize.md`) (direct
 archive URLs are in `references/upstreams/usd-optimize.md`), or use the package
@@ -39,5 +41,5 @@ mechanics to upstream: `computeExtents`, `decimateMeshes`,
 `pythonScript`, `removeSmallGeometry`, and `removeUnusedUVs`. `merge`
 (Merge Static Meshes) is the intent-gated within-prototype prim-count
 consolidation step — see `workflow.md` Phase 4 and
-`usd-structure-assessment/references/apply-restructure/references/mesh-merge-rewrite-spec.md`
+`usd-structure-assessment/references/apply-restructure/references/hierarchy-dedupe-rewrite-tool-spec.md`
 §9 for its op-chain and eligibility guard.
