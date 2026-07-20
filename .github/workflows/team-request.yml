@@ -9,8 +9,125 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  statuses: read
 
 jobs:
+  require-nvskills-ci:
+    if: >
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'push' &&
+        !startsWith(github.event.head_commit.message, vars.NVSKILLS_SIGNATURE_COMMIT_TITLE || 'Attach NVSkills validation signatures')) ||
+      (github.event_name == 'status' &&
+        github.event.context == (vars.NVSKILLS_STATUS_CONTEXT || 'NVSkills CI'))
+    runs-on: ubuntu-latest
+    concurrency:
+      group: nvskills-ci-required-${{ github.repository }}-${{ github.event.pull_request.number || github.event.sha || github.sha }}
+      cancel-in-progress: true
+    steps:
+      - name: Require NVSkills CI for watched changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number || '' }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.event.sha || github.sha }}
+          STATUS_CONTEXT: ${{ vars.NVSKILLS_STATUS_CONTEXT || 'NVSkills CI' }}
+        run: |
+          set -euo pipefail
+
+          owner="${REPO%%/*}"
+          repo="${REPO#*/}"
+          head_sha="$(printf '%s' "${HEAD_SHA}" | tr '[:upper:]' '[:lower:]')"
+          pr_number="${PR_NUMBER}"
+
+          append_summary() {
+            printf '%s\n' "$@" | tee -a "${GITHUB_STEP_SUMMARY}"
+          }
+
+          github_get() {
+            curl -fsSL \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$1"
+          }
+
+          if [ "${EVENT_NAME}" != "pull_request" ]; then
+            prs_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/commits/${head_sha}/pulls?per_page=100")"
+            pr_number="$(printf '%s' "${prs_json}" | jq -r \
+              --arg sha "${head_sha}" \
+              '[.[] | select(.state == "open" and (.head.sha | ascii_downcase) == $sha)][0].number // empty')"
+            if [ -z "${pr_number}" ]; then
+              append_summary \
+                "## NVSkills CI required status" \
+                "" \
+                "Skipped: no open pull request is associated with this event."
+              exit 0
+            fi
+          fi
+
+          if [ -z "${pr_number}" ] || [ -z "${head_sha}" ]; then
+            echo "Pull request metadata is incomplete."
+            exit 1
+          fi
+
+          has_watched_change=false
+          page=1
+          while true; do
+            files_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/pulls/${pr_number}/files?per_page=100&page=${page}")"
+            if printf '%s' "${files_json}" | jq -e '
+              any(.[]; .filename |
+                startswith("skills/") or
+                startswith("team-skills/") or
+                startswith("rules/team-rules/") or
+                startswith("plugins/")
+              )
+            ' >/dev/null; then
+              has_watched_change=true
+              break
+            fi
+            if [ "$(printf '%s' "${files_json}" | jq 'length')" -lt 100 ]; then
+              break
+            fi
+            page=$((page + 1))
+          done
+
+          if [ "${has_watched_change}" != "true" ]; then
+            append_summary \
+              "## NVSkills CI required status" \
+              "" \
+              "Skipped: PR #${pr_number} has no changes under watched NVSkills paths."
+            exit 0
+          fi
+
+          statuses_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/commits/${head_sha}/statuses?per_page=100")"
+          status_state="$(printf '%s' "${statuses_json}" | jq -r \
+            --arg context "${STATUS_CONTEXT}" \
+            '[.[] | select(.context == $context)][0].state // "missing"')"
+          target_url="$(printf '%s' "${statuses_json}" | jq -r \
+            --arg context "${STATUS_CONTEXT}" \
+            '[.[] | select(.context == $context)][0].target_url // ""')"
+
+          if [ "${status_state}" = "success" ]; then
+            append_summary \
+              "## NVSkills CI required status" \
+              "" \
+              "Passed: \`${STATUS_CONTEXT}\` succeeded for \`${head_sha}\`."
+            exit 0
+          fi
+
+          append_summary \
+            "## NVSkills CI required status" \
+            "" \
+            "Failed: \`${STATUS_CONTEXT}\` status is \`${status_state}\` for \`${head_sha}\`." \
+            "" \
+            "Comment \`/nvskills-ci\` on this PR after every commit that changes" \
+            "\`skills/\`, \`team-skills/\`, \`rules/team-rules/\`, or \`plugins/\`."
+          if [ -n "${target_url}" ]; then
+            append_summary "" "Current NVSkills CI run: ${target_url}"
+          fi
+          exit 1
+
   request:
     if: >
       (github.event_name == 'issue_comment' &&
