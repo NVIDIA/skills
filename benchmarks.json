@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 238,
-  "result_row_count": 2160,
+  "skill_count": 299,
+  "result_row_count": 2760,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -19,6 +19,7 @@
     "mcore-split-pr",
     "mcore-testing",
     "nemo-data-designer-plugin",
+    "nemoclaw-user-guide",
     "omniverse-cad-to-simready",
     "omniverse-realtime-viewer",
     "omniverse-usd-performance-tuning",
@@ -615,6 +616,1086 @@
       "component": "Digital Health",
       "has_results": false,
       "average_uplift_pct": null
+    },
+    {
+      "skill": "doca-aes-gcm",
+      "evaluation_date": "2026-07-14",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-aes-gcm",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 38.7
+    },
+    {
+      "skill": "doca-argp",
+      "evaluation_date": "2026-07-14",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-argp",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 33.4
+    },
+    {
+      "skill": "doca-argus",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-argus",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 41.3
+    },
+    {
+      "skill": "doca-bare-metal-deployment",
+      "evaluation_date": "2026-06-25",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-bare-metal-deployment",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 33.8
+    },
+    {
+      "skill": "doca-bench",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-bench",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 43.4
+    },
+    {
+      "skill": "doca-bench-extension",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-bench-extension",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 46.6
+    },
+    {
+      "skill": "doca-bf3-deployment",
+      "evaluation_date": "2026-06-25",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 6,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-bf3-deployment",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 30.5
+    },
+    {
+      "skill": "doca-bf4-deployment",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 6,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-bf4-deployment",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 39.6
+    },
+    {
+      "skill": "doca-caps",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-caps",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 35.9
+    },
+    {
+      "skill": "doca-collectx-deployment",
+      "evaluation_date": "2026-06-25",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-collectx-deployment",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 31.4
+    },
+    {
+      "skill": "doca-comch",
+      "evaluation_date": "2026-07-14",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-comch",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 38.7
+    },
+    {
+      "skill": "doca-comm-channel-admin",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-comm-channel-admin",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 48.6
+    },
+    {
+      "skill": "doca-common",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-common",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 42.3
+    },
+    {
+      "skill": "doca-compress",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-compress",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 53.4
+    },
+    {
+      "skill": "doca-container-deployment",
+      "evaluation_date": "2026-06-25",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 6,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 46.7
+    },
+    {
+      "skill": "doca-debug",
+      "evaluation_date": "2026-07-14",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-debug",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 42.8
+    },
+    {
+      "skill": "doca-devemu",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-devemu",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 40.8
+    },
+    {
+      "skill": "doca-dma",
+      "evaluation_date": "2026-07-14",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-dma",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 41.1
+    },
+    {
+      "skill": "doca-dms",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 42.9
+    },
+    {
+      "skill": "doca-dpa",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 40.7
+    },
+    {
+      "skill": "doca-dpa-hl-tracer",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-dpa-hl-tracer",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 43.5
+    },
+    {
+      "skill": "doca-dpdk-bridge",
+      "evaluation_date": "2026-07-14",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-dpdk-bridge",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 39.7
+    },
+    {
+      "skill": "doca-erasure-coding",
+      "evaluation_date": "2026-07-14",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-erasure-coding",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 46.9
+    },
+    {
+      "skill": "doca-eth",
+      "evaluation_date": "2026-07-14",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-eth",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 44.3
+    },
+    {
+      "skill": "doca-firefly",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-firefly",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 40.6
+    },
+    {
+      "skill": "doca-flow",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 46.0
+    },
+    {
+      "skill": "doca-flow-dpa-perf",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-flow-dpa-perf",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 45.7
+    },
+    {
+      "skill": "doca-flow-dpa-provider",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-flow-dpa-provider",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 47.0
+    },
+    {
+      "skill": "doca-flow-grpc-server",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-flow-grpc-server",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 46.9
+    },
+    {
+      "skill": "doca-flow-perf",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-flow-perf",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 48.1
+    },
+    {
+      "skill": "doca-flow-tune",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-flow-tune",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 42.9
+    },
+    {
+      "skill": "doca-gpi",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-gpi",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 39.0
+    },
+    {
+      "skill": "doca-gpunetio",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-gpunetio",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 40.1
+    },
+    {
+      "skill": "doca-gpunetio-ib-write-bw",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-gpunetio-ib-write-bw",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 42.3
+    },
+    {
+      "skill": "doca-gpunetio-ib-write-lat",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-gpunetio-ib-write-lat",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 48.4
+    },
+    {
+      "skill": "doca-hardware-safety",
+      "evaluation_date": "2026-06-25",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-hardware-safety",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 31.2
+    },
+    {
+      "skill": "doca-mgmt",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-mgmt",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 37.4
+    },
+    {
+      "skill": "doca-pcc",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-pcc",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 40.6
+    },
+    {
+      "skill": "doca-pcc-counters",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-pcc-counters",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 46.3
+    },
+    {
+      "skill": "doca-pcc-ztr-rttcc-algo",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-pcc-ztr-rttcc-algo",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 34.1
+    },
+    {
+      "skill": "doca-programming-guide",
+      "evaluation_date": "2026-06-25",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-programming-guide",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 37.4
+    },
+    {
+      "skill": "doca-public-knowledge-map",
+      "evaluation_date": "2026-06-28",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 6,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-public-knowledge-map",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 34.6
+    },
+    {
+      "skill": "doca-rdma",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-rdma",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 37.6
+    },
+    {
+      "skill": "doca-rdmi",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-rdmi",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 46.2
+    },
+    {
+      "skill": "doca-rmax",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-rmax",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 41.4
+    },
+    {
+      "skill": "doca-setup",
+      "evaluation_date": "2026-06-28",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-setup",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 39.2
+    },
+    {
+      "skill": "doca-sha",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 42.7
+    },
+    {
+      "skill": "doca-sha-offload-engine",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-sha-offload-engine",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 47.5
+    },
+    {
+      "skill": "doca-socket-relay",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-socket-relay",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 44.6
+    },
+    {
+      "skill": "doca-spcx-cc",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-spcx-cc",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 47.8
+    },
+    {
+      "skill": "doca-sta",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-sta",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 43.5
+    },
+    {
+      "skill": "doca-structured-tools-contract",
+      "evaluation_date": "2026-07-14",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-structured-tools-contract",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 35.6
+    },
+    {
+      "skill": "doca-telemetry",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-telemetry",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 45.0
+    },
+    {
+      "skill": "doca-telemetry-exporter",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-telemetry-exporter",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 39.3
+    },
+    {
+      "skill": "doca-telemetry-utils",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-telemetry-utils",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 41.7
+    },
+    {
+      "skill": "doca-upgrade",
+      "evaluation_date": "2026-07-14",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-upgrade",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 26.0
+    },
+    {
+      "skill": "doca-urom",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-urom",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 43.2
+    },
+    {
+      "skill": "doca-urom-svc",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-urom-svc",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 43.0
+    },
+    {
+      "skill": "doca-verbs",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 43.3
+    },
+    {
+      "skill": "doca-version",
+      "evaluation_date": "2026-07-14",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "doca-version",
+      "component": "DOCA",
+      "has_results": true,
+      "average_uplift_pct": 33.2
     },
     {
       "skill": "dynamo-interconnect-check",
@@ -2364,12 +3445,12 @@
     },
     {
       "skill": "nemoclaw-user-guide",
-      "evaluation_date": "2026-06-24",
+      "evaluation_date": "2026-07-17",
       "profile": "external",
       "environment": "astra-sandbox",
-      "tasks": 5,
-      "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "tasks": null,
+      "attempts_per_task": null,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -2377,8 +3458,26 @@
       ],
       "catalog_dir": "nemoclaw-user-guide",
       "component": "NemoClaw",
+      "has_results": false,
+      "average_uplift_pct": null
+    },
+    {
+      "skill": "nemotron-asr-finetune",
+      "evaluation_date": "2026-07-15",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 9,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
       "has_results": true,
-      "average_uplift_pct": 40.2
+      "average_uplift_pct": 28.0
     },
     {
       "skill": "nemotron-customize",
@@ -7040,6 +8139,5406 @@
       "agent": "codex",
       "score_pct": 48.0,
       "uplift_pct": 6.0
+    },
+    {
+      "catalog_dir": "doca-aes-gcm",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-aes-gcm",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-aes-gcm",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 52.0
+    },
+    {
+      "catalog_dir": "doca-aes-gcm",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-aes-gcm",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": 73.0
+    },
+    {
+      "catalog_dir": "doca-aes-gcm",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "doca-aes-gcm",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-aes-gcm",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 99.0,
+      "uplift_pct": 59.0
+    },
+    {
+      "catalog_dir": "doca-aes-gcm",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "doca-aes-gcm",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "doca-argp",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-argp",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-argp",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "doca-argp",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "doca-argp",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-argp",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "doca-argp",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "doca-argp",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "doca-argp",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-argp",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "doca-argus",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-argus",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-argus",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 65.0
+    },
+    {
+      "catalog_dir": "doca-argus",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "doca-argus",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 52.0
+    },
+    {
+      "catalog_dir": "doca-argus",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 54.0
+    },
+    {
+      "catalog_dir": "doca-argus",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 89.0,
+      "uplift_pct": 65.0
+    },
+    {
+      "catalog_dir": "doca-argus",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 99.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "doca-argus",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "doca-argus",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 89.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-bare-metal-deployment",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-bare-metal-deployment",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-bare-metal-deployment",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "doca-bare-metal-deployment",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "doca-bare-metal-deployment",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-bare-metal-deployment",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 89.0,
+      "uplift_pct": 21.0
+    },
+    {
+      "catalog_dir": "doca-bare-metal-deployment",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 77.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "doca-bare-metal-deployment",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-bare-metal-deployment",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-bare-metal-deployment",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": 19.0
+    },
+    {
+      "catalog_dir": "doca-bench",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-bench",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-bench",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 82.0
+    },
+    {
+      "catalog_dir": "doca-bench",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-bench",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-bench",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "doca-bench",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 77.0
+    },
+    {
+      "catalog_dir": "doca-bench",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 63.0
+    },
+    {
+      "catalog_dir": "doca-bench",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-bench",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": 19.0
+    },
+    {
+      "catalog_dir": "doca-bench-extension",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-bench-extension",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-bench-extension",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 76.0
+    },
+    {
+      "catalog_dir": "doca-bench-extension",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "doca-bench-extension",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "doca-bench-extension",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 54.0
+    },
+    {
+      "catalog_dir": "doca-bench-extension",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-bench-extension",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "doca-bench-extension",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-bench-extension",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "doca-bf3-deployment",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-bf3-deployment",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-bf3-deployment",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "doca-bf3-deployment",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "doca-bf3-deployment",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "doca-bf3-deployment",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 26.0
+    },
+    {
+      "catalog_dir": "doca-bf3-deployment",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 83.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-bf3-deployment",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 79.0,
+      "uplift_pct": 13.0
+    },
+    {
+      "catalog_dir": "doca-bf3-deployment",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "doca-bf3-deployment",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": 27.0
+    },
+    {
+      "catalog_dir": "doca-bf4-deployment",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-bf4-deployment",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-bf4-deployment",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 70.0
+    },
+    {
+      "catalog_dir": "doca-bf4-deployment",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "doca-bf4-deployment",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "doca-bf4-deployment",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-bf4-deployment",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 72.0
+    },
+    {
+      "catalog_dir": "doca-bf4-deployment",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "doca-bf4-deployment",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "doca-bf4-deployment",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "doca-caps",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-caps",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-caps",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-caps",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "doca-caps",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 53.0
+    },
+    {
+      "catalog_dir": "doca-caps",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 89.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "doca-caps",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "doca-caps",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 58.0
+    },
+    {
+      "catalog_dir": "doca-caps",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "doca-caps",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": 26.0
+    },
+    {
+      "catalog_dir": "doca-collectx-deployment",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-collectx-deployment",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-collectx-deployment",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-collectx-deployment",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "doca-collectx-deployment",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-collectx-deployment",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 86.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "doca-collectx-deployment",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 78.0
+    },
+    {
+      "catalog_dir": "doca-collectx-deployment",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-collectx-deployment",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "doca-collectx-deployment",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 74.0,
+      "uplift_pct": -3.0
+    },
+    {
+      "catalog_dir": "doca-comch",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-comch",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-comch",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "doca-comch",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "doca-comch",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-comch",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "doca-comch",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 86.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-comch",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "doca-comch",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-comch",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "doca-comm-channel-admin",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-comm-channel-admin",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-comm-channel-admin",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 88.0
+    },
+    {
+      "catalog_dir": "doca-comm-channel-admin",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-comm-channel-admin",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-comm-channel-admin",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-comm-channel-admin",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 84.0
+    },
+    {
+      "catalog_dir": "doca-comm-channel-admin",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 62.0
+    },
+    {
+      "catalog_dir": "doca-comm-channel-admin",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-comm-channel-admin",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "doca-common",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-common",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-common",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "doca-common",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-common",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": 73.0
+    },
+    {
+      "catalog_dir": "doca-common",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "doca-common",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 61.0
+    },
+    {
+      "catalog_dir": "doca-common",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "doca-common",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "doca-common",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "doca-compress",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-compress",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-compress",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 80.0
+    },
+    {
+      "catalog_dir": "doca-compress",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 71.0
+    },
+    {
+      "catalog_dir": "doca-compress",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-compress",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "doca-compress",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 79.0
+    },
+    {
+      "catalog_dir": "doca-compress",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 99.0,
+      "uplift_pct": 80.0
+    },
+    {
+      "catalog_dir": "doca-compress",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-compress",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 97.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 79.0
+    },
+    {
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 97.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 73.0
+    },
+    {
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "doca-container-deployment",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "doca-debug",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-debug",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-debug",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 97.0,
+      "uplift_pct": 65.0
+    },
+    {
+      "catalog_dir": "doca-debug",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-debug",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-debug",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 53.0
+    },
+    {
+      "catalog_dir": "doca-debug",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 83.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-debug",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "doca-debug",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-debug",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-devemu",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-devemu",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-devemu",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "doca-devemu",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "doca-devemu",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 97.0,
+      "uplift_pct": 72.0
+    },
+    {
+      "catalog_dir": "doca-devemu",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "doca-devemu",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 54.0
+    },
+    {
+      "catalog_dir": "doca-devemu",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 65.0
+    },
+    {
+      "catalog_dir": "doca-devemu",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "doca-devemu",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 29.0
+    },
+    {
+      "catalog_dir": "doca-dma",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-dma",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-dma",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-dma",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-dma",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-dma",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 51.0
+    },
+    {
+      "catalog_dir": "doca-dma",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-dma",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 97.0,
+      "uplift_pct": 58.0
+    },
+    {
+      "catalog_dir": "doca-dma",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-dma",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 70.0
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-dms",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 86.0,
+      "uplift_pct": 17.0
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 70.0
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": 73.0
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 86.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "doca-dpa",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "doca-dpa-hl-tracer",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-dpa-hl-tracer",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-dpa-hl-tracer",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "doca-dpa-hl-tracer",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "doca-dpa-hl-tracer",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "doca-dpa-hl-tracer",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "doca-dpa-hl-tracer",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 70.0
+    },
+    {
+      "catalog_dir": "doca-dpa-hl-tracer",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "doca-dpa-hl-tracer",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-dpa-hl-tracer",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "doca-dpdk-bridge",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-dpdk-bridge",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-dpdk-bridge",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "doca-dpdk-bridge",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 97.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-dpdk-bridge",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": 73.0
+    },
+    {
+      "catalog_dir": "doca-dpdk-bridge",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 97.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "doca-dpdk-bridge",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "doca-dpdk-bridge",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 97.0,
+      "uplift_pct": 52.0
+    },
+    {
+      "catalog_dir": "doca-dpdk-bridge",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 89.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "doca-dpdk-bridge",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "doca-erasure-coding",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-erasure-coding",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-erasure-coding",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "doca-erasure-coding",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 54.0
+    },
+    {
+      "catalog_dir": "doca-erasure-coding",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-erasure-coding",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 66.0
+    },
+    {
+      "catalog_dir": "doca-erasure-coding",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 58.0
+    },
+    {
+      "catalog_dir": "doca-erasure-coding",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 97.0,
+      "uplift_pct": 58.0
+    },
+    {
+      "catalog_dir": "doca-erasure-coding",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "doca-erasure-coding",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 51.0
+    },
+    {
+      "catalog_dir": "doca-eth",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-eth",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-eth",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "doca-eth",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "doca-eth",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-eth",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 58.0
+    },
+    {
+      "catalog_dir": "doca-eth",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "doca-eth",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 51.0
+    },
+    {
+      "catalog_dir": "doca-eth",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "doca-eth",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 93.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "doca-firefly",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-firefly",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-firefly",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "doca-firefly",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "doca-firefly",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-firefly",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "doca-firefly",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 51.0
+    },
+    {
+      "catalog_dir": "doca-firefly",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "doca-firefly",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-firefly",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 82.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 71.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 83.0,
+      "uplift_pct": 70.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 99.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "doca-flow",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-perf",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-perf",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-perf",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 71.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-perf",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 51.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-perf",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 66.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-perf",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-perf",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": 77.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-perf",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-perf",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-perf",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-provider",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-provider",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-provider",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-provider",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-provider",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-provider",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 57.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-provider",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-provider",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 97.0,
+      "uplift_pct": 82.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-provider",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "doca-flow-dpa-provider",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "doca-flow-grpc-server",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow-grpc-server",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow-grpc-server",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-flow-grpc-server",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 53.0
+    },
+    {
+      "catalog_dir": "doca-flow-grpc-server",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-flow-grpc-server",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-flow-grpc-server",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 89.0,
+      "uplift_pct": 61.0
+    },
+    {
+      "catalog_dir": "doca-flow-grpc-server",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 97.0,
+      "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "doca-flow-grpc-server",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-flow-grpc-server",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "doca-flow-perf",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow-perf",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow-perf",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 66.0
+    },
+    {
+      "catalog_dir": "doca-flow-perf",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 61.0
+    },
+    {
+      "catalog_dir": "doca-flow-perf",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 65.0
+    },
+    {
+      "catalog_dir": "doca-flow-perf",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 93.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "doca-flow-perf",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 97.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-flow-perf",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 97.0,
+      "uplift_pct": 70.0
+    },
+    {
+      "catalog_dir": "doca-flow-perf",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "doca-flow-perf",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 89.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "doca-flow-tune",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow-tune",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-flow-tune",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 97.0,
+      "uplift_pct": 74.0
+    },
+    {
+      "catalog_dir": "doca-flow-tune",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-flow-tune",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 62.0
+    },
+    {
+      "catalog_dir": "doca-flow-tune",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "doca-flow-tune",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 76.0
+    },
+    {
+      "catalog_dir": "doca-flow-tune",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "doca-flow-tune",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "doca-flow-tune",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 89.0,
+      "uplift_pct": 23.0
+    },
+    {
+      "catalog_dir": "doca-gpi",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-gpi",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-gpi",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 62.0
+    },
+    {
+      "catalog_dir": "doca-gpi",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "doca-gpi",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-gpi",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-gpi",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 86.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "doca-gpi",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 86.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "doca-gpi",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-gpi",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-bw",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-bw",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-bw",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 71.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-bw",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-bw",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 62.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-bw",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-bw",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 86.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-bw",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-bw",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-bw",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-lat",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-lat",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-lat",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 82.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-lat",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-lat",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-lat",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-lat",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 76.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-lat",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-lat",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-gpunetio-ib-write-lat",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "doca-hardware-safety",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-hardware-safety",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-hardware-safety",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 80.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "doca-hardware-safety",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "doca-hardware-safety",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-hardware-safety",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "doca-hardware-safety",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 76.0,
+      "uplift_pct": 51.0
+    },
+    {
+      "catalog_dir": "doca-hardware-safety",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 29.0
+    },
+    {
+      "catalog_dir": "doca-hardware-safety",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 77.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "doca-hardware-safety",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 56.0,
+      "uplift_pct": 11.0
+    },
+    {
+      "catalog_dir": "doca-mgmt",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-mgmt",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-mgmt",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 97.0,
+      "uplift_pct": 54.0
+    },
+    {
+      "catalog_dir": "doca-mgmt",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "doca-mgmt",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "doca-mgmt",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "doca-mgmt",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 81.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "doca-mgmt",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 51.0
+    },
+    {
+      "catalog_dir": "doca-mgmt",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "doca-mgmt",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "doca-pcc",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-pcc",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-pcc",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 72.0
+    },
+    {
+      "catalog_dir": "doca-pcc",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "doca-pcc",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-pcc",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 93.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "doca-pcc",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 80.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-pcc",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 93.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-pcc",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "doca-pcc",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "doca-pcc-counters",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-pcc-counters",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-pcc-counters",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "doca-pcc-counters",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-pcc-counters",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "doca-pcc-counters",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 52.0
+    },
+    {
+      "catalog_dir": "doca-pcc-counters",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 79.0
+    },
+    {
+      "catalog_dir": "doca-pcc-counters",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 59.0
+    },
+    {
+      "catalog_dir": "doca-pcc-counters",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-pcc-counters",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "doca-pcc-ztr-rttcc-algo",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-pcc-ztr-rttcc-algo",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-pcc-ztr-rttcc-algo",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-pcc-ztr-rttcc-algo",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "doca-pcc-ztr-rttcc-algo",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "doca-pcc-ztr-rttcc-algo",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 93.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "doca-pcc-ztr-rttcc-algo",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 86.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "doca-pcc-ztr-rttcc-algo",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 89.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "doca-pcc-ztr-rttcc-algo",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "doca-pcc-ztr-rttcc-algo",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 86.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "doca-programming-guide",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-programming-guide",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-programming-guide",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 70.0
+    },
+    {
+      "catalog_dir": "doca-programming-guide",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 21.0
+    },
+    {
+      "catalog_dir": "doca-programming-guide",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-programming-guide",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "doca-programming-guide",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 81.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-programming-guide",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 82.0,
+      "uplift_pct": 26.0
+    },
+    {
+      "catalog_dir": "doca-programming-guide",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-programming-guide",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-public-knowledge-map",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-public-knowledge-map",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-public-knowledge-map",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 73.0
+    },
+    {
+      "catalog_dir": "doca-public-knowledge-map",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "doca-public-knowledge-map",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "doca-public-knowledge-map",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 77.0,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "doca-public-knowledge-map",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 89.0,
+      "uplift_pct": 77.0
+    },
+    {
+      "catalog_dir": "doca-public-knowledge-map",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "doca-public-knowledge-map",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-public-knowledge-map",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 65.0,
+      "uplift_pct": 4.0
+    },
+    {
+      "catalog_dir": "doca-rdma",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-rdma",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-rdma",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 97.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "doca-rdma",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "doca-rdma",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 62.0
+    },
+    {
+      "catalog_dir": "doca-rdma",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "doca-rdma",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "doca-rdma",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 99.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "doca-rdma",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "doca-rdma",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": 27.0
+    },
+    {
+      "catalog_dir": "doca-rdmi",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-rdmi",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-rdmi",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 76.0
+    },
+    {
+      "catalog_dir": "doca-rdmi",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 58.0
+    },
+    {
+      "catalog_dir": "doca-rdmi",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 99.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "doca-rdmi",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "doca-rdmi",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 80.0
+    },
+    {
+      "catalog_dir": "doca-rdmi",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 66.0
+    },
+    {
+      "catalog_dir": "doca-rdmi",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 89.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "doca-rdmi",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 93.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "doca-rmax",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-rmax",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-rmax",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 61.0
+    },
+    {
+      "catalog_dir": "doca-rmax",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "doca-rmax",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "doca-rmax",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "doca-rmax",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 72.0
+    },
+    {
+      "catalog_dir": "doca-rmax",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 61.0
+    },
+    {
+      "catalog_dir": "doca-rmax",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-rmax",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "doca-setup",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-setup",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-setup",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 59.0
+    },
+    {
+      "catalog_dir": "doca-setup",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "doca-setup",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 99.0,
+      "uplift_pct": 74.0
+    },
+    {
+      "catalog_dir": "doca-setup",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 51.0
+    },
+    {
+      "catalog_dir": "doca-setup",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 80.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "doca-setup",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "doca-setup",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 89.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "doca-setup",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 65.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 52.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 58.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-sha",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "doca-sha-offload-engine",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-sha-offload-engine",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-sha-offload-engine",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-sha-offload-engine",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 52.0
+    },
+    {
+      "catalog_dir": "doca-sha-offload-engine",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-sha-offload-engine",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "doca-sha-offload-engine",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 78.0
+    },
+    {
+      "catalog_dir": "doca-sha-offload-engine",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 74.0
+    },
+    {
+      "catalog_dir": "doca-sha-offload-engine",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-sha-offload-engine",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "doca-socket-relay",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-socket-relay",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-socket-relay",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 71.0
+    },
+    {
+      "catalog_dir": "doca-socket-relay",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "doca-socket-relay",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "doca-socket-relay",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-socket-relay",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 76.0
+    },
+    {
+      "catalog_dir": "doca-socket-relay",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 54.0
+    },
+    {
+      "catalog_dir": "doca-socket-relay",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-socket-relay",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "doca-spcx-cc",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-spcx-cc",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-spcx-cc",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 97.0,
+      "uplift_pct": 78.0
+    },
+    {
+      "catalog_dir": "doca-spcx-cc",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 54.0
+    },
+    {
+      "catalog_dir": "doca-spcx-cc",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-spcx-cc",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 51.0
+    },
+    {
+      "catalog_dir": "doca-spcx-cc",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 82.0,
+      "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "doca-spcx-cc",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 97.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "doca-spcx-cc",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-spcx-cc",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "doca-sta",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-sta",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-sta",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "doca-sta",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-sta",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 71.0
+    },
+    {
+      "catalog_dir": "doca-sta",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 52.0
+    },
+    {
+      "catalog_dir": "doca-sta",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 85.0,
+      "uplift_pct": 58.0
+    },
+    {
+      "catalog_dir": "doca-sta",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 59.0
+    },
+    {
+      "catalog_dir": "doca-sta",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 86.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "doca-sta",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "doca-structured-tools-contract",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-structured-tools-contract",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-structured-tools-contract",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 70.0
+    },
+    {
+      "catalog_dir": "doca-structured-tools-contract",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 89.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "doca-structured-tools-contract",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-structured-tools-contract",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 93.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "doca-structured-tools-contract",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 87.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "doca-structured-tools-contract",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 80.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "doca-structured-tools-contract",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-structured-tools-contract",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 24.0
+    },
+    {
+      "catalog_dir": "doca-telemetry",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-telemetry",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-telemetry",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 76.0
+    },
+    {
+      "catalog_dir": "doca-telemetry",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "doca-telemetry",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 66.0
+    },
+    {
+      "catalog_dir": "doca-telemetry",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "doca-telemetry",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 79.0
+    },
+    {
+      "catalog_dir": "doca-telemetry",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "doca-telemetry",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "doca-telemetry",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-exporter",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-exporter",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-exporter",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-exporter",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-exporter",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 66.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-exporter",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-exporter",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 58.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-exporter",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-exporter",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-exporter",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-utils",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-utils",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-utils",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 76.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-utils",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-utils",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-utils",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-utils",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 81.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-utils",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 59.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-utils",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-utils",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 82.0,
+      "uplift_pct": 17.0
+    },
+    {
+      "catalog_dir": "doca-upgrade",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-upgrade",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-upgrade",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 78.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-upgrade",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 74.0,
+      "uplift_pct": 21.0
+    },
+    {
+      "catalog_dir": "doca-upgrade",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 68.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "doca-upgrade",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 63.0,
+      "uplift_pct": 26.0
+    },
+    {
+      "catalog_dir": "doca-upgrade",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-upgrade",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 74.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "doca-upgrade",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 65.0,
+      "uplift_pct": 21.0
+    },
+    {
+      "catalog_dir": "doca-upgrade",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 65.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "doca-urom",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-urom",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-urom",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "doca-urom",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "doca-urom",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-urom",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "doca-urom",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "doca-urom",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 59.0
+    },
+    {
+      "catalog_dir": "doca-urom",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-urom",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "doca-urom-svc",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-urom-svc",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-urom-svc",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 82.0
+    },
+    {
+      "catalog_dir": "doca-urom-svc",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "doca-urom-svc",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-urom-svc",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-urom-svc",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 86.0,
+      "uplift_pct": 66.0
+    },
+    {
+      "catalog_dir": "doca-urom-svc",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 89.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-urom-svc",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-urom-svc",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 89.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 72.0
+    },
+    {
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 58.0
+    },
+    {
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 62.0
+    },
+    {
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "doca-verbs",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "doca-version",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-version",
+      "component": "DOCA",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "doca-version",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 66.0
+    },
+    {
+      "catalog_dir": "doca-version",
+      "component": "DOCA",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-version",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 99.0,
+      "uplift_pct": 62.0
+    },
+    {
+      "catalog_dir": "doca-version",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 67.0,
+      "uplift_pct": -0.0
+    },
+    {
+      "catalog_dir": "doca-version",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "doca-version",
+      "component": "DOCA",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 99.0,
+      "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "doca-version",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "doca-version",
+      "component": "DOCA",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 54.0,
+      "uplift_pct": -13.0
     },
     {
       "catalog_dir": "earth2studio-create-diagnostic",
@@ -14782,94 +21281,94 @@
       "uplift_pct": 10.0
     },
     {
-      "catalog_dir": "nemoclaw-user-guide",
-      "component": "NemoClaw",
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
       "dimension": "Security",
-      "num": 5,
+      "num": 8,
       "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": -10.0
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "nemoclaw-user-guide",
-      "component": "NemoClaw",
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
       "dimension": "Security",
-      "num": 5,
+      "num": 8,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 10.0
+      "uplift_pct": 11.0
     },
     {
-      "catalog_dir": "nemoclaw-user-guide",
-      "component": "NemoClaw",
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
       "dimension": "Correctness",
-      "num": 5,
+      "num": 8,
       "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": 68.0
+      "score_pct": 80.0,
+      "uplift_pct": 28.0
     },
     {
-      "catalog_dir": "nemoclaw-user-guide",
-      "component": "NemoClaw",
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
       "dimension": "Correctness",
-      "num": 5,
+      "num": 8,
       "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 27.0
+    },
+    {
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
+      "dimension": "Discoverability",
+      "num": 8,
+      "agent": "claude-code",
       "score_pct": 86.0,
       "uplift_pct": 47.0
     },
     {
-      "catalog_dir": "nemoclaw-user-guide",
-      "component": "NemoClaw",
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
       "dimension": "Discoverability",
-      "num": 5,
-      "agent": "claude-code",
-      "score_pct": 86.0,
-      "uplift_pct": 67.0
-    },
-    {
-      "catalog_dir": "nemoclaw-user-guide",
-      "component": "NemoClaw",
-      "dimension": "Discoverability",
-      "num": 5,
+      "num": 8,
       "agent": "codex",
-      "score_pct": 67.0,
-      "uplift_pct": 22.0
+      "score_pct": 93.0,
+      "uplift_pct": 50.0
     },
     {
-      "catalog_dir": "nemoclaw-user-guide",
-      "component": "NemoClaw",
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
       "dimension": "Effectiveness",
-      "num": 5,
+      "num": 8,
       "agent": "claude-code",
-      "score_pct": 80.0,
-      "uplift_pct": 74.0
+      "score_pct": 64.0,
+      "uplift_pct": 20.0
     },
     {
-      "catalog_dir": "nemoclaw-user-guide",
-      "component": "NemoClaw",
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
       "dimension": "Effectiveness",
-      "num": 5,
+      "num": 8,
       "agent": "codex",
-      "score_pct": 87.0,
-      "uplift_pct": 64.0
+      "score_pct": 76.0,
+      "uplift_pct": 24.0
     },
     {
-      "catalog_dir": "nemoclaw-user-guide",
-      "component": "NemoClaw",
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
       "dimension": "Efficiency",
-      "num": 5,
+      "num": 8,
       "agent": "claude-code",
-      "score_pct": 71.0,
-      "uplift_pct": 45.0
+      "score_pct": 83.0,
+      "uplift_pct": 36.0
     },
     {
-      "catalog_dir": "nemoclaw-user-guide",
-      "component": "NemoClaw",
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
       "dimension": "Efficiency",
-      "num": 5,
+      "num": 8,
       "agent": "codex",
-      "score_pct": 57.0,
-      "uplift_pct": 15.0
+      "score_pct": 88.0,
+      "uplift_pct": 37.0
     },
     {
       "catalog_dir": "nemotron-customize",
