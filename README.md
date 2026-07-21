@@ -3,7 +3,7 @@
 
 # NVIDIA Agent Skills
 
-**Official, NVIDIA-verified skills for AI agents.**
+**Official, NVIDIA-verified Agent Skills for Claude Code, Codex, and other coding agents.**
 
 [![NVIDIA](https://img.shields.io/badge/NVIDIA-Verified-76B900?style=flat&logo=nvidia&logoColor=white)](https://nvidia.com)
 [![Agent Skills Spec](https://img.shields.io/badge/Agent%20Skills-Specification-blue)](https://agentskills.io)
@@ -15,7 +15,7 @@
 
 ---
 
-Skills are portable instruction sets that teach AI agents how to use NVIDIA software optimally, including CUDA-X libraries, AI Blueprints, and platform tools. This repository is a catalog: skills are maintained in their respective product repos, and mirrored here daily via an automated sync pipeline. Skills are being added continuously, so check back for updates. We are building this infrastructure in the open, and contributions are welcome. See the [Roadmap](#roadmap) for what is planned next.
+Skills are portable instruction sets that teach AI agents how to use NVIDIA software optimally: Physical AI and robotics workflows, simulation, CUDA-X libraries, RAG and AI Blueprints, and platform tools. This repository is a catalog: skills are maintained in their respective product repos, and mirrored here daily via an automated sync pipeline. Skills are being added continuously, so check back for updates. We are building this infrastructure in the open, and contributions are welcome. See the [Roadmap](#roadmap) for what is planned next.
 
 ---
 

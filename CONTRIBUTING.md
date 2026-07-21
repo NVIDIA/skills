@@ -19,6 +19,18 @@ Avoid agent-specific paths in the repo (`.claude/skills/`, `.codex/skills/`, `.c
 
 At install time, your tooling or packaging can copy or symlink from `skills/` into the appropriate agent discovery locations (for example `.agents/skills/`, `.claude/skills/`, `.codex/skills/`) as required by each tool.
 
+## Discoverability Checklist (Source Repos)
+
+GitHub search ranks repositories on metadata and engagement, not just content. Before (or right after) onboarding your skills to the catalog, check your source repo:
+
+- [ ] **Repo description** names what developers search for: the product, the workflow, and "agent skills" (for example, "Agent skills for video search and summarization with VLMs and RAG"), not just the product name.
+- [ ] **GitHub topics** are set (Settings → edit topics): include `agent-skills` plus your domain terms (`robotics`, `video-understanding`, `synthetic-data`, ...). Repos with no topics do not surface in topic browsing or filtered search.
+- [ ] **README opens with a two-sentence value proposition** using those same search terms, before badges or tables of contents.
+- [ ] **License is detected by GitHub**: the repo sidebar should show your license name. If it shows "Other" or "View license", GitHub could not parse your license file and the repo is excluded from license-filtered searches.
+- [ ] **Social preview image** is set (Settings → Social preview, 1280×640) so shared links render a card instead of a blank tile.
+
+These apply to the *source* repo; the catalog repo's own metadata is maintained by the catalog team.
+
 ## IP Review and License (External Skills)
 
 For skills published to `github.com/nvidia/skills`, NVIDIA contributors confirm three things per onboarding PR:
