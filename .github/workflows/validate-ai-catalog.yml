@@ -1,0 +1,46 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: Validate AI Catalog
+
+on:
+  pull_request:
+    paths:
+      - "docs/.well-known/ai-catalog.json"
+      - "skills/**/SKILL.md"
+      - "tests/integration/test_catalog.py"
+      - ".github/workflows/validate-ai-catalog.yml"
+  push:
+    branches: [main]
+    paths:
+      - "docs/.well-known/ai-catalog.json"
+      - "skills/**/SKILL.md"
+      - "tests/integration/test_catalog.py"
+      - ".github/workflows/validate-ai-catalog.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-ai-catalog-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Validate catalog
+        run: pytest tests/integration/test_catalog.py
