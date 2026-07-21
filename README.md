@@ -7,7 +7,7 @@
 
 [![NVIDIA](https://img.shields.io/badge/NVIDIA-Verified-76B900?style=flat&logo=nvidia&logoColor=white)](https://nvidia.com)
 [![Agent Skills Spec](https://img.shields.io/badge/Agent%20Skills-Specification-blue)](https://agentskills.io)
-[![License](https://img.shields.io/badge/License-Apache%202.0%20%2B%20CC--BY--4.0-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0%20%2B%20CC--BY--4.0-green.svg)](#license)
 
 > 📖 **Docs:** [docs.nvidia.com/skills](https://docs.nvidia.com/skills) &nbsp;·&nbsp;
 > 📺 **Livestream:** [From Vulnerable to Verified](https://www.youtube.com/watch?v=sVpKonYJ4D4&list=PL5B692fm6--vEL0FwctKghCpyEnBGAQJA&index=1) &nbsp;·&nbsp;
@@ -306,7 +306,8 @@ NVIDIA/skills/
 ├── CONTRIBUTING.md              # Contribution guidelines
 ├── SECURITY.md                  # Security reporting policy
 ├── CODE_OF_CONDUCT.md           # Community code of conduct
-└── LICENSE                      # Apache 2.0 / CC BY 4.0
+├── LICENSE-APACHE               # Apache 2.0 (source code)
+└── LICENSE-CC-BY-4.0            # CC BY 4.0 (documentation/skills)
 ```
 
 Skills are maintained in their respective product repos (see the **Source** column in the [Skill Catalog](#skill-catalog)) and synced to this repo daily. Products only appear under `skills/` after the sync pipeline confirms each skill carries:
@@ -332,4 +333,6 @@ This repository adheres to the [Agent Skills specification](https://agentskills.
 
 ## License
 
-This project is dual-licensed under the [Apache License 2.0](LICENSE) and [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE).
+Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This code is dual-licensed with documentation/skills under the CC-BY-4.0 AND source code under Apache-2.0 license terms. The full license texts can be found in [LICENSE-APACHE](LICENSE-APACHE) and [LICENSE-CC-BY-4.0](LICENSE-CC-BY-4.0) respectively.
