@@ -1,0 +1,25 @@
+[
+  {
+    "id": "i4h-workflow-readme-quick-overview",
+    "question": "What does the i4h workflow include, and where should I start?",
+    "expected_skill": "i4h-workflow",
+    "ground_truth": "This README Quick Run prompt routes to the overview skill. The agent summarizes the workflows/agentic pipeline, supported environments, and which stage skill to use next.",
+    "expected_behavior": [
+      "routes to i4h-workflow",
+      "summarizes the unified IsaacLab-Arena plus GR00T/openpi workflow",
+      "mentions env YAMLs as the source of truth",
+      "points concrete next steps to setup, create, teleop, replay, mimic, annotate, convert, visualize, finetune, validate, or e2e skills"
+    ]
+  },
+  {
+    "id": "i4h-workflow-readme-quick-stop-all",
+    "question": "Stop all",
+    "expected_skill": null,
+    "ground_truth": "This README Quick Run prompt is a direct operational cleanup request. No stage skill is required; the agent should run the workflow stop-all command from the repo root and report what was stopped.",
+    "expected_behavior": [
+      "does not launch a new workflow stage",
+      "uses workflows/agentic/stop.sh all from the repository root",
+      "reports process cleanup status succinctly"
+    ]
+  }
+]

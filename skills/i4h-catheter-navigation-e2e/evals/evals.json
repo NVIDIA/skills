@@ -1,0 +1,58 @@
+[
+  {
+    "id": "i4h-catheter-navigation-e2e-001",
+    "question": "Run the full catheter navigation smoke pipeline with my TotalSegmentator subject in $SUBJ: setup checks, digital twin, cache-based DRR, and CPU tests, then summarize every artifact.",
+    "expected_skill": "i4h-catheter-navigation-e2e",
+    "expected_script": null,
+    "ground_truth": "The agent used the end-to-end skill to initialize one shared run, verify setup, validate and process the supplied subject into CACHE, render a cache-based DRR, run CPU unittests, and write and report a stage summary while excluding the interactive viewport.",
+    "expected_behavior": [
+      "The agent read the i4h-catheter-navigation-e2e SKILL.md and the referenced stage skills before executing their commands",
+      "The agent resolved the workflow checkout, created one timestamped e2e RUN_DIR with logs, preserved SUBJ and CACHE, and updated runs/.latest",
+      "The agent performed setup and CPU checks, validated SUBJ before preprocess_ct and segment_vessels, then used the resulting CACHE for the DRR stage",
+      "The agent ran the catheter smoke unittest and wrote RUN_DIR/logs/SUMMARY.txt containing RUN_DIR, CACHE, SUBJ, and observed artifacts",
+      "The final response identified completed, failed, and skipped stages, the DRR output, smoke status, and log paths without launching the interactive viewport",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "i4h-catheter-navigation-e2e-002",
+    "question": "Run the catheter end-to-end smoke now, but I have no CT subject. Use the supported partial path and make it obvious which stages were skipped.",
+    "expected_skill": "i4h-catheter-navigation-e2e",
+    "expected_script": null,
+    "ground_truth": "The agent followed the documented partial e2e path: it initialized the shared run, completed setup checks, explicitly skipped digital-twin processing because SUBJ was absent, attempted the synthetic DRR path, ran CPU smoke tests, and recorded an honest partial-run summary.",
+    "expected_behavior": [
+      "The agent did not invent or download CT data when the user requested the supported no-subject path",
+      "The agent marked the digital-twin stage skipped and selected the synthetic render_drr variant without a cache argument",
+      "The agent still ran the setup verification and CPU smoke-test stages and preserved per-stage logs under the shared RUN_DIR",
+      "The agent wrote SUMMARY.txt and clearly labeled the run partial, including any GPU renderer blocker and the completed or skipped stages",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "i4h-catheter-navigation-e2e-003",
+    "question": "Give me one reproducible v0.7 catheter workflow smoke run that ties together host readiness, patient-cache generation when available, a fluoroscopy frame, and unit-test evidence.",
+    "expected_skill": "i4h-catheter-navigation-e2e",
+    "expected_script": null,
+    "ground_truth": "The agent recognized the cross-stage request as the e2e orchestrator, used a shared RUN_DIR and CACHE across the relevant stage skills, selected full or partial behavior based on an actually available SUBJ, and produced a consolidated evidence summary.",
+    "expected_behavior": [
+      "The agent used i4h-catheter-navigation-e2e rather than independently creating unrelated stage run directories",
+      "The agent selected full digital-twin and cache rendering only when a valid SUBJ was available, otherwise documented the partial synthetic path",
+      "The agent preserved actual command results and artifacts for setup, render, and unittest stages in the shared run logs",
+      "The agent summarized RUN_DIR, completed and skipped stages, DRR output, CACHE state, and smoke-test status and recommended the viewport only as a later interactive step",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "i4h-catheter-navigation-e2e-004",
+    "question": "Launch only the interactive catheter viewport from /tmp/ct_cache so I can drive it with the keyboard; do not rerun preprocessing, rendering smoke, or unit tests.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The agent recognized this narrowly scoped GUI request as i4h-catheter-navigation-viewport, not the multi-stage e2e smoke, and honored the instruction not to rerun unrelated stages.",
+    "expected_behavior": [
+      "The agent did not invoke the e2e setup, digital-twin, single-frame DRR, or unittest stages",
+      "The agent routed the request to i4h-catheter-navigation-viewport and retained CACHE=/tmp/ct_cache",
+      "The agent validated the cache and display/GPU prerequisites and used the interactive viewport path with keyboard controls",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  }
+]

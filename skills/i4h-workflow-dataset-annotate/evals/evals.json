@@ -1,0 +1,26 @@
+[
+  {
+    "id": "i4h-workflow-dataset-annotate-readme-quick-all-recorded",
+    "question": "Run Annotation on all recorded episodes and summarize.",
+    "expected_skill": "i4h-workflow-dataset-annotate",
+    "ground_truth": "This README Quick Run prompt routes to VLM annotation over the latest recorded HDF5 episodes and returns a summary.",
+    "expected_behavior": [
+      "routes to i4h-workflow-dataset-annotate",
+      "uses the latest recorded HDF5 episodes",
+      "uses the env YAML task description unless overridden",
+      "summarizes success labels after annotation"
+    ]
+  },
+  {
+    "id": "i4h-workflow-dataset-annotate-table-recording",
+    "question": "Run the VLM annotator on my scissor pick-and-place recording and label which episodes satisfy the task.",
+    "expected_skill": "i4h-workflow-dataset-annotate",
+    "ground_truth": "This README skill-table prompt routes to VLM annotation for a scissor_pick_and_place recording.",
+    "expected_behavior": [
+      "routes to i4h-workflow-dataset-annotate",
+      "labels episodes against the task criterion",
+      "keeps artifacts under workflows/agentic/runs",
+      "does not run annotation when only conversion or replay is requested"
+    ]
+  }
+]

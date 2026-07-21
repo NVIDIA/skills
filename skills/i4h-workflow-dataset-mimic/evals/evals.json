@@ -1,0 +1,27 @@
+[
+  {
+    "id": "i4h-workflow-dataset-mimic-readme-quick-three-visualize",
+    "question": "Mimic 3 more episodes and visualize my dataset.",
+    "expected_skill": "i4h-workflow-dataset-mimic",
+    "ground_truth": "This README Quick Run prompt routes first to mimic augmentation for the latest HDF5, then conversion/visualization as follow-up so the dataset can be inspected.",
+    "expected_behavior": [
+      "routes primarily to i4h-workflow-dataset-mimic",
+      "uses the latest HDF5 recording as input",
+      "adds three augmented episodes",
+      "continues to conversion and LeRobot visualization when needed",
+      "reports the augmented dataset and visualizer output"
+    ]
+  },
+  {
+    "id": "i4h-workflow-dataset-mimic-table-ten-episodes",
+    "question": "Expand my scissor pick-and-place recording to 10 episodes with small action and state noise.",
+    "expected_skill": "i4h-workflow-dataset-mimic",
+    "ground_truth": "This README skill-table prompt routes to mimic augmentation for a scissor_pick_and_place recording.",
+    "expected_behavior": [
+      "routes to i4h-workflow-dataset-mimic",
+      "uses an existing HDF5 recording as input",
+      "expands to the requested episode count",
+      "applies small action and state noise"
+    ]
+  }
+]

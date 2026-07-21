@@ -1,0 +1,27 @@
+[
+  {
+    "id": "i4h-workflow-dataset-teleop-readme-quick-five",
+    "question": "Run teleop for 5 episodes.",
+    "expected_skill": "i4h-workflow-dataset-teleop",
+    "ground_truth": "This README Quick Run prompt routes to teleop recording for the active/new env with five episodes.",
+    "expected_behavior": [
+      "routes to i4h-workflow-dataset-teleop",
+      "uses the current or recently created env context",
+      "sets EPISODES to 5",
+      "records teleoperated demos to HDF5",
+      "reports the output HDF5 path"
+    ]
+  },
+  {
+    "id": "i4h-workflow-dataset-teleop-table-keyboard-five",
+    "question": "Record 5 keyboard teleop demos for the scissor pick-and-place task.",
+    "expected_skill": "i4h-workflow-dataset-teleop",
+    "ground_truth": "This README skill-table prompt routes to keyboard teleop recording for scissor_pick_and_place with five demos.",
+    "expected_behavior": [
+      "routes to i4h-workflow-dataset-teleop",
+      "maps scissor pick-and-place to scissor_pick_and_place",
+      "selects keyboard teleoperation",
+      "records five demos to HDF5"
+    ]
+  }
+]

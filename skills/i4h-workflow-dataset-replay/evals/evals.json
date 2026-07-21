@@ -1,0 +1,26 @@
+[
+  {
+    "id": "i4h-workflow-dataset-replay-readme-quick-second-episode",
+    "question": "Replay second episode.",
+    "expected_skill": "i4h-workflow-dataset-replay",
+    "ground_truth": "This README Quick Run prompt routes to HDF5 replay using the latest recorded run and episode index 1.",
+    "expected_behavior": [
+      "routes to i4h-workflow-dataset-replay",
+      "resolves the latest recorded HDF5 from workflows/agentic/runs",
+      "interprets second episode as episode index 1",
+      "launches replay in Isaac Sim rather than policy validation"
+    ]
+  },
+  {
+    "id": "i4h-workflow-dataset-replay-table-episode-zero",
+    "question": "Replay episode 0 from my scissor pick-and-place recording in Isaac Sim.",
+    "expected_skill": "i4h-workflow-dataset-replay",
+    "ground_truth": "This README skill-table prompt routes to HDF5 replay for scissor_pick_and_place episode 0.",
+    "expected_behavior": [
+      "routes to i4h-workflow-dataset-replay",
+      "uses the specified recording as input",
+      "replays episode 0 in Isaac Sim",
+      "does not convert the HDF5 to LeRobot as the main task"
+    ]
+  }
+]

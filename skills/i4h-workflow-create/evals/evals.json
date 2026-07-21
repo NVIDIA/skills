@@ -1,0 +1,39 @@
+[
+  {
+    "id": "i4h-workflow-create-readme-quick-g1-sort",
+    "question": "Create a new i4h environment for surgical tool sorting using G1 based on scissor_pick_and_place.",
+    "expected_skill": "i4h-workflow-create",
+    "ground_truth": "This README Quick Run prompt routes to environment creation, forking scissor_pick_and_place into a G1 surgical tool sorting env.",
+    "expected_behavior": [
+      "routes to i4h-workflow-create",
+      "uses scissor_pick_and_place as the source env",
+      "switches the robot/policy plan to Unitree G1 and GR00T N1.6",
+      "treats the env YAML as the source of truth",
+      "runs the create validation gate after source changes"
+    ]
+  },
+  {
+    "id": "i4h-workflow-create-table-soarm-sort",
+    "question": "Create a new i4h environment by forking the scissor pick-and-place task for surgical tool sorting.",
+    "expected_skill": "i4h-workflow-create",
+    "ground_truth": "This README skill-table prompt routes to environment creation by forking the scissor pick-and-place task for surgical tool sorting.",
+    "expected_behavior": [
+      "routes to i4h-workflow-create",
+      "forks from scissor_pick_and_place",
+      "preserves existing source patterns unless a robot or policy change is requested",
+      "creates or updates env YAML, assets, task, and registration files"
+    ]
+  },
+  {
+    "id": "i4h-workflow-create-table-g1-sort",
+    "question": "Create a new i4h environment by forking the scissor pick-and-place task for surgical tool sorting using G1 robot.",
+    "expected_skill": "i4h-workflow-create",
+    "ground_truth": "This README skill-table prompt routes to environment creation with G1 as the robot variant.",
+    "expected_behavior": [
+      "routes to i4h-workflow-create",
+      "forks from scissor_pick_and_place",
+      "uses G1 robot conventions and matching policy stack",
+      "validates the new env with the source-instantiation gate"
+    ]
+  }
+]

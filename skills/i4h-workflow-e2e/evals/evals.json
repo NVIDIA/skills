@@ -1,0 +1,26 @@
+[
+  {
+    "id": "i4h-workflow-e2e-readme-quick-scissor",
+    "question": "Run end-to-end smoke pipeline for scissor pick-and-place.",
+    "expected_skill": "i4h-workflow-e2e",
+    "ground_truth": "This README Quick Run prompt routes to the full e2e smoke pipeline for scissor_pick_and_place.",
+    "expected_behavior": [
+      "routes to i4h-workflow-e2e",
+      "maps scissor pick-and-place to scissor_pick_and_place",
+      "uses the e2e script rather than manually running only one stage",
+      "covers record, mimic, annotate/filter, replay, convert, visualize, finetune, and validate unless skipped"
+    ]
+  },
+  {
+    "id": "i4h-workflow-e2e-table-scissor",
+    "question": "Run the full end-to-end smoke pipeline for the scissor pick-and-place task.",
+    "expected_skill": "i4h-workflow-e2e",
+    "ground_truth": "This README skill-table prompt routes to the full e2e smoke pipeline for scissor_pick_and_place.",
+    "expected_behavior": [
+      "routes to i4h-workflow-e2e",
+      "uses workflows/agentic/scripts/e2e/run.sh",
+      "reports the run directory and per-stage status",
+      "does not replace the full pipeline with a single validation rollout"
+    ]
+  }
+]

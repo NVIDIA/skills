@@ -1,0 +1,29 @@
+[
+  {
+    "id": "i4h-workflow-finetune-readme-quick-steps-batch",
+    "question": "Finetune for 200 steps with batch size of 32.  Turn off vision tuning.",
+    "expected_skill": "i4h-workflow-finetune",
+    "ground_truth": "This README Quick Run prompt routes to finetuning for the active/new env, using 200 training steps, batch size 32, and vision tuning disabled.",
+    "expected_behavior": [
+      "routes to i4h-workflow-finetune",
+      "uses the current or recently converted LeRobot dataset",
+      "sets training steps to 200",
+      "sets batch size to 32",
+      "turns off vision tuning",
+      "reports checkpoint output"
+    ]
+  },
+  {
+    "id": "i4h-workflow-finetune-table-short-smoke",
+    "question": "Fine-tune a policy for the scissor pick-and-place task on my converted dataset for a short smoke run.",
+    "expected_skill": "i4h-workflow-finetune",
+    "ground_truth": "This README skill-table prompt routes to a short finetune smoke run for scissor_pick_and_place using an existing converted dataset.",
+    "expected_behavior": [
+      "routes to i4h-workflow-finetune",
+      "maps scissor pick-and-place to scissor_pick_and_place",
+      "uses the converted LeRobot dataset",
+      "runs a short smoke training configuration",
+      "does not evaluate the checkpoint unless requested"
+    ]
+  }
+]

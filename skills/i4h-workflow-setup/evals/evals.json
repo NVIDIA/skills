@@ -1,0 +1,14 @@
+[
+  {
+    "id": "i4h-workflow-setup-readme-quick-setup",
+    "question": "Set up the i4h workflow on this machine and tell me if any host requirements are missing.",
+    "expected_skill": "i4h-workflow-setup",
+    "ground_truth": "This README Quick Run prompt routes to setup. The agent resolves the repo root, checks host prerequisites, runs workflows/agentic/setup.sh as needed, and reports missing requirements.",
+    "expected_behavior": [
+      "routes to i4h-workflow-setup",
+      "checks host requirements such as uv, git, GPU driver, disk, and third-party checkout state",
+      "runs or prepares workflows/agentic/setup.sh from the repo root",
+      "reports missing requirements and verification results"
+    ]
+  }
+]

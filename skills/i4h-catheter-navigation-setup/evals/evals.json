@@ -1,0 +1,58 @@
+[
+  {
+    "id": "i4h-catheter-navigation-setup-001",
+    "question": "Set up the catheter navigation workflow on this machine and tell me which host requirements or dependencies are missing.",
+    "expected_skill": "i4h-catheter-navigation-setup",
+    "expected_script": null,
+    "ground_truth": "The agent performed the setup skill's preflight, resolved the workflow checkout and paths, verified catheter_navigation CLI registration, ran the seven CPU smoke tests, and reported host, import, GPU, or Docker gaps without treating the optional GPU render as mandatory.",
+    "expected_behavior": [
+      "The agent read the i4h-catheter-navigation-setup SKILL.md before executing commands",
+      "The agent checked python3, git, nvidia-smi, and available disk space and compared the results with the documented host requirements",
+      "The agent resolved REPO_ROOT and WF_ROOT, exported the simulation PYTHONPATH, and created a timestamped setup run directory with logs",
+      "The agent ran ./i4h modes catheter_navigation and python3 -m unittest workflows/catheter_navigation/tests/test_fluorosim_smoke.py, preserving their output in the run logs",
+      "The agent treated the synthetic GPU DRR check as optional, reported blockers instead of hiding them, and summarized setup status plus the next suitable stage skill",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "i4h-catheter-navigation-setup-002",
+    "question": "The catheter viewport fails with missing fluorosim and slangpy imports. Diagnose my catheter workflow installation and get the basic checks passing.",
+    "expected_skill": "i4h-catheter-navigation-setup",
+    "expected_script": null,
+    "ground_truth": "The agent used the setup workflow to repair or explain environment and PYTHONPATH problems, verify mode registration and CPU tests, then addressed GPU-specific dependency failures through the documented host or Docker guidance.",
+    "expected_behavior": [
+      "The agent resolved the i4h-workflows root and exported workflows/catheter_navigation/scripts/simulation on PYTHONPATH before rechecking imports",
+      "The agent verified the catheter_navigation mode registry through ./i4h modes catheter_navigation rather than inventing a setup script",
+      "The agent ran the CPU smoke suite and distinguished its result from the optional slangpy/CUDA rendering check",
+      "The agent recommended the workflow Docker path or installation guidance when host GPU dependencies remained incomplete",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "i4h-catheter-navigation-setup-003",
+    "question": "Verify catheter_navigation in a headless CI runner with no GPU. I only need the CPU-safe readiness checks and a reusable log.",
+    "expected_skill": "i4h-catheter-navigation-setup",
+    "expected_script": null,
+    "ground_truth": "The agent performed the setup skill's CLI and CPU-only checks in a timestamped run directory, explicitly skipped the optional GPU render because the runner had no GPU, and reported the expected seven-test result and log paths.",
+    "expected_behavior": [
+      "The agent created RUN_DIR/logs and updated the workflow runs/.latest symlink",
+      "The agent captured ./i4h modes catheter_navigation in modes.log and the unittest command in smoke.log",
+      "The agent checked for the expected Ran 7 tests and OK result while noting that parser errors from negative CLI tests are expected",
+      "The agent skipped the optional synthetic DRR sanity check on the no-GPU runner and did not present that skip as a CPU validation failure",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  },
+  {
+    "id": "i4h-catheter-navigation-setup-004",
+    "question": "Use my TotalSegmentator subject at /data/s0011 to build a vasculature cache in /tmp/ct_cache, including the vessel centerline.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The agent recognized this as a digital-twin build request for i4h-catheter-navigation-digital-twin, not a setup-only request, and routed to CT preprocessing and vessel segmentation after checking prerequisites.",
+    "expected_behavior": [
+      "The agent did not treat host setup checks as the requested end result",
+      "The agent routed the task to i4h-catheter-navigation-digital-twin and preserved the supplied subject and cache paths",
+      "The agent did not claim that the setup skill creates mu_volume.npy, a vessel mask, or a centerline",
+      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+    ]
+  }
+]

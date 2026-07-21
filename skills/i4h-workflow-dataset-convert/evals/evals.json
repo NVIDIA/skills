@@ -1,0 +1,27 @@
+[
+  {
+    "id": "i4h-workflow-dataset-convert-table-scissor",
+    "question": "Convert my scissor pick-and-place recording into a LeRobot dataset.",
+    "expected_skill": "i4h-workflow-dataset-convert",
+    "ground_truth": "This README skill-table prompt routes to HDF5 to LeRobot conversion for a scissor_pick_and_place recording.",
+    "expected_behavior": [
+      "routes to i4h-workflow-dataset-convert",
+      "maps scissor pick-and-place to scissor_pick_and_place",
+      "uses the env YAML dataset and camera mappings",
+      "creates LeRobot parquet, metadata, and videos",
+      "reports the LeRobot dataset path"
+    ]
+  },
+  {
+    "id": "i4h-workflow-dataset-convert-latest-training",
+    "question": "Prepare my latest HDF5 recording for training by converting it to a LeRobot dataset.",
+    "expected_skill": "i4h-workflow-dataset-convert",
+    "ground_truth": "This conversion prompt routes to HDF5 to LeRobot conversion for the latest recorded dataset.",
+    "expected_behavior": [
+      "routes to i4h-workflow-dataset-convert",
+      "resolves the latest HDF5 recording",
+      "converts it into LeRobot parquet, metadata, and videos",
+      "reports the converted dataset path for training"
+    ]
+  }
+]

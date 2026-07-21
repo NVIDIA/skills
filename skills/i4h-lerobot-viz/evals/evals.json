@@ -1,0 +1,27 @@
+[
+  {
+    "id": "i4h-lerobot-viz-table-scissor",
+    "question": "Serve the LeRobot visualizer for my converted scissor pick-and-place dataset and show me the local URL.",
+    "expected_skill": "i4h-lerobot-viz",
+    "ground_truth": "This README skill-table prompt routes to the LeRobot HTML visualizer for an existing converted dataset.",
+    "expected_behavior": [
+      "routes to i4h-lerobot-viz",
+      "uses the existing converted LeRobot dataset",
+      "starts or reuses the HTML visualizer",
+      "reports the local URL and stop command",
+      "does not convert HDF5 as the main task"
+    ]
+  },
+  {
+    "id": "i4h-lerobot-viz-latest-converted",
+    "question": "Open the latest converted LeRobot dataset for inspection.",
+    "expected_skill": "i4h-lerobot-viz",
+    "ground_truth": "This visualization prompt routes to the LeRobot HTML visualizer for the latest converted dataset.",
+    "expected_behavior": [
+      "routes to i4h-lerobot-viz",
+      "finds the latest converted LeRobot dataset",
+      "serves the dataset in the HTML visualizer",
+      "reports the local URL"
+    ]
+  }
+]

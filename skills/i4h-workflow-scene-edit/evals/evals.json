@@ -1,0 +1,42 @@
+[
+  {
+    "id": "i4h-workflow-scene-edit-readme-quick-live-bake",
+    "question": "Edit the scene for new env in live mode.\n  - Add new red cube on table.\n  - Increase size of red cube by 2x.\n  - Shift G1 to the opposite side of the table and 4 ft away from table.\n  - Add a room camera based on current perspective view to capture room area.\n  - Bake all changes and stop.",
+    "expected_skill": "i4h-workflow-scene-edit",
+    "ground_truth": "This README Quick Run prompt routes to scene-edit. The agent launches the bridge, performs the requested live edits, verifies each edit, then bakes because the prompt explicitly says bake all changes and stop.",
+    "expected_behavior": [
+      "routes to i4h-workflow-scene-edit",
+      "launches edit mode with the bridge",
+      "adds and resizes the red cube live",
+      "moves the G1 stand using bridge-safe pose handling",
+      "adds a room camera from the perspective view",
+      "bakes source changes only because the prompt explicitly asks to bake",
+      "stops the bridge through the arena stop path"
+    ]
+  },
+  {
+    "id": "i4h-workflow-scene-edit-readme-quick-task-description",
+    "question": "Change policy task description to \"Walk towards surgical table\"",
+    "expected_skill": "i4h-workflow-scene-edit",
+    "ground_truth": "This README Quick Run prompt routes to scene-edit/source update for the current/new env task wording.",
+    "expected_behavior": [
+      "routes to i4h-workflow-scene-edit",
+      "updates the env YAML policy task description or language instruction for the active env",
+      "does not create a new env",
+      "validates source wiring when persisted"
+    ]
+  },
+  {
+    "id": "i4h-workflow-scene-edit-table-red-cube",
+    "question": "Edit the scissor pick-and-place scene to replace the scissors with a red cube and save the scene.",
+    "expected_skill": "i4h-workflow-scene-edit",
+    "ground_truth": "This README skill-table prompt routes to scene-edit and bakes because the prompt says save the scene.",
+    "expected_behavior": [
+      "routes to i4h-workflow-scene-edit",
+      "uses live bridge edits first",
+      "replaces the requested prop with a red cube",
+      "bakes source changes because save is explicit",
+      "runs the bake validation gate"
+    ]
+  }
+]

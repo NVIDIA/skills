@@ -1,0 +1,113 @@
+[
+  {
+    "id": "i4h-workflow-validate-readme-quick-scissor-two",
+    "question": "Evaluate scissor pick and place for 2 episodes.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This README Quick Run prompt routes to validation for env scissor_pick_and_place with two policy rollout episodes.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "maps the natural env name to scissor_pick_and_place",
+      "sets EPISODES to 2",
+      "uses the env YAML policy model unless a checkpoint is provided",
+      "records verification episodes to HDF5"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-readme-quick-ultrasound",
+    "question": "Evaluate ultrasound for 1 episode.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This README Quick Run prompt routes to validation for env ultrasound_liver_scan with one episode.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "maps ultrasound to ultrasound_liver_scan",
+      "sets EPISODES to 1",
+      "uses the openpi policy stack from the env YAML"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-readme-quick-trocar",
+    "question": "Evaluate trocar assembly for 1 episode.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This README Quick Run prompt routes to validation for env assemble_trocar with one inference-only episode.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "maps trocar assembly to assemble_trocar",
+      "sets EPISODES to 1",
+      "treats assemble_trocar as inference-only"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-readme-quick-locomanip-tray",
+    "question": "Evaluate locomanip tray pick and place for 1 episode.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This README Quick Run prompt routes to validation for env locomanip_tray_pick_and_place with one episode.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "maps the prompt to locomanip_tray_pick_and_place",
+      "sets EPISODES to 1",
+      "uses the GR00T N1.6 locomanip policy stack"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-readme-quick-locomanip-cart",
+    "question": "Evaluate locomanip push cart for 1 episode.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This README Quick Run prompt routes to validation for env locomanip_push_cart with one episode.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "maps the prompt to locomanip_push_cart",
+      "sets EPISODES to 1",
+      "uses the GR00T N1.6 locomanip policy stack"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-readme-quick-surgical-reach-state-machine",
+    "question": "Run surgical_reach_psm with the state machine for 1 episode.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This README Quick Run prompt routes to validation/smoke-run handling for env surgical_reach_psm with Arena --state-machine and one episode, without starting a policy daemon.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "sets ENV_ID to surgical_reach_psm",
+      "sets STATE_MACHINE to true and EPISODES to 1",
+      "runs Arena with --state-machine",
+      "does not start the policy daemon"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-readme-quick-surgical-lift-needle-state-machine",
+    "question": "Run surgical_lift_needle with the state machine for 1 episode.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This README Quick Run prompt routes to validation/smoke-run handling for env surgical_lift_needle with Arena --state-machine and one episode, without starting a policy daemon.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "sets ENV_ID to surgical_lift_needle",
+      "sets STATE_MACHINE to true and EPISODES to 1",
+      "runs Arena with --state-machine",
+      "does not start the policy daemon"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-readme-quick-new-checkpoint",
+    "question": "Run eval using new checkpoint for 300 timesteps.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This README Quick Run prompt routes to checkpoint validation, using the newly produced checkpoint and max timesteps of 300.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "uses the latest/new checkpoint as MODEL_PATH",
+      "sets MAX_TIMESTEPS to 300",
+      "records rollout verification output"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-table-scissor-three",
+    "question": "Evaluate scissor pick and place with 3 episodes.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This README skill-table prompt routes to validation for scissor_pick_and_place with three episodes.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "maps the prompt to scissor_pick_and_place",
+      "sets EPISODES to 3",
+      "does not run annotation unless separately requested"
+    ]
+  }
+]
