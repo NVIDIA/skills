@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: Isaac for Healthcare Workflows
+repo: isaac-for-healthcare/i4h-workflows
+description: Agent-ready skills for Isaac for Healthcare agentic and catheter-navigation workflows, covering task authoring, data pipelines, policy training and validation, CT-derived digital twins, DRR rendering, and interactive catheter simulation.
+links:
+  discussions: false
+skills:
+  - path: skills/i4h-workflow/
+    catalog_dir: i4h-workflow
+  - path: skills/i4h-workflow-setup/
+    catalog_dir: i4h-workflow-setup
+  - path: skills/i4h-workflow-create/
+    catalog_dir: i4h-workflow-create
+  - path: skills/i4h-workflow-scene-edit/
+    catalog_dir: i4h-workflow-scene-edit
+  - path: skills/i4h-workflow-dataset-teleop/
+    catalog_dir: i4h-workflow-dataset-teleop
+  - path: skills/i4h-workflow-dataset-replay/
+    catalog_dir: i4h-workflow-dataset-replay
+  - path: skills/i4h-workflow-dataset-mimic/
+    catalog_dir: i4h-workflow-dataset-mimic
+  - path: skills/i4h-workflow-dataset-annotate/
+    catalog_dir: i4h-workflow-dataset-annotate
+  - path: skills/i4h-workflow-dataset-convert/
+    catalog_dir: i4h-workflow-dataset-convert
+  - path: skills/i4h-workflow-finetune/
+    catalog_dir: i4h-workflow-finetune
+  - path: skills/i4h-workflow-validate/
+    catalog_dir: i4h-workflow-validate
+  - path: skills/i4h-workflow-e2e/
+    catalog_dir: i4h-workflow-e2e
+  - path: skills/i4h-lerobot-viz/
+    catalog_dir: i4h-lerobot-viz
+  - path: skills/i4h-catheter-navigation/
+    catalog_dir: i4h-catheter-navigation
+  - path: skills/i4h-catheter-navigation-setup/
+    catalog_dir: i4h-catheter-navigation-setup
+  - path: skills/i4h-catheter-navigation-digital-twin/
+    catalog_dir: i4h-catheter-navigation-digital-twin
+  - path: skills/i4h-catheter-navigation-render-drr/
+    catalog_dir: i4h-catheter-navigation-render-drr
+  - path: skills/i4h-catheter-navigation-viewport/
+    catalog_dir: i4h-catheter-navigation-viewport
+  - path: skills/i4h-catheter-navigation-smoke/
+    catalog_dir: i4h-catheter-navigation-smoke
+  - path: skills/i4h-catheter-navigation-e2e/
+    catalog_dir: i4h-catheter-navigation-e2e
