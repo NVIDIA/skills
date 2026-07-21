@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 301,
-  "result_row_count": 2780,
+  "skill_count": 321,
+  "result_row_count": 2980,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -2053,6 +2053,345 @@
       "component": "Holoscan Sensor Bridge",
       "has_results": true,
       "average_uplift_pct": 18.4
+    },
+    {
+      "skill": "i4h-catheter-navigation",
+      "evaluation_date": "2026-07-20",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [],
+      "catalog_dir": "i4h-catheter-navigation",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 29.6
+    },
+    {
+      "skill": "i4h-catheter-navigation-digital-twin",
+      "evaluation_date": "2026-07-20",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [],
+      "catalog_dir": "i4h-catheter-navigation-digital-twin",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 25.0
+    },
+    {
+      "skill": "i4h-catheter-navigation-e2e",
+      "evaluation_date": "2026-07-20",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [],
+      "catalog_dir": "i4h-catheter-navigation-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 25.5
+    },
+    {
+      "skill": "i4h-catheter-navigation-render-drr",
+      "evaluation_date": "2026-07-20",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [],
+      "catalog_dir": "i4h-catheter-navigation-render-drr",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 34.6
+    },
+    {
+      "skill": "i4h-catheter-navigation-setup",
+      "evaluation_date": "2026-07-20",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [],
+      "catalog_dir": "i4h-catheter-navigation-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 25.5
+    },
+    {
+      "skill": "i4h-catheter-navigation-smoke",
+      "evaluation_date": "2026-07-20",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [],
+      "catalog_dir": "i4h-catheter-navigation-smoke",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 21.0
+    },
+    {
+      "skill": "i4h-catheter-navigation-viewport",
+      "evaluation_date": "2026-07-20",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [],
+      "catalog_dir": "i4h-catheter-navigation-viewport",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 27.5
+    },
+    {
+      "skill": "i4h-lerobot-viz",
+      "evaluation_date": "2026-07-03",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 35.3
+    },
+    {
+      "skill": "i4h-workflow",
+      "evaluation_date": "2026-07-03",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "i4h-workflow",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 26.3
+    },
+    {
+      "skill": "i4h-workflow-create",
+      "evaluation_date": "2026-07-03",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "i4h-workflow-create",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 39.5
+    },
+    {
+      "skill": "i4h-workflow-dataset-annotate",
+      "evaluation_date": "2026-07-03",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 33.5
+    },
+    {
+      "skill": "i4h-workflow-dataset-convert",
+      "evaluation_date": "2026-07-03",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 25.5
+    },
+    {
+      "skill": "i4h-workflow-dataset-mimic",
+      "evaluation_date": "2026-07-03",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "i4h-workflow-dataset-mimic",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 26.4
+    },
+    {
+      "skill": "i4h-workflow-dataset-replay",
+      "evaluation_date": "2026-07-03",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "i4h-workflow-dataset-replay",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 39.5
+    },
+    {
+      "skill": "i4h-workflow-dataset-teleop",
+      "evaluation_date": "2026-07-03",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "i4h-workflow-dataset-teleop",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 37.8
+    },
+    {
+      "skill": "i4h-workflow-e2e",
+      "evaluation_date": "2026-07-03",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 28.4
+    },
+    {
+      "skill": "i4h-workflow-finetune",
+      "evaluation_date": "2026-07-03",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "i4h-workflow-finetune",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 37.4
+    },
+    {
+      "skill": "i4h-workflow-scene-edit",
+      "evaluation_date": "2026-07-03",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "i4h-workflow-scene-edit",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 24.6
+    },
+    {
+      "skill": "i4h-workflow-setup",
+      "evaluation_date": "2026-07-03",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 1,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "i4h-workflow-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 45.7
+    },
+    {
+      "skill": "i4h-workflow-validate",
+      "evaluation_date": "2026-07-03",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 9,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "i4h-workflow-validate",
+      "component": "Isaac for Healthcare Workflows",
+      "has_results": true,
+      "average_uplift_pct": 32.0
     },
     {
       "skill": "jetson-build-source",
@@ -14829,6 +15168,1806 @@
       "agent": "codex",
       "score_pct": 62.0,
       "uplift_pct": 19.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 75.0,
+      "uplift_pct": -25.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 75.0,
+      "uplift_pct": -25.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 90.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 100.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 98.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 94.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 75.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 91.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 98.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 100.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-digital-twin",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 88.0,
+      "uplift_pct": 62.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-digital-twin",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 50.0,
+      "uplift_pct": -25.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-digital-twin",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 85.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-digital-twin",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 95.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-digital-twin",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 91.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-digital-twin",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 81.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-digital-twin",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 62.0,
+      "uplift_pct": 14.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-digital-twin",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 58.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-digital-twin",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 89.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-digital-twin",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 85.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 25.0,
+      "uplift_pct": -25.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 55.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 90.0,
+      "uplift_pct": 70.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 95.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 86.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 38.0,
+      "uplift_pct": -3.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 74.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 93.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 84.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-render-drr",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 100.0,
+      "uplift_pct": 12.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-render-drr",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 100.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-render-drr",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 75.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-render-drr",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 75.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-render-drr",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 94.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-render-drr",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 81.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-render-drr",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 64.0,
+      "uplift_pct": 17.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-render-drr",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 78.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-render-drr",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 93.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-render-drr",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 93.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 75.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 75.0,
+      "uplift_pct": 12.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 55.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 65.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 89.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 81.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 35.0,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 46.0,
+      "uplift_pct": 19.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 89.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 80.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-smoke",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 75.0,
+      "uplift_pct": -25.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-smoke",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-smoke",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 80.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-smoke",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 80.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-smoke",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 95.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-smoke",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 83.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-smoke",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 55.0,
+      "uplift_pct": 8.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-smoke",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 70.0,
+      "uplift_pct": 27.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-smoke",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 94.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-smoke",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 95.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-viewport",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-viewport",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 100.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-viewport",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 85.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-viewport",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 80.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-viewport",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 92.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-viewport",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 84.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-viewport",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 62.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-viewport",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 71.0,
+      "uplift_pct": 19.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-viewport",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 98.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "i4h-catheter-navigation-viewport",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 95.0,
+      "uplift_pct": 24.0
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 70.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 87.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 44.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 33.0,
+      "uplift_pct": 23.0
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 87.0,
+      "uplift_pct": 51.0
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 78.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "i4h-workflow",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "i4h-workflow",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "i4h-workflow",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 29.0
+    },
+    {
+      "catalog_dir": "i4h-workflow",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 23.0
+    },
+    {
+      "catalog_dir": "i4h-workflow",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 49.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "i4h-workflow",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 61.0,
+      "uplift_pct": 52.0
+    },
+    {
+      "catalog_dir": "i4h-workflow",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "i4h-workflow",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 19.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-create",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-create",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-create",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-create",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 81.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-create",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 79.0,
+      "uplift_pct": 54.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-create",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 82.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-create",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 89.0,
+      "uplift_pct": 82.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-create",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 60.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-create",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 50.0,
+      "uplift_pct": 27.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-create",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 74.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": -25.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 74.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 79.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 45.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 48.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 73.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 73.0,
+      "uplift_pct": 29.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 50.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 79.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 57.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 79.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 31.0,
+      "uplift_pct": 14.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 52.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 81.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 76.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-mimic",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-mimic",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-mimic",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-mimic",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 65.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-mimic",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 57.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-mimic",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 86.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-mimic",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 45.0,
+      "uplift_pct": 11.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-mimic",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 27.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-mimic",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 82.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-mimic",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": 24.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-replay",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-replay",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-replay",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 59.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-replay",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 65.0,
+      "uplift_pct": 53.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-replay",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 99.0,
+      "uplift_pct": 62.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-replay",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-replay",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 41.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-replay",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 41.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-replay",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-replay",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 73.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-teleop",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-teleop",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-teleop",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-teleop",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 82.0,
+      "uplift_pct": 57.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-teleop",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 59.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-teleop",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 76.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-teleop",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 63.0,
+      "uplift_pct": 58.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-teleop",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 46.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-teleop",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 72.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-teleop",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 64.0,
+      "uplift_pct": 19.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 50.0,
+      "uplift_pct": -50.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 78.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 79.0,
+      "uplift_pct": 54.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 69.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 45.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 68.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 60.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 49.0,
+      "uplift_pct": 6.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-finetune",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-finetune",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-finetune",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 66.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-finetune",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 82.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-finetune",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 54.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-finetune",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-finetune",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 66.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-finetune",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 59.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-finetune",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-finetune",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 2,
+      "agent": "codex",
+      "score_pct": 77.0,
+      "uplift_pct": 26.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-scene-edit",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 83.0,
+      "uplift_pct": -17.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-scene-edit",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-scene-edit",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 77.0,
+      "uplift_pct": 52.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-scene-edit",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 58.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-scene-edit",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-scene-edit",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 66.0,
+      "uplift_pct": 21.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-scene-edit",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 46.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-scene-edit",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 36.0,
+      "uplift_pct": 29.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-scene-edit",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 62.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-scene-edit",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 63.0,
+      "uplift_pct": 12.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 1,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 1,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 1,
+      "agent": "claude-code",
+      "score_pct": 97.0,
+      "uplift_pct": 72.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 1,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 59.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 1,
+      "agent": "claude-code",
+      "score_pct": 97.0,
+      "uplift_pct": 72.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 1,
+      "agent": "codex",
+      "score_pct": 84.0,
+      "uplift_pct": 14.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 1,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 80.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 1,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 1,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 66.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-setup",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 1,
+      "agent": "codex",
+      "score_pct": 71.0,
+      "uplift_pct": 12.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-validate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 8,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-validate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": 8,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": -6.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-validate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 8,
+      "agent": "claude-code",
+      "score_pct": 71.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-validate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": 8,
+      "agent": "codex",
+      "score_pct": 68.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-validate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 8,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 57.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-validate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": 8,
+      "agent": "codex",
+      "score_pct": 70.0,
+      "uplift_pct": 26.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-validate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 8,
+      "agent": "claude-code",
+      "score_pct": 48.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-validate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": 8,
+      "agent": "codex",
+      "score_pct": 51.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-validate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 8,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-validate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": 8,
+      "agent": "codex",
+      "score_pct": 63.0,
+      "uplift_pct": 12.0
     },
     {
       "catalog_dir": "jetson-build-source",
