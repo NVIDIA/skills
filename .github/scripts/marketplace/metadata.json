@@ -2161,6 +2161,18 @@
       }
     },
     {
+      "path": "skills/nemo-relay-get-started",
+      "name": "nemo-relay-get-started",
+      "description": "Use this skill when first-time NeMo Relay users want to try Relay, choose the least-complex supported quick start, or verify initial value through the CLI, a maintained integration, or direct Python, Node.js, or Rust instrumentation before production setup.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "application_developer,ai_engineer,ml_engineer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "get_started,integrate,configure,validate,test"
+      }
+    },
+    {
       "path": "skills/nemo-relay-install",
       "name": "nemo-relay-install",
       "description": "Use this skill when choosing or running NeMo Relay installation for the CLI, Python, Node.js, Rust, OpenClaw, Hermes, or maintained framework integrations before runtime configuration or quick-start setup.",
@@ -2242,6 +2254,18 @@
         "catalog.subdomain": "agentic-ai",
         "audience": "developer,application_developer,platform_engineer,devops_engineer,ai_engineer",
         "discovery.activity_tags": "package,configure,validate,extend,integrate"
+      }
+    },
+    {
+      "path": "skills/nemo-relay-plugin-observability",
+      "name": "nemo-relay-plugin-observability",
+      "description": "Use this skill when choosing or configuring NeMo Relay observability through the built-in plugin, subscribers, or exporters, including raw ATOF events, ATIF trajectories, OpenTelemetry traces, OpenInference export, or custom event handling.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "application_developer,ai_engineer,platform_engineer,devops_engineer,developer",
+        "discovery.activity_tags": "configure,monitor,integrate,extend,operate"
       }
     },
     {
