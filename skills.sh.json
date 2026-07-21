@@ -8,6 +8,7 @@
       "skills": [
         "aiq-deploy",
         "aiq-research",
+        "i4h-workflow-setup",
         "nemo-evaluator-plugin",
         "nemo-relay-debug-runtime-integration",
         "nemo-relay-get-started",
@@ -37,6 +38,7 @@
         "hsb-flash",
         "hsb-setup",
         "hsb-test",
+        "i4h-catheter-navigation-setup",
         "jetson-build-source",
         "jetson-customize-camera",
         "jetson-customize-fan",
@@ -71,9 +73,28 @@
       "title": "Robotics",
       "description": "Build, deploy, test, and operate robotic systems, robot policies, robot applications, and robot development workflows.",
       "skills": [
+        "i4h-lerobot-viz",
+        "i4h-workflow",
+        "i4h-workflow-dataset-annotate",
+        "i4h-workflow-dataset-convert",
+        "i4h-workflow-dataset-mimic",
+        "i4h-workflow-dataset-teleop",
+        "i4h-workflow-e2e",
+        "i4h-workflow-finetune",
         "jetson-customize-pcie",
         "jetson-customize-pinmux",
         "jetson-validate-image"
+      ]
+    },
+    {
+      "title": "Robotics Simulation",
+      "description": "Build and run robotics simulation workflows for training, testing, validation, synthetic data generation, and scenario coverage.",
+      "skills": [
+        "i4h-catheter-navigation-e2e",
+        "i4h-workflow-create",
+        "i4h-workflow-dataset-replay",
+        "i4h-workflow-scene-edit",
+        "i4h-workflow-validate"
       ]
     },
     {
@@ -176,7 +197,18 @@
         "earth2studio-deterministic-forecast",
         "earth2studio-discover",
         "earth2studio-install",
+        "i4h-catheter-navigation",
+        "i4h-catheter-navigation-render-drr",
+        "i4h-catheter-navigation-smoke",
+        "i4h-catheter-navigation-viewport",
         "physicsnemo-discover"
+      ]
+    },
+    {
+      "title": "Digital Twins",
+      "description": "Build, simulate, connect, and operate digital representations of physical systems, environments, factories, and assets.",
+      "skills": [
+        "i4h-catheter-navigation-digital-twin"
       ]
     },
     {
