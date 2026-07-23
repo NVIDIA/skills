@@ -59,7 +59,7 @@ npx skills add nvidia/skills --skill cuopt-numerical-optimization-api --agent cl
 npx skills add nvidia/skills --skill cuopt-numerical-optimization-api --agent codex
 ```
 
-**Cortex**
+**Snowflake CoCo**
 
 ```bash
 npx skills add nvidia/skills --skill cuopt-numerical-optimization-api --agent cortex
