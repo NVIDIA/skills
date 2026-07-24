@@ -2,7 +2,7 @@
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
   "skill_count": 321,
-  "result_row_count": 2980,
+  "result_row_count": 2975,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -4084,21 +4084,18 @@
     },
     {
       "skill": "nvidia-skill-finder",
-      "evaluation_date": "2026-07-10",
-      "profile": "external",
-      "environment": "astra-sandbox",
+      "evaluation_date": "2026-07-24",
+      "profile": null,
+      "environment": "local",
       "tasks": 17,
       "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
       "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
+      "agents": [],
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "has_results": true,
-      "average_uplift_pct": 31.4
+      "average_uplift_pct": 32.8
     },
     {
       "skill": "omniverse-cad-to-simready",
@@ -24893,17 +24890,8 @@
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "dimension": "Security",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nvidia-skill-finder",
-      "component": "NVIDIA Skills",
-      "dimension": "Security",
-      "num": 8,
-      "agent": "codex",
+      "num": 17,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -24911,73 +24899,37 @@
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "dimension": "Correctness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 97.0,
-      "uplift_pct": 45.0
-    },
-    {
-      "catalog_dir": "nvidia-skill-finder",
-      "component": "NVIDIA Skills",
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 89.0,
-      "uplift_pct": 31.0
+      "num": 17,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 100.0,
+      "uplift_pct": 24.0
     },
     {
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "dimension": "Discoverability",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 98.0,
-      "uplift_pct": 63.0
-    },
-    {
-      "catalog_dir": "nvidia-skill-finder",
-      "component": "NVIDIA Skills",
-      "dimension": "Discoverability",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 44.0
+      "num": 17,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 91.0,
-      "uplift_pct": 40.0
-    },
-    {
-      "catalog_dir": "nvidia-skill-finder",
-      "component": "NVIDIA Skills",
-      "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 78.0,
-      "uplift_pct": 22.0
+      "num": 17,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 99.0,
+      "uplift_pct": 52.0
     },
     {
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "dimension": "Efficiency",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": 43.0
-    },
-    {
-      "catalog_dir": "nvidia-skill-finder",
-      "component": "NVIDIA Skills",
-      "dimension": "Efficiency",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 81.0,
-      "uplift_pct": 26.0
+      "num": 17,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 86.0,
+      "uplift_pct": 38.0
     },
     {
       "catalog_dir": "physical-ai-defect-image-generation",
