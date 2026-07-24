@@ -1,5 +1,5 @@
 ## Description: <br>
-Help users discover, install, and start using NVIDIA skills that may not be installed yet. <br>
+Helps users discover, install, and start using NVIDIA skills that may not be installed yet by acting as a capability detector and catalog router for NVIDIA products and workflows. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to discover, install, and start using NVIDIA catalog skills that match their hardware, software, or workflow requirements. <br>
+Developers and engineers working with NVIDIA hardware, software, SDKs, or accelerated-computing workflows who need to discover and install relevant NVIDIA agent skills from the official catalog. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Not Specified] <br>
-**Credential Type(s):** [None identified] <br>
+**Requires API Key or External Credential:** [No] <br>
+**Credential Type(s):** [None] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -26,24 +26,23 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [Taxonomy Routing Reference](references/taxonomy-routing.md) <br>
-- [NVIDIA Skills Catalog (GitHub)](https://github.com/NVIDIA/skills/tree/main/skills) <br>
-- [NVIDIA Skills Catalog (Build)](https://build.nvidia.com/skills) <br>
+- [NVIDIA Skills Catalog](https://build.nvidia.com/skills) <br>
+- [NVIDIA Skills GitHub Repository](https://github.com/NVIDIA/skills/tree/main/skills) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
+**Output Type(s):** [Analysis, Shell commands, Configuration instructions] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- `claude-code` <br>
-- `codex` <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 17 tasks (12 positive activation, 5 negative activation) using NVSkills-Eval profile 'external' in astra-sandbox environment. <br>
+Evaluated against 17 evaluation tasks (12 positive activation, 5 negative activation) through Skill Evaluator with external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,18 +59,17 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 8 | 100% (+0%) | 100% (+0%) |
-| Correctness | 8 | 97% (+45%) | 89% (+31%) |
-| Discoverability | 8 | 98% (+63%) | 88% (+44%) |
-| Effectiveness | 8 | 91% (+40%) | 78% (+22%) |
-| Efficiency | 8 | 90% (+43%) | 81% (+26%) |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) |
+|---|---:|---:|
+| Security | 17 | 100% (+0%) |
+| Correctness | 17 | 100% (+24%) |
+| Discoverability | 17 | 100% (+50%) |
+| Effectiveness | 17 | 99% (+52%) |
+| Efficiency | 17 | 86% (+38%) |
 
 ## Skill Version(s): <br>
 0.3.0 (source: changelog, released 2025-05-21) <br>

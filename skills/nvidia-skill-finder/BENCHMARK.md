@@ -1,15 +1,15 @@
 # Evaluation Report
 
-Evaluation of the `nvidia-skill-finder` skill before publication through NVSkills-Eval.
+Evaluation of the `nvidia-skill-finder` skill before publication through Skill Evaluator.
 
-This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
+This benchmark summarizes 3-Tier Evaluation from Skill Evaluator results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
 
 ## Evaluation Summary
 
 - Skill: `nvidia-skill-finder`
-- Evaluation date: 2026-07-10
-- NVSkills-Eval profile: `external`
-- Environment: `astra-sandbox`
+- Evaluation date: 2026-07-24
+- Skill Evaluator profile: `external`
+- Environment: `local`
 - Dataset: 17 evaluation tasks
 - Attempts per task: 1
 - Pass threshold: 50%
@@ -17,8 +17,7 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 
 ## Agents Used
 
-- `claude-code`
-- `codex`
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)
 
 ## Metrics Used
 
@@ -38,7 +37,6 @@ Underlying evaluation signals used in this run:
 - `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
 - `goal_accuracy` (Goal Accuracy): checks whether the overall user task completed successfully.
 - `behavior_check` (Behavior Check): verifies expected behavior steps, including safety expectations.
-- `token_efficiency` (Token Efficiency): compares token usage with and without the skill.
 
 ## Test Tasks
 
@@ -52,19 +50,19 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 ## Results
 
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 8 | 100% (+0%) | 100% (+0%) |
-| Correctness | 8 | 97% (+45%) | 89% (+31%) |
-| Discoverability | 8 | 98% (+63%) | 88% (+44%) |
-| Effectiveness | 8 | 91% (+40%) | 78% (+22%) |
-| Efficiency | 8 | 90% (+43%) | 81% (+26%) |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) |
+|---|---:|---:|
+| Security | 17 | 100% (+0%) |
+| Correctness | 17 | 100% (+24%) |
+| Discoverability | 17 | 100% (+50%) |
+| Effectiveness | 17 | 99% (+52%) |
+| Efficiency | 17 | 86% (+38%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 3 total findings.
+Tier 1 validation passed with observations. Skill Evaluator ran 1 checks and found 3 total findings.
 
 Top findings:
 
@@ -78,4 +76,4 @@ This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 
-The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.
+The skill is suitable to proceed toward Skill Evaluator publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.
