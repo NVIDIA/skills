@@ -67,12 +67,13 @@ jobs:
           while true; do
             files_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/pulls/${pr_number}/files?per_page=100&page=${page}")"
             if printf '%s' "${files_json}" | jq -e '
-              any(.[]; .filename |
+              def watched:
+                (. // "") |
                 startswith("skills/") or
                 startswith("team-skills/") or
                 startswith("rules/team-rules/") or
-                startswith("plugins/")
-              )
+                startswith("plugins/");
+              any(.[]; (.filename | watched) or (.previous_filename? | watched))
             ' >/dev/null; then
               has_watched_change=true
               break
@@ -91,32 +92,110 @@ jobs:
             exit 0
           fi
 
-          statuses_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/commits/${head_sha}/statuses?per_page=100")"
-          status_state="$(printf '%s' "${statuses_json}" | jq -r \
-            --arg context "${STATUS_CONTEXT}" \
-            '[.[] | select(.context == $context)][0].state // "missing"')"
-          target_url="$(printf '%s' "${statuses_json}" | jq -r \
-            --arg context "${STATUS_CONTEXT}" \
-            '[.[] | select(.context == $context)][0].target_url // ""')"
+          commit_shas_file="$(mktemp)"
+          trap 'rm -f "${commit_shas_file}"' EXIT
+
+          page=1
+          while true; do
+            commits_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/pulls/${pr_number}/commits?per_page=100&page=${page}")"
+            printf '%s' "${commits_json}" | jq -r '.[].sha | ascii_downcase' >> "${commit_shas_file}"
+            if [ "$(printf '%s' "${commits_json}" | jq 'length')" -lt 100 ]; then
+              break
+            fi
+            page=$((page + 1))
+          done
+
+          mapfile -t commit_shas < "${commit_shas_file}"
+          if [ "${#commit_shas[@]}" -eq 0 ]; then
+            echo "Pull request commits could not be resolved."
+            exit 1
+          fi
+
+          latest_watched_sha=""
+          latest_watched_path=""
+          for ((idx=${#commit_shas[@]} - 1; idx >= 0; idx--)); do
+            commit_sha="${commit_shas[idx]}"
+            commit_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/commits/${commit_sha}")"
+            watched_path="$(printf '%s' "${commit_json}" | jq -r '
+              def watched:
+                (. // "") |
+                startswith("skills/") or
+                startswith("team-skills/") or
+                startswith("rules/team-rules/") or
+                startswith("plugins/");
+              [
+                .files[]? |
+                select((.filename | watched) or (.previous_filename? | watched)) |
+                (.filename // .previous_filename)
+              ][0] // empty
+            ')"
+            if [ -n "${watched_path}" ]; then
+              latest_watched_sha="${commit_sha}"
+              latest_watched_path="${watched_path}"
+              break
+            fi
+          done
+
+          if [ -z "${latest_watched_sha}" ]; then
+            append_summary \
+              "## NVSkills CI required status" \
+              "" \
+              "Skipped: PR #${pr_number} has no commits that changed watched NVSkills paths."
+            exit 0
+          fi
+
+          status_sha=""
+          status_state="missing"
+          target_url=""
+          for ((idx=${#commit_shas[@]} - 1; idx >= 0; idx--)); do
+            commit_sha="${commit_shas[idx]}"
+            statuses_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/commits/${commit_sha}/statuses?per_page=100")"
+            candidate_state="$(printf '%s' "${statuses_json}" | jq -r \
+              --arg context "${STATUS_CONTEXT}" \
+              '[.[] | select(.context == $context)][0].state // "missing"')"
+            if [ "${candidate_state}" != "missing" ]; then
+              status_sha="${commit_sha}"
+              status_state="${candidate_state}"
+              target_url="$(printf '%s' "${statuses_json}" | jq -r \
+                --arg context "${STATUS_CONTEXT}" \
+                '[.[] | select(.context == $context)][0].target_url // ""')"
+              break
+            fi
+            if [ "${commit_sha}" = "${latest_watched_sha}" ]; then
+              break
+            fi
+          done
 
           if [ "${status_state}" = "success" ]; then
             append_summary \
               "## NVSkills CI required status" \
               "" \
-              "Passed: \`${STATUS_CONTEXT}\` succeeded for \`${head_sha}\`."
+              "Passed: \`${STATUS_CONTEXT}\` succeeded for \`${status_sha}\`." \
+              "" \
+              "Latest watched-path change: \`${latest_watched_path}\` at \`${latest_watched_sha}\`."
+            if [ "${status_sha}" != "${head_sha}" ]; then
+              append_summary \
+                "" \
+                "PR head \`${head_sha}\` has only trailing changes that do not require a fresh NVSkills CI status."
+            fi
             exit 0
           fi
 
           append_summary \
             "## NVSkills CI required status" \
             "" \
-            "Failed: \`${STATUS_CONTEXT}\` status is \`${status_state}\` for \`${head_sha}\`." \
+            "Failed: \`${STATUS_CONTEXT}\` status is \`${status_state}\` for the latest relevant commit." \
+            "" \
+            "Latest watched-path change: \`${latest_watched_path}\` at \`${latest_watched_sha}\`." \
             "" \
             "Comment \`/nvskills-ci\` on this PR after every commit that changes" \
             "\`skills/\`, \`team-skills/\`, \`rules/team-rules/\`, or \`plugins/\`." \
             "" \
             "\`/nvskills-ci\` only works on branches in \`NVIDIA/skills\`, not forks." \
             "If this PR is from a fork, move the changes to a branch in \`NVIDIA/skills\` first."
+          if [ -n "${status_sha}" ]; then
+            append_summary "" "Latest NVSkills CI status checked: \`${status_state}\` on \`${status_sha}\`."
+          fi
           if [ -n "${target_url}" ]; then
             append_summary "" "Current NVSkills CI run: ${target_url}"
           fi
