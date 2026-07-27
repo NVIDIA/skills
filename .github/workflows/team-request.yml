@@ -27,6 +27,9 @@ jobs:
           HEAD_REF: ${{ github.event.pull_request.head.ref || '' }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.event.sha || github.sha }}
           STATUS_CONTEXT: ${{ vars.NVSKILLS_STATUS_CONTEXT || 'NVSkills CI' }}
+          EVENT_ACTOR: ${{ github.actor }}
+          SIGNATURE_COMMIT_TITLE: ${{ vars.NVSKILLS_SIGNATURE_COMMIT_TITLE || 'Attach NVSkills validation signatures' }}
+          SIGNATURE_PUSH_ACTOR: ${{ vars.NVSKILLS_SIGNATURE_PUSH_ACTOR || 'nv-skills-ci[bot]' }}
         run: |
           set -euo pipefail
 
@@ -55,6 +58,33 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
               "$1"
+          }
+
+          is_trusted_generated_signature_commit() {
+            local commit_json="$1"
+            local commit_title
+            local file_count
+
+            [ "${EVENT_ACTOR}" = "${SIGNATURE_PUSH_ACTOR}" ] || return 1
+
+            commit_title="$(printf '%s' "${commit_json}" | jq -r '.commit.message | split("\n")[0]')"
+            [ "${commit_title}" = "${SIGNATURE_COMMIT_TITLE}" ] || return 1
+
+            file_count="$(printf '%s' "${commit_json}" | jq '.files | length')"
+            # GitHub paginates commit file lists. Fail closed rather than
+            # exempting a commit whose complete set of changed files is unknown.
+            [ "${file_count}" -gt 0 ] && [ "${file_count}" -lt 100 ] || return 1
+
+            printf '%s' "${commit_json}" | jq -e '
+              def generated_artifact:
+                test(
+                  "^(skills/[^/]+|team-skills/[^/]+/[^/]+|plugins/[^/]+)/" +
+                  "(BENCHMARK\\.md|skill-card\\.md|skill\\.oms\\.sig|" +
+                  "skill-card-review-needed\\.md|[^/]+-review-needed\\.md)$"
+                );
+              any(.files[]?; .filename | endswith("/skill.oms.sig")) and
+              all(.files[]?; .filename | generated_artifact)
+            ' >/dev/null
           }
 
           if [ -z "${pr_number}" ] || [ -z "${head_sha}" ]; then
@@ -113,9 +143,10 @@ jobs:
 
           latest_watched_sha=""
           latest_watched_path=""
+          generated_signature_sha=""
           for ((idx=${#commit_shas[@]} - 1; idx >= 0; idx--)); do
             commit_sha="${commit_shas[idx]}"
-            commit_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/commits/${commit_sha}")"
+            commit_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/commits/${commit_sha}?per_page=100")"
             watched_path="$(printf '%s' "${commit_json}" | jq -r '
               def watched:
                 (. // "") |
@@ -130,6 +161,10 @@ jobs:
               ][0] // empty
             ')"
             if [ -n "${watched_path}" ]; then
+              if is_trusted_generated_signature_commit "${commit_json}"; then
+                generated_signature_sha="${commit_sha}"
+                continue
+              fi
               latest_watched_sha="${commit_sha}"
               latest_watched_path="${watched_path}"
               break
@@ -137,6 +172,13 @@ jobs:
           done
 
           if [ -z "${latest_watched_sha}" ]; then
+            if [ -n "${generated_signature_sha}" ]; then
+              append_summary \
+                "## NVSkills CI required status" \
+                "" \
+                "Failed: trusted generated signature commit \`${generated_signature_sha}\` has no preceding watched-path content commit to validate."
+              exit 1
+            fi
             append_summary \
               "## NVSkills CI required status" \
               "" \
@@ -177,6 +219,11 @@ jobs:
               append_summary \
                 "" \
                 "PR head \`${head_sha}\` has only trailing changes that do not require a fresh NVSkills CI status."
+            fi
+            if [ -n "${generated_signature_sha}" ]; then
+              append_summary \
+                "" \
+                "Trusted generated signature commit \`${generated_signature_sha}\` was verified against the preceding watched-path validation status."
             fi
             exit 0
           fi
