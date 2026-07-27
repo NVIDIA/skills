@@ -1,6 +1,6 @@
 interface:
   display_name: "NVIDIA Skill Finder"
-  short_description: "Find and install relevant NVIDIA skills."
+  short_description: "Find relevant NVIDIA skills and, with your approval, install them."
   default_prompt: "Use $nvidia-skill-finder to find the right NVIDIA agent skill for my task."
 
 policy:

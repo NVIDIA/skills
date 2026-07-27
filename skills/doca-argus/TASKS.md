@@ -91,7 +91,11 @@ review) before the container starts.
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy))
    to triage initial false positives, tune the detection policy
    per the public guide, and confirm a steady-state finding
-   baseline. Skipping this step is how a noisy initial channel
+   baseline. Record the exit criteria before starting: minimum
+   observation window, representative workload phases and smoke
+   events, quantified acceptable finding/false-positive budget, zero
+   missed required smoke detections, no undocumented disables, and
+   the security-ops owner who must sign off. Skipping this step is how a noisy initial channel
    either floods the SIEM ops queue or trains the team to
    ignore Argus findings entirely.
 6. **Author the Argus container config.** From the public DOCA
@@ -230,9 +234,10 @@ flowing, BEFORE enabling any production alerting on top.
    waiting on real findings.
 7. **Single-event smoke (next: `## test` step 1).** Before
    enabling production alerting on the SIEM channel, walk
-   `## test` step 1 once with a known-benign event so the
-   end-to-end pipeline is exercised; only then layer production
-   alerting on top.
+   `## test` step 1 on a non-production monitored workload: enable
+   the documented **Process Created** event and start one harmless,
+   pre-approved process. Confirm that exact event traverses the
+   end-to-end pipeline; only then layer production alerting on top.
 
 For the runtime version + container-tag cross-checks that
 underlie *"my Argus behaves differently from what the docs say"*,
@@ -269,36 +274,49 @@ iterative loop is here to prevent — and in security tooling, the
 silent failure mode means the channel goes blind in a way nobody
 notices until the first real event.
 
-1. **End-to-end smoke.** With Argus running and the forwarder
-   wired, confirm in this order: (a) Argus container stdout
-   shows the documented startup banner, the configured detectors
-   activated, and the forwarder handshake succeeded; (b) a
-   known-benign event (one that should fire a documented benign
-   detector class per the public guide, or an explicit smoke
-   event the public guide describes) is generated; (c) the
-   finding for that event appears in Argus's local finding feed;
-   (d) the same finding appears in the SIEM's ingest, in the
-   review surface the security ops team will actually look at.
-2. **Four-axis smoke.** Confirm the negative case: temporarily
-   misconfigure a non-load-bearing detector to verify findings
-   still flow for the rest, then revert. This validates the
-   operator's understanding of the four-axis rule AND that a
-   detection-policy mutation is recoverable. Do this in a smoke
-   posture, not on the production SIEM channel.
-3. **Forwarder smoke.** Stop the SIEM endpoint (or block its
-   reachability for a short, scheduled window) and confirm that
-   the Argus container's documented forwarder error path
-   surfaces the failure — Argus must NOT silently drop findings.
-   Restore reachability and confirm queued findings either
-   arrive or are accounted for per the public guide. This
-   validates the forwarder, not Argus.
+1. **End-to-end smoke using a documented event.** With Argus
+   running and the forwarder wired, use a non-production monitored
+   workload. Enable the public guide's documented **Process
+   Created** event, record the local and receiver baselines, then
+   start one harmless, pre-approved process. Confirm in order:
+   (a) Argus container stdout shows the documented startup state
+   with the configured detectors active and the forwarder handshake
+   successful; (b) the corresponding Process Created event for the
+   approved process appears in Argus's local event log; (c) that same
+   event ID appears at the dedicated smoke receiver or tagged,
+   non-alerting SIEM index the security ops team will review. Do not
+   invent a detector, alert, or synthetic-event interface: process
+   creation is the documented source-backed mechanism.
+2. **Four-axis smoke without disabling detection.** Repeat the same
+   release-matched Process Created smoke after
+   each proposed detection-policy, forwarding, sampling, or
+   host-coverage change, one axis at a time, on the non-production
+   workload and smoke destination. Compare the identical local and
+   receiver evidence against the baseline. Where the public guide
+   documents a non-matching benign event, also confirm it does not
+   produce that detector's alert while the container, other enabled
+   detectors, and forwarder remain healthy. Do not deliberately
+   misconfigure or disable an unspecified detector to manufacture a
+   negative case.
+3. **Forwarder failure smoke (strictly gated).** Prefer a dedicated
+   test receiver whose reachability can be interrupted without
+   affecting production. Inject an outage only there, or during an
+   explicit owner-approved maintenance window for the real SIEM
+   endpoint. Never stop or block a shared production SIEM merely
+   for an Argus test. Confirm the documented forwarder error path,
+   restore reachability, and account for queued findings per the
+   public guide. If isolation is impossible, require SIEM-owner
+   approval, a time-boxed maintenance window, production-alert
+   suppression for the test stream, and a data-gap accounting plan;
+   otherwise skip destructive fault injection and escalate to the
+   SIEM owner. This validates the forwarder, not Argus.
 4. **Calibration-period triage.** Run the deployment against the
    real workload, in a posture where findings flow to a smoke
    destination (or a tagged SIEM index that the security ops
    team is NOT yet alerting on). Triage the false-positive
    stream; tune the detection policy per the public guide; loop
-   until the steady-state finding baseline is acceptable to the
-   ops team. Per the calibration-period rule in
+   until the pre-recorded calibration exit criteria all hold and the
+   security-ops owner signs off. Per the calibration-period rule in
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy),
    early false positives are expected, not bugs; never silently
    disable a detector class to make the stream quieter.
@@ -318,6 +336,9 @@ notices until the first real event.
 Layered diagnosis. Walk the layers in this order; do not skip
 down without clearing the layer above. The five layers match
 [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy).
+To "clear" a layer, capture the layer's named healthy evidence and
+show that its listed symptoms are absent; applying a proposed
+resolution alone does not clear it.
 
 1. **Container runtime layer.** Is the Argus container actually
    running and not restart-looping? Symptoms: container exits
@@ -327,7 +348,9 @@ down without clearing the layer above. The five layers match
    config mount path matches what the public guide names;
    confirm BlueField has the runtime configured per the public
    Container Deployment Guide. This layer is owned by the
-   container runtime, not by detection policy.
+   container runtime, not by detection policy. **Cleared when:** the
+   release-matched image is running, its restart count is stable
+   across two reads, and the documented config mount is present.
 2. **Detection-policy layer.** Container green; no findings
    arriving (false-negative posture) or far too many findings
    arriving (false-positive flood). Resolution: walk the
@@ -343,6 +366,9 @@ down without clearing the layer above. The five layers match
    quiet the stream.** Use the public guide's tuning surface or
    the sampling knob instead, and if a disable is truly needed,
    document it and time-box it.
+   **Cleared when:** the required documented smoke detections pass,
+   the recorded calibration budget holds for its observation window,
+   and no detector is disabled outside the disable register.
 3. **Forwarding-destination layer.** Findings present in Argus's
    local finding feed; SIEM ingest empty. Resolution: walk the
    forwarder config in the Argus container, the network
@@ -351,6 +377,9 @@ down without clearing the layer above. The five layers match
    layer is owned by the forwarder and the SIEM-side ingest,
    not by the detection policy — re-tuning the detection
    policy here is wasted effort.
+   **Cleared when:** the local finding and the same finding identifier
+   appear at the intended SIEM destination, and the documented
+   forwarder health signal remains green.
 4. **Sampling / performance layer.** Argus healthy, findings
    correct, SIEM receiving — but the host workload's
    performance is noticeably impacted (CPU / latency) since
@@ -360,14 +389,20 @@ down without clearing the layer above. The five layers match
    from lab sampling). **Do NOT respond to performance impact
    by disabling detector classes silently** — re-tune sampling
    first, then re-tune detection policy if sampling alone is
-   insufficient, and document any disable.
+   insufficient, and document any disable. **Cleared when:** the
+   workload's pre-recorded CPU/latency budget holds during a
+   representative observation window while required smoke detections
+   still pass.
 5. **Host-coverage layer.** Argus healthy, findings correct,
    SIEM receiving — but the findings are about the wrong host
    targets (silent about the workload the operator cared about,
    noisy about out-of-scope targets). Resolution: walk the
    host-coverage axis in the Argus config per the public guide
    and re-scope. The Argus container can be perfectly green and
-   still be looking the wrong direction.
+   still be looking the wrong direction. **Cleared when:** documented
+   smoke events from every intended target are observed and equivalent
+   events from explicitly out-of-scope targets do not enter the review
+   stream.
 6. **Version layer.** When the public Argus Service Guide page
    appears to disagree with what the deployed container does,
    the docs version may not match the container tag. Walk
@@ -375,10 +410,14 @@ down without clearing the layer above. The five layers match
    layer 2 (partial install / version mismatch) and apply the
    container-tag overlay from
    [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
+   **Cleared when:** the running container tag, release-matched guide,
+   and applicable DOCA/BFB anchors satisfy the `doca-version` check.
 7. **Cross-cutting layer.** For env-side and program-side debug
    that is not Argus-specific (host install, host kernel, DOCA
    library errors Argus may surface), drop to
    [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug).
+   **Cleared when:** the owning debug skill names and observes its
+   green signal; Argus does not declare this layer clear on its behalf.
 
 ## Command appendix
 

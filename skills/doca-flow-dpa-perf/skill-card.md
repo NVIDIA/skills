@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when invoking doca_flow_dpa_perf on DPA-capable hardware (ConnectX-7+ or BlueField-3) to measure rule update and disable rates on the DPA-offloaded DOCA Flow path. <br>
+Use this skill when invoking doca_flow_dpa_perf on DPA-capable hardware (ConnectX-7 minimum supported, ConnectX-8 recommended, or BlueField-3) to measure rule update / disable rates on the DPA-offloaded DOCA Flow path. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers, performance engineers, and platform operators use this skill to produce defensible Kops/sec measurements of the DPA-offloaded Flow update path on DPA-capable NVIDIA hardware, configure workload-shape parameters, and diagnose zero-ops or failed self-test runs. <br>
+External operators, performance engineers, DOCA Flow application developers, and AI agents who need a defensible measurement of the DPA-offloaded Flow update path on DPA-capable hardware (ConnectX-7+, BlueField-3+). <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -37,13 +37,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 internal evaluation tasks using the NVSkills-Eval external profile. <br>
+Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,21 +60,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+71%) | 98% (+51%) |
-| Discoverability | 4 | 100% (+66%) | 98% (+44%) |
-| Effectiveness | 4 | 98% (+77%) | 98% (+68%) |
-| Efficiency | 4 | 92% (+44%) | 95% (+36%) |
+| Correctness | 4 | 100% (+75%) | 100% (+55%) |
+| Discoverability | 4 | 100% (+25%) | 95% (+33%) |
+| Effectiveness | 4 | 100% (+75%) | 92% (+67%) |
+| Efficiency | 4 | 92% (+26%) | 81% (+50%) |
 
 ## Skill Version(s): <br>
-b46f0c4 (source: git SHA, committed 2026-07-15) <br>
+2790d51 (source: git SHA, committed 2026-07-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -34,7 +34,7 @@ The operator-side install path:
 
 1. **Confirm DOCA is installed with the Telemetry
    component.** If the binary is missing, route to
-   [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+   [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
    to install or repair the host-side DOCA package
    selection; confirm the version per
    [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure).
@@ -58,7 +58,11 @@ The operator-side install path:
    public DOCA Telemetry guide requires** for the
    per-device probe (binding a `doca_dev` against a
    PCI address typically requires elevated
-   privileges).
+   privileges). Run the probe as the intended deploying user. If it returns a
+   permission error, stop and route the host policy through `doca-setup`; do
+   not guess a group, ACL, or `sudo` escalation. Schema-only enumeration may
+   continue, but a per-device result is then absent and no device-specific
+   exporter configuration may be committed.
 5. **Confirm the downstream pipeline shape.** Is the
    target an exporter shipping Data IDs to a local
    collector? An exporter shipping into a DTS
@@ -146,7 +150,7 @@ Routing for nearby "build" questions:
 
 - *"The binary isn't there — do I need to build it?"*
   → no. Route to
-  [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
   to install / repair the host-side DOCA package
   selection that includes the Telemetry component.
 - *"I want to build my own collector app that
@@ -424,13 +428,10 @@ The agent's hand-off:
    (collector) plus the publisher-side library
    that emits the IDs.
 2. **Stand up the collector** per
-   [`doca-telemetry TASKS.md ## configure`](../../libs/doca-telemetry/TASKS.md#configure)
-   and
-   [`## run`](../../libs/doca-telemetry/TASKS.md#run);
-   confirm the collector is up before the
-   exporter starts emitting (per the
-   publisher-up-before-collector staging the
-   collector-library skill enforces).
+   the actual downstream consumer's public runbook; confirm it is ready before
+   the exporter starts emitting. The `doca-telemetry` skill is a hardware
+   counter reader, not a collector lifecycle owner, so it does not establish a
+   publisher/collector startup-order contract.
 3. **Round-trip an end-to-end smoke** per
    [`## test`](#test); confirm the Data ID the
    collector sees reverse-resolves through this
@@ -471,7 +472,7 @@ of them under this skill's name.
   via
   [`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services).
 - **DOCA install / repair / upgrade** → route to
-  [`doca-setup ## install`](../../doca-setup/TASKS.md#configure).
+  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure).
 - **Cross-cutting Telemetry pipeline observability
   (Prometheus / OpenTelemetry / fluentd
   integration)** → operator-owned downstream
@@ -500,8 +501,10 @@ the agent should:
    telemetry-component availability in one shot;
    `doca-capability-snapshot` for per-device
    capability flags).
-2. If the probe succeeds, the structured tool's
-   output is the authoritative answer.
+2. If the probe succeeds, the structured tool's output is authoritative for
+   the overlapping environment/device-capability fields it reports. It does
+   not replace artifact-specific `doca_telemetry_utils` name↔ID resolution or
+   reverse-resolution required by this skill's audit tuple.
 3. If the probe fails, fall back to the manual
    command in the row.
 4. The schemas the structured tools emit are

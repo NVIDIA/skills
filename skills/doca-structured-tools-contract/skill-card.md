@@ -1,5 +1,5 @@
 ## Description: <br>
-Defines the structured-tool JSON schemas and agent behavior contract that every other DOCA skill uses to prefer one-shot structured output over multi-command manual fallback chains. <br>
+Defines the structured-tool detection, preference, and fallback contracts that DOCA agent skills use to consolidate multi-command environment, version, device, capability, and validation queries into single one-shot answers. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers who need a single authoritative reference for the structured-tool JSON contracts (doca-env, version-matrix, capability-snapshot, validate-before-commit, collect-host/dpu-state) so agents can detect, prefer, and fall back gracefully across DOCA hosts. <br>
+Developers and engineers using AI agents to query DOCA environment state, version compatibility, device capabilities, and validate specifications before commit through structured tool contracts. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,23 +25,23 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [Routing Examples](references/examples.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Configuration instructions] <br>
-**Output Format:** [Markdown with JSON schema definitions] <br>
+**Output Type(s):** [Analysis, Shell commands] <br>
+**Output Format:** [Markdown with inline JSON schemas and shell command sequences] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 tasks using NVSkills-Eval 3-Tier Evaluation (external profile, astra-sandbox environment). <br>
+Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative) in k8s-sandbox environment using Skill Evaluator external profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -58,21 +58,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+70%) | 89% (+30%) |
-| Discoverability | 4 | 100% (+75%) | 93% (+33%) |
-| Effectiveness | 4 | 87% (+46%) | 80% (+28%) |
-| Efficiency | 4 | 95% (+50%) | 88% (+24%) |
+| Correctness | 4 | 100% (+40%) | 100% (+20%) |
+| Discoverability | 4 | 97% (+34%) | 95% (+33%) |
+| Effectiveness | 4 | 91% (+57%) | 95% (+29%) |
+| Efficiency | 4 | 98% (+38%) | 100% (+75%) |
 
 ## Skill Version(s): <br>
-b7a7b28 (source: git SHA, committed 2026-07-14) <br>
+d53d861 (source: git SHA, committed 2026-07-23) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

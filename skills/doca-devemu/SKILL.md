@@ -79,9 +79,9 @@ they do not have to write the backend for (the DOCA SNAP
 Service and the DOCA Virtio-net Service are the packaged
 options that build on top of this library).
 
-**Language scope.** DOCA Device Emulation ships as a C library
-with three public `pkg-config` modules — one per sub-library —
-selected by which emulation class the user is building (see
+**Language scope.** DOCA Device Emulation ships as a C library;
+this skill covers three sub-libraries end-to-end. Select the exact
+installed `pkg-config` module for the user's emulation class (see
 the sub-library selection table in
 [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)).
 The shipped samples under

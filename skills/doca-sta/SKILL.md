@@ -33,7 +33,7 @@ compatibility: >
 **Where to start:** This skill assumes DOCA is already installed and
 the user is doing **hands-on NVMe-over-Fabrics storage-target work** on
 a BlueField-class device with DOCA. Open [`TASKS.md`](TASKS.md) if
-the user wants to *do* something (configure / build / modify / run
+the user wants to *do* something (configure / modify / build / run
 / test / debug); open [`CAPABILITIES.md`](CAPABILITIES.md) when the
 question is *what can DOCA STA express* on this version. If the
 user has not installed DOCA yet, route to
@@ -195,7 +195,7 @@ material lives in two companion files:
   gates substrate-library, permission, and steering
   preconditions.
 - `TASKS.md` — step-by-step workflows for the six in-scope
-  STA verbs: `configure`, `build`, `modify`, `run`, `test`,
+  STA verbs: `configure`, `modify`, `build`, `run`, `test`,
   `debug`. Plus a `Deferred task verbs` block that points
   out-of-scope questions at the right next skill, and a
   `Command appendix` of the recurring commands the agent
@@ -249,7 +249,7 @@ contain — and pull requests should not add:
    queue-pair shape, RDMA-only transport, capability-query
    rules, error taxonomy, observability, and safety policy,
    see [CAPABILITIES.md](CAPABILITIES.md).**
-3. **For step-by-step workflows — configure, build, modify,
+3. **For step-by-step workflows — configure, modify, build,
    run, test, debug — see [TASKS.md](TASKS.md).**
 
 Both companion files cross-link to each other,

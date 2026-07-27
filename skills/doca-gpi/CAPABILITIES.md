@@ -24,7 +24,7 @@ GPU-initiated RDMA use case, not just the worked example shown.
 | 1. Pick `doca-gpi` vs `doca-gpunetio` | Decide *before* writing any code whether the CUDA kernel drives an RDMA channel directly (channel level — GPI) or sends / receives at the Ethernet-shaped Send/Receive layer (GPU NetIO) | [`## Capabilities and modes`](#capabilities-and-modes) surface-selection table |
 | 2. Stand up the GPI instance | Lifecycle: `doca_gpi_create` on a `doca_dev` → configure via `doca_gpi_set_*` → `doca_gpi_start` → create domain(s) and channel(s) from their attribute objects → retrieve GPU handles → use → `doca_gpi_stop` → `doca_gpi_destroy` | [TASKS.md ## configure](TASKS.md#configure) |
 | 3. Connect a channel endpoint to a remote peer | The channel owns the *GPU-side wiring*; an endpoint is connected by exchanging connection info out of band via `doca_gpi_channel_ep_conn_info_create` + `doca_gpi_channel_ep_connect`, and memory is shared via `doca_gpi_domain_attach_local_mmap` / `doca_gpi_domain_attach_remote_mmap` | [`## Capabilities and modes`](#capabilities-and-modes) endpoint-connection bullet + [TASKS.md ## configure](TASKS.md#configure) |
-| 4. Hand off to the CUDA kernel | `doca_gpi_gpu_channel_get` returns a `doca_gpu_gpi_channel*` the CUDA kernel uses directly; the host releases ownership and the device-side path is then GPU-driven | [`## Capabilities and modes`](#capabilities-and-modes) GPU-handoff bullet + [TASKS.md ## run](TASKS.md#run) |
+| 4. Hand off to the CUDA kernel | `doca_gpi_gpu_channel_get` returns a `doca_gpu_gpi_channel*` the CUDA kernel uses directly; device-side execution is then GPU-driven, while the host remains responsible for the channel lifecycle and must not tear it down until the kernel drains | [`## Capabilities and modes`](#capabilities-and-modes) GPU-handoff bullet + [TASKS.md ## run](TASKS.md#run) |
 | 5. Interpret a `DOCA_ERROR_*` from a GPI call | Map the error to a layer (configuration / lifecycle / GPU datapath / CUDA-version / verbs below / driver) and route | [`## Error taxonomy`](#error-taxonomy) GPI overlay + [TASKS.md ## debug](TASKS.md#debug) |
 
 Two cross-cutting rules that apply to *every* pattern above:
@@ -39,8 +39,9 @@ Two cross-cutting rules that apply to *every* pattern above:
   `_set_gpu_wqe_num`). `doca_gpi.h` ships **no** `doca_gpi_cap_*`
   devinfo query, so the agent must not invent a runtime maximum;
   an out-of-range value surfaces as a `DOCA_ERROR_*` from the
-  create / start call, and supported ranges come from the device
-  and release notes, not from agent memory.
+  create / start call. Candidate ranges come from evidence for the
+  installed version and its release notes; create results on the
+  active device are the runtime acceptance check.
 - **All `doca_gpi_set_*` attributes must be set before
   `doca_gpi_start()`.** The header states `doca_gpi_start` *"Must
   be called after setting all the GPI attributes"*, and
@@ -185,6 +186,12 @@ lives there; this skill does not duplicate it.
   as GPI's DOCA dependencies; a partial install where one of
   these `.pc` files reports a different version is the most
   common partial-install pattern for GPI users.
+  On disagreement, stop before building or running GPI, identify
+  every divergent `.pc` or install-version source, and use
+  [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+  plus [`doca-setup`](../../doca-setup/SKILL.md) to look up and
+  repair the platform-specific package set. Re-run the complete
+  match after repair; do not proceed with a mismatched stack.
 - **The closest public docs surface for the GPU-side handoff is
   the DOCA GPU NetIO programming guide.** Until a dedicated
   *DOCA GPI* page is published, the agent uses the sister DOCA
@@ -212,7 +219,7 @@ indicate:
 | Family | Most common GPI cause | First action |
 | --- | --- | --- |
 | `DOCA_ERROR_BAD_STATE` | A `doca_gpi_set_*` attribute call ran *after* `doca_gpi_start()`, or `doca_gpi_get_dpa` was called on an already-started instance (the header notes it "can be called only if gpi not started") | Walk the lifecycle in [`## Capabilities and modes`](#capabilities-and-modes); confirm every `doca_gpi_set_*` call and `doca_gpi_get_dpa` landed before `doca_gpi_start()` |
-| `DOCA_ERROR_INVALID_VALUE` | An attribute setter (`doca_gpi_domain_attr_set_*`, `doca_gpi_channel_attr_set_*`) was given an unsupported value, or a pointer argument is NULL | GPI exposes no `doca_gpi_cap_*` query, so re-derive the supported range from the device and release notes rather than agent memory; do not invent a runtime maximum |
+| `DOCA_ERROR_INVALID_VALUE` | An attribute setter (`doca_gpi_domain_attr_set_*`, `doca_gpi_channel_attr_set_*`) was given an unsupported value, or a pointer argument is NULL | GPI exposes no `doca_gpi_cap_*` query, so derive a candidate from installed-version evidence and release notes, then use the create result on the active device as the acceptance check; do not invent a runtime maximum |
 | `DOCA_ERROR_NO_MEMORY` | `doca_gpi_create` failed to allocate internal state | Inspect the system's available memory; this is rarely an application bug, usually a host-side resource issue |
 | `DOCA_ERROR_INITIALIZATION` | `doca_gpi_create` failed to initialize internal state | Same as above — inspect host resources |
 | `DOCA_ERROR_IN_USE` | `doca_gpi_destroy` ran while domains or channels are still alive | Destroy every channel (`doca_gpi_channel_destroy`) and domain (`doca_gpi_domain_destroy`), and detach mmaps (`doca_gpi_domain_detach_mmap`), before destroying the GPI instance |

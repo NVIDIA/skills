@@ -180,8 +180,9 @@ needed to pick the right next file. The substantive
 Compress-specific material lives in two companion files:
 
 - `CAPABILITIES.md` — what DOCA Compress can express on this
-  version: the two task types (compress-deflate and
-  decompress-deflate, each a valid standalone shape), the
+  version: the four task types (compress-deflate,
+  decompress-deflate, decompress-lz4-stream, and
+  decompress-lz4-block, each independently capability-gated), the
   per-task capability-query surface (`doca_compress_cap_*` for
   task support and per-submission max buffer size), the Compress
   error taxonomy (mapped onto the cross-library `DOCA_ERROR_*`

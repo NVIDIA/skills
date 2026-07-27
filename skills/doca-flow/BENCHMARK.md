@@ -1,24 +1,24 @@
 # Evaluation Report
 
-Evaluation of the `doca-flow` skill before publication through NVSkills-Eval.
+Evaluation of the `doca-flow` skill before publication through Skill Evaluator.
 
-This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
+This benchmark summarizes 3-Tier Evaluation from Skill Evaluator results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
 
 ## Evaluation Summary
 
 - Skill: `doca-flow`
-- Evaluation date: 2026-07-15
-- NVSkills-Eval profile: `external`
-- Environment: `astra-sandbox`
-- Dataset: 8 evaluation tasks
+- Evaluation date: 2026-07-23
+- Skill Evaluator profile: `external`
+- Environment: `k8s-sandbox`
+- Dataset: 4 evaluation tasks
 - Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
 ## Agents Used
 
-- `claude-code`
-- `codex`
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)
+- Codex (`openai/openai/gpt-5.5`)
 
 ## Metrics Used
 
@@ -38,27 +38,32 @@ Underlying evaluation signals used in this run:
 - `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
 - `goal_accuracy` (Goal Accuracy): checks whether the overall user task completed successfully.
 - `behavior_check` (Behavior Check): verifies expected behavior steps, including safety expectations.
-- `token_efficiency` (Token Efficiency): compares token usage with and without the skill.
 
 ## Test Tasks
 
-The benchmark included 8 recorded Tier 3 trials, but the source evaluation dataset was not available in this report payload.
+The benchmark dataset contained 4 evaluation tasks:
+
+- Positive tasks: 3 tasks where the skill was expected to activate.
+- Negative tasks: 1 tasks where no skill was expected.
+- Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
+
+Task composition is derived from the evaluation dataset when possible. Entries with `expected_skill` set are treated as positive skill-activation cases, while entries with `expected_skill: null` are treated as negative activation cases.
 
 ## Results
 
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+82%) | 98% (+48%) |
-| Discoverability | 4 | 96% (+71%) | 98% (+50%) |
-| Effectiveness | 4 | 83% (+70%) | 99% (+64%) |
-| Efficiency | 4 | 84% (+39%) | 94% (+36%) |
+| Correctness | 4 | 100% (+55%) | 100% (+50%) |
+| Discoverability | 4 | 98% (+23%) | 95% (+45%) |
+| Effectiveness | 4 | 92% (+73%) | 100% (+75%) |
+| Efficiency | 4 | 92% (+23%) | 100% (+62%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 1 checks and found 7 total findings.
+Tier 1 validation passed with observations. Skill Evaluator ran 1 checks and found 7 total findings.
 
 Top findings:
 
@@ -74,4 +79,4 @@ This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 
-The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.
+The skill is suitable to proceed toward Skill Evaluator publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

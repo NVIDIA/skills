@@ -55,8 +55,10 @@ Steps the agent should walk the user through:
    [`doca-setup CAPABILITIES.md ## Version compatibility`](../../doca-setup/CAPABILITIES.md#version-compatibility).
    Quote the version observed (`pkg-config --modversion
    doca-urom`, then `doca_caps --version`); do not assume
-   "latest". Cross-check against the host library + DPU service
-   version-pairing rule in
+   "latest". Obtain the DPU-side service version through the
+   public *DOCA UROM Service* guide; this skill provides no
+   host-side command for that value, so stop if it cannot be
+   obtained. Cross-check both versions against the pairing rule in
    [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility)
    per the [DOCA Compatibility Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html).
    Disagreement = a paired-version gap to fix BEFORE proceeding,
@@ -137,9 +139,10 @@ Steps the agent should walk the user through:
 If any step fails with a `DOCA_ERROR_*`, route through the
 error taxonomy in
 [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
-before retrying. The first hypothesis on `DOCA_ERROR_NOT_PERMITTED`
-is always *DPU-side UROM Service not deployed and running*,
-not a host-OS permission problem.
+before retrying. For `DOCA_ERROR_NOT_PERMITTED`, check both
+explicit preconditions — target `doca_dev` access and DPU-side
+service state/version — because the API error alone does not
+distinguish them.
 
 ## build
 
@@ -324,10 +327,19 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | Bulk enqueue starts returning `DOCA_ERROR_AGAIN` after N successful submits | First N submissions succeed, then `AGAIN` | The Worker's in-flight task queue is sized below the user's intended in-flight depth. Raise it via `doca_urom_worker_set_max_inflight_tasks` at configure time OR drain completions between bursts |
 | Single-pair smoke passes; collective smoke fails | The operation family the collective uses (most often a specific atomic or active-message variant) is supported in single-pair shape but not in the collective primitive the user picked, OR the UROM Service version does not have that collective | Re-run the cap query for the specific collective variant; the answer may be that the user needs to upgrade the UROM Service or pick a different collective algorithm at the MPI / UCX layer |
 
-Loop termination: stop iterating once two consecutive
-iterations of the same kind don't change anything — that means
-the cause is below UROM (DPU-side service, RDMA substrate,
-firmware, fabric, MPI / UCX stack). Escalate to
+Loop terms are exact: an iteration's **kind** is the `Iteration
+trigger` row selected above; its **prescribed change** is that row's
+`What changes next iteration` action; and its **evidence** is the
+plugin / version snapshot, enqueue and completion results, and
+peer-memory effect captured before and after that change. The outcome
+is **resolved** when the named smoke turns green, **shape-changed**
+when the re-run selects a different trigger row or materially changes
+that evidence, and **unchanged** when the prescribed change was
+applied but the re-run selects the same trigger row with the same
+outcome and materially unchanged evidence. The baseline occurrence
+and that post-change re-run are the two consecutive iterations; on
+`unchanged`, the cause is below UROM (DPU-side service, RDMA
+substrate, firmware, fabric, MPI / UCX stack), so stop and escalate to
 [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
 with the captured layer-1-through-5 evidence, the public *DOCA
 UROM Service* guide cross-link for service-side investigation,
@@ -354,12 +366,12 @@ UROM-specific manifestation at layers 5 (runtime) and 6
   is enqueueing to. The host-side library cannot offload to a
   service that is not there; symptoms surface as
   `DOCA_ERROR_NOT_PERMITTED` at the first enqueue even though
-  `doca_urom_service_create` looked fine. The agent's FIRST diagnostic
-  move on this error is to walk the user to the public *DOCA
+  `doca_urom_service_create` looked fine. On this error, verify
+  that the process can enumerate and open the target `doca_dev`,
+  and verify service state/version through the public *DOCA
   UROM Service* guide via
   [`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services)
-  to confirm the service is up — NOT to dig into host-OS
-  permissions or `doca_dev` access.
+  because the API error alone cannot select between those causes.
 - `DOCA_ERROR_IO_FAILED` from UROM enqueue / completion is
   almost always an underlying RDMA substrate failure (link
   down, RoCE / IB config skew between host and BlueField or
@@ -394,7 +406,11 @@ UROM-specific manifestation at layers 5 (runtime) and 6
   before the context has finished starting, or destroying the
   Service / Worker while operations are still in flight (the
   in-flight ones may leak DPU-side resources the next
-  `doca_urom_service_create` has to recover from).
+  `doca_urom_service_create` has to recover from). If a later
+  create reports either error after an out-of-order teardown,
+  stop blind retries and route recovery to the public *DOCA
+  UROM Service* guide; do not invent a service-side cleanup
+  command.
 - Paired-version mismatch: a host-side `pkg-config --modversion
   doca-urom` upgraded without the matching DPU-side UROM
   Service upgrade (or vice versa) returns
@@ -462,9 +478,11 @@ so the agent does not invent guidance:
   applications across multiple nodes — out of scope for Phase
   1 and reserved for a future platform skill. For a single
   in-session UROM configuration rollback, the right verb in
-  this skill is destroying the context (`doca_ctx_stop` →
-  `doca_ctx_destroy`) and re-running `## configure` with the
-  corrected parameters; do not invent a "rollback" workflow.
+  this skill is stopping each Worker context, destroying every
+  Worker with `doca_urom_worker_destroy`, stopping the Service
+  context, then destroying it with `doca_urom_service_destroy`.
+  Re-run `## configure` with the corrected parameters; do not
+  invent a "rollback" workflow.
 
 ## Command appendix
 

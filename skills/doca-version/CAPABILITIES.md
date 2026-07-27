@@ -83,17 +83,17 @@ shapes.** A source returning `No such file or directory` or
 signal* (one or more DOCA host-packages was not installed
 alongside `doca-common`), record which sources are absent in the
 captured triple, and continue with the remaining sources to pin
-down which package to add — do NOT route an absent-source case to
-a full `doca-all` reinstall when a targeted, granular `apt install`
-is the actual fix. The canonical partial-install pattern on a host
+down which component is missing — do NOT route an absent-source case
+to a full reinstall when `doca-setup` can perform a targeted package
+installation. The canonical partial-install pattern on a host
 with `doca-common` installed is:
 
-| What the four sources say                                      | What it means                                          | Fix (DOCA 3.3+ vocabulary)                                       |
-| ---                                                            | ---                                                    | ---                                                              |
-| (a) returns *X*; (b) and (c) are *absent*                      | Only the `doca-common` host package is installed       | `apt install doca-samples doca-caps` (samples ships `applications/VERSION` too on 3.3+; `doca-caps` ships the `doca_caps` binary; add other per-tool packages — `doca-bench`, `doca-pcc-counters`, `doca-flow-tune`, `doca-comm-channel-admin` — as the workload requires) |
-| (a) returns *X*; (b) returns *X*; (c) is *absent*              | The per-tool package(s) that ship the binary you need (e.g. `doca-caps`) were not installed | `apt install doca-caps` (or the specific per-tool package the workload needs) |
-| (a) returns *X*; (c) returns *X*; (b) is *absent*              | The `doca-samples` package (which on DOCA 3.3+ ships `/opt/mellanox/doca/applications/VERSION` as well) was not installed | `apt install doca-samples` |
-| (a) returns *X*; (b) returns *X*; (c) returns *Y* (*X ≠ Y*)    | Build-time and runtime are from *different* releases   | Reinstall consistently — this IS the case that requires `doca-all`|
+| What the four sources say                                      | What it means                                          | Fix                                                               |
+| ---                                                            | ---                                                    | ---                                                               |
+| (a) returns *X*; (b) and (c) are *absent*                      | Only the `doca-common` host package is installed       | Route to `doca-setup` for targeted installation of the packages that provide the missing sources and workload tools. |
+| (a) returns *X*; (b) returns *X*; (c) is *absent*              | The per-tool package that ships `doca_caps` was not installed | Route to `doca-setup` for targeted installation of the package that provides `doca_caps`. |
+| (a) returns *X*; (c) returns *X*; (b) is *absent*              | The package that ships `/opt/mellanox/doca/applications/VERSION` was not installed | Route to `doca-setup` for targeted installation of the package that provides the missing file. |
+| (a) returns *X*; (b) returns *X*; (c) returns *Y* (*X ≠ Y*)    | Build-time and runtime are from *different* releases   | Route to `doca-setup` for a consistent reinstall. |
 
 **Confirm package vocabulary against the host BEFORE prescribing.**
 DOCA package naming has been refactored across releases — on DOCA 3.3
@@ -203,7 +203,12 @@ Path 0), the four-way match is *of the container*: the headers,
 at the container tag the user pulled. Mixing artifacts built
 inside the container with a `*.so` from a different DOCA install
 on the host is the same partial-install trap as case (a) ≠ (c) on
-a non-container host.
+a non-container host. Before declaring a container coherent, record
+`pkg-config --variable=prefix doca-common` and `LD_LIBRARY_PATH`, then
+run `ldd <built-binary>` inside the container. Every resolved DOCA
+library must come from the container's observed DOCA prefix; a
+host-mounted or other-prefix DOCA `*.so` is contamination and fails
+the coherence gate.
 
 **Cross-version `*.so` loading is not supported.** A program built
 against version *X* must run against runtime version *X*. The
@@ -222,13 +227,13 @@ up *as* those errors.
 
 | Symptom | Most-likely version cause | First action |
 | --- | --- | --- |
-| `pkg-config: Package 'doca-common' was not found` | `PKG_CONFIG_PATH` is not configured OR the install is missing the `doca-common` package | Locate the live `doca-common.pc` first: `find /opt/mellanox/doca -name doca-common.pc -print -quit` (commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig/` on DOCA 3.3+, OR `/opt/mellanox/doca/infrastructure/lib/pkgconfig/` on legacy / split-profile installs). If found, fix `PKG_CONFIG_PATH` (see [`doca-setup ## configure`](../doca-setup/TASKS.md#configure)). If not found, reinstall via the appropriate DOCA profile package. |
-| `pkg-config --modversion doca-common` returns *X*; `doca_caps --version` returns `command not found` (NOT a version disagreement; the binary is ABSENT) | Either the per-tool package that ships the binary (e.g. `doca-caps`) was not installed, OR the package IS installed but `/opt/mellanox/doca/tools/` is not on `$PATH` (DOCA 3.3+ ships these binaries off-PATH by default). | First disambiguate: `dpkg -l doca-caps` and `ls /opt/mellanox/doca/tools/doca_caps`. If `dpkg -l` says absent → `apt install doca-caps` (NOT the legacy `doca-tools` meta, which no longer exists on 3.3+; verify with `apt-cache policy doca-caps` first). If the binary IS present at `/opt/mellanox/doca/tools/doca_caps` → it's a `$PATH` issue, not a missing-install; either invoke by absolute path or extend `PATH`. See `## Version compatibility` partial-install table. |
-| `pkg-config --modversion doca-common` returns *X*; `cat /opt/mellanox/doca/applications/VERSION` errors with `No such file or directory` | Partial install: the package that ships `applications/VERSION` was not installed. On DOCA 3.3+ this file is shipped by `doca-samples` (not by a separate `doca-applications` package, which no longer exists on 3.3+); on older DOCA releases it shipped via `doca-applications`. | `apt install doca-samples` on DOCA 3.3+ (confirm with `apt-cache policy doca-samples` first); `apt install doca-applications` on older releases that still ship that package. |
-| `pkg-config --modversion doca-common` returns *X*; `ls /opt/mellanox/doca/samples/` errors with `No such file or directory` | Partial install: the `doca-samples` package was not installed alongside `doca-common`. The bundle's modify-from-sample first-app workflow CANNOT apply on this host — the agent must say so explicitly (see [AGENTS.md `## Ground rules` rule 5](../../AGENTS.md#ground-rules-every-agent-must-follow)) rather than scaffold a sample from memory. | `apt install doca-samples` OR pivot to the NGC DOCA container via [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install) Path 0. |
+| `pkg-config: Package 'doca-common' was not found` | `PKG_CONFIG_PATH` is not configured OR the install is missing the `doca-common` package | Locate the live `doca-common.pc` first: `find /opt/mellanox/doca -name doca-common.pc -print -quit` (commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig/` on DOCA 3.3+, OR `/opt/mellanox/doca/infrastructure/lib/pkgconfig/` on legacy / split-profile installs). If found, fix `PKG_CONFIG_PATH` (see [`doca-setup ## configure`](../doca-setup/TASKS.md#configure)). If not found, route to `doca-setup` to select and install the appropriate DOCA profile. |
+| `pkg-config --modversion doca-common` returns *X*; `doca_caps --version` returns `command not found` (NOT a version disagreement; the binary is ABSENT) | Either the per-tool package that ships the binary was not installed, OR the package IS installed but `/opt/mellanox/doca/tools/` is not on `$PATH` (DOCA 3.3+ ships these binaries off-PATH by default). | First disambiguate with the installed-package query and `ls /opt/mellanox/doca/tools/doca_caps`. If the package is absent, route to `doca-setup` for targeted installation after its package-policy precheck. If the binary is present, it is a `$PATH` issue: invoke it by absolute path or extend `PATH`. See `## Version compatibility` partial-install table. |
+| `pkg-config --modversion doca-common` returns *X*; `cat /opt/mellanox/doca/applications/VERSION` errors with `No such file or directory` | Partial install: the package that ships `applications/VERSION` was not installed. | Route to `doca-setup` for targeted installation after it identifies and validates the package for this DOCA release. |
+| `pkg-config --modversion doca-common` returns *X*; `ls /opt/mellanox/doca/samples/` errors with `No such file or directory` | Partial install: the samples package was not installed alongside `doca-common`. The bundle's modify-from-sample first-app workflow CANNOT apply on this host — the agent must say so explicitly (see [AGENTS.md `## Ground rules` rule 5](../../AGENTS.md#ground-rules-every-agent-must-follow)) rather than scaffold a sample from memory. | Route to `doca-setup` for targeted installation or pivot to the NGC DOCA container via [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install) Path 0. |
 | `pkg-config --modversion doca-common` returns *X*; `doca_caps --version` returns *Y* (*X ≠ Y*) | Partial install: build-time and runtime are from different DOCA releases | Reinstall consistently. Do NOT work around in code. See [TASKS.md ## debug](TASKS.md#debug) ladder step 2. |
 | Program compiles with `DOCA_VERSION_MAJOR = X`; same program returns `DOCA_ERROR_NOT_SUPPORTED` from a call that the docs say is available since *X* | The headers are from version *X*; the runtime `*.so` is from version *Y* < *X* | Same partial-install diagnosis as above; the header path is *not* what the runtime is. |
-| BFB image version differs from host package version by more than one minor release | Host ↔ DPU compatibility window may not cover this pair | Cite the [DOCA Compatibility Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html); if the user is outside the supported window, the answer is to bring the BFB and host into agreement, not to patch around the mismatch. |
+| BFB image version differs from the host package version by any amount | The four-way coherence check has failed. A separate compatibility-window policy may still describe whether this mixed pair is temporarily supported, but it does not make the install four-way coherent. | Report the mismatch and do not declare the install coherent. Cite the [DOCA Compatibility Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html) only for the separate support-window decision; if the pair is unsupported, bring the BFB and host into agreement rather than patching around it. |
 | NIC firmware version (per `flint -d <bdf> q` `FW Version:` line) major.minor predates the host DOCA's published required-FW level, OR the `FW Release Date:` predates the host DOCA's release by more than 12 months | NIC FW is out-of-window for this DOCA. NIC FW is a DIFFERENT anchor from BFB-image DOCA version — `flint q` reads the FW *image* shipped to the silicon, `bfver` reads the BFB DOCA *userland* — and skew on either independently disqualifies the pairing. | Route to [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify) for a firmware burn (NOT a host-package reinstall). Cross-check the required FW level against the *Supported NICs and Firmware* table in the [DOCA Release Notes](https://docs.nvidia.com/doca/sdk/doca-release-notes/index.html) before burning. |
 | Two or more BlueField devices on the same host (e.g. BF2 + BF3, or BF3 ×2 from different procurement waves) with DIFFERENT firmware levels | The four-way match is *per-device*: each BlueField/NIC enumerated by `lspci -d 15b3:` is its own anchor and must independently sit inside the host DOCA's compatibility window. BF2 and BF3 FW levels are independent silicon and need not match each other; do not "average" them or pick one. | Run `flint -d <bdf> q` (and `bfver` when the BlueField Arm console is reachable) once per visible 15b3:* device; apply the FW-skew rule above to each independently; surface a per-device verdict to the user rather than a single global verdict. |
 | `doca-flow.pc` exists; `pkg-config --modversion doca-flow` works; `doca_caps --version` is silent or errors | DOCA runtime is not on `LD_LIBRARY_PATH` OR is from a different install | Verify with `ldconfig -p | grep doca`; route to [`doca-setup ## debug`](../doca-setup/TASKS.md#debug) layer 3. |
@@ -263,7 +268,10 @@ Three primary signals the agent should reach for:
    freshest source) but slower than a local lookup; an offline
    version-data file together with an offline verifier is on the
    maintainer roadmap. The agent never treats the missing data file
-   as a "no answer" — it walks the manual fallback.
+   as a "no answer" — it walks the manual fallback. If the docs
+   fetch fails, report the attempted URL and failure, do not guess
+   the minimum version, and route to the matching library skill for
+   manual verification.
 3. **The capability-query result.** The per-library
    `doca_<library>_cap_*` API answers *"is this supported on this
    device + this version"* at runtime. The version-matrix is the
@@ -298,11 +306,13 @@ rules below exist to prevent that.
   The cost of asking the user to run two commands is much smaller
   than the cost of telling them a feature exists when their
   install pre-dates it.
-- **Never recommend a workaround for a partial install.** When the
-  four-way match fails, the *only* safe answer is to reinstall
-  consistently. Pinning `LD_LIBRARY_PATH` to a different `*.so`,
-  manually copying a header, or any other workaround perpetuates
-  the bug and makes the next failure harder to diagnose.
+- **Never recommend a workaround for a partial install.** For an
+  absent source, route to `doca-setup` for targeted package
+  installation. When observed source values disagree, route to
+  `doca-setup` for a consistent reinstall. Pinning
+  `LD_LIBRARY_PATH` to a different `*.so`, manually copying a
+  header, or any other workaround perpetuates the bug and makes
+  the next failure harder to diagnose.
 
 **The per-library overlay pattern.** Every library / service / tool
 skill in the bundle has a `## Version compatibility` section in its

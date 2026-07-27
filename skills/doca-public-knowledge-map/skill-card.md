@@ -1,5 +1,5 @@
 ## Description: <br>
-Routes users to authoritative NVIDIA DOCA documentation, on-disk install paths, public GitHub samples, and NGC catalog entries without requiring access to the DOCA source tree. <br>
+Use this skill when the user needs to locate authoritative information about NVIDIA DOCA without access to the source tree — finding the right docs.nvidia.com page for a library/service/tool, identifying which DOCA libraries are installed and at what version, locating a sample on disk or its public GitHub source, decoding an on-disk path under /opt/mellanox/doca, or recovering from a 404'd or renamed doc URL. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers working with NVIDIA DOCA use this skill to locate the correct documentation page, identify installed library versions, find samples on disk or on GitHub, decode on-disk paths, and recover from broken or renamed doc URLs. <br>
+Developers and engineers working with NVIDIA DOCA who need to locate authoritative documentation, identify installed library versions, find samples, decode on-disk paths, or recover broken doc URLs without access to the source tree. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [No] <br>
-**Credential Type(s):** [None] <br>  
+**Credential Type(s):** [None] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,27 +25,27 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA Public Knowledge Map routing tables](references/map.md) <br>
+- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
 - [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
-- [Routing tables reference](references/map.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Configuration instructions] <br>
-**Output Format:** [Markdown with inline URLs and routing tables] <br>
+**Output Type(s):** [Documentation routing, Configuration instructions] <br>
+**Output Format:** [Markdown with inline URLs and path references] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 6 internal evaluation tasks using NVSkills-Eval 3-Tier Evaluation (external profile, astra-sandbox environment). <br>
+Evaluated against 3 evaluation tasks (2 positive activation, 1 negative activation). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,21 +62,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 3 | 100% (+0%) | 100% (+0%) |
-| Correctness | 3 | 100% (+73%) | 98% (+30%) |
-| Discoverability | 3 | 100% (+67%) | 77% (+15%) |
-| Effectiveness | 3 | 89% (+77%) | 95% (+32%) |
-| Efficiency | 3 | 95% (+48%) | 65% (+4%) |
+| Correctness | 3 | 100% (+67%) | 100% (+33%) |
+| Discoverability | 3 | 100% (+33%) | 96% (+46%) |
+| Effectiveness | 3 | 98% (+57%) | 92% (+48%) |
+| Efficiency | 3 | 97% (+30%) | 100% (+67%) |
 
 ## Skill Version(s): <br>
-d3b2828 (source: git SHA, committed 2026-06-28) <br>
+18a69be (source: git SHA, committed 2026-07-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

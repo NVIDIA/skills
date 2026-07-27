@@ -216,7 +216,12 @@ the flow, not the verbatim recipe.
 > `${DOCA_DIR}/tools/doca_sha_offload_engine/` (per
 > `install_dir: 'tools/doca_sha_offload_engine'` in
 > `tools/sha_offload_engine/meson.build` and the shipped
-> `readme.md`; NOT under `${DOCA_DIR}/infrastructure/`).
+> `readme.md`; NOT under `${DOCA_DIR}/infrastructure/`). These names belong to
+> different lifecycle stages: source is under
+> `doca/tools/sha_offload_engine/`, Meson installs under
+> `tools/doca_sha_offload_engine/`, and OpenSSL registers the engine ID
+> `doca_sha_offload_engine`. Do not derive one spelling from another; inspect
+> the installed `.so` path before loading it.
 
 1. **Confirm the `.so` and the environment.** Per
    [`## install`](#install), [`## configure`](#configure),

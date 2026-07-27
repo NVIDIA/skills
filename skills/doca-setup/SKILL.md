@@ -1,5 +1,5 @@
 ---
-license: Apache-2.0
+license: Apache-2.0 AND CC-BY-4.0
 name: doca-setup
 description: >
   Use this skill when the user is dealing with the DOCA environment
@@ -22,7 +22,10 @@ metadata:
 compatibility: >
   No DOCA install required to read this skill (it is an overlay loaded
   against any DOCA artifact skill); the validation steps within DO
-  require a live DOCA install at /opt/mellanox/doca.
+  require a live DOCA install at /opt/mellanox/doca. The agent must
+  have a target-host command channel or provide commands for the user
+  to run and return their exact output; local shell access must not be
+  assumed to reach the target.
 ---
 
 # DOCA setup
@@ -43,11 +46,14 @@ or the no-hardware fallback
 mode is to silently steer every developer onto containers because the
 agent loaded that skill first; `## recognize` exists to prevent that.
 
-If the user does not have DOCA installed yet, jump straight to
+If the user does not have DOCA installed yet and the request is not
+deployment-shaped, jump straight to
 [`TASKS.md ## no-install`](TASKS.md#no-install) for the NGC container
-path. Otherwise read [`## When to load this skill`](#when-to-load-this-skill)
-to confirm the question is env-class, then route to the section below
-that matches the user's intent.
+path. Deployment-shaped requests still enter `## recognize` first,
+which routes fresh-laptop cases to `## no-install`. Otherwise read
+[`## When to load this skill`](#when-to-load-this-skill) to confirm the
+question is env-class, then route to the section below that matches the
+user's intent.
 
 ## Example questions this skill answers well
 
@@ -123,12 +129,39 @@ This skill assumes nothing about whether DOCA is installed — the `## no-instal
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is env-class, deployment-routing-class, not programming-class or knowledge-map-class.
-2. **If the question is beginner-orientation-shaped (*"I am new to DOCA, guide me to my first app"* or similar), open the answer with the [`TASKS.md ## no-install` Stage 1 vs Stage 2 staged-roadmap table](TASKS.md#stage-1-vs-stage-2--open-every-i-am-new-to-doca-answer-with-the-staged-roadmap) BEFORE any command.** Beginners overwhelm easily when the first thing the agent emits is a stack of commands; the staged roadmap establishes *where the user is going* before *what to type next*. If the agent's first emitted block is a `docker pull` or `pkg-config` invocation rather than the two-row stage table, the answer is mis-shaped — back up.
-3. **If the question is deployment-shaped (containers vs. bare-metal not yet decided), walk [TASKS.md ## recognize](TASKS.md#recognize) FIRST.** That is the front-door routing decision and must happen before any other env work.
-4. **For install profiles, build-flavor disk locations, env-side version-detection, the env-class error taxonomy, and the env-side safety policy, see [CAPABILITIES.md](CAPABILITIES.md).**
-5. **For env workflows — `configure`, `test`, `debug`, and the critical `no-install` (NGC container path) — see [TASKS.md](TASKS.md).** The `build`, `modify`, and `run` anchors in `TASKS.md` are stubs that route to [`doca-programming-guide`](../doca-programming-guide/SKILL.md); their substance lives there. The NGC tag selection rule (no guessing) lives in [`TASKS.md ## no-install` → *How to pick an NGC tag without guessing*](TASKS.md#how-to-pick-an-ngc-tag-without-guessing) and is mandatory before any `docker pull` recommendation.
-6. Once the env is healthy, hand off to the deployment skill `## recognize` routed you to ([`doca-container-deployment`](../doca-container-deployment/SKILL.md) for the container path, [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md) for the bare-metal hardware path) for the deployment runtime, then to [`doca-programming-guide`](../doca-programming-guide/SKILL.md) for the build pattern, the first-app workflow, and the program-side error / debug order, and finally to the matching library skill (e.g. [`doca-flow`](../libs/doca-flow/SKILL.md)) for library-specific API guidance.
+1. Read this `SKILL.md` and classify the question as programming,
+   knowledge-map, beginner orientation, deployment routing, or
+   environment work. Programming and knowledge-map questions route to
+   their owning skill and stop here.
+2. **For beginner orientation**, show the
+   [`TASKS.md ## no-install` Stage 1 vs Stage 2 roadmap](TASKS.md#stage-1-vs-stage-2--open-every-i-am-new-to-doca-answer-with-the-staged-roadmap)
+   before any command. Then route Stage 1/container learning to
+   `## no-install` Path 0 and Stage 2/hardware runtime to
+   `## no-install` Paths A/C, followed by `## recognize` before
+   selecting container versus bare-metal. Ask one clarifying question
+   when the stage is unknown; if it remains unknown or no reply is
+   available in unattended execution, stop with
+   `confirmation_required` and both paths explained rather than
+   guessing.
+3. **For deployment routing**, walk
+   [TASKS.md ## recognize](TASKS.md#recognize) first only when the
+   container-versus-bare-metal path is not already established. If it
+   is established, proceed directly to the matching env workflow.
+4. **Before a change recommendation on an installed/hardware target**,
+   load the mandatory
+   [Universal verification contract](CAPABILITIES.md#universal-verification-contract)
+   and walk all applicable steps through an auditable green signal.
+   Hardware-touching answers also load the
+   [hardware binding-layer command stanza](CAPABILITIES.md#hardware-binding-layer-command-stanza).
+   The Stage-1 no-hardware path instead uses its own container
+   install/smoke green signal; never fabricate unavailable PCIe,
+   representor, or hardware evidence.
+5. **For env workflows — `configure`, `test`, `debug`, and
+   `no-install` — see [TASKS.md](TASKS.md).** The `build`, `modify`,
+   and `run` anchors route to
+   [`doca-programming-guide`](../doca-programming-guide/SKILL.md).
+6. Once the env is healthy, hand off to the selected deployment skill,
+   then `doca-programming-guide`, then the matching library skill.
 
 Both companion files cross-link to each other and to `doca-public-knowledge-map` whenever the right answer is *"look it up in the public docs or the installed package layout"* rather than *"setup-specific guidance"*.
 

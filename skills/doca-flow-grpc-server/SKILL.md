@@ -55,14 +55,13 @@ compatibility: >
 > previous aspirational framing and is wrong against the shipped
 > source. Treat the server as **plaintext-on-a-trusted-segment
 > only**: it MUST be bound on a control-plane-only network
-> segment behind an external firewall / VPN / hardened bastion
+> segment behind an external proxy, sidecar, or VPN
 > that itself enforces TLS + identity. Any "TLS / mTLS / token-
 > auth" discussion below is about the operator's external
 > hardening layer, NOT a knob on this binary. Routing for an
-> in-binary TLS / auth design discussion must say so explicitly
-> and route the user to a generic gRPC framework
-> ([gRPC auth concepts](https://grpc.io/docs/guides/auth/)) for
-> a future-state design, not to a shipped-today knob.
+> TLS / identity design discussion must stay on the selected
+> external proxy, sidecar, or VPN; never route it to a
+> shipped-today binary knob.
 
 **Where to start:** This is a tool skill for standing up and
 operating `doca_flow_grpc`, the DOCA-shipped gRPC remote-
@@ -75,8 +74,8 @@ the start → bind → one-client-smoke sequence, then
 gates any RPC that mutates Flow / dataplane state. Open
 [`CAPABILITIES.md`](CAPABILITIES.md) when the question is *what
 the gRPC contract surface looks like* (the `.proto` files shipped
-under the tool's source tree on the user's install), *how the
-auth / TLS posture decision is made*, *which language bindings
+under the tool's source tree on the user's install), *which
+external proxy / sidecar / VPN protects the plaintext server*, *which language bindings
 the gRPC ecosystem covers*, or *how to interpret the server's
 own logs alongside the live Flow application's logs*. If DOCA is
 not installed, route to
@@ -114,7 +113,7 @@ load-bearing piece; the worked example is one instance.
   bound on `0.0.0.0`; what should I do before exposing it?"*.
   Answered by the *admin attack surface* posture in
   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
-  + the auth / TLS / network-segment decision in
+  + the external protection / network-segment decision in
   [`TASKS.md ## configure`](TASKS.md#configure).
 - **"How do I smoke ONE client end-to-end before opening the
   server to the fleet?"** — worked example: *"my Python client
@@ -125,7 +124,7 @@ load-bearing piece; the worked example is one instance.
   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
   smoke-before-bulk rule.
 - **"My client cannot reach the server — is the server down,
-  the wrong endpoint, a TLS / auth mismatch, or a version
+  the wrong endpoint, an external-proxy mismatch, or a version
   mismatch?"** — worked example: *"the client times out
   connecting"*. Answered by the layered error taxonomy in
   [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
@@ -205,7 +204,8 @@ to it. Concretely:
   network segment. NOTE: the shipped server is plaintext-only
   (`grpc::InsecureServerCredentials()`); TLS / mTLS / token-auth
   are NOT binary configuration knobs — they are external
-  infrastructure concerns (e.g. an mTLS proxy / sidecar) and the
+  infrastructure concerns handled by a capable proxy, sidecar,
+  or VPN, and the
   plaintext endpoint must stay on a trusted, isolated segment.
 - Standing up the server alongside a known-good Flow setup
   and smoke-testing one client end-to-end before exposing
@@ -229,12 +229,12 @@ companion files:
   user's install are the source of truth), the *when-to-use-
   gRPC vs direct-library-link* decision, the language-
   bindings story (any language standard gRPC tooling covers),
-  the auth / TLS / network-segment decision axis, the
+  the external proxy / sidecar / VPN and network-segment decision, the
   packet-buffering / DPA-side option per the shipped
   `packet_buffering/` and `dpa_device/` subtrees, the
   version overlay (server rides the `doca-flow` library
   version it links against), the layered error taxonomy
-  (server-not-started / server-binding-failed / TLS-or-auth-
+  (server-not-started / server-binding-failed / external-layer-
   rejected / RPC-call-error / Flow-precondition-failed /
   version / cross-cutting), the observability surface (the
   server's own logs + the live Flow application's logs +
@@ -243,8 +243,8 @@ companion files:
 - `TASKS.md` — step-by-step workflows for the in-scope task
   verbs: `install` (route to setup; binary is built from
   source with gRPC support enabled),
-  `configure` (decide remote-vs-direct, pick auth / TLS,
-  pick the network segment), `build` (route to install),
+  `configure` (decide remote-vs-direct, pick the external
+  proxy / sidecar / VPN and network segment), `build` (route to install),
   `modify` (refuse — modify the deployment, not the binary),
   `run` (start → bind → smoke), `test` (the
   smoke-before-bulk loop with the client-side stub
@@ -276,10 +276,10 @@ contain — and pull requests should not add:
   are the contract; client code generated from them on the
   user's installed version is the right answer, not a stub
   pinned to a snapshot.
-- **A pre-baked auth / TLS posture (which CA, which token
-  source, which mTLS configuration).** That posture is a
-  deployment-environment decision — route it to the
-  operator's security review and the safety policy.
+- **A pre-baked external security-layer configuration.** CA,
+  token, and mTLS configuration belong to the selected proxy,
+  sidecar, or VPN and its security review, never to
+  `doca_flow_grpc`.
 - **Wrappers, parsers, or scripts** that proxy the gRPC
   endpoint into another protocol. The endpoint is the
   endpoint; if a user wants HTTP/JSON instead, that is a
@@ -295,8 +295,8 @@ contain — and pull requests should not add:
    plane on top of `doca-flow`, not a direct library link or
    a different DOCA library).
 2. **For what the server exposes, the `.proto`-as-contract
-   rule, the language-bindings story, the auth / TLS /
-   network-segment decision, version availability, the
+   rule, the language-bindings story, the external proxy /
+   sidecar / VPN and network-segment decision, version availability, the
    layered error surface, observability, and safety posture,
    see [CAPABILITIES.md](CAPABILITIES.md).**
 3. **For the documented start sequence and the

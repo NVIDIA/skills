@@ -66,9 +66,8 @@ compatibility: >
 >
 > The valid `PROFILE` values are exactly **`default` / `media` /
 > `telco-l2` / `custom`** (per `doca_firefly.yaml` comments) —
-> the agent must not invent additional values. All five
-> subsystems respond to `defined_by_profile` so the active
-> `PROFILE` is what actually flips most of the knobs.
+> the agent must not invent additional values. Subsystems configured
+> as `defined_by_profile` are controlled by the active `PROFILE`.
 >
 > Configuration-override env vars follow the pattern
 > `CONF_<SUBSYSTEM>_<section>_<key>` (e.g.
@@ -76,6 +75,12 @@ compatibility: >
 > `CONF_MONITOR_global_telemetry_export`); these are the
 > documented surface for overriding individual config keys
 > without shipping a full custom config file.
+>
+> **Configuration hierarchy:** the mounted Firefly config file is
+> mandatory and owns the primary PTP axes (role, profile, domain,
+> interface, and transport). `CONF_<SUBSYSTEM>_<section>_<key>`
+> variables are optional, documented per-key overrides of that file;
+> they are not a second standalone configuration model.
 
 **Where to start:** This skill is for *operating* the DOCA Firefly
 Service container, not for *linking against* a library. Firefly is

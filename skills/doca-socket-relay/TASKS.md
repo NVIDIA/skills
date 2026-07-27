@@ -269,8 +269,10 @@ port numbers"*).
    host application client (not the fleet) and verify, from the
    application side and the relay side, that the connect succeeded:
    the application's own connect / send / recv error reporting reads
-   clean, the relay's documented connection-set inspection lists the
-   client. A *"the relay accepts but no client appears"* asymmetry
+   clean, and the relay's `SOCKET_RELAY` logger at the installed
+   `--sdk-log-level INFO` or `DEBUG` records the expected accept/state
+   transition. The shipped binary has no dedicated connection-list command.
+   A *"the relay accepts but no client appears"* asymmetry
    here is layer 3 in
    [`## debug`](#debug); a *"the application reports
    `ECONNREFUSED` / connect timeout"* is layer 2 or 3 depending on
@@ -295,7 +297,11 @@ port numbers"*).
    client at a time* on a HIGH-STAKES relay (per
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy));
    batching the fleet onto a freshly-bound relay makes failure
-   attribution much harder.
+   attribution much harder. In production, the regression-baseline gate in
+   `## test` must also pass. If no no-relay baseline is feasible, do not admit
+   the fleet on a one-sided liveness result alone: record the missing evidence
+   and require the operator/owner to choose and approve a substitute
+   regression oracle or explicitly accept the residual risk.
 6. **Stop in reverse order.** Drain or stop the host application
    clients first; only then tear down the relay; only then tear down
    the DPU-side terminator. Tearing the relay or terminator down while
@@ -359,7 +365,9 @@ load-bearing):
    regression that the round-trip smoke alone cannot expose. If a
    no-relay baseline is not feasible in the operator's environment,
    the agent must say so — the regression check degrades to a
-   one-sided liveness check and the agent flags the gap, rather than
+   one-sided liveness check and the agent flags the gap. That result is not a
+   production fleet-admission pass: require an owner-approved substitute
+   regression oracle or explicit residual-risk acceptance rather than
    silently quoting the round-trip as proof of regression-freedom.
 
 Eval-loop overlay (rows apply to every relay deployment, not just
@@ -483,7 +491,7 @@ layers in order. The shape of the diagnosis:
    at this layer hoping for a different outcome.
 
 In every case: **quote what the relay said, and quote both ends of the
-bridge.** Do not paraphrase the relay's connection-set output, do not
+bridge.** Do not paraphrase the `SOCKET_RELAY` connection-state logger output, do not
 "summarize" the round-trip into prose, do not blame one side of the
 bridge without quoting the other side's view. The relay sits in the
 data path precisely so that an inspection of both sides is feasible;

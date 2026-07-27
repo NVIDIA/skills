@@ -61,9 +61,9 @@ agent walks four checks, then stops:
    <https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html>,
    the DPACC version must match the DOCA version. Inherit
    the verification ladder from
-   [`doca-pcc TASKS.md ## install`](../doca-pcc/TASKS.md#configure)
+   [`doca-pcc TASKS.md ## configure`](../doca-pcc/TASKS.md#configure)
    and
-   [`doca-dpa TASKS.md ## install`](../doca-dpa/TASKS.md#configure).
+   [`doca-dpa TASKS.md ## configure`](../doca-dpa/TASKS.md#configure).
 4. **Are the host-side `doca-pcc` and the DPA-side
    prerequisite chain present?** Per the shipped README's
    build chain (DPACC → flexio-sources → doca-sdk-common →
@@ -157,7 +157,7 @@ ZTR application" section, the canonical sequence is:
 3. **Build the host application via meson/ninja.** Per the
    README, the canonical invocation is `cd
    /opt/mellanox/doca/applications` then `meson
-   <BUILD_DIR> -D=enable_all_applications=false
+   <BUILD_DIR> -Denable_all_applications=false
    -Denable_pcc=true && ninja -C <BUILD_DIR>`. The
    `enable_pcc=true` flag turns on the PCC application
    inside the DOCA applications meson project; the
@@ -213,22 +213,19 @@ verifies each one before triggering the rebuild in
 4. **`rp_rtt_template_dev_main.c` —
    `doca_pcc_dev_user_set_algo_params()`.** Add the
    set-params call:
-   `doca_pcc_dev_set_ztr_rttcc_params(param_id_base,
-   param_num, new_param_values, params)` per the README's
-   modify step 4. The framework dispatches host-set
-   parameter updates here. (Note: this is the call shape as
-   used from *inside* the `doca_pcc_dev_user_set_algo_params()`
-   callback, where `port_num` and `algo_slot` are already
-   resolved in the surrounding scope. The full public-header
-   signature carries those two as the first two arguments —
    `doca_pcc_dev_set_ztr_rttcc_params(port_num, algo_slot,
-   param_id_base, param_num, new_param_values, params)` — and
-   is what
+   param_id_base, param_num, new_param_values, params)`.
+   Before editing, read the exact prototype from the installed
+   `doca_pcc_dev_ztr_rttcc_algo.h` and preserve its argument
+   order and types verbatim. Do not shorten this to a
+   four-argument form or claim arguments are supplied
+   implicitly unless the installed sample exposes a named,
+   verified wrapper with that exact shorter signature. The
+   six-argument public call shown here is what
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
    and
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
-   document. Use whichever form the surrounding context
-   exposes — both are the same call.)
+   document.
 5. **`build_device_code.sh` — DPACC linker flag.** Add
    `-ldoca_pcc_ztr_rttcc_algo_dev` to the `-device-libs`
    option of the DPACC compilation command, per the

@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when dropping below the higher-level DOCA libraries (doca-rdma / doca-eth / doca-rmax) into the raw-verbs escape hatch — managing QP / CQ / PD / MR / SRQ / AH / CC-group / Ethernet-SQ-RQ primitives inside DOCA Core, porting libibverbs code into the DOCA Core model, capability-querying a specific verb or opcode via doca_verbs_query_device, or debugging DOCA_ERROR_* from doca_verbs_* calls. <br>
+Guides agents through the raw-verbs escape hatch beneath the higher-level DOCA libraries (doca-rdma / doca-eth / doca-rmax) for managing QP / CQ / PD / MR / SRQ / AH / CC-group / Ethernet-SQ-RQ primitives inside DOCA Core, porting libibverbs code into the DOCA Core model, capability-querying specific verbs, and debugging DOCA_ERROR_* from doca_verbs_* calls. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers building applications that consume the DOCA Verbs library for raw QP / CQ / PD / MR / SRQ / Address-Handle / Ethernet-SQ / Ethernet-RQ control inside a DOCA Core context, when the higher-level DOCA libraries do not expose the specific verb or attribute needed. <br>
+External developers building applications that consume the DOCA Verbs library use this skill to determine whether to drop below higher-level DOCA libraries, port libibverbs code into the DOCA Core model, query device capabilities, and debug raw-verbs errors. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -32,19 +32,19 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Configuration instructions, Code] <br>
-**Output Format:** [Markdown with inline C code blocks] <br>
+**Output Type(s):** [Configuration instructions, Code, Shell commands, Analysis] <br>
+**Output Format:** [Markdown with inline C code blocks and bash commands] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 evaluation tasks using NVSkills-Eval profile `external` in astra-sandbox environment. <br>
+Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,21 +61,25 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+72%) | 98% (+48%) |
-| Discoverability | 4 | 100% (+75%) | 98% (+39%) |
-| Effectiveness | 4 | 91% (+58%) | 98% (+62%) |
-| Efficiency | 4 | 94% (+49%) | 95% (+30%) |
+| Correctness | 4 | 100% (+50%) | 100% (+20%) |
+| Discoverability | 4 | 100% (+25%) | 95% (+33%) |
+| Effectiveness | 4 | 100% (+78%) | 92% (+55%) |
+| Efficiency | 4 | 94% (+36%) | 87% (+54%) |
+
+## Testing Completed: <br>
+**[x] Agent Red-Teaming** <br>
+**[ ] Network Security** <br>
+**[ ] Product Security** <br>
 
 ## Skill Version(s): <br>
-59d6e8a (source: git SHA, committed 2026-07-15) <br>
+d6d1714 (source: git SHA, committed 2026-07-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

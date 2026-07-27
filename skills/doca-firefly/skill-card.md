@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External operators and platform teams deploying the DOCA Firefly Service container on BlueField to provide PTP-grade time synchronization to time-sensitive workloads (SMPTE ST 2110 broadcast, 5G UPF, financial trading, distributed databases). <br>
+External operators and platform teams deploying the DOCA Firefly Service container to provide PTP-grade time synchronization to time-sensitive workloads on BlueField, including configuring PTP axes, wiring host-side followers, pairing with consumer workloads (Rivermax SMPTE, 5G UPF, finance), and debugging synchronization issues. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,7 +25,7 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
 
@@ -37,13 +37,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- `claude-code` <br>
-- `codex` <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 internal evaluation tasks using NVSkills-Eval (profile: external, environment: astra-sandbox). Overall verdict: PASS. <br>
+Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,21 +60,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+68%) | 98% (+35%) |
-| Discoverability | 4 | 100% (+75%) | 98% (+44%) |
-| Effectiveness | 4 | 91% (+51%) | 90% (+46%) |
-| Efficiency | 4 | 92% (+48%) | 94% (+39%) |
+| Correctness | 4 | 75% (+10%) | 100% (+20%) |
+| Discoverability | 4 | 100% (+38%) | 95% (+34%) |
+| Effectiveness | 4 | 86% (+54%) | 81% (+61%) |
+| Efficiency | 4 | 94% (+40%) | 95% (+55%) |
 
 ## Skill Version(s): <br>
-344504a (source: git SHA, committed 2026-07-15) <br>
+6919a46 (source: git SHA, committed 2026-07-23) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill to enumerate host-to-DPU DOCA comch (formerly Comm Channel) servers and connections via the shipped doca_comm_channel_admin binary, listing comch-capable devices and decoding the per-device server/connection table. <br>
+Use this skill to enumerate host-DPU DOCA comch (formerly Comm Channel) servers and connections via the shipped doca_comm_channel_admin binary, listing comch-capable devices and decoding the per-device server/connection table. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and operators who need to inspect host-to-DPU DOCA Comm Channel servers and connections to verify channel health, diagnose stuck channels, or cross-check the admin tool's view against program-side state. <br>
+Developers and operators who need to inventory and verify DOCA Comm Channel servers and connections on a BlueField DPU from the host or Arm side. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [No] <br>
-**Credential Type(s):** [None] <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,27 +25,27 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [CAPABILITIES.md](CAPABILITIES.md) <br>
-- [TASKS.md](TASKS.md) <br>
 - [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
+- [CAPABILITIES.md](CAPABILITIES.md) <br>
+- [TASKS.md](TASKS.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Analysis, Configuration instructions] <br>
+**Output Type(s):** [Shell commands, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 recorded Tier 3 trials via NVSkills-Eval with the external profile. <br>
+Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,21 +62,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+88%) | 98% (+48%) |
-| Discoverability | 4 | 100% (+75%) | 91% (+48%) |
-| Effectiveness | 4 | 96% (+84%) | 96% (+62%) |
-| Efficiency | 4 | 94% (+49%) | 85% (+32%) |
+| Correctness | 4 | 100% (+70%) | 100% (+5%) |
+| Discoverability | 4 | 100% (+38%) | 95% (+33%) |
+| Effectiveness | 4 | 100% (+69%) | 100% (+50%) |
+| Efficiency | 4 | 100% (+49%) | 100% (+75%) |
 
 ## Skill Version(s): <br>
-b46f0c4 (source: git SHA, committed 2026-07-15) <br>
+56cf891 (source: git SHA, committed 2026-07-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -139,7 +139,13 @@ through, in order:
    ends of the deployment must agree on the format.
 6. **Stage the parameters.** Each algorithm exposes a
    parameter set; the parameters live in the algorithm
-   documentation, not in this skill. Pin the parameter
+   documentation, not in this skill. For a user-authored algorithm, resolve
+   the applicable public DOCA SPCX programming guide through
+   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) and
+   validate every name/range there. For the shipped zero-touch RTT reference,
+   use
+   [`doca-pcc-ztr-rttcc-algo CAPABILITIES.md`](../../libs/doca-pcc-ztr-rttcc-algo/CAPABILITIES.md).
+   If no authoritative range is available, stop rather than invent one. Pin the parameter
    set in writing; the parameter set is part of the
    evaluation evidence tuple per
    [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability).
@@ -372,7 +378,7 @@ session):
 | Host-side status never reaches `Active` | Install / device-binding / firmware-slot / DPA-image / algorithm-precondition layer of the error taxonomy | Walk [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy) layers 1–5 in order; do not jump ahead. |
 | Status reaches `Active` but tracer / counters show no effect on the link | Live-link / contention layer — the link is idle, the contention is below the algorithm's signal floor, or the contention pattern is wrong | Inject the planned contention; confirm via `doca-pcc-counters` that the link is in fact congested; re-run. Do NOT conclude the algorithm is broken from an idle-link run. |
 | Algorithm running on a congested link but the captured behaviour is wrong (oscillation, rate collapse, persistent under-utilisation) | Runtime layer of the error taxonomy | Do NOT roll forward; stop the algorithm, capture the runtime evidence, walk [`doca-pcc TASKS.md ## debug`](../../libs/doca-pcc/TASKS.md#debug); fix in the algorithm source, rebuild via DPACC, re-evaluate. |
-| Behaviour looks right on this replica but the replica's hardware class does not match production | Per the bundle-wide hardware-safety replica-first rule | Re-run on a replica that matches production on BlueField generation, firmware level, host kernel, and fabric topology class; do NOT roll forward against a non-matching replica. |
+| Behaviour looks right on this replica but the replica does not match production | Per the bundle-wide hardware-safety replica-first rule | Re-run on a replica that matches production on BlueField generation, firmware level, host kernel, fabric topology class, contention pattern, and representative workload class; do NOT roll forward against a non-matching replica. |
 | Two consecutive runs on the same setup produce different captured behaviour | Non-determinism in the contention generator, the algorithm itself, or the observability surface | Pin the contention generator; pin the parameter set; pin the algorithm SHA; re-run; if still divergent, the algorithm's non-determinism is the answer the user came for. |
 | Algorithm passes replica testing on every captured axis | Evidence is ready for the production-rollout gate per [`## use`](#use) | Move to [`## use`](#use); do NOT skip the bounded-blast-radius and rollback-rehearsed steps. |
 
@@ -385,7 +391,8 @@ replaces.
 
 Loop termination: stop iterating once the captured
 behaviour is consistent across two consecutive runs on
-a production-matching replica AND the rollback path
+a production-matching replica — including hardware/firmware/kernel/topology,
+contention pattern, and representative workload class — AND the rollback path
 has been rehearsed end-to-end on the replica AND the
 bounded-blast-radius rollout plan is in writing.
 

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "paidf-anomalygen-basic",
+    "question": "A user request: \"Use the paidf-anomalygen skill.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
+    "expected_skill": "paidf-anomalygen",
+    "expected_script": null,
+    "ground_truth": "Identify paidf-anomalygen as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",
+    "expected_behavior": [
+      "Identifies paidf-anomalygen as the relevant skill",
+      "Outlines the documented workflow steps from SKILL.md",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]

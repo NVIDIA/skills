@@ -75,8 +75,10 @@ or assuming a message length, call the matching
 **Configuration shape.** *Mandatory* configurations before
 `doca_ctx_start()`: at least one of (slow-path recv callback,
 producer attached, consumer attached) per side, and the connection
-state callback per side. *Optional* configurations on the server
-side include `doca_comch_server_set_max_msg_size(server, …)` (and
+state callback on the server side; the client observes connection
+state through its context state and task callbacks. *Optional*
+configurations on the server side include
+`doca_comch_server_set_max_msg_size(server, …)` (and
 the matching `_client_set_max_msg_size`); the max-clients value is
 a device capability (`doca_comch_cap_get_max_clients(devinfo)`)
 and is not user-settable via a public setter — the cap is the
@@ -141,8 +143,10 @@ Three primary signals the agent should reach for:
    with `_task_send_alloc_init`; the send is submitted with the
    generic `doca_task_submit(doca_comch_task_send_as_task(task))`.
    The per-task success / error callback fires on every submitted
-   send; absence of a completion is *always* a missing
-   `doca_pe_progress()` call in the user's main loop.
+   send; absence of a completion most commonly means
+   `doca_pe_progress()` is missing from the user's main loop. If
+   progress is running, check submit status, connection state, and
+   callback registration before diagnosing the stall.
 3. **Producer / consumer completion callbacks (fast-path).** Same
    shape as the slow-path task callbacks, on the producer and
    consumer context objects. Per-transfer status flows through

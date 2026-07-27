@@ -28,7 +28,7 @@ Routing for nearby "install" questions:
 
 - *"The binary isn't there — do I need to install something?"* →
   yes. Route to
-  [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
   for the DOCA install with the appropriate package profile, or
   to [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install)
   for the public NGC DOCA container path when the user has no
@@ -174,13 +174,20 @@ The pattern:
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
    layer 5 (recommendation-unactionable) rather than guessing at
    a wider modification.
-3. **Apply the minimum diff.** Walk
+3. **Obtain explicit confirmation for this recommendation.**
+   Present the exact recommendation, target pipe / scope,
+   selected tuning axis, proposed minimum diff, expected
+   measurement direction, and rollback snapshot. Ask the user
+   to confirm this specific change before modifying the Flow
+   program. Confirmation of one recommendation does not cover
+   another; without confirmation, stop at the proposal.
+4. **Apply the minimum diff.** Walk
    [`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify)
    for the cross-library minimum-diff modification pattern; the
    shipped DOCA Flow samples on disk are the verified source of
    truth, the tune recommendation is the *direction* of the diff
    on top.
-4. **Re-run the tune session against the post-change state.**
+5. **Re-run the tune session against the post-change state.**
    The before / after pair is the only defensible artifact; a
    recommendation applied without a captured before snapshot and
    a captured after snapshot cannot be evaluated. The
@@ -287,10 +294,11 @@ The smoke-before-bulk shape:
    [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test).
    A measurement under a partial install is not a measurement of
    anything the operator can defend.
-3. **Apply the recommendation via [`## modify`](#modify).** The
-   minimum-diff change to the Flow program lands in the
-   application's source; redeploy the application on its
-   documented cadence.
+3. **Confirm, then apply the recommendation via
+   [`## modify`](#modify).** Obtain the per-recommendation
+   confirmation required by `## modify` step 3 before the
+   minimum-diff change lands in the application's source;
+   redeploy the application on its documented cadence.
 4. **Capture a post-change snapshot.** Re-run step 1 against the
    redeployed application; the resulting outputs are the
    *after* leg.
@@ -301,18 +309,22 @@ The smoke-before-bulk shape:
 6. **Only after steps 1-5 read clean** may the agent declare the
    tuning iteration converged on a real change. If the after-leg
    measurement does not move in the direction the recommendation
-   predicted, the next move is [`## debug`](#debug) — not a
-   repeat of the same recommendation.
+   predicted, reselect exactly one of the three axes and run one
+   new confirmed recommendation. If that second attempt is also
+   non-green, restore the pre-change snapshot via
+   [`doca-flow TASKS.md ## rollback`](../../libs/doca-flow/TASKS.md#rollback),
+   report both diffs, and escalate the unresolved gap. Do not
+   start a third tuning attempt.
 
 Eval-loop overlay (rows apply to every tune session):
 
 | Iteration trigger | What it looks like | What changes next iteration |
 | --- | --- | --- |
-| Smoke completed; analyze recommendation does not match the question | Could be the wrong tuning axis was selected, the wrong measurement was selected, or the scope is wrong | Re-walk axes 1-3 in [`## configure`](#configure) before re-running |
+| Smoke completed; analyze recommendation does not match the question | Could be the wrong tuning axis was selected, the wrong measurement was selected, or the scope is wrong | Reselect exactly one axis in [`## configure`](#configure), obtain fresh per-recommendation confirmation, and run once. If that second attempt is non-green, roll back and escalate; do not reselect another axis. |
 | Online attach fails on a known-good Flow app | Attach-failed layer per [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy) layer 2; not a measurement-soundness issue | Walk [`## debug`](#debug) layer 2; do not loop on the dumper expecting different output |
 | Before / after diff is empty when a Flow-program change shipped | Either the change did not deploy, or the captured before-leg snapshot was already the post-change state | Re-confirm the Flow application's running version, re-capture the before leg from a known-pre-change state |
 | Recommendation says *"increase table size"* but the Flow program hard-codes the value | Recommendation-unactionable layer 5; not a tune bug | Modify the Flow program per [`doca-flow TASKS.md ## modify`](../../libs/doca-flow/TASKS.md#modify) to expose the knob, then re-run the tune session |
-| After-leg measurement is in the opposite direction from the prediction | Could be a real regression the recommendation introduced, or could be a different workload running on the device | Re-confirm workload stability; quote the diff; route through [`doca-debug ## debug`](../../doca-debug/SKILL.md) layer 7 if the workload is steady |
+| After-leg measurement is in the opposite direction from the prediction | Could be a real regression the recommendation introduced, or could be a different workload running on the device | Re-confirm workload stability, quote the diff, then reselect one axis and retry once with fresh confirmation. On a second non-green result, restore the pre-change snapshot and escalate through [`doca-debug ## debug`](../../doca-debug/SKILL.md); no third attempt. |
 
 This skill does **not** ship a "test fixture" or pre-recorded
 expected output. The expected output is install-, device-,
@@ -431,7 +443,7 @@ name.
   Tune observes pipelines the program created; it does not
   create them.
 - **install DOCA** ⇒
-  [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
   and [`## no-install`](../../doca-setup/TASKS.md#no-install).
 - **library-internal pipe / counter / inspector deep dive** ⇒
   [`doca-flow`](../../libs/doca-flow/SKILL.md). Tune transports

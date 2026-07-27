@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides agents through hands-on DOCA Management programming against BlueField and ConnectX devices, covering management context lifecycle, device capability queries, congestion-control configuration, diagnostics data, ICM quotas, and raw firmware commands. <br>
+Use this skill when the user is doing hands-on DOCA Management programming against BlueField / ConnectX devices — standing up management or representor contexts, querying device caps, toggling congestion-control global status, modifying diagnostics data, setting ICM quotas, or issuing raw firmware commands via doca_mgmt_raw_cmd. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers building fleet-management, orchestration, or device-administration tools that programmatically query and modify BlueField / ConnectX device-level state through the DOCA Management C API. <br>
+External developers building fleet-management, orchestration, or device-administration tools that programmatically query and modify BlueField / ConnectX device-level state through the DOCA Management C library. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,26 +26,24 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
-- [CAPABILITIES.md](CAPABILITIES.md) <br>
-- [TASKS.md](TASKS.md) <br>
+- [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Configuration instructions, Code guidance] <br>
-**Output Format:** [Markdown with inline C code blocks] <br>
+**Output Type(s):** [Code, Shell commands, Configuration instructions, Analysis] <br>
+**Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 evaluation tasks using NVSkills-Eval `external` profile in astra-sandbox environment. <br>
+Evaluated against 4 tasks (3 positive skill-activation, 1 negative activation) in k8s-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,21 +60,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 97% (+54%) | 98% (+46%) |
-| Discoverability | 4 | 100% (+67%) | 98% (+41%) |
-| Effectiveness | 4 | 81% (+34%) | 90% (+51%) |
-| Efficiency | 4 | 92% (+47%) | 95% (+34%) |
+| Correctness | 4 | 100% (+65%) | 100% (+5%) |
+| Discoverability | 4 | 100% (+38%) | 95% (+36%) |
+| Effectiveness | 4 | 68% (+29%) | 95% (+41%) |
+| Efficiency | 4 | 94% (+46%) | 84% (+51%) |
 
 ## Skill Version(s): <br>
-a7eddc6 (source: git SHA, committed 2026-07-15) <br>
+7b32072 (source: git SHA, committed 2026-07-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

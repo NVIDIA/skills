@@ -12,8 +12,8 @@ description: >
   debugging `DOCA_ERROR_*` from a Rivermax call. Trigger even when the
   user does not explicitly mention "DOCA Rivermax" or "rmax" —
   implicit phrasings include "ST 2110 receive isn't getting frames",
-  "sub-microsecond jitter on BlueField", "NOT_PERMITTED on first
-  rivermax create", "no recv events after stream start", or "license
+  "sub-microsecond jitter on BlueField", "NOT_SUPPORTED from
+  doca_rmax_init", "no recv events after stream start", or "license
   check failing on a media receiver". Refuse and route elsewhere for
   installing the Rivermax SDK or its license, programming the
   underlying queue (`doca-eth`), steering rules (`doca-flow`), or
@@ -82,9 +82,9 @@ single instance.
   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
   input stream capability table.
 - **"Which `doca_rmax_get_*_supported` query do I have to call before
-  picking a stream type / frame size / packet rate?"** — worked
-  example: *"can this device + this Rivermax install carry a
-  1080p60 video stream at the rate I want?"*. Answered by the
+  picking a PTP clock or hardware packet-placement order?"** — worked
+  example: *"can this device + this Rivermax install use
+  ST 2110-20 sequence-number placement?"*. Answered by the
   capability-query rule in
   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
   + step 3 in
@@ -103,7 +103,7 @@ single instance.
 - **"Is this Rivermax integration capability available on my
   device + my installed DOCA + my Rivermax SDK?"** — worked
   example: *"does this device + this Rivermax version advertise
-  the stream type I need"*. Answered by the capability-query
+  the PTP clock or placement mode I need"*. Answered by the capability-query
   rule in
   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
   + the version-and-device overlay in
@@ -113,16 +113,17 @@ single instance.
   [`doca-version`](../../doca-version/SKILL.md).
 - **"What does this `DOCA_ERROR_*` from a Rivermax call mean and
   which layer caused it?"** — worked example:
-  *"`DOCA_ERROR_NOT_PERMITTED` on the first Rivermax stream
-  create"*. Answered by the Rivermax overlay on the
+  *"`DOCA_ERROR_NOT_SUPPORTED` from `doca_rmax_init()`"*.
+  Answered by the Rivermax overlay on the
   cross-library taxonomy in
   [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
   + the layered ladder in
   [`TASKS.md ## debug`](TASKS.md#debug) that escalates to
-  [`doca-debug`](../../doca-debug/SKILL.md), and which calls out
-  that `_NOT_PERMITTED` on Rivermax frequently means *"Rivermax
-  license missing / expired / not readable"*, not the usual
-  DOCA-side device-access shortfall.
+  [`doca-debug`](../../doca-debug/SKILL.md), and which preserves
+  the installed header's call-specific mapping: init-time
+  `_NOT_SUPPORTED` routes first to Rivermax SDK / license checks;
+  later errors are interpreted from the exact failing call rather
+  than generalized into a license diagnosis.
 
 ## Audience
 
@@ -172,15 +173,14 @@ work, in any language. Concretely:
   transmit/output stream object.
 - Configuring a Rivermax input stream for SMPTE ST 2110 audio +
   video over IP, real-time market data feeds, or a scientific
-  instrument stream — with awareness that the stream type,
-  frame size, and packet rate the user wants are *all* device-
-  and Rivermax-conditional and gate on the matching
+  instrument stream — with awareness that PTP-clock and
+  hardware packet-placement-order support are device- and
+  Rivermax-conditional and gate on the matching
   `doca_rmax_get_*_supported` query.
 - Reading or setting Rivermax stream properties via
   `doca_rmax_in_stream_set_*` and querying device + Rivermax
   capability via the `doca_rmax_get_*_supported` family before
-  assuming any specific stream type / frame size / packet rate
-  is supported.
+  assuming PTP-clock or hardware packet-placement-order support.
 - Pairing the Rivermax stream with the `doca-eth` queue surface
   that carries the packets and the `doca-flow` rules that
   steer them — Rivermax does not program steering itself.

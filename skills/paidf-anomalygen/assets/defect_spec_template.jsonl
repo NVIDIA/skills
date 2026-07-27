@@ -1,0 +1,4 @@
+{"defect_type": "PCB+bridge", "spatial_dependency": "cad", "roi_prompt_defect_location": ""}
+{"defect_type": "PCB+missing", "spatial_dependency": "cad", "roi_prompt_defect_location": ""}
+{"defect_type": "PCB+excess_solder", "spatial_dependency": "cad", "roi_prompt_defect_location": ""}
+{"defect_type": "Phone+crack", "spatial_dependency": "text", "roi_prompt_defect_location": "the entire mobile phone screen surface, excluding the phone frame and background"}

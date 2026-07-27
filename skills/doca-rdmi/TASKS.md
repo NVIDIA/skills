@@ -1,8 +1,9 @@
 # DOCA RDMA Initiator workflows
 
-**Where to start:** The verbs run `install → configure → build →
-modify → run → test → debug → use`. Skip ahead only when the user
-is already past a verb. The `## test` verb is an iterative loop
+**Where to start:** The verbs run `install → configure → modify →
+build → run → test → debug → use`. When modifying an existing
+baseline, first confirm that baseline builds, then modify and rebuild.
+Skip ahead only when the user is already past a verb. The `## test` verb is an iterative loop
 (symbol presence → lifecycle order → single-completion smoke →
 DPA-handoff probe → loop back if any check fails), not a one-shot
 pass — see the eval-loop overlay in `## test` below.
@@ -58,6 +59,10 @@ install — never hardcode versions or paths.
    deliberately defers to `ls` rather than naming a sample that may
    not exist on the user's version). Use the discovered sample as the
    modify-target via the five-slot fill in [`## modify`](#modify).
+   If the directory is absent or empty, stop and route to
+   [`doca-setup`](../../doca-setup/SKILL.md) for install repair and
+   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+   for the current sample-layout source; do not invent a sample name.
    Because every `doca_rdmi_*` symbol is EXPERIMENTAL, authoring RDMI
    source from documentation is forbidden.
 4. **Build with pkg-config (never hand-crafted `-l` flags)** (full
@@ -72,8 +77,9 @@ install — never hardcode versions or paths.
    (full detail: [`## run`](#run), [`## test`](#test)). Run with
    `DOCA_LOG_LEVEL=trace ./<binary>`; **green** is *not* "exited 0" —
    it is **one completion observed on the configured surface** (one
-   CQE on the `doca_verbs_cq` for a host initiator, or one increment
-   of the `doca_dpa_completion` counter for a DPA initiator) matching
+   CQE on the host-side `doca_verbs_cq` completion-observation path,
+   or one increment of the `doca_dpa_completion` counter on the DPA
+   completion path) matching
    the single posted work request. Silence after `doca_ctx_start()`
    means the DPA kernel was never launched or the responder is
    silently rejecting the QP transition.
@@ -217,7 +223,7 @@ code-level edit:
 
 | Slot | What the agent asks the user | RDMI-specific consideration |
 | --- | --- | --- |
-| 1. Starting code | Which RDMI-using file or sample is the baseline? | If the user has no working baseline, *stop* — the EXPERIMENTAL tag on the API surface means authoring RDMI source from documentation prose is forbidden by this skill (per [`SKILL.md ## What this skill deliberately does not ship`](SKILL.md#what-this-skill-deliberately-does-not-ship)) |
+| 1. Starting code | Which RDMI-using file or sample is the baseline? | If the user has no working baseline, *stop* — route through the sample-discovery fallback in [`## end-to-end (quickref)`](#end-to-end-quickref); the EXPERIMENTAL tag on the API surface means authoring RDMI source from documentation prose is forbidden by this skill (per [`SKILL.md ## What this skill deliberately does not ship`](SKILL.md#what-this-skill-deliberately-does-not-ship)) |
 | 2. Object set | Connection only, poster only, or both? | Each object has its own lifecycle and its own completion attach; adding one mid-flight is a re-architecture, not a tweak |
 | 3. Completion source | Switch between `doca_dpa_completion` and `doca_verbs_cq`? | This changes the datapath and which `_attach` call applies; the public headers describe these as alternatives, so the switch is a re-architecture |
 | 4. Receive window | Resize `doca_rdmi_connection_init_receive`'s buffer? | A larger window changes the host-side ack-loop sizing; under-acking is a silent stall, not an error return |
@@ -284,6 +290,12 @@ escalated to the matching skill.
 
 Iteration shape:
 
+0. **Pre-run receive-window guard.** Confirm
+   `doca_rdmi_connection_init_receive` completed with a non-zero
+   buffer, the host-side `doca_rdmi_connection_recv_ack` loop is
+   ready, and `doca_rdmi_connection_get_app_rq_info` plus the
+   host-ack and DPA-consumption counts do not show an exhausted
+   receive window. Fix any mismatch before posting.
 1. **Symbol-presence check.** Confirm every `doca_rdmi_*`
    symbol the user's code references is exported by the
    installed `libdoca_rdmi.so` (and matched in the installed
@@ -313,7 +325,9 @@ Iteration shape:
    sequence (e.g. attach a completion AFTER `doca_ctx_start()`)
    and confirm the API returns `DOCA_ERROR_BAD_STATE`. This
    validates that the agent's lifecycle understanding is itself
-   correct on this DOCA version.
+   correct on this DOCA version. Run this only with disposable
+   connection / poster objects that are torn down immediately;
+   do not mutate the primary test context.
 
 Eval-loop overlay — why this is a loop, not a one-shot pass:
 
@@ -325,9 +339,10 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | DPA kernel sees no completions | The CQ attach was a `doca_verbs_cq` (host-side), not a `doca_dpa_completion` | The completion source decides which side observes; confirm the attach call matches the consumer |
 | Link errors on `doca_rdmi_*` symbol | The shipped `libdoca_rdmi.so` does not export the symbol the user's code references | Audit the EXPERIMENTAL tag set on the installed version; a symbol present in one release may be absent or renamed in another |
 
-Loop termination: stop iterating once two consecutive iterations
-of the same kind don't change anything — that means the cause is
-below RDMI. Escalate to
+Loop termination: stop when two consecutive phase-4 comparisons
+produce identical triple-capture diffs for the same hypothesis
+(verbs context state, RDMI connection state, and DOCA log lines).
+That means the cause is below RDMI. Escalate to
 [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
 with the captured layer-1-through-5 evidence.
 
@@ -412,9 +427,10 @@ debug answer before declaring done:
    the evidence. A "no change between iterations" diff means
    the cause is below RDMI (verbs / firmware / network).
 5. **Exit with named green signal OR escalate.** Green = one
-   completion observed on the right datapath (host CQ for host
-   initiator; DPA completion counter for DPA initiator). If two
-   consecutive iterations don't change anything, escalate via
+   completion observed on the configured path (host-side CQ
+   observation or DPA completion counter). If two consecutive
+   phase-4 comparisons for the same hypothesis produce identical
+   triple-capture diffs, escalate via
    the layer-7 route table above with the captured triple.
 
 ## rollback
@@ -439,17 +455,21 @@ is unfalsifiable without it.
 
 1. **Quiesce the data path FIRST.** Stop posting new WRs from
    both initiator and responder. For DPA-initiated paths, signal
-   the DPA kernel to drain via the host-side termination flag
-   from [`## modify`](#modify); `cudaDeviceSynchronize` / DPA
-   join until the kernel returns. If it does not return within
-   the bounded debug-loop window, that is the
+   the DPA kernel to drain via the termination mechanism established
+   by [`doca-dpa`](../doca-dpa/SKILL.md), then wait for the host/DPA
+   completion mechanism defined by
+   [`doca-dpa`](../doca-dpa/SKILL.md) to report that the kernel
+   returned. Do not substitute a CUDA synchronization API for DPA
+   completion. If it does not return within the bounded debug-loop
+   window, that is the
    [deploy-loop bridge](../../doca-setup/CAPABILITIES.md#deploy-loop-bridge--step-5-not-green-is-the-debug-loop-trigger)
    trigger; fire the debug-loop on the hung-kernel symptom
    before continuing the rollback.
 2. **Tear down RDMI objects in reverse-create order.** (a)
-   Destroy DPA attach handles (`_get_dpa_handle` outputs) so the
-   DPA-side kernel cannot resurrect a stale CQ pointer; (b)
-   `doca_ctx_stop` on each RDMI poster and connection context
+   after the DPA kernel has drained, invalidate each
+   `_get_dpa_handle` output by stopping its owning context; there
+   is no separate handle-destroy step; (b) `doca_ctx_stop` on each
+   RDMI poster and connection context
    (each `doca_rdmi_poster` / `doca_rdmi_connection` is its own
    `doca_ctx` via `_as_ctx` — RDMI exposes no single top-level
    context object); (c) destroy posters then connections in
@@ -545,12 +565,11 @@ so the agent does not invent guidance:
   RDMA isolation — out of scope and reserved for a future
   platform skill. For single-host first-run testing, the right
   verb is `## run`.
-- **rollback.** Coordinated rollback of RDMI-using applications
-  across multiple hosts / DPUs — out of scope and reserved for
-  a future platform skill. For single in-session rollback, the
-  right verb is destroying the connection / poster contexts and
-  re-running `## configure` with the corrected parameters; do
-  not invent a "rollback" workflow.
+- **rollback.** Only coordinated multi-host / platform rollback is
+  out of scope and reserved for a future platform skill. A
+  single-session rollback is in scope: follow
+  [`## rollback`](#rollback) on both peers in reverse-connect order;
+  do not replace that documented workflow with an invented shortcut.
 - **DPA programming.** The DPA toolchain, kernel build, memory
   model, and execution semantics belong to
   [`doca-dpa`](../doca-dpa/SKILL.md). This skill describes the

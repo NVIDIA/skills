@@ -1,33 +1,17 @@
 # DOCA Comm Channel Admin Tool — Tasks
 
-> **CRITICAL — body-interpretation banner.** This file repeatedly
-> says *"drain"*, *"restart"*, *"per-channel inspect"*,
-> *"state-changing operation"*, *"list-first → inspect-one →
-> drain-or-restart"*, *"smoke-before-bulk"*, including in the
-> Command appendix table rows. Those names are the **operator's
-> mental model**; they are NOT subcommands or flags the
-> `doca_comm_channel_admin` binary ships. The binary registers ZERO
-> application-level arguments. Whenever a workflow step below says
-> *"drain a channel"* or *"restart it"*, the operator does that
-> through [`doca-comch`](../../libs/doca-comch/SKILL.md) (program-side
-> reconnect lifecycle: `doca_ctx_stop()` → reset →
-> `doca_ctx_start()`), [`doca-setup`](../../doca-setup/SKILL.md) +
-> [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) (driver
-> reload, BlueField-mode flip), or RShim/BFB (deepest reset) — NEVER
-> by re-running the admin binary with a flag that does not exist.
-> The Command appendix rows for *"Drain a stuck channel"* and
-> *"Restart a stuck channel"* describe **what the operator does next
-> via those other paths**, not a subcommand of this tool. The
-> [`SKILL.md`](SKILL.md) top-of-file banner is the authoritative
-> surface contract; this file's flow language is the operator
-> overlay on top of it.
+> **Actual binary contract.** Run
+> `/opt/mellanox/doca/tools/doca_comm_channel_admin` with zero
+> application arguments. It scans every comch-capable device on
+> the current side through `resourcedump` and prints SERVERS and
+> CONNECTIONS tables. No list, inspect, device-scope, drain,
+> restart, or other application operation exists.
 
 **Where to start:** The verbs that carry real workflow content are
 `## run`, `## test`, and `## debug`. The other three (`configure`,
 `build`, `modify`) are documented routing stubs that exist because
-the bundle's verb contract is uniform. The `## test` verb is the
-smoke-before-bulk loop, not a one-shot pass — see the eval-loop
-overlay in `## test` below.
+the bundle's verb contract is uniform. `## test` cross-checks the
+single scan against the program side.
 
 This file is loaded by [`SKILL.md`](SKILL.md) after
 [`CAPABILITIES.md`](CAPABILITIES.md). It walks the agent through
@@ -68,7 +52,8 @@ Tool?"*, the question they almost certainly mean is one of:
   [`doca-comch TASKS.md ## configure`](../../libs/doca-comch/TASKS.md#configure).
 - *"How do I make the admin tool see a specific channel?"* → not a
   configuration question; it is a discovery question. Run the
-  list operation first (see [`## run`](#run)) and let the
+  zero-argument scan (see [`## run`](#run)), inspect the printed
+  rows, and let the
   channel-discovery layer in [`## debug`](#debug) guide the next
   step.
 
@@ -128,101 +113,57 @@ Routing for nearby "modify" questions:
 
 ## run
 
-The Comm Channel Admin Tool exposes two functionally distinct
-families of operations per
-[`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes):
-read-only enumeration / inspection, and state-changing
-drain / restart. The flow the agent should walk the user through
-when the user asks *"what's going on with this comch channel"*:
+The Comm Channel Admin Tool exposes one operation: a
+zero-application-argument scan-and-print.
 
 1. **Confirm the binary is present** under
    `/opt/mellanox/doca/tools/`. If absent, route to
    [`## configure`](#configure) above.
-2. **List the comch channels visible from this side first.** This
-   is the read-only entry point and the only safe first step. Run
-   it on the side (host or BlueField Arm) where the user reports
-   the problem. Capture the full output verbatim — it is the
-   identifier set the `inspect` step needs.
-3. **Inspect the specific channel the user is asking about.** Use
-   the channel identifier from step 2; do not guess one. The
-   inspection output is the per-channel state surface from
-   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-   and is the evidence the rest of the workflow consumes.
-4. **Stop here unless step 3 surfaces a stuck-state finding.** If
-   the channel reads as healthy, the user's reported symptom is
-   somewhere else (the program side, the driver, the network); do
-   NOT escalate to drain or restart on a healthy channel. Route
-   the next step to
-   [`doca-comch TASKS.md ## debug`](../../libs/doca-comch/TASKS.md#debug)
-   or to [`## debug`](#debug) below depending on which layer the
-   evidence points at.
-5. **For the exact subcommand inventory, flag names, channel
-   identifier shape, and output column names** read `--help` on the
-   installed version and the public DOCA Comm Channel Admin Tool
-   guide via
-   [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools).
-   Do **not** invent any of these from generic CLI knowledge —
-   the public guide and `--help` are the joint source of truth,
-   see
-   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
+2. **Run the binary with zero application arguments** on the side
+   where the user reports the problem. Do not add a device selector
+   or a list/inspect token; the binary itself scans every
+   comch-capable `doca_dev` on that side.
+3. **Capture the process result as one artifact:** exit status,
+   complete stdout (SERVERS and CONNECTIONS tables), and complete
+   stderr.
+4. **Check the `resourcedump` dependency before interpreting empty
+   output.** Missing MFT, `resourcedump` absent from `PATH`,
+   insufficient privilege, non-zero child exit, or child stderr is
+   a setup failure. Route it to
+   [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug); do not
+   call it an empty inventory.
+5. **Read the relevant row.** Locate the expected server or
+   connection in the printed tables. There is no per-row follow-up
+   invocation. If the row is absent after a clean exit, cross-check
+   the program side and, if needed, run the same zero-argument scan
+   on the other side.
 
 When recording the run for downstream consumers, write down: the
 DOCA version (per [`doca-version`](../../doca-version/SKILL.md)),
 the side the tool was run on (host vs BlueField Arm), the exact
-command line used, and the full unredacted output. The downstream
-`## test` and `## debug` workflows depend on those four fields.
+zero-argument command line, exit status, stdout tables, and stderr.
+The downstream `## test` and `## debug` workflows depend on all
+six fields.
 
 ## test
 
-The Comm Channel Admin Tool is **the canonical smoke-before-bulk
-surface** for any operation that might intervene on a comch
-channel. *"Test"* in this skill means *"confirm the channel is
-healthy before any state-changing action"*, not *"unit-test the
-tool"*.
+`## test` validates that one complete scan is trustworthy and
+cross-checks its relevant row; it does not invoke a second
+operation.
 
-**`## test` is an iterative loop, not a one-shot pass.** Every
-mutation — a drain, a restart, a program-side reconnect, a driver
-reload, a BlueField mode change — re-opens the smoke. Treating it
-as a one-shot pass is the failure mode this loop replaces.
-
-The smoke-before-bulk shape:
-
-1. **List one channel.** Run the read-only enumeration per
-   [`## run`](#run) step 2 and pick the channel the user is about
-   to touch. The list step is also the cheapest confirmation that
-   the tool itself can bind to the DOCA device on this side.
-2. **Inspect that channel and confirm HEALTHY.** Healthy means the
-   per-channel state from
-   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-   shows a connection state the public guide documents as steady
-   for an active channel, with peer identity reported and no
-   stuck-state indicators. Quote the state line; do not paraphrase.
+1. **Require a clean scan artifact.** Per [`## run`](#run), retain
+   exit status, both stdout tables, and stderr. Any unresolved
+   `resourcedump` prerequisite or execution failure routes to
+   setup and blocks interpretation.
+2. **Locate the expected row in the existing tables.** Do not add
+   an inspect or device-scope argument. Quote the row verbatim.
 3. **Cross-check against the program side.** The program-side
    connection callback in
    [`doca-comch CAPABILITIES.md ## Observability`](../../libs/doca-comch/CAPABILITIES.md#observability)
-   must agree the channel is CONNECTED before either side is
-   declared healthy. A one-sided "healthy" reading is half the
-   evidence; the cross-check is what closes it.
-4. **Only after steps 1-3 read clean** may the agent proceed to a
-   state-changing operation (drain or restart) per
-   [`## debug`](#debug) layer 4. If step 1, 2, or 3 surfaces a
-   finding, the agent walks the debug ladder instead — drain or
-   restart on an unhealthy channel without a root-cause is a guess.
-
-Eval-loop overlay (rows apply to every comch deployment, not just
-one):
-
-| Step | Why this is a loop, not a step | Where the substance lives |
-| --- | --- | --- |
-| 1 → 2 → ## debug | Inspection surfaces a stuck-state finding; walk the debug ladder, then re-run step 1 | [`## debug`](#debug) |
-| 1 → 2 → 3 → drain → 1 | After a drain, re-run the smoke to confirm the channel either recovered or remains stuck for a different reason | [`## debug`](#debug) layer 4 |
-| 1 → 2 → 3 → restart → 1 | After a restart, re-run the smoke to confirm a fresh channel came up cleanly | [`## debug`](#debug) layer 4 |
-| 1 → driver / firmware / mode change → 1 | After a driver reload or BlueField mode change, the channel view may have changed; re-run step 1 | [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) |
-| 1 (clean) → save → debug session | Once clean, the inspection is saved and consumed by the cross-cutting debug ladder | [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug) |
-
-The agent's rule: every state-changing action on the channel
-re-opens the smoke. Saving a stale inspection from before a
-mutation is exactly the failure mode this loop is here to prevent.
+   must agree with the printed row.
+4. **If the expected row is absent, scan the other side.** Run the
+   same zero-argument binary there and compare its full tables.
+   There is still no device-scoped or per-channel invocation.
 
 This skill does **not** ship a "test fixture" or pre-recorded
 expected output. The expected output is install-, version-, and
@@ -244,49 +185,26 @@ layers in order. The shape of the diagnosis:
    install profile included the Comm Channel tooling subpackage.
    Route to [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
    if not.
-2. **Device-binding layer.** The tool runs but cannot bind to a
-   DOCA device on the side it was invoked from. Confirm the
-   driver stack (`mlx5_core`, IB stack) is loaded and the
-   BlueField mode is compatible with the comch transport the user
-   expects. The tool's own message and `dmesg` are ground truth;
-   do not guess. Route to
-   [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) layer
-   *Driver*.
-3. **Channel-discovery layer.** The tool runs, binds to a DOCA
-   device, but the expected channel is absent from the listing.
-   Re-run scoped to the other DOCA device on this side, confirm
-   the program-side connection callback has fired CONNECTED per
+2. **`resourcedump` prerequisite / execution layer.** Confirm MFT
+   is installed, `resourcedump` resolves through `PATH`, and the
+   documented privilege requirement is met. Capture the admin
+   tool's exit status and stderr and the child `resourcedump`
+   exit/stderr. Any non-zero exit or diagnostic output is routed
+   to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug);
+   do not interpret absent tables.
+3. **Device-binding layer.** The scan cannot read one or more
+   devices on this side. Use the captured exit/stderr and
+   `resourcedump` diagnostics as ground truth and route driver,
+   representor, privilege, MFT, or PATH remediation to
+   [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug).
+4. **Row-discovery layer.** The scan exits cleanly and prints both
+   tables, but the expected row is absent. Inspect those rows; do
+   not rerun with an invented device scope. Confirm the
+   program-side connection callback has fired CONNECTED per
    [`doca-comch TASKS.md ## debug`](../../libs/doca-comch/TASKS.md#debug),
-   and confirm no previous state-changing operation already
-   destroyed the channel. The right answer when the program-side
-   never reached CONNECTED is to fix the program / env, not to
-   keep re-running the list.
-4. **Channel-state-stuck layer.** The channel is listed, the
-   state reads as stuck per
-   [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
-   layer 4, and the cross-check in [`## test`](#test) step 3
-   agrees the program side is also wedged. This is the layer that
-   *justifies* a drain or restart. Decision rule:
-   - Prefer **drain** when in-flight work might still complete on
-     its own and the user can tolerate the channel remaining
-     up. The program side will observe quiescing rather than a
-     hard reset.
-   - Prefer **restart** when drain has been tried once without
-     effect, when the peer process is gone, or when the user has
-     explicitly accepted a `DOCA_ERROR_CONNECTION_RESET` /
-     DISCONNECTED transition on the program side per
-     [`doca-comch CAPABILITIES.md ## Error taxonomy`](../../libs/doca-comch/CAPABILITIES.md#error-taxonomy).
-   - After **either** state-changing operation, re-run the smoke
-     in [`## test`](#test) — do not chain state-changing
-     operations without a fresh inspection in between.
-5. **Permission layer.** Tool runs but reports it cannot read or
-   change the channel because of insufficient privileges. The
-   tool's own message is ground truth; re-run with the privileges
-   the public guide names per
-   [`doca-comch CAPABILITIES.md ## Safety policy`](../../libs/doca-comch/CAPABILITIES.md#safety-policy)
-   permission matrix. Bypassing the privilege check is not on the
-   table.
-6. **Version layer.** Tool runs but its view of the channel
+   then run the same zero-argument scan on the other side if
+   needed.
+5. **Version layer.** Tool runs but its view of the channel
    disagrees with what the program-side `doca_comch_*` API
    reports. Walk the four-way match per
    [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
@@ -294,20 +212,15 @@ layers in order. The shape of the diagnosis:
    [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
    When the tool and the `*.so` came from different installs, the
    fix is a consistent reinstall, not a code change.
-7. **Cross-cutting layer.** All layers above are clean and
-   drain / restart did not resolve the symptom. The cause is
-   below the comch layer — driver, firmware, BlueField mode, or
-   hardware. Escalate to
+6. **Cross-cutting layer.** All layers above are clean but the
+   scan and program-side evidence disagree. Escalate to
    [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
    with the captured admin-tool inspection plus the program-side
-   trace as evidence. Looping on drain / restart at this layer is
-   the wrong move.
+   trace as evidence.
 
-In every case: **quote what the tool said.** Do not paraphrase
-channel-state output, do not reorder fields, do not summarize
-into prose. The whole point of inspecting a channel before
-touching it is to break the agent out of the
-inference-from-symptom trap.
+In every case: quote the relevant table row and retain the exact
+exit status and stderr. Do not synthesize a second command surface
+from the printed fields.
 
 ## Deferred task verbs
 
@@ -337,11 +250,7 @@ skill's name.
 
 ## Command appendix
 
-Comm Channel Admin Tool-specific invocations the verbs above reach
-for. Every row is a CLASS — the agent must not invent flags,
-subcommand names, or output columns beyond `--help` on the
-installed binary. The read-only-first / state-changing-after-smoke
-symmetry is the load-bearing piece.
+The tool has exactly one application invocation class.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
@@ -366,26 +275,15 @@ the agent should:
 
 | Purpose (class) | Invocation (shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
-| Discover available subcommands and flags | The admin tool's own `--help` (subcommand-and-flag inventory comes from here, not from prose) | [`## run`](#run) step 5 | Prints the documented inventory; the agent uses this as the only source of truth for subcommand and flag names. |
-| Confirm tool version against the comch library | The admin tool's `--version`, cross-checked with `pkg-config --modversion doca-comch` | [`## test`](#test) cross-check + [`## debug`](#debug) layer 6 | Both strings agree; disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2). |
-| Enumerate comch channels on this side | The admin tool's documented list-channels subcommand, run on the side the user reports the problem | [`## run`](#run) step 2 + [`## test`](#test) step 1 | Exit 0; the listing includes the channel identifier the user expected, or surfaces an empty listing the agent treats as a channel-discovery finding per [`## debug`](#debug) layer 3. |
-| Inspect one channel by identifier | The admin tool's documented inspect-channel subcommand, given the identifier from the enumeration | [`## run`](#run) step 3 + [`## test`](#test) step 2 | Exit 0; the per-channel state reads as the public guide documents for a healthy active channel. |
-| Save a channel-state snapshot for debug | Redirect the inspection output to a file (`> chan-state.txt`) | [`## test`](#test) "save" step + [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug) | The saved file is consumed by the cross-cutting debug ladder as the channel-state half of the evidence pair. |
-| Drain a stuck channel (state-changing) | **No drain subcommand exists on this binary** — this admin tool only enumerates/inspects; perform the drain through `doca-comch` itself (program-side), not via this tool | [`## debug`](#debug) layer 4 (after smoke) | The post-drain re-inspection reads as quiesced or recovered; never chained without a re-inspection per [`## test`](#test) eval loop. |
-| Restart a stuck channel (state-changing) | **No restart subcommand exists on this binary** — this admin tool only enumerates/inspects; perform the restart through `doca-comch` itself (program-side), not via this tool | [`## debug`](#debug) layer 4 (after smoke; after drain did not resolve) | The post-restart re-inspection shows a fresh channel that the program side observes as a new CONNECTED transition per [`doca-comch CAPABILITIES.md ## Observability`](../../libs/doca-comch/CAPABILITIES.md#observability). |
-| Re-confirm after a state-changing operation | Any of the read-only rows above, re-run after drain / restart / driver / firmware / mode change | [`## test`](#test) eval loop | The post-change output reflects the change; a stale inspection is the failure mode. |
+| Scan and print all comch rows on this side | `/opt/mellanox/doca/tools/doca_comm_channel_admin` with zero application arguments; capture exit status, complete stdout, and complete stderr | [`## run`](#run), [`## test`](#test), [`## debug`](#debug) | Exit 0; MFT `resourcedump` is installed and reachable through `PATH`, privilege is sufficient, no child invocation fails, and stdout contains the SERVERS and CONNECTIONS tables. Any MFT/PATH/privilege/non-zero-exit/stderr failure routes to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) before table interpretation. |
 
 Three cross-cutting rules for this appendix:
 
-- **Never invent a subcommand, flag, or output column name.**
-  `--help` on the installed binary plus the public DOCA Comm
-  Channel Admin Tool guide via
-  [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools)
-  are the joint contract; prose-derived names are the most common
-  hallucination failure for this skill.
-- **State-changing operations re-open the smoke.** Drain and
-  restart are not retryable in place; after either, the agent
-  re-runs the read-only smoke per [`## test`](#test).
+- **Never add an application argument.** There is no subcommand,
+  device scope, or per-row follow-up.
+- **Inspect rows or the other side.** If the target row is absent,
+  inspect the existing tables or run the same zero-argument scan
+  on the other side.
 - **Cross-link instead of duplicate.** Cross-cutting commands
   (`pkg-config --modversion`, `dmesg`, `mlxconfig -d <bdf> q`)
   live in
@@ -401,17 +299,9 @@ A few rules that apply across every verb in this file, restated
 here so they are visible at the point of action and not buried in
 [`SKILL.md`](SKILL.md):
 
-- The **public DOCA Comm Channel Admin Tool guide** plus the
-  installed `--help` are the joint source of truth. When they
-  disagree (e.g. a flag landed in a release this skill was not
-  written against), the *installed* `--help` wins for the user's
-  actual run.
-- The **read-only operations are safe**; the **state-changing
-  operations are not**. The agent must say which class an
-  operation belongs to before recommending it, and must gate
-  every state-changing operation on a clean inspection per
-  [`## test`](#test).
-- **Quote, do not paraphrase.** The channel-state output is the
+- The binary has one zero-application-argument scan-and-print
+  operation. Do not invent additional command surfaces.
+- **Quote, do not paraphrase.** The table output is the
   artifact downstream debug consumes; reformatting it loses
   fidelity that the rest of the bundle's procedures depend on.
 - This skill **assumes a healthy DOCA install** (or the public

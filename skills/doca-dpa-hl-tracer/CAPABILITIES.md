@@ -101,12 +101,12 @@ events verbatim — do not paraphrase event names.
 | `TRACE` | Full per-event capture across every event class the DPA-side instrumentation emits. | Higher; can shift kernel timing by a measurable amount in tight loops. | When the bug is correctness (wrong-result, wrong ordering) or when the perf question is fine-grained (sub-microsecond gaps between events). |
 | `CRIT` | Critical-events-only — a documented narrower subset (errors, faults, lifecycle transitions). | Lower; minimal kernel timing perturbation. | When the bug is *"did anything bad happen"* (crash, fault, error event) and full event detail is not needed. Also the default *"start here"* mode before widening to `TRACE`. |
 
-The `--sub-mode` strings the binary accepts are `DBUF` or
-`COMCH` — a transport selector for *how* trace data is
-carried off the DPA, valid only for `TRACE` mode (not a
-narrower TRACE / CRIT capture variant). The exact strings
-remain authoritative on `--help` of the installed version;
-the agent does not invent them.
+`--sub-mode` is valid **only with `--mode TRACE`**. The
+documented strings are `DBUF` and `COMCH`, selecting how
+TRACE data is carried off the DPA; they are not narrower
+TRACE / CRIT capture variants. A `CRIT` invocation must omit
+`--sub-mode`. Re-confirm the exact strings against `--help`
+on the installed version; the agent does not invent them.
 
 **JSON config layout.** Capture parameters live in a JSON
 config file (passed via `--config-file`). The documented
@@ -141,8 +141,11 @@ just *"a few seconds"*.
 `doca_dpa_app` context. A decode against a different ELF
 build produces noise / wrong-symbol output even when the
 binary trace is intact. The agent's rule: snapshot the ELF
-path (and a SHA of the ELF) at capture time; pair them in
-the captured artifact.
+path and SHA at capture time, then recompute the SHA
+immediately before decode. If they differ, **abort decode**,
+preserve the binary trace unchanged, and locate the exact
+capture-time ELF. Rebuilding an ELF or decoding anyway
+cannot repair the mismatch.
 
 ## Version compatibility
 
@@ -173,7 +176,8 @@ there; this skill does not duplicate it.
   agent attaches the ELF path + SHA to the captured
   artifact.
 - **Capture-mode tokens and JSON keys are versioned.**
-  `TRACE` / `CRIT` / `--sub-mode` strings and the JSON
+  `TRACE` / `CRIT` tokens, TRACE-only `--sub-mode` strings,
+  and the JSON
   key set evolve release to release; re-verify against
   `--help` on the installed binary and the public DOCA
   DPA Tools page rather than against this skill's prose.
@@ -214,19 +218,19 @@ jumping layers wastes the user's time on the wrong fix.
    only re-attempt the tracer once the device is visible.
 3. **Image-not-instrumented.** The tracer binds but the
    DPA-side image emits no events. Cause: the DPA-side
-   workload is not running (no kernel launched), the
-   DPA-side application image is not the documented
+   application image is not the documented
    instrumented build (DPACC build flags did not enable
-   the tracer-instrumentation hooks), or the workload
-   ran to completion before the tracer started capture.
+   the tracer-instrumentation hooks).
    Routing: confirm via
    [`doca-dpa TASKS.md ## run`](../../libs/doca-dpa/TASKS.md#run)
-   that the workload is up; re-read the public DPACC
+   that the instrumented image was loaded; re-read the public DPACC
    guide via
    [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
    for the documented instrumentation build options.
 4. **Capture-window.** Capture started after the relevant
-   events fired, ended before they fired, or saturated
+   events fired (including a workload that ended before
+   capture began), ended before they fired, observed an
+   idle workload, or saturated
    the file-size limit before completing. Cause: window
    too short, file-size limits too small for the chosen
    mode, `file_size_limit_policy=0` (stop-on-limit) truncated
@@ -239,10 +243,12 @@ jumping layers wastes the user's time on the wrong fix.
    the ELF passed to `--elf-file` is the wrong build,
    was rebuilt after capture, or is missing the
    debug-info sections the tracer's parser uses. Routing:
-   confirm the ELF SHA at decode time matches the SHA
-   captured at capture time (per
+   recompute the ELF SHA before invoking decode and compare
+   it with the capture-time SHA (per
    [`## Capabilities and modes`](#capabilities-and-modes)
-   ELF-must-match-image rule).
+   ELF-must-match-image rule). On mismatch, abort decode
+   and locate the exact capture-time ELF; do not rebuild,
+   substitute, or decode against the mismatched file.
 6. **Overhead-saturated.** The capture completed but the
    measured behaviour is dominated by tracer overhead, not
    the workload. Symptoms: per-event timing in the trace
@@ -305,7 +311,7 @@ log file. Specifically:
 - **Capture-time tuple.** The minimum metadata to
   attach to any captured trace artifact: (DOCA version,
   DPACC compiler version, ELF path + SHA, mode +
-  sub-mode, JSON config, capture wall-clock window,
+  TRACE-only sub-mode when applicable, JSON config, capture wall-clock window,
   BlueField identity + firmware version). Without this,
   two captures in a fleet drawer cannot be ranked or
   attributed.
@@ -355,9 +361,14 @@ the capture itself. The rules:
   the binary trace and log files.
 - **Captured traces can leak workload information.**
   Event arguments, RDMA WR fields, and comm-call
-  payload pointers may show up in the trace; treat
-  trace files as workload-sensitive artifacts and
-  apply the operator's data-handling policy to them.
+  payload pointers may show up in the trace. Before
+  sharing, classify the binary trace, decoded output,
+  logs, stderr, config, and metadata under the operator's
+  data-handling policy; redact workload-sensitive fields
+  from a derived shareable copy. Preserve the unmodified
+  raw trace and matching ELF/config tuple in restricted
+  storage. Never overwrite the restricted raw artifact
+  with the redacted derivative.
 - **Do not invent event names, mode tokens, or JSON
   keys.** The documented surface lives on the public
   DOCA DPA Tools page and in `--help` on the installed

@@ -116,7 +116,7 @@ disambiguate before falling back to the cross-library response.
 | `DOCA_ERROR_AGAIN` | `doca_task_submit` on the memcpy task | The DMA task queue is full. This is *not* a hardware error; the program must drain completions via `doca_pe_progress()` before re-submitting. Same as the cross-library *"would-block, retry after progress"* pattern. |
 | `DOCA_ERROR_NOT_PERMITTED` | First memcpy submit, or first cross-peer submit | The mmap permission flag is missing for the direction of access — source mmap missing `DOCA_ACCESS_FLAG_LOCAL_READ_ONLY`, destination missing `DOCA_ACCESS_FLAG_LOCAL_READ_WRITE`, or a cross-peer source not exported via `doca_mmap_export_*`. Re-walk the matrix in [`## Safety policy`](#safety-policy). |
 | `DOCA_ERROR_NOT_SUPPORTED` | `doca_dma_task_memcpy_set_conf` or first submit | The active `doca_devinfo` does not advertise the memcpy task at all. Re-run `doca_dma_cap_task_memcpy_is_supported(devinfo)`; if false, that is the answer — the user's device cannot offload this copy. |
-| `DOCA_ERROR_DRIVER` | Any submit / completion call | The layer below DOCA reported failure (driver / firmware). Capture state and route to env-class debug ([`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)) — the layer below DOCA is the suspect, not the DMA program. |
+| `DOCA_ERROR_DRIVER` | Any submit / completion call | The layer below DOCA reported failure (driver / firmware). Before routing, capture the recent driver log (`dmesg`), trace-level DOCA output, and active-device listing (`doca_caps --list-devs`) using the commands in [TASKS.md ## Command appendix](TASKS.md#command-appendix), then route to env-class debug ([`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)) — the layer below DOCA is the suspect, not the DMA program. |
 
 The agent's rule: **never recommend a retry loop on
 `DOCA_ERROR_*` without first identifying which of the rows above
@@ -129,8 +129,8 @@ retry.
 The DOCA Core progress engine (PE) is the single source of
 observability for DMA: every memcpy task completion (success or
 failure) arrives as an event on the PE. DMA does not maintain
-external counters; its observability surface is entirely
-event-driven, not poll-driven.
+external counters; completion events arrive on the PE, and the
+program must repeatedly call `doca_pe_progress()` to pump them.
 
 Three primary signals the agent should reach for:
 
@@ -186,10 +186,12 @@ walk for any new DMA setup:
   subsequent calls and undefined behavior on outstanding tasks.
 - **Validate permissions BEFORE the bulk run.** A small-buffer
   smoke memcpy (a few KiB) is the cheapest way to confirm the
-  source / destination permission pair is correct. If the smoke
-  passes, the permission set is right; any subsequent
-  oversize-buffer failure narrows cleanly to the cap-query / size
-  axis instead of the permission axis.
+  source / destination permission pair for the tested path is
+  correct. For a cross-peer copy, the smoke must exercise the
+  exported and imported mmap path before its permissions are
+  considered valid. Any subsequent oversize-buffer failure then
+  narrows cleanly to the cap-query / size axis instead of the
+  permission axis.
 
 ## Deferred topic boundaries
 

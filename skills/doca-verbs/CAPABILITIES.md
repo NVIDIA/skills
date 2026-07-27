@@ -142,13 +142,15 @@ naming the cap query that established it.
 `doca_ctx_start()` on a verbs context: a `doca_verbs_context`
 created against a `doca_dev`; at least one `doca_verbs_pd`
 attached; for QP-class work, at least one `doca_verbs_qp` created
-with its matching `doca_verbs_qp_init_attr`, plus the send and
-receive `doca_verbs_cq`s and the per-QP `doca_verbs_qp_attr`
-transitions via `doca_verbs_qp_modify` to drive the QP state
-machine (RESET → INIT → RTR → RTS for RC; analogous transitions
-for UC); MRs covering any memory the QP will read or
-write — all configured through the `doca_verbs_*` setters
-appropriate for each object. *Optional but commonly needed*:
+with its matching `doca_verbs_qp_init_attr`, plus at least one
+`doca_verbs_cq` (send and receive may share a CQ when that shape is
+chosen; otherwise create separate send and receive CQs) and the
+per-QP `doca_verbs_qp_attr` transitions via
+`doca_verbs_qp_modify` to drive the QP state machine (RESET → INIT
+→ RTR → RTS for RC; analogous transitions for UC); MRs covering
+any memory the QP will read or write — all configured through the
+`doca_verbs_*` setters appropriate for each object. *Optional but
+commonly needed*:
 explicit QP-type selection (RC / UC — the only two QP types this
 release defines: `DOCA_VERBS_QP_TYPE_RC` / `_UC`), queue depths,
 per-WR flag selection, ECE attribute tuning, CC-group attachment,

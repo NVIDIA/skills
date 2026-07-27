@@ -18,13 +18,13 @@ description: >
 metadata:
   kind: tool
 compatibility: >
-  Requires a DOCA/MFT environment on Linux (Ubuntu 22.04/24.04 or
-  RHEL/SLES) with a ConnectX-6+/BlueField device, mst tools (`mst status
-  -v` must resolve it), debugfs mounted, and root/sudo (reads/writes
-  /sys/kernel/debug/mlx5/{pci}/diag_cnt/). `pcc_counters.sh` is a bash
-  script under the DOCA tools dir; it reads FW/HW diagnostic counters,
-  independent of any custom DPA/doca-pcc kernel. The set op reconfigures
-  collected counters (privileged write) and is fleet-impacting.
+  Requires DOCA/MFT on Linux with a ConnectX-6 or newer or BlueField
+  device, mst tools, mounted debugfs, and root access to the mlx5
+  diag_cnt interface. The script reads fixed firmware and hardware
+  diagnostics independently of custom PCC code. Its set operation
+  changes which counters are collected, not congestion-control or
+  forwarding behavior; treat later fleet tuning as a separate
+  high-stakes action.
 
 ---
 

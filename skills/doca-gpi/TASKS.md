@@ -73,8 +73,8 @@ wastes the user's time.
 ## configure
 
 Goal: bring up a `doca_gpi` context, size its channels and
-queues against the device's reported capabilities, and reach the
-state where the GPU-side handle is valid.
+queues from installed-version evidence and create-call results, and
+reach the state where the GPU-side handle is valid.
 
 Steps the agent should walk the user through:
 
@@ -90,8 +90,10 @@ Steps the agent should walk the user through:
    to see which devices have the GPU-datapath capability. Note
    that `doca_gpi.h` exposes **no** `doca_gpi_cap_*` devinfo
    query — GPI has no runtime capability API — so the agent does
-   not invent per-device maxima; supported sizing ranges come
-   from the device and the DOCA release notes.
+   not invent per-device maxima. Derive candidate sizing only from
+   evidence for the installed DOCA version (including its release
+   notes), then treat the domain/channel create results on the
+   active device as runtime acceptance or rejection.
 3. **Pick the sizing.** Choose the domain channel count
    (`doca_gpi_domain_attr_set_num_channels`), endpoint / bind
    counts (`_set_num_ep`, `_set_num_binds`, `_set_bind_size`),
@@ -127,17 +129,25 @@ Steps the agent should walk the user through:
 8. **Connect channel endpoints.** For each endpoint, call
    `doca_gpi_channel_ep_conn_info_create(channel, ep_idx,
    &conn_info_size, &conn_info)` to build the local connection
-   info; transport it over the application's out-of-band channel
-   to the remote peer; receive the peer's blob back; call
+   info; transport it over a secure, authenticated out-of-band
+   channel to the remote peer; receive the peer's blob back; call
    `doca_gpi_channel_ep_connect(channel, ep_idx, peer_conn_info,
    peer_conn_info_size)`. After this call the endpoint is
    connected and the GPU side can issue work; free each local
-   blob with `doca_gpi_channel_ep_conn_info_destroy`.
+   blob with `doca_gpi_channel_ep_conn_info_destroy`. Per
+   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy),
+   treat the connection-info blob and remote mmap as wire-format
+   secrets.
 
 If any step fails with a `DOCA_ERROR_*`, route through the error
 taxonomy in
 [CAPABILITIES.md ## Error taxonomy](CAPABILITIES.md#error-taxonomy)
-before retrying.
+before retrying. Do not retry against partially created state:
+stop the CUDA consumer, destroy any created channels, detach mmaps,
+destroy created domains, stop the GPI instance if it was started,
+and then destroy it. Recreate the sequence from step 1 only after
+that reverse-order cleanup succeeds; otherwise stop and escalate
+with the cleanup error.
 
 ## build
 
@@ -181,7 +191,7 @@ code-level edit:
 
 | Slot | What the agent asks the user | GPI-specific consideration |
 | --- | --- | --- |
-| 1. Starting code | Which GPI-using file or sample is the baseline? | If the user has no working baseline, *stop* — the EXPERIMENTAL periphery of the API surface means authoring GPI source from documentation prose is forbidden by this skill (per [`SKILL.md ## What this skill deliberately does not ship`](SKILL.md#what-this-skill-deliberately-does-not-ship)) |
+| 1. Starting code | Which GPI-using file or sample is the baseline? | If the user has no working baseline, use only a live, verified GPI baseline from the installed version. If none is available, route through [`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify) preconditions and [`doca-setup TASKS.md ## no-install`](../../doca-setup/TASKS.md#no-install) to obtain a real installed sample surface. Do not author GPI from prose and do not substitute an unverified GPUNetIO sample |
 | 2. Sizing change | Change domain channel count or per-channel work-queue depths? | Channel count is set on `doca_gpi_domain_attr` (`_set_num_channels`); WQE depths on `doca_gpi_channel_attr` (`_set_sq_wqe_num` / `_set_srq_wqe_num` / `_set_gpu_wqe_num`). There is no `doca_gpi_cap_*` query, so an out-of-range value fails at create time, not at a cap check; do not carry a number over from a different device |
 | 3. Memory binding | Add or remove a `doca_gpi_domain_attach_local_mmap` / `doca_gpi_domain_attach_remote_mmap` region? | Each attach needs an application-created `doca_mmap`; a remote attach requires the peer's `doca_mmap` exchanged out of band and is not safe to re-export without re-doing that exchange |
 | 4. Endpoint connection | Change how endpoint connection info is exchanged with the remote peer? | This is a re-architecture, not a tweak. The conn-info blob from `doca_gpi_channel_ep_conn_info_create` crosses an application-owned out-of-band channel (TCP, file, MPI, …); do not invent a built-in exchange |
@@ -217,7 +227,10 @@ Steps the agent should walk the user through:
    `DOCA_LOG_LEVEL=trace` for the first run (see
    [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability)).
    This is the cheapest way to make the host-side lifecycle
-   visible on first failure.
+   visible on first failure. Treat the trace as sensitive because
+   it can contain endpoint, descriptor, or connection metadata:
+   store it with access restricted to the current operator and
+   redact those values before sharing the diagnostic bundle.
 4. **Observe completions on the CUDA side.** Per
    [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability),
    the CUDA kernel is the only thing that observes per-work-
@@ -226,8 +239,15 @@ Steps the agent should walk the user through:
    destroy. A run that produces no GPU-side completions but
    doesn't error on the host is almost always (a) the CUDA
    kernel did not launch, (b) the descriptor exchange landed
-   wrong, or (c) the remote peer silently disconnected — walk
-   all three before diving into GPI internals.
+   wrong, or (c) the remote peer silently disconnected. Route
+   kernel-launch verification to
+   [`doca-gpunetio TASKS.md ## debug`](../doca-gpunetio/TASKS.md#debug);
+   route peer reachability back to [`## run`](#run) step 1 and the
+   peer's RDMA stack. Check descriptor bytes between those two
+   boundaries before diving into GPI internals.
+   If either delegated check remains non-green after its single
+   bounded diagnostic pass, stop and escalate with both captures;
+   do not route back to `## run` and repeat the launch.
 
 ## test
 
@@ -253,7 +273,11 @@ Iteration shape:
    `doca_gpi_channel_create` at configure time. GPI has no
    `doca_gpi_cap_*` query, so there is no cap to compare against;
    if the user has logged-and-ignored a create error, the GPI
-   state is undefined.
+   state is undefined. Treat the failed call's output handle as
+   unusable. Tear down only objects and mmap binds whose creation
+   or attachment succeeded, then stop and destroy the valid parent
+   instance and re-run [`## configure`](#configure) from the
+   start; never call a destroy function on a failed call's output.
 2. **Lifecycle-order check.** Walk the configure sequence in
    [`## configure`](#configure) against the user's code: every
    `doca_gpi_set_*` instance attribute must precede
@@ -274,29 +298,39 @@ Iteration shape:
    observability surface in
    [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability);
    do not raise traffic into an unobserved path.
-5. **Negative test.** Construct one deliberately oversized
-   domain / channel attribute value and confirm the create call
-   (`doca_gpi_domain_create` / `doca_gpi_channel_create`) returns
-   a `DOCA_ERROR_*`. This validates that the agent's sizing
-   understanding is itself correct on this DOCA version + this
-   device — without relying on a cap query that GPI does not
-   expose.
+5. **Negative test.** Do not discover a sizing limit by requesting
+   an oversized allocation on live or shared hardware. If the
+   rejection path must be tested, use only a value that the
+   installed header, release notes, or shipped sample explicitly
+   documents as invalid, and run it on a dedicated non-production
+   device or queue with no shared workloads. If that isolation
+   cannot be proven, skip the negative test and record it as not
+   safely executable.
+   Confirm the create call returns a `DOCA_ERROR_*`; if it
+   unexpectedly succeeds, immediately destroy the created object
+   and do not increase the value further.
 
 Eval-loop overlay — why this is a loop, not a one-shot pass:
 
 | Iteration trigger | What it looks like | What changes next iteration |
 | --- | --- | --- |
 | `DOCA_ERROR_*` from `doca_gpi_gpu_channel_get` | The channel was not yet created on a configured, started GPI instance | Re-walk steps 4-7 of [`## configure`](#configure); confirm `doca_gpi_start` and `doca_gpi_channel_create` ran before the handle was requested |
-| `DOCA_ERROR_*` from a create call | A domain / channel attribute value is out of range | GPI exposes no cap query, so re-derive the value from the device and release notes against the actual active device; clamp it |
+| `DOCA_ERROR_*` from a create call | A domain / channel attribute value is out of range | GPI exposes no cap query, so re-derive a candidate from installed-version evidence and release notes, then use one corrected create attempt on the active device as the acceptance check |
 | Endpoint connect silently fails | Both sides ran `doca_gpi_channel_ep_connect` without error; no traffic flows | The conn-info blob or remote `doca_mmap` transported wrong, or the GID indexes don't agree; diff the bytes and re-confirm the GID selection |
-| CUDA kernel never observes a completion | The host side is fine; the kernel polls forever | Either the kernel was not launched, or the endpoint is not actually connected end-to-end, or the remote peer rejected the work; walk all three |
+| CUDA kernel never observes a completion | The host side is fine; the kernel polls forever | Route kernel-launch verification to [`doca-gpunetio TASKS.md ## debug`](../doca-gpunetio/TASKS.md#debug); route peer reachability to [`## run`](#run) step 1 and the peer's RDMA stack; verify descriptor exchange between them |
 | `DOCA_ERROR_IN_USE` from `doca_gpi_destroy` | Domains or channels are still alive | Destroy every channel and domain and detach mmaps before destroy; the destroy does not auto-clean |
 
-Loop termination: stop iterating once two consecutive iterations
-of the same kind don't change anything — that means the cause is
-below GPI. Escalate to
+Loop termination: allow at most two corrective iterations total
+per invocation, regardless of whether the observed error kind
+changes. Stop earlier when an iteration produces no new evidence
+(the same error, sizing values, descriptor bytes, and GID / port
+observations). Treat either limit as an inconclusive plateau:
+capture the evidence, re-check the applicable GPI gate once, and
+escalate to
 [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
-with the captured layer-1-through-5 evidence.
+with the captured layer-1-through-5 evidence. Do not claim the
+cause is below GPI unless the captured evidence establishes that
+boundary.
 
 ## debug
 
@@ -379,8 +413,8 @@ The integration shape this skill teaches:
    domain (`doca_gpi_domain_destroy`) and detach mmaps
    (`doca_gpi_domain_detach_mmap`); call `doca_gpi_stop()`; call
    `doca_gpi_destroy()` (which returns `DOCA_ERROR_IN_USE` if a
-   domain or channel is still alive). The destroy-then-stop
-   ordering is the load-bearing piece.
+   domain or channel is still alive). The load-bearing order is
+   child cleanup → instance stop → instance destroy.
 3. **Multi-channel discipline.** A GPI domain may expose
    multiple channels; each channel may expose multiple
    endpoints; each GPU-side handle is per-channel, not

@@ -8,7 +8,7 @@ around them is interpretation.
 
 Read this file when the loader sent you here from
 [SKILL.md](SKILL.md). For the *how* of executing each pattern (the
-verbs `configure / build / modify / run / test / debug`), jump to
+verbs `configure / modify / build / run / test / debug`), jump to
 [TASKS.md](TASKS.md). For the canonical DOCA version-handling
 rules that this skill layers a STA overlay on top of, see
 [`doca-version`](../../doca-version/SKILL.md). For the RDMA
@@ -273,7 +273,12 @@ target-side acceleration, not an initiator transport provider.
 **Smoke before scale-up.** Before driving production workloads,
 the agent must walk the user through a single-IO smoke (one NVMe
 admin command — typically Identify Controller — over the admin
-queue, then one NVMe Read / Write I/O over a single I/O queue).
+queue, then one NVMe Read over a single I/O queue). Read is the
+default smoke. A Write is permitted only after the user explicitly
+confirms that the namespace is disposable and supplies a safe test
+LBA or LBA range whose existing data may be overwritten. Without
+both confirmations, the agent must not recommend a Write or invent
+an LBA.
 A failure here narrows cleanly: admin-queue side, fabric, or
 I/O-queue side. A failure at production scale *without* the
 single-IO smoke pass is a much harder bisection.

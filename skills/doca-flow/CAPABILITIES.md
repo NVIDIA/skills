@@ -426,6 +426,13 @@ verified empirically, not through more cap queries:
 | NAT variants (SNAT / DNAT / combined) | Requested through `doca_flow_ct_cfg_set_direction` and the CT actions; an unsupported request surfaces as `_NOT_SUPPORTED` at entry add — there is no per-variant cap query |
 | Overlay encapsulations for CT | Confirmed against the shipped CT sample and runtime behavior, not a per-overlay cap symbol |
 
+**Empirical CT checks are isolation-only.** Confirm NAT variants,
+overlay handling, sizing, and aging on a dedicated test
+representor/VF or isolated ports that carry no production traffic.
+Snapshot counters, stage one entry, and widen only after the isolated
+smoke is green. Never use a live production port to discover whether a
+CT action is supported.
+
 **Version pairing — CT ships inside doca-flow.** There is no separate
 `doca-flow-ct` pkg-config module; `pkg-config --modversion doca-flow` MUST
 equal `doca_caps --version`. A skew between the doca-flow library and the
@@ -441,17 +448,20 @@ in [`## Error taxonomy`](#error-taxonomy):
 | --- | --- |
 | `DOCA_ERROR_BAD_STATE` | Layering / lifecycle violation: `doca_flow_ct_init` called after a port was already started (it must run before port start), OR a CT entry add before the ports and wrapped pipes are up, OR calling `doca_flow_ct_destroy` out of order relative to `doca_flow_destroy` |
 | `DOCA_ERROR_NOT_SUPPORTED` | NAT variant / overlay / aging range / CT feature is unsupported on this device + firmware combo. Re-run `doca_flow_ct_cap_is_dev_supported(devinfo)` to confirm the device supports CT at all; surface which DOCA version is installed. Do not retry the same spec on the same device |
-| `DOCA_ERROR_FULL` (or `_NO_MEMORY`) | CT entry table at capacity. Read the per-CT-entry counters to identify idle / stale entries; either wait for aging to evict them, evict explicitly, or — if the workload genuinely needs more concurrent flows than the device supports — re-run the cap query for the max-concurrent-flows axis and consider whether the workload fits this device at all |
-| `DOCA_ERROR_INVALID_VALUE` | Malformed 5-tuple (zero protocol, mismatched IP versions on src / dst), NAT translation that conflicts with an existing entry (two entries cannot map the same translated 5-tuple to two different connections), unsupported overlay configuration, or aging timer outside the cap-advertised range |
+| `DOCA_ERROR_FULL` (or `_NO_MEMORY`) | CT entry table at capacity. Read the per-CT-entry counters to identify idle / stale entries; either wait for aging to evict them or evict explicitly. The documented surface has no separate max-concurrent-flows cap getter: do not invent one. Use the configured table sizing accepted by the installed CT sample/API plus observed add failures, then surface a device-fit gap if the required peak cannot be admitted |
+| `DOCA_ERROR_INVALID_VALUE` | Malformed 5-tuple (zero protocol, mismatched IP versions on src / dst), NAT translation that conflicts with an existing entry (two entries cannot map the same translated 5-tuple to two different connections), unsupported overlay configuration, or an aging value rejected by the installed CT configuration API. Confirm accepted values from the installed header/sample and setter return; do not claim a numeric cap-advertised range |
 | `DOCA_ERROR_IN_USE` | CT entry remove while the entry is still being referenced by in-flight traffic. Quiesce the affected 5-tuple (or wait for the aging timer to evict the entry naturally), then retry. Do NOT force-remove — doing so can corrupt the per-connection state on the wire |
 
 **Safety overlay.** Inherits [`## Safety policy`](#safety-policy) plus three
 CT rules:
 
-1. **Aging-table sizing.** Cap-advertised max concurrent flows is the
-   ceiling; size to the expected *peak* (not average). If the estimate
-   exceeds the ceiling, surface the device-fit gap — do NOT over-commit. The
-   aging timer must fit both the cap-advertised range and the granularity.
+1. **Aging-table sizing.** The public CT capability surface provides the
+   device-level `doca_flow_ct_cap_is_dev_supported(devinfo)` gate, not
+   separate numeric max-flow or aging-range getters. Size to the expected
+   *peak* (not average), use only values accepted by the installed
+   header/sample and CT configuration setters, and treat `_FULL`,
+   `_NO_MEMORY`, or rejected configuration as the measured device-fit
+   boundary. Do not invent a numeric ceiling or aging range.
 2. **Do not invent NAT translations to resolve a conflict.**
    `DOCA_ERROR_INVALID_VALUE` on a NAT entry add is almost always a policy
    bug (two NAT rules that should not coexist) — surface it; the policy layer
@@ -586,7 +596,8 @@ unintended traffic. Three policies follow:
    successful `doca_flow_pipe_create` (optionally backed by the
    staged-entry / dry-run sample pattern) as the validation step
    **before** the entry-add call hits the hardware. The lifecycle is
-   *build (create = validate) → start → add entries → read counters*.
+   *start port → create pipe (validate) → add entries → read counters*;
+   a pipe has no separate start operation.
    Skipping it is the most common cause of "my pipe takes the link down".
 2. **Hairpin pipes must be staged.** A hairpin pipe (RX-to-TX without the
    host CPU) effectively rewires the steering plane, so its ordering is

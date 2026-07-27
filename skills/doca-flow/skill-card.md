@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill for DOCA Flow on a supported NVIDIA NIC/DPU — both for DOCA Flow application knowledge and for writing Flow applications: defining match/action pipes, bringing up ports / representors, forwarding with FWD_PORT (or another fwd target), reading flow counters, validating a pipe before hardware programming, picking the right Flow version against an installed DOCA, or debugging DOCA_ERROR_* from the Flow API. <br>
+Build and debug DOCA Flow applications on supported NVIDIA NICs/DPUs: define match/action pipes, initialize ports and representors, choose forwarding targets, validate pipes before hardware programming, read counters, match the Flow version to the installed DOCA release, and diagnose Flow API errors. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers writing DOCA Flow applications on supported NVIDIA NICs/DPUs — defining packet-steering pipes, bringing up ports, reading counters, and debugging Flow API errors in C/C++ or via FFI. <br>
+External developers and engineers building applications that consume the DOCA Flow library to program packet steering on supported NVIDIA NICs/DPUs with DOCA installed. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -28,22 +28,23 @@ Mitigation: Review and scan skill before deployment. <br>
 - [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
+- [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Code, Shell commands, Configuration instructions, Analysis] <br>
-**Output Format:** [Markdown with inline C and bash code blocks] <br>
+**Output Format:** [Markdown with inline C code blocks and bash commands] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- claude-code <br>
-- codex <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-8 evaluation tasks using NVSkills-Eval external profile in astra-sandbox environment. <br>
+Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative activation) in k8s-sandbox environment with external Skill Evaluator profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,21 +61,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+82%) | 98% (+48%) |
-| Discoverability | 4 | 96% (+71%) | 98% (+50%) |
-| Effectiveness | 4 | 83% (+70%) | 99% (+64%) |
-| Efficiency | 4 | 84% (+39%) | 94% (+36%) |
+| Correctness | 4 | 100% (+55%) | 100% (+50%) |
+| Discoverability | 4 | 98% (+23%) | 95% (+45%) |
+| Effectiveness | 4 | 92% (+73%) | 100% (+75%) |
+| Efficiency | 4 | 92% (+23%) | 100% (+62%) |
 
 ## Skill Version(s): <br>
-1bf01d0 (source: git SHA, committed 2026-07-15) <br>
+a62f6e2 (source: git SHA, committed 2026-07-22) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

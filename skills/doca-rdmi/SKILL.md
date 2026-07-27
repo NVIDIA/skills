@@ -49,8 +49,8 @@ which carries the self-contained install-check → device/cap
 discovery → sample → `pkg-config` build → run → debug walkthrough
 with the exact commands. You do **not** need to open `doca-setup` or
 `doca-programming-guide` to answer an RDMI build/run/debug question.
-Route to [`doca-setup`](../../doca-setup/SKILL.md) **only** when the
-user has no DOCA install at all.
+Route to [`doca-setup`](../../doca-setup/SKILL.md) when the required
+DOCA prerequisites are absent, partial, or version-mismatched.
 
 ## Example questions this skill answers well
 
@@ -108,15 +108,15 @@ load-bearing piece — the worked example is a single instance.
 
 ## Audience
 
-This skill serves **external developers building DPA / GPU-resident
-DOCA applications that need to *initiate* one-sided RDMA operations
+This skill serves **external developers building DPA-resident DOCA
+applications that need to *initiate* one-sided RDMA operations
 against a remote responder** — i.e., users whose accelerator-side
 code wants to post sends, writes, or reads directly from the
 accelerator without round-tripping through the host CPU. The
 canonical caller is a DPA kernel that has been compiled with
 `doca-dpacc-compiler` and runs on the BlueField DPA datapath; a
 GPU-side caller that drives the DPU's RDMA queues is the
-sister case covered by [`doca-gpi`](../doca-gpi/SKILL.md). This
+sister case routed to [`doca-gpi`](../doca-gpi/SKILL.md). This
 skill is *not* for NVIDIA developers contributing to DOCA RDMI
 itself, and it is not the right surface for general host-CPU
 two-sided RDMA — that belongs to

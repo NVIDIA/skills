@@ -51,6 +51,10 @@ lives in [`doca-setup`](../../doca-setup/SKILL.md). The
 7. **OOB connectivity exists between client and server**
    for the TCP exchange the source's `oob_connection_*`
    helpers drive.
+8. **The operator explicitly confirms the IB fabric is
+   trusted and non-shared for the benchmark window.** If the
+   fabric is shared or its trust / tenancy is unknown, stop;
+   do not run sustained WRITE traffic.
 
 If any precondition fails, stop and route; tool-level
 diagnosis against a half-installed environment wastes time.
@@ -91,6 +95,9 @@ Steps the agent walks the user through, in order:
 6. **Confirm the build inputs.** `PKG_CONFIG_PATH` includes
    the install's `pkgconfig` directory; the agent does not
    invent the literal path.
+7. **Re-confirm the fabric gate.** Record the operator's
+   explicit confirmation that the IB fabric is trusted and
+   non-shared for this run. No confirmation means stop.
 
 For the canonical DOCA universal lifecycle that underlies
 program-side configuration (which the binary runs internally
@@ -135,10 +142,10 @@ Routing for nearby "build" questions:
   and
   [`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
 
-The `## What this skill deliberately does not ship` block in
-[`SKILL.md`](SKILL.md) explicitly forbids adding a verbatim
-build recipe; revisit that policy before changing this
-section.
+This documented Meson flow is the supported build path for
+the shipped source tree. The skill forbids inventing wrappers
+or replacement source, not following the tool's documented
+Meson build.
 
 ## modify
 
@@ -192,10 +199,12 @@ the installed build.
    [`## install`](#install) and [`## configure`](#configure).
 2. **Bring up the server first.** On the host that hosts
    the remote buffer, run the `server` binary without `-c`.
-   The server listens on the OOB TCP socket.
+   The server listens on the OOB TCP socket. It has no
+   `--gpu` argument.
 3. **Confirm the server's pre-run echo.** The tool logs
-   the IB device name, the GPU PCIe address, the GID
-   index, and the role. If the echo does not match intent,
+   the IB device name, the GID index, and the server role.
+   Do not expect or synthesize a server GPU field. If the
+   echo does not match intent,
    stop now; the client's connect will pin the wrong
    pairing.
 4. **Bring up the client.** On the second host, run the
@@ -228,8 +237,10 @@ firmware on each side, the GPU model and PCIe address on
 each side, the IB device model and PCIe address on each
 side, the GID index, the exact client and server command
 lines, the binding constraint identified in the
-decomposition, and the full unredacted stdout for both
-halves. The downstream
+decomposition, and the full stdout for both halves. Before
+persisting or sharing it, redact GPU-side handles,
+memory-mmap exports, and OOB connection descriptors; retain
+all other lines and ordering. The downstream
 [`## test`](#test) and [`## debug`](#debug) workflows
 depend on those fields.
 
@@ -249,7 +260,7 @@ The eval-loop overlay:
 | Iteration trigger | What it looks like | What changes next iteration |
 | --- | --- | --- |
 | Smoke completes; BW is well below link capacity | One of three candidates (or pairing) — name which before iterating | Re-walk the throughput decomposition in [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes); confirm `nvidia-smi dmon` shows the SM at occupancy; confirm `ibstat` shows the link at expected rate. |
-| BW swings between runs by > X% | Steady-state not reached; system not at idle | Lengthen the run (more iterations); confirm no background traffic on the link; confirm no concurrent CUDA workloads. |
+| BW variation fails the acceptance criterion supplied by the benchmark owner or operator | Steady-state not reached; system not at idle | Lengthen the run using the documented iteration control; confirm no background traffic on the link; confirm no concurrent CUDA workloads. Do not invent a percentage threshold. |
 | BW grows with message size but does not move with kernel-side concurrency | NIC issue rate is the binding constraint | Quote the NIC-issue-rate hypothesis; confirm against the device's documented per-transport submission rate. |
 | BW grows with kernel-side concurrency but does not move with message size | GPU compute occupancy is the binding constraint | Re-walk the persistent-kernel pattern in [`../../libs/doca-gpunetio/CAPABILITIES.md#capabilities-and-modes`](../../libs/doca-gpunetio/CAPABILITIES.md#capabilities-and-modes). |
 | BW does not move with either knob and sits well below link capacity | Likely PCIe crossover (wrong pairing) | Re-walk the GPU-NIC pairing precondition; the answer is platform-side, not benchmark-side. |
@@ -264,8 +275,10 @@ exactly the failure mode this loop replaces.
 **Baseline-capture rule.** The captured artifact includes
 the multi-axis tuple per
 [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
-alongside the stdout from both halves AND the named binding
-constraint. Without all of them, the baseline cannot be
+alongside the full stdout from both halves, redacted only for
+GPU-side handles, memory-mmap exports, and OOB connection
+descriptors, AND the named binding constraint. Without all
+of them, the baseline cannot be
 regression-tested later.
 
 ## debug
@@ -306,9 +319,11 @@ layers in order:
    and
    [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug).
 
-In every case: **quote what the binaries reported.** Do
-not paraphrase, do not reorder columns, do not summarize a
-sweep into a single number.
+In every case: **quote what the binaries reported.** Keep
+full stdout and its ordering; redact only GPU-side handles,
+memory-mmap exports, and OOB connection descriptors before
+persisting or sharing it. Do not summarize a sweep into a
+single number.
 
 ## use
 

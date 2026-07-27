@@ -1,8 +1,8 @@
 # DOCA Telemetry Exporter workflows
 
 **Where to start:** The verbs run `configure → build → modify →
-run → test → debug`. Skip ahead only when the user is already past a
-verb. The `## test` verb is an iterative loop (single-event smoke →
+rebuild → run → test → debug`. Skip ahead only when the user is
+already past a verb. The `## test` verb is an iterative loop (single-event smoke →
 receiver-side reception check → multi-event smoke → load behavior →
 loop back if the receiver staging or transport changes), not a
 one-shot pass — see the eval-loop overlay in `## test` below.
@@ -43,7 +43,20 @@ Steps the agent should walk the user through:
    wanted to emit from the app is wrong; an agent that recommends
    linking the exporter when the user actually wanted the
    aggregating service is wrong. State the role first.
-2. **Verify the receiver is up and reachable BEFORE the
+2. **Confirm the exporter is the right tool.** Walk the
+   path-selection rule in
+   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes):
+   if the user really wants stdout / structured-log shipping, use
+   `doca_log` instead (covered in
+   [`doca-programming-guide`](../../doca-programming-guide/SKILL.md));
+   if the user wants a non-DOCA-aware Prometheus scrape endpoint,
+   use a Prometheus client library directly; if the user actually
+   needs real-time event subscription back INTO the app, route to
+   [`doca-comch`](../doca-comch/SKILL.md). Picking the exporter
+   *for* the user when the path-selection rule rules it out is a
+   wrong answer regardless of how cleanly the rest of the
+   configure step goes.
+3. **Verify the receiver is up and reachable BEFORE the
    exporter.** Walk the permission + staging matrix in
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy):
    (a) the receiving telemetry consumer is started and reachable
@@ -57,7 +70,7 @@ Steps the agent should walk the user through:
    [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
    or to [`doca-setup TASKS.md ## configure`](../../doca-setup/TASKS.md#configure)
    for the env-side path.
-3. **Confirm the installed DOCA version and run capability
+4. **Confirm the installed DOCA version and run capability
    discovery.** Use the procedure in
    [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure).
    Quote the version observed (`pkg-config --modversion
@@ -68,7 +81,7 @@ Steps the agent should walk the user through:
    rule in [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
    the queried value is the runtime authority, not the agent's
    memory. Quote the values back to the user.
-4. **Define and REGISTER the schema BEFORE any emit.** Sketch the
+5. **Define and REGISTER the schema BEFORE any emit.** Sketch the
    `doca_telemetry_exporter_schema` for the events the app will
    publish: field names + matching `doca_telemetry_exporter_type`
    (counter / gauge / event) per field. Register every schema with
@@ -78,7 +91,7 @@ Steps the agent should walk the user through:
    unregistered schema returns `DOCA_ERROR_NOT_FOUND`; emitting a
    value whose type does not match the registered schema returns
    `DOCA_ERROR_INVALID_VALUE`.
-5. **Create the `doca_telemetry_exporter_source`(s).** One source
+6. **Create the `doca_telemetry_exporter_source`(s).** One source
    per logical reporter (per-worker / per-pipeline-stage / per-
    tenant), per the object table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
@@ -86,26 +99,15 @@ Steps the agent should walk the user through:
    without asking — multi-source aggregation is one of the things
    the receiver fans out on, and the user's choice here is
    workload-bound.
-6. **Confirm the exporter is the right tool.** Walk the
-   path-selection rule in
-   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes):
-   if the user really wants stdout / structured-log shipping, use
-   `doca_log` instead (covered in
-   [`doca-programming-guide`](../../doca-programming-guide/SKILL.md));
-   if the user wants a non-DOCA-aware Prometheus scrape endpoint,
-   use a Prometheus client library directly; if the user actually
-   needs real-time event subscription back INTO the app, route to
-   [`doca-comch`](../doca-comch/SKILL.md). Picking the exporter
-   *for* the user when the path-selection rule rules it out is a
-   wrong answer regardless of how cleanly the rest of the
-   configure step goes.
 7. **Start the exporter context.** `doca_ctx_start()` on the
    exporter; per the universal lifecycle in
    [`doca-programming-guide TASKS.md ## configure`](../../doca-programming-guide/TASKS.md#configure),
    nothing emits cleanly until the context is in `RUNNING`. If
-   start fails, route through the error taxonomy in
+   start fails, identify the cause in
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
-   before retrying.
+   and apply that row's corrective action before retrying. Retry
+   once; if the same error remains, stop and escalate through
+   [`## debug`](#debug).
 
 If any step fails with a `DOCA_ERROR_*`, route through the error
 taxonomy in
@@ -154,7 +156,7 @@ before recommending any code-level edit:
 | Slot | What the agent asks the user | Exporter-specific consideration |
 | --- | --- | --- |
 | 1. Starting sample | Which sample under `/opt/mellanox/doca/samples/doca_telemetry_exporter/`? | Pick the closest in *event shape* (counter / gauge / event) and *source layout* (single source / multi source) to the user's intent. A smaller diff is always safer than a re-architecture |
-| 2. Event schema | Which fields, with which `doca_telemetry_exporter_type` each, does the user want to emit? | Re-validate the proposed schema against `doca_telemetry_exporter_*_get_*` per [`## configure`](#configure) step 3; an event shape that works on one install may exceed `max event size` on another |
+| 2. Event schema | Which fields, with which `doca_telemetry_exporter_type` each, does the user want to emit? | Re-validate the proposed schema against `doca_telemetry_exporter_*_get_*` per [`## configure`](#configure) step 4; an event shape that works on one install may exceed `max event size` on another |
 | 3. Schema registration site | Where in the user's app flow does the schema register relative to the first emit? | Per [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes) schema-register-before-emit rule, registration MUST happen before the first emit; if the sample emits before registering (some samples register implicitly on context-start), keep that order intact when modifying |
 | 4. Emit-site behavior on `AGAIN` | What does the modified app do when an emit returns `DOCA_ERROR_AGAIN`? | Per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) hot-path drop-not-block rule, the correct behavior is to DROP the event or buffer it bounded — never to block the data path. If the sample's existing emit-site does the wrong thing under load (sleep / retry / busy-wait), that is a sample bug that needs to be edited out before the modify lands |
 | 5. Receiver staging | Is the receiver the user is targeting started before the modified app starts? | Per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) consumer-up-first rule; not a code change but a runtime-staging concern the modify must surface |
@@ -167,6 +169,15 @@ modify-from-sample renderer (deferred to a future round, per
 Until the renderer ships, the agent must walk the user through the
 diff line-by-line against the sample source they read on disk, and
 have the user paste back the result for validation.
+
+**Manual diff validation checklist:** before accepting that pasted
+diff, verify that schema registration precedes the first emit in
+every code path; every emit site drops or bounded-buffers on
+`DOCA_ERROR_AGAIN` without blocking; the source count matches the
+intended logical reporters; the existing build manifest still uses
+`pkg-config doca-telemetry-exporter`; and all edits are in the
+user's project copy, not the installed sample tree. Then rebuild
+using [`## build`](#build) before proceeding to `## run`.
 
 ## run
 
@@ -260,7 +271,11 @@ Iteration shape:
    per-emit return value alone would not surface.
 6. **Under-load `AGAIN` behavior.** Push the emit rate up until
    the transport queue saturates and the publisher starts
-   returning `DOCA_ERROR_AGAIN`. The application MUST drop (or
+   returning `DOCA_ERROR_AGAIN`, but only on an isolated or staging
+   receiver with explicit operational approval. Set a rate ceiling
+   and test-duration limit before starting, and stop immediately at
+   `AGAIN` or either bound; never saturate a production receiver.
+   The application MUST drop (or
    bounded-buffer) — confirm the data path's latency does NOT
    rise. If the data path's latency rises with the emit rate,
    the modify violated the hot-path drop-not-block rule per
@@ -276,11 +291,19 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | `DOCA_ERROR_NOT_FOUND` on first emit | Schema was never registered with this exporter context, OR the source the emit references was never created | Walk the schema-register-before-emit rule in [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes); fix the registration order in the modify before re-running |
 | Emit returns success but receiver log is empty | Receiver is not up, OR the exporter is configured against a transport the receiver does not listen on | Re-walk the consumer-up-first staging in [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy); verify the receiver independently before suspecting the exporter |
 | `DOCA_ERROR_AGAIN` appears under bulk load | Receiver is slower than the publisher; transport queue is full | This is by design — the app must DROP / bounded-buffer at the emit site, not block. If the drop rate is unacceptable, widen the receiver side (separate problem on the receiver guide), do NOT back-pressure the data path |
-| Same code drops events on host A, doesn't on host B | Receiver throughput / transport differs between hosts | Re-narrow to the receiver side; the exporter's behavior is the same on both, the variance is at the consumer / transport layer |
+| Same code drops events on host A, doesn't on host B | Exporter capabilities or receiver throughput / transport may differ between hosts | Re-run the capability queries from `## configure` step 4 on each host. If the queried capabilities differ, adjust the schema or align the installs; only after they match should the investigation re-narrow to the receiver / transport layer |
 
-Loop termination: stop iterating once two consecutive iterations of
-the same kind don't change anything — that means the cause is below
-the exporter (transport, receiver, driver). Escalate to
+Loop terms are exact: an iteration's **kind** is the `Iteration
+trigger` row selected above; its **prescribed change** is that row's
+`What changes next iteration` action; and its **evidence** is the
+publisher result plus receiver-side log / count captured before and
+after that change. The outcome is **resolved** when the named smoke
+turns green, **shape-changed** when the re-run selects a different
+trigger row or materially changes that evidence, and **unchanged**
+when the prescribed change was applied but the re-run selects the
+same trigger row with the same outcome and materially unchanged
+evidence. The baseline occurrence and that post-change re-run are
+the two consecutive iterations; on `unchanged`, stop and escalate to
 [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug) with
 the captured layer-1-through-5 evidence and the receiver-side log
 state.
@@ -413,12 +436,12 @@ the agent should:
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
-| `pkg-config --modversion doca-telemetry-exporter` | `## configure` step 3; `## build` slot 1 | What is the build-time DOCA Telemetry Exporter version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2) |
+| `pkg-config --modversion doca-telemetry-exporter` | `## configure` step 4; `## build` slot 1 | What is the build-time DOCA Telemetry Exporter version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2) |
 | `pkg-config --cflags --libs doca-telemetry-exporter` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores on every release where we have ground truth, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
 | `ls /opt/mellanox/doca/samples/doca_telemetry_exporter/` | `## modify` slot 1 | Which exporter samples ship in this install, and which is the closest starting point? | A list of sample directories named after the event shape / source layout they demonstrate |
-| `doca_caps --version` | `## configure` step 3; `## test` step 2 | What is the *runtime* DOCA version? | A semver string matching `pkg-config --modversion doca-telemetry-exporter` |
-| `id` | `## configure` step 2; `## run` step 2 | Is the application user the one the receiver's transport endpoint expects to allow? | The user's id matches what owns / can write the receiver's transport endpoint. Mismatch = `DOCA_ERROR_NOT_PERMITTED` on first emit — fix on the receiver side, not by adding sudo |
-| `cat /opt/mellanox/doca/applications/VERSION` | `## configure` step 3; `## debug` layer 1 | What does the install tree itself claim its version is? | A semver string matching the other two version sources |
+| `doca_caps --version` | `## configure` step 4; `## test` step 2 | What is the *runtime* DOCA version? | A semver string matching `pkg-config --modversion doca-telemetry-exporter` |
+| `id` | `## configure` step 3; `## run` step 2 | Is the application user the one the receiver's transport endpoint expects to allow? | The user's id matches what owns / can write the receiver's transport endpoint. Mismatch = `DOCA_ERROR_NOT_PERMITTED` on first emit — fix on the receiver side, not by adding sudo |
+| `cat /opt/mellanox/doca/applications/VERSION` | `## configure` step 4; `## debug` layer 1 | What does the install tree itself claim its version is? | A semver string matching the other two version sources |
 | `dmesg \| tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last exporter call? | Empty or recent benign messages. Repeated mlx5 / network / socket errors → driver / env-layer bug; route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 4 | What did the structured DOCA logger emit for the first failing emit? | A trace-level line on every lifecycle transition and every emit. Per-emit `AGAIN` traces under load = transport-full / drop-or-buffer (NOT an error to retry on the hot path) |
 

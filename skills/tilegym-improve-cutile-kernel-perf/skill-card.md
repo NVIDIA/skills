@@ -9,38 +9,44 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to systematically optimize cuTile GPU kernel performance through profiling, bottleneck diagnosis, and iterative tuning in the TileGym project. <br>
+Developers and engineers optimizing cuTile GPU kernel performance in the TileGym project through iterative profiling, bottleneck diagnosis, and systematic tuning. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [optimization-playbook.md](references/optimization-playbook.md) <br>
-- [perf-knobs-catalog.md](references/perf-knobs-catalog.md) <br>
-- [cutile-api-reference.md](references/cutile-api-reference.md) <br>
-- [performance-model.md](references/performance-model.md) <br>
-- [ir-dump-guide.md](references/ir-dump-guide.md) <br>
-- [cutile-patterns-reference.md](references/cutile-patterns-reference.md) <br>
+- [Optimization Playbook](references/optimization-playbook.md) <br>
+- [Performance Knobs Catalog](references/perf-knobs-catalog.md) <br>
+- [cuTile API Reference](references/cutile-api-reference.md) <br>
+- [Performance Model](references/performance-model.md) <br>
+- [IR Dump Guide](references/ir-dump-guide.md) <br>
+- [cuTile Patterns Reference](references/cutile-patterns-reference.md) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Code, Shell commands, Analysis] <br>
-**Output Format:** [Markdown with inline code blocks and structured performance tables] <br>
+**Output Format:** [Markdown with inline code blocks and performance tables] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 5 tasks (1 positive skill-activation, 4 negative activation) using NVSkills-Eval external profile in astra-sandbox environment. <br>
+Evaluated against 5 evaluation tasks (1 positive skill-activation, 4 negative) in a k8s-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -57,21 +63,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 5 | 100% (+0%) | 100% (+0%) |
-| Correctness | 5 | 88% (+8%) | 99% (+12%) |
-| Discoverability | 5 | 80% (+0%) | 99% (+7%) |
-| Effectiveness | 5 | 85% (+12%) | 97% (+17%) |
-| Efficiency | 5 | 83% (-0%) | 97% (+7%) |
+| Correctness | 5 | 100% (+20%) | 100% (+16%) |
+| Discoverability | 5 | 99% (+9%) | 99% (+9%) |
+| Effectiveness | 5 | 100% (+18%) | 97% (+12%) |
+| Efficiency | 5 | 87% (+4%) | 100% (+10%) |
 
 ## Skill Version(s): <br>
-2026.04.11 (source: frontmatter) <br>
+2026.4.11 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

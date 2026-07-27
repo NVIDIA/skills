@@ -181,8 +181,9 @@ and drives a CUDA kernel against an RDMA queue. The error
 layers the agent should distinguish, in escalating order:
 
 1. **Config-syntax.** Invocation does not parse: missing
-   `-d <ibdev>`, missing `--gpu <bdf>`, an `-c` server-IP
-   that is not a valid IPv4, a non-numeric `--gid-index`.
+   `-d <ibdev>`, missing client-only `--gpu <bdf>`, an
+   `-c` server-IP that is not a valid IPv4, or a non-numeric
+   `--gid-index`. The server has no `--gpu` option.
    The tool's `main.c` carries the ARGP schema; re-read the
    binary's `--help` on the installed build.
 2. **Build-time.** `meson setup` or `meson compile` failed
@@ -255,6 +256,9 @@ Specifically:
   iteration count, and the binding constraint per
   [`## Capabilities and modes`](#capabilities-and-modes)
   throughput-decomposition.
+  Preserve full stdout from both processes for diagnosis, but
+  redact GPU-side handles, memory-mmap exports, and OOB
+  connection descriptors before storing or sharing the capture.
 - **DOCA log levels.** `DOCA_LOG_LEVEL` and
   `--sdk-log-level` apply per the cross-cutting rule in
   [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
@@ -266,10 +270,11 @@ Specifically:
   observable signal that bring-up reached the exchange
   step.
 - **Pre-run echo.** The tool logs the device name, GPU
-  PCIe address, GID index, and client/server choice at
-  startup via `DOCA_LOG_INFO`. A captured log self-documents
-  the invocation the throughput belongs to; preserve it
-  when capturing a baseline.
+  PCIe address on the client, GID index, and client/server
+  choice at startup via `DOCA_LOG_INFO`. The server echo has
+  no GPU field. A captured log self-documents the invocation
+  the throughput belongs to; preserve it with the sensitive
+  handle / mmap / OOB descriptor redactions above.
 - **`nvidia-smi dmon` cross-check.** When the binding
   constraint hypothesis is *"GPU compute occupancy is the
   limit"*, `nvidia-smi dmon` against the chosen GPU is the
@@ -307,7 +312,10 @@ safety overlay:
   trusted OOB segment, and never re-used across runs. The
   shipped tool uses cleartext TCP for the OOB exchange; run
   this benchmark only on a trusted segment, never on a
-  shared production fabric.
+  shared production fabric. Full process output is still
+  required for diagnosis, but GPU handles, memory-mmap
+  exports, and OOB descriptors must be redacted before the
+  capture is persisted or shared.
 - **Smoke-before-bulk; never trust the first sweep.** A
   swept run on the wrong GPU-NIC pair, wrong GID index,
   wrong RDMA permissions, or wrong message-size range burns
@@ -321,15 +329,18 @@ safety overlay:
   saturation was the binding constraint — is unreplicable
   and unfalsifiable.
 - **Do not invent flags.** The flag surface is small (per
-  the shipped `main.c`: `-c`, `-d`, `--gpu`,
-  `--gid-index`); the installed binary's `--help` is the
-  authoritative source. Prose-derived flags are the most
-  common hallucination failure for this skill.
+  the shipped `main.c`: the client owns `-c`, `-d`,
+  `--gpu`, and `--gid-index`; the server owns `-d` and
+  `--gid-index` and has no GPU option). Each installed
+  binary's `--help` is authoritative. Prose-derived flags
+  are the most common hallucination failure for this skill.
 - **Sustained traffic on a shared fabric is a deployment
   concern.** This benchmark drives line-rate WRITE traffic;
-  on a shared IB fabric it will affect other tenants.
-  Schedule the run inside an explicit maintenance window
-  per [`doca-hardware-safety CAPABILITIES.md ## Safety policy`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy).
+  on a shared IB fabric it will affect other tenants. Before
+  any run, require the operator to explicitly confirm that
+  the IB fabric is trusted and non-shared for the benchmark
+  window. If they cannot confirm both, stop; a maintenance
+  window alone does not satisfy this precondition.
 - **Hardware-safety meta-policy applies to host-side
   changes.** Any host-side change the benchmark surfaces a
   need for (kernel command-line `iommu=` change for

@@ -2,22 +2,18 @@
 license: Apache-2.0
 name: doca-dms
 description: >
-  SAFETY: several gNOI operations here — reboot, OS install,
-  factory-reset — are DESTRUCTIVE and IRREVERSIBLE and can take a
-  production BlueField or ConnectX offline; confirm the target device
-  and require explicit user confirmation before issuing any, and never
-  invoke them speculatively. Use this skill for operating NVIDIA DOCA
-  Management Service (DMS) on a BlueField, Arm/x86 host, or K8s pod —
-  bringing up `dmsd` frontend + `dmspe` backend, picking deployment
-  shape and auth, wiring `-allowed_users` + `dmsgroup`, issuing gNMI
-  Get/Set on YANG paths, gNMI Subscribe for streaming telemetry, gNOI
-  for reboot/OS install/factory-reset/file transfer/`mlxconfig`/`containerz`,
-  or debugging frontend-vs-backend errors and logs. Trigger even
-  without "DMS" — e.g. "manage a remote BlueField over gRPC", "gNOI
-  reboot from orchestrator", "OS install over gRPC to a SmartNIC".
-  Refuse and route for DOCA install, library-API / sample-build
-  questions, and the DOCA Telemetry Service (DTS) turnkey
-  aggregator-side stream consumer.
+  Operate NVIDIA DOCA Management Service (`dmsd` + `dmspe`) on a
+  BlueField, Arm/x86 host, or Kubernetes pod: choose deployment and
+  authentication, configure `-allowed_users` and `dmsgroup`, use gNMI
+  Get/Set/Subscribe, run supported gNOI workflows, and debug
+  frontend/backend failures. Trigger even without "DMS" for "manage a
+  remote BlueField over gRPC", "gNOI reboot from orchestrator", or
+  fleet-management requests.
+  SAFETY: reboot, OS install, factory-reset, and managed-file deletion
+  are destructive and require target-bound explicit confirmation;
+  never invoke them speculatively. Route installation and library/API
+  build questions elsewhere, and route turnkey aggregation to the
+  externally-productized DOCA Telemetry Service.
 metadata:
   kind: service
 compatibility: >
@@ -31,12 +27,16 @@ compatibility: >
 
 # DOCA Management Service (DMS)
 
-> **⚠️ Destructive operations.** The gNOI `reboot`, `OS install`, and
-> `factory-reset` operations are **irreversible** and **service-impacting**
+> **⚠️ Destructive operations.** The gNOI `reboot`, `OS install`,
+> `factory-reset`, and managed-file deletion operations are
+> **irreversible** and **service-impacting**
 > — they can take a production BlueField or ConnectX offline or wipe its
 > configuration. Before issuing any of them the agent MUST: (1) verify the
-> target device identity, and (2) obtain explicit user confirmation for
-> that specific destructive action. Never invoke them speculatively or as
+> target device identity, and (2) obtain explicit confirmation bound to
+> that target and action. In an interactive session this is an explicit
+> user reply naming/accepting both; in unattended execution it must be an
+> approved-system authorization artifact bound to both. Otherwise stop
+> with `confirmation_required`. Never invoke them speculatively or as
 > a side effect of another task. See the public DMS guide's safety
 > guidance for these operations.
 
@@ -195,6 +195,12 @@ and pull requests should not add:
    posture, see [CAPABILITIES.md](CAPABILITIES.md).**
 3. **For step-by-step workflows — configure, build, modify, run, test,
    debug — see [TASKS.md](TASKS.md).**
+4. **Apply the destructive-operation gate in every phase.** Before any
+   gNOI OS install, reboot, factory reset, or managed-file deletion —
+   including a test or debug action — verify the exact target and obtain explicit
+   confirmation for that specific operation using the interactive or
+   approved-system mechanism defined in the warning above. No earlier
+   confirmation or workflow phase carries authorization forward.
 
 ## Related skills
 

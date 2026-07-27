@@ -89,7 +89,7 @@ table BEFORE writing any code:
 | Tier | What it controls | How to set at runtime | Typical default | Symptom when confused |
 | --- | --- | --- | --- | --- |
 | **SDK log level** | Verbosity of DOCA *library internals* — log lines emitted from inside the DOCA libraries themselves as they call into hardware, manage state, validate inputs, … | `--sdk-log-level <level>` CLI flag on any DOCA sample / reference app; `DOCA_LOG_LEVEL_SDK` env var; programmatic SDK setter equivalent | `WARNING` | User sets `--sdk-log-level DEBUG` to see their own DEBUG lines and is flooded with internal DOCA spam instead, or *"my own DEBUG lines do not appear"* despite the flag |
-| **App log level** | Verbosity of *user code* — log lines the user emits via `DOCA_LOG_*` macros from their own source files | App-side global lower-limit setter (`doca_log_level_set_global_lower_limit`); per-source via `doca_logger_set_level` once the source ID is in hand | `INFO` (per release; quote the observed default) | User sets app level to `INFO`, then wonders why their `DOCA_LOG_DBG`-shaped lines never print; or user expects `--sdk-log-level` to reach their own lines and it does not |
+| **App log level** | Verbosity of *user code* — log lines the user emits via `DOCA_LOG_*` macros from their own source files | App-side global lower-limit setter (`doca_log_level_set_global_lower_limit`); per-source via `doca_logger_set_level` once the source ID is in hand | `INFO` at steady state (per release; quote the observed default). A first diagnostic run may explicitly override it to `DEBUG`, then restore `INFO`. | User sets app level to `INFO`, then wonders why their `DOCA_LOG_DBG`-shaped lines never print; or user expects `--sdk-log-level` to reach their own lines and it does not |
 
 The agent's diagnostic rule: when the user reports *"my log levels
 do nothing"*, the FIRST hypothesis is *tier confusion* (setting one
@@ -174,9 +174,10 @@ the handle.
 `buf` from its inventory is still in flight returns
 `DOCA_ERROR_BAD_STATE`; destroying a `doca_dev` while an `mmap` is
 still registered on it returns the same. The teardown order is the
-reverse of bring-up: outstanding tasks drain → contexts stop →
-inventories stop → mmaps stop → devices close → mmaps / inventories /
-devices destroy. See [TASKS.md ## use](TASKS.md#use) for the worked
+canonical dependency order: drain outstanding tasks → stop contexts
+→ destroy library contexts → stop and destroy inventories → stop and
+destroy mmaps → destroy progress engines → close devices → destroy
+devinfo lists. See [TASKS.md ## use](TASKS.md#use) for the worked
 buffer-lifecycle walk.
 
 For the verb-side workflow (configuring buffers, modifying a sample's
@@ -410,7 +411,7 @@ specifically indicate at the foundation layer:
 
 | Error | Common subsystem where it shows up | Common-specific cause | First action |
 | --- | --- | --- | --- |
-| `DOCA_ERROR_BAD_STATE` | Any of `doca_ctx_*`, `doca_mmap_*`, `doca_buf_inventory_*`, `doca_pe_*`, `doca_log_*` | Lifecycle violation. The object was operated on outside its allowed window: `ctx_start` before `connect_ctx`; `mmap_add_dev` after `mmap_start`; `buf_inventory_buf_get_by_args` before `buf_inventory_start`; `pe_progress` after `pe_destroy`; `DOCA_LOG_*` emission from a source not yet registered. | Walk the lifecycle in [`## ctx`](#ctx) / [`## buf`](#buf) / [`## progress engine`](#progress-engine) / [`## log`](#log); confirm each call's preconditions BEFORE retrying. Static initializers that emit log lines BEFORE `main()`-time init are a frequent log-subsystem cause. |
+| `DOCA_ERROR_BAD_STATE` | Any of `doca_ctx_*`, `doca_mmap_*`, `doca_buf_inventory_*`, `doca_pe_*` | Lifecycle violation. The object was operated on outside its allowed window: `ctx_start` before `connect_ctx`; `mmap_add_dev` after `mmap_start`; `buf_inventory_buf_get_by_args` before `buf_inventory_start`; `pe_progress` after `pe_destroy`. | Walk the lifecycle in [`## ctx`](#ctx) / [`## buf`](#buf) / [`## progress engine`](#progress-engine); confirm each call's preconditions BEFORE retrying. |
 | `DOCA_ERROR_INVALID_VALUE` | `doca_dev_open` (invalid devinfo), `doca_mmap_set_memrange` (bad range), `doca_buf_*` (out-of-range handle), `doca_log_*` (level enum / unregistered source) | The call's arguments did not pass validation. For `doca_log`, the most common cause is an unregistered source ID passed to a `DOCA_LOG_*` macro; for `doca_mmap`, a memrange that overlaps an existing range; for `doca_dev_open`, a devinfo that was destroyed (the destroy_list call invalidates every devinfo pointer it owned). | Re-check the call's arguments against the headers. The cap-query family is also `INVALID_VALUE`-prone when the devinfo passed in was destroyed — re-fetch from a live `doca_devinfo_create_list`. |
 | `DOCA_ERROR_NOT_SUPPORTED` | Any `doca_*_cap_*` query that returns false at runtime, then the actual call that depends on it. Common examples: `doca_mmap_cap_is_export_pci_supported` returning false followed by `doca_mmap_export_pci`; a `doca_devinfo` that does not advertise hotplug-manager support followed by the corresponding `doca_dev_*` call; an experimental log level (`TRACE`) on a release that does not expose it | The device, firmware, or DOCA version does not support what the user requested. Climb back up: drop the optional capability, choose a different device, or upgrade the install. | Re-run the cap-query against the *active* `doca_devinfo`; if false, that is the answer. Do not retry the same call on the same device. |
 | `DOCA_ERROR_NOT_PERMITTED` | `doca_dev_open` (insufficient permissions to open the device), `doca_mmap_*` (insufficient permissions on the registered memory or the device-side mapping) | Host-side env issue. Common causes: RDMA stack module loads, user not in the right group, ulimits, IOMMU mode mismatch, missing capabilities (`CAP_SYS_RAWIO` / `CAP_NET_ADMIN` depending on the device class). | Route to [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug) — the layer below the Common API is the suspect. This is *not* a Common-spec error. |

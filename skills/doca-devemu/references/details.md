@@ -24,7 +24,7 @@ example is a single instance.
   in
   [`CAPABILITIES.md ## Capabilities and modes`](../CAPABILITIES.md#capabilities-and-modes)
   + the routing decision in
-  [`TASKS.md ## configure`](../TASKS.md#configure) step 2.
+  [`TASKS.md ## configure`](../TASKS.md#configure) step 1.
 - **"Does this BlueField + firmware actually let me emulate
   the device class I want, and what capabilities does my DOCA
   install expose for it?"** — worked example: *"can I emulate
@@ -35,7 +35,7 @@ example is a single instance.
   `doca_devinfo` must agree) in
   [`CAPABILITIES.md ## Capabilities and modes`](../CAPABILITIES.md#capabilities-and-modes)
   + the env-precondition checklist in
-  [`TASKS.md ## configure`](../TASKS.md#configure) step 1.
+  [`TASKS.md ## configure`](../TASKS.md#configure) step 2.
 - **"Is this `doca-devemu` library the right tool,
   or should I use the DOCA SNAP Service / DOCA Virtio-net
   Service?"** — worked example: *"I want NVMe storage to the
@@ -55,7 +55,7 @@ example is a single instance.
   permission matrix in
   [`CAPABILITIES.md ## Safety policy`](../CAPABILITIES.md#safety-policy)
   + the firmware-side env fix routed via
-  [`TASKS.md ## configure`](../TASKS.md#configure) step 1.
+  [`TASKS.md ## configure`](../TASKS.md#configure) step 2.
 - **"Is this Device Emulation sub-library / capability on my
   installed DOCA version?"** — worked example: *"is the
   virtio-fs emulation surface available on the DOCA install I

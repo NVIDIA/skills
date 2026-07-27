@@ -30,35 +30,48 @@ gap — all WITHOUT issuing any upgrade.
 
 Steps the agent should walk the user through:
 
-1. **Detect the installed version.** Route to
+1. **Confirm this is an upgrade, not a first install.** The target
+   must have an existing DOCA state that `doca-version` can detect.
+   If no live install is present, STOP and route to
+   [`doca-setup`](../doca-setup/SKILL.md); do not turn a first install
+   into an upgrade workflow.
+2. **Detect the installed version.** Route to
    [`doca-version ## configure`](../doca-version/TASKS.md#configure)
    and capture the four-source chain plus the four-way match status.
    This skill consumes that result; it does NOT restate the
    detection chain. Record the version and host kind for the session.
-2. **Discover the available target release.** Look up what release
+3. **Discover the available target release.** Look up what release
    is current via the DOCA Release Notes, reached through
    [`doca-public-knowledge-map ## Public documentation entry points`](../doca-public-knowledge-map/SKILL.md#public-documentation-entry-points).
    Never quote a "latest" version from memory; the target is the one
    the user names or the one the release notes confirm is current.
-3. **Run the apt-source consistency precheck.** For any host that
+4. **Run the apt-source consistency precheck.** For any host that
    will receive an `apt`-shaped upgrade, route to
    [`doca-version ## apt-source consistency`](../doca-version/TASKS.md#apt-source-consistency)
    to confirm the configured source channel matches the intended
    target before any move is contemplated.
-4. **Check for sunset / deprecation status.** Per
+5. **Validate that the jump is supported.** Check the requested
+   `installed → target` path against the public Compatibility Policy
+   and target release notes. If that exact jump is not documented,
+   fail closed: report it as unsupported and do not invent an
+   intermediate-release sequence.
+6. **Check for sunset / deprecation status.** Per
    [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes),
    surface whether an installed component appears to be on a
    deprecation track and route the user to the release notes via
    [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)
    to confirm, rather than recommending continued investment.
-5. **Report the gap.** State the installed release, the target
+7. **Report the gap.** State the installed release, the target
    release, the upgrade mode (per the mode table), and what moving
    costs. Then STOP — the actual move is gated on explicit
    confirmation in [`## run`](#run).
 
 If detection fails (a `pkg-config` not-found or a four-way mismatch),
-route through [`doca-version ## debug`](../doca-version/TASKS.md#debug)
-before reporting any gap.
+this is failed/partial-state diagnosis, not planned-upgrade loading.
+Route directly through
+[`doca-version ## debug`](../doca-version/TASKS.md#debug), then enter
+this file's [`## debug`](#debug) ladder; do not produce a target gap
+or confirmation prompt from an incoherent baseline.
 
 ## build
 
@@ -110,17 +123,32 @@ Steps the agent should walk the user through (in order):
    and the upgrade mode, then obtain explicit user confirmation per
    [CAPABILITIES.md ## Safety policy](CAPABILITIES.md#safety-policy).
    No upgrade command runs until the user says yes; *"should I
-   upgrade?"* is answered with the gap and a request to confirm.
+   upgrade?"* is answered with the gap and a request to confirm. If
+   the user declines or does not explicitly confirm, state that no
+   upgrade will proceed, summarize the captured current state, and
+   stop awaiting further instructions.
 2. **Confirm a rollback path first.** Before the move, confirm the
    prior version anchors are captured and a rollback exists for the
    chosen mode (reinstall the prior release, reflash the prior BFB,
    redeploy the prior container tag) per the rollback-first rule.
-3. **Apply the mode-appropriate move.** For a host apt upgrade,
+   Apply the viability criteria in
+   [CAPABILITIES.md ## Safety policy](CAPABILITIES.md#safety-policy);
+   record the immutable rollback artifact and its verification
+   command, and STOP if it cannot be resolved or restored.
+3. **Open a maintenance window when the move is disruptive.** For a
+   host carrying real workload, any shared-service disruption, BFB
+   reflash, or reboot-class step, require the explicit time-boxed
+   window from the safety policy. Record the start/end time, affected
+   workloads, notified stakeholders, OOB contact, and rollback owner;
+   if that gate is incomplete, STOP before applying the move. For an
+   idle dedicated non-prod target, record the isolation evidence and
+   proceed without inventing a stakeholder window.
+4. **Apply the mode-appropriate move.** For a host apt upgrade,
    route the package-set convergence to
    [`doca-setup ## configure`](../doca-setup/TASKS.md#configure)
    after the apt source is reconciled. The agent does not invent the
    package list; it uses the documented install procedure.
-4. **Delegate every hardware / firmware / reboot step.** A BFB
+5. **Delegate every hardware / firmware / reboot step.** A BFB
    reflash, a BlueField mode flip, an `mlxconfig` write, or any cold
    power cycle the target release requires is routed to
    [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify)
@@ -129,7 +157,7 @@ Steps the agent should walk the user through (in order):
    This skill names *when* such a step is part of the upgrade; that
    skill names *how* it is applied safely. The agent never redefines
    the reflash / mode-flip / power-cycle steps here.
-5. **Gate the workload behind verification.** Do not declare the
+6. **Gate the workload behind verification.** Do not declare the
    upgrade done until [`## test`](#test) passes; route the
    post-change workload gate through
    [`doca-hardware-safety ## run`](../doca-hardware-safety/TASKS.md#run)
@@ -196,12 +224,18 @@ this verb is the recovery ladder.
    - **Partial upgrade** → converge the package set on one release
      via the install path in
      [`doca-setup ## debug`](../doca-setup/TASKS.md#debug).
-   - **Host/BFB skew** → the BFB reflash is the missing move; route
-     it to [`doca-hardware-safety ## debug`](../doca-hardware-safety/TASKS.md#debug).
+   - **Host/BFB skew** → route the proposed BFB corrective change to
+     [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify);
+     that skill decides whether the documented rollback/OOB gates
+     permit it. Do not prescribe the reflash here.
 3. **Re-verify against the target.** After the corrective action,
    re-run [`## test`](#test) step 1; the four-way match must hold on
    the target release before any other layer is reconsidered.
-4. **Hand off a residual software-layer symptom.** Once the version
+4. **Bound identical failures.** If the exact same four-source state
+   and error recur after one documented corrective action, stop
+   repeating it. Preserve both identical captures, invoke the
+   rollback/escalation path, and do not recommend an unbounded retry.
+5. **Hand off a residual software-layer symptom.** Once the version
    state is known-good and a symptom remains, route to
    [`doca-debug ## debug`](../doca-debug/TASKS.md#debug) with the
    captured upgrade state as evidence.

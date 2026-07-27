@@ -92,12 +92,12 @@ Two deployment-shape rules:
 - **BlueField Arm only.** Firefly is a BlueField-side service; it
   does not run on the host. The host's relationship to Firefly is
   via the network (PTP on the wire) and via the PHC (time follower).
-- **One Firefly per BlueField, on the right port.** Firefly drives
-  the BlueField PHC for the BlueField as a whole; the user picks
-  *which* network interface carries PTP traffic (typically the
-  wire-side port, not the management port). Running two Firefly
-  containers fighting over the same PHC is a configuration error,
-  not a redundancy strategy.
+- **One Firefly container per BlueField, with the interface set the
+  selected role requires.** A single-port role may use one wire-side
+  interface, while a boundary-clock or other multi-port role requires
+  the interface set defined by that role's documented recipe. Never
+  run containers that contend for the same PHC; that is a
+  configuration error, not a redundancy strategy.
 
 ### Four-axis PTP configuration
 
@@ -194,7 +194,7 @@ clearing the layer above.
 | 1. Container runtime | Container fails to start, restart-loops, exits immediately, image pull fails | Image tag wrong, registry credentials missing, BlueField runtime not configured to run this container, config file mount path wrong | BlueField container runtime + the public Container Deployment Guide via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) |
 | 2. Four-axis PTP config | Container green, PTP never advances past `LISTENING`; or no peers seen on the wire; or wrong upstream master selected | One or more of the four axes (role / profile / domain / interface) mismatches the upstream PTP infrastructure | [`## Capabilities and modes`](#capabilities-and-modes) four-axis table; the fix is config, not container |
 | 3. Host-side follower | PTP locks (Firefly says synced; PHC offset is tight); host OS clock drifts; `chronyc tracking` or `date` shows seconds-of-drift | Host-side chrony / `ptp4l` / `phc2sys` not configured to follow the PHC; the BlueField PHC is in sync but the host has not been told to read it | Host's chrony / `ptp4l` / `phc2sys` configuration (upstream Linux PTP / chrony docs) — Firefly is correct |
-| 4. PTP-aware path | PTP locks; sync acquired; offset and jitter are wildly past the profile's spec | A non-PTP-aware switch is in the path between Firefly and its peer; the switch silently adds variable latency that PTP cannot correct for | Network-side fix: insert boundary clocks at the non-PTP-aware switch, or replace the switch with a PTP-aware one — Firefly cannot fix a non-PTP-aware path from the endpoint |
+| 4. PTP-aware path | PTP reaches `SLAVE`/`MASTER`, all four axes match the peer, but offset and jitter remain past the profile's spec | First verify domain, transport, profile compatibility, and peer identity from config plus captured PTP traffic. Layer 2 normally stalls at `LISTENING`/`UNCALIBRATED` or sees zero peers; layer 4 reaches a synchronized state with persistently bad metrics, indicating variable path latency from a non-PTP-aware switch. | Network-side fix: insert boundary clocks at the non-PTP-aware switch, or replace the switch with a PTP-aware one — Firefly cannot fix a non-PTP-aware path from the endpoint |
 | 5. Consumer workload | Firefly correct; PHC correct; host clock follows PHC; but the consumer workload still reports time drift | The workload reads its own time source instead of the disciplined system clock; e.g., a Rivermax workload that was never wired to the disciplined PHC | The consumer-side skill — for Rivermax, [`doca-rmax CAPABILITIES.md ## Safety policy`](../../libs/doca-rmax/CAPABILITIES.md#safety-policy); for 5G UPF or a distributed DB, the workload's own docs |
 
 The agent's rule: **never recommend a Firefly config change without
@@ -296,12 +296,12 @@ operational disciplines around the container itself.
   workload on top. A workload that comes up before the smoke passes
   silently uses a wrong time source, and the bisection across
   Firefly / host / workload is much harder.
-- **One Firefly per BlueField on one interface.** Two Firefly
-  containers on the same BlueField fighting over the same PHC is
-  a configuration error; the agent must NOT recommend it as a
-  redundancy strategy. PTP redundancy is a network-side concern
-  (multiple PTP masters, BMCA election) that does not require
-  multiple Firefly containers.
+- **One Firefly container per BlueField, using the interface set the
+  selected role requires.** A single-port role may use one interface;
+  a boundary-clock or other documented multi-port role may use its
+  required set. Never run containers that contend for the same PHC.
+  PTP redundancy is a network-side concern (multiple PTP masters,
+  BMCA election), not a reason for competing Firefly containers.
 - **Don't paper over a non-PTP-aware path.** When the symptom is
   *"sync acquired but jitter is way past spec"* and the layer is
   *"a non-PTP-aware switch in the path"* per

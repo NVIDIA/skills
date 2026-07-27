@@ -35,8 +35,12 @@ Steps the agent should walk the user through:
    `doca_caps --list-devs` ([`doca-caps`](../../tools/doca-caps/SKILL.md))
    to see which devices have RDMA capability, then run the
    per-`doca_devinfo` `doca_rdma_cap_*` queries against the candidate
-   device. Record which task types are supported, which transport
-   types are supported (IB / RoCE / DC-alpha), and what
+   device. Record the link layer the active port already exposes
+   (**IB** or Ethernet/**RoCE**) separately from the DOCA RDMA
+   transport type (**RC** or **DC**, with DC alpha and restricted as
+   described in the capabilities matrix). IB / RoCE is not an
+   argument to `doca_rdma_set_transport_type()`. Also record which
+   task types are supported for the selected transport and what
    `doca_rdma_cap_get_max_*` returns for the queue / buf-list sizes.
    The capability matrix to compare against lives in
    [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes).
@@ -63,7 +67,12 @@ Steps the agent should walk the user through:
 
 If any step fails with a `DOCA_ERROR_*`, route through the error
 taxonomy in [CAPABILITIES.md ## Error taxonomy](CAPABILITIES.md#error-taxonomy)
-before retrying.
+before retrying. Configure retries use the bounded identity defined
+in [`## test`](#test): the same error family and configure step on
+the same device, link layer, transport, task set, permission set,
+and connection method, with unchanged logs, capability results, and
+connection-state evidence. Stop after two unchanged iterations and
+escalate instead of retrying indefinitely.
 
 ## build
 
@@ -76,14 +85,14 @@ the build system — and is fully documented in
 [`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
 
 **Step 0 — resolve the pkg-config module (do this first; do not assume).**
-DOCA RDMA does **not** ship a standalone `doca-rdma.pc` on current
-installs. The RDMA library is delivered inside the **umbrella `doca`**
-pkg-config module. Resolve it on the target before writing any build file:
+DOCA RDMA is normally delivered inside the **umbrella `doca`** pkg-config
+module; split installs may expose a per-library module. Resolve the actual
+module on the target before writing any build file:
 
 1. Make sure pkg-config can see DOCA. If `pkg-config --exists doca`
-   fails, export the install's pkgconfig dir first:
-   `export PKG_CONFIG_PATH=/opt/mellanox/doca/lib/$(uname -m)-linux-gnu/pkgconfig:$PKG_CONFIG_PATH`
-   (the arch segment is e.g. `aarch64-linux-gnu` on BlueField, `x86_64-linux-gnu` on a host).
+   fails, discover the install's pkgconfig directory first with
+   `find /opt -name 'doca-*.pc' -path '*/pkgconfig/*'`, then prepend
+   that discovered directory to `PKG_CONFIG_PATH`.
 2. List what actually exists: `pkg-config --list-all | grep -i doca`.
    Use the **most specific RDMA module that exists** if a split install
    exposes one; otherwise use the umbrella **`doca`** (the normal case).
@@ -123,7 +132,9 @@ and apply a minimum-diff modification to express the user's intent.
 
 **Non-C languages (Go / Rust / Python): this is still the right verb.**
 Do not reimplement RDMA in raw libibverbs to avoid C. Start from the
-shipped sample under `/opt/mellanox/doca/samples/doca_rdma/<name>/`,
+shipped sample under
+`$(pkg-config --variable=prefix doca)/samples/doca_rdma/<name>/`
+(substitute the module resolved in `## build` Step 0),
 then expose its entry points (e.g. the sample's send/receive or
 write/read driver functions) through a **thin** FFI shim — for Go, one
 small `*.c`/`*.h` pair compiled via `#cgo pkg-config: doca` calling the
@@ -139,7 +150,7 @@ before recommending any code-level edit:
 
 | Slot | What the agent asks the user | RDMA-specific consideration |
 | --- | --- | --- |
-| 1. Starting sample | Which sample under `/opt/mellanox/doca/samples/doca_rdma/`? | Pick the closest in *task direction* (one-sided vs two-sided) and *connection method* (CM vs bridge vs OOB) to the user's intent. Do NOT bridge across both axes — a smaller diff is always safer than a re-architecture |
+| 1. Starting sample | Which sample under `$(pkg-config --variable=prefix doca)/samples/doca_rdma/` (using the resolved module)? | Pick the closest in *task direction* (one-sided vs two-sided) and *connection method* (CM vs bridge vs OOB) to the user's intent. Do NOT bridge across both axes — a smaller diff is always safer than a re-architecture |
 | 2. Task types added or removed | Which task types from the eleven? | Each added type needs its own `doca_rdma_task_*_set_conf` call before `doca_ctx_start()`, plus its matching mmap-permission flags |
 | 3. Permission changes | Which mmap / RDMA permissions change? | Refer to the permission matrix in [CAPABILITIES.md ## Safety policy](CAPABILITIES.md#safety-policy); over-broad permissions are a silent security regression |
 | 4. Connection method | Change CM → bridge or vice versa? | This is a re-architecture, not a tweak. If yes, recommend the user start from the sample that already uses the target method instead of patching one over |
@@ -151,7 +162,11 @@ modify-from-sample renderer (deferred to a future round on the
 maintainer roadmap). Until the renderer ships, the agent must walk
 the user through the diff line-by-line against the sample source
 they read on disk, and have the user paste back the result for
-validation.
+validation. Modify is complete only when (1) all five slots match
+the edited sample, (2) the resulting binary links DOCA RDMA
+(`libdoca_rdma` is present in the resolved link/runtime dependency
+surface), and (3) the edited sample builds successfully with the
+install-resolved `pkg-config` flags.
 
 ## run
 
@@ -241,7 +256,9 @@ Iteration shape:
    submit one task type the device should NOT support (per step 1)
    and confirm the failure is the expected
    `DOCA_ERROR_NOT_SUPPORTED`. This validates the agent's
-   capability-discovery is itself correct.
+   capability-discovery is itself correct. Run this only in a
+   non-production test environment, on a dedicated test connection
+   and mmap that contain no production data.
 
 Eval-loop overlay — why this is a loop, not a one-shot pass:
 
@@ -251,12 +268,18 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | `DOCA_ERROR_NOT_PERMITTED` on a one-sided task | The local-side smoke worked; the cross-side Read/Write/Atomic fails | The mmap was not exported, or the peer's mmap permissions don't include the matching RDMA flag. Re-check the matrix. |
 | Submitted task produces no completion | `doca_task_submit()` returned `DOCA_SUCCESS`; the PE produces nothing | Either the PE is not being progressed, or the peer disconnected silently. Wire the connection-state callbacks. |
 | Bulk submit returns `DOCA_ERROR_FULL` | First N submissions succeed, then `FULL` | The queue sizing is below the user's intended in-flight depth. Raise `send_queue_size` and re-run, or drain completions between bursts. |
-| Connection callback never fires | RDMA CM connect was called; nothing happens for >30s | Server side is not listening, the network does not route, or `connection_request_timeout` is too short. Check the network first, then the timeout. |
+| Connection callback never fires | RDMA CM connect was called; no callback arrives before the configured `connection_request_timeout` expires | Server side is not listening, the network does not route, or the configured timeout is too short. Record the configured value, check the network first, then change only that timeout if the evidence supports it. |
 
-Loop termination: stop iterating once two consecutive iterations of
-the same kind don't change anything — that means the cause is below
-RDMA. Escalate to [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug)
-with the captured layer-1-through-5 evidence.
+Loop identity is the same trigger or `DOCA_ERROR_*` family for the
+same device, link layer, transport, task set, permission set,
+connection method, and configured timeout, with unchanged program
+log, capability results, completion events, and connection-state
+callbacks. Stop after two consecutive iterations with that identity
+produce no evidence change — that means the cause is below RDMA.
+Escalate to
+[`doca-debug ## debug`](../../doca-debug/TASKS.md#debug) with the
+captured layer-1-through-5 evidence. The configure workflow reuses
+this exact identity and bound.
 
 ## debug
 
@@ -373,15 +396,15 @@ the agent should:
 | `grep -RHn 'DOCA_VERSION_' $(pkg-config --variable=includedir doca)/doca_version.h` | `## configure` step 1 | What macros does this DOCA install expose for compile-time version checks? | A `DOCA_VERSION_MAJOR`, `MINOR`, `PATCH` triple matching the runtime version |
 | `doca_caps --list-devs` | `## configure` step 2 | Which devices on this host can be used as a `doca_dev`? | One row per visible device with PCIe address and capability flags |
 | `doca_caps --version` | `## configure` step 1; `## test` step 1 | What is the *runtime* DOCA version on this host? | A semver string matching `pkg-config --modversion doca` |
-| `ls /opt/mellanox/doca/samples/doca_rdma/` | `## modify` slot 1 | Which RDMA samples ship in this install, and which is the closest starting point? | A list of sample directories named after the task pattern they demonstrate |
-| `cat /opt/mellanox/doca/applications/VERSION` | `## configure` step 1; `## debug` layer 1 | What does the install tree itself claim its version is? | A semver string matching the other two version sources |
+| `ls "$(pkg-config --variable=prefix doca)/samples/doca_rdma/"` (substitute the resolved module) | `## modify` slot 1 | Which RDMA samples ship in this install, and which is the closest starting point? | A list of sample directories named after the task pattern they demonstrate |
+| `cat "$(pkg-config --variable=prefix doca)/applications/VERSION"` (substitute the resolved module) | `## configure` step 1; `## debug` layer 1 | What does the install tree itself claim its version is? | A semver string matching the other two version sources |
 | `dmesg | tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last RDMA call? | Empty or recent benign messages. Repeated mlx5/IB errors → driver-layer bug; route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) |
 | `mlxconfig -d <pcie> q | head -n 40` (sudo) | `## debug` layer 7 | What firmware config does the underlying NIC report? | Stable firmware config; transient values indicate a partial reset |
 | `ibv_devinfo` (sudo) | `## configure` step 2; `## debug` layer 7 | What does the underlying `libibverbs` see for this device? | One device row with `state: PORT_ACTIVE` and a sane MTU |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 3 | What did the structured DOCA logger emit for the first failing call? | A trace-level line on every lifecycle transition and every task submission. Silence after submission = PE not progressed |
 
 For commands shared across libraries (`pkg-config --modversion`,
-`doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,
+`doca_caps`, the install-prefix `applications/VERSION`,
 `DOCA_LOG_LEVEL`) the cross-library overlay is in
 [`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
 this table adds the RDMA-specific rows on top.

@@ -2,23 +2,17 @@
 license: Apache-2.0
 name: doca-bench
 description: >
-  Use this skill when the user is running `doca_bench` (DOCA ≥
-  2.7.0) — the cross-library micro-benchmark harness — to measure
-  throughput, bulk-latency, precision-latency, or max-bandwidth
-  (the four `benchmark_mode` enum values the binary ships) of a
-  DOCA library (RDMA, COMPRESS, AES-GCM, SHA, DMA, EC, ETH,
-  Comch, GPUNetIO) on host or BlueField Arm, probe the granular-
-  build query for which libraries the install exposes, capture a
-  baseline four-tuple (command, version, device, environment), or
-  diagnose a bench failure in the config-syntax, device-binding,
-  library/workload-precondition, or measurement-soundness layer.
-  Trigger even without the word "doca_bench" — typical implicit
-  forms include "how fast is compress on my BlueField", "what
-  RDMA throughput can this NIC do", "measure AES-GCM latency",
-  or "baseline before a firmware update". Refuse and route
-  elsewhere for application-level end-to-end timing, custom
-  benchmark programs, DOCA install/upgrade, or patching the
-  binary.
+  Run `doca_bench` (DOCA 2.7.0 or newer) to measure throughput,
+  bulk latency, precision latency, or maximum bandwidth for RDMA,
+  Compress, AES-GCM, SHA, DMA, EC, Ethernet, Comch, or GPUNetIO on
+  a host or BlueField Arm. Use it to discover enabled benchmark
+  libraries, capture a reproducible command/version/device/environment
+  baseline, compare stable runs against a declared tolerance, or
+  diagnose configuration, device-binding, workload-precondition, and
+  measurement failures. Trigger for requests such as measuring
+  BlueField compression speed, NIC RDMA throughput, crypto latency,
+  or a pre-upgrade baseline. Do not use for application end-to-end
+  timing, custom benchmark code, DOCA installation, or binary patches.
 metadata:
   kind: tool
 compatibility: >
@@ -155,6 +149,9 @@ to measure performance of a DOCA library. Concretely:
   instead of inventing a workload.
 - Capturing a documented baseline (command line + version + device
   + as-deployed environment + numbers) for later regression hunts.
+- Requiring the workload owner to predeclare acceptable variance
+  and obtaining two consecutive runs within that tolerance before
+  reporting a stable result; otherwise escalating the variance.
 - Diagnosing why a bench run reported zero / unstable / unexpected
   results (the error-taxonomy walk in
   [`TASKS.md ## debug`](TASKS.md#debug)).

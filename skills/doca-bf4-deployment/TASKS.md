@@ -1,10 +1,11 @@
 # DOCA BlueField-4 deployment — Tasks
 
-**Where to start:** The verb order is `configure -> build -> modify ->
-run -> test -> debug`. For BF4 day-1 platform bring-up, `build` and
-`modify` are *routing stubs* — there is no application artifact to
-build or sample to modify in a platform bring-up; those questions live
-in the application-deployment skills and
+**Where to start:** The executable bring-up path is `configure -> run ->
+test -> debug`. The lint-required `build` and `modify` anchors below
+are routing stubs reached only when the user asks those questions —
+they are not steps in BF4 day-1 bring-up. There is no application
+artifact to build or sample to modify in a platform bring-up; those
+questions live in the application-deployment skills and
 [`doca-programming-guide`](../doca-programming-guide/SKILL.md). This
 skill owns getting a bare BlueField-4 to a Grace OS installed and
 firmware at the target level, driven from the BMC. The `## test` verb
@@ -38,13 +39,24 @@ precondition BEFORE any boot, transfer, or burn.
    {iso-uri} on your own HTTP/HTTPS server. For a remote HTTPS source
    used by Redfish Virtual Media, confirm it allows unauthenticated
    access, supports HTTP `HEAD`, and that the BMC has the server
-   certificate in its truststore.
+   certificate in its truststore using the BMC's documented
+   certificate-store query. If trust cannot be verified, stop before
+   transfer; do not improvise certificate-install commands.
 3. **Pick the install method.** Per the install-method table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes):
    UEFI HTTP Boot (recommended — fewest moving parts), PXE Boot (when
    you already have DHCP+TFTP or need a custom `bf.cfg`), or Redfish
    Virtual Media (fully out-of-band; needs a recent dpu-bmc version).
-   The choice feeds [`## run`](#run).
+   For Virtual Media, read the installed dpu-bmc version from the
+   documented Redfish/BMC inventory surface and compare it with the
+   minimum in the current public BF4 deployment guide. If either value
+   is unavailable, do not use Virtual Media; choose UEFI HTTP Boot or
+   PXE when one fits. If Virtual Media is mandatory, stop and escalate
+   the missing version evidence rather than assuming support.
+   The choice feeds [`## run`](#run). If local BMC-eMMC Virtual Media
+   is selected, preflight the combined local payload and stop if it
+   exceeds 5 GB. For Grace Ubuntu, also record that the BMC-facing
+   URIs must be exactly `image.iso` and `config.iso`.
 4. **Capture the target versions.** Read the target bundle-ISO build,
    NIC firmware level, and SBIOS / ERoT / BMC component versions from
    the **public BlueField/DOCA release notes** (route via
@@ -59,6 +71,17 @@ precondition BEFORE any boot, transfer, or burn.
    survives a failed change — all per
    [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify),
    loaded ALONGSIDE.
+6. **Select optional branches explicitly.** Decide from the public
+   release notes whether this bring-up requires the
+   [`### pldm-firmware-update`](#pldm-firmware-update) branch, and
+   decide whether the target is the
+   [`### grace-ubuntu-cloud-init`](#grace-ubuntu-cloud-init) branch.
+   Do not infer either branch from hardware generation alone.
+7. **Resolve action inputs.** Before entering any mutating sub-step,
+   confirm that every placeholder required by that action has a
+   concrete, operator-supplied or live-discovered value. Stop before
+   an upload, attach, burn, reset, or power cycle if any required
+   credential, URI, image, EID, or task ID is unresolved.
 
 ## build
 
@@ -118,6 +141,15 @@ chosen method, update platform firmware via PLDM when required, and
 sub-anchor below is one documented flow. Reach the OOB console via BMC
 SSH + `obmc-console-client` before starting any of them, and load
 [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) ALONGSIDE.
+The bundle-ISO methods and the Grace-Ubuntu path are alternative OS
+targets selected in [`## configure`](#configure); run one OS-install
+path. The PLDM firmware-update branch may accompany either when the
+release notes require it.
+Before **each** mutating upload, attach, burn, reset, or power cycle,
+show that exact action and blast radius and obtain confirmation for
+that specific action. After confirmation, resume only the sub-step
+that triggered the gate; one confirmation never authorizes later
+mutations.
 
 ### method-a-uefi-http-boot
 
@@ -148,7 +180,10 @@ Use when you already have PXE infrastructure or need a custom `bf.cfg`.
 
 Fully out-of-band; needs a recent dpu-bmc version. No physical access.
 
-1. Upload the ISO to the BMC eMMC via the Redfish SimpleUpdate API.
+1. If uploading to local BMC eMMC, verify the combined local payload
+   is no more than 5 GB; otherwise stop and use remote hosting. Then
+   show the exact upload and blast radius, obtain confirmation for
+   this upload, and use the Redfish SimpleUpdate API.
 2. Attach it via Redfish VirtualMedia; Grace then sees USB
    mass-storage devices. Confirm the media reports `"Inserted": true`.
 3. Set BootSourceOverride to USB (Once / UEFI).
@@ -161,24 +196,38 @@ Fully out-of-band; needs a recent dpu-bmc version. No physical access.
 Update BMC / NIC firmware / SBIOS / ERoT via PLDM over Redfish. Every
 step here is MUTATING — `doca-hardware-safety` is loaded ALONGSIDE.
 
-1. **NIC firmware from the host (when required).** Program NIC
-   firmware from the host with `flint` if the flow calls for it, then
-   power cycle. Route the burn through
+1. **NIC firmware from the host (only when explicitly required).**
+   Use the host-side `flint` path only when the public release notes
+   for the selected bundle explicitly require it; otherwise skip this
+   step rather than guessing. When required, program from the host and
+   power cycle. Route each mutation through
    [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify).
 2. **Push the bundle.** Upload the `.fwpkg` ({fw-image}) via a Redfish
    multipart `POST` to the UpdateService update-multipart endpoint.
 3. **Monitor the Task.** Poll the returned Task ({task-id}):
    `TaskState` Running -> Completed, `PercentComplete` to 100; a
    `Messages` Exception or a non-Completed terminal state is failure
-   (drop to [`## debug`](#debug) layer 3).
+   (drop to [`## debug`](#debug) layer 3). Use the Task's documented
+   retry/timeout guidance when present. Otherwise, classify it as
+   stalled when `TaskState`, `PercentComplete`, and `Messages` are
+   unchanged across two consecutive observations at an
+   operator-approved polling interval; approval means an explicit
+   interval value for this Task. Those are the only two
+   observations permitted. If no interval is approved, do not poll:
+   stop with `confirmation_required`, ask the operator to approve an
+   interval, and remain stopped until one is supplied. In either case
+   there is no open-ended polling loop.
 4. **Verify pending images.** `pldmtool fw_update GetFwParams -m
    {eid}` and compare `ActiveComponentVersionString` against
    `PendingComponentVersionString` per component — Pending differs
    from Active before activation.
-5. **Activate.** Power cycle to activate (e.g. `ipmitool power
-   cycle`); re-run GetFwParams and confirm Active now equals the
-   release-notes target. Optionally BMC factory reset for a clean
-   state (MUTATING — route through `doca-hardware-safety`).
+5. **Activate.** Show the exact power-cycle action and blast radius
+   and obtain separate confirmation (e.g. `ipmitool power cycle`);
+   re-run GetFwParams and confirm Active now equals the release-notes
+   target. Do not add a BMC factory reset as a generic "clean state"
+   step; perform one only when a version-matched public recovery
+   procedure explicitly requires it and the operator requests and
+   separately confirms that exact reset.
 
 ### grace-ubuntu-cloud-init
 
@@ -187,19 +236,26 @@ Redfish Virtual Media.
 
 1. **Prepare the cloud-init seed (optional).** Build the seed as an
    ISO with volume label `CIDATA`.
-2. **Choose hosting.** Local — copy the image and seed onto BMC eMMC,
-   up to 5 GB combined. Remote — host on an HTTPS server that allows
+2. **Choose hosting and preflight it.** Local — calculate the image
+   plus seed size before transfer and proceed only when it is no more
+   than 5 GB combined on BMC eMMC. Remote — host on an HTTPS server that allows
    unauthenticated access and supports HTTP `HEAD`, with the server
    certificate in the BMC truststore.
-3. **Transfer + attach.** Transfer via Redfish SimpleUpdate; attach
-   via Redfish VirtualMedia. The URIs are fixed to `image.iso` and
+3. **Transfer + attach.** For each action, show the exact transfer or
+   attach and blast radius and obtain action-specific confirmation;
+   then transfer via Redfish SimpleUpdate and attach via Redfish
+   VirtualMedia. The URIs are fixed to `image.iso` and
    `config.iso` — original filenames do not matter. Confirm
    `"Inserted": true`.
-4. **Boot.** Set BootSourceOverride to USB and reset Grace, OR
+4. **Boot.** Show and separately confirm the boot-state change and
+   reset with their blast radii. Set BootSourceOverride to USB and
+   reset Grace, OR
    manually pick the OpenBMC Virtual Media Device from the UEFI Boot
    Manager.
-5. **Verify + detach.** Check component versions via the Redfish
-   FirmwareInventory; eject / detach when done and confirm
+5. **Verify + detach.** Verify the installed OS build from Grace,
+   verify the expected cloud-init user/key/hostname when a seed was
+   supplied, and cross-check component versions via Redfish
+   FirmwareInventory. Then eject / detach and confirm
    `"Inserted": false`. **Never eject mid-install.**
 
 ### post-install
@@ -221,10 +277,14 @@ operational against the BMC and Grace. **`## test` is the sweep run
 after every install or firmware change**; skipping it after a change
 is the failure mode this verb replaces.
 
-1. **OS install took.** `cat /etc/mlnx-release` on Grace reports the
-   release-notes target build string, and the OOB console shows a
-   clean boot to a login prompt. Default credentials have been
-   changed.
+Run each check that applies to the path performed. A PLDM-only update
+requires checks 2, 3, and 6; OS, Virtual Media, and cloud-init checks
+apply only when those paths were performed.
+
+1. **OS install took (OS-install paths only).** `cat
+   /etc/mlnx-release` on Grace reports the release-notes target build
+   string, and the OOB console shows a clean boot to a login prompt.
+   Default credentials have been changed.
 2. **Firmware update took.** The Redfish Task reported `TaskState`
    Completed with `PercentComplete` 100 and no Exception; after the
    activation power cycle, `pldmtool fw_update GetFwParams -m {eid}`
@@ -232,10 +292,15 @@ is the failure mode this verb replaces.
    updated component.
 3. **Versions match the release notes.** The Redfish FirmwareInventory
    per-component versions equal the targets captured in
-   [`## configure`](#configure) step 4 — not an assumed value.
-4. **Virtual media detached.** Any Virtual Media resource reports
-   `"Inserted": false`, and Grace does not re-enter the installer on a
-   subsequent reset (no boot loop).
+   [`## configure`](#configure) step 4 — not an assumed value. Compare
+   it with `pldmtool GetFwParams` from step 2; if they disagree,
+   re-query both sources once. If they still disagree, stop and
+   escalate to the operator with both values, the OOB-console
+   evidence, and the bring-up snapshot for manual adjudication; do
+   not choose one or declare success.
+4. **Virtual media detached (Virtual Media paths only).** Any Virtual
+   Media resource reports `"Inserted": false`, and Grace does not
+   re-enter the installer on a subsequent reset (no boot loop).
 5. **Cloud-init applied (Grace-Ubuntu path only).** The customization
    from the CIDATA seed (user, SSH key, hostname) is present on the
    booted Grace OS.
@@ -271,12 +336,20 @@ without clearing the layer above. The six layers match
    Task stays Running, ends with an Exception, or stalls
    `PercentComplete`. Read the Task `Messages`; verify the `.fwpkg`
    is the correct, uncorrupted bundle and targets present components;
-   do NOT re-push blindly — a stalled firmware Task is HIGH-STAKES per
+   do NOT re-push or power-cycle blindly. If the Task remains stalled,
+   capture the complete Task resource and `Messages`, stop this
+   workflow, and escalate with the bring-up snapshot and OOB-console
+   evidence. Any recovery that re-burns, resets, or power-cycles MUST
+   be planned through `doca-hardware-safety` and separately confirmed
+   by the operator — a stalled firmware Task is HIGH-STAKES per
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy).
 4. **Activation layer.** `pldmtool fw_update GetFwParams -m {eid}`
    still shows Pending differing from Active after the Task completed:
-   the component needs a power cycle to activate. Power cycle (e.g.
-   `ipmitool power cycle`), then re-verify.
+   identify that the component needs a power cycle, but do not treat
+   it as a non-mutating debug correction. Stop this sweep, route the
+   exact power cycle through `doca-hardware-safety`, obtain separate
+   operator confirmation, and resume at [`## test`](#test) only after
+   the approved action.
 5. **Cloud-init layer (Grace-Ubuntu).** The OS installed but the
    cloud-init seed did not apply: confirm the seed ISO volume label is
    exactly `CIDATA` and that both `image.iso` and `config.iso` were
@@ -292,6 +365,21 @@ BF4 (kernel, drivers, PCIe link state), drop to
 [`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug). For any
 mutating recovery action (re-burn, reflash, factory reset), route to
 [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md).
+
+**Debug-loop bound.** Walk the six-layer sweep once, apply at most one
+evidence-backed, non-mutating correction: the exact failed observed
+value must map to an explicit read-only/configuration remedy written
+in that same numbered layer above; no inferred or cross-layer remedy
+qualifies. Then re-run
+[`## test`](#test).
+If the same layer remains non-green, STOP and escalate with the bring-up
+snapshot, Task resource and `Messages`, `pldmtool` output, and OOB-console
+capture. Do not start another sweep or improvise a mutating recovery.
+The activation-layer power cycle is a separately confirmed mutating
+recovery, does not consume this non-mutating correction, and resumes at
+`## test` rather than continuing the debug sweep. If that single
+post-action test is not green, stop and escalate; do not re-enter
+debug or request another power cycle.
 
 ## Deferred task verbs
 

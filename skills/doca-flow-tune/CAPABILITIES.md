@@ -354,6 +354,17 @@ lands in live Flow state on a running dataplane. The safety rules:
   without that sequence is a guess against possibly-stale
   evidence — exactly the failure mode this rule exists to
   prevent.
+- **Every recommendation requires its own explicit confirmation.**
+  Before changing the Flow program, present the exact recommendation,
+  scope, tuning axis, expected measurement direction, minimum diff,
+  and rollback snapshot. Do not treat a prior confirmation as approval
+  for a different recommendation or axis.
+- **Bound the non-green loop.** After a non-green result, reselect
+  exactly one axis and try one newly confirmed recommendation. A
+  second non-green result requires restoring the pre-change snapshot
+  via
+  [`doca-flow TASKS.md ## rollback`](../../libs/doca-flow/TASKS.md#rollback)
+  and escalating with both captured diffs; do not begin a third attempt.
 - **Quote the four-tuple, not just the recommendation.** A
   `doca_flow_tune` recommendation is only meaningful with the
   (command line + JSON config + DOCA version + device +

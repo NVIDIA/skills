@@ -2,24 +2,18 @@
 license: Apache-2.0
 name: doca-telemetry
 description: >
-  Use this skill when reading **DOCA hardware-counter events**
-  from a `doca_dev` via the per-domain DOCA Telemetry reader
-  libraries — `doca_telemetry_pcc`, `_dpa`, `_diag`,
-  `_adp_retx`, `_phy`, `_pci`. This is the **counter-READER**
-  surface — there is no NetFlow / IPFIX / local-socket collector
-  framework here; the bundle previously framed it that way and
-  that framing is wrong. Each domain ships its own
-  `doca_telemetry_{domain}_*` API: cap-query
-  `_cap_is_supported(devinfo)`, `_create()` on a `doca_dev`,
-  `_start()`, then per-domain read / sample. Trigger
-  even when the user does not say "DOCA Telemetry" — typical
-  implicit phrasings: "read PCC counters from my BlueField
-  app", "sample DPA counter exports", "expose PHY / PCI / DIAG
-  counters from this `doca_dev`". Refuse and route elsewhere
-  for the publishing / export side
-  (`doca-telemetry-exporter`), DOCA Telemetry Service (DTS) as
-  deployed (out of scope), NetFlow / IPFIX collectors, and
-  plain stdout logging.
+  Use this skill to read DOCA hardware-counter events from a
+  `doca_dev` through the per-domain Telemetry reader libraries:
+  `doca_telemetry_pcc`, `_dpa`, `_diag`, `_adp_retx`, `_phy`,
+  and `_pci`. It covers capability checks, context creation,
+  startup, and per-domain reads or samples. Trigger for implicit
+  requests such as "read PCC counters from my BlueField app",
+  "sample DPA counter exports", or "expose PHY, PCI, or DIAG
+  counters from this doca_dev". This is the counter-reader
+  surface, not a NetFlow, IPFIX, or local-socket collector.
+  Route publishing and export to `doca-telemetry-exporter`;
+  route deployed DOCA Telemetry Service (DTS), collectors, and
+  plain stdout logging elsewhere.
 metadata:
   kind: library
 compatibility: >
@@ -116,11 +110,12 @@ Load this skill when the user is doing hands-on DOCA Telemetry
   that domain. Note this is a per-domain `_create`/`_start`
   surface, not the generic `doca_ctx_*` progress-engine
   lifecycle.
-- Reading the device + library capability surface for the
-  per-domain reader via the
-  `doca_telemetry_<domain>_cap_is_supported` query before
-  assuming a particular counter family is available on this
-  install / this `doca_dev`.
+- Reading the device + library capability surface before assuming
+  a counter family is available: use
+  `doca_telemetry_<domain>_cap_is_supported` only for `pcc`,
+  `dpa`, `diag`, `adp_retx`, and `phy`; use the matching
+  per-feature `doca_telemetry_pci_cap_*_is_supported` query for
+  PCI.
 - Handling per-domain `DOCA_ERROR_*` returns from a counter
   read (lifecycle vs. device-doesn't-support-this-domain vs.
   per-domain `AGAIN`-means-snapshot-not-ready vs. permission /
@@ -161,8 +156,9 @@ hardware-counter-reader material lives in two companion files:
   six shipped sub-libraries (`doca_telemetry_pcc` / `_dpa` /
   `_diag` / `_adp_retx` / `_phy` / `_pci`) and which counter
   family each one exposes, the per-domain DOCA Core lifecycle
-  on a `doca_dev`, the per-domain capability query
-  (`doca_telemetry_<domain>_cap_is_supported(devinfo)`), the
+  on a `doca_dev`, the domain-level capability query for PCC /
+  DPA / DIAG / ADP_RETX / PHY and the per-feature capability
+  queries for PCI, the
   reader error taxonomy (mapped onto the cross-library
   `DOCA_ERROR_*` set, with the `NOT_SUPPORTED`-means-domain-
   not-exposed-on-this-device rule and the `AGAIN`-means-
@@ -179,10 +175,11 @@ hardware-counter-reader material lives in two companion files:
   out-of-scope questions at the right next skill.
 
 The skill assumes a host where DOCA is already installed at
-the standard location and a `doca_dev` is open against a
-BlueField DPU or ConnectX NIC that the per-domain cap-query
-returns `DOCA_SUCCESS` for. It does not cover installing DOCA
-— that path goes through
+the standard location and a target BlueField DPU or ConnectX NIC
+is available. The [`TASKS.md ## run`](TASKS.md#run) workflow
+opens the corresponding `doca_dev` and requires the per-domain
+cap-query to return `DOCA_SUCCESS`. It does not cover installing
+DOCA — that path goes through
 [`doca-setup`](../../doca-setup/SKILL.md) — and it does not
 cover writing the publishing / export side, which is
 [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md).

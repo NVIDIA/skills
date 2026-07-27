@@ -3,7 +3,8 @@ license: Apache-2.0
 name: doca-flow-dpa-perf
 description: >
   Use this skill when the user is invoking doca_flow_dpa_perf on
-  DPA-capable hardware (ConnectX-7+ or BlueField-3) to measure rule
+  DPA-capable hardware (ConnectX-7 minimum supported,
+  ConnectX-8 recommended, or BlueField-3) to measure rule
   update / disable rates on the DPA-offloaded DOCA Flow path —
   picking the active / passive device split, choosing workload-shape
   axes (burst, queue, completion threshold, workers, hash pipe algo,
@@ -22,8 +23,9 @@ metadata:
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
   22.04/24.04 or RHEL/SLES) with a DPA-capable device attached —
-  ConnectX-7+ or BlueField-3 (BlueField-2 and earlier ConnectX are
-  unsupported). VNF Flow mode required; PF or VF only (SFs are not
+  ConnectX-7 as the minimum supported ConnectX generation,
+  ConnectX-8 recommended, or BlueField-3 (BlueField-2 and earlier
+  ConnectX are unsupported). VNF Flow mode required; PF or VF only (SFs are not
   supported on the DPA path). Reads `pkg-config doca-flow` and the
   shipped `doca_flow_dpa_perf` binary plus its README on the user's
   install.
@@ -73,8 +75,9 @@ load-bearing piece; the worked example is one instance.
   worked example: *"is my BlueField-2 DPA-capable?"*. Answered
   by the device-preconditions table in
   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  (BlueField-3 yes, BlueField-2 no; ConnectX-7 recommended-or-
-  later, ConnectX-8 / 9 supported per the public guide and the
+  (BlueField-3 yes, BlueField-2 no; ConnectX-7 minimum
+  supported, ConnectX-8 recommended, and later generations
+  supported per the public guide and the
   shipped README on the user's install).
 - **"How do I size my run — burst, queue, completion threshold,
   number of operations, iterations — to get a defensible
@@ -235,7 +238,11 @@ bundle. To keep the boundary clean, it deliberately does not
 contain — and pull requests should not add:
 
 - **Verbatim default values for flag inventories beyond what
-  the public guide and the shipped README document.** The
+  the shipped README or installed `--help` documents.** Read
+  defaults from the README first, then fall back to the
+  installed binary's `--help`. If neither defines a needed
+  default, stop and request the operator's explicit value
+  instead of guessing. The
   flag surface is install-specific within the documented
   surface; the documented invocations + `--help` on the
   installed version are the authoritative answer. Inventing

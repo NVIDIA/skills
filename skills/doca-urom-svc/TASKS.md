@@ -68,6 +68,10 @@ substrate before the container starts.
    surface as stalled completions at the host (per
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
    layer 3) and the user will incorrectly blame the service.
+   Predeclare the exact memory regions the workload needs to
+   export and the minimum read, write, or atomic permissions
+   each operation requires. Broader exports or permissions are
+   not an acceptable bring-up shortcut.
 5. **Decide the three service-configuration axes.** Per the
    configuration-axes table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
@@ -85,7 +89,9 @@ substrate before the container starts.
       queues hide service-side handler stalls.
     - **DOCA Comch endpoint pairing** — how the host's
       `doca-urom` library reaches the service (over a DOCA
-      Comch endpoint pair). Access is governed by that Comch
+      Comch endpoint pair). Name the exact intended host
+      endpoint(s) and reject broad, wildcard, ambiguous, or
+      unintended pairing. Access is governed by that Comch
       pairing plus the underlying RDMA permissions; there is
       NO service-side authorization list to author — a
       host-visible `DOCA_ERROR_NOT_PERMITTED` is a Comch /
@@ -102,16 +108,30 @@ substrate before the container starts.
    `doca_urom.yaml` mounts only the `plugins/` directory and
    the log directory — there is no service config file to
    author or place on the filesystem.
-7. **Sanity check before container start.** Confirm with the
+7. **Verify the access boundary before container start.**
+   Use the documented read-only
+   [`doca-comm-channel-admin`](../../tools/doca-comm-channel-admin/SKILL.md)
+   scan and the program-side
+   [`doca-comch TASKS.md ## test`](../../libs/doca-comch/TASKS.md#test)
+   view to confirm the Comch mapping contains only the intended
+   host endpoint(s). Then walk
+   [`doca-rdma TASKS.md ## test`](../../libs/doca-rdma/TASKS.md#test)
+   to confirm the intended peer, healthy transport, narrowly
+   scoped exported regions, and only the permissions required
+   by the workload. Capture both outputs. Any unexpected peer,
+   over-broad export, excess permission, or non-green substrate
+   blocks startup.
+8. **Sanity check before container start.** Confirm with the
    user: which BlueField the service will run on; which
    container tag the operator intends to pull; which host
    library version the deployment is paired against; which
    UCX components / collectives the service will expose; what
    the queue depth is; how the paired hosts reach the service
-   over DOCA Comch. If any of those are unclear, stop and
+   over DOCA Comch; which RDMA regions and permissions are
+   required; and that step 7 passed. If any are unclear, stop and
    ask — do not start the container against an
    underspecified configuration; a deploy that races past
-   step 7 is the canonical source of the layer-4 (paired-version
+   step 8 is the canonical source of the layer-4 (paired-version
    mismatch) debug failures in
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy).
 
@@ -217,7 +237,12 @@ BEFORE layering any HPC workload on top.
    invent the tag. A wrong tag is the canonical source of
    layer-1 (container runtime) and layer-4 (paired-version
    mismatch) errors simultaneously.
-2. **Start the container per the public Container Deployment
+2. **Re-check the pre-start gate.** Confirm the captured Comch
+   and RDMA verification from [`## configure`](#configure)
+   step 7 is current for this intended host set, export set,
+   and permission set. If it is stale or non-green, do not
+   start the container.
+3. **Start the container per the public Container Deployment
    Guide pattern.** Set the daemon's `SERVICE_ARGS` /
    `UROM_PLUGIN_PATH` and mount the `plugins/` directory as
    the public DOCA UROM Service Guide names (there is no
@@ -226,19 +251,19 @@ BEFORE layering any HPC workload on top.
    container manager) is documented in the Container
    Deployment Guide reachable through
    [`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services).
-3. **Confirm the container is running, not restart-looping.**
+4. **Confirm the container is running, not restart-looping.**
    A restart loop is a layer-1 symptom per
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
    (container runtime / image tag / plugins mount); diagnose
    it before touching service config.
-4. **Watch the service container's logs for startup.** The
+5. **Watch the service container's logs for startup.** The
    container's stdout is the primary observability surface.
    The service should report that it is ready to receive host
    enqueues, name the UCX-component / collective surface it
    exposed, and report its queue sizing. The agent should NOT
    invent log line formats; quote what the live container is
    emitting.
-5. **Confirm at least one paired host can `doca_ctx_start`
+6. **Confirm one intended paired host can `doca_ctx_start`
    against this BlueField.** On a single paired host, walk
    [`doca-urom ## configure`](../../libs/doca-urom/TASKS.md#configure)
    through `doca_ctx_start`; success here means the service
@@ -247,7 +272,9 @@ BEFORE layering any HPC workload on top.
    not reachable, or the DOCA Comch pairing not established) or
    layer-4 (host-library / service version mismatch) — walk
    the layers in [`## debug`](#debug).
-6. **Single-operation smoke (next: `## test` step 1).**
+   An unintended host connecting is a failed access-boundary
+   check, not a successful availability test.
+7. **Single-operation smoke (next: `## test` step 1).**
    Before driving any HPC workload, walk `## test` step 1
    once: one host enqueue → observe the service receive it
    in logs → observe one completion at the host. Only then

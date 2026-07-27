@@ -166,10 +166,11 @@ Load this skill when the user is doing hands-on DOCA UROM work
   operation types / atomics / collectives, since these are
   plugin-defined) this device + this DOCA install + this DPU-side
   UROM Service version actually supports.
-- Wiring the host-side `doca-urom` library underneath a
-  UCX-based HPC stack (OpenMPI, MPICH, custom UCX consumer) so
-  the stack's remote memory traffic offloads to the BlueField
-  DPU instead of running on the host CPU.
+- Applying the host-side UROM lifecycle, capability-discovery,
+  and error rules to a UCX-based HPC stack (OpenMPI, MPICH,
+  custom UCX consumer) that is already wired to use UROM.
+  Designing the UCX transport integration itself remains
+  upstream-stack work.
 - Debugging a `DOCA_ERROR_*` returned from a `doca_urom_*` call
   — in particular disambiguating *DPU-side UROM Service not
   reachable* from *operation type not supported on this device*

@@ -44,10 +44,8 @@ can GPUNetIO express* on this version + this GPU. If the user has
 not installed DOCA yet, route to
 [`doca-setup`](../../doca-setup/SKILL.md) first; if the user has
 not set up the underlying Ethernet RX/TX queues yet, that is a
-DOCA Ethernet question (no library skill ships for it yet in this
-bundle — route via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
-to the public DOCA Ethernet guide).
+DOCA Ethernet question — route to
+[`doca-eth`](../doca-eth/SKILL.md).
 
 ## Example questions this skill answers well
 
@@ -225,8 +223,9 @@ contain — and pull requests should not add:
   `CMakeLists.txt`, …) parked inside the skill. The agent
   constructs the build manifest *in the user's project
   directory* against the user's installed DOCA + CUDA toolkit,
-  where `pkg-config --modversion doca-gpunetio` and `nvcc
-  --version` are the two sources of truth.
+  where `pkg-config --modversion doca-gpunetio`,
+  `pkg-config --modversion doca-common`, and `nvcc --version`
+  form the version gate.
 - **A `samples/`, `bindings/`, or `reference/` subtree** of any
   kind. A mock or incomplete artifact in this skill's tree, even
   one labeled "reference", is misleading: users will read it as
@@ -294,10 +293,6 @@ docs, or the on-disk install layout" rather than
 
 DOCA Ethernet is GPUNetIO's mandatory companion library: GPU-visible
 RX / TX queue handles are layered on top of `doca_eth_rxq` /
-`doca_eth_txq` from DOCA Ethernet. No `libs/doca-eth/` skill
-ships in this bundle yet; for the underlying Ethernet queue
-setup, route via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
-to the public *DOCA Ethernet* guide and to the shipped
-`/opt/mellanox/doca/samples/doca_eth/` samples.
+`doca_eth_txq` from DOCA Ethernet. For the underlying queue setup,
+route to [`doca-eth`](../doca-eth/SKILL.md).
 

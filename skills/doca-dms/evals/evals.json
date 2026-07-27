@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-dms.explicit-positive.v1",
-      "prompt": "Use the doca-dms skill to help me. I'm working on: Use this skill for operating NVIDIA DOCA Management Service (DMS) on a BlueField, Arm host, x86 host, or K8s pod \u2014 bringing up `dmsd` frontend + `dmspe` backend, picking deployment shape, choosing auth (localhost / PAM / credentials / mTLS), wiring `-allowed_users` (gRPC client allow-list) + `dmsgroup` (Unix group for `dmspe`), issuing gNMI Get/Set on YANG paths, gNMI Subscribe for streaming telemetry (STREAM / SAMPLE 1s\u201360s, ONCE supported; POLL + Aggregation Unimplemented), gNOI for reboot/OS install/factory-reset/file transfer/`mlxconfig`/ `containerz`, or debugging frontend-vs-backend errors and logs.",
+      "prompt": "Use the doca-dms skill to help me. I'm working on: Operate NVIDIA DOCA Management Service (`dmsd` + `dmspe`) on a BlueField, Arm/x86 host, or Kubernetes pod: choose deployment and authentication, configure `-allowed_users` and `dmsgroup`, use gNMI Get/Set/Subscribe, run supported gNOI workflows, and debug frontend/backend failures.",
       "expected_skill": "doca-dms",
       "expected_output": "The agent selects the doca-dms skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
       "assertions": [

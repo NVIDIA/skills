@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when measuring GPU-kernel-initiated RDMA WRITE latency through doca-gpunetio — building and running the gpunetio_ib_write_lat client + server pair, checking GPU-NIC pairing, reading the half-iter / full-iter / CUDA-side usec columns, characterizing median / p99 / jitter for a real-time control-loop workload, picking GPUNetIO vs GPI vs CPU-initiated perftest, or weighing the latency-vs-batching trade-off. <br>
+Guides agents through building and running the gpunetio_ib_write_lat client/server pair to measure GPU-kernel-initiated RDMA WRITE latency through doca-gpunetio, including GPU-NIC pairing validation, median/p99/jitter characterization, and the GPUNetIO-vs-GPI-vs-CPU-initiated surface selection. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and performance engineers measuring GPU-kernel-initiated RDMA WRITE latency on real hosts with DOCA-capable hardware, characterizing tail latency for real-time control-loop workloads, and deciding between GPUNetIO, GPI, and CPU-initiated perftest paths. <br>
+Developers and performance engineers measuring GPU-kernel-initiated RDMA WRITE latency to validate whether the GPUNetIO path meets real-time control-loop deadlines on their GPU-NIC pair. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,24 +26,24 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
+- [DOCA Samples and Applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
+**Output Type(s):** [Analysis, Shell commands, Configuration instructions] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 Tier-3 evaluation tasks using the NVSkills-Eval external profile in the astra-sandbox environment. <br>
+Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,21 +60,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+82%) | 96% (+55%) |
-| Discoverability | 4 | 100% (+75%) | 94% (+47%) |
-| Effectiveness | 4 | 94% (+76%) | 100% (+69%) |
-| Efficiency | 4 | 92% (+48%) | 91% (+32%) |
+| Correctness | 4 | 100% (+50%) | 100% (+20%) |
+| Discoverability | 4 | 98% (+36%) | 95% (+33%) |
+| Effectiveness | 4 | 99% (+81%) | 93% (+71%) |
+| Efficiency | 4 | 93% (+34%) | 97% (+63%) |
 
 ## Skill Version(s): <br>
-ff51db6 (source: git SHA, committed 2026-07-15) <br>
+18a69be (source: git SHA, committed 2026-07-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

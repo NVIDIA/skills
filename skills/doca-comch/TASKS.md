@@ -66,9 +66,11 @@ Steps the agent should walk the user through:
    callbacks registered after start are silently ignored by the
    library, and the agent must surface this.
 6. **Start the context** via `doca_ctx_start()` and progress the
-   PE (`doca_pe_progress`) until the connection callback reports
-   CONNECTED on both sides. If the callback does not fire within
-   a reasonable timeout, route to [`## debug`](#debug) ladder
+   PE (`doca_pe_progress`) until the server connection callback
+   reports CONNECTED and the client context-state callback reports
+   its running state. The client has no connection-event callback.
+   If either side does not reach its documented signal within the
+   application/sample deadline, route to [`## debug`](#debug) ladder
    step 1 (lifecycle / connection).
 
 For the canonical DOCA universal lifecycle that underlies steps
@@ -139,7 +141,10 @@ Steps the agent should walk the user through:
    server side is the *"server is ready"* signal; do not infer
    from the absence of an error log.
 2. **Start the host side** (the client). The client's connection
-   callback firing as CONNECTED is the *"channel is up"* signal.
+   context-state callback reaching its documented running state,
+   followed by the first successful task callback, is the
+   *"channel is up"* signal; do not invent a client connection-event
+   callback.
 3. **Send a smoke message** — one slow-path send-task with a
    small payload; verify the recv callback fires on the peer with
    the expected payload. If using fast-path, send one producer
@@ -200,9 +205,10 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | Producer submit returns `AGAIN` after 100 successful submits | Consumer is not draining at the same rate | This is a flow-control problem in the app, not a Comch bug; the agent must surface the rate gap, not paper over with retries |
 | Same code passes on host A, fails on host B | Different DOCA version or different representor permission | Re-run [`## configure`](#configure) step 1 (env preconditions) + [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test) four-way match on host B |
 
-Loop termination: stop iterating once two consecutive iterations
-do not change the picture — the cause is below Comch (driver,
-hardware, env). Escalate to
+Loop termination: run the smoke sweep once and permit at most one
+single-variable correction followed by one rerun. If that second
+sweep is still non-green, stop regardless of whether the symptom
+changed; escalate to
 [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
 with the captured trace + version state as evidence.
 
@@ -223,17 +229,25 @@ at the *runtime* and *program* layers.
   representor / PCIe visibility issue, not a Comch code issue.
   Confirm the env-side preconditions per
   [`## configure`](#configure) step 1 before any code change.
-- `DOCA_ERROR_AGAIN` on submit is *always* a missing
-  `doca_pe_progress()` in the user's main loop. Do not recommend
-  a retry loop; recommend a progress call.
+- `DOCA_ERROR_AGAIN` on submit means queue-full/backpressure. Progress
+  the PE to drain completions before one bounded resubmit. If it
+  recurs while completions are being drained, surface a
+  producer/consumer rate gap; do not claim progress was necessarily
+  absent and do not hide the gap behind a retry loop.
 - A *"server seems up; client hangs at start"* pattern is
   most often that the server-side accept slot is occupied — the
   device's per-server cap from `doca_comch_cap_get_max_clients(devinfo)`
   is reached because a previous client did not cleanly disconnect
   (leaked connection object on the server side). The cap is a
-  device capability, not a user-settable knob: agent must
-  enumerate live connections and prune the leaked one, not
-  invent a "raise the limit" setter.
+  device capability, not a user-settable knob, and the public Comch
+  API provides no live-connection enumeration call. Use the
+  application's own connection registry to identify and destroy a
+  connection object only when that registry exists and proves which
+  object is stale. Otherwise stop and report that selective cleanup is
+  unavailable. A planned server-process restart destroys every
+  connection and is allowed only after showing that blast radius and
+  obtaining explicit operator confirmation; never invent a "raise the
+  limit" setter or prune an unverified object.
 
 **Layer 6 (program) — Comch overlay.**
 

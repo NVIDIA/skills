@@ -27,7 +27,7 @@ every DOCA library bench can drive, not just one.
 | 1. Pick the target library | Cross-library — bench can drive AES-GCM, Comch, Compress, DMA, EC, Eth, RDMA, SHA, GPUNetIO. Picking the target library is axis 1 of the three-axis configuration. | [`## Capabilities and modes`](#capabilities-and-modes) cross-library table + [TASKS.md ## configure](TASKS.md#configure) step 1 |
 | 2. Pick the workload shape | The pipeline-of-steps model is axis 2 — what *operation* is the device being asked to do on each iteration (e.g. compress vs decompress, send vs receive, encrypt vs decrypt), with the data provider, batching, and remote-memory choices that go with it. | [`## Capabilities and modes`](#capabilities-and-modes) workload-shape rules + [TASKS.md ## configure](TASKS.md#configure) step 3 |
 | 3. Pick the measurement axis | Throughput vs bulk-latency vs precision-latency vs max-bandwidth is axis 3 — the shipped `doca_bench` binary defines FOUR benchmark modes in `tools/bench/doca_bench/configuration.hpp`. The public guide documents the modes as **not interchangeable**; a single number reported without naming the mode is ambiguous and the agent must surface that. | [`## Capabilities and modes`](#capabilities-and-modes) measurement-axis table + [TASKS.md ## configure](TASKS.md#configure) step 4 |
-| 4. Smoke-before-bulk | Confirm the bench can talk to the target device with a trivial workload (small job count, short duration, minimum data provider) before kicking off a long or swept run. | [TASKS.md ## run](TASKS.md#run) smoke flow + [TASKS.md ## test](TASKS.md#test) eval-loop overlay |
+| 4. Smoke-before-bulk | Confirm the bench can talk to the target device with a trivial workload before a long run; predeclare the workload's acceptable run-to-run tolerance, then require two consecutive runs within it before calling the result stable | [TASKS.md ## configure](TASKS.md#configure) tolerance step + [TASKS.md ## run](TASKS.md#run) smoke flow + [TASKS.md ## test](TASKS.md#test) eval-loop overlay |
 | 5. Diagnose a bench failure | Walk the layered error taxonomy in [`## Error taxonomy`](#error-taxonomy) — config-syntax / device-binding / library-precondition / workload-precondition / measurement-soundness / version / cross-cutting — instead of guessing at causes from a stack trace. | [`## Error taxonomy`](#error-taxonomy) + [TASKS.md ## debug](TASKS.md#debug) |
 | 6. Interpret a bench number | A bench number is only meaningful with the (command line + DOCA version + device + as-deployed environment) four-tuple. Quoting one without the other three is the cross-version regression-hunt failure mode. | [`## Observability`](#observability) + [TASKS.md ## test](TASKS.md#test) baseline-capture rule |
 
@@ -339,6 +339,12 @@ out-of-band channel. The safety rules:
   This rule applies to every output of this skill — the *most
   common* downstream misuse of bench is quoting a screenshot
   from one platform as if it described another.
+- **Predeclare tolerance; require two consecutive stable runs.**
+  The workload owner supplies an acceptable absolute or percentage
+  delta before measurement. A stable result requires two
+  consecutive runs within that tolerance. If the bounded re-run
+  cannot meet it, report the variance and escalate; do not invent
+  or relax a tolerance after seeing the numbers.
 - **Do not invent flags, scenario names, attribute names, or
   metric names.** The documented invocations and the installed
   `--help` are the authoritative surface. Prose-derived flags

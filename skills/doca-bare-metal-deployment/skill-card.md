@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides agents through launching, supervising, debugging, and platform lifecycle operations for DOCA-linked application binaries running directly on hardware (host x86 + BlueField NIC over PCIe, or BlueField Arm bare-metal) without containers or kubelet. <br>
+Use this skill for launching, supervising, debugging, or platform lifecycle on a BlueField — BFB install, RShim/TMFIFO, host PF rebind, post-BFB recovery — taking a DOCA-linked binary to a healthy run directly on hardware (host x86 + BlueField NIC over PCIe, or BlueField Arm bare-metal). <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External DOCA developers and operators who have a DOCA-linked application binary and want to run it directly on hardware — covering launch mode selection, PCI/NUMA/CPU/IRQ binding, co-tenant isolation, error diagnosis, and BlueField lifecycle management. <br>
+Developers and operators who have a DOCA-linked application binary and want to run it directly on hardware — launching, binding to PCI/NUMA/CPU/IRQ resources, configuring co-tenant isolation, diagnosing bare-metal failures, and managing BlueField lifecycle operations. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [No] <br>
-**Credential Type(s):** [None] <br>  
+**Credential Type(s):** [None] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,10 +25,10 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [details.md](references/details.md) <br>
+- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
-- [Skill Details](references/details.md) <br>
 
 
 ## Skill Output: <br>
@@ -38,13 +38,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 evaluation tasks in the `external` NVSkills-Eval profile on `astra-sandbox` environment. <br>
+Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,21 +61,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 88% (+60%) | 98% (+33%) |
-| Discoverability | 4 | 100% (+75%) | 89% (+21%) |
-| Effectiveness | 4 | 77% (+41%) | 95% (+40%) |
-| Efficiency | 4 | 92% (+49%) | 83% (+19%) |
+| Correctness | 4 | 100% (+35%) | 75% (+10%) |
+| Discoverability | 4 | 100% (+50%) | 95% (+45%) |
+| Effectiveness | 4 | 92% (+58%) | 100% (+57%) |
+| Efficiency | 4 | 94% (+56%) | 100% (+75%) |
 
 ## Skill Version(s): <br>
-ce589ef (source: git SHA, committed 2026-06-25) <br>
+ffe362c (source: git SHA, committed 2026-07-25) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

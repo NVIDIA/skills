@@ -9,7 +9,10 @@ This file enumerates DMS's documented capabilities, deployment shapes,
 authentication surface, and operational behaviors as described in the
 public DMS guide on `docs.nvidia.com`. Treat it as a *map of what is
 documented*, not a substitute for reading the live page when configuring
-a real deployment.
+a real deployment. If the version-matched page is unavailable, use
+the installed `dmsd --help`, SystemD unit, and installed documentation.
+If none exists for the installed release, stop with a version/source
+gap; this bundle must not be used to guess flags or paths.
 
 ## Pattern overview
 
@@ -124,12 +127,12 @@ guide; do not infer flags from generic gRPC knowledge.
 
 The public DMS guide documents four authentication modes:
 
-| Method | Security level | Best for | Description |
-|--------|----------------|----------|-------------|
-| Local testing | Low | Development only | No authentication. Server binds to localhost only. |
-| PAM | Medium | Unix user authentication | Uses system user accounts. Requires an `allowed_users` list. |
-| Credentials | per public guide | per public guide | Documented in the public guide; quote, do not paraphrase. |
-| mTLS | per public guide | per public guide | Documented in the public guide; quote, do not paraphrase. |
+| Method | In-bundle invariant | Required live source |
+|--------|---------------------|----------------------|
+| Local testing | No authentication; loopback-only; development only | Installed guide's local-testing recipe |
+| PAM | System-user authentication plus `-allowed_users` authorization | Installed guide's PAM recipe and Security Best Practices |
+| Credentials | Do not infer credential shape, storage, or exposure policy | Installed guide's Credentials recipe and Security Best Practices |
+| mTLS | Do not infer certificate roles, trust roots, or client-auth policy | Installed guide's mTLS recipe and Security Best Practices |
 
 Authorization for **gRPC client callers** is the `-allowed_users` flag
 (default `root`; comma-separated list, enforced by `isUserAllowed` in
@@ -139,23 +142,10 @@ Authorization for **gRPC client callers** is the `-allowed_users` flag
 the privileged backend (`dmspe`) for its file-system / IPC handoff
 (see `gnxi/dmspe/dmspe.c` `dmsgroup` membership probe and the
 `Group=dmsgroup` line in `gnxi/scripts/dmsd.service`); it is not the
-boundary the gRPC client sees. The bundle's previous framing that
-"`dmsgroup` is the authorization boundary" was wrong and is now
-disavowed — the `-allowed_users` flag is the gRPC authz boundary,
-and `dmsgroup` is layered orthogonally as the backend-helper unix-
-group surface.
-
-(Legacy `dmsgroup`-only framing follows; treat any sentence below that
-says "the gRPC client must be in `dmsgroup`" or "members of the
-`dmsgroup` Unix group are authorized to execute DMS commands,
-regardless of the chosen authentication mode" as the disavowed
-framing — the agent must use the `-allowed_users` flag as the gRPC
-client allow-list and treat `dmsgroup` only as the dmspe backend-
-helper's unix-group surface. Any "set DMS up for user X" workflow
-must therefore add the user to BOTH the `-allowed_users` list (for
-the gRPC front door) AND the `dmsgroup` Unix group (only if the user
-also needs to invoke the dmspe privileged helper directly on the
-endpoint).)
+boundary the gRPC client sees. The authoritative rule is: add a gRPC
+caller to `-allowed_users`; add a local user to `dmsgroup` only when
+that user also needs to invoke the privileged `dmspe` backend helper
+directly. Never describe `dmsgroup` as the gRPC authorization boundary.
 
 ### Configuration persistency
 
@@ -261,8 +251,7 @@ Documented observability surfaces:
 DMS provides gNMI Subscribe streaming telemetry — `STREAM` (with
 `SAMPLE` interval bounds of 1s–60s) and `ONCE` modes are implemented
 in `gnxi/gnmi/server.go`; `POLL` and `Aggregation` MODES are
-Unimplemented. The bundle's previous framing that "DMS does not
-provide gNMI Subscribe" was wrong and is now disavowed. For the
+Unimplemented. For the
 externally-productized **DOCA Telemetry Service (DTS)** — turnkey
 aggregator that is OUT OF SCOPE for this bundle — route via
 [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
@@ -305,9 +294,11 @@ posture:
   bullets — route to the live guide.
 - **Underlying-tool destructive operations** (gNOI `OS install`,
   `Reboot`, `Factory-reset`, file-delete) change managed-device state
-  in non-trivial ways. Operators should know which sub-operation they
-  are invoking before issuing it; the agent's safe default is to
-  state the documented effect and ask the user to confirm.
+  in non-trivial ways. Before issuing one, verify the target identity
+  and obtain authorization bound to that target and action: an explicit
+  user reply in an interactive session or an approved-system
+  authorization artifact in unattended execution. Otherwise stop with
+  `confirmation_required`.
 
 ## Public-source pointer
 

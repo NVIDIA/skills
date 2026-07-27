@@ -123,7 +123,7 @@ For the canonical DOCA version-detection chain, the four-way match rule, NGC con
 
 **The GPUNetIO-specific overlay** is:
 
-- **DOCA must match CUDA per the DOCA Compatibility Policy.** The public DOCA Compatibility Policy at <https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html> defines which CUDA toolkit version a given DOCA release supports. Mismatched CUDA + DOCA combos fail at link time (missing CUDA-side symbols) or at runtime (`DOCA_ERROR_DRIVER` from `doca_gpu_create`) in confusing ways. The agent must surface BOTH `pkg-config --modversion doca-gpunetio` AND `nvcc --version` (and `cat /usr/local/cuda/version.txt` when present) and compare them against the DOCA Compatibility Policy before any GPUNetIO bring-up.
+- **DOCA must match CUDA per the DOCA Compatibility Policy.** The public DOCA Compatibility Policy at <https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html> defines which CUDA toolkit version a given DOCA release supports. Mismatched CUDA + DOCA combos fail at link time (missing CUDA-side symbols) or at runtime (`DOCA_ERROR_DRIVER` from `doca_gpu_create`) in confusing ways. The agent must compare `pkg-config --modversion doca-gpunetio` with `pkg-config --modversion doca-common`, require those DOCA versions to agree, then compare `nvcc --version` (and `cat /usr/local/cuda/version.txt` when present) against the DOCA Compatibility Policy before any GPUNetIO bring-up.
 - **The DOCA cap-query AND `cudaGetDeviceProperties` are both runtime authorities.** Per the cross-cutting cap-query rule in [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability), the DOCA-side cap query is the runtime authority for *"is this GPUNetIO feature on this DOCA install"*. The CUDA-side device-properties query is the runtime authority for *"is this GPU capable of GPU-initiated networking at all"*. Either being false fails the feature; the agent must report both.
 - **`doca-gpunetio.pc`, `doca-common.pc`, and the matching CUDA toolkit must all line up at the four-way-match check** (per [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)). A common partial-install pattern is that DOCA was upgraded but the CUDA toolkit on the host was not, or vice versa; the agent must surface that as a four-way-match failure and route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) before any GPUNetIO-layer diagnosis.
 
@@ -207,10 +207,10 @@ GPUNetIO setup:
 
 | Precondition | What must be true | How the agent verifies | Where to fix |
 | --- | --- | --- | --- |
-| CUDA toolkit installed and matched to DOCA | The CUDA toolkit on the host is installed at a version listed as compatible with the installed DOCA release per the DOCA Compatibility Policy | `nvcc --version`; `cat /usr/local/cuda/version.txt`; cross-check against `pkg-config --modversion doca-gpunetio` and the [DOCA Compatibility Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html) | [`doca-setup`](../../doca-setup/SKILL.md) for the install-side; route to [`doca-version`](../../doca-version/SKILL.md) for the four-way-match check |
+| CUDA toolkit installed and matched to DOCA | The CUDA toolkit on the host is installed at a version listed as compatible with both installed DOCA package surfaces per the DOCA Compatibility Policy | `nvcc --version`; `cat /usr/local/cuda/version.txt`; compare both `pkg-config --modversion doca-gpunetio` and `pkg-config --modversion doca-common`, require those DOCA versions to agree, then cross-check CUDA against the [DOCA Compatibility Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html) | [`doca-setup`](../../doca-setup/SKILL.md) for the install-side; route to [`doca-version`](../../doca-version/SKILL.md) for the four-way-match check |
 | `nvidia_peermem` loaded for GPUDirect RDMA | The `nvidia_peermem` kernel module is loaded so GPUDirect RDMA between the NIC and the GPU works; without it GPU-initiated networking falls back or fails entirely | `lsmod \| grep nvidia_peermem`; missing → `sudo modprobe nvidia_peermem`; persistent via system config | [`doca-setup`](../../doca-setup/SKILL.md) for the env-side; do not modify the program |
 | CUDA device enumerable | `cudaGetDeviceCount` returns at least 1 and `cudaGetDeviceProperties(devOrdinal)` succeeds for the device the user intends to drive | `nvidia-smi -L`; programmatic via the CUDA runtime; `cudaSetDevice(devOrdinal)` must succeed | [`doca-setup`](../../doca-setup/SKILL.md) for the env-side; verify the NVIDIA driver is loaded |
-| doca-eth side already up | The underlying `doca_eth_rxq` / `doca_eth_txq` exists and the doca-eth context is at the right lifecycle stage to expose the queue to the GPU | The doca-eth bring-up workflow (no library skill yet ships in this bundle; route via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) to the public DOCA Ethernet guide) is the upstream verb | Configure doca-eth first; do NOT skip ahead to `doca_gpu_*` calls |
+| doca-eth side already up | The underlying `doca_eth_rxq` / `doca_eth_txq` exists and the doca-eth context is at the right lifecycle stage to expose the queue to the GPU | The [`doca-eth`](../doca-eth/SKILL.md) bring-up workflow is the upstream verb | Configure doca-eth first; do NOT skip ahead to `doca_gpu_*` calls |
 | CUDA buffers registered with DOCA | The GPU-side payload pool allocated via `cudaMalloc` is registered with DOCA via the `doca_buf_arr_create_*` family before `doca_ctx_start()` | Walk the registration sequence in [TASKS.md ## configure](TASKS.md#configure) step 4; a missing registration surfaces as `DOCA_ERROR_BAD_STATE` from the first device-side submit | Program-layer fix — the registration call goes in the host-side bring-up code, before the persistent kernel is launched |
 
 **Do not partial-install one side.** A CUDA-only install
@@ -243,10 +243,8 @@ topics the agent will get asked but should route elsewhere:
   into a CUDA kernel*.
 - **DOCA Ethernet queue setup** (`doca_eth_rxq` / `doca_eth_txq`
   bring-up, RSS, representor selection on the NIC side) —
-  GPUNetIO depends on it but does not redefine it. Route via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
-  to the public DOCA Ethernet guide; no library skill yet ships
-  for it in this bundle.
+  GPUNetIO depends on it but does not redefine it. Route to
+  [`doca-eth`](../doca-eth/SKILL.md).
 - **DOCA DPA** (DPA-side networking primitives, DPA kernel
   programming) — the *sibling* DOCA library for offloading
   device-side compute onto a different non-CPU target. The

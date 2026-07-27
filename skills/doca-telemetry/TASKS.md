@@ -119,6 +119,12 @@ Steps the agent should walk the user through:
      reading perf-event lists.
    - `pcc` / `phy` / `pci`: typically no pre-start setters — read
      directly after start.
+   Before enabling `adp_retx` `_set_hist_clear_on_read` or
+   `diag` data-clear, explicitly confirm destructive-read intent:
+   each read resets the underlying counters, so a second reader
+   or later read sees only values accumulated after that reset.
+   Leave destructive reads disabled unless the user explicitly
+   requests them.
 6. **Start the per-domain context.** Call
    `doca_telemetry_<domain>_start(ctx)`. Reads before start
    return `DOCA_ERROR_BAD_STATE`. For `diag`, start is only
@@ -182,13 +188,12 @@ user before recommending any code-level edit:
 | 5. Clear-on-read intent | Does the modified reader enable clear-on-read (`adp_retx` `_set_hist_clear_on_read`, `diag` data-clear)? | Per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy), clear-on-read resets the underlying counters — a second reader sees the counters as they stand after the reset. Decide explicitly; default to NOT clearing unless the user wants destructive reads |
 | 6. Build manifest | Keep the sample's existing `meson.build` (which already wires `pkg-config doca-telemetry`)? | Yes. Do not switch to a hand-rolled Makefile for *"simplicity"* — it removes the version-check rail. And do not silently swap the `pkg-config` module to `doca-telemetry-exporter` — that flips the role and is the load-bearing first-app failure |
 
-The agent emits an *intent description + the filled slots*; the
-*actual* unified diff against the sample source is produced by
-the modify-from-sample renderer (deferred to a future round, per
+The agent emits an *intent description + the filled slots*, then
+walks the unified diff line-by-line against the sample source
+read on disk and has the user paste back the result for
+validation. A future modify-from-sample renderer may automate
+this workflow; it is not currently available (per
 [`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify)).
-Until the renderer ships, the agent must walk the user through
-the diff line-by-line against the sample source they read on
-disk, and have the user paste back the result for validation.
 
 ## run
 
@@ -222,7 +227,10 @@ Steps the agent should walk the user through:
    `doca_telemetry_pci_read_perf_counters_1`,
    `doca_telemetry_dpa_read_cumul_info_list`). Confirm the read
    returns `DOCA_SUCCESS` and the output struct is populated
-   before any loop.
+   before any loop. If clear-on-read is configured, do not issue
+   the read until the user has explicitly confirmed the
+   destructive reset described in [`## configure`](#configure)
+   step 5; otherwise leave clear-on-read disabled.
 4. **Capture the structured log.** Set `DOCA_LOG_LEVEL=trace`
    for the first run (see
    [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability)).
@@ -234,6 +242,10 @@ Steps the agent should walk the user through:
    sample window (for `diag`, after the previous sampling cycle
    completes — see the note on `doca_telemetry_diag_query_counters`),
    per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy).
+   A direct run gets at most **two** sample-window retries, with no
+   mutation between them. If both produce the same `AGAIN`
+   read outcome, stop the run and enter [`## debug`](#debug) with
+   both reads; do not add a third retry.
 6. **Stop and destroy on teardown.** Call
    `doca_telemetry_<domain>_stop` then
    `doca_telemetry_<domain>_destroy` in reverse-create order.
@@ -254,6 +266,13 @@ sample-window behavior matches the policy decided in
 failure to a layer outside the reader itself (device / driver /
 privilege) and escalated to the matching skill.
 
+**Iteration identity is exact evidence, not prose similarity.** One
+iteration is identified by the tuple **trigger-table row + capability
+result (or capability-query error) + read result / error / populated
+outcome**. Compare that complete tuple between iterations. Two
+consecutive unchanged tuples are an escalation condition and are
+never evidence of success.
+
 Iteration shape:
 
 1. **Lifecycle smoke.** Create the per-domain context on the
@@ -264,8 +283,10 @@ Iteration shape:
    privilege gap. Validates the lifecycle BEFORE chasing counter
    values.
 2. **Capability re-check.** Re-run the per-domain
-   `doca_telemetry_<domain>_cap_is_supported(devinfo)` (and, for
-   `phy` / `pci`, the per-sub-area / per-feature caps). If the
+   `doca_telemetry_<domain>_cap_is_supported(devinfo)` for `pcc`,
+   `dpa`, `diag`, `adp_retx`, or `phy` (plus PHY per-sub-area
+   caps), or the matching per-feature
+   `doca_telemetry_pci_cap_*_is_supported` query for PCI. If the
    sub-area / counter family the user wants returns
    `NOT_SUPPORTED`, that *is* the answer for this device + install;
    update the domain / sub-area selection (or the device) before
@@ -298,13 +319,15 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | --- | --- | --- |
 | `DOCA_ERROR_NOT_SUPPORTED` on cap-query or read | The device does not expose this domain / sub-area on this install | Re-pick the domain / sub-area per [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes), or confirm the right device is selected; this is the cap answer, not a retry case |
 | `DOCA_ERROR_BAD_STATE` on read | Read before `_start`, or (diag) start before `_apply_config` | Fix the per-domain lifecycle ordering per [`## configure`](#configure); re-run the lifecycle smoke |
-| `DOCA_ERROR_AGAIN` on read | Snapshot / sample cycle not ready yet | Retry after the sample window (diag: after the previous cycle); widen the read interval if a tight loop keeps hitting `AGAIN` |
+| `DOCA_ERROR_AGAIN` on read | Snapshot / sample cycle not ready yet | Retry after the sample window (diag: after the previous cycle), with no mutation between retries; after two unchanged sample-window retries, stop and escalate to `## debug` |
 | `DOCA_ERROR_INVALID_VALUE` on a setter or read | A sample / histogram value past the install's cap, or an undersized output buffer | Re-read the `_cap_get_*` sizing query and size the value / buffer to it |
 | Same code reads on device A, returns NOT_SUPPORTED on device B | Different device family / firmware feature bits, or different DOCA version | Re-narrow to per-device cap-query; the reader behavior is the same, the variance is at the device / version layer |
 
-Loop termination: stop iterating once two consecutive iterations
-of the same kind don't change anything — that means the cause is
-below the reader (device / driver / firmware feature gating).
+Loop termination: stop iterating when two consecutive iterations
+have the same trigger row, capability result / error, and read
+result / error / populated outcome. Matching evidence across both
+iterations requires escalation, never success; it means the cause
+is below the reader (device / driver / firmware feature gating).
 Escalate to
 [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
 with the captured cap-query + per-read evidence and the device /

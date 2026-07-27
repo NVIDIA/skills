@@ -50,14 +50,16 @@ Two cross-cutting rules apply to *every* pattern above:
   Inferring them from generic Linux intuition or from a previous
   BF2's behaviour is the most common hallucination failure for this
   skill.
-- **Every mutating burn leaves this skill for the meta-policy.** The
+- **Every mutating burn is governed by the meta-policy alongside this
+  skill.** The
   BFB reflash itself, any `mlxconfig set` (including a DPU-mode
   flip), a firmware burn, and any kernel-boot-parameter change are
   owned by
   [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) for the
   preflight / OOB-console / maintenance-window / rollback
-  discipline. This skill adds only the BF3-specific *sequencing* on
-  top.
+  discipline. Keep this skill loaded for BF3-specific *sequencing*;
+  `doca-hardware-safety ## modify` owns whether and how the mutation
+  may proceed.
 
 ## Capabilities and modes
 
@@ -211,7 +213,9 @@ this skill is their BF3 home.
    PFs, `ip link show` does NOT show the netdevs, `ibv_devinfo` is
    empty, DOCA programs cannot attach by representor name. Root
    cause class: stale host `mlx5` driver-binding state post-push.
-   Recovery: run the documented PF-rebind sequence in
+   Recovery: route the documented PF-rebind sequence through
+   [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify),
+   then return to the identical readiness smoke in
    [`TASKS.md ## test`](TASKS.md#test); do NOT launch any DOCA
    binary in this state.
 6. **`host-bf-version-mismatch`.** Everything above looks healthy,
@@ -221,12 +225,14 @@ this skill is their BF3 home.
    in full, resolve apt-source / repo-pin drift first, route any
    host-side reinstall through [`doca-setup`](../doca-setup/SKILL.md).
 
-Two cross-cutting rules: **match multiple states, do not stop at the
-first** (a BF3 back from a partial install can be `uefi-only` then
-`arm-ok-host-pfs-unbound` after a cold cycle); and **never declare
-healthy from absence of evidence** (a TMFIFO `ping` without
-`ip route get`, an SSH connect without `uptime`/`dmesg`, an `lspci`
-listing without a usable netdev are each NOT proof).
+Three cross-cutting rules: **evaluate all six states and report every
+match before selecting a recovery**; **recover in dependency order**
+(installer → boot/Arm → TMFIFO → SSH → PF binding → version); and
+**never declare healthy from absence of evidence** (a TMFIFO `ping`
+without `ip route get`, an SSH connect without `uptime`/`dmesg`, an
+`lspci` listing without a usable netdev are each NOT proof). Each
+recovery is followed by the identical readiness-smoke tuple defined
+in `TASKS.md ## test`, so before/after evidence remains comparable.
 
 ## Observability
 
@@ -275,15 +281,17 @@ skill names only the BF3-bring-up-specific surfaces.
 > When the two layers disagree, the stricter wins; when either layer
 > says STOP, the agent stops.
 
-- **Every mutating burn leaves this skill.** A BFB reflash, any
+- **Every mutating burn loads the safety meta-policy alongside.** A
+  BFB reflash, any
   `mlxconfig set` (including a DPU/separated-host mode flip), a
   firmware burn, and any kernel-boot-parameter change are
   hardware-state changes. The agent hands the change-application
   discipline (preflight inventory, OOB console, maintenance window,
   rollback) to
   [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify)
-  and returns here only once the change is complete and verified.
-  This skill owns the *sequencing*, never the burn.
+  while retaining this skill for BF3 sequencing. Continue the BF3
+  workflow only after that change is complete and verified. This
+  skill owns the *sequencing*, never the burn discipline.
 - **An OOB path is a precondition, not a nicety.** Before any BFB
   push the operator must have a BMC console / serial-over-LAN /
   physical UART path to reach the BF3 if the push breaks the Arm OS.

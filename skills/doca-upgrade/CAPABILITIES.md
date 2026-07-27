@@ -17,11 +17,13 @@ reboot discipline this skill delegates to is owned by
 
 ## Pattern overview
 
-Every upgrade question this skill teaches resolves into the same
-shape: **detect what is installed → report the gap to the target →
-ASK for explicit confirmation → only then walk a guided upgrade.**
-The patterns are CLASSES — they apply across every DOCA release,
-every upgrade mode, and every host kind.
+Every planned-upgrade question resolves into **detect what is
+installed → report the gap to the target → ASK for explicit
+confirmation → only then walk a guided upgrade.** A failed/partial
+upgrade instead resolves into **capture the current state → classify
+the failure → apply one documented corrective action → re-verify or
+rollback/escalate**. The patterns are CLASSES — they apply across
+every DOCA release, every upgrade mode, and every host kind.
 
 | Upgrade pattern | Class shape | Where the substance lives |
 | --- | --- | --- |
@@ -107,6 +109,13 @@ this skill does not duplicate it.
   [DOCA Compatibility Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html)
   (cited once via
   [`doca-version ## Version compatibility`](../doca-version/CAPABILITIES.md#version-compatibility)).
+  If the target is outside that documented window, or the policy and
+  target release notes do not document the exact requested jump,
+  report it as unsupported and STOP; do not recommend or execute the
+  move or synthesize an intermediate-release ladder. Route the user
+  through `doca-public-knowledge-map` to the release-matched policy
+  and ask for a documented supported path, or keep the current
+  release in place.
 - **Host, BFB, firmware, and container tag are independent anchors.**
   An upgrade that moves one anchor must bring the others into a
   supported pairing; a move that leaves them skewed is a failed
@@ -182,7 +191,19 @@ The body lives there; this skill does not redefine it.
   tag) and that the prior version anchors are captured — the same
   documented-and-rehearsed rollback rule the hardware-safety
   meta-policy requires for any hardware-touching step.
-- **Maintenance window.** Any upgrade that touches a host carrying
-  real workload — and every BFB reflash or reboot-class step — runs
-  inside an explicit, time-boxed maintenance window with stakeholders
-  notified, per the hardware-safety maintenance-window rule.
+  Viability means the prior artifact is identified by an immutable
+  version/tag and is available through the release-matched documented
+  source: the package manager can resolve the prior host package set,
+  the prior BFB plus its published checksum is locally available or
+  retrievable and has an OOB restore path, or the prior container tag
+  resolves and the prior config is saved. Record the exact rollback
+  artifact and verification command. If any required artifact,
+  checksum, config snapshot, or recovery path is unavailable, STOP;
+  a conceptual rollback is not a rollback path.
+- **Maintenance window when disruptive.** An explicit, time-boxed
+  maintenance window with stakeholders notified is mandatory when
+  the target carries real workload, when the move disrupts a shared
+  service, and for every BFB reflash or reboot-class step. A
+  non-disruptive move on an idle, dedicated non-production target
+  does not require a fictional stakeholder window; record that the
+  target is isolated and why no window is needed.

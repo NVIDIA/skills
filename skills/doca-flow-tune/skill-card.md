@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when the user is tuning a live or captured doca-flow pipeline with doca_flow_tune — snapshotting pipe/counter/KPI state, picking a tuning axis and measurement, running offline or online modes, reading dumper/analyze/visualize outputs, or applying a recommendation back into the Flow program. <br>
+Guides agents through invoking doca_flow_tune to snapshot, analyze, visualize, and tune a live or captured doca-flow pipeline on BlueField DPUs or ConnectX NICs. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External operators, performance engineers, and DOCA Flow application developers who need to characterize, optimize, or tune a running doca-flow pipeline on BlueField DPU or ConnectX NIC hardware. <br>
+Developers, performance engineers, and platform operators use this skill to characterize, dump, visualize, analyze, and optimize running doca-flow pipelines on NVIDIA BlueField or ConnectX hardware. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [No] <br>
-**Credential Type(s):** [None] <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -37,13 +37,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 internal skill tasks using NVSkills-Eval Tier 3 profile (external, astra-sandbox environment). <br>
+Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,21 +60,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 97% (+74%) | 98% (+50%) |
-| Discoverability | 4 | 100% (+62%) | 95% (+35%) |
-| Effectiveness | 4 | 88% (+76%) | 95% (+68%) |
-| Efficiency | 4 | 93% (+41%) | 89% (+23%) |
+| Correctness | 4 | 100% (+70%) | 100% (+40%) |
+| Discoverability | 4 | 100% (+38%) | 95% (+34%) |
+| Effectiveness | 4 | 99% (+68%) | 100% (+81%) |
+| Efficiency | 4 | 91% (+51%) | 96% (+58%) |
 
 ## Skill Version(s): <br>
-b46f0c4 (source: git SHA, committed 2026-07-15) <br>
+2790d51 (source: git SHA, committed 2026-07-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -35,7 +35,7 @@ the user is doing **hands-on telemetry-exporter work** — emitting
 structured application telemetry (counters / events) from a
 DOCA-using program to an external consumer. Open
 [`TASKS.md`](TASKS.md) if the user wants to *do* something (configure
-/ build / modify / run / test / debug); open
+/ build / modify + rebuild / run / test / debug); open
 [`CAPABILITIES.md`](CAPABILITIES.md) when the question is *what can
 the exporter express* on this install. If the user has not installed
 DOCA yet, route to [`doca-setup`](../../doca-setup/SKILL.md) first.
@@ -196,8 +196,8 @@ exporter-specific material lives in two companion files:
   consumer-must-be-up-first staging, and the path-selection rule
   against `doca_log`, Prometheus, and `doca-comch`.
 - `TASKS.md` — step-by-step workflows for the six in-scope
-  exporter verbs: `configure`, `build`, `modify`, `run`, `test`,
-  `debug`. Plus a `Deferred task verbs` block that points
+  exporter verbs: `configure`, `build`, `modify` (followed by a
+  rebuild), `run`, `test`, `debug`. Plus a `Deferred task verbs` block that points
   out-of-scope questions at the right next skill.
 
 The skill assumes a host where DOCA is already installed at the
@@ -250,8 +250,8 @@ contain — and pull requests should not add:
    rule), observability, the safety policy, and the
    path-selection rule against `doca_log` / Prometheus / comch,
    see [CAPABILITIES.md](CAPABILITIES.md).**
-3. **For step-by-step workflows — configure, build, modify, run,
-   test, debug — see [TASKS.md](TASKS.md).**
+3. **For step-by-step workflows — configure, build, modify,
+   rebuild, run, test, debug — see [TASKS.md](TASKS.md).**
 
 Both companion files cross-link to each other,
 [`doca-version`](../../doca-version/SKILL.md) for the canonical

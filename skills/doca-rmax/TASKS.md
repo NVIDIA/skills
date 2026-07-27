@@ -82,7 +82,10 @@ Steps the agent should walk the user through:
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
    there is no per-integration context object and no
    transmit/output stream. Sketch the call sequence before
-   writing code.
+   writing code. If `doca_rmax_init()` returns
+   `DOCA_ERROR_NOT_SUPPORTED`, check the Rivermax SDK and license
+   preconditions first; that call-specific mapping is documented
+   by the installed header.
 4. **Run capability discovery against the active `doca_devinfo`.**
    Walk the `doca_rmax_get_*_supported` family per the
    capability-query rule in
@@ -197,9 +200,11 @@ Steps the agent should walk the user through:
    present and readable by the user the process will run as.
    A license that expired or moved between configure and run
    is the second-most-common Rivermax first-app symptom (after
-   *"I didn't install Rivermax at all"*) and presents as a
-   `DOCA_ERROR_NOT_PERMITTED` that an agent without this rule
-   will misread as a DOCA-side device-access shortfall.
+   *"I didn't install Rivermax at all"*). The documented
+   call-specific signal is `DOCA_ERROR_NOT_SUPPORTED` from
+   `doca_rmax_init()`. Do not infer a license failure from a later
+   `DOCA_ERROR_NOT_PERMITTED` unless the installed header or
+   Rivermax documentation maps that exact failing call.
 2. **Confirm the steering plan is live.** Before starting the
    binary (input direction), confirm the DOCA Flow rule that
    steers traffic to the underlying `doca_eth_rxq` is
@@ -273,7 +278,7 @@ Iteration shape:
    for the steering side. A silent Rivermax input stream is
    almost always one of these two.
 4. **Single-frame smoke.** As in [`## run`](#run) step 5 —
-   one frame in or out, one completion. If yes, advance. If
+   one matching frame received, one completion. If yes, advance. If
    no, walk the error: a `DOCA_ERROR_*` narrows to the
    `doca_rmax_in_stream` object or to `doca_rmax_init()`; no
    completion narrows to license, steering, queue, or
@@ -294,20 +299,23 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 
 | Iteration trigger | What it looks like | What changes next iteration |
 | --- | --- | --- |
-| First Rivermax create returns `DOCA_ERROR_NOT_PERMITTED` | The DOCA-side device access has been validated independently; the `_NOT_PERMITTED` is from a Rivermax call, not a plain `doca_dev_open` | First hypothesis is Rivermax license missing / expired / not readable. Re-walk the first two precondition rows; ONLY then consider DOCA-side device access. |
+| `doca_rmax_init()` returns `DOCA_ERROR_NOT_SUPPORTED` | Initialization fails before any stream is created | Re-walk the Rivermax SDK and license preconditions and route their remediation through `doca-public-knowledge-map`. Do not reinterpret this as device access. |
+| A later Rivermax call returns `DOCA_ERROR_NOT_PERMITTED` | The exact failing call and installed-header mapping have been captured | Follow the call-specific evidence. For device open / stream create, validate DOCA-side device access; do not label the error a license failure without verified documentation for that call. |
 | Input stream started cleanly, no completions | Stream + underlying queue both STARTED; no `DOCA_ERROR_*`; no Rx-data event | Almost always (a) Flow rule missing on the steering side, or (b) Rivermax license problem the agent missed at configure, or (c) PE not progressed in the user's main loop. Walk those three in order. |
 | Stream-rate smoke shows jitter / dropped frames | Single-frame smoke passed cleanly; full-rate run shows jitter past the Rivermax spec | The streaming thread is not at real-time priority, or the CPU is not isolated, or another high-priority thread is preempting it. Route the scheduling discipline to the public Rivermax SDK guide via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md). |
 | Placement-order set returns `DOCA_ERROR_NOT_SUPPORTED` at start | A `doca_rmax_get_*_supported` query returned `DOCA_SUCCESS`, but `doca_ctx_start()` rejects the configuration | The cap query was run against the wrong `doca_devinfo`, or a `doca_rmax_in_stream_set_*` setter is incompatible with the chosen configuration. Re-narrow to the per-`devinfo` query and the full setter sequence. Confirm the Rivermax SDK version on the host matches the one the cap-query result implies. |
 | Same code works on host A, fails on host B | One host has the Rivermax SDK + license; the other does not, or has a different Rivermax version | Re-walk the precondition matrix on host B; then re-run [`## configure`](#configure) step 4 (capability discovery) + [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test) four-way match on host B. The cap surface is per-device AND per-Rivermax-version. |
 
-Loop termination: stop iterating once two consecutive
-iterations do not change the picture — the cause is below
-DOCA Rivermax (Rivermax SDK internals / license server /
-driver / firmware / network steering / scheduling-discipline /
-env). Escalate to
+Loop termination: stop after five iterations or once two consecutive
+iterations do not change the picture, whichever comes first. Route Rivermax SDK,
+license, and Rivermax scheduling causes through
+[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+to the public Rivermax guidance. Route DOCA runtime, driver,
+firmware, and device-access causes to
 [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
-with the captured trace + capability snapshot + Rivermax-side
-state as evidence.
+(and its matching setup/driver route) with the captured trace,
+capability snapshot, and Rivermax-side state. Queue and steering
+causes remain with `doca-eth` and `doca-flow` respectively.
 
 ## debug
 
@@ -340,11 +348,11 @@ not check.
   a missing-or-wrong Flow rule, or an unstarted underlying
   `doca_eth_rxq`. Confirm those env-side preconditions per
   [`## configure`](#configure) step 1 before any code change.
-- `DOCA_ERROR_NOT_PERMITTED` on a Rivermax call after the
-  DOCA-side device access has been independently validated is
-  the canonical *"Rivermax license missing / expired / not
-  readable"* signal — not the DOCA-side `mlnx` group
-  shortfall.
+- `DOCA_ERROR_NOT_SUPPORTED` from `doca_rmax_init()` is the
+  documented license / Rivermax-SDK precondition signal. A later
+  `DOCA_ERROR_NOT_PERMITTED` is interpreted only from the exact
+  failing call and installed-header evidence; do not generalize it
+  into a license diagnosis.
 - Jitter past spec at full stream rate is *almost always* a
   scheduling-discipline gap — the streaming thread is not at
   real-time priority, or the CPU is not isolated, or another
@@ -355,9 +363,9 @@ not check.
 
 **Layer 6 (program) — Rivermax overlay.**
 
-- Stream-type / cap-query mismatch: requesting a stream type
-  / frame size / packet rate the device + Rivermax SDK does
-  not advertise returns `DOCA_ERROR_NOT_SUPPORTED` at the
+- Capability / configuration mismatch: requesting a PTP clock
+  or hardware packet-placement order the device + Rivermax SDK
+  does not advertise returns `DOCA_ERROR_NOT_SUPPORTED` at the
   matching setter or at `doca_ctx_start()`. Walk the
   cap-query rule in
   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
@@ -474,7 +482,7 @@ the agent should:
 | `doca_caps --list-devs` | `## configure` step 4 | Which devices on this host can be used as a `doca_dev` for Rivermax integration? | One row per visible device with PCIe address and capability flags |
 | `dmesg | tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last Rivermax call? | Empty or recent benign messages. Repeated `mlx5` errors → driver-layer bug; route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug). Repeated Rivermax-side errors → route to the Rivermax SDK guide via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) |
 | `mlxconfig -d <pcie> q | head -n 40` (sudo) | `## debug` layer 7 | What firmware config does the underlying NIC report? | Stable firmware config; transient values indicate a partial reset |
-| `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 4 | What did the structured DOCA logger emit for the first failing call? | A trace-level line on every lifecycle transition and every event / task. Silence after a Rivermax create = license / SDK / PE-progress problem, not a code bug |
+| `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 4 | What did the structured DOCA logger emit for the first failing call? | A trace-level line on every lifecycle transition and every event / task. Preserve the exact failing call and return code: `DOCA_ERROR_NOT_SUPPORTED` from `doca_rmax_init()` routes first to SDK/license checks; silence after a started stream routes to PE progress, steering, and queue checks |
 
 For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,

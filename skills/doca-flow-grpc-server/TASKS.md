@@ -31,7 +31,7 @@ Routing for nearby "install" questions:
   DOCA source tree with gRPC support enabled (see
   [`## build`](#build)). For the DOCA SDK / source prerequisites,
   route to
-  [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
   or to [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install).
 - *"I need to install gRPC tooling for my client language."*
   → not a DOCA-side install question. The
@@ -42,8 +42,9 @@ Routing for nearby "install" questions:
 ## configure
 
 `configure` for `doca_flow_grpc` is *"decide whether
-gRPC is the right surface AND pick the auth / TLS posture AND
-pick the network segment AND locate the `.proto` files BEFORE
+gRPC is the right surface AND pick the external proxy /
+sidecar / VPN AND pick the trusted plaintext network segment
+AND locate the `.proto` files BEFORE
 starting the server"*. Skipping any of those is the canonical
 failure mode.
 
@@ -73,21 +74,16 @@ Steps the agent should walk the user through, in order:
    contract — see
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
    `.proto`-as-contract.
-4. **Pick the auth posture.** mTLS-with-client-cert,
-   token-based, or plaintext-on-trusted-segment. Per the
-   [gRPC auth concepts](https://grpc.io/docs/guides/auth/)
-   page on `grpc.io`, gRPC has documented standard
-   mechanisms; the agent routes the operator there for the
-   design discussion. Plaintext-without-auth is acceptable
-   only on a genuinely trusted segment.
-5. **Pick the TLS posture.** TLS-encrypted, mTLS, or
-   plaintext. The operator must supply the CA / cert / key
-   material; the agent never invents a path to a CA or a
-   key.
+4. **Pick the external security layer.** Choose a capable
+   proxy, sidecar, or VPN that terminates TLS and enforces
+   identity. Certificates, tokens, and policy are configured
+   only on that layer; the shipped server has no such knobs.
+5. **Keep the server hop plaintext and isolated.** Bind
+   `doca_flow_grpc` only on the trusted segment behind the
+   selected external layer. Do not expose it directly.
 6. **Pick the network segment.** Loopback, a control-plane-
-   only subnet, or a broader segment. The agent must
-   surface that binding on `0.0.0.0` without an auth +
-   firewall posture is the canonical exposure failure.
+   only subnet, or an internal management VLAN. Binding the
+   plaintext server broadly is the canonical exposure failure.
 7. **Decide whether the packet-buffering or DPA-side
    companion is required.** Per the shipped
    `packet_buffering/` and `dpa_device/` source subtrees,
@@ -100,8 +96,8 @@ Steps the agent should walk the user through, in order:
    for the underlying DPA performance surface.
 8. **Sanity check before any invocation.** Confirm with the
    user: what is the client language? Where will the client
-   run? Which network segment is the endpoint on? Which auth
-   posture? Where are the `.proto` files? If any answer is
+   run? Which network segment is the endpoint on? Which
+   external layer protects it? Where are the `.proto` files? If any answer is
    unclear, stop and ask.
 
 Do not invent CLI flag strings, default endpoint shapes, or
@@ -149,10 +145,12 @@ unmodified contract and breaks the version-overlay rule per
 [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
 
 What the agent *does* modify, every time, is the **server
-deployment**: the configuration file (when one exists per the
-public guide), the TLS / auth posture, the bind address, the
-optional companion components. That is the configuration loop
-in [`## configure`](#configure) above.
+deployment**: the plaintext bind address and optional companion
+components, plus the separately managed external proxy /
+sidecar / VPN. TLS, identity, and access policy belong only to
+that external layer; they are not binary configuration knobs.
+That is the configuration loop in [`## configure`](#configure)
+above.
 
 Routing for nearby "modify" questions:
 
@@ -160,10 +158,10 @@ Routing for nearby "modify" questions:
   scope; this skill is for consumers of the shipped server,
   not contributors to it.
 - *"Can I subset the `.proto` to expose only some RPCs?"* →
-  no, not by editing the shipped `.proto`. Subset by
-  *access control* on the server side (auth + per-method
-  authorization) instead; the documented surface is the
-  documented surface.
+  no, not by editing the shipped `.proto` and not through a
+  binary per-method authorization knob (none exists). Put a
+  capable external gRPC proxy in front of the plaintext server
+  and allow only the selected RPC methods there.
 - *"I need an RPC the contract doesn't expose."* → out of
   scope here; that is a contract-evolution request that
   belongs upstream of DOCA, not in an external-consumer
@@ -183,10 +181,11 @@ names the *shape* of the flow.
    the Flow port is up, at least one pipe is created and
    validated, counters are wired. The gRPC server has no
    value if the Flow side is not yet useful.
-3. **Start the server with the chosen auth / TLS / bind
-   configuration.** Quote the operator's chosen TLS / auth
-   posture back to them before invocation so they can
-   challenge it. Capture the server's start / bind log
+3. **Start the plaintext server behind the chosen external
+   proxy / sidecar / VPN.** Quote the isolated bind segment
+   and external layer back to the operator before invocation.
+   Do not pass certificate, token, or TLS options to the
+   binary; none exist. Capture the server's start / bind log
    lines verbatim — the public DOCA Flow gRPC Server guide
    documents the log shape; do not invent it.
 4. **Confirm the server bound the configured endpoint.** On
@@ -199,8 +198,9 @@ names the *shape* of the flow.
    has passed.
 
 When recording the run for downstream consumers, write down:
-the DOCA version, the host the server runs on, the auth /
-TLS / bind configuration, the configured optional companion
+the DOCA version, the host the server runs on, the external
+layer's TLS / identity configuration, the plaintext bind
+configuration, the configured optional companion
 components, and the server's start / bind log block. The
 downstream [`## test`](#test) and [`## debug`](#debug)
 workflows depend on those fields.
@@ -209,13 +209,13 @@ workflows depend on those fields.
 
 The gRPC server's `## test` is **the canonical
 smoke-before-bulk loop** for the deployment. *"Test"* in this
-skill means *"prove one client can dial, handshake, and issue
+skill means *"prove one client can traverse the external layer and issue
 one read-only RPC end-to-end before the endpoint is exposed to
 additional clients or any state-changing RPC"*, not
 *"unit-test the server"*.
 
-**`## test` is an iterative loop, not a one-shot pass.** Every
-mutation — a TLS / auth posture change, a bind-address change,
+**`## test` is bounded to one diagnostic retry.** Every
+mutation — an external-layer change, a bind-address change,
 a `.proto` regeneration, a Flow-application redeploy, a
 driver / firmware change — re-opens the smoke.
 
@@ -229,10 +229,11 @@ The smoke-before-bulk shape:
    index on `grpc.io`, with the shipped `.proto` files on
    the user's install as input. Quote the `protoc` command
    the user actually ran; do not paraphrase it.
-3. **Dial the endpoint with the chosen auth / TLS posture.**
-   The client confirms the TLS handshake and any auth check
-   passes; failures here belong in [`## debug`](#debug)
-   layers 2-3.
+3. **Dial through the selected external layer.** The client
+   confirms that proxy, sidecar, or VPN admitted the request;
+   failures here belong to that layer's logs and
+   [`## debug`](#debug) layer 3, not to an invented server
+   TLS / auth knob.
 4. **Issue ONE read-only RPC.** The RPC should be a
    listing / status RPC the `.proto` contract documents;
    the agent must NOT invent the method name from memory.
@@ -255,16 +256,18 @@ deployment, not just one):
 | Step | Why this is a loop, not a step | Where the substance lives |
 | --- | --- | --- |
 | 1 → ## debug | Server did not bind; walk the binding-failed layer, then re-run step 1 | [`## debug`](#debug) layer 2 |
-| 3 → ## debug | TLS handshake or auth fails; walk the TLS / auth layer, then re-run step 1 with the corrected client posture | [`## debug`](#debug) layer 3 |
+| 3 → ## debug | The external proxy / sidecar / VPN rejects the connection; diagnose that layer, then retry the smoke once | [`## debug`](#debug) layer 3 |
 | 4 → ## debug | RPC returns a non-OK gRPC status code; map the code to the documented contract before retrying | [`## debug`](#debug) layer 4 |
 | 5 → ## debug | gRPC response disagrees with the Flow application's own view; walk the version layer before any wider exposure | [`## debug`](#debug) layer 6 |
-| 1 → auth / TLS / bind change → 1 | After widening / narrowing the access surface, re-run the smoke; the prior smoke is stale | [`## configure`](#configure) steps 4-6 + [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) |
+| 1 → external-layer / bind change → 1 | After changing the access surface, re-run the smoke once; the prior smoke is stale | [`## configure`](#configure) steps 4-6 + [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) |
 | 1 → Flow-side pipe change → 1 | After the Flow application creates or destroys pipes, re-run the smoke to confirm the gRPC server's view reflects the change | [`doca-flow TASKS.md ## modify`](../../libs/doca-flow/TASKS.md#modify) |
 
 The agent's rule: every state-changing action on the server
 configuration, the `.proto` contract, or the Flow application
-re-opens the smoke. Saving a stale smoke is exactly the
-failure mode this loop is here to prevent.
+re-opens the smoke for one diagnostic retry only. If that
+retry remains non-green, stop, preserve the client status,
+server logs, and external-layer logs, and escalate. Saving a
+stale smoke or continuing into repeated retries is forbidden.
 
 This skill does **not** ship a "test fixture" or pre-recorded
 expected output. The expected RPC response is install-,
@@ -273,8 +276,8 @@ mislead operators on a different platform / version.
 
 ## debug
 
-When the user reports a stuck client connection, a TLS / auth
-failure, an RPC returning a non-OK status code, or a response
+When the user reports a stuck client connection, an external-
+layer rejection, an RPC returning a non-OK status code, or a response
 that disagrees with the Flow application, walk the
 [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
 layers in order:
@@ -283,13 +286,13 @@ layers in order:
    Flow library is present, and the binary is actually
    running; check the server's own logs.
 2. **Server-binding-failed.** Confirm the configured
-   address / port / TLS material; the server's own error
-   log is ground truth.
-3. **TLS-or-auth-rejected.** Quote the standard gRPC
-   status codes (`UNAUTHENTICATED`, `PERMISSION_DENIED`);
-   route the client-side auth fix through the
-   [gRPC auth concepts](https://grpc.io/docs/guides/auth/)
-   page on `grpc.io`.
+   address / port; the server's own error log is ground
+   truth. Certificate and token material are not binary
+   inputs.
+3. **External-layer-rejected.** Inspect the selected proxy,
+   sidecar, or VPN logs and configuration. Do not attribute
+   its TLS, identity, or policy rejection to
+   `doca_flow_grpc`, and do not invent a server knob.
 4. **RPC-call-error.** Match the gRPC status code
    (`INVALID_ARGUMENT`, `NOT_FOUND`, `FAILED_PRECONDITION`,
    etc.) to the documented RPC contract in the `.proto`
@@ -316,6 +319,9 @@ layers in order:
 In every case: **quote the standard gRPC status code and the
 server's log line verbatim.** Paraphrasing the status code is
 the canonical lost-fidelity failure for this skill.
+Apply at most one diagnostic correction and retry the same
+smoke once. If it remains non-green, stop and escalate with
+the preserved server, client, and external-layer evidence.
 
 ## use
 
@@ -344,7 +350,7 @@ should be routed out before the agent does any of them under
 this skill's name.
 
 - **install DOCA** ⇒
-  [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
   and [`## no-install`](../../doca-setup/TASKS.md#no-install).
 - **write a doca-flow application** ⇒
   [`doca-flow`](../../libs/doca-flow/SKILL.md), layered on
@@ -398,14 +404,14 @@ the agent should:
 | Confirm DOCA Flow library version | `pkg-config --modversion doca-flow` on the side the gRPC server runs | [`## configure`](#configure) step 1 + [`## debug`](#debug) layer 6 | Matches `doca_caps --version` and the version the client-side `.proto` was generated from; disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2). |
 | Locate the shipped `.proto` files | On the monorepo source tree the Flow gRPC `.proto` files live under `doca/libs/doca_flow/grpc/` (`common.proto`, `doca_flow.proto`, `packet_buffering/packet_buffering.proto`) — NOT under `doca/tools/flow_grpc_server/`. On a binary install they are shipped via the `doca-flow` include / share path; the agent runs `pkg-config doca-flow --variable=prefix` then `find <prefix> -name '*.proto'` to pin the actual install path on the user's host instead of memorizing one. | [`## configure`](#configure) step 3 | The `.proto` files exist on the user's install at the path the `find` confirms; the agent quotes the confirmed path, not memory. |
 | Generate client stubs in the chosen language | `protoc` + the language-specific gRPC plugin per [grpc.io](https://grpc.io/docs/languages/), with the shipped `.proto` files as input | [`## test`](#test) step 2 | The generated stubs compile in the client language; the client can construct request / response messages matching the contract. |
-| Confirm a client can dial the server end-to-end | The chosen client language's gRPC dial / channel / stub invocation against the configured endpoint with the configured auth / TLS posture | [`## run`](#run) step 4 + [`## test`](#test) step 3 | The TLS handshake succeeds; the auth check passes; the channel is ready to issue RPCs. |
+| Confirm a client can dial the server end-to-end | The chosen client language's gRPC dial / channel / stub invocation through the selected external proxy / sidecar / VPN to the isolated plaintext endpoint | [`## run`](#run) step 4 + [`## test`](#test) step 3 | The external layer admits the request and the channel is ready to issue RPCs; no TLS / auth knob is configured on `doca_flow_grpc`. |
 | Issue ONE read-only RPC to confirm the server is wired to the live Flow application | The client invocation for a listing / status RPC documented in the shipped `.proto` files (the specific method name comes from the `.proto`, NOT from agent memory) | [`## test`](#test) step 4 | Exit 0 / `OK` status; the response reflects the live Flow application's state. |
-| Save a session snapshot for debug | Capture (a) the server's start / bind log, (b) the client's full command line + stub generation command + dial + RPC trace, (c) the gRPC status code(s) verbatim, (d) the four-tuple of (DOCA version, host, auth / TLS / bind config, Flow application state) | [`## test`](#test) save step + [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug) | The saved bundle is consumed by the cross-cutting debug ladder. |
+| Save a session snapshot for debug | Capture (a) the server's start / bind log, (b) the client's full command line + stub generation command + dial + RPC trace, (c) the gRPC status code(s) verbatim, (d) the four-tuple of (DOCA version, host, external-layer + plaintext-bind config, Flow application state) | [`## test`](#test) save step + [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug) | The saved bundle is consumed by the cross-cutting debug ladder. |
 
 Three cross-cutting rules for this appendix:
 
 - **Never invent an RPC method name, message field name,
-  endpoint path, or auth-mechanism identifier.** The
+  endpoint path, or binary security knob.** The
   shipped `.proto` files on the user's install plus the
   public DOCA Flow gRPC Server guide plus the
   `grpc.io` documentation are the joint contract;
@@ -413,8 +419,9 @@ Three cross-cutting rules for this appendix:
   failure for this skill.
 - **State-changing RPCs re-open the smoke.** They are not
   retryable in place; after any state-changing RPC, the
-  agent re-runs the read-only smoke per [`## test`](#test)
-  before issuing anything else.
+  agent re-runs the read-only smoke once per [`## test`](#test)
+  before issuing anything else. A second non-green result
+  stops and escalates.
 - **Cross-link instead of duplicate.** Cross-cutting
   commands (`pkg-config --modversion`, `dmesg`, network
   tooling) live in
@@ -437,7 +444,9 @@ A few rules that apply across every verb in this file:
 - The **`.proto` file is the contract.** Quote it; do not
   paraphrase RPC names from prose memory.
 - The **endpoint is an admin attack surface.** Bind on a
-  trusted segment, gate with auth + TLS, smoke before bulk.
+  trusted isolated segment behind a capable external proxy,
+  sidecar, or VPN; the binary remains plaintext. Smoke once,
+  permit one diagnostic retry, then stop if still non-green.
 - **Quote the gRPC status code, not the user's summary of
   it.** The status code is the contract; the summary is the
   user's interpretation.

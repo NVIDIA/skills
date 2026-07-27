@@ -54,22 +54,21 @@ Two cross-cutting rules that apply to *every* pattern above:
   [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
   Inferring them from generic Kubernetes / upstream `kubelet`
   prose is the most common hallucination failure for this skill.
-- **The runtime is uniform across services; the per-service
-  overlay is the variable.** The six in-bundle DOCA services
-  (Argus, DMS, Firefly, Flow-Inspector, OS-Inspector, UROM
-  service) all use this same kubelet-standalone + pod-spec-drop
+- **The runtime is uniform across supported services; the
+  per-service overlay is the variable.** The four supported
+  overlays (Argus, DMS, Firefly, UROM service) use this same
+  kubelet-standalone + pod-spec-drop
   pattern. What changes per service is the config-file mount, the
   image string, the per-service preconditions (PTP-aware path
-  for Firefly, paired host↔DPU workload for UROM service, mirror
-  source configuration for Flow-Inspector, gNMI endpoint exposure
-  for DMS, host-OS introspection target for OS-Inspector,
-  policy-set pinning for Argus), the "healthy" definition (PHC
-  offset + ports state for Firefly, mirrored-flow ingest for
-  Flow-Inspector, gNMI session up for DMS, per-target sample for
-  OS-Inspector, event-stream output for Argus, per-operation
+  for Firefly, paired host↔DPU workload for UROM service, gNMI
+  endpoint exposure for DMS, policy-set pinning for Argus), the
+  "healthy" definition (PHC offset + ports state for Firefly,
+  gNMI session up for DMS, event-stream output for Argus, per-operation
   counter for UROM service), and the paired-workload contract.
   The agent's job is to walk the shared runtime here, then route
-  to the per-service skill for the overlay.
+  to the per-service skill for the overlay. Flow-Inspector and
+  OS-Inspector are policy-excluded; route those requests through
+  [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
 
 ## Capabilities and modes
 
@@ -107,7 +106,7 @@ configuration documentation reached through
 | DOCA install on the BlueField Arm | DOCA installed and healthy on the BlueField Arm side. Without this, kubelet's documented runtime hooks and the DOCA Container Deployment Guide's documented mount paths do not exist | [`doca-setup ## test`](../doca-setup/TASKS.md#test) (install verification) and the *no-install* path at [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install) when there is no install yet |
 | Container runtime + kubelet standalone | Both ship with the BlueField OS image per the public DOCA Container Deployment Guide. The operator confirms `kubelet` is running and that the static-pod manifests directory exists; the operator does NOT install upstream Kubernetes from scratch | Public DOCA Container Deployment Guide |
 | BFB version compatible with the service's container tag | The BlueField OS image (the BFB) ships a kubelet + container runtime version pair that the public Container Deployment Guide for the operator's DOCA release certifies. A BFB on a different release line can fail to run a service container even when the host DOCA install looks healthy | Public DOCA Container Deployment Guide + the per-service guide for the operator's DOCA release |
-| Per-service firmware slot (when the service emulates a host-facing PCIe device) | Some externally-productized NVIDIA services (notably SNAP and Virtio-net, both out of scope for this bundle per the strict-to-DOCA invariant) stand up emulated PCIe devices via the BlueField firmware emulation slots; the matching slot must be enabled BEFORE the pod is scheduled, and a BlueField reset is typically required after the slot is flipped. **None of the six DOCA services in this bundle (Argus, DMS, Firefly, Flow-Inspector, OS-Inspector, UROM service) emulate a host-facing PCIe device**, so this precondition does NOT apply to any in-bundle service. The precondition is documented here only because an operator who reads this skill while deploying an external NVIDIA service needs to know the pattern exists; the operator's source of truth in that case is the public NVIDIA docs at `docs.nvidia.com/doca/sdk/` | The public NVIDIA docs at `docs.nvidia.com/doca/sdk/` for the external service plus [`doca-setup ## configure`](../doca-setup/TASKS.md#configure) for the firmware-tool workflow itself |
+| Per-service firmware slot (when the service emulates a host-facing PCIe device) | Some externally-productized NVIDIA services (notably SNAP and Virtio-net, both out of scope for this bundle per the strict-to-DOCA invariant) stand up emulated PCIe devices via the BlueField firmware emulation slots; the matching slot must be enabled BEFORE the pod is scheduled, and a BlueField reset is typically required after the slot is flipped. **None of the four supported service overlays (Argus, DMS, Firefly, UROM service) emulate a host-facing PCIe device**, so this precondition does NOT apply to them. The precondition is documented here only because an operator who reads this skill while deploying an external NVIDIA service needs to know the pattern exists; the operator's source of truth in that case is the public NVIDIA docs at `docs.nvidia.com/doca/sdk/` | The public NVIDIA docs at `docs.nvidia.com/doca/sdk/` for the external service plus [`doca-setup ## configure`](../doca-setup/TASKS.md#configure) for the firmware-tool workflow itself |
 | Image-pull reachability to NGC | The BlueField needs network reach to the NGC catalog (`nvcr.io`) so the container runtime can pull the service's image at the documented tag. A BlueField that can ping the world but cannot reach `nvcr.io` (corporate proxy, firewall, air-gap) will pass every other precondition and still fail to deploy | The container runtime's image-pull log surface + the operator's network team |
 | Host-OS permissions on the BlueField | The operator needs the permissions the public Container Deployment Guide names to write into the static-pod manifests directory, read kubelet's log surface, and inspect the container runtime. The permission boundary lives at the BlueField OS, not inside any DOCA service | The BlueField OS plus the public Container Deployment Guide |
 
@@ -173,8 +172,8 @@ there; this skill does not duplicate it.
   middle of debugging.
 - **The container tag is the per-service runtime anchor, NOT
   `pkg-config --modversion` on the host.** Same overlay every
-  per-service skill in the bundle (Argus / DMS / Firefly /
-  Flow-Inspector / OS-Inspector / UROM service) carries. When the
+  supported per-service skill in the bundle (Argus / DMS /
+  Firefly / UROM service) carries. When the
   operator reports a service-container behavior, the relevant
   version anchor is the container tag pulled, not
   `pkg-config --modversion doca-common` on the host. Quote both
@@ -275,7 +274,7 @@ them wastes debug time and blames the wrong layer.
    probe times out; an external client cannot connect to the
    service's documented port; the container's outbound to a
    paired endpoint (NGC for image pull, upstream PTP master for
-   Firefly, gNMI client for DMS, mirror source for Flow-Inspector)
+   Firefly, gNMI client for DMS)
    times out. Causes: the pod-spec `hostNetwork` / port mapping
    does not match what the per-service guide expects; a host
    firewall on the BlueField blocks the port; a network policy
@@ -349,8 +348,7 @@ three agree.
   liveness signal that proves the service inside the container
   is actually serving its purpose — Argus's event-stream output,
   DMS's gNMI session-up + per-RPC counter, Firefly's PHC offset
-  + ports state, Flow-Inspector's mirrored-flow ingest,
-  OS-Inspector's per-target sample, UROM service's per-operation
+  + ports state, or UROM service's per-operation
   counter, and so on. This layer is the one the agent uses as
   the end-to-end "healthy" oracle; "pod is `Running`" alone is
   NOT the same as "the service inside is ready". Route to the
@@ -386,9 +384,8 @@ cross-cutting rules below apply across every service.
   (c) the per-service liveness signal (per the matching per-
   service skill) is healthy. Only then is the BlueField ready
   for the per-service workload (PTP-locked workload for Firefly,
-  gNMI traffic for DMS, mirror-source traffic for Flow-Inspector,
-  introspection targets for OS-Inspector, paired UROM workload
-  for UROM service, policy-driven monitoring for Argus).
+  gNMI traffic for DMS, paired UROM workload for UROM service,
+  or policy-driven monitoring for Argus).
   Skipping the smoke and going straight to bulk workload is the
   most common reason "kubelet says the pod is up but my workload
   still fails".
@@ -399,8 +396,8 @@ cross-cutting rules below apply across every service.
   default for a recurring failure. A pod in `CrashLoopBackOff`
   burns BlueField CPU / memory, fills the container runtime's
   log surface, and obscures the underlying error. The agent's
-  rule: a pod that has crashed more than the documented
-  threshold (or twice in a row with the same exit signature) is
+  rule: a pod that has crashed twice in a row with the same exit
+  signature is
   no longer evidence the deployment can self-heal; STOP the
   retry loop, read the container's last full ENTRYPOINT log,
   walk the error taxonomy from layer 1, and only re-enable
@@ -428,16 +425,20 @@ cross-cutting rules below apply across every service.
 - **Edit-in-place is documented; treat it as a deploy event.**
   When the operator edits a pod-spec file in place (rather than
   removing-and-re-adding), kubelet's documented behavior is to
-  reconcile. Treat every edit as a deploy event for safety:
+  reconcile. Live-manifest mutation smoke is limited to
+  targets with no active paired workloads and a confirmed
+  maintenance window. The operator must explicitly approve the
+  destructive smoke after a pre-mutation snapshot is saved and a
+  tested rollback is verified; if any gate is unmet, skip it.
+  Treat every approved edit as a deploy event for safety:
   re-walk the smoke after every edit. A config change followed
   by "it probably still works" is exactly the failure mode the
   smoke replaces.
 - **The per-service skill owns the per-service safety overlay.**
   Firefly's PTP-aware-path-required rule, DMS's
   gNMI-credential rotation rule, UROM service's paired-
-  workload-restart-order rule, Argus's policy-rollback rule,
-  Flow-Inspector's mirror-source-quiesce rule, OS-Inspector's
-  host-OS-permission-boundary rule, and similar per-service
+  workload-restart-order rule, Argus's policy-rollback rule, and
+  similar per-service
   safety rules are owned by the matching per-service skill, not
   by this one. The agent reads the per-service skill in parallel
   and applies both layers; this skill names the cross-cutting

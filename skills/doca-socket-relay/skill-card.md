@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when the operator is driving the DOCA Socket Relay to bridge a socket-oriented host application onto a BlueField DPU peer without rewriting it — picking the deployment shape, configuring the host-side socket and DPU-side forwarding endpoint, walking the bind-connect-round-trip-admit-fleet smoke, or diagnosing a stuck/silent relay. <br>
+Guides an AI agent through deploying the DOCA Socket Relay to bridge a socket-oriented host application onto a BlueField DPU peer without rewriting it — covering deployment-shape selection, host-side socket and DPU-side forwarding-endpoint configuration, the bind-connect-roundtrip-admit-fleet smoke workflow, and layered diagnosis of stuck or silent relays. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers, platform operators, and AI agents who need to bridge a socket-oriented host application onto a BlueField DPU without rewriting the application against the DOCA programming surface — covering deployment-shape selection, relay configuration, smoke-testing, and diagnosis of relay failures. <br>
+External operators, application owners, and AI agents who need to bridge a socket-oriented host application onto a BlueField DPU without rewriting the application against the DOCA programming surface — picking the relay deployment shape, configuring the socket and forwarding endpoint, running the smoke workflow, and diagnosing relay failures. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -38,13 +38,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 internal evaluation tasks using the NVSkills-Eval external profile in the astra-sandbox environment. <br>
+Evaluated against 4 internal skill tasks (3 positive activation, 1 negative activation). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,21 +61,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+71%) | 98% (+43%) |
-| Discoverability | 4 | 100% (+69%) | 96% (+49%) |
-| Effectiveness | 4 | 91% (+76%) | 94% (+54%) |
-| Efficiency | 4 | 92% (+48%) | 92% (+36%) |
+| Correctness | 4 | 100% (+50%) | 100% (+20%) |
+| Discoverability | 4 | 100% (+25%) | 95% (+34%) |
+| Effectiveness | 4 | 81% (+62%) | 92% (+52%) |
+| Efficiency | 4 | 94% (+33%) | 93% (+55%) |
 
 ## Skill Version(s): <br>
-ff51db6 (source: git SHA, committed 2026-07-15) <br>
+18a69be (source: git SHA, committed 2026-07-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

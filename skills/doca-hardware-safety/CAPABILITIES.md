@@ -147,9 +147,11 @@ The replica's hardware class must match production on:
 - The set of representors / VFs / SFs that the change touches.
 
 Differences against production along any of those axes mean the
-replica is *not* a representative test of the change; the agent
-surfaces the difference and treats the replica result as advisory
-rather than gating.
+replica is *not* a representative test of the change, and its result
+does not satisfy the production gate. Obtain a representative replica;
+if one cannot be obtained, refuse the production change and escalate
+through change control. Do not downgrade a mismatched result to merely
+advisory and then proceed.
 
 ## Version compatibility
 

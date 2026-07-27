@@ -1,18 +1,12 @@
 ---
 name: tilegym-improve-cutile-kernel-perf
 description: Iteratively optimize cuTile kernel performance through systematic profiling, bottleneck analysis, IR comparison, and targeted tuning. Covers tile sizes, occupancy, autotune configs, TMA, latency hints, persistent scheduling, num_ctas, flush_to_zero, and IR-level debugging. Use when asked to "optimize cutile kernel", "improve kernel perf", "tune cutile performance", "make kernel faster", or iteratively benchmark and refine a cuTile GPU kernel in the TileGym project.
-version: 2026.04.11
-environment:
-  IDE:
-  - Claude Code
-  - Cursor (Agent mode)
-  model:
-  - Opus 4.6
-requires:
-- GPU node Blackwell, Hopper and Ampere for benchmarking
 license: CC-BY-4.0 AND Apache-2.0
 metadata:
   author: "TileGym Team <TileGym@nvidia.com>"
+  version: "2026.4.11"
+  environment: "IDE: Claude Code, Cursor (Agent mode); model: Opus 4.6"
+  requires: "GPU node Blackwell, Hopper and Ampere for benchmarking"
   tags:
     - cutile
     - performance

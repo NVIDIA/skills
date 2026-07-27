@@ -28,7 +28,7 @@ specific board.
 | `doca_flow_dpa_perf` pattern | Class shape | Where the substance lives |
 | --- | --- | --- |
 | 1. Pick the right tool | DPA-vs-host path is the load-bearing decision. This tool measures the DPA-offloaded Flow update / disable path; [`doca-flow-perf`](../doca-flow-perf/SKILL.md) measures the host / DPU-CPU Flow path. Quoting a number without naming the tool that produced it is the cross-tool apples-to-oranges failure. | [`## Capabilities and modes`](#capabilities-and-modes) DPA-vs-host bullet + [TASKS.md ## configure](TASKS.md#configure) |
-| 2. Check DPA preconditions | The DPA-Provider library uses the DPA device. Hardware is gated: ConnectX-7 and above (ConnectX-8 recommended-or-later per the shipped README), BlueField-3. SFs are not supported on the DPA path. VNF Flow mode is required per the shipped README. | [`## Capabilities and modes`](#capabilities-and-modes) device-preconditions table + [TASKS.md ## configure](TASKS.md#configure) |
+| 2. Check DPA preconditions | The DPA-Provider library uses the DPA device. Hardware is gated: ConnectX-7 is the minimum supported ConnectX generation, ConnectX-8 is recommended, and BlueField-3 is supported. SFs are not supported on the DPA path. VNF Flow mode is required per the shipped README. | [`## Capabilities and modes`](#capabilities-and-modes) device-preconditions table + [TASKS.md ## configure](TASKS.md#configure) |
 | 3. Pick the active / passive device split | Two-port boards run the active device for steering + the passive device for outgoing traffic; one-port boards run active only. Picking the wrong split is a configuration error, not a measurement error. | [`## Capabilities and modes`](#capabilities-and-modes) device-split bullet + [TASKS.md ## configure](TASKS.md#configure) |
 | 4. Pick the workload-shape axes | Burst size, queue size, completion threshold, number of PSL tables, table size, number of workers, hash pipe algorithm, work policy, operation (update vs disable). Each axis is documented in the shipped README on the user's install and in the public guide; picking one set silently narrows the answer. | [`## Capabilities and modes`](#capabilities-and-modes) workload-shape table + [TASKS.md ## configure](TASKS.md#configure) |
 | 5. Smoke before bulk | Confirm a single small-operation run completes with sensible iteration stats (median ≈ max, low standard deviation, warmup applied if enabled) before kicking off a long run or a parameter sweep. | [TASKS.md ## run](TASKS.md#run) smoke flow + [TASKS.md ## test](TASKS.md#test) eval loop |
@@ -85,8 +85,8 @@ the right response is to route to host-side
 
 | Hardware class | Supported by this tool? | Notes from the shipped README |
 | --- | --- | --- |
-| ConnectX-7 | Supported, lower bound | Tool will run; ConnectX-8 is the recommended-or-later starting point per the shipped README |
-| ConnectX-8 | Supported, recommended starting point | The shipped README documents ConnectX-8 as the first generation recommended for routine use |
+| ConnectX-7 | Minimum supported | Supported lower bound; do not describe it as the recommended generation |
+| ConnectX-8 | Supported, recommended | The shipped README recommends ConnectX-8 for routine use |
 | ConnectX-9 | Supported | Single-port operation documented in the shipped README example invocations |
 | BlueField-3 | Supported | Two-port operation documented in the shipped README example invocations |
 | BlueField-2 | NOT supported | The DPA-Provider library does not run on BlueField-2; the right tool here is host-side `doca-flow-perf` |
@@ -131,20 +131,22 @@ not to this skill.
 | **Operation** | Update vs disable-enable. The two operations exercise different DPA-side paths. | A *"DPA Kops/sec for update"* number and a *"DPA Kops/sec for disable"* number are not the same number. |
 | **Burst size** | Number of update / disable WQE requests per burst. | Must be a divisor of `num_tables * table_size`; the README documents the divisibility rule. |
 | **Queue size** | Capacity of the DPA-side send queue. | Bounds the worker's outstanding-request count before it must wait for a completion. |
-| **Completion threshold** | Number of operations after which a completion is polled. | The README defaults this to `queue_size / 2`; smaller thresholds raise polling overhead, larger ones risk queue stall. |
-| **Number of PSL tables (per worker)** | Number of path-selector pipes per DPA worker. | Sizes the worker's working set; default is 1 per the shipped README. |
-| **PSL table size** | Number of entries per PSL table. | Sizes the per-pipe entry count; default is 256 per the shipped README. |
+| **Completion threshold** | Number of operations after which a completion is polled. | Read the default from the shipped README; if absent, use installed `--help`; if both are silent, stop and request an explicit value. Smaller thresholds raise polling overhead, larger ones risk queue stall. |
+| **Number of PSL tables (per worker)** | Number of path-selector pipes per DPA worker. | Sizes the worker's working set. Resolve the default through README → installed `--help` → stop and request an explicit value. |
+| **PSL table size** | Number of entries per PSL table. | Sizes the per-pipe entry count. Resolve the default through README → installed `--help` → stop and request an explicit value. |
 | **Number of workers** | Number of DPA worker threads. | Supported range is 1-8 per the shipped README. |
 | **Hash pipe algorithm** | Random vs identity per the shipped README. | The identity algo only supports update; the random algo supports update / disable / enable. |
 | **Work policy** | Sequential vs random per the shipped README. | The README notes sequential is ~4% better due to memory locality; the choice should match the workload being characterized. |
 | **Self-test** | When enabled, the tool replaces one path-selector value with a sentinel and pauses for traffic-side verification per tcpdump. | Useful for end-to-end correctness; a separate concern from the throughput measurement. |
-| **Warmup** | A short warmup round excluded from time measurements. | Disabled by default per the shipped README; enabling it surfaces a steadier number. |
+| **Warmup** | A short warmup round excluded from time measurements. | Resolve its default through README → installed `--help` → stop and request an explicit value; enabling it surfaces a steadier number. |
 | **Pipeline policy** | Entries vs resources per the shipped README. | Determines which DOCA Flow pipeline policy the tool exercises. |
 
 For exact flag names, default values, and ranges, read the
 shipped `README.md` under the tool's source on the user's
-install plus `--help` on the installed binary; do not invent
-values from prose.
+install first. When the README does not define a value, fall
+back to `--help` on the installed binary. If neither source
+defines it, stop and request an explicit operator value; do
+not invent one from prose.
 
 ## Version compatibility
 

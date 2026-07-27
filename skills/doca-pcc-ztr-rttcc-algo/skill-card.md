@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers deploying, tuning, or evaluating the DOCA-shipped ZTR RTTCC reference congestion-control algorithm on BlueField-3 DPUs carrying RoCE-v2 traffic. <br>
+External developers and engineers operating BlueField-3-class DPUs who want to deploy NVIDIA's shipped reference PCC algorithm on RoCE-v2 traffic, tune its parameters, or evaluate it against a custom algorithm they intend to write. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -28,24 +28,23 @@ Mitigation: Review and scan skill before deployment. <br>
 - [DOCA PCC Programming Guide](https://docs.nvidia.com/doca/sdk/doca-pcc/index.html) <br>
 - [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [CAPABILITIES.md](CAPABILITIES.md) <br>
-- [TASKS.md](TASKS.md) <br>
+- [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Configuration instructions, Shell commands] <br>
+**Output Type(s):** [Configuration instructions, Shell commands, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 evaluation tasks via NVSkills-Eval external profile in astra-sandbox environment. <br>
+Evaluated against 4 internal evaluation tasks (3 positive skill-activation, 1 negative activation). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,21 +61,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+49%) | 98% (+33%) |
-| Discoverability | 4 | 100% (+44%) | 93% (+44%) |
-| Effectiveness | 4 | 86% (+55%) | 89% (+46%) |
-| Efficiency | 4 | 92% (+33%) | 86% (+37%) |
+| Correctness | 4 | 100% (+65%) | 100% (+50%) |
+| Discoverability | 4 | 100% (+25%) | 91% (+31%) |
+| Effectiveness | 4 | 88% (+67%) | 92% (+69%) |
+| Efficiency | 4 | 93% (+23%) | 97% (+55%) |
 
 ## Skill Version(s): <br>
-a7eddc6 (source: git SHA, committed 2026-07-15) <br>
+7b32072 (source: git SHA, committed 2026-07-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

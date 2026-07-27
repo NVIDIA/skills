@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides agents through library-agnostic DOCA programming tasks including first-app derivation from shipped samples, the canonical pkg-config build pattern, the universal object lifecycle, cross-library error handling, and program-class debugging. <br>
+Guides agents through library-agnostic DOCA programming tasks including first-app derivation from shipped samples, the canonical pkg-config build pattern, the universal DOCA object lifecycle, cross-library error decoding, and program-class debugging. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers writing applications that consume NVIDIA DOCA libraries, using AI coding agents to scaffold first apps, resolve build issues, decode DOCA errors, and debug programs across C/C++ and FFI consumers. <br>
+Developers and engineers building applications that consume DOCA libraries, in C/C++ directly or via FFI/bindings from Rust, Go, or Python against the public C ABI. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [Not Specified] <br>
-**Credential Type(s):** [None identified] <br>  
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -34,18 +34,18 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Configuration instructions, Shell commands] <br>
-**Output Format:** [Markdown with inline code blocks] <br>
+**Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 tasks using NVSkills-Eval profile `external` in `astra-sandbox` environment with 1 attempt per task and a 50% pass threshold. <br>
+Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -62,21 +62,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+70%) | 98% (+21%) |
-| Discoverability | 4 | 100% (+75%) | 96% (+42%) |
-| Effectiveness | 4 | 81% (+50%) | 82% (+26%) |
-| Efficiency | 4 | 93% (+50%) | 92% (+40%) |
+| Correctness | 4 | 100% (+35%) | 100% (+20%) |
+| Discoverability | 4 | 100% (+25%) | 91% (+28%) |
+| Effectiveness | 4 | 100% (+82%) | 92% (+39%) |
+| Efficiency | 4 | 100% (+34%) | 100% (+62%) |
 
 ## Skill Version(s): <br>
-54742b6 (source: git SHA, committed 2026-06-25) <br>
+d33a8af (source: git SHA, committed 2026-07-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

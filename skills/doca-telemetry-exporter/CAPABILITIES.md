@@ -8,7 +8,7 @@ content; the prose around them is interpretation.
 
 Read this file when the loader sent you here from
 [SKILL.md](SKILL.md). For the *how* of executing each pattern (the
-verbs `configure / build / modify / run / test / debug`), jump to
+verbs `configure / build / modify + rebuild / run / test / debug`), jump to
 [TASKS.md](TASKS.md). For the canonical DOCA version-handling rules
 that this skill layers an exporter overlay on top of, see
 [`doca-version`](../../doca-version/SKILL.md).
@@ -24,9 +24,9 @@ the worked examples shown.
 | --- | --- | --- |
 | 1. Pick exporter, not the service | The application is the PUBLISHER of telemetry events; the receiving / aggregating side is a separate DOCA service out of this skill's scope | [`## Capabilities and modes`](#capabilities-and-modes) role-split table |
 | 2. Decide the exporter is the right tool | The need is structured event / counter / gauge publishing INTO the DOCA telemetry ecosystem; it is NOT plain stdout logging, NOT a non-DOCA Prometheus-style scrape, NOT a real-time event subscription back into the app | [`## Capabilities and modes`](#capabilities-and-modes) path-selection bullet |
-| 3. Register the schema BEFORE the first emit | Every event the exporter publishes is shaped by a `doca_telemetry_exporter_schema` the app registers in advance; emitting before registration returns `BAD_STATE` / `NOT_FOUND` | [`## Capabilities and modes`](#capabilities-and-modes) object table + [TASKS.md ## configure](TASKS.md#configure) step 4 |
+| 3. Register the schema BEFORE the first emit | Every event the exporter publishes is shaped by a `doca_telemetry_exporter_schema` the app registers in advance; emitting before registration returns `BAD_STATE` / `NOT_FOUND` | [`## Capabilities and modes`](#capabilities-and-modes) object table + [TASKS.md ## configure](TASKS.md#configure) step 5 |
 | 4. Stand up the source + schema + lifecycle | DOCA Core lifecycle: create exporter context → register one or more `_schema` → create one or more `_source` → start → emit events → stop → destroy | [`## Capabilities and modes`](#capabilities-and-modes) object table + [TASKS.md ## configure](TASKS.md#configure) |
-| 5. Discover capabilities before assuming limits | `doca_telemetry_exporter_*_get_*` family for max schema fields, max event size, supported event types — call BEFORE assuming a particular shape fits this install | [`## Capabilities and modes`](#capabilities-and-modes) capability-query rule + [TASKS.md ## configure](TASKS.md#configure) step 3 |
+| 5. Discover capabilities before assuming limits | `doca_telemetry_exporter_*_get_*` family for max schema fields, max event size, supported event types — call BEFORE assuming a particular shape fits this install | [`## Capabilities and modes`](#capabilities-and-modes) capability-query rule + [TASKS.md ## configure](TASKS.md#configure) step 4 |
 | 6. Diagnose an exporter error | Map symptom (`BAD_STATE`, `INVALID_VALUE`, `AGAIN`, `NOT_PERMITTED`, `NOT_FOUND`, `DRIVER`) to root cause; in particular recognise `AGAIN` as a *transport-full, drop-or-buffer-bounded, never-block* signal, not a sleep-and-retry signal | [`## Error taxonomy`](#error-taxonomy) + [TASKS.md ## debug](TASKS.md#debug) |
 
 Two cross-cutting rules that apply to *every* pattern above:

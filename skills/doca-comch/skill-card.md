@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when the user is doing hands-on DOCA Comch work on a host + BlueField pair — bringing up host-to-DPU PCIe control-plane messaging, picking server vs client roles, choosing slow-path or fast-path data transfer, querying capabilities, registering connection callbacks, or debugging DOCA_ERROR returns from the Comch API. <br>
+Guides developers through hands-on DOCA Comch work on a host + BlueField pair, covering PCIe control-plane messaging setup, server/client role selection, slow-path and fast-path data transfer, capability queries, connection callbacks, and DOCA_ERROR debugging. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers building applications that consume the DOCA Comch library to exchange control or data messages between a host process and a BlueField agent over PCIe. <br>
+Developers and engineers building applications that consume the DOCA Comch C library to exchange control or data messages between a host process and a BlueField DPU agent over PCIe. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Not Specified] <br>
-**Credential Type(s):** [None identified] <br>
+**Requires API Key or External Credential:** [No] <br>
+**Credential Type(s):** [None] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,26 +25,26 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
 - [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Configuration instructions, Shell commands] <br>
-**Output Format:** [Markdown with inline code blocks] <br>
+**Output Type(s):** [Configuration instructions, Code, Shell commands, Analysis] <br>
+**Output Format:** [Markdown with inline C code blocks and bash commands] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 internal evaluation tasks using the NVSkills-Eval external profile in the astra-sandbox environment. <br>
+Evaluated against 4 internal evaluation tasks (3 positive skill-activation, 1 negative) using the Skill Evaluator external profile in a k8s-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,21 +61,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+60%) | 98% (+34%) |
-| Discoverability | 4 | 100% (+75%) | 98% (+37%) |
-| Effectiveness | 4 | 86% (+50%) | 92% (+55%) |
-| Efficiency | 4 | 93% (+48%) | 94% (+28%) |
+| Correctness | 4 | 95% (+10%) | 100% (+15%) |
+| Discoverability | 4 | 100% (+26%) | 95% (+33%) |
+| Effectiveness | 4 | 88% (+34%) | 95% (+24%) |
+| Efficiency | 4 | 97% (+41%) | 92% (+67%) |
 
 ## Skill Version(s): <br>
-c82da23 (source: git SHA, committed 2026-07-14) <br>
+d53d861 (source: git SHA, committed 2026-07-23) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

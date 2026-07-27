@@ -39,13 +39,15 @@ container-tag bump vs downgrade/rollback modes, the never-auto rule,
 the confirmation gate, the sunset-awareness concern, the error
 taxonomy, and the upgrade-specific safety overlay).
 
-**The single most important rule this skill exists to enforce:**
-**detect → report → ASK → only-then guided upgrade. Never upgrade
-automatically.** The skill detects the installed DOCA env and what
-newer release is available, reports the gap clearly, then STOPS and
-asks the user for explicit confirmation. Only on an explicit "yes"
-does it walk a guided upgrade — and every hardware / firmware /
-reboot step is delegated to
+**For a planned move, the single most important rule this skill
+exists to enforce is detect → report → ASK → only-then guided
+upgrade. Never upgrade automatically.** The skill detects the
+installed DOCA env and what newer release is available, reports the
+gap clearly, then STOPS and asks the user for explicit confirmation.
+Only on an explicit "yes" does it walk a guided upgrade. A failed or
+partial move instead enters the recovery ladder without presenting a
+new target move. In both paths every hardware / firmware / reboot
+step is delegated to
 [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md), never
 redefined here. Version detection itself is owned by
 [`doca-version`](../doca-version/SKILL.md); this skill routes there
@@ -113,9 +115,12 @@ exists, whether to move to it, how to move safely, or how to recover
 a move that went wrong. The decision must be made **before** the
 agent composes its first sentence; the activation checklist below is
 mirrored here so the activation rule is at hand whenever this skill
-is consulted. The skill's contract is unconditional: it reports the
-gap and then STOPS for explicit user confirmation; it never issues an
-upgrade command on the user's behalf without that confirmation.
+is consulted. For a planned upgrade or downgrade, it reports the gap
+and then STOPS for explicit user confirmation. For a failed or partial
+upgrade, it enters [`TASKS.md ## debug`](TASKS.md#debug) first to
+capture and stabilize the current state; it never uses another
+upgrade command as the first recovery action, retries the move, or
+issues a new upgrade command without explicit confirmation.
 
 ## Agent activation checklist — load this skill at the START of the answer when any cell below is true
 
@@ -127,12 +132,23 @@ upgrade command on the user's behalf without that confirmation.
 | Container tag bump | the user wants to move an NGC DOCA container deployment from one tag to a newer one, or asks whether bumping the tag is an upgrade |
 | Sunset / deprecation awareness | the user asks whether the component they depend on is deprecated, being sunset, or worth continued investment |
 
-When any cell above fires, the agent MUST:
+First classify the request. A **planned move** (including a requested
+rollback) follows detect → report → ASK. A **failed, partial, or
+accidentally drifted move** is already a diagnosis/recovery request:
+load this skill, capture the current four-source state, and enter
+`TASKS.md ## debug`; do not ask for permission to perform an upgrade
+that has already failed, and do not issue another upgrade command as
+the first recovery action.
 
-1. Route version detection to
-   [`doca-version ## configure`](../doca-version/TASKS.md#configure)
-   — do NOT restate the four-source detection chain here; this skill
-   consumes the detected version and the four-way match status.
+For a planned move, the agent MUST:
+
+1. Route planned-upgrade version detection to
+   [`doca-version ## configure`](../doca-version/TASKS.md#configure).
+   For failed or partial upgrades, start with
+   [`doca-version ## debug`](../doca-version/TASKS.md#debug) and
+   [`TASKS.md ## debug`](TASKS.md#debug). Do NOT restate the
+   four-source detection chain here; this skill consumes the detected
+   state and four-way match status.
 2. **Report the gap and STOP for explicit confirmation.** Present
    the installed release, the available target release, and what
    moving costs (per
@@ -143,6 +159,15 @@ When any cell above fires, the agent MUST:
    [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md). This
    skill names *when* such a step is part of the upgrade; that skill
    names *how* it is applied safely.
+
+For a failed/partial move, the agent MUST instead classify the
+captured state against
+[`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy),
+delegate the single documented corrective action, and re-enter the
+recovery ladder. Any unsupported `installed → target` jump fails
+closed: do not improvise intermediate releases or commands; require
+an upgrade path explicitly documented by the Compatibility Policy or
+release notes.
 
 Do **not** load this skill for first-time install (use
 [`doca-setup`](../doca-setup/SKILL.md)), for the version-detection

@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when the user is invoking the DOCA PCC Counters tool — the `pcc_counters.sh` bash script under the DOCA tools directory — to arm and read the fixed firmware/hardware PCC (Programmable Congestion Control) diagnostic counters (CNP, RTT, WRED-drop, etc.) on a ConnectX / BlueField device via mst + the mlx5 debugfs `diag_cnt` interface. <br>
+Guides an AI agent through arming and reading the fixed firmware/hardware PCC (Programmable Congestion Control) diagnostic counters (CNP, RTT, WRED-drop, etc.) on a ConnectX or BlueField device via the pcc_counters.sh bash script and the mlx5 debugfs diag_cnt interface. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers, network operators, and AI agents who need to arm and read firmware/hardware PCC diagnostic counters on ConnectX / BlueField devices to observe congestion-control behavior (CNP generation, RTT requests/responses, WRED drops) on a port. <br>
+Operators, developers, and AI agents who need to read a ConnectX or BlueField device's firmware PCC diagnostic counters to reason about congestion-control behaviour (CNP generation, RTT requests/responses, WRED drops) on a port. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,24 +25,26 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
+- [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 evaluation tasks in the `astra-sandbox` environment using the NVSkills-Eval `external` profile with 1 attempt per task. <br>
+Evaluated against 4 internal evaluation tasks (3 positive skill-activation, 1 negative activation). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -59,21 +61,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+69%) | 98% (+48%) |
-| Discoverability | 4 | 100% (+69%) | 98% (+52%) |
-| Effectiveness | 4 | 100% (+79%) | 95% (+59%) |
-| Efficiency | 4 | 93% (+49%) | 94% (+38%) |
+| Correctness | 4 | 100% (+65%) | 100% (+30%) |
+| Discoverability | 4 | 100% (+25%) | 95% (+33%) |
+| Effectiveness | 4 | 100% (+76%) | 88% (+55%) |
+| Efficiency | 4 | 91% (+36%) | 100% (+62%) |
 
 ## Skill Version(s): <br>
-ff51db6 (source: git SHA, committed 2026-07-15) <br>
+18a69be (source: git SHA, committed 2026-07-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

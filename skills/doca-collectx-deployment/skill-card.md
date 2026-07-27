@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External operators and engineers deploying, operating, and debugging CollectX-based telemetry collectors on NVIDIA BlueField DPUs or hosts to wire providers/counters and shape exporters for downstream observability consumers. <br>
+External operators and engineers deploying, wiring, and debugging a CollectX-based telemetry collector and its exporters on a host or BlueField they administer. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [Not Specified] <br>
-**Credential Type(s):** [None identified] <br>  
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,10 +25,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Reference detail (examples, non-goals, related skills)](references/details.md) <br>
+- [details.md](references/details.md) <br>
 - [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
 
 
 ## Skill Output: <br>
@@ -38,13 +37,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 evaluation tasks in the NVSkills-Eval `external` profile using the `astra-sandbox` environment. <br>
+Evaluated against 2 evaluation tasks (1 positive activation, 1 negative activation) in k8s-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,21 +60,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+75%) | 98% (+25%) |
-| Discoverability | 2 | 100% (+50%) | 86% (+5%) |
-| Effectiveness | 2 | 91% (+78%) | 95% (+48%) |
-| Efficiency | 2 | 94% (+36%) | 74% (-3%) |
+| Correctness | 2 | 100% (+80%) | 100% (+50%) |
+| Discoverability | 2 | 100% (+25%) | 97% (+47%) |
+| Effectiveness | 2 | 100% (+29%) | 84% (+38%) |
+| Efficiency | 2 | 94% (+19%) | 69% (+19%) |
 
 ## Skill Version(s): <br>
-ccd0863 (source: git SHA, committed 2026-06-25) <br>
+ffe362c (source: git SHA, committed 2026-07-25) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

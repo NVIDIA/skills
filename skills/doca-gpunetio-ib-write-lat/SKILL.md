@@ -25,7 +25,8 @@ compatibility: >
   Toolkit and `nvidia_peermem` loaded; client and server hosts
   each need a GPU-NIC pair on a common PCIe / NVLink fabric.
   Reads pkg-config doca-gpunetio / doca-rdma / doca-common and
-  inspects /opt/mellanox/doca/tools/gpunetio_ib_write_lat.
+  builds from the source tree at
+  /opt/mellanox/doca/tools/gpunetio_ib_write_lat against the installed DOCA.
 ---
 
 # DOCA GPUNetIO ib_write_lat

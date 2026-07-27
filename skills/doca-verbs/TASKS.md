@@ -57,11 +57,13 @@ raw-verbs work:
    plus the adjacent `doca_verbs_*.h` family) per the
    headers-win-over-docs rule in
    [`doca-version`](../../doca-version/SKILL.md).
-4. **The RDMA stack is loaded on the host** — `ibv_devinfo` (with
-   sudo) returns at least one device row with `state: PORT_ACTIVE`.
-   Same precondition as
-   [`doca-rdma`](../doca-rdma/SKILL.md); without an RDMA-capable
-   port, the verbs surface has nothing to operate on.
+4. **The selected workload has a usable device.** For RDMA-class
+   QP workloads, `ibv_devinfo` (with sudo) returns at least one
+   device row with `state: PORT_ACTIVE`, the same precondition as
+   [`doca-rdma`](../doca-rdma/SKILL.md). For Ethernet-SQ/RQ
+   workloads, `doca_caps --list-devs` returns the selected
+   Ethernet-capable `doca_dev`; its exact queue feature is then
+   gated by the device-level query in `## configure` step 5.
 
 If any of the four checks fails, **stop** — this skill's workflows
 assume the install is healthy, and a partial install is a
@@ -154,7 +156,9 @@ Steps the agent should walk the user through:
    apply the verbs-specific setters in the order the headers
    require. The high-level shape is:
    `doca_verbs_context_create(dev, &ctx)` → `doca_verbs_pd_create(ctx, &pd)`
-   → CQ init-attr / create → QP init-attr / create →
+   → if selected, `doca_verbs_comp_channel_create(ctx, &chan)` and
+   `doca_verbs_cq_attr_set_comp_channel` on the CQ attributes →
+   CQ init-attr / create → QP init-attr / create →
    `doca_pe_connect_ctx(pe, ctx_as_doca_ctx)` BEFORE
    `doca_ctx_start` → drive the QP state machine via
    `doca_verbs_qp_modify(qp, qp_attr)` through the transitions
@@ -388,16 +392,25 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 
 | Iteration trigger | What it looks like | What changes next iteration |
 | --- | --- | --- |
-| `DOCA_ERROR_NOT_SUPPORTED` on the verb / attribute / option we expected to work | A `doca_verbs_device_attr_get_*` returned true at configure time, but the runtime rejects the WR or the modify call | The cap-query was at the *library* level; the *device* capability per `doca_devinfo` is the real gate. Re-narrow to the device-level query (the same `doca_verbs_query_device` → `_get_*` chain), and consider whether the higher-level library exposes a viable alternative |
+| `DOCA_ERROR_NOT_SUPPORTED` on the verb / attribute / option we expected to work | A `doca_verbs_device_attr_get_*` returned true at configure time, but the runtime rejects the WR or the modify call | Re-run the same `doca_verbs_query_device` + matching `doca_verbs_device_attr_get_*` against the active selected `doca_devinfo`; verify that the queried attribute, selected device, and requested runtime configuration still match. If support is absent, climb back up or update the environment |
 | `DOCA_ERROR_IO_FAILED` on the WR | Submit returned `DOCA_SUCCESS`; completion arrives with error status | Stop reading the submit return; read the CQE error field. The cross-cutting taxonomy ladder in [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug) takes over from the CQE error |
 | Submit succeeded but no completion at all | One of: the PE is not progressed, the `doca_verbs_bridge_poll_cq` loop is missing, the comp-channel is not armed (`doca_verbs_req_notify_cq` not called) or its handle is not `epoll`'d, or the peer disconnected silently | Map to the path picked in [CAPABILITIES.md ## Observability](CAPABILITIES.md#observability); only ONE of PE / manual / comp-channel should be active on this CQ |
 | Intermittent `DOCA_ERROR_BAD_STATE` on `doca_verbs_qp_modify` / WR submit | QP state transitions misordered | Re-walk the verbs object lifecycle from [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes); raw verbs exposes the QP state machine directly via `doca_verbs_qp_modify` + `_set_current_state` / `_set_next_state`, and the agent must confirm each transition's precondition |
 | Same code that worked yesterday now fails with `NOT_PERMITTED` | RDMA stack module loads / user group / ulimits regressed | Route to [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug); this is an env regression, not a verbs code change |
 | The user's case turned out to be covered by the higher-level library after all | The drop-down was unnecessary; the smoke surfaced a higher-level alternative | This is a successful outcome of the loop. Climb back up to [`doca-rdma`](../doca-rdma/SKILL.md) / [`doca-eth`](../doca-eth/SKILL.md) / [`doca-rmax`](../doca-rmax/SKILL.md) and retire the raw-verbs path |
 
-Loop termination: stop iterating once two consecutive iterations
-of the same kind don't change anything — that means the cause is
-below `doca-verbs`. Escalate to
+Loop terms are exact: an iteration's **kind** is the `Iteration
+trigger` row selected above; its **prescribed change** is that row's
+`What changes next iteration` action; and its **evidence** is the
+cap-query, QP state, submit result, and selected completion-path
+capture taken before and after that change. The outcome is
+**resolved** when the named smoke turns green, **shape-changed** when
+the re-run selects a different trigger row or materially changes
+that evidence, and **unchanged** when the prescribed change was
+applied but the re-run selects the same trigger row with the same
+outcome and materially unchanged evidence. The baseline occurrence
+and that post-change re-run are the two consecutive iterations; on
+`unchanged`, stop and escalate to
 [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug) with the
 captured layer-1-through-5 evidence.
 
@@ -447,10 +460,10 @@ raw-verbs-specific manifestation at layers 5 (runtime) and 6
   case in verbs context is destroying an MR or PD before the QP
   that referenced it, or destroying the `doca_verbs_context`
   before the per-object handles it owned.
-- Cap-query mismatches: the program assumed a verb / opcode / WR
-  flag / QP attribute is supported because the *library*
-  cap-query returned true, but the per-`doca_devinfo` cap-query
-  for the live device returns false. Re-run per
+- Cap-query mismatches: the program's selected device, queried
+  attribute, or requested runtime configuration does not match
+  the device-level capability snapshot. Re-run the query against
+  the active `doca_devinfo` per
   [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes)
   cap-query rule.
 - **Climb-back-up check.** Before exhausting a layer-6 debug
@@ -500,23 +513,24 @@ walked in [`doca-common TASKS.md ## use`](../doca-common/TASKS.md#use):
 2. **`doca_verbs_pd_create(ctx, &pd)`** — create the protection
    domain. Every QP / MR / AH attached to this verbs context
    lives inside this PD.
-3. **Create the CQ(s).** Build a `doca_verbs_cq_attr` via the
+3. **(Optional) Create the completion channel.** If the user
+   picked the comp-channel completion path (per
+   [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability)),
+   call `doca_verbs_comp_channel_create(ctx, &chan)`. The channel
+   must exist before the CQ that will use it.
+4. **Create the CQ(s).** Build a `doca_verbs_cq_attr` via the
    `doca_verbs_cq_attr_create` + `_set_*` family (size, overrun,
-   collapsed, entry size, completion channel if using the
-   comp-channel path), then `doca_verbs_cq_create(ctx, cq_attr,
+   collapsed, entry size). For the comp-channel path, attach the
+   already-created channel with
+   `doca_verbs_cq_attr_set_comp_channel` BEFORE
+   `doca_verbs_cq_create(ctx, cq_attr,
    &cq)`. One CQ per send / receive direction is the common case;
    shared send-and-receive CQs are valid when the user has named
    that as the shape.
-4. **(Optional) Create the SRQ(s).** Build a
+5. **(Optional) Create the SRQ(s).** Build a
    `doca_verbs_srq_init_attr` via the `doca_verbs_srq_init_attr_create`
    + `_set_*` family, then `doca_verbs_srq_create(ctx, init_attr,
    &srq)`. Use when multiple QPs share a receive queue.
-5. **(Optional) Create the completion channel.** If the user
-   picked the comp-channel completion path (per
-   [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability)),
-   call `doca_verbs_comp_channel_create(ctx, &chan)` and attach
-   it to the CQ via `doca_verbs_cq_attr_set_comp_channel` BEFORE
-   the CQ create.
 6. **(Optional) Create the CC group.** If the user is attaching
    a congestion-control group, build a
    `doca_verbs_cc_group_attr` via `doca_verbs_cc_group_attr_create`
@@ -580,11 +594,14 @@ walked in [`doca-common TASKS.md ## use`](../doca-common/TASKS.md#use):
     destroying a parent (PD, context) before its children (QP,
     CQ) is `DOCA_ERROR_BAD_STATE`.
 
-The agent's rule: **the order is the contract.** Misordering any
-of steps 1–10 returns `DOCA_ERROR_BAD_STATE`; misordering steps
-14 destroy-targets does the same. The cost of getting the order
-right once is much lower than the cost of debugging a misordered
-destroy in production.
+The agent's rule: **the order of the selected objects is the
+contract.** Optional steps 3, 5, and 6 impose ordering only when
+their objects are used: a completion channel precedes its CQ, and
+an SRQ or CC group precedes the QP configuration that references
+it. Violating a selected object's API preconditions can return
+`DOCA_ERROR_BAD_STATE`; misordering step 14 destroy-targets can do
+the same. The cost of getting the order right once is much lower
+than the cost of debugging a misordered destroy in production.
 
 ## Deferred task verbs
 

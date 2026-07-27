@@ -138,7 +138,7 @@ order:
 1. **Script-not-present.** `pcc_counters.sh` is not under the
    DOCA tools directory. Cause: DOCA / MFT not installed, or an
    internal-tool build that did not install it. Routing:
-   [`doca-setup ## install`](../../doca-setup/TASKS.md#configure).
+  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure).
 2. **Bad-device.** The script prints `ERROR: Bad Device`.
    Cause: the mst device path does not match an entry in
    `sudo mst status -v` (wrong path, mst service not started,
@@ -154,7 +154,10 @@ order:
    stale / zero because `set` was never run for this device
    (or the device's `diag_cnt` was reconfigured by something
    else). Fix: run `set` first, then `query`, per the script's
-   documented order.
+   documented order, once. If the same condition recurs after that single
+   recovery, stop; preserve both captures and escalate to layer 7 to identify
+   the external process reconfiguring `diag_cnt`. Do not repeat privileged
+   arm/read cycles.
 5. **Debugfs-or-permission.** The script cannot read/write
    `/sys/kernel/debug/mlx5/<pci>/diag_cnt/`. Cause: not running
    as root / sudo, debugfs not mounted, or the mlx5 driver does
@@ -207,8 +210,14 @@ might derive from a reading are high-stakes.
 - **`set` is a privileged debugfs write.** It reprograms the
   device's diagnostic counter selection. It does not change
   congestion-control behaviour, but it is a root-level write
-  to a kernel debug interface — run it deliberately, on the
-  intended device, not speculatively across devices.
+  to a kernel debug interface. Before running it, show the exact resolved mst
+  device and PCI BDF, explain that it reprograms diagnostic-counter selection,
+  and obtain the operator's explicit confirmation. Run it on that one intended
+  device, never speculatively across devices.
+- **The script does not mount debugfs or start mst.** Those are separate
+  host-state changes. If either prerequisite is absent, stop and route the
+  remediation through `doca-setup`; do not perform it implicitly as part of a
+  counter read.
 - **The reading is evidence; the tuning decision it informs is
   high-stakes.** A misread counter that drives a
   congestion-control parameter change can destabilize the

@@ -34,9 +34,18 @@ Steps the agent should walk the user through:
    If present, run `doca-env --json` and read `version.consistent`
    — one line, four-way match pre-computed. Report *"using
    structured `doca-env`"* per the contract's report rule.
+   If the command fails, emits invalid JSON, or omits
+   `version.consistent`, record the helper failure and fall back to
+   the manual chain; do not infer coherence from partial output.
 2. **If structured helper absent, walk the manual chain.** In
    order: `pkg-config --modversion doca-common`, `cat
    /opt/mellanox/doca/applications/VERSION`, `doca_caps --version`.
+   Before the runtime leg, resolve the installed binary without
+   assuming it is on `PATH`:
+   `DOCA_CAPS="$(command -v doca_caps || true)"; test -n "$DOCA_CAPS" || DOCA_CAPS=/opt/mellanox/doca/tools/doca_caps; test -x "$DOCA_CAPS"`.
+   Stop and report the missing runtime source if that final test
+   fails; otherwise invoke `"$DOCA_CAPS" --version`. This is the
+   chain's `doca_caps --version` leg.
    On BlueField hosts also: `bfver` (BlueField Arm console, or on the host against a standalone BFB file) and `cat /etc/mlnx-release` (BlueField Arm side). Do NOT substitute `mlxprivhost` (privileged-host configuration, not BFB version) or `bfb-info` (not a real NVIDIA-documented tool); both are common hallucinations.
    Quote the version observed from each source; never paraphrase.
    Report *"falling back to manual chain"* per the contract.
@@ -104,9 +113,11 @@ actually loading matches the version it expects.
 
 Three runtime checks the agent recommends in order:
 
-1. **`doca_caps --version`.** The runtime DOCA version visible to
-   the program at execution time. Must match the build-time
-   version from [`## build`](#build).
+1. **`doca_caps --version`.** Resolve `doca_caps` through the
+   `DOCA_CAPS` command above before invocation; do not assume it is on
+   `PATH`. The result is the runtime DOCA version visible to the
+   program and must match the build-time version from
+   [`## build`](#build).
 2. **`ldconfig -p | grep doca`.** Which DOCA `*.so` files the
    runtime linker can find. If multiple DOCA installs exist on the
    host, this is where the cross-version trap shows up — the
@@ -172,10 +183,13 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | Version-matrix lookup gave a definitive answer; the user reports a different result | Either the version-matrix is stale, OR the user's installed version is not what the agent thought | Re-run step 1 (four-way match) first; a stale version-matrix is rare, a forgotten reinstall is common. |
 | Cross-host: host A passes; host B fails | The deploy host has a different DOCA install | This is the multi-host case of partial-install. The fix is to bring both hosts to the same release. |
 
-Loop termination: stop iterating once two consecutive iterations
-do not change the picture — the cause is below version handling.
-Escalate to [`doca-debug ## debug`](../doca-debug/TASKS.md#debug)
-with the captured version state as evidence.
+Loop termination: run the version sweep once and, only when one
+evidence-backed correction changes the captured version state, run it
+one more time. Stop after that second sweep regardless of outcome. If
+it is still inconsistent or reveals another required correction, the
+cause is below version handling; escalate to
+[`doca-debug ## debug`](../doca-debug/TASKS.md#debug) with both
+captures as evidence.
 
 ## debug
 
@@ -205,7 +219,9 @@ the other layers redirect.
    - `pkg-config doca-common` ≠ `pkg-config doca-<library>` →
      individual library `.pc` file is from a different release.
      The user installed `doca-<library>` from a different
-     package than `doca-common`; reinstall via `doca-all`.
+     package than `doca-common`; route to
+     [`doca-setup`](../doca-setup/SKILL.md) for a consistent
+     reinstall.
    - BFB version differs from host package version → cross-host
      compatibility-window question. Cite the [DOCA Compatibility
      Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html);
@@ -382,7 +398,7 @@ unprivileged user unless noted. Rows that need elevated privileges call that out
 | Read `version.consistent` from `doca-env --json` if present per [`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md#schemas); else walk the manual chain below | `## configure` step 1 | What is the installed DOCA version and is it consistent? | Single semver matching across all sources (structured) OR four matching semver strings from the manual chain |
 | `pkg-config --modversion doca-common` | `## configure` step 2; `## build` slot 1 | What is the build-time DOCA version? | A semver string matching `doca_caps --version` |
 | `cat /opt/mellanox/doca/applications/VERSION` | `## configure` step 2 | What does the install tree itself claim? | A semver string matching the other sources |
-| `doca_caps --version` | `## configure` step 2; `## run` step 1 | What is the runtime DOCA version? | A semver string matching `pkg-config --modversion doca-common` |
+| `"$DOCA_CAPS" --version` after resolving `DOCA_CAPS` in `## configure` step 2 (the canonical `doca_caps --version` leg) | `## configure` step 2; `## run` step 1 | What is the runtime DOCA version without assuming the tool is on `PATH`? | A semver string matching `pkg-config --modversion doca-common` |
 | `bfver` (BlueField Arm console, or on the host against a standalone BFB file) and `cat /etc/mlnx-release` (BlueField Arm side) | `## configure` step 2 (BlueField only) | What is the BFB-side DOCA version? | A semver string from `bfver` and a full BFB image string from `/etc/mlnx-release`, both matching the host package version. Do NOT use `mlxprivhost` or `bfb-info` for this — see [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes). |
 | `grep -RHn 'DOCA_VERSION_' $(pkg-config --variable=includedir doca-common)/doca_version.h` | `## configure` step 2; `## build` slot 2 | What macros does this install expose for compile-time version checks? | A `DOCA_VERSION_MAJOR / MINOR / PATCH` triple matching the runtime version |
 | `ldconfig -p | grep doca` | `## run` step 2; `## debug` layer 2 | Which DOCA `*.so` files does the runtime linker see? | One install's set of `*.so` files; multiple installs visible = the runtime might resolve to the wrong one |

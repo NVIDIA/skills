@@ -1,5 +1,5 @@
 ---
-license: Apache-2.0
+license: Apache-2.0 AND CC-BY-4.0
 name: doca-public-knowledge-map
 description: >
   Use this skill when the user needs to locate authoritative
@@ -23,7 +23,7 @@ metadata:
 compatibility: >
   No DOCA install required to read this skill (it is an overlay
   loaded against any DOCA artifact skill); the validation steps
-  within DO require a live DOCA install at /opt/mellanox/doca.
+  within this skill require a live DOCA install at /opt/mellanox/doca.
 ---
 
 # DOCA Public Knowledge Map
@@ -37,10 +37,13 @@ first; then jump to the routing-table section that matches the user's intent.
 
 Load this skill whenever the user asks anything about NVIDIA DOCA where the
 agent needs to **locate authoritative information** without access to the
-DOCA source tree. That includes: installing DOCA, building a sample, learning
-a DOCA library (Flow, DPA, Comm Channel, GPUNetIO, …), debugging an error,
-finding an API reference, finding a sample, finding release notes, or
-pointing the user at the developer forum.
+DOCA source tree. That includes **documentation-routing questions** about
+installing DOCA, building a sample, learning a DOCA library (Flow, DPA, Comm
+Channel, GPUNetIO, …), debugging an error, finding an API or error reference,
+finding a sample, release notes, or the developer forum. This skill locates
+the authoritative answer; hands-on installation, building, tutorials, and
+debugging route to the workflow-owning skills named in the frontmatter and
+[`## Related skills`](#related-skills).
 
 This skill is intentionally a **routing table**, not a tutorial. Pick the
 entry that matches the user's intent, fetch the URL or inspect the local
@@ -62,11 +65,18 @@ short message; do not interrogate one-at-a-time.
 | 3. **What's your goal?** Just exploring, building a small first app on a specific library (Flow / RDMA / Comch / Telemetry / GPUNetIO / DPA / …), running an existing reference application, operating a service (DMS / DTS / BlueMan / Firefly), or something else? | The bundle's first-app workflow (`doca-programming-guide ## modify`) starts from a **shipped C sample** and edits down. The right sample depends on the library the user is targeting. | Picks which library skill (if any) to load next. If the user does not yet know which library — that itself is a routing answer (see the *Library- and module-specific guides* table above and let the user pick). |
 | 4. **Which language do you plan to write the program in?** C / C++, Rust, Go, Python, other? | DOCA's public surface is a C ABI. Non-C consumers go through FFI / language bindings (`doca-programming-guide CAPABILITIES.md ## Capabilities and modes` and the per-library skill). The C samples are the reference even when the user's language is not C. | Picks whether the agent's first-app guidance is *direct C build* or *FFI / bindings against the C ABI*. Does **not** change which sample the agent points at first. |
 
-The agent's rule: **never recommend a specific install path, container tag,
-or sample without first having the answers to questions 1–3** (question 4 is
-needed for the first-app workflow but not for orientation itself).
-Volunteering specific commands before this is the single most common failure
-mode for DOCA orientation.
+The four-question gate applies when an open-ended orientation, install,
+build, or run recommendation depends on the user's environment. For that
+class, **never recommend a specific install path, container tag, or runnable
+sample without first having the answers to questions 1–3** (question 4 is
+needed for the first-app workflow but not for orientation itself). Pure
+documentation lookups — a URL, API reference, sample location, version
+reference, or stale-link recovery — skip this gate and route directly.
+If the user cannot or will not answer a required question, state which
+environment-dependent recommendation cannot be made, give only the safe
+version-agnostic umbrella documentation route, and do not guess the missing
+value. Volunteering specific commands before this is the single most common
+failure mode for DOCA orientation.
 
 If the user has already volunteered some of the information in their first
 message, mark those questions answered and only ask the rest. Do not re-ask
@@ -85,13 +95,14 @@ When the user asks something, route as follows:
 | "Show me a sample that uses library X." | `/opt/mellanox/doca/samples/doca_<X>/` if installed; otherwise the per-library guide on `docs.nvidia.com/doca/sdk/` (each library guide documents the samples shipped with it). |
 | "How do I build a DOCA sample?" | Library guide + the sample's own `meson.build` inside `/opt/mellanox/doca/samples/...`. |
 | "What is the API for X?" | Library guide; confirm by inspecting headers under `$(pkg-config --variable=includedir doca-common)` (commonly `/opt/mellanox/doca/include/` on DOCA 3.3+; `/opt/mellanox/doca/infrastructure/include/` on legacy / split-profile installs). |
-| "Why does my build fail with `pkg-config` not finding `doca-...`?" | "Layout of an installed DOCA package" section above (`PKG_CONFIG_PATH`), then Installation Guide. |
+| "Why does my build fail with `pkg-config` not finding `doca-...`?" | "Layout of an installed DOCA package" (`PKG_CONFIG_PATH`), then load [`doca-setup`](../doca-setup/SKILL.md) for environment preparation and debugging; do not silently mutate the environment. |
 | "What is the latest version / what changed?" | Release Notes. |
 | "Is there a newer DOCA — should I upgrade / downgrade / roll back?" | [`doca-upgrade`](../doca-upgrade/SKILL.md) for the detect → report → ASK → guided-upgrade discipline (never auto-upgrade); Release Notes for what the target release contains. |
 | "Is the component I depend on being sunset / deprecated?" | Release Notes (lifecycle / deprecation notices), reached via the [`doca-upgrade`](../doca-upgrade/SKILL.md) sunset-awareness check; do not assert deprecation from memory. |
 | "What does the DOCA version number mean? Is LTS still supported?" | Compatibility Policy (Public documentation entry points table). |
 | "How do I run DOCA on Kubernetes / provision a DPU?" | DOCA Platform Framework on GitHub. |
 | "I have a behavior I cannot explain." | Release Notes (known issues) first; then the DOCA Developer Forum. Never go to the forum first. |
+| Any intent not matched above | Start at the DOCA SDK index and the Libraries / Services / Tools umbrella page in [`references/map.md`](references/map.md#public-documentation-entry-points). If the authoritative route remains unresolved, say so and use the Developer Forum; do not invent a URL or component name. |
 
 ## What this skill deliberately does not cover
 

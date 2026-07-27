@@ -12,7 +12,7 @@ description: >
   preserving the standard `--device` / `--representor` /
   `--json` (`-j`; real flag is `--json`, NOT `--json-config`) /
   `--sdk-log-level` surface; or debugging
-  `DOCA_ERROR_BAD_STATE` / `INVALID_VALUE` / `NOT_SUPPORTED` / `NOT_FOUND` /
+  `DOCA_ERROR_BAD_STATE` / `INVALID_VALUE` / `NOT_SUPPORTED` /
   `IO_FAILED` from `doca_argp_*`. Trigger on implicit
   phrasings: "add a custom flag to a DOCA sample", "should I
   use getopt here", "BAD_STATE registering a new param", "my
@@ -136,8 +136,9 @@ work, in any language. Concretely:
   contract.
 - Registering a `doca_argp_param` (short name, long name, value
   callback, description for `--help`) with a parameter type
-  drawn from the small public set (string, int, bool flag, JSON
-  config file).
+  drawn from the six-value public enum: string, int, boolean,
+  device, device representor, or double. A JSON config file is an
+  input surface for those parameters, not a parameter type.
 - Reading complex configurations from a JSON file via the shared
   `--json <path>` flag instead of expanding the command
   line.

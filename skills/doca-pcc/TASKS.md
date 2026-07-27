@@ -52,8 +52,11 @@ Steps the agent should walk the user through:
    check is the load-bearing one the agent MUST surface
    explicitly — it is the precondition baseline agents most
    often miss, and a disabled slot will silently look like a
-   permission bug at the API surface. If ANY of these fails,
-   this is an env / firmware / version problem to fix via
+   permission bug at the API surface. If the slot was just
+   enabled, confirm the BlueField has completed the required
+   reset since that change; otherwise stop and route to
+   `doca-setup` for the hardware-safe reset workflow. If ANY
+   of these fails, this is an env / firmware / version problem to fix via
    [`doca-setup TASKS.md ## configure`](../../doca-setup/TASKS.md#configure)
    + [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure),
    NOT a code change in the host-side PCC program.
@@ -91,10 +94,11 @@ Steps the agent should walk the user through:
    custom PCC on more than one port needs one `doca_pcc` per
    port, not a *"global"* one, per the per-instance rule in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
-   This is a standard DOCA Core context create — the
-   universal lifecycle from
-   [`doca-programming-guide TASKS.md ## configure`](../../doca-programming-guide/TASKS.md#configure)
-   applies.
+   Use the PCC-specific lifecycle:
+   `doca_pcc_create` → configure / load / parameterize →
+   `doca_pcc_start` → use → `doca_pcc_stop` →
+   `doca_pcc_destroy`. A `doca_pcc` is not a `doca_ctx`;
+   do not substitute `doca_ctx_*` calls.
 5. **Load the PCC algorithm image and parameterize the
    algorithm.** Load the `doca_pcc_app` produced by `dpacc`
    from the user's DPA-side algorithm source into the
@@ -127,11 +131,9 @@ Steps the agent should walk the user through:
    report). If any of those are unclear, stop and ask — do
    not invent.
 
-For the canonical DOCA universal lifecycle that underlies
-steps 4-5, see
+For shared device and progress-engine patterns around this
+PCC-specific lifecycle, see
 [`doca-programming-guide TASKS.md ## configure`](../../doca-programming-guide/TASKS.md#configure).
-This skill adds the PCC overlay; do not re-explain the
-lifecycle here.
 
 ## build
 
@@ -302,7 +304,11 @@ Iteration shape:
    traffic"* case; if it fails, the algorithm body has no
    effect path, or it is not actually attached to the
    traffic-carrying port — re-verify the `doca_dev`
-   selection at configure time.
+   selection at configure time. Before starting, confirm the
+   selected port and workload are an approved, isolated test
+   scope; otherwise do not run a traffic-affecting algorithm.
+   Afterward, stop PCC and verify that the port returned to
+   its intended baseline behavior.
 3. **Sustained-run loop.** Let the smoke algorithm run for a
    sustained period (minutes, not seconds) under RDMA /
    RoCE load and confirm the host continues to observe
@@ -315,14 +321,18 @@ Iteration shape:
    host gets `DOCA_ERROR_INVALID_VALUE` cleanly — validates
    that the agent's earlier two-side-program parameter
    check is real, not just notional. Then restore the
-   in-range parameter.
+   in-range parameter. Run this only on the approved,
+   isolated test scope; after restoring the parameter,
+   verify the PCC context remains healthy.
 5. **Cap-query negative test.** Intentionally call a
    `doca_pcc_cap_*` axis the agent expects to be *not
    supported* on this BlueField + DOCA + firmware combo and
    confirm the reported `DOCA_ERROR_NOT_SUPPORTED` matches
    the triple capability discovery from [`## configure`](#configure)
    step 3 — validates the agent's capability-discovery
-   itself is correct.
+   itself is correct. Keep the same approved, isolated test
+   scope and verify the PCC context remains healthy before
+   continuing.
 
 Eval-loop overlay — why this is a loop, not a one-shot pass:
 
@@ -333,11 +343,14 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | `DOCA_ERROR_DRIVER` on first algorithm load | DOCA + DPACC versions are skewed OR the algorithm image was built against a different DOCA install than the host runtime OR the firmware custom-PCC slot is enabled but in a transitional state | Re-run the version chain per [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test); rebuild BOTH sides via `dpacc` + the host build against the matched versions; cross-check against the DOCA Compatibility Policy; if all that is clean, reset the BlueField to settle the firmware state |
 | Smoke loaded and reports fire; counter tool shows no on-wire change | The algorithm body has no effect path on the actual rate-update events, OR there is no RDMA / RoCE traffic on the attached port to modulate | Walk the algorithm-body effect path with the user; confirm RDMA / RoCE traffic is actually flowing on the attached port (route to [`doca-rdma`](../doca-rdma/SKILL.md) if not) |
 | Host observed N reports; report stream then stops mid-run | The host is not draining the report queue fast enough OR the DPA-side algorithm has hung in its main loop | Restructure the host loop to drain reports per batch; consult the DPA-side tooling named in [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability) for stuck-DPA cases |
-| `doca_ctx_stop` blocks on teardown | The algorithm body has an unbounded loop with no termination signal | The agent must surface that custom PCC algorithms, like generic DPA kernels, need a termination signal — see the [`doca-dpa TASKS.md ## modify`](../doca-dpa/TASKS.md#modify) DPA-kernel termination rule; the host cannot force-kill the DPA-side algorithm from the `doca-pcc` API |
+| `doca_pcc_stop` blocks on teardown | The algorithm body has an unbounded loop with no termination signal | The agent must surface that custom PCC algorithms, like generic DPA kernels, need a termination signal — see the [`doca-dpa TASKS.md ## modify`](../doca-dpa/TASKS.md#modify) DPA-kernel termination rule; the host cannot force-kill the DPA-side algorithm from the `doca-pcc` API |
 
-Loop termination: stop iterating once two consecutive
-iterations of the same kind don't change anything — that
-means the cause is below PCC (BlueField firmware slot,
+Loop identity is the same trigger or `DOCA_ERROR_*` on the
+same port, algorithm image, parameter set, and traffic
+profile, with unchanged host logs, PCC counters, algorithm
+reports, and traffic evidence. Stop after two consecutive
+iterations with that identity produce no evidence change —
+that means the cause is below PCC (BlueField firmware slot,
 algorithm design bug, DPACC bug, NIC firmware). Escalate to
 [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
 with the captured layer-1-through-5 evidence including BOTH

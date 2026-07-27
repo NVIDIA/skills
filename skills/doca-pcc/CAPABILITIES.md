@@ -100,7 +100,7 @@ port the host is driving.**
 
 | Object | Lifetime | What it owns | Key calls |
 | --- | --- | --- | --- |
-| `doca_pcc` | Per BlueField port the host is driving a custom PCC algorithm on; created against a `doca_dev` that maps to a DPA-capable BlueField port with the firmware custom-PCC slot enabled | The DOCA-side bookkeeping for that PCC instance, the registration of the loaded PCC algorithm image, and the host-side observability for what the running algorithm reports back | `doca_pcc` create / configure / start / stop / destroy (DOCA Core lifecycle); `doca_pcc_cap_*` for what this device + firmware combo actually supports |
+| `doca_pcc` | Per BlueField port the host is driving a custom PCC algorithm on; created against a `doca_dev` that maps to a DPA-capable BlueField port with the firmware custom-PCC slot enabled | The DOCA-side bookkeeping for that PCC instance, the registration of the loaded PCC algorithm image, and the host-side observability for what the running algorithm reports back | PCC-specific `doca_pcc_create` / configure / `doca_pcc_start` / `doca_pcc_stop` / `doca_pcc_destroy`; `doca_pcc_cap_*` for what this device + firmware combo actually supports. A `doca_pcc` is not a `doca_ctx` |
 
 A host driving custom PCC on more than one BlueField port
 needs one `doca_pcc` per port — there is no *"global PCC
@@ -220,11 +220,11 @@ Three primary signals the agent should reach for:
    exposes (algorithm-defined report stream, per-event
    callbacks, status counters) is the first place to look
    when the user reports *"the algorithm loaded but I'm not
-   sure it's doing anything"*. Absence of a report when the
-   algorithm should be emitting one is *always* a host-side
-   missing-progress bug OR a DPA-side algorithm body that
-   has no effect path; confirm by progressing the PE and by
-   re-reading the algorithm's report-emission points.
+   sure it's doing anything"*. Missing expected reports can
+   result from the host PE not being progressed, no DPA-side
+   report-emission path, or a host report queue that is not
+   drained and becomes full. Check those in that order before
+   attributing the issue to the algorithm body.
 2. **Capability snapshot at configure time.** The output of
    `doca_pcc_cap_*` against the active `doca_devinfo`
    together with the installed `pkg-config --modversion
@@ -278,7 +278,7 @@ new host-side custom PCC setup:
 | Precondition | What must be true | How the agent verifies | Where to fix |
 | --- | --- | --- | --- |
 | BlueField with a DPA processor visible to the host | The host's `doca_dev` enumeration includes a BlueField whose generation carries a DPA processor and whose mode exposes that DPA to the host (since the custom PCC algorithm runs on the DPA) | `doca_pcc_cap_*` against the active `doca_devinfo`; cross-check with `doca_caps --list-devs`; confirm BlueField mode via the env-side BlueField checks. Same hardware axis [`doca-dpa CAPABILITIES.md ## Safety policy`](../doca-dpa/CAPABILITIES.md#safety-policy) documents | [`doca-setup`](../../doca-setup/SKILL.md) for the env-side BlueField mode; this is **not** a code fix in the host-side PCC program |
-| BlueField firmware has the custom-PCC slot enabled | The BlueField firmware must be configured to permit a custom (non-factory) PCC algorithm to be loaded; this is a firmware-side knob, not a host-side library call | Via the env-side firmware configuration tools — the agent must NAME this precondition explicitly even though the exact firmware tool sits in [`doca-setup`](../../doca-setup/SKILL.md). A successful `doca_dev` open with no PCC features in `doca_pcc_cap_*` strongly suggests the slot is disabled | [`doca-setup`](../../doca-setup/SKILL.md) for the firmware-side enable; the BlueField typically needs a reset after the slot is flipped before the new state takes effect |
+| BlueField firmware has the custom-PCC slot enabled | The BlueField firmware must be configured to permit a custom (non-factory) PCC algorithm to be loaded; this is a firmware-side knob, not a host-side library call | Via the env-side firmware configuration tools — the agent must NAME this precondition explicitly even though the exact firmware tool sits in [`doca-setup`](../../doca-setup/SKILL.md). A successful `doca_dev` open with no PCC features in `doca_pcc_cap_*` can also mean that the BlueField lacks DPA exposure or does not support custom PCC; run the full triple-axis discovery to disambiguate | [`doca-setup`](../../doca-setup/SKILL.md) for the firmware-side enable; the BlueField typically needs a reset after the slot is flipped before the new state takes effect |
 | DOCA install paired with a matching DPACC compiler | `pkg-config --modversion doca-pcc` and the installed `dpacc` are at versions the DOCA Compatibility Policy lists as compatible | `pkg-config --modversion doca-pcc`; check the installed `dpacc` version; cross-check against the [DOCA Compatibility Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html). Same overlay [`doca-dpa CAPABILITIES.md ## Safety policy`](../doca-dpa/CAPABILITIES.md#safety-policy) documents | [`doca-setup`](../../doca-setup/SKILL.md) for the install-side; route to [`doca-version`](../../doca-version/SKILL.md) for the four-way-match check |
 | Standard DOCA `doca_dev` access | The user / process can open the target `doca_dev` for the BlueField port — same baseline DOCA access rule as every other DOCA library; typically requires sudo or membership in the host's standard mlnx-style group | The DOCA `doca_dev` enumeration succeeds for the target device; if it does not, that is an env-side problem | [`doca-setup`](../../doca-setup/SKILL.md) for the env-side; do **not** modify the program |
 | Host-side parameter shape matches DPA-side algorithm | The host-side parameter set calls match the parameter shape (count, sizes, types) the DPA-side algorithm in the loaded `doca_pcc_app` actually exposes | Re-read the DPA-side algorithm source and compare with the host-side parameter calls; if the DPA-side source changed, rebuild the PCC algorithm image via `dpacc` AND rebuild the host executable that embeds it | Program-layer fix on the two sides together; do **not** patch only one side |
@@ -296,8 +296,10 @@ to silence the error.
 
 **Lifecycle ordering is PCC-aware.** The loaded `doca_pcc_app`
 must be released BEFORE the parent `doca_pcc` is destroyed;
-the `doca_pcc` itself follows the universal DOCA Core
-teardown order on top of the `doca_dev`. Out-of-order teardown
+stop the instance with `doca_pcc_stop`, release the loaded
+app, destroy the instance with `doca_pcc_destroy`, then close
+the `doca_dev`. Do not use `doca_ctx_stop` or
+`doca_ctx_destroy` for this object. Out-of-order teardown
 surfaces as `DOCA_ERROR_BAD_STATE` on subsequent calls and may
 also leave the BlueField port with a half-configured custom
 PCC state that the firmware has to recover from on the next

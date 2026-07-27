@@ -108,7 +108,7 @@ The general taxonomy the agent must recognize:
 | `DOCA_ERROR_TIME_OUT` | An async operation did not complete in time. | Increase the timeout if intended; investigate why the underlying operation is slow if not. |
 | `DOCA_ERROR_INITIALIZATION` | Library / object initialization itself failed. | Almost always a missing prerequisite (driver, capability, peer). Walk through the library's `## configure` workflow; do not retry blindly. |
 | `DOCA_ERROR_DRIVER` | The underlying driver / firmware reported failure. | Capture state and route to env-class debug ([`doca-setup ## debug`](../doca-setup/TASKS.md#debug)) — the layer below DOCA is the suspect, not the program. |
-| `DOCA_ERROR_UNKNOWN` | Internal error not mappable to the taxonomy. | Capture state and escalate; do not paper over with a retry loop. |
+| `DOCA_ERROR_UNKNOWN` | Internal error not mappable to the taxonomy. | Capture state and escalate through [`doca-debug ## debug`](../doca-debug/TASKS.md#debug); do not paper over with a retry loop. |
 
 For *any* returned `doca_error_t` other than `DOCA_SUCCESS`, the agent's first step is to call `doca_error_get_descr(err)` and quote the actual descriptor string — never paraphrase from memory. The descriptor is the library's own statement of what went wrong; library-specific guides can refine it but cannot contradict it.
 

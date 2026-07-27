@@ -1,7 +1,8 @@
 # DOCA setup workflows
 
-**Where to start:** Before anything else, walk
-[`## recognize`](#recognize) — that is the **front door**. It detects
+**Where to start:** For a deployment-shaped question whose deployment
+path is not already known, walk [`## recognize`](#recognize) first.
+It detects
 the user's system shape (host x86 / BlueField Arm bare-metal /
 DPU-only / fresh laptop with no hardware), asks the developer the
 minimal set of questions needed to disambiguate, and routes to the
@@ -27,9 +28,9 @@ Goal: detect the user's **system shape and deployment target** before any other 
 
 **Why this exists.** The bundle today supports four distinct system shapes — host x86 + remote BlueField NIC, BlueField Arm bare-metal, DPU-only / converged-accelerator, and fresh-laptop-with-no-hardware — and **two parallel deployment paths** on top: containers (kubelet-standalone with a YAML pod-spec drop, owned by [`doca-container-deployment`](../doca-container-deployment/SKILL.md)) and bare-metal binaries (direct/tmux/systemd launch, owned by [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)). The wrong failure mode is to silently push every developer onto the container path because the agent loaded that skill first. The right behavior is to recognize the system, confirm with the developer, and route. This is what `## recognize` enforces.
 
-**Step 0 — scale gate (run this BEFORE the four-leaf walk).** First decide *persona and scale*, because the four leaves below are the **developer / PoC / small-dev** path (a single host or a handful of DPUs). If the user's intent is **production / fleet-scale** — provisioning racks of DPUs, declarative lifecycle, coordinated BFB/firmware rollouts across many BlueFields (signals: *"across N DPUs"*, *"in production"*, *"at fleet/cluster scale"*, *"Kubernetes operator"*, *"declaratively manage"*) — do **not** walk the single-host leaves and do **not** hand-roll per-host `bfb-install` loops or static-pod drops. Route to the orchestration entry-point in [`doca-public-knowledge-map ## Deploying DOCA services at scale`](../doca-public-knowledge-map/references/map.md#deploying-doca-services-at-scale--orchestration-entry-point-personascale-routing), which points at DOCA Platform Framework (DPF), NVIDIA Network Operator, and the Kubernetes Launch Kit (externally owned, routed-not-owned). Only if the user is clearly in the developer/PoC persona (or unsure and small-scale) continue with the four-leaf walk below.
+**Step 0 — scale gate (run this BEFORE the five-leaf walk).** First decide *persona and scale*, because the five leaves below are the **developer / PoC / small-dev** path (a single host or a handful of DPUs). If the user's intent is **production / fleet-scale** — provisioning racks of DPUs, declarative lifecycle, coordinated BFB/firmware rollouts across many BlueFields (signals: *"across N DPUs"*, *"in production"*, *"at fleet/cluster scale"*, *"Kubernetes operator"*, *"declaratively manage"*) — ask one closed question to confirm production-fleet intent. Route to orchestration only after that confirmation; absent a fleet signal, use the developer/PoC path. Once confirmed, do **not** walk the single-host leaves and do **not** hand-roll per-host `bfb-install` loops or static-pod drops. Route to the orchestration entry-point in [`doca-public-knowledge-map ## Deploying DOCA services at scale`](../doca-public-knowledge-map/references/map.md#deploying-doca-services-at-scale--orchestration-entry-point-personascale-routing), which points at DOCA Platform Framework (DPF), NVIDIA Network Operator, and the Kubernetes Launch Kit (externally owned, routed-not-owned).
 
-**The decision tree the agent walks.** The agent asks the **minimum** number of questions needed to land on one of the four leaves below. Do not ask all of them; stop as soon as the leaf is unambiguous. The system-shape × deployment-shape matrix the bundle covers lives in [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes); this anchor is the *interactive* walk of that matrix.
+**The decision tree the agent walks.** The agent asks the **minimum** number of questions needed to land on one of the five leaves below. Do not ask all of them; stop as soon as the leaf is unambiguous. The system-shape × deployment-shape matrix the bundle covers lives in [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes); this anchor is the *interactive* walk of that matrix.
 
 1. **Detect first; ask only the residual.** Before any question, the agent attempts a non-destructive auto-detect against what is already on the wire:
    - `uname -m` (x86_64 vs aarch64 — the BlueField Arm side is aarch64).
@@ -44,16 +45,16 @@ Goal: detect the user's **system shape and deployment target** before any other 
    - **Q2 (packaging):** *"Will the workload be deployed as a kubelet-standalone container (YAML pod-spec drop on the BlueField), as a bare-metal binary you launch directly (CLI / tmux / systemd), or you do not know yet?"* Two answers route to the two deployment paths; the *"do not know"* answer triggers the brief explainer in step 3 below. Skip if the developer has already produced a binary or a pod-spec YAML.
    - **Q3 (workload kind):** *"Is the workload a DOCA-linked **application** you wrote (or are about to write), or a packaged DOCA **service** from NVIDIA (Argus / DMS / Firefly / Flow-Inspector / OS-Inspector / UROM-svc)?"* Application + bare-metal is the most common mismatch the question catches; service + container is the canonical NVIDIA-packaged path. Skip if the matching artifact already exists on disk.
 
-3. **If the developer answers "do not know" to Q2, give them the one-paragraph decision rule, then re-ask Q2.** The rule: *"Containers are the canonical way to deploy a packaged NVIDIA DOCA service (the BlueField OS image already ships kubelet-standalone + the runtime); the operator drops a YAML pod-spec into a documented directory and the pod starts. Bare-metal is the canonical way to run a DOCA-linked application you wrote yourself; you launch the binary directly and you own the lifecycle (CPU pinning, hugepages, systemd unit). The two paths are equally supported; the right answer depends on the workload, not on which path is 'better'."* Then re-ask Q2.
+3. **If the developer answers "do not know" to Q2, give them the one-paragraph decision rule, then re-ask Q2 once.** The rule: *"Containers are the canonical way to deploy a packaged NVIDIA DOCA service (the BlueField OS image already ships kubelet-standalone + the runtime); the operator drops a YAML pod-spec into a documented directory and the pod starts. Bare-metal is the canonical way to run a DOCA-linked application you wrote yourself; you launch the binary directly and you own the lifecycle (CPU pinning, hugepages, systemd unit). The two paths are equally supported; the right answer depends on the workload, not on which path is 'better'."* If Q2 remains unknown after that explanation, or no reply is available in unattended execution, stop with `confirmation_required` and explain both paths rather than re-asking again.
 
-4. **Route to the matching leaf** (the agent states the routing explicitly: *"Based on what you said and what I detected, the right next skill is …"*). The four leaves:
+4. **Route to the matching leaf** (the agent states the routing explicitly: *"Based on what you said and what I detected, the right next skill is …"*). The five leaves:
    - **Leaf A — fresh laptop / no DOCA install / no BlueField reachable from this host:** route to [`## no-install`](#no-install). The NGC DOCA container is the universal Stage-1.
    - **Leaf B — host x86 with a reachable BlueField, application workload, bare-metal launch:** route to [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md) for the launch contract, after completing [`## configure`](#configure) for the env prep on this host.
    - **Leaf C — host x86 (or BlueField Arm bare-metal) with a reachable BlueField, service workload, container launch:** route to [`doca-container-deployment`](../doca-container-deployment/SKILL.md) for the pod-spec drop, after completing [`## configure`](#configure) for the env prep.
    - **Leaf D — BlueField Arm bare-metal (DPU-side), application workload, bare-metal launch:** route to [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md). Cross-link the BlueField-Arm-specific overlay there.
    - **Leaf E — DPU-only / converged-accelerator card (e.g. SuperNIC-class) with no host CPU available for DOCA:** today this is a constrained subset of Leaf D — route to [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md) with the explicit caveat that some host-side env steps in [`## configure`](#configure) do not apply (e.g. the host-side `LD_LIBRARY_PATH`). The agent should ALSO load [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) early on this leaf because device-only systems are higher-stakes (no escape hatch on a host CPU).
 
-5. **Stop and confirm before proceeding.** Before handing off to the routed skill, the agent restates the routing decision in one line — *"You are on a `<system shape>`, deploying a `<workload kind>` via the `<deployment path>` path; I'll continue with `<routed skill>`. Speak up now if any of that is wrong."* — and waits for the developer's acknowledgment. Routing failures are far cheaper to fix here than after the deployment is half-built.
+5. **Stop and confirm before proceeding.** Before handing off to the routed skill, the agent restates the routing decision in one line — *"You are on a `<system shape>`, deploying a `<workload kind>` via the `<deployment path>` path; I'll continue with `<routed skill>`. Speak up now if any of that is wrong."* In an interactive session, wait for acknowledgment. In unattended execution, emit the proposed route and stop with `confirmation_required`; never treat silence as approval.
 
 **What this verb deliberately does NOT do.** It does not install DOCA (that's `## configure` after `## no-install` for the install-absent leaf). It does not bind hardware resources (that's [`doca-bare-metal-deployment ## run`](../doca-bare-metal-deployment/TASKS.md#run) or, for containers, the pod-spec mount in [`doca-container-deployment ## modify`](../doca-container-deployment/TASKS.md#modify)). It does not pick a DOCA version (that's [`doca-version`](../doca-version/SKILL.md)). It does not author the workload (that's [`doca-programming-guide`](../doca-programming-guide/SKILL.md)). It does not change device state (that's a [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) meta-policy concern). The verb is **exactly** *"detect, ask the minimum, route, confirm"* — nothing more.
 
@@ -104,17 +105,31 @@ Steps the agent should walk the user through:
 
 6. **Set `LD_LIBRARY_PATH` for the runtime, if using the trace build flavor.** The program-side rationale for picking trace vs release lives in [`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes); the env mechanics here are: either link with the `doca-<lib>-trace` `pkg-config` module at build time, or set `LD_LIBRARY_PATH=/opt/mellanox/doca/lib/<arch>-linux-gnu/trace:$LD_LIBRARY_PATH` at runtime.
 
-7. **Mount and reserve hugepages.** Required by all DPDK-based DOCA libraries (Flow in particular). The agent must read [CAPABILITIES.md ## Safety policy](CAPABILITIES.md#safety-policy) item 2 before recommending the change; hugepages are global state. The minimum-viable sequence is:
+7. **Mount and reserve hugepages.** Required by DPDK-based DOCA
+   libraries (Flow in particular). Hugepages are global state: first
+   record the current `nr_hugepages`, derive the requested count from
+   the selected application's documented memory requirement and the
+   host's available memory. For 2 MiB pages, calculate
+   `ceil(required_bytes / 2 MiB)` and use the application's installed
+   sample/configuration guide as the only source for
+   `required_bytes`; if it provides no requirement, stop and ask the
+   application owner rather than guessing. Confirm the resulting
+   reservation fits the operator-approved memory budget, show its
+   impact, and obtain explicit approval. Never default to a fixed page
+   count. Only then apply the approved value:
 
    ```bash
-   echo '1024' | sudo tee -a /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+   echo '<approved-page-count>' | sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
    sudo mkdir -p /mnt/huge
    sudo mount -t hugetlbfs -o pagesize=2M nodev /mnt/huge
    ```
 
    Verify with `mount | grep huge` and `cat /proc/meminfo | grep -i huge`.
+   Rollback restores the recorded previous count and unmounts
+   `/mnt/huge` only if this workflow mounted it and no workload is
+   using it.
 
-8. **Confirm device and representor visibility.** `devlink dev show` lists the network devices the kernel sees; `cat /sys/class/net/*/phys_port_name` shows the names of any active representors. If the user expects representors and the listing is empty, switching the eswitch to `switchdev` mode is required (`devlink dev eswitch set <pcie> mode switchdev`) — but only with the user's explicit consent, since the change disrupts existing flows.
+8. **Confirm device and representor visibility.** `devlink dev show` lists the network devices the kernel sees; `cat /sys/class/net/*/phys_port_name` shows the names of any active representors. If representors are expected but absent, first verify the target BDF, driver binding, SR-IOV/VF state, and current eswitch mode. Recommend `switchdev` only when that evidence and the version-matched deployment guide identify legacy eswitch mode as the cause; the change still requires explicit consent because it disrupts existing flows.
 
 9. **Sanity-check before any program work.** Confirm with the user: which BlueField (or which host PCIe slot), which install version, which mode (host / DPU / switch). If any of these is unclear, stop and ask. Once these are confirmed, hand off to [`doca-programming-guide ## configure`](../doca-programming-guide/TASKS.md#configure) for the program-side configuration.
 
@@ -165,9 +180,9 @@ escalating to programming-guide:
 
 | Pre-run check | Where it lives | What clean output looks like |
 | --- | --- | --- |
-| Hugepages mounted and reserved | [`## configure`](#configure) step 4 | `mount \| grep huge` shows hugetlbfs; `/proc/meminfo` shows non-zero free hugepages. |
-| Network devices visible | [`## configure`](#configure) step 5 | `devlink dev show` lists the BlueField PCIe device. |
-| Representors visible (Flow / Switching) | [`## configure`](#configure) step 5 | `/sys/class/net/*/phys_port_name` lists the expected representor indices. |
+| Hugepages mounted and reserved | [`## configure`](#configure) step 7 | `mount \| grep huge` shows hugetlbfs; `/proc/meminfo` shows non-zero free hugepages. |
+| Network devices visible | [`## configure`](#configure) step 8 | `devlink dev show` lists the BlueField PCIe device. |
+| Representors visible (Flow / Switching) | [`## configure`](#configure) step 8 | `/sys/class/net/*/phys_port_name` lists the expected representor indices. |
 | Kernel modules loaded | [CAPABILITIES.md ## Error taxonomy](CAPABILITIES.md#error-taxonomy) | `lsmod \| grep mlx5` shows `mlx5_core`, `mlx5_ib`. |
 | Mode set (host / DPU / switch) | [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes) | `mlxconfig -d <pcie> q INTERNAL_CPU_MODEL` matches the mode the program expects. |
 
@@ -207,7 +222,7 @@ When the user opens with *"I am new to DOCA, guide me to my first app"* (or any 
 
    | Path | When it fits | What the agent walks the user through |
    | --- | --- | --- |
-   | **0. NGC DOCA container** (`nvcr.io/nvidia/doca/doca`) — **canonical first option for any user on macOS, Windows, or Linux without DOCA.** | The user wants to build samples, modify a sample, read the API surface, generate FFI bindings, learn — *anything except real-traffic runtime against a real NIC*. Works on any OS that runs Docker. Free; no NVIDIA hardware required. | (1) Install Docker (Docker Desktop on macOS / Windows; native Docker on Linux). (2) **Pick a tag using the deterministic rule below — never invent one.** (3) `docker pull nvcr.io/nvidia/doca/doca:<tag-copied-verbatim-from-the-catalog>`. The public DOCA images are anonymously pullable at the time of writing; if a particular tag asks for auth, sign up for a free NGC account at <https://ngc.nvidia.com>, generate an API key, and `docker login nvcr.io -u '$oauthtoken' -p <api-key>` once. (4) `docker run -it --rm -v $HOME/dev:/work nvcr.io/nvidia/doca/doca:<tag> bash`; inside the container the user has a real `/opt/mellanox/doca` install — `pkg-config --modversion doca-<library>` works, `ls /opt/mellanox/doca/samples/` works, and the workflows in [`## configure`](#configure), [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build), and [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify) all work. **Limitations to surface upfront:** no real NIC inside the container, so DPDK / DOCA calls that need real hardware will fail at runtime — that is *expected* and the right move at that point is to graduate the user to Path A or Path C below. |
+   | **0. NGC DOCA container** (`nvcr.io/nvidia/doca/doca`) — **canonical first option for any user on macOS, Windows, or Linux without DOCA.** | The user wants to build samples, modify a sample, read the API surface, generate FFI bindings, learn — *anything except real-traffic runtime against a real NIC*. Works on any OS that runs Docker. Free; no NVIDIA hardware required. | (1) Install Docker (Docker Desktop on macOS / Windows; native Docker on Linux). (2) **Pick a tag using the deterministic rule below — never invent one.** (3) `docker pull nvcr.io/nvidia/doca/doca:<tag-copied-verbatim-from-the-catalog>`. The public DOCA images are anonymously pullable at the time of writing; if a particular tag asks for auth, sign up for a free NGC account at <https://ngc.nvidia.com>, generate an API key, read it into a local `NGC_API_KEY` variable without sharing or logging it, and run `printf '%s' "$NGC_API_KEY" \| docker login nvcr.io -u '$oauthtoken' --password-stdin`; never request, repeat, or place the key directly on a command line. (4) `docker run -it --rm -v $HOME/dev:/work nvcr.io/nvidia/doca/doca:<tag> bash`; inside the container the user has a real `/opt/mellanox/doca` install — `pkg-config --modversion doca-<library>` works, `ls /opt/mellanox/doca/samples/` works, and the workflows in [`## configure`](#configure), [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build), and [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify) all work. **Limitations to surface upfront:** no real NIC inside the container, so DPDK / DOCA calls that need real hardware will fail at runtime — that is *expected* and the right move at that point is to graduate the user to Path A or Path C below. |
    | **A. Existing Linux + DOCA host** (lab box, dev server, BlueField over `rshim`) | The user already has a DOCA-installed host — most common case at NVIDIA, less common for external users. | SSH or Cursor-remote into it; rerun the [`## configure`](#configure) workflow there, then hand off to [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify). |
    | **B. Fresh Linux instance, no NIC** (laptop running Ubuntu, cloud VM, etc.) | The user wants a *persistent, native* install (not container-scoped) but doesn't have NVIDIA hardware. | Pick any Linux distro listed under the [DOCA Host Supported OS table](https://docs.nvidia.com/doca/sdk/NVIDIA+DOCA+Installation+Guide+for+Linux). Install via the Installation Guide; the **build-only** parts of [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build) and [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify) work; the actual runtime needs hardware (Path C). For most users, **Path 0 is faster and lighter** unless the user explicitly wants a non-container install. |
    | **C. Linux + ConnectX or BlueField hardware** | The user wants the real end-to-end runtime, including programmed flows and real packet behavior. | Either user-owned hardware, an internal lab allocation, or the [DOCA Downloads page](https://developer.nvidia.com/doca-downloads) for the BFB image to bring up a BlueField. The agent does *not* recommend specific cloud SKUs by name unless they are listed in the public Supported OS table; cloud GPU/ARM SKUs do not generically include DOCA-eligible NICs and the agent must not pretend otherwise. |
@@ -274,7 +289,10 @@ The four-step variant of the loop, in detail:
 The loop terminates when one of:
 
 - Every layer is observed clean in the same session ⇒ env healthy; record the observed `pkg-config --modversion doca-common` and `doca_caps --version` strings so any later regression has a baseline.
-- An env-class failure is found and fixed ⇒ restart the loop from the layer that broke (NOT from the top; you've already validated everything above).
+- An env-class failure is found and fixed ⇒ restart at the layer that
+  broke and re-run that layer plus every downstream layer, because the
+  fix may invalidate downstream evidence. Earlier independent layers
+  need not be repeated.
 - The failure is reproducibly *not* env-class ⇒ hand off to [`doca-programming-guide ## test`](../doca-programming-guide/TASKS.md#test) with the captured probe outputs as evidence.
 
 ## debug
@@ -307,10 +325,10 @@ to and the H2 anchor in this file or in
 | Detect install | `cat /opt/mellanox/doca/applications/VERSION` | [CAPABILITIES.md ## Version compatibility](CAPABILITIES.md#version-compatibility) | Fallback when `pkg-config` is broken. Returns the same string. |
 | Wire build | `pkg-config --cflags doca-<library>` | [`## configure`](#configure) step 2 | Returns `-I/opt/mellanox/doca/infrastructure/include` (or trace-flavor equivalent). |
 | Wire build | `pkg-config --libs doca-<library>` | [`## configure`](#configure) step 2 / [`## run`](#run) checklist | Returns `-L/opt/mellanox/doca/lib/<arch>-linux-gnu -ldoca_<library>` plus deps. |
-| Wire runtime | `mount \| grep huge` | [`## configure`](#configure) step 4 / [CAPABILITIES.md ## Observability](CAPABILITIES.md#observability) | Shows a `hugetlbfs` mount. Empty ⇒ no hugepages reserved. |
-| Wire runtime | `cat /proc/meminfo \| grep -i huge` | [`## configure`](#configure) step 4 | Shows `HugePages_Total` > 0 and `HugePages_Free` > 0. |
-| Wire runtime | `devlink dev show` | [`## configure`](#configure) step 5 | Lists the expected BlueField / ConnectX PCIe BDF. |
-| Wire runtime | `cat /sys/class/net/*/phys_port_name` | [`## configure`](#configure) step 5 | Shows the representor port names for the device. |
+| Wire runtime | `mount \| grep huge` | [`## configure`](#configure) step 7 / [CAPABILITIES.md ## Observability](CAPABILITIES.md#observability) | Shows a `hugetlbfs` mount. Empty ⇒ no hugepages reserved. |
+| Wire runtime | `cat /proc/meminfo \| grep -i huge` | [`## configure`](#configure) step 7 | Shows `HugePages_Total` > 0 and `HugePages_Free` > 0. |
+| Wire runtime | `devlink dev show` | [`## configure`](#configure) step 8 | Lists the expected BlueField / ConnectX PCIe BDF. |
+| Wire runtime | `cat /sys/class/net/*/phys_port_name` | [`## configure`](#configure) step 8 | Shows the representor port names for the device. |
 | Wire runtime | `lsmod \| grep mlx5` | [CAPABILITIES.md ## Error taxonomy](CAPABILITIES.md#error-taxonomy) | Shows `mlx5_core`, `mlx5_ib` loaded. |
 | Detect mode | `mlxconfig -d <pcie> q INTERNAL_CPU_MODEL` | [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes) | Matches the mode the program expects (`EMBEDDED_CPU(1)` for switch mode). |
 | Reach an install | `docker pull nvcr.io/nvidia/doca/doca:<tag>` | [`## no-install`](#no-install) Path 0 | Pull succeeds; tag exists on NGC. |

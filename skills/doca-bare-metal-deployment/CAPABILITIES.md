@@ -315,7 +315,7 @@ BSP / DOCA Platform Framework documentation for those steps.
    PCIe devices still enumerated (`lspci -d 15b3:`), (iv) host-
    visible NIC firmware version matches the per-device target from
    the release notes (`flint -d <bdf> q`).
-6. **Handoff to BFB install — OUT OF SCOPE here, route per the contract.**
+6. **Handoff to BFB install — external tooling, in-scope sequencing.**
    Once the host is green, the BFB-side install (push BFB to BlueField via
    RShim, eMMC image install, BFB-side firmware update, BFB-side OS bring-
    up to `Linux up` / `DPU is ready`, TMFIFO recovery, BFB-side apt

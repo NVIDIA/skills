@@ -68,19 +68,19 @@ is a real bug):
 - **Transport-type (RDMA QP service type):** the per-QP service
   type. The `enum doca_rdma_transport_type` defines exactly two
   values — **RC** (Reliable Connection) and **DC** (Dynamically
-  Connected; supported only in the export/connect flow on the
-  CPU datapath). There is NO UD (Unreliable Datagram) transport
+  Connected; **alpha**, supported only in the export/connect flow
+  on the CPU datapath). There is NO UD (Unreliable Datagram) transport
   in DOCA RDMA. This IS the axis that
   `doca_rdma_set_transport_type()` controls. RC is the baseline;
-  DC is restricted to the export/connect + CPU-datapath flow —
+  DC is alpha and restricted to the export/connect + CPU-datapath flow —
   gate task availability on
   `doca_rdma_cap_task_*_is_supported(devinfo)`.
 
-The two axes are independent: RC over IB, RC over RoCE, DC
-over IB, DC over RoCE are all valid combinations subject to
+The two axes are independent: RC over IB, RC over RoCE, DC (alpha)
+over IB, DC (alpha) over RoCE are all valid combinations subject to
 device + version caps. Treating "IB / RoCE" as the value the
 agent passes to `doca_rdma_set_transport_type()` is a bug —
-that setter takes a transport-type (RC or DC), not a
+that setter takes a transport-type (RC or alpha-level DC), not a
 link-layer.
 
 **Device support.** BlueField-2 and higher devices are supported.
@@ -144,7 +144,7 @@ For the canonical DOCA version-detection chain, the four-way match rule, NGC con
 
 - **DC transport is alpha.** The public DOCA RDMA guide explicitly notes that dynamically-connected (DC) transport support is alpha-level. The agent must surface this when the user asks about DC, not present it as production-stable. Use `pkg-config --modversion doca` as the build-time anchor (per [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure)) when asked which RDMA features are on this install.
 - **Use the `doca_rdma_cap_*` query family at runtime.** Per the cross-cutting rule in [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability), the cap-query is the runtime authority for *"is this task / transport supported on this device + this DOCA version"*. The version-matrix is the *promise*; the cap query is the *reality*.
-- **The resolved DOCA pkg-config module must match `doca_caps --version`** at the four-way-match check (per [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)). On current installs RDMA ships inside the umbrella `doca` module (there is no separate `doca-rdma.pc`); `pkg-config --modversion doca` must agree with `doca_caps --version`. On the rarer split installs that *do* expose per-library `.pc` files, every resolved component `.pc` must agree; a mismatch (one component reporting release *X*, another release *Y*) is the classic partial-install pattern — route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) ladder step 2 before any RDMA-layer diagnosis.
+- **The resolved DOCA pkg-config module must match `doca_caps --version`** at the four-way-match check (per [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)). RDMA normally ships inside the umbrella `doca` module; `pkg-config --modversion doca` must agree with `doca_caps --version`. On rarer split installs that expose per-library `.pc` files, every resolved component `.pc` must agree; a mismatch (one component reporting release *X*, another release *Y*) is the classic partial-install pattern — route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) ladder step 2 before any RDMA-layer diagnosis.
 
 ## Error taxonomy
 
@@ -225,11 +225,11 @@ Per the public RDMA guide:
 
 | Task | Local-side mmap | Local-side RDMA | Peer-side mmap | Peer-side RDMA | Export required |
 | --- | --- | --- | --- | --- | --- |
-| Read / Get Remote Sync | local read-write | RDMA read | local read-write \| RDMA read | RDMA read | yes (peer exports) |
-| Write / Write-Imm / Set Remote Sync | local read-write | RDMA write | local read-write \| RDMA write | RDMA write | yes (peer exports) |
-| Atomic CmpSwap / Atomic FetchAdd / Add Remote Sync | local read-write | RDMA atomic | local read-write \| RDMA atomic | RDMA atomic | yes (peer exports) |
+| Read / Get Remote Sync | local read-write | RDMA read | local read-write **and** RDMA read | RDMA read | yes (peer exports) |
+| Write / Write-Imm / Set Remote Sync | local read-write | RDMA write | local read-write **and** RDMA write | RDMA write | yes (peer exports) |
+| Atomic CmpSwap / Atomic FetchAdd / Add Remote Sync | local read-write | RDMA atomic | local read-write **and** RDMA atomic | RDMA atomic | yes (peer exports) |
 | Send / Send-Imm | local read-write | — | local read-write | — | no |
-| Receive | depends on the received task | — | local read-write | — | not relevant |
+| Receive | local read-write | — | local read-write | — | not relevant |
 
 - **The mmap must stay valid until the RDMA context is destroyed.**
   Destroying the mmap before `doca_ctx_destroy()` is a use-after-free

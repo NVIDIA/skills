@@ -26,39 +26,18 @@ compatibility: >
   subpackage so the CLI is present under
   /opt/mellanox/doca/tools/. Runs from either the x86/Arm host or
   the BlueField Arm side; a live host↔DPU comch channel created
-  via the doca-comch library is needed for non-empty inspection.
+  via the doca-comch library is needed for non-empty tables.
 ---
 
 # DOCA Comm Channel Admin Tool
 
-> **CRITICAL — how to read the body of this skill (drain / restart /
-> inspect / state-changing-operation framing).** The shipped
-> `doca_comm_channel_admin` binary is a SINGLE-SHOT, READ-ONLY,
-> SCAN-AND-PRINT tool. It registers ZERO application-level arguments
-> in `register_comm_channel_admin_params()` (only ARGP defaults are
-> registered), it shells out to `resourcedump` (MFT) per device, and
-> it prints two ASCII tables. There is NO `drain` subcommand, NO
-> `restart` subcommand, NO `inspect <channel-id>` subcommand, NO
-> state-changing operation, and NO `list-first → inspect-one →
-> drain-or-restart` workflow exposed BY THIS BINARY. Wherever the
-> sections below (`## Example questions`, [`CAPABILITIES.md`](CAPABILITIES.md),
-> [`TASKS.md`](TASKS.md)) say *"drain a channel"*, *"restart it"*,
-> *"per-channel inspect step"*, *"state-changing operation gate"*,
-> or *"smoke-before-bulk"*, read those as **conceptual operator
-> actions the operator performs via OTHER paths AFTER reading this
-> tool's tables** — not as subcommands the admin binary itself ships.
-> Concretely: the operator drains/resets/reconnects by going to the
-> **program side** through [`doca-comch`](../../libs/doca-comch/SKILL.md)
-> (the comch library's `doca_ctx_stop()` → reset → `doca_ctx_start()`
-> reconnect lifecycle), or by reloading the BlueField driver / mode
-> via [`doca-setup`](../../doca-setup/SKILL.md) +
-> [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md), or by
-> RShim / BFB reset for the deepest cases — NEVER by re-invoking the
-> admin binary with a flag, because no such flag exists. The body
-> below uses the legacy *drain/restart/inspect/state-changing* names
-> because they describe the operator's mental model; this banner is
-> the authoritative mapping from that model onto the actual binary
-> surface.
+> **Actual binary contract.** `doca_comm_channel_admin` is one
+> zero-application-argument, read-only scan-and-print operation.
+> It scans every comch-capable `doca_dev` on the current side via
+> `resourcedump` (MFT) and prints SERVERS and CONNECTIONS tables.
+> It has no list, inspect, device-scope, drain, restart, or other
+> application operation. This skill does not retain conceptual
+> workflows under invented command names.
 
 **Where to start:** This is a tool skill for invoking the DOCA Comm
 Channel Admin Tool — the **read-only inventory** CLI counterpart
@@ -79,13 +58,13 @@ a different channel set than the program. Open
 the printed tables actually mean* and *what is not in this
 tool's scope*. If the user has not installed DOCA yet, route to
 [`doca-setup`](../../doca-setup/SKILL.md) first; if the user
-needs MFT (`mst start` + `resourcedump` on PATH and root/sudo
-privileges to invoke it), `doca-setup` + `doca-public-knowledge-map`
+needs MFT (`resourcedump` on `PATH` with the privilege documented
+for the installed release), `doca-setup` + `doca-public-knowledge-map`
 cover that. If the user is holding pre-2.5 docs that mention
 "Comm Channel", route to
 [`doca-comch CAPABILITIES.md ## Version compatibility`](../../libs/doca-comch/CAPABILITIES.md#version-compatibility)
 for the rename rule. If the user wants to *change* channel
-state (reset / drain / restart), route to the program-side
+state, route to the program-side
 reconnect lifecycle in [`doca-comch`](../../libs/doca-comch/SKILL.md)
 or to BlueField mode / driver reload in
 [`doca-setup`](../../doca-setup/SKILL.md) +
@@ -98,27 +77,17 @@ The CLASSES of admin-tool questions this skill is built to answer,
 each with one worked example. The class is the load-bearing piece;
 the worked example is one instance.
 
-- **"Which comch channels are currently active on this BlueField?"** —
-  worked example: *"enumerate every comch channel the DPU server is
-  presently accepting from host clients"*. Answered by the channel
-  enumeration in
+- **"Which comch servers and connections are currently visible?"** —
+  worked example: *"print every server and connection row visible
+  on this side"*. Answered by the scan-and-print surface in
   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  + the list-first invocation in
+  + the single invocation in
   [`TASKS.md ## run`](TASKS.md#run).
-- **"What state is this channel in?"** — worked example: *"a host
-  client reports its send-task is hanging; is the channel HEALTHY,
-  draining, or stuck"*. Answered by the channel-state inspection
-  surface in
+- **"What does the tool report for this server or connection?"** —
+  locate the matching row in the SERVERS or CONNECTIONS table;
+  there is no second per-channel query. Answered by
   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  + the per-channel inspect step in
-  [`TASKS.md ## run`](TASKS.md#run).
-- **"A channel is stuck — should I drain it or restart it?"** —
-  worked example: *"a producer / consumer fast-path has no
-  completions for 30 seconds and the consumer process is still
-  alive"*. Answered by the drain-vs-restart decision rule in
-  [`TASKS.md ## debug`](TASKS.md#debug) +
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
-  state-changing-operation gate.
+  + [`TASKS.md ## run`](TASKS.md#run).
 - **"How do I know the admin tool's view matches what my Comch
   program sees?"** — worked example: *"the program reports
   CONNECTED but the admin tool lists zero channels"*. Answered by
@@ -143,7 +112,7 @@ the worked example is one instance.
 ## Audience
 
 This skill serves **external operators and AI agents who need to
-inspect or intervene on a host-DPU comch channel from the outside**
+inventory a host-DPU comch channel from the outside**
 — after the [`doca-comch`](../../libs/doca-comch/SKILL.md) library
 has been used to create the channel from a program. Concretely:
 
@@ -153,9 +122,8 @@ has been used to create the channel from a program. Concretely:
 - A developer of a Comch consumer who sees `DOCA_ERROR_AGAIN` or a
   silent stall on the program side and wants to read the channel's
   state from outside the program rather than guessing.
-- An AI agent driving an operational triage step *"is the comch
-  channel stuck"* before recommending a code change or a process
-  restart.
+- An AI agent capturing the external server/connection rows before
+  recommending a program-side code or lifecycle change.
 
 It is **not** for users debugging the admin tool itself, **not** a
 substitute for the live public DOCA Comm Channel Admin Tool guide,
@@ -178,10 +146,8 @@ with DOCA installed (or inside the public NGC DOCA container with
 the right device passthrough). Concretely:
 
 - Listing currently active comch channels on a host or DPU.
-- Inspecting the state of one named channel before deciding
-  whether to leave it alone, drain it, or restart it.
-- Walking the drain-vs-restart decision for a stuck channel
-  reported by a Comch-using application.
+- Reading the row for one named server or connection from the
+  complete zero-argument scan.
 - Cross-checking the admin tool's view against the program-side
   connection callback state when the two appear to disagree.
 - Capturing a side-effect-free channel snapshot as prerequisite
@@ -200,21 +166,18 @@ those, route to
 This is a **thin loader**. Substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — what the Comm Channel Admin Tool reports and
-  changes: the documented channel-state surface, the read-only vs
-  state-changing operation split, the version-availability overlay
+- `CAPABILITIES.md` — what the Comm Channel Admin Tool reports:
+  the two read-only tables, the version-availability overlay
   that redirects to [`doca-version`](../../doca-version/SKILL.md),
   the layered error taxonomy (tool-not-installed / device-binding
   / channel-discovery / channel-state-stuck / permission /
   version / cross-cutting), the tool's role as an observability
   primitive for [`doca-comch`](../../libs/doca-comch/SKILL.md)
-  debug sessions, and the safety policy that makes drain and
-  restart high-stakes operations gated on a clean inspection
-  first.
+  debug sessions, and the read-only safety policy.
 - `TASKS.md` — step-by-step workflows for the in-scope task verbs:
   `configure` (route to install), `build` (route to install),
-  `modify` (refuse), `run` (list-then-inspect), `test`
-  (smoke-before-bulk capability check), `debug` (the layered
+  `modify` (refuse), `run` (one scan-and-print), `test`
+  (cross-check the printed rows), `debug` (the layered
   diagnosis ladder), plus a `Deferred task verbs` block and a
   `Command appendix` that honors the bundle's
   [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
@@ -251,13 +214,12 @@ pull requests should not add:
 ## Loading order
 
 1. Read this `SKILL.md` first to confirm the user's question is in
-   scope (the user wants to inspect or intervene on a comch
+   scope (the user wants to inventory a comch
    channel from the outside, not learn the comch API).
-2. **For what the tool reports, the read-only vs state-changing
-   split, version availability, the layered error surface,
+2. **For what the tool reports, version availability, the layered error surface,
    observability, and safety posture, see
    [CAPABILITIES.md](CAPABILITIES.md).**
-3. **For the documented invocations and the smoke-before-bulk
+3. **For the single invocation and cross-check
    workflow — `configure`, `build`, `modify`, `run`, `test`,
    `debug`, plus the `Command appendix` — see
    [TASKS.md](TASKS.md).**
@@ -265,7 +227,7 @@ pull requests should not add:
 ## Related skills
 
 - [`doca-comch`](../../libs/doca-comch/SKILL.md) — the library
-  whose channels this tool inspects. Pair them in every
+  whose channels this tool inventories. Pair them in every
   triage session: the program-side connection callback and the
   admin tool's channel state are the two halves of the same
   picture.
@@ -286,5 +248,5 @@ pull requests should not add:
   container. This skill assumes its preconditions are satisfied.
 - [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
   debug ladder. The Comm Channel Admin Tool slots in at the
-  *runtime* layer as the read-only inspection surface before any
+  *runtime* layer as the read-only inventory surface before any
   code change is recommended.

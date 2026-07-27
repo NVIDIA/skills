@@ -253,10 +253,12 @@ Iteration shape:
    silently accepting a tampered ciphertext is the worst failure
    mode this library exposes.
 7. **Negative test for unsupported config.** Once the positive path
-   works, intentionally request a key size the device should NOT
-   support (per step 1) and confirm the failure is the expected
-   `DOCA_ERROR_NOT_SUPPORTED`. This validates the agent's
-   capability-discovery is itself correct.
+   works, use a key type that the step-1 capability query explicitly
+   reports unsupported and confirm `DOCA_ERROR_NOT_SUPPORTED`. If the
+   device supports both public key types, skip this key-type negative
+   test with that reason; do not invent an enum value. An alternative
+   negative is allowed only when another capability query explicitly
+   declares the selected configuration unsupported.
 
 Eval-loop overlay — why this is a loop, not a one-shot pass:
 
@@ -270,9 +272,13 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | Decrypt completion reports `IO_FAILED` (or equivalent tag-verification-failure status) on real user ciphertext | Tag verification failed on data the user thought was good | This is a **security signal**, not a code bug: the ciphertext was tampered with or corrupted in transit / at rest. Do not consume the plaintext, do not retry the decrypt — treat the input as untrusted and route to the user's application-layer policy for tampered input. |
 | Bulk submit returns `DOCA_ERROR_AGAIN` | First N submissions succeed, then `AGAIN` | The task queue is full. Drain completions between bursts via `doca_pe_progress()`, or raise the configured queue depth at configure time. |
 
-Loop termination: stop iterating once two consecutive iterations of
-the same kind do not change anything — that means the cause is
-below DOCA AES-GCM. Escalate to
+Loop termination: an iteration kind is one row of the table above:
+capability re-check, permission fix, sizing fix, known-vector/AAD
+fix, completion drain, or queue-pressure fix. After each
+single-variable fix, re-capture that row's observable result. Stop
+after two consecutive iterations of the same kind leave both the
+relevant configuration or capability output and the observed symptom
+unchanged — that means the cause is below DOCA AES-GCM. Escalate to
 [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
 with the captured cap-query snapshot + known-vector diff as
 evidence.
@@ -435,7 +441,7 @@ the agent should:
 | `doca_caps --version` | `## configure` step 1; `## test` step 1 | What is the *runtime* DOCA version on this host? | A semver string matching `pkg-config --modversion doca-aes-gcm` |
 | `ls /opt/mellanox/doca/samples/doca_aes_gcm/` | `## modify` slot 1 | Which AES-GCM samples ship in this install, and which is the closest starting point? | A list of sample directories named after the task pattern they demonstrate |
 | `cat /opt/mellanox/doca/applications/VERSION` | `## configure` step 1; `## debug` layer 1 | What does the install tree itself claim its version is? | A semver string matching the other two version sources |
-| `openssl enc -aes-256-gcm -K <hex_key> -iv <hex_iv> -in plaintext.bin -out ciphertext.bin` (illustrative — the real reference uses `EVP_*` programmatically) | `## test` step 5 | What is the CPU-reference ciphertext for the bulk-encrypt comparison? | Bytes matching the doca-aes-gcm output for the same key + IV + AAD + plaintext. Differences = configuration bug, not a CPU-vs-accelerator difference |
+| The existing EVP-based CPU reference harness or a published NIST/RFC AES-GCM known vector | `## test` step 5 | What is the CPU-reference ciphertext and tag for the bulk-encrypt comparison? | Ciphertext and tag matching the doca-aes-gcm output for the same key + IV + AAD + plaintext. Do not use `openssl enc -aes-*-gcm`; that CLI is not the bundle's AEAD reference workflow. |
 | `dmesg | tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last AES-GCM call? | Empty or recent benign messages. Repeated mlx5 / accelerator errors → driver-layer bug; route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 3 | What did the structured DOCA logger emit for the first failing call? | A trace-level line on every lifecycle transition and every task submission. Silence after submission = PE not progressed. **Do not log the key buffer** — only the library's own trace lines |
 

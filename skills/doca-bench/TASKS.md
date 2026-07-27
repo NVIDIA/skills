@@ -70,10 +70,13 @@ Steps the agent should walk the user through, in order:
    not every workload shape is documented for every BlueField
    generation.
 5. **Axis 3 — pick the measurement mode.** Throughput vs
-   bulk-latency vs precision-latency per the public guide's
-   three documented modes. Quote back to the user *why* you
+   bulk-latency vs precision-latency vs max-bandwidth per
+   the shipped binary's four `benchmark_mode` values and the
+   public guide. Quote back to the user *why* you
    picked the mode — *"throughput because the user asked
-   about bandwidth"*, *"precision-latency because the user
+   about aggregate op-rate"*, *"max-bandwidth because the
+   user asked for the saturation ceiling"*,
+   *"precision-latency because the user
    asked about per-job tail latency"* — so the user can
    challenge the framing if it does not match intent. The
    modes are not interchangeable; see
@@ -86,6 +89,13 @@ Steps the agent should walk the user through, in order:
    public guide's *"not for production"* warning per
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
    and confirm a non-production segment is available.
+7. **Predeclare workload tolerance.** Before the first
+   measurement, record the metric being judged and the
+   acceptable run-to-run absolute or percentage delta for this
+   workload. The operator or workload owner supplies this
+   tolerance; the agent must not invent `X%` after seeing the
+   results. No declared tolerance means the run can be captured
+   as exploratory evidence but cannot be called stable.
 
 For the canonical DOCA universal lifecycle that underlies
 program-side configuration (which `doca_bench` itself runs
@@ -162,9 +172,10 @@ Routing for nearby "modify" questions:
   the shipped tool, not contributors to it.
 - *"I need a *different measurement* than `doca_bench`
   reports."* → re-examine axis 3 (measurement mode) in
-  [`## configure`](#configure) first; the three documented
-  modes cover throughput, latency-distribution, and
-  per-job-latency. If the question is genuinely outside
+  [`## configure`](#configure) first; the four documented
+  modes cover aggregate throughput, bulk-latency
+  distribution, per-job precision latency, and the
+  max-bandwidth saturation ceiling. If the question is genuinely outside
   bench's surface (e.g. application-level end-to-end timing),
   route to
   [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)
@@ -224,7 +235,8 @@ flow, not the verbatim command lines (per
    loop back to [`## debug`](#debug) before sinking time
    into a longer run.
 5. **Plan the bulk / swept run** only after the smoke is
-   green. The public guide documents the `--sweep` family for
+   green and the workload tolerance from `## configure`
+   step 7 is recorded. The public guide documents the `--sweep` family for
    parameter sweeps; the agent's rule for sweep planning is
    *enumerate the swept dimension explicitly, estimate the
    total run time, and confirm the operator is OK with the
@@ -262,7 +274,7 @@ one library × mode):
 | Iteration trigger | What it looks like | What changes next iteration |
 | --- | --- | --- |
 | Smoke completed; number is far below datasheet headline | Could be cold pipeline, wrong workload shape, wrong NUMA, or actually-right for this install. Do not assume datasheet first. | Confirm warm-up applied per [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy) layer 5; re-check axis 2 (workload shape) in [`## configure`](#configure) step 4; only then question hardware. |
-| Throughput-mode number swings > X% across short re-runs | Steady-state not reached; outlier-dominated run | Lengthen the run via the documented duration / job-count limit; re-run; if still volatile, switch to bulk-latency mode to surface the distribution. |
+| Throughput- or max-bandwidth-mode result exceeds the workload's predeclared tolerance across re-runs | Steady-state not reached; outlier-dominated run | Lengthen the run via the documented duration / job-count limit and re-run. Do not substitute an after-the-fact tolerance. |
 | Precision-latency mean looks good; 99.99th percentile is huge | Tail-latency story is the actual answer; the mean is misleading | Quote the percentile breakdown, not the mean, per [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability) the precision-latency mode's reported distribution. |
 | Same invocation produces different numbers on two hosts at the same DOCA version | NUMA / firmware / driver delta below DOCA | Walk axis 2 environment (cores / threads / NUMA) and the version layer per [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test) before blaming bench. |
 | Same invocation produces different numbers on the same host across DOCA versions | This *is* a regression signal — provided both four-tuples are captured | Cross-link the two baselines, name the changed fields, route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) for the version-delta diagnosis. |
@@ -284,10 +296,13 @@ alongside the summary and CSV. Without all four, the baseline
 cannot be regression-tested later; quoting a number without the
 four-tuple is the cross-version regression-hunt failure mode.
 
-Loop termination: stop iterating once two consecutive runs do
-not change the picture — the answer is now *"this is what the
-device delivers on this DOCA version / firmware / driver
-stack"*. Escalate cross-version or cross-host comparisons to
+Loop termination requires **two consecutive runs within the
+predeclared workload tolerance** for the selected metric. Record
+both values and the tolerance. If two consecutive stable runs
+cannot be obtained after the bounded re-run above, do not report
+a stable benchmark; escalate the captured four-tuples and
+variance to [`doca-debug ## debug`](../../doca-debug/SKILL.md)
+or the workload owner. Escalate cross-version or cross-host comparisons to
 [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test)
 or [`doca-debug ## debug`](../../doca-debug/SKILL.md) with the
 captured four-tuples as evidence.

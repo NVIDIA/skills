@@ -4,7 +4,7 @@ name: doca-gpunetio-ib-write-bw
 description: >
   Use this skill when the user is building, running, or interpreting
   the doca/tools/gpunetio_ib_write_bw client+server benchmark — a CUDA
-  kernel on the server posts RDMA WRITE work requests through the
+  kernel on the client posts RDMA WRITE work requests through the
   doca-gpunetio device-side surface to measure sustained GPU-driven
   WRITE bandwidth on a GPU+IB-device pair. Trigger even when the user
   does not explicitly mention "doca-gpunetio-ib-write-bw" or
@@ -21,13 +21,12 @@ description: >
 metadata:
   kind: tool
 compatibility: >
-  Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
-  22.04/24.04 or RHEL/SLES) with a BlueField DPU or ConnectX NIC. Reads
-  `pkg-config doca-gpunetio doca-rdma doca-common` and inspects
-  /opt/mellanox/doca/tools/gpunetio_ib_write_bw/. Requires an NVIDIA
-  GPU with CUDA toolkit + nvcc installed, the `nvidia_peermem` kernel
-  module loaded, and an InfiniBand-capable RNIC paired with the GPU on
-  a common PCIe/NVLink fabric.
+  Requires DOCA SDK on Linux with a BlueField DPU or ConnectX NIC,
+  NVIDIA GPU, CUDA toolkit and nvcc, loaded `nvidia_peermem`, and an
+  InfiniBand RNIC paired with the GPU. Uses `pkg-config` for
+  doca-gpunetio, doca-rdma, and doca-common, plus the installed
+  gpunetio_ib_write_bw sources. Run only on a trusted, non-shared IB
+  fabric during the benchmark window.
 ---
 
 # DOCA GPUNetIO ib_write_bw
@@ -204,7 +203,7 @@ This is a **thin loader**. Substantive material lives in
 two companion files:
 
 - `CAPABILITIES.md` — what the tool measures (the
-  sustained-WRITE-BW primitive driven by a server-side
+  sustained-WRITE-BW primitive driven by a client-side
   CUDA kernel through doca-gpunetio), the
   runtime-surface selection rule (GPUNetIO vs GPI vs
   CPU-initiated), the GPU-NIC pairing precondition, the

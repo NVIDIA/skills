@@ -46,10 +46,13 @@ lives in [`doca-setup`](../../doca-setup/SKILL.md). The
    reports the IB device for `-d <ibdev>`.
 7. **OOB connectivity exists between client and server**
    for the TCP exchange the source's connection helpers
-   drive.
+   drive. Determine the OOB TCP port from the installed source or binary
+   `--help` before changing a firewall; do not guess a port.
 
 If any precondition fails, stop and route; tool-level
-diagnosis against a half-installed environment wastes time.
+diagnosis against a half-installed environment wastes time. This applies
+independently to client and server: if only one host passes, the pair is not
+ready and no benchmark run starts.
 
 ## configure
 
@@ -68,7 +71,10 @@ Steps the agent walks the user through, in order:
    pairing** on each host. `nvidia-smi --query-gpu=pci.bus_id`
    for the GPU; `ibdev2netdev -v` (or
    `doca_caps --list-devs`) for the IB device. The
-   pairing is a hardware-topology precondition.
+   pairing is a hardware-topology precondition. Correlate both BDFs in
+   `lspci -t` (and use `nvidia-smi topo -m` when that platform exposes the
+   NIC) to verify they share the intended PCIe root or documented NVLink path;
+   do not infer locality from device names alone.
 3. **Confirm `nvidia_peermem`** per
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
 4. **Pick the GID index.** `--gid-index` is optional; the
@@ -199,19 +205,17 @@ The smoke-before-bulk flow:
    Verify the numbers are in a defensible order of
    magnitude for the GPU-NIC pair. If anything looks off,
    loop back to [`## debug`](#debug).
-6. **For real-time / control-loop characterization,
-   plan a long-iteration run.** A meaningful p99 / p99.9
-   needs enough iterations to populate the tail (typical
-   rule of thumb: at least 10^5 iterations for p99, 10^6
-   for p99.9; the exact threshold is workload-class-
-   specific). The agent surfaces this requirement to
-   the user before they ask for a *"quick latency
-   test"* that would not be statistically meaningful.
-7. **Capture all iterations.** The verified `common.h`
-   defines `NUM_ITER` constants and exposes a
-   `t_cuda`-side measurement per iteration; the agent's
-   rule for a real-time decision is *"capture the full
-   distribution, not just the summary line"*.
+6. **Determine whether the installed tool can support the requested
+   statistic.** Inspect the source and actual stdout. A meaningful p99 /
+   p99.9 needs raw samples and enough iterations to populate the tail
+   (typical rule of thumb: at least 10^5 samples for p99, 10^6 for p99.9;
+   the exact threshold is workload-class-specific). `NUM_ITER` is a source
+   constant unless the installed interface proves otherwise; do not promise
+   that the operator can raise it at runtime.
+7. **Capture the complete stdout.** If it contains only aggregate rows, report
+   them as aggregate rows and route an in-run percentile request to a bespoke
+   benchmark. Do not relabel `t_cuda` or one result row as raw per-iteration
+   samples.
 
 When recording the run for downstream consumers, write
 down: `pkg-config --modversion doca-gpunetio`,
@@ -240,7 +244,7 @@ The eval-loop overlay:
 | --- | --- | --- |
 | Smoke completes; median is far below the NIC's documented one-way latency floor | Likely a measurement artifact — possibly the CUDA-side timer is reporting wall time that does not include the full WR-completion observation | Cross-check the CUDA-side number against the host-side `t_full_iter`; re-walk the warm-up rule. |
 | Median fine, but p99 is many multiples of the median | Tail latency is real — this IS the answer the operator is looking for if the workload is real-time | Quote the p99 as the answer; capture the tail-event count alongside; do NOT average it away. |
-| Iteration count reported is lower than configured | The per-iteration timeout was set too short and iterations were dropped per `common.h`'s `timeout_ns` argument | Lengthen the timeout in the run config; re-run; the dropped iterations are themselves a signal, not noise. |
+| Iteration count reported is lower than the source constant | One hypothesis is that the kernel-side timeout compiled into the source was too short and iterations were dropped | Verify the cause from installed source and logs. The shipped interface does not document a timeout runtime option; if a different timeout is required, route to a bespoke benchmark rather than claiming a run-config change. |
 | Same invocation produces different distributions across two hosts at the same DOCA version | NUMA / firmware / driver delta below DOCA | Capture the tuple on both hosts; route through [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test) and [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug). |
 | Same invocation produces different distributions on the same host across DOCA versions | Regression signal — provided both tuples are captured | Route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug). |
 | Distribution shifts when the operator runs anything else on the GPU concurrently | The benchmark's measurement is corrupted by concurrent SM activity | Re-run with the GPU at idle (`CUDA_VISIBLE_DEVICES` isolation, `nvidia-smi` to confirm no other processes). |
@@ -249,7 +253,9 @@ The agent's rule: every change to the environment re-opens
 the loop. Re-running with a different GID index, NUMA
 pinning, or firmware level without re-walking the
 distribution is exactly the failure mode this loop
-replaces.
+replaces. Bound the loop to one corrective rerun per changed axis. If that
+rerun remains unsound, capture both attempts and route to `## debug` or the
+owning cross-cutting skill; do not continue tuning indefinitely.
 
 **Baseline-capture rule.** The captured artifact includes
 the multi-axis tuple per
@@ -282,8 +288,8 @@ layers in order:
    [`../../libs/doca-rdma/CAPABILITIES.md`](../../libs/doca-rdma/CAPABILITIES.md).
 6. **Measurement-soundness.** Walk the
    [`## test`](#test) eval loop; confirm warm-up applied;
-   confirm the per-iteration timeout was generous enough;
-   confirm the right statistic was quoted.
+   verify any timeout/drop hypothesis from source or logs; confirm the
+   requested statistic is actually derivable from the emitted data.
 7. **Version.** Cross-cutting partial-install /
    mixed-version. Walk
    [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug).

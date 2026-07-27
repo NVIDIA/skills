@@ -338,7 +338,17 @@ silent.
   first acknowledging the calibration period is misreading the
   layer. The fix is a policy tuning pass per the public guide,
   done while the deployment continues to run and emit findings —
-  not a disable.
+  not a disable. Before calibration starts, the operator and
+  security-ops owner must record objective exit criteria for this
+  workload: a minimum observation window, representative workload
+  phases and documented smoke events that must be covered, a
+  quantified acceptable finding/false-positive budget, zero missed
+  required smoke detections, and no undocumented disables. The
+  period ends only when those recorded criteria hold across the full
+  window and the security-ops owner signs off. This skill does not
+  invent universal durations or rates; they are deployment posture
+  decisions grounded in the public guide and the team's operating
+  budget.
 - **Never silently disable findings (load-bearing).** When a
   detector class is over-firing during the calibration period,
   the honest moves are: (a) re-tune the detection policy per the

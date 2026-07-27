@@ -15,16 +15,15 @@ description: >
   after launch", "systemd keeps restarting it", "no matching
   device on the BF", "bfb-install exited 0 but DPU is dead",
   "ping 192.168.100.2 works but ssh fails", "host PFs aren't
-  showing netdevs". Mutating-step meta-policy (firmware burn,
-  mlxconfig set, kernel boot params) is doca-hardware-safety,
-  loaded alongside; container deployment, library APIs, env prep,
-  and binary build belong to other skills.
+  showing netdevs". Destructive firmware burn / mlxconfig set
+  requires explicit confirmation via doca-hardware-safety;
+  containers, library APIs, env prep, and build use other skills.
 metadata:
   kind: library
 compatibility: >
   No DOCA install required to read this skill (it is an overlay
   loaded against any DOCA artifact skill); the validation steps
-  within DO require a live DOCA install at /opt/mellanox/doca on
+  within this skill require a live DOCA install at /opt/mellanox/doca on
   a host or BlueField with a built DOCA-linked binary.
 ---
 
@@ -162,7 +161,7 @@ companion files:
   bare-metal-specific version overlay on the four-way version
   match owned by
   [`doca-version`](../doca-version/SKILL.md), the cross-cutting
-  error taxonomy (≥ 6 layers, walked in order), the observability
+  error taxonomy (seven layers, walked in order), the observability
   surface (stdout/stderr discipline by launch mode; device-state
   introspection via `devlink` / `sysfs` / `mlxconfig` *query*;
   per-tenant resource visibility), and the safety policy (overlay
@@ -214,7 +213,7 @@ building the binary — that path goes through
    cluster, NOT a library-API question).
 2. **For the runtime contract (two host modes, three launch
    modes, hardware-binding surface, per-tenant isolation, version
-   overlay, ≥ 6-layer error taxonomy, observability surface,
+   overlay, seven-layer error taxonomy, observability surface,
    bare-metal safety overlay), see
    [CAPABILITIES.md](CAPABILITIES.md).**
 3. **For step-by-step workflows — `configure`, `build` (routing

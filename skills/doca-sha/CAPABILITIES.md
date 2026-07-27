@@ -220,9 +220,9 @@ setup:
   *or* repeated, *or* the input is already pinned in `doca_mmap`
   memory because another DOCA library produced it.
 - **Unsupported algorithm.** If `doca_sha_cap_task_hash_get_supported(devinfo, algorithm)`
-  returns false for the user's intended algorithm on the active
-  device, the answer is to use OpenSSL (or a similar CPU library),
-  not to invent a partial-hash workaround.
+  returns anything other than `DOCA_SUCCESS` for the user's intended
+  algorithm on the active device, the answer is to use OpenSSL (or a
+  similar CPU library), not to invent a partial-hash workaround.
 - **Hash is part of a larger crypto flow.** If the user is
   computing the hash only to feed it into AES-GCM or a similar
   authenticated-encryption mode that DOCA already implements,

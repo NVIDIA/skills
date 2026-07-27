@@ -165,8 +165,14 @@ exact valid values from there rather than from memory.
 | --- | --- | --- | --- |
 | **UCX-component / collective surface** | Which UCX components and collective primitives this service instance exposes for host offload — cap-bound to what the underlying BlueField generation supports, NOT freely selectable | Host's `doca_urom_cap_*` claims the collective is supported (host library + device say yes), but runtime enqueue returns `DOCA_ERROR_NOT_SUPPORTED` because the service was not configured to expose that collective on this deployment | Public DOCA UROM Service Guide's component / collective configuration section |
 | **Enqueue queue depth** | The depth of the service-side queue that receives host enqueues; sized to the cluster's intended in-flight depth per host | Host enqueues start succeeding, then return `DOCA_ERROR_AGAIN` after N submits; OR, on the service side, the queue backs up and the host's progress engine sees a stall | Public DOCA UROM Service Guide's queue / sizing section |
-| **DOCA Comch endpoint pairing** | How the host's `doca-urom` library reaches this service — over a DOCA Comch endpoint pair (the daemon defaults to the BlueField's Comch device/representor). Access is governed by that Comch pairing plus the underlying RDMA permissions; there is NO service-side authorization list to author | Host's `doca_ctx_start` cannot establish, or the daemon never logs the connection — a Comch-pairing / device-mapping problem, surfaced as a connection failure, NOT a service authz rejection | Public DOCA UROM Service Guide's connection / Comch section; [`doca-rdma`](../../libs/doca-rdma/SKILL.md) for the permission substrate |
+| **DOCA Comch endpoint pairing** | How the host's `doca-urom` library reaches this service — over a DOCA Comch endpoint pair (the daemon defaults to the BlueField's Comch device/representor). Because there is no service-side authorization list, pair only the explicitly intended host endpoint(s); a broad or ambiguous pairing expands who can drive remote memory operations | Host's `doca_ctx_start` cannot establish, the daemon never logs the intended connection, or an unintended host can pair — a Comch-pairing / device-mapping problem, not a service authz decision | Public DOCA UROM Service Guide's connection / Comch section; [`doca-comch`](../../libs/doca-comch/SKILL.md) for pairing verification |
 | Underlying RDMA substrate (fourth, configured outside this service) | The service does NOT stand up the RDMA fabric; it consumes it. The BlueField's `doca-rdma` substrate must be healthy on the ports this service will use | Operations enqueued, never complete; or completions surface as `DOCA_ERROR_IO_FAILED` at the host API | Route to [`doca-rdma`](../../libs/doca-rdma/SKILL.md) for the substrate-layer configure / debug |
+
+The RDMA side follows least privilege: export only the memory
+regions the intended UROM operation requires, with only the
+documented access permissions needed for that operation. Do not
+broaden an export or grant read/write/atomic permissions merely
+to make bring-up easier.
 
 The agent's rule: **the configuration-axes decision precedes
 container start**. A deployment that starts the container
@@ -426,6 +432,26 @@ around the container itself.
   implement; a host-visible `DOCA_ERROR_NOT_PERMITTED` is a
   Comch / RDMA / `doca_dev` signal, not a UROM-service authz
   decision.
+- **Intended-host-only pairing is the access boundary.** Before
+  start, identify the exact host endpoint(s) permitted to pair,
+  verify that mapping through the documented read-only
+  [`doca-comch`](../../libs/doca-comch/SKILL.md) surface, and
+  refuse startup when the pairing is broad, ambiguous, or shows
+  an unintended peer.
+- **RDMA exports are least privilege.** Export only the memory
+  regions needed by the intended workload and grant only its
+  required read, write, or atomic permissions. Verify the
+  documented `doca-rdma` capability, connection, and permission
+  state through
+  [`doca-rdma TASKS.md ## test`](../../libs/doca-rdma/TASKS.md#test)
+  before service start; never use a wider export as a diagnostic
+  shortcut.
+- **Pre-start substrate gate.** Container start is blocked until
+  both checks are green: the Comch view identifies only the
+  intended host pairing, and the RDMA view confirms the intended
+  peer, narrowly scoped exports, required permissions, and
+  healthy transport. Capture both read-only outputs as the
+  pre-start evidence.
 
 ## Public-source pointer
 

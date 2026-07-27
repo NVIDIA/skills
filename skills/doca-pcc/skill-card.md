@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when the user is doing hands-on host-side DOCA PCC work to load a custom Programmable Congestion Control algorithm onto a BlueField DPU — creating per-port doca_pcc contexts, loading a dpacc-compiled doca_pcc_app, parameterizing it, walking triple-axis capability discovery, or debugging DOCA_ERROR_* from doca_pcc_*. <br>
+Use this skill when the user is doing hands-on host-side DOCA PCC work to load a custom Programmable Congestion Control algorithm onto a BlueField DPU. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers building applications that consume the DOCA PCC library from the host side to load custom congestion control algorithms onto BlueField DPUs, attach them to ports carrying RDMA/RoCE traffic, and debug DOCA_ERROR_* failures. <br>
+External developers and engineers building host-side applications that consume the DOCA PCC library to load, attach, parameterize, and debug custom congestion control algorithms on BlueField DPUs. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,24 +25,25 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA PCC Documentation](https://docs.nvidia.com/doca/sdk/DOCA-PCC/index.html) <br>
-- [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA PCC Programming Guide](https://docs.nvidia.com/doca/sdk/DOCA-PCC/index.html) <br>
+- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Shell commands, Configuration instructions] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- claude-code <br>
-- codex <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 evaluation tasks using NVSkills-Eval Tier 3 profile (external). <br>
+Evaluated against 4 internal skill tasks (3 positive activation, 1 negative activation). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -59,26 +60,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+72%) | 96% (+37%) |
-| Discoverability | 4 | 100% (+75%) | 93% (+41%) |
-| Effectiveness | 4 | 80% (+49%) | 93% (+48%) |
-| Efficiency | 4 | 92% (+47%) | 88% (+37%) |
-
-## Testing Completed: <br>
-**[x] Agent Red-Teaming** <br>
-**[ ] Network Security** <br>
-**[ ] Product Security** <br>
+| Correctness | 4 | 100% (+35%) | 100% (+35%) |
+| Discoverability | 4 | 100% (+38%) | 95% (+39%) |
+| Effectiveness | 4 | 88% (+54%) | 94% (+46%) |
+| Efficiency | 4 | 94% (+45%) | 98% (+58%) |
 
 ## Skill Version(s): <br>
-a7eddc6 (source: git SHA, committed 2026-07-15) <br>
+7b32072 (source: git SHA, committed 2026-07-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

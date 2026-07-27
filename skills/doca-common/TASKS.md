@@ -214,9 +214,11 @@ Steps the agent should walk the user through:
 5. **Submit one task and confirm it completes.** Use the
    per-library `task_*_submit` for the user's primary library;
    confirm the completion callback fires through `doca_pe_progress`.
-   This is the cheapest smoke that the foundation is alive — if
-   the callback never fires, the failure is at the foundation
-   layer, not the per-library layer.
+   This is the cheapest smoke that the foundation is alive. If the
+   callback never fires, capture both possibilities: a foundation
+   failure (PE not driven or context not connected) and a per-library
+   failure (task submission or callback registration), then route
+   through [`## debug`](#debug) without assuming which layer owns it.
 6. **Capture the structured log.** Redirect `stderr` to a file
    (`2> doca.log`) so the subsequent `## test` iterations have a
    stable artifact to diff against.
@@ -235,9 +237,10 @@ done.
 
 **`## test` is an iterative loop, not a one-shot pass.** The agent's
 job is to run the four steps below in order, and *loop back to
-step 1 whenever the spec is mutated by a cross-check finding*.
+step 1 after the first evidence-backed spec mutation*. A finding on
+that complete rerun triggers escalation rather than another mutation.
 Treating validate-once as good-enough is the failure mode this loop
-replaces; every spec mutation re-opens validate.
+replaces; the first spec mutation re-opens validate.
 
 The eval-loop overlay (rows apply to every Common skeleton, not
 just one):
@@ -249,8 +252,10 @@ just one):
 | 1 → 4 → 1 | PE-drive verification (step 4) may reveal `doca_pe_progress` is never called or is called on the wrong PE; loop back to step 1 with the loop fixed | [`CAPABILITIES.md ## progress engine`](CAPABILITIES.md#progress-engine) |
 | 4 → ## debug | Tasks submit, PE is driven, completions still do not arrive — escalate to the Common debug overlay | [`## debug`](#debug) |
 
-The agent's rule: every mutation between steps re-opens the four
-steps. Skipping the re-validate after a mutation is the universal
+The agent's rule: the first evidence-backed mutation between steps
+re-opens the four steps for one complete rerun. A further useful
+mutation is captured for escalation instead of opening another rerun.
+Skipping the re-validate after the first mutation is the universal
 foundation-layer failure mode.
 
 Steps:
@@ -281,9 +286,11 @@ Steps:
    created the PE. Catches the case where the run loop drives a
    different PE than the one the contexts are connected to.
 
-Loop termination: stop iterating once the four steps each pass
-without mutating the prior step. Beyond that, escalate suspicious
-behavior to
+Loop termination: run the four-step sweep once and permit at most one
+evidence-backed mutation followed by one complete rerun. Stop when
+that second sweep finishes, even if another mutation appears useful.
+If all four steps are not green without mutating a prior step,
+escalate to
 [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
 with the captured log + baseline + version state as evidence.
 

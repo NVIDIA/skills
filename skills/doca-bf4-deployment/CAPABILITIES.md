@@ -64,7 +64,7 @@ boot mechanism differs by method.
 
 | Property | Method A — UEFI HTTP Boot (recommended) | Method B — PXE Boot | Method C — Redfish Virtual Media |
 | --- | --- | --- | --- |
-| What hosts the ISO | An HTTP server the operator runs at {iso-uri} (no PXE/DHCP/TFTP needed) | A configured PXE server: DHCP + TFTP + the ISO | The BMC itself (ISO uploaded to BMC eMMC), or a remote HTTPS server |
+| What hosts the ISO | An HTTP server the operator runs at {iso-uri} (no PXE/DHCP/TFTP needed) | A configured PXE server: DHCP + TFTP + the ISO | The BMC itself (ISO uploaded to BMC eMMC; preflight the combined local payload and stop above the 5 GB local-payload limit documented by the public BlueField-4 deployment guide), or a remote HTTPS server |
 | How Grace reaches the installer | Reach the OOB console via BMC SSH + `obmc-console-client`; reboot; in UEFI go Device Manager -> Network Device List -> select the OOB MAC -> HTTP Boot Configuration -> set Boot URI to {iso-uri} -> save -> Boot Manager -> select UEFI HTTP -> boot | In Boot Manager set next boot to the OOB IPv4 net device; select the DOCA arm64 menu, then the ISO | Upload the ISO to BMC eMMC via the Redfish SimpleUpdate API; attach via Redfish VirtualMedia (Grace then sees USB mass-storage devices); set BootSourceOverride to USB (Once / UEFI); reset Grace |
 | When to use it | Default — fewest moving parts, no DHCP/TFTP infrastructure | When you already have PXE infrastructure or need a custom `bf.cfg` | Fully out-of-band, no physical access, when you do not want to stand up HTTP/PXE; requires a recent dpu-bmc version |
 | Out-of-band? | Console is OOB; the ISO fetch is over the OOB network | Console is OOB; the ISO fetch is over the OOB network | Fully out-of-band end to end |
@@ -85,9 +85,10 @@ BlueField-4 platform firmware (the BMC, the NIC firmware, the SBIOS,
 and the ERoT root-of-trust) updates through the **PLDM for Firmware
 Update** flow driven over Redfish. The class-level surface:
 
-- **NIC firmware from the host (when required).** Some flows program
-  NIC firmware from the host with `flint` before the platform bundle
-  is applied; a power cycle activates it. `flint` is a MUTATING
+- **NIC firmware from the host (only when explicitly required).** Use
+  `flint` before the platform bundle only when the public release
+  notes for the selected bundle explicitly require that path;
+  otherwise skip it. A power cycle activates it. `flint` is a MUTATING
   firmware op — route the burn through
   [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md).
 - **Push the bundle.** Upload the `.fwpkg` bundle ({fw-image}) via a
@@ -96,7 +97,14 @@ Update** flow driven over Redfish. The class-level surface:
 - **Monitor the Task.** The push returns a Redfish **Task** resource
   ({task-id}). Healthy progression is `TaskState` Running ->
   Completed with `PercentComplete` climbing to 100; a `Messages`
-  Exception or a non-Completed terminal state is failure.
+  Exception or a non-Completed terminal state is failure. Follow any
+  Task-specific retry/timeout guidance. If none is published, classify
+  the Task as stalled when `TaskState`, `PercentComplete`, and
+  `Messages` are unchanged across two consecutive observations at an
+  operator-approved interval, then stop polling and escalate. Permit
+  only those two observations. If no interval is approved, do not
+  poll; stop with `confirmation_required`, ask the operator to approve
+  an interval, and remain stopped until one is supplied.
 - **Verify the pending images.** `pldmtool fw_update GetFwParams -m
   {eid}` lists each component's `ActiveComponentVersionString` and
   `PendingComponentVersionString`. A staged-but-not-active update
@@ -105,8 +113,10 @@ Update** flow driven over Redfish. The class-level surface:
 - **Activate.** Many components activate only on a power cycle (e.g.
   `ipmitool power cycle`). After activation, re-run GetFwParams and
   confirm Active now equals the target (Pending cleared).
-- **Optional clean state.** A BMC factory reset can return the BMC to
-  a documented clean state; it is a MUTATING op and is never routine.
+- **BMC factory reset is recovery-only.** Do not add it as generic
+  cleanup. It is allowed only when a version-matched public recovery
+  procedure explicitly requires it and the operator requests and
+  separately confirms the exact reset through `doca-hardware-safety`.
 
 The target versions for every component come from the **public
 BlueField/DOCA release notes** — this skill never cites a specific
@@ -116,12 +126,13 @@ pre-release / "dev drop" firmware version number.
 
 A Grace Ubuntu image can be installed — with an optional cloud-init
 seed — entirely through Redfish Virtual Media, as a variant of
-Method C above. The load-bearing constraints (the `CIDATA` seed
-volume label; the local-eMMC vs remote-HTTPS hosting choice; the
-BMC-fixed `image.iso` / `config.iso` URIs; and the
-attach → boot → verify → **detach** order, never ejecting
-mid-install) are carried inline in the procedure rather than
-restated here. See
+Method C above. The load-bearing constraints are: the seed volume
+label is exactly `CIDATA`; local eMMC hosting is allowed only after
+the image-plus-seed total is confirmed at no more than 5 GB; remote
+hosting must meet the documented HTTPS requirements; the BMC-facing
+URIs are exactly `image.iso` and `config.iso` regardless of original
+filenames; and the order is attach → boot → verify → **detach**,
+never ejecting mid-install. See
 [`TASKS.md ### grace-ubuntu-cloud-init`](TASKS.md#grace-ubuntu-cloud-init)
 for the full step-by-step flow and the cloud-init layer of
 [`## Error taxonomy`](#error-taxonomy) for its failure modes.
@@ -142,12 +153,16 @@ there; this skill does not duplicate it.
   Quoting a specific pre-release firmware version string from memory is
   the canonical hallucination failure for this skill and would also
   leak non-public information.
-- **The Redfish FirmwareInventory is the post-update version anchor.**
-  After a PLDM update, the per-component versions reported by the
-  Redfish FirmwareInventory (and by `pldmtool fw_update GetFwParams -m
-  {eid}`) are the authoritative "what is actually running" picture —
-  compare them against the release-notes target, not against an
-  assumed value.
+- **Use PLDM for activation state; use Redfish as the inventory
+  cross-check.** After a PLDM update,
+  `pldmtool fw_update GetFwParams -m {eid}` is the authoritative
+  Active-versus-Pending signal for whether each component activated.
+  Redfish FirmwareInventory is the independent post-update inventory
+  cross-check. Compare both against the release-notes target; if they
+  disagree, re-query both sources once. If they still disagree, stop
+  and escalate to the operator with both values, the OOB-console
+  evidence, and the bring-up snapshot for manual adjudication rather
+  than choosing one value or declaring success.
 - **The installed-build anchor on Grace is `cat /etc/mlnx-release`.**
   After the ISO install, the build string in `/etc/mlnx-release` is
   the Grace-side install anchor; it feeds the four-way match owned by
@@ -188,8 +203,12 @@ and blames the wrong layer.
    ends with a `Messages` Exception, or `PercentComplete` stalls.
    Causes: a corrupt or wrong-architecture `.fwpkg`; a component the
    bundle targets is not present; the BMC is busy with another update.
-   Resolution: read the Task resource's `Messages`; do NOT re-push
-   blindly; treat a stalled Task as HIGH-STAKES per
+   Resolution: capture the complete Task resource and `Messages`; do
+   NOT re-push or power-cycle blindly. If it remains stalled, stop and
+   escalate with the bring-up snapshot and OOB-console evidence. Any
+   re-burn, reset, or power-cycle recovery routes through
+   `doca-hardware-safety` and requires separate operator confirmation.
+   Treat a stalled Task as HIGH-STAKES per
    [`## Safety policy`](#safety-policy).
 4. **Activation layer — staged but not running.** Symptoms:
    `pldmtool fw_update GetFwParams -m {eid}` still shows Pending

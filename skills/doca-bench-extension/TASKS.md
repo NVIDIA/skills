@@ -170,9 +170,14 @@ Steps the agent should walk the user through, in order:
 5. **Confirm the shared library version stamp.** Run
    `readelf -d` or `objdump -p` on the built library to
    confirm `SONAME` carries the expected `soversion`.
-6. **STOP here.** Do NOT point the parent `doca-bench` at
-   the extension until the smoke-before-bulk loop in
-   [`## test`](#test) has passed.
+6. **Proceed only to smoke.** The built extension may now be
+   exercised through [`## run`](#run) steps 2–4: the no-op
+   invocation, its load/call confirmation, and one minimal
+   workload invocation. Those steps are the evidence consumed
+   by [`## test`](#test); blocking them would make testing
+   impossible. Block only [`## run`](#run) step 5, scale-up to
+   the full workload, until the no-op and minimal-workload
+   checks in `## test` have passed.
 
 When recording the build for downstream consumers, write
 down: the DOCA version, the CUDA toolkit version, the
@@ -247,6 +252,8 @@ flow.
    [`## build`](#build) steps 1-5. The build product
    exists, has the expected `SONAME`, and is on a path
    the parent loader can find.
+   Build completion authorizes only steps 2–4 below; it
+   does not authorize scale-up.
 2. **Run a no-op invocation first.** Per
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
    (smoke-before-bulk, twice): point the parent
@@ -268,7 +275,9 @@ flow.
    `timeout_ns`. The agent must confirm the `stop_flag`
    discipline before scaling.
 5. **Scale up to the operator's full workload.** ONLY
-   after steps 2-4 are clean. The agent captures the
+   after `## test` has accepted the evidence from steps
+   2–4. This is the only run step blocked by the
+   smoke-before-bulk gate. The agent captures the
    full output per [`## test`](#test) (capture step).
 
 When recording the run for downstream consumers, write

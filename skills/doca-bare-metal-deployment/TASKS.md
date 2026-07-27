@@ -9,6 +9,14 @@ skill owns deployment of an already-built binary on the operator's
 hardware. The `## test` verb is an iterative smoke-before-bulk loop,
 not a one-shot pass.
 
+> **⚠️ Destructive / irreversible operations require explicit
+> confirmation.** Before any firmware burn, `mlxconfig set`, BFB
+> reflash, or reboot/power-cycle action, load
+> [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md), show the
+> exact impact and rollback plan beside the command, and obtain the
+> operator's explicit confirmation. Do not issue the command from
+> this skill alone.
+
 These verbs cover the in-scope cross-cutting bare-metal-deployment
 workflows for an external operator launching any DOCA-linked
 application binary on either supported host mode — host x86 with a
@@ -355,9 +363,9 @@ on the bare-metal path, not just one library):
 
 | Step | Why this is a loop, not a step | Where the substance lives |
 | --- | --- | --- |
-| 1 → 4 → 1 | Step 4 (per-library liveness probe) often reveals an as-launched gap in the binding (wrong representor, wrong NUMA node) that masquerades as a binary problem; loop back to step 1 | [`## test`](#test) step 4 |
-| 2 → ## debug | When trivial-arg invocation fails, the binary cannot reach DOCA at all — escalate to [`## debug`](#debug) immediately, do not run later steps | [`## debug`](#debug) |
-| 3 → ## configure → 3 | When the liveness-equivalent invocation shows a precondition was not closed (hugepages, devlink mode, representor visibility), loop back to [`## configure`](#configure) step 3 and re-walk the preconditions | [`## configure`](#configure) |
+| 1 → 3 → 1 | Step 3 (per-library liveness probe) often reveals an as-launched gap in the binding (wrong representor, wrong NUMA node) that masquerades as a binary problem; loop back to step 1 | [`## test`](#test) step 3 |
+| 1 → ## debug | When trivial-arg invocation fails, the binary cannot reach DOCA at all — escalate to [`## debug`](#debug) immediately, do not run later steps | [`## debug`](#debug) |
+| 2 → ## configure → 2 | When the liveness-equivalent invocation shows a precondition was not closed (hugepages, devlink mode, representor visibility), loop back to [`## configure`](#configure) step 3 and re-walk the preconditions | [`## configure`](#configure) |
 | 1..5 → ## run | Each loop iteration ends with a documented smoke; if all five pass, hand off to live [`## run`](#run) traffic | [`## run`](#run) |
 
 The five steps of the smoke:
@@ -404,18 +412,22 @@ The five steps of the smoke:
    walk [`### isolation`](#isolation) before queueing more
    tenants.
 
-Loop termination: stop iterating once two consecutive iterations
-of the same kind don't change anything — that means the cause is
-below the deployment runtime (per-library configuration, hardware
-state, BlueField OS, host). Escalate to the per-library skill's
-debug ladder plus
+Loop termination: all applicable smoke steps passing ends the loop
+successfully and hands off to live traffic in [`## run`](#run).
+Otherwise stop and escalate when either (a) the **same smoke step**
+has failed twice with the same pass/fail outcome and unchanged saved
+capability + launch evidence from step 4, or (b) ten total smoke-loop
+iterations have completed without a green result. Neither stop
+condition proves which lower layer is at fault. Escalate to the
+per-library skill's debug ladder plus
 [`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug)
 with the captured layer evidence.
 
 ## debug
 
-Layered diagnosis. Walk the layers in this order; do not skip down
-without clearing the layer above. The seven layers match
+Layered diagnosis. Walk the seven deployment layers in this order;
+do not skip down without clearing the layer above. After those
+seven, run the cross-cutting host check. The seven layers match
 [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy).
 
 1. **Process-won't-start layer (layer 1).** Is the binary even
@@ -498,7 +510,8 @@ without clearing the layer above. The seven layers match
    a per-library conclusion; if the symptom only reproduces
    under co-tenancy, the diagnosis is multi-tenant isolation,
    not a per-library bug.
-8. **Cross-cutting host layer (last resort).** Deployment looks
+**Cross-cutting host check (after the seven layers; not an eighth
+taxonomy layer).** Deployment looks
    healthy at every layer above but a cross-cutting host issue
    (kernel version, driver loaded / not loaded, PCIe link
    state, hugepage allocation health beyond reserved-vs-used,
@@ -576,7 +589,9 @@ public BlueField Platform Software Manual.
       serial-over-LAN, or the physical UART (per the
       [`BlueField BMC Software`](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route)
       row in the public-knowledge-map). Without one of these, the
-      bar for proceeding is "stop, escalate" per
+      agent MUST stop and escalate to the operator responsible for
+      the target with the captured pre-flight state and rollback
+      plan; it must not proceed without an OOB path, per
       [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md).
     - The BFB image's SHA matches the SHA the operator
       downloaded from the documented DOCA Downloads page (per
@@ -761,8 +776,10 @@ the "did the install actually take?" gate.
    after first SSH; (b) if it is `root:root`, flags it to the
    operator and proposes the documented `chown -R ubuntu:ubuntu
    /home/ubuntu` fix (per the BSP manual) BEFORE the operator
-   pastes any script that writes there. The fix itself is
-   trivially documented Linux; the value is the recognition
+   pastes any script that writes there. Because this recursively
+   changes ownership, capture the current ownership and obtain the
+   operator's explicit confirmation before applying it. The fix
+   itself is trivially documented Linux; the value is the recognition
    *during* lifecycle recovery instead of after a script fails.
 4. **Log copy-back to host workspace.** All install / readiness /
    recovery evidence collected on the Arm side (the RShim console
@@ -789,8 +806,9 @@ the "did the install actually take?" gate.
 
 When a BFB push, a soft-reset, or a host PF rebind has been done
 and the BlueField is *not yet* confirmed healthy, the agent walks
-this six-state classifier IN ORDER and stops at the first state
-the evidence matches. Each state names the evidence that
+this six-state classifier IN ORDER and records every matching state
+in that order. It never stops at the first match. Each state names
+the evidence that
 identifies it, the most-likely root cause class, and the
 *sequencing* of the recovery action (mutating steps still load
 [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md)
@@ -887,6 +905,11 @@ Two cross-cutting rules for this classifier:
   after a cold power cycle. The agent reports the *current*
   state set and the most-recently-observed transition, not just
   the first match.
+- **Sequence recovery in classifier order.** When multiple states
+  match, apply the earliest matching state's recovery first, then
+  re-run the classifier from state 1 before applying another
+  recovery. Every mutating recovery still requires the explicit
+  confirmation gate from `doca-hardware-safety`.
 - **Never declare healthy from absence of evidence.** "TMFIFO
   ping succeeded" without `ip route get` is NOT evidence the
   BlueField is reachable (see [`### rshim and tmfifo`](#rshim-and-tmfifo)
@@ -942,11 +965,12 @@ the agent should:
 | Process output (direct launch) | The terminal the operator launched from | [`## run`](#run) step 4; [`## debug`](#debug) layers 2-5 | Documented bring-up lines from the public DOCA Programming Guide appear; no documented error lines repeat. |
 | Process output (tmux / screen) | `tmux attach -t <session>` ; `screen -r <session>` (per the operator's session name) | [`## run`](#run) step 4; [`## debug`](#debug) layers 2-5 | Same as direct, read from the reattached pane buffer. |
 | Process output (systemd-supervised) | `systemctl status <unit>` ; `journalctl -u <unit> -f` (per the operator's unit name) | [`## run`](#run) step 4; [`## debug`](#debug) layers 2-6 | Unit is `active (running)`; journald tail shows the documented bring-up lines; restart count is stable. |
-| Firmware query (READ-ONLY) | The documented BlueField firmware-query command (`mlxconfig -d <pci> query`) per the public BlueField / DPU User Manual — QUERY only; `mlxconfig set` is a hardware-state change owned by [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) | [`## configure`](#configure) step 7; [`## debug`](#debug) layer 8 | Reports the firmware version anchor used by [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility). |
+| Firmware configuration query (READ-ONLY) | `mlxconfig -d <bdf> q` per the MFT / BlueField documentation — configuration only; `mlxconfig set` is a hardware-state change owned by [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) | [`## configure`](#configure) step 7; cross-cutting host check | Reports current / next-boot NV-config values; it does **not** report the running firmware version. |
+| Firmware version query (READ-ONLY) | `flint -d <bdf> q`; read the `FW Version:` field per the MFT manual | [`## configure`](#configure) step 7; cross-cutting host check | Reports the running NIC firmware-version anchor used by [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility). |
 | cgroup-v2 budget inspection | `systemd-cgls` ; `cat /sys/fs/cgroup/<path>/cpu.max` ; `cat /sys/fs/cgroup/<path>/memory.stat` (per the kernel cgroup-v2 documentation) | [`### isolation`](#isolation) step 5; [`## debug`](#debug) layer 5 + layer 7 | Per-tenant cgroup limits match the planned budget; `memory.stat` does not show OOM evidence. |
 | Network-namespace inspection | `ip netns list` ; `ip netns exec <name> ip link show` (per `ip-netns(8)`) | [`### isolation`](#isolation) step 2 + step 5; [`## debug`](#debug) layer 3 | The per-tenant representor is in the netns the binary launches into; the root netns does not own a representor a netns-scoped binary is trying to reach. |
 | Version anchor — host DOCA install | `pkg-config --modversion doca-common` ; `doca_caps --version` on the active install | [`## configure`](#configure) step 7; [`## debug`](#debug) layer 4 | The two strings match each other and match the binary's link-time `pkg-config doca-*` capture from [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build). |
-| Version anchor — BlueField firmware | The documented firmware-query command on the BlueField (per the BlueField / DPU User Manual) | [`## configure`](#configure) step 7; [`## debug`](#debug) layer 4 | Reports a firmware version the public DOCA Programming Guide certifies for the operator's DOCA release. |
+| Version anchor — BlueField firmware | `flint -d <bdf> q`; read `FW Version:` (per the MFT manual) | [`## configure`](#configure) step 7; [`## debug`](#debug) layer 4 | Reports a firmware version the public DOCA Programming Guide certifies for the operator's DOCA release. |
 
 Three cross-cutting rules for this appendix:
 

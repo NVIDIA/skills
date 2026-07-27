@@ -47,8 +47,13 @@ Quantum Computing: CUDA-Q and hybrid quantum-classical development.
 Infrastructure: accelerated workload setup, cluster/runtime/service operations,
 GPU-enabled deployment, Holoscan setup, Jetson host setup, and TAO platform runs.
 
-Networking: accelerated infrastructure networking, data center or edge network
-configuration, Jetson MGBE workflows, and cluster network troubleshooting.
+Networking: DOCA, BlueField DPUs, ConnectX NICs, DPA, GPUNetIO, RDMA, Ethernet
+packet processing, DOCA Flow, host/DPU communication, accelerated
+infrastructure networking, data center or edge network configuration, Jetson
+MGBE workflows, and cluster network troubleshooting.
+
+For DOCA, BlueField, DPU, or ConnectX requests, search the live catalog for the
+`doca-` skill family together with the user's task verb or subsystem.
 
 ## Matching Heuristic
 

@@ -2,7 +2,7 @@
 license: Apache-2.0
 name: doca-gpi
 description: >
-  Use this skill when the user is doing hands-on DOCA GPI programming
+  Use this skill for hands-on DOCA GPI programming
   — wiring a GPU-Packet-Initiator context so a CUDA kernel drives
   RDMA queues directly from GPU memory without host CPU mediation.
   Covers picking GPI vs doca-gpunetio, the doca_gpi / domain /
@@ -10,7 +10,7 @@ description: >
   (doca_gpu_gpi_channel*), attaching GPU memory to a GPI domain,
   the domain and channel attribute objects, and debugging
   DOCA_ERROR_* from doca_gpi_* calls. Trigger even when the user
-  does not explicitly mention "DOCA GPI" — typical implicit
+  does not explicitly mention "DOCA GPI" — implicit
   phrasings include "my CUDA kernel needs to post RDMA directly
   from GPU memory", "DOCA_ERROR_* from doca_gpi_gpu_channel_get",
   "how do I hand a GPU handle to my CUDA kernel", "how many
@@ -170,6 +170,12 @@ NetIO Send/Receive Ethernet-shaped API. For those, use
 [`doca-setup`](../../doca-setup/SKILL.md),
 [`doca-rdma`](../doca-rdma/SKILL.md), and
 [`doca-gpunetio`](../doca-gpunetio/SKILL.md) respectively.
+When one question spans the GPI channel lifecycle and CUDA-side
+GPU NetIO behavior, load both skills: this skill owns GPI object
+creation, connection, and teardown, while `doca-gpunetio` owns
+kernel launch and device-side execution. If that boundary remains
+ambiguous after reading both scopes, stop and ask which side is
+failing instead of choosing one implicitly.
 
 ## What this skill provides
 

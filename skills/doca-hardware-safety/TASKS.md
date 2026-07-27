@@ -1,13 +1,15 @@
 # DOCA hardware safety workflows
 
-**Where to start:** The verbs run `configure → modify → run → test →
-debug`. `## build` is a routing stub — hardware-touching changes do
+**Where to start:** For a production change, the verbs run `configure
+→ test on a representative replica (including rollback rehearsal) →
+modify production → run production verification → debug / rollback`.
+`## build` is a routing stub — hardware-touching changes do
 not produce build artifacts. The change-application discipline is a
 loop: pre-flight inventory and out-of-band reachability are captured
-in `## configure`, the apply step lives in `## modify`, post-change
-verification gates live in `## run`, replica-first smoke is the
-loop's pre-prod leg in `## test`, and the rollback ladder + escalation
-escape valve live in `## debug`.
+in `## configure`, replica-first smoke and rollback rehearsal live in
+`## test`, the production apply step lives in `## modify`, production
+verification gates live in `## run`, and the rollback ladder +
+escalation escape valve live in `## debug`.
 
 Read this file when the loader sent you here from [SKILL.md](SKILL.md).
 For the meta-policy surface (the change classes in scope, the failure
@@ -79,7 +81,16 @@ Steps the agent should walk the operator through:
    stakeholders notified. *"I'll just do this right now"* is the
    anti-pattern; the agent refuses to issue a hardware-touching
    change outside an explicit, time-boxed window.
-7. **Name the rollback plan and the verification gate up front.**
+7. **For a firmware burn or BFB reflash, reserve continuous power
+   and the OOB recovery path.** Confirm the device, host, and OOB
+   controller are on power that will remain uninterrupted for the
+   full burn / reflash and activation window; reserve the named BMC,
+   RShim, or physical-console session so another operator or
+   automation cannot take it. A UPS that does not also power the
+   OOB controller is not sufficient. If power continuity or the
+   reserved recovery path cannot be confirmed, stop and escalate;
+   do not begin the burn.
+8. **Name the rollback plan and the verification gate up front.**
    Document the rollback path BEFORE the change is applied per
    [CAPABILITIES.md ## Safety policy](CAPABILITIES.md#safety-policy);
    the gate that will declare the change "applied and safe to move
@@ -124,11 +135,11 @@ Steps the agent should walk the operator through (in order):
 
 1. **Re-confirm the inventory and OOB are still in scope.** The
    pre-flight inventory was captured in [`## configure`](#configure);
-   confirm it is still current (the operator did not run other
-   changes in between) and that the OOB path is still reachable. A
-   stale inventory is the discovered-during-failure rollback failure
-   mode; the agent re-runs the inventory probe before the apply step
-   when there is any doubt.
+   re-run the inventory probe immediately before the apply step to
+   confirm the baseline is still current (the operator did not run
+   other changes in between), and confirm that the OOB path is still
+   reachable. A stale inventory is the discovered-during-failure
+   rollback failure mode.
 2. **Quiesce the affected workload.** When the change touches a port,
    a function, or a service currently carrying traffic, the operator
    drains or schedules around the workload before the change is
@@ -140,6 +151,15 @@ Steps the agent should walk the operator through (in order):
    verbatim command and passes the operator's captured pre-flight
    values to it; the agent never invents a parameter literal, a PCI
    address, a firmware version, or a kernel-command literal.
+   If the per-artifact skill or verified vendor documentation does
+   not provide the exact command for this change class, stop and
+   escalate to the artifact owner; do not infer a destructive command
+   from a neighboring artifact or remembered syntax.
+   **Immediately before a NIC firmware burn or BFB reflash command,**
+   re-confirm uninterrupted power for the device, host, and OOB
+   controller and re-confirm exclusive access to the reserved OOB
+   recovery session from [`## configure`](#configure) step 7. If
+   either check changed, abort before issuing the burn.
 4. **Apply the documented commit action for the change class.** Per
    [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes):
    - `mlxconfig`-class writes: a **cold power cycle** (full A/C
@@ -171,6 +191,12 @@ Steps the agent should walk the operator through (in order):
    trigger for the rollback ladder in [`## debug`](#debug). The
    agent does not declare the change applied until the post-change
    inventory matches the plan.
+   If a shell script performed the change or capture, apply all three
+   script-hygiene gates from
+   [CAPABILITIES.md](CAPABILITIES.md#script-hygiene-for-hardware-touching-scripts-the-operator-runs):
+   restore log ownership, probe shared-reader devices before opening
+   them, and treat documented error-class prefixes as failure even
+   when the tool exits zero.
 
 The anti-pattern to refuse: declaring the change applied after a
 warm reboot when the change class commits at cold power cycle, or
@@ -231,9 +257,12 @@ Iteration shape:
    replica must match production on BlueField generation, running
    firmware level, host kernel version, loaded `mlx5_*` modules, and
    the set of representors / VFs / SFs the change touches. Mismatches
-   on any of those axes mean the replica result is advisory rather
-   than gating per
-   [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes).
+   on any of those axes mean the replica is not representative and
+   its result does not satisfy the production gate. Obtain a
+   representative replica; if one cannot be obtained, refuse the
+   production change and escalate through change control. Do not
+   downgrade a mismatched result to merely "advisory" and then
+   proceed.
 2. **Run the same [`## configure`](#configure) discipline on the
    replica.** Capture the replica's pre-flight inventory; the
    replica's baseline is what the replica's rollback path quotes.
@@ -260,18 +289,24 @@ Loop termination: stop iterating once both the replica change and
 the replica rollback succeed against the captured baseline, AND the
 operator can describe the rollback path in a way the agent can
 reproduce. Replica passes that the operator cannot describe are not
-rehearsed rollbacks; the agent loops back until the rollback is
-explicit.
+rehearsed rollbacks. Limit the rehearsal to three iterations. If
+both legs have not passed with a reproducible rollback after the
+third iteration, refuse the production change and escalate through
+the class-shape escape valve in [`## debug`](#debug).
 
-The anti-pattern to refuse: skipping the replica because the change
-"is small". A change without a tested rollback is not a small change
-— it is a change with an untested recovery surface.
+The anti-pattern to refuse: any plan, recommendation, or next action
+that would apply the change to production before a representative
+replica has passed both the change smoke and rollback rehearsal. The
+refusal applies whenever production application is contemplated,
+whether or not the user explicitly asks to "apply directly" or says
+the change "is small". A change without a tested rollback is not a
+small change — it is a change with an untested recovery surface.
 
 ## debug
 
 Goal: when the production change goes wrong, walk the rollback ladder
 in order. The rollback path was documented in [`## configure`](#configure)
-step 7 and rehearsed on the replica in [`## test`](#test); the debug
+step 8 and rehearsed on the replica in [`## test`](#test); the debug
 verb's job is to apply it and route the residual to the right next
 skill.
 
@@ -312,6 +347,10 @@ skill.
    [`doca-version ## debug`](../doca-version/TASKS.md#debug). The
    ladder is not done until the inventory matches the baseline AND
    the four-way match is clean.
+   If rollback or verification used a shell script, enforce the
+   script-hygiene gates from
+   [CAPABILITIES.md](CAPABILITIES.md#script-hygiene-for-hardware-touching-scripts-the-operator-runs)
+   before accepting the evidence.
 4. **If the residual symptom is at a software layer, hand off.**
    Once the rollback has restored the captured hardware state and a
    symptom still remains, the symptom now lives at a software layer.

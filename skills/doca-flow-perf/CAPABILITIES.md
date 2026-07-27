@@ -161,9 +161,12 @@ Recurring rules for the JSON the agent must surface:
 
 - the agent NEVER invents JSON keys that are not present in
   the shipped `configs/` files; if the operator needs a
-  field that no shipped policy demonstrates, the agent
-  refuses to invent the spelling and routes to the public
-  DOCA Flow Perf guide;
+  field that no shipped policy demonstrates, the agent checks
+  the public DOCA Flow Perf guide. If neither source defines
+  the field, this is a documentation gap: stop, report the
+  missing field and both sources checked, and request an
+  authoritative schema or known-good policy from the user.
+  Do not continue by guessing a spelling or value;
 - changing `mode: fixed` to `mode: increase` or
   `mode: decrease` is NOT a free change — it changes the
   per-entry uniqueness pattern and is the most common cause
@@ -247,7 +250,7 @@ order; this section names them so the agent can route fast.
    JSON library is not present on the user's system —
    either DOCA isn't installed, or the user's DOCA install
    profile didn't include the flow-perf component. Route to
-   [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+   [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
    and [`## no-install`](../../doca-setup/TASKS.md#no-install).
 2. **JSON-policy-malformed.** The policy file doesn't
    parse, or references fields the running binary's version

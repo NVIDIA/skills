@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides agents through DOCA environment setup, install verification, build-environment preparation, runtime precondition configuration, env-class failure diagnosis, and deployment-path routing (container vs. bare-metal) for NVIDIA BlueField DPUs. <br>
+Guides agents through verifying a DOCA install is healthy, preparing the build and runtime environment, debugging env-class failures, deciding container-vs-bare-metal deployment shape, and reaching a DOCA install from a host that does not have one via the NGC DOCA container fallback. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers setting up, verifying, debugging, and configuring NVIDIA DOCA environments on BlueField DPUs — including install health checks, build-environment preparation (pkg-config, headers, LD_LIBRARY_PATH, hugepages, devlink, representors), and deployment-path routing. <br>
+Developers and engineers working with NVIDIA DOCA on BlueField DPUs who need to install, verify, configure, or troubleshoot the DOCA environment before running workloads. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [No] <br>
-**Credential Type(s):** [None] <br>  
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,9 +25,10 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
+- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
+- [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
 
 
 ## Skill Output: <br>
@@ -37,13 +38,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- claude-code <br>
-- codex <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 evaluation tasks using the NVSkills-Eval external profile in astra-sandbox environment. <br>
+Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative) in the k8s-sandbox environment with the external Skill Evaluator profile. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,21 +61,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 91% (+59%) | 98% (+37%) |
-| Discoverability | 4 | 99% (+74%) | 98% (+51%) |
-| Effectiveness | 4 | 80% (+42%) | 96% (+41%) |
-| Efficiency | 4 | 89% (+46%) | 95% (+42%) |
+| Correctness | 4 | 100% (+45%) | 95% (+10%) |
+| Discoverability | 4 | 100% (+39%) | 83% (+22%) |
+| Effectiveness | 4 | 100% (+68%) | 91% (+42%) |
+| Efficiency | 4 | 77% (+22%) | 90% (+54%) |
 
 ## Skill Version(s): <br>
-d3b2828 (source: git SHA, committed 2026-06-28) <br>
+a62f6e2 (source: git SHA, committed 2026-07-22) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

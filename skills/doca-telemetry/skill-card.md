@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when reading DOCA hardware-counter events from a doca_dev via the per-domain DOCA Telemetry reader libraries — doca_telemetry_pcc, _dpa, _diag, _adp_retx, _phy, _pci. <br>
+Use this skill to read DOCA hardware-counter events from a doca_dev through the per-domain Telemetry reader libraries: doca_telemetry_pcc, _dpa, _diag, _adp_retx, _phy, and _pci. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers building applications that read DOCA hardware counters from a doca_dev through one or more of the six per-domain DOCA Telemetry reader libraries. <br>
+Developers and engineers building applications that read DOCA hardware counters from a doca_dev through one or more of the six per-domain DOCA Telemetry reader libraries on BlueField DPU or ConnectX NIC hardware. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,26 +25,25 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
 - [details.md](references/details.md) <br>
+- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Configuration instructions, Code, Analysis] <br>
-**Output Format:** [Markdown with inline C code blocks] <br>
+**Output Type(s):** [Code, Configuration instructions, Shell commands] <br>
+**Output Format:** [Markdown with inline C code blocks and bash commands] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 internal evaluation tasks using the NVSkills-Eval external profile in astra-sandbox environment. <br>
+Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative) in k8s-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,21 +60,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+76%) | 98% (+45%) |
-| Discoverability | 4 | 100% (+66%) | 98% (+41%) |
-| Effectiveness | 4 | 93% (+79%) | 98% (+64%) |
-| Efficiency | 4 | 92% (+46%) | 94% (+33%) |
+| Correctness | 4 | 100% (+40%) | 100% (+10%) |
+| Discoverability | 4 | 100% (+25%) | 95% (+36%) |
+| Effectiveness | 4 | 100% (+78%) | 99% (+55%) |
+| Efficiency | 4 | 100% (+29%) | 98% (+56%) |
 
 ## Skill Version(s): <br>
-1bf01d0 (source: git SHA, committed 2026-07-15) <br>
+d33a8af (source: git SHA, committed 2026-07-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

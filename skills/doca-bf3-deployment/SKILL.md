@@ -14,10 +14,10 @@ description: >
   typical phrasings include {push a BFB to my BlueField-3},
   {bfb-install exited 0 but the DPU never came back}, {ping
   192.168.100.2 works but ssh fails}, or {is DOCA on the host or
-  the Arm side?}. Mutating burns (BFB reflash, mlxconfig set, mode
-  flip, firmware burn) are meta-policy owned by doca-hardware-safety,
-  loaded alongside; app launch, container deploy, env install, and
-  the BF4 BMC-Redfish path belong to other skills.
+  the Arm side?}. BFB reflash, mlxconfig set, mode changes, and
+  firmware burns are destructive: require explicit target-bound
+  confirmation and load doca-hardware-safety. App launch, container
+  deploy, env install, and the BF4 BMC-Redfish path route elsewhere.
 metadata:
   kind: library
 compatibility: >

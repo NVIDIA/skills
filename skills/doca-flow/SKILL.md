@@ -2,21 +2,15 @@
 name: doca-flow
 license: Apache-2.0
 description: >
-  Use this skill for DOCA Flow on a supported NVIDIA NIC/DPU — both for
-  DOCA Flow application knowledge and for writing Flow applications:
-  defining match/action pipes, bringing up ports / representors,
-  forwarding with FWD_PORT (or another fwd target), reading flow
-  counters, validating a pipe before hardware programming, picking the
-  right Flow version against an installed DOCA, or debugging DOCA_ERROR_*
-  from the Flow API. Trigger even when the user does not explicitly
-  mention "DOCA Flow" or "pipe" — typical implicit phrasings include
-  "packets aren't reaching my representor", "rule isn't matching on the
-  BF", "PMD reports init failed", "match/action drop on egress", "how do
-  I steer this 5-tuple to a queue", "ConnectX hairpin routing on Linux",
-  or any flow-steering / packet-classifier question where DOCA is
-  installed. Refuse and route elsewhere for non-Flow pipelines (DPDK
-  rte_flow without DOCA, kernel TC offload, OVS), BFB bring-up, or DPU
-  OS install — those belong to other skills.
+  Build and debug DOCA Flow applications on supported NVIDIA NICs/DPUs:
+  define match/action pipes, initialize ports and representors, choose
+  forwarding targets, validate pipes before hardware programming, read
+  counters, match the Flow version to the installed DOCA release, and
+  diagnose Flow API errors. Trigger on DOCA packet steering, classifier,
+  representor, rule-matching, hairpin, or 5-tuple-to-queue questions even
+  when "DOCA Flow" is not named. Route plain DPDK `rte_flow`, kernel TC,
+  OVS, BFB bring-up, and DPU OS installation elsewhere. DPU OS
+  installation is destructive and always requires explicit confirmation.
 metadata:
   kind: library
 compatibility: >
@@ -77,8 +71,11 @@ the user's installed headers — the header on the machine is ground
 truth above prose, the API reference, blog posts, or memory:
 
 ```bash
-grep -h '<candidate_name>' \
-  "$(pkg-config --variable=includedir doca-common)"/doca_flow*.h
+for header in "$(pkg-config --variable=includedir doca-common)"/doca_flow*.h; do
+  grep -n '<candidate_name>' "$header"
+  # For a multi-line function declaration, print through its closing `);`.
+  awk '/<candidate_name>[[:space:]]*\(/,/[)][[:space:]]*;/' "$header"
+done
 ```
 
 DOCA Flow ships no backward-compat alias header, so a
@@ -92,10 +89,11 @@ never from prose.
 
 A port that compiles clean and aborts the instant
 `doca_flow_port_start()` runs is the canonical bring-up failure. The
-bring-up gate (probe-before-count, both
-`doca_flow_port_cfg_set_port_id()` *and* `doca_flow_port_cfg_set_dev()`,
-device taken from launch args not hard-coded, and the binary returning
-a non-zero exit from `main()` if the bridge cannot arm and forward) is
+bring-up gate (probe-before-count, `doca_flow_port_cfg_set_port_id()` plus
+the mode-appropriate device source — `doca_flow_port_cfg_set_dev()` in
+VNF mode or the installed switch sample's `doca_dev_rep` path — device
+taken from launch args not hard-coded, and the binary returning a
+non-zero exit from `main()` if the bridge cannot arm and forward) is
 enforced step-by-step in
 [`TASKS.md ## configure`](TASKS.md#configure) step 6 — open it before
 writing or running port code; do not reconstruct the gate from this
@@ -117,8 +115,10 @@ not silently emit half-correct code — when:**
    match on payload bytes outside L4, mutable match keys, …). Name the
    closest legal shape and stop.
 3. **The request relies on an API name that is not in the installed
-   headers.** Grep the header for the closest real symbol, name it, and
-   confirm with the user before generating code (the ground rule above).
+   headers.** Grep the header for the closest real symbol, name it in
+   the refusal, and stop without generating code. A later, explicit
+   request using the verified symbol may begin a new build workflow;
+   do not silently substitute it in the current request.
 4. **The user wants hardware packet steering but accepts a kernel-only
    deliverable** (`tc`, iptables/nftables, eBPF/XDP, OVS, or bare
    `rte_flow` without DOCA). Refuse per

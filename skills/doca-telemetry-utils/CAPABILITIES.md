@@ -221,7 +221,7 @@ time on the wrong fix.
    optional component is not installed, or the
    binary's loader-dependent shared libs are
    missing. Routing: route to
-   [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
    to install / repair the host-side DOCA package
    selection; confirm the installed version per
    [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure).

@@ -3,8 +3,8 @@ license: Apache-2.0
 name: doca-container-deployment
 description: >
   Use this skill when the user is hands-on deploying an in-bundle DOCA
-  service container (Argus, DMS, Firefly, Flow-Inspector, OS-Inspector,
-  UROM service) on a BlueField — kubelet standalone watching a
+  service container (Argus, DMS, Firefly, or UROM service) on a
+  BlueField — kubelet standalone watching a
   static-pod manifests directory, YAML pod-spec drop, kubelet status /
   ENTRYPOINT logs / per-service liveness, smoke-before-bulk, and the
   layered error taxonomy (pod-spec, scheduling, image pull, runtime,
@@ -55,12 +55,14 @@ launches directly).
 of runtime is this and what does the deployment contract look like*,
 start at [`CAPABILITIES.md`](CAPABILITIES.md). For per-service
 overlays, follow the per-service skill under `skills/services/` that
-layers on top of this one — the DOCA monorepo ships six service
-skills (Argus, DMS, Firefly, Flow-Inspector, OS-Inspector, UROM
-service); externally-productized NVIDIA services (BlueMan, HBN, SNAP,
-Virtio-net, DOCA Telemetry Service as productized, …) are out of
-scope for this bundle by the strict-to-DOCA invariant — route those
-to the public NVIDIA docs at `docs.nvidia.com/doca/sdk/`. If DOCA is
+layers on top of this one — the supported overlays are Argus, DMS,
+Firefly, and UROM service. Flow-Inspector and OS-Inspector are
+policy-excluded from this public bundle; route them through
+[`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)
+instead of applying this runtime overlay. Externally-productized
+NVIDIA services (BlueMan, HBN, SNAP, Virtio-net, DOCA Telemetry
+Service as productized, …) are also out of scope and route through
+that map. If DOCA is
 not installed on the BlueField target yet, route to
 [`doca-setup`](../doca-setup/SKILL.md) first.
 
@@ -103,8 +105,8 @@ service's config schema. Concretely:
   directory on the BlueField Arm so kubelet standalone schedules the
   pod and runs the DOCA service container.
 - Inspecting pod status, container logs, and the documented
-  liveness signal for any in-bundle DOCA service container — Argus,
-  DMS, Firefly, Flow-Inspector, OS-Inspector, UROM service — so the
+  liveness signal for any supported in-bundle DOCA service container
+  — Argus, DMS, Firefly, or UROM service — so the
   agent answers "did the container come up, and is the service
   inside actually ready" the same way for every service.
 - Walking the smoke-before-bulk loop (pod reaches `Running`;
@@ -147,7 +149,7 @@ companion files:
   side liveness signal — three layers, each with its own owner),
   the cross-cutting error taxonomy (pod-spec syntax → pod
   scheduling → image pull → runtime → volume mount → network policy
-  → version → cross-cutting host) covering ≥ 6 layers, and the
+  → version → cross-cutting host) covering exactly eight layers, and the
   safety policy (smoke before bulk; failed pod is high-stakes —
   clear the root cause before letting kubelet restart-loop the
   pod; do NOT invent pod-spec field names / kubelet flags / image
@@ -175,7 +177,7 @@ concern of each DOCA service's public guide reached through
    config-schema question).
 2. **For the kubelet-standalone-mode runtime shape, the static-pod
    manifests directory rule, the host-OS / BFB / firmware-slot /
-   image-pull preconditions, the error taxonomy (≥ 6 layers), the
+   image-pull preconditions, the eight-layer error taxonomy, the
    observability surface, and the safety / smoke-before-bulk
    policy, see [CAPABILITIES.md](CAPABILITIES.md).**
 3. **For step-by-step workflows — configure, build, modify, run,

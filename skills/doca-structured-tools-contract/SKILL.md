@@ -1,5 +1,5 @@
 ---
-license: Apache-2.0
+license: Apache-2.0 AND CC-BY-4.0
 name: doca-structured-tools-contract
 description: >
   Use this skill whenever another DOCA skill says "prefer the
@@ -41,50 +41,9 @@ path was never tried).
 
 ## Example questions this skill answers well
 
-These are the question SHAPES this skill is designed to route, with
-one worked example each. The agent should treat the *shape* as the
-load-bearing piece — the worked example is a single instance.
-
-- **"Is there a single command that tells me everything about my
-  DOCA install?"** — worked example: *"version, devices, libraries
-  installed, sample paths, drivers, hugepages — all at once"*.
-  Answered by the `doca-env --json` schema in
-  [`## Schemas`](#schemas) and the four-step fallback chain in the
-  same section.
-- **"How do I look up which DOCA version a capability requires
-  without fetching a doc page?"** — worked example: *"is symmetric
-  RSS hash mode in DOCA 2.6.0"*. Answered by the
-  `version-matrix.json` schema in [`## Schemas`](#schemas), with
-  the manual fallback being to fetch the matching per-library doc
-  page via [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
-- **"What does my hardware actually look like to DOCA — every PCIe
-  function, every representor?"** — worked example: *"every PF / VF
-  / SF visible on this BlueField, with PCIe address and link
-  state"*. Answered by the `collect-host-state` / `collect-dpu-state`
-  schema in [`## Schemas`](#schemas), with the manual fallback being
-  `devlink dev show` + `lspci | grep Mellanox` + `ip -j link`.
-- **"How do I know my Flow / RDMA / DMS / etc. spec is valid before
-  I program hardware with it?"** — worked example: *"will this Flow
-  pipe pass validate before commit"*. Answered by the
-  `validate-before-commit` schema in [`## Schemas`](#schemas), with
-  the manual fallback being the library's own constructor-time
-  validation surface (e.g. for DOCA Flow, treat the
-  `DOCA_ERROR_INVALID_VALUE` / `DOCA_ERROR_NOT_SUPPORTED` return
-  from `doca_flow_pipe_create` as the validate signal — the
-  public Flow header does not ship a separate `doca_flow_pipe_validate`
-  call at the bundle-aligned release, and the agent must not
-  invent one).
-- **"My agent is acting differently on different hosts — is one of
-  them missing the helpers?"** — worked example: *"the agent on host
-  A gave a one-line answer; the agent on host B walked five manual
-  commands"*. Answered by the report-which-path rule in
-  [`## The agent behavior contract`](#the-agent-behavior-contract) —
-  if the agent on host A did not say "structured tool used", the user
-  should ask explicitly.
-
-If the question fits a different shape (how to write code, how to
-debug a crash, how to set up an env), route to the matching skill
-instead — see [`AGENTS.md`](../../AGENTS.md) for the routing table.
+See [`references/examples.md`](references/examples.md) for the five
+worked routing examples. Keep this loader focused on detection,
+fallback behavior, and the authoritative schemas below.
 
 ## When to load this skill
 
@@ -112,6 +71,9 @@ guidance. For those, use the matching library skill +
 [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)
 + [`doca-setup`](../doca-setup/SKILL.md).
 
+Running probes and fallbacks requires shell access to the target host,
+either directly by the agent or through commands the user runs.
+
 ## Ground rules for any agent using this skill
 
 1. **Detect first; never assume the tool is present.** Each schema
@@ -119,16 +81,17 @@ guidance. For those, use the matching library skill +
    structured tool is installed on this host. Run the probe before
    reading the schema's output as authoritative.
 2. **Prefer structured when present; fall back to manual when not.**
-   When the probe succeeds, the structured tool's JSON output is
-   the source of truth. When the probe fails, walk the manual
-   command chain in the same schema section and synthesize the
-   equivalent answer.
+   When the probe succeeds and the output validates against the
+   selected schema, the structured JSON is the source of truth. When
+   the probe fails or the output is invalid, walk the manual command
+   chain in the same schema section and synthesize the equivalent
+   answer.
 3. **Report which path you took.** Always tell the user at the
-   start of the answer: *"using structured `doca-env --json`"* OR
-   *"falling back to manual chain (no structured helpers
-   installed)"*. The user adopting the helpers is a downstream
-   improvement; the user knowing whether they were used is the
-   *now*.
+   start of the answer: *"using structured `<helper>` (path:
+   `<path>`)"* OR *"falling back to manual chain (structured
+   `<helper>` probe failed: `<reason>`)"*, substituting the helper
+   selected by the schema and the actual probe failure. Never report
+   a helper different from the one the schema selected.
 4. **Schemas are locked here; per-skill overlays are NOT.** A
    library / service / tool skill MAY add a per-skill row to its
    own Command appendix that *uses* a schema; it MUST NOT redefine
@@ -145,6 +108,12 @@ guidance. For those, use the matching library skill +
    subsequent PR on the maintainer roadmap. This skill exists so
    every other skill in the bundle can be *infra-aware* before the
    executables ship.
+7. **Privilege is never implicit.** A manual fallback command that
+   requires `sudo` is emitted for the user to run or executed only
+   through an already approved privileged channel. Never silently
+   elevate merely because the structured helper was absent. Do not
+   assume such a channel exists; if it does not, ask the user to run
+   the command or report the privileged-data gap.
 
 ## The agent behavior contract
 
@@ -155,32 +124,53 @@ Command appendix references this contract:
    for the relevant tool. Examples: `command -v doca-env`,
    `test -f /opt/mellanox/doca/share/version-matrix.json`,
    `command -v doca-capability-snapshot`. Probes are read-only and
-   safe to run on any host.
+   safe to run on any host. The executable helpers are deferred to
+   PR2, so until they ship, failed command probes are expected and
+   the manual chains are the operative path unless a helper was
+   installed separately.
 2. **Prefer.** If the probe succeeds, invoke the structured tool
    and parse its JSON per the schema in [`## Schemas`](#schemas).
-   The output is the authoritative answer for this turn. Do NOT
-   also run the manual chain "to double check" — the contract is
-   that the structured tool replaces the chain.
+   It is authoritative only when parsing succeeds and every required
+   field has the documented type. Malformed JSON, missing fields, or
+   type mismatches make the structured path fail: report that exact
+   validation failure and use step 3. Ignore unexpected extra fields
+   as advisory per ground rule 5; do not expose them as contract
+   output. Do NOT run the manual chain merely "to double check" valid
+   structured output — valid structured output replaces the chain.
 3. **Fall back.** If the probe fails, walk the manual command
    chain documented in the same schema section. Synthesize the
    answer by combining the manual command outputs in the order the
    chain lists them. If a manual command is unavailable on the
    host, surface that as a gap and route the user to the matching
-   skill (typically [`doca-setup`](../doca-setup/SKILL.md)).
+   skill (typically [`doca-setup`](../doca-setup/SKILL.md)). If that
+   route cannot resolve the gap, name the missing commands or
+   artifacts, state that the consolidated answer cannot be completed,
+   and stop rather than presenting partial data as complete.
 4. **Report.** Open the answer with one of:
    - *"Using structured `<tool>` (path: `<path>`)."* — when the
-     probe succeeded.
-   - *"Falling back to manual chain (no structured `<tool>` on
-     this host)."* — when the probe failed. Plus a one-line note
-     pointing the user at how to install the helpers when they
-     become available.
+     probe succeeded and its output validated.
+   - *"Falling back to manual chain (structured `<tool>` probe
+     failed: `<reason>`)."* — when the probe failed. Include the
+     actual probe command and failure reason; for `command -v`, note
+     that failure means the helper was not found on `PATH`, not that
+     it is definitively absent. Plus a one-line note pointing the
+     user at how to install the helpers when they become available.
+   - *"Falling back to manual chain (`<tool>` output failed schema
+     validation: `<reason>`)."* — when the helper exists but its
+     output is malformed, missing required fields, or has invalid
+     field types.
 
-The report step is the bundle's signal to the user that the agent
-*tried* the helpers, not just the manual chain. Without it, an
-agent that always falls back looks identical to an agent that
-never knew the helpers existed.
+The report step proves the agent tried the helper before falling back.
 
 ## Schemas
+
+Select the schema from the question shape: environment/install state
+uses `doca-env`; capability minimum-version lookup uses
+`version-matrix`; per-device library capabilities use
+`capability-snapshot`; spec validation uses
+`validate-before-commit`; and a host-versus-DPU state comparison uses
+the two collect-state schemas. When a per-skill Command appendix names
+a schema, use that schema directly.
 
 Each subsection below names ONE structured tool the bundle expects
 to interoperate with, gives its detection probe, names its top-level
@@ -213,7 +203,7 @@ synthesize the same answer):
 2. `cat /opt/mellanox/doca/applications/VERSION` → `version.applications_version`
 3. `doca_caps --version` → `version.doca_caps`
 4. `doca_caps --list-devs` → `devices` array (parse PCIe address + kind + representor)
-5. `PCDIR="$(dirname "$(find /opt/mellanox/doca -name doca-common.pc -print -quit)")"; for pc in "$PCDIR"/*.pc; do pkg-config --exists "$(basename "$pc" .pc)" && echo "$pc"; done` → `libraries` array. `PCDIR` is commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig` on DOCA 3.3+, or `/opt/mellanox/doca/infrastructure/lib/pkgconfig` on legacy / split-profile installs; deriving it from the live `doca-common.pc` (equivalently `pkg-config --variable=pcfiledir doca-common`) avoids the empty-glob trap of hard-coding `infrastructure/`.
+5. Find `doca-common.pc` first. If `find /opt/mellanox/doca -name doca-common.pc -print -quit` returns empty, stop this row, surface the partial-install gap, and route to `doca-setup`; do not expand an empty directory glob. Otherwise derive `PCDIR` from that result and run `for pc in "$PCDIR"/*.pc; do pkg-config --exists "$(basename "$pc" .pc)" && echo "$pc"; done` → `libraries` array. If `PCDIR` is not a directory or no module resolves through `pkg-config --exists`, surface that gap and route to `doca-setup`. `PCDIR` is commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig` on DOCA 3.3+, or `/opt/mellanox/doca/infrastructure/lib/pkgconfig` on legacy / split-profile installs.
 6. `ls /opt/mellanox/doca/samples/` → `sample_paths` array
 7. `lsmod | grep -E '^mlx5_(core|ib)'` and `uname -r` → `drivers` object
 8. `cat /proc/meminfo | grep -i Huge` → `hugepages` object
@@ -222,7 +212,8 @@ synthesize the same answer):
 
 ### version-matrix.json schema
 
-**Detection probe:** `test -f /opt/mellanox/doca/share/version-matrix.json` (or a sibling location documented at install time by the file that ships it).
+**Detection probe:** `test -f /opt/mellanox/doca/share/version-matrix.json`.
+If absent, use the manual fallback; do not guess another install path.
 
 **Top-level shape (JSON object):**
 
@@ -278,19 +269,20 @@ structured tool, if installed, lives at the same `$PATH` location as
 1. `doca_caps --list-devs` → device enumeration
 2. For each device + each library of interest: invoke the
    library-specific `doca_<lib>_cap_*` query family from a small
-   test program (the agent walks the user through writing it, per
-   the library's own `## test` workflow).
+   test program by following the library's own `## test` workflow
+   and modifying its named shipped sample. Do not invent test code.
 
 ### validate-before-commit schema
 
-**Detection probe:** `command -v doca-validate` (cross-library) OR the
-library-specific constructor-time validation surface (e.g. for Flow,
-the `DOCA_ERROR_INVALID_VALUE` / `DOCA_ERROR_NOT_SUPPORTED` return
-from `doca_flow_pipe_create` — the public Flow header at this
-release does not ship a separate `doca_flow_pipe_validate` symbol;
-the agent uses the constructor-failure path as the validate signal).
-The structured tool wraps the library-specific calls and returns a
-uniform JSON result.
+**Detection probe:** `command -v doca-validate`. If that command is
+absent, the structured helper is absent and the agent uses the manual
+fallback below. A library-specific constructor-time validation
+surface is not a detection probe and may mutate state. For example,
+the public Flow header at this release does not ship a separate
+`doca_flow_pipe_validate` symbol: never invent one and never use
+`doca_flow_pipe_create` as a read-only probe. The structured tool
+wraps only library-specific validation calls that are safe for its
+contract and returns a uniform JSON result.
 
 **Top-level shape (JSON object):**
 
@@ -299,23 +291,33 @@ uniform JSON result.
 | `library` | string | which DOCA library the spec is for |
 | `spec_path` | string | path on disk to the spec being validated |
 | `result` | string | `pass` \| `fail` \| `skip` |
-| `checks` | array of object | per-check breakdown: `name`, `status` (`pass` \| `fail`), `details` (string), `remediation` (string \| null) |
+| `checks` | array of object | per-check breakdown: `name`, `status` (`pass` \| `fail` \| `skip`), `details` (string), `remediation` (string \| null) |
 
 **Manual fallback chain:**
 
 1. Find the library-specific validate surface in the matching skill's
    `## test` workflow. For some libs this is a dedicated `_validate`
-   call; for others (notably DOCA Flow) it is the
-   constructor-time validation embedded in the `_create` / `_cfg`
-   call family (e.g. `doca_flow_pipe_create` for Flow) whose
-   `DOCA_ERROR_INVALID_VALUE` / `DOCA_ERROR_NOT_SUPPORTED` return
-   is the validate signal. The lib's per-skill `## test` anchor
-   names which.
+   call. Constructor-time checks embedded in a mutating `_create`
+   call are not read-only validators. In particular,
+   `doca_flow_pipe_create` belongs to `doca-flow TASKS.md ## test`
+   after that skill's snapshot/safety preconditions; do not invoke it
+   as a pre-commit probe. If the caller requires read-only validation
+   and the installed API exposes no dedicated validator, report
+   `result: skip` and route to the per-library `## test` workflow.
 2. Invoke it before any commit / create / submit call.
-3. Treat a non-`DOCA_SUCCESS` return as `result: fail`; map the
-   `doca_error_get_descr()` text into a single `checks` entry.
+3. Map validation outcomes deliberately: `DOCA_ERROR_INVALID_VALUE`
+   and `DOCA_ERROR_NOT_SUPPORTED` are `result: fail`. Permission,
+   transport, unavailable-device, and other operational errors are
+   `result: skip`, with the exact `doca_error_get_descr()` text and
+   remediation in a `checks` entry. Never turn an inability to run
+   validation into a claim that the spec itself failed.
 
 ### collect-host-state and collect-dpu-state schemas
+
+Select the helper for the side where commands execute: host uses
+`doca-collect-host-state`; BlueField uses `doca-collect-dpu-state`.
+The presence of both binaries does not imply cross-side access. For a
+diff, collect independently on each side and then compare the outputs.
 
 **Detection probes:** `command -v doca-collect-host-state` (run on
 the host side) and `command -v doca-collect-dpu-state` (run on the
@@ -336,11 +338,14 @@ BlueField side).
 **Manual fallback chain (per side):**
 
 1. `doca_caps --version` → `doca_version`
-2. `flint -d <pcie> q` (sudo) → `firmware_version`
-3. `uname -r` → `kernel_version`
-4. `lsmod | grep mlx5` → `mlx5_modules`
-5. `mlxconfig -d <pcie> q INTERNAL_CPU_MODEL` → `bf_mode`
-6. `devlink dev show` + `ip -j link` → `devices` array
+2. `uname -r` → `kernel_version`
+3. `lsmod | grep mlx5` → `mlx5_modules`
+4. `devlink dev show` + `lspci | grep Mellanox` + `ip -j link` →
+   enumerate the `devices` array and its PCIe addresses
+5. For each discovered target PCIe address, `flint -d <pcie> q`
+   through the approved privileged channel → `firmware_version`
+6. On a discovered BlueField target, `mlxconfig -d <pcie> q
+   INTERNAL_CPU_MODEL` → `bf_mode`
 
 The two sides are deliberately symmetric so the agent can diff them
 trivially when diagnosing host ↔ BlueField mismatches.
@@ -351,21 +356,19 @@ The schemas above describe **contracts**. The implementations that
 satisfy each contract are deferred to a subsequent PR on the
 maintainer roadmap.
 
-The reason this skill exists *before* the executables ship is so
-every other skill in the bundle can be infra-aware from PR1 onward:
-each library / service / tool skill's Command appendix references
-this contract in its first row, so when the executables land in PR2
-the skills do not need any retrofit.
+This skill ships first so other skills can reference the contract
+without later retrofit when PR2 executables land.
 
 Concrete consequence for contributors writing a new library skill:
 when you build the Command appendix, do not duplicate the manual
 fallback chain — link to this skill's matching schema section and
-add only the *per-library overlay* (e.g. "Flow-specific: treat the
-`DOCA_ERROR_INVALID_VALUE` / `DOCA_ERROR_NOT_SUPPORTED` return
-from `doca_flow_pipe_create` as the validate signal; the public
-Flow header at this release does not ship a separate
-`doca_flow_pipe_validate` symbol — do not invent one"). The
-fallback chain itself lives here.
+add only the *per-library overlay*. For Flow, the public header at
+this release has no separate `doca_flow_pipe_validate` symbol: do not
+invent one or use `doca_flow_pipe_create` as this contract's read-only
+pre-commit probe. Report `result: skip` and route to `doca-flow
+TASKS.md ## test`, where constructor-time checks may run only after
+that workflow's snapshot and safety preconditions. The fallback chain
+itself lives here.
 
 ## URL audit
 

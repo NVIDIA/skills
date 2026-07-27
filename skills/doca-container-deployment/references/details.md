@@ -28,7 +28,7 @@ piece; the worked example is one instance.
   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md);
   it does NOT invent YAML field names).
 - **"My pod spec is in the directory but the pod never starts — how
-  do I diagnose it?"** — worked example: *"I dropped the OS-Inspector
+  do I diagnose it?"** — worked example: *"I dropped the Argus
   pod-spec YAML into the documented manifests directory and nothing
   happens"*. Answered by the layered error taxonomy in
   [`CAPABILITIES.md ## Error taxonomy`](../CAPABILITIES.md#error-taxonomy)
@@ -37,9 +37,9 @@ piece; the worked example is one instance.
   layered debug ladder in [`TASKS.md ## debug`](../TASKS.md#debug).
 - **"How do I find the logs of a DOCA service container, and what
   does 'healthy' look like before I put real workload on the
-  BlueField?"** — worked example: *"the Flow-Inspector pod is
-  `Running`, but I do not yet know whether the mirrored-flow capture
-  inside is actually ready"*. Answered by the smoke-before-bulk loop in
+  BlueField?"** — worked example: *"the Firefly pod is `Running`,
+  but I do not yet know whether the PTP service inside is actually
+  ready"*. Answered by the smoke-before-bulk loop in
   [`CAPABILITIES.md ## Safety policy`](../CAPABILITIES.md#safety-policy)
   + the eval-loop overlay in [`TASKS.md ## test`](../TASKS.md#test).
 - **"My pod was Running and crashed; should I just have kubelet
@@ -53,7 +53,7 @@ piece; the worked example is one instance.
 - **"Does this same pattern carry over to every other DOCA service,
   or is each service deployed in a different way?"** — worked
   example: *"I have DMS deployed; what changes for Firefly,
-  Flow-Inspector, OS-Inspector, UROM service, and Argus?"*.
+  UROM service, and Argus?"*.
   Answered by the cross-service generalization in
   [`CAPABILITIES.md ## Capabilities and modes`](../CAPABILITIES.md#capabilities-and-modes)
   + the per-service overlay routing in
@@ -105,8 +105,8 @@ bundle. To keep the boundary clean, it deliberately does not contain
 - [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
   — the routing table to the public DOCA Container Deployment Guide
   (cross-service deployment pattern), the per-service public guides
-  for the in-bundle services (Argus, DMS, Firefly, Flow-Inspector,
-  OS-Inspector, UROM service), and the NGC catalog. This skill does
+  for the in-bundle services (Argus, DMS, Firefly, UROM service),
+  and the NGC catalog. This skill does
   not duplicate URLs; it points at them and adds the
   deployment-runtime overlay. See in particular
   [`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services)
@@ -118,7 +118,7 @@ bundle. To keep the boundary clean, it deliberately does not contain
   path via the public NGC DOCA container and the BFB version check.
   (`doca-setup` also documents the firmware-slot enable workflow
   for externally-productized NVIDIA services that emulate a
-  host-facing PCIe device; none of the six in-bundle services need
+  host-facing PCIe device; none of the four in-bundle services need
   that workflow — see the firmware-slot disclaimer in
   [`CAPABILITIES.md ## Capabilities and modes`](../CAPABILITIES.md#capabilities-and-modes).)
   This skill assumes its preconditions are satisfied at the

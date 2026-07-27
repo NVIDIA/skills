@@ -22,7 +22,7 @@ Routing for nearby "install" questions:
 
 - *"The binary isn't there — do I need to install something?"*
   → yes. Route to
-  [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
   for the DOCA install or to
   [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install)
   for the NGC DOCA container path.
@@ -73,12 +73,16 @@ Steps the agent should walk the user through, in order:
    burst size, queue size, completion threshold, number of
    PSL tables, table size, number of workers, hash pipe algo,
    work policy, warmup, pipeline policy. Defaults belong to
-   the shipped README on the user's install; quote the README,
-   do not infer.
+   the shipped README on the user's install. If the README
+   omits one, check the installed binary's `--help`; if both
+   are silent, stop and request an explicit operator value.
+   Never infer a default.
 6. **Pick the self-test posture.** The self-test path is
-   off by default; enable it only when end-to-end correctness
-   (not just throughput) is the question. The README documents
-   the tcpdump-side verification step.
+   enabled only when end-to-end correctness (not just
+   throughput) is the question. Resolve its default through
+   the shipped README, then installed `--help`; if neither
+   defines it, stop and ask the operator to choose explicitly.
+   The README documents the tcpdump-side verification step.
 7. **Sanity check before any invocation.** Confirm with the
    user: what is the question (throughput? correctness? a
    sweep)? Which device-class? Which workload shape? If any
@@ -159,10 +163,12 @@ verbatim command lines (per
    [`## configure`](#configure) steps 1-3. The device must
    be DPA-capable, VNF mode active, not an SF.
 2. **Smoke run — small operations, few iterations, warmup
-   enabled.** Pick the smallest defensible values per the
-   shipped README's defaults (small `num-operations`, small
-   `num-iterations`, warmup on, single worker, identity or
-   random algo). Goal: *the tool binds the devices, the
+   enabled.** Resolve each value from the shipped README's
+   defaults first, then the installed binary's `--help`.
+   If neither defines a needed value, stop and request an
+   explicit value rather than inventing one. Use a small
+   operation count and iteration count only when the selected
+   source or operator explicitly supplies them. Goal: *the tool binds the devices, the
    DPA path starts, and per-iteration stats land in a
    defensible range*. Not a usable performance number.
 3. **Read the printed parameter set.** Per the shipped
@@ -221,7 +227,7 @@ just one workload):
 | Iteration trigger | What it looks like | What changes next iteration |
 | --- | --- | --- |
 | Smoke completed; Kops/sec is far below datasheet headline | Could be cold pipeline, wrong workload shape, wrong device class for this DPA, or actually-right for this install. Do not assume datasheet first. | Confirm warmup applied per [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy) layer 5; re-check the workload-shape axes per [`## configure`](#configure) step 5; only then question hardware. |
-| Per-iteration variance is high (standard deviation > a small fraction of median) | Steady-state not reached or outlier-dominated | Lengthen the run via `num-iterations`; if still volatile, isolate the device from other workloads; consider NUMA pinning. |
+| Per-iteration variance fails the acceptance criterion supplied by the shipped README or the benchmark owner | Steady-state not reached or outlier-dominated | Lengthen the run via the documented `num-iterations` control; if still volatile, isolate the device from other workloads; consider NUMA pinning. Do not invent a variance threshold. |
 | Self-test path-selector sentinel does not appear on the wire | Traffic was not sent during the pause, or the configured ports do not match the operator's traffic generator | Re-walk the README's self-test section; confirm the tcpdump filter matches the configured device. |
 | Same invocation produces different numbers on two hosts at the same DOCA version | NUMA / firmware / driver delta below DOCA | Walk axis 2 environment (cores / threads / NUMA) and the version layer per [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test) before blaming the tool. |
 | Same invocation produces different numbers on the same host across DOCA versions | This *is* a regression signal — provided both four-tuples are captured | Cross-link the two baselines, name the changed fields, route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) for the version-delta diagnosis. |
@@ -333,7 +339,7 @@ skill's name.
   [`doca-flow-tune`](../doca-flow-tune/SKILL.md). Optimization
   is downstream of measurement.
 - **install DOCA** ⇒
-  [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
   and [`## no-install`](../../doca-setup/TASKS.md#no-install).
 - **write a doca-flow / doca-dpa application** ⇒
   [`doca-flow`](../../libs/doca-flow/SKILL.md) +
@@ -384,9 +390,11 @@ the agent should:
 Three cross-cutting rules for this appendix:
 
 - **Never invent a flag, default value, workload-axis name,
-  or output column header.** `--help` on the installed
-  binary, the shipped README on the user's install, and the
-  public DOCA Flow DPA Perf guide are the joint contract.
+  output column header, or acceptance threshold.** For
+  defaults, use the shipped README first, then installed
+  `--help`; if neither defines the value, stop and request it.
+  The public DOCA Flow DPA Perf guide remains supporting
+  documentation, not a license to infer a missing default.
 - **Smoke before bulk.** Every row above presumes the smoke
   row succeeded first.
 - **Cross-link instead of duplicate.** Cross-cutting
@@ -407,8 +415,9 @@ A few rules that apply across every verb in this file:
 
 - The **public DOCA Flow DPA Perf guide** + the installed
   `--help` + the shipped `README.md` are the joint source of
-  truth. When they disagree, the *installed* `--help` plus
-  the shipped README on the user's version win.
+  truth. Resolve defaults in this strict order: shipped README
+  on the user's version, then installed `--help`, then stop and
+  request an explicit value. Do not guess when both are silent.
 - `doca_flow_dpa_perf` *does* drive hardware and *does*
   allocate DPA resources; smoke-before-bulk is mandatory.
 - **Quote the four-tuple AND the tool name.** Command line

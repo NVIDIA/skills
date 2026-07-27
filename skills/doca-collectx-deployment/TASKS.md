@@ -55,6 +55,11 @@ smoke-before-bulk postures are established.
    own DOCA program, that source side is the publisher library
    ([`doca-telemetry-exporter`](../libs/doca-telemetry-exporter/SKILL.md)),
    not this skill.
+   Resolve and record the expected sample cadence for each enabled
+   provider from the live collector config/help and matching public
+   guide. If the supported cadence field or units cannot be verified,
+   stop and ask for the installed collector documentation; do not
+   invent a field, unit, or default.
 4. **Gate provider / counter support BEFORE committing the
    config.** Per the gate-before-commit rule in
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy),
@@ -64,6 +69,11 @@ smoke-before-bulk postures are established.
    owns for the exporter-config case). A counter the device does
    not expose is the canonical silently-dropped metric — gate it
    before the config commits, not after.
+   If the support probe itself errors, times out, returns malformed
+   output, or cannot identify the target device, fail closed: treat
+   support as unknown, do not commit the counter, and capture the
+   probe error for [`## debug`](#debug). Probe failure is not
+   evidence of either support or non-support.
 5. **Pick the export backend(s).** Per the export-backend table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
    choose the backend(s) whose ingest model fits the downstream
@@ -166,16 +176,18 @@ declaring the pipeline deployed. Every step assumes
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
    (provider not enabled, or device does not expose it — back to
    [`## configure`](#configure) step 4).
-3. **Confirm the export backend ships.** Confirm the chosen
-   backend (Prometheus endpoint, Fluent Bit forward, NetFlow
-   export, file / IPC sink) is actually emitting. An exporter that
+3. **Confirm every export backend ships.** Independently confirm
+   each enabled backend (Prometheus endpoint, Fluent Bit forward,
+   NetFlow export, file / IPC sink) is actually emitting. One
+   healthy backend does not validate the others. Any exporter that
    is silent while rows exist locally is a layer-4 symptom.
 4. **Capture the as-deployed snapshot.** Record the collector's
    DOCA version (per
    [`doca-version TASKS.md ## run`](../doca-version/TASKS.md#run)),
    the device / generation, the enabled providers + resolved
-   counter identities (not just names), the export backend(s) +
-   sink endpoints, and the downstream consumer's schema version.
+   counter identities (not just names), each provider's expected
+   sample cadence, the export backend(s) + sink endpoints, and the
+   downstream consumer's schema version.
    This snapshot is the artifact future debug sessions skip
    rediscovery from.
 5. **Smoke before bulk (next: [`## test`](#test) step 1).** Before
@@ -197,8 +209,8 @@ not):
 
 1. **End-to-end row smoke.** Confirm the full chain: the device /
    source produces the counters, the collector assembles schema
-   rows for them, the export backend ships them, AND the
-   downstream consumer receives rows with the expected identities.
+   rows for them, every enabled export backend ships them, AND each
+   backend's downstream consumer receives rows with the expected identities.
    Passing = the consumer shows the expected rows; failing =
    "daemon running but consumer silent" (drop to
    [`## debug`](#debug)).
@@ -217,10 +229,17 @@ not):
    from [`## run`](#run) step 4 as the rollback / reproduction
    baseline.
 
-Loop termination: stop iterating once two consecutive iterations
-of the same kind change nothing — the cause is below the collector
-runtime (device, host, network, or the productized DTS container).
-Escalate to
+On a non-green smoke, use the captured layer evidence to make at
+most **one** corrective mutation, then re-run this exact five-step
+smoke once. If the retest is still non-green, stop and escalate; do
+not make a second corrective mutation in this loop.
+
+Loop termination: green ends the loop successfully. A non-green
+retest after the one corrective mutation ends it in escalation.
+Unchanged checks mean only that the attempted mutation **did not
+isolate the cause**; they do not prove the cause is below the
+collector runtime or identify the device, host, network, or DTS
+layer. Escalate to
 [`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug)
 with the captured evidence, or to the public DTS guide if the
 operator is on the productized container.

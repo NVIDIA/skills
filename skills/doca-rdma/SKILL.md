@@ -20,13 +20,12 @@ description: >
 metadata:
   kind: library
 compatibility: >
-  Requires DOCA SDK at /opt/mellanox/doca on Linux (Ubuntu 22.04/24.04 or
-  RHEL/SLES) with a BlueField DPU or ConnectX NIC. Reads the local install
-  via `pkg-config doca` (umbrella module shipping the RDMA library; no
-  separate doca-rdma.pc — find the real name via `pkg-config --list-all |
-  grep -i doca`, set PKG_CONFIG_PATH to
-  /opt/mellanox/doca/lib/{arch}/pkgconfig if needed) and inspects
-  /opt/mellanox/doca/{lib,include,samples,applications}.
+  Requires DOCA SDK on Linux (Ubuntu 22.04/24.04 or RHEL/SLES) with a
+  BlueField DPU or ConnectX NIC. Resolves the local install and module via
+  `pkg-config --list-all | grep -i doca` and
+  `pkg-config --variable=prefix MODULE`, replacing `MODULE` with the exact
+  name returned by the preceding query. The normal module is the umbrella
+  `doca`, while split installs may expose a per-library module.
 
 ---
 
@@ -48,7 +47,8 @@ ConnectX generations), and is the single most common failure mode.
 is **not** an acceptable reason to bypass DOCA. The correct low-friction
 path for a non-C language (Go, Rust, Python, …) is **not** to re-bind
 the whole API — it is to start from a **shipped DOCA RDMA sample** under
-`/opt/mellanox/doca/samples/doca_rdma/` and wrap its entry functions in
+`$(pkg-config --variable=prefix doca)/samples/doca_rdma/` (substitute the
+module resolved on the target) and wrap its entry functions in
 a **thin** cgo/FFI shim built with `#cgo pkg-config: doca` (Go) or the
 equivalent. That shim is a single small file, not "a large custom
 binding layer". See [`TASKS.md ## build`](TASKS.md#build) Step 0 and
@@ -122,12 +122,11 @@ another language) to do RDMA data movement between two sides
 (host↔host, host↔BlueField, DPU↔DPU, or SF↔SF on a BlueField). It
 is *not* for NVIDIA developers contributing to DOCA RDMA itself.
 
-**Language scope.** DOCA RDMA ships as a C library *inside the umbrella
-`doca` pkg-config module* (public header `doca_rdma.h`, shared object
-`libdoca_rdma.so`). Current DOCA installs do **not** ship a separate
-`doca-rdma.pc`; `pkg-config doca` is what resolves the RDMA cflags/libs.
+**Language scope.** DOCA RDMA normally ships as a C library *inside the
+umbrella `doca` pkg-config module* (public header `doca_rdma.h`, shared
+object `libdoca_rdma.so`); split installs may expose a per-library module.
 Always discover the module on the target (`pkg-config --list-all |
-grep -i doca`) rather than assuming a per-library `.pc` exists. The
+grep -i doca`) rather than assuming either layout. The
 shipped samples are written in C
 (NVIDIA's choice). C and C++ consumers are the canonical case and
 the worked examples in `TASKS.md` assume that path. Other-language
@@ -182,8 +181,8 @@ material lives in two companion files:
 
 - `CAPABILITIES.md` — what RDMA can express on this version: the
   eleven task types and their permission matrix, the three
-  connection methods, transport types (RC baseline and DC for
-  the export/connect CPU-datapath flow — there is no UD) — note
+  connection methods, transport types (RC baseline and alpha-level
+  DC for the export/connect CPU-datapath flow — there is no UD) — note
   these are the per-QP service
   type controlled by `doca_rdma_set_transport_type()`, NOT the
   link-layer (IB vs RoCE) which is inherited from the device
@@ -211,7 +210,9 @@ pull requests should not add:
 
 - **Pre-written DOCA RDMA application source code, in any
   language.** The verified RDMA source code is the shipped C
-  samples at `/opt/mellanox/doca/samples/doca_rdma/<name>/`. The
+  samples below the install prefix at
+  `$(pkg-config --variable=prefix doca)/samples/doca_rdma/<name>/`
+  (using the module resolved on the target). The
   agent's job is to route the user to those files and prescribe a
   minimum-diff modification on them via the universal
   modify-a-sample workflow in
@@ -233,11 +234,14 @@ pull requests should not add:
 
 1. Read this `SKILL.md` first to confirm the user's question is in
    scope.
-2. **For the RDMA capability matrix, task taxonomy, connection
-   methods, permission matrix, error taxonomy, observability, and
-   safety policy, see [CAPABILITIES.md](CAPABILITIES.md).**
-3. **For step-by-step workflows — configure, build, modify, run,
-   test, debug — see [TASKS.md](TASKS.md).**
+2. If the question is *what RDMA can express*—task taxonomy,
+   link-layer vs transport-type selection, connection methods,
+   permissions, errors, observability, or safety—read
+   [CAPABILITIES.md](CAPABILITIES.md).
+3. If the question is *how to do it*—configure, build, modify, run,
+   test, or debug—read the matching H2 in [TASKS.md](TASKS.md).
+   Read both companions only when the workflow depends on a
+   capability or safety decision; do not load both unconditionally.
 
 Both companion files cross-link to each other and to
 [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)

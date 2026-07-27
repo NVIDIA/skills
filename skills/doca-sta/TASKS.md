@@ -1,6 +1,6 @@
 # DOCA STA workflows
 
-**Where to start:** The verbs run `configure → build → modify →
+**Where to start:** The verbs run `configure → modify → build →
 run → test → debug`. Skip ahead only when the user is already
 past a verb. The `## test` verb is an iterative loop (cap-query
 re-check → substrate / steering precondition re-check →
@@ -253,8 +253,8 @@ narrows either the capability set, the substrate / steering
 preconditions, the queue-pair sizing, or the target object
 model. The loop
 terminates when either (a) a single admin command (e.g.
-Identify Controller) on the admin queue plus a single Read or
-Write I/O on one I/O queue both complete successfully, or
+Identify Controller) on the admin queue plus a single Read I/O
+on one I/O queue both complete successfully, or
 (b) the agent has narrowed the failure cause to a layer
 outside STA itself (substrate library, steering, fabric, remote
 initiator, driver / firmware) and escalated to the matching
@@ -285,20 +285,26 @@ Iteration shape:
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy),
    drive ONE NVMe admin command (typically Identify Controller)
    on the admin queue and confirm the completion event arrives
-   on the DOCA Core PE with success; THEN drive ONE NVMe Read
-   or Write on a single I/O queue and confirm its completion
-   arrives. Failure on admin narrows to handshake / fabric
+   on the DOCA Core PE with success; THEN drive ONE NVMe Read on
+   a single I/O queue and confirm its completion arrives. Read is
+   the default smoke because it does not overwrite namespace data.
+   Use Write instead only after the user explicitly confirms that
+   the namespace is disposable and supplies a safe test LBA or LBA
+   range whose existing data may be overwritten; without both
+   confirmations, do not issue a Write and do not invent an LBA.
+   Failure on admin narrows to handshake / fabric
    / steering; failure on I/O after admin succeeded narrows to
    I/O-queue sizing / mmap / SPDK or kernel-nvme glue. Both
    together give a much cleaner bisection than starting at
    production scale.
 4. **Multi-queue smoke.** Once the single-IO smoke is green,
    add a second I/O queue on the same connection, repeat one
-   Read or Write on each, and confirm both completions
+   Read on each, and confirm both completions
    arrive. Catches per-queue bugs that a single-queue smoke
    cannot (queue-count cap miscount, per-queue progress not
-   wired, queue-pair state machine confused about which
-   queue is which).
+   wired, queue-pair state machine confused about which queue is
+   which). A Write remains gated on the same explicit disposable-
+   namespace and user-supplied safe-LBA confirmation from step 3.
 5. **Negative test — capability mismatch.** Intentionally
    request an over-cap queue depth or queue count, or a
    logical block size, that the `doca_sta_get_max_*` /
@@ -307,7 +313,11 @@ Iteration shape:
    reported `DOCA_ERROR_NOT_SUPPORTED` (or
    `DOCA_ERROR_INVALID_VALUE` for an over-cap value) matches
    the queried answer. Validates the agent's capability
-   discovery is itself correct.
+   discovery is itself correct. Run this intentional
+   invalid-configuration test only on an isolated,
+   non-production target context with a disposable test
+   namespace; never run it against an active workload or
+   production namespace.
 6. **Sustained-run loop (optional, only after the smoke is
    green).** Drive a small steady-state workload through the
    established connection for minutes — not seconds — and

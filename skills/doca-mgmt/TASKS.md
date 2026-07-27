@@ -198,8 +198,12 @@ Apply-with-rollback workflow (every modify pattern):
    [`doca-hardware-safety ## Capabilities and modes`](../../doca-hardware-safety/CAPABILITIES.md#capabilities-and-modes)
    replica-first rule, apply on a non-prod replica that
    matches the production hardware class first; run the
-   post-write re-query gate (step 8 below) on the replica; only
-   then schedule the production change.
+   post-write re-query gate (step 8 below) on the replica.
+   After the intended forward diff is proven, apply the recorded
+   rollback values to restore the replica's captured pre-state and
+   re-run the same `_get` / `_query`. Production remains blocked
+   until this second re-query proves the replica is back at the
+   recorded baseline.
 7. **Apply the write.** Call the sub-domain's `_set` /
    `_modify` / `_set_limit` / `raw_cmd` on the target context.
    Quote `doca_error_get_descr()` verbatim if the call
@@ -208,12 +212,20 @@ Apply-with-rollback workflow (every modify pattern):
    `_get` / `_query` and diff against the pre-state. The diff
    should be exactly the change the user intended. Any
    unexpected delta is a regression; trigger the rollback path
-   from step 4.
+   from step 4. Re-query after rollback and require an exact
+   match to the recorded pre-state. If the rollback call fails
+   or the re-query still differs, fail closed: stop all further
+   writes, preserve the target identity plus pre-state, intended
+   forward diff, post-write state, rollback call/result, and
+   post-rollback state, then escalate to the operator's
+   change-control / hardware-recovery path.
 9. **Hold the rollback path ready for the duration of the
    change window.** The user does not declare the change "done"
    until either (a) the workload has resumed and the device's
    observability surface is healthy, or (b) the rollback has
-   been applied.
+   been applied and the re-query proves the pre-state was
+   restored. A failed or unproven rollback is an incident, not a
+   reason to retry or continue production rollout.
 
 The agent emits the *intent description + the apply-with-
 rollback workflow filled out for the user's specific call*; the
@@ -294,13 +306,27 @@ Iteration shape:
 5. **Post-write re-query.** Run the `_get` / `_query` again
    and diff against step 3. The diff should match the user's
    intent exactly.
-6. **Negative test.** Construct one deliberately invalid
+6. **Restore and prove the replica pre-state.** Apply the
+   rollback values captured in step 3, then run the same
+   `_get` / `_query` again. Do not authorize production unless
+   this re-query exactly matches the captured pre-state. On a
+   rollback error or residual diff, stop, preserve the full
+   forward/rollback evidence set from [`## modify`](#modify)
+   step 8, and escalate for operator intervention.
+7. **Negative test.** Construct one deliberately invalid
    call (e.g. an ICM-quota limit above `_cap_get_max_limit`,
    or a `_set` on a context whose `_is_supported` returned
    failure) and confirm the API returns
    `DOCA_ERROR_INVALID_VALUE` / `DOCA_ERROR_NOT_SUPPORTED` as
    expected. This validates the agent's capability-discovery
-   understanding is itself correct on this DOCA version.
+   understanding is itself correct on this DOCA version. If the
+   invalid operation unexpectedly succeeds, stop immediately:
+   capture the exact target, sub-domain, parameters, capability
+   result, return value, and post-operation `_get` / `_query`
+   state; restore the captured pre-state using the prepared
+   rollback; re-query; and escalate the unexpected
+   firmware/library behavior. Do not continue negative testing or
+   promote the operation.
 
 Eval-loop overlay — why this is a loop, not a one-shot pass:
 
@@ -313,9 +339,13 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | `DOCA_ERROR_IO_FAILED` on `raw_cmd` | The firmware rejected the command | Re-confirm the four-way version match; re-confirm the opcode against the vendor docs; if both check out, the device state is the gate — route to [`doca-hardware-safety TASKS.md ## debug`](../../doca-hardware-safety/TASKS.md#debug) |
 | Post-write re-query diff doesn't match intent | The `_set` returned success; the `_get` shows unexpected state | The write landed but with side effects the agent did not anticipate; rollback per [`## modify`](#modify) step 4, then re-investigate |
 
-Loop termination: stop iterating once two consecutive
-iterations of the same kind don't change anything — that means
-the cause is below doca-mgmt. Escalate to
+Loop identity is the same error family on the same sub-domain,
+target device/representor, operation, inputs, and captured
+pre-state, with unchanged return descriptions, capability
+results, trace logs, and post-operation query evidence. Stop
+after two consecutive iterations with that identity produce no
+evidence change — that means the cause is below doca-mgmt.
+Escalate to
 [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
 with the captured layer-1-through-5 evidence.
 

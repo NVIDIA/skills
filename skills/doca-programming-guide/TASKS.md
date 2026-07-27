@@ -135,6 +135,15 @@ for a given sample shape.
 
 5. **Apply the swap as a minimum-diff edit on the copied file.** Where the user has given you a real value, substitute the literal. Where the user has not yet given you a value but the build would otherwise fail to compile, leave a `/* TODO: replace with your <thing>; see <how-to-find-it> */` comment around a syntactically-valid placeholder constant. The placeholder rule is **only for values that block compilation if absent** (constants, `#define`s the rest of the file references); it is not a license to leave function bodies or DOCA API call sequences unfilled. The init / teardown / validation / error-handling calls all stay verbatim from the upstream sample.
 
+   **A runtime-affecting placeholder is a hard gate.** A syntactically
+   valid placeholder may permit build-only verification, but it does
+   not represent a runnable configuration. Until every placeholder
+   that can change device selection, queue / port identity, addressing,
+   traffic matching, buffer sizing, or another runtime effect is
+   replaced with a source-verified user value, stop after the build:
+   do not run the program, enter a hardware commit / start / program
+   path, or declare the change ready to commit.
+
    Example placeholders (note: the *surrounding code* is the upstream sample's, untouched):
 
    ```c
@@ -149,7 +158,20 @@ for a given sample shape.
 
 6. **Update the build manifest minimally.** The simplest correct change to the sample's `meson.build` is to rename the executable; do not refactor build options. If the original sample required `-D enable_<flag>=true`, keep that option in your build invocation. If the user's project must build *standalone* (outside the DOCA samples meson tree), the standalone `meson.build` depends on `doca-<library>` via `pkg-config` ([`## build`](#build) Track 1 step 2). The agent constructs that manifest *in the user's project directory*, not from a template pinned in this skill.
 
-7. **Build and run staged.** Build with [`## build`](#build). Run with [`## run`](#run) against the smallest possible scope (one representor, one queue, one channel — whatever the library's unit of damage is per [CAPABILITIES.md ## Safety policy](CAPABILITIES.md#safety-policy) item 2). Read the output. Only after the staged run succeeds may the user widen the scope. *NGC-container caveat:* the build half of this step works inside the container; the actual hardware-runtime half does not — the container has no access to a real NIC / DPU. For runtime, the user has to graduate from Path 0 (container) to Path A or Path C in [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install).
+7. **Build and run staged.** Build with [`## build`](#build). Before
+   running, scan the modified source for the TODO markers introduced
+   in step 5 and resolve every runtime-affecting placeholder from its
+   named source. If any remains, record **build-only verified** and
+   stop: run and commit are blocked. Once none remains, run with
+   [`## run`](#run) against the smallest possible scope (one
+   representor, one queue, one channel — whatever the library's unit
+   of damage is per [CAPABILITIES.md ## Safety policy](CAPABILITIES.md#safety-policy)
+   item 2). Read the output. Only after the staged run succeeds may
+   the user widen the scope. *NGC-container caveat:* the build half of
+   this step works inside the container; the actual hardware-runtime
+   half does not — the container has no access to a real NIC / DPU.
+   For runtime, the user has to graduate from Path 0 (container) to
+   Path A or Path C in [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install).
 
 8. **Document what was changed.** A two-line `README` next to the modified sample saying *"Derived from `<source-sample>` on `<date>` against DOCA `<version>`. Modified fields: `<list>`."* lets the user re-derive against the next DOCA release without having to re-read the agent's chat history.
 
@@ -157,7 +179,16 @@ for a given sample shape.
 
 Goal: launch a built DOCA program (shipped sample or derived custom app) and read its output meaningfully.
 
-1. **Pre-run checklist.** Re-verify the env preconditions via [`doca-setup ## test`](../doca-setup/TASKS.md#test) (hugepages mounted, devices visible, representors enumerated). A failed pre-run check is faster to diagnose than a runtime error. *Inside an NGC container*, several of these checks are vacuously satisfied (no real NIC) — that's expected; runs that need real hardware will fail at start, and the right move is to graduate the user to a hardware path per [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install).
+1. **Pre-run checklist.** Refuse to run a derived sample while any
+   runtime-affecting placeholder from [`## modify`](#modify) step 5
+   remains; a clean compile is only build evidence. Then re-verify the
+   env preconditions via [`doca-setup ## test`](../doca-setup/TASKS.md#test)
+   (hugepages mounted, devices visible, representors enumerated). A
+   failed pre-run check is faster to diagnose than a runtime error.
+   *Inside an NGC container*, several of these checks are vacuously
+   satisfied (no real NIC) — that's expected; runs that need real
+   hardware will fail at start, and the right move is to graduate the
+   user to a hardware path per [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install).
 
 2. **Use the program's own CLI flags.** Each shipped sample documents its `-h` flags. The agent must use those, not invent new ones — the most common runtime error is a flag rename across DOCA versions.
 
@@ -199,6 +230,12 @@ The loop, library-agnostic:
 The four-step variant of the loop, in detail:
 
 1. **Validate the spec / configuration before commit.** Every DOCA library that programs hardware (Flow in particular) exposes a *validate* call separate from the *commit / start / program* call. Use validate first; never enter a commit path with an un-validated spec. This is the cross-library validate-before-commit rule from [CAPABILITIES.md ## Safety policy](CAPABILITIES.md#safety-policy). Library skills extend it with library-specific *what to validate*. **Loop:** if validate rejects, fix the spec and re-run *this step*; do not move to step 2 with a failing validate.
+
+   Before validation, scan for unresolved runtime-affecting
+   placeholders from [`## modify`](#modify) step 5. Their presence
+   limits this loop to build-only verification and blocks validation
+   as a readiness signal, runtime, hardware commit / start / program,
+   and source commit until the real values are supplied and verified.
 
 2. **Capability cross-check.** Re-confirm that every feature your program intends to use is supported by the active mode and version on this host. Validation answers *"is the spec internally consistent"*; capability cross-check answers *"will this hardware / library actually accept it"*. **Loop:** if a capability is missing, do *not* code around it — back up to [`## configure`](#configure) step 4 (or to [`doca-setup`](../doca-setup/SKILL.md) if firmware / version is the gap) and re-enter the loop only after the capability is present or the program intent has changed to accommodate.
 
@@ -441,7 +478,8 @@ library-agnostic ones.
 | Find samples on disk | `ls /opt/mellanox/doca/samples/<library>/` | [`## modify`](#modify) precondition table | Lists `meson.build` plus the sample subdirectories. |
 | Copy a sample | `cp -r /opt/mellanox/doca/samples/<library>/<sample>/ <writable>/` | [`## modify`](#modify) step 3 | Yields a writable copy outside the install tree. |
 | Build the copy | `meson /tmp/build-<project> && ninja -C /tmp/build-<project>` | [`## build`](#build) Track 1 step 1 | Build succeeds; binary lives in `/tmp/build-<project>/`. |
-| Run the program | `./<built-binary> --sdk-log-level 70 -h` | [`## run`](#run) steps 2-3 | `-h` lists the program's own CLI flags; trace logging in stderr for the first run. |
+| Discover program flags | `./<built-binary> -h` | [`## run`](#run) step 2 | Lists the program's own CLI flags. |
+| Run the program | `./<built-binary> --sdk-log-level 70 <actual-args>` | [`## run`](#run) step 3 | Runs the intended workload with trace logging in stderr. |
 | Inspect `DOCA_ERROR_*` | `doca_error_get_descr(<rc>)` (called from program code) | [`## debug`](#debug) step 5 | Returns a string description; quote it verbatim. |
 
 Two cross-cutting rules:

@@ -116,9 +116,12 @@ to pick which statistic answers their question:
 | Jitter (min / max spread, or stdev) | Run-to-run variability | The right number for workloads that need predictability rather than a fast median (e.g. a phase-locked control loop where consistency matters more than speed). |
 
 The tool's reported columns (`t_half_iter`, `t_full_iter`,
-`t_cuda`) carry per-iteration timing — the agent's job is
-to teach the user that quoting any single number is
-incomplete for a real-time workload class.
+`t_cuda`) carry timing summaries for the configured run. The
+documented result format alone does not establish that raw
+per-iteration samples are printed. Before promising percentile
+statistics, inspect the installed source and actual stdout; if raw
+samples are unavailable, this shipped tool cannot produce an
+in-run p99/p99.9 distribution without a bespoke benchmark.
 
 ### Latency-vs-batching trade-off
 
@@ -137,7 +140,9 @@ This trade-off is intrinsic to GPU-init RDMA: the per-WR
 latency this benchmark reports already reflects the chosen
 batch size (the tool's shipped configuration is small per
 `common.h`'s `NUM_ITER` / `POST_LIST` / `NUM_MSG_SIZE`
-constants, but those are configurable). A real-time
+constants). Treat those as compile-time source constants unless
+the installed `--help` or Meson options explicitly expose a supported
+knob; do not imply runtime configurability. A real-time
 control loop typically wants the smallest batch (one WR
 per launch); a sustained-throughput workload wants the
 batch size that minimizes amortized cost — those are two
@@ -223,8 +228,9 @@ escalating order:
    (d) the user quoted the median when the workload
    class wanted p99, (e) the user quoted a single number
    without naming median / p99 / jitter, (f) the
-   per-iteration timeout the kernel-side function takes
-   was set too short and iterations were dropped. Re-walk
+   kernel-side timeout compiled into the installed source was too short and
+   iterations were dropped. Verify that condition from source or logs; do not
+   imply this shipped tool exposes a timeout runtime option. Re-walk
    [`## Observability`](#observability).
 7. **Version.** Cross-cutting partial-install /
    mixed-version per
@@ -259,12 +265,13 @@ exchange. Specifically:
   - `t_cuda` = CUDA-side measured time; cross-check
     against the host-side number. A large divergence is
     itself a diagnostic signal, not a number to quote.
-- **Distribution, not just summary.** A latency
-  benchmark's value is in the distribution. The agent's
-  rule: capture all iterations the run reported (the
-  tool's stdout per iteration) and compute or report
-  median, p99, p99.9, and jitter — not a single number
-  paraphrased from the summary line.
+- **Distribution availability.** Capture the complete stdout, but first
+  determine whether the installed tool emits raw per-iteration samples or
+  only one aggregate result line per (message size × iteration count)
+  combination. Compute median, p99, or p99.9 only from actual raw samples.
+  When only aggregate rows are available, report those rows as summaries and
+  route percentile characterization to a bespoke GPUNetIO benchmark; repeated
+  aggregate runs characterize run-to-run variation, not per-iteration tails.
 - **DOCA log levels.** `DOCA_LOG_LEVEL` and
   `--sdk-log-level` apply per the cross-cutting rule in
   [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).

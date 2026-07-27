@@ -252,8 +252,10 @@ two companion files:
 
 The skill assumes a host where DOCA is already installed,
 OpenSSL ≥ 1.1.1 is present (`libssl-dev` or equivalent),
-and the operator has whatever privileges the public
-install profile expects for the engine's PCIe binding.
+and the deploying user can access the selected DOCA SHA PCIe device. Verify
+device visibility and run the engine-load smoke as that same user before
+integration; if either fails with a permission error, stop and route to
+`doca-setup` rather than guessing a group, ACL, or `sudo` policy.
 
 ## What this skill deliberately does not ship
 

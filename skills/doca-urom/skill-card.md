@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when the user is doing hands-on DOCA UROM library work from the host side — wiring doca-urom under an HPC / UCX / MPI stack to offload remote memory operations (puts, gets, atomics, collectives) onto a BlueField DPU, creating UROM Service and Worker contexts, discovering plugins, progressing completions, or debugging DOCA_ERROR_* from a doca_urom_* call. <br>
+Guides AI agents through hands-on DOCA UROM host-side library work — wiring doca-urom under an HPC / UCX / MPI stack to offload remote memory operations onto a BlueField DPU, creating Service and Worker contexts, discovering plugins, progressing completions, and debugging DOCA_ERROR_* from doca_urom_* calls. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers building HPC / UCX / MPI applications that consume the DOCA UROM host-side library to offload remote memory operations onto a BlueField DPU instead of executing them on the host CPU. <br>
+Developers and engineers building HPC / UCX / MPI applications that consume the DOCA UROM library from the host side to offload remote memory operations (puts, gets, atomics, collectives) onto a BlueField DPU. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Not Specified] <br>
-**Credential Type(s):** [None identified] <br>
+**Requires API Key or External Credential:** [No] <br>
+**Credential Type(s):** [None] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -28,23 +28,23 @@ Mitigation: Review and scan skill before deployment. <br>
 - [DOCA UROM Library Guide](https://docs.nvidia.com/doca/sdk/DOCA-UROM/index.html) <br>
 - [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
+- [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Configuration instructions, Shell commands] <br>
-**Output Format:** [Markdown with inline code blocks] <br>
+**Output Type(s):** [Configuration instructions, Shell commands, Analysis] <br>
+**Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 8 recorded Tier 3 trials using the NVSkills-Eval external profile in the astra-sandbox environment. <br>
+Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -61,21 +61,20 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
 | Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+60%) | 98% (+50%) |
-| Discoverability | 4 | 100% (+75%) | 98% (+45%) |
-| Effectiveness | 4 | 91% (+55%) | 98% (+59%) |
-| Efficiency | 4 | 94% (+49%) | 95% (+39%) |
+| Correctness | 4 | 100% (+45%) | 100% (+20%) |
+| Discoverability | 4 | 100% (+38%) | 95% (+45%) |
+| Effectiveness | 4 | 87% (+66%) | 100% (+57%) |
+| Efficiency | 4 | 91% (+43%) | 92% (+68%) |
 
 ## Skill Version(s): <br>
-59d6e8a (source: git SHA, committed 2026-07-15) <br>
+d6d1714 (source: git SHA, committed 2026-07-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -126,7 +126,17 @@ has the activation rule at hand.
 | BlueField reboot class | BlueField cold reboot, BlueField warm reboot to apply `mlxconfig`; any change whose blast radius is *"every hosted service on this DPU restarts"* |
 | Per-artifact cross-link | any per-artifact skill's `## Safety policy` cross-links here for the cross-cutting rule body |
 
-When any cell above fires, the agent MUST load this skill **before** composing the first sentence of the answer, MUST walk the change-application discipline in [`TASKS.md ## configure`](TASKS.md#configure) → [`## modify`](TASKS.md#modify) → [`## test`](TASKS.md#test) → [`## debug`](TASKS.md#debug) in order, and MUST cite the activation explicitly in the answer (e.g. *"because this touches `mlxconfig`, the answer follows the `doca-hardware-safety` discipline …"*) so the user can audit the reasoning.
+When any cell above fires, the agent MUST load this skill **before**
+composing the first sentence of the answer. For production it MUST
+walk the change-application discipline in this order:
+[`TASKS.md ## configure`](TASKS.md#configure) (plan) →
+[`## test`](TASKS.md#test) (representative replica change + rollback
+rehearsal) → [`## modify`](TASKS.md#modify) (production apply) →
+[`## run`](TASKS.md#run) (production verification) →
+[`## debug`](TASKS.md#debug) (debug / rollback). It MUST cite the
+activation explicitly in the answer (e.g. *"because this touches
+`mlxconfig`, the answer follows the `doca-hardware-safety`
+discipline …"*) so the user can audit the reasoning.
 
 The activation is **mandatory, not advisory.** The most common failure mode this overlay prevents is *"the agent recommended a `mlxconfig` change with no maintenance window, no out-of-band path, and no rollback statement, the user applied it, the management link dropped, and the box was unrecoverable without a physical console."* The cost of one unjustified activation (a few extra paragraphs in the answer) is trivial compared to the cost of one missed activation.
 
@@ -136,8 +146,19 @@ If any of the following is true, the agent MUST stop and refuse to recommend the
 
 1. The change has no documented rollback path AND the user cannot provide one. (Per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) *rollback-must-be-documented* rule.)
 2. The change is link-breaking AND the host has no out-of-band access path. (Per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) *out-of-band-precondition* rule.)
-3. The change requires a cold power cycle AND the user has not confirmed a maintenance window. (Per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) *maintenance-window* rule.)
-4. The change has not been validated against a non-prod replica AND the user is asking for direct application to a production box. (Per [`TASKS.md ## test`](TASKS.md#test) *replica-first* rule.)
+3. The change touches hardware state AND the user has not confirmed an
+   explicit, time-boxed maintenance window. (Per
+   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+   *maintenance-window* rule.)
+4. Production application is contemplated before the change and its
+   rollback have passed on a representative non-prod replica. This
+   refusal is intent-based: it applies to a plan, recommendation, or
+   next action that would reach production early, not only when the
+   user explicitly asks for "direct application." A replica
+   mismatched on the required hardware, firmware, kernel, module, or
+   function-topology axes does not satisfy the gate; obtain a
+   representative replica or refuse and escalate. (Per
+   [`TASKS.md ## test`](TASKS.md#test) *replica-first* rule.)
 
 In each of these cases the correct answer shape is *"this change requires X (here is why); the bundle refuses to recommend it without X; here is the route to obtain X"* — not silence and not improvisation. The refuse-and-escalate rule is what makes the bundle's hardware-safety guidance trustworthy to production operators.
 

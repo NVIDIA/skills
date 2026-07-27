@@ -24,7 +24,7 @@ Routing for nearby "install" questions:
 
 - *"The binary isn't on my system — do I need to install
   something?"* → yes. Route to
-  [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
   or to [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install).
   When the DOCA install profile excluded the perf tools,
   the binary will be absent even on a healthy DOCA install.
@@ -71,6 +71,10 @@ Steps the agent should walk the user through, in order:
    through which fields are safe to change (entry count,
    value steps) versus which fields change the workload
    class entirely (match field structure, action list).
+   If a required field appears in neither the shipped
+   exemplars nor the public DOCA Flow Perf guide, stop and
+   report a documentation gap; request an authoritative
+   schema or known-good policy instead of inventing the field.
 4. **Pick the backend.** DPDK or DOCA. Per
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
    (Backends): the JSON contract is shared, the
@@ -157,6 +161,9 @@ through:
    `steps` (the step size). Common unsafe edits: adding new
    match fields not demonstrated by any shipped exemplar
    (the agent refuses to invent the JSON spelling).
+   If the public guide also does not define the requested
+   field, stop and report the documentation gap with both
+   sources checked; do not produce an edited policy.
 3. Run the single-iteration smoke per [`## run`](#run) on
    the edited JSON FIRST before scaling up.
 4. Capture the edited JSON contents in the four-tuple per
@@ -196,7 +203,8 @@ the *shape* of the flow.
    it is non-negotiable. The agent must NOT skip it.
 3. **Confirm the smoke ran cleanly.** Per
    [`## test`](#test) layer 1 — the tool printed an
-   iteration summary, `num_failed == 0`, and the device
+   iteration summary, `num_failed == 0`,
+   `num_pushed == num_inserted_entries`, and the device
    has not entered a degraded state per the
    `doca-flow` library's own view.
 4. **Scale up to the operator's chosen workload.** Increase
@@ -243,7 +251,10 @@ The smoke-before-bulk shape:
    steps 1-2 with small entries and small iteration count.
 2. **Confirm the tool printed an iteration summary** and
    that the printed counters reflect a successful run
-   (`num_failed == 0`, `num_pushed > 0`).
+   (`num_failed == 0`,
+   `num_pushed == num_inserted_entries`). A merely positive
+   `num_pushed` count is not a primary pass when fewer rules
+   were pushed than the policy requested.
 3. **Cross-check against the `doca-flow` library's view.**
    The surrounding doca-flow application's
    counter / inspector view per
@@ -298,7 +309,7 @@ layers in order:
 
 1. **Tool-not-installed.** Confirm the binary and the
    `configs/` JSON library are present; if not, route to
-   [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+   [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
    and [`## no-install`](../../doca-setup/TASKS.md#no-install).
 2. **JSON-policy-malformed.** Quote the tool's parser error
    verbatim; walk the user back to the closest shipped
@@ -375,7 +386,7 @@ routed out before the agent does any of them under this
 skill's name.
 
 - **install DOCA** ⇒
-  [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
   and [`## no-install`](../../doca-setup/TASKS.md#no-install).
 - **write or modify a doca-flow application** ⇒
   [`doca-flow`](../../libs/doca-flow/SKILL.md), layered on
