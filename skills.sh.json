@@ -121,6 +121,7 @@
         "nv-segment-ct",
         "nv-segment-ct-finetune",
         "nv-segment-ctmr",
+        "paidf-anomalygen",
         "tao-analyze-changenet-rca",
         "tao-analyze-gaps-visual-changenet",
         "tao-analyze-gaps-vlm-bcq",
@@ -315,6 +316,7 @@
       "title": "GPU Development",
       "description": "Develop, tune, profile, and integrate GPU kernels and accelerated code, including CUDA-adjacent workflows, autotuning, low-level performance work, and framework integration.",
       "skills": [
+        "tao-run-on-docker",
         "tilegym-adding-cutile-kernel",
         "tilegym-converting-cutile-to-julia",
         "tilegym-converting-cutile-to-triton",
