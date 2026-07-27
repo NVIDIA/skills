@@ -189,23 +189,46 @@ jobs:
           status_sha=""
           status_state="missing"
           target_url=""
-          for ((idx=${#commit_shas[@]} - 1; idx >= 0; idx--)); do
-            commit_sha="${commit_shas[idx]}"
-            statuses_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/commits/${commit_sha}/statuses?per_page=100")"
-            candidate_state="$(printf '%s' "${statuses_json}" | jq -r \
-              --arg context "${STATUS_CONTEXT}" \
-              '[.[] | select(.context == $context)][0].state // "missing"')"
-            if [ "${candidate_state}" != "missing" ]; then
-              status_sha="${commit_sha}"
-              status_state="${candidate_state}"
-              target_url="$(printf '%s' "${statuses_json}" | jq -r \
+          status_attempt=1
+          status_attempts=1
+          if [ -n "${generated_signature_sha}" ]; then
+            status_attempts=41
+          fi
+
+          while true; do
+            status_sha=""
+            status_state="missing"
+            target_url=""
+            for ((idx=${#commit_shas[@]} - 1; idx >= 0; idx--)); do
+              commit_sha="${commit_shas[idx]}"
+              statuses_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/commits/${commit_sha}/statuses?per_page=100")"
+              candidate_state="$(printf '%s' "${statuses_json}" | jq -r \
                 --arg context "${STATUS_CONTEXT}" \
-                '[.[] | select(.context == $context)][0].target_url // ""')"
+                '[.[] | select(.context == $context)][0].state // "missing"')"
+              if [ "${candidate_state}" != "missing" ]; then
+                status_sha="${commit_sha}"
+                status_state="${candidate_state}"
+                target_url="$(printf '%s' "${statuses_json}" | jq -r \
+                  --arg context "${STATUS_CONTEXT}" \
+                  '[.[] | select(.context == $context)][0].target_url // ""')"
+                break
+              fi
+              if [ "${commit_sha}" = "${latest_watched_sha}" ]; then
+                break
+              fi
+            done
+
+            case "${status_state}" in
+              success|failure|error)
+                break
+                ;;
+            esac
+            if [ "${status_attempt}" -ge "${status_attempts}" ]; then
               break
             fi
-            if [ "${commit_sha}" = "${latest_watched_sha}" ]; then
-              break
-            fi
+            echo "Waiting for ${STATUS_CONTEXT} to finish after trusted signature commit ${generated_signature_sha} (current state: ${status_state}, attempt ${status_attempt}/${status_attempts})."
+            sleep 15
+            status_attempt=$((status_attempt + 1))
           done
 
           if [ "${status_state}" = "success" ]; then
