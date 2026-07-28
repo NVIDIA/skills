@@ -1,0 +1,273 @@
+name: Require NVSkills CI status
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+  statuses: read
+
+jobs:
+  require-nvskills-ci:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: read
+    concurrency:
+      group: nvskills-ci-required-${{ github.repository }}-${{ github.event.pull_request.number || github.event.sha || github.sha }}
+      cancel-in-progress: true
+    steps:
+      - name: Require NVSkills CI for watched changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number || '' }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref || '' }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.event.sha || github.sha }}
+          STATUS_CONTEXT: ${{ vars.NVSKILLS_STATUS_CONTEXT || 'NVSkills CI' }}
+          EVENT_ACTOR: ${{ github.actor }}
+          SIGNATURE_COMMIT_TITLE: ${{ vars.NVSKILLS_SIGNATURE_COMMIT_TITLE || 'Attach NVSkills validation signatures' }}
+          SIGNATURE_PUSH_ACTOR: ${{ vars.NVSKILLS_SIGNATURE_PUSH_ACTOR || 'nv-skills-ci[bot]' }}
+        run: |
+          set -euo pipefail
+
+          owner="${REPO%%/*}"
+          repo="${REPO#*/}"
+          head_sha="$(printf '%s' "${HEAD_SHA}" | tr '[:upper:]' '[:lower:]')"
+          pr_number="${PR_NUMBER}"
+
+          append_summary() {
+            printf '%s\n' "$@" | tee -a "${GITHUB_STEP_SUMMARY}"
+          }
+
+          case "${HEAD_REF}" in
+            automated/sync-skills|bot/regenerate-skill-metadata)
+              append_summary \
+                "## NVSkills CI required status" \
+                "" \
+                "Skipped: bot-managed branch \`${HEAD_REF}\` is exempt from this check."
+              exit 0
+              ;;
+          esac
+
+          github_get() {
+            curl -fsSL \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$1"
+          }
+
+          is_trusted_generated_signature_commit() {
+            local commit_json="$1"
+            local commit_title
+            local file_count
+
+            [ "${EVENT_ACTOR}" = "${SIGNATURE_PUSH_ACTOR}" ] || return 1
+
+            commit_title="$(printf '%s' "${commit_json}" | jq -r '.commit.message | split("\n")[0]')"
+            [ "${commit_title}" = "${SIGNATURE_COMMIT_TITLE}" ] || return 1
+
+            file_count="$(printf '%s' "${commit_json}" | jq '.files | length')"
+            # GitHub paginates commit file lists. Fail closed rather than
+            # exempting a commit whose complete set of changed files is unknown.
+            [ "${file_count}" -gt 0 ] && [ "${file_count}" -lt 100 ] || return 1
+
+            printf '%s' "${commit_json}" | jq -e '
+              def generated_artifact:
+                test(
+                  "^(skills/[^/]+|team-skills/[^/]+/[^/]+|plugins/[^/]+)/" +
+                  "(BENCHMARK\\.md|skill-card\\.md|skill\\.oms\\.sig|" +
+                  "skill-card-review-needed\\.md|[^/]+-review-needed\\.md)$"
+                );
+              any(.files[]?; .filename | endswith("/skill.oms.sig")) and
+              all(.files[]?; .filename | generated_artifact)
+            ' >/dev/null
+          }
+
+          if [ -z "${pr_number}" ] || [ -z "${head_sha}" ]; then
+            echo "Pull request metadata is incomplete."
+            exit 1
+          fi
+
+          has_watched_change=false
+          page=1
+          while true; do
+            files_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/pulls/${pr_number}/files?per_page=100&page=${page}")"
+            if printf '%s' "${files_json}" | jq -e '
+              def watched:
+                (. // "") |
+                startswith("skills/") or
+                startswith("team-skills/") or
+                startswith("rules/team-rules/") or
+                startswith("plugins/");
+              any(.[]; (.filename | watched) or (.previous_filename? | watched))
+            ' >/dev/null; then
+              has_watched_change=true
+              break
+            fi
+            if [ "$(printf '%s' "${files_json}" | jq 'length')" -lt 100 ]; then
+              break
+            fi
+            page=$((page + 1))
+          done
+
+          if [ "${has_watched_change}" != "true" ]; then
+            append_summary \
+              "## NVSkills CI required status" \
+              "" \
+              "Skipped: PR #${pr_number} has no changes under watched NVSkills paths."
+            exit 0
+          fi
+
+          commit_shas_file="$(mktemp)"
+          trap 'rm -f "${commit_shas_file}"' EXIT
+
+          page=1
+          while true; do
+            commits_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/pulls/${pr_number}/commits?per_page=100&page=${page}")"
+            printf '%s' "${commits_json}" | jq -r '.[].sha | ascii_downcase' >> "${commit_shas_file}"
+            if [ "$(printf '%s' "${commits_json}" | jq 'length')" -lt 100 ]; then
+              break
+            fi
+            page=$((page + 1))
+          done
+
+          mapfile -t commit_shas < "${commit_shas_file}"
+          if [ "${#commit_shas[@]}" -eq 0 ]; then
+            echo "Pull request commits could not be resolved."
+            exit 1
+          fi
+
+          latest_watched_sha=""
+          latest_watched_path=""
+          generated_signature_sha=""
+          for ((idx=${#commit_shas[@]} - 1; idx >= 0; idx--)); do
+            commit_sha="${commit_shas[idx]}"
+            commit_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/commits/${commit_sha}?per_page=100")"
+            watched_path="$(printf '%s' "${commit_json}" | jq -r '
+              def watched:
+                (. // "") |
+                startswith("skills/") or
+                startswith("team-skills/") or
+                startswith("rules/team-rules/") or
+                startswith("plugins/");
+              [
+                .files[]? |
+                select((.filename | watched) or (.previous_filename? | watched)) |
+                (.filename // .previous_filename)
+              ][0] // empty
+            ')"
+            if [ -n "${watched_path}" ]; then
+              if is_trusted_generated_signature_commit "${commit_json}"; then
+                generated_signature_sha="${commit_sha}"
+                continue
+              fi
+              latest_watched_sha="${commit_sha}"
+              latest_watched_path="${watched_path}"
+              break
+            fi
+          done
+
+          if [ -z "${latest_watched_sha}" ]; then
+            if [ -n "${generated_signature_sha}" ]; then
+              append_summary \
+                "## NVSkills CI required status" \
+                "" \
+                "Failed: trusted generated signature commit \`${generated_signature_sha}\` has no preceding watched-path content commit to validate."
+              exit 1
+            fi
+            append_summary \
+              "## NVSkills CI required status" \
+              "" \
+              "Skipped: PR #${pr_number} has no commits that changed watched NVSkills paths."
+            exit 0
+          fi
+
+          status_sha=""
+          status_state="missing"
+          target_url=""
+          status_attempt=1
+          status_attempts=1
+          if [ -n "${generated_signature_sha}" ]; then
+            status_attempts=41
+          fi
+
+          while true; do
+            status_sha=""
+            status_state="missing"
+            target_url=""
+            for ((idx=${#commit_shas[@]} - 1; idx >= 0; idx--)); do
+              commit_sha="${commit_shas[idx]}"
+              statuses_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/commits/${commit_sha}/statuses?per_page=100")"
+              candidate_state="$(printf '%s' "${statuses_json}" | jq -r \
+                --arg context "${STATUS_CONTEXT}" \
+                '[.[] | select(.context == $context)][0].state // "missing"')"
+              if [ "${candidate_state}" != "missing" ]; then
+                status_sha="${commit_sha}"
+                status_state="${candidate_state}"
+                target_url="$(printf '%s' "${statuses_json}" | jq -r \
+                  --arg context "${STATUS_CONTEXT}" \
+                  '[.[] | select(.context == $context)][0].target_url // ""')"
+                break
+              fi
+              if [ "${commit_sha}" = "${latest_watched_sha}" ]; then
+                break
+              fi
+            done
+
+            case "${status_state}" in
+              success|failure|error)
+                break
+                ;;
+            esac
+            if [ "${status_attempt}" -ge "${status_attempts}" ]; then
+              break
+            fi
+            echo "Waiting for ${STATUS_CONTEXT} to finish after trusted signature commit ${generated_signature_sha} (current state: ${status_state}, attempt ${status_attempt}/${status_attempts})."
+            sleep 15
+            status_attempt=$((status_attempt + 1))
+          done
+
+          if [ "${status_state}" = "success" ]; then
+            append_summary \
+              "## NVSkills CI required status" \
+              "" \
+              "Passed: \`${STATUS_CONTEXT}\` succeeded for \`${status_sha}\`." \
+              "" \
+              "Latest watched-path change: \`${latest_watched_path}\` at \`${latest_watched_sha}\`."
+            if [ "${status_sha}" != "${head_sha}" ]; then
+              append_summary \
+                "" \
+                "PR head \`${head_sha}\` has only trailing changes that do not require a fresh NVSkills CI status."
+            fi
+            if [ -n "${generated_signature_sha}" ]; then
+              append_summary \
+                "" \
+                "Trusted generated signature commit \`${generated_signature_sha}\` was verified against the preceding watched-path validation status."
+            fi
+            exit 0
+          fi
+
+          append_summary \
+            "## NVSkills CI required status" \
+            "" \
+            "Failed: \`${STATUS_CONTEXT}\` status is \`${status_state}\` for the latest relevant commit." \
+            "" \
+            "Latest watched-path change: \`${latest_watched_path}\` at \`${latest_watched_sha}\`." \
+            "" \
+            "Comment \`/nvskills-ci\` on this PR after every commit that changes" \
+            "\`skills/\`, \`team-skills/\`, \`rules/team-rules/\`, or \`plugins/\`." \
+            "" \
+            "\`/nvskills-ci\` only works on branches in \`NVIDIA/skills\`, not forks." \
+            "If this PR is from a fork, move the changes to a branch in \`NVIDIA/skills\` first."
+          if [ -n "${status_sha}" ]; then
+            append_summary "" "Latest NVSkills CI status checked: \`${status_state}\` on \`${status_sha}\`."
+          fi
+          if [ -n "${target_url}" ]; then
+            append_summary "" "Current NVSkills CI run: ${target_url}"
+          fi
+          exit 1
