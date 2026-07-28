@@ -3,6 +3,15 @@
   "input_stage": "/tmp/factory.usd",
   "output_dir": "/tmp/factory",
   "new_assembly_root": "/tmp/factory/factory.optimized.usdc",
+  "assembly_root": {
+    "path": "/tmp/factory/factory.optimized.usdc",
+    "mesh_count": 1840
+  },
+  "frontier": {
+    "reuse_measured": true,
+    "descent_converged": true,
+    "final_rescan_new_groups_above_floor": 0
+  },
   "phase4_targets": [
     {
       "path": "/tmp/factory/prototypes/rack_unit.usd",

@@ -9,7 +9,7 @@ never enumerate rules, guess class names, or shell out to a CLI.
 Why this exists
 ---------------
 Bare rule names are not unique. ``IndexedPrimvarChecker`` is registered by both
-Scene Optimizer (0.3 s triage) and the Asset Validator (376 s full audit). A
+Usd Optimize (0.3 s triage) and the usd-validation-nvidia (376 s full audit). A
 name-only lookup picks one by registry order, so the same scope note produces
 different work and wildly different runtimes on different hosts. That is the
 root cause of "every run finds a different solution and it takes forever."
@@ -193,6 +193,52 @@ def get_validation_engine_cls() -> Any:
         raise ValidationRuntimeUnavailable(_RUNTIME_UNAVAILABLE) from exc
 
 
+def _shape_registered_rules(reg: Any) -> Any:
+    """Kit core ``ValidationRulesRegistry`` shape (iterable or callable)."""
+    try:
+        rules = reg.registered_rules
+    except AttributeError:
+        return None
+    return rules() if callable(rules) else rules
+
+
+def _shape_rules_by_name(reg: Any) -> Any:
+    """Older ``name -> rule`` map shape; yields the map's values."""
+    try:
+        mapping = reg.rules_by_name
+    except AttributeError:
+        return None
+    return mapping.values() if isinstance(mapping, dict) else None
+
+
+def _shape_rules(reg: Any) -> Any:
+    """OAV 1.18.0 ``CategoryRuleRegistry.rules`` shape (iterable/dict/callable)."""
+    try:
+        direct = reg.rules
+    except AttributeError:
+        return None
+    if callable(direct):
+        direct = direct()
+    if isinstance(direct, dict):
+        direct = direct.values()
+    return direct
+
+
+#: Allowlist of the only registry entry points the enumerator may consult, each
+#: mapped to an accessor that normalizes that runtime's shape to an iterable of
+#: rule objects. Using an explicit static mapping (instead of dynamic
+#: ``getattr``) guarantees no externally-influenced name can select an
+#: attribute — only these three known, hand-vetted registry shapes are ever
+#: read, and each accessor uses direct attribute access. This is a runtime
+#: adapter, not a correctness fallback: extend it only with a new entry point
+#: that yields rule classes carrying real ``__module__`` / ``__name__`` identity.
+_REGISTRY_SHAPE_ACCESSORS: dict[str, Callable[[Any], Any]] = {
+    "registered_rules": _shape_registered_rules,
+    "rules_by_name": _shape_rules_by_name,
+    "rules": _shape_rules,
+}
+
+
 def iter_registered_rules(rule_registry: Any) -> Iterable[type]:
     """Yield every registered rule *class* (collision-aware enumeration).
 
@@ -200,33 +246,20 @@ def iter_registered_rules(rule_registry: Any) -> Iterable[type]:
     to the differing registry shapes across runtimes but never collapses rules
     to bare names. Fail-closed: if no enumeration entry point is found, raises.
     """
-    # Scene Optimizer registers its rules on import for discovery.
+    # Usd Optimize registers its rules on import for discovery.
     try:
         import omni.scene.optimizer.validators  # type: ignore  # noqa: F401
     except ImportError:  # pragma: no cover - environment dependent
         pass
 
-    # Known registry shapes, probed by entry point (never collapsed to bare
-    # names — matching stays identity-based below):
-    #   - ``registered_rules``  Kit core ValidationRulesRegistry (iterable/callable)
-    #   - ``rules_by_name``     older name->rule map
-    #   - ``rules``             OAV 1.18.0 CategoryRuleRegistry (iterable of classes)
-    # This is a runtime adapter, not a correctness fallback. Extend here only if
-    # a new runtime exposes another shape, and only with an entry point that
-    # yields rule classes carrying real ``__module__`` / ``__name__`` identity.
-    rules = getattr(rule_registry, "registered_rules", None)
-    if callable(rules):
-        rules = rules()
-    if rules is None:
-        mapping = getattr(rule_registry, "rules_by_name", None)
-        rules = mapping.values() if isinstance(mapping, dict) else None
-    if rules is None:
-        direct = getattr(rule_registry, "rules", None)
-        if callable(direct):
-            direct = direct()
-        if isinstance(direct, dict):
-            direct = direct.values()
-        rules = direct
+    # Probe the known registry shapes in order via the explicit allowlist above;
+    # the first accessor to yield a non-None result wins. Matching stays
+    # identity-based below (never collapsed to bare names).
+    rules = None
+    for accessor in _REGISTRY_SHAPE_ACCESSORS.values():
+        rules = accessor(rule_registry)
+        if rules is not None:
+            break
     if rules is None:
         raise ValidationRuntimeUnavailable(
             "Could not enumerate registered rules from the runtime registry; the "
@@ -234,7 +267,10 @@ def iter_registered_rules(rule_registry: Any) -> Iterable[type]:
         )
 
     for rule in rules:
-        rule_cls = getattr(rule, "rule", rule)  # unwrap registration wrappers
+        try:
+            rule_cls = rule.rule  # unwrap registration wrappers
+        except AttributeError:
+            rule_cls = rule
         if isinstance(rule_cls, type):
             yield rule_cls
 
@@ -271,7 +307,7 @@ def open_scoped_stage(stage_path: str, mask_paths: list[str] | None = None) -> A
     """Open a stage, optionally masked to ``mask_paths`` (+ the default prim).
 
     ``Usd.Stage.OpenMasked()`` is the only reliable scoping mechanism for the
-    Asset Validator (it discards caller ``StageLoadRules`` but preserves the
+    usd-validation-nvidia (it discards caller ``StageLoadRules`` but preserves the
     population mask). Rejects an empty masked sample so the caller never reports
     a misleading "0 findings".
     """
@@ -513,8 +549,21 @@ def subprocess_concept_runner(
     import os
     import sys
 
+    # Pin the child command so neither the interpreter nor the script can be
+    # redirected by external (job) input. The interpreter defaults to the
+    # current ``sys.executable``; the worker is *always* this executor module's
+    # own resolved path — it never derives from the job payload. Validate both
+    # up front so ``[executable, worker]`` passed to ``subprocess.run`` is a
+    # fixed, vetted command.
     executable = python_executable or sys.executable
-    worker = str(Path(__file__).resolve())
+    if not isinstance(executable, str) or not executable:
+        raise ValueError("python_executable must be a non-empty path string")
+    # The worker is always this executor module's own resolved path; it is never
+    # job-derived, so the command stays fixed regardless of stdin input.
+    worker_path = Path(__file__).resolve()
+    if not worker_path.is_file():  # pragma: no cover - defensive
+        raise RuntimeError(f"validation worker path does not resolve to a file: {worker_path}")
+    worker = str(worker_path)
 
     def _runner(stage_path, concepts, *, registry=None, mask_paths=None):
         job = json.dumps(
@@ -550,6 +599,54 @@ def subprocess_concept_runner(
     return _runner
 
 
+#: The exact set of fields the internal worker job may carry. The stdin payload
+#: is an internal protocol, but the input is still untrusted, so ``_validate_job``
+#: rejects anything outside this schema before any value is used.
+_JOB_ALLOWED_KEYS = frozenset({"stage_path", "concept", "mask_paths", "registry_path"})
+
+
+def _validate_job(job: Any) -> dict[str, Any]:
+    """Validate/normalize the untrusted stdin job against the worker schema.
+
+    Fail-closed on shape, unexpected/missing fields, and wrong types. Returns a
+    normalized dict with exactly the four known keys so the caller can index it
+    directly. This is the trust boundary for the child process (the job arrives
+    as JSON on stdin from ``subprocess_concept_runner``).
+    """
+    if not isinstance(job, dict):
+        raise ValueError(f"job must be a JSON object, got {type(job).__name__}")
+    unexpected = set(job) - _JOB_ALLOWED_KEYS
+    if unexpected:
+        raise ValueError(f"job has unexpected field(s): {sorted(unexpected)}")
+
+    stage_path = job.get("stage_path")
+    if not isinstance(stage_path, str) or not stage_path:
+        raise ValueError("job['stage_path'] must be a non-empty string")
+
+    concept = job.get("concept")
+    if not isinstance(concept, str) or not concept:
+        raise ValueError("job['concept'] must be a non-empty string")
+
+    mask_paths = job.get("mask_paths", [])
+    if mask_paths is None:
+        mask_paths = []
+    if not isinstance(mask_paths, list) or not all(
+        isinstance(p, str) and p for p in mask_paths
+    ):
+        raise ValueError("job['mask_paths'] must be a list of non-empty strings")
+
+    registry_path = job.get("registry_path")
+    if registry_path is not None and (not isinstance(registry_path, str) or not registry_path):
+        raise ValueError("job['registry_path'] must be a non-empty string or null")
+
+    return {
+        "stage_path": stage_path,
+        "concept": concept,
+        "mask_paths": mask_paths,
+        "registry_path": registry_path,
+    }
+
+
 def _worker_main() -> int:
     """Child entrypoint: read one JSON job from stdin, print a JSON result.
 
@@ -557,14 +654,14 @@ def _worker_main() -> int:
     """
     import sys
 
-    job = json.loads(sys.stdin.read())
-    registry = load_registry(job.get("registry_path"))
+    job = _validate_job(json.loads(sys.stdin.read()))
+    registry = load_registry(job["registry_path"])
     try:
         issues = validate_concepts(
             job["stage_path"],
             [job["concept"]],
             registry=registry,
-            mask_paths=job.get("mask_paths") or None,
+            mask_paths=job["mask_paths"] or None,
         )
     except ValidationRuntimeUnavailable as exc:
         print(json.dumps({"status": "blocked_validation_runtime", "detail": str(exc)}))

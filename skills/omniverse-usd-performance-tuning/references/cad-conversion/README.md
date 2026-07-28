@@ -1,6 +1,3 @@
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
 # CAD-to-USD Conversion Advisor
 
 > CAD conversion is a pre-USD concern; `omniverse-usd-performance-tuning` cites this reference when the user reports `problem_type = conversion quality`.
@@ -42,7 +39,7 @@ Guide CAD-to-USD conversion diagnosis before optimization. Capture the source fo
 
 ## Limitations
 
-- Does not execute conversion or Scene Optimizer operations.
+- Does not execute conversion or Usd Optimize operations.
 - Cannot guarantee a tessellation knob exists for every source format or backend.
 - Post-conversion performance issues still need composition audit and validation.
 

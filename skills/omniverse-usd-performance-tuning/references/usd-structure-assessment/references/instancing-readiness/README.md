@@ -1,27 +1,18 @@
 # Instancing Readiness
 
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
-## When to Use
-
-Use when checking repeated USD references for safe instanceable authoring after structure assessment.
-
 ## Instructions
 
-1. Confirm the target asset, artifact, or user intent and check the prerequisites listed below.
-2. Read only the referenced files needed for the current phase, failure mode, or output contract.
-3. Follow the workflow, rules, and safety gates in this reference before invoking downstream references or shell commands.
-4. Return the result using the Output Format section and name any blocked prerequisite or unresolved user decision.
+See `references/_shared/standard-instructions.md`.
 
 ## Output Format
 
-Return a concise status or report that names the input, selected runtime or evidence source, actions planned or performed, artifacts written, blockers, and the next validation or user-decision step. When a schema or template is referenced below, conform to that contract.
+See `references/_shared/standard-output-format.md`.
 
-## Purpose
+## Purpose / When to Use
 
 Use this reference after `usd-structure-assessment` identifies repeated references
-that are instancing candidates. This reference determines whether each candidate
+that are instancing candidates — i.e. when checking repeated USD references for
+safe `instanceable` authoring. This reference determines whether each candidate
 can safely be marked `instanceable = true` without breaking the scene.
 
 ## Prerequisites

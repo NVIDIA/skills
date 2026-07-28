@@ -1,22 +1,16 @@
 # USD Hierarchy Dedupe Candidates
 
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
 ## When to Use
 
 Use when finding repeated USD subtrees that may become shared prototypes or references before mesh-level dedupe.
 
 ## Instructions
 
-1. Confirm the target asset, artifact, or user intent and check the prerequisites listed below.
-2. Read only the referenced files needed for the current phase, failure mode, or output contract.
-3. Follow the workflow, rules, and safety gates in this reference before invoking downstream references or shell commands.
-4. Return the result using the Output Format section and name any blocked prerequisite or unresolved user decision.
+See `references/_shared/standard-instructions.md`.
 
 ## Output Format
 
-Return a concise status or report that names the input, selected runtime or evidence source, actions planned or performed, artifacts written, blockers, and the next validation or user-decision step. When a schema or template is referenced below, conform to that contract.
+See `references/_shared/standard-output-format.md`.
 
 Use this after `usd-structure-assessment` and before unscoped
 `deduplicateGeometry` when a stage appears monolithic or assembly repetition is
@@ -27,6 +21,14 @@ likely.
 Produce a read-only candidate report for repeated subtrees that could be
 rewritten as shared prototype/reference assets. This is hierarchy-level analysis,
 not mesh-level deduplication, and it must not modify the stage.
+
+**Share, don't scatter.** Candidates feed the bounded recursive descent
+(`workflow.md` Phase 2g): the report runs again on each extracted asset to find
+deeper (component/subcomponent) repetition to a bounded depth. The win is always
+a SHARED prototype with `instanceable=true` references, never N unshared per-node
+payloads. Flag structurally identical subtrees (hash-confirmed) so the rewrite
+shares one prototype; a repack or unshared split is not the optimization win and
+fails the Phase-6 gate.
 
 ## Prerequisites
 
@@ -101,7 +103,8 @@ must distinguish candidates.
 For a precise behavior spec, read
 `references/instance-candidate-finder-spec.md` only when implementing or
 debugging the analyzer. For the follow-on rewrite behavior, read
-`skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/apply-restructure/references/hierarchy-dedupe-rewrite-tool-spec.md`.
+`skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/apply-restructure/references/restructure-mode.md`
+§ Dedupe Plan.
 
 ## Output
 
@@ -125,9 +128,14 @@ For top candidates:
 2. Choose an edit target with `usd-edit-target-planner`.
 3. Use `restructure-decision` and `apply-restructure` to rewrite repeated
    hierarchy as references/payloads to shared prototype assets.
-4. Run `so-run-operations` on the new explicit prototypes or sub-assets.
+4. Run `usd-optimize-run-operations` on the new explicit prototypes or sub-assets.
 5. Run mesh-level `deduplicateGeometry` only inside remaining unique prototypes
    or scoped sub-assets.
 
 Do not claim savings as achieved until a rewrite is performed and after-profile
 metrics confirm it.
+
+Coverage note: candidate quality depends on full-tree hashing. Shallow
+subtree-hash shortcuts miss depth-3+ duplicates (a shallow heuristic covers
+only a small fraction of the full-tree pass's coverage on a large CAD stage) — see the finder spec's
+"Coverage limit" section.
