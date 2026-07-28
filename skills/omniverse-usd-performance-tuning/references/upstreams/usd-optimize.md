@@ -1,18 +1,24 @@
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
+# usd-optimize / Usd Optimize Package Handoff
 
-# usd-optimize / Scene Optimizer Package Handoff
-
-Scene Optimizer operation mechanics are owned by upstream `usd-optimize` and
-ship with the prebuilt Scene Optimizer package. This package owns digital twin
+Usd Optimize operation mechanics are owned by upstream `usd-optimize` and
+ship with the prebuilt Usd Optimize package. This package owns digital twin
 workflow routing, runtime setup context, validation scope, output workspace
 policy, batch orchestration, and reporting.
 
-- Public repository: [https://github.com/NVIDIA-omniverse/usd-optimize/](https://github.com/NVIDIA-omniverse/usd-optimize/)
-- Prebuilt package pattern: `scene_optimizer_core_usd_<usd>_py_<python>@<version>.<platform>.release.zip`
-- Linux direct archive: `https://d4i3qtqj3r0z5.cloudfront.net/scene_optimizer_core_usd_25.11_py_3.12%40110.1.0%2Bmaster.401.324ccecb.gl.manylinux_2_35_x86_64.release.zip`
-- Windows direct archive: `https://d4i3qtqj3r0z5.cloudfront.net/scene_optimizer_core_usd_25.11_py_3.12%40110.1.0%2Bmaster.401.324ccecb.gl.windows-x86_64.release.zip`
-- Package operation guides: `.agents/operations/<operation>.md`
+- Public repository: [https://github.com/NVIDIA-Omniverse/usd-optimize/](https://github.com/NVIDIA-Omniverse/usd-optimize/)
+- Prebuilt packages: **GitHub Releases** on the repository above
+  (`https://github.com/NVIDIA-Omniverse/usd-optimize/releases`). Each release
+  carries Linux x86_64, Linux aarch64, and Windows x86_64 zips (~330-360 MB).
+- Package pattern: `usd_optimize_usd_<usd>_py_<python>@<version>.<platform>.release.zip`.
+  usd-optimize 1.0.4 is the minimum supported runtime for this skill; 1.1.x is
+  also supported. The two layouts differ only in where per-operation docs live:
+  1.1.x packages ship them at `docs/operations/<key>.rst`, 1.0.x packages at
+  `.agents/operations/<key>.md`. Operation inventory, arguments, and defaults are
+  the same across both.
+- Download example:
+  `gh release download v1.0.4 -R NVIDIA-Omniverse/usd-optimize -p '*manylinux*x86_64*'`
+  (or pick the asset from the releases page in a browser).
+- Package operation guides: `docs/operations/<operation>.rst` (1.1.x) or `.agents/operations/<operation>.md` (1.0.x)
 - Package operation runner skill: `.agents/skills/run-operations/SKILL.md`
 - Package validator runner skill: `.agents/skills/run-validators/SKILL.md`
 - Package validator interpretation skill: `.agents/skills/interpret-validators/SKILL.md`
@@ -21,34 +27,45 @@ policy, batch orchestration, and reporting.
 
 ## Operation Guide Resolution
 
-For any operation key listed in `references/operations/manifest.json`, derive
+For any operation key listed in `references/operations/operations.json`, derive
 the upstream mechanics path instead of storing per-operation package details in
-this repo:
+this repo. Resolve it with a version-tolerant lookup under the selected package
+root (`$USD_OPTIMIZE_ROOT`), without cloning the source repo. This is the single
+place this rule is stated; other skill files point here.
 
-- Package path template: `.agents/operations/<operation-key>.md`
-- Upstream web URL template: `https://github.com/NVIDIA-omniverse/usd-optimize/blob/main/.agents/operations/<operation-key>.md`
-- Package operation index: `.agents/operations/INDEX.md`
+- Package path template (prefer): `$USD_OPTIMIZE_ROOT/docs/operations/<operation-key>.rst`
+  (1.1.x packages).
+- Fallback: `$USD_OPTIMIZE_ROOT/.agents/operations/<operation-key>.md` (1.0.x
+  packages, which predate the auto-generated docs tree).
+- Sidecars follow the same rule. Operation index: `docs/operations.rst` (1.1.x)
+  or `.agents/operations/INDEX.md` (1.0.x). Pipeline/preset guidance:
+  `docs/choosing-operations.rst` plus `config_presets/*.json` (1.1.x) or
+  `.agents/operations/PIPELINES.md` (1.0.x). Invocation: `docs/cli.rst` (1.1.x)
+  or `.agents/operations/INVOCATION.md` (1.0.x).
+- Upstream web URL template (1.1.x `main`):
+  `https://github.com/NVIDIA-Omniverse/usd-optimize/blob/main/docs/operations/<operation-key>.rst`.
+  To document the 1.0.x layout, pin the tag:
+  `https://github.com/NVIDIA-Omniverse/usd-optimize/blob/1.0.4/.agents/operations/<operation-key>.md`.
 
-Resolve local upstream guidance without cloning the source repo:
-
-1. `$SCENE_OPTIMIZER_PACKAGE_ROOT`
-2. `$SO_HOME`
-
-Each root above must contain `.agents/operations/INDEX.md` and the runtime
-sentinels `python/`, `usdpy/`, `lib/`, and `extraLibs/` when it is also used
-for standalone execution. The package may include `.claude` and `.codex`
+Each root above must contain the per-operation doc set — `docs/operations/` with
+`docs/operations.rst` (1.1.x) or `.agents/operations/INDEX.md` (1.0.x) — plus the
+runtime sentinels `python/`, `usdpy/`, `lib/`, and `extraLibs/` when it is also
+used for standalone execution. The package may include `.claude` and `.codex`
 compatibility aliases, but handoffs should use `.agents` paths.
 
 If no package root exists, download and extract the published
-`scene_optimizer_core_...release.zip` package for the target platform, or use
-the package archive path, direct archive URL, or extracted package root
-supplied by the user. If web or raw GitHub fetch is available, the public
+`usd_optimize_...release.zip` package for the target platform from GitHub
+Releases, or use the package archive path, release-asset URL, or extracted
+package root supplied by the user. Package-internal paths (`.agents/...`,
+`python/`, `usdpy/`, `lib/`, `extraLibs/`) were last verified against the
+110.x packages; re-verify against the extracted 1.0.x package on first use. If web or raw GitHub fetch is available, the public
 repository URL can be used for docs-only reads. Do not clone the source repo
 just to read operation parameters, defaults, or implementation gotchas.
 
-Local operation files under `references/operations/<operation-key>.md` keep only
-routing frontmatter. Use `references/operations/manifest.json` and
-`references/operations/_curation.json` for digitaltwin routing, risk,
-confirmation, and recommendation posture. Before invoking any operation, consume
+Use `references/operations/operations.json` — the single catalog carrying both
+routing metadata and the nested `curation` block (generated `status` +
+authored `wired_into`; `rationale` only on overrides) — for digitaltwin
+routing, risk, confirmation, and recommendation
+posture. Before invoking any operation, consume
 `<output_path>/setup-preflight.json` and confirm the op appears in
-`sceneOptimizer.operationsAvailable`.
+`usdOptimize.operationsAvailable`.

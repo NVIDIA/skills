@@ -1,0 +1,86 @@
+{
+  "$comment": "SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.\nSPDX-License-Identifier: Apache-2.0",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Batch Plan",
+  "description": "Contract for the plan JSON consumed by the batch scheduler (usd-optimize-run-operations/scripts/run_batch.py, --plan). This makes the descent -> apply-restructure manifest -> scheduler handoff a real contract: ONE target = ONE own-layer file = ONE job (the edit-target invariant). The agent decides max_workers, archetype tags, op chains, and intent-gated opt-ins; the runner owns spawning, dependency ordering, per-target/per-op timeouts, the GPU-cliff guard, status emission, and resume. The frontier metadata from apply-restructure-manifest.json phase4_targets[] flows into per-target jobs (level / archetype / role carried through). The emitted status.json is owned by status.schema.json.",
+  "type": "object",
+  "required": ["targets"],
+  "additionalProperties": true,
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "description": "Stable id for this batch (used in status.json and the per-target output hash). Defaults to 'batch' when absent."
+    },
+    "source_manifest": {
+      "type": "string",
+      "description": "Optional path to the apply-restructure-manifest.json whose phase4_targets[] this plan was built from (provenance for the handoff)."
+    },
+    "targets": {
+      "type": "array",
+      "description": "One job per Phase-4 target. Each target file is an INDEPENDENT own-root-layer edit target (never the composed assembly); that independence is why per-target work parallelizes.",
+      "items": {
+        "type": "object",
+        "required": ["path", "command"],
+        "additionalProperties": true,
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "The target's own root-layer file path. SO's edit target IS this file's bytes."
+          },
+          "role": {
+            "type": "string",
+            "enum": ["assembly_root", "prototype", "shared_layer", "loadable_subasset", "monolith"],
+            "description": "Restructure role (mirrors the manifest phase4_targets[] target_class, plus 'monolith' for an N=1 optimize-as-is run)."
+          },
+          "target_class": {
+            "type": "string",
+            "description": "Alias accepted for role (matches the manifest field name)."
+          },
+          "level": {
+            "type": ["string", "null"],
+            "enum": ["assembly", "component", "subcomponent", "detail", null],
+            "description": "Descent level carried from the manifest (drives ordering / weight, not authority)."
+          },
+          "archetype": {
+            "type": ["string", "null"],
+            "description": "large-spatial | encapsulated-product | piping | generic — selects which op-chain steps apply."
+          },
+          "dep_group": {
+            "type": "string",
+            "enum": ["shared_first", "dependent_after", "independent"],
+            "description": "Prototype-first ordering: shared_first targets (prototypes/shared layers) run to completion before dependent targets so changes propagate. Independent targets ride the dependent wave. Alias: dependency_group."
+          },
+          "dependency_group": {
+            "type": "string",
+            "enum": ["shared_first", "dependent_after", "independent"]
+          },
+          "gpu_bound": {
+            "type": "boolean",
+            "description": "When true and the runtime_context reports no CUDA, the runner SKIPS the target (state skipped_gpu_unavailable) rather than entering a long CPU fallback."
+          },
+          "command": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1,
+            "description": "Argv for the standalone single-asset worker process. The worker runs the per-target op chain (e.g. meshCleanup -> deduplicateGeometry -> computeExtents; pruneLeaves is NOT in the per-prototype chain) and emits its summary to summary_path."
+          },
+          "timeout_sec": {
+            "type": ["number", "null"],
+            "minimum": 0,
+            "description": "Per-target wall-clock budget; a worker exceeding it is killed (state timeout), bounding a hung op without stalling the batch."
+          },
+          "summary_path": {
+            "type": "string",
+            "description": "Path the worker writes its before/after summary to. The runner derives the coverage disposition (optimized | no_op | unknown) from before/after deltas — 'done' alone is never 'optimized'."
+          },
+          "log_path": { "type": "string" },
+          "steps_applied": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Op-chain steps planned/applied for this target (advisory; the worker summary is authoritative for outcome)."
+          }
+        }
+      }
+    }
+  }
+}

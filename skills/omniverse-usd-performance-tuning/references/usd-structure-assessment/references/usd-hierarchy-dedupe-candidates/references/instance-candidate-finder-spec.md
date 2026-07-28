@@ -1,9 +1,6 @@
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
 # Instance-Candidate Finder — Behavioral Specification
 
-Status: draft (revision 3 - pairs the read-only finder with a rewrite-tool spec)
+Status: draft (revision 4 - adds the kind-trust preflight, issue #172)
 Audience: a coding agent (or human) re-implementing the tool from scratch
 Style: behavior-only. Do not infer function names, class layout, or module
 structure from this document. Any implementation that satisfies every clause
@@ -20,8 +17,10 @@ turned into a shared prototype, based on outgoing references from inside the
 subtree.
 
 The tool **does not modify the stage**. The actual de-duplication step
-(rewriting the stage to use shared prototypes) is a separate tool described in
-`skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/apply-restructure/references/hierarchy-dedupe-rewrite-tool-spec.md`.
+(rewriting the stage to use shared prototypes) is driven per descent region by the
+native `deduplicateHierarchies` op, described in
+`skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/apply-restructure/references/restructure-mode.md`
+§ Dedupe Plan.
 
 Treat the finder output as the input packet for a USD authoring rewrite that
 creates prototype assets or internal prototype prims and then rewrites
@@ -84,7 +83,7 @@ mandatory defaults are:
 | Knob                          | Default       | Rationale                                      |
 | ---                           | ---           | ---                                            |
 | `ROOT`                        | `"/"`         | Whole stage; user almost always narrows it.    |
-| `HASH_LEVEL`                  | `3`           | Values matter for real dedup; samples don't usually distinguish identical assets. |
+| `HASH_LEVEL`                  | `2`           | Structure (types + names + attr names/types, no values) finds repeated NAMED subtrees cheaply for the broad Phase-2b sweep. Escalate to `3` to fold in values and CONFIRM / split near-duplicates (the value digest is byte-based, so level 3 is an affordable confirmation pass, not a whole-stage cost); `4` splits on samples / relationship targets. |
 | `MIN_SUBTREE_PRIMS`           | `3`           | Single-prim "groups" are noise.                |
 | `MIN_DUPLICATE_COUNT`         | `2`           | The minimum that "duplicate" can mean.         |
 | `TOP_N`                       | `25`          | Fits in one screen of console output.          |
@@ -200,6 +199,144 @@ substitution function must be:
   realistic USD content (sha256 or stronger).
 
 ## 6. Duplicate detection
+
+### 6.0 Identity first — the hash confirms reuse, it does not pick the grain
+
+This finder is a **read-only reuse-confirmation** pass, not a boundary finder.
+Run it on the **identity-marked candidate units** the agent has already
+identified — `kind`-tagged `component`/`subcomponent` scopes, meaningfully named
+scopes (`assetInfo` / display name / variant set), or the semantic real-world
+unit — *not* on raw subtrees chosen by the hash. The hash then **confirms** which
+of those meaningful units actually repeat and **partitions value-variants**
+(§6.3); it must never be the thing that *chooses* the grain. Letting the hash
+choose the grain is exactly the failure mode that over-shares at the mesh level
+(on a large data-center assembly asset this produced orders of magnitude more
+mesh arcs than the handful of named subcomponents that actually repeat).
+
+The one exception is a **structural fallback** for assets with no authored
+identity at all: where `kind`, names, and semantics are silent, the repetition
+pattern may *propose* the **coarsest repeating subtree** as a grain — recorded as
+`grain_source = structural_fallback` — while still stopping at that coarsest unit
+and **never descending the grain to leaves**. With identity present,
+`grain_source = identity`.
+
+The deterministic disposition step (externalization cutoff, value-variant
+partition, non-overlapping frontier, two-axis disposition, arc-count contrast)
+is shipped as a co-located script — `select_frontier.py` (alongside this finder in
+`scripts/`) — which consumes
+this finder's grouped, identity-marked candidates and emits the frontier targets
+that drop into the apply-restructure manifest. The finder hashes; the decision
+core decides; the agent authors.
+
+That handoff is executable, not just conceptual. Running the finder with
+`--emit-candidates` prints the `candidates[]` packet in exactly the schema
+`select_frontier.py` reads, so the two tools pipe directly:
+
+```
+python3 instance_candidate_finder.py <stage.usd> --emit-candidates \
+  | python3 select_frontier.py -
+```
+
+One reported group becomes one candidate. Because the candidate hash already
+folds in attribute values at `HASH_LEVEL >= 3`, genuine value-variants land in
+SEPARATE groups (one prototype per variant), so each candidate carries
+`structure_hash == value_hash`; lower the `HASH_LEVEL` to merge near-variants
+into one structural family. `identity_signal` is set from the AUTHORED USD
+`kind` on each group's root — absent any authored identity the candidate is
+emitted as the explicit `structural_fallback` grain (the §6.0 exception), never
+a hash-invented strong identity. The agent may refine `identity_signal` to
+`naming` / `semantic` on the emitted packet before the pipe.
+
+There is no separate "reuse analyzer" beyond this finder: the identity-first
+reuse analysis is just this finder run with `ROOT` set to each identity-marked
+candidate boundary, re-run as the descent re-enters each level (and *resuming*
+from the level an already-instanced / BIM-CAD input already sits at — see the
+recursive descent and resume-from-existing rules in
+`skills/omniverse-usd-performance-tuning/references/workflow.md` Phase 2).
+
+### 6.0.1 Kind-trust preflight — sample meshes-per-kind before trusting `kind`
+
+`kind` is trustworthy only when it reflects source lifecycle / ownership
+boundaries; CAD exporters often don't encode that, so assetization ideally
+begins upstream — this preflight is the downstream mitigation. On a monolithic
+CAD import an exporter may tag ~every mesh `kind=component` (field case: 81%
+of components held exactly one mesh), and trusting that label lands the
+frontier on non-boundaries: suspiciously few prototypes and no merge signal,
+because the real reuse unit was the parent prim.
+
+Before `kind` may set `identity_signal`, sample meshes-per-kind **stage-wide**
+during the §4 traversal: for every walked prim with an authored kind in
+{`component`, `subcomponent`, `group`}, record its subtree Mesh count. The
+sample is the whole traversal universe, never the candidate groups (groups
+hold only repeated subtrees — a biased sample).
+
+**Fine-grain-authoring exclusion.** A single-mesh `subcomponent` nested under
+a multi-mesh kind-bearing ancestor is the *well-authored* fine-grain pattern
+(individually addressable parts for BOM / service selection under a real
+multi-mesh component), so it is EXCLUDED from the sample before the stats are
+computed; the excluded count is reported for audit
+(`excluded_fine_grain_subcomponents`). This cannot mask the junk-CAD
+signature, which tags single-mesh `component`s with no multi-mesh kind
+structure above them — model-hierarchy convention keeps the two patterns
+disjoint (components do not nest inside components).
+
+`kind` is **untrusted** for the whole run when:
+
+- the fraction of sampled prims whose subtree holds <= 1 mesh is >= the named
+  threshold knob (`KIND_TRUST_MAX_SINGLE_MESH_FRACTION`, default **0.80**), OR
+- the median meshes-per-kind is <= 1.
+
+When `kind` is untrusted it does not partition geometry, and the tool must
+fall to the structural grain **exactly as if identity were absent** (the §6.0
+fallback): candidates are emitted with `grain_source = structural_fallback`
+(never `identity_signal = kind`), tagged `kind_untrusted: true` plus the
+sampled stats (single-mesh fraction, median, sample size) so the
+sampled-and-rejected kind stays auditable, and the boundary is **re-derived
+structurally**:
+
+- **Walk-up.** Each occurrence walks up to the nearest ancestor whose subtree
+  holds > 1 mesh (the multi-mesh parent). Re-derived boundaries that genuinely
+  repeat are re-grouped by candidate hash; hash-singletons are grouped by
+  normalized sibling name-base, reusing the one sibling-name suffix-stripping
+  normalization (usd-structure-assessment §2.4) — never a second normalizer.
+- **No-collateral rule.** The walk terminates immediately at any node with
+  > 1 subtree mesh, so a component that is ITSELF multi-mesh re-derives to
+  itself: it keeps its boundary and only loses the `kind` label as the
+  identity signal, gaining `structural_fallback` at the SAME prim.
+- **Internal-motion stop.** The walk must never cross (or land on) a prim
+  whose subtree needs independent per-instance motion — instancing makes
+  descendants read-only. Both signals are tallied during the §4 traversal (no
+  extra pass) and both use the same at-root vs strictly-below rule: motion
+  authored ON the landing target itself never blocks (it rides the instance
+  prim's own writable transform — the ideal cut), motion STRICTLY BELOW it
+  does.
+  - **Physics — `RigidBodyAPI` strictly below** (stop recorded as
+    `walkup_stopped_by: articulation`). Per the UsdPhysics schema,
+    `RigidBodyAPI` engulfs its subtree (everything below moves rigidly with
+    it), so a body strictly below a boundary is an independent mover — a
+    jointed link or a free simulated part — whose transform would freeze
+    inside the prototype. Keying on bodies makes joint-prim location
+    irrelevant: joint prims are not Xformables and bind their bodies via
+    `body0`/`body1` relationships wherever they are authored. An explicit
+    `ArticulationRootAPI` on the landing target also stops the walk. When
+    UsdPhysics is unavailable the physics leg is skipped gracefully and
+    noted in the diagnostics.
+  - **Animation — time-varying xformOps strictly below** (stop recorded as
+    `walkup_stopped_by: animation`). A prim whose authored xformOp
+    attributes are time-varying (samples or value clips —
+    `ValueMightBeTimeVarying`, the cheap conservative check) is an
+    independent mover in the animation sense. Landing above it would
+    collapse per-copy motion into the shared prototype — and the level-2/3
+    hashes cannot see that samples DIFFER across copies (only `HASH_LEVEL 4`
+    folds samples in), so a group whose subtrees carry time-varying
+    attributes must be confirmed at level 4 before any rewrite. This leg is
+    pure Usd and needs no UsdPhysics.
+  1-mesh links of a robot arm therefore never re-derive to the arm root, and
+  an animated slide inside a repeated conveyor keeps the conveyor from
+  becoming the shared boundary.
+
+A healthy stage — components bounding multi-mesh parts — is untouched: the
+preflight never demotes trusted kind, and the whole pass stays read-only.
 
 ### 6.1 Full hash
 Computed once per prim, post-order (children-first), and memoized so each
@@ -646,6 +783,16 @@ any framework.
 20. **Out-of-range config rejection.** Setting `HASH_LEVEL = 5` or
     `MIN_DUPLICATE_COUNT = 1` causes the tool to print one error line
     and produce no other output.
+21. **Kind-trust preflight (§6.0.1).** A stage where >= 80% of
+    `kind=component` prims contain <= 1 mesh emits candidates with
+    `grain_source = structural_fallback` re-derived at the multi-mesh parent
+    (or sibling name-base group), tagged `kind_untrusted` with the sampled
+    stats — NOT `identity_signal = kind` at the 1-mesh grain. A control stage
+    whose components bound multi-mesh parts keeps `identity_signal = kind`
+    unchanged; in a demoted stage a genuinely multi-mesh component re-derives
+    to itself (no collateral); and a 1-mesh link under a prim with
+    `UsdPhysics.ArticulationRootAPI` (or joint children) stays below that
+    prim, recording `walkup_stopped_by = articulation`.
 
 ## 14. Non-goals
 
@@ -669,6 +816,17 @@ any framework.
 
 ## Changelog
 
+- **rev 4** — Adds the §6.0.1 kind-trust preflight (issue #172): stage-wide
+  meshes-per-kind sampling; the untrust rule (single-mesh fraction >= 0.80 OR
+  median meshes-per-kind <= 1, named threshold knob); demotion to the
+  structural-fallback grain with structural boundary re-derivation (nearest
+  multi-mesh parent / sibling name-base group); the no-collateral rule
+  (multi-mesh components re-derive to themselves); the articulation stop
+  (never cross `UsdPhysics.ArticulationRootAPI` / joint-bearing prims); and
+  §13 acceptance test 21.
+- **rev 3** — Pairs the read-only finder with the rewrite-tool spec and the
+  co-located `select_frontier.py` decision core (§6.0 identity-first wiring,
+  `--emit-candidates`).
 - **rev 2** — Incorporates feedback from a clean-room re-implementation.
   Fixes §8/§11 ordering contradiction; tightens §5 Level 4 to include
   sample values; tightens §7.2 INTERNAL classification to require
@@ -683,3 +841,12 @@ any framework.
   attribute author-order invariance, `INCLUDE_ATTRIBUTE_CONNECTIONS`
   monotonicity, unreadable attribute, and out-of-range config rejection.
 - **rev 1** — Initial draft.
+
+## Coverage limit (field-measured)
+
+Shallow subtree hashing misses depth-3+ duplicates. On a large data-center CAD
+stage (hundreds of MB, hundreds of thousands of prims), a shallow heuristic
+surfaced only a small fraction of the dedupe-candidate coverage that the
+full-tree (Merkle) pass in the shipped finder reached. Treat any non-full-tree
+shortcut as a triage signal only; candidate-quality claims must come from the
+full-tree pass.

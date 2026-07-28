@@ -1,6 +1,3 @@
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
 # Asset Structure Performance Optimizations and Tradeoffs
 
 > **Canonical URL:** https://docs.omniverse.nvidia.com/vfi/latest/guide/asset-structure-optimizations-and-tradeoffs.html
@@ -114,9 +111,9 @@ Monolithic baseline
 
 3.7 GB ↓
 
-469158 ↓
+~470k ↓
 
-3664
+~3.7k
 
 Disaggregated Structure
 
@@ -128,9 +125,9 @@ Disaggregated Structure
 
 3.5 GB
 
-192479
+~190k
 
-11488
+~11k
 
 Component + subcomponent library packaging
 
@@ -142,7 +139,7 @@ Component + subcomponent library packaging
 
 3.5 GB ↑
 
-192455 ↑
+~190k ↑
 
 8 ↑
 

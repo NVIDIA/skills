@@ -1,22 +1,16 @@
 # apply-restructure
 
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
 ## When to Use
 
-Use this reference when you need to tool of restructure-decision and usd-edit-target-planner. Orchestrates USD reference rewriting for Phase 2f (monolithic -> prototypes) and Phase 5 (parent assemblies -> optimized children + stage-level cleanup). Two cognate modes under one skill since both reduce to 'write USD files + rewrite references'.
+Use this reference to execute the plan from restructure-decision and usd-edit-target-planner. Orchestrates USD reference rewriting for Phase 2f (monolithic -> prototypes) and Phase 5 (parent assemblies -> optimized children + stage-level cleanup). Two cognate modes under one skill since both reduce to 'write USD files + rewrite references'.
 
 ## Instructions
 
-1. Confirm the target asset, artifact, or user intent and check the prerequisites listed below.
-2. Read only the referenced files needed for the current phase, failure mode, or output contract.
-3. Follow the workflow, rules, and safety gates in this reference before invoking downstream references or shell commands.
-4. Return the result using the Output Format section and name any blocked prerequisite or unresolved user decision.
+See `references/_shared/standard-instructions.md`.
 
 ## Output Format
 
-Return a concise status or report that names the input, selected runtime or evidence source, actions planned or performed, artifacts written, blockers, and the next validation or user-decision step. When a schema or template is referenced below, conform to that contract.
+See `references/_shared/standard-output-format.md`.
 
 > **Invocation.** Tool of `restructure-decision` (Phase 2e gate, mode=`restructure`) and the `optimize-loop` (mode=`ref_remap`, after Phase 4 mesh ops produce optimized sub-assets). In Codex / generic shell agents, invoke by name. In Claude Code, also available as `/apply-restructure`.
 >
@@ -26,7 +20,8 @@ Return a concise status or report that names the input, selected runtime or evid
 
 Orchestrate USD reference rewriting in two cognate use cases that both reduce to "write USD files + rewrite references":
 
-- **`mode=restructure`** (Phase 2f, after `restructure-decision` returns `extract-as-assets` or `decompose-for-selective-loading`): materialize the asset boundaries identified by `usd-structure-assessment` §2.7 and the dedupe candidates from `usd-hierarchy-dedupe-candidates`. Hierarchy dedupe is implemented as a USD rewrite from the candidate report: write shared prototypes, replace duplicate local subtrees with references, and then validate the new assembly root.
+- **`mode=restructure`** (Phase 2f, after `restructure-decision` returns `extract-as-assets` or `decompose-for-selective-loading`): materialize the asset boundaries identified by `usd-structure-assessment` §2.5 and the dedupe candidates from `usd-hierarchy-dedupe-candidates`. Hierarchy dedupe is driven **per descent region** by the native `deduplicateHierarchies` op: the identity-first frontier (`usd-hierarchy-dedupe-candidates/scripts/select_frontier.py`) selects the `paths` and a small per-region `maxDepth`, the per-level driver invokes `deduplicateHierarchies(paths=[node], maxDepth=<small>)` on each node and recurses, and `apply-restructure` owns the identity gate, writes the shared prototypes / rewrites duplicate sites as `instanceable=true` references, emits the restructure-role manifest, then validates the new assembly root. Never drive it with a single stage-wide `maxDepth`. The hand-authored `Sdf` path stays permitted for what the native op does not cover (external-prototype materialization into payload files, and material-network closure at a prototype boundary). Execution detail: `references/restructure-mode.md`.
+  - **Bounded recursive descent.** Restructure is a bounded *descent*, not one cut: after extracting assemblies, the workflow re-runs boundary inference (§2.5) on each extracted asset to find component, then subcomponent boundaries, to a bounded depth (the stopping rule in `workflow.md` Phase 2g). Tag each `phase4_targets[]` entry with its target-tree tags — `level` (assembly/component/subcomponent = USD `kind`), `importance` / `articulated`, and `archetype` — per the manifest schema; Phase 4 reads them to gate the op chain and per-target tolerance. **Share, don't scatter:** every externalized node MUST be a shared prototype with `instanceable=true` references; N unshared per-node payloads are not the optimization win (the Phase-6 gate fails closed on a repack or unshared split). Articulated assets instance at rigid-body/link level, never whole-asset.
 - **`mode=ref_remap`** (Phase 5, after Phase 4 mesh ops): given a map of `original_path -> optimized_path` for each sub-asset Phase 4 produced, compute the parent-assembly impact set, copy each parent to a new path, rewrite its references to point at the optimized children, then run stage-level cleanup ops.
 
 Both modes share the same primitives (write USD, rewrite refs) so they live in one skill body.
@@ -35,7 +30,7 @@ Both modes share the same primitives (write USD, rewrite refs) so they live in o
 
 - A USD asset path that opens cleanly under the active runtime (Phase 0 chosen).
 - A writable `output_dir` distinct from the input stage's directory (no in-place overwrites by default).
-- USD Python access (`pxr.Usd`, `pxr.Sdf`, and `pxr.UsdUtils`) from the active runtime. Scene Optimizer is optional for later stage-level cleanup ops, but is not required for hierarchy dedupe.
+- USD Python access (`pxr.Usd`, `pxr.Sdf`, and `pxr.UsdUtils`) from the active runtime. Usd Optimize (with `deduplicateHierarchies` in `operationsAvailable`) is the per-region authoring primitive for the internal instanceable-reference collapse; it is not required for the hand-authored `Sdf` paths (external-prototype materialization, material-network closure) that cover what the op does not.
 - For `mode=restructure`: a `restructure_plan` packet from `restructure-decision` (boundary cut points + optional dedupe candidates).
 - For `mode=ref_remap`: an `optimized_targets` map (every `original_path` actually appears as a reference in the input stage; every `optimized_path` exists and opens cleanly).
 
@@ -43,8 +38,8 @@ Both modes share the same primitives (write USD, rewrite refs) so they live in o
 
 Before executing restructure writes, re-read and confirm:
 
-- [ ] `references/hierarchy-dedupe-rewrite-tool-spec.md` — exact rewrite
-  semantics, reference patching, prototype extraction rules.
+- [ ] `references/restructure-mode.md` § Dedupe Plan — per-region native-op driver,
+  reference patching, prototype extraction rules, and material-network closure.
 - [ ] User has explicitly approved the restructure plan from Phase 2e.
 - [ ] Backup / non-destructive output path — restructure writes new layers,
   never overwrites the original stage in-place.
@@ -63,7 +58,7 @@ Before executing restructure writes, re-read and confirm:
 ## Troubleshooting
 
 - If the input plan from `restructure-decision` references prim paths that do not exist on the stage, return an error that names the missing paths and ask the user to refresh the SA report.
-- If the hierarchy rewrite would collapse unrelated assemblies or drop local child overrides, stop and refresh the candidate report with stricter hash settings. See `references/hierarchy-dedupe-rewrite-tool-spec.md` and `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/instancing-readiness/references/instancing-tradeoffs.md` "Merge safety".
+- If the hierarchy rewrite would collapse unrelated assemblies or drop local child overrides, stop and refresh the candidate report with stricter hash settings. See `references/restructure-mode.md` § Dedupe Plan and `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/instancing-readiness/references/instancing-tradeoffs.md` "Merge safety".
 - If a parent-assembly copy fails reference rewriting (e.g. the original reference uses a relative path that resolves differently in the new location), capture the resolver context and surface to the user before continuing.
 - If minimum USD validation fails on a written output, do NOT delete it; report the failure and let the user inspect the bad file.
 
@@ -95,6 +90,7 @@ Manifest schema:
   "input_stage": "<path>",
   "output_dir": "<path>",
   "new_assembly_root": "<path>",
+  "assembly_root": { "path": "<new_assembly_root>", "mesh_count": 0 },
   "outputs": [
     {
       "path": "<written file>",
@@ -170,12 +166,22 @@ only when this `mesh_count` is `0`, so a retained-mesh target cannot be silently
 - For `mode=restructure`: every extracted file has `defaultPrim` set to the
   root prim of the extracted sub-hierarchy. Validate with
   `Usd.Stage.Open(path).GetDefaultPrim().IsValid()`.
-- For `mode=restructure`: the manifest documents what mesh content remains on
-  the assembly root after extraction. If the assembly root has > 0 mesh prims,
-  include it in `phase4_targets[]` with `target_class: "assembly_root"` so
-  Phase 4 does not skip it. Downstream Phase 4 must process that entry through
-  the per-target mesh op chain for its retained meshes; it is not limited to
-  final stage-level cleanup operations.
+- For `mode=restructure`: **residual-mesh postcondition (fail loud).** With the
+  USD stage still open, measure the assembly root's default-predicate mesh count
+  after extraction and record it under the manifest's `assembly_root`
+  (`{ "path": <new_assembly_root>, "mesh_count": <count> }`). When that count is
+  `> 0`, the manifest MUST also include the same root in `phase4_targets[]` with
+  `target_class: "assembly_root"` and the identical authoritative `mesh_count`.
+  **Do not write a restructure manifest that records residual assembly-root
+  meshes without that `phase4_targets[]` entry — error out instead.** This check
+  lives here because only apply-restructure has the stage open to count residual
+  meshes; the report-time gate (`optimization-report/scripts/validate_report.py`)
+  only sees report↔manifest and cannot detect the residual itself. The manifest's
+  internal consistency is re-asserted by `validate_manifest_structure()` (in
+  `optimization-report/scripts/validate_report.py`): `assembly_root.mesh_count > 0`
+  with no matching `assembly_root` Phase-4 target fails. Downstream Phase 4 must
+  process that entry through the per-target mesh op chain for its retained meshes;
+  it is not limited to final stage-level cleanup operations.
 
 ---
 
@@ -191,7 +197,9 @@ High-level steps:
 
 1. Scan for internal references that escape candidate boundaries.
 2. Validate input paths, boundary prim paths, and output directory.
-3. Apply approved hierarchy-dedupe groups when present.
+3. Drive the per-region native `deduplicateHierarchies` op per descent node from
+   the approved frontier (small per-region `maxDepth`; never one global cut),
+   owning the identity gate and manifest.
 4. Materialize each accepted boundary, shared layer, loadable sub-asset, or
    dedupe group as USD output.
 5. Validate every written output with the runner's minimum-openability check.
@@ -213,7 +221,7 @@ High-level steps:
 2. Stop on cyclic reference graphs.
 3. Copy impacted parent layers and rewrite references to optimized children.
 4. Pick the new assembly root.
-5. Run lossless stage-level cleanup through `so-run-operations`.
+5. Run lossless stage-level cleanup through `usd-optimize-run-operations`.
 6. Validate written outputs and emit the manifest.
 
 ---
@@ -233,10 +241,9 @@ High-level steps:
 
 - `skills/omniverse-usd-performance-tuning/references/workflow.md` - canonical 7-phase flow context.
 - `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/instancing-readiness/references/instancing-tradeoffs.md` - merge safety policy (especially the "Do not recommend mesh merge when..." block).
-- `references/hierarchy-dedupe-rewrite-tool-spec.md` - hierarchy dedupe rewrite behavior.
-- `references/restructure-mode.md` - mode=`restructure` execution notes and internal-reference handling.
+- `references/restructure-mode.md` - mode=`restructure` execution notes, the per-region native-op Dedupe Plan, material-network closure, and internal-reference handling.
 - `references/ref-remap-mode.md` - mode=`ref_remap` parent rewrite and stage cleanup notes.
-- `skills/omniverse-usd-performance-tuning/references/so-run-operations/references/pipelines.md` - local handoff for Scene Optimizer operation chaining after hierarchy rewrite.
-- `references/upstreams/usd-optimize.md` - upstream Scene Optimizer mechanics, invocation docs, and prebuilt package resolution.
-- `usd-structure-assessment/README.md` §2.7 + "Tools for asset extraction" - boundary identification + USD API patterns this reference builds on.
+- `skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md` - local handoff for Usd Optimize operation chaining after hierarchy rewrite.
+- `references/upstreams/usd-optimize.md` - upstream Usd Optimize mechanics, invocation docs, and prebuilt package resolution.
+- `usd-structure-assessment/README.md` §2.5 + "Tools for asset extraction" - boundary identification + USD API patterns this reference builds on.
 - `usd-structure-assessment/references/usd-edit-target-planner/README.md` - per-asset optimization with reference remapping pattern (mode=`ref_remap` is a generalization of this).

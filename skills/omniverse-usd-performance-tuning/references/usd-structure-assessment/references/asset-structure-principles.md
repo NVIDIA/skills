@@ -1,6 +1,3 @@
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
 # Principles of Scalable Asset Structure in OpenUSD
 
 > **Canonical URL:** https://docs.omniverse.nvidia.com/usd/latest/learn-openusd/independent/asset-structure-principles.html
@@ -981,7 +978,7 @@ def Xform "Neighborhood" (
 }
 
 ## Principles Quick Reference
-A scalable asset structure promotes the scalability needs of an organization by being **legible**, **modular**, **performant**, and **navigable**.
+A condensed checklist of the four properties introduced in [Planning an Asset Structure](#planning-an-asset-structure) — **legible**, **modular**, **performant**, **navigable**.
 
 ### Legibility
 *A legible asset structure should be easy to inspect and onboard new users familiar with a domain.*

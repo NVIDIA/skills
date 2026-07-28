@@ -1,31 +1,25 @@
 # Compare Profiles
 
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
 ## When to Use
 
 Use when comparing matching baseline/after profiles; do not use without paired profile-stage JSON.
 
 ## Instructions
 
-1. Confirm the target asset, artifact, or user intent and check the prerequisites listed below.
-2. Read only the referenced files needed for the current phase, failure mode, or output contract.
-3. Follow the workflow, rules, and safety gates in this reference before invoking downstream references or shell commands.
-4. Return the result using the Output Format section and name any blocked prerequisite or unresolved user decision.
-
+See `references/_shared/standard-instructions.md`.
 
 ## Pre-flight Checklist
 
 Before computing the comparison verdict, re-read and confirm:
 
-- [ ] Verdict thresholds — see the Verdict Thresholds section in this file
+- [ ] Verdict thresholds — see
+  [compare-profiles.md § Verdict Thresholds](../compare-profiles.md#verdict-thresholds)
   for improvement/regression bands.
 - [ ] `runtime-artifact-token-budget.md` — don't dump raw profile data.
 - [ ] Both baseline and after profiles used same measurement method.
 ## Output Format
 
-Return a concise status or report that names the input, selected runtime or evidence source, actions planned or performed, artifacts written, blockers, and the next validation or user-decision step. When a schema or template is referenced below, conform to that contract.
+See `references/_shared/standard-output-format.md`.
 
 Use this reference after running `profile-stage` both before and after optimization.
 It compares the two result sets and reports whether the changes helped, hurt,
@@ -36,13 +30,13 @@ or had no measurable effect.
 Before reporting the verdict, prepend the **compact one-liner** from
 `skills/omniverse-usd-performance-tuning/references/setup-usd-performance-tuning/references/runtime-context-header.md` (Format B). The verdict is only
 reproducible against the runtime that produced it; users reading the verdict
-later need to know which Kit / Scene Optimizer / Asset Validator versions
+later need to know which Kit / Usd Optimize / usd-validation-nvidia versions
 were in effect. Read from the `runtime_context` block in
 `<output_path>/setup-preflight.json` (canonical location; see
 `skills/omniverse-usd-performance-tuning/references/setup-usd-performance-tuning/references/runtime-context-header.md` *Where artifacts live*).
 
 ```
-[Kit: {runtime_context.kit.application} {runtime_context.kit.version}  |  SO: {runtime_context.sceneOptimizer.version}  |  AV: {runtime_context.assetValidator.version}]
+[Kit: {runtime_context.kit.application} {runtime_context.kit.version}  |  SO: {runtime_context.usdOptimize.version}  |  AV: {runtime_context.assetValidator.version}]
 ```
 
 If a profile capture spans more than one runtime (rare — usually means the
@@ -56,26 +50,28 @@ the comparison output regardless.
 Quantify before/after performance deltas, classify improvements and
 regressions, and produce an evidence-backed verdict for the optimization flow.
 
-## Prerequisites
+## Required Inputs
 
-- Baseline and optimized JSON results from `profile-stage`.
+This is the authoritative input list for `compare-profiles`; the docs-class
+[compare-profiles.md](../compare-profiles.md#required-inputs) points here.
+
+Two profile results (JSON from `profile-stage`):
+
+- `baseline` — captured before optimization.
+- `optimized` (after) — captured after optimization.
+
+Plus:
+
 - Matching profile mode: quick vs quick or full vs full.
-- Same hardware and runtime environment for full mode comparisons.
-- Knowledge of the operations applied between the two captures.
+- Same hardware and runtime environment for full-mode comparisons, unless the
+  user explicitly accepts a cross-runtime comparison.
+- Knowledge of the operation chain, restructure step, or validation-driven fix
+  applied between the two captures.
 
 ## Examples
 
 - "Compare these quick profile JSON files and flag regressions."
 - "Did the optimized Kit trace improve runtime frame cost?"
-
-## Inputs
-
-Two profile results (JSON from `profile-stage`):
-
-- `baseline` — captured before optimization.
-- `optimized` — captured after optimization.
-
-Both must use the same mode (quick or full).
 
 ## Comparison metrics
 
@@ -105,10 +101,10 @@ Both must use the same mode (quick or full).
 
 ## Significance thresholds
 
-- **Improvement:** metric improved by >5% — report as gain.
-- **Neutral:** within ±5% — report as no significant change.
-- **Regression:** metric worsened by >5% — flag as potential problem.
-- **Critical regression:** metric worsened by >20% — flag prominently, the optimization may have backfired.
+See [compare-profiles.md § Verdict Thresholds](../compare-profiles.md#verdict-thresholds)
+for the canonical improvement / neutral / regression / critical-regression bands
+(>5% gain, ±5% neutral, >5% regression, >20% critical) and the "report absolute
+values and percentages together" rule.
 
 ## Warm-load confidence
 
@@ -144,7 +140,7 @@ If any metric regressed >5%:
 1. Report which metric regressed and by how much.
 2. Correlate with what changed — did file size grow? Did prim count increase?
 3. Check for known causes:
-   - Size regression after SO operations → likely USDC `Layer.Save()` bloat
+   - Size regression after Usd Optimize operations → likely USDC `Layer.Save()` bloat
      (see `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/usd-edit-target-planner/references/output-saving.md`).
    - Load time regression after adding instancing → unexpected, investigate
      prototype count vs instance count ratio.
@@ -163,7 +159,7 @@ omniverse-usd-performance-tuning
 → usd-validation-runner (master router; uses skills/omniverse-usd-performance-tuning/references/usd-validation-runner/README.md for tier detail and selected-probe policy)
 → restructure-decision (Phase 2e gate)
 → instancing-readiness (if applicable)
-→ SO operations / instancing
+→ Usd Optimize operations / instancing
 → apply-restructure (Phase 5 ref-remap)
 → profile-stage (AFTER)
 → compare-profiles

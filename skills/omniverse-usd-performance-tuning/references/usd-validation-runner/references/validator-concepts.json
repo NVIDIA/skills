@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "$comment": "Canonical validator-concept registry for the USD performance-tuning workflow. Single binding layer between agent-facing concept names and runtime rule identity, tier, scope policy, and backing op. Curated by maintainers, not inferred. Resolution key is (module, class_name); category is informational. Tiers/costs are CPU-only worst-case from gb300_03 evidence (batch-additivity-findings.md); gpu_bound concepts relax on CUDA hosts. Governed by validator-concepts.schema.json (added in PR-2).",
+  "$comment": "Canonical validator-concept registry for the USD performance-tuning workflow. Single binding layer between agent-facing concept names and runtime rule identity, tier, scope policy, and backing op. Curated by maintainers, not inferred. Resolution key is (module, class_name); category is informational. Tiers/costs are CPU-only worst-case from large-asset evidence (batch-additivity-findings.md); gpu_bound concepts relax on CUDA hosts. Governed by validator-concepts.schema.json.",
   "concepts": [
     {
       "canonical_name": "primvar_indexability",
@@ -241,7 +241,7 @@
           "use_for": ["performance_tuning"]
         }
       ],
-      "notes": "2.5 s on gb300 (hash short-circuit) but can be minutes with many similar meshes. Treat as Tier 3 default; promote to Tier 2 only after measuring on target stage."
+      "notes": "A few seconds on a large reference stage (hash short-circuit) but can be minutes with many similar meshes. Treat as Tier 3 default; promote to Tier 2 only after measuring on target stage."
     },
     {
       "canonical_name": "geom_duplicates_fuzzy",
@@ -360,7 +360,7 @@
           "use_for": ["performance_tuning"]
         }
       ],
-      "notes": "~94 s on gb300 — slowest Tier 1. Counts meshes through composition."
+      "notes": "Around a minute and a half on a large reference stage — slowest Tier 1. Counts meshes through composition."
     },
     {
       "canonical_name": "perf_small_mesh",
@@ -516,7 +516,7 @@
           "use_for": ["performance_tuning"]
         }
       ],
-      "notes": "Two-step detect->act: feed occluded paths to removePrims. Scope to SA containment pairs with enclosure_opaque:true. 485 s full-stage on CPU; scope via paths=. Two-stage approval (analysis cost, then deletion)."
+      "notes": "Two-step detect->act: feed occluded paths to removePrims. Scope to SA validation_scope.cross_component_pairs that aren't explicitly transparent (enclosure_opaque true or unset; boundary pairs nominated via candidate_source hash OR semantics; bbox confirmation-only, not a first-step containment sweep). 485 s full-stage on CPU; scope via paths=. Scoped probe runs without approval; only the removePrims deletion is intent-gated."
     },
     {
       "canonical_name": "spatial_overlapping",

@@ -1,6 +1,3 @@
-<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
 # Factory-Level USD Structuring
 
 > **Canonical URL:** https://docs.omniverse.nvidia.com/vfi/latest/guide/factory-level-structuring.html
