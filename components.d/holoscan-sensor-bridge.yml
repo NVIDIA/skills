@@ -3,7 +3,7 @@
 
 name: Holoscan Sensor Bridge
 repo: nvidia-holoscan/holoscan-sensor-bridge
-description: Agent-ready skills for Holoscan Sensor Bridge devkit workflows, covering demo environment bring-up, FPGA flashing for Lattice and VB1940 hardware, example application execution, and QA test-plan automation.
+description: Agent-ready skills for Holoscan Sensor Bridge devkit workflows, covering demo environment bring-up, FPGA flashing for Lattice and VB1940 hardware, example application execution, and QA test-plan automation. Also includes skills to aid in configuration and usage of the IP.
 links:
   discussions: false
   security: false
@@ -16,3 +16,10 @@ skills:
     catalog_dir: hsb-app
   - path: skills/hsb-test/
     catalog_dir: hsb-test
+  - path: skills/hsb-ip-def
+    catalog dir: hsb-ip-def
+  - path: skills/hsb-ip-packetizer
+    catalog dir: hsb-ip-packetizer
+  - path: skills/hsb-ip-create-top
+    catalog dir: hsb-ip-create-top
+
