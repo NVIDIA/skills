@@ -196,10 +196,10 @@ def get_validation_engine_cls() -> Any:
 def _shape_registered_rules(reg: Any) -> Any:
     """Kit core ``ValidationRulesRegistry`` shape (iterable or callable)."""
     try:
-        rules = reg.registered_rules
+        registered = reg.registered_rules
     except AttributeError:
         return None
-    return rules() if callable(rules) else rules
+    return registered() if callable(registered) else registered
 
 
 def _shape_rules_by_name(reg: Any) -> Any:
@@ -566,7 +566,7 @@ def subprocess_concept_runner(
     worker = str(worker_path)
 
     def _runner(stage_path, concepts, *, registry=None, mask_paths=None):
-        job = json.dumps(
+        request_payload = json.dumps(
             {
                 "stage_path": stage_path,
                 "concept": concepts[0],
@@ -580,7 +580,7 @@ def subprocess_concept_runner(
         )
         completed = subprocess.run(
             [executable, worker],
-            input=job,
+            input=request_payload,
             capture_output=True,
             text=True,
             timeout=timeout_seconds,
