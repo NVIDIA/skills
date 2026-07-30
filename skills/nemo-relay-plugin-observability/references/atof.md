@@ -12,7 +12,9 @@ trace spans.
 
 ## Default Plugin Path
 
-Prefer plugin-managed lifecycle for reusable process configuration:
+Prefer plugin-managed lifecycle for reusable process configuration. Use
+`version = 2` with NeMo Relay 0.6 and `version = 3` with NeMo Relay 0.7; the
+rest of this ATOF example is shared:
 
 ```toml
 version = 1
@@ -22,7 +24,7 @@ kind = "observability"
 enabled = true
 
 [components.config]
-version = 2
+version = 2 # Use 3 with NeMo Relay 0.7.
 
 [components.config.atof]
 enabled = true

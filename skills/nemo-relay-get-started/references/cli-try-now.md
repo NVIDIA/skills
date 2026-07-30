@@ -102,7 +102,9 @@ both ATOF and ATIF local file output. The Hermes path also installs or updates
 the hook configuration that its transparent run requires.
 
 When an interactive plugin editor is unavailable, add or merge the following
-component in `./.nemo-relay/plugins.toml` after confirmation:
+component in `./.nemo-relay/plugins.toml` after confirmation. First determine
+the installed NeMo Relay version: use observability configuration version 2
+with Relay 0.6 and version 3 with Relay 0.7.
 
 ```toml
 version = 1
@@ -112,7 +114,7 @@ kind = "observability"
 enabled = true
 
 [components.config]
-version = 2
+version = 2 # Use 3 with NeMo Relay 0.7.
 
 [components.config.atof]
 enabled = true

@@ -60,6 +60,16 @@ live OTLP spans.
 - Response codecs can improve LLM end annotations, but they do not change the
   caller-visible LLM response.
 
+## Plugin-Managed File Routing
+
+- `filename_template` must contain `{session_id}` and can use
+  `{metadata.<path>}` to select nested string values from top-level scope
+  metadata. Use `{metadata.<path>:-fallback}` when the value is optional.
+- Metadata values must be relative path fragments using ASCII letters, digits,
+  `-`, `_`, `.`, `~`, and safe `/`-separated segments.
+- Missing, non-string, or unsafe metadata values skip only the affected
+  trajectory and produce an `atif_destination_render_failed` warning.
+
 ## Checklist
 
 - [ ] Session and agent metadata chosen

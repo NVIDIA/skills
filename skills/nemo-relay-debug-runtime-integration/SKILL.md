@@ -64,9 +64,11 @@ Start by proving which runtime layer is failing before changing configuration.
 - **Adaptive behavior unchanged**: confirm instrumentation emits events, the
   adaptive component is enabled, policy allows the behavior, and the call path
   reaches the configured component.
-- **OpenTelemetry or OpenInference export failure**: confirm `http_binary` vs
-  `grpc`, endpoint, headers, target support, and whether a native gRPC exporter
-  has an active Tokio runtime.
+- **OpenTelemetry or OpenInference export failure**: first identify the Relay
+  version. For 0.6, check the separate exporter, `http_binary` versus `grpc`,
+  endpoint, headers, target support, and an active Tokio runtime for native
+  gRPC. For 0.7, check the typed projection, endpoint, headers, TLS, and target
+  support; the subscriber owns the native gRPC runtime.
 - **Callback succeeded but no lifecycle events appear**: confirm the integration
   uses managed execute helpers or balanced manual start/end APIs, not only the
   underlying business callback.
