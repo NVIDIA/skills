@@ -3,7 +3,7 @@
 
 name: Holoscan Sensor Bridge
 repo: nvidia-holoscan/holoscan-sensor-bridge
-description: Agent-ready skills for Holoscan Sensor Bridge devkit workflows, covering demo environment bring-up, FPGA flashing for Lattice and VB1940 hardware, example application execution, and QA test-plan automation. Also includes skills to aid in configuration and usage of the IP.
+Agent-ready skills for Holoscan Sensor Bridge devkit workflows, including demo environment bring-up, FPGA flashing for Lattice and VB1940 hardware, example application execution, QA test-plan automation, and support for configuring and using the Holoscan Sensor Bridge FPGA intellectual property (IP) core.
 links:
   discussions: false
   security: false
