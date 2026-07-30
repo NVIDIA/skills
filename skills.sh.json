@@ -302,6 +302,7 @@
       "title": "Decision Optimization",
       "description": "Formulate and solve routing, scheduling, and numerical optimization problems using optimization solvers, APIs, services, and deployment workflows.",
       "skills": [
+        "cufolio",
         "cuopt-developer",
         "cuopt-install",
         "cuopt-multi-objective-exploration",
