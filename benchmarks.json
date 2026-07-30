@@ -2,7 +2,7 @@
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
   "skill_count": 323,
-  "result_row_count": 2995,
+  "result_row_count": 2965,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -19,6 +19,9 @@
     "mcore-split-pr",
     "mcore-testing",
     "nemo-data-designer-plugin",
+    "nemo-relay-debug-runtime-integration",
+    "nemo-relay-get-started",
+    "nemo-relay-plugin-observability",
     "nemoclaw-user-guide",
     "omniverse-cad-to-simready",
     "omniverse-realtime-viewer",
@@ -3388,36 +3391,33 @@
     },
     {
       "skill": "nemo-relay-debug-runtime-integration",
-      "evaluation_date": "2026-07-15",
-      "profile": "external",
-      "environment": "astra-sandbox",
-      "tasks": 4,
+      "evaluation_date": "2026-07-30",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": null,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
+      "agents": [],
       "catalog_dir": "nemo-relay-debug-runtime-integration",
       "component": "NeMo Relay",
-      "has_results": true,
-      "average_uplift_pct": 27.4
+      "has_results": false,
+      "average_uplift_pct": null
     },
     {
       "skill": "nemo-relay-get-started",
-      "evaluation_date": "2026-07-20",
+      "evaluation_date": "2026-07-30",
       "profile": null,
       "environment": "k8s-sandbox",
-      "tasks": 15,
+      "tasks": null,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [],
       "catalog_dir": "nemo-relay-get-started",
       "component": "NeMo Relay",
-      "has_results": true,
-      "average_uplift_pct": 30.5
+      "has_results": false,
+      "average_uplift_pct": null
     },
     {
       "skill": "nemo-relay-install",
@@ -3547,18 +3547,18 @@
     },
     {
       "skill": "nemo-relay-plugin-observability",
-      "evaluation_date": "2026-07-20",
+      "evaluation_date": "2026-07-30",
       "profile": null,
       "environment": "k8s-sandbox",
-      "tasks": 20,
+      "tasks": null,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [],
       "catalog_dir": "nemo-relay-plugin-observability",
       "component": "NeMo Relay",
-      "has_results": true,
-      "average_uplift_pct": 33.5
+      "has_results": false,
+      "average_uplift_pct": null
     },
     {
       "skill": "nemo-retriever",
@@ -22145,186 +22145,6 @@
       "uplift_pct": -3.0
     },
     {
-      "catalog_dir": "nemo-relay-debug-runtime-integration",
-      "component": "NeMo Relay",
-      "dimension": "Security",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nemo-relay-debug-runtime-integration",
-      "component": "NeMo Relay",
-      "dimension": "Security",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nemo-relay-debug-runtime-integration",
-      "component": "NeMo Relay",
-      "dimension": "Correctness",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 31.0
-    },
-    {
-      "catalog_dir": "nemo-relay-debug-runtime-integration",
-      "component": "NeMo Relay",
-      "dimension": "Correctness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 20.0
-    },
-    {
-      "catalog_dir": "nemo-relay-debug-runtime-integration",
-      "component": "NeMo Relay",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 56.0
-    },
-    {
-      "catalog_dir": "nemo-relay-debug-runtime-integration",
-      "component": "NeMo Relay",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 91.0,
-      "uplift_pct": 47.0
-    },
-    {
-      "catalog_dir": "nemo-relay-debug-runtime-integration",
-      "component": "NeMo Relay",
-      "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 22.0
-    },
-    {
-      "catalog_dir": "nemo-relay-debug-runtime-integration",
-      "component": "NeMo Relay",
-      "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 91.0,
-      "uplift_pct": 10.0
-    },
-    {
-      "catalog_dir": "nemo-relay-debug-runtime-integration",
-      "component": "NeMo Relay",
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 52.0
-    },
-    {
-      "catalog_dir": "nemo-relay-debug-runtime-integration",
-      "component": "NeMo Relay",
-      "dimension": "Efficiency",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 87.0,
-      "uplift_pct": 36.0
-    },
-    {
-      "catalog_dir": "nemo-relay-get-started",
-      "component": "NeMo Relay",
-      "dimension": "Security",
-      "num": 15,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
-      "score_pct": 93.0,
-      "uplift_pct": 3.0
-    },
-    {
-      "catalog_dir": "nemo-relay-get-started",
-      "component": "NeMo Relay",
-      "dimension": "Security",
-      "num": 15,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
-      "score_pct": 77.0,
-      "uplift_pct": -7.0
-    },
-    {
-      "catalog_dir": "nemo-relay-get-started",
-      "component": "NeMo Relay",
-      "dimension": "Correctness",
-      "num": 15,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
-      "score_pct": 89.0,
-      "uplift_pct": 61.0
-    },
-    {
-      "catalog_dir": "nemo-relay-get-started",
-      "component": "NeMo Relay",
-      "dimension": "Correctness",
-      "num": 15,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
-      "score_pct": 89.0,
-      "uplift_pct": 27.0
-    },
-    {
-      "catalog_dir": "nemo-relay-get-started",
-      "component": "NeMo Relay",
-      "dimension": "Discoverability",
-      "num": 15,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
-      "score_pct": 94.0,
-      "uplift_pct": 44.0
-    },
-    {
-      "catalog_dir": "nemo-relay-get-started",
-      "component": "NeMo Relay",
-      "dimension": "Discoverability",
-      "num": 15,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
-      "score_pct": 87.0,
-      "uplift_pct": 40.0
-    },
-    {
-      "catalog_dir": "nemo-relay-get-started",
-      "component": "NeMo Relay",
-      "dimension": "Effectiveness",
-      "num": 15,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
-      "score_pct": 69.0,
-      "uplift_pct": 33.0
-    },
-    {
-      "catalog_dir": "nemo-relay-get-started",
-      "component": "NeMo Relay",
-      "dimension": "Effectiveness",
-      "num": 15,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
-      "score_pct": 74.0,
-      "uplift_pct": 24.0
-    },
-    {
-      "catalog_dir": "nemo-relay-get-started",
-      "component": "NeMo Relay",
-      "dimension": "Efficiency",
-      "num": 15,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
-      "score_pct": 76.0,
-      "uplift_pct": 38.0
-    },
-    {
-      "catalog_dir": "nemo-relay-get-started",
-      "component": "NeMo Relay",
-      "dimension": "Efficiency",
-      "num": 15,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
-      "score_pct": 74.0,
-      "uplift_pct": 42.0
-    },
-    {
       "catalog_dir": "nemo-relay-install",
       "component": "NeMo Relay",
       "dimension": "Security",
@@ -22953,96 +22773,6 @@
       "agent": "codex",
       "score_pct": 85.0,
       "uplift_pct": 22.0
-    },
-    {
-      "catalog_dir": "nemo-relay-plugin-observability",
-      "component": "NeMo Relay",
-      "dimension": "Security",
-      "num": 20,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
-      "score_pct": 100.0,
-      "uplift_pct": 2.0
-    },
-    {
-      "catalog_dir": "nemo-relay-plugin-observability",
-      "component": "NeMo Relay",
-      "dimension": "Security",
-      "num": 20,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
-      "score_pct": 100.0,
-      "uplift_pct": 2.0
-    },
-    {
-      "catalog_dir": "nemo-relay-plugin-observability",
-      "component": "NeMo Relay",
-      "dimension": "Correctness",
-      "num": 20,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
-      "score_pct": 100.0,
-      "uplift_pct": 51.0
-    },
-    {
-      "catalog_dir": "nemo-relay-plugin-observability",
-      "component": "NeMo Relay",
-      "dimension": "Correctness",
-      "num": 20,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
-      "score_pct": 94.0,
-      "uplift_pct": 4.0
-    },
-    {
-      "catalog_dir": "nemo-relay-plugin-observability",
-      "component": "NeMo Relay",
-      "dimension": "Discoverability",
-      "num": 20,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
-      "score_pct": 100.0,
-      "uplift_pct": 51.0
-    },
-    {
-      "catalog_dir": "nemo-relay-plugin-observability",
-      "component": "NeMo Relay",
-      "dimension": "Discoverability",
-      "num": 20,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
-      "score_pct": 93.0,
-      "uplift_pct": 34.0
-    },
-    {
-      "catalog_dir": "nemo-relay-plugin-observability",
-      "component": "NeMo Relay",
-      "dimension": "Effectiveness",
-      "num": 20,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
-      "score_pct": 89.0,
-      "uplift_pct": 48.0
-    },
-    {
-      "catalog_dir": "nemo-relay-plugin-observability",
-      "component": "NeMo Relay",
-      "dimension": "Effectiveness",
-      "num": 20,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
-      "score_pct": 86.0,
-      "uplift_pct": 23.0
-    },
-    {
-      "catalog_dir": "nemo-relay-plugin-observability",
-      "component": "NeMo Relay",
-      "dimension": "Efficiency",
-      "num": 20,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
-      "score_pct": 96.0,
-      "uplift_pct": 55.0
-    },
-    {
-      "catalog_dir": "nemo-relay-plugin-observability",
-      "component": "NeMo Relay",
-      "dimension": "Efficiency",
-      "num": 20,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
-      "score_pct": 93.0,
-      "uplift_pct": 65.0
     },
     {
       "catalog_dir": "nemo-retriever",
