@@ -1,6 +1,6 @@
 ---
 name: nemo-relay-plugin-observability
-description: Use this skill when choosing or configuring NeMo Relay observability through the built-in plugin, subscribers, or exporters, including raw ATOF events, ATIF trajectories, OpenTelemetry traces, OpenInference export, or custom event handling.
+description: Use this skill when choosing or configuring NeMo Relay 0.6 or 0.7 observability through the built-in plugin, subscribers, or exporters, including raw ATOF events, ATIF trajectories, OpenTelemetry, OpenInference, or custom event handling.
 license: Apache-2.0
 metadata:
   author: NVIDIA Corporation and Affiliates
@@ -17,6 +17,20 @@ Use manual subscriber or exporter APIs only when a test, script, or application
 needs direct control over registration names, collection windows, or flush
 timing. Both paths consume the same canonical event stream.
 
+## Select The Relay Version
+
+Determine whether the application uses NeMo Relay 0.6 or 0.7 before proposing
+configuration or binding APIs. Prefer the installed package version, lockfile,
+or manifest. Ask the user when the version cannot be established; do not mix
+the two surfaces in one example.
+
+- **0.6** uses observability configuration version 2. OpenTelemetry and
+  OpenInference are separate exporters with `OpenTelemetryConfig` /
+  `OpenTelemetrySubscriber` and `OpenInferenceConfig` /
+  `OpenInferenceSubscriber`.
+- **0.7** uses observability configuration version 3. One typed OpenTelemetry
+  exporter provides `full`, `gen_ai`, and `openinference` projections.
+
 ## Choose The Output
 
 Select the output that best matches the user's immediate inspection target:
@@ -27,10 +41,11 @@ Select the output that best matches the user's immediate inspection target:
   Use ATOF JSONL; read `references/atof.md`.
 - **Portable execution trajectories**
   Use ATIF; read `references/atif.md`.
-- **General OTLP tracing**
-  Use OpenTelemetry; read `references/opentelemetry.md`.
-- **OpenInference-aware backends**
-  Use OpenInference; read `references/openinference.md`.
+- **OTLP tracing**
+  For 0.6, choose the separate OpenTelemetry or OpenInference exporter. For
+  0.7, choose a typed OpenTelemetry endpoint (`full`, `gen_ai`, or
+  `openinference`). Read `references/opentelemetry.md` and, for an
+  OpenInference-aware backend, `references/openinference.md`.
 
 Choose one output first and verify it before adding another. ATOF is the
 default local proof because it preserves the raw event stream with the least
@@ -53,7 +68,7 @@ Use this model when explaining how capture and export relate:
 - Plugin-installed subscribers are reusable, configuration-driven runtime
   components.
 - Exporter-oriented subscribers preserve raw ATOF or translate the event stream
-  into ATIF, OpenTelemetry, or OpenInference output.
+  into ATIF or the version-appropriate OpenTelemetry/OpenInference form.
 - Event payloads reflect sanitized post-guardrail input and output when calls
   use managed helpers or manual lifecycle params provide those fields.
 - LLM annotations follow the freshness rules:
@@ -79,18 +94,18 @@ Use this model when explaining how capture and export relate:
 1. Create the exporter or subscriber.
 2. Register it with a unique name before the relevant scoped work.
 3. Run NeMo Relay-instrumented work inside scopes.
-4. Flush if deterministic delivery is needed and the binding supports it.
-5. Deregister it, then shut it down when the process or subsystem is done.
+4. Flush and deregister in the exporter-specific reference's documented order.
+5. Shut it down when the process or subsystem is done.
 
 ## Binding Names
 
-Use the names exported by the selected language binding:
+Use the names exported by the selected language binding and Relay version:
 
-- Python: `nemo_relay.subscribers.register(...)`,
-  `AtofExporter`, `AtifExporter`, `OpenTelemetrySubscriber`, and
-  `OpenInferenceSubscriber`
-- Node.js: root exports `registerSubscriber(...)`, `AtofExporter`,
+- Python 0.6: `nemo_relay.subscribers.register(...)`, `AtofExporter`,
   `AtifExporter`, `OpenTelemetrySubscriber`, and `OpenInferenceSubscriber`
+- Python 0.7: the same registration and file exporters, plus
+  `OpenTelemetrySubscriber` for all three typed projections
+- Node.js follows the same 0.6/0.7 split through its root exports
 - Rust: `nemo_relay::api::subscriber` and `nemo_relay::observability::*`
 - Go: source-first wrappers expose equivalent register, exporter, and subscriber
   lifecycle methods
@@ -103,7 +118,8 @@ Load only the reference required by the selected output:
   offline inspection.
 - Load `references/atif.md` for ATIF trajectories.
 - Load `references/opentelemetry.md` for OTLP/OpenTelemetry traces.
-- Load `references/openinference.md` for OpenInference semantic traces.
+- Load `references/openinference.md` for the standalone 0.6 OpenInference
+  exporter or the 0.7 `openinference` OpenTelemetry projection.
 
 ## Use Another Skill When
 

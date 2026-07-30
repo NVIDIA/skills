@@ -4,12 +4,13 @@
     "question": "I want to use the nemo-relay-plugin-observability skill to add monitoring to my NeMo Relay application. Can you walk me through choosing the right observability path?",
     "expected_skill": "nemo-relay-plugin-observability",
     "expected_script": null,
-    "ground_truth": "The agent used nemo-relay-plugin-observability and guided the user through the decision matrix of observability outputs (console/subscribers, ATOF, ATIF, OpenTelemetry, OpenInference), recommended one plugin-managed exporter as the default starting point, and provided relevant binding names for their language.",
+    "ground_truth": "The agent used nemo-relay-plugin-observability, established whether the application uses NeMo Relay 0.6 or 0.7, guided the user through the version-appropriate observability outputs, recommended verifying a plugin-managed exporter before adding others, and provided relevant binding names for their language and version.",
     "expected_behavior": [
       "The agent read the nemo-relay-plugin-observability SKILL.md before responding",
-      "The agent presented the observability output options (console/custom, ATOF, ATIF, OpenTelemetry, OpenInference) with guidance on when to use each",
-      "The agent recommended starting with one plugin-managed exporter and verifying it before adding another",
-      "The agent explained the shared lifecycle of creating, registering, running instrumented work, flushing when needed, deregistering, and shutting down",
+      "The agent determined the installed NeMo Relay version or asked for it before giving version-specific configuration",
+      "The agent presented the observability output options with guidance on the separate 0.6 OpenTelemetry/OpenInference exporters and the unified typed 0.7 exporter",
+      "The agent recommended verifying a plugin-managed exporter before adding others",
+      "The agent explained the lifecycle operations for creating, registering, running instrumented work, flushing when needed, deregistering, and shutting down",
       "The agent referenced the appropriate binding names for the user's language or listed multiple language bindings",
       "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
     ]
@@ -19,12 +20,13 @@
     "question": "I have a Python application using NeMo Relay and I want to get visibility into what's happening during LLM calls and tool invocations. I'm not sure whether I should use tracing, logging, or some kind of event export. What are my options and how do I set one up?",
     "expected_skill": "nemo-relay-plugin-observability",
     "expected_script": null,
-    "ground_truth": "The agent identified this as an observability setup task, presented the available NeMo Relay observability paths (subscribers for console/custom handling, ATOF for raw events, ATIF for portable trajectories, OpenTelemetry for OTLP tracing, and OpenInference for model-aware traces), and explained when plugin-managed configuration or manual subscriber APIs are appropriate.",
+    "ground_truth": "The agent identified this as an observability setup task, established the NeMo Relay version, presented console/custom subscribers, ATOF, ATIF, and the version-appropriate OpenTelemetry/OpenInference paths, and explained when plugin-managed configuration or manual subscriber APIs are appropriate.",
     "expected_behavior": [
       "The agent identified the user's need as choosing and setting up NeMo Relay observability without the skill being explicitly named",
+      "The agent determined whether the Python application uses NeMo Relay 0.6 or 0.7 before selecting configuration version 2 or 3 and binding classes",
       "The agent described the embedded event and subscriber model including global, scope-local, and plugin-installed subscribers",
       "The agent distinguished plugin-managed process configuration from manual Python subscriber or exporter lifecycle control",
-      "The agent outlined the shared lifecycle steps (create, register, run, flush when needed, deregister, shut down)",
+      "The agent outlined the shared lifecycle steps (create, register, run, deregister, flush when needed, shut down)",
       "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
     ]
   },
@@ -115,13 +117,14 @@
   },
   {
     "id": "nemo-relay-plugin-observability-009",
-    "question": "How do I use the nemo-relay-plugin-observability skill to configure OTLP tracing export to a local OpenTelemetry Collector?",
+    "question": "How do I use the nemo-relay-plugin-observability skill with NeMo Relay 0.6 to configure OTLP tracing export to a local OpenTelemetry Collector?",
     "expected_skill": "nemo-relay-plugin-observability",
     "expected_script": null,
-    "ground_truth": "The agent used nemo-relay-plugin-observability, loaded references/opentelemetry.md, and provided a complete configuration walkthrough for exporting traces to a local OpenTelemetry Collector, including endpoint setup on port 4318, transport selection (http_binary), service name configuration, subscriber registration, and shutdown/flush steps.",
+    "ground_truth": "The agent used nemo-relay-plugin-observability, loaded references/opentelemetry.md, and provided a NeMo Relay 0.6 configuration-version-2 walkthrough using the standalone OpenTelemetryConfig and OpenTelemetrySubscriber, including endpoint setup on port 4318, http_binary transport, service name, registration, and shutdown/flush steps.",
     "expected_behavior": [
       "The agent read the nemo-relay-plugin-observability SKILL.md to understand the configuration workflow",
       "The agent loaded references/opentelemetry.md for OpenTelemetry-specific export guidance",
+      "The agent kept the example on the NeMo Relay 0.6 surface with observability configuration version 2 and did not introduce 0.7 typed endpoints",
       "The agent provided specific configuration details including http_binary transport and endpoint localhost:4318",
       "The agent explained the register/deregister lifecycle including flush and shutdown steps",
       "The agent mentioned service name and resource attribute configuration",
@@ -130,14 +133,14 @@
   },
   {
     "id": "nemo-relay-plugin-observability-010",
-    "question": "I need to send NeMo Relay traces to Jaeger using gRPC transport. How do I set up the endpoint, configure auth headers, and ensure spans are flushed before my service exits?",
+    "question": "I use NeMo Relay 0.7 and need to send traces to Jaeger using gRPC transport. How do I set up the endpoint, configure auth headers, and ensure spans are flushed before my service exits?",
     "expected_skill": "nemo-relay-plugin-observability",
     "expected_script": null,
-    "ground_truth": "The agent identified this as an OpenTelemetry export task and provided guidance on configuring gRPC transport for Jaeger, including a TLS-verified endpoint, runtime-only auth header construction from secret injection, the requirement for a native Tokio runtime, a synthetic non-sensitive first proof with sanitization before production export, backend span validation with redacted diagnostics, and deterministic flush-before-exit procedures.",
+    "ground_truth": "The agent identified this as an OpenTelemetry export task and provided guidance on configuring gRPC transport for Jaeger, including a TLS-verified endpoint, runtime-only auth header construction from secret injection, exporter-owned runtime behavior, a synthetic non-sensitive first proof with sanitization before production export, backend span validation with redacted diagnostics, and deterministic flush-before-exit procedures.",
     "expected_behavior": [
       "The agent referenced the nemo-relay-plugin-observability skill content for gRPC transport requirements",
       "The agent loaded references/opentelemetry.md for OpenTelemetry-specific export guidance",
-      "The agent warned that gRPC requires an active Tokio runtime",
+      "The agent explained that the subscriber owns the Tokio runtime required by gRPC",
       "The agent explained how to construct auth headers in memory from runtime secret injection without placing credential values in source code, committed configuration, command-line arguments, prompts, examples, or diagnostics",
       "The agent required TLS verification and avoided endpoints that embed credentials in URL user information or query parameters",
       "The agent used synthetic non-sensitive payloads for the first proof and required sanitization before production export",
@@ -176,14 +179,15 @@
   },
   {
     "id": "nemo-relay-plugin-observability-013",
-    "question": "How do I use the nemo-relay-plugin-observability skill to send traces to Arize Phoenix with HTTP binary transport?",
+    "question": "How do I use the nemo-relay-plugin-observability skill with NeMo Relay 0.7 to send traces to Arize Phoenix with HTTP binary transport?",
     "expected_skill": "nemo-relay-plugin-observability",
     "expected_script": null,
     "ground_truth": "The agent used nemo-relay-plugin-observability, loaded references/openinference.md, and provided a complete configuration walkthrough for sending OpenInference traces to Arize Phoenix using http_binary transport, including endpoint setup, service metadata, and subscriber registration.",
     "expected_behavior": [
       "The agent read the nemo-relay-plugin-observability SKILL.md before responding",
       "The agent loaded references/openinference.md for OpenInference-specific export guidance",
-      "The agent explained how to build an OpenInferenceConfig with http_binary transport and an OTLP/HTTP traces endpoint",
+      "The agent used observability configuration version 3 and did not introduce the standalone 0.6 OpenInferenceConfig or OpenInferenceSubscriber",
+      "The agent explained how to build an OpenTelemetryConfig with type openinference, http_binary transport, and an OTLP/HTTP traces endpoint",
       "The agent described the steps to construct and register the subscriber, run instrumented work, and deregister/flush/shutdown",
       "The agent mentioned that input.value and output.value are derived from scope/tool/LLM start inputs and end outputs respectively",
       "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
@@ -191,16 +195,16 @@
   },
   {
     "id": "nemo-relay-plugin-observability-014",
-    "question": "I need to export my LLM traces with model-centric semantic conventions to an OTLP backend. How do I configure the endpoint, headers, and resource attributes so the backend understands the span kinds and token usage?",
+    "question": "I use NeMo Relay 0.6 and need to export my LLM traces with model-centric semantic conventions to an OTLP backend. How do I configure the endpoint, headers, and resource attributes so the backend understands the span kinds and token usage?",
     "expected_skill": "nemo-relay-plugin-observability",
     "expected_script": null,
-    "ground_truth": "The agent identified this as an OpenInference export task and provided guidance on configuring endpoint, headers, resource attributes, service identity, transport selection, and how LLM usage metadata maps token counters in OpenInference semantics.",
+    "ground_truth": "The agent identified this as a NeMo Relay 0.6 standalone OpenInference exporter task and provided guidance using OpenInferenceConfig and OpenInferenceSubscriber with observability configuration version 2, including endpoint, headers, resource attributes, service identity, transport selection, and token counters.",
     "expected_behavior": [
       "The agent referenced the nemo-relay-plugin-observability skill content to address the user's needs",
       "The agent loaded references/openinference.md for OpenInference-specific export guidance",
-      "The agent explained how to configure transport, endpoint, service_name, headers, and resource attributes in the OpenInferenceConfig",
+      "The agent explained how to configure transport, endpoint, service_name, headers, and resource attributes in the 0.6 OpenInferenceConfig",
       "The agent described how scope types map to OpenInference span kinds and how LLM usage metadata maps token counters",
-      "The agent noted the transport constraints: http_binary as default and grpc requiring an active Tokio runtime",
+      "The agent noted that http_binary is the default and 0.6 grpc requires an active Tokio runtime",
       "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
     ]
   },
@@ -209,11 +213,12 @@
     "question": "We're integrating NeMo Relay into our ML observability stack and our team uses Arize Phoenix to monitor LLM calls. Spans are not showing up in Phoenix even though our collector seems to be running. What should I check?",
     "expected_skill": "nemo-relay-plugin-observability",
     "expected_script": null,
-    "ground_truth": "The agent applied the nemo-relay-plugin-observability troubleshooting guidance and walked the user through verifying construction logs, collector traffic, root_uuid span correlation, correct OTLP transport selection, and proper subscriber lifecycle (register, flush, shutdown).",
+    "ground_truth": "The agent applied the nemo-relay-plugin-observability troubleshooting guidance, established whether the application uses NeMo Relay 0.6 or 0.7, and used the corresponding subscriber, correlation fields, transport requirements, and lifecycle checks.",
     "expected_behavior": [
       "The agent consulted the nemo-relay-plugin-observability skill's troubleshooting focus section",
       "The agent loaded references/openinference.md for OpenInference-specific export guidance",
-      "The agent suggested checking construction logs, collector traffic, and spans from the same root_uuid in the tracing backend",
+      "The agent determined the NeMo Relay version before choosing the standalone 0.6 OpenInference subscriber or the 0.7 typed OpenTelemetry projection",
+      "The agent suggested checking construction logs and collector traffic, then same-root_uuid spans for 0.6 or nemo_relay.uuid/nemo_relay.parent_uuid lineage for 0.7",
       "The agent asked or advised about verifying the correct OTLP transport (http_binary vs grpc) for the user's binding/target",
       "The agent recommended confirming the subscriber was properly registered and that flush/shutdown was called after instrumented work",
       "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
@@ -240,7 +245,7 @@
     "ground_truth": "The agent selected ATOF JSONL as the raw canonical event output, loaded references/atof.md, and recommended enabling one plugin-managed ATOF exporter before adding translated formats.",
     "expected_behavior": [
       "The agent read the nemo-relay-plugin-observability SKILL.md before responding",
-      "The agent selected ATOF rather than ATIF, OpenTelemetry, or OpenInference for raw canonical lifecycle events",
+      "The agent selected ATOF rather than ATIF or the version-appropriate OpenTelemetry/OpenInference exporter for raw canonical lifecycle events",
       "The agent loaded references/atof.md for ATOF-specific guidance",
       "The agent recommended a plugin-managed ATOF exporter as the default reusable process configuration",
       "The agent explained that ATOF preserves raw events rather than translating them into trajectories or trace spans",
