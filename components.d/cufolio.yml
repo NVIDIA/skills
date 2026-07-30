@@ -3,3 +3,6 @@
 name: Portfolio Optimization
 repo: NVIDIA-AI-Blueprints/portfolio-optimization
 description: GPU-accelerated Mean-CVaR portfolio optimization with NVIDIA cuOpt — CVaR optimization, efficient frontier, scenario generation, backtesting, and rebalancing.
+skills:
+  - path: skills/portfolio-optimization/
+    catalog_dir: portfolio-optimization
