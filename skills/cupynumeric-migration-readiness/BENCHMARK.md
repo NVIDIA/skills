@@ -1,24 +1,23 @@
 # Evaluation Report
 
-Evaluation of the `cupynumeric-migration-readiness` skill before publication through NVSkills-Eval.
+Evaluation of the `cupynumeric-migration-readiness` skill before publication through Skill Evaluator.
 
-This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
+This benchmark summarizes 3-Tier Evaluation from Skill Evaluator results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
 
 ## Evaluation Summary
 
 - Skill: `cupynumeric-migration-readiness`
-- Evaluation date: 2026-05-29
-- NVSkills-Eval profile: `external`
-- Environment: `local`
+- Evaluation date: 2026-07-27
+- Environment: `k8s-sandbox`
 - Dataset: 27 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
-- Overall verdict: FAIL
+- Overall verdict: PASS
 
 ## Agents Used
 
-- `claude-code`
-- `codex`
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)
+- Codex (`openai/openai/gpt-5.5`)
 
 ## Metrics Used
 
@@ -38,7 +37,6 @@ Underlying evaluation signals used in this run:
 - `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
 - `goal_accuracy` (Goal Accuracy): checks whether the overall user task completed successfully.
 - `behavior_check` (Behavior Check): verifies expected behavior steps, including safety expectations.
-- `token_efficiency` (Token Efficiency): compares token usage with and without the skill.
 
 ## Test Tasks
 
@@ -52,44 +50,28 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 ## Results
 
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+0%) | 100% (+1%) |
-| Correctness | 8 | 98% (+24%) | 87% (+13%) |
-| Discoverability | 8 | 96% (+42%) | 66% (+8%) |
-| Effectiveness | 8 | 81% (+16%) | 70% (+15%) |
-| Efficiency | 8 | 81% (+28%) | 52% (+2%) |
+| Security | 27 | 100% (+0%) | 96% (-4%) |
+| Correctness | 27 | 96% (+20%) | 92% (+18%) |
+| Discoverability | 27 | 100% (+43%) | 83% (+33%) |
+| Effectiveness | 27 | 82% (+33%) | 64% (+19%) |
+| Efficiency | 27 | 93% (+48%) | 96% (+52%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 6 total findings.
+Tier 1 validation passed. Skill Evaluator ran 1 checks and found 0 total findings.
 
-Top findings:
+Notable observations:
 
-- MEDIUM QUALITY/quality_correctness: Instructions don't mention 'run_script' (`skills/cupynumeric-migration-readiness/SKILL.md`)
-- MEDIUM QUALITY/quality_efficiency: Deeply nested references in idioms-that-block.md (`skills/cupynumeric-migration-readiness/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Description very long (815 chars, recommend 50-150) (`skills/cupynumeric-migration-readiness/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Broad description without negative triggers may cause over-triggering (`skills/cupynumeric-migration-readiness/SKILL.md`)
-- LOW QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/cupynumeric-migration-readiness/SKILL.md`)
+- Schema & Repository Governance: Found skill manifest: SKILL.md
 
 ## Tier 2: Deduplication Summary
 
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 1 total findings.
-
-Top findings:
-
-- HIGH DUPLICATE/duplicate: Duplicate content found across assets/sample_report.md and references/case-studies.md:
-  "## Verdict: **NOT RECOMMENDED**" in assets/sample_report.md (lines 115-118)
-  vs "## What blocks (BLOCKS findings)" in assets/sample_report.md (lines 123-131)
-  vs "## Compatibility / cost notes (INFO findings)" in assets/sample_report.md (lines 136-140)
-  vs "## Recommended next steps" in assets/sample_report.md (lines 156-160)
-  vs "### Verdict" in references/case-studies.md (lines 197-200)
-  vs "### What blocks (BLOCKS findings)" in references/case-studies.md (lines 205-215)
-  vs "### Compatibility / cost notes (INFO findings)" in references/case-studies.md (lines 220-225)
-  vs "### Recommended next steps" in references/case-studies.md (lines 241-248) (`assets/sample_report.md:115`)
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 
-The skill should be reviewed before NVSkills-Eval publication. Skill owners should address the findings above and rerun NVSkills-Eval to refresh this benchmark.
+The skill is suitable to proceed toward Skill Evaluator publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

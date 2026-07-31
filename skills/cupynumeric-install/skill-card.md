@@ -9,10 +9,16 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 OR Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to install cuPyNumeric for GPU-accelerated NumPy-compatible array computing via conda or pip, and verify the installation works correctly. <br>
+Developers and engineers use this skill to install and verify cuPyNumeric for Python, ensuring correct GPU-accelerated or CPU-only NumPy-compatible array computing via conda or pip. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
@@ -22,6 +28,7 @@ Mitigation: Review and scan skill before deployment. <br>
 - [Verification Examples](references/verification_examples.md) <br>
 - [cuPyNumeric Installation Docs](https://docs.nvidia.com/cupynumeric/latest/installation.html) <br>
 - [Legate Installation Requirements](https://docs.nvidia.com/legate/latest/installation.html) <br>
+- [cuPyNumeric GitHub](https://github.com/nv-legate/cupynumeric) <br>
 
 
 ## Skill Output: <br>
@@ -31,13 +38,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- claude-code <br>
-- codex <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 24 evaluation tasks with 2 attempts per task, pass threshold 50%. Overall verdict: PASS. <br>
+Evaluated against 24 evaluation tasks in k8s-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -48,23 +55,23 @@ Reported benchmark dimensions: <br>
 - Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
 
 Underlying evaluation signals used in this run: <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
 - `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
-| Security | 8 | 79% (+21%) | 79% (+31%) |
-| Correctness | 8 | 91% (+16%) | 84% (+19%) |
-| Discoverability | 8 | 90% (+40%) | 73% (+29%) |
-| Effectiveness | 8 | 82% (+16%) | 78% (+28%) |
-| Efficiency | 8 | 83% (+45%) | 70% (+31%) |
+| Security | 24 | 100% (+0%) | 96% (+0%) |
+| Correctness | 24 | 96% (+7%) | 88% (+8%) |
+| Discoverability | 24 | 97% (+75%) | 93% (+47%) |
+| Effectiveness | 24 | 83% (+13%) | 70% (+12%) |
+| Efficiency | 24 | 79% (+74%) | 80% (+78%) |
 
 ## Skill Version(s): <br>
 2.0.0 (source: frontmatter) <br>

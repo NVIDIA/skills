@@ -2,7 +2,7 @@
 name: cupynumeric-install
 description: Install and verify cuPyNumeric for Python — requirements, commands, verification. Source builds are out of scope.
 license: CC-BY-4.0 OR Apache-2.0
-compatibility: linux-x86_64, linux-aarch64, darwin-aarch64, wsl-x86_64
+compatibility: linux-x86_64, linux-aarch64, wsl-x86_64
 metadata:
   author: "NVIDIA Corporation <legate@nvidia.com>"
   version: "2.0.0"
@@ -36,8 +36,8 @@ Confirm these system requirements before recommending any install:
 
 - **GPU**: Compute Capability ≥ 7.0 (Volta+). CPU-only also supported.
 - **CUDA**: 12.2+.
-- **OS**: Linux (x86_64 / aarch64), macOS aarch64 (pip wheels only), Windows via WSL.
-- **Python**: 3.11 through 3.14 on Linux; 3.11 through 3.13 on macOS aarch64.
+- **OS**: Linux (x86_64 / aarch64), Windows via WSL.
+- **Python**: 3.11 through 3.14
 - **conda**: ≥ 24.1 (conda path only).
 - **Package manager**: conda (upstream-recommended) or pip. If neither is present, bootstrap one first (see Instructions).
 
@@ -53,7 +53,7 @@ Follow these steps in order: confirm the prerequisites, ask the scoping question
 
 ### Bootstrap — install a package manager first
 
-If neither `conda` nor `pip` is available, install one. **Provide the command and the docs link; do not run it** — `curl | bash` requires user trust.
+If neither `conda` nor `pip` is available, install one. **Provide the command and the docs link; do not run it**.
 
 #### Recommended: Miniforge (full conda, conda-forge default)
 
@@ -169,7 +169,10 @@ wait "$WORKLOAD"
 rm -rf "$TMPDIR_GPU"
 ```
 
-Expect `memory.used` in the GiB range across most samples and non-trivial `utilization.gpu` in several. If both stay at baseline across every sample, the GPU variant is not installed — check `conda list cupynumeric` for `*_gpu` (not `*_cpu`).
+Expect `memory.used` in the GiB range across most samples and non-trivial
+`utilization.gpu` in several. If both stay at baseline across every sample, the
+GPU variant is not installed — check `conda list cupynumeric` for `*_gpu` (not
+`*_cpu`).
 
 #### Deeper recipes
 

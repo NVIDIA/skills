@@ -2,7 +2,7 @@
 name: cupynumeric-parallel-data-load
 description: Load a sharded, on-disk dataset (sharded .npy, Parquet/Arrow, raw binary, sharded HDF5, custom layouts) into a distributed cuPyNumeric ndarray via a manual partition + leaf @task launch with CPU/OMP/GPU variants. Use when no single-call loader fits, including when per-shard row counts differ across files. Prefer cupynumeric.load or legate.io.hdf5.from_file when they apply.
 license: CC-BY-4.0 OR Apache-2.0
-compatibility: linux-x86_64, linux-aarch64, darwin-aarch64, wsl-x86_64
+compatibility: linux-x86_64, linux-aarch64, wsl-x86_64
 metadata:
   version: "1.0.0"
   author: "NVIDIA Corporation <legate@nvidia.com>"
@@ -21,9 +21,9 @@ metadata:
 
 # Parallel sharded data -> cupynumeric load
 
-**Why this skill exists.** cupynumeric mirrors NumPy's array API,
-including `cupynumeric.load` for a single `.npy` file. Beyond that,
-file *loading* lives in Legate, not cupynumeric:
+**Why this skill exists.** cupynumeric mirrors NumPy's array API, including
+`cupynumeric.load` for a single `.npy` file. Beyond that, file *loading* lives
+in Legate, not cupynumeric:
 
 | Format | Built-in loader |
 |---|---|

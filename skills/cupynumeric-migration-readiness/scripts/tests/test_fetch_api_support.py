@@ -29,6 +29,7 @@ from __future__ import annotations
 import importlib.util
 import sys
 from pathlib import Path
+from unittest import mock
 
 _SCRIPT_PATH = Path(__file__).resolve().parent.parent / "fetch_api_support.py"
 _spec = importlib.util.spec_from_file_location(
@@ -102,6 +103,30 @@ def _by_name(entries, name):
         f"expected exactly one entry for {name}, got {len(matches)}"
     )
     return matches[0]
+
+
+class _FakeResponse:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        return False
+
+    def read(self):
+        return b"<html></html>"
+
+
+def test_fetch_html_uses_only_the_canonical_source_url():
+    with mock.patch.object(
+        fetch_api_support.urllib.request,
+        "urlopen",
+        return_value=_FakeResponse(),
+    ) as urlopen:
+        assert fetch_api_support.fetch_html() == "<html></html>"
+
+    (req,), kwargs = urlopen.call_args
+    assert req.full_url == fetch_api_support.SOURCE_URL
+    assert kwargs == {"timeout": fetch_api_support._HTTP_TIMEOUT_SECONDS}
 
 
 def test_parse_comparison_covers_all_token_formats():

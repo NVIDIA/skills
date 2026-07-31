@@ -75,7 +75,7 @@ python -c "import legate; print(legate.__version__)"
 nvidia-smi
 nvcc --version
 nvidia-smi --query-gpu=compute_cap --format=csv,noheader      # need >= 7.0
-python --version                                                # need 3.11+ (Linux: 3.11–3.14; macOS aarch64: 3.11–3.13)
+python --version                                                # need 3.11–3.14;
 conda --version                                                 # need >= 24.1 for conda path
 nvidia-smi --query-gpu=memory.total,memory.free --format=csv
 ```

@@ -143,15 +143,15 @@
         "expected_behavior": [
             "Confirms CPU-only install is supported",
             "Notes conda auto-selects the CPU variant when no GPU is visible",
-            "Notes macOS aarch64 (Apple Silicon) is supported via pip wheels; x86 macOS is not",
+            "Notes that only Linux is supported, and Windows through WSL",
             "Warns about Legate per-task overhead making it slower than NumPy on small problems",
             "Provides the install command rather than executing it"
         ],
         "expected_script": null,
         "expected_skill": "cupynumeric-install",
-        "ground_truth": "Yes. cuPyNumeric runs CPU-only on machines without a supported GPU \u2014 conda auto-selects the CPU variant when nvidia-smi is absent. macOS aarch64 is supported via pip wheels (macOS x86_64 is not). The agent provides the standard install command (pip path for macOS, or conda if the user has it), notes the user is opting into the CPU variant, and warns up front that cuPyNumeric is typically slower than NumPy on a single CPU laptop because of Legate's per-task overhead \u2014 see the cuPyNumeric FAQ before benchmarking.",
+        "ground_truth": "Yes, cuPyNumeric runs CPU-only on machines without a supported GPU, but only on Linux or Windows with WSL \u2014 conda auto-selects the CPU variant when nvidia-smi is absent. The agent provides the standard install command (pip, or conda if the user has it), notes the user is opting into the CPU variant, and warns up front that cuPyNumeric is typically slower than NumPy on a single CPU laptop because of Legate's per-task overhead \u2014 see the cuPyNumeric FAQ before benchmarking.",
         "id": "install-013-cpu-only-laptop",
-        "question": "I'm on a MacBook with no GPU. Can I still install cuPyNumeric to play with the API?"
+        "question": "I'm on a laptop with no GPU. Can I still install cuPyNumeric to play with the API?"
     },
     {
         "expected_behavior": [
@@ -257,31 +257,30 @@
     },
     {
         "expected_behavior": [
-            "States cuPyNumeric requires Python 3.11 or newer (minimum supported version is 3.11)",
+            "States cuPyNumeric requires Python 3.11 - 3.14",
             "Identifies Python 3.10 as unsupported",
-            "Recommends creating a fresh env / venv pinned to a supported Python version (e.g. 'conda create -n cupynumeric python=3.12 ...' or installing a newer Python for the venv)",
+            "Recommends creating a fresh env / venv pinned to a supported Python version (e.g. 'conda create -n cupynumeric python=3.12 ...' or installing a supported Python version for the venv)",
             "Does not recommend installing cuPyNumeric against the 3.10 interpreter",
             "Provides commands rather than executing them"
         ],
         "expected_script": null,
         "expected_skill": "cupynumeric-install",
-        "ground_truth": "No. cuPyNumeric requires Python 3.11 or newer; Python 3.10 is not supported. (Linux packages cover 3.11 through 3.14; macOS aarch64 pip wheels cover 3.11 through 3.13.) The agent recommends either creating a conda env that pins a supported Python ('conda create -n cupynumeric -c conda-forge -c legate python=3.12 cupynumeric') or installing a newer Python (3.11+) and creating a venv against it before 'pip install nvidia-cupynumeric'. It provides the commands for the user to run.",
+        "ground_truth": "No. cuPyNumeric requires Python 3.11 - 3.14; Python 3.10 is not supported. The agent recommends either creating a conda env that pins a supported Python version ('conda create -n cupynumeric -c conda-forge -c legate python=3.12 cupynumeric') or installing a supported Python version and creating a venv against it before 'pip install nvidia-cupynumeric'. It provides the commands for the user to run.",
         "id": "install-021-python-too-old",
         "question": "I have Python 3.10 on this box. Can I just 'pip install nvidia-cupynumeric'?"
     },
     {
         "expected_behavior": [
-            "States that macOS x86_64 (Intel Macs) is NOT supported",
-            "Notes that macOS aarch64 (Apple Silicon) IS supported via pip wheels",
+            "States that macOS is NOT supported",
             "Suggests alternatives: a Linux box / WSL, cloud GPU instance, or remote Linux dev box",
-            "Does not hand the user a pip install command for Intel macOS",
+            "Does not hand the user a pip install command for macOS",
             "Provides guidance rather than executing commands"
         ],
         "expected_script": null,
         "expected_skill": "cupynumeric-install",
-        "ground_truth": "No. cuPyNumeric supports macOS aarch64 (Apple Silicon) via pip wheels, but macOS x86_64 (Intel Macs) is not supported \u2014 no wheels are published and no conda packages target that platform. The agent suggests alternatives: a Linux machine (x86_64 or aarch64), WSL on a Windows machine, or a cloud Linux instance. It does not give an install command that will fail on Intel macOS.",
-        "id": "install-022-macos-intel-unsupported",
-        "question": "I'm on a 2019 MacBook Pro with an Intel chip. How do I install cuPyNumeric?"
+        "ground_truth": "cuPyNumeric does not support macOS \u2014 no wheels are published and no conda packages target that platform. The agent suggests alternatives: a Linux machine (x86_64 or aarch64), WSL on a Windows machine, or a cloud Linux instance. It does not give an install command that will fail on macOS.",
+        "id": "install-022-macos-unsupported",
+        "question": "I'm on a MacBook. How do I install cuPyNumeric?"
     },
     {
         "expected_behavior": [
