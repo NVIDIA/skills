@@ -259,7 +259,7 @@ NVIDIA/skills/
 │   │                              synced from upstream product repos
 │   ├── README.md                 # Browser-facing install guidance
 │   ├── <product-prefix>-*/       # Flat layout — one dir per skill, product-prefixed
-│   │                               # e.g. aiq-*, cufolio, cuopt-*, cupynumeric-*,
+│   │                               # e.g. aiq-*, cuopt-*, cupynumeric-*,
 │   │                               # dali-*, deepstream-*, dicom-*, digital-health-*,
 │   │                               # dynamo-*, earth2studio-*, holoscan-*, hsb-*,
 │   │                               # jetson-*, launch-nemo-rl, mcore-*,
@@ -270,7 +270,7 @@ NVIDIA/skills/
 │   │                               # nv-* (medical AI), physicsnemo-*, rag-*,
 │   │                               # skill-card-generator, tao-*, tilegym-*,
 │   │                               # vss-* (15 skills), accelerated-computing-cudf,
-│   │                               # cudaq-guide
+│   │                               # cudaq-guide, portfolio-optimization
 │   ├── omniverse-*/              # Physical AI — manually staged (see manual-components.yml)
 │   └── physical-ai-*/            # Physical AI — manually staged
 ├── components.d/                # Product registry — one file per component, teams onboard here
