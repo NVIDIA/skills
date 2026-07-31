@@ -17,11 +17,8 @@
 
 """Scrape the cuPyNumeric NumPy-vs-cuPyNumeric API comparison table.
 
-The upstream page at https://nv-legate.github.io/cupynumeric/api/comparison.html
-is the GitHub Pages mirror that tracks the in-development repo and is the
-most up-to-date source during the documentation transition. The long-term
-canonical URL is https://docs.nvidia.com/cupynumeric/latest/api/comparison.html;
-pass --docs-nvidia-url to target it instead.
+The only network source is the canonical NVIDIA documentation page:
+https://docs.nvidia.com/cupynumeric/latest/api/comparison.html.
 
 The page is HTML-only. This script extracts every row and emits a markdown
 manifest the skill's agent consults to answer the question "is `numpy.<x>`
@@ -64,10 +61,9 @@ keyed on the (single_gpu, multi_gpu) pair:
         either way, hot-path use is a migration blocker
 
 Run as:
-    python fetch_api_support.py --default-path     # writes this skill's manifest
-    python fetch_api_support.py --docs-nvidia-url --default-path   # use docs.nvidia.com
-    python fetch_api_support.py --out a.md --out b.md    # explicit paths
-    python fetch_api_support.py --print            # dump to stdout
+    python fetch_api_support.py --default-path  # writes this skill's manifest
+    python fetch_api_support.py --out a.md --out b.md  # explicit paths
+    python fetch_api_support.py --print  # dump to stdout
 
 Writes a single markdown manifest into this skill's `assets/api-support.md`.
 Standalone - no other skills or files depend on it; Python stdlib only.
@@ -85,10 +81,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Optional
 
-SOURCE_URL = "https://nv-legate.github.io/cupynumeric/api/comparison.html"
-_DOCS_NVIDIA_URL = (
-    "https://docs.nvidia.com/cupynumeric/latest/api/comparison.html"
-)
+SOURCE_URL = "https://docs.nvidia.com/cupynumeric/latest/api/comparison.html"
 
 # Upstream is mid numeric->glyph transition; both formats are accepted.
 # Extend these sets when upstream introduces a new glyph.
@@ -345,11 +338,9 @@ def parse_comparison(html: str, base_url: str = SOURCE_URL) -> list[ApiEntry]:
     return out
 
 
-def fetch_html(
-    url: str = SOURCE_URL, timeout: float = _HTTP_TIMEOUT_SECONDS
-) -> str:
+def fetch_html(timeout: float = _HTTP_TIMEOUT_SECONDS) -> str:
     req = urllib.request.Request(
-        url, headers={"User-Agent": "cupynumeric-skill-fetcher/1.0"}
+        SOURCE_URL, headers={"User-Agent": "cupynumeric-skill-fetcher/1.0"}
     )
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         raw = resp.read()
@@ -484,23 +475,6 @@ def render_markdown(entries: list[ApiEntry], source_url: str) -> str:
 def main(argv: Optional[list[str]] = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n", 1)[0])
     ap.add_argument(
-        "--url",
-        default=None,
-        help=(
-            "Source URL. Defaults to the GitHub Pages mirror "
-            f"({SOURCE_URL}). Override with --docs-nvidia-url or with an "
-            "explicit URL."
-        ),
-    )
-    ap.add_argument(
-        "--docs-nvidia-url",
-        action="store_true",
-        help=(
-            "Fetch from the long-term canonical URL "
-            f"({_DOCS_NVIDIA_URL}) instead of the GitHub Pages mirror."
-        ),
-    )
-    ap.add_argument(
         "--out",
         type=Path,
         action="append",
@@ -519,16 +493,14 @@ def main(argv: Optional[list[str]] = None) -> int:
         "--from-file",
         type=Path,
         default=None,
-        help="Skip fetch; read HTML from a local file.",
+        help=(
+            "Skip network fetch; read HTML from a local copy of the "
+            "canonical comparison page."
+        ),
     )
     args = ap.parse_args(argv)
 
-    if args.url is not None:
-        source_url = args.url
-    elif args.docs_nvidia_url:
-        source_url = _DOCS_NVIDIA_URL
-    else:
-        source_url = SOURCE_URL
+    source_url = SOURCE_URL
 
     out_paths: list[Path] = list(args.out) if args.out else []
     if args.default_path:
@@ -537,7 +509,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     if args.from_file is not None:
         html = args.from_file.read_text(encoding="utf-8")
     else:
-        html = fetch_html(source_url)
+        html = fetch_html()
 
     entries = parse_comparison(html, base_url=source_url)
     if not entries:
@@ -545,9 +517,8 @@ def main(argv: Optional[list[str]] = None) -> int:
             "ERROR: no rows parsed from "
             f"{source_url}; the upstream HTML structure may have changed, "
             "or the table may use a token format the scraper does not "
-            "recognize. Try --docs-nvidia-url for the long-term mirror, "
-            "or update _SUPPORTED_TOKENS / _PARTIAL_TOKENS if upstream "
-            "introduced a new glyph.",
+            "recognize. Update _SUPPORTED_TOKENS / _PARTIAL_TOKENS if "
+            "upstream introduced a new glyph.",
             file=sys.stderr,
         )
         return 2

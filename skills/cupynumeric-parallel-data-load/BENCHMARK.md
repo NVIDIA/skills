@@ -1,24 +1,23 @@
 # Evaluation Report
 
-Evaluation of the `cupynumeric-parallel-data-load` skill before publication through NVSkills-Eval.
+Evaluation of the `cupynumeric-parallel-data-load` skill before publication through Skill Evaluator.
 
-This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
+This benchmark summarizes 3-Tier Evaluation from Skill Evaluator results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
 
 ## Evaluation Summary
 
 - Skill: `cupynumeric-parallel-data-load`
-- Evaluation date: 2026-05-29
-- NVSkills-Eval profile: `external`
-- Environment: `local`
+- Evaluation date: 2026-07-27
+- Environment: `k8s-sandbox`
 - Dataset: 7 evaluation tasks
-- Attempts per task: 2
+- Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
 
 ## Agents Used
 
-- `claude-code`
-- `codex`
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)
+- Codex (`openai/openai/gpt-5.5`)
 
 ## Metrics Used
 
@@ -38,7 +37,6 @@ Underlying evaluation signals used in this run:
 - `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
 - `goal_accuracy` (Goal Accuracy): checks whether the overall user task completed successfully.
 - `behavior_check` (Behavior Check): verifies expected behavior steps, including safety expectations.
-- `token_efficiency` (Token Efficiency): compares token usage with and without the skill.
 
 ## Test Tasks
 
@@ -52,37 +50,28 @@ Task composition is derived from the evaluation dataset when possible. Entries w
 
 ## Results
 
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+7%) | 100% (+0%) |
-| Correctness | 8 | 92% (+16%) | 89% (+25%) |
-| Discoverability | 8 | 95% (+21%) | 86% (+14%) |
-| Effectiveness | 8 | 84% (+16%) | 80% (+30%) |
-| Efficiency | 8 | 83% (+21%) | 74% (+11%) |
+| Security | 7 | 100% (+0%) | 100% (+14%) |
+| Correctness | 7 | 91% (+31%) | 77% (+14%) |
+| Discoverability | 7 | 94% (+32%) | 89% (+23%) |
+| Effectiveness | 7 | 93% (+40%) | 89% (+32%) |
+| Efficiency | 7 | 91% (+32%) | 96% (+34%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 
 ## Tier 1: Static Validation Summary
 
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 6 total findings.
-
-Top findings:
-
-- LOW QUALITY/quality_discoverability: Description very long (375 chars, recommend 50-150) (`skills/cupynumeric-parallel-data-load/SKILL.md`)
-- LOW QUALITY/quality_discoverability: Broad description without negative triggers may cause over-triggering (`skills/cupynumeric-parallel-data-load/SKILL.md`)
-- LOW QUALITY/quality_discoverability: No '## Purpose' section (`skills/cupynumeric-parallel-data-load/SKILL.md`)
-- LOW QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/cupynumeric-parallel-data-load/SKILL.md`)
-- LOW QUALITY/quality_reliability: No limitations documented (`skills/cupynumeric-parallel-data-load/SKILL.md`)
-
-## Tier 2: Deduplication Summary
-
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
+Tier 1 validation passed. Skill Evaluator ran 1 checks and found 0 total findings.
 
 Notable observations:
 
-- Context Deduplication: Collected 2 file(s)
-- Inter-Skill Deduplication: Parsed skill 'cupynumeric-parallel-data-load': 375 char description
+- Schema & Repository Governance: Found skill manifest: SKILL.md
+
+## Tier 2: Deduplication Summary
+
+This tier was not run or did not produce findings in this report.
 
 ## Publication Recommendation
 
-The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.
+The skill is suitable to proceed toward Skill Evaluator publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.

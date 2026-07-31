@@ -39,7 +39,8 @@ A graph / sparse / ML / NLP  workload that the user *is* asking to migrate is st
 
 ## Instructions
 
-Run all five steps below, in order. Read the user's code and reason about it semantically; do not emit a one-shot prose verdict.
+Run all five steps below, in order. Read the user's code and reason about it
+semantically; do not emit a one-shot prose verdict.
 
 ### Step 1 — Gather context
 
@@ -166,7 +167,7 @@ The full worked report is in [`assets/sample_report.md`](assets/sample_report.md
 
 ## Authoritative upstream references
 
-- **Comparison table** (source for `assets/api-support.md`): https://nv-legate.github.io/cupynumeric/api/comparison.html (mirror, most current) / `.../latest/api/comparison.html` on docs.nvidia.com (canonical)
+- **Comparison table** (source for `assets/api-support.md`): https://docs.nvidia.com/cupynumeric/latest/api/comparison.html
 - **Best practices**, **Doctor**, **profiling**, **differences with NumPy**, **Legate launcher** — under https://docs.nvidia.com/cupynumeric/latest/ (`user/practices.html`, `user/doctor.html`, `user/profiling_debugging.html`, `user/differences.html`) and https://docs.nvidia.com/legate/latest/manual/usage/running.html
 - **Source**: https://github.com/nv-legate/cupynumeric
 
@@ -174,7 +175,7 @@ The full worked report is in [`assets/sample_report.md`](assets/sample_report.md
 
 | Script | Purpose | Arguments |
 |---|---|---|
-| `scripts/fetch_api_support.py` | Scrape the upstream comparison table into `assets/api-support.md`. Python stdlib only; standalone. | `--default-path` (write the committed `assets/api-support.md`); `--docs-nvidia-url` (use canonical `docs.nvidia.com` instead of the default GitHub Pages mirror) |
+| `scripts/fetch_api_support.py` | Scrape the upstream comparison table into `assets/api-support.md`. Python stdlib only; standalone. The source URL is fixed to the canonical NVIDIA docs comparison page and cannot be overridden. | `--default-path`, `--from-file PATH`, `--out PATH`, `--print` |
 
 The user runs this to refresh the manifest (`python scripts/fetch_api_support.py --default-path`).
 
@@ -187,6 +188,6 @@ The `references/` files are enumerated under **Required reading order** above (R
 | Symptom | Cause | Fix |
 |---|---|---|
 | `Fetched:` line in the manifest > ~90 days old | Stale snapshot | Run `fetch_api_support.py --default-path` (user-run) |
-| Manifest missing or scraper fails | Upstream HTML changed | `WebFetch` the [comparison table](https://nv-legate.github.io/cupynumeric/api/comparison.html) for that assessment |
+| Manifest missing or scraper fails | Upstream HTML changed | `WebFetch` the [comparison table](https://docs.nvidia.com/cupynumeric/latest/api/comparison.html) for that assessment |
 | NOT RECOMMENDED for many fixable BLOCKS | Heuristics applied out of order | Re-apply order: Gate 4 → Gate 2 → R108 → BLOCKS → REFACTOR; weigh *kinds*, not count |
 | Kernel authoring or post-migration profiling | Out of scope | Decline and redirect (see "When to use") — no verdict |

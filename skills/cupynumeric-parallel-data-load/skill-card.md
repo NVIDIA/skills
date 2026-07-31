@@ -7,37 +7,42 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-CC-BY-4.0 OR Apache-2.0 <br>
+CC-BY-4.0 AND Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to load sharded multi-file datasets into distributed cuPyNumeric ndarrays when no single-call built-in loader fits, including when per-shard row counts differ across files. <br>
+Developers and engineers loading sharded on-disk datasets into distributed cuPyNumeric ndarrays for parallel GPU-based computation, replacing sequential NumPy concatenation with per-GPU parallel reads. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [cuPyNumeric GitHub Repository](https://github.com/nv-legate/cupynumeric) <br>
 - [cuPyNumeric Documentation](https://docs.nvidia.com/cupynumeric/latest/) <br>
-- [cuPyNumeric GitHub](https://github.com/nv-legate/cupynumeric) <br>
-- [parallel_npy_load.py](assets/examples/parallel_npy_load.py) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Code, Shell commands] <br>
-**Output Format:** [Markdown with inline Python and bash code blocks] <br>
+**Output Format:** [Python code with Legate task definitions and bash launch commands] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- `claude-code` <br>
-- `codex` <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 7 evaluation tasks (4 positive skill-activation, 3 negative). 2 attempts per task, 50% pass threshold. Overall verdict: PASS. <br>
+Evaluated against 7 evaluation tasks (4 positive activation, 3 negative activation). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -54,18 +59,17 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Grades final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
 - `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
+| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
 |---|---:|---:|---:|
-| Security | 8 | 100% (+7%) | 100% (+0%) |
-| Correctness | 8 | 92% (+16%) | 89% (+25%) |
-| Discoverability | 8 | 95% (+21%) | 86% (+14%) |
-| Effectiveness | 8 | 84% (+16%) | 80% (+30%) |
-| Efficiency | 8 | 83% (+21%) | 74% (+11%) |
+| Security | 7 | 100% (+0%) | 100% (+14%) |
+| Correctness | 7 | 91% (+31%) | 77% (+14%) |
+| Discoverability | 7 | 94% (+32%) | 89% (+23%) |
+| Effectiveness | 7 | 93% (+40%) | 89% (+32%) |
+| Efficiency | 7 | 91% (+32%) | 96% (+34%) |
 
 ## Skill Version(s): <br>
 1.0.0 (source: frontmatter) <br>

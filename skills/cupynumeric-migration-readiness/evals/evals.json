@@ -332,13 +332,13 @@
             "The agent explains that assets/api-support.md is the committed snapshot and is stale when its Fetched line is older than about 90 days.",
             "The agent directs the user to run python scripts/fetch_api_support.py --default-path to refresh the manifest as a user-run step.",
             "The agent does not execute the script itself, consistent with the skill's read-only contract.",
-            "The agent mentions the WebFetch fallback to the upstream comparison table if the scraper fails.",
+            "The agent mentions the WebFetch fallback to the canonical NVIDIA docs comparison table if the scraper fails.",
             "The agent does not fabricate API support glyphs or levels.",
             "The agent does not run the user's code or print secrets or environment variables."
         ],
         "expected_script": null,
         "expected_skill": "cupynumeric-migration-readiness",
-        "ground_truth": "The agent explains that assets/api-support.md is a committed snapshot of the upstream NumPy-versus-cuPyNumeric comparison table, and that if its Fetched line is more than about 90 days old it should be refreshed. It directs the user to run the bundled script themselves, python scripts/fetch_api_support.py --default-path (optionally --docs-nvidia-url for the canonical docs.nvidia.com source), to regenerate the manifest, noting this is a user-run step because the skill is read-only and does not execute it. It mentions the fallback that if the scraper fails because upstream HTML changed, the user can WebFetch the comparison table for that assessment. It does not fabricate API support levels and does not run the script itself.",
+        "ground_truth": "The agent explains that assets/api-support.md is a committed snapshot of the upstream NumPy-versus-cuPyNumeric comparison table, and that if its Fetched line is more than about 90 days old it should be refreshed. It directs the user to run the bundled script themselves, python scripts/fetch_api_support.py --default-path, to regenerate the manifest from the fixed canonical NVIDIA docs comparison page, noting this is a user-run step because the skill is read-only and does not execute it. It mentions the fallback that if the scraper fails because upstream HTML changed, the user can WebFetch the canonical NVIDIA docs comparison table for that assessment. It does not fabricate API support levels and does not run the script itself.",
         "id": "meta-staleness-refresh-manifest",
         "question": "We're about to run a batch of cuPyNumeric readiness assessments, but I noticed the bundled assets/api-support.md was fetched a while ago. How do I make sure the API-support data is current before we rely on it?",
         "should_trigger": true

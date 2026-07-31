@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. SPDX-License-Identifier: CC-BY-4.0 -->
 # cuPyNumeric API support
 
-Source: https://nv-legate.github.io/cupynumeric/api/comparison.html
+Source: https://docs.nvidia.com/cupynumeric/latest/api/comparison.html
 Fetched: 2026-05-22T15:45:33+00:00
 Counts: 616 total · 412 implemented · 363 multi-GPU · 9 single-GPU only · 14 partial · 204 not implemented
 

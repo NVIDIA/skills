@@ -11,7 +11,7 @@ ______________________________________________________________________
 | GPU compute capability ≥ 7.0 (Volta+)? | Continue | **STOP** — no Pascal or earlier support |
 | CUDA 12.x or 13.x driver installed? | Continue | Fix toolchain first |
 | At least 80 GB of FBMEM total across available GPUs (or equivalent system memory on CPU-only runs) for production runs? | Continue | Pilot is fine; production needs to fit |
-| Linux (or WSL2)? | Continue | macOS aarch64 is CPU-only; Windows native unsupported |
+| Linux (or WSL2)? | Continue | macOS unsupported; Windows native unsupported |
 
 **Bail condition.** Old GPUs or non-Linux production targets → defer migration; consider CPU-only Legate variant or different runtime.
 
