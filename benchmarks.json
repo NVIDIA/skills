@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 322,
+  "skill_count": 323,
   "result_row_count": 2955,
   "skills_without_results": [
     "deepstream-generate-pipeline",
@@ -27,6 +27,7 @@
     "omniverse-realtime-viewer",
     "omniverse-usd-performance-tuning",
     "physical-ai-infrastructure-setup-and-resilient-scaling",
+    "portfolio-optimization",
     "rag-blueprint",
     "rag-eval",
     "rag-perf"
@@ -304,57 +305,48 @@
     },
     {
       "skill": "cupynumeric-install",
-      "evaluation_date": "2026-05-28",
-      "profile": "external",
-      "environment": "local",
+      "evaluation_date": "2026-07-27",
+      "profile": null,
+      "environment": "k8s-sandbox",
       "tasks": 24,
-      "attempts_per_task": 2,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
       "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
+      "agents": [],
       "catalog_dir": "cupynumeric-install",
       "component": "cuPyNumeric",
       "has_results": true,
-      "average_uplift_pct": 27.6
+      "average_uplift_pct": 31.4
     },
     {
       "skill": "cupynumeric-migration-readiness",
-      "evaluation_date": "2026-05-29",
-      "profile": "external",
-      "environment": "local",
+      "evaluation_date": "2026-07-27",
+      "profile": null,
+      "environment": "k8s-sandbox",
       "tasks": 27,
-      "attempts_per_task": 2,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
-      "verdict": "FAIL",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
+      "verdict": "PASS",
+      "agents": [],
       "catalog_dir": "cupynumeric-migration-readiness",
       "component": "cuPyNumeric",
       "has_results": true,
-      "average_uplift_pct": 14.9
+      "average_uplift_pct": 26.2
     },
     {
       "skill": "cupynumeric-parallel-data-load",
-      "evaluation_date": "2026-05-29",
-      "profile": "external",
-      "environment": "local",
+      "evaluation_date": "2026-07-27",
+      "profile": null,
+      "environment": "k8s-sandbox",
       "tasks": 7,
-      "attempts_per_task": 2,
+      "attempts_per_task": 1,
       "pass_threshold_pct": 50.0,
       "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
+      "agents": [],
       "catalog_dir": "cupynumeric-parallel-data-load",
       "component": "cuPyNumeric",
       "has_results": true,
-      "average_uplift_pct": 16.1
+      "average_uplift_pct": 25.2
     },
     {
       "skill": "dali-dynamic-mode",
@@ -4086,6 +4078,21 @@
       "average_uplift_pct": 6.4
     },
     {
+      "skill": "portfolio-optimization",
+      "evaluation_date": "2026-07-30",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": null,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [],
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "has_results": false,
+      "average_uplift_pct": null
+    },
+    {
       "skill": "rag-blueprint",
       "evaluation_date": "2026-05-29",
       "profile": "external",
@@ -6920,271 +6927,271 @@
       "catalog_dir": "cupynumeric-install",
       "component": "cuPyNumeric",
       "dimension": "Security",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 79.0,
-      "uplift_pct": 21.0
-    },
-    {
-      "catalog_dir": "cupynumeric-install",
-      "component": "cuPyNumeric",
-      "dimension": "Security",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 79.0,
-      "uplift_pct": 31.0
-    },
-    {
-      "catalog_dir": "cupynumeric-install",
-      "component": "cuPyNumeric",
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 91.0,
-      "uplift_pct": 16.0
-    },
-    {
-      "catalog_dir": "cupynumeric-install",
-      "component": "cuPyNumeric",
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 19.0
-    },
-    {
-      "catalog_dir": "cupynumeric-install",
-      "component": "cuPyNumeric",
-      "dimension": "Discoverability",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": 40.0
-    },
-    {
-      "catalog_dir": "cupynumeric-install",
-      "component": "cuPyNumeric",
-      "dimension": "Discoverability",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 73.0,
-      "uplift_pct": 29.0
-    },
-    {
-      "catalog_dir": "cupynumeric-install",
-      "component": "cuPyNumeric",
-      "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 82.0,
-      "uplift_pct": 16.0
-    },
-    {
-      "catalog_dir": "cupynumeric-install",
-      "component": "cuPyNumeric",
-      "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 78.0,
-      "uplift_pct": 28.0
-    },
-    {
-      "catalog_dir": "cupynumeric-install",
-      "component": "cuPyNumeric",
-      "dimension": "Efficiency",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 83.0,
-      "uplift_pct": 45.0
-    },
-    {
-      "catalog_dir": "cupynumeric-install",
-      "component": "cuPyNumeric",
-      "dimension": "Efficiency",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 70.0,
-      "uplift_pct": 31.0
-    },
-    {
-      "catalog_dir": "cupynumeric-migration-readiness",
-      "component": "cuPyNumeric",
-      "dimension": "Security",
-      "num": 8,
-      "agent": "claude-code",
+      "num": 24,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "cupynumeric-migration-readiness",
+      "catalog_dir": "cupynumeric-install",
       "component": "cuPyNumeric",
       "dimension": "Security",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 1.0
-    },
-    {
-      "catalog_dir": "cupynumeric-migration-readiness",
-      "component": "cuPyNumeric",
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 98.0,
-      "uplift_pct": 24.0
-    },
-    {
-      "catalog_dir": "cupynumeric-migration-readiness",
-      "component": "cuPyNumeric",
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 87.0,
-      "uplift_pct": 13.0
-    },
-    {
-      "catalog_dir": "cupynumeric-migration-readiness",
-      "component": "cuPyNumeric",
-      "dimension": "Discoverability",
-      "num": 8,
-      "agent": "claude-code",
+      "num": 24,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
       "score_pct": 96.0,
-      "uplift_pct": 42.0
+      "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "cupynumeric-migration-readiness",
+      "catalog_dir": "cupynumeric-install",
       "component": "cuPyNumeric",
-      "dimension": "Discoverability",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 66.0,
-      "uplift_pct": 8.0
-    },
-    {
-      "catalog_dir": "cupynumeric-migration-readiness",
-      "component": "cuPyNumeric",
-      "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 81.0,
-      "uplift_pct": 16.0
-    },
-    {
-      "catalog_dir": "cupynumeric-migration-readiness",
-      "component": "cuPyNumeric",
-      "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 70.0,
-      "uplift_pct": 15.0
-    },
-    {
-      "catalog_dir": "cupynumeric-migration-readiness",
-      "component": "cuPyNumeric",
-      "dimension": "Efficiency",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 81.0,
-      "uplift_pct": 28.0
-    },
-    {
-      "catalog_dir": "cupynumeric-migration-readiness",
-      "component": "cuPyNumeric",
-      "dimension": "Efficiency",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 52.0,
-      "uplift_pct": 2.0
-    },
-    {
-      "catalog_dir": "cupynumeric-parallel-data-load",
-      "component": "cuPyNumeric",
-      "dimension": "Security",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 100.0,
+      "dimension": "Correctness",
+      "num": 24,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 96.0,
       "uplift_pct": 7.0
     },
     {
+      "catalog_dir": "cupynumeric-install",
+      "component": "cuPyNumeric",
+      "dimension": "Correctness",
+      "num": 24,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 88.0,
+      "uplift_pct": 8.0
+    },
+    {
+      "catalog_dir": "cupynumeric-install",
+      "component": "cuPyNumeric",
+      "dimension": "Discoverability",
+      "num": 24,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 97.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "cupynumeric-install",
+      "component": "cuPyNumeric",
+      "dimension": "Discoverability",
+      "num": 24,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 93.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "cupynumeric-install",
+      "component": "cuPyNumeric",
+      "dimension": "Effectiveness",
+      "num": 24,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 83.0,
+      "uplift_pct": 13.0
+    },
+    {
+      "catalog_dir": "cupynumeric-install",
+      "component": "cuPyNumeric",
+      "dimension": "Effectiveness",
+      "num": 24,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 70.0,
+      "uplift_pct": 12.0
+    },
+    {
+      "catalog_dir": "cupynumeric-install",
+      "component": "cuPyNumeric",
+      "dimension": "Efficiency",
+      "num": 24,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 79.0,
+      "uplift_pct": 74.0
+    },
+    {
+      "catalog_dir": "cupynumeric-install",
+      "component": "cuPyNumeric",
+      "dimension": "Efficiency",
+      "num": 24,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 80.0,
+      "uplift_pct": 78.0
+    },
+    {
+      "catalog_dir": "cupynumeric-migration-readiness",
+      "component": "cuPyNumeric",
+      "dimension": "Security",
+      "num": 27,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "cupynumeric-migration-readiness",
+      "component": "cuPyNumeric",
+      "dimension": "Security",
+      "num": 27,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 96.0,
+      "uplift_pct": -4.0
+    },
+    {
+      "catalog_dir": "cupynumeric-migration-readiness",
+      "component": "cuPyNumeric",
+      "dimension": "Correctness",
+      "num": 27,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 96.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "cupynumeric-migration-readiness",
+      "component": "cuPyNumeric",
+      "dimension": "Correctness",
+      "num": 27,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 92.0,
+      "uplift_pct": 18.0
+    },
+    {
+      "catalog_dir": "cupynumeric-migration-readiness",
+      "component": "cuPyNumeric",
+      "dimension": "Discoverability",
+      "num": 27,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 100.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "cupynumeric-migration-readiness",
+      "component": "cuPyNumeric",
+      "dimension": "Discoverability",
+      "num": 27,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 83.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "cupynumeric-migration-readiness",
+      "component": "cuPyNumeric",
+      "dimension": "Effectiveness",
+      "num": 27,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 82.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "cupynumeric-migration-readiness",
+      "component": "cuPyNumeric",
+      "dimension": "Effectiveness",
+      "num": 27,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 64.0,
+      "uplift_pct": 19.0
+    },
+    {
+      "catalog_dir": "cupynumeric-migration-readiness",
+      "component": "cuPyNumeric",
+      "dimension": "Efficiency",
+      "num": 27,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 93.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "cupynumeric-migration-readiness",
+      "component": "cuPyNumeric",
+      "dimension": "Efficiency",
+      "num": 27,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 96.0,
+      "uplift_pct": 52.0
+    },
+    {
       "catalog_dir": "cupynumeric-parallel-data-load",
       "component": "cuPyNumeric",
       "dimension": "Security",
-      "num": 8,
-      "agent": "codex",
+      "num": 7,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
     {
       "catalog_dir": "cupynumeric-parallel-data-load",
       "component": "cuPyNumeric",
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 92.0,
-      "uplift_pct": 16.0
-    },
-    {
-      "catalog_dir": "cupynumeric-parallel-data-load",
-      "component": "cuPyNumeric",
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 89.0,
-      "uplift_pct": 25.0
-    },
-    {
-      "catalog_dir": "cupynumeric-parallel-data-load",
-      "component": "cuPyNumeric",
-      "dimension": "Discoverability",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 21.0
-    },
-    {
-      "catalog_dir": "cupynumeric-parallel-data-load",
-      "component": "cuPyNumeric",
-      "dimension": "Discoverability",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 86.0,
+      "dimension": "Security",
+      "num": 7,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 100.0,
       "uplift_pct": 14.0
     },
     {
       "catalog_dir": "cupynumeric-parallel-data-load",
       "component": "cuPyNumeric",
-      "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 84.0,
-      "uplift_pct": 16.0
+      "dimension": "Correctness",
+      "num": 7,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 91.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "cupynumeric-parallel-data-load",
+      "component": "cuPyNumeric",
+      "dimension": "Correctness",
+      "num": 7,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 77.0,
+      "uplift_pct": 14.0
+    },
+    {
+      "catalog_dir": "cupynumeric-parallel-data-load",
+      "component": "cuPyNumeric",
+      "dimension": "Discoverability",
+      "num": 7,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 94.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "cupynumeric-parallel-data-load",
+      "component": "cuPyNumeric",
+      "dimension": "Discoverability",
+      "num": 7,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 89.0,
+      "uplift_pct": 23.0
     },
     {
       "catalog_dir": "cupynumeric-parallel-data-load",
       "component": "cuPyNumeric",
       "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 30.0
+      "num": 7,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 93.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "cupynumeric-parallel-data-load",
+      "component": "cuPyNumeric",
+      "dimension": "Effectiveness",
+      "num": 7,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 89.0,
+      "uplift_pct": 32.0
     },
     {
       "catalog_dir": "cupynumeric-parallel-data-load",
       "component": "cuPyNumeric",
       "dimension": "Efficiency",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 83.0,
-      "uplift_pct": 21.0
+      "num": 7,
+      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "score_pct": 91.0,
+      "uplift_pct": 32.0
     },
     {
       "catalog_dir": "cupynumeric-parallel-data-load",
       "component": "cuPyNumeric",
       "dimension": "Efficiency",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 74.0,
-      "uplift_pct": 11.0
+      "num": 7,
+      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "score_pct": 96.0,
+      "uplift_pct": 34.0
     },
     {
       "catalog_dir": "dali-dynamic-mode",

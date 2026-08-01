@@ -2869,6 +2869,18 @@
       }
     },
     {
+      "path": "skills/portfolio-optimization",
+      "name": "portfolio-optimization",
+      "description": "Use when a user asks to build, optimize, backtest, rebalance, or analyze a stock portfolio with Mean-CVaR, Mean-Variance/SOCP variance caps, efficient frontiers, scenario generation, or NVIDIA cuOpt.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "data_scientist,application_developer,developer,solutions_architect",
+        "discovery.activity_tags": "optimize,evaluate,benchmark,compare,generate"
+      }
+    },
+    {
       "path": "skills/rag-blueprint",
       "name": "rag-blueprint",
       "description": "NVIDIA RAG Blueprint — deploy, configure, troubleshoot, and manage. Handles any RAG action: deploy, install, start, enable, disable, toggle, change, configure, troubleshoot, debug, fix, shutdown, stop, or tear down any RAG feature or service (Agentic RAG, VLM, guardrails, query rewriting, models, search, ingestion, observability, summarization, reasoning, and more).",
