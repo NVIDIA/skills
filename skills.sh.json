@@ -308,7 +308,8 @@
         "cuopt-numerical-optimization-api",
         "cuopt-numerical-optimization-formulation",
         "cuopt-routing-api-python",
-        "cuopt-server-api-python"
+        "cuopt-server-api-python",
+        "portfolio-optimization"
       ]
     },
     {
