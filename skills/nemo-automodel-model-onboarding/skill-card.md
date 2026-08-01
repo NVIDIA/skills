@@ -16,7 +16,7 @@ Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [Not Specified] <br>
-**Credential Type(s):** [None identified] <br>  
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -39,41 +39,41 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- `claude-code` <br>
-- `codex` <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 3 internal skill-activation tasks in an astra-sandbox environment with 1 attempt per task and a 50% pass threshold. <br>
+Evaluated against 3 positive evaluation tasks in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Whether the skill is safe to use (unsafe operations, secret leakage, unauthorized access). <br>
+- Correctness: Whether the answer produced is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded and activated when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and followed expected workflow behavior. <br>
+- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 3 | 100% (+0%) | 100% (+0%) |
-| Correctness | 3 | 100% (+48%) | 95% (+32%) |
-| Discoverability | 3 | 100% (+75%) | 83% (+49%) |
-| Effectiveness | 3 | 95% (+56%) | 94% (+41%) |
-| Efficiency | 3 | 94% (+70%) | 74% (+36%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 49% → 98% (+49 points) | 45% → 98% (+53 points) |
+| Security | 67% → 100% (+33 points) | 50% → 100% (+50 points) |
+| Correctness | 60% → 100% (+40 points) | 60% → 100% (+40 points) |
+| Discoverability | 48% → 100% (+52 points) | 33% → 94% (+60 points) |
+| Effectiveness | 40% → 91% (+50 points) | 61% → 98% (+37 points) |
+| Efficiency | 29% → 100% (+71 points) | 20% → 100% (+80 points) |
 
 ## Skill Version(s): <br>
 v1.2.1+7febc6e (source: pyproject.toml) <br>
