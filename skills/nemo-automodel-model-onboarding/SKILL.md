@@ -15,7 +15,7 @@ metadata:
 ## Purpose
 
 This skill guides implementation of new model architectures in NeMo AutoModel. Follow the five phases in order.
-<!-- NVSkills signature refresh requested for AM-519. -->
+<!-- NVSkills signature refresh requested after PR #2998 (2026-07-31). -->
 
 ## Instructions
 
@@ -60,19 +60,7 @@ Use these compact answer patterns for common questions:
   Do not treat VLM onboarding as a pure causal-LM path or skip processor/image
   tests.
 
-For MoE state-dict questions, always include the safety checklist:
-
-- Map router tensors separately from expert tensors.
-- Preserve routed-expert index order; never sort, drop, merge, or silently
-  reshape expert weights to make loading pass.
-- Map gate, up, and down projections explicitly, including combined projection
-  layouts and shared experts when present.
-- Add adapter key-map tests and tiny-config numerical equivalence tests before
-  relying on full checkpoint loading.
-
-For VLM questions, explicitly check `vision_config`, `text_config`, the
-conditional-generation architecture, text backbone, vision tower, projector,
-processor assumptions, registry entry, and tiny image-text tests.
+For MoE state-dict and VLM questions, apply the checklists in Sections 2.4 and 2.5.
 
 ## Routing Boundary
 
@@ -104,7 +92,7 @@ Download the model's `config.json` from the HuggingFace Hub (or use `AutoConfig.
 - `model_type` -- used for custom config registration in `_CUSTOM_CONFIG_REGISTRATIONS` if HF does not have a built-in config class
 - `hidden_size`, `intermediate_size`, `num_hidden_layers`, `num_attention_heads`, `num_key_value_heads` -- sizing
 - `vocab_size` -- needed for tiny test configs
-- `tie_word_embeddings` -- whether lm_head shares weights with embed_tokens
+- `tie_word_embeddings` -- the saved setting in each supported checkpoint; do not infer it from a bare config constructor
 - `hidden_act` -- activation function (e.g., `"silu"` for SwiGLU)
 
 ### 1.2 Determine model type
@@ -195,11 +183,47 @@ See the pattern files for detailed implementation guidance:
 
 ### 2.3 Causal LM weight tying
 
-For any CausalLM-style class whose config can enable `tie_word_embeddings`,
-make tying explicit: declare `_tied_weights_keys`, implement `tie_weights()`
-with the actual `lm_head` and input-embedding FQNs, and add tiny tests for
-tied and untied configs. Do not tie architectures with intentionally separate
-heads, asymmetric vocab sizes, or stages that do not own both tensors.
+Every registered model class with a causal `lm_head` must:
+
+- Declare `tie_word_embeddings_support: TieSupport` as `BOTH`, `TIED_ONLY`, or
+  `UNTIED_ONLY`.
+- Call `reject_unsupported_tie_word_embeddings(type(self), config)` at the top
+  of `__init__`, using the original config before unwrapping `text_config` or
+  `thinker_config`.
+
+Only classes with no causal LM head may be explicitly exempted from the registry
+test.
+
+Choose the policy from the implementation and the actual supported checkpoint
+configs, not from a bare config constructor:
+
+- `BOTH`: tied and untied configurations are both supported.
+- `TIED_ONLY`: only a tied configuration is supported.
+- `UNTIED_ONLY`: only an untied configuration is supported.
+
+Runtime helpers must treat `TIED_ONLY` and `UNTIED_ONLY` as authoritative and
+only resolve a per-checkpoint config flag for `BOTH`. All current `BOTH` VLMs
+honor the outer `tie_word_embeddings` flag, so do not add a model-specific
+resolver until a supported `BOTH` model actually requires another config path.
+
+For `BOTH` and `TIED_ONLY`, always declare `_tied_weights_keys` and implement
+`tie_weights()` with the actual `lm_head` and input-embedding FQNs. Do not rely
+on inherited Hugging Face tying, and re-tie after any language-model swap.
+
+Add policy-specific tests:
+
+- `BOTH`: tied aliases; untied does not alias.
+- `TIED_ONLY`: tied aliases; untied is rejected.
+- `UNTIED_ONLY`: weights stay separate; tied is rejected.
+
+Do not tie architectures with intentionally separate heads, asymmetric vocab
+sizes, or stages that do not own both tensors.
+
+For `from_pretrained`, the checkpoint's saved `tie_word_embeddings` value is
+authoritative, even for `BOTH`. The `NeMoAuto*` bridge rejects flips in either
+direction. A model-owned `from_pretrained` that bypasses that bridge must call
+`reject_tie_word_embeddings_flip(checkpoint_config, requested_config,
+model_class_name)`.
 
 ### 2.4 MoE state-dict adapter checklist
 
@@ -395,6 +419,9 @@ that only surface in a full parity comparison.
 - [ ] Registered in `MODEL_ARCH_MAPPING` in `_transformers/registry.py`
 - [ ] Registered custom config in `_CUSTOM_CONFIG_REGISTRATIONS` (if applicable)
 - [ ] Declared `ModelCapabilities` nested dataclass (static) OR `get_capabilities(cls, config)` classmethod (variant dispatch, e.g. ERNIE-4.5 MoE vs dense) — never both, never neither
+- [ ] Declared `TieSupport` and called the constructor guard for every class with a causal `lm_head` (or added an explicit no-head exemption) -- see §2.3
+- [ ] Added explicit `_tied_weights_keys` and `tie_weights()` for `BOTH` / `TIED_ONLY`, plus policy-specific alias and rejection tests -- see §2.3
+- [ ] Guarded any model-owned `from_pretrained` that bypasses the `NeMoAuto*` bridge against checkpoint flips -- see §2.3
 - [ ] Created example YAML config
 - [ ] Verified model loads via `NeMoAutoModelForCausalLM.from_pretrained()`
 - [ ] Created unit tests (forward shape, state_dict round-trip)
