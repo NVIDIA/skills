@@ -2,7 +2,7 @@
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
   "skill_count": 323,
-  "result_row_count": 2955,
+  "result_row_count": 2935,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -18,6 +18,8 @@
     "mcore-run-on-slurm",
     "mcore-split-pr",
     "mcore-testing",
+    "nemo-automodel-distributed-training",
+    "nemo-automodel-model-onboarding",
     "nemo-data-designer-plugin",
     "nemo-relay-debug-runtime-integration",
     "nemo-relay-get-started",
@@ -2897,21 +2899,18 @@
     },
     {
       "skill": "nemo-automodel-distributed-training",
-      "evaluation_date": "2026-06-26",
-      "profile": "external",
-      "environment": "astra-sandbox",
-      "tasks": 3,
+      "evaluation_date": "2026-07-31",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": null,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
+      "agents": [],
       "catalog_dir": "nemo-automodel-distributed-training",
       "component": "NeMo AutoModel",
-      "has_results": true,
-      "average_uplift_pct": 44.6
+      "has_results": false,
+      "average_uplift_pct": null
     },
     {
       "skill": "nemo-automodel-launcher-config",
@@ -2933,21 +2932,18 @@
     },
     {
       "skill": "nemo-automodel-model-onboarding",
-      "evaluation_date": "2026-06-26",
-      "profile": "external",
-      "environment": "astra-sandbox",
-      "tasks": 3,
+      "evaluation_date": "2026-07-31",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": null,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
+      "agents": [],
       "catalog_dir": "nemo-automodel-model-onboarding",
       "component": "NeMo AutoModel",
-      "has_results": true,
-      "average_uplift_pct": 40.7
+      "has_results": false,
+      "average_uplift_pct": null
     },
     {
       "skill": "nemo-automodel-recipe-development",
@@ -19794,96 +19790,6 @@
       "uplift_pct": 14.0
     },
     {
-      "catalog_dir": "nemo-automodel-distributed-training",
-      "component": "NeMo AutoModel",
-      "dimension": "Security",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-distributed-training",
-      "component": "NeMo AutoModel",
-      "dimension": "Security",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-distributed-training",
-      "component": "NeMo AutoModel",
-      "dimension": "Correctness",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 64.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-distributed-training",
-      "component": "NeMo AutoModel",
-      "dimension": "Correctness",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 29.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-distributed-training",
-      "component": "NeMo AutoModel",
-      "dimension": "Discoverability",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 82.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-distributed-training",
-      "component": "NeMo AutoModel",
-      "dimension": "Discoverability",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 85.0,
-      "uplift_pct": 60.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-distributed-training",
-      "component": "NeMo AutoModel",
-      "dimension": "Effectiveness",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 97.0,
-      "uplift_pct": 63.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-distributed-training",
-      "component": "NeMo AutoModel",
-      "dimension": "Effectiveness",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 93.0,
-      "uplift_pct": 30.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-distributed-training",
-      "component": "NeMo AutoModel",
-      "dimension": "Efficiency",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 61.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-distributed-training",
-      "component": "NeMo AutoModel",
-      "dimension": "Efficiency",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 57.0
-    },
-    {
       "catalog_dir": "nemo-automodel-launcher-config",
       "component": "NeMo AutoModel",
       "dimension": "Security",
@@ -19972,96 +19878,6 @@
       "agent": "codex",
       "score_pct": 70.0,
       "uplift_pct": 4.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-model-onboarding",
-      "component": "NeMo AutoModel",
-      "dimension": "Security",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-model-onboarding",
-      "component": "NeMo AutoModel",
-      "dimension": "Security",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-model-onboarding",
-      "component": "NeMo AutoModel",
-      "dimension": "Correctness",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 48.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-model-onboarding",
-      "component": "NeMo AutoModel",
-      "dimension": "Correctness",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 32.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-model-onboarding",
-      "component": "NeMo AutoModel",
-      "dimension": "Discoverability",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 75.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-model-onboarding",
-      "component": "NeMo AutoModel",
-      "dimension": "Discoverability",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 83.0,
-      "uplift_pct": 49.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-model-onboarding",
-      "component": "NeMo AutoModel",
-      "dimension": "Effectiveness",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 56.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-model-onboarding",
-      "component": "NeMo AutoModel",
-      "dimension": "Effectiveness",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 41.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-model-onboarding",
-      "component": "NeMo AutoModel",
-      "dimension": "Efficiency",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 70.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-model-onboarding",
-      "component": "NeMo AutoModel",
-      "dimension": "Efficiency",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 74.0,
-      "uplift_pct": 36.0
     },
     {
       "catalog_dir": "nemo-automodel-recipe-development",
