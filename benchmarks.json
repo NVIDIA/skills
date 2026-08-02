@@ -2,7 +2,7 @@
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
   "skill_count": 323,
-  "result_row_count": 2955,
+  "result_row_count": 3000,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -19,15 +19,10 @@
     "mcore-split-pr",
     "mcore-testing",
     "nemo-data-designer-plugin",
-    "nemo-relay-debug-runtime-integration",
-    "nemo-relay-get-started",
-    "nemo-relay-plugin-observability",
     "nemoclaw-user-guide",
     "omniverse-cad-to-simready",
     "omniverse-realtime-viewer",
-    "omniverse-usd-performance-tuning",
     "physical-ai-infrastructure-setup-and-resilient-scaling",
-    "portfolio-optimization",
     "rag-blueprint",
     "rag-eval",
     "rag-perf"
@@ -2897,12 +2892,12 @@
     },
     {
       "skill": "nemo-automodel-distributed-training",
-      "evaluation_date": "2026-06-26",
-      "profile": "external",
-      "environment": "astra-sandbox",
+      "evaluation_date": "2026-07-31",
+      "profile": null,
+      "environment": "k8s-sandbox",
       "tasks": 3,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -2911,7 +2906,7 @@
       "catalog_dir": "nemo-automodel-distributed-training",
       "component": "NeMo AutoModel",
       "has_results": true,
-      "average_uplift_pct": 44.6
+      "average_uplift_pct": 40.88
     },
     {
       "skill": "nemo-automodel-launcher-config",
@@ -2933,12 +2928,12 @@
     },
     {
       "skill": "nemo-automodel-model-onboarding",
-      "evaluation_date": "2026-06-26",
-      "profile": "external",
-      "environment": "astra-sandbox",
+      "evaluation_date": "2026-07-31",
+      "profile": null,
+      "environment": "k8s-sandbox",
       "tasks": 3,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -2947,7 +2942,7 @@
       "catalog_dir": "nemo-automodel-model-onboarding",
       "component": "NeMo AutoModel",
       "has_results": true,
-      "average_uplift_pct": 40.7
+      "average_uplift_pct": 51.3
     },
     {
       "skill": "nemo-automodel-recipe-development",
@@ -3368,30 +3363,36 @@
       "evaluation_date": "2026-07-30",
       "profile": null,
       "environment": "k8s-sandbox",
-      "tasks": null,
+      "tasks": 4,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
-      "agents": [],
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
       "catalog_dir": "nemo-relay-debug-runtime-integration",
       "component": "NeMo Relay",
-      "has_results": false,
-      "average_uplift_pct": null
+      "has_results": true,
+      "average_uplift_pct": 30.0
     },
     {
       "skill": "nemo-relay-get-started",
       "evaluation_date": "2026-07-30",
       "profile": null,
       "environment": "k8s-sandbox",
-      "tasks": null,
+      "tasks": 15,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
-      "agents": [],
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
       "catalog_dir": "nemo-relay-get-started",
       "component": "NeMo Relay",
-      "has_results": false,
-      "average_uplift_pct": null
+      "has_results": true,
+      "average_uplift_pct": 36.89
     },
     {
       "skill": "nemo-relay-install",
@@ -3524,15 +3525,18 @@
       "evaluation_date": "2026-07-30",
       "profile": null,
       "environment": "k8s-sandbox",
-      "tasks": null,
+      "tasks": 20,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
-      "agents": [],
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
       "catalog_dir": "nemo-relay-plugin-observability",
       "component": "NeMo Relay",
-      "has_results": false,
-      "average_uplift_pct": null
+      "has_results": true,
+      "average_uplift_pct": 38.0
     },
     {
       "skill": "nemo-retriever",
@@ -3944,15 +3948,18 @@
       "evaluation_date": "2026-07-30",
       "profile": null,
       "environment": "k8s-sandbox",
-      "tasks": null,
+      "tasks": 9,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
-      "agents": [],
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
       "catalog_dir": "omniverse-usd-performance-tuning",
       "component": "Physical AI",
-      "has_results": false,
-      "average_uplift_pct": null
+      "has_results": true,
+      "average_uplift_pct": 38.6
     },
     {
       "skill": "paidf-anomalygen",
@@ -4082,15 +4089,18 @@
       "evaluation_date": "2026-07-30",
       "profile": null,
       "environment": "k8s-sandbox",
-      "tasks": null,
+      "tasks": 4,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
-      "agents": [],
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
       "catalog_dir": "portfolio-optimization",
       "component": "Portfolio Optimization",
-      "has_results": false,
-      "average_uplift_pct": null
+      "has_results": true,
+      "average_uplift_pct": 19.0
     },
     {
       "skill": "rag-blueprint",
@@ -6928,7 +6938,7 @@
       "component": "cuPyNumeric",
       "dimension": "Security",
       "num": 24,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -6937,7 +6947,7 @@
       "component": "cuPyNumeric",
       "dimension": "Security",
       "num": 24,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 96.0,
       "uplift_pct": 0.0
     },
@@ -6946,7 +6956,7 @@
       "component": "cuPyNumeric",
       "dimension": "Correctness",
       "num": 24,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 96.0,
       "uplift_pct": 7.0
     },
@@ -6955,7 +6965,7 @@
       "component": "cuPyNumeric",
       "dimension": "Correctness",
       "num": 24,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 88.0,
       "uplift_pct": 8.0
     },
@@ -6964,7 +6974,7 @@
       "component": "cuPyNumeric",
       "dimension": "Discoverability",
       "num": 24,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 97.0,
       "uplift_pct": 75.0
     },
@@ -6973,7 +6983,7 @@
       "component": "cuPyNumeric",
       "dimension": "Discoverability",
       "num": 24,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 93.0,
       "uplift_pct": 47.0
     },
@@ -6982,7 +6992,7 @@
       "component": "cuPyNumeric",
       "dimension": "Effectiveness",
       "num": 24,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 83.0,
       "uplift_pct": 13.0
     },
@@ -6991,7 +7001,7 @@
       "component": "cuPyNumeric",
       "dimension": "Effectiveness",
       "num": 24,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 70.0,
       "uplift_pct": 12.0
     },
@@ -7000,7 +7010,7 @@
       "component": "cuPyNumeric",
       "dimension": "Efficiency",
       "num": 24,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 79.0,
       "uplift_pct": 74.0
     },
@@ -7009,7 +7019,7 @@
       "component": "cuPyNumeric",
       "dimension": "Efficiency",
       "num": 24,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 80.0,
       "uplift_pct": 78.0
     },
@@ -7018,7 +7028,7 @@
       "component": "cuPyNumeric",
       "dimension": "Security",
       "num": 27,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -7027,7 +7037,7 @@
       "component": "cuPyNumeric",
       "dimension": "Security",
       "num": 27,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 96.0,
       "uplift_pct": -4.0
     },
@@ -7036,7 +7046,7 @@
       "component": "cuPyNumeric",
       "dimension": "Correctness",
       "num": 27,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 96.0,
       "uplift_pct": 20.0
     },
@@ -7045,7 +7055,7 @@
       "component": "cuPyNumeric",
       "dimension": "Correctness",
       "num": 27,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 92.0,
       "uplift_pct": 18.0
     },
@@ -7054,7 +7064,7 @@
       "component": "cuPyNumeric",
       "dimension": "Discoverability",
       "num": 27,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 43.0
     },
@@ -7063,7 +7073,7 @@
       "component": "cuPyNumeric",
       "dimension": "Discoverability",
       "num": 27,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 83.0,
       "uplift_pct": 33.0
     },
@@ -7072,7 +7082,7 @@
       "component": "cuPyNumeric",
       "dimension": "Effectiveness",
       "num": 27,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 82.0,
       "uplift_pct": 33.0
     },
@@ -7081,7 +7091,7 @@
       "component": "cuPyNumeric",
       "dimension": "Effectiveness",
       "num": 27,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 64.0,
       "uplift_pct": 19.0
     },
@@ -7090,7 +7100,7 @@
       "component": "cuPyNumeric",
       "dimension": "Efficiency",
       "num": 27,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 93.0,
       "uplift_pct": 48.0
     },
@@ -7099,7 +7109,7 @@
       "component": "cuPyNumeric",
       "dimension": "Efficiency",
       "num": 27,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 96.0,
       "uplift_pct": 52.0
     },
@@ -7108,7 +7118,7 @@
       "component": "cuPyNumeric",
       "dimension": "Security",
       "num": 7,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -7117,7 +7127,7 @@
       "component": "cuPyNumeric",
       "dimension": "Security",
       "num": 7,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 14.0
     },
@@ -7126,7 +7136,7 @@
       "component": "cuPyNumeric",
       "dimension": "Correctness",
       "num": 7,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 91.0,
       "uplift_pct": 31.0
     },
@@ -7135,7 +7145,7 @@
       "component": "cuPyNumeric",
       "dimension": "Correctness",
       "num": 7,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 77.0,
       "uplift_pct": 14.0
     },
@@ -7144,7 +7154,7 @@
       "component": "cuPyNumeric",
       "dimension": "Discoverability",
       "num": 7,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 32.0
     },
@@ -7153,7 +7163,7 @@
       "component": "cuPyNumeric",
       "dimension": "Discoverability",
       "num": 7,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 89.0,
       "uplift_pct": 23.0
     },
@@ -7162,7 +7172,7 @@
       "component": "cuPyNumeric",
       "dimension": "Effectiveness",
       "num": 7,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 93.0,
       "uplift_pct": 40.0
     },
@@ -7171,7 +7181,7 @@
       "component": "cuPyNumeric",
       "dimension": "Effectiveness",
       "num": 7,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 89.0,
       "uplift_pct": 32.0
     },
@@ -7180,7 +7190,7 @@
       "component": "cuPyNumeric",
       "dimension": "Efficiency",
       "num": 7,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 91.0,
       "uplift_pct": 32.0
     },
@@ -7189,7 +7199,7 @@
       "component": "cuPyNumeric",
       "dimension": "Efficiency",
       "num": 7,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 96.0,
       "uplift_pct": 34.0
     },
@@ -8278,7 +8288,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8287,7 +8297,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8296,7 +8306,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 75.0,
       "uplift_pct": 15.0
     },
@@ -8305,7 +8315,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -8314,7 +8324,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 38.0
     },
@@ -8323,7 +8333,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 31.0
     },
@@ -8332,7 +8342,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 93.0,
       "uplift_pct": 57.0
     },
@@ -8341,7 +8351,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 46.0
     },
@@ -8350,7 +8360,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 97.0,
       "uplift_pct": 39.0
     },
@@ -8359,7 +8369,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 96.0,
       "uplift_pct": 66.0
     },
@@ -8368,7 +8378,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8377,7 +8387,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8386,7 +8396,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -8395,7 +8405,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -8404,7 +8414,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 36.0
     },
@@ -8413,7 +8423,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 33.0
     },
@@ -8422,7 +8432,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 37.0
     },
@@ -8431,7 +8441,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 24.0
     },
@@ -8440,7 +8450,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 99.0,
       "uplift_pct": 52.0
     },
@@ -8449,7 +8459,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 73.0
     },
@@ -8458,7 +8468,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8467,7 +8477,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8476,7 +8486,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -8485,7 +8495,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 40.0
     },
@@ -8494,7 +8504,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -8503,7 +8513,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 45.0
     },
@@ -8512,7 +8522,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 88.0,
       "uplift_pct": 54.0
     },
@@ -8521,7 +8531,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 99.0,
       "uplift_pct": 74.0
     },
@@ -8530,7 +8540,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 97.0,
       "uplift_pct": 56.0
     },
@@ -8539,7 +8549,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 98.0,
       "uplift_pct": 60.0
     },
@@ -8548,7 +8558,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8557,7 +8567,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8566,7 +8576,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 35.0
     },
@@ -8575,7 +8585,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 75.0,
       "uplift_pct": 10.0
     },
@@ -8584,7 +8594,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -8593,7 +8603,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 45.0
     },
@@ -8602,7 +8612,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 92.0,
       "uplift_pct": 58.0
     },
@@ -8611,7 +8621,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 57.0
     },
@@ -8620,7 +8630,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 56.0
     },
@@ -8629,7 +8639,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 75.0
     },
@@ -8638,7 +8648,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8647,7 +8657,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8656,7 +8666,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -8665,7 +8675,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -8674,7 +8684,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 97.0,
       "uplift_pct": 34.0
     },
@@ -8683,7 +8693,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 45.0
     },
@@ -8692,7 +8702,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 81.0
     },
@@ -8701,7 +8711,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 86.0,
       "uplift_pct": 44.0
     },
@@ -8710,7 +8720,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 91.0,
       "uplift_pct": 37.0
     },
@@ -8719,7 +8729,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 78.0,
       "uplift_pct": 53.0
     },
@@ -8728,7 +8738,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8737,7 +8747,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8746,7 +8756,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 65.0
     },
@@ -8755,7 +8765,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -8764,7 +8774,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 23.0
     },
@@ -8773,7 +8783,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 38.0
     },
@@ -8782,7 +8792,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 92.0,
       "uplift_pct": 61.0
     },
@@ -8791,7 +8801,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 99.0,
       "uplift_pct": 62.0
     },
@@ -8800,7 +8810,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 93.0,
       "uplift_pct": 28.0
     },
@@ -8809,7 +8819,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 64.0
     },
@@ -8818,7 +8828,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8827,7 +8837,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8836,7 +8846,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 53.0
     },
@@ -8845,7 +8855,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 33.0
     },
@@ -8854,7 +8864,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -8863,7 +8873,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 90.0,
       "uplift_pct": 40.0
     },
@@ -8872,7 +8882,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 91.0,
       "uplift_pct": 40.0
     },
@@ -8881,7 +8891,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 98.0,
       "uplift_pct": 54.0
     },
@@ -8890,7 +8900,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 92.0,
       "uplift_pct": 42.0
     },
@@ -8899,7 +8909,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 98.0,
       "uplift_pct": 64.0
     },
@@ -8908,7 +8918,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8917,7 +8927,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -8926,7 +8936,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 73.0
     },
@@ -8935,7 +8945,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 33.0
     },
@@ -8944,7 +8954,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 33.0
     },
@@ -8953,7 +8963,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 27.0
     },
@@ -8962,7 +8972,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 54.0
     },
@@ -8971,7 +8981,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 29.0
     },
@@ -8980,7 +8990,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 72.0,
       "uplift_pct": 19.0
     },
@@ -8989,7 +8999,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 79.0,
       "uplift_pct": 29.0
     },
@@ -9088,7 +9098,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 2,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9097,7 +9107,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 2,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9106,7 +9116,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 2,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 80.0
     },
@@ -9115,7 +9125,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 2,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -9124,7 +9134,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 2,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -9133,7 +9143,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 2,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 97.0,
       "uplift_pct": 47.0
     },
@@ -9142,7 +9152,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 2,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 29.0
     },
@@ -9151,7 +9161,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 2,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 84.0,
       "uplift_pct": 38.0
     },
@@ -9160,7 +9170,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 2,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 19.0
     },
@@ -9169,7 +9179,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 2,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 69.0,
       "uplift_pct": 19.0
     },
@@ -9178,7 +9188,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9187,7 +9197,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9196,7 +9206,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 95.0,
       "uplift_pct": 10.0
     },
@@ -9205,7 +9215,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 15.0
     },
@@ -9214,7 +9224,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 26.0
     },
@@ -9223,7 +9233,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 33.0
     },
@@ -9232,7 +9242,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 88.0,
       "uplift_pct": 34.0
     },
@@ -9241,7 +9251,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 24.0
     },
@@ -9250,7 +9260,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 97.0,
       "uplift_pct": 41.0
     },
@@ -9259,7 +9269,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 92.0,
       "uplift_pct": 67.0
     },
@@ -9268,7 +9278,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9277,7 +9287,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9286,7 +9296,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 70.0
     },
@@ -9295,7 +9305,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 5.0
     },
@@ -9304,7 +9314,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 38.0
     },
@@ -9313,7 +9323,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 33.0
     },
@@ -9322,7 +9332,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 69.0
     },
@@ -9331,7 +9341,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -9340,7 +9350,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 49.0
     },
@@ -9349,7 +9359,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 75.0
     },
@@ -9358,7 +9368,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9367,7 +9377,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9376,7 +9386,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 45.0
     },
@@ -9385,7 +9395,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -9394,7 +9404,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 97.0,
       "uplift_pct": 22.0
     },
@@ -9403,7 +9413,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 36.0
     },
@@ -9412,7 +9422,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 99.0,
       "uplift_pct": 74.0
     },
@@ -9421,7 +9431,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 88.0,
       "uplift_pct": 45.0
     },
@@ -9430,7 +9440,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 38.0
     },
@@ -9439,7 +9449,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 67.0
     },
@@ -9448,7 +9458,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9457,7 +9467,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9466,7 +9476,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 95.0,
       "uplift_pct": 0.0
     },
@@ -9475,7 +9485,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 15.0
     },
@@ -9484,7 +9494,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -9493,7 +9503,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 34.0
     },
@@ -9502,7 +9512,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 58.0
     },
@@ -9511,7 +9521,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 61.0
     },
@@ -9520,7 +9530,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -9529,7 +9539,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 93.0,
       "uplift_pct": 44.0
     },
@@ -9538,7 +9548,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9547,7 +9557,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9556,7 +9566,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 33.0
     },
@@ -9565,7 +9575,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -9574,7 +9584,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 33.0
     },
@@ -9583,7 +9593,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 44.0
     },
@@ -9592,7 +9602,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 84.0
     },
@@ -9601,7 +9611,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 93.0,
       "uplift_pct": 76.0
     },
@@ -9610,7 +9620,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 33.0
     },
@@ -9619,7 +9629,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 96.0,
       "uplift_pct": 62.0
     },
@@ -9628,7 +9638,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9637,7 +9647,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9646,7 +9656,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 80.0,
       "uplift_pct": 20.0
     },
@@ -9655,7 +9665,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 15.0
     },
@@ -9664,7 +9674,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 62.0
     },
@@ -9673,7 +9683,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 47.0
     },
@@ -9682,7 +9692,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 78.0,
       "uplift_pct": 58.0
     },
@@ -9691,7 +9701,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 60.0
     },
@@ -9700,7 +9710,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 60.0
     },
@@ -9709,7 +9719,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 68.0
     },
@@ -9718,7 +9728,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9727,7 +9737,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9736,7 +9746,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -9745,7 +9755,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 15.0
     },
@@ -9754,7 +9764,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 38.0
     },
@@ -9763,7 +9773,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 33.0
     },
@@ -9772,7 +9782,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 71.0
     },
@@ -9781,7 +9791,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 49.0
     },
@@ -9790,7 +9800,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 91.0,
       "uplift_pct": 47.0
     },
@@ -9799,7 +9809,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 56.0
     },
@@ -9808,7 +9818,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9817,7 +9827,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9826,7 +9836,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -9835,7 +9845,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -9844,7 +9854,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -9853,7 +9863,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 36.0
     },
@@ -9862,7 +9872,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 87.0,
       "uplift_pct": 30.0
     },
@@ -9871,7 +9881,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 40.0
     },
@@ -9880,7 +9890,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 95.0,
       "uplift_pct": 58.0
     },
@@ -9889,7 +9899,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 92.0,
       "uplift_pct": 61.0
     },
@@ -9898,7 +9908,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9907,7 +9917,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -9916,7 +9926,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 85.0,
       "uplift_pct": 60.0
     },
@@ -9925,7 +9935,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -9934,7 +9944,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -9943,7 +9953,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 33.0
     },
@@ -9952,7 +9962,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 89.0,
       "uplift_pct": 79.0
     },
@@ -9961,7 +9971,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 51.0
     },
@@ -9970,7 +9980,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 32.0
     },
@@ -9979,7 +9989,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 84.0,
       "uplift_pct": 59.0
     },
@@ -10078,7 +10088,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -10087,7 +10097,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -10096,7 +10106,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 45.0
     },
@@ -10105,7 +10115,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 40.0
     },
@@ -10114,7 +10124,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 26.0
     },
@@ -10123,7 +10133,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 38.0
     },
@@ -10132,7 +10142,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 86.0,
       "uplift_pct": 61.0
     },
@@ -10141,7 +10151,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 75.0
     },
@@ -10150,7 +10160,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 97.0,
       "uplift_pct": 29.0
     },
@@ -10159,7 +10169,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 68.0
     },
@@ -10438,7 +10448,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -10447,7 +10457,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -10456,7 +10466,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 75.0,
       "uplift_pct": 10.0
     },
@@ -10465,7 +10475,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -10474,7 +10484,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 38.0
     },
@@ -10483,7 +10493,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 34.0
     },
@@ -10492,7 +10502,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 86.0,
       "uplift_pct": 54.0
     },
@@ -10501,7 +10511,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 81.0,
       "uplift_pct": 61.0
     },
@@ -10510,7 +10520,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 40.0
     },
@@ -10519,7 +10529,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 55.0
     },
@@ -10528,7 +10538,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -10537,7 +10547,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -10546,7 +10556,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 55.0
     },
@@ -10555,7 +10565,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -10564,7 +10574,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 23.0
     },
@@ -10573,7 +10583,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 45.0
     },
@@ -10582,7 +10592,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 92.0,
       "uplift_pct": 73.0
     },
@@ -10591,7 +10601,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 75.0
     },
@@ -10600,7 +10610,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 92.0,
       "uplift_pct": 23.0
     },
@@ -10609,7 +10619,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 62.0
     },
@@ -10618,7 +10628,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -10627,7 +10637,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -10636,7 +10646,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 75.0
     },
@@ -10645,7 +10655,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 55.0
     },
@@ -10654,7 +10664,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -10663,7 +10673,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 33.0
     },
@@ -10672,7 +10682,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 75.0
     },
@@ -10681,7 +10691,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 92.0,
       "uplift_pct": 67.0
     },
@@ -10690,7 +10700,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 92.0,
       "uplift_pct": 26.0
     },
@@ -10699,7 +10709,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 81.0,
       "uplift_pct": 50.0
     },
@@ -10798,7 +10808,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -10807,7 +10817,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -10816,7 +10826,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 65.0
     },
@@ -10825,7 +10835,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 35.0
     },
@@ -10834,7 +10844,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 38.0
     },
@@ -10843,7 +10853,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 45.0
     },
@@ -10852,7 +10862,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 87.0,
       "uplift_pct": 53.0
     },
@@ -10861,7 +10871,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -10870,7 +10880,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 91.0,
       "uplift_pct": 34.0
     },
@@ -10879,7 +10889,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 91.0,
       "uplift_pct": 62.0
     },
@@ -10888,7 +10898,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -10897,7 +10907,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -10906,7 +10916,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 40.0
     },
@@ -10915,7 +10925,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 40.0
     },
@@ -10924,7 +10934,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 36.0
     },
@@ -10933,7 +10943,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 33.0
     },
@@ -10942,7 +10952,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 78.0
     },
@@ -10951,7 +10961,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 85.0
     },
@@ -10960,7 +10970,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 92.0,
       "uplift_pct": 42.0
     },
@@ -10969,7 +10979,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 84.0,
       "uplift_pct": 56.0
     },
@@ -10978,7 +10988,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -10987,7 +10997,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -10996,7 +11006,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 70.0
     },
@@ -11005,7 +11015,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 40.0
     },
@@ -11014,7 +11024,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 38.0
     },
@@ -11023,7 +11033,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 34.0
     },
@@ -11032,7 +11042,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 99.0,
       "uplift_pct": 68.0
     },
@@ -11041,7 +11051,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 81.0
     },
@@ -11050,7 +11060,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 91.0,
       "uplift_pct": 51.0
     },
@@ -11059,7 +11069,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 96.0,
       "uplift_pct": 58.0
     },
@@ -11068,7 +11078,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11077,7 +11087,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11086,7 +11096,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 65.0
     },
@@ -11095,7 +11105,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 30.0
     },
@@ -11104,7 +11114,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -11113,7 +11123,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 33.0
     },
@@ -11122,7 +11132,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 72.0,
       "uplift_pct": 30.0
     },
@@ -11131,7 +11141,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 93.0,
       "uplift_pct": 45.0
     },
@@ -11140,7 +11150,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 91.0,
       "uplift_pct": 66.0
     },
@@ -11149,7 +11159,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 88.0,
       "uplift_pct": 63.0
     },
@@ -11158,7 +11168,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11167,7 +11177,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11176,7 +11186,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -11185,7 +11195,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 10.0
     },
@@ -11194,7 +11204,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -11203,7 +11213,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 34.0
     },
@@ -11212,7 +11222,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 55.0
     },
@@ -11221,7 +11231,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 65.0
     },
@@ -11230,7 +11240,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -11239,7 +11249,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 56.0
     },
@@ -11248,7 +11258,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11257,7 +11267,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11266,7 +11276,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 65.0
     },
@@ -11275,7 +11285,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 40.0
     },
@@ -11284,7 +11294,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 97.0,
       "uplift_pct": 34.0
     },
@@ -11293,7 +11303,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 50.0
     },
@@ -11302,7 +11312,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 81.0,
       "uplift_pct": 60.0
     },
@@ -11311,7 +11321,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 88.0,
       "uplift_pct": 62.0
     },
@@ -11320,7 +11330,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 44.0
     },
@@ -11329,7 +11339,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 58.0
     },
@@ -11338,7 +11348,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11347,7 +11357,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11356,7 +11366,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -11365,7 +11375,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -11374,7 +11384,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 36.0
     },
@@ -11383,7 +11393,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 33.0
     },
@@ -11392,7 +11402,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 99.0,
       "uplift_pct": 81.0
     },
@@ -11401,7 +11411,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 93.0,
       "uplift_pct": 71.0
     },
@@ -11410,7 +11420,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 93.0,
       "uplift_pct": 34.0
     },
@@ -11419,7 +11429,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 97.0,
       "uplift_pct": 63.0
     },
@@ -11428,7 +11438,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11437,7 +11447,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11446,7 +11456,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 75.0,
       "uplift_pct": 50.0
     },
@@ -11455,7 +11465,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -11464,7 +11474,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -11473,7 +11483,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 44.0
     },
@@ -11482,7 +11492,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 86.0,
       "uplift_pct": 46.0
     },
@@ -11491,7 +11501,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 99.0,
       "uplift_pct": 48.0
     },
@@ -11500,7 +11510,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 91.0,
       "uplift_pct": 41.0
     },
@@ -11509,7 +11519,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 93.0,
       "uplift_pct": 68.0
     },
@@ -11518,7 +11528,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11527,7 +11537,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11536,7 +11546,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 65.0
     },
@@ -11545,7 +11555,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 5.0
     },
@@ -11554,7 +11564,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 38.0
     },
@@ -11563,7 +11573,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 36.0
     },
@@ -11572,7 +11582,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 68.0,
       "uplift_pct": 29.0
     },
@@ -11581,7 +11591,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 41.0
     },
@@ -11590,7 +11600,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 46.0
     },
@@ -11599,7 +11609,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 84.0,
       "uplift_pct": 51.0
     },
@@ -11608,7 +11618,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11617,7 +11627,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11626,7 +11636,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 35.0
     },
@@ -11635,7 +11645,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 35.0
     },
@@ -11644,7 +11654,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 38.0
     },
@@ -11653,7 +11663,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 39.0
     },
@@ -11662,7 +11672,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 88.0,
       "uplift_pct": 54.0
     },
@@ -11671,7 +11681,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 46.0
     },
@@ -11680,7 +11690,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 45.0
     },
@@ -11689,7 +11699,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 98.0,
       "uplift_pct": 58.0
     },
@@ -11698,7 +11708,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11707,7 +11717,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11716,7 +11726,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 65.0
     },
@@ -11725,7 +11735,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 30.0
     },
@@ -11734,7 +11744,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -11743,7 +11753,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 33.0
     },
@@ -11752,7 +11762,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 76.0
     },
@@ -11761,7 +11771,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 88.0,
       "uplift_pct": 55.0
     },
@@ -11770,7 +11780,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 91.0,
       "uplift_pct": 36.0
     },
@@ -11779,7 +11789,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 62.0
     },
@@ -11788,7 +11798,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11797,7 +11807,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11806,7 +11816,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 65.0
     },
@@ -11815,7 +11825,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -11824,7 +11834,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -11833,7 +11843,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 91.0,
       "uplift_pct": 31.0
     },
@@ -11842,7 +11852,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 88.0,
       "uplift_pct": 67.0
     },
@@ -11851,7 +11861,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 92.0,
       "uplift_pct": 69.0
     },
@@ -11860,7 +11870,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 93.0,
       "uplift_pct": 23.0
     },
@@ -11869,7 +11879,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 97.0,
       "uplift_pct": 55.0
     },
@@ -11878,7 +11888,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11887,7 +11897,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11896,7 +11906,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 35.0
     },
@@ -11905,7 +11915,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -11914,7 +11924,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -11923,7 +11933,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 91.0,
       "uplift_pct": 28.0
     },
@@ -11932,7 +11942,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 82.0
     },
@@ -11941,7 +11951,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 92.0,
       "uplift_pct": 39.0
     },
@@ -11950,7 +11960,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 34.0
     },
@@ -11959,7 +11969,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 62.0
     },
@@ -11968,7 +11978,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11977,7 +11987,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -11986,7 +11996,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 67.0
     },
@@ -11995,7 +12005,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 33.0
     },
@@ -12004,7 +12014,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 33.0
     },
@@ -12013,7 +12023,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 96.0,
       "uplift_pct": 46.0
     },
@@ -12022,7 +12032,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 57.0
     },
@@ -12031,7 +12041,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 92.0,
       "uplift_pct": 48.0
     },
@@ -12040,7 +12050,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 3,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 97.0,
       "uplift_pct": 30.0
     },
@@ -12049,7 +12059,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 3,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 67.0
     },
@@ -12058,7 +12068,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12067,7 +12077,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12076,7 +12086,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 35.0
     },
@@ -12085,7 +12095,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 30.0
     },
@@ -12094,7 +12104,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -12103,7 +12113,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 33.0
     },
@@ -12112,7 +12122,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 75.0
     },
@@ -12121,7 +12131,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 86.0,
       "uplift_pct": 63.0
     },
@@ -12130,7 +12140,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 29.0
     },
@@ -12139,7 +12149,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 66.0
     },
@@ -12148,7 +12158,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12157,7 +12167,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12166,7 +12176,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -12175,7 +12185,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 30.0
     },
@@ -12184,7 +12194,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 38.0
     },
@@ -12193,7 +12203,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 45.0
     },
@@ -12202,7 +12212,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 86.0,
       "uplift_pct": 59.0
     },
@@ -12211,7 +12221,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 99.0,
       "uplift_pct": 57.0
     },
@@ -12220,7 +12230,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 91.0,
       "uplift_pct": 43.0
     },
@@ -12229,7 +12239,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 71.0
     },
@@ -12238,7 +12248,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12247,7 +12257,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12256,7 +12266,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 40.0
     },
@@ -12265,7 +12275,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 35.0
     },
@@ -12274,7 +12284,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -12283,7 +12293,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 45.0
     },
@@ -12292,7 +12302,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 88.0,
       "uplift_pct": 78.0
     },
@@ -12301,7 +12311,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 69.0
     },
@@ -12310,7 +12320,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 90.0,
       "uplift_pct": 26.0
     },
@@ -12319,7 +12329,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 75.0
     },
@@ -12328,7 +12338,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12337,7 +12347,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12346,7 +12356,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 45.0
     },
@@ -12355,7 +12365,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 10.0
     },
@@ -12364,7 +12374,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 39.0
     },
@@ -12373,7 +12383,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 83.0,
       "uplift_pct": 22.0
     },
@@ -12382,7 +12392,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 68.0
     },
@@ -12391,7 +12401,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 91.0,
       "uplift_pct": 42.0
     },
@@ -12400,7 +12410,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 77.0,
       "uplift_pct": 22.0
     },
@@ -12409,7 +12419,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 90.0,
       "uplift_pct": 54.0
     },
@@ -12418,7 +12428,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12427,7 +12437,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12436,7 +12446,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 40.0
     },
@@ -12445,7 +12455,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 15.0
     },
@@ -12454,7 +12464,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -12463,7 +12473,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 34.0
     },
@@ -12472,7 +12482,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 88.0,
       "uplift_pct": 55.0
     },
@@ -12481,7 +12491,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 46.0
     },
@@ -12490,7 +12500,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 30.0
     },
@@ -12499,7 +12509,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 89.0,
       "uplift_pct": 52.0
     },
@@ -12508,7 +12518,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12517,7 +12527,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12526,7 +12536,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 35.0
     },
@@ -12535,7 +12545,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -12544,7 +12554,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -12553,7 +12563,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 34.0
     },
@@ -12562,7 +12572,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 69.0
     },
@@ -12571,7 +12581,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 59.0
     },
@@ -12580,7 +12590,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 97.0,
       "uplift_pct": 36.0
     },
@@ -12589,7 +12599,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 59.0
     },
@@ -12598,7 +12608,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12607,7 +12617,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12616,7 +12626,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -12625,7 +12635,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -12634,7 +12644,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -12643,7 +12653,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 34.0
     },
@@ -12652,7 +12662,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 81.0,
       "uplift_pct": 62.0
     },
@@ -12661,7 +12671,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 92.0,
       "uplift_pct": 52.0
     },
@@ -12670,7 +12680,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 33.0
     },
@@ -12679,7 +12689,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 93.0,
       "uplift_pct": 55.0
     },
@@ -12688,7 +12698,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12697,7 +12707,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12706,7 +12716,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 75.0
     },
@@ -12715,7 +12725,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 45.0
     },
@@ -12724,7 +12734,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 26.0
     },
@@ -12733,7 +12743,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 88.0,
       "uplift_pct": 25.0
     },
@@ -12742,7 +12752,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 88.0,
       "uplift_pct": 59.0
     },
@@ -12751,7 +12761,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 98.0,
       "uplift_pct": 71.0
     },
@@ -12760,7 +12770,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 29.0
     },
@@ -12769,7 +12779,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 91.0,
       "uplift_pct": 66.0
     },
@@ -12778,7 +12788,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12787,7 +12797,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12796,7 +12806,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 55.0
     },
@@ -12805,7 +12815,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -12814,7 +12824,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 38.0
     },
@@ -12823,7 +12833,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 33.0
     },
@@ -12832,7 +12842,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 81.0,
       "uplift_pct": 62.0
     },
@@ -12841,7 +12851,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 71.0
     },
@@ -12850,7 +12860,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 50.0
     },
@@ -12859,7 +12869,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 96.0,
       "uplift_pct": 71.0
     },
@@ -12868,7 +12878,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12877,7 +12887,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12886,7 +12896,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 40.0
     },
@@ -12895,7 +12905,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -12904,7 +12914,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 97.0,
       "uplift_pct": 34.0
     },
@@ -12913,7 +12923,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 33.0
     },
@@ -12922,7 +12932,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 91.0,
       "uplift_pct": 57.0
     },
@@ -12931,7 +12941,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 29.0
     },
@@ -12940,7 +12950,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 38.0
     },
@@ -12949,7 +12959,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 75.0
     },
@@ -12958,7 +12968,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12967,7 +12977,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -12976,7 +12986,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 40.0
     },
@@ -12985,7 +12995,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 10.0
     },
@@ -12994,7 +13004,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -13003,7 +13013,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 36.0
     },
@@ -13012,7 +13022,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 78.0
     },
@@ -13021,7 +13031,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 99.0,
       "uplift_pct": 55.0
     },
@@ -13030,7 +13040,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 29.0
     },
@@ -13039,7 +13049,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 98.0,
       "uplift_pct": 56.0
     },
@@ -13048,7 +13058,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -13057,7 +13067,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -13066,7 +13076,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 40.0
     },
@@ -13075,7 +13085,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -13084,7 +13094,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -13093,7 +13103,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 34.0
     },
@@ -13102,7 +13112,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 71.0
     },
@@ -13111,7 +13121,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 81.0,
       "uplift_pct": 31.0
     },
@@ -13120,7 +13130,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 30.0
     },
@@ -13129,7 +13139,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 66.0
     },
@@ -13138,7 +13148,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -13147,7 +13157,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -13156,7 +13166,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 65.0
     },
@@ -13165,7 +13175,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 30.0
     },
@@ -13174,7 +13184,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 38.0
     },
@@ -13183,7 +13193,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 39.0
     },
@@ -13192,7 +13202,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 57.0
     },
@@ -13201,7 +13211,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 99.0,
       "uplift_pct": 74.0
     },
@@ -13210,7 +13220,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 99.0,
       "uplift_pct": 48.0
     },
@@ -13219,7 +13229,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -13228,7 +13238,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -13237,7 +13247,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -13246,7 +13256,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 85.0,
       "uplift_pct": 35.0
     },
@@ -13255,7 +13265,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 90.0,
       "uplift_pct": 30.0
     },
@@ -13264,7 +13274,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 75.0,
       "uplift_pct": 38.0
     },
@@ -13273,7 +13283,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 69.0,
       "uplift_pct": 19.0
     },
@@ -13282,7 +13292,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 73.0,
       "uplift_pct": 30.0
     },
@@ -13291,7 +13301,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 70.0,
       "uplift_pct": 35.0
     },
@@ -13300,7 +13310,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 58.0,
       "uplift_pct": 29.0
     },
@@ -13309,7 +13319,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 45.0,
       "uplift_pct": 20.0
     },
@@ -13318,7 +13328,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -13327,7 +13337,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -13336,7 +13346,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 45.0
     },
@@ -13345,7 +13355,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -13354,7 +13364,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 38.0
     },
@@ -13363,7 +13373,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 45.0
     },
@@ -13372,7 +13382,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 87.0,
       "uplift_pct": 66.0
     },
@@ -13381,7 +13391,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 57.0
     },
@@ -13390,7 +13400,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 91.0,
       "uplift_pct": 43.0
     },
@@ -13399,7 +13409,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 92.0,
       "uplift_pct": 68.0
     },
@@ -13408,7 +13418,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -13417,7 +13427,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -13426,7 +13436,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -13435,7 +13445,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 30.0
     },
@@ -13444,7 +13454,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -13453,7 +13463,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 34.0
     },
@@ -13462,7 +13472,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 88.0,
       "uplift_pct": 59.0
     },
@@ -13471,7 +13481,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 59.0
     },
@@ -13480,7 +13490,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 43.0
     },
@@ -13489,7 +13499,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 83.0,
       "uplift_pct": 55.0
     },
@@ -13498,7 +13508,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -13507,7 +13517,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -13516,7 +13526,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -13525,7 +13535,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -13534,7 +13544,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -13543,7 +13553,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 33.0
     },
@@ -13552,7 +13562,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 78.0
     },
@@ -13561,7 +13571,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 92.0,
       "uplift_pct": 55.0
     },
@@ -13570,7 +13580,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 36.0
     },
@@ -13579,7 +13589,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 87.0,
       "uplift_pct": 54.0
     },
@@ -13588,7 +13598,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -13597,7 +13607,7 @@
       "component": "DOCA",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -13606,7 +13616,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 60.0
     },
@@ -13615,7 +13625,7 @@
       "component": "DOCA",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -13624,7 +13634,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 36.0
     },
@@ -13633,7 +13643,7 @@
       "component": "DOCA",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 31.0
     },
@@ -13642,7 +13652,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 81.0
     },
@@ -13651,7 +13661,7 @@
       "component": "DOCA",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 99.0,
       "uplift_pct": 49.0
     },
@@ -13660,7 +13670,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 99.0,
       "uplift_pct": 47.0
     },
@@ -13669,7 +13679,7 @@
       "component": "DOCA",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 92.0,
       "uplift_pct": 61.0
     },
@@ -14938,7 +14948,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 75.0,
       "uplift_pct": -25.0
     },
@@ -14947,7 +14957,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 75.0,
       "uplift_pct": -25.0
     },
@@ -14956,7 +14966,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 90.0,
       "uplift_pct": 55.0
     },
@@ -14965,7 +14975,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 55.0
     },
@@ -14974,7 +14984,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 36.0
     },
@@ -14983,7 +14993,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 34.0
     },
@@ -14992,7 +15002,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 75.0,
       "uplift_pct": 36.0
     },
@@ -15001,7 +15011,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 91.0,
       "uplift_pct": 46.0
     },
@@ -15010,7 +15020,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 35.0
     },
@@ -15019,7 +15029,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 49.0
     },
@@ -15028,7 +15038,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 88.0,
       "uplift_pct": 62.0
     },
@@ -15037,7 +15047,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 50.0,
       "uplift_pct": -25.0
     },
@@ -15046,7 +15056,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 85.0,
       "uplift_pct": 25.0
     },
@@ -15055,7 +15065,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 35.0
     },
@@ -15064,7 +15074,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 91.0,
       "uplift_pct": 39.0
     },
@@ -15073,7 +15083,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 81.0,
       "uplift_pct": 28.0
     },
@@ -15082,7 +15092,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 62.0,
       "uplift_pct": 14.0
     },
@@ -15091,7 +15101,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 58.0,
       "uplift_pct": 0.0
     },
@@ -15100,7 +15110,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 89.0,
       "uplift_pct": 42.0
     },
@@ -15109,7 +15119,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 85.0,
       "uplift_pct": 30.0
     },
@@ -15118,7 +15128,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -15127,7 +15137,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 25.0,
       "uplift_pct": -25.0
     },
@@ -15136,7 +15146,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 55.0,
       "uplift_pct": 35.0
     },
@@ -15145,7 +15155,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 90.0,
       "uplift_pct": 70.0
     },
@@ -15154,7 +15164,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 95.0,
       "uplift_pct": 35.0
     },
@@ -15163,7 +15173,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 86.0,
       "uplift_pct": 36.0
     },
@@ -15172,7 +15182,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 38.0,
       "uplift_pct": -3.0
     },
@@ -15181,7 +15191,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 74.0,
       "uplift_pct": 38.0
     },
@@ -15190,7 +15200,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 93.0,
       "uplift_pct": 35.0
     },
@@ -15199,7 +15209,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 84.0,
       "uplift_pct": 34.0
     },
@@ -15208,7 +15218,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 12.0
     },
@@ -15217,7 +15227,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -15226,7 +15236,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 75.0,
       "uplift_pct": 45.0
     },
@@ -15235,7 +15245,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 75.0,
       "uplift_pct": 60.0
     },
@@ -15244,7 +15254,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 39.0
     },
@@ -15253,7 +15263,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 81.0,
       "uplift_pct": 28.0
     },
@@ -15262,7 +15272,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 64.0,
       "uplift_pct": 17.0
     },
@@ -15271,7 +15281,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 78.0,
       "uplift_pct": 45.0
     },
@@ -15280,7 +15290,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 93.0,
       "uplift_pct": 43.0
     },
@@ -15289,7 +15299,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 93.0,
       "uplift_pct": 32.0
     },
@@ -15298,7 +15308,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 75.0,
       "uplift_pct": 0.0
     },
@@ -15307,7 +15317,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 75.0,
       "uplift_pct": 12.0
     },
@@ -15316,7 +15326,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 55.0,
       "uplift_pct": 40.0
     },
@@ -15325,7 +15335,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 65.0,
       "uplift_pct": 40.0
     },
@@ -15334,7 +15344,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 89.0,
       "uplift_pct": 28.0
     },
@@ -15343,7 +15353,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 81.0,
       "uplift_pct": 28.0
     },
@@ -15352,7 +15362,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 35.0,
       "uplift_pct": 15.0
     },
@@ -15361,7 +15371,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 46.0,
       "uplift_pct": 19.0
     },
@@ -15370,7 +15380,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 89.0,
       "uplift_pct": 36.0
     },
@@ -15379,7 +15389,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 80.0,
       "uplift_pct": 37.0
     },
@@ -15388,7 +15398,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 75.0,
       "uplift_pct": -25.0
     },
@@ -15397,7 +15407,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -15406,7 +15416,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 80.0,
       "uplift_pct": 35.0
     },
@@ -15415,7 +15425,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 80.0,
       "uplift_pct": 30.0
     },
@@ -15424,7 +15434,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 95.0,
       "uplift_pct": 35.0
     },
@@ -15433,7 +15443,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 83.0,
       "uplift_pct": 25.0
     },
@@ -15442,7 +15452,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 55.0,
       "uplift_pct": 8.0
     },
@@ -15451,7 +15461,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 70.0,
       "uplift_pct": 27.0
     },
@@ -15460,7 +15470,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 94.0,
       "uplift_pct": 37.0
     },
@@ -15469,7 +15479,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 38.0
     },
@@ -15478,7 +15488,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Security",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -15487,7 +15497,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Security",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 38.0
     },
@@ -15496,7 +15506,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 85.0,
       "uplift_pct": 40.0
     },
@@ -15505,7 +15515,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 80.0,
       "uplift_pct": 30.0
     },
@@ -15514,7 +15524,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 92.0,
       "uplift_pct": 30.0
     },
@@ -15523,7 +15533,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 84.0,
       "uplift_pct": 25.0
     },
@@ -15532,7 +15542,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 62.0,
       "uplift_pct": 25.0
     },
@@ -15541,7 +15551,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Effectiveness",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 71.0,
       "uplift_pct": 19.0
     },
@@ -15550,7 +15560,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 44.0
     },
@@ -15559,7 +15569,7 @@
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Efficiency",
       "num": 4,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 95.0,
       "uplift_pct": 24.0
     },
@@ -19797,91 +19807,91 @@
       "catalog_dir": "nemo-automodel-distributed-training",
       "component": "NeMo AutoModel",
       "dimension": "Security",
-      "num": 3,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 17.0
     },
     {
       "catalog_dir": "nemo-automodel-distributed-training",
       "component": "NeMo AutoModel",
       "dimension": "Security",
-      "num": 3,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemo-automodel-distributed-training",
       "component": "NeMo AutoModel",
       "dimension": "Correctness",
-      "num": 3,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 64.0
+      "uplift_pct": 27.0
     },
     {
       "catalog_dir": "nemo-automodel-distributed-training",
       "component": "NeMo AutoModel",
       "dimension": "Correctness",
-      "num": 3,
+      "num": null,
       "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 29.0
+      "score_pct": 100.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemo-automodel-distributed-training",
       "component": "NeMo AutoModel",
       "dimension": "Discoverability",
-      "num": 3,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 82.0
+      "uplift_pct": 67.0
     },
     {
       "catalog_dir": "nemo-automodel-distributed-training",
       "component": "NeMo AutoModel",
       "dimension": "Discoverability",
-      "num": 3,
+      "num": null,
       "agent": "codex",
-      "score_pct": 85.0,
-      "uplift_pct": 60.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-distributed-training",
-      "component": "NeMo AutoModel",
-      "dimension": "Effectiveness",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 97.0,
-      "uplift_pct": 63.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-distributed-training",
-      "component": "NeMo AutoModel",
-      "dimension": "Effectiveness",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 93.0,
-      "uplift_pct": 30.0
-    },
-    {
-      "catalog_dir": "nemo-automodel-distributed-training",
-      "component": "NeMo AutoModel",
-      "dimension": "Efficiency",
-      "num": 3,
-      "agent": "claude-code",
       "score_pct": 94.0,
-      "uplift_pct": 61.0
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "nemo-automodel-distributed-training",
+      "component": "NeMo AutoModel",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 27.0
+    },
+    {
+      "catalog_dir": "nemo-automodel-distributed-training",
+      "component": "NeMo AutoModel",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": 4.0
     },
     {
       "catalog_dir": "nemo-automodel-distributed-training",
       "component": "NeMo AutoModel",
       "dimension": "Efficiency",
-      "num": 3,
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "nemo-automodel-distributed-training",
+      "component": "NeMo AutoModel",
+      "dimension": "Efficiency",
+      "num": null,
       "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 57.0
+      "score_pct": 73.0,
+      "uplift_pct": 73.0
     },
     {
       "catalog_dir": "nemo-automodel-launcher-config",
@@ -19977,91 +19987,91 @@
       "catalog_dir": "nemo-automodel-model-onboarding",
       "component": "NeMo AutoModel",
       "dimension": "Security",
-      "num": 3,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 33.0
     },
     {
       "catalog_dir": "nemo-automodel-model-onboarding",
       "component": "NeMo AutoModel",
       "dimension": "Security",
-      "num": 3,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "nemo-automodel-model-onboarding",
       "component": "NeMo AutoModel",
       "dimension": "Correctness",
-      "num": 3,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 48.0
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "nemo-automodel-model-onboarding",
       "component": "NeMo AutoModel",
       "dimension": "Correctness",
-      "num": 3,
+      "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 32.0
+      "score_pct": 100.0,
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "nemo-automodel-model-onboarding",
       "component": "NeMo AutoModel",
       "dimension": "Discoverability",
-      "num": 3,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 75.0
+      "uplift_pct": 52.0
     },
     {
       "catalog_dir": "nemo-automodel-model-onboarding",
       "component": "NeMo AutoModel",
       "dimension": "Discoverability",
-      "num": 3,
+      "num": null,
       "agent": "codex",
-      "score_pct": 83.0,
-      "uplift_pct": 49.0
+      "score_pct": 94.0,
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "nemo-automodel-model-onboarding",
       "component": "NeMo AutoModel",
       "dimension": "Effectiveness",
-      "num": 3,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 56.0
+      "score_pct": 91.0,
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "nemo-automodel-model-onboarding",
       "component": "NeMo AutoModel",
       "dimension": "Effectiveness",
-      "num": 3,
+      "num": null,
       "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 41.0
+      "score_pct": 98.0,
+      "uplift_pct": 37.0
     },
     {
       "catalog_dir": "nemo-automodel-model-onboarding",
       "component": "NeMo AutoModel",
       "dimension": "Efficiency",
-      "num": 3,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 70.0
+      "score_pct": 100.0,
+      "uplift_pct": 71.0
     },
     {
       "catalog_dir": "nemo-automodel-model-onboarding",
       "component": "NeMo AutoModel",
       "dimension": "Efficiency",
-      "num": 3,
+      "num": null,
       "agent": "codex",
-      "score_pct": 74.0,
-      "uplift_pct": 36.0
+      "score_pct": 100.0,
+      "uplift_pct": 80.0
     },
     {
       "catalog_dir": "nemo-automodel-recipe-development",
@@ -22044,6 +22054,186 @@
       "uplift_pct": -3.0
     },
     {
+      "catalog_dir": "nemo-relay-debug-runtime-integration",
+      "component": "NeMo Relay",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-relay-debug-runtime-integration",
+      "component": "NeMo Relay",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "nemo-relay-debug-runtime-integration",
+      "component": "NeMo Relay",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "nemo-relay-debug-runtime-integration",
+      "component": "NeMo Relay",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-relay-debug-runtime-integration",
+      "component": "NeMo Relay",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "nemo-relay-debug-runtime-integration",
+      "component": "NeMo Relay",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "nemo-relay-debug-runtime-integration",
+      "component": "NeMo Relay",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 19.0
+    },
+    {
+      "catalog_dir": "nemo-relay-debug-runtime-integration",
+      "component": "NeMo Relay",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 2.0
+    },
+    {
+      "catalog_dir": "nemo-relay-debug-runtime-integration",
+      "component": "NeMo Relay",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "nemo-relay-debug-runtime-integration",
+      "component": "NeMo Relay",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": 51.0
+    },
+    {
+      "catalog_dir": "nemo-relay-get-started",
+      "component": "NeMo Relay",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-relay-get-started",
+      "component": "NeMo Relay",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 73.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "nemo-relay-get-started",
+      "component": "NeMo Relay",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 72.0
+    },
+    {
+      "catalog_dir": "nemo-relay-get-started",
+      "component": "NeMo Relay",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "nemo-relay-get-started",
+      "component": "NeMo Relay",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "nemo-relay-get-started",
+      "component": "NeMo Relay",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "nemo-relay-get-started",
+      "component": "NeMo Relay",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 70.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "nemo-relay-get-started",
+      "component": "NeMo Relay",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 66.0,
+      "uplift_pct": 23.0
+    },
+    {
+      "catalog_dir": "nemo-relay-get-started",
+      "component": "NeMo Relay",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 77.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "nemo-relay-get-started",
+      "component": "NeMo Relay",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 77.0,
+      "uplift_pct": 46.0
+    },
+    {
       "catalog_dir": "nemo-relay-install",
       "component": "NeMo Relay",
       "dimension": "Security",
@@ -22672,6 +22862,96 @@
       "agent": "codex",
       "score_pct": 85.0,
       "uplift_pct": 22.0
+    },
+    {
+      "catalog_dir": "nemo-relay-plugin-observability",
+      "component": "NeMo Relay",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-relay-plugin-observability",
+      "component": "NeMo Relay",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": -5.0
+    },
+    {
+      "catalog_dir": "nemo-relay-plugin-observability",
+      "component": "NeMo Relay",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "nemo-relay-plugin-observability",
+      "component": "NeMo Relay",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 12.0
+    },
+    {
+      "catalog_dir": "nemo-relay-plugin-observability",
+      "component": "NeMo Relay",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "nemo-relay-plugin-observability",
+      "component": "NeMo Relay",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "nemo-relay-plugin-observability",
+      "component": "NeMo Relay",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "nemo-relay-plugin-observability",
+      "component": "NeMo Relay",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.0,
+      "uplift_pct": 27.0
+    },
+    {
+      "catalog_dir": "nemo-relay-plugin-observability",
+      "component": "NeMo Relay",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "nemo-relay-plugin-observability",
+      "component": "NeMo Relay",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 63.0
     },
     {
       "catalog_dir": "nemo-retriever",
@@ -24388,7 +24668,7 @@
       "component": "NVIDIA Skills",
       "dimension": "Security",
       "num": 17,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -24397,7 +24677,7 @@
       "component": "NVIDIA Skills",
       "dimension": "Correctness",
       "num": 17,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 24.0
     },
@@ -24406,7 +24686,7 @@
       "component": "NVIDIA Skills",
       "dimension": "Discoverability",
       "num": 17,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 50.0
     },
@@ -24415,7 +24695,7 @@
       "component": "NVIDIA Skills",
       "dimension": "Effectiveness",
       "num": 17,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 99.0,
       "uplift_pct": 52.0
     },
@@ -24424,9 +24704,54 @@
       "component": "NVIDIA Skills",
       "dimension": "Efficiency",
       "num": 17,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 86.0,
       "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "omniverse-usd-performance-tuning",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 11.0
+    },
+    {
+      "catalog_dir": "omniverse-usd-performance-tuning",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 76.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "omniverse-usd-performance-tuning",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "omniverse-usd-performance-tuning",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 63.0,
+      "uplift_pct": 26.0
+    },
+    {
+      "catalog_dir": "omniverse-usd-performance-tuning",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": 56.0
     },
     {
       "catalog_dir": "paidf-anomalygen",
@@ -24967,6 +25292,96 @@
       "agent": "codex",
       "score_pct": 73.0,
       "uplift_pct": 3.0
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 70.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 19.0
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 23.0
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 52.0,
+      "uplift_pct": 2.0
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 41.0,
+      "uplift_pct": 8.0
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.0,
+      "uplift_pct": 29.0
     },
     {
       "catalog_dir": "skill-card-generator",
@@ -26953,7 +27368,7 @@
       "component": "TAO Toolkit",
       "dimension": "Security",
       "num": 1,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -26962,7 +27377,7 @@
       "component": "TAO Toolkit",
       "dimension": "Security",
       "num": 1,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -26971,7 +27386,7 @@
       "component": "TAO Toolkit",
       "dimension": "Correctness",
       "num": 1,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 100.0
     },
@@ -26980,7 +27395,7 @@
       "component": "TAO Toolkit",
       "dimension": "Correctness",
       "num": 1,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 100.0
     },
@@ -26989,7 +27404,7 @@
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
       "num": 1,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 100.0
     },
@@ -26998,7 +27413,7 @@
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
       "num": 1,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 94.0,
       "uplift_pct": 94.0
     },
@@ -27007,7 +27422,7 @@
       "component": "TAO Toolkit",
       "dimension": "Effectiveness",
       "num": 1,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 83.0
     },
@@ -27016,7 +27431,7 @@
       "component": "TAO Toolkit",
       "dimension": "Effectiveness",
       "num": 1,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 83.0,
       "uplift_pct": 35.0
     },
@@ -27025,7 +27440,7 @@
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": 1,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 83.0,
       "uplift_pct": 83.0
     },
@@ -27034,7 +27449,7 @@
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": 1,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 100.0
     },
@@ -30643,7 +31058,7 @@
       "component": "TileGym",
       "dimension": "Security",
       "num": 5,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -30652,7 +31067,7 @@
       "component": "TileGym",
       "dimension": "Security",
       "num": 5,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -30661,7 +31076,7 @@
       "component": "TileGym",
       "dimension": "Correctness",
       "num": 5,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
@@ -30670,7 +31085,7 @@
       "component": "TileGym",
       "dimension": "Correctness",
       "num": 5,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 16.0
     },
@@ -30679,7 +31094,7 @@
       "component": "TileGym",
       "dimension": "Discoverability",
       "num": 5,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 99.0,
       "uplift_pct": 9.0
     },
@@ -30688,7 +31103,7 @@
       "component": "TileGym",
       "dimension": "Discoverability",
       "num": 5,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 99.0,
       "uplift_pct": 9.0
     },
@@ -30697,7 +31112,7 @@
       "component": "TileGym",
       "dimension": "Effectiveness",
       "num": 5,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 18.0
     },
@@ -30706,7 +31121,7 @@
       "component": "TileGym",
       "dimension": "Effectiveness",
       "num": 5,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 97.0,
       "uplift_pct": 12.0
     },
@@ -30715,7 +31130,7 @@
       "component": "TileGym",
       "dimension": "Efficiency",
       "num": 5,
-      "agent": "Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`)",
+      "agent": "claude-code",
       "score_pct": 87.0,
       "uplift_pct": 4.0
     },
@@ -30724,7 +31139,7 @@
       "component": "TileGym",
       "dimension": "Efficiency",
       "num": 5,
-      "agent": "Codex (`openai/openai/gpt-5.5`)",
+      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 10.0
     },
