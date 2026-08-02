@@ -17,21 +17,56 @@ import re
 import sys
 from pathlib import Path
 
+# Two report layouts are in circulation and both must parse:
+#   v1 — "Evaluation Report" with an Evaluation Summary list, an "Agents Used"
+#        list, and a "## Results" table keyed on Dimension.
+#   v2 — SkillEvaluator 0.9.x, with an "Evaluation Metadata" list, agents on a
+#        single line, and a "## Results at a Glance" table keyed on Measure.
+# Each field lists its patterns most-specific first; the first match wins.
 SUMMARY_FIELDS = {
-    "skill": re.compile(r"^- Skill: `?([^`\n]+)`?\s*$"),
-    "evaluation_date": re.compile(r"^- Evaluation date: (.+)$"),
-    "profile": re.compile(r"^- NVSkills-Eval profile: `?([^`\n]+)`?\s*$"),
-    "environment": re.compile(r"^- Environment: `?([^`\n]+)`?\s*$"),
-    "tasks": re.compile(r"^- Dataset: (\d+) evaluation tasks?"),
-    "attempts_per_task": re.compile(r"^- Attempts per task: (\d+)"),
-    "pass_threshold_pct": re.compile(r"^- Pass threshold: (\d+(?:\.\d+)?)%"),
-    "verdict": re.compile(r"^- Overall verdict: (\w+)"),
+    "skill": [re.compile(r"^- Skill: `?([^`\n]+)`?\s*$")],
+    "evaluation_date": [re.compile(r"^- Evaluation date: (.+)$")],
+    "profile": [re.compile(r"^- NVSkills-Eval profile: `?([^`\n]+)`?\s*$")],
+    "environment": [re.compile(r"^- Environment: `?([^`\n]+)`?\s*$")],
+    "tasks": [
+        re.compile(r"^- Dataset: (\d+) evaluation tasks?"),          # v1
+        re.compile(r"^- Tasks: (\d+) evaluation tasks?"),            # v2
+    ],
+    "attempts_per_task": [re.compile(r"^- Attempts per task: (\d+)")],
+    "pass_threshold_pct": [re.compile(r"^- Pass threshold: (\d+(?:\.\d+)?)%")],
+    "verdict": [
+        # v2 states the verdict in a callout above the report body.
+        re.compile(r"^>?\s*[^\w\s]*\s*\*\*Overall verdict: (\w+)"),
+        # v1 states it as a summary bullet. Anchored to end-of-line so it
+        # cannot match the v2 methodology bullet, which begins
+        # "- Overall verdict: PASS only when every configured dimension ..."
+        # and would otherwise report PASS for every v2 report.
+        re.compile(r"^- Overall verdict: (\w+)\s*$"),
+    ],
 }
 AGENT_LINE = re.compile(r"^- `([^`]+)`\s*$")
-# e.g. "100% (+70%)" or "97%" — score with optional uplift vs. baseline
+# v2 lists agents inline, e.g. "- Agents: Claude Code (`model/id`), Codex (`model/id`)"
+AGENTS_INLINE = re.compile(r"^- Agents: (.+)$")
+# v1 cell, e.g. "100% (+70%)" or "97%" — score with optional uplift vs. baseline
 CELL = re.compile(r"(\d+(?:\.\d+)?)%(?:\s*\(([+-]?\d+(?:\.\d+)?)%\))?")
+# v2 cell, e.g. "45% → 98% (+53 points)" — baseline, skill score, then uplift
+CELL_V2 = re.compile(
+    r"(\d+(?:\.\d+)?)%\s*(?:→|->)\s*(\d+(?:\.\d+)?)%"
+    r"(?:\s*\(([+-]?\d+(?:\.\d+)?)\s*points?\))?"
+)
+RESULTS_SECTIONS = {"results", "results at a glance"}
+# v2 leads its table with an aggregate row; the per-dimension rows below it are
+# what v1 reports, so skipping it keeps average_uplift comparable across both.
+SUMMARY_ROWS = {"overall"}
 INT_FIELDS = {"tasks", "attempts_per_task"}
 FLOAT_FIELDS = {"pass_threshold_pct"}
+
+
+def normalize_agent(name: str) -> str:
+    """v1 writes `claude-code`; v2 writes "Claude Code (`model/id`)"."""
+    name = re.sub(r"\s*\(.*?\)\s*", "", name).strip().strip("`")
+    name = re.sub(r"\s*\(Baseline\s*(?:→|->)\s*Skill Uplift\)\s*", "", name).strip()
+    return name.lower().replace(" ", "-")
 
 
 def parse_benchmark(path: Path) -> dict:
@@ -47,9 +82,13 @@ def parse_benchmark(path: Path) -> dict:
             section = line.lstrip("# ").lower()
             continue
 
-        for key, rx in SUMMARY_FIELDS.items():
-            m = rx.match(line)
-            if m and entry[key] is None:
+        for key, patterns in SUMMARY_FIELDS.items():
+            if entry[key] is not None:
+                continue
+            for rx in patterns:
+                m = rx.match(line)
+                if not m:
+                    continue
                 val = m.group(1).strip()
                 if key in INT_FIELDS:
                     val = int(val)
@@ -61,28 +100,45 @@ def parse_benchmark(path: Path) -> dict:
         if section == "agents used":
             m = AGENT_LINE.match(line)
             if m:
-                entry["agents"].append(m.group(1))
+                entry["agents"].append(normalize_agent(m.group(1)))
+        m = AGENTS_INLINE.match(line)
+        if m and not entry["agents"]:
+            # Each agent reads "Name (`provider/model`)"; keep the name only.
+            names = re.findall(r"([^,(]+?)\s*\(`[^`]*`\)", m.group(1))
+            if not names:
+                names = m.group(1).split(",")
+            entry["agents"] = [normalize_agent(a) for a in names if a.strip()]
 
-        if section == "results" and line.startswith("|"):
+        if section in RESULTS_SECTIONS and line.startswith("|"):
             cells = [c.strip() for c in line.strip("|").split("|")]
             if not cells or set(cells[0]) <= {"-", ":", " "}:
                 continue
-            if cells[0] == "Dimension":
+            if cells[0] in ("Dimension", "Measure"):
                 # Key agent columns off the header row rather than assuming
                 # they match Agents Used order (columns may vary per report).
                 agent_cols = {
-                    i: c.strip("`")
+                    i: normalize_agent(c)
                     for i, c in enumerate(cells)
                     if i > 0 and c.strip("`") and c != "Num"
                 }
                 continue
             dimension = cells[0]
+            if dimension.lower() in SUMMARY_ROWS:
+                continue
             num = None
             scores = {}
             for i, cell in enumerate(cells[1:], start=1):
                 if i not in agent_cols:
                     if num is None and cell.isdigit():
                         num = int(cell)
+                    continue
+                m2 = CELL_V2.search(cell)
+                if m2:
+                    # Record the skill-assisted score, matching v1 semantics.
+                    scores[agent_cols[i]] = {
+                        "score_pct": float(m2.group(2)),
+                        "uplift_pct": float(m2.group(3)) if m2.group(3) is not None else None,
+                    }
                     continue
                 m = CELL.search(cell)
                 if not m:
