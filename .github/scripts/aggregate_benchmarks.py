@@ -48,11 +48,13 @@ AGENT_LINE = re.compile(r"^- `([^`]+)`\s*$")
 # v2 lists agents inline, e.g. "- Agents: Claude Code (`model/id`), Codex (`model/id`)"
 AGENTS_INLINE = re.compile(r"^- Agents: (.+)$")
 # v1 cell, e.g. "100% (+70%)" or "97%" — score with optional uplift vs. baseline
-CELL = re.compile(r"(\d+(?:\.\d+)?)%(?:\s*\(([+-]?\d+(?:\.\d+)?)%\))?")
-# v2 cell, e.g. "45% → 98% (+53 points)" — baseline, skill score, then uplift
+CELL = re.compile(r"(\d+(?:\.\d+)?)%(?:\s*\(([+-±]?\d+(?:\.\d+)?)%\))?")
+# v2 cell, e.g. "45% → 98% (+53 points)" — baseline, skill score, then uplift.
+# An unchanged dimension is written "±0 points", so ± must be accepted here
+# alongside + and -; see parse_uplift for why dropping it is not harmless.
 CELL_V2 = re.compile(
     r"(\d+(?:\.\d+)?)%\s*(?:→|->)\s*(\d+(?:\.\d+)?)%"
-    r"(?:\s*\(([+-]?\d+(?:\.\d+)?)\s*points?\))?"
+    r"(?:\s*\(([+-±]?\d+(?:\.\d+)?)\s*points?\))?"
 )
 RESULTS_SECTIONS = {"results", "results at a glance"}
 # v2 leads its table with an aggregate row; the per-dimension rows below it are
@@ -60,6 +62,21 @@ RESULTS_SECTIONS = {"results", "results at a glance"}
 SUMMARY_ROWS = {"overall"}
 INT_FIELDS = {"tasks", "attempts_per_task"}
 FLOAT_FIELDS = {"pass_threshold_pct"}
+
+
+def parse_uplift(raw):
+    """Convert an uplift cell capture to a float, or None when absent.
+
+    Reports write an unchanged dimension as "±0 points". ± carries no sign,
+    so strip it and keep the magnitude — the only value emitted in practice
+    is ±0, which must land as 0.0 rather than None: average_uplift() skips
+    None entries, so a dropped ±0 leaves the row out of the denominator and
+    inflates the average for any skill that scored the same with and without
+    the skill applied.
+    """
+    if raw is None:
+        return None
+    return float(raw.replace("±", ""))
 
 
 def normalize_agent(name: str) -> str:
@@ -137,7 +154,7 @@ def parse_benchmark(path: Path) -> dict:
                     # Record the skill-assisted score, matching v1 semantics.
                     scores[agent_cols[i]] = {
                         "score_pct": float(m2.group(2)),
-                        "uplift_pct": float(m2.group(3)) if m2.group(3) is not None else None,
+                        "uplift_pct": parse_uplift(m2.group(3)),
                     }
                     continue
                 m = CELL.search(cell)
@@ -145,7 +162,7 @@ def parse_benchmark(path: Path) -> dict:
                     continue
                 scores[agent_cols[i]] = {
                     "score_pct": float(m.group(1)),
-                    "uplift_pct": float(m.group(2)) if m.group(2) is not None else None,
+                    "uplift_pct": parse_uplift(m.group(2)),
                 }
             if scores:
                 entry["results"].append({
