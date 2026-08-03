@@ -68,5 +68,45 @@
       "Reports supply in interpretable units, flags the knee, names candidate operating points, and defers the budget call to leadership",
       "Distinguishes this from a hard-budget case (cf. the decoy): cost is unconstrained here, so it exposes the tradeoff rather than returning a single plan"
     ]
+  },
+  {
+    "id": "multiobj-explore-eval-006-gap-detection-completion",
+    "question": "A planner swept 20 weight combinations over cost and coverage for a facility-selection MILP and got only 6 distinct plans, with a big empty stretch in the middle of the curve. She asks: 'Are there really no options in between, or is my sweep missing them?' Advise her.",
+    "expected_skill": "cuopt-multi-objective-exploration",
+    "expected_script": null,
+    "ground_truth": "The agent recognizes the symptom of a weighted-sum sweep on a MILP: weighted-sum reaches only supported points (the convex hull of the frontier), so non-supported plans in between are invisible no matter how many weights are tried. It does NOT recommend simply adding more weight vectors. It measures the miss by forming the boxes between adjacent swept points, treats boxes much larger than the median spacing as candidate gaps, and fills the largest first with targeted epsilon-constraint subproblems (optimize one objective with the other bounded inside the box, bisecting when a new point appears). It notes that only certified Optimal solves settle a gap (a time-limited incumbent proves nothing), that a probe returning an existing endpoint clears just the probed side of the bound, and that certifying a true discontinuity additionally needs a known objective step size (e.g. all-integer objective coefficients over integer variables) to place a bound just inside the far endpoint -- otherwise the region is reported as a candidate gap, not a proven one -- and that filling stops on a solve budget or when the remaining boxes are small. It defers per-solve mechanics to the api skills and formulation to cuopt-numerical-optimization-formulation.",
+    "expected_behavior": [
+      "Attributes the empty stretch to weighted-sum reaching only supported (convex-hull) points on a MILP, not to the intermediate options being absent",
+      "Does NOT prescribe more weight vectors as the fix",
+      "Measures the miss via the boxes between adjacent swept points and flags outsized boxes as candidate gaps",
+      "Fills the largest gaps first with targeted epsilon-constraint subproblems bounded inside each box, bisecting when new points appear",
+      "Does NOT declare a gap empty from a single midpoint probe; certifies a discontinuity only with certified Optimal solves plus a known objective step size (bound just inside the far endpoint), otherwise reports a candidate gap; stops on a solve budget or size threshold"
+    ]
+  },
+  {
+    "id": "multiobj-explore-eval-007-provenance-reporting",
+    "question": "While tracing a cost-vs-emissions frontier for a plant-scheduling MILP with per-solve time limits, three of an analyst's epsilon-constraint solves hit their limit but returned feasible solutions. He asks: 'Can I include those points in the tradeoff table I hand my team?' Advise him.",
+    "expected_skill": "cuopt-multi-objective-exploration",
+    "expected_script": null,
+    "ground_truth": "The agent says yes, keep the time-limited incumbents — they are feasible and near the frontier — but only with provenance: every point in the table is tagged exact (proved optimal for its scalarization at the gap setting) or approximate (time-limited incumbent or heuristics-only result), each time-limited incumbent quoting its solver-reported remaining gap or bound (a heuristics-only point has no bound, which is itself stated), and the two counts are reported alongside the frontier (e.g. '14 points, 11 exact, 3 approximate near the low-cost end, worst gap 2%'). The mixed frontier is never presented as uniformly optimal; silently including the points and discarding them are both wrong. Optionally it notes that a persistently slow region can be populated with a short heuristics-only run (also tagged approximate) and that a larger per-solve budget can later upgrade approximate points to exact.",
+    "expected_behavior": [
+      "Keeps the feasible time-limited incumbents rather than discarding them",
+      "Tags every reported point exact or approximate and reports the two counts with the frontier",
+      "Never presents the mixed frontier as uniformly optimal; approximate points are identified, not silently included",
+      "Distinguishes proved-optimal-at-gap (exact) from time-limited or heuristics-only results (approximate), quoting each incumbent's reported gap or bound and noting heuristics-only points carry none",
+      "Leaves the tradeoff choice to the team; the table shows options, not one answer"
+    ]
+  },
+  {
+    "id": "multiobj-explore-eval-008-single-objective-lp-decoy",
+    "question": "A plant manager wants next month's production schedule at MINIMUM total cost, subject to machine capacity, labor hours, and contracted demand — all firm requirements. Report the optimal schedule and its cost.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "DECOY (negative) — the multi-objective-exploration skill should NOT activate, and in particular the front-completion workflow should not. There is a single clear objective (minimize cost) and the requirements are genuinely fixed, so there is no tradeoff to explore, no frontier to trace, and no gaps to measure or fill. The correct response is one optimization solve returning ONE schedule and its cost.",
+    "expected_behavior": [
+      "Recognizes a single objective with hard constraints, not a tradeoff",
+      "Does NOT trace a frontier, sweep weights or epsilon bounds, or run any gap-measurement/fill pass",
+      "Returns one optimal schedule and its cost from one solve"
+    ]
   }
 ]
