@@ -192,12 +192,12 @@
     },
     {
       "skill": "cuopt-multi-objective-exploration",
-      "evaluation_date": "2026-07-02",
-      "profile": "external",
-      "environment": "astra-sandbox",
-      "tasks": 5,
+      "evaluation_date": "2026-07-30",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 8,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -206,7 +206,7 @@
       "catalog_dir": "cuopt-multi-objective-exploration",
       "component": "cuOpt",
       "has_results": true,
-      "average_uplift_pct": 29.3
+      "average_uplift_pct": 28.2
     },
     {
       "skill": "cuopt-numerical-optimization-api",
@@ -2906,7 +2906,7 @@
       "catalog_dir": "nemo-automodel-distributed-training",
       "component": "NeMo AutoModel",
       "has_results": true,
-      "average_uplift_pct": 40.88
+      "average_uplift_pct": 32.7
     },
     {
       "skill": "nemo-automodel-launcher-config",
@@ -3374,7 +3374,7 @@
       "catalog_dir": "nemo-relay-debug-runtime-integration",
       "component": "NeMo Relay",
       "has_results": true,
-      "average_uplift_pct": 30.0
+      "average_uplift_pct": 24.0
     },
     {
       "skill": "nemo-relay-get-started",
@@ -3392,7 +3392,7 @@
       "catalog_dir": "nemo-relay-get-started",
       "component": "NeMo Relay",
       "has_results": true,
-      "average_uplift_pct": 36.89
+      "average_uplift_pct": 33.2
     },
     {
       "skill": "nemo-relay-install",
@@ -3536,7 +3536,7 @@
       "catalog_dir": "nemo-relay-plugin-observability",
       "component": "NeMo Relay",
       "has_results": true,
-      "average_uplift_pct": 38.0
+      "average_uplift_pct": 34.2
     },
     {
       "skill": "nemo-retriever",
@@ -4100,7 +4100,7 @@
       "catalog_dir": "portfolio-optimization",
       "component": "Portfolio Optimization",
       "has_results": true,
-      "average_uplift_pct": 19.0
+      "average_uplift_pct": 17.1
     },
     {
       "skill": "rag-blueprint",
@@ -6397,7 +6397,7 @@
       "catalog_dir": "cuopt-multi-objective-exploration",
       "component": "cuOpt",
       "dimension": "Security",
-      "num": 5,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -6406,7 +6406,7 @@
       "catalog_dir": "cuopt-multi-objective-exploration",
       "component": "cuOpt",
       "dimension": "Security",
-      "num": 5,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -6415,73 +6415,73 @@
       "catalog_dir": "cuopt-multi-objective-exploration",
       "component": "cuOpt",
       "dimension": "Correctness",
-      "num": 5,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": 54.0
+      "score_pct": 88.0,
+      "uplift_pct": -5.0
     },
     {
       "catalog_dir": "cuopt-multi-objective-exploration",
       "component": "cuOpt",
       "dimension": "Correctness",
-      "num": 5,
+      "num": null,
       "agent": "codex",
-      "score_pct": 68.0,
-      "uplift_pct": 15.0
+      "score_pct": 98.0,
+      "uplift_pct": 3.0
     },
     {
       "catalog_dir": "cuopt-multi-objective-exploration",
       "component": "cuOpt",
       "dimension": "Discoverability",
-      "num": 5,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 80.0,
-      "uplift_pct": 60.0
+      "score_pct": 100.0,
+      "uplift_pct": 69.0
     },
     {
       "catalog_dir": "cuopt-multi-objective-exploration",
       "component": "cuOpt",
       "dimension": "Discoverability",
-      "num": 5,
+      "num": null,
       "agent": "codex",
-      "score_pct": 75.0,
-      "uplift_pct": 50.0
+      "score_pct": 95.0,
+      "uplift_pct": 52.0
     },
     {
       "catalog_dir": "cuopt-multi-objective-exploration",
       "component": "cuOpt",
       "dimension": "Effectiveness",
-      "num": 5,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 92.0,
-      "uplift_pct": 40.0
+      "score_pct": 87.0,
+      "uplift_pct": 9.0
     },
     {
       "catalog_dir": "cuopt-multi-objective-exploration",
       "component": "cuOpt",
       "dimension": "Effectiveness",
-      "num": 5,
+      "num": null,
       "agent": "codex",
-      "score_pct": 63.0,
-      "uplift_pct": -1.0
+      "score_pct": 82.0,
+      "uplift_pct": 10.0
     },
     {
       "catalog_dir": "cuopt-multi-objective-exploration",
       "component": "cuOpt",
       "dimension": "Efficiency",
-      "num": 5,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 80.0,
-      "uplift_pct": 40.0
+      "score_pct": 100.0,
+      "uplift_pct": 69.0
     },
     {
       "catalog_dir": "cuopt-multi-objective-exploration",
       "component": "cuOpt",
       "dimension": "Efficiency",
-      "num": 5,
+      "num": null,
       "agent": "codex",
-      "score_pct": 76.0,
-      "uplift_pct": 35.0
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
     },
     {
       "catalog_dir": "cuopt-numerical-optimization-api",
@@ -19819,7 +19819,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": null
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-automodel-distributed-training",
@@ -19837,7 +19837,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": null
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-automodel-distributed-training",
@@ -22060,7 +22060,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": null
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-relay-debug-runtime-integration",
@@ -22087,7 +22087,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": null
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-relay-debug-runtime-integration",
@@ -22150,7 +22150,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 93.0,
-      "uplift_pct": null
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-relay-get-started",
@@ -22870,7 +22870,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": null
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-relay-plugin-observability",
@@ -25309,7 +25309,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 75.0,
-      "uplift_pct": null
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "portfolio-optimization",
