@@ -33,8 +33,31 @@ jobs:
       group: nvskills-ci-request-${{ github.repository }}-${{ github.event.issue.number || github.sha }}
       cancel-in-progress: true
     steps:
+      - name: Check dispatch availability
+        id: dispatch
+        env:
+          DISPATCH_TOKEN: ${{ secrets.NVSKILLS_CI_DISPATCH_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          if [ -n "${DISPATCH_TOKEN}" ]; then
+            echo "enabled=true" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+          if [ "${EVENT_NAME}" = "push" ]; then
+            {
+              echo "## NVSkills CI request"
+              echo
+              echo "Skipped: this trusted signature push has no dispatch secret. The originating central run verifies the generated signature commit."
+            } >> "${GITHUB_STEP_SUMMARY}"
+            echo "enabled=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+          echo "Missing NVSKILLS_CI_DISPATCH_TOKEN secret."
+          exit 1
+
       - name: Validate requester permission
-        if: ${{ github.event_name == 'issue_comment' }}
+        if: ${{ steps.dispatch.outputs.enabled == 'true' && github.event_name == 'issue_comment' }}
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -53,6 +76,7 @@ jobs:
 
       - name: Resolve request context
         id: context
+        if: ${{ steps.dispatch.outputs.enabled == 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
           EVENT_NAME: ${{ github.event_name }}
@@ -153,7 +177,7 @@ jobs:
           } >> "${GITHUB_OUTPUT}"
 
       - name: Dispatch NVSkills CI
-        if: steps.context.outputs.should_dispatch == 'true'
+        if: steps.dispatch.outputs.enabled == 'true' && steps.context.outputs.should_dispatch == 'true'
         env:
           DISPATCH_TOKEN: ${{ secrets.NVSKILLS_CI_DISPATCH_TOKEN }}
           REPO: ${{ github.repository }}
