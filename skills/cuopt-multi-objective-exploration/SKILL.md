@@ -1,7 +1,7 @@
 ---
 name: cuopt-multi-objective-exploration
 version: "26.08.00"
-description: Trace and interpret the Pareto frontier across competing objectives using repeated single-objective cuOpt solves (weighted-sum and ε-constraint).
+description: Trace, complete, and interpret the Pareto frontier across competing objectives using repeated single-objective cuOpt solves (weighted-sum and ε-constraint).
 license: Apache-2.0
 origin: cuopt-skill-evolution
 metadata:
@@ -13,8 +13,6 @@ metadata:
     - tradeoff
     - workflow
 ---
-
-
 
 # Multi-Objective Exploration
 
@@ -97,7 +95,7 @@ Sweep each `ε_k` across the range from the payoff table. Each `(ε2, ε3, …)`
 
 Spot it in existing code: a hand-coded loop over a target or budget value (a return target, a cost cap) is already the ε-constraint method — name it as such, filter dominated points, and read the swept constraint's dual (LP/QP only).
 
-**Read that dual as the local exchange rate.** Where the frontier is smooth, the dual on a swept ε-constraint is its slope — how much the kept objective `f1` moves per unit of the bound — at no cost beyond the solve already run; at a kink it gives only a one-sided rate. A **zero** dual means the bound is slack: the sweep has run past the frontier's edge. This reading needs LP/QP and a *linear* ε-constraint (MILP optima and problems with quadratic constraints return no duals) — where duals are unavailable, difference adjacent frontier points instead.
+**Read that dual as the local exchange rate.** Where the frontier is smooth, the dual on a swept ε-constraint is its slope — how much the kept objective `f1` moves per unit of the bound — at no cost beyond the solve already run; at a kink it gives only a one-sided rate. A **zero** dual usually means the bound is slack — the sweep has run past the frontier's edge (one-way: a slack bound always shows a zero dual, but under degeneracy a binding bound can too). This reading needs LP/QP and a *linear* ε-constraint (MILP optima and problems with quadratic constraints return no duals) — where duals are unavailable, difference adjacent frontier points instead.
 
 **Picking a method:** weighted-sum for a quick convex sketch or when you know the frontier is convex (e.g. a pure-LP/QP tradeoff); ε-constraint when the problem is MILP, when the frontier may be non-convex, or when the user needs a faithful and complete curve.
 
@@ -123,11 +121,42 @@ Practical notes:
 - **Spend the budget where the slope changes (LP/QP).** Because the ε-constraint dual is the frontier's local slope, compare it across solved points: where it barely changes, the curve is nearly straight — interpolate rather than add solves; where it jumps by more than the solve tolerance, the frontier bends between those points — refine there (smaller differences are solver noise, not curvature). This concentrates solves where the curve actually bends instead of spreading them over a uniform grid. On MILP, judge where to refine from the gaps between primal objective values instead.
 - **Verify, don't assume.** When you claim one method beats another, measure it — e.g. count the efficient points ε-constraint recovered that weighted-sum missed — rather than asserting it; and flag any solve returning feasible-but-not-`Optimal` so a non-certified point is never read as exact.
 
-## Step 5 — interpret the frontier
+## Step 5 — complete the frontier: measure and fill what the sweep missed
+
+A weighted-sum sweep returns only **supported** points (Step 3's convex-hull limitation); on MILP frontiers, non-supported points — the ones no weighted-sum weighting returns — often make up much of the non-dominated set. A coarse ε-constraint grid leaves gaps the same way: any finite sweep can miss regions. Before presenting a swept frontier, measure the likely miss and decide whether to fill.
+
+### Measure the miss
+
+Sort the swept points by one objective. For each adjacent pair, form the rectangle (in general, the box) between them in objective space; flag any box much larger than the median adjacent box (3× is a reasonable bar) or covering a large share of the frontier's spanned area — a sweep that returned only a handful of points is all gaps, so no box stands out from the median. Large boxes have two causes — non-supported regions (weighted sum cannot reach them, common under fixed-charge structure) and weight clustering (a finite grid re-discovering the same corners, even on a nearly convex frontier). The fill step treats both the same.
+
+If all boxes are small and even, the sweep is likely adequate — say so and stop.
+
+### Fill the largest gaps first
+
+For each flagged box, solve one ε-constraint subproblem targeted inside it: optimize one objective with the other bounded at the box midpoint (bi-objective; with more objectives, sort by each objective in turn and place one target per flagged box instead of recursing). Only certified `Optimal` results settle or steer anything here — a time-limited incumbent is kept as a point (tagged, below) but proves nothing about the gap. A new certified point that survives Step 4's dominance filter means the gap was real (an ε solve can return a weakly optimal point) — bisect: two more targets inside the two sub-boxes it creates. A certified endpoint coming back clears just the probed side of the bound; certifying the whole box as a true discontinuity also needs a known objective step size — all-integer objective coefficients over integer variables give one — to place the bound just inside the far endpoint and match its certified optimum. Without that step size, report the box as a candidate gap, not a proven discontinuity. Stop on a solve budget, or when the remaining boxes fall below the flag bar.
+
+### Warm-start each solve (cheap insurance)
+
+Consecutive fill solves differ by one bound, so seed each with its neighbor as a MIP start (Step 4's warm-start note) — one line, and it never changes what is optimal. Expect unchanged solve times; the value is insurance on hard subproblems.
+
+### Degrade gracefully, never silently
+
+If a subproblem hits its time limit with a feasible incumbent (`FeasibleFound`), keep the point — it is feasible, and the solve's reported gap bounds its suboptimality — but record it as approximate. The time-capped solve is the primary fallback: it returns both an incumbent and a bound. Heuristics-only mode (`mip_heuristics_only`) drops the proof work and returns feasible points with no gap bound — use it when feasible points are all you need, and tag everything it returns approximate.
+
+### Report with provenance
+
+Every presented point carries one of two tags:
+
+- **exact** — `Optimal` at your gap setting, i.e. optimal to that gap (Step 4);
+- **approximate** — time-limited incumbent (quote its reported gap) or heuristics-only result (no bound exists; say so).
+
+State the counts with the frontier ("14 points, 11 exact, 3 approximate near the low-cost end, worst gap 2.4%"). Never present a mixed frontier as uniformly optimal.
+
+## Step 6 — interpret the frontier
 
 - **Report tradeoffs, not single numbers.** A frontier point means nothing in isolation. Quote the exchange rate — "≈ $4k of extra cost per 1% of added coverage in this region" — so the user can judge whether a move is worth it. On an LP/QP frontier this exchange rate is the swept constraint's dual at that point — the local slope of the frontier, accurate to the solve's optimality tolerance (tighten it before relying on a dual); on MILP, estimate it from the gap to the adjacent frontier point.
 - **Flag knee points; don't auto-pick them.** The "knee" is where the curve bends most sharply — beyond it you pay a lot for a little. It's often the best-balanced compromise and worth highlighting, but the final choice is the user's preference, not a rule. At the knee the slope is two-sided — the dual just below differs from just above — so quote the exchange rate there as a range, not one number.
-- **Treat dominated or gappy output as a diagnostic.** If dominated points survive filtering, or the frontier is implausibly sparse or perfectly linear, suspect the sweep or the model — most often weighted-sum hiding a concave region (switch to ε-constraint) or a normalization mistake.
+- **Treat dominated or gappy output as a diagnostic.** If dominated points survive filtering, or the frontier is implausibly sparse or perfectly linear, suspect the sweep or the model — most often weighted-sum hiding a concave region (return to Step 5 and fill the gaps) or a normalization mistake.
 - **State the weighting/ε you used.** Every reported point is conditional on its scalarization. Make that explicit so a single solve is never mistaken for "the" optimum. On LP/QP, the ε-constraint duals are the *implicit weights* at that point — the effective price the solution puts on each constrained objective, and the weights a weighted-sum solve would need to reproduce that tradeoff. Reporting them makes the accepted tradeoff ratio explicit.
 
 ## Interfaces
