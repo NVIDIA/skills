@@ -1,0 +1,302 @@
+{
+  "schema_version": 1,
+  "captured_at_ip_rev": "16'h2604",
+  "config_count": 13,
+  "scalar_macros": {
+    "APB_CLK_FREQ": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "19531250": 6,
+        "100000000": 4,
+        "19531000": 1,
+        "25000000": 1,
+        "50000000": 1
+      },
+      "min": 19531000,
+      "max": 100000000,
+      "median": 19531250
+    },
+    "DATAKEEP_WIDTH": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "8": 8,
+        "16": 2,
+        "64": 2,
+        "1": 1
+      },
+      "min": 1,
+      "max": 64,
+      "median": 8
+    },
+    "DATAPATH_WIDTH": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "64": 8,
+        "128": 2,
+        "512": 2,
+        "8": 1
+      },
+      "min": 8,
+      "max": 512,
+      "median": 64
+    },
+    "DATAUSER_WIDTH": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "2": 7,
+        "1": 6
+      },
+      "min": 1,
+      "max": 2,
+      "median": 2
+    },
+    "DISABLE_COE": {
+      "defined_in_count": 2,
+      "value_counts": {
+        "1": 2
+      },
+      "min": 1,
+      "max": 1,
+      "median": 1
+    },
+    "EEPROM_REG_ADDR_BITS": {
+      "defined_in_count": 9,
+      "value_counts": {
+        "8": 8,
+        "16": 1
+      },
+      "min": 8,
+      "max": 16,
+      "median": 8
+    },
+    "ENUM_EEPROM": {
+      "defined_in_count": 9,
+      "value_counts": {
+        "<defined>": 9
+      }
+    },
+    "GPIO_INST": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "31": 5,
+        "16": 4,
+        "10": 1,
+        "25": 1,
+        "3": 1,
+        "54": 1
+      },
+      "min": 3,
+      "max": 54,
+      "median": 25
+    },
+    "HIF_CLK_FREQ": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "156250000": 7,
+        "201416016": 2,
+        "195312500": 1,
+        "25000000": 1,
+        "322265625": 1,
+        "402832031": 1
+      },
+      "min": 25000000,
+      "max": 402832031,
+      "median": 156250000
+    },
+    "HOSTKEEP_WIDTH": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "8": 7,
+        "64": 3,
+        "16": 2,
+        "1": 1
+      },
+      "min": 1,
+      "max": 64,
+      "median": 8
+    },
+    "HOSTUSER_WIDTH": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "1": 13
+      },
+      "min": 1,
+      "max": 1,
+      "median": 1
+    },
+    "HOST_IF_INST": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "1": 6,
+        "2": 6,
+        "4": 1
+      },
+      "min": 1,
+      "max": 4,
+      "median": 2
+    },
+    "HOST_MTU": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "4096": 10,
+        "1500": 3
+      },
+      "min": 1500,
+      "max": 4096,
+      "median": 4096
+    },
+    "HOST_WIDTH": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "64": 7,
+        "512": 3,
+        "128": 2,
+        "8": 1
+      },
+      "min": 8,
+      "max": 512,
+      "median": 64
+    },
+    "I2C_INST": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "4": 5,
+        "1": 4,
+        "3": 2,
+        "2": 1,
+        "5": 1
+      },
+      "min": 1,
+      "max": 5,
+      "median": 3
+    },
+    "N_INIT_REG": {
+      "defined_in_count": 12,
+      "value_counts": {
+        "2": 3,
+        "22": 3,
+        "1": 2,
+        "13": 1,
+        "15": 1,
+        "20": 1,
+        "3": 1
+      },
+      "min": 1,
+      "max": 22,
+      "median": 8
+    },
+    "PERI_RAM_DEPTH": {
+      "defined_in_count": 1,
+      "value_counts": {
+        "32": 1
+      },
+      "min": 32,
+      "max": 32,
+      "median": 32
+    },
+    "PTP_CLK_FREQ": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "100446545": 5,
+        "100000000": 4,
+        "100707500": 1,
+        "100708007": 1,
+        "104161000": 1,
+        "78125000": 1
+      },
+      "min": 78125000,
+      "max": 104161000,
+      "median": 100446545
+    },
+    "REG_INST": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "8": 12,
+        "1": 1
+      },
+      "min": 1,
+      "max": 8,
+      "median": 8
+    },
+    "SENSOR_RX_IF_INST": {
+      "defined_in_count": 12,
+      "value_counts": {
+        "2": 6,
+        "1": 3,
+        "12": 1,
+        "3": 1,
+        "8": 1
+      },
+      "min": 1,
+      "max": 12,
+      "median": 2
+    },
+    "SENSOR_TX_IF_INST": {
+      "defined_in_count": 9,
+      "value_counts": {
+        "1": 7,
+        "12": 1,
+        "8": 1
+      },
+      "min": 1,
+      "max": 12,
+      "median": 1
+    },
+    "SIF_RX_DATA_GEN": {
+      "defined_in_count": 3,
+      "value_counts": {
+        "": 3
+      }
+    },
+    "SPI_INST": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "1": 8,
+        "2": 3,
+        "4": 1,
+        "5": 1
+      },
+      "min": 1,
+      "max": 5,
+      "median": 1
+    },
+    "UART_INST": {
+      "defined_in_count": 3,
+      "value_counts": {
+        "1": 3
+      },
+      "min": 1,
+      "max": 1,
+      "median": 1
+    },
+    "UUID": {
+      "defined_in_count": 13,
+      "value_counts": {
+        "<redacted-uuid>": 13
+      }
+    }
+  },
+  "archetype_distribution": {
+    "mid-bandwidth-baseline": 5,
+    "None": 4,
+    "high-bandwidth-single-sensor": 1,
+    "minimal-gateway": 1,
+    "ultra-minimal": 1,
+    "very-high-speed": 1
+  },
+  "init_reg_length": {
+    "value_counts": {
+      "2": 3,
+      "22": 3,
+      "1": 2,
+      "0": 1,
+      "3": 1,
+      "13": 1,
+      "15": 1,
+      "20": 1
+    },
+    "min": 0,
+    "max": 22,
+    "median": 3
+  }
+}

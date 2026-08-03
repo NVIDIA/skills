@@ -1,0 +1,45 @@
+[
+  {
+    "id": "hsb-ip-packetizer-001",
+    "question": "Use hsb-ip-packetizer to choose packetizer fields for two Sensor RX interfaces. RX0 is 512 bits and must split each input word into four 128-bit virtual streams; RX1 is pass-through.",
+    "expected_skill": "hsb-ip-packetizer",
+    "ground_truth": "The agent reads the hsb-ip-packetizer SKILL.md, recognizes this as Standalone SVH, gathers only missing packetizer-specific facts, derives all packetizer arrays together, emits only packetizer localparams, and explains how the settings support RX0 split and RX1 pass-through.",
+    "expected_behavior": [
+      "The agent reads hsb-ip-packetizer/SKILL.md before taking action",
+      "The agent recognizes the request as Standalone SVH",
+      "The agent derives values from the stated RX widths and split intent",
+      "The agent emits SIF_RX_PACKETIZER_EN plus peer arrays at SENSOR_RX_IF_INST length because one interface is enabled",
+      "The agent uses ignored placeholder values for the disabled RX1 peer-array entries",
+      "The agent does not emit or modify non-packetizer macros",
+      "The agent tells the user to validate the full file with hsb-ip-def"
+    ]
+  },
+  {
+    "id": "hsb-ip-packetizer-002",
+    "question": "hsb-ip-def is generating my HOLOLINK_def.svh and needs packetizer values. RX0 should rearrange 16-bit lanes into four virtual streams; RX1 should stay pass-through.",
+    "expected_skill": "hsb-ip-packetizer",
+    "ground_truth": "The agent reads the hsb-ip-packetizer SKILL.md, recognizes this as Def-Skill Handoff, loads the handoff contract, emits a labeled packetizer_profile_overlay YAML block first, and leaves final merge, generation, and full validation to hsb-ip-def.",
+    "expected_behavior": [
+      "The agent reads hsb-ip-packetizer/SKILL.md before taking action",
+      "The agent recognizes the request as Def-Skill Handoff",
+      "The agent gathers only packetizer facts not already supplied by the def flow",
+      "The agent loads references/handoff-contract.md",
+      "The agent emits packetizer_profile_overlay before explanation",
+      "The agent includes only packetizer profile keys in the overlay",
+      "The agent states that hsb-ip-def remains responsible for merging and full validation"
+    ]
+  },
+  {
+    "id": "hsb-ip-packetizer-003",
+    "question": "Do I need hsb-ip-packetizer if SENSOR_RX_IF_INST is disabled in my HOLOLINK_def.svh?",
+    "expected_skill": "hsb-ip-packetizer",
+    "ground_truth": "The agent reads the hsb-ip-packetizer SKILL.md, explains that packetizer fields are only configured when SENSOR_RX_IF_INST is defined, says no packetizer fields are needed when Sensor RX is disabled, and does not invent packetizer arrays.",
+    "expected_behavior": [
+      "The agent reads hsb-ip-packetizer/SKILL.md before answering",
+      "The agent explains that packetizer fields apply only to Sensor RX interfaces",
+      "The agent says no packetizer fields are needed when SENSOR_RX_IF_INST is disabled",
+      "The agent does not emit SIF_RX_PACKETIZER_EN or peer arrays",
+      "The agent avoids configuring runtime APB pattern-RAM behavior"
+    ]
+  }
+]

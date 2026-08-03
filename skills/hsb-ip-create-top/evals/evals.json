@@ -1,0 +1,45 @@
+[
+  {
+    "id": "hsb-ip-create-top-001",
+    "question": "Use hsb-ip-create-top to create an FPGA_top.sv scaffold from my validated HOLOLINK_def.svh. Use the bundled known-rev port reference if no HSB IP source checkout is obvious.",
+    "expected_skill": "hsb-ip-create-top",
+    "ground_truth": "The agent reads the hsb-ip-create-top SKILL.md, recognizes this as Standalone Create Top, requires a validated HOLOLINK_def.svh, uses the bundled known-rev reference when live HOLOLINK_top.sv source is not available, loads the fixed-format guidance, preserves HOLOLINK_top signal shapes, and produces or plans a fixed-format FPGA_top.sv scaffold.",
+    "expected_behavior": [
+      "The agent reads hsb-ip-create-top/SKILL.md before taking action",
+      "The agent recognizes the request as Standalone Create Top",
+      "The agent requires a validated HOLOLINK_def.svh before generating FPGA_top.sv",
+      "The agent uses references/source-policy.md and references/fixed-format.md when live HSB IP source is unavailable",
+      "The agent preserves HOLOLINK_top port shapes, using unpacked arrays for multi-interface vector buses such as *_tdata, *_tkeep, and *_tuser",
+      "The agent declares APB with scalar paddr, pwdata, penable, and pwrite; vector psel, pready, and pserr; and unpacked apb_prdata[REG_INST-1:0]",
+      "The agent does not generate or validate HOLOLINK_def.svh itself",
+      "The agent summarizes emitted HSB signal groups and uses the generic reference/template note"
+    ]
+  },
+  {
+    "id": "hsb-ip-create-top-002",
+    "question": "Create a top-level FPGA_top.sv wrapper for HSB, but I do not have a HOLOLINK_def.svh yet.",
+    "expected_skill": "hsb-ip-create-top",
+    "ground_truth": "The agent reads the hsb-ip-create-top SKILL.md, stops top-generation work because no validated HOLOLINK_def.svh exists, and directs the user to hsb-ip-def for HOLOLINK_def.svh generation and validation before resuming top creation.",
+    "expected_behavior": [
+      "The agent reads hsb-ip-create-top/SKILL.md before taking action",
+      "The agent does not create FPGA_top.sv without a validated HOLOLINK_def.svh",
+      "The agent directs the user to hsb-ip-def for defs generation and validation",
+      "The agent asks for the validated defs file path or content before proceeding",
+      "The agent avoids inventing macro settings or project-specific integration details"
+    ]
+  },
+  {
+    "id": "hsb-ip-create-top-003",
+    "question": "Why does the generated FPGA_top.sv include different HSB signal groups depending on my HOLOLINK_def.svh macros?",
+    "expected_skill": "hsb-ip-create-top",
+    "ground_truth": "The agent reads the hsb-ip-create-top SKILL.md, recognizes this as an Explain workflow, explains that active signal groups are derived from validated defs macros and the HOLOLINK_top port map, prefers live HOLOLINK_top.sv when available, and otherwise relies on the bundled known-rev reference.",
+    "expected_behavior": [
+      "The agent reads hsb-ip-create-top/SKILL.md before answering",
+      "The agent recognizes the request as an Explain workflow",
+      "The agent explains that defs macros gate which HSB-facing signal groups appear",
+      "The agent prefers live HOLOLINK_top.sv as the source of truth when available",
+      "The agent uses bundled references only when live source is unavailable",
+      "The agent defers detailed HOLOLINK_def.svh macro meaning to hsb-ip-def"
+    ]
+  }
+]

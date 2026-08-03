@@ -1,0 +1,61 @@
+[
+  {
+    "id": "hsb-ip-def-001",
+    "question": "Use hsb-ip-def to generate a HOLOLINK_def.svh for a new HSB board. I know the sensor count and host interface, but I need help turning the design requirements into the def file.",
+    "expected_skill": "hsb-ip-def",
+    "ground_truth": "The agent reads the hsb-ip-def SKILL.md, recognizes this as Generate, runs bundled-tool preflight before design questioning, asks one requirements question per turn, avoids silently defaulting macros, uses sensor-agnostic language, and plans to run generate_def.py after the profile is fully confirmed.",
+    "expected_behavior": [
+      "The agent reads hsb-ip-def/SKILL.md before taking action",
+      "The agent recognizes the request as the Generate workflow",
+      "The agent verifies generate_def.py, validate_def.py, compare_defs.py, Python 3.9+, and PyYAML before continuing",
+      "The agent asks one design-requirement question per turn",
+      "The agent does not silently choose macro defaults",
+      "The agent uses sensor-agnostic language unless the user identifies a camera-specific design",
+      "The agent plans to run scripts/generate_def.py with the selected Python interpreter after the profile is complete"
+    ]
+  },
+  {
+    "id": "hsb-ip-def-002",
+    "question": "Use hsb-ip-def to validate my existing HOLOLINK_def.svh and tell me whether any warnings are important.",
+    "expected_skill": "hsb-ip-def",
+    "ground_truth": "The agent reads the hsb-ip-def SKILL.md, recognizes this as Validate, runs bundled-tool preflight, asks for or locates the defs file, runs validate_def.py with --json, groups findings by severity, and surfaces HD-W3xx footgun warnings even if the user asks only about errors.",
+    "expected_behavior": [
+      "The agent reads hsb-ip-def/SKILL.md before taking action",
+      "The agent recognizes the request as the Validate workflow",
+      "The agent runs bundled-tool preflight before validation",
+      "The agent asks for the file path or uses pasted content instead of inventing a path",
+      "The agent runs scripts/validate_def.py with --json through the selected Python interpreter",
+      "The agent groups findings as errors, warnings, and info",
+      "The agent always surfaces HD-W3xx footgun warnings"
+    ]
+  },
+  {
+    "id": "hsb-ip-def-003",
+    "question": "Use hsb-ip-def to explain whether HOST_WIDTH=512 and PTP_CLK_FREQ=90_000_000 is legal for my HOLOLINK_def.svh.",
+    "expected_skill": "hsb-ip-def",
+    "ground_truth": "The agent reads the hsb-ip-def SKILL.md, recognizes this as Explain/Reason, uses validation scripts for legality rather than reasoning only by hand, loads validation or macro references only as needed, and explains that PTP_CLK_FREQ must be within the documented 95-105 MHz band if validation flags it.",
+    "expected_behavior": [
+      "The agent reads hsb-ip-def/SKILL.md before answering",
+      "The agent recognizes the request as an Explain/Reason workflow",
+      "The agent runs preflight if script-backed validation is needed",
+      "The agent prefers constructing or validating a concrete file with scripts/validate_def.py for legality checks",
+      "The agent loads references/validation-rules.md or references/macro-reference.md only as needed",
+      "The agent does not rely on undocumented typical-value claims"
+    ]
+  },
+  {
+    "id": "hsb-ip-def-004",
+    "question": "Use hsb-ip-def to generate a HOLOLINK_def.svh for a board with two host interfaces and one Sensor TX interface. Help me fill in any missing requirements.",
+    "expected_skill": "hsb-ip-def",
+    "ground_truth": "The agent reads the hsb-ip-def SKILL.md, recognizes this as Generate, treats HOST_WIDTH as one scalar shared by all host interfaces, does not ask whether host widths are the same or different, and prompts for SIF_TX_BUF_SIZE when Sensor TX is enabled before generating the file.",
+    "expected_behavior": [
+      "The agent reads hsb-ip-def/SKILL.md before taking action",
+      "The agent recognizes the request as the Generate workflow",
+      "The agent treats HOST_WIDTH as one shared scalar for every HOST_IF_INST interface",
+      "The agent does not ask whether host interfaces have the same or different host widths",
+      "The agent asks for SIF_TX_BUF_SIZE when one or more Sensor TX interfaces are enabled",
+      "The agent records sif_tx_buf_size as a list of TX-width-element FIFO depths whose length matches SENSOR_TX_IF_INST",
+      "The agent does not silently use the 2048-element TX FIFO default without user confirmation"
+    ]
+  }
+]

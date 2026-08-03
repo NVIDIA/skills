@@ -1,0 +1,828 @@
+{
+  "schema_version": 1,
+  "captured_at_ip_rev": "16'h2604",
+  "config_count": 13,
+  "configs": [
+    {
+      "config_id": "config-01",
+      "scalars": {
+        "APB_CLK_FREQ": 100000000,
+        "DATAKEEP_WIDTH": 16,
+        "DATAPATH_WIDTH": 128,
+        "DATAUSER_WIDTH": 1,
+        "EEPROM_REG_ADDR_BITS": 8,
+        "ENUM_EEPROM": "<defined>",
+        "GPIO_INST": 16,
+        "HIF_CLK_FREQ": 201416016,
+        "HOSTKEEP_WIDTH": 16,
+        "HOSTUSER_WIDTH": 1,
+        "HOST_IF_INST": 4,
+        "HOST_MTU": 4096,
+        "HOST_WIDTH": 128,
+        "I2C_INST": 3,
+        "N_INIT_REG": 13,
+        "PTP_CLK_FREQ": 100000000,
+        "REG_INST": 8,
+        "SENSOR_RX_IF_INST": 8,
+        "SENSOR_TX_IF_INST": 8,
+        "SPI_INST": 1,
+        "UUID": "<redacted-uuid>"
+      },
+      "arrays": {
+        "SIF_RX_NUM_CYCLES": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "SIF_RX_PACKETIZER_EN": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "SIF_RX_SORT_RESOLUTION": [
+          128,
+          128,
+          128,
+          128,
+          128,
+          128,
+          128,
+          128
+        ],
+        "SIF_RX_VP_COUNT": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "SIF_RX_VP_SIZE": [
+          128,
+          128,
+          128,
+          128,
+          128,
+          128,
+          128,
+          128
+        ],
+        "SIF_RX_WIDTH": [
+          128,
+          128,
+          128,
+          128,
+          128,
+          128,
+          128,
+          128
+        ],
+        "SIF_TX_BUF_SIZE": [
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048
+        ],
+        "SIF_TX_WIDTH": [
+          128,
+          128,
+          128,
+          128,
+          128,
+          128,
+          128,
+          128
+        ]
+      },
+      "init_reg_length": 13,
+      "inferred_archetype": null
+    },
+    {
+      "config_id": "config-02",
+      "scalars": {
+        "APB_CLK_FREQ": 19531250,
+        "DATAKEEP_WIDTH": 8,
+        "DATAPATH_WIDTH": 64,
+        "DATAUSER_WIDTH": 2,
+        "EEPROM_REG_ADDR_BITS": 8,
+        "ENUM_EEPROM": "<defined>",
+        "GPIO_INST": 31,
+        "HIF_CLK_FREQ": 156250000,
+        "HOSTKEEP_WIDTH": 8,
+        "HOSTUSER_WIDTH": 1,
+        "HOST_IF_INST": 2,
+        "HOST_MTU": 4096,
+        "HOST_WIDTH": 64,
+        "I2C_INST": 4,
+        "N_INIT_REG": 2,
+        "PTP_CLK_FREQ": 100446545,
+        "REG_INST": 8,
+        "SENSOR_RX_IF_INST": 2,
+        "SENSOR_TX_IF_INST": 1,
+        "SPI_INST": 2,
+        "UART_INST": 1,
+        "UUID": "<redacted-uuid>"
+      },
+      "arrays": {
+        "SIF_RX_NUM_CYCLES": [
+          1,
+          1
+        ],
+        "SIF_RX_PACKETIZER_EN": [
+          0,
+          0
+        ],
+        "SIF_RX_SORT_RESOLUTION": [
+          64,
+          64
+        ],
+        "SIF_RX_VP_COUNT": [
+          1,
+          1
+        ],
+        "SIF_RX_VP_SIZE": [
+          64,
+          64
+        ],
+        "SIF_RX_WIDTH": [
+          64,
+          64
+        ],
+        "SIF_TX_BUF_SIZE": [
+          2048
+        ],
+        "SIF_TX_WIDTH": [
+          64
+        ]
+      },
+      "init_reg_length": 2,
+      "inferred_archetype": "mid-bandwidth-baseline"
+    },
+    {
+      "config_id": "config-03",
+      "scalars": {
+        "APB_CLK_FREQ": 19531250,
+        "DATAKEEP_WIDTH": 8,
+        "DATAPATH_WIDTH": 64,
+        "DATAUSER_WIDTH": 2,
+        "GPIO_INST": 3,
+        "HIF_CLK_FREQ": 156250000,
+        "HOSTKEEP_WIDTH": 8,
+        "HOSTUSER_WIDTH": 1,
+        "HOST_IF_INST": 1,
+        "HOST_MTU": 1500,
+        "HOST_WIDTH": 64,
+        "I2C_INST": 1,
+        "PTP_CLK_FREQ": 78125000,
+        "REG_INST": 8,
+        "SENSOR_RX_IF_INST": 1,
+        "SPI_INST": 1,
+        "UUID": "<redacted-uuid>"
+      },
+      "arrays": {
+        "SIF_RX_NUM_CYCLES": [
+          3
+        ],
+        "SIF_RX_PACKETIZER_EN": [
+          0
+        ],
+        "SIF_RX_SORT_RESOLUTION": [
+          2
+        ],
+        "SIF_RX_VP_COUNT": [
+          2
+        ],
+        "SIF_RX_VP_SIZE": [
+          64
+        ],
+        "SIF_RX_WIDTH": [
+          64
+        ]
+      },
+      "init_reg_length": 0,
+      "inferred_archetype": "minimal-gateway"
+    },
+    {
+      "config_id": "config-04",
+      "scalars": {
+        "APB_CLK_FREQ": 19531250,
+        "DATAKEEP_WIDTH": 8,
+        "DATAPATH_WIDTH": 64,
+        "DATAUSER_WIDTH": 2,
+        "EEPROM_REG_ADDR_BITS": 8,
+        "ENUM_EEPROM": "<defined>",
+        "GPIO_INST": 31,
+        "HIF_CLK_FREQ": 156250000,
+        "HOSTKEEP_WIDTH": 8,
+        "HOSTUSER_WIDTH": 1,
+        "HOST_IF_INST": 2,
+        "HOST_MTU": 4096,
+        "HOST_WIDTH": 64,
+        "I2C_INST": 4,
+        "N_INIT_REG": 22,
+        "PTP_CLK_FREQ": 100446545,
+        "REG_INST": 8,
+        "SENSOR_RX_IF_INST": 2,
+        "SENSOR_TX_IF_INST": 1,
+        "SPI_INST": 5,
+        "UUID": "<redacted-uuid>"
+      },
+      "arrays": {
+        "SIF_RX_NUM_CYCLES": [
+          3,
+          3
+        ],
+        "SIF_RX_PACKETIZER_EN": [
+          1,
+          1
+        ],
+        "SIF_RX_SORT_RESOLUTION": [
+          2,
+          2
+        ],
+        "SIF_RX_VP_COUNT": [
+          2,
+          2
+        ],
+        "SIF_RX_VP_SIZE": [
+          64,
+          64
+        ],
+        "SIF_RX_WIDTH": [
+          64,
+          64
+        ],
+        "SIF_TX_BUF_SIZE": [
+          4096
+        ],
+        "SIF_TX_WIDTH": [
+          32
+        ]
+      },
+      "init_reg_length": 22,
+      "inferred_archetype": "mid-bandwidth-baseline"
+    },
+    {
+      "config_id": "config-05",
+      "scalars": {
+        "APB_CLK_FREQ": 19531250,
+        "DATAKEEP_WIDTH": 8,
+        "DATAPATH_WIDTH": 64,
+        "DATAUSER_WIDTH": 2,
+        "EEPROM_REG_ADDR_BITS": 8,
+        "ENUM_EEPROM": "<defined>",
+        "GPIO_INST": 25,
+        "HIF_CLK_FREQ": 156250000,
+        "HOSTKEEP_WIDTH": 8,
+        "HOSTUSER_WIDTH": 1,
+        "HOST_IF_INST": 2,
+        "HOST_MTU": 4096,
+        "HOST_WIDTH": 64,
+        "I2C_INST": 4,
+        "N_INIT_REG": 22,
+        "PTP_CLK_FREQ": 100446545,
+        "REG_INST": 8,
+        "SENSOR_RX_IF_INST": 2,
+        "SENSOR_TX_IF_INST": 1,
+        "SPI_INST": 4,
+        "UART_INST": 1,
+        "UUID": "<redacted-uuid>"
+      },
+      "arrays": {
+        "SIF_RX_NUM_CYCLES": [
+          3,
+          3
+        ],
+        "SIF_RX_PACKETIZER_EN": [
+          1,
+          1
+        ],
+        "SIF_RX_SORT_RESOLUTION": [
+          2,
+          2
+        ],
+        "SIF_RX_VP_COUNT": [
+          2,
+          2
+        ],
+        "SIF_RX_VP_SIZE": [
+          64,
+          64
+        ],
+        "SIF_RX_WIDTH": [
+          64,
+          64
+        ],
+        "SIF_TX_BUF_SIZE": [
+          4096
+        ],
+        "SIF_TX_WIDTH": [
+          32
+        ]
+      },
+      "init_reg_length": 22,
+      "inferred_archetype": "mid-bandwidth-baseline"
+    },
+    {
+      "config_id": "config-06",
+      "scalars": {
+        "APB_CLK_FREQ": 19531250,
+        "DATAKEEP_WIDTH": 8,
+        "DATAPATH_WIDTH": 64,
+        "DATAUSER_WIDTH": 2,
+        "EEPROM_REG_ADDR_BITS": 8,
+        "ENUM_EEPROM": "<defined>",
+        "GPIO_INST": 31,
+        "HIF_CLK_FREQ": 156250000,
+        "HOSTKEEP_WIDTH": 8,
+        "HOSTUSER_WIDTH": 1,
+        "HOST_IF_INST": 2,
+        "HOST_MTU": 4096,
+        "HOST_WIDTH": 64,
+        "I2C_INST": 4,
+        "N_INIT_REG": 22,
+        "PTP_CLK_FREQ": 100446545,
+        "REG_INST": 8,
+        "SENSOR_RX_IF_INST": 2,
+        "SENSOR_TX_IF_INST": 1,
+        "SPI_INST": 2,
+        "UART_INST": 1,
+        "UUID": "<redacted-uuid>"
+      },
+      "arrays": {
+        "SIF_RX_NUM_CYCLES": [
+          3,
+          3
+        ],
+        "SIF_RX_PACKETIZER_EN": [
+          1,
+          1
+        ],
+        "SIF_RX_SORT_RESOLUTION": [
+          2,
+          2
+        ],
+        "SIF_RX_VP_COUNT": [
+          2,
+          2
+        ],
+        "SIF_RX_VP_SIZE": [
+          64,
+          64
+        ],
+        "SIF_RX_WIDTH": [
+          64,
+          64
+        ],
+        "SIF_TX_BUF_SIZE": [
+          4096
+        ],
+        "SIF_TX_WIDTH": [
+          32
+        ]
+      },
+      "init_reg_length": 22,
+      "inferred_archetype": "mid-bandwidth-baseline"
+    },
+    {
+      "config_id": "config-07",
+      "scalars": {
+        "APB_CLK_FREQ": 19531250,
+        "DATAKEEP_WIDTH": 8,
+        "DATAPATH_WIDTH": 64,
+        "DATAUSER_WIDTH": 2,
+        "EEPROM_REG_ADDR_BITS": 16,
+        "ENUM_EEPROM": "<defined>",
+        "GPIO_INST": 16,
+        "HIF_CLK_FREQ": 156250000,
+        "HOSTKEEP_WIDTH": 8,
+        "HOSTUSER_WIDTH": 1,
+        "HOST_IF_INST": 1,
+        "HOST_MTU": 4096,
+        "HOST_WIDTH": 64,
+        "I2C_INST": 4,
+        "N_INIT_REG": 15,
+        "PTP_CLK_FREQ": 100446545,
+        "REG_INST": 8,
+        "SENSOR_RX_IF_INST": 3,
+        "SIF_RX_DATA_GEN": "",
+        "SPI_INST": 1,
+        "UUID": "<redacted-uuid>"
+      },
+      "arrays": {
+        "SIF_RX_NUM_CYCLES": [
+          1,
+          3,
+          3
+        ],
+        "SIF_RX_PACKETIZER_EN": [
+          0,
+          1,
+          1
+        ],
+        "SIF_RX_SORT_RESOLUTION": [
+          32,
+          2,
+          2
+        ],
+        "SIF_RX_VP_COUNT": [
+          1,
+          1,
+          1
+        ],
+        "SIF_RX_VP_SIZE": [
+          64,
+          64,
+          64
+        ],
+        "SIF_RX_WIDTH": [
+          64,
+          64,
+          64
+        ]
+      },
+      "init_reg_length": 15,
+      "inferred_archetype": null
+    },
+    {
+      "config_id": "config-08",
+      "scalars": {
+        "APB_CLK_FREQ": 25000000,
+        "DATAKEEP_WIDTH": 1,
+        "DATAPATH_WIDTH": 8,
+        "DATAUSER_WIDTH": 1,
+        "EEPROM_REG_ADDR_BITS": 8,
+        "ENUM_EEPROM": "<defined>",
+        "GPIO_INST": 54,
+        "HIF_CLK_FREQ": 25000000,
+        "HOSTKEEP_WIDTH": 1,
+        "HOSTUSER_WIDTH": 1,
+        "HOST_IF_INST": 1,
+        "HOST_MTU": 1500,
+        "HOST_WIDTH": 8,
+        "I2C_INST": 1,
+        "N_INIT_REG": 20,
+        "PERI_RAM_DEPTH": 32,
+        "PTP_CLK_FREQ": 100000000,
+        "REG_INST": 8,
+        "SENSOR_TX_IF_INST": 1,
+        "SPI_INST": 1,
+        "UUID": "<redacted-uuid>"
+      },
+      "arrays": {
+        "SIF_TX_BUF_SIZE": [
+          8192
+        ],
+        "SIF_TX_WIDTH": [
+          8
+        ]
+      },
+      "init_reg_length": 20,
+      "inferred_archetype": "ultra-minimal"
+    },
+    {
+      "config_id": "config-09",
+      "scalars": {
+        "APB_CLK_FREQ": 50000000,
+        "DATAKEEP_WIDTH": 64,
+        "DATAPATH_WIDTH": 512,
+        "DATAUSER_WIDTH": 1,
+        "GPIO_INST": 31,
+        "HIF_CLK_FREQ": 322265625,
+        "HOSTKEEP_WIDTH": 64,
+        "HOSTUSER_WIDTH": 1,
+        "HOST_IF_INST": 1,
+        "HOST_MTU": 4096,
+        "HOST_WIDTH": 512,
+        "I2C_INST": 1,
+        "N_INIT_REG": 1,
+        "PTP_CLK_FREQ": 100000000,
+        "REG_INST": 8,
+        "SENSOR_RX_IF_INST": 1,
+        "SENSOR_TX_IF_INST": 1,
+        "SIF_RX_DATA_GEN": "",
+        "SPI_INST": 1,
+        "UUID": "<redacted-uuid>"
+      },
+      "arrays": {
+        "SIF_RX_NUM_CYCLES": [
+          1
+        ],
+        "SIF_RX_PACKETIZER_EN": [
+          0
+        ],
+        "SIF_RX_SORT_RESOLUTION": [
+          512
+        ],
+        "SIF_RX_VP_COUNT": [
+          1
+        ],
+        "SIF_RX_VP_SIZE": [
+          512
+        ],
+        "SIF_RX_WIDTH": [
+          512
+        ],
+        "SIF_TX_BUF_SIZE": [
+          4096
+        ],
+        "SIF_TX_WIDTH": [
+          512
+        ]
+      },
+      "init_reg_length": 1,
+      "inferred_archetype": "very-high-speed"
+    },
+    {
+      "config_id": "config-10",
+      "scalars": {
+        "APB_CLK_FREQ": 100000000,
+        "DATAKEEP_WIDTH": 64,
+        "DATAPATH_WIDTH": 512,
+        "DATAUSER_WIDTH": 1,
+        "DISABLE_COE": 1,
+        "EEPROM_REG_ADDR_BITS": 8,
+        "ENUM_EEPROM": "<defined>",
+        "GPIO_INST": 16,
+        "HIF_CLK_FREQ": 201416016,
+        "HOSTKEEP_WIDTH": 64,
+        "HOSTUSER_WIDTH": 1,
+        "HOST_IF_INST": 2,
+        "HOST_MTU": 4096,
+        "HOST_WIDTH": 512,
+        "I2C_INST": 2,
+        "N_INIT_REG": 2,
+        "PTP_CLK_FREQ": 100707500,
+        "REG_INST": 8,
+        "SENSOR_RX_IF_INST": 1,
+        "SENSOR_TX_IF_INST": 1,
+        "SPI_INST": 2,
+        "UUID": "<redacted-uuid>"
+      },
+      "arrays": {
+        "SIF_RX_NUM_CYCLES": [
+          1
+        ],
+        "SIF_RX_PACKETIZER_EN": [
+          1
+        ],
+        "SIF_RX_SORT_RESOLUTION": [
+          16
+        ],
+        "SIF_RX_VP_COUNT": [
+          4
+        ],
+        "SIF_RX_VP_SIZE": [
+          128
+        ],
+        "SIF_RX_WIDTH": [
+          512
+        ],
+        "SIF_TX_BUF_SIZE": [
+          2048
+        ],
+        "SIF_TX_WIDTH": [
+          512
+        ]
+      },
+      "init_reg_length": 2,
+      "inferred_archetype": "high-bandwidth-single-sensor"
+    },
+    {
+      "config_id": "config-11",
+      "scalars": {
+        "APB_CLK_FREQ": 100000000,
+        "DATAKEEP_WIDTH": 16,
+        "DATAPATH_WIDTH": 128,
+        "DATAUSER_WIDTH": 1,
+        "DISABLE_COE": 1,
+        "GPIO_INST": 16,
+        "HIF_CLK_FREQ": 402832031,
+        "HOSTKEEP_WIDTH": 64,
+        "HOSTUSER_WIDTH": 1,
+        "HOST_IF_INST": 1,
+        "HOST_MTU": 4096,
+        "HOST_WIDTH": 512,
+        "I2C_INST": 5,
+        "N_INIT_REG": 2,
+        "PTP_CLK_FREQ": 100708007,
+        "REG_INST": 8,
+        "SENSOR_RX_IF_INST": 2,
+        "SIF_RX_DATA_GEN": "",
+        "SPI_INST": 1,
+        "UUID": "<redacted-uuid>"
+      },
+      "arrays": {
+        "SIF_RX_NUM_CYCLES": [
+          1,
+          1
+        ],
+        "SIF_RX_PACKETIZER_EN": [
+          0,
+          0
+        ],
+        "SIF_RX_SORT_RESOLUTION": [
+          16,
+          16
+        ],
+        "SIF_RX_VP_COUNT": [
+          1,
+          1
+        ],
+        "SIF_RX_VP_SIZE": [
+          128,
+          128
+        ],
+        "SIF_RX_WIDTH": [
+          128,
+          128
+        ]
+      },
+      "init_reg_length": 2,
+      "inferred_archetype": null
+    },
+    {
+      "config_id": "config-12",
+      "scalars": {
+        "APB_CLK_FREQ": 100000000,
+        "DATAKEEP_WIDTH": 8,
+        "DATAPATH_WIDTH": 64,
+        "DATAUSER_WIDTH": 1,
+        "GPIO_INST": 31,
+        "HIF_CLK_FREQ": 195312500,
+        "HOSTKEEP_WIDTH": 16,
+        "HOSTUSER_WIDTH": 1,
+        "HOST_IF_INST": 1,
+        "HOST_MTU": 4096,
+        "HOST_WIDTH": 128,
+        "I2C_INST": 1,
+        "N_INIT_REG": 3,
+        "PTP_CLK_FREQ": 100000000,
+        "REG_INST": 8,
+        "SENSOR_RX_IF_INST": 12,
+        "SENSOR_TX_IF_INST": 12,
+        "SPI_INST": 1,
+        "UUID": "<redacted-uuid>"
+      },
+      "arrays": {
+        "SIF_RX_NUM_CYCLES": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "SIF_RX_PACKETIZER_EN": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "SIF_RX_SORT_RESOLUTION": [
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64
+        ],
+        "SIF_RX_VP_COUNT": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "SIF_RX_VP_SIZE": [
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64
+        ],
+        "SIF_RX_WIDTH": [
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64,
+          64
+        ],
+        "SIF_TX_BUF_SIZE": [],
+        "SIF_TX_WIDTH": []
+      },
+      "init_reg_length": 3,
+      "inferred_archetype": null
+    },
+    {
+      "config_id": "config-13",
+      "scalars": {
+        "APB_CLK_FREQ": 19531000,
+        "DATAKEEP_WIDTH": 8,
+        "DATAPATH_WIDTH": 64,
+        "DATAUSER_WIDTH": 2,
+        "EEPROM_REG_ADDR_BITS": 8,
+        "ENUM_EEPROM": "<defined>",
+        "GPIO_INST": 10,
+        "HIF_CLK_FREQ": 156250000,
+        "HOSTKEEP_WIDTH": 8,
+        "HOSTUSER_WIDTH": 1,
+        "HOST_IF_INST": 2,
+        "HOST_MTU": 1500,
+        "HOST_WIDTH": 64,
+        "I2C_INST": 3,
+        "N_INIT_REG": 1,
+        "PTP_CLK_FREQ": 104161000,
+        "REG_INST": 1,
+        "SENSOR_RX_IF_INST": 2,
+        "SPI_INST": 1,
+        "UUID": "<redacted-uuid>"
+      },
+      "arrays": {
+        "SIF_RX_NUM_CYCLES": [
+          3,
+          3
+        ],
+        "SIF_RX_PACKETIZER_EN": [
+          0,
+          0
+        ],
+        "SIF_RX_SORT_RESOLUTION": [
+          2,
+          2
+        ],
+        "SIF_RX_VP_COUNT": [
+          1,
+          1
+        ],
+        "SIF_RX_VP_SIZE": [
+          64,
+          64
+        ],
+        "SIF_RX_WIDTH": [
+          64,
+          64
+        ]
+      },
+      "init_reg_length": 1,
+      "inferred_archetype": "mid-bandwidth-baseline"
+    }
+  ]
+}
