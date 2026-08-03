@@ -304,7 +304,6 @@
       "skills": [
         "cuopt-developer",
         "cuopt-install",
-        "cuopt-multi-objective-exploration",
         "cuopt-numerical-optimization-api",
         "cuopt-numerical-optimization-formulation",
         "cuopt-routing-api-python",
