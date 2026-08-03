@@ -597,8 +597,13 @@ class _AIClient:
             except requests.RequestException as exc:
                 raise EnrichmentError(f"Inference API request failed: {exc}")
 
-            # Retry on rate-limit (429) and transient server errors (5xx).
-            if resp.status_code == 429 or resp.status_code >= 500:
+            # Retry on rate-limit (429), transient server errors (5xx), and 403.
+            # The gateway fronting the inference API returns 403 for transient
+            # edge rejections as well as for genuine permission failures: on
+            # 2026-08-03 an enrichment call failed with 403 three minutes after
+            # the identical call succeeded. Retrying costs ~7s on a real
+            # permission failure and saves an enrichment on a transient one.
+            if resp.status_code in (403, 429) or resp.status_code >= 500:
                 last_error = f"HTTP {resp.status_code}"
                 if attempt < _RETRY_ATTEMPTS:
                     wait = _RETRY_BASE_SECONDS * (2 ** attempt)
@@ -742,6 +747,13 @@ def build_skill_entry(
         # valid values. Ask the AI whether any of those values should be
         # amended to better fit the new content. If AI returns the same value
         # for a field, output stays byte-stable.
+        # An amendment is optional: every required field already holds a valid
+        # value, so a failed enrichment must leave the existing entry standing.
+        # Returning None here would drop the skill from metadata.json and
+        # skills.sh.json outright — delisting a published skill from the
+        # marketplace on a transient AI failure, with the regenerated file
+        # still internally consistent and so still passing --check.
+        amended = None
         try:
             amended = ai_client(
                 skill,
@@ -751,11 +763,13 @@ def build_skill_entry(
                 current_values=metadata,
             )
         except EnrichmentError as exc:
-            skill_warnings.append(f"{skill.path}: {exc}")
-            return None
-        for k in MVP_FIELDS:
-            if amended.get(k):
-                metadata[k] = amended[k]
+            skill_warnings.append(
+                f"{skill.path}: {exc}; keeping the existing metadata values."
+            )
+        if amended:
+            for k in MVP_FIELDS:
+                if amended.get(k):
+                    metadata[k] = amended[k]
 
     # Re-order to schema field order.
     ordered_metadata = {k: metadata[k] for k in MVP_FIELDS if k in metadata}
@@ -981,6 +995,35 @@ def main(argv: list[str] | None = None) -> int:
             entries.append(entry)
 
     metadata_obj = {"skills": entries}
+
+    # A skill that is still on disk and was in the previous metadata.json must
+    # not vanish from this one. Skills removed via metadata-exclusions.yaml are
+    # dropped in discover_skills and never reach skills_now, so they cannot
+    # trip this. Anything else reaching here means an entry failed to build,
+    # which would otherwise delist a published skill silently — the output
+    # stays schema-valid and internally consistent, so no other check sees it.
+    # A newly added skill is covered too whenever AI enrichment is available,
+    # since it should have been enrichable; under --no-ai a new skill with no
+    # carried metadata is expected to be skipped, so only published skills are
+    # guarded there.
+    baseline_paths = {
+        e.get("path") for e in (baseline or {}).get("skills", []) if e.get("path")
+    }
+    emitted_paths = {e["path"] for e in entries}
+    dropped = sorted(
+        s.path
+        for s in skills_now
+        if s.path not in emitted_paths
+        and (s.path in baseline_paths or ai_client is not None)
+    )
+    if dropped:
+        errors.append(
+            "these skills are present on disk and in the previous metadata.json "
+            "but no entry could be built for them: "
+            + ", ".join(dropped)
+            + ". Re-run, or add an entry to metadata-exclusions.yaml to drop a "
+            "skill deliberately."
+        )
 
     # Validate metadata.json against the schema (all entries in one pass).
     if not errors:
