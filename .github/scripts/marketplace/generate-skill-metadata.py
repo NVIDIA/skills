@@ -709,6 +709,7 @@ def build_skill_entry(
     taxonomy: dict,
     ai_client,
     skill_warnings: list[str],
+    retained_notices: list[str] | None = None,
     is_materially_changed: bool = False,
 ) -> dict | None:
     component = components.get(skill.path)
@@ -763,9 +764,13 @@ def build_skill_entry(
                 current_values=metadata,
             )
         except EnrichmentError as exc:
-            skill_warnings.append(
-                f"{skill.path}: {exc}; keeping the existing metadata values."
-            )
+            # The entry is complete and is being emitted unchanged, so this is
+            # not an omission. Recording it in skill_warnings would report the
+            # skill as excluded from output and fail an otherwise correct run.
+            if retained_notices is not None:
+                retained_notices.append(
+                    f"{skill.path}: {exc}; existing metadata values kept."
+                )
         if amended:
             for k in MVP_FIELDS:
                 if amended.get(k):
@@ -977,6 +982,7 @@ def main(argv: list[str] | None = None) -> int:
 
     errors: list[str] = []
     skill_warnings: list[str] = []
+    retained_notices: list[str] = []
     entries: list[dict] = []
     materially_changed = set(cls.materially_changed)
     for skill in sorted(skills_now, key=lambda s: s.path):
@@ -989,41 +995,68 @@ def main(argv: list[str] | None = None) -> int:
             taxonomy,
             ai_client,
             skill_warnings,
+            retained_notices,
             is_materially_changed=skill.path in materially_changed,
         )
         if entry is not None:
             entries.append(entry)
 
-    metadata_obj = {"skills": entries}
-
-    # A skill that is still on disk and was in the previous metadata.json must
-    # not vanish from this one. Skills removed via metadata-exclusions.yaml are
-    # dropped in discover_skills and never reach skills_now, so they cannot
-    # trip this. Anything else reaching here means an entry failed to build,
-    # which would otherwise delist a published skill silently — the output
-    # stays schema-valid and internally consistent, so no other check sees it.
-    # A newly added skill is covered too whenever AI enrichment is available,
-    # since it should have been enrichable; under --no-ai a new skill with no
-    # carried metadata is expected to be skipped, so only published skills are
-    # guarded there.
-    baseline_paths = {
-        e.get("path") for e in (baseline or {}).get("skills", []) if e.get("path")
+    # A skill already in metadata.json must never regress: a regenerated entry
+    # is an improvement or byte-identical, and enrichment may add or amend but
+    # never subtract. So when an entry fails to build for a skill that is still
+    # on disk, fall back to its last-good entry rather than emitting a file
+    # without it — the output would stay schema-valid and internally
+    # consistent, so nothing downstream would notice the skill had been
+    # delisted. Skills removed via metadata-exclusions.yaml are dropped in
+    # discover_skills and never reach skills_now, so they cannot trip this.
+    #
+    # A genuinely new skill has no prior state to fall back on. That case is a
+    # hard error whenever AI enrichment is available, since it should have been
+    # enrichable; under --no-ai a new skill with no carried metadata is
+    # expected to be skipped.
+    baseline_entries = {
+        e.get("path"): e for e in (baseline or {}).get("skills", []) if e.get("path")
     }
     emitted_paths = {e["path"] for e in entries}
-    dropped = sorted(
-        s.path
-        for s in skills_now
-        if s.path not in emitted_paths
-        and (s.path in baseline_paths or ai_client is not None)
-    )
-    if dropped:
+    unbuilt = sorted(s.path for s in skills_now if s.path not in emitted_paths)
+
+    recovered: list[str] = []
+    unrecoverable: list[str] = []
+    for path in unbuilt:
+        prior = baseline_entries.get(path)
+        # metadata_validator covers the whole document, so a single entry is
+        # checked by wrapping it the same way existing_valid_metadata does.
+        prior_is_valid = False
+        if prior is not None:
+            try:
+                metadata_validator.validate({"skills": [prior]})
+                prior_is_valid = True
+            except Exception:
+                prior_is_valid = False
+        if prior_is_valid:
+            entries.append(prior)
+            recovered.append(path)
+        elif prior is not None or ai_client is not None:
+            unrecoverable.append(path)
+
+    if recovered:
+        entries.sort(key=lambda e: e["path"])
+        for path in recovered:
+            skill_warnings.append(
+                f"{path}: no entry could be built; kept the entry from the "
+                f"previous metadata.json."
+            )
+
+    if unrecoverable:
         errors.append(
-            "these skills are present on disk and in the previous metadata.json "
-            "but no entry could be built for them: "
-            + ", ".join(dropped)
-            + ". Re-run, or add an entry to metadata-exclusions.yaml to drop a "
-            "skill deliberately."
+            "no entry could be built for these skills, and no usable entry "
+            "exists in the previous metadata.json to fall back on: "
+            + ", ".join(unrecoverable)
+            + ". Re-run, or add the skill name to metadata-exclusions.yaml to "
+            "drop it deliberately."
         )
+
+    metadata_obj = {"skills": entries}
 
     # Validate metadata.json against the schema (all entries in one pass).
     if not errors:
@@ -1056,6 +1089,32 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  - {e}", file=sys.stderr)
         _print_classification(cls, stream=sys.stderr)
         return 1
+
+    if retained_notices:
+        # Not a failure: every one of these skills is present in the output
+        # with its existing values intact.
+        print(
+            f"\n{len(retained_notices)} skill(s) kept existing metadata after an "
+            f"enrichment failure:",
+            file=sys.stderr,
+        )
+        for w in retained_notices:
+            print(f"  - {w}", file=sys.stderr)
+
+    if skill_warnings:
+        print(
+            f"\nPARTIAL SUCCESS: {len(skill_warnings)} skill(s) could not be "
+            f"regenerated and were emitted from the previous metadata.json:",
+            file=sys.stderr,
+        )
+        for w in skill_warnings:
+            print(f"  - {w}", file=sys.stderr)
+        # Write a structured warnings file for CI to surface in issue bodies.
+        warnings_path = Path("/tmp/skill-warnings.json")
+        warnings_path.write_text(
+            json.dumps({"stale_skills": skill_warnings}, indent=2) + "\n",
+            encoding="utf-8",
+        )
 
     metadata_text = dumps_canonical(metadata_obj)
     skills_sh_text = dumps_canonical(skills_sh_obj)
@@ -1095,22 +1154,6 @@ def main(argv: list[str] | None = None) -> int:
         f"skills.sh.json: {'updated' if sh_changed else 'unchanged'} "
         f"({len(skills_sh_obj.get('groupings', []))} non-empty groups)"
     )
-
-    if skill_warnings:
-        print(
-            f"\nPARTIAL SUCCESS: {len(skill_warnings)} skill(s) could not be enriched "
-            f"and were excluded from output:",
-            file=sys.stderr,
-        )
-        for w in skill_warnings:
-            print(f"  - {w}", file=sys.stderr)
-        # Write a structured warnings file for CI to surface in issue bodies.
-        warnings_path = Path("/tmp/skill-warnings.json")
-        warnings_path.write_text(
-            json.dumps({"omitted_skills": skill_warnings}, indent=2) + "\n",
-            encoding="utf-8",
-        )
-        return 1
 
     return 0
 

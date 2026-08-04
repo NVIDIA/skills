@@ -100,6 +100,9 @@ jobs:
           INFERENCE_API_URL: ${{ vars.INFERENCE_API_URL }}
           INFERENCE_MODEL: ${{ vars.INFERENCE_MODEL }}
         run: |
+          # Without pipefail the pipeline reports tee's status, so a failing
+          # generator was read as rc=0 and the failure path below never ran.
+          set -o pipefail
           rc=0
           python3 .github/scripts/marketplace/generate-skill-metadata.py 2>&1 | tee /tmp/generator.log || rc=$?
           if [ "${rc}" = "0" ]; then
