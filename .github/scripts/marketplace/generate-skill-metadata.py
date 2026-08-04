@@ -1115,6 +1115,10 @@ def main(argv: list[str] | None = None) -> int:
             json.dumps({"stale_skills": skill_warnings}, indent=2) + "\n",
             encoding="utf-8",
         )
+    # A stale entry still has to fail the run. Outputs are written first so the
+    # catalog does not lose a skill, but the exit code stays non-zero in both
+    # --check and write mode so CI cannot read a partial success as a pass.
+    exit_code = 1 if skill_warnings else 0
 
     metadata_text = dumps_canonical(metadata_obj)
     skills_sh_text = dumps_canonical(skills_sh_obj)
@@ -1140,7 +1144,7 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         _print_classification(cls)
         print("OK: generated outputs are byte-stable.")
-        return 0
+        return exit_code
 
     md_changed = write_if_changed(METADATA_PATH, metadata_text)
     sh_changed = write_if_changed(SKILLS_SH_PATH, skills_sh_text)
@@ -1155,7 +1159,7 @@ def main(argv: list[str] | None = None) -> int:
         f"({len(skills_sh_obj.get('groupings', []))} non-empty groups)"
     )
 
-    return 0
+    return exit_code
 
 
 def _print_classification(cls: Classification, stream=sys.stdout) -> None:
