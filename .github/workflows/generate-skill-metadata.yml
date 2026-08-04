@@ -59,6 +59,12 @@ jobs:
       - name: Install Python deps
         run: pip install --upgrade pyyaml jsonschema
 
+      # Runs before the byte-stability check: it induces enrichment failures
+      # against a stub inference API to cover the recovery and reporting paths,
+      # which a healthy catalog never exercises on its own.
+      - name: Test generator failure handling
+        run: python3 .github/scripts/marketplace/test_generate_skill_metadata.py
+
       - name: Validate (no AI; checked-in files must be byte-stable)
         run: python3 .github/scripts/marketplace/generate-skill-metadata.py --check --no-ai
 
@@ -130,12 +136,12 @@ jobs:
             let omittedSection = '';
             try {
               const warnings = JSON.parse(fs.readFileSync('/tmp/skill-warnings.json', 'utf8'));
-              const items = (warnings.omitted_skills || []);
+              const items = (warnings.stale_skills || []);
               if (items.length > 0) {
                 omittedSection = [
-                  `### Skills omitted from this run (${items.length})`,
+                  `### Skills that could not be regenerated (${items.length})`,
                   ``,
-                  `These skills could not be enriched and were **excluded from \`metadata.json\` and \`skills.sh.json\`**. They will be retried on the next run once the issue is resolved.`,
+                  `These skills could not be enriched. Any that had a valid entry in the previous \`metadata.json\` were **emitted from it unchanged**, so the catalog has not lost them, but their metadata is now stale. Any without a usable prior entry are **absent from \`metadata.json\` and \`skills.sh.json\`**. Both are retried on the next run once the underlying issue is resolved.`,
                   ``,
                   items.map(w => `- \`${w}\``).join('\n'),
                   ``,
