@@ -1115,10 +1115,16 @@ def main(argv: list[str] | None = None) -> int:
             json.dumps({"stale_skills": skill_warnings}, indent=2) + "\n",
             encoding="utf-8",
         )
-    # A stale entry still has to fail the run. Outputs are written first so the
-    # catalog does not lose a skill, but the exit code stays non-zero in both
-    # --check and write mode so CI cannot read a partial success as a pass.
-    exit_code = 1 if skill_warnings else 0
+    # A skill that could not be built has to fail the run, in both --check and
+    # write mode, so CI cannot read a partial success as a pass. Outputs are
+    # still rendered first, so the catalog does not lose a skill either way.
+    #
+    # --no-ai is the exception. PR CI runs without an inference key on purpose,
+    # so a genuinely new skill always lands there with its fields unenriched;
+    # filling them is the regenerate job's work, not the PR's. Failing here
+    # would red-line every open PR from the moment a sync adds a skill until
+    # regeneration runs. The warnings are still printed either way.
+    exit_code = 1 if skill_warnings and not args.no_ai else 0
 
     metadata_text = dumps_canonical(metadata_obj)
     skills_sh_text = dumps_canonical(skills_sh_obj)

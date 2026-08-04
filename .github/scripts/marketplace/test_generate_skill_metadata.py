@@ -206,6 +206,42 @@ def main() -> int:
         victim not in log.split("DRIFT DETECTED")[-1] if "DRIFT DETECTED" in log else True,
     )
 
+    # --- 5. exit code: --no-ai tolerates unenriched new skills ----------
+    # PR CI runs --no-ai with no inference key, so a newly synced skill always
+    # arrives unenriched there. That must not fail the PR; the same condition
+    # with AI available must fail. A synthetic skill is injected into discovery
+    # so the outcome does not depend on whether the working tree happens to
+    # contain an unenriched skill today.
+    original_discover = gen.discover_skills
+    ghost = gen.Skill(
+        path="skills/zzz-unenriched-fixture",
+        name="zzz-unenriched-fixture",
+        description="fixture with no metadata and no prior entry",
+        frontmatter={},
+    )
+
+    def discover_with_ghost(exclusions):
+        found, excluded = original_discover(exclusions)
+        return list(found) + [ghost], excluded
+
+    def exit_code_for(argv, client):
+        gen.discover_skills = discover_with_ghost
+        gen.build_ai_client = lambda allow_ai=True: client
+        try:
+            with contextlib.redirect_stderr(io.StringIO()), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                return gen.main(argv)
+        finally:
+            gen.discover_skills = original_discover
+            gen.build_ai_client = original_client
+
+    rc_no_ai = exit_code_for(["--check", "--no-ai"], None)
+    rc_with_ai = exit_code_for(["--check"], failing_api)
+    r.check("unenriched new skill under --no-ai -> does not fail PR CI", rc_no_ai == 0,
+            f"rc={rc_no_ai}")
+    r.check("unenrichable new skill with AI available -> fails the run", rc_with_ai == 1,
+            f"rc={rc_with_ai}")
+
     return r.report()
 
 
