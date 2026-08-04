@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 323,
-  "result_row_count": 3000,
+  "skill_count": 326,
+  "result_row_count": 3030,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -1827,6 +1827,60 @@
       "component": "Holoscan Sensor Bridge",
       "has_results": true,
       "average_uplift_pct": 18.2
+    },
+    {
+      "skill": "hsb-ip-create-top",
+      "evaluation_date": "2026-06-26",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "hsb-ip-create-top",
+      "component": "Holoscan Sensor Bridge",
+      "has_results": true,
+      "average_uplift_pct": 31.5
+    },
+    {
+      "skill": "hsb-ip-def",
+      "evaluation_date": "2026-06-26",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "hsb-ip-def",
+      "component": "Holoscan Sensor Bridge",
+      "has_results": true,
+      "average_uplift_pct": 34.4
+    },
+    {
+      "skill": "hsb-ip-packetizer",
+      "evaluation_date": "2026-06-26",
+      "profile": "external",
+      "environment": "astra-sandbox",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "hsb-ip-packetizer",
+      "component": "Holoscan Sensor Bridge",
+      "has_results": true,
+      "average_uplift_pct": 47.5
     },
     {
       "skill": "hsb-setup",
@@ -14762,6 +14816,276 @@
       "agent": "codex",
       "score_pct": 68.0,
       "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "hsb-ip-create-top",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "hsb-ip-create-top",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "hsb-ip-create-top",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 70.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "hsb-ip-create-top",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "hsb-ip-create-top",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 63.0,
+      "uplift_pct": 26.0
+    },
+    {
+      "catalog_dir": "hsb-ip-create-top",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 84.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "hsb-ip-create-top",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 59.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "hsb-ip-create-top",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "hsb-ip-create-top",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 66.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "hsb-ip-create-top",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 76.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "hsb-ip-def",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "hsb-ip-def",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": -25.0
+    },
+    {
+      "catalog_dir": "hsb-ip-def",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 97.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "hsb-ip-def",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "hsb-ip-def",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 59.0
+    },
+    {
+      "catalog_dir": "hsb-ip-def",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 64.0,
+      "uplift_pct": 11.0
+    },
+    {
+      "catalog_dir": "hsb-ip-def",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 68.0,
+      "uplift_pct": 59.0
+    },
+    {
+      "catalog_dir": "hsb-ip-def",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 74.0,
+      "uplift_pct": 63.0
+    },
+    {
+      "catalog_dir": "hsb-ip-def",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "claude-code",
+      "score_pct": 81.0,
+      "uplift_pct": 53.0
+    },
+    {
+      "catalog_dir": "hsb-ip-def",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 55.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "hsb-ip-packetizer",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "hsb-ip-packetizer",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Security",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "hsb-ip-packetizer",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 65.0
+    },
+    {
+      "catalog_dir": "hsb-ip-packetizer",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Correctness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 97.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "hsb-ip-packetizer",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "hsb-ip-packetizer",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Discoverability",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 97.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "hsb-ip-packetizer",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 71.0
+    },
+    {
+      "catalog_dir": "hsb-ip-packetizer",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Effectiveness",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 62.0
+    },
+    {
+      "catalog_dir": "hsb-ip-packetizer",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "hsb-ip-packetizer",
+      "component": "Holoscan Sensor Bridge",
+      "dimension": "Efficiency",
+      "num": 3,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 49.0
     },
     {
       "catalog_dir": "hsb-setup",
