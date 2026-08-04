@@ -42,3 +42,20 @@ navigation:
       - page: Advanced Installation
         path: ../docs/advanced-install.mdx
         slug: advanced-install
+  - section: SkillEvaluator
+    skip-slug: true
+    contents:
+      - link: Overview
+        href: https://docs.nvidia.com/skills/skillevaluator
+      - link: Quickstart
+        href: https://docs.nvidia.com/skills/skillevaluator/quickstart
+      - link: Installation
+        href: https://docs.nvidia.com/skills/skillevaluator/installation
+      - link: "Tier 1: Validation"
+        href: https://docs.nvidia.com/skills/skillevaluator/tier1-validation
+      - link: "Tier 2: Deduplication"
+        href: https://docs.nvidia.com/skills/skillevaluator/tier2-deduplication
+      - link: "Tier 3: Live Evaluation"
+        href: https://docs.nvidia.com/skills/skillevaluator/tier3-live-evaluation
+      - link: CLI Reference
+        href: https://docs.nvidia.com/skills/skillevaluator/cli-reference
