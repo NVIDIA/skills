@@ -1,8 +1,6 @@
 name: Require NVSkills CI status
 
 on:
-  pull_request:
-    types: [opened, reopened, synchronize, ready_for_review]
   workflow_call:
 
 permissions:
@@ -13,7 +11,7 @@ permissions:
 jobs:
   require-nvskills-ci:
     runs-on: ubuntu-latest
-    timeout-minutes: 245
+    timeout-minutes: 65
     permissions:
       contents: read
       pull-requests: read
@@ -30,12 +28,9 @@ jobs:
           HEAD_REF: ${{ github.event.pull_request.head.ref || '' }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.event.sha || github.sha }}
           STATUS_CONTEXT: ${{ vars.NVSKILLS_STATUS_CONTEXT || 'NVSkills CI' }}
-          EVENT_ACTOR: ${{ github.actor }}
-          SIGNATURE_COMMIT_TITLE: ${{ vars.NVSKILLS_SIGNATURE_COMMIT_TITLE || 'Attach NVSkills validation signatures' }}
-          SIGNATURE_PUSH_ACTOR: ${{ vars.NVSKILLS_SIGNATURE_PUSH_ACTOR || 'nv-skills-ci[bot]' }}
           STATUS_POLL_SECONDS: ${{ vars.NVSKILLS_STATUS_POLL_SECONDS || '30' }}
           MISSING_STATUS_GRACE_SECONDS: ${{ vars.NVSKILLS_MISSING_STATUS_GRACE_SECONDS || '120' }}
-          MAX_STATUS_WAIT_SECONDS: ${{ vars.NVSKILLS_MAX_STATUS_WAIT_SECONDS || '14400' }}
+          MAX_STATUS_WAIT_SECONDS: ${{ vars.NVSKILLS_MAX_STATUS_WAIT_SECONDS || '3600' }}
         run: |
           set -euo pipefail
 
@@ -125,28 +120,6 @@ jobs:
             '
           }
 
-          is_trusted_generated_signature_commit() {
-            local commit_json="$1"
-            local commit_title
-
-            [ "${EVENT_ACTOR}" = "${SIGNATURE_PUSH_ACTOR}" ] || return 1
-
-            commit_title="$(printf '%s' "${commit_json}" | jq -r '.commit.message | split("\n")[0]')"
-            [ "${commit_title}" = "${SIGNATURE_COMMIT_TITLE}" ] || return 1
-
-            printf '%s' "${commit_json}" | jq -e '
-              def generated_artifact:
-                test(
-                  "^(skills/[^/]+|team-skills/[^/]+/[^/]+|" +
-                  "plugins/[^/]+|plugins/[^/]+/skills/[^/]+)/" +
-                  "(BENCHMARK\\.md|skill-card\\.md|skill\\.oms\\.sig|" +
-                  "skill-card-review-needed\\.md|[^/]+-review-needed\\.md)$"
-                );
-              any(.files[]?; .filename | endswith("/skill.oms.sig")) and
-              all(.files[]?; .filename | generated_artifact)
-            ' >/dev/null
-          }
-
           if [ -z "${pr_number}" ] || [ -z "${head_sha}" ]; then
             echo "Pull request metadata is incomplete."
             exit 1
@@ -162,14 +135,37 @@ jobs:
             exit 0
           fi
 
-          head_commit_json="$(get_commit_json "${head_sha}")"
-          if is_trusted_generated_signature_commit "${head_commit_json}"; then
+          has_watched_change=false
+          page=1
+          while true; do
+            files_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/pulls/${pr_number}/files?per_page=100&page=${page}")"
+            if printf '%s' "${files_json}" | jq -e '
+              def watched:
+                (. // "") |
+                startswith("skills/") or
+                startswith("team-skills/") or
+                startswith("rules/team-rules/") or
+                startswith("plugins/");
+              any(.[]; (.filename | watched) or (.previous_filename? | watched))
+            ' >/dev/null; then
+              has_watched_change=true
+              break
+            fi
+            if [ "$(printf '%s' "${files_json}" | jq 'length')" -lt 100 ]; then
+              break
+            fi
+            page=$((page + 1))
+          done
+
+          if [ "${has_watched_change}" != "true" ]; then
             append_summary \
               "## NVSkills CI required status" \
               "" \
-              "Passed: trusted NVSkills bot commit \`${head_sha}\` contains only generated validation artifacts."
+              "Skipped: PR #${pr_number} has no changes under watched NVSkills paths."
             exit 0
           fi
+
+          head_commit_json="$(get_commit_json "${head_sha}")"
 
           commit_shas_file="$(mktemp)"
           trap 'rm -f "${commit_shas_file}"' EXIT
@@ -217,7 +213,7 @@ jobs:
 
           poll_seconds="$(positive_integer "${STATUS_POLL_SECONDS}" 30)"
           missing_grace_seconds="$(positive_integer "${MISSING_STATUS_GRACE_SECONDS}" 120)"
-          max_wait_seconds="$(positive_integer "${MAX_STATUS_WAIT_SECONDS}" 14400)"
+          max_wait_seconds="$(positive_integer "${MAX_STATUS_WAIT_SECONDS}" 3600)"
           elapsed_seconds=0
           status_sha=""
           status_state="missing"
