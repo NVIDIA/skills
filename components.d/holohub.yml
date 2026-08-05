@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: HoloHub
+repo: nvidia-holoscan/holohub
+description: Build, run, debug, benchmark, and develop HoloHub applications and Holoscan Modules with validated lifecycle workflows.
+links:
+  discussions: false
+skills:
+  - path: skills/holohub-app-lifecycle/
+    catalog_dir: holohub-app-lifecycle
+  - path: skills/holohub-debug-build-run/
+    catalog_dir: holohub-debug-build-run
+  - path: skills/holohub-module-lifecycle/
+    catalog_dir: holohub-module-lifecycle
