@@ -1404,18 +1404,21 @@
     },
     {
       "skill": "doca-telemetry-exporter",
-      "evaluation_date": "2026-07-26",
+      "evaluation_date": "2026-07-29",
       "profile": null,
       "environment": "k8s-sandbox",
       "tasks": 4,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
-      "agents": [],
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
       "catalog_dir": "doca-telemetry-exporter",
       "component": "DOCA",
       "has_results": true,
-      "average_uplift_pct": 31.7
+      "average_uplift_pct": 37.1
     },
     {
       "skill": "doca-telemetry-utils",
@@ -13111,7 +13114,7 @@
       "catalog_dir": "doca-telemetry-exporter",
       "component": "DOCA",
       "dimension": "Security",
-      "num": 4,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -13120,7 +13123,7 @@
       "catalog_dir": "doca-telemetry-exporter",
       "component": "DOCA",
       "dimension": "Security",
-      "num": 4,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -13129,26 +13132,17 @@
       "catalog_dir": "doca-telemetry-exporter",
       "component": "DOCA",
       "dimension": "Correctness",
-      "num": 4,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "doca-telemetry-exporter",
       "component": "DOCA",
       "dimension": "Correctness",
-      "num": 4,
+      "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 20.0
-    },
-    {
-      "catalog_dir": "doca-telemetry-exporter",
-      "component": "DOCA",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 25.0
     },
@@ -13156,46 +13150,55 @@
       "catalog_dir": "doca-telemetry-exporter",
       "component": "DOCA",
       "dimension": "Discoverability",
-      "num": 4,
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "doca-telemetry-exporter",
+      "component": "DOCA",
+      "dimension": "Discoverability",
+      "num": null,
       "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 34.0
+      "score_pct": 92.0,
+      "uplift_pct": 33.0
     },
     {
       "catalog_dir": "doca-telemetry-exporter",
       "component": "DOCA",
       "dimension": "Effectiveness",
-      "num": 4,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 94.0,
-      "uplift_pct": 71.0
+      "uplift_pct": 64.0
     },
     {
       "catalog_dir": "doca-telemetry-exporter",
       "component": "DOCA",
       "dimension": "Effectiveness",
-      "num": 4,
+      "num": null,
       "agent": "codex",
-      "score_pct": 81.0,
-      "uplift_pct": 31.0
+      "score_pct": 94.0,
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "doca-telemetry-exporter",
       "component": "DOCA",
       "dimension": "Efficiency",
-      "num": 4,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 94.0,
-      "uplift_pct": 30.0
+      "uplift_pct": 41.0
     },
     {
       "catalog_dir": "doca-telemetry-exporter",
       "component": "DOCA",
       "dimension": "Efficiency",
-      "num": 4,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 66.0
+      "uplift_pct": 70.0
     },
     {
       "catalog_dir": "doca-telemetry-utils",

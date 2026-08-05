@@ -36,6 +36,8 @@
       "skills": [
         "hsb-app",
         "hsb-flash",
+        "hsb-ip-def",
+        "hsb-ip-packetizer",
         "hsb-setup",
         "hsb-test",
         "i4h-catheter-navigation-setup",
@@ -316,6 +318,7 @@
       "title": "GPU Development",
       "description": "Develop, tune, profile, and integrate GPU kernels and accelerated code, including CUDA-adjacent workflows, autotuning, low-level performance work, and framework integration.",
       "skills": [
+        "hsb-ip-create-top",
         "tao-run-on-docker",
         "tilegym-adding-cutile-kernel",
         "tilegym-converting-cutile-to-julia",
