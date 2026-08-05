@@ -821,6 +821,68 @@ jobs:
       - name: Regenerate README tables
         run: .github/scripts/regenerate-readme.sh
 
+      # The rsync loop records a component as changed the moment rsync
+      # produces a diff, but the drift, compliance and prune steps that run
+      # after it can revert those files. Nothing ever removed the component
+      # from the list, so a component whose skills were all held came out
+      # labelled "updated" — contradicting the held list printed directly
+      # below it in the same PR body, and inflating the title that GitHub
+      # rejects past 256 characters. Recompute from the working tree now
+      # that every step which can mutate it has run.
+      - name: Recompute changed components after reverts
+        run: |
+          set -euo pipefail
+
+          CONFIG=/tmp/components.aggregated.yml
+          recomputed=/tmp/changed-components.recomputed.txt
+          : > "$recomputed"
+
+          if [ -f "$CONFIG" ]; then
+            component_count=$(yq -r '.components | length' "$CONFIG")
+            for ((i = 0; i < component_count; i++)); do
+              name=$(yq -r ".components[$i].name" "$CONFIG")
+              skill_count=$(yq -r ".components[$i].skills | length" "$CONFIG")
+              for ((j = 0; j < skill_count; j++)); do
+                catalog_dir=$(yq -r ".components[$i].skills[$j].catalog_dir" "$CONFIG")
+                if [ -n "$(git status --porcelain "skills/$catalog_dir" 2>/dev/null)" ]; then
+                  echo "- $name" >> "$recomputed"
+                  break
+                fi
+              done
+            done
+          fi
+
+          # Entries that are not components describe changes outside
+          # skills/, so they are re-established from their own evidence
+          # rather than carried over from the pre-revert list.
+          if [ -s /tmp/pruned-orphans.txt ]; then
+            echo "- orphan pruning" >> "$recomputed"
+          fi
+          if [ -n "$(git status --porcelain plugins .agents/plugins .claude-plugin .cursor-plugin 2>/dev/null)" ]; then
+            echo "- plugin catalog" >> "$recomputed"
+          fi
+
+          sort -u -o "$recomputed" "$recomputed"
+
+          # A sync can legitimately change only README tables or generated
+          # catalog files. Those still warrant a PR, so never let the
+          # recompute turn a dirty tree into "no changes".
+          if [ ! -s "$recomputed" ] && [ -n "$(git status --porcelain)" ]; then
+            echo "- catalog maintenance" >> "$recomputed"
+          fi
+
+          before=$(wc -l < /tmp/changed-components.txt | tr -d ' ')
+          after=$(wc -l < "$recomputed" | tr -d ' ')
+          echo "changed components: ${before} recorded during rsync -> ${after} after reverts"
+          if [ "${before}" -ne "${after}" ]; then
+            echo "Dropped from the list (rsynced then reverted or removed):"
+            comm -23 \
+              <(sort -u /tmp/changed-components.txt) \
+              <(sort -u "$recomputed") | sed 's/^/  /'
+          fi
+
+          mv "$recomputed" /tmp/changed-components.txt
+
       - name: Build sync summary
         id: summary
         run: |
