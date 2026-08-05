@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when the user is doing hands-on DOCA Telemetry Exporter programming on a host where DOCA is installed — defining a doca_telemetry_exporter_schema, creating sources, picking counter/gauge/event types, running capability queries before assuming limits, registering schemas before the first emit, or debugging DOCA_ERROR_* failures from the exporter API. <br>
+Use this skill when the user is doing hands-on DOCA Telemetry Exporter programming on a host where DOCA is installed — defining a doca_telemetry_exporter_schema and event types, creating sources, picking a publish surface (typed events / opaque events / the metrics counter-gauge-histogram API / OTLP logs / NetFlow), walking the schema-then-source lifecycle, or debugging DOCA_ERROR_* failures from the exporter API. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers building applications that emit structured telemetry through DOCA Telemetry Exporter — users whose application code calls doca_telemetry_exporter_* to publish counters, gauges, and events from their DOCA-using program to an external telemetry consumer. <br>
+External developers and engineers building DOCA applications that emit structured telemetry (counters, gauges, events) through the DOCA Telemetry Exporter C library to an external consumer. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,13 +26,13 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [DOCA Telemetry Exporter Documentation](https://docs.nvidia.com/doca/sdk/DOCA-Telemetry-Exporter/index.html) <br>
-- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Code, Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash and C code blocks] <br>
+**Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -43,37 +43,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 evaluation tasks (3 positive skill-activation tasks, 1 negative task). <br>
+4 evaluation tasks (3 positive, 1 negative) from skill-evaluator-dataset-snapshot/1, each in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Whether the skill is safe to use (unsafe operations, secret leakage, unauthorized access). <br>
+- Correctness: Whether the answer produced is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded and activated when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
+- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `skill_execution`: Verifies the expected skill was found and executed. <br>
+- `skill_efficiency`: Measures routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `accuracy`: Checks final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
+- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
-|---|---:|---:|---:|
-| Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+40%) | 100% (+20%) |
-| Discoverability | 4 | 100% (+25%) | 94% (+34%) |
-| Effectiveness | 4 | 94% (+71%) | 81% (+31%) |
-| Efficiency | 4 | 94% (+30%) | 100% (+66%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 57% → 98% (+40 points) | 64% → 97% (+34 points) |
+| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
+| Correctness | 40% → 100% (+60 points) | 75% → 100% (+25 points) |
+| Discoverability | 62% → 100% (+38 points) | 59% → 92% (+33 points) |
+| Effectiveness | 30% → 94% (+64 points) | 54% → 94% (+40 points) |
+| Efficiency | 53% → 94% (+41 points) | 30% → 100% (+70 points) |
 
 ## Skill Version(s): <br>
-d6d1714 (source: git SHA, committed 2026-07-26) <br>
+0aeaedb (source: git SHA, committed 2026-07-28) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

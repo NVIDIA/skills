@@ -4,20 +4,20 @@ name: doca-telemetry-exporter
 description: >
   Use this skill when the user is doing hands-on DOCA Telemetry
   Exporter programming on a host where DOCA is installed — defining
-  a doca_telemetry_exporter_schema, creating sources, picking
-  counter/gauge/event types, running capability queries before
-  assuming limits, registering schemas before the first emit, or
-  debugging DOCA_ERROR_* failures from the exporter API. Trigger
-  even when the user does not explicitly mention "DOCA Telemetry
-  Exporter" or "doca_telemetry_exporter_*" — typical implicit
-  phrasings include "publishing counters from my DOCA app", "emit
-  returns AGAIN under bulk load", "consumer sees nothing but emit
-  reports success", "NOT_FOUND on first submit", or "should I link
-  the exporter or the telemetry service". Refuse and route elsewhere
-  for the receiving DOCA Telemetry Service, plain stdout logging via
-  doca_log, non-DOCA Prometheus scrape sinks, or real-time event
-  subscription back into the app via doca-comch — those belong to
-  other skills.
+  a doca_telemetry_exporter_schema and event types, creating
+  sources, picking a publish surface (typed events / opaque events
+  / the metrics counter-gauge-histogram API / OTLP logs / NetFlow),
+  walking the schema-then-source lifecycle, or debugging
+  DOCA_ERROR_* failures from the exporter API. Trigger even when
+  the user does not explicitly mention "DOCA Telemetry Exporter" or
+  "doca_telemetry_exporter_*" — typical implicit phrasings include
+  "publishing counters from my DOCA app", "BAD_STATE when I report
+  an event", "consumer/DTS sees nothing but my report succeeded",
+  "how do I export NetFlow/IPFIX records", or "should I link the
+  exporter or the telemetry service". Refuse and route elsewhere
+  for the receiving DOCA Telemetry Service (DTS), plain stdout
+  logging via doca_log, or real-time event subscription back into
+  the app via doca-comch — those belong to other skills.
 metadata:
   kind: library
 compatibility: >
@@ -45,6 +45,13 @@ exporter-vs-service rule in
 [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
 before configuring anything.
 
+> **This library is NOT a DOCA Core context.** There is no
+> `doca_ctx_start()` for the exporter and no per-`doca_devinfo`
+> capability-query family (its `doca_caps` dump is a stub). The
+> lifecycle is `schema_init` → configure exporters → register
+> type(s) → `schema_start` → `source_create` → `source_start` →
+> report → flush → destroy.
+
 ## Example questions this skill answers well
 
 The CLASSES of telemetry-exporter questions this skill is built to
@@ -62,50 +69,51 @@ instance.
   `doca-telemetry-exporter` as the publisher the application links
   and route the receiving / consuming side away from this skill.
 - **"How do I emit my first structured event from a DOCA program?"** —
-  worked example: *"emit a single per-second `packets_processed`
-  counter event from my DOCA Flow application"*. Answered by the
-  schema-register-before-emit lifecycle in
+  worked example: *"emit a `packets_processed` event record from my
+  DOCA Flow application"*. Answered by the schema → source
+  lifecycle in
   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
   object table + the workflow in
   [`TASKS.md ## configure`](TASKS.md#configure) +
-  [`TASKS.md ## run`](TASKS.md#run) step 3 (single-event smoke
-  before bulk).
-- **"My event-emit call returns `DOCA_ERROR_AGAIN` under load —
-  should I retry?"** — worked example: *"my high-rate emit loop
-  starts returning `AGAIN` once the downstream consumer falls
-  behind — do I sleep-and-retry?"*. Answered by the hot-path
-  drop-not-block invariant in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
-  + the `AGAIN` row in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy):
-  the app's correct response is to drop the event (or buffer
-  bounded) — never block the data path on telemetry.
-- **"My emit returns `DOCA_ERROR_NOT_FOUND` — what did I forget?"** —
-  worked example: *"`doca_telemetry_exporter_source_report` returns
-  `NOT_FOUND` on the very first call"*. Answered by the `NOT_FOUND`
-  row in
+  [`TASKS.md ## run`](TASKS.md#run) step 3 (file-write smoke before
+  bulk), starting from the `telemetry_export/` sample.
+- **"Which publish surface do I want — typed events, metrics, OTLP
+  logs, or NetFlow?"** — worked example: *"I want labeled
+  per-interface packet counters and a bandwidth gauge"*. Answered
+  by the publish-surface table in
+  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  (that intent maps to the Metrics API — `_metrics_add_counter` /
+  `_add_gauge` — and the `telemetry_export_metrics/` sample), plus
+  the sample map in [`TASKS.md ## modify`](TASKS.md#modify).
+- **"My report call returns `DOCA_ERROR_BAD_STATE` — what did I
+  get wrong?"** — worked example:
+  *"`doca_telemetry_exporter_source_report` returns `BAD_STATE` on
+  the first call"*. Answered by the `BAD_STATE` row in
   [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
-  (schema for the event type was never registered against this
-  source) + the lifecycle order in
-  [`TASKS.md ## configure`](TASKS.md#configure) (register schemas
-  BEFORE the first emit).
-- **"My program emits, but the consumer sees nothing — where do I
-  start?"** — worked example: *"emit returns success, but the
-  collector log on the same host is empty"*. Answered by the
-  consumer-must-be-up-first rule in
+  (the source was never started, or an OTLP context is missing on
+  write/flush) + the lifecycle order in
+  [`TASKS.md ## configure`](TASKS.md#configure). Note there is NO
+  `DOCA_ERROR_AGAIN` and NO `DOCA_ERROR_NOT_FOUND` on this API.
+- **"My program reports, but the DTS / collector sees nothing —
+  where do I start?"** — worked example: *"my report returns
+  success, but the DTS log is empty"*. Answered by the
+  receiver-up-first staging in
   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
-  permission matrix + the smoke-before-bulk loop in
-  [`TASKS.md ## test`](TASKS.md#test) (one event end-to-end with
-  consumer reception confirmed BEFORE any bulk emit).
-- **"Is `doca_telemetry_exporter_*` on my installed DOCA, and is
-  the event type I want supported here?"** — worked example: *"is
-  the gauge type on DOCA 3.3 against my install?"*. Answered by
+  + the file-write smoke and `check_ipc_status` steps in
+  [`TASKS.md ## test`](TASKS.md#test) (prove the publish half with
+  file write, then confirm IPC is `CONNECTED` and the receiver
+  is up).
+- **"How do I confirm the exporter is installed and my transport
+  is live?"** — worked example: *"is the exporter on my DOCA 3.x
+  install, and is IPC to DTS actually connected?"*. Answered by
   the version-compatibility overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility),
-  which cross-links the canonical detection chain in
-  [`doca-version`](../../doca-version/SKILL.md), plus the
-  capability-query rule in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
+  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility)
+  (cross-linking the detection chain in
+  [`doca-version`](../../doca-version/SKILL.md)) plus the honest
+  introspection rule in
+  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  (`doca_telemetry_exporter_check_ipc_status`, not a device
+  cap-query).
 
 ## Audience
 
@@ -128,9 +136,9 @@ canonical case; the worked examples in `TASKS.md` assume that path.
 Other-language consumers (Rust, Go, Python, …) consume the same
 `*.so` through FFI or language-specific bindings; the skill's
 contribution in that case is to keep the exporter-vs-service
-distinction, the schema-register-before-emit lifecycle, the
-capability-discovery rule, the same-user-as-the-app permission
-rule, the hot-path drop-not-block invariant, and the error-taxonomy
+distinction, the schema → source lifecycle, the transport-not-caps
+discovery rule, the same-user-as-the-app permission rule, the
+buffered flush-based delivery model, and the error-taxonomy
 guidance language-neutral, and to route the agent to the public C
 ABI as the authoritative surface that any wrapper will eventually
 call.
@@ -147,16 +155,19 @@ Exporter work, in any language. Concretely:
   to represent distinct logical sources of telemetry inside the
   application (e.g. one source per worker thread / per pipeline
   stage).
-- Picking the right `doca_telemetry_exporter_type` (counter,
-  gauge, event) for each field the application reports.
-- Reading the device + library capability surface for the
-  exporter via the `doca_telemetry_exporter_*_get_*` query family
-  before assuming a particular limit (max schema fields, max
-  event size, …) is available on this install.
+- Picking the right publish surface — typed structured events
+  (`_source_report`), opaque events (`_source_opaque_report`), the
+  Metrics API (counter / gauge / histogram), OTLP logs, or the
+  NetFlow sibling API — for what the application reports.
+- Confirming the exporter's install + transport reality (there is
+  NO `doca_devinfo` cap-query family and NO `doca_caps` data for
+  this library): `doca_telemetry_exporter_check_ipc_status` for
+  IPC liveness, `_source_get_opaque_report_max_data_size` for the
+  opaque payload bound, and the `_schema_get_*` config getters.
 - Debugging a `DOCA_ERROR_*` returned from an exporter call
-  (lifecycle vs. invalid value vs. transport-queue-full vs.
-  permission vs. transport / driver) and the per-emit status
-  reported back to the application.
+  (`BAD_STATE` lifecycle-order vs. `INVALID_VALUE` type/label
+  mismatch vs. `NO_MEMORY` vs. `INITIALIZATION` vs. `UNKNOWN`
+  backend) and the per-call status returned to the application.
 - Choosing between Telemetry Exporter and an adjacent option
   (`doca_log` when stdout / structured-log shipping is enough; a
   Prometheus client library when the user needs a non-DOCA-aware
@@ -165,9 +176,9 @@ Exporter work, in any language. Concretely:
   exporter is publish-only / one-way).
 - Designing or extending non-C bindings (Rust, Go, Python, …)
   that wrap the exporter C ABI — for the exporter-vs-service
-  distinction, the schema-register-before-emit lifecycle, the
-  permission policy, the hot-path drop-not-block invariant, and
-  the capability + error rules the wrapper must honor.
+  distinction, the schema → source lifecycle, the permission
+  policy, the buffered flush-based delivery model, and the
+  transport-introspection + error rules the wrapper must honor.
 
 Do **not** load this skill for general DOCA orientation, install
 of DOCA itself, the receiving telemetry service (the DOCA
@@ -184,17 +195,21 @@ exporter-specific material lives in two companion files:
 
 - `CAPABILITIES.md` — what the exporter can express on this
   install: the exporter-vs-service role-split rule, the object
-  family (`doca_telemetry_exporter_schema` → `_source` → `_type`
-  with the schema-register-before-emit lifecycle), the
-  capability-query surface (`doca_telemetry_exporter_*_get_*`),
-  the exporter error taxonomy (mapped onto the cross-library
-  `DOCA_ERROR_*` set, with the `AGAIN`-means-drop-not-block rule
-  called out explicitly), the observability surface (per-emit
-  status + capability snapshot at configure time + the consumer
-  side as the end-to-end signal), the safety policy that gates
-  the same-user-as-the-app permission and the
-  consumer-must-be-up-first staging, and the path-selection rule
-  against `doca_log`, Prometheus, and `doca-comch`.
+  family (`doca_telemetry_exporter_schema` → `_type`/`_field` →
+  `_source` with the schema → source lifecycle), the four publish
+  surfaces (typed events / opaque events / Metrics API / OTLP
+  logs) plus the NetFlow sibling API, the transport-not-caps
+  introspection rule (`check_ipc_status`,
+  `_get_opaque_report_max_data_size`, `_schema_get_*` — NO
+  `doca_caps` data, NO device cap-query), the exporter error
+  taxonomy (mapped onto the cross-library `DOCA_ERROR_*` set, with
+  the note that there is NO `AGAIN` and NO `NOT_FOUND` on this
+  surface), the observability surface (per-call status + IPC
+  status + file-write inspection + the receiver side as the
+  end-to-end signal), the safety policy that gates the
+  same-user-as-the-app permission and the receiver-up-first
+  staging, and the path-selection rule against `doca_log` and
+  `doca-comch`.
 - `TASKS.md` — step-by-step workflows for the six in-scope
   exporter verbs: `configure`, `build`, `modify` (followed by a
   rebuild), `run`, `test`, `debug`. Plus a `Deferred task verbs` block that points
@@ -245,10 +260,10 @@ contain — and pull requests should not add:
 1. Read this `SKILL.md` first to confirm the user's question is
    in scope.
 2. **For the exporter-vs-service rule, the object family, the
-   schema-register-before-emit lifecycle, the capability-query
-   surface, the error taxonomy (including the `AGAIN`-means-drop
-   rule), observability, the safety policy, and the
-   path-selection rule against `doca_log` / Prometheus / comch,
+   schema → source lifecycle, the four publish surfaces + NetFlow,
+   the transport-not-caps introspection rule, the error taxonomy
+   (note: no `AGAIN`, no `NOT_FOUND`), observability, the safety
+   policy, and the path-selection rule against `doca_log` / comch,
    see [CAPABILITIES.md](CAPABILITIES.md).**
 3. **For step-by-step workflows — configure, build, modify,
    rebuild, run, test, debug — see [TASKS.md](TASKS.md).**
@@ -301,6 +316,6 @@ guidance".
   actual requirement.
 - [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
   debug ladder (install / version / build / link / runtime /
-  program / driver). Exporter-specific debug (consumer not up,
-  schema-not-registered, transport queue full, hot-path block)
-  overlays on top of that ladder.
+  program / driver). Exporter-specific debug (receiver not up,
+  lifecycle-order `BAD_STATE`, type/label `INVALID_VALUE`,
+  opaque-path-not-enabled) overlays on top of that ladder.

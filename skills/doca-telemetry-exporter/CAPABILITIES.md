@@ -1,17 +1,27 @@
-# DOCA Telemetry Exporter capabilities, version overlay, errors, observability, safety
+# DOCA Telemetry Exporter capabilities, publish surfaces, version overlay, errors, observability, safety
 
 **Where to start:** Pick the H2 anchor that matches your question
-(role-split / object family / capability discovery / path selection
-/ version / errors / observability / safety) and read that section
+(role-split / object family / publish-surface selection / version
+/ errors / observability / safety) and read that section
 end-to-end. The tables in each section are the load-bearing
 content; the prose around them is interpretation.
 
 Read this file when the loader sent you here from
 [SKILL.md](SKILL.md). For the *how* of executing each pattern (the
-verbs `configure / build / modify + rebuild / run / test / debug`), jump to
+verbs `configure / build / modify / run / test / debug`), jump to
 [TASKS.md](TASKS.md). For the canonical DOCA version-handling rules
 that this skill layers an exporter overlay on top of, see
 [`doca-version`](../../doca-version/SKILL.md).
+
+> **Ground-truth note.** Every symbol, macro, error code, default
+> path, and lifecycle step in this file is quoted from the public
+> exporter headers (`doca_telemetry_exporter.h`,
+> `doca_telemetry_exporter_netflow.h`) and the shipped samples
+> under `/opt/mellanox/doca/samples/doca_telemetry_exporter/`.
+> The headers-win-over-docs rule
+> ([`doca-version`](../../doca-version/SKILL.md)) applies: if the
+> installed header disagrees with anything here, the header is
+> authoritative and the agent must re-read it before answering.
 
 ## Pattern overview
 
@@ -22,42 +32,43 @@ the worked examples shown.
 
 | Pattern | When it applies (class shape) | Where the substance lives |
 | --- | --- | --- |
-| 1. Pick exporter, not the service | The application is the PUBLISHER of telemetry events; the receiving / aggregating side is a separate DOCA service out of this skill's scope | [`## Capabilities and modes`](#capabilities-and-modes) role-split table |
-| 2. Decide the exporter is the right tool | The need is structured event / counter / gauge publishing INTO the DOCA telemetry ecosystem; it is NOT plain stdout logging, NOT a non-DOCA Prometheus-style scrape, NOT a real-time event subscription back into the app | [`## Capabilities and modes`](#capabilities-and-modes) path-selection bullet |
-| 3. Register the schema BEFORE the first emit | Every event the exporter publishes is shaped by a `doca_telemetry_exporter_schema` the app registers in advance; emitting before registration returns `BAD_STATE` / `NOT_FOUND` | [`## Capabilities and modes`](#capabilities-and-modes) object table + [TASKS.md ## configure](TASKS.md#configure) step 5 |
-| 4. Stand up the source + schema + lifecycle | DOCA Core lifecycle: create exporter context → register one or more `_schema` → create one or more `_source` → start → emit events → stop → destroy | [`## Capabilities and modes`](#capabilities-and-modes) object table + [TASKS.md ## configure](TASKS.md#configure) |
-| 5. Discover capabilities before assuming limits | `doca_telemetry_exporter_*_get_*` family for max schema fields, max event size, supported event types — call BEFORE assuming a particular shape fits this install | [`## Capabilities and modes`](#capabilities-and-modes) capability-query rule + [TASKS.md ## configure](TASKS.md#configure) step 4 |
-| 6. Diagnose an exporter error | Map symptom (`BAD_STATE`, `INVALID_VALUE`, `AGAIN`, `NOT_PERMITTED`, `NOT_FOUND`, `DRIVER`) to root cause; in particular recognise `AGAIN` as a *transport-full, drop-or-buffer-bounded, never-block* signal, not a sleep-and-retry signal | [`## Error taxonomy`](#error-taxonomy) + [TASKS.md ## debug](TASKS.md#debug) |
+| 1. Pick exporter, not the service | The application is the PUBLISHER of telemetry; the receiving / aggregating side (DOCA Telemetry Service, DTS) is a separate DOCA artifact out of this skill's scope | [`## Capabilities and modes`](#capabilities-and-modes) role-split table |
+| 2. Pick the right publish surface | The library exposes FOUR distinct publish surfaces — typed structured events, opaque events, the Metrics API (counter/gauge/histogram), and the NetFlow/IPFIX API — plus the OTLP-logs API layered on a source. Picking the wrong one is the #1 first-app confusion | [`## Capabilities and modes`](#capabilities-and-modes) publish-surface table |
+| 3. Register the schema/type BEFORE the first report | Typed events are shaped by a `doca_telemetry_exporter_type` added to a `doca_telemetry_exporter_schema` and finalized with `doca_telemetry_exporter_schema_start()` BEFORE any source is created; reporting against a source that was not started returns `DOCA_ERROR_BAD_STATE` | [`## Capabilities and modes`](#capabilities-and-modes) object table + [TASKS.md ## configure](TASKS.md#configure) |
+| 4. Walk the schema → source lifecycle | `schema_init` → configure exporters (file / IPC / opaque) → `type_create` + `field_*` + `schema_add_type` → `schema_start` → `source_create` → `source_set_id/tag` → `source_start` → report → `source_flush` → `source_destroy` → `schema_destroy` | [`## Capabilities and modes`](#capabilities-and-modes) object table + [TASKS.md ## configure](TASKS.md#configure) |
+| 5. Confirm the transport, not device caps | This library has NO per-`doca_devinfo` capability-query family and NO `doca_caps` data (its `doca_caps` dump is a stub). The real preconditions are transport ones: is a receiver up, is IPC connected (`doca_telemetry_exporter_check_ipc_status`), is the file-write data root writable | [`## Capabilities and modes`](#capabilities-and-modes) transport rule + [`## Observability`](#observability) |
+| 6. Diagnose an exporter error | Map the actual documented codes (`DOCA_ERROR_BAD_STATE`, `DOCA_ERROR_INVALID_VALUE`, `DOCA_ERROR_NO_MEMORY`, `DOCA_ERROR_INITIALIZATION`, `DOCA_ERROR_UNKNOWN`) to root cause; there is NO `DOCA_ERROR_AGAIN` and NO `DOCA_ERROR_NOT_FOUND` on this API surface | [`## Error taxonomy`](#error-taxonomy) + [TASKS.md ## debug](TASKS.md#debug) |
 
 Two cross-cutting rules that apply to *every* pattern above:
 
-- **Telemetry must never block the application's data path.** When
-  the transport is congested (`DOCA_ERROR_AGAIN`), the correct app
-  behavior is to DROP the event or buffer it bounded — never block
-  the hot path on a telemetry submit. An agent that recommends a
-  blocking retry-loop on `AGAIN` is wrong for every release of the
-  exporter; that pattern destroys the very application latency the
-  user is presumably trying to measure.
 - **The exporter is the publisher; the receiver is a separate
   artifact.** `doca-telemetry-exporter` is what the user's
-  application links to *send* telemetry. The aggregating /
-  collecting side (the DOCA Telemetry Service) is a separate DOCA
-  service with its own public guide, reachable through
+  application links to *publish* telemetry. The aggregating /
+  collecting side (the DOCA Telemetry Service, DTS — reached over
+  IPC) and any downstream OpenTelemetry Collector are separate,
+  each with its own public guide reachable through
   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
   Conflating the two is the #1 first-app confusion and the agent
   must surface the distinction before any code-level guidance.
+- **Delivery is buffered and flush-based, not a blocking submit.**
+  Reports accumulate in an internal buffer that is flushed when
+  full or on an explicit `doca_telemetry_exporter_source_flush()`
+  (or the Metrics API's `_metrics_flush` / auto flush interval).
+  A `_source_report` does NOT block on a full transport and does
+  NOT return `DOCA_ERROR_AGAIN` — there is no such return in this
+  API. The NetFlow `_netflow_send` reports how many records it
+  actually sent via its `records_sent` out-parameter; a short
+  send is the backpressure signal on that surface.
 
 ## Capabilities and modes
 
-DOCA Telemetry Exporter is a **DOCA Core Context** with one
-exporter context object that owns one or more schemas, one or more
-sources, and a transport to the receiving consumer. Every exporter
-instance follows the universal `cfg-create → cfg-set-* → init →
-start → use → stop → destroy` lifecycle (see
-[`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes)).
-On top of that lifecycle, the exporter layers an asymmetric
-publisher / receiver role split, a small object family, and a
-capability-query family.
+DOCA Telemetry Exporter is a **CollectX-backed publisher library**,
+not a DOCA Core Context. It does NOT use the
+`doca_ctx_create → doca_ctx_start` lifecycle and there is no
+`doca_ctx` handle for the exporter. The lifecycle is instead a
+**schema → source** progression, with three optional per-source
+publish contexts (metrics / OTLP logs) and one sibling top-level
+API (NetFlow).
 
 **Role split — exporter (publisher) vs telemetry service
 (receiver).** The exporter is asymmetric and the asymmetry is the
@@ -65,62 +76,62 @@ capability-query family.
 
 | Side | What it does | What it does NOT do | Where it lives |
 | --- | --- | --- | --- |
-| Exporter (this library) | Application-side publishing of structured telemetry events: register schemas describing event shape, create one or more sources, submit values into the transport | Aggregate, persist, query, fan-out, or downstream-route telemetry; subscribe back into the app on someone else's events | Linked INTO the user's DOCA-using application; runs as the application's user, in the application's process |
-| Telemetry receiver (separate DOCA service, out of scope here) | Receive telemetry from one or more exporters, aggregate / persist / forward to downstream sinks (NetFlow / IPFIX / Prometheus / …) | Publish telemetry events itself | A separate DOCA service with its own public guide; reach via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md). NOT part of this skill |
+| Exporter (this library) | Application-side publishing: define event/type schemas, create sources, report typed / opaque events, metrics, and NetFlow records into the configured exporters (file write, IPC to DTS, Prometheus for metrics, UDP collector for NetFlow) | Aggregate, persist, query, fan-out, or downstream-route telemetry | Linked INTO the user's DOCA-using application; runs as the application's user, in the application's process |
+| Telemetry receiver (separate — DTS / OTel Collector / NetFlow collector) | Receive telemetry from one or more exporters, aggregate / persist / forward to downstream sinks | Publish telemetry itself | A separate DOCA service (DTS) or third-party collector with its own guide; reach via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md). NOT part of this skill |
 
-**Object family.** The exporter exposes ONE root context plus a
-small set of cooperating object types. The agent must not invent
-additional ones; the public surface is closed.
+**Object family.** The public surface is closed; the agent must not
+invent additional object types or a `doca_ctx`.
 
-| Object | What it represents | Per-instance scope | Notes |
+| Object / handle | What it represents | Created / finalized by | Notes |
 | --- | --- | --- | --- |
-| `doca_telemetry_exporter_schema` | The shape of a telemetry event the app will publish — field names + field types | One per distinct event shape the application emits | MUST be registered with the exporter BEFORE the first emit referencing it; emitting against an unknown schema returns `DOCA_ERROR_NOT_FOUND` |
-| `doca_telemetry_exporter_source` | One logical source of telemetry events from the app's perspective (per-worker, per-pipeline-stage, per-tenant) | The app may create multiple sources from one exporter context, e.g. one source per worker thread | Used at emit time as the *who-is-reporting* anchor; aggregated by the receiver for fan-out / filtering |
-| `doca_telemetry_exporter_type` | The data type of a telemetry value: counter (monotonic), gauge (instantaneous), event (one-shot structured record) | Per field declared in a schema | Selection drives the receiver's downstream-rendering choice (counters → rate, gauges → snapshot, events → timeline). The right type is workload-bound and the agent should NOT default to one without asking |
+| `struct doca_telemetry_exporter_schema` | The root publisher configuration: which exporters are enabled (file / IPC / opaque), buffer size, and the set of registered event types | `doca_telemetry_exporter_schema_init(name, &schema)`; finalized by `doca_telemetry_exporter_schema_start(schema)`; freed by `doca_telemetry_exporter_schema_destroy` | Configure exporters with the `doca_telemetry_exporter_schema_set_*` family BEFORE `schema_start`. Do NOT add types after `schema_start` |
+| `struct doca_telemetry_exporter_type` | The shape (field list) of ONE structured event record | `doca_telemetry_exporter_type_create(&type)`, fields added via `doca_telemetry_exporter_type_add_field`, registered into a schema with `doca_telemetry_exporter_schema_add_type(schema, name, type, &type_index)` | `schema_add_type` returns a `doca_telemetry_exporter_type_index_t` — the handle you pass to `_source_report`. Duplicate type name or bad field type → `DOCA_ERROR_INVALID_VALUE` |
+| `struct doca_telemetry_exporter_field` | One field of a type: name, description, type-name, array length | `doca_telemetry_exporter_field_create`, then `_field_set_name` / `_field_set_description` / `_field_set_type_name` / `_field_set_array_len` | Field type is one of the `DOCA_TELEMETRY_EXPORTER_FIELD_TYPE_*` string macros (e.g. `..._UINT64`, `..._INT32`, `..._CHAR`, `..._TIMESTAMP`). Ownership transfers to the type on `_type_add_field` |
+| `struct doca_telemetry_exporter_source` | One logical reporter (per-worker / per-pipeline-stage / per-tenant) | `doca_telemetry_exporter_source_create(schema, &source)` (schema must be started first), `_source_set_id` / `_source_set_tag`, then `doca_telemetry_exporter_source_start(source)` | Report only after `source_start`. Multiple sources per schema are allowed. `_source_flush` forces a buffer flush; `_source_destroy` tears it down |
 
-**Capability discovery — the only rule.** Before sizing a schema,
-choosing an event payload size, or assuming a particular event type
-is on this install, call the matching
-`doca_telemetry_exporter_*_get_*` query family (per the
-cross-cutting cap-query rule in
-[`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability)).
-The query is the runtime authority for *"is this exporter shape
-supported on this install"*. Quoting *"the exporter supports X
-fields"* from memory without the cap query is the silent-fail case
-— when the install's actual cap is lower, the program returns
-`DOCA_ERROR_INVALID_VALUE` at schema-register time and the user
-has no idea why. The agent MUST quote the queried values back to
-the user; the canonical list of `_get_*` queries that exist on a
-particular install is in the public exporter headers (per the
-headers-win-over-docs rule in [`doca-version`](../../doca-version/SKILL.md)).
+**Publish surfaces.** ONE source can drive several publish
+surfaces. The agent MUST pick the surface that matches intent
+before writing any report call.
 
-**Path selection — exporter vs the adjacent options.** The exporter
-is for structured telemetry publishing INTO the DOCA telemetry
-ecosystem. It is not the answer for every "I want to emit
-something" question; the agent must walk this rule before
-recommending exporter setup.
+| Publish surface | How to publish | Precondition | Stability |
+| --- | --- | --- | --- |
+| Typed structured events | `doca_telemetry_exporter_source_report(source, type_index, data, count)` where `data` is an array of `count` packed records matching the registered type | A `type` was added via `_schema_add_type` before `schema_start`; source started | `DOCA_EXPERIMENTAL` |
+| Opaque events | `doca_telemetry_exporter_source_opaque_report(source, app_id, user_defined1, user_defined2, data, data_size)`; size bound via `doca_telemetry_exporter_source_get_opaque_report_max_data_size` | `doca_telemetry_exporter_schema_set_opaque_events_enabled(schema)` BEFORE `schema_start` | `DOCA_STABLE` |
+| Metrics (counter / gauge / histogram) | Create a metrics context on a STARTED source with `doca_telemetry_exporter_metrics_create_context(source)`, then `_metrics_add_counter` / `_add_counter_increment` / `_add_gauge` / `_add_gauge_uint64` / `_add_histogram` / `_add_base_histogram` / `_metrics_histogram_observe` / `_metrics_base_histogram_observe`; labels via `_metrics_add_constant_label` / `_metrics_add_label_names`; flush via `_metrics_flush` or `_metrics_set_flush_interval_ms` | Source started; metrics context created after `source_start` | `DOCA_EXPERIMENTAL` |
+| OTLP logs | Create an OTLP-logs context on a STARTED source with `doca_telemetry_exporter_otlp_logs_create_context(source)`, add resource(s) + scope(s), then `_otlp_logs_write_event` / `_write_event_with_severity`, `_otlp_logs_flush` | `doca_telemetry_exporter_schema_set_opaque_events_enabled(schema)` (OTLP logs ride the opaque path); source started | `DOCA_EXPERIMENTAL` |
+| NetFlow / IPFIX records | Sibling top-level API in `doca_telemetry_exporter_netflow.h`: `_netflow_init(source_id)` → `_netflow_set_collector_addr/port` → `_netflow_source_set_id/tag` → build a `_netflow_template` (`_netflow_template_create` + `_netflow_field_*` + `_netflow_template_add_field`) → `_netflow_start` → `_netflow_send(template, records, count, &records_sent)` → `_netflow_flush` → `_netflow_destroy` | NetFlow field IDs are the `DOCA_TELEMETRY_EXPORTER_NETFLOW_*` macros (IPFIX element IDs) | `DOCA_STABLE` |
 
-| Use DOCA Telemetry Exporter when … | Use a different primitive when … |
-| --- | --- |
-| Structured application telemetry (counters / gauges / events) is the goal and the receiver is the DOCA telemetry ecosystem (DOCA Telemetry Service → downstream NetFlow / IPFIX / Prometheus integrations) | Simple stdout / per-line structured logging is enough — use `doca_log` (covered in [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)); the exporter's schema discipline is overhead the user doesn't need |
-| The user wants the receiver-side ecosystem (rate aggregation, downstream routing, multi-source fan-out) the DOCA Telemetry Service already provides | The user needs a custom non-DOCA-aware telemetry sink (raw Prometheus scrape endpoint, custom binary protocol) — use a Prometheus client library directly, not the DOCA exporter |
-| The flow is one-way publishing from the app to one or more receivers | The user actually needs a real-time event subscription back INTO the application (events flowing app ← receiver) — the exporter is publish-only / one-way; route to [`doca-comch`](../doca-comch/SKILL.md) for a host ↔ DPU message channel the app can drive both ways |
+**Export destinations (transports).** Enabled on the schema (or via
+the NetFlow API / env var) BEFORE start. Multiple may be enabled
+at once.
 
-**Configuration shape.** *Mandatory* configurations before
-`doca_ctx_start()` on the exporter context: at least one
-`doca_telemetry_exporter_schema` registered, and the transport
-target the exporter will write to (the receiver consumer, reachable
-on the host the application runs on, started BEFORE the exporter
-per [`## Safety policy`](#safety-policy)). *Optional* configurations
-(buffer sizing, per-source naming, additional schemas) follow the
-standard DOCA Core surface; defaults come from the library and the
-active install. The exact transport options surface (which
-on-host transports the library supports today — local domain
-socket / on-host telemetry agent / NetFlow consumer / …) is
-install-bound and the agent MUST route the user to the public
-exporter guide (reachable via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md))
-for the current matrix rather than committing to one transport.
+| Destination | How to enable | Where it goes | Default path / knob |
+| --- | --- | --- | --- |
+| File write | `doca_telemetry_exporter_schema_set_file_write_enabled(schema)` | Binary telemetry files on local disk (dev / offline ingestion) | Data root default documented in the header as `/opt/mellanox/doca/services/telemetry/data/`; override with `_schema_set_buf_data_root`. File rotation via `_schema_set_file_write_max_size` / `_max_age` |
+| IPC to DTS | `doca_telemetry_exporter_schema_set_ipc_enabled(schema)` | Streams to the DOCA Telemetry Service over a local socket | Socket dir default documented in the header as `/opt/mellanox/doca/services/telemetry/ipc_sockets`; override with `_schema_set_ipc_sockets_dir`. Reconnect knobs: `_set_ipc_reconnect_time` / `_reconnect_tries` / `_socket_timeout`. Liveness via `doca_telemetry_exporter_check_ipc_status` |
+| Prometheus (metrics only) | Set `PROMETHEUS_ENDPOINT=host:port` in the environment before `schema_init` | Exposes a `/metrics` scrape endpoint | Env-var driven, per the metrics sample; not a `schema_set_*` call |
+| NetFlow collector | `_netflow_set_collector_addr` / `_netflow_set_collector_port` (and/or `_netflow_set_ipc_enabled` / `_netflow_set_file_write_enabled`) | UDP NetFlow/IPFIX collector | Address/port are caller-supplied |
+
+**Capability discovery — the honest rule.** Unlike accelerator
+libraries (SHA, RDMA, Compress, Flow), DOCA Telemetry Exporter has
+**no `doca_devinfo` capability-query family** and **no `doca_caps`
+data** — the `doca_caps` telemetry-exporter dump is a stub that
+returns success with no fields. Do NOT tell the user to run a
+`doca_telemetry_exporter_*_get_*` "cap query" for max fields / max
+event size / supported event types; those functions do not exist.
+The only runtime introspection the library offers is:
+
+- `doca_telemetry_exporter_check_ipc_status(source, &status)` —
+  is the IPC transport `CONNECTED` / `FAILED` / `DISABLED`.
+- `doca_telemetry_exporter_source_get_opaque_report_max_data_size(source, &max)` —
+  the max opaque payload size for this source.
+- the `doca_telemetry_exporter_schema_get_*` config getters —
+  read back the buffer / file-write / IPC settings you set.
+
+Everything else is validated the sample-driven way: enable file
+write, run, and inspect the emitted binary data files (and/or
+confirm receipt at the DTS / collector). See
+[`## Observability`](#observability).
 
 ## Version compatibility
 
@@ -128,118 +139,102 @@ For the canonical DOCA version-detection chain, the four-way match rule, NGC con
 
 **The exporter-specific overlay** is:
 
-- **Use `pkg-config --modversion doca-telemetry-exporter` as the build-time anchor.** Per [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure), this MUST match the other version sources in the four-way match. The set of event types / max schema fields / max event size that the exporter actually supports on a given install is bound to BOTH the DOCA version AND the active `doca_devinfo`; agent-memory limits are not authoritative and MUST be replaced with a `doca_telemetry_exporter_*_get_*` query at runtime (per the cross-cutting cap-query rule in [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability)).
-- **The exporter is distinct from the DOCA Telemetry Service across every release.** When the user reports *"the docs I'm reading talk about a telemetry SERVICE — is that this library?"*, the answer is no — that is a separate DOCA artifact. Route to [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) for the service guide; the exporter is the library the user's application links to publish events INTO the service / ecosystem.
-- **`doca-telemetry-exporter.pc` plus `doca-common.pc` must both match `doca_caps --version`** at the four-way-match check (per [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)). A common partial-install pattern after a DOCA upgrade is that `doca-telemetry-exporter.pc` lingers from the previous release while `doca-common.pc` was refreshed; route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) ladder step 2 before any exporter-layer diagnosis.
+- **Use `pkg-config --modversion doca-telemetry-exporter` as the build-time anchor.** Per [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure), this MUST match the other version sources. Because there is no `doca_caps` data for this library, the four-way match's `doca_caps --version` leg is a whole-install version check, NOT a per-artifact capability probe for the exporter.
+- **The Metrics API, OTLP-logs API, typed-`_source_report`, and `_schema_set_indexes` / `_get_indexes` are `DOCA_EXPERIMENTAL`.** They require building with `-DDOCA_ALLOW_EXPERIMENTAL_API` (per [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)); they may change across releases. The `DOCA_STABLE` surface includes the schema → source core (`schema_init` / `schema_start` / `source_create` / `source_start` / `source_destroy` / `schema_destroy`), typed-schema registration (`type_create` / `field_create` / `type_add_field` / `schema_add_type`), `source_opaque_report` / `source_flush` / `check_ipc_status` / `get_timestamp`, the full `schema_set_*` / `schema_get_*` config family, and the entire NetFlow sibling API in `doca_telemetry_exporter_netflow.h`. Confirm the `DOCA_STABLE` / `DOCA_EXPERIMENTAL` marker in the installed header before relying on any symbol — the shipped samples still set `-DDOCA_ALLOW_EXPERIMENTAL_API` blanket-style even when only stable symbols are used.
+- **The exporter is distinct from the DOCA Telemetry Service across every release.** When the user reports *"the docs I'm reading talk about a telemetry SERVICE — is that this library?"*, the answer is no. Route to [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) for the service guide.
+- **`doca-telemetry-exporter.pc` plus `doca-common.pc` must both match `doca_caps --version`** at the version check (per [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)). A common partial-install pattern after a DOCA upgrade is that `doca-telemetry-exporter.pc` lingers from the previous release while `doca-common.pc` was refreshed; route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) ladder step 2 before any exporter-layer diagnosis.
 
 ## Error taxonomy
 
-Exporter-specific overlays on the cross-library `DOCA_ERROR_*`
-taxonomy. The cross-library taxonomy itself lives in
+Only the `doca_error_t` codes the exporter headers actually document
+appear below. There is **no `DOCA_ERROR_AGAIN`** (delivery is
+buffered/flush-based, not a blocking submit) and **no
+`DOCA_ERROR_NOT_FOUND`** on this API surface — do not invent them.
+The cross-library taxonomy lives in
 [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
-the rows below are the *exporter surface* meaning that the agent
-must disambiguate before falling back to the cross-library response.
+the rows below are the *exporter surface* meanings.
 
-| Error | Exporter context where it shows up | Exporter-specific cause |
+| Error | Exporter context where it shows up | Exporter-specific cause / fix |
 | --- | --- | --- |
-| `DOCA_ERROR_BAD_STATE` | Emit call before `doca_ctx_start()` on the exporter context; or schema-register call after the context is already in `RUNNING` and the library does not allow late registration on this install | Lifecycle violation. Walk the call sequence against the lifecycle in [`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes); the most common case is emitting before the exporter context reaches `RUNNING`. |
-| `DOCA_ERROR_INVALID_VALUE` | Schema-register call, emit call | An event field's type does not match the registered schema; the event payload is oversized relative to the install's max-event-size cap; a required field is missing from the emit. The fix is to re-read the registered schema and the matching `doca_telemetry_exporter_*_get_*` cap query against the active install. |
-| `DOCA_ERROR_AGAIN` | Emit call (per-event submit), under load | The transport queue to the receiving consumer is full. This is *not* a hardware error and *not* a sleep-and-retry signal. The application's correct response is to DROP the event (or buffer it bounded at the app layer) and continue the data path. NEVER block the hot path on telemetry retries — that pattern destroys the latency the user is presumably trying to measure. See [`## Safety policy`](#safety-policy) hot-path rule. |
-| `DOCA_ERROR_NOT_PERMITTED` | Exporter context create, first emit | The application's user cannot write to the configured telemetry transport (e.g. the local socket the receiver listens on is owned by a different user / permission set). Route to [`## Safety policy`](#safety-policy) permission matrix BEFORE any code change. The exporter itself does NOT need sudo as a rule; this error usually means the receiver's transport endpoint is what is locked down. |
-| `DOCA_ERROR_NOT_FOUND` | Emit call referencing a schema or a source that was never registered with this exporter context | The schema (or the source) the emit names is unknown to the exporter. The fix is to register the schema with the exporter context BEFORE the first emit that references it (per the schema-register-before-emit rule in [`## Capabilities and modes`](#capabilities-and-modes)). |
-| `DOCA_ERROR_DRIVER` | Exporter context create, first emit | The transport layer below DOCA reported failure (socket / network / on-host agent). Capture state and route to env-class debug ([`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)) — the layer below DOCA is the suspect, not the exporter program. |
+| `DOCA_ERROR_BAD_STATE` | `doca_telemetry_exporter_source_report` / `_source_opaque_report` when the source was never started; `_otlp_logs_*` when the OTLP context does not exist (or the source is not started, or context already exists on create); NetFlow `_netflow_*` when NetFlow was not initialized / not started / already initialized (per `doca_telemetry_exporter_netflow.h`) | Lifecycle order violation. For schema/source: `schema_start` before `source_create`, `source_start` before any report, and create the OTLP context only AFTER `source_start`. For NetFlow: `_netflow_init` → configure → `_netflow_start` before `_netflow_send` |
+| `DOCA_ERROR_INVALID_VALUE` | NULL handle to almost any call; `_schema_add_type` with a duplicate type name or a field carrying an invalid `DOCA_TELEMETRY_EXPORTER_FIELD_TYPE_*`; a `_metrics_*` call with a NULL handle, mismatched label arity, or invalid histogram ID; an `_otlp_logs_*` call with a NULL or mismatched-arity argument | Re-read the registered type/field definitions and the label-set arity. For events, confirm the packed struct matches the field list you registered. For metrics, note the header documents `INVALID_VALUE` / `NO_MEMORY` on `_metrics_*` — not `BAD_STATE` |
+| `DOCA_ERROR_NO_MEMORY` | `_schema_init`, `_type_create`, `_field_create`, `_schema_add_type`, `_source_create`, metrics/histogram allocation, NetFlow template build | Allocation failure — an env / resource problem, not an API-usage bug. Capture and route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) |
+| `DOCA_ERROR_INITIALIZATION` | `_schema_init`, `_schema_start` | The schema could not be initialized / finalized (often a bad exporter configuration, e.g. an unwritable data root, or a CollectX-backend init failure). Re-check the enabled exporters and their paths before retrying |
+| `DOCA_ERROR_UNKNOWN` | `_schema_set_indexes` / `_schema_get_indexes` and other experimental paths where the underlying CollectX operation failed for a non-specific reason | Treat as a CollectX-backend failure; capture the trace log and route to [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug) |
 
-The agent's rule: **never recommend a retry loop on
-`DOCA_ERROR_*` without first identifying which of the rows above
-is the cause**. None of the exporter rows wants a blind retry:
-`AGAIN` wants a DROP (or bounded buffer) at the app layer;
-`NOT_FOUND` wants the schema registered first; the others want
-investigation, not retry.
+The agent's rule: **identify which row above is the cause before
+recommending any change; never invent an `AGAIN`/`NOT_FOUND` retry
+loop.** A `BAD_STATE` wants the lifecycle fixed; an
+`INVALID_VALUE` wants the type/field/label definition fixed.
 
 ## Observability
 
-The exporter's observability surface is per-emit + capability
-snapshot + the consumer side. There is no PE-based completion
-stream on the publisher itself the agent can subscribe to —
-visibility comes from inspecting each emit's return value, the
-configure-time cap snapshot, and the receiving consumer's own
-log / counters.
+The exporter's observability is per-call return + IPC status +
+the emitted data itself + the receiver side. There is no
+progress-engine completion stream (this is not a Core context).
 
-Three primary signals the agent should reach for:
+Four primary signals the agent should reach for:
 
-1. **Per-emit return.** Every `doca_telemetry_exporter_*` emit
-   call returns a `doca_error_t`. The agent must inspect it on
-   every emit: success means the event entered the transport;
-   `DOCA_ERROR_AGAIN` means the transport was full and the app
-   should drop / buffer (per [`## Safety policy`](#safety-policy));
-   `DOCA_ERROR_*` of any other shape means the emit did not
-   reach the transport and the row in
-   [`## Error taxonomy`](#error-taxonomy) names the fix.
-2. **Capability snapshot at configure time.** The output of every
-   `doca_telemetry_exporter_*_get_*` query is a snapshot of *what
-   the exporter said was possible* before any emit. Save it as
-   the baseline; if a later emit returns `DOCA_ERROR_INVALID_VALUE`
-   the diff against this snapshot is the bug, not the emit call
-   itself. Cap-query at configure time is the cheapest way to
-   make a later `INVALID_VALUE` self-explanatory.
-3. **Consumer-side reception (end-to-end).** The exporter's
-   *true* observability is at the receiver: did the consumer
-   actually log the event? An exporter that returns success on
-   every emit while the consumer log is empty is the canonical
-   *"emit succeeded into a transport with no reader"* failure —
-   route via the receiver's own guide (reach through
-   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)).
-   The smoke-emit / verify-reception loop in
-   [`TASKS.md ## test`](TASKS.md#test) is the bundle's
-   end-to-end check before any bulk emit.
+1. **Per-call return.** Every `doca_telemetry_exporter_*` call
+   returns a `doca_error_t`; inspect it. For NetFlow,
+   ALSO inspect the `records_sent` out-parameter of
+   `_netflow_send` — `records_sent < count` is a partial send
+   (backpressure at the collector / transport), which the
+   NetFlow sample treats as a failure.
+2. **IPC status.** `doca_telemetry_exporter_check_ipc_status`
+   returns `DOCA_TELEMETRY_EXPORTER_IPC_STATUS_CONNECTED` /
+   `_FAILED` / `_DISABLED`. When IPC is enabled but the DTS is
+   not up, this is where the agent sees it — BEFORE blaming the
+   report calls.
+3. **File-write inspection (the cheapest end-to-end check).**
+   Enable `_schema_set_file_write_enabled`, run, and inspect the
+   binary data files under the data root. The shipped samples
+   themselves rely on this as the "did it work" signal. A file
+   with the expected schema + rows is the green signal for the
+   publish half of the contract.
+4. **Receiver-side reception (true end-to-end).** For IPC → DTS,
+   OTLP → OpenTelemetry Collector, or NetFlow → collector, the
+   *true* signal is that the receiver logged / stored the events.
+   An exporter returning success on every call while the receiver
+   is empty is the canonical *"published into a transport with no
+   reader"* failure — route via the receiver's own guide reached
+   through [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
 
 For the cross-cutting observability primitives
-(`--sdk-log-level`, the `doca-<lib>-trace` build flavor, the
-`DOCA_LOG_LEVEL` env var) see
+(`DOCA_LOG_LEVEL`, the `doca-<lib>-trace` build flavor) see
 [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
-For the install-tree observability (logger names, package layout)
-defer to
+For the install-tree layout defer to
 [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy). Telemetry publishing does not change hardware or fabric state (no `mlxconfig`, no firmware, no eswitch/representor change), so the hardware-safety triggers do not fire here. The safety surface is **transport staging + destination permissions + buffer-flush semantics**.
 
-The exporter's safety surface is **same-user-as-the-app
-permissions + consumer-up-first staging + hot-path drop-not-block
-invariant**. Each one is the source of a specific first-app
-failure the agent must prevent.
-
-The **permission + staging matrix** the agent must walk for any
-new exporter setup:
+The **staging + permission matrix** the agent must walk for any new
+exporter setup:
 
 | Prerequisite | Required state | How the agent verifies | Where to fix |
 | --- | --- | --- | --- |
-| Application user can write to the telemetry transport | The exporter runs as the application's normal user (no sudo as a rule); that user has write access to whichever transport endpoint the receiver listens on | `id` (confirm the running user); inspect the receiver's transport endpoint ownership (e.g. socket permissions on the local consumer); the first emit returns success rather than `DOCA_ERROR_NOT_PERMITTED` | If the user thinks the exporter needs sudo, that is the bug — the exporter does not require sudo; what is locked down is the receiver's transport endpoint. Fix on the receiver / env side via the matching receiver guide reached through [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md), or via [`doca-setup`](../../doca-setup/SKILL.md) for the env-side staging |
-| Receiving telemetry consumer is running BEFORE the exporter starts | The downstream telemetry receiver (the DOCA Telemetry Service or whichever consumer the exporter is configured to write to) is started and reachable BEFORE the exporter context is started; otherwise emitted events may be queued or dropped depending on the transport, with no app-side error | The user can independently confirm the receiver is up (its own logs / status); the first emit-then-observe smoke (per [`TASKS.md ## test`](TASKS.md#test)) sees the event on the receiver side | Start the receiver first; only then start the exporter-using application. This staging is on the user — the exporter cannot start the receiver on the user's behalf |
-| Hot-path drop-not-block invariant | Application code that calls `doca_telemetry_exporter_*` emit on the data path treats `DOCA_ERROR_AGAIN` as a SIGNAL to drop the event (or push to a bounded app-side buffer) — never to block, sleep, or busy-retry on the hot path | Code review at modify-time per [`TASKS.md ## modify`](TASKS.md#modify); structured log shows event counts dropping rather than data-path latency rising under load | Edit the app's emit-site to non-blocking-on-`AGAIN`; if the drop rate is unacceptable, the answer is to widen the receiver's throughput (separate problem on the receiver side), NOT to back-pressure the data path through the exporter |
+| File-write data root is writable | If `_schema_set_file_write_enabled` is on, the application user can write to the data root (default `/opt/mellanox/doca/services/telemetry/data/`, or the `_set_buf_data_root` override) | `id` + a write test to the data root; `schema_start` returns success rather than `DOCA_ERROR_INITIALIZATION` | Point the data root at a writable directory via `_schema_set_buf_data_root`; do NOT reflexively add `sudo` |
+| Receiver up BEFORE export starts | If IPC is on, the DTS is running and its socket dir is reachable; if OTLP, the OpenTelemetry Collector is up; if NetFlow, the collector is listening | `doca_telemetry_exporter_check_ipc_status` returns `CONNECTED` (IPC); the receiver's own log/status for OTLP/NetFlow | Start the receiver first, then the app. The exporter cannot start the receiver; route to the receiver's guide via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) |
+| Opaque path enabled before use | Opaque events and OTLP logs require `_schema_set_opaque_events_enabled` BEFORE `schema_start` | The first `_source_opaque_report` / `_otlp_logs_*` call does not return `DOCA_ERROR_BAD_STATE` for a missing context | Enable opaque events on the schema before `schema_start`; you cannot enable it after |
+| Buffer is flushed before teardown | Buffered reports are flushed when the buffer fills or on explicit flush; on shutdown the app must flush so trailing events are not lost | The receiver / data file contains the final events, not just the pre-last-flush ones | Call `_source_flush` (events) / `_metrics_flush` (metrics) / `_netflow_flush` (NetFlow) before destroy, or configure a flush interval |
 
-- **The exporter does NOT need sudo as a rule.** Unlike
-  introspection-style DOCA libraries that read host memory from
-  the DPU side, the telemetry exporter runs in the application's
-  own process as the application's own user. If the user's first
-  reaction to `DOCA_ERROR_NOT_PERMITTED` is to add `sudo`, walk
-  them back: the cause is almost always the receiver's transport
-  endpoint permissions, not a missing capability on the exporter
-  process.
-- **The exporter is one-way.** Do not invent a `_subscribe()` or
-  `_callback_on_consumer_event()` shape; the library is
-  publish-only. If the user needs the application to react to
-  events flowing IN, the right primitive is a host ↔ DPU message
-  channel via [`doca-comch`](../doca-comch/SKILL.md) (or the
-  receiver's own API on the receiver side), not the exporter.
-- **Validate with a one-event smoke before any bulk emit.** A
-  single emit + receiver-side reception confirmation is the
-  cheapest way to prove the permission + staging + transport
-  path are all correct. If the smoke passes, bulk emits inherit
-  that confidence; if the smoke says success-on-publish but
-  nothing on the receiver, the consumer staging is the prime
-  suspect. The loop is described in
+- **No sudo as a rule.** The exporter runs in the application's
+  own process as the application's user. If the first reaction to
+  an init failure is to add `sudo`, walk it back: the cause is
+  almost always an unwritable data root or a receiver that is not
+  up, not a missing privilege on the exporter process.
+- **Delivery never blocks the data path.** Because reporting is
+  buffered and flush-based (not a blocking submit), there is no
+  hot-path back-pressure knob and no `DOCA_ERROR_AGAIN` to handle.
+  If loss under load matters, tune buffer size
+  (`_schema_set_buf_size`) and flush cadence, or widen the
+  receiver — do NOT invent a retry loop.
+- **Validate with a file-write smoke before any bulk / IPC run.**
+  Enabling file write and inspecting the emitted data files is the
+  cheapest way to prove the schema/type/report path is correct
+  independent of any receiver. The loop is in
   [`TASKS.md ## test`](TASKS.md#test).
 
 ## Deferred topic boundaries
@@ -248,31 +243,29 @@ This skill scopes itself to the DOCA Telemetry Exporter library.
 Adjacent topics the agent will get asked but should route
 elsewhere:
 
-- **The DOCA Telemetry Service (the receiver)** — separate DOCA
-  service with its own public guide. Reach via
+- **The DOCA Telemetry Service (DTS, the receiver)** — separate
+  DOCA service with its own public guide. Reach via
   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
   This skill is publisher-side only.
-- **DOCA Core context and progress engine internals** — owned by
+- **CollectX (`clx`) collection deployment** — the collector-side
+  deployment lives in
+  [`doca-collectx-deployment`](../../doca-collectx-deployment/SKILL.md).
+- **Downstream rendering / dashboards** — once events reach the
+  receiver, the downstream sinks (NetFlow / IPFIX / Prometheus /
+  Grafana / OpenTelemetry Collector) are governed by their own
+  ecosystems and guides.
+- **DOCA Core context and progress-engine internals** — owned by
   [`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
-  This skill *uses* the Core context lifecycle; it does not
-  redefine it.
-- **Downstream telemetry rendering / dashboards** — out of scope.
-  Once events reach the receiver, the downstream sinks
-  (NetFlow / IPFIX / Prometheus / Grafana) are governed by their
-  own ecosystems and the receiver's own guide.
+  Note the exporter is NOT a Core context; do not apply the
+  `doca_ctx` lifecycle to it.
 - **Real-time event subscription back into the app** — the
   exporter is publish-only / one-way. The right primitive is
   [`doca-comch`](../doca-comch/SKILL.md) for a bi-directional
   message channel, not the exporter.
 - **Plain structured logging to stdout / files** — use `doca_log`
-  (documented in [`doca-programming-guide`](../../doca-programming-guide/SKILL.md));
-  the exporter's schema discipline is overhead the user does not
-  need for plain logs.
+  (documented in [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)).
 - **Cross-cutting `DOCA_ERROR_*` taxonomy** — owned by
   [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
-  This skill adds the exporter overlay (including the
-  `AGAIN`-means-drop-not-block rule), not the taxonomy itself.
-- **Cross-cutting debug ladder** (install / version / build /
-  link / runtime / program / driver) — owned by
+- **Cross-cutting debug ladder** — owned by
   [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug). This
   skill's `## debug` overlays the runtime + program layers.

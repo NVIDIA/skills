@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-telemetry-exporter.explicit-positive.v1",
-      "prompt": "Use the doca-telemetry-exporter skill to help me. I'm working on: doing hands-on DOCA Telemetry Exporter programming on a host where DOCA is installed \u2014 defining a doca_telemetry_exporter_schema, creating sources, picking counter/gauge/event types, running capability queries before assuming limits, registering schemas before the first emit, or debugging DOCA_ERROR_* failures from the exporter API.",
+      "prompt": "Use the doca-telemetry-exporter skill to help me. I'm working on: doing hands-on DOCA Telemetry Exporter programming on a host where DOCA is installed — defining a doca_telemetry_exporter_schema and event types, creating sources, picking a publish surface (typed events / opaque events / metrics / OTLP logs / NetFlow), walking the schema-then-source lifecycle, confirming IPC status or file-write output before assuming delivery, or debugging DOCA_ERROR_* failures from the exporter API.",
       "expected_skill": "doca-telemetry-exporter",
       "expected_output": "The agent selects the doca-telemetry-exporter skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
       "assertions": [
@@ -23,7 +23,7 @@
     },
     {
       "id": "doca-telemetry-exporter.implicit-positive.v2",
-      "prompt": "I'm running into this: \"emit returns AGAIN under bulk load\". Can you walk me through it?",
+      "prompt": "I'm running into this: \"BAD_STATE when I report an event\". Can you walk me through it?",
       "expected_skill": "doca-telemetry-exporter",
       "expected_output": "The agent recognizes this as a doca-telemetry-exporter issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
