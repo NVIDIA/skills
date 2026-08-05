@@ -842,8 +842,47 @@ jobs:
           # Dedupe before composing the title — the enforce step may have
           # re-added entries already present from the rsync loop.
           sort -u -o /tmp/changed-components.txt /tmp/changed-components.txt
-          changed=$(cat /tmp/changed-components.txt | tr '\n' ',' | sed 's/- //g;s/,$//')
-          echo "title=chore: sync skills ($changed)" >> "$GITHUB_OUTPUT"
+
+          # GitHub rejects a pull request title over 256 characters, and it
+          # rejects it on create as well as on update — so an over-long title
+          # stops the sync PR from existing at all, stranding synced content on
+          # the branch. Name as many components as fit and count the rest; the
+          # complete list is always in the body below, which has no limit.
+          sed 's/^- //' /tmp/changed-components.txt | sed '/^[[:space:]]*$/d' > /tmp/changed-names.txt
+          total=$(wc -l < /tmp/changed-names.txt | tr -d ' ')
+
+          title_limit=256
+          title_prefix="chore: sync skills ("
+          names=""
+          shown=0
+          while IFS= read -r name; do
+            if [ -z "${names}" ]; then candidate="${name}"; else candidate="${names},${name}"; fi
+            remaining=$((total - shown - 1))
+            if [ "${remaining}" -gt 0 ]; then more=" +${remaining} more"; else more=""; fi
+            if [ $(( ${#title_prefix} + ${#candidate} + ${#more} + 1 )) -le "${title_limit}" ]; then
+              names="${candidate}"
+              shown=$((shown + 1))
+            else
+              break
+            fi
+          done < /tmp/changed-names.txt
+
+          if [ "${total}" -eq 1 ]; then count_label="1 component"; else count_label="${total} components"; fi
+
+          omitted=$((total - shown))
+          if [ "${shown}" -eq 0 ]; then
+            # Even one name does not fit; fall back to a bare count.
+            title="chore: sync skills (${count_label})"
+          elif [ "${omitted}" -gt 0 ]; then
+            title="${title_prefix}${names} +${omitted} more)"
+          else
+            title="${title_prefix}${names})"
+          fi
+          # Belt and braces: never emit a title the API will reject.
+          if [ "${#title}" -gt "${title_limit}" ]; then
+            title="chore: sync skills (${count_label})"
+          fi
+          echo "title=${title}" >> "$GITHUB_OUTPUT"
           {
             echo 'body<<EOFBODY'
             echo "## Automated skills sync"
