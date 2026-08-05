@@ -33,7 +33,7 @@ jobs:
           SIGNATURE_SERVICE_ACCOUNT_LOGIN: ${{ vars.NVSKILLS_FORK_SERVICE_ACCOUNT_LOGIN || vars.NVSKILLS_SIGNATURE_COMMIT_LOGIN || 'svc-nvskills-signing' }}
           STATUS_POLL_SECONDS: ${{ vars.NVSKILLS_STATUS_POLL_SECONDS || '30' }}
           MISSING_STATUS_GRACE_SECONDS: ${{ vars.NVSKILLS_MISSING_STATUS_GRACE_SECONDS || '120' }}
-          MAX_STATUS_WAIT_SECONDS: ${{ vars.NVSKILLS_MAX_STATUS_WAIT_SECONDS || '3600' }}
+          MAX_STATUS_WAIT_SECONDS: ${{ vars.NVSKILLS_MAX_STATUS_WAIT_SECONDS || '3300' }}
         run: |
           set -euo pipefail
 
@@ -51,6 +51,25 @@ jobs:
               ''|*[!0-9]*|0) printf '%s' "$2" ;;
               *) printf '%s' "$1" ;;
             esac
+          }
+
+          bounded_positive_integer() {
+            local value
+            local maximum="$3"
+
+            value="$(positive_integer "$1" "$2")"
+            while [ "${value#0}" != "${value}" ]; do
+              value="${value#0}"
+            done
+            if [ -z "${value}" ] || [ "${value}" = "0" ]; then
+              value="$2"
+            fi
+            if [ "${#value}" -gt "${#maximum}" ] ||
+              { [ "${#value}" -eq "${#maximum}" ] && [[ "${value}" > "${maximum}" ]]; }; then
+              echo "::warning::Configured wait value ${value}s exceeds the safe maximum ${maximum}s; clamping it." >&2
+              value="${maximum}"
+            fi
+            printf '%s' "${value}"
           }
 
           case "${HEAD_REF}" in
@@ -274,9 +293,9 @@ jobs:
             status_floor_sha="${latest_generated_signature_sha}"
           fi
 
-          poll_seconds="$(positive_integer "${STATUS_POLL_SECONDS}" 30)"
-          missing_grace_seconds="$(positive_integer "${MISSING_STATUS_GRACE_SECONDS}" 120)"
-          max_wait_seconds="$(positive_integer "${MAX_STATUS_WAIT_SECONDS}" 3600)"
+          poll_seconds="$(bounded_positive_integer "${STATUS_POLL_SECONDS}" 30 300)"
+          missing_grace_seconds="$(bounded_positive_integer "${MISSING_STATUS_GRACE_SECONDS}" 120 600)"
+          max_wait_seconds="$(bounded_positive_integer "${MAX_STATUS_WAIT_SECONDS}" 3300 3300)"
           elapsed_seconds=0
           status_sha=""
           status_state="missing"
