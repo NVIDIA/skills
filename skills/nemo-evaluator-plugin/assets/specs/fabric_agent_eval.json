@@ -1,0 +1,70 @@
+{
+  "tasks": [
+    {
+      "id": "capital-france",
+      "intent": "Name the capital of France.",
+      "inputs": {
+        "instruction": "What is the capital of France?"
+      },
+      "reference": {
+        "expected": "Paris"
+      },
+      "metrics": [
+        {
+          "bundle_kind": "metric-bundle",
+          "bundle_format_version": "v1",
+          "metric_type": "exact-match",
+          "metadata": {
+            "description": null,
+            "labels": {}
+          },
+          "outputs": [
+            {
+              "name": "exact-match",
+              "description": null,
+              "value_json_schema": {
+                "description": "Continuous numeric metric value.",
+                "title": "ContinuousScore",
+                "type": "number"
+              }
+            }
+          ],
+          "secrets": {},
+          "payload": {
+            "metric": {
+              "type": "exact-match",
+              "description": null,
+              "labels": {},
+              "supported_job_types": [
+                "online",
+                "offline"
+              ],
+              "reference": "{{reference.expected}}",
+              "candidate": "{{sample.output_text}}"
+            },
+            "digest": "e48a2f8e509d2ff3fe0b48749baec84577ee590050ff037449ddc5ddcee0045a",
+            "kind": "inline"
+          }
+        }
+      ]
+    }
+  ],
+  "target": {
+    "kind": "fabric",
+    "config": {
+      "metadata": {
+        "name": "readme-fabric-smoke"
+      },
+      "harness": {
+        "adapter_id": "nvidia.fabric.codex"
+      }
+    },
+    "model": "<provider>/<model>",
+    "capture_trajectory": false
+  },
+  "max_concurrent_tasks": 1,
+  "fail_fast": true,
+  "labels": {
+    "benchmark": "readme-fabric-smoke"
+  }
+}

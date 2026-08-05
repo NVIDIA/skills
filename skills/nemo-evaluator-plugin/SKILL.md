@@ -1,145 +1,208 @@
 ---
 name: nemo-evaluator-plugin
-description: Use when working on the Evaluator plugin CLI, jobs, SDK-backed specs, metric types, or plugin-owned Evaluator skills.
+description: Evaluate models, datasets, and agents with the NeMo Evaluator plugin. Use for metric selection, SDK checks, platform jobs, and result retrieval.
+license: Apache-2.0
 metadata:
   owner: nemo-platform
+  author: nemo-platform
   maturity: active
-license: Apache-2.0
+  tags: [evaluation, metrics, agent-eval, nemo-platform]
 ---
 
 # Evaluator Plugin
 
-Use this skill for evaluation tasks against a running NeMo Platform server. The plugin-backed CLI interface is `nemo evaluator`; the legacy generated `nemo evaluation` API command group is not the target surface for new guidance.
+The Plugin CLI entrypoint is `uv run nemo evaluator`.
+
+## Purpose
+
+Use this skill to choose an evaluation interface and metric, validate a minimal
+example, submit a NeMo Platform evaluation job, and retrieve its results.
+
+## Inputs
+
+Establish these inputs before building an evaluation:
+
+- Evaluation interface: [dataset-driven vs. task-driven agentic evaluation](references/evaluation-shapes.md#difference-summary)
+- Execution interface: standalone SDK evaluation or a durable NeMo Platform job.
+- Pass/fail dataset examples: the smallest representative pass and failure cases.
+- Metrics: the behaviors to score and the template fields they consume.
+- Target: no target for offline scoring, or the model, agent, runner, or precomputed trials that produce outputs.
+
+## Instructions
+
+1. Clarify whether the input is [dataset-driven rows](references/evaluation-shapes.md#dataset-driven-evaluation)
+   or [task-driven agent work](references/evaluation-shapes.md#task-driven-evaluation).
+2. Choose the simplest metric that measures the requested behavior. Prefer deterministic metrics when possible.
+3. Build a tiny smoke case with one expected pass and one expected failure.
+4. Validate metric behavior with the standalone SDK and inspect row-level output plus aggregates.
+5. Fix field mappings, prompts, parsers, or task definitions before scaling.
+6. Submit the platform job only after the input and scoring shape works.
+
+Read [Metric Selection](references/metric-selection.md) before choosing a
+metric for a rubric, RAG workflow, or tool-calling evaluation.
+
+## Choose the execution interface
+
+| Need | Interface |
+| --- | --- |
+| Fast metric iteration without NeMo Platform | `nemo_evaluator_sdk.Evaluator` |
+| Dataset-driven platform job | `client.evaluator.submit(...)` or `nemo evaluator evaluate submit` |
+| Multiple inline/stored metric refs in one job | `nemo evaluator evaluate submit` with an `EvaluateInputSpec` |
+| Task-driven platform job | `nemo evaluator agent-evaluate submit` |
+| Reusable platform definitions and result indexes | `client.evaluator.metrics`, `.tasks`, `.tasksets`, `.eval_results`, `.agent_eval_results` |
+
+Default to `submit` for every plugin evaluation. The plugin's local execution
+path — `client.evaluator.run()` and the `nemo evaluator ... run` CLI verb — is
+being retired, so do not build on it even though `--help` still lists it. For
+fast metric iteration without the platform, use the standalone
+`nemo_evaluator_sdk.Evaluator` instead.
+
+- Read [SDK Execution](references/execution.md) for datasets, targets,
+configuration, field mapping, job lifecycle, and custom metric packaging.
+- Read [Stored Resources](references/resources.md) for persisted definitions and
+result queries.
+
+## Limitations
+
+- `api_key_secret` is an environment-variable name standalone but a NeMo
+  Platform secret name on `submit`. See [API Auth](references/api-auth.md).
+- HTTP 409 from a submission often means a referenced platform secret is
+  missing, not a duplicate job. Read the response body.
+- `intent` is grader metadata and is never shown to the agent; only `inputs`
+  reaches it.
+- Metric templates use `item.*` for dataset rows but `reference.*`, `sample.*`,
+  and `inputs.*` in agent evaluation.
+- Metric progress can reach 100 percent before the platform job is terminal.
+  Always call `job.wait_until_done()` before retrieving results or downloading
+  artifacts.
 
 ## CLI Interface
 
 ### Prerequisites
 
-- all commands in this file assume that the shell's working dir is at the root of the Nvidia-NeMo/nemo-platform repo
-- activate the Python virtual environment before invoking the `nemo` CLI: `source .venv/bin/activate`
+All commands in this file assume that the shell's working directory is the root
+of the NVIDIA-NeMo/nemo-platform repository.
 
-Check plugin status from the CLI:
-
-```bash
-nemo evaluator info
-```
-
-## Metric Types
-
-### Explore Available Metrics
-
-To view available metric names, run:
+In a NeMo Platform repository checkout, run commands through the workspace:
 
 ```bash
-nemo evaluator metric-types
+# confirms plugin readiness and lists the registered evaluator jobs.
+uv run nemo evaluator info
+# lists available metric names; add a metric name to print its schema.
+uv run nemo evaluator metric-types
+# next two commands print the dataset-driven and task-driven job input and
+# output schemas - can be very large, use with caution to avoid filling up the context window.
+uv run nemo evaluator evaluate explain
+uv run nemo evaluator agent-evaluate explain
 ```
 
-To view a specific metric schema, pass a metric name from the `metric_types` list above:
+When the skill and plugin are installed, use the installed `nemo` command
+without assuming a repository root or manually activating `.venv`.
+
+Resolve bundled assets relative to this skill directory. In this repository the
+canonical path is `skills/nemo-evaluator-plugin`; an installed skill may live
+under a different skills root.
+
+## Bundled assets
+
+| Path | Use |
+| --- | --- |
+| `assets/specs/exact_match_metric.json` | Two-row offline smoke spec; submit as-is |
+| `assets/specs/llm_as_judge.json` | Online generation + judge; local-first (`NVIDIA_API_KEY`) |
+| `assets/specs/fabric_agent_eval.json` | Task-driven Fabric runner spec |
+| `assets/examples/plugin_sdk_examples.py` | Copyable SDK snippets for each plugin surface |
+
+## Available Scripts
+
+| Script | Purpose | Arguments |
+| --- | --- | --- |
+| `scripts/generate_example_specs.py` | Generate or drift-check bundled specs | `--check`, `--write` |
+
+In this repository, NeMo uses the displayed workspace command:
 
 ```bash
-nemo evaluator metric-types <metric-name>
+uv run --frozen python skills/nemo-evaluator-plugin/scripts/generate_example_specs.py --check
 ```
 
-Inspect all the registered metric schema contracts:
+Do not assume a client-specific `run_script()` helper; use the displayed
+`uv run` command.
+
+## Examples
+
+### Dataset-driven evaluation examples
+
+- Follow [Validate standalone, then submit to the platform](references/execution.md#validate-standalone-then-submit-to-the-platform).
+  for the two-row pass/fail smoke test and its CLI submission.
+- Follow [Map noncanonical fields](references/execution.md#map-noncanonical-fields)
+  when dataset columns need `field_mapping`.
+- Follow [Getting job results](references/execution.md#getting-job-results)
+  for submission, terminal waiting, result retrieval, and artifact download.
+- Follow [Store a metric, task, and taskset](references/resources.md#store-a-metric-task-and-taskset)
+  for reusable definitions, and [Query persisted results](references/resources.md#query-persisted-results)
+  for result lookup.
+
+### Task-driven agent evaluation examples
+
+**Standalone SDK evaluation**
+
+Use `AgentEvaluator().run(...)` for standalone task-driven SDK evaluation. Its
+`target` can be a `Model`, a `GenericAgent`, or a direct `AgentTaskRunner`.
+
+**Platform job evaluation**
+
+Use the plugin `agent-evaluate submit` job for platform task evaluation. Its
+target is a `ModelTarget`, `AgentTarget`, `CodexRunnerTarget`,
+`FabricRunnerTarget`, or `HarborRunnerTarget`; alternatively provide
+precomputed `trials`. Provide exactly one of `target` or `trials`.
+
+Submission accepts inline tasks or a stored `TasksetRef`. Stored tasksets are
+resolved in the target workspace.
+
+Read [Agent Evaluation](references/agent-evaluation.md) for inline tasks,
+`TasksetRef`, concurrency, fail-fast behavior, result artifacts, and runner
+configuration.
+
+### Prepare Fabric in a repository checkout
+
+Fabric runner examples and tests need the optional harness adapters and the
+matching Relay gateway:
 
 ```bash
-nemo evaluator evaluate explain
+uv sync --frozen --package nemo-evaluator-sdk --extra fabric --inexact
+script/dev-install-fabric.sh
 ```
 
-> Note: use `nemo evaluator evaluate explain` as the source of truth for the current plugin input schema. It will return a large json schema response, so strongly prefer `nemo evaluator metric-types` when you only need metric names and corresponding schemas.
+The install script downloads the checksum-verified `nemo-relay` binary that
+matches the locked Python bindings. Add its reported directory to `PATH`, then
+use `uv run --frozen --no-sync ...` for Fabric checks so uv does not remove the
+optional adapters.
 
-## Evaluation Spec
+## Output Format
 
-Evaluation spec is a payload that is provided to CLI as an input to execute evaluation.
+Report a completed platform evaluation in this form:
 
-At a high level, a spec describes:
-
-- `metrics`: bundled Evaluator SDK metric configurations
-- `dataset`: inline rows to evaluate or platform FilesetRef that contains the dataset
-- `params`: optional Evaluator SDK execution parameters
-- `target`: optional model or agent target for online evaluation
-
-See the LLM-judge spec example at [assets/specs/llm_as_judge.json](./assets/specs/llm_as_judge.json).
-
-### Metric Bundle Payloads
-
-The checked-in [spec examples](./assets/specs) use bundled SDK metrics. The fields under `metrics[*].payload` are generated by `bundle_metric(metric, CloudpickleMetricBundlePackager())`.
-
-To see the pattern for configuring a pre-defined SDK metric, for example `ExactMatchMetric`, and converting it into bundled metric JSON, inspect `build_metric_bundle_example()` in [generate_example_specs.py](./scripts/generate_example_specs.py) and run:
-
-```bash
-uv run --frozen python skills/nemo-evaluator-plugin/scripts/generate_example_specs.py
+```text
+Job: <job-name>
+Status: <terminal-status>
+Metrics: <metric-names>
+Mean: <aggregate-mean>
+Artifacts: <downloaded result or artifact location>
+Errors: <error messages>
 ```
 
-## Run Evaluations
+## Read specialized references
 
-### Run Using File Spec Reference
+- Read [Evaluator API Auth](references/api-auth.md) before using a model,
+  agent, remote metric, or durable submission.
+- Read [LLM Judge](references/llm-judge.md) before writing judge scores,
+  prompts, or parsers.
 
-When using the `nemo evaluator evaluate run` command, results are saved into local temporary directories and the link is printed to stdout.
-Prefer the `--spec-file` named argument over inline shell JSON because metric bundles include serialized payloads.
-Examples of various specs are provided in the [assets/specs](./assets/specs/) directory.
+## Troubleshooting
 
-#### Evaluate using `exact-match` metric
+Read [Evaluator troubleshooting](references/troubleshooting.md) when schema,
+authentication, job, result, or runner behavior fails.
 
-See the spec example at [assets/specs/exact_match_metric.json](./assets/specs/exact_match_metric.json).
+## Follow security best practices
 
-```bash
-nemo evaluator evaluate run --spec-file skills/nemo-evaluator-plugin/assets/specs/exact_match_metric.json
-```
-
-#### Evaluate using a benchmark metric set
-
-```bash
-nemo evaluator evaluate run --spec-file skills/nemo-evaluator-plugin/assets/specs/exact_match_benchmark.json
-```
-
-#### Evaluate using `LLM-Judge` metric
-
-Uses an LLM to score responses. See the spec example at [assets/specs/llm_as_judge.json](./assets/specs/llm_as_judge.json).
-
-```bash
-nemo evaluator evaluate run --spec-file skills/nemo-evaluator-plugin/assets/specs/llm_as_judge.json
-```
-
-### Run Evaluation As A Durable Job
-
-Use the `nemo evaluator evaluate submit` command to create a durable evaluation job. The response of this command returns a job handler object instead of the evaluation result.
-
-```bash
-nemo evaluator evaluate submit \
-  --spec-file skills/nemo-evaluator-plugin/assets/specs/exact_match_metric.json
-```
-
-The submit response includes the generated job's `name` field, for example `nemo-evaluator-zlhn1ecd`. Wait for the job to complete, then list and download the job results.
-
-```bash
-nemo jobs get-status <job-name>
-nemo jobs get <job-name>
-nemo jobs results list <job-name>
-nemo jobs results download aggregate-scores --job <job-name> --output-file aggregate-scores.json
-nemo jobs results download row-scores --job <job-name> --output-file row-scores.jsonl
-```
-
-## Python SDK Interface
-
-Evaluator Python SDK client is exposed as `evaluator` variable on `NeMoPlatform` instance:
-
-```python
-from nemo_platform import NeMoPlatform
-
-platform_client = NeMoPlatform(base_url="http://localhost:8080")
-status = platform_client.evaluator.plugin_status()
-```
-
-See examples of using the plugin SDK interface in [plugin_sdk_examples.py](./assets/examples/plugin_sdk_examples.py).
-
-## Security
-Make sure not to print any secrets to stdout since this can be collected as logs
-
-## Additional Resources
-
-For LLM-judge setup notes, see [LLM Judge Notes](references/llm-judge.md).
-
-For evaluator API key auth, see [Evaluator API Auth](references/api-auth.md).
-
-For local and cluster troubleshooting, see [Evaluation Troubleshooting](references/troubleshooting.md).
+Never print, serialize, or commit secret values. Store only environment-variable
+names or platform secret references in specs and examples.
