@@ -4,3 +4,5 @@ description: NVIDIA PhysicsNeMo - Open-source deep-learning framework for buildi
 skills:
   - path: skills/physicsnemo-discover/
     catalog_dir: physicsnemo-discover
+  - path: skills/physicsnemo-shard-tensor/
+    catalog_dir: physicsnemo-shard-tensor
