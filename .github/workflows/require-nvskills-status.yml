@@ -30,7 +30,8 @@ jobs:
           STATUS_CONTEXT: ${{ vars.NVSKILLS_STATUS_CONTEXT || 'NVSkills CI' }}
           SIGNATURE_COMMIT_TITLE: ${{ vars.NVSKILLS_SIGNATURE_COMMIT_TITLE || 'Attach NVSkills validation signatures' }}
           SIGNATURE_PUSH_ACTOR: ${{ vars.NVSKILLS_SIGNATURE_PUSH_ACTOR || 'nv-skills-ci[bot]' }}
-          SIGNATURE_SERVICE_ACCOUNT_LOGIN: ${{ vars.NVSKILLS_FORK_SERVICE_ACCOUNT_LOGIN || vars.NVSKILLS_SIGNATURE_COMMIT_LOGIN || 'svc-nvskills-signing' }}
+          SIGNATURE_COMMITTER_NAME: ${{ vars.NVSKILLS_SIGNATURE_COMMITTER_NAME || 'nvskills-svc-account' }}
+          SIGNATURE_COMMITTER_EMAIL: ${{ vars.NVSKILLS_SIGNATURE_COMMITTER_EMAIL || 'svc-nvskills-signing@nvidia.com' }}
           STATUS_POLL_SECONDS: ${{ vars.NVSKILLS_STATUS_POLL_SECONDS || '30' }}
           MISSING_STATUS_GRACE_SECONDS: ${{ vars.NVSKILLS_MISSING_STATUS_GRACE_SECONDS || '120' }}
           MAX_STATUS_WAIT_SECONDS: ${{ vars.NVSKILLS_MAX_STATUS_WAIT_SECONDS || '3600' }}
@@ -139,10 +140,7 @@ jobs:
                   "skill-card-review-needed\\.md|[^/]+-review-needed\\.md)$"
                 );
               any(.files[]?; .filename | endswith("/skill.oms.sig")) and
-              all(.files[]?;
-                ((.previous_filename? // "") | length) == 0 and
-                (.filename | generated_artifact)
-              )
+              all(.files[]?; .filename | generated_artifact)
             ' >/dev/null
           }
 
@@ -152,15 +150,15 @@ jobs:
             is_generated_signature_artifact_commit "${commit_json}" || return 1
             printf '%s' "${commit_json}" | jq -e \
               --arg actor "${SIGNATURE_PUSH_ACTOR}" \
-              --arg service_login "${SIGNATURE_SERVICE_ACCOUNT_LOGIN}" '
-                ((.author.login? // "") | ascii_downcase) == ($actor | ascii_downcase) or
-                ((.committer.login? // "") | ascii_downcase) == ($actor | ascii_downcase) or
+              --arg name "${SIGNATURE_COMMITTER_NAME}" \
+              --arg email "${SIGNATURE_COMMITTER_EMAIL}" '
+                (.author.login? == $actor) or
+                (.committer.login? == $actor) or
                 (
-                  ($service_login | length) > 0 and
-                  (
-                    ((.author.login? // "") | ascii_downcase) == ($service_login | ascii_downcase) or
-                    ((.committer.login? // "") | ascii_downcase) == ($service_login | ascii_downcase)
-                  )
+                  .commit.author.name == $name and
+                  .commit.author.email == $email and
+                  .commit.committer.name == $name and
+                  .commit.committer.email == $email
                 )
               ' >/dev/null
           }
@@ -361,7 +359,7 @@ jobs:
             "Comment \`/nvskills-ci\` on this PR after every commit that changes" \
             "\`skills/\`, \`team-skills/\`, \`rules/team-rules/\`, or \`plugins/\`." \
             "" \
-            "For a fork pull request, add the NVSkills signing service account as a collaborator with write access to the fork repository, then ask a maintainer of the base repository to comment \`/nvskills-ci\`."
+            "For a fork pull request, install the NVSkills GitHub App on the fork repository, then ask a maintainer of the base repository to comment \`/nvskills-ci\`."
           if [ -n "${status_sha}" ]; then
             append_summary "" "Latest NVSkills CI status checked: \`${status_state}\` on \`${status_sha}\`."
           fi
