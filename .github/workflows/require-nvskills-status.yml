@@ -380,7 +380,7 @@ jobs:
             "Comment \`/nvskills-ci\` on this PR after every commit that changes" \
             "\`skills/\`, \`team-skills/\`, \`rules/team-rules/\`, or \`plugins/\`." \
             "" \
-            "For a fork pull request, add \`${SIGNATURE_SERVICE_ACCOUNT_LOGIN}\`, the configured NVSkills signing service account, as a collaborator with write access to the fork repository, then ask a maintainer of the base repository to comment \`/nvskills-ci\`."
+            "For a fork pull request, add the NVSkills signing service account as a collaborator with write access to the fork repository, then ask a maintainer of the base repository to comment \`/nvskills-ci\`."
           if [ -n "${status_sha}" ]; then
             append_summary "" "Latest NVSkills CI status checked: \`${status_state}\` on \`${status_sha}\`."
           fi
