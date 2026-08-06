@@ -1,0 +1,48 @@
+[
+  {
+    "id": "holohub-debug-build-run-002",
+    "question": "A C++ HoloHub application now fails in ./holohub build after I changed its operator dependency. Find the first causal error and make the smallest fix while preserving my unrelated edits.",
+    "expected_skill": "holohub-debug-build-run",
+    "expected_script": null,
+    "ground_truth": "The agent freezes the existing checkout and exact command, previews and reproduces the failure, isolates metadata/CMake/dependency/image/compiler boundaries, tests one hypothesis at a time, and changes only the owning root cause. It refreshes the build preview after the fix before running the identical build. It preserves unrelated dirty files by using only path-scoped checks in the original checkout and runs the full auto-fixing lint workflow against the exact requested candidate in a clean disposable checkout.",
+    "expected_behavior": [
+      "Activates holohub-debug-build-run",
+      "Records the full revision and dirty baseline without cloning, switching revisions, or disturbing unrelated changes",
+      "Uses --dryrun --verbose on the exact build shape before real reproduction",
+      "Uses the first actionable CMake or compiler failure rather than final shutdown noise",
+      "Checks metadata, registration, operator targets, include/link paths, language, mode, and build type as separate boundaries",
+      "Refreshes the exact build preview after the fix before the passing reproduction",
+      "Uses path-scoped checks in the dirty checkout and full lint on the exact candidate in a clean disposable checkout",
+      "Does not reset, clear caches, upgrade dependencies, use host-local execution, or commit without authorization"
+    ]
+  },
+  {
+    "id": "holohub-debug-build-run-009",
+    "question": "./holohub install my-module --dev succeeded, but the Python used by my consumer still cannot import it. Diagnose the environment mismatch.",
+    "expected_skill": "holohub-debug-build-run",
+    "expected_script": null,
+    "ground_truth": "The agent treats this as an environment-scoped editable-hook failure. It records ./holohub environment identity and the hook target, compares it with the consumer environment/container, changes only the mismatched selection or consumer path, verifies the import, and removes stale diagnostic hooks.",
+    "expected_behavior": [
+      "Activates holohub-debug-build-run rather than the non-failing module lifecycle",
+      "Uses ./holohub env-info --json and inspects the exact editable-hook destination with sensitive paths redacted",
+      "Compares the selected and consuming environments instead of changing module source first",
+      "Does not assume a host editable hook is forwarded into a project container",
+      "Verifies import in the corrected environment and removes stale diagnostic hooks"
+    ]
+  },
+  {
+    "id": "holohub-debug-build-run-011",
+    "question": "`./holohub test my_app --clear-cache` fails. Diagnose and fix it, but do not clear existing cached artifacts unless I explicitly approve the exact affected paths after seeing them.",
+    "expected_skill": "holohub-debug-build-run",
+    "expected_script": null,
+    "ground_truth": "The agent preserves the exact failing command and baseline, inspects local help, and previews the unchanged command to identify every cache path that would be cleared. Because --clear-cache is destructive, the request to diagnose is not treated as authorization to reproduce it: the agent shows the exact affected paths and obtains explicit user approval first. Only after approval does it reproduce once, test one causal hypothesis at a time, make the smallest fix, refresh the same preview, and run the identical proof command.",
+    "expected_behavior": [
+      "Activates holohub-debug-build-run and preserves the exact command, revision, dirty state, and cache baseline",
+      "Previews the unchanged --clear-cache command and resolves every affected cache path before reproduction",
+      "Does not treat a diagnosis request as approval to clear existing cached artifacts",
+      "Obtains explicit user authorization for the displayed affected paths before the real reproduction",
+      "After a minimal fix, refreshes the preview before rerunning the identical proof command",
+      "Does not broaden cleanup to unrelated caches or paths"
+    ]
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "id": "holohub-module-lifecycle-008",
+    "question": "Before executing anything, state the exact preview/action command order required to scaffold a new external Python Holoscan Module from modules/template. Do not run commands or install anything.",
+    "expected_skill": "holohub-module-lifecycle",
+    "expected_script": null,
+    "ground_truth": "The agent activates the module lifecycle and states this order in one selected wrapper environment: ./holohub setup --scripts template --dryrun; inspect the previewed host dependency installation and obtain explicit user authorization; ./holohub setup --scripts template; a fully specified non-interactive ./holohub create command with modules/template, an existing parent, explicit Python language, all required context, and --dryrun; review; then the identical create command without --dryrun. It says not to attempt create when setup fails and executes nothing.",
+    "expected_behavior": [
+      "Activates holohub-module-lifecycle",
+      "Places template setup preview before any create invocation, inspects its host dependency installation, and requires explicit user authorization before real setup in the same selected wrapper environment",
+      "Uses modules/template, an existing parent, explicit Python language, non-interactive mode, and complete module context for create",
+      "Places the fully specified create preview before the matching real create command and stops before create if setup fails",
+      "Does not execute commands, install packages, create a repository, or publish anything"
+    ]
+  },
+  {
+    "id": "holohub-module-lifecycle-009",
+    "question": "My HoloHub app declares an external module at an immutable SHA, but I need a planning-only command sequence to exercise an uncommitted local module working tree in the normal project container. Do not execute anything.",
+    "expected_skill": "holohub-module-lifecycle",
+    "expected_script": null,
+    "ground_truth": "The agent activates the module lifecycle, distinguishes ordinary immutable consumption through top-level ./holohub run from the advanced mounted-source override, derives HOLOSCAN_CLI_LOCAL_<SANITIZED_MODULE_NAME> from the declared module name, and keeps the host source mounted at its /workspace/volumes path. It gives three gates: outer run-container dry run containing one inner run --local dry run; the same outer action so the inner preview executes and validates the override; then a freshly reviewed identical outer action with only the inner --dryrun removed. It does not split the inner lifecycle into build plus run, silently fall back to the fetched SHA, or execute anything.",
+    "expected_behavior": [
+      "Activates holohub-module-lifecycle and states that ordinary immutable consumption should use top-level ./holohub run",
+      "Derives the HOLOSCAN_CLI_LOCAL_<SANITIZED_MODULE_NAME> key from metadata and maps the absolute host module path to /workspace/volumes/<basename>",
+      "Explains that nesting is required because the host override is not automatically forwarded and the outer dry run does not execute the inner resolver",
+      "Uses one nested ./holohub run --local command and preserves project, mode, language, mount, and relevant mode options across preview and action",
+      "Orders outer dry run, outer action with inner dry run, fresh review, and outer action with only the inner dry run removed",
+      "Requires mounted-path build evidence and a finite consumer result without executing, fetching, committing, or publishing anything"
+    ]
+  },
+  {
+    "id": "holohub-module-lifecycle-006",
+    "question": "./holohub package fails on my module partway through CMake. Reproduce it and make the smallest fix.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The module-lifecycle skill stays silent because one exact command fails. The agent should use holohub-debug-build-run, preserve and preview the command, isolate the first causal layer, and prove a minimal fix.",
+    "expected_behavior": [
+      "Does not activate holohub-module-lifecycle's happy path",
+      "Routes to holohub-debug-build-run",
+      "Preserves the exact failing command, full revision, dirty state, and meaningful inputs",
+      "Avoids speculative cache deletion, broad dependency upgrades, or publishing"
+    ]
+  }
+]

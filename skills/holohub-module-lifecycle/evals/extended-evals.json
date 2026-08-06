@@ -1,0 +1,46 @@
+[
+  {
+    "id": "holohub-module-lifecycle-001",
+    "question": "Create a self-contained Python Holoscan Module from HoloHub with one reusable operator, a finite demo application, tests, and metadata suitable for future wheel and Debian packaging.",
+    "expected_skill": "holohub-module-lifecycle",
+    "expected_script": null,
+    "ground_truth": "The agent chooses an external module, preserves the user-provided HoloHub checkout and full revision, previews template setup, identifies its host dependency installation, obtains explicit user authorization, and only then runs real setup in the selected wrapper environment before previewing and running a fully non-interactive create command with an existing parent. It inspects the generated staged repository, implements operator/demo/test contracts, and builds and validates through ./holohub without publishing.",
+    "expected_behavior": [
+      "Activates holohub-module-lifecycle",
+      "Uses the existing checkout without an implicit clone or revision switch and records its full SHA and dirty state",
+      "Previews setup --scripts template, inspects its host dependency installation, obtains explicit user authorization, and only then runs real setup in the selected wrapper environment; does not attempt create if setup fails",
+      "Uses modules/template with explicit directory, language, names, versions, SDK, license, maintainer context, -i False, and --dryrun before real creation",
+      "Keeps module namespace, repository/package, operator, metadata, and build identities consistent",
+      "Treats the generated result as a staged Git repository and never pushes it without a request",
+      "Builds the module, runs a finite consumer-style demo, tests at honest scope, and does not publish artifacts"
+    ]
+  },
+  {
+    "id": "holohub-module-lifecycle-005",
+    "question": "My module builds and tests pass. Package it as a Debian package and wheel through ./holohub and confirm both are usable by a clean consumer.",
+    "expected_skill": "holohub-module-lifecycle",
+    "expected_script": null,
+    "ground_truth": "The agent validates module metadata, previews and runs module DEB/WHEEL packaging container-first, inspects artifact identity and contents, installs each format in a disposable artifact-only consumer, and proves import/link plus a finite smoke result without publishing.",
+    "expected_behavior": [
+      "Activates holohub-module-lifecycle",
+      "Confirms module metadata, namespace, version, dependencies, testing, and binary package declarations",
+      "Previews explicit ./holohub package <module> with --dryrun --verbose without treating the preview as artifact output, then records actual action artifact paths",
+      "Inspects wheel metadata and deb control/payload rather than trusting exit zero",
+      "Proves each requested format from a clean consumer that cannot import from the checkout, build tree, user site, or local override",
+      "Does not commit, push, upload, publish, or remove unrelated files without authorization"
+    ]
+  },
+  {
+    "id": "holohub-module-lifecycle-007",
+    "question": "Create an ordinary HoloHub video application with finite replay and recording modes; it does not expose a reusable module API.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The module-lifecycle skill stays silent because this is an ordinary application with no reusable module API. The agent should use holohub-app-lifecycle.",
+    "expected_behavior": [
+      "Does not activate holohub-module-lifecycle or invent module metadata/packages",
+      "Routes to holohub-app-lifecycle",
+      "Uses finite visual evidence appropriate to an application",
+      "Does not invent a reusable API or distribution contract"
+    ]
+  }
+]

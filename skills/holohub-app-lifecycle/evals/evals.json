@@ -1,0 +1,57 @@
+[
+  {
+    "id": "holohub-app-lifecycle-007",
+    "question": "Show me the fastest safe ./holohub edit-build-run-test loop for this existing Python application. Nothing is failing; I changed only application source.",
+    "expected_skill": "holohub-app-lifecycle",
+    "expected_script": null,
+    "ground_truth": "The agent treats this as a non-failing existing-app lifecycle. It records the checkout and project/mode/language identity, parses structured environment diagnostics without treating an irrelevant failed capability as an automatic task failure, previews the first exact shape, proves one full container-first run, then reuses an unchanged image and only skips the project build when current artifacts or mounted-source execution are proved.",
+    "expected_behavior": [
+      "Activates holohub-app-lifecycle and does not create a replacement scaffold",
+      "Reads local help, metadata, structured version/list/modes/env-info/env-check output, and current image/artifact state before choosing acceleration flags",
+      "Stops on an env-check failure only when that capability is required by the selected project or proof",
+      "Uses explicit language and mode and previews materially different command shapes",
+      "Explains when --no-docker-build and --no-local-build are safe and when an image or project rebuild is required",
+      "Verifies finite or visual behavior rather than treating status markers or exit zero as sufficient proof"
+    ]
+  },
+  {
+    "id": "holohub-app-lifecycle-011",
+    "question": "Before executing anything, state the exact preview/action command order required to scaffold a new Python HoloHub application named sensor_demo. Do not run commands or install anything.",
+    "expected_skill": "holohub-app-lifecycle",
+    "expected_script": null,
+    "ground_truth": "The agent activates the application lifecycle and states this order in one selected wrapper environment: ./holohub setup --scripts template --dryrun; inspect the previewed host dependency installation and obtain explicit user authorization; ./holohub setup --scripts template; ./holohub create sensor_demo --language python -i False --dryrun; review the scaffold and registration; then the identical create command without --dryrun. It says not to attempt create when setup fails and executes nothing.",
+    "expected_behavior": [
+      "Activates holohub-app-lifecycle",
+      "Places template setup preview before any create invocation, inspects the host dependency installation, and requires explicit user authorization before real setup in the same wrapper environment",
+      "Places the non-interactive language-explicit create preview before the matching real create command",
+      "Stops before create if setup fails and preserves the failed setup command for holohub-debug-build-run",
+      "Does not execute commands, install packages, or create files"
+    ]
+  },
+  {
+    "id": "holohub-app-lifecycle-004",
+    "question": "Before touching the checkout, classify this request: an existing HoloHub application built yesterday, but today ./holohub run fails inside its container. Is holohub-app-lifecycle the right workflow? Name the workflow to use and the state it should preserve first. Do not diagnose the failure or run commands yet.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The agent classifies this as diagnosis of one concrete failing command, so the app-lifecycle skill stays silent. It routes to holohub-debug-build-run and names the exact command, full revision, dirty state, and unrelated edits as the state to preserve before diagnosis. It does not execute commands during this routing step.",
+    "expected_behavior": [
+      "Does not activate holohub-app-lifecycle",
+      "Routes the task to holohub-debug-build-run",
+      "Preserves the exact failing command, full revision, dirty state, and unrelated edits",
+      "Does not diagnose, run commands, clear caches, rebuild broadly, or create a scaffold during this routing step"
+    ]
+  },
+  {
+    "id": "holohub-app-lifecycle-006",
+    "question": "Before making changes, classify this request: my Holoscan Module already builds and tests pass, and I need a Debian package and a wheel through ./holohub with clean-install verification. Is holohub-app-lifecycle the right workflow? Name the workflow and verification path to use. Do not package or run commands yet.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The agent classifies this as module packaging and clean-consumer verification, so the app-lifecycle skill stays silent. It routes to holohub-module-lifecycle, identifies module-only DEB and WHEEL packaging followed by clean-consumer installation checks, and does not execute commands during this routing step.",
+    "expected_behavior": [
+      "Does not activate holohub-app-lifecycle or create an app scaffold",
+      "Routes the task to holohub-module-lifecycle",
+      "Names module-only ./holohub package behavior and clean-consumer verification",
+      "Does not package, run commands, publish artifacts, or reintroduce a removed application packager during this routing step"
+    ]
+  }
+]

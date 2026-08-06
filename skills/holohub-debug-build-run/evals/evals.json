@@ -1,0 +1,43 @@
+[
+  {
+    "id": "holohub-debug-build-run-004",
+    "question": "Create a new Python HoloHub application from this sensor-processing brief, including a scaffold, finite smoke mode, visual recording, tests, and a flow benchmark.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The debug skill stays silent because no concrete command is failing. The agent should use holohub-app-lifecycle for the scaffold-to-evidence happy path.",
+    "expected_behavior": [
+      "Does not activate holohub-debug-build-run or begin failure reproduction",
+      "Routes the task to holohub-app-lifecycle",
+      "Keeps application requirements and evidence boundaries in the user's brief",
+      "Does not perform destructive diagnosis or cache cleanup"
+    ]
+  },
+  {
+    "id": "holohub-debug-build-run-007",
+    "question": "My Holoscan Module builds and tests pass. Now package it into DEB and WHEEL artifacts through ./holohub and verify they install cleanly.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The debug skill stays silent because this is a non-failing module packaging and clean-consumer task. The agent should use holohub-module-lifecycle.",
+    "expected_behavior": [
+      "Does not activate holohub-debug-build-run or manufacture a failure",
+      "Routes the task to holohub-module-lifecycle",
+      "Requires artifact inspection and clean-consumer proof",
+      "Does not publish, upload, or remove unrelated files without authorization"
+    ]
+  },
+  {
+    "id": "holohub-debug-build-run-010",
+    "question": "Before executing anything, outline how to diagnose this exact failure: `./holohub run endoscopy_tool_tracking` exits 1 after `ModuleNotFoundError: holoscan`. State the evidence to preserve, preview and reproduction order, first boundary to test, and proof required. Do not run commands or change files.",
+    "expected_skill": "holohub-debug-build-run",
+    "expected_script": null,
+    "ground_truth": "Activate the debug skill for the concrete failing wrapper command. Preserve the exact command, full revision, dirty state, input and environment identities, and complete error boundary. Inspect local help and wrapper-selected environment, preview the same command shape, then reproduce once unchanged. First distinguish launcher environment selection from the project-container application import boundary. Test one falsifiable hypothesis at a time. After a minimal fix, refresh the preview for the same mutating command before rerunning it with identical inputs, the expected finite result, and the nearest focused regression test. The planning-only request must not execute commands or edit files.",
+    "expected_behavior": [
+      "Activates holohub-debug-build-run for the concrete failing command",
+      "Preserves the exact command, revision, dirty state, inputs, environment, and error boundary",
+      "Keeps preview and reproduction arguments identical to the failing command",
+      "Tests the wrapper environment versus project-container import boundary before proposing broad changes",
+      "Requires a fresh post-fix preview before the identical passing command and a focused regression test as proof",
+      "Does not execute commands, edit files, clear caches, or change privileges"
+    ]
+  }
+]
