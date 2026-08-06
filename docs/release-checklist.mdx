@@ -13,17 +13,17 @@ Use this checklist when preparing a skill for review, publication, or internal d
 - Scripts and references are necessary for the stated use case.
 - Test fixtures, examples, and generated files are either intentionally included or excluded.
 
-## Scanning
+## Scanning and Evaluation
 
-- Run SkillSpector against the complete skill directory.
+- Ship an evaluation task set at `evals/evals.json` so Tier 3 can run.
+- Run SkillEvaluator against the complete skill directory. Tier 1 includes the SkillSpector scan.
 - Save a Markdown or SARIF report for review.
 - Resolve critical and high findings before release.
 - Review medium findings for policy or usability impact.
 - Confirm the skill description matches executable behavior.
+- Review the `BENCHMARK.md` verdict before publishing.
 
-```bash
-skillspector scan ./skill-name --format markdown --output skillspector-report.md
-```
+For installation and the commands to run an evaluation, see the [SkillEvaluator documentation](https://docs.nvidia.com/skills/skillevaluator).
 
 ## Skill Card
 
@@ -55,7 +55,7 @@ The release packet should include:
 
 - Skill source or release artifact
 - Skill card (`skill-card.md`)
-- SkillSpector report or CI link
+- SkillEvaluator report or CI link (includes the Tier 1 SkillSpector scan)
 - Tier-3 evaluation dataset — accepted at `evals/evals.json`, `evals/*.json`, `eval/*.json`, or `benchmark/evals.json`
 - `BENCHMARK.md` capturing the benchmark report from the evaluation run
 - Detached OMS signature (`skill.oms.sig`)

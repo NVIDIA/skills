@@ -30,6 +30,9 @@ navigation:
       - page: Scan Agent Skills Before Installation
         path: ../docs/scanning-agent-skills.mdx
         slug: scanning-agent-skills
+      - page: Evaluate Agent Skills Before Publication
+        path: ../docs/evaluating-agent-skills.mdx
+        slug: evaluating-agent-skills
       - page: Verify Signed Agent Skills
         path: ../docs/signing-agent-skills.mdx
         slug: signing-agent-skills
@@ -47,15 +50,3 @@ navigation:
     contents:
       - link: Overview
         href: https://docs.nvidia.com/skills/skillevaluator
-      - link: Quickstart
-        href: https://docs.nvidia.com/skills/skillevaluator/quickstart
-      - link: Installation
-        href: https://docs.nvidia.com/skills/skillevaluator/installation
-      - link: "Tier 1: Validation"
-        href: https://docs.nvidia.com/skills/skillevaluator/tier1-validation
-      - link: "Tier 2: Deduplication"
-        href: https://docs.nvidia.com/skills/skillevaluator/tier2-deduplication
-      - link: "Tier 3: Live Evaluation"
-        href: https://docs.nvidia.com/skills/skillevaluator/tier3-live-evaluation
-      - link: CLI Reference
-        href: https://docs.nvidia.com/skills/skillevaluator/cli-reference

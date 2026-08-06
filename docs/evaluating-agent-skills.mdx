@@ -1,0 +1,43 @@
+---
+title: "Evaluate Agent Skills Before Publication"
+description: "How SkillEvaluator measures whether a skill improves an agent's output, what to ship so it can run, and how to read the result."
+---
+
+Scanning tells you whether a skill is safe to run. It does not tell you whether the skill is any good. A skill can be perfectly safe, well documented, correctly signed, and still leave an agent no better off than it was without it.
+
+Evaluation answers that second question by measurement rather than assertion: an agent attempts a fixed set of tasks twice, once with the skill loaded and once without, and the difference is recorded.
+
+## What SkillEvaluator Runs
+
+**SkillSpector is part of SkillEvaluator.** It is the security scanner that runs as Tier 1, not a separate tool you run alongside it.
+
+| Tier | What it does | Can it block publication? |
+|---|---|---|
+| **Tier 1 — Validation** | Schema, license, PII, Unicode safety, and the full SkillSpector security scan | Yes, on high-severity findings |
+| **Tier 2 — Deduplication** | Semantic overlap against skills already in the catalog | Advisory |
+| **Tier 3 — Live evaluation** | Real agents run the task set in a sandbox, with and without the skill | Yes, via the verdict |
+
+## What You Need to Ship
+
+Tier 3 cannot run without a task set. Provide one at `evals/evals.json`, next to your `SKILL.md`. Other accepted locations are `evals/*.json`, `eval/*.json`, and `benchmark/evals.json`.
+
+Without it, Tier 3 is skipped and the generated `BENCHMARK.md` reports no live results — which is treated the same as a missing report during review.
+
+Write tasks that reflect what the skill is actually for. Include negative cases, where the correct behavior is for the agent *not* to use the skill.
+
+## Reading a BENCHMARK.md
+
+Every evaluated skill publishes a `BENCHMARK.md` alongside it. It records the agents used, the evaluation date, per-dimension scores in both conditions, and an overall verdict.
+
+Scores are shown as `baseline → with skill (change)` for each agent, across five dimensions: security, correctness, discoverability, effectiveness, and efficiency.
+
+**PASS** requires every configured dimension to pass for at least one supported agent. Measured change is reported as diagnostic evidence and does not by itself override that gate.
+
+### Two Things to Keep in Mind
+
+- **Change can be negative.** A skill may improve one agent and degrade another. That is a real result worth understanding, not noise to discard.
+- **A single run is directional, not precise.** Scores move between runs on the same skill. Treat a small difference as a range rather than a measurement.
+
+<Note>
+For installation and the commands to run an evaluation, see the [SkillEvaluator documentation](https://docs.nvidia.com/skills/skillevaluator).
+</Note>

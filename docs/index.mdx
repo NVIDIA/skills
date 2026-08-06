@@ -57,10 +57,11 @@ The catalogs group skills by the kind of work the user is trying to do, while th
 
 NVIDIA-verified skills are also release artifacts. Before a skill is published, the catalog expects the same discipline we expect from deployable software: security review, provenance, ownership, clear use boundaries, and verification instructions.
 
-Verified means the skill is cataloged, scanned, signed, and documented with a skill card:
+Verified means the skill is cataloged, scanned, evaluated, signed, and documented with a skill card:
 
 - **Cataloged** from the product team or source repository that owns the capability.
 - **Scanned** before publication for software risks and agent-native risks such as hidden instructions, prompt injection, trigger abuse, excessive agency, and mismatches between declared purpose and bundled behavior.
+- **Evaluated** against a task set to measure whether the skill improves an agent's output. An agent attempts the same tasks with and without the skill, and the difference is recorded per dimension — correctness, security, discoverability, effectiveness, and efficiency. The result is published as a `BENCHMARK.md` report carrying a verdict and the measured change.
 - **Signed** with a detached `skill.oms.sig` so users can verify that the downloaded skill is authentic and unchanged.
 - **Documented** with a skill card that records what the skill does, who owns it, how it is licensed, what it depends on, and what limitations or risks users should understand.
 

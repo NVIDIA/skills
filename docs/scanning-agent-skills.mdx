@@ -5,11 +5,13 @@ description: "Use SkillSpector to detect vulnerabilities, malicious patterns, an
 
 Agent skills can look harmless while still containing risky instructions, hidden metadata, overbroad permissions, or executable code that does more than the description says. SkillSpector is a security scanner for AI agent skills that helps answer: should this skill be installed?
 
+SkillSpector is also the security tier inside SkillEvaluator. If you are preparing a skill for publication, running SkillEvaluator runs these checks as Tier 1 — see [Evaluate Agent Skills Before Publication](/skills/evaluating-agent-skills). This page covers running the scanner directly, which is what you want when reviewing a skill before installing it.
+
 SkillSpector accepts Git repositories, URLs, zip files, directories, and single files. It runs fast static checks by default and can add optional LLM semantic analysis for issues that require intent comparison.
 
 ## What SkillSpector Checks
 
-SkillSpector covers 64 vulnerability patterns across 16 categories, including:
+SkillSpector covers 68 vulnerability patterns across 17 categories, including:
 
 - Prompt injection
 - Data exfiltration
@@ -106,7 +108,7 @@ skillspector scan ./my-skill/ --no-llm
 
 ## Triage Policy
 
-Use scan results as a release gate:
+Use scan results as one of the release gates. Scanning determines whether a skill is safe to ship; evaluation determines whether it improves an agent's output. Both apply before publication:
 
 | Finding type | Recommended action |
 |---|---|

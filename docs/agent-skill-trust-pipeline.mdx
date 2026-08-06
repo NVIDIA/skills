@@ -1,38 +1,54 @@
 ---
 title: "A Trust Pipeline for Agent Skills"
-description: "How scanning, signing, and skill cards work together to make AI agent skills easier to review and safer to deploy."
+description: "How scanning, evaluation, signing, and skill cards work together to make AI agent skills easier to review and safer to deploy."
 ---
 
 AI agent skills package instructions, code, references, and assets into a format agents can reuse. They are also a new supply-chain surface: a skill can ask an agent to run commands, read files, call tools, fetch remote content, or make decisions on a user's behalf.
 
-A practical release process should answer three questions before a skill is installed:
+A skill on its own is a set of statements about what it does and how safe it is. The pipeline exists to replace those statements with artifacts a reviewer can check without taking the author's word for it. Each stage answers one question and leaves behind one piece of evidence.
 
-- What does this skill claim to do?
-- What did automated review find?
-- Can users verify the reviewed artifact is the artifact they received?
+| Question | Evidence produced | Stage |
+|---|---|---|
+| Is this skill safe to run? | Scan report over the complete bundle | SkillSpector, inside SkillEvaluator Tier 1 |
+| Does it already exist in the catalog? | Semantic overlap report | SkillEvaluator Tier 2 |
+| Does it improve an agent's output? | `BENCHMARK.md` with per-dimension scores | SkillEvaluator Tier 3 |
+| What does it do, and who owns it? | Skill card | Author, reviewed |
+| Is this the artifact that was reviewed? | Detached signature over the directory | OMS signing |
 
-The combination of SkillSpector scanning, a completed skill card, and an OMS signature gives those questions a concrete place in the workflow.
+## One Framework, Three Tiers
+
+**SkillSpector is part of SkillEvaluator.** It is the security scanner that runs as SkillEvaluator's first tier, not a separate step alongside it. Running SkillEvaluator runs SkillSpector.
+
+- **Tier 1 — Validation.** Schema, license, PII, Unicode safety, and the full SkillSpector security scan. Deterministic, and it can fail a skill outright.
+- **Tier 2 — Deduplication.** Semantic overlap against skills already in the catalog, so the same capability is not published twice under two names.
+- **Tier 3 — Live evaluation.** The skill is exercised by real agents in a sandbox against a task set, with and without the skill loaded. Each dimension is scored in both conditions, and the difference is the skill's measured contribution.
+
+A skill can pass every security check and still make an agent worse. Tier 3 is where that shows up. See [Evaluate Agent Skills Before Publication](/skills/evaluating-agent-skills) for what to ship and how to read the result.
 
 ## The Release Gate
 
 Use this order for skills intended for enterprise deployment as **NVIDIA-Verified**:
 
 1. Author the skill with a narrow purpose, clear triggers, and explicit permissions.
-2. Run SkillSpector against the complete skill directory.
-3. Fix high-risk findings or record why a finding is accepted.
-4. Complete the skill card with owner, license, use case, deployment geography, output shape, risks, and references.
-5. Sign the skill directory and publish the detached `skill.oms.sig` file with the skill.
-6. Ask consumers or CI to verify the signature before installation.
+2. Ship an evaluation task set at `evals/evals.json` so Tier 3 has something to measure against.
+3. Run SkillEvaluator against the complete skill directory. Tier 1 includes the SkillSpector scan.
+4. Fix high-risk findings, or record why a finding is accepted.
+5. Review the `BENCHMARK.md` verdict. A skill that does not improve agent performance is not ready, regardless of how it scores on security.
+6. Complete the skill card with owner, license, use case, deployment geography, output shape, risks, and references.
+7. Sign the skill directory and publish the detached `skill.oms.sig` file with the skill.
+8. Ask consumers or CI to verify the signature before installation.
 
 <Note>
-Scanning and signing solve different problems. Scanning asks whether the content appears safe enough to ship. Signing asks whether the shipped content is the same content that was reviewed.
+Scanning, evaluation, and signing solve three different problems. Scanning asks whether the content appears safe to ship. Evaluation asks whether it does any good. Signing asks whether what shipped is what was reviewed.
 </Note>
 
 ## What Each Layer Catches
 
 | Layer | Primary job | Example evidence |
 |---|---|---|
-| SkillSpector scan | Detect risky behavior before installation | Markdown, JSON, SARIF, or terminal report |
+| SkillSpector scan (SkillEvaluator Tier 1) | Detect risky behavior before installation | Markdown, JSON, SARIF, or terminal report |
+| Semantic deduplication (Tier 2) | Prevent duplicate capability entering the catalog | Overlap report against catalog skills |
+| Live agent evaluation (Tier 3) | Measure whether the skill improves agent output | `BENCHMARK.md` with per-dimension scores and verdict |
 | Skill card | State human-readable intent, ownership, limits, and output behavior | `Skill Card.md` or equivalent release metadata |
 | OMS signature | Verify integrity and authenticity of the published skill directory | `skill.oms.sig` plus NVIDIA signing certificate |
 
@@ -43,7 +59,7 @@ Every released skill should ship or link to:
 - `SKILL.md`
 - Supporting `scripts/`, `references/`, and `assets/` as needed
 - A completed skill card (`skill-card.md`)
-- A SkillSpector report or CI link
+- A SkillEvaluator report or CI link
 - A Tier-3 evaluation dataset — accepted at `evals/evals.json`, `evals/*.json`, `eval/*.json`, or `benchmark/evals.json`
 - `BENCHMARK.md` capturing the benchmark report from the evaluation run
 - `skill.oms.sig`
@@ -57,6 +73,7 @@ Before approval, reviewers should be able to answer:
 - Are permissions limited to what the skill actually needs?
 - Are network, shell, file, environment, and MCP capabilities declared in the `SKILL.md` frontmatter and justified by the skill's stated use case?
 - Are known risks and mitigations written in plain language?
+- Does the `BENCHMARK.md` verdict show the skill improving agent output, and is any negative result on a supported agent understood?
 - Does the signature verify against the released directory?
 
 If one of those answers is unclear, the skill is not ready for broad deployment.
