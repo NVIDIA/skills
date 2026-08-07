@@ -41,11 +41,7 @@ jobs:
           ACTOR: ${{ github.actor }}
         run: |
           set -euo pipefail
-          role_name="$(curl -fsSL \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${REPO}/collaborators/${ACTOR}/permission" \
-            | jq -r '.role_name // ""')"
+          role_name="$(gh api "repos/${REPO}/collaborators/${ACTOR}/permission" --jq '.role_name // ""')"
           case "${role_name}" in
             admin|maintain) ;;
             *) echo "Requester must have maintain or admin permission"; exit 1 ;;
@@ -156,7 +152,7 @@ jobs:
       - name: Dispatch NVSkills CI
         if: steps.context.outputs.should_dispatch == 'true'
         env:
-          DISPATCH_TOKEN: ${{ secrets.NVSKILLS_CI_DISPATCH_TOKEN }}
+          GH_TOKEN: ${{ secrets.NVSKILLS_CI_DISPATCH_TOKEN }}
           REPO: ${{ github.repository }}
           PR_NUMBER: ${{ steps.context.outputs.pr_number }}
           REQUEST_HEAD_SHA: ${{ steps.context.outputs.head_sha }}
@@ -167,7 +163,7 @@ jobs:
           REQUESTED_BY: ${{ github.actor }}
         run: |
           set -euo pipefail
-          if [ -z "${DISPATCH_TOKEN}" ]; then
+          if [ -z "${GH_TOKEN}" ]; then
             echo "Missing NVSKILLS_CI_DISPATCH_TOKEN secret."
             exit 1
           fi
@@ -175,29 +171,15 @@ jobs:
           owner="${REPO%%/*}"
           repo="${REPO#*/}"
 
-          curl -fsSL -X POST \
-            -H "Authorization: Bearer ${DISPATCH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/NVIDIA/nvskills-ci/actions/workflows/nvskills-ci.yml/dispatches" \
-            -d "$(jq -n \
-              --arg ref "main" \
-              --arg source_owner "${owner}" \
-              --arg source_repo "${repo}" \
-              --arg pr_number "${PR_NUMBER}" \
-              --arg request_run_id "${REQUEST_RUN_ID}" \
-              --arg request_head_sha "${REQUEST_HEAD_SHA}" \
-              --arg request_base_ref "${REQUEST_BASE_REF}" \
-              --arg request_commit_title "${REQUEST_COMMIT_TITLE}" \
-              --arg request_comment_id "${REQUEST_COMMENT_ID}" \
-              --arg requested_by "${REQUESTED_BY}" \
-              '{ref: $ref, inputs: {
-                source_owner: $source_owner,
-                source_repo: $source_repo,
-                pr_number: $pr_number,
-                request_run_id: $request_run_id,
-                request_head_sha: $request_head_sha,
-                request_base_ref: $request_base_ref,
-                request_commit_title: $request_commit_title,
-                request_comment_id: $request_comment_id,
-                requested_by: $requested_by
-              }}')"
+          gh workflow run nvskills-ci.yml \
+            -R NVIDIA/nvskills-ci \
+            --ref main \
+            -f source_owner="${owner}" \
+            -f source_repo="${repo}" \
+            -f pr_number="${PR_NUMBER}" \
+            -f request_run_id="${REQUEST_RUN_ID}" \
+            -f request_head_sha="${REQUEST_HEAD_SHA}" \
+            -f request_base_ref="${REQUEST_BASE_REF}" \
+            -f request_commit_title="${REQUEST_COMMIT_TITLE}" \
+            -f request_comment_id="${REQUEST_COMMENT_ID}" \
+            -f requested_by="${REQUESTED_BY}"
