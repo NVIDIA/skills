@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to explore multi-objective tradeoffs (cost vs. service level, return vs. risk, etc.) by orchestrating repeated cuOpt solves into a Pareto frontier, enabling informed decision-making across competing objectives. <br>
+Developers and engineers who need to explore multi-objective tradeoffs (cost vs. service level, return vs. risk, makespan vs. overtime) by generating and interpreting Pareto frontiers from sequences of cuOpt LP, MILP, or QP solves. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,7 +26,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
-- [cuopt-examples (GitHub)](https://github.com/NVIDIA/cuopt-examples) <br>
+- [cuopt-examples](https://github.com/NVIDIA/cuopt-examples) <br>
 
 
 ## Skill Output: <br>
@@ -42,11 +42,11 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-8 evaluation tasks (6 positive, 2 negative) in isolated sandbox pods. <br>
+8 evaluation tasks (6 positive, 2 negative) run in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Final-answer correctness against the reference answer. <br>
 - Discoverability: Whether the expected skill was found and executed when needed. <br>
 - Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
@@ -65,15 +65,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 67% → 95% (+28 points) | 67% → 95% (+28 points) |
+| Overall | 65% → 97% (+33 points) | 67% → 90% (+23 points) |
 | Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 92% → 88% (-5 points) | 95% → 98% (+3 points) |
-| Discoverability | 31% → 100% (+69 points) | 44% → 95% (+52 points) |
-| Effectiveness | 79% → 87% (+9 points) | 72% → 82% (+10 points) |
-| Efficiency | 31% → 100% (+69 points) | 25% → 100% (+75 points) |
+| Correctness | 95% → 100% (+5 points) | 95% → 100% (+5 points) |
+| Discoverability | 25% → 100% (+75 points) | 44% → 84% (+40 points) |
+| Effectiveness | 79% → 87% (+8 points) | 73% → 85% (+12 points) |
+| Efficiency | 25% → 100% (+75 points) | 25% → 83% (+58 points) |
 
 ## Skill Version(s): <br>
-26.08.00 (source: frontmatter) <br>
+26.10.00 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

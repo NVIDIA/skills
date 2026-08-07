@@ -1,6 +1,6 @@
 ---
 name: cuopt-multi-objective-exploration
-version: "26.08.00"
+version: "26.10.00"
 description: Trace, complete, and interpret the Pareto frontier across competing objectives using repeated single-objective cuOpt solves (weighted-sum and ε-constraint).
 license: Apache-2.0
 origin: cuopt-skill-evolution
@@ -13,6 +13,7 @@ metadata:
     - tradeoff
     - workflow
 ---
+
 
 # Multi-Objective Exploration
 
