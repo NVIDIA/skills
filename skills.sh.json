@@ -204,7 +204,8 @@
         "i4h-catheter-navigation-render-drr",
         "i4h-catheter-navigation-smoke",
         "i4h-catheter-navigation-viewport",
-        "physicsnemo-discover"
+        "physicsnemo-discover",
+        "physicsnemo-shard-tensor"
       ]
     },
     {

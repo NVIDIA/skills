@@ -2163,7 +2163,7 @@
     {
       "path": "skills/nemo-evaluator-plugin",
       "name": "nemo-evaluator-plugin",
-      "description": "Use when working on the Evaluator plugin CLI, jobs, SDK-backed specs, metric types, or plugin-owned Evaluator skills.",
+      "description": "Evaluate models, datasets, and agents with the NeMo Evaluator plugin. Use for metric selection, SDK checks, platform jobs, and result retrieval.",
       "metadata": {
         "product.primary": "NeMo",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2902,6 +2902,18 @@
         "catalog.subdomain": "simulation-modeling",
         "audience": "developer,data_scientist,research_academic",
         "discovery.activity_tags": "select,inspect,assess,validate"
+      }
+    },
+    {
+      "path": "skills/physicsnemo-shard-tensor",
+      "name": "physicsnemo-shard-tensor",
+      "description": "Official NVIDIA-authored guidance for PhysicsNeMo ShardTensor domain parallelism — integrate domain parallelism into training/inference scripts (new or existing) with DDP or FSDP2, write and register shard patches to enable new layers/ops, and bootstrap multi-GPU correctness tests. Use when working with ShardTensor, scatter_tensor, domain parallelism, sequence/spatial sharding, ring attention, DeviceMesh + DDP/FSDP2 hybrid parallelism, or physicsnemo.domain_parallel. Do NOT use for generic PyTorch DDP/FSDP setup without domain parallelism, picking a PhysicsNeMo model or example (use physicsnemo-discover), or non-distributed training questions.",
+      "metadata": {
+        "product.primary": "PhysicsNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "hpc_developer,ml_engineer,simulation_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "integrate,scale,train,inference,test"
       }
     },
     {

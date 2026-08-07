@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 326,
-  "result_row_count": 3030,
+  "skill_count": 327,
+  "result_row_count": 3040,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -3039,12 +3039,12 @@
     },
     {
       "skill": "nemo-evaluator-plugin",
-      "evaluation_date": "2026-06-03",
-      "profile": "external",
-      "environment": "local",
+      "evaluation_date": "2026-08-05",
+      "profile": null,
+      "environment": "k8s-sandbox",
       "tasks": 1,
-      "attempts_per_task": 2,
-      "pass_threshold_pct": 50.0,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -3053,7 +3053,7 @@
       "catalog_dir": "nemo-evaluator-plugin",
       "component": "NeMo Platform",
       "has_results": true,
-      "average_uplift_pct": 4.1
+      "average_uplift_pct": 38.1
     },
     {
       "skill": "nemo-mbridge-mlm-bridge-training",
@@ -4140,6 +4140,24 @@
       "component": "PhysicsNeMo",
       "has_results": true,
       "average_uplift_pct": 6.4
+    },
+    {
+      "skill": "physicsnemo-shard-tensor",
+      "evaluation_date": "2026-08-05",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "physicsnemo-shard-tensor",
+      "component": "PhysicsNeMo",
+      "has_results": true,
+      "average_uplift_pct": 27.3
     },
     {
       "skill": "portfolio-optimization",
@@ -20494,7 +20512,7 @@
       "catalog_dir": "nemo-evaluator-plugin",
       "component": "NeMo Platform",
       "dimension": "Security",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -20503,7 +20521,7 @@
       "catalog_dir": "nemo-evaluator-plugin",
       "component": "NeMo Platform",
       "dimension": "Security",
-      "num": 2,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -20512,73 +20530,73 @@
       "catalog_dir": "nemo-evaluator-plugin",
       "component": "NeMo Platform",
       "dimension": "Correctness",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 92.0,
-      "uplift_pct": 0.0
+      "score_pct": 100.0,
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
       "component": "NeMo Platform",
       "dimension": "Correctness",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 85.0,
-      "uplift_pct": 5.0
-    },
-    {
-      "catalog_dir": "nemo-evaluator-plugin",
-      "component": "NeMo Platform",
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "claude-code",
-      "score_pct": 63.0,
+      "score_pct": 100.0,
       "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
       "component": "NeMo Platform",
       "dimension": "Discoverability",
-      "num": 2,
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "nemo-evaluator-plugin",
+      "component": "NeMo Platform",
+      "dimension": "Discoverability",
+      "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 12.0
+      "score_pct": 88.0,
+      "uplift_pct": 44.0
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
       "component": "NeMo Platform",
       "dimension": "Effectiveness",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
+      "score_pct": 62.0,
+      "uplift_pct": 52.0
+    },
+    {
+      "catalog_dir": "nemo-evaluator-plugin",
+      "component": "NeMo Platform",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
       "score_pct": 85.0,
-      "uplift_pct": -2.0
-    },
-    {
-      "catalog_dir": "nemo-evaluator-plugin",
-      "component": "NeMo Platform",
-      "dimension": "Effectiveness",
-      "num": 2,
-      "agent": "codex",
-      "score_pct": 70.0,
-      "uplift_pct": 8.0
+      "uplift_pct": 30.0
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
       "component": "NeMo Platform",
       "dimension": "Efficiency",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 51.0,
-      "uplift_pct": 3.0
+      "score_pct": 100.0,
+      "uplift_pct": 70.0
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
       "component": "NeMo Platform",
       "dimension": "Efficiency",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 93.0,
-      "uplift_pct": 15.0
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
     },
     {
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
@@ -25619,6 +25637,96 @@
       "agent": "codex",
       "score_pct": 73.0,
       "uplift_pct": 3.0
+    },
+    {
+      "catalog_dir": "physicsnemo-shard-tensor",
+      "component": "PhysicsNeMo",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "physicsnemo-shard-tensor",
+      "component": "PhysicsNeMo",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "physicsnemo-shard-tensor",
+      "component": "PhysicsNeMo",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "physicsnemo-shard-tensor",
+      "component": "PhysicsNeMo",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "physicsnemo-shard-tensor",
+      "component": "PhysicsNeMo",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "physicsnemo-shard-tensor",
+      "component": "PhysicsNeMo",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "physicsnemo-shard-tensor",
+      "component": "PhysicsNeMo",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 24.0
+    },
+    {
+      "catalog_dir": "physicsnemo-shard-tensor",
+      "component": "PhysicsNeMo",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "physicsnemo-shard-tensor",
+      "component": "PhysicsNeMo",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "physicsnemo-shard-tensor",
+      "component": "PhysicsNeMo",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "portfolio-optimization",
