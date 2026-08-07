@@ -33,7 +33,7 @@ jobs:
           SIGNATURE_SERVICE_ACCOUNT_LOGIN: ${{ vars.NVSKILLS_FORK_SERVICE_ACCOUNT_LOGIN || vars.NVSKILLS_SIGNATURE_COMMIT_LOGIN || 'svc-nvskills-signing' }}
           STATUS_POLL_SECONDS: ${{ vars.NVSKILLS_STATUS_POLL_SECONDS || '30' }}
           MISSING_STATUS_GRACE_SECONDS: ${{ vars.NVSKILLS_MISSING_STATUS_GRACE_SECONDS || '120' }}
-          MAX_STATUS_WAIT_SECONDS: ${{ vars.NVSKILLS_MAX_STATUS_WAIT_SECONDS || '3600' }}
+          MAX_STATUS_WAIT_SECONDS: ${{ vars.NVSKILLS_MAX_STATUS_WAIT_SECONDS || '3300' }}
         run: |
           set -euo pipefail
 
@@ -51,6 +51,25 @@ jobs:
               ''|*[!0-9]*|0) printf '%s' "$2" ;;
               *) printf '%s' "$1" ;;
             esac
+          }
+
+          bounded_positive_integer() {
+            local value
+            local maximum="$3"
+
+            value="$(positive_integer "$1" "$2")"
+            while [ "${value#0}" != "${value}" ]; do
+              value="${value#0}"
+            done
+            if [ -z "${value}" ] || [ "${value}" = "0" ]; then
+              value="$2"
+            fi
+            if [ "${#value}" -gt "${#maximum}" ] ||
+              { [ "${#value}" -eq "${#maximum}" ] && [[ "${value}" > "${maximum}" ]]; }; then
+              echo "::warning::Configured wait value ${value}s exceeds the safe maximum ${maximum}s; clamping it." >&2
+              value="${maximum}"
+            fi
+            printf '%s' "${value}"
           }
 
           case "${HEAD_REF}" in
@@ -296,9 +315,14 @@ jobs:
             exit 0
           fi
 
-          poll_seconds="$(positive_integer "${STATUS_POLL_SECONDS}" 30)"
-          missing_grace_seconds="$(positive_integer "${MISSING_STATUS_GRACE_SECONDS}" 120)"
-          max_wait_seconds="$(positive_integer "${MAX_STATUS_WAIT_SECONDS}" 3600)"
+          status_floor_sha="${latest_watched_sha}"
+          if [ -n "${latest_generated_signature_sha}" ]; then
+            status_floor_sha="${latest_generated_signature_sha}"
+          fi
+
+          poll_seconds="$(bounded_positive_integer "${STATUS_POLL_SECONDS}" 30 300)"
+          missing_grace_seconds="$(bounded_positive_integer "${MISSING_STATUS_GRACE_SECONDS}" 120 600)"
+          max_wait_seconds="$(bounded_positive_integer "${MAX_STATUS_WAIT_SECONDS}" 3300 3300)"
           elapsed_seconds=0
           status_sha=""
           status_state="missing"
@@ -322,7 +346,7 @@ jobs:
                   '[.[] | select(.context == $context)][0].target_url // ""')"
                 break
               fi
-              if [ "${commit_sha}" = "${latest_watched_sha}" ]; then
+              if [ "${commit_sha}" = "${status_floor_sha}" ]; then
                 break
               fi
             done
@@ -348,7 +372,7 @@ jobs:
                 ;;
             esac
 
-            echo "Waiting for ${STATUS_CONTEXT} at or after ${latest_watched_sha} (state: ${status_state}, elapsed: ${elapsed_seconds}s)."
+            echo "Waiting for ${STATUS_CONTEXT} at or after ${status_floor_sha} (state: ${status_state}, elapsed: ${elapsed_seconds}s)."
             sleep "${poll_seconds}"
             elapsed_seconds=$((elapsed_seconds + poll_seconds))
           done
@@ -363,7 +387,7 @@ jobs:
             if [ -n "${latest_generated_signature_sha}" ]; then
               append_summary \
                 "" \
-                "Trusted generated signature commit \`${latest_generated_signature_sha}\` was excluded from content status requirements."
+                "Latest generated signature commit: \`${latest_generated_signature_sha}\`."
             fi
             if [ "${status_sha}" != "${head_sha}" ]; then
               append_summary \
@@ -376,7 +400,7 @@ jobs:
           append_summary \
             "## NVSkills CI required status" \
             "" \
-            "Failed: no successful \`${STATUS_CONTEXT}\` status was found at or after latest watched commit \`${latest_watched_sha}\` (state: \`${status_state}\`)." \
+            "Failed: no successful \`${STATUS_CONTEXT}\` status was found at or after required evidence commit \`${status_floor_sha}\` (state: \`${status_state}\`)." \
             "" \
             "Latest watched-path change: \`${latest_watched_path}\`." \
             "" \
@@ -385,7 +409,7 @@ jobs:
           if [ "${is_fork_pull_request}" = "true" ]; then
             append_summary \
               "" \
-              "\`/nvskills-ci\` only works on branches in the parent repo, not forks."
+              "For a fork pull request, add \`${SIGNATURE_SERVICE_ACCOUNT_LOGIN}\`, the configured NVSkills signing service account, as a collaborator with write access to the fork repository, then ask a maintainer of the base repository to comment \`/nvskills-ci\`."
           fi
           if [ -n "${status_sha}" ]; then
             append_summary "" "Latest NVSkills CI status checked: \`${status_state}\` on \`${status_sha}\`."
