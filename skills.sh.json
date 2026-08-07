@@ -34,6 +34,8 @@
       "title": "Physical AI",
       "description": "Build and validate AI workflows that interact with the physical world, including robotics, autonomy, simulation, synthetic data, and embodied AI systems.",
       "skills": [
+        "holohub-app-lifecycle",
+        "holohub-debug-build-run",
         "hsb-app",
         "hsb-flash",
         "hsb-ip-def",
@@ -319,6 +321,7 @@
       "title": "GPU Development",
       "description": "Develop, tune, profile, and integrate GPU kernels and accelerated code, including CUDA-adjacent workflows, autotuning, low-level performance work, and framework integration.",
       "skills": [
+        "holohub-module-lifecycle",
         "hsb-ip-create-top",
         "tao-run-on-docker",
         "tilegym-adding-cutile-kernel",

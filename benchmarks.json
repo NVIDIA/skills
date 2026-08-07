@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 327,
-  "result_row_count": 3040,
+  "skill_count": 330,
+  "result_row_count": 3070,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -1686,6 +1686,60 @@
       "component": "Earth2Studio",
       "has_results": true,
       "average_uplift_pct": 1.1
+    },
+    {
+      "skill": "holohub-app-lifecycle",
+      "evaluation_date": "2026-08-05",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "holohub-app-lifecycle",
+      "component": "HoloHub",
+      "has_results": true,
+      "average_uplift_pct": 23.1
+    },
+    {
+      "skill": "holohub-debug-build-run",
+      "evaluation_date": "2026-08-05",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "holohub-debug-build-run",
+      "component": "HoloHub",
+      "has_results": true,
+      "average_uplift_pct": 4.7
+    },
+    {
+      "skill": "holohub-module-lifecycle",
+      "evaluation_date": "2026-08-05",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "holohub-module-lifecycle",
+      "component": "HoloHub",
+      "has_results": true,
+      "average_uplift_pct": 16.3
     },
     {
       "skill": "holoscan-install-conda",
@@ -14117,6 +14171,276 @@
       "agent": "codex",
       "score_pct": 43.0,
       "uplift_pct": -3.0
+    },
+    {
+      "catalog_dir": "holohub-app-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "holohub-app-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "holohub-app-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "holohub-app-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "holohub-app-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "holohub-app-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 73.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "holohub-app-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "holohub-app-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 69.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "holohub-app-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "holohub-app-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 71.0,
+      "uplift_pct": 18.0
+    },
+    {
+      "catalog_dir": "holohub-debug-build-run",
+      "component": "HoloHub",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 67.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "holohub-debug-build-run",
+      "component": "HoloHub",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 67.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "holohub-debug-build-run",
+      "component": "HoloHub",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.0,
+      "uplift_pct": 7.0
+    },
+    {
+      "catalog_dir": "holohub-debug-build-run",
+      "component": "HoloHub",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 67.0,
+      "uplift_pct": -20.0
+    },
+    {
+      "catalog_dir": "holohub-debug-build-run",
+      "component": "HoloHub",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "holohub-debug-build-run",
+      "component": "HoloHub",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 67.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "holohub-debug-build-run",
+      "component": "HoloHub",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.0,
+      "uplift_pct": 3.0
+    },
+    {
+      "catalog_dir": "holohub-debug-build-run",
+      "component": "HoloHub",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 58.0,
+      "uplift_pct": -9.0
+    },
+    {
+      "catalog_dir": "holohub-debug-build-run",
+      "component": "HoloHub",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "holohub-debug-build-run",
+      "component": "HoloHub",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 67.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "holohub-module-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "holohub-module-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "holohub-module-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "holohub-module-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 40.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "holohub-module-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "holohub-module-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 50.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "holohub-module-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 62.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "holohub-module-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 20.0,
+      "uplift_pct": -11.0
+    },
+    {
+      "catalog_dir": "holohub-module-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "holohub-module-lifecycle",
+      "component": "HoloHub",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 33.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "holoscan-install-conda",

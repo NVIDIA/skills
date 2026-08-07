@@ -1237,6 +1237,42 @@
       }
     },
     {
+      "path": "skills/holohub-app-lifecycle",
+      "name": "holohub-app-lifecycle",
+      "description": "Use for non-failing HoloHub app work with ./holohub: scaffold, build, run, test, visual evidence, lint, and flow benchmarking.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "application_developer,developer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "get_started,test,validate,benchmark,configure"
+      }
+    },
+    {
+      "path": "skills/holohub-debug-build-run",
+      "name": "holohub-debug-build-run",
+      "description": "Use when a concrete ./holohub command fails, hangs, regresses, or returns wrong output and needs reproducible diagnosis and verification.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "physical-ai",
+        "audience": "application_developer,developer,devops_engineer,platform_engineer,hands_on_builder",
+        "discovery.activity_tags": "debug,troubleshoot,validate,test,inspect"
+      }
+    },
+    {
+      "path": "skills/holohub-module-lifecycle",
+      "name": "holohub-module-lifecycle",
+      "description": "Use for reusable Holoscan Module work with ./holohub: scaffold, tests, editable install, DEB/WHEEL packaging, and clean-consumer proof.",
+      "metadata": {
+        "product.primary": "Holoscan",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "application_developer,developer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "package,test,get_started,configure,validate"
+      }
+    },
+    {
       "path": "skills/holoscan-install-conda",
       "name": "holoscan-install-conda",
       "description": "Install Holoscan SDK v4.3+ via Conda in a CUDA 13 environment. Use for Conda installs; redirect CUDA 12 hosts to container/wheel.",
