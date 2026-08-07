@@ -9,7 +9,7 @@ Evaluation answers that second question by measurement rather than assertion: an
 
 ## What SkillEvaluator Runs
 
-**SkillSpector is part of SkillEvaluator.** It is the security scanner that runs as Tier 1, not a separate tool you run alongside it.
+SkillEvaluator runs three tiers over a skill: deterministic validation, semantic deduplication against the catalog, and live agent evaluation in a sandbox. The security checks in Tier 1 are run by [SkillSpector](https://github.com/NVIDIA/SkillSpector), which is part of SkillEvaluator rather than a separate tool you run alongside it.
 
 | Tier | What it does | Can it block publication? |
 |---|---|---|

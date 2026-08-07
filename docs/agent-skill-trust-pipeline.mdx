@@ -17,7 +17,7 @@ A skill on its own is a set of statements about what it does and how safe it is.
 
 ## One Framework, Three Tiers
 
-**SkillSpector is part of SkillEvaluator.** It is the security scanner that runs as SkillEvaluator's first tier, not a separate step alongside it. Running SkillEvaluator runs SkillSpector.
+**[SkillSpector](https://github.com/NVIDIA/SkillSpector) is part of SkillEvaluator.** It is the security scanner that runs as SkillEvaluator's first tier, not a separate step alongside it. Running SkillEvaluator runs SkillSpector.
 
 - **Tier 1 — Validation.** Schema, license, PII, Unicode safety, and the full SkillSpector security scan. Deterministic, and it can fail a skill outright.
 - **Tier 2 — Deduplication.** Semantic overlap against skills already in the catalog, so the same capability is not published twice under two names.
