@@ -119,12 +119,13 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/${owner}/${repo}/pulls/${pr_number}/files?per_page=100&page=${page}")"
             if printf '%s' "${files_json}" | jq -e '
-              any(.[]; .filename |
+              def watched:
+                (. // "") |
                 startswith("skills/") or
                 startswith("team-skills/") or
                 startswith("rules/team-rules/") or
-                startswith("plugins/")
-              )
+                startswith("plugins/");
+              any(.[]; (.filename | watched) or (.previous_filename? | watched))
             ' >/dev/null; then
               has_watched_change=true
               break
