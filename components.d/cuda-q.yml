@@ -1,8 +1,10 @@
 name: CUDA-Q
 repo: NVIDIA/cuda-quantum
-description: CUDA Quantum — onboarding guide for installation, test programs, GPU simulation, QPU hardware, and quantum applications.
+description: Use for CUDA-Q setup, simulation targets, QPU access, and @cudaq.kernel authoring guidance.
 skills:
   - path: skills/cudaq-guide/
     catalog_dir: cudaq-guide
+  - path: skills/qiskit-to-cudaq/
+    catalog_dir: qiskit-to-cudaq
 links:
   contributing: Contributing.md
