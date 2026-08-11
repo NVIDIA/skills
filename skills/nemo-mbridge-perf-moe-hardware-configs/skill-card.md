@@ -1,5 +1,5 @@
 ## Description: <br>
-Representative MoE training playbooks by hardware platform and model family, summarizing rounded throughput bands, parallelism patterns, and common tuning stacks. <br>
+Representative, point-in-time MoE training playbooks by hardware and model family. Use them as candidate seeds, then revalidate the exact runtime, semantics, topology, and steady-state throughput. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,66 +9,72 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers selecting MoE training configurations for specific hardware platforms, comparing parallelism strategies, throughput bands, and dispatcher choices across H100, B200, GB200, and GB300 systems. <br>
+Developers and performance engineers selecting MoE parallelism configurations and dispatcher strategies for large-scale training on NVIDIA hardware (H100, B200, GB200, GB300). <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [No] <br>
+**Credential Type(s):** [None] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [MoE Optimization Documentation](docs/training/moe-optimization.md) <br>
 - [Performance Tuning Guide](docs/performance-guide.md) <br>
 - [Performance Summary Archive](docs/performance-summary-archive.md) <br>
-- [NVIDIA Megatron Bridge Documentation](https://docs.nvidia.com/nemo/megatron-bridge/latest/) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Configuration instructions, Analysis] <br>
-**Output Format:** [Markdown with inline code blocks] <br>
+**Output Format:** [Markdown with inline code blocks and tables] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task with 2 attempts per task; pass threshold 50%. <br>
+Evaluated against 1 task (1 positive) in isolated k8s-sandbox pods with dataset digest sha256:bfc3173e. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Whether the skill is safe to use (unsafe operations, secret leakage, unauthorized access). <br>
+- Correctness: Whether the answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded and activated when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
+- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 100% (+0%) | 88% (-5%) |
-| Discoverability | 2 | 100% (+0%) | 62% (-17%) |
-| Effectiveness | 2 | 97% (-1%) | 95% (-1%) |
-| Efficiency | 2 | 92% (-0%) | 60% (-18%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 32% → 96% (+64 points) | 64% → 96% (+32 points) |
+| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
+| Correctness | 0% → 100% (+100 points) | 80% → 100% (+20 points) |
+| Discoverability | 50% → 100% (+50 points) | 50% → 94% (+44 points) |
+| Effectiveness | 12% → 80% (+68 points) | 80% → 86% (+6 points) |
+| Efficiency | 0% → 100% (+100 points) | 8% → 100% (+92 points) |
 
 ## Skill Version(s): <br>
-v0.2.0rc6-1529-g97db3553 (source: git describe) <br>
+2f0c6a87 (source: git SHA, committed 2026-08-03) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

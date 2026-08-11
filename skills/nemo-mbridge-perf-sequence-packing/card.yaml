@@ -1,16 +1,18 @@
 title: packed_sequences_long_context
-validated_on: "2026-07-06"
+validated_on: "2026-08-05"
 summary: >
-  Megatron-Bridge currently supports two distinct packing paths: offline packed
-  SFT for text-only finetuning and in-batch packing for some VLM finetuning
-  paths. Long-context training is primarily expressed through context
-  parallelism, long-context Llama recipes, and memory tradeoff knobs like
-  recompute and CPU offloading.
+  Megatron-Bridge supports offline text SFT packing, collate-time VLM packing,
+  and Energon online packing for Qwen-VL. Long-context training is primarily
+  expressed through context parallelism and memory tradeoff knobs.
 validation_status:
   offline_packed_sft_runtime:
     - code_verified
   vlm_in_batch_packing_runtime:
     - code_verified
+  qwen3_vl_energon_online_packing_runtime:
+    - code_verified
+  qwen36_moe_ep8_energon_online_packing_runtime:
+    - functional_verified
   cp_and_packing_validation_rules:
     - code_verified
   packed_seq_helper_behavior:
@@ -34,16 +36,29 @@ feature_meaning:
   vlm_in_batch_packing: >
     Collate-time batch concatenation path for supported VLM training flows,
     controlled by enable_in_batch_packing=True and emitted in MCore THD form.
+  energon_online_packing: >
+    Per-worker candidate-buffer packing for Qwen-VL WebDataset streams,
+    controlled by packing_buffer_size and emitted as one physical MBS1 THD row.
   long_context_training: >
     Training at longer sequence lengths, primarily enabled through context
     parallelism plus recipe-specific long-context presets and memory tuning
     knobs.
 recommended_path:
   llm_packed_sft:
+    target_seq_length: 8192_when_model_and_memory_support_it
     train.micro_batch_size: 1
-    dataset.dataset_kwargs.pad_to_max_length: true
+    train.global_batch_size: preserve_equal_token_slots
     dataset.enable_offline_packing: true
     dataset.offline_packing_specs.packed_sequence_size: match_seq_length
+    dataset.offline_packing_specs.pad_seq_to_mult: lcm(cp_multiple, sp_multiple)
+    sizing_rule: packed_sequence_size * global_batch_size = token_slots_per_step
+  fixed_width_execution:
+    when: dispatcher_kernel_or_cuda_graph_requires_static_token_width
+    dataset.dataset_kwargs.pad_to_max_length: true
+    packed_sequence_size: divisible_by_kernel_chunk
+  cuda_graph_packing:
+    dataset.offline_packing_specs.pad_cu_seqlens: true
+    requires_pack_metadata: true
   cp_finetuning:
     model.calculate_per_token_loss: true
     ddp.average_in_collective: false
@@ -51,10 +66,25 @@ recommended_path:
   vlm_in_batch_packing:
     dataset.enable_in_batch_packing: true
     train.micro_batch_size: ">1"
+  qwen3_vl_energon_online_packing:
+    dataset.packing_buffer_size: 16
+    train.micro_batch_size: 1
+    model.calculate_per_token_loss: true
+    ddp.average_in_collective: false
+    step_func: vlm_step
 known_constraints:
   - seq_length must be divisible by 2 * context_parallel_size when CP > 1.
   - Offline packed SFT requires micro_batch_size == 1.
+  - With offline MBS1 packing, global_batch_size must be divisible by and no smaller than data_parallel_size.
+  - pad_seq_to_mult is derived from CP/TP/SP and follows the same rule for SFT and PEFT.
+  - pad_to_max_length is conditional on a fixed-width dispatcher, kernel, or CUDA-graph path.
   - VLM in-batch packing requires micro_batch_size > 1.
+  - Energon online packing requires physical micro_batch_size == 1 and counts candidate samples per worker.
+  - Energon online packing is mutually exclusive with collate-time in-batch packing and the deferred Qwen step.
+  - Energon online packing does not support MTP, CUDA graphs, or pipeline parallelism.
+  - Requested MoE expert-parallel communication overlap is disabled with a warning for Energon online packing.
+  - EP dispatchers other than standard alltoall use fixed-width native packs but lack equivalent runtime evidence.
+  - Current MCore may dispatch fixed-width padding; expert-capacity/token-dropping configurations lack runtime coverage.
   - For finetuning with CP > 1, calculate_per_token_loss must be true.
   - For finetuning with CP > 1, ddp.average_in_collective must be false.
   - pad_cu_seqlens=true also requires pad_to_max_length=true.
@@ -66,6 +96,9 @@ known_limitations:
   - GLM-4.5 SFT and PEFT disable packed sequences.
   - Qwen3.5-VL disables enable_in_batch_packing.
   - The repo does not contain checked-in benchmark results validating long-context throughput claims.
+  - Prepared visual tensors remain resident in every Energon worker's packing buffer, so buffer size must be memory-tuned.
+  - Qwen3.6-35B-A3B has functional TP1/PP1/EP8 coverage with the standard eager alltoall dispatcher and EP
+    communication overlap disabled; this does not establish a performance result.
 evidence:
   - docs/training/packed-sequences.md
   - docs/performance-guide.md
@@ -79,6 +112,8 @@ evidence:
   - src/megatron/bridge/training/gpt_step.py
   - src/megatron/bridge/data/sequence_batching.py
   - src/megatron/bridge/training/vlm_step.py
+  - src/megatron/bridge/models/qwen_vl/data/energon.py
+  - src/megatron/bridge/data/builders/energon.py
   - src/megatron/bridge/training/config.py
   - src/megatron/bridge/recipes/utils/dataset_utils.py
   - src/megatron/bridge/recipes/common.py
@@ -94,9 +129,13 @@ evidence:
   - tests/unit_tests/training/utils/test_packed_seq_utils.py
   - tests/unit_tests/training/test_config.py
   - tests/unit_tests/training/test_vlm_step.py
+  - tests/unit_tests/models/qwen_vl/data/test_energon.py
+  - tests/unit_tests/data/builders/test_energon_builder.py
+  - tests/unit_tests/tutorials/test_multimodal_data_tutorials.py
   - scripts/performance/utils/overrides.py
 follow_up_validation:
   - Run the checked-in packed-plus-CP functional test and record whether it still passes on current infrastructure.
   - Add a tiny no-download end-to-end smoke test for offline packed SFT.
   - Add a checked-in long-context training smoke for at least one 16K or 64K recipe.
   - Cross-link public packing docs to model-family opt-outs and the MTP incompatibility note.
+  - Benchmark Qwen-VL Energon buffer sizes against worker RSS, first-batch latency, and bin fill.

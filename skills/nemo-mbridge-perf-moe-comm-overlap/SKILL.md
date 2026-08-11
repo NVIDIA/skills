@@ -55,7 +55,42 @@ You must also set `moe_token_dispatcher_type = "flex"`.
   attention or MoE-router work.
 - In practice, selective recompute is the safer pairing when overlap is enabled.
 
-## Measured Short-Run Caveat
+## Measured Evidence
+
+### HybridEP production-shape validation
+
+A 2026-07-25 controlled Qwen3 30B-A3B pretraining comparison used 16 H100
+GPUs, BF16, sequence length 4096, `TP=1`, `PP=1`, `CP=1`, `EP=16`,
+`MBS=1`, `GBS=1024`, forced-balanced routing, HybridEP, and Transformer
+Engine CUDA-graph scopes `moe_router` and `moe_preprocess`. The only
+performance change was plain EP overlap; delayed wgrad stayed disabled.
+
+| Case | Steady window | Step time | Model TFLOPS/GPU |
+|---|---:|---:|---:|
+| EP overlap off | iterations 5-20 | 24.7138s | 244.039 |
+| EP overlap on, search run | iterations 5-20 | 21.0725s | 286.208 |
+| EP overlap on, independent validation | iterations 41-50 | 20.9920s | 287.305 |
+
+The independent result reduced step time by 15.059% and increased throughput
+by 17.729% over the reproduced baseline. Loss remained finite, no iterations
+were skipped or NaN, and rank-0 peak allocated memory was 62.166 GiB.
+
+A same-method rank-0 Nsight Systems comparison captured 463,348 kernels in
+each case:
+
+| Profile metric | Overlap off | Overlap on |
+|---|---:|---:|
+| Communication concurrent with GEMM/attention | 9.079ms | 3,958.997ms |
+| Communication time hidden by compute | 0.11% | 36.55% |
+| GPU-active interval union | 22.821s | 21.221s |
+| HybridEP dispatch-with-permute NVTX | 4.253s | 1.767s |
+| HybridEP metadata-preprocess NVTX | 3.109s | 0.670s |
+
+This is direct evidence that the gain came from hiding exposed HybridEP
+dispatch/combine work, not from changing the dispatcher, routing, graph
+scopes, batch shape, or parallel layout.
+
+### Correctness-first alltoall smoke
 
 A 2026-05-18 current-main H100 x16 smoke on Qwen3 30B-A3B mock pretraining
 used `EP=16`, `alltoall`, global batch size 1024, CUDA graphs disabled, and
@@ -101,6 +136,11 @@ separate win, and it does not validate the fused permutation path. An earlier
    communication is already a visible slice of step time. It is not guaranteed
    to help every small or lightly loaded EP run.
 
+6. **Summed kernel time is not wall time**: concurrent kernels can run longer
+   because they contend for SMs or bandwidth, so overlap may increase summed
+   per-stream kernel duration while reducing the exposed interval union and
+   end-to-end step time.
+
 ## Verification
 
 Look for overlap-related log messages during initialization. The comm overlap
@@ -132,3 +172,17 @@ uv run python scripts/performance/run_script.py \
 If fused MoE permutation fails during bring-up, add
 `model.moe_permute_fusion=false` to separate overlap timing from runtime-stack
 validation, then retest with the matched production container.
+
+For performance validation, use an unprofiled steady window as the acceptance
+metric. Use a matched Nsight A/B to establish causality:
+
+1. Keep dispatcher, routing, CUDA graphs, batch shape, parallelism, and runtime
+   fixed.
+2. Toggle only `overlap_moe_expert_parallel_comm`; keep
+   `delay_wgrad_compute=false` for the first isolation.
+3. Compare communication and compute interval unions and their intersection,
+   not only summed kernel durations.
+4. Report steady step time, model TFLOPS/GPU, loss finiteness, skipped/NaN
+   iterations, and peak allocated memory.
+
+_Last signature refresh: 2026-08-03._
