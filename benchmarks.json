@@ -345,12 +345,12 @@
     },
     {
       "skill": "dali-dynamic-mode",
-      "evaluation_date": "2026-07-13",
-      "profile": "external",
-      "environment": "astra-sandbox",
-      "tasks": 12,
+      "evaluation_date": "2026-08-11",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 6,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -359,7 +359,7 @@
       "catalog_dir": "dali-dynamic-mode",
       "component": "DALI",
       "has_results": true,
-      "average_uplift_pct": 36.7
+      "average_uplift_pct": 32.4
     },
     {
       "skill": "data-designer",
@@ -7336,7 +7336,7 @@
       "catalog_dir": "dali-dynamic-mode",
       "component": "DALI",
       "dimension": "Security",
-      "num": 6,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -7345,82 +7345,82 @@
       "catalog_dir": "dali-dynamic-mode",
       "component": "DALI",
       "dimension": "Security",
-      "num": 6,
+      "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 8.0
-    },
-    {
-      "catalog_dir": "dali-dynamic-mode",
-      "component": "DALI",
-      "dimension": "Correctness",
-      "num": 6,
-      "agent": "claude-code",
       "score_pct": 92.0,
-      "uplift_pct": 45.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "dali-dynamic-mode",
       "component": "DALI",
       "dimension": "Correctness",
-      "num": 6,
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.0,
+      "uplift_pct": 7.0
+    },
+    {
+      "catalog_dir": "dali-dynamic-mode",
+      "component": "DALI",
+      "dimension": "Correctness",
+      "num": null,
       "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 16.0
+      "score_pct": 60.0,
+      "uplift_pct": -30.0
     },
     {
       "catalog_dir": "dali-dynamic-mode",
       "component": "DALI",
       "dimension": "Discoverability",
-      "num": 6,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 98.0,
-      "uplift_pct": 85.0
+      "score_pct": 100.0,
+      "uplift_pct": 84.0
     },
     {
       "catalog_dir": "dali-dynamic-mode",
       "component": "DALI",
       "dimension": "Discoverability",
-      "num": 6,
+      "num": null,
       "agent": "codex",
-      "score_pct": 85.0,
-      "uplift_pct": 56.0
-    },
-    {
-      "catalog_dir": "dali-dynamic-mode",
-      "component": "DALI",
-      "dimension": "Effectiveness",
-      "num": 6,
-      "agent": "claude-code",
-      "score_pct": 85.0,
-      "uplift_pct": 36.0
-    },
-    {
-      "catalog_dir": "dali-dynamic-mode",
-      "component": "DALI",
-      "dimension": "Effectiveness",
-      "num": 6,
-      "agent": "codex",
-      "score_pct": 71.0,
-      "uplift_pct": 15.0
-    },
-    {
-      "catalog_dir": "dali-dynamic-mode",
-      "component": "DALI",
-      "dimension": "Efficiency",
-      "num": 6,
-      "agent": "claude-code",
       "score_pct": 90.0,
-      "uplift_pct": 59.0
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "dali-dynamic-mode",
+      "component": "DALI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 53.0
+    },
+    {
+      "catalog_dir": "dali-dynamic-mode",
+      "component": "DALI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": 14.0
     },
     {
       "catalog_dir": "dali-dynamic-mode",
       "component": "DALI",
       "dimension": "Efficiency",
-      "num": 6,
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 84.0
+    },
+    {
+      "catalog_dir": "dali-dynamic-mode",
+      "component": "DALI",
+      "dimension": "Efficiency",
+      "num": null,
       "agent": "codex",
-      "score_pct": 77.0,
-      "uplift_pct": 47.0
+      "score_pct": 76.0,
+      "uplift_pct": 71.0
     },
     {
       "catalog_dir": "data-designer",
