@@ -2343,7 +2343,7 @@
     {
       "path": "skills/nemo-mbridge-perf-moe-hardware-configs",
       "name": "nemo-mbridge-perf-moe-hardware-configs",
-      "description": "Representative MoE training playbooks by hardware platform and model family. Summarizes rounded throughput bands, parallelism patterns, and common tuning stacks.",
+      "description": "Representative, point-in-time MoE training playbooks by hardware and model family. Use them as candidate seeds, then revalidate the exact runtime, semantics, topology, and steady-state throughput.",
       "metadata": {
         "product.primary": "NeMo Megatron Bridge",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2367,7 +2367,7 @@
     {
       "path": "skills/nemo-mbridge-perf-moe-optimization-workflow",
       "name": "nemo-mbridge-perf-moe-optimization-workflow",
-      "description": "Systematic workflow for MoE training optimization in Megatron Bridge, based on the Megatron-Core MoE paper. Covers the Three Walls framework, parallel folding, recompute strategy, dispatcher choice, and CUDA-graph bring-up.",
+      "description": "Evidence-gated workflow for MoE performance optimization in Megatron Bridge. Covers measurement contracts, the Three Walls framework, parallel folding, profiling, matched A/B tuning, and final validation.",
       "metadata": {
         "product.primary": "NeMo Megatron Bridge",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2403,7 +2403,7 @@
     {
       "path": "skills/nemo-mbridge-perf-sequence-packing",
       "name": "nemo-mbridge-perf-sequence-packing",
-      "description": "Validate and use packed sequences and long-context training in Megatron-Bridge, distinguishing offline packed SFT for LLMs from in-batch packing for VLMs, and applying the right CP constraints.",
+      "description": "Validate and use packed sequences and long-context training in Megatron-Bridge, including offline LLM packing, collate-time VLM packing, Energon online packing, and CP constraints.",
       "metadata": {
         "product.primary": "NeMo Megatron Bridge",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2427,13 +2427,13 @@
     {
       "path": "skills/nemo-mbridge-recipe-recommender",
       "name": "nemo-mbridge-recipe-recommender",
-      "description": "Recommend and customize Megatron Bridge recipes for a user's model, GPU count, and training goal. Indexes library recipes (pretrain/SFT/PEFT) and performance recipes.",
+      "description": "Recommend and customize Megatron Bridge library and benchmark recipes for a user's model, GPU count, hardware, sequence length, and pretrain/SFT/PEFT goal. Use when selecting a starting recipe, comparing library and benchmark configs, resizing parallelism for a GPU allocation, or distinguishing convergence changes, semantics-preserving execution tuning, and benchmark-only shortcuts.",
       "metadata": {
         "product.primary": "NeMo Megatron Bridge",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
-        "discovery.activity_tags": "select,configure,train,optimize,validate"
+        "discovery.activity_tags": "select,configure,benchmark,compare,optimize"
       }
     },
     {

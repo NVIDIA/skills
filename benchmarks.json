@@ -3201,12 +3201,12 @@
     },
     {
       "skill": "nemo-mbridge-perf-expert-parallel-overlap",
-      "evaluation_date": "2026-07-08",
-      "profile": "external",
-      "environment": "astra-sandbox",
+      "evaluation_date": "2026-08-05",
+      "profile": null,
+      "environment": "k8s-sandbox",
       "tasks": 1,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -3215,7 +3215,7 @@
       "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
       "component": "NeMo MBridge",
       "has_results": true,
-      "average_uplift_pct": 49.3
+      "average_uplift_pct": 47.3
     },
     {
       "skill": "nemo-mbridge-perf-hierarchical-context-parallel",
@@ -3273,12 +3273,12 @@
     },
     {
       "skill": "nemo-mbridge-perf-moe-comm-overlap",
-      "evaluation_date": "2026-07-08",
-      "profile": "external",
-      "environment": "astra-sandbox",
+      "evaluation_date": "2026-08-05",
+      "profile": null,
+      "environment": "k8s-sandbox",
       "tasks": 1,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -3287,7 +3287,7 @@
       "catalog_dir": "nemo-mbridge-perf-moe-comm-overlap",
       "component": "NeMo MBridge",
       "has_results": true,
-      "average_uplift_pct": 59.2
+      "average_uplift_pct": 58.5
     },
     {
       "skill": "nemo-mbridge-perf-moe-dispatcher-selection",
@@ -3309,12 +3309,12 @@
     },
     {
       "skill": "nemo-mbridge-perf-moe-hardware-configs",
-      "evaluation_date": "2026-06-02",
-      "profile": "external",
-      "environment": "local",
+      "evaluation_date": "2026-08-05",
+      "profile": null,
+      "environment": "k8s-sandbox",
       "tasks": 1,
-      "attempts_per_task": 2,
-      "pass_threshold_pct": 50.0,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -3323,7 +3323,7 @@
       "catalog_dir": "nemo-mbridge-perf-moe-hardware-configs",
       "component": "NeMo MBridge",
       "has_results": true,
-      "average_uplift_pct": -4.2
+      "average_uplift_pct": 48.0
     },
     {
       "skill": "nemo-mbridge-perf-moe-long-context",
@@ -3345,12 +3345,12 @@
     },
     {
       "skill": "nemo-mbridge-perf-moe-optimization-workflow",
-      "evaluation_date": "2026-06-02",
-      "profile": "external",
-      "environment": "local",
-      "tasks": 1,
-      "attempts_per_task": 2,
-      "pass_threshold_pct": 50.0,
+      "evaluation_date": "2026-08-05",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -3359,7 +3359,7 @@
       "catalog_dir": "nemo-mbridge-perf-moe-optimization-workflow",
       "component": "NeMo MBridge",
       "has_results": true,
-      "average_uplift_pct": 2.7
+      "average_uplift_pct": 33.8
     },
     {
       "skill": "nemo-mbridge-perf-moe-vlm-training",
@@ -3399,12 +3399,12 @@
     },
     {
       "skill": "nemo-mbridge-perf-sequence-packing",
-      "evaluation_date": "2026-07-15",
-      "profile": "external",
-      "environment": "astra-sandbox",
+      "evaluation_date": "2026-08-11",
+      "profile": null,
+      "environment": "k8s-sandbox",
       "tasks": 1,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -3413,7 +3413,7 @@
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "has_results": true,
-      "average_uplift_pct": 59.8
+      "average_uplift_pct": 36.3
     },
     {
       "skill": "nemo-mbridge-perf-tp-dp-comm-overlap",
@@ -3435,12 +3435,12 @@
     },
     {
       "skill": "nemo-mbridge-recipe-recommender",
-      "evaluation_date": "2026-07-08",
-      "profile": "external",
-      "environment": "astra-sandbox",
+      "evaluation_date": "2026-08-05",
+      "profile": null,
+      "environment": "k8s-sandbox",
       "tasks": 1,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -3449,7 +3449,7 @@
       "catalog_dir": "nemo-mbridge-recipe-recommender",
       "component": "NeMo MBridge",
       "has_results": true,
-      "average_uplift_pct": 66.4
+      "average_uplift_pct": 56.4
     },
     {
       "skill": "nemo-mbridge-resiliency",
@@ -21376,7 +21376,7 @@
       "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -21385,7 +21385,7 @@
       "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 1,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -21394,73 +21394,73 @@
       "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 75.0
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 22.0
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
       "component": "NeMo MBridge",
       "dimension": "Discoverability",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 75.0
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
       "component": "NeMo MBridge",
       "dimension": "Discoverability",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 72.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
-      "component": "NeMo MBridge",
-      "dimension": "Effectiveness",
-      "num": 1,
-      "agent": "claude-code",
-      "score_pct": 98.0,
-      "uplift_pct": 98.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
-      "component": "NeMo MBridge",
-      "dimension": "Effectiveness",
-      "num": 1,
-      "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 13.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
-      "component": "NeMo MBridge",
-      "dimension": "Efficiency",
-      "num": 1,
-      "agent": "claude-code",
       "score_pct": 94.0,
-      "uplift_pct": 69.0
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
+      "component": "NeMo MBridge",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 92.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
+      "component": "NeMo MBridge",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.0,
+      "uplift_pct": 37.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 1,
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
+      "component": "NeMo MBridge",
+      "dimension": "Efficiency",
+      "num": null,
       "agent": "codex",
-      "score_pct": 96.0,
-      "uplift_pct": 69.0
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-hierarchical-context-parallel",
@@ -21736,7 +21736,7 @@
       "catalog_dir": "nemo-mbridge-perf-moe-comm-overlap",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -21745,7 +21745,7 @@
       "catalog_dir": "nemo-mbridge-perf-moe-comm-overlap",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 1,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -21754,7 +21754,7 @@
       "catalog_dir": "nemo-mbridge-perf-moe-comm-overlap",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 100.0
@@ -21763,17 +21763,8 @@
       "catalog_dir": "nemo-mbridge-perf-moe-comm-overlap",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 72.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-moe-comm-overlap",
-      "component": "NeMo MBridge",
-      "dimension": "Discoverability",
-      "num": 1,
-      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 100.0
     },
@@ -21781,46 +21772,55 @@
       "catalog_dir": "nemo-mbridge-perf-moe-comm-overlap",
       "component": "NeMo MBridge",
       "dimension": "Discoverability",
-      "num": 1,
-      "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 47.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-moe-comm-overlap",
-      "component": "NeMo MBridge",
-      "dimension": "Effectiveness",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 84.0,
-      "uplift_pct": 79.0
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-moe-comm-overlap",
+      "component": "NeMo MBridge",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 44.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-comm-overlap",
       "component": "NeMo MBridge",
       "dimension": "Effectiveness",
-      "num": 1,
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.0,
+      "uplift_pct": 87.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-moe-comm-overlap",
+      "component": "NeMo MBridge",
+      "dimension": "Effectiveness",
+      "num": null,
       "agent": "codex",
-      "score_pct": 89.0,
-      "uplift_pct": 89.0
+      "score_pct": 87.0,
+      "uplift_pct": 87.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-comm-overlap",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 94.0,
+      "score_pct": 100.0,
       "uplift_pct": 67.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-comm-overlap",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 96.0,
-      "uplift_pct": 38.0
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-dispatcher-selection",
@@ -21916,7 +21916,7 @@
       "catalog_dir": "nemo-mbridge-perf-moe-hardware-configs",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -21925,7 +21925,7 @@
       "catalog_dir": "nemo-mbridge-perf-moe-hardware-configs",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 2,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -21934,73 +21934,73 @@
       "catalog_dir": "nemo-mbridge-perf-moe-hardware-configs",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-hardware-configs",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": -5.0
+      "score_pct": 100.0,
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-hardware-configs",
       "component": "NeMo MBridge",
       "dimension": "Discoverability",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-hardware-configs",
       "component": "NeMo MBridge",
       "dimension": "Discoverability",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 62.0,
-      "uplift_pct": -17.0
+      "score_pct": 94.0,
+      "uplift_pct": 44.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-hardware-configs",
       "component": "NeMo MBridge",
       "dimension": "Effectiveness",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 97.0,
-      "uplift_pct": -1.0
+      "score_pct": 80.0,
+      "uplift_pct": 68.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-hardware-configs",
       "component": "NeMo MBridge",
       "dimension": "Effectiveness",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": -1.0
+      "score_pct": 86.0,
+      "uplift_pct": 6.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-hardware-configs",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 92.0,
-      "uplift_pct": -0.0
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-hardware-configs",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 60.0,
-      "uplift_pct": -18.0
+      "score_pct": 100.0,
+      "uplift_pct": 92.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-long-context",
@@ -22096,7 +22096,7 @@
       "catalog_dir": "nemo-mbridge-perf-moe-optimization-workflow",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -22105,7 +22105,7 @@
       "catalog_dir": "nemo-mbridge-perf-moe-optimization-workflow",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 2,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -22114,26 +22114,17 @@
       "catalog_dir": "nemo-mbridge-perf-moe-optimization-workflow",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "score_pct": 50.0,
+      "uplift_pct": 10.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-optimization-workflow",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-moe-optimization-workflow",
-      "component": "NeMo MBridge",
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -22141,46 +22132,55 @@
       "catalog_dir": "nemo-mbridge-perf-moe-optimization-workflow",
       "component": "NeMo MBridge",
       "dimension": "Discoverability",
-      "num": 2,
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-moe-optimization-workflow",
+      "component": "NeMo MBridge",
+      "dimension": "Discoverability",
+      "num": null,
       "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 12.0
+      "score_pct": 94.0,
+      "uplift_pct": 44.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-optimization-workflow",
       "component": "NeMo MBridge",
       "dimension": "Effectiveness",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": -4.0
+      "score_pct": 96.0,
+      "uplift_pct": 59.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-optimization-workflow",
       "component": "NeMo MBridge",
       "dimension": "Effectiveness",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 2.0
+      "score_pct": 100.0,
+      "uplift_pct": 31.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-optimization-workflow",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": -0.0
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-optimization-workflow",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 78.0,
-      "uplift_pct": 17.0
+      "score_pct": 100.0,
+      "uplift_pct": 94.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-moe-vlm-training",
@@ -22366,7 +22366,7 @@
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -22375,7 +22375,7 @@
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 1,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -22384,7 +22384,7 @@
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 100.0
@@ -22393,64 +22393,64 @@
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 42.0
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Discoverability",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 100.0
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Discoverability",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 69.0
+      "score_pct": 88.0,
+      "uplift_pct": 38.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Effectiveness",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 95.0
+      "score_pct": 66.0,
+      "uplift_pct": 66.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Effectiveness",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 48.0
+      "score_pct": 45.0,
+      "uplift_pct": -29.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 67.0
+      "score_pct": 90.0,
+      "uplift_pct": 55.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 96.0,
-      "uplift_pct": 77.0
+      "score_pct": 100.0,
+      "uplift_pct": 83.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-tp-dp-comm-overlap",
@@ -22546,7 +22546,7 @@
       "catalog_dir": "nemo-mbridge-recipe-recommender",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -22555,7 +22555,25 @@
       "catalog_dir": "nemo-mbridge-recipe-recommender",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 1,
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-recipe-recommender",
+      "component": "NeMo MBridge",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-recipe-recommender",
+      "component": "NeMo MBridge",
+      "dimension": "Correctness",
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -22563,44 +22581,26 @@
     {
       "catalog_dir": "nemo-mbridge-recipe-recommender",
       "component": "NeMo MBridge",
-      "dimension": "Correctness",
-      "num": 1,
+      "dimension": "Discoverability",
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-recipe-recommender",
-      "component": "NeMo MBridge",
-      "dimension": "Correctness",
-      "num": 1,
-      "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 75.0
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "nemo-mbridge-recipe-recommender",
       "component": "NeMo MBridge",
       "dimension": "Discoverability",
-      "num": 1,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-recipe-recommender",
-      "component": "NeMo MBridge",
-      "dimension": "Discoverability",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 70.0
+      "score_pct": 94.0,
+      "uplift_pct": 44.0
     },
     {
       "catalog_dir": "nemo-mbridge-recipe-recommender",
       "component": "NeMo MBridge",
       "dimension": "Effectiveness",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 98.0,
       "uplift_pct": 98.0
@@ -22609,28 +22609,28 @@
       "catalog_dir": "nemo-mbridge-recipe-recommender",
       "component": "NeMo MBridge",
       "dimension": "Effectiveness",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 98.0,
-      "uplift_pct": 87.0
+      "score_pct": 90.0,
+      "uplift_pct": 39.0
     },
     {
       "catalog_dir": "nemo-mbridge-recipe-recommender",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 67.0
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "nemo-mbridge-recipe-recommender",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 67.0
+      "score_pct": 100.0,
+      "uplift_pct": 83.0
     },
     {
       "catalog_dir": "nemo-mbridge-resiliency",
