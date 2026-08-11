@@ -1,0 +1,226 @@
+{
+  "skill_name": "rtvi-vlm-customize-model",
+  "scope": "documentation-only",
+  "scope_note": "Every assertion is a regex match against agent response text. A PASS means the skill produced the expected guidance, not that the described deployment works.",
+  "evals": [
+    {
+      "id": "rtvi-vlm-customize-model-001",
+      "name": "happy-path-blueprint-openai-compat",
+      "prompt": "Point the VSS Alerts Blueprint at a host-side NIM on http://host.docker.internal:30082 for all RTVI-VLM calls.",
+      "expected_output": "Skill configures the blueprint-side RTVI_VLM_* variables for openai-compat with host.docker.internal, updates vlm-as-verifier/configs/config.yml because alert-bridge is a separate service, sets vss-agent VLM_MODEL_TYPE/VLM_NAME/VLM_BASE_URL, and finishes with recreate plus container-side connectivity and log-based health checks.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Response configures RTVI-VLM for an OpenAI-compatible endpoint",
+          "type": "contains_pattern",
+          "pattern": "RTVI_VLM_MODEL_TO_USE=openai-compat[\\s\\S]*RTVI_VLM_ENDPOINT=http://host\\.docker\\.internal:30082/v1[\\s\\S]*VLM_NAME"
+        },
+        {
+          "text": "Response verifies the host-side endpoint from inside the Blueprint RTVI container",
+          "type": "contains_pattern",
+          "pattern": "exec -T rtvi-vlm[\\s\\S]*(VIA_VLM_ENDPOINT|host\\.docker\\.internal:30082/v1)[\\s\\S]*/models"
+        },
+        {
+          "text": "Response does not use container localhost for the host-side NIM",
+          "type": "not_contains_pattern",
+          "pattern": "RTVI_VLM_ENDPOINT=http://localhost:30082/v1"
+        },
+        {
+          "text": "Response calls out the separate verifier configuration",
+          "type": "contains_pattern",
+          "pattern": "(vlm-as-verifier|alert-bridge|config\\.yml)"
+        },
+        {
+          "text": "Response configures vss-agent separately",
+          "type": "contains_pattern",
+          "pattern": "(vss-agent|VLM_MODEL_TYPE|VLM_BASE_URL|VLM_NAME)"
+        },
+        {
+          "text": "Response does not leak tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|glpat-|nvapi-)[A-Za-z0-9+/=_-]{10,}"
+        }
+      ]
+    },
+    {
+      "id": "rtvi-vlm-customize-model-002",
+      "name": "happy-path-standalone-vllm-compatible",
+      "prompt": "Run rtvi-vlm standalone with the model served inside the container using Qwen3-VL-8B-Instruct.",
+      "expected_output": "Skill switches the standalone compose env to VLM_MODEL_TO_USE=vllm-compatible, sets MODEL_PATH=git:https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct, mentions HF_TOKEN only if the model requires auth, and validates the deployment by container exit status plus the absence of the real downloader and 'Error during warmup' messages, then /v1/health/ready, /v1/models, and one successful /v1/chat/completions inference request. It does not present 'Warmup VlmProcess-0 done' as proof of a successful warm-up and does not reference RepositoryNotFoundError.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Response selects the in-container vLLM implementation",
+          "type": "contains_pattern",
+          "pattern": "VLM_MODEL_TO_USE=vllm-compatible"
+        },
+        {
+          "text": "Response points MODEL_PATH at the Qwen3-VL-8B-Instruct weights source",
+          "type": "contains_pattern",
+          "pattern": "MODEL_PATH=git:https://huggingface\\.co/Qwen/Qwen3-VL-8B-Instruct"
+        },
+        {
+          "text": "Response detects a warm-up failure by its error line, not by the unconditional completion line",
+          "type": "contains_pattern",
+          "pattern": "Error during (model )?warmup"
+        },
+        {
+          "text": "Response does not grep for the completion log line as the pass condition",
+          "type": "not_contains_pattern",
+          "pattern": "grep [^\\n]*Warmup VlmProcess-0 done"
+        },
+        {
+          "text": "Response verifies readiness and the advertised model id after warmup",
+          "type": "contains_pattern",
+          "pattern": "v1/health/ready[\\s\\S]*v1/models"
+        },
+        {
+          "text": "Response finishes with a real inference request, not only metadata endpoints",
+          "type": "contains_pattern",
+          "pattern": "v1/chat/completions[\\s\\S]*(choices\\[0\\]\\.message\\.content|message\\.content)"
+        },
+        {
+          "text": "Response treats a failed weights download as a startup failure using the real downloader errors",
+          "type": "contains_pattern",
+          "pattern": "(Failed to download model|Model download failed|Could not find the model|Could not authenticate with NGC)"
+        },
+        {
+          "text": "Response does not cite the nonexistent RepositoryNotFoundError as the download failure",
+          "type": "not_contains_pattern",
+          "pattern": "(with|exits with|fails with|error:)\\s+.{0,3}RepositoryNotFoundError"
+        },
+        {
+          "text": "Response does not leak tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|glpat-|nvapi-)[A-Za-z0-9+/=_-]{10,}"
+        }
+      ]
+    },
+    {
+      "id": "rtvi-vlm-customize-model-003",
+      "name": "negative-assume-one-config-updates-all-consumers",
+      "prompt": "I changed only RTVI_VLM_ENDPOINT in generated.env. That should automatically repoint vlm-as-verifier and vss-agent too, right?",
+      "expected_output": "Skill says no: rtvi-vlm, vlm-as-verifier, and vss-agent are separate consumers. It explains that alert-bridge needs its own config.yml base_url/model updates, vss-agent needs VLM_MODEL_TYPE/VLM_NAME/VLM_BASE_URL, and containers may need force-recreate plus log checks.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Response rejects the single-config assumption",
+          "type": "contains_pattern",
+          "pattern": "(separate service|does not automatically|not itself RTVI|three services)"
+        },
+        {
+          "text": "Response includes the verifier-specific fix",
+          "type": "contains_pattern",
+          "pattern": "(alert-bridge|vlm-as-verifier|base_url: \/v1|force-recreate)"
+        },
+        {
+          "text": "Response does not falsely claim the single change is sufficient",
+          "type": "not_contains_pattern",
+          "pattern": "(yes[, ]+that should automatically repoint|no other changes needed)"
+        },
+        {
+          "text": "Response does not leak tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|glpat-|nvapi-)[A-Za-z0-9+/=_-]{10,}"
+        }
+      ]
+    },
+    {
+      "id": "rtvi-vlm-customize-model-004",
+      "name": "negative-model-check-omits-endpoint-auth",
+      "prompt": "RTVI-VLM says my configured OpenAI model does not exist. Show me how to verify the model ID advertised by the configured endpoint.",
+      "expected_output": "Skill queries the configured endpoint's /models route with curl -f, conditionally sends Authorization: Bearer using the configured RTVI_VLM_API_KEY or in-container VIA_VLM_API_KEY, distinguishes HTTP 401 from a model-name mismatch, and does not expose the credential value.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Response conditionally authenticates the external models request",
+          "type": "contains_pattern",
+          "pattern": "(VIA_VLM_API_KEY|RTVI_VLM_API_KEY).*(Authorization: Bearer|/models)|(Authorization: Bearer|/models).*(VIA_VLM_API_KEY|RTVI_VLM_API_KEY)"
+        },
+        {
+          "text": "Response distinguishes authentication failure from model mismatch",
+          "type": "contains_pattern",
+          "pattern": "(401|unauthorized|authentication).*(model|VLM_NAME)|(model|VLM_NAME).*(401|unauthorized|authentication)"
+        },
+        {
+          "text": "Response does not leak tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|glpat-|nvapi-)[A-Za-z0-9+/=_-]{10,}"
+        }
+      ]
+    },
+    {
+      "id": "rtvi-vlm-customize-model-005",
+      "name": "negative-method-b-to-method-a-stale-ngc-key",
+      "prompt": "I am switching RTVI-VLM from in-container vLLM with an NGC key to OpenAI Method A. I set OPENAI_API_KEY, so can I leave the old RTVI_VLM_API_KEY unchanged?",
+      "expected_output": "Skill says no. It explains that stock Compose maps RTVI_VLM_API_KEY, falling back to NGC_CLI_API_KEY, into VIA_VLM_API_KEY and that the client prefers VIA_VLM_API_KEY over OPENAI_API_KEY. It requires replacing the stale NGC credential and setting OPENAI_API_KEY and RTVI_VLM_API_KEY to the same OpenAI credential before recreating the service, while never exposing either value.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Response rejects retaining the stale NGC credential",
+          "type": "contains_pattern",
+          "pattern": "(do not|don't|cannot|must not|replace|clear).*(stale|old|NGC|RTVI_VLM_API_KEY)"
+        },
+        {
+          "text": "Response explains the Compose mapping and client priority",
+          "type": "contains_pattern",
+          "pattern": "(RTVI_VLM_API_KEY|NGC_CLI_API_KEY).*(VIA_VLM_API_KEY).*(prefer|priority|before|over).*OPENAI_API_KEY"
+        },
+        {
+          "text": "Response configures both Method A credentials consistently",
+          "type": "contains_pattern",
+          "pattern": "OPENAI_API_KEY.*RTVI_VLM_API_KEY|RTVI_VLM_API_KEY.*OPENAI_API_KEY"
+        },
+        {
+          "text": "Response does not leak tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|glpat-|nvapi-)[A-Za-z0-9+/=_-]{10,}"
+        }
+      ]
+    },
+    {
+      "id": "rtvi-vlm-customize-model-006",
+      "name": "method-b-advertised-model-id",
+      "prompt": "I deployed blueprint RTVI-VLM with Method B and RTVI_VLM_MODEL_PATH=ngc:nim/nvidia/cosmos-reason2-8b:hf-1208. The service is ready and /v1/models returns nim_nvidia_cosmos-reason2-8b_hf-1208, but the documented check compares it to VLM_NAME and fails. Is the deployment broken, and which ID should downstream consumers use?",
+      "expected_output": "Skill explains that the deployment is not broken: Method B derives the advertised ID from the resolved model-directory basename, so it must not be compared with VIA_VLM_OPENAI_MODEL_DEPLOYMENT_NAME or VLM_NAME. It shows the ngc path to nim_nvidia_cosmos-reason2-8b_hf-1208 transformation, treats a non-empty /v1/models ID as the identity inspection, and tells downstream consumers to use the advertised ID. It preserves exact equality only for Method A.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Response says the healthy Method B deployment is not broken by this mismatch",
+          "type": "contains_pattern",
+          "pattern": "(not broken|expected for Method B|normal for Method B|does not indicate.*failure)"
+        },
+        {
+          "text": "Response explains that Method B derives identity from the resolved model directory",
+          "type": "contains_pattern",
+          "pattern": "(resolved model|model directory|directory basename|MODEL_PATH).*(advertised|/v1/models|model ID)"
+        },
+        {
+          "text": "Response shows the observed NGC path transformation",
+          "type": "contains_pattern",
+          "pattern": "ngc:nim/nvidia/cosmos-reason2-8b:hf-1208[\\s\\S]*nim_nvidia_cosmos-reason2-8b_hf-1208"
+        },
+        {
+          "text": "Response does not apply the Method A equality check to Method B",
+          "type": "contains_pattern",
+          "pattern": "(do not|don't|must not|should not).*(compare|exact match).*(VLM_NAME|VIA_VLM_OPENAI_MODEL_DEPLOYMENT_NAME)"
+        },
+        {
+          "text": "Response tells downstream consumers to use the advertised ID",
+          "type": "contains_pattern",
+          "pattern": "(downstream|vlm-as-verifier|vss-agent).*(advertised ID|/v1/models|nim_nvidia_cosmos-reason2-8b_hf-1208)"
+        },
+        {
+          "text": "Response limits configured-name equality to Method A",
+          "type": "contains_pattern",
+          "pattern": "Method A[\\s\\S]*(exact|equality|match)|(?:exact|equality|match)[\\s\\S]*Method A"
+        },
+        {
+          "text": "Response does not leak tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|glpat-|nvapi-)[A-Za-z0-9+/=_-]{10,}"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "skill_name": "rtvi-cv-scaffold-vss-service",
+  "evals": [
+    {
+      "id": "rtvi-cv-scaffold-vss-service-001",
+      "name": "happy-path-scaffold-deployable-service",
+      "prompt": "Create a custom RTVI CV microservice that runs YOLO26 in DeepStream and publishes object metadata to Kafka so a VSS Search Profile and Alerts Profile deployment picks it up.",
+      "expected_output": "Skill reads the integration contract, scaffolds a runnable microservice (Dockerfile, DeepStream pipeline configs, compose file with VSS profile gates, Python adapter, tests, kafka smoke-test). The generated service publishes to mdx-raw with msg-conv-payload-type=2 via libnvds_kafka_proto.so.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Response references the fixed VSS perception broker contract",
+          "type": "contains_pattern",
+          "pattern": "(mdx-raw|libnvds_kafka_proto\\.so|msg-conv-payload-type=2)"
+        },
+        {
+          "text": "Response references both VSS profile flags it plugs into",
+          "type": "contains_pattern",
+          "pattern": "bp_developer_search_2d.*bp_developer_alerts_2d_cv|bp_developer_alerts_2d_cv.*bp_developer_search_2d"
+        },
+        {
+          "text": "Response keeps DeepStream as the producer rather than rolling a Python Kafka producer",
+          "type": "contains_pattern",
+          "pattern": "(nvmsgconv|nvmsgbroker|deepstream-app)"
+        },
+        {
+          "text": "Response does not expose tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|glpat-|nvapi-)[A-Za-z0-9+/=_-]{10,}"
+        }
+      ]
+    },
+    {
+      "id": "rtvi-cv-scaffold-vss-service-002",
+      "name": "happy-path-validation",
+      "prompt": "Validate the generated RTVI VSS service scaffold locally, then describe how to verify the live integration on a host with a deployed VSS stack.",
+      "expected_output": "Skill runs the unit tests (no GPU), describes building the image and bringing it up alongside the VSS profile compose, and points at tools/kafka_smoketest.py for end-to-end verification. Distinguishes local validation from live VSS validation.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Response includes the unit test command",
+          "type": "contains_pattern",
+          "pattern": "python3 -m unittest discover"
+        },
+        {
+          "text": "Response includes the kafka smoke test for live verification",
+          "type": "contains_phrase",
+          "phrase": "kafka_smoketest.py"
+        },
+        {
+          "text": "Response distinguishes live VSS validation from local tests",
+          "type": "contains_pattern",
+          "pattern": "(live VSS|GPU|deployed|Search Profile|Alerts Profile)"
+        },
+        {
+          "text": "Response does not claim hardware validation without evidence",
+          "type": "not_contains_pattern",
+          "pattern": "(confirmed.*live VSS|hardware.*passed)"
+        }
+      ]
+    },
+    {
+      "id": "rtvi-cv-scaffold-vss-service-003",
+      "name": "negative-missing-customer-yolo26-assets",
+      "prompt": "Run the live VSS integration but I haven't trained YOLO26 yet \u2014 I have no ONNX, no labels file, no custom parser .so.",
+      "expected_output": "Skill explains that scaffolding can run with placeholders, unit tests can run on any host, but the live deepstream-app cannot run without the customer-supplied ONNX, labels matching num-detected-classes, and the custom parser library exposing NvDsInferParseYolo26.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Response calls out the customer-supplied artifacts",
+          "type": "contains_pattern",
+          "pattern": "(ONNX|labels|custom parser|NvDsInferParseYolo26|YOLO26_ONNX_PATH|YOLO26_PARSER_LIB)"
+        },
+        {
+          "text": "Response does not pretend the live deployment can run without inputs",
+          "type": "not_contains_pattern",
+          "pattern": "(no model needed|will run automatically without)"
+        },
+        {
+          "text": "Response does not expose tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|glpat-|nvapi-)[A-Za-z0-9+/=_-]{10,}"
+        }
+      ]
+    }
+  ]
+}
