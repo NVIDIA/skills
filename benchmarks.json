@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 330,
-  "result_row_count": 3070,
+  "skill_count": 335,
+  "result_row_count": 3110,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -81,6 +81,24 @@
       "component": "AIQ",
       "has_results": true,
       "average_uplift_pct": 18.1
+    },
+    {
+      "skill": "amc-run-rtsp-calibration",
+      "evaluation_date": "2026-07-09",
+      "profile": "internal",
+      "environment": "astra-sandbox",
+      "tasks": 6,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "amc-run-rtsp-calibration",
+      "component": "DeepStream",
+      "has_results": true,
+      "average_uplift_pct": 20.6
     },
     {
       "skill": "amc-run-sample-calibration",
@@ -447,6 +465,23 @@
       "component": "DeepStream",
       "has_results": true,
       "average_uplift_pct": 5.8
+    },
+    {
+      "skill": "deepstream-run-mv3dt",
+      "evaluation_date": "2026-07-02",
+      "profile": "internal",
+      "environment": "local",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": 50.0,
+      "verdict": "PASS",
+      "agents": [
+        "codex"
+      ],
+      "catalog_dir": "deepstream-run-mv3dt",
+      "component": "DeepStream",
+      "has_results": true,
+      "average_uplift_pct": 13.2
     },
     {
       "skill": "deepstream-sop",
@@ -4277,6 +4312,60 @@
       "average_uplift_pct": null
     },
     {
+      "skill": "rtvi-cv-customize-model",
+      "evaluation_date": "2026-07-31",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "rtvi-cv-customize-model",
+      "component": "DeepStream",
+      "has_results": true,
+      "average_uplift_pct": 38.2
+    },
+    {
+      "skill": "rtvi-cv-scaffold-vss-service",
+      "evaluation_date": "2026-07-31",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "rtvi-cv-scaffold-vss-service",
+      "component": "DeepStream",
+      "has_results": true,
+      "average_uplift_pct": 38.2
+    },
+    {
+      "skill": "rtvi-vlm-customize-model",
+      "evaluation_date": "2026-07-31",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 6,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "rtvi-vlm-customize-model",
+      "component": "DeepStream",
+      "has_results": true,
+      "average_uplift_pct": 35.6
+    },
+    {
       "skill": "skill-card-generator",
       "evaluation_date": "2026-06-30",
       "profile": "external",
@@ -5981,6 +6070,96 @@
       "agent": "codex",
       "score_pct": 43.0,
       "uplift_pct": 14.0
+    },
+    {
+      "catalog_dir": "amc-run-rtsp-calibration",
+      "component": "DeepStream",
+      "dimension": "Security",
+      "num": 6,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "amc-run-rtsp-calibration",
+      "component": "DeepStream",
+      "dimension": "Security",
+      "num": 6,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": -8.0
+    },
+    {
+      "catalog_dir": "amc-run-rtsp-calibration",
+      "component": "DeepStream",
+      "dimension": "Correctness",
+      "num": 6,
+      "agent": "claude-code",
+      "score_pct": 55.0,
+      "uplift_pct": 27.0
+    },
+    {
+      "catalog_dir": "amc-run-rtsp-calibration",
+      "component": "DeepStream",
+      "dimension": "Correctness",
+      "num": 6,
+      "agent": "codex",
+      "score_pct": 74.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "amc-run-rtsp-calibration",
+      "component": "DeepStream",
+      "dimension": "Discoverability",
+      "num": 6,
+      "agent": "claude-code",
+      "score_pct": 48.0,
+      "uplift_pct": 8.0
+    },
+    {
+      "catalog_dir": "amc-run-rtsp-calibration",
+      "component": "DeepStream",
+      "dimension": "Discoverability",
+      "num": 6,
+      "agent": "codex",
+      "score_pct": 87.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "amc-run-rtsp-calibration",
+      "component": "DeepStream",
+      "dimension": "Effectiveness",
+      "num": 6,
+      "agent": "claude-code",
+      "score_pct": 51.0,
+      "uplift_pct": 27.0
+    },
+    {
+      "catalog_dir": "amc-run-rtsp-calibration",
+      "component": "DeepStream",
+      "dimension": "Effectiveness",
+      "num": 6,
+      "agent": "codex",
+      "score_pct": 61.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "amc-run-rtsp-calibration",
+      "component": "DeepStream",
+      "dimension": "Efficiency",
+      "num": 6,
+      "agent": "claude-code",
+      "score_pct": 53.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "amc-run-rtsp-calibration",
+      "component": "DeepStream",
+      "dimension": "Efficiency",
+      "num": 6,
+      "agent": "codex",
+      "score_pct": 81.0,
+      "uplift_pct": 32.0
     },
     {
       "catalog_dir": "amc-run-sample-calibration",
@@ -7781,6 +7960,51 @@
       "agent": "codex",
       "score_pct": 53.0,
       "uplift_pct": 3.0
+    },
+    {
+      "catalog_dir": "deepstream-run-mv3dt",
+      "component": "DeepStream",
+      "dimension": "Security",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "deepstream-run-mv3dt",
+      "component": "DeepStream",
+      "dimension": "Correctness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": 18.0
+    },
+    {
+      "catalog_dir": "deepstream-run-mv3dt",
+      "component": "DeepStream",
+      "dimension": "Discoverability",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 77.0,
+      "uplift_pct": 24.0
+    },
+    {
+      "catalog_dir": "deepstream-run-mv3dt",
+      "component": "DeepStream",
+      "dimension": "Effectiveness",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 59.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "deepstream-run-mv3dt",
+      "component": "DeepStream",
+      "dimension": "Efficiency",
+      "num": 4,
+      "agent": "codex",
+      "score_pct": 71.0,
+      "uplift_pct": 19.0
     },
     {
       "catalog_dir": "deepstream-sop",
@@ -26141,6 +26365,231 @@
       "agent": "codex",
       "score_pct": 89.0,
       "uplift_pct": 29.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-customize-model",
+      "component": "DeepStream",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 67.0,
+      "uplift_pct": -33.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-customize-model",
+      "component": "DeepStream",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-customize-model",
+      "component": "DeepStream",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": 81.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-customize-model",
+      "component": "DeepStream",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 82.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-customize-model",
+      "component": "DeepStream",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 79.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-scaffold-vss-service",
+      "component": "DeepStream",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-scaffold-vss-service",
+      "component": "DeepStream",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 67.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-scaffold-vss-service",
+      "component": "DeepStream",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-scaffold-vss-service",
+      "component": "DeepStream",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 53.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-scaffold-vss-service",
+      "component": "DeepStream",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-scaffold-vss-service",
+      "component": "DeepStream",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-scaffold-vss-service",
+      "component": "DeepStream",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-scaffold-vss-service",
+      "component": "DeepStream",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-scaffold-vss-service",
+      "component": "DeepStream",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.0,
+      "uplift_pct": 70.0
+    },
+    {
+      "catalog_dir": "rtvi-cv-scaffold-vss-service",
+      "component": "DeepStream",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "rtvi-vlm-customize-model",
+      "component": "DeepStream",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "rtvi-vlm-customize-model",
+      "component": "DeepStream",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": -8.0
+    },
+    {
+      "catalog_dir": "rtvi-vlm-customize-model",
+      "component": "DeepStream",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "rtvi-vlm-customize-model",
+      "component": "DeepStream",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "rtvi-vlm-customize-model",
+      "component": "DeepStream",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "rtvi-vlm-customize-model",
+      "component": "DeepStream",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "rtvi-vlm-customize-model",
+      "component": "DeepStream",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "rtvi-vlm-customize-model",
+      "component": "DeepStream",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.0,
+      "uplift_pct": 37.0
+    },
+    {
+      "catalog_dir": "rtvi-vlm-customize-model",
+      "component": "DeepStream",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 99.0,
+      "uplift_pct": 63.0
+    },
+    {
+      "catalog_dir": "rtvi-vlm-customize-model",
+      "component": "DeepStream",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 44.0
     },
     {
       "catalog_dir": "skill-card-generator",
