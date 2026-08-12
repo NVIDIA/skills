@@ -3650,12 +3650,12 @@
     },
     {
       "skill": "nemo-relay-plugin-build",
-      "evaluation_date": "2026-07-15",
-      "profile": "external",
-      "environment": "astra-sandbox",
-      "tasks": 4,
+      "evaluation_date": "2026-08-12",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 7,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -3664,7 +3664,7 @@
       "catalog_dir": "nemo-relay-plugin-build",
       "component": "NeMo Relay",
       "has_results": true,
-      "average_uplift_pct": 29.0
+      "average_uplift_pct": 32.8
     },
     {
       "skill": "nemo-relay-plugin-observability",
@@ -23670,7 +23670,7 @@
       "catalog_dir": "nemo-relay-plugin-build",
       "component": "NeMo Relay",
       "dimension": "Security",
-      "num": 4,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -23679,82 +23679,82 @@
       "catalog_dir": "nemo-relay-plugin-build",
       "component": "NeMo Relay",
       "dimension": "Security",
-      "num": 4,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 14.0
     },
     {
       "catalog_dir": "nemo-relay-plugin-build",
       "component": "NeMo Relay",
       "dimension": "Correctness",
-      "num": 4,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "uplift_pct": 66.0
     },
     {
       "catalog_dir": "nemo-relay-plugin-build",
       "component": "NeMo Relay",
       "dimension": "Correctness",
-      "num": 4,
+      "num": null,
       "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 21.0
-    },
-    {
-      "catalog_dir": "nemo-relay-plugin-build",
-      "component": "NeMo Relay",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 71.0
-    },
-    {
-      "catalog_dir": "nemo-relay-plugin-build",
-      "component": "NeMo Relay",
-      "dimension": "Discoverability",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 93.0,
-      "uplift_pct": 30.0
-    },
-    {
-      "catalog_dir": "nemo-relay-plugin-build",
-      "component": "NeMo Relay",
-      "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "claude-code",
       "score_pct": 91.0,
-      "uplift_pct": 28.0
+      "uplift_pct": -3.0
+    },
+    {
+      "catalog_dir": "nemo-relay-plugin-build",
+      "component": "NeMo Relay",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "nemo-relay-plugin-build",
+      "component": "NeMo Relay",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "nemo-relay-plugin-build",
       "component": "NeMo Relay",
       "dimension": "Effectiveness",
-      "num": 4,
-      "agent": "codex",
-      "score_pct": 96.0,
-      "uplift_pct": 27.0
-    },
-    {
-      "catalog_dir": "nemo-relay-plugin-build",
-      "component": "NeMo Relay",
-      "dimension": "Efficiency",
-      "num": 4,
+      "num": null,
       "agent": "claude-code",
+      "score_pct": 83.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "nemo-relay-plugin-build",
+      "component": "NeMo Relay",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
       "score_pct": 85.0,
-      "uplift_pct": 41.0
+      "uplift_pct": 13.0
     },
     {
       "catalog_dir": "nemo-relay-plugin-build",
       "component": "NeMo Relay",
       "dimension": "Efficiency",
-      "num": 4,
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "nemo-relay-plugin-build",
+      "component": "NeMo Relay",
+      "dimension": "Efficiency",
+      "num": null,
       "agent": "codex",
-      "score_pct": 85.0,
-      "uplift_pct": 22.0
+      "score_pct": 84.0,
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "nemo-relay-plugin-observability",

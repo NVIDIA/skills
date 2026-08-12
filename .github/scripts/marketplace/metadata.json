@@ -2571,7 +2571,7 @@
     {
       "path": "skills/nemo-relay-plugin-build",
       "name": "nemo-relay-plugin-build",
-      "description": "Use this skill when building or packaging reusable NeMo Relay runtime behavior as a configuration-activated plugin with deterministic validation and rollback-safe registration.",
+      "description": "Use this skill when building or packaging reusable NeMo Relay runtime behavior as an embedded configuration component or a manifest-backed `rust_dynamic` native or `worker` gRPC plugin, with deterministic validation and rollback-safe registration.",
       "metadata": {
         "product.primary": "NeMo",
         "classification.category.primary": "ai_and_machine_learning",
