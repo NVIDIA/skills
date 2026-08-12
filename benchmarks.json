@@ -2,7 +2,7 @@
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
   "skill_count": 335,
-  "result_row_count": 3110,
+  "result_row_count": 3115,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -20,7 +20,6 @@
     "mcore-testing",
     "nemo-data-designer-plugin",
     "nemoclaw-user-guide",
-    "omniverse-cad-to-simready",
     "omniverse-realtime-viewer",
     "physical-ai-infrastructure-setup-and-resilient-scaling",
     "rag-blueprint",
@@ -4061,18 +4060,21 @@
     },
     {
       "skill": "omniverse-cad-to-simready",
-      "evaluation_date": "2026-05-28",
-      "profile": "external",
-      "environment": null,
-      "tasks": null,
-      "attempts_per_task": null,
+      "evaluation_date": "2026-08-12",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 8,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
-      "verdict": "FAIL",
-      "agents": [],
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
       "catalog_dir": "omniverse-cad-to-simready",
       "component": "Physical AI",
-      "has_results": false,
-      "average_uplift_pct": null
+      "has_results": true,
+      "average_uplift_pct": 33.4
     },
     {
       "skill": "omniverse-realtime-viewer",
@@ -25600,6 +25602,51 @@
       "agent": "claude-code",
       "score_pct": 86.0,
       "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "omniverse-cad-to-simready",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "omniverse-cad-to-simready",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "omniverse-cad-to-simready",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "omniverse-cad-to-simready",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "omniverse-cad-to-simready",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": 34.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
