@@ -10,11 +10,11 @@ The generated USD should be handed to `validate-usd-minimum` before any deeper v
 
 Use the upstream NVIDIA Omniverse `usd-convert-gsplat` skill as the authoritative reference for converter behavior, supported Gaussian splat fields, schema mapping, and converter-specific CLI/API options:
 
-- Upstream skill: `https://github.com/NVIDIA-Omniverse/usd-convert-gsplat/blob/main/.agents/skills/usd-convert-gsplat/SKILL.md`
+- Upstream skill: `https://github.com/NVIDIA-Omniverse/usd-convert-gsplat/blob/v0.1.15/.agents/skills/usd-convert-gsplat/SKILL.md`
 - Upstream repository: `https://github.com/NVIDIA-Omniverse/usd-convert-gsplat`
 - NVIDIA Omniverse gsplat-converter docs: `https://docs.omniverse.nvidia.com/kit/docs/gsplat-converter`
 
-Access note: Browser or raw-file fetches of the upstream skill URL can fail when the repo requires GitHub credentials. If that happens, use an authenticated local clone of `https://github.com/NVIDIA-Omniverse/usd-convert-gsplat` and read `.agents/skills/usd-convert-gsplat/SKILL.md` from that checkout. Prefer `$PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT/usd-convert-gsplat` or `$HOME/.physical-ai-skill-hub/upstreams/usd-convert-gsplat`.
+Access note: Browser or raw-file fetches of the upstream skill URL can fail when the repo requires GitHub credentials. If that happens, use an authenticated local clone of `https://github.com/NVIDIA-Omniverse/usd-convert-gsplat` checked out to the exact ref in `upstream-versions.lock.json` (currently `v0.1.15`) and read `.agents/skills/usd-convert-gsplat/SKILL.md` from that checkout. Prefer `$OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT/usd-convert-gsplat` or `$HOME/.omniverse-cad-to-simready/upstreams/usd-convert-gsplat`.
 
 Do not copy or reinterpret upstream conversion internals here. Keep this reference limited to this repo's wrapper contract, dependency check, report shape, and `validate-usd-minimum` handoff.
 
@@ -31,7 +31,7 @@ Require:
 - external `gsplat2USD` CLI from `https://github.com/NVIDIA-Omniverse/gsplat-converter.git`
 - Python module `gsplat2USD`
 
-The dependency is declared in this repo as a direct Git source for `gsplat2usd`. If the upstream repo is not accessible, `uv sync` will fail and the skill should report a blocked dependency.
+The dependency is declared in this repo as a direct Git source for `gsplat2usd`, pinned to commit `c965f84bcbdc9667bb9631c6c922d12b4fea20ce` in both `pyproject.toml` and `upstream-versions.lock.json`. If the upstream repo is not accessible, `uv sync` will fail and the skill should report a blocked dependency.
 
 ## Conversion Workflow
 

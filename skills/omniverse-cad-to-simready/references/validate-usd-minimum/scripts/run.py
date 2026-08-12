@@ -15,6 +15,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "shared"))
 
 from script_utils import usd_bounds_metadata
 
+from preflight_manifest import preflight_required, preflight_status_check
+
 
 SKILL = "validate-usd-minimum"
 TOOL = "pxr.Usd"
@@ -128,6 +130,12 @@ def validate_minimum_usd(asset_path: Path, next_step: str = DEFAULT_NEXT_STEP) -
     warnings: list[str] = []
     errors: list[str] = []
     metadata = _base_metadata()
+
+    if preflight_required():
+        preflight_check = preflight_status_check(SKILL, "openusd_python")
+        if not preflight_check["passed"]:
+            errors.append(preflight_check["message"])
+            return _report(asset_path, False, checks, metadata, warnings, errors, next_step)
 
     exists = asset_path.exists()
     checks.append(_check("asset_exists", exists, "Asset path exists" if exists else "Asset path does not exist"))

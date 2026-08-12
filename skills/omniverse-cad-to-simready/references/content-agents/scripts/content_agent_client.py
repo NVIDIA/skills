@@ -15,7 +15,7 @@ import sys
 import time
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse, urlunparse
 from urllib.request import Request, urlopen
 import uuid
 
@@ -29,6 +29,8 @@ from preflight_manifest import load_preflight_manifest, preflight_required, pref
 
 USD_EXTENSIONS = {".usd", ".usda", ".usdc", ".usdz"}
 USD_LAYER_EXTENSIONS = {".usd", ".usda", ".usdc"}
+MATERIAL_AGENT_DEFAULT_STEPS = "build_dataset_usd,build_dataset_prepare_dataset,predict,apply"
+DEFAULT_MATERIAL_AGENT_VLM_MAX_WORKERS = 1
 TERMINAL_SUCCESS = {"completed", "complete", "succeeded", "success", "done"}
 TERMINAL_FAILURE = {"failed", "failure", "cancelled", "canceled", "error"}
 MATERIAL_ZERO_IMAGE_MARKERS = (
@@ -50,6 +52,11 @@ PHYSICS_SCENE_OPTIMIZER_CONTAINER_CANDIDATES = (
     "content-physics-agent-service",
     "pash-e2e-physics_agent_service",
     "physics_agent_service",
+)
+LOCAL_OVRTX_ENDPOINT_ENV = (
+    "OVRTX_RENDER_ENDPOINT",
+    "OVRTX_RENDER_BASE_URL",
+    "CONTENT_AGENTS_RENDER_BASE_URL",
 )
 MDL_UPLOAD_PREP_SNIPPET = r"""
 import json
@@ -790,6 +797,77 @@ def _required_output_path(agent_key: str, spec: dict[str, Any], asset_path: Path
     return output_directory / f"{asset_path.stem}{spec['output_suffix']}"
 
 
+def _render_endpoint_candidates() -> list[tuple[str, str]]:
+    candidates: list[tuple[str, str]] = []
+    for name in LOCAL_OVRTX_ENDPOINT_ENV:
+        value = os.environ.get(name)
+        if value:
+            candidates.append((name, value.strip()))
+    manifest, _, _ = load_preflight_manifest()
+    manifest_endpoint = ready_service_url(manifest, "ovrtx")
+    if manifest_endpoint:
+        candidates.append(("preflight_manifest_ovrtx", manifest_endpoint))
+
+    seen: set[str] = set()
+    unique: list[tuple[str, str]] = []
+    for source, endpoint in candidates:
+        endpoint = endpoint.rstrip("/")
+        if not endpoint or endpoint in seen:
+            continue
+        seen.add(endpoint)
+        unique.append((source, endpoint))
+    return unique
+
+
+def _host_probe_render_endpoint(endpoint: str) -> str:
+    parsed = urlparse(endpoint)
+    if parsed.hostname != "host.docker.internal":
+        return endpoint
+    port = f":{parsed.port}" if parsed.port else ""
+    netloc = f"localhost{port}"
+    return urlunparse(parsed._replace(netloc=netloc))
+
+
+def _render_health_url(endpoint: str) -> str:
+    endpoint = _host_probe_render_endpoint(endpoint).rstrip("/")
+    parsed = urlparse(endpoint)
+    path = parsed.path.rstrip("/")
+    if path.endswith("/render"):
+        path = path[: -len("/render")]
+    base = urlunparse(parsed._replace(path=path, params="", query="", fragment="")).rstrip("/")
+    return urljoin(f"{base}/", "health")
+
+
+def _is_local_render_endpoint(endpoint: str) -> bool:
+    host = (urlparse(endpoint).hostname or "").lower()
+    return host in {"localhost", "127.0.0.1", "0.0.0.0", "host.docker.internal", "::1"}
+
+
+def _local_render_endpoint_check(request_timeout: float) -> dict[str, Any] | None:
+    for source, endpoint in _render_endpoint_candidates():
+        if not _is_local_render_endpoint(endpoint):
+            continue
+        health_url = _render_health_url(endpoint)
+        try:
+            with urlopen(health_url, timeout=max(1.0, min(float(request_timeout), 10.0))) as response:
+                ok = 200 <= int(response.status) < 300
+        except Exception as exc:
+            return _check(
+                "ovrtx_render_endpoint_reachable",
+                False,
+                f"Local OVRTX render endpoint from {source} is not reachable at {health_url}: {exc}",
+            )
+        return _check(
+            "ovrtx_render_endpoint_reachable",
+            ok,
+            f"Local OVRTX render endpoint from {source} responded at {health_url}"
+            if ok
+            else f"Local OVRTX render endpoint from {source} did not return HTTP 2xx at {health_url}",
+            "info" if ok else "error",
+        )
+    return None
+
+
 def _service_fields(args: argparse.Namespace, agent_key: str) -> dict[str, str]:
     fields: dict[str, str] = {}
     if agent_key == "material":
@@ -809,6 +887,12 @@ def _service_fields(args: argparse.Namespace, agent_key: str) -> dict[str, str]:
             fields["skip_existing_materials"] = "true"
         if args.layer_only:
             fields["layer_only"] = "true"
+        if args.material_steps:
+            fields["steps"] = args.material_steps
+        if args.vlm_max_workers is not None:
+            fields["vlm_max_workers"] = str(args.vlm_max_workers)
+        if args.render_num_workers is not None:
+            fields["render_num_workers"] = str(args.render_num_workers)
     elif agent_key == "physics":
         if args.prompt:
             fields["user_prompt"] = args.prompt
@@ -1227,6 +1311,16 @@ def _maybe_retry_physics_without_optimizer(report: dict[str, Any], args: argpars
     return retry_report
 
 
+def _positive_int_arg(value: str) -> int:
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(f"{value!r} is not an integer") from exc
+    if parsed < 1:
+        raise argparse.ArgumentTypeError(f"{value!r} must be >= 1")
+    return parsed
+
+
 def _report_markdown(report: dict[str, Any]) -> str:
     lines = [
         f"# {report['skill']} Report",
@@ -1348,6 +1442,12 @@ def _command(
             command.append("--layer-only")
         if not args.material_output_cleanup:
             command.append("--no-material-output-cleanup")
+        if args.material_steps:
+            command.extend(["--material-steps", args.material_steps])
+        if args.vlm_max_workers is not None:
+            command.extend(["--vlm-max-workers", str(args.vlm_max_workers)])
+        if args.render_num_workers is not None:
+            command.extend(["--render-num-workers", str(args.render_num_workers)])
     elif agent_key == "physics":
         if args.render_backend:
             command.extend(["--render-backend", args.render_backend])
@@ -1495,6 +1595,15 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         report["errors"] = [check["message"] for check in checks if check["severity"] == "error" and not check["passed"]]
         return report
 
+    if agent_key in {"material", "physics"}:
+        render_check = _local_render_endpoint_check(args.request_timeout)
+        if render_check is not None:
+            checks.append(render_check)
+            if not render_check["passed"]:
+                report["status"] = "BLOCKED"
+                report["errors"] = [render_check["message"]]
+                return report
+
     if agent_key == "texture" and args.material_textures:
         try:
             json.loads(args.material_textures)
@@ -1609,7 +1718,6 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             for warning in poll_warnings:
                 report["warnings"].append(f"Recovered transient status poll error: {warning}")
         state = str(service_status.get("status", "")).lower()
-        checks.append(_check("session_completed", state in TERMINAL_SUCCESS, f"Content Agents session status: {service_status.get('status')}"))
         try:
             report["service_results"] = _json_request(
                 "GET",
@@ -1619,6 +1727,16 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             )
         except Exception as exc:
             report["warnings"].append(f"Could not fetch service results: {exc}")
+        session_message = f"Content Agents session status: {service_status.get('status')}"
+        if state not in TERMINAL_SUCCESS:
+            service_results = report.get("service_results")
+            error_message = service_results.get("error_message") if isinstance(service_results, dict) else None
+            if error_message:
+                session_message = f"{session_message}: {error_message}"
+                failed_step = service_results.get("failed_step")
+                if failed_step:
+                    session_message = f"{session_message} (failed_step: {failed_step})"
+        checks.append(_check("session_completed", state in TERMINAL_SUCCESS, session_message))
     except Exception as exc:
         checks.append(_check("service_pipeline_completed", False, str(exc)))
         report["errors"] = [check["message"] for check in checks if check["severity"] == "error" and not check["passed"]]
@@ -1793,6 +1911,27 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--skip-prototypes", action="store_true")
     parser.add_argument("--skip-existing-materials", action="store_true")
     parser.add_argument("--layer-only", action="store_true")
+    parser.add_argument(
+        "--material-steps",
+        default=MATERIAL_AGENT_DEFAULT_STEPS,
+        help=(
+            "Comma-separated Material Agent service steps. The default omits the "
+            "service-side render step because this workflow performs the final "
+            "OVRTX render separately."
+        ),
+    )
+    parser.add_argument(
+        "--vlm-max-workers",
+        type=_positive_int_arg,
+        default=DEFAULT_MATERIAL_AGENT_VLM_MAX_WORKERS,
+        help="Maximum parallel Material Agent VLM workers sent to the service.",
+    )
+    parser.add_argument(
+        "--render-num-workers",
+        type=_positive_int_arg,
+        default=None,
+        help="Optional maximum parallel Material Agent render workers sent to the service.",
+    )
     parser.add_argument(
         "--no-material-output-cleanup",
         dest="material_output_cleanup",

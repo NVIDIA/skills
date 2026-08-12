@@ -61,7 +61,7 @@ For ROS packages, pass one or more mappings:
 python3 scripts/run.py /path/to/robot.urdf /path/to/usd_robot --package robot_package=/path/to/assets
 ```
 
-The wrapper preserves the normalized skill-hub report and forwards supported
+The wrapper preserves the normalized omniverse-cad-to-simready report and forwards supported
 upstream `urdf_usd_converter` options verbatim. Use the upstream flag names for
 single-file output, physics-scene omission, or authored comments:
 

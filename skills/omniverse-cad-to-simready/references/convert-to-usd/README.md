@@ -20,8 +20,7 @@ For NVIDIA-backed conversion references, preserve the upstream tool names. The r
   conversion runs.
 - CAD routes require the NVIDIA Omniverse `usd-convert-cad` checkout,
   `omniverse-kit`, supported CAD core extensions, and CAD Converter licensing
-  on supported architectures. On Linux arm64 only, CAD routes use the
-  `usd-convert-cad` reference's Kit App Template CAD Converter fallback.
+  on supported architectures, including Linux arm64.
 - First CAD runs need network access to download Kit extensions from the NVIDIA
   registry.
 
@@ -34,7 +33,7 @@ Do not classify NVIDIA-backed inputs from a router-owned extension table. Existi
 | URDF reference probe | `urdf-usd-converter` |
 | MuJoCo reference probe, including XML `<mujoco>` root inspection | `mujoco-usd-converter` |
 | Upstream `usd-convert-gsplat` CLI source inspected by the `usd-convert-gsplat` reference | `usd-convert-gsplat` |
-| Upstream `usd-convert-cad` `src/usd_convert_cad/formats.py` inspected by the `usd-convert-cad` reference; on Linux arm64, after dedicated references such as URDF and MuJoCo decline the source, the Kit App Template CAD Converter fallback reports support and lets the installed Kit runtime determine whether conversion can succeed | `usd-convert-cad`; NVIDIA-backed source conversion delegates to upstream `usd-convert-cad` on supported architectures and to the Kit App Template CAD Converter fallback on Linux arm64 only |
+| Upstream `usd-convert-cad` SKILL.md Supported Formats table inspected by the `usd-convert-cad` reference probe | `usd-convert-cad`; NVIDIA-backed source conversion delegates to upstream `usd-convert-cad` |
 | Existing OpenUSD layer or package signature | Skip conversion and route to `validate-usd-minimum` |
 
 If more than one converter reference reports support, the router selects by converter-reference priority and records a warning. If no reference reports support, return an unsupported report rather than guessing.
@@ -49,15 +48,13 @@ Most conversion routes eventually hand off to a usdex consumer:
 |---|---|
 | `urdf-usd-converter` | `urdf_usd_converter`, direct `usdex.core` |
 | `mujoco-usd-converter` | `mujoco_usd_converter`, direct `usdex.core` |
-| `usd-convert-cad` JT route | `omni.kit.converter.jt_core`, linked with `libusdex_core` and `libusdex_rtx` |
-| `usd-convert-cad` DGN route | `omni.kit.converter.dgn_core`, linked with `libusdex_core` and `libusdex_rtx` |
-| `usd-convert-cad` HOOPS route | `omni.kit.converter.hoops_core`, linked with `libusdex_core` and `libusdex_rtx` |
+| `usd-convert-cad` routes | Self-contained `usd-convert-cad==0.2.0` wheel pinned by `upstream-versions.lock.json`, with its bundled OpenUSD and CAD conversion runtime |
 
 `usd-convert-asset` is intentionally not an active route until a public PyPI
 package is available. Downstream validation still follows the OpenUSD Exchange
 SDK 2.3 stage and metadata contract where applicable; use the OpenUSD Exchange
 SDK / usdex reference for repo authoring rules and `omni-asset-validate` for
-the hub validation wrapper.
+the workflow validation wrapper.
 
 ## Instructions
 
@@ -66,11 +63,10 @@ the hub validation wrapper.
 3. Identify required asset roots such as mesh folders, texture folders, ROS package roots, or MJCF asset directories.
 4. Run each converter reference probe and select the first supported reference in router priority order.
 5. Confirm the installed reference script and selected converter dependency are available before running conversion.
-6. For CAD inputs, let the `usd-convert-cad` reference run upstream
-   `validate.py` as a delegated readiness gate before it invokes upstream
-   conversion. On Linux arm64, let that reference start the Kit App Template CAD
-   Converter fallback. Do not import or start either runtime directly from this
-   router.
+6. For CAD inputs, let the `usd-convert-cad` reference verify the
+   `usd-convert-cad` wheel is importable in the resolved interpreter before it
+   invokes conversion. Do not import the wheel or start a converter runtime
+   directly from this router.
 7. Convert to a dedicated output directory with `convert-to-usd`, not next to source files unless the user requested that location.
 8. Record a conversion report with source, converter, output, warnings, and next validation step.
 9. Hand off the generated USD artifact to `validate-usd-minimum`.
@@ -129,10 +125,8 @@ Markdown is acceptable for the first report. JSON can be added later when schema
 - This router does not own NVIDIA-backed source-extension tables. Update the
   upstream converter reference or upstream repo when format capability changes.
 - NVIDIA-backed source conversion must delegate to the `usd-convert-cad`
-  reference. That reference uses upstream `usd-convert-cad` except for its
-  Linux arm64 Kit App Template CAD Converter fallback. Do not switch to any
-  other converter or substitute tooling when the selected runtime is
-  unavailable.
+  reference. Do not switch to any other converter or substitute tooling when the
+  selected runtime is unavailable.
 - Ambiguous source types are only routed when a converter reference probe
   reports support.
 
@@ -140,10 +134,19 @@ Markdown is acceptable for the first report. JSON can be added later when schema
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| NVIDIA-backed conversion is blocked | `USD_CONVERT_CAD_ROOT`, the upstream checkout, Python 3.12, `omniverse-kit`, the required converter extension, registry access, platform support, or converter licensing is unavailable; on Linux arm64, `KIT_APP_TEMPLATE_ROOT`, the Kit App Template build, Kit executable, or CAD Converter extension is unavailable | Return a `blocked` conversion report with the specific readiness or conversion dependency. Do not switch to another converter or substitute tooling. NVIDIA-backed source conversion must delegate to the `usd-convert-cad` reference. |
-| Kit registry access is denied | Upstream `usd-convert-cad validate.py` cannot pull its Kit extensions from the extension registry/CDN | Return the structured `kit_registry_access_denied` diagnostic, including the extension, URL host, exit code, and recovery hint. Fix Horde node egress, proxy, or credentials, or pre-populate/reuse the upstream Kit extension cache, then rerun `OMNI_KIT_ACCEPT_EULA=yes python validate.py` in the upstream checkout. |
-| A source routes to an unexpected converter | More than one reference reported support, or an upstream capability source changed | Inspect the report warnings. The router records the priority-selected reference and warns when multiple probes report support. |
-| First CAD conversion runs slowly | Kit downloads converter extensions from the registry on first run | Expected on first run only. Subsequent runs use the cached extensions. |
+| NVIDIA-backed conversion is blocked | The `usd-convert-cad` wheel is not installed/importable, the resolved interpreter is not Python 3.12, `USD_CONVERT_CAD_PYTHON` points at the wrong interpreter, or converter licensing is unavailable | Return a `blocked` conversion report with the specific readiness or conversion dependency and the install hint. Do not switch to another converter or substitute tooling. NVIDIA-backed source conversion must delegate to the `usd-convert-cad` reference. |
+| CAD conversion is blocked on import or version | The pinned `usd-convert-cad==0.2.0` wheel is not installed in the resolved interpreter, a different version is installed, or its bundled `pxr` conflicts with another OpenUSD in a shared interpreter | Install the pinned wheel into an isolated Python 3.12 environment (`python -m pip install usd-convert-cad==0.2.0`) and point `USD_CONVERT_CAD_PYTHON` (or `--usd-convert-cad-python`) at that interpreter, then rerun. |
+| A source routes to an unexpected converter | More than one reference reported support, or a capability snapshot changed | Inspect the report warnings. The router records the priority-selected reference and warns when multiple probes report support. |
+
+## Runtime Availability
+
+Do not imply that `uv sync` installs every source converter runtime. URDF,
+MuJoCo/MJCF, and the repo Python dependencies are handled by the project
+environment, but NVIDIA-backed source conversion requires an installed and
+validated `NVIDIA-Omniverse/usd-convert-cad` checkout. If that runtime is
+missing or does not support the source, preserve the blocked conversion report
+and its `install_hint` instead of attempting an unrequested local build or
+substituting another converter.
 
 ## Unsupported Cases
 
@@ -156,16 +159,14 @@ Do not pretend a conversion succeeded if a converter is unavailable or cannot pa
 - recommended next action
 
 NVIDIA-backed source conversion must delegate to the `usd-convert-cad`
-reference, including source types listed by upstream
-`src/usd_convert_cad/formats.py`. The upstream route uses converter extensions
-such as `omni.kit.converter.hoops_core`, `omni.kit.converter.dgn_core`, and
-`omni.kit.converter.jt_core`. On Linux arm64 only, when the router reaches the
-`usd-convert-cad` reference after higher-priority dedicated references decline
-the source, that CAD reference uses the Kit App Template CAD Converter fallback
-and lets the installed Kit runtime decide whether the input can be converted.
-If `USD_CONVERT_CAD_ROOT`, the upstream checkout setup, Python 3.12,
-`omniverse-kit`, the required converter extension, platform support, licensing,
-Kit App Template fallback runtime, or conversion support is unavailable, return
-a blocked conversion report rather than switching to any other converter or
+reference, including the source types listed in the upstream `usd-convert-cad`
+SKILL.md Supported Formats table. The `usd-convert-cad` reference probe parses
+that table live from a checkout of the repo (falling back to a built-in
+snapshot when offline); conversion itself runs the self-contained
+`usd-convert-cad` pip wheel, which bundles its own OpenUSD and CAD conversion
+runtime (no Omniverse Kit app or converter extensions).
+If the wheel is not importable in the resolved Python 3.12 interpreter, or
+platform support, licensing, or conversion support is unavailable, return a
+blocked conversion report rather than switching to any other converter or
 substitute tooling. The higher-level router must not override converter
 capability with its own source-extension list.

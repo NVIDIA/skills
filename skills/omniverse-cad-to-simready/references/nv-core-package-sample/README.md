@@ -23,10 +23,10 @@ The installed reference entrypoint is `scripts/run.py`. It creates `com.nvidia.s
 The team reference workflow is NVIDIA's SimReady Foundation create-package skill:
 
 ```text
-https://github.com/NVIDIA/simready-foundation/blob/main/skills/simready-foundation-create-package/SKILL.md
+https://github.com/NVIDIA/simready-foundation/blob/v2026.04.1/skills/simready-foundation-create-package/SKILL.md
 ```
 
-Access note: Browser or raw-file fetches of the upstream skill URL can fail in restricted environments. If that happens, use a local clone of `https://github.com/NVIDIA/simready-foundation` on branch `main` and read `skills/simready-foundation-create-package/SKILL.md` from that checkout. Prefer `$PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT/simready-foundation` or `$HOME/.physical-ai-skill-hub/upstreams/simready-foundation`.
+Access note: Browser or raw-file fetches of the upstream skill URL can fail in restricted environments. If that happens, use a local clone of `https://github.com/NVIDIA/simready-foundation` checked out to the exact ref in `upstream-versions.lock.json` (currently `v2026.04.1`) and read `skills/simready-foundation-create-package/SKILL.md` from that checkout. Prefer `$OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT/simready-foundation` or `$HOME/.omniverse-cad-to-simready/upstreams/simready-foundation`.
 
 Use that upstream skill as the source of truth for the packaging flow. It drives `assets/scripts/create_simready_package.py`, which performs pre-validation, package creation, and post-validation in one command. Do not duplicate or reinterpret the upstream package workflow inside this reference; point to the upstream skill and run the upstream sample when formal packaging is required. In an installed reference, use `scripts/run.py --backend wrapp --upstream-scripts-dir /path/to/simready-foundation/skills/simready-foundation-create-package/assets/scripts` when the user has a local checkout and WRAPP runtime.
 
@@ -85,7 +85,7 @@ WRAPP-backed publishing through the upstream sample:
 ```bash
 python3 /path/to/skills/omniverse-cad-to-simready/references/nv-core-package-sample/scripts/run.py /path/to/source \
   --backend wrapp \
-  --upstream-scripts-dir "$HOME/.physical-ai-skill-hub/upstreams/simready-foundation/skills/simready-foundation-create-package/assets/scripts" \
+  --upstream-scripts-dir "$HOME/.omniverse-cad-to-simready/upstreams/simready-foundation/skills/simready-foundation-create-package/assets/scripts" \
   --repo /path/to/repo \
   --name apple_a01 \
   --version 1.0.0 \

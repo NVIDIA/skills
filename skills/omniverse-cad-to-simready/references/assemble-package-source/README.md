@@ -30,18 +30,23 @@ Collect:
 ## Instructions
 
 1. Confirm `final_usd` and `thumbnail` exist.
-2. Create `{output_root}/deliverable/simready_usd/`.
-3. Copy `final_usd` to the canonical root USD path:
+2. Inspect the thumbnail pixels and stop before writing anything when it is
+   blank/uniform or when inspection is unavailable. This stage always fails
+   closed; the `--no-fail-on-uniform` diagnostic opt-out on
+   `ovrtx-render-service` has no equivalent here because every thumbnail
+   assembled here ships inside the deliverable.
+3. Create `{output_root}/deliverable/simready_usd/`.
+4. Copy `final_usd` to the canonical root USD path:
    `simready_usd/sm_{asset_name}_01.usd`.
-4. Inspect USD layers and authored asset paths with OpenUSD APIs.
-5. Copy local USD layer dependencies, textures, MDL files, and sidecar assets
+5. Inspect USD layers and authored asset paths with OpenUSD APIs.
+6. Copy local USD layer dependencies, textures, MDL files, and sidecar assets
    into `deliverable/simready_usd/`.
-6. Rewrite package-local asset paths in copied USD layers.
-7. Copy the thumbnail to
+7. Rewrite package-local asset paths in copied USD layers.
+8. Copy the thumbnail to
    `simready_usd/.thumbs/256x256/{root_usd_filename}.png`.
-8. Run a self-containment check over USD composition dependencies and authored
+9. Run a self-containment check over USD composition dependencies and authored
    `Sdf.AssetPath` values.
-9. Write a JSON assembly report.
+10. Write a JSON assembly report.
 
 Do not pass the workflow output root to `nv-core-package-sample`. Pass
 `{output_root}/deliverable` with root USD
@@ -84,6 +89,7 @@ The report includes:
 - `root_usd_path`
 - `root_usd_relative_path`
 - `thumbnail_path`
+- `thumbnail_inspection`
 - `copied_files`
 - `rewritten_paths`
 - `checks`
@@ -96,6 +102,8 @@ The report includes:
 Fail when:
 
 - the final USD or thumbnail is missing
+- the thumbnail is blank or uniform by pixel inspection
+- thumbnail pixel inspection is unavailable, for example when Pillow is missing
 - OpenUSD cannot open the final assembled root USD
 - a local authored asset path cannot be resolved
 - an authored dependency resolves outside `deliverable/`

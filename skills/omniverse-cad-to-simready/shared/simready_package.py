@@ -17,6 +17,8 @@ from typing import Any
 
 from script_utils import check_result_with_code as _check, emit_json_report
 
+from preflight_manifest import preflight_required, preflight_status_check
+
 
 PACKAGING_DEFINITION_FILENAME = "com.nvidia.simready.packaging.json"
 METADATA_FOLDER = ".metadata"
@@ -403,6 +405,13 @@ def _run_wrapp_sample(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def create_package(args: argparse.Namespace) -> dict[str, Any]:
+    if preflight_required():
+        preflight_check = preflight_status_check("nv-core-package-sample", "openusd_python")
+        if not preflight_check["passed"]:
+            report = _base_report(args.source.resolve(), "nv-core-package-sample", "package", args.backend, "Package")
+            report["errors"] = [preflight_check["message"]]
+            return _finalize(report)
+
     if args.backend == "wrapp":
         return _run_wrapp_sample(args)
 
@@ -595,6 +604,11 @@ def validate_package(package_definition: Path, *, profile: str) -> dict[str, Any
     report = _base_report(package_root, "nv-core-package-sample-validation", "validate", "local", profile)
     report["package_definition_path"] = str(package_definition)
     checks = report["checks"]
+    if preflight_required():
+        preflight_check = preflight_status_check("nv-core-package-sample-validation", "openusd_python")
+        if not preflight_check["passed"]:
+            report["errors"] = [preflight_check["message"]]
+            return _finalize(report)
     exists = package_definition.is_file()
     checks.append(_check("package_definition_exists", exists, "Package definition exists" if exists else "Package definition does not exist", code="PKG.DEF.001"))
     if not exists:

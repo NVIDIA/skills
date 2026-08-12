@@ -34,7 +34,7 @@ TOOL = "gsplat2USD"
 NEXT_STEP = "validate-usd-minimum"
 USD_OUTPUT_SUFFIXES = {".usd", ".usda", ".usdc", ".usdz"}
 UPSTREAM_REPO_URL = "https://github.com/NVIDIA-Omniverse/usd-convert-gsplat"
-UPSTREAM_ROOT_ENV = "PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT"
+UPSTREAM_ROOT_ENV = "OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT"
 
 
 @dataclass(frozen=True)
@@ -120,7 +120,7 @@ def default_upstream_root() -> Path:
     root = os.environ.get(UPSTREAM_ROOT_ENV)
     if root:
         return Path(root).expanduser() / "usd-convert-gsplat"
-    return Path.home() / ".physical-ai-skill-hub" / "upstreams" / "usd-convert-gsplat"
+    return Path.home() / ".omniverse-cad-to-simready" / "upstreams" / "usd-convert-gsplat"
 
 
 def resolve_usd_convert_gsplat_root() -> Path:
@@ -241,7 +241,7 @@ def convert_gsplat_to_usd(
     if suffixes is None:
         errors.append(
             "unable to read upstream usd-convert-gsplat supported formats; "
-            "set USD_CONVERT_GSPLAT_ROOT or PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT"
+            "set USD_CONVERT_GSPLAT_ROOT or OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT"
         )
     elif source_asset.suffix.lower() not in suffixes:
         errors.append(f"unsupported Gaussian splat source format: {source_asset.suffix.lower() or 'unknown'}")

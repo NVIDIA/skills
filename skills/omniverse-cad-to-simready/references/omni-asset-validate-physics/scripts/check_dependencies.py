@@ -16,6 +16,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "shared"))
 
 from script_utils import check_result as _check, emit_json_report
 
+from preflight_manifest import preflight_required, preflight_status_check
+
 
 SKILL = "omni-asset-validate-physics"
 TOOL = "omni_asset_validate"
@@ -26,6 +28,12 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Check portable physics validation dependencies.")
     parser.add_argument("--report", type=Path)
     args = parser.parse_args(argv)
+    if preflight_required():
+        preflight_check = preflight_status_check(SKILL, "asset_validator")
+        if not preflight_check["passed"]:
+            payload = {"skill": SKILL, "passed": False, "checks": [preflight_check], "errors": [preflight_check["message"]]}
+            emit_json_report(payload, args.report)
+            return 1
     executable = shutil.which(TOOL)
     module_available = importlib.util.find_spec(MODULE_TOOL) is not None
     runtime = executable if executable is not None else (f"{sys.executable} -m {MODULE_TOOL}" if module_available else "not found")

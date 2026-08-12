@@ -28,8 +28,8 @@ Require:
   direct legacy discovery. When `PHYSICAL_AI_REQUIRE_PREFLIGHT=1` is set,
   missing profile-validation readiness blocks at the preflight guardrail.
 - `simready.validate` / `simready-validate` from NVIDIA SimReady Foundation, or a source checkout with `requirements.txt` or `nv_core/validator_sample/requirements.txt`
-- Upstream source: `https://github.com/NVIDIA/simready-foundation` on branch `main`
-- Temporary aarch64 OpenUSD runtime fallback: NVIDIA OpenUSD Exchange SDK package `usd-exchange>=2.3.0` from `https://github.com/NVIDIA-Omniverse/usd-exchange`
+- Upstream source: `https://github.com/NVIDIA/simready-foundation` pinned by `upstream-versions.lock.json` to `v2026.04.1`
+- Deterministic OpenUSD runtime: NVIDIA OpenUSD Exchange SDK package `usd-exchange==2.3.0` from `https://github.com/NVIDIA-Omniverse/usd-exchange`, with the complete SimReady venv package set pinned in the same manifest
 - SimReady Foundation spec files: `capabilities/`, `features/`, and `profiles/profiles.toml`
 
 Check installed reference dependencies with:
@@ -38,13 +38,19 @@ Check installed reference dependencies with:
 python3 scripts/check_dependencies.py --report dependency-check.json
 ```
 
-If `--foundation-root`, `--foundation-spec-root`, `SIMREADY_FOUNDATION_ROOT`, and `SIMREADY_FOUNDATION_SPEC_ROOT` are not configured and no installed `simready.validate` specs are available, provide a checkout under `$HOME/.physical-ai-skill-hub/upstreams/simready-foundation` or `$PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT/simready-foundation`, checked out to `main`, and load `nv_core/sr_specs/docs` plus `nv_core/validator_sample` from that checkout.
+If `--foundation-root`, `--foundation-spec-root`, `SIMREADY_FOUNDATION_ROOT`, and `SIMREADY_FOUNDATION_SPEC_ROOT` are not configured and no installed `simready.validate` specs are available, provide a checkout under `$HOME/.omniverse-cad-to-simready/upstreams/simready-foundation` or `$OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT/simready-foundation`, checked out to the manifest pin (`v2026.04.1`), and load `nv_core/sr_specs/docs` plus `nv_core/validator_sample` from that checkout.
 
-If `simready-validate` is not on `PATH`, do not stop there. `scripts/run.py` must install the runtime from the Foundation checkout's root `requirements.txt` when present, otherwise from `nv_core/validator_sample/requirements.txt`, into a dedicated venv and use that executable. Override the venv with `PHYSICAL_AI_SIMREADY_VALIDATE_VENV`; otherwise the default is `$XDG_CACHE_HOME/physical-ai-skill-hub/simready-validate-venv` or `$HOME/.cache/physical-ai-skill-hub/simready-validate-venv`.
+If `simready-validate` is not on `PATH`, do not stop there. `scripts/run.py` installs the exact runtime set from `upstream-versions.lock.json` into a dedicated venv and verifies the installed distribution versions before using that executable. Override the venv with `PHYSICAL_AI_SIMREADY_VALIDATE_VENV`; otherwise the default is `$XDG_CACHE_HOME/omniverse-cad-to-simready/simready-validate-venv` or `$HOME/.cache/omniverse-cad-to-simready/simready-validate-venv`.
 
-Until the upstream Foundation dependency metadata is fixed, Linux aarch64 hosts need one extra guardrail: PyPI `usd-core` is not available for this architecture, while `usd-exchange` ships the required OpenUSD Python modules and shared libraries for aarch64. If the normal Foundation `requirements.txt` install fails because `usd-core` cannot resolve, `scripts/run.py` must retry in the same dedicated venv by installing `usd-exchange>=2.3.0`, `omniverse-asset-validator`, `omniverse-usd-profiles`, the non-`simready-validate` Foundation requirements such as `numpy`, and then `simready-validate` itself with `--no-deps`. Do not report `BLOCKED` for the aarch64 `usd-core` resolver failure until this USD Exchange SDK fallback has also failed.
+This locked runtime is also the Linux aarch64 solution: `usd-exchange==2.3.0`
+provides OpenUSD Python modules and shared libraries, and
+`simready-validate==2026.4.8` is installed with `--no-deps`. The manifest pins
+`omniverse-asset-validator==1.18.0`,
+`omniverse-usd-profiles==1.10.22`, and every transitive package used by that
+venv, preventing a future resolver run from silently selecting an incompatible
+combination.
 
-Do not fall back to local profile presets or direct `omni_asset_validate` feature/capability flags for validation. Report `BLOCKED` only when the executable is unavailable, no usable Foundation checkout/spec root exists for installation and validation, or both the normal Foundation install and the aarch64 USD Exchange SDK fallback fail.
+Do not fall back to local profile presets or direct `omni_asset_validate` feature/capability flags for validation. Report `BLOCKED` when the executable is unavailable, no usable Foundation checkout/spec root exists, the locked runtime cannot be installed, or the installed versions do not match the manifest.
 
 ## Target Selection
 
@@ -81,8 +87,8 @@ For URDF or MuJoCo robot assets, prefer `Robot-Body-Runnable` unless the user na
    validation-only or property assignment was skipped, record that exception.
 3. Confirm earlier validation has passed, or state that minimum USD and generic Asset Validator checks should run first.
 4. Select a formal SimReady Foundation profile from user intent and asset type.
-5. Resolve the SimReady Foundation source checkout from `--foundation-root` or `SIMREADY_FOUNDATION_ROOT`; alternatively resolve specs from `--foundation-spec-root` or `SIMREADY_FOUNDATION_SPEC_ROOT`. If no path is configured, use `$PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT/simready-foundation` or `$HOME/.physical-ai-skill-hub/upstreams/simready-foundation`, checked out to `main`.
-6. Run this reference's portable `scripts/run.py`, which installs `simready-validate` from the Foundation checkout when the CLI is missing on `PATH`, uses the temporary USD Exchange SDK runtime fallback on Linux aarch64 when PyPI `usd-core` cannot resolve, then uses Foundation `simready-validate`/`validator_sample` behavior to load Foundation `capabilities`, `features`, and `profiles/profiles.toml`.
+5. Resolve the SimReady Foundation source checkout from `--foundation-root` or `SIMREADY_FOUNDATION_ROOT`; alternatively resolve specs from `--foundation-spec-root` or `SIMREADY_FOUNDATION_SPEC_ROOT`. If no path is configured, use `$OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT/simready-foundation` or `$HOME/.omniverse-cad-to-simready/upstreams/simready-foundation`, checked out to the ref pinned in `upstream-versions.lock.json`.
+6. Run this reference's portable `scripts/run.py`, which installs and verifies the locked SimReady runtime when the CLI is missing on `PATH`, then uses Foundation `simready-validate` behavior to load Foundation `capabilities`, `features`, and `profiles/profiles.toml`.
 7. Parse profile, feature, requirement, issue, warning, and error results from the Foundation validation runtime.
 8. Inspect the asset topology with OpenUSD. Treat `RB.MB.001` as non-blocking when the asset has only one mesh component or one `GeomSubset` component, because there is no reusable multi-body component structure to promote. Preserve the ignored issue under `ignored_issues`, add a warning, and pass the profile if no other failures remain.
 9. Fail when any selected profile feature fails or any issue has `ERROR` or `FAILURE` severity after applying the single-component `RB.MB.001` policy.
@@ -169,4 +175,4 @@ Use this handoff:
 |---|---|
 | Passes selected profile | Report validation result and preserve the JSON report. |
 | Fails selected profile feature | Send issues to a post-assignment repair loop through `simready-conform-profile`, then rerun this reference on the newest authored USD. |
-| SimReady Foundation runtime blocked | Provide a `simready-foundation` checkout on branch `main` with `--foundation-root` or `SIMREADY_FOUNDATION_ROOT`, then retry so `scripts/run.py` can install the compatible runtime from `requirements.txt`; on Linux aarch64, confirm the USD Exchange SDK fallback was attempted after any `usd-core` resolver failure. |
+| SimReady Foundation runtime blocked | Provide the manifest-pinned `simready-foundation` checkout with `--foundation-root` or `SIMREADY_FOUNDATION_ROOT`, then retry so `scripts/run.py` can install and verify the exact runtime from `upstream-versions.lock.json`. |

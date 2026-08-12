@@ -10,11 +10,11 @@ This reference does not assign rigid bodies, colliders, mass, friction, or textu
 
 Use the upstream NVIDIA Omniverse Content Agents Material Agent client skill as the authoritative reference for service API behavior, endpoint semantics, request fields, and client-side troubleshooting:
 
-- Upstream skill: `https://github.com/nvidia-omniverse/content-agents/blob/main/.codex/skills/material-agent-client/SKILL.md`
-- Upstream repository: `https://github.com/nvidia-omniverse/content-agents` on branch `main`
-- Upstream service client: `https://github.com/nvidia-omniverse/content-agents/blob/main/apps/material_agent_service/client/client.py`
+- Upstream skill: `https://github.com/nvidia-omniverse/content-agents/blob/v0.5.2/.codex/skills/material-agent-client/SKILL.md`
+- Upstream repository: `https://github.com/nvidia-omniverse/content-agents` at manifest pin `v0.5.2`
+- Upstream service client: `https://github.com/nvidia-omniverse/content-agents/blob/v0.5.2/apps/material_agent_service/client/client.py`
 
-Access note: Browser or raw-file fetches of the upstream skill URL can fail. If that happens, use the normalized local clone of `https://github.com/nvidia-omniverse/content-agents` checked out to `main` and read `.codex/skills/material-agent-client/SKILL.md` from that checkout. Resolve that clone from `CONTENT_AGENTS_UPSTREAM_ROOT`, then `$PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT/content-agents`, then `$HOME/.physical-ai-skill-hub/upstreams/content-agents`.
+Access note: Browser or raw-file fetches of the upstream skill URL can fail. If that happens, use the normalized local clone of `https://github.com/nvidia-omniverse/content-agents` checked out to the exact ref in `upstream-versions.lock.json` and read `.codex/skills/material-agent-client/SKILL.md` from that checkout. Resolve that clone from `CONTENT_AGENTS_UPSTREAM_ROOT`, then `$OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT/content-agents`, then `$HOME/.omniverse-cad-to-simready/upstreams/content-agents`.
 
 Do not copy or reinterpret upstream Material Agent API behavior here. Keep this reference limited to this reference's wrapper contract, required environment, report shape, and downstream handoff.
 
@@ -63,6 +63,9 @@ Collect:
 | `prompt` | Optional material assignment guidance; prefer the `material_physics_prompt` from `identify-asset-context` when available. |
 | `optimize_usd` | Optional; enabled by default. The wrapper inspects USD topology first and disables it only for instance/prototype-only assets that would otherwise lose all renderable prims if the main service falls back to original topology. If system `python3` cannot import `pxr`, the wrapper tries `uv run --python 3.12` for topology inspection before falling back to the service default. |
 | `skip_instances` | Optional; normally left to the service default when `optimize_usd` remains enabled. The wrapper sends `skip_instances=false` only when it selects the instance/prototype-only traversal path. |
+| `vlm_max_workers` | Optional Material Agent VLM worker limit. The wrapper defaults to `1` to avoid partial prediction batches from bursty service-side VLM concurrency. |
+| `render_num_workers` | Optional Material Agent render worker limit passed through to the service when supplied. |
+| `material_steps` | Optional comma-separated service steps. The wrapper defaults to `build_dataset_usd,build_dataset_prepare_dataset,predict,apply`; final rendering is handled by `ovrtx-render-service` after material assignment. |
 
 ## Upload Prep
 
@@ -120,8 +123,8 @@ docker exec --user root content-material-agent-service chmod -R a+rX /app/.build
 If the container name differs, use the active Material Agent service container.
 If the endpoint is managed or remote and you cannot inspect or repair the
 container, preserve the report and include the optimizer-bypass evidence in the
-blocked or failed handoff. Track the upstream issue at
-`https://github.com/NVIDIA-dev/world-understanding/issues/303`.
+blocked or failed handoff. Track the upstream issue in the
+`https://github.com/nvidia-omniverse/content-agents` issue tracker.
 
 ## Instructions
 
@@ -130,7 +133,7 @@ blocked or failed handoff. Track the upstream issue at
 3. If no endpoint is available, check `NVIDIA_API_KEY`; if missing, ask the user to provide one and wait.
 4. Use `deploy-content-agents` with target `material`; when deployment succeeds and the service is healthy, set `CONTENT_AGENTS_MATERIAL_AGENT_BASE_URL` and return to this workflow.
 5. If an asset context report exists, use its likely identity, evidence, and material hints to craft `--prompt`.
-6. Run this reference's portable `scripts/run.py`. It inspects the USD first, strips missing MDL shader-source upload references when needed, keeps `optimize_usd=true` by default, and switches to `optimize_usd=false` with `skip_instances=false` only for instance/prototype-only topology where the main service would otherwise skip all renderable prims. If the optimized path still fails with the known `Rendering produced 0 images` symptom, the wrapper retries once with `optimize_usd=false` and `skip_instances=false` and records both attempts. After downloading the materialized USD, it removes unbound stale material subtrees and repairs bound stale shaders with broken `sourceAsset` references.
+6. Run this reference's portable `scripts/run.py`. It inspects the USD first, strips missing MDL shader-source upload references when needed, keeps `optimize_usd=true` by default, sends `vlm_max_workers=1`, omits the service-side `render` step, and switches to `optimize_usd=false` with `skip_instances=false` only for instance/prototype-only topology where the main service would otherwise skip all renderable prims. If the optimized path still fails with the known `Rendering produced 0 images` symptom, the wrapper retries once with `optimize_usd=false` and `skip_instances=false` and records both attempts. After downloading the materialized USD, it removes unbound stale material subtrees and repairs bound stale shaders with broken `sourceAsset` references.
 7. If the optimized path was intended but service logs show the local Scene Optimizer permission failure above, repair the container permissions and rerun the optimized command before accepting a direct-traversal result as diagnostic.
 8. Preserve the JSON report, materialized USD output, predictions JSONL, and report HTML when available.
 9. Use `output_usd_path` from the report as the input to `physics-agent-client`.
@@ -157,6 +160,10 @@ The JSON report includes `attempts` when this fallback runs.
 Use `--no-material-output-cleanup` only when preserving the raw downloaded
 Material Agent artifact is more important than downstream SimReady validation
 hygiene.
+
+Use `--material-steps` only when the service's own render artifact is required.
+The CAD-to-SimReady workflow treats the standalone `ovrtx-render-service` output
+as the final render.
 
 ## Output Format
 

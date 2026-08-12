@@ -16,6 +16,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "shared"))
 
 from script_utils import emit_json_report
 
+from preflight_manifest import preflight_required, preflight_status_check
+
 
 SKILL = "simready-conform-profile"
 DEFAULT_PROFILE = "Prop-Robotics-Neutral"
@@ -371,6 +373,11 @@ def conform(args: argparse.Namespace) -> dict[str, Any]:
     asset_path = args.asset_path.resolve()
     output_dir = args.output_dir.resolve()
     report = _empty_report(asset_path, output_dir, args)
+    if preflight_required():
+        preflight_check = preflight_status_check(SKILL, "openusd_python")
+        if not preflight_check["passed"]:
+            report["errors"].append(preflight_check["message"])
+            return report
     if not asset_path.exists():
         report["errors"].append(f"Asset path does not exist: {asset_path}")
         return report

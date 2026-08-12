@@ -19,11 +19,11 @@ from urllib.request import Request, urlopen
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "shared"))
 
-from script_utils import check_result as _check, emit_json_report
+from script_utils import check_result as _check, emit_json_report, inspect_png
 
 from preflight_manifest import load_preflight_manifest, preflight_required, preflight_status_check, ready_service_url
 
-from stage_prep import can_prepare_with_openusd, inspect_png, prepare_render_stage, raw_asset_data_uri
+from stage_prep import can_prepare_with_openusd, prepare_render_stage, raw_asset_data_uri
 
 
 SKILL = "ovrtx-render-service"
@@ -208,7 +208,11 @@ def _collect_stage_stats(asset_path: Path) -> tuple[dict[str, Any] | None, str |
     mesh_count = 0
     point_count = 0
     triangle_count = 0
-    for prim in stage.Traverse():
+    # Read through instance proxies so externally referenced instanceable
+    # assets contribute their rendered meshes to the pre-render guard and
+    # scene statistics. This remains a read-only traversal; do not author
+    # through the returned proxy prims.
+    for prim in Usd.PrimRange.Stage(stage, Usd.TraverseInstanceProxies()):
         if not prim.IsA(UsdGeom.Mesh):
             continue
         mesh_count += 1
@@ -501,9 +505,12 @@ def render(args: argparse.Namespace) -> dict[str, Any]:
         pixel_inspection = inspect_png(output_image_path)
         report["pixel_inspection"] = pixel_inspection
         if pixel_inspection.get("available") is False:
-            warning = pixel_inspection.get("warning", "Could not inspect output PNG pixels")
-            report["warnings"].append(str(warning))
-            checks.append(_check("output_png_pixel_inspected", False, str(warning), "warning"))
+            message = pixel_inspection.get("warning", "Could not inspect output PNG pixels")
+            # Pixel inspection is required to prove the render is not blank. An
+            # inspection failure (missing Pillow, unreadable PNG, ...) is a
+            # blocker, not a skip: we cannot tell a healthy render from a blank
+            # one, so this must fail closed rather than pass the stage.
+            checks.append(_check("output_png_pixel_inspected", False, str(message)))
         elif pixel_inspection.get("uniform"):
             message = "Output PNG is blank/uniform by pixel inspection"
             severity = "error" if args.fail_on_uniform else "warning"
@@ -539,7 +546,16 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--default-lights", action="store_true", help="Add default Dome/Sphere lights to lightless prepared stages.")
     parser.add_argument("--no-default-lights", action="store_true", help="Deprecated compatibility flag; default rendering does not author lights.")
     parser.add_argument("--no-bundle-local-assets", action="store_true", help="Do not bundle local MDL/texture assets referenced by the prepared stage.")
-    parser.add_argument("--fail-on-uniform", action="store_true", help="Return failure when the rendered PNG is blank or uniform.")
+    parser.add_argument(
+        "--fail-on-uniform",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "Fail the stage when the rendered PNG is blank/uniform (default: on). "
+            "Pass --no-fail-on-uniform to demote a blank/uniform render to a warning "
+            "for diagnostic-only runs; packaging flows should keep this enabled."
+        ),
+    )
     parser.add_argument("--request-timeout", type=int, default=120)
     parser.add_argument("--report", type=Path)
     parser.add_argument("--markdown-report", type=Path)

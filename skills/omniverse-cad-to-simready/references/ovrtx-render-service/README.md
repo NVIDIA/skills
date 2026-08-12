@@ -28,9 +28,9 @@ the preflight guardrail.
 
 ## Upstream Reference
 
-This reference follows the current `nvidia-omniverse/content-agents` `main` OVRTX rendering API contract: encode local USD as a data URI in the `/render` request `url` field, pass render settings, and decode returned image bytes from the response `images` map. Its stage-preparation behavior mirrors the useful parts of the earlier render-usd proof of concept from `https://github.com/NVIDIA-dev/content-claw/tree/main/.claude/skills/render-usd`: compute render bounds, author a camera from those bounds, preserve the source stage lighting state by default, and bundle local MDL/texture sidecars. The source asset is not modified.
+This reference follows the `nvidia-omniverse/content-agents` OVRTX rendering API contract at the manifest pin `v0.5.2`: encode local USD as a data URI in the `/render` request `url` field, pass render settings, and decode returned image bytes from the response `images` map. Its stage-preparation behavior computes render bounds, authors a camera from those bounds, preserves the source stage lighting state by default, and bundles local MDL/texture sidecars. The source asset is not modified.
 
-OVRTX service deployment belongs to NVIDIA Omniverse Content Agents: `https://github.com/nvidia-omniverse/content-agents` on branch `main`. When a render task requires provisioning, starting, or troubleshooting a local OVRTX render endpoint, use the installed `deploy-content-agents` skill, which points to `https://github.com/nvidia-omniverse/content-agents/blob/main/.codex/skills/deploy-ovrtx-docker/SKILL.md`. Do not copy Docker Compose or OVRTX deployment instructions into this reference.
+OVRTX service deployment belongs to NVIDIA Omniverse Content Agents: `https://github.com/nvidia-omniverse/content-agents` at the exact ref in `upstream-versions.lock.json`. When a render task requires provisioning, starting, or troubleshooting a local OVRTX render endpoint, use the installed `deploy-content-agents` skill, which points to `https://github.com/nvidia-omniverse/content-agents/blob/v0.5.2/.codex/skills/deploy-ovrtx-docker/SKILL.md`. Do not copy Docker Compose or OVRTX deployment instructions into this reference.
 
 ## Stage Preparation
 
@@ -51,9 +51,17 @@ when `pxr` is available:
   `--default-lights` only as an explicit debugging override.
 - Export a temporary `main.usda` and bundle referenced local MDL/texture files
   into the data-URI payload, rewriting asset paths to the bundle.
+- When a material has a valid universal `UsdPreviewSurface` fallback, remove
+  `outputs:mdl:*` and `outputs:mtlx:*` from that temporary payload so OVRTX does
+  not choose an unsupported render-context shader and show a red error material.
 - Inspect the returned PNG for blank/uniform pixels and record the result in the
-  JSON report. Use `--fail-on-uniform` when a blank render should fail the
-  command rather than produce a warning.
+  JSON report. Pixel inspection requires Pillow (a pinned dependency of this
+  repo); a blank/uniform render, or an inspection that cannot run at all (for
+  example Pillow missing or the PNG unreadable), fails the stage by default so
+  packaging never proceeds on an unverified render. Pass
+  `--no-fail-on-uniform` only for diagnostic-only runs where a blank/uniform
+  render should stay a warning instead of a failure; a missing/unreadable
+  pixel inspection still fails the stage regardless of that flag.
 
 ## Camera Handling
 
@@ -91,6 +99,7 @@ Require:
 
 - this reference's portable `scripts/run.py` and `scripts/check_dependencies.py`.
 - OpenUSD Python APIs through `pxr.Usd` and `pxr.UsdGeom` when local mesh statistics are required. Missing `pxr` is reported as a warning; the OVRTX render request can still proceed.
+- Pillow (`PIL`) to inspect the rendered PNG for blank/uniform pixels. Pillow is a pinned dependency of this repo's environment (see the repo root `pyproject.toml`). Missing or non-functional Pillow fails the render stage; it is not an optional/best-effort check.
 - Python stdlib HTTP support for the OVRTX render service call.
 - For protected remote rendering, a bearer token from `OVRTX_RENDER_TOKEN`,
   `RENDER_TOKEN`, `CONTENT_AGENTS_RENDER_TOKEN`, `NGC_API_KEY`,
@@ -145,7 +154,7 @@ required by this reference's normal `scripts/run.py` path.
 4. Run this reference's portable `scripts/run.py` with the asset path and PNG output path. Keep default composition-preserving stage preparation enabled unless debugging a specific source-stage camera, light setup, or packaging issue. Do not pass `--flatten` for final report renders unless the unflattened render is blocked. Do not pass `--default-lights` for final report renders unless the user explicitly asks for authored lighting.
 5. Preserve the JSON and Markdown reports when requested.
 6. Confirm the output PNG exists and is non-empty.
-7. Check that the output PNG is not blank or a uniform background image. If it is blank/uniform, mark the render as failed or blocked and troubleshoot the OVRTX request, camera, lighting, asset packaging, or endpoint; do not replace it with a Material Agent or Physics Agent report image.
+7. Check that the output PNG is not blank or a uniform background image. `scripts/run.py` fails the stage by default when pixel inspection detects a blank/uniform PNG, or when pixel inspection could not run at all (for example Pillow missing); treat that failure as blocked and troubleshoot the OVRTX request, camera, lighting, asset packaging, or endpoint. Do not pass `--no-fail-on-uniform` and do not replace a blank render with a Material Agent or Physics Agent report image to force a pass.
 8. If the single image is still blank or poorly framed, run `scripts/turntable.py` and inspect its frame reports before changing service endpoint assumptions.
 9. Use the preview as diagnostic context for conversion, material, physics, SimReady, or package reports.
 
