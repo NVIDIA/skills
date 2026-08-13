@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 338,
-  "result_row_count": 3140,
+  "skill_count": 336,
+  "result_row_count": 3130,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -18,7 +18,6 @@
     "mcore-run-on-slurm",
     "mcore-split-pr",
     "mcore-testing",
-    "nemo-data-designer-plugin",
     "nemoclaw-user-guide",
     "omniverse-realtime-viewer",
     "physical-ai-infrastructure-setup-and-resilient-scaling",
@@ -3106,42 +3105,6 @@
       "component": "NeMo AutoModel",
       "has_results": true,
       "average_uplift_pct": 32.5
-    },
-    {
-      "skill": "nemo-data-designer-plugin",
-      "evaluation_date": "2026-07-17",
-      "profile": "external",
-      "environment": "astra-sandbox",
-      "tasks": null,
-      "attempts_per_task": null,
-      "pass_threshold_pct": null,
-      "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "catalog_dir": "nemo-data-designer-plugin",
-      "component": null,
-      "has_results": false,
-      "average_uplift_pct": null
-    },
-    {
-      "skill": "nemo-evaluator-plugin",
-      "evaluation_date": "2026-08-12",
-      "profile": null,
-      "environment": "k8s-sandbox",
-      "tasks": 1,
-      "attempts_per_task": 1,
-      "pass_threshold_pct": null,
-      "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "catalog_dir": "nemo-evaluator-plugin",
-      "component": null,
-      "has_results": true,
-      "average_uplift_pct": 44.4
     },
     {
       "skill": "nemo-mbridge-mlm-bridge-training",
@@ -21111,96 +21074,6 @@
       "agent": "codex",
       "score_pct": 59.0,
       "uplift_pct": 27.0
-    },
-    {
-      "catalog_dir": "nemo-evaluator-plugin",
-      "component": null,
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nemo-evaluator-plugin",
-      "component": null,
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "nemo-evaluator-plugin",
-      "component": null,
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 60.0
-    },
-    {
-      "catalog_dir": "nemo-evaluator-plugin",
-      "component": null,
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 20.0
-    },
-    {
-      "catalog_dir": "nemo-evaluator-plugin",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 56.0
-    },
-    {
-      "catalog_dir": "nemo-evaluator-plugin",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 38.0
-    },
-    {
-      "catalog_dir": "nemo-evaluator-plugin",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 75.0,
-      "uplift_pct": 65.0
-    },
-    {
-      "catalog_dir": "nemo-evaluator-plugin",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 85.0,
-      "uplift_pct": 10.0
-    },
-    {
-      "catalog_dir": "nemo-evaluator-plugin",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 70.0
-    },
-    {
-      "catalog_dir": "nemo-evaluator-plugin",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 75.0
     },
     {
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
