@@ -4019,6 +4019,42 @@
         "audience": "application_developer,ai_engineer,ml_engineer,solutions_architect,developer",
         "discovery.activity_tags": "summarize,inference,integrate,deploy,operate"
       }
+    },
+    {
+      "path": "skills/warp-compile-time-optimizer",
+      "name": "warp-compile-time-optimizer",
+      "description": "Use when compile time or startup time is the problem in code that uses Warp: a request to improve, optimize, or cut compile times; an app that is slow to start or stalls at the first wp.launch; seconds of compiling before real work begins; JIT modules recompiling on every run or every CI job. Only applies when the code being optimized uses Warp kernels. Not for steady-state kernel runtime, memory, correctness, building Warp itself from source, or nvcc/C++ build times.",
+      "metadata": {
+        "product.primary": "Warp",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,application_developer,hpc_developer,simulation_engineer,robotics_developer",
+        "discovery.activity_tags": "optimize,profile,measure,debug,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/warp-debug-gradients",
+      "name": "warp-debug-gradients",
+      "description": "Use to diagnose and fix incorrect gradients in differentiable Warp programs. Anything trained, optimized, calibrated, or fit through Warp kernels depends on wp.Tape gradients, so treat any misbehavior of such a workflow as a gradient problem until proven otherwise — use this when training diverges or NaNs, won't train at all, stalls or plateaus above the expected loss, converges to a wrong or biased answer, is worse than a reference implementation, works at small scale but fails at production scale, or fails a QA/validation recheck. Also for explicit symptoms — exploding, NaN/inf, zero, or subtly wrong gradients, suspected wp.Tape/backward issues, gradcheck failures — but users usually describe only the surface symptom (\"the sim explodes\", \"the fit gets dragged toward outliers\") without mentioning gradients: make that leap. Not for forward-only Warp work, build/install problems, or autograd issues in other frameworks without Warp.",
+      "metadata": {
+        "product.primary": "Warp",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "simulation_engineer,developer,ml_engineer,ai_engineer,robotics_developer",
+        "discovery.activity_tags": "debug,troubleshoot,validate,test,measure"
+      }
+    },
+    {
+      "path": "skills/warp-eval",
+      "name": "warp-eval",
+      "description": "Evaluate whether an existing hot path is a credible NVIDIA Warp candidate. Use for irregular or spatial queries, particle or geometry simulation, branch-heavy loops, many small launches, host fallbacks, or large intermediates. CPU-only code and absent GPU dependencies are normal unless NVIDIA is prohibited. Exclude required cross-vendor or CPU-only deployment, vendor-lowered dense or NN layers, general Warp API questions, and already-selected Warp kernels. Contribution policy alone is not exclusion.\n",
+      "metadata": {
+        "product.primary": "Warp",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "simulation_engineer,application_developer,hpc_developer,developer,robotics_developer",
+        "discovery.activity_tags": "evaluate,benchmark,profile,optimize,assess"
+      }
     }
   ]
 }

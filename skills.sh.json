@@ -335,7 +335,10 @@
         "tilegym-cutile-autotuning",
         "tilegym-cutile-python",
         "tilegym-improve-cutile-kernel-perf",
-        "tilegym-monkey-patch-kernels-to-transformers"
+        "tilegym-monkey-patch-kernels-to-transformers",
+        "warp-compile-time-optimizer",
+        "warp-debug-gradients",
+        "warp-eval"
       ]
     },
     {

@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 335,
-  "result_row_count": 3115,
+  "skill_count": 338,
+  "result_row_count": 3140,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -5800,6 +5800,60 @@
       "component": "Video Search and Summarization",
       "has_results": true,
       "average_uplift_pct": 37.2
+    },
+    {
+      "skill": "warp-compile-time-optimizer",
+      "evaluation_date": "2026-08-13",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 18,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "warp-compile-time-optimizer",
+      "component": "Warp",
+      "has_results": true,
+      "average_uplift_pct": 7.0
+    },
+    {
+      "skill": "warp-debug-gradients",
+      "evaluation_date": "2026-08-12",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 6,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "warp-debug-gradients",
+      "component": "Warp",
+      "has_results": true,
+      "average_uplift_pct": 12.5
+    },
+    {
+      "skill": "warp-eval",
+      "evaluation_date": "2026-08-11",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 22,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "warp-eval",
+      "component": "Warp",
+      "has_results": true,
+      "average_uplift_pct": 22.8
     }
   ],
   "results": [
@@ -33837,6 +33891,231 @@
       "agent": "codex",
       "score_pct": 77.0,
       "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "warp-compile-time-optimizer",
+      "component": "Warp",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 11.0
+    },
+    {
+      "catalog_dir": "warp-compile-time-optimizer",
+      "component": "Warp",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 6.0
+    },
+    {
+      "catalog_dir": "warp-compile-time-optimizer",
+      "component": "Warp",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "warp-compile-time-optimizer",
+      "component": "Warp",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "warp-compile-time-optimizer",
+      "component": "Warp",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 8.0
+    },
+    {
+      "catalog_dir": "warp-debug-gradients",
+      "component": "Warp",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "warp-debug-gradients",
+      "component": "Warp",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": -17.0
+    },
+    {
+      "catalog_dir": "warp-debug-gradients",
+      "component": "Warp",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "warp-debug-gradients",
+      "component": "Warp",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "warp-debug-gradients",
+      "component": "Warp",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 26.0
+    },
+    {
+      "catalog_dir": "warp-debug-gradients",
+      "component": "Warp",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.0,
+      "uplift_pct": 24.0
+    },
+    {
+      "catalog_dir": "warp-debug-gradients",
+      "component": "Warp",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "warp-debug-gradients",
+      "component": "Warp",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 13.0
+    },
+    {
+      "catalog_dir": "warp-debug-gradients",
+      "component": "Warp",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "warp-debug-gradients",
+      "component": "Warp",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "warp-eval",
+      "component": "Warp",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "warp-eval",
+      "component": "Warp",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 9.0
+    },
+    {
+      "catalog_dir": "warp-eval",
+      "component": "Warp",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "warp-eval",
+      "component": "Warp",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "warp-eval",
+      "component": "Warp",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "warp-eval",
+      "component": "Warp",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "warp-eval",
+      "component": "Warp",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "warp-eval",
+      "component": "Warp",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "warp-eval",
+      "component": "Warp",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "warp-eval",
+      "component": "Warp",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 36.0
     }
   ]
 }
