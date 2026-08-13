@@ -113,8 +113,7 @@ jobs:
                 (. // "") |
                 startswith("skills/") or
                 startswith("team-skills/") or
-                startswith("rules/team-rules/") or
-                startswith("plugins/");
+                startswith("rules/team-rules/");
               [
                 .files[]? |
                 select((.filename | watched) or (.previous_filename? | watched)) |
@@ -197,8 +196,7 @@ jobs:
                 (. // "") |
                 startswith("skills/") or
                 startswith("team-skills/") or
-                startswith("rules/team-rules/") or
-                startswith("plugins/");
+                startswith("rules/team-rules/");
               any(.[]; (.filename | watched) or (.previous_filename? | watched))
             ' >/dev/null; then
               has_watched_change=true
@@ -363,7 +361,7 @@ jobs:
             "Latest watched-path change: \`${latest_watched_path}\`." \
             "" \
             "Comment \`/nvskills-ci\` on this PR after every commit that changes" \
-            "\`skills/\`, \`team-skills/\`, \`rules/team-rules/\`, or \`plugins/\`."
+            "\`skills/\`, \`team-skills/\`, or \`rules/team-rules/\`."
           if [ "${is_fork_pull_request}" = "true" ]; then
             append_summary \
               "" \
