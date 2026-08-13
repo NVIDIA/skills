@@ -2209,30 +2209,6 @@
       }
     },
     {
-      "path": "skills/nemo-data-designer-plugin",
-      "name": "nemo-data-designer-plugin",
-      "description": "Use when the user wants to create a dataset, generate synthetic data, or build a data generation pipeline.",
-      "metadata": {
-        "product.primary": "NeMo",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer,data_engineer",
-        "discovery.activity_tags": "generate,synthesize,configure,validate"
-      }
-    },
-    {
-      "path": "skills/nemo-evaluator-plugin",
-      "name": "nemo-evaluator-plugin",
-      "description": "Evaluate models, datasets, and agents with the NeMo Evaluator plugin. Use for metric selection, SDK checks, platform jobs, and result retrieval.",
-      "metadata": {
-        "product.primary": "NeMo",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "evaluate,validate,configure,inspect"
-      }
-    },
-    {
       "path": "skills/nemo-mbridge-mlm-bridge-training",
       "name": "nemo-mbridge-mlm-bridge-training",
       "description": "Run Megatron-LM (MLM) and Megatron Bridge training with mock or real data. Covers correlation testing, available recipes, and multi-GPU examples.",
