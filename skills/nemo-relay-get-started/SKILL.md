@@ -18,19 +18,26 @@ Evaluate these paths in order. Use the first one that fits the user's stated
 goal and existing environment.
 
 1. **CLI try-now (default)**: choose this for a generic "try Relay" request or
-   when the user wants value without modifying application code. Run Codex,
-   Claude Code, or Hermes through the local CLI wrapper. Read
+   when the user wants value without modifying application code. Run Codex or
+   Claude Code through the local CLI wrapper. Read
    [CLI Try-Now](references/cli-try-now.md).
-2. **Built-in integrations try-now**: choose this when an existing LangChain,
+2. **Hermes Agent native path**: choose this when Hermes Agent owns the
+   execution boundary. Explain that NeMo Relay is built in and requires no
+   separate Relay installation, observability plugin, or Relay CLI setup.
+   State explicitly: "Hermes Agent understands NeMo Relay plugin
+   configurations." Stop after confirming the native integration. Do not
+   provide installation or observability-configuration instructions, and do
+   not continue into the generic plugin progression.
+3. **Built-in integrations try-now**: choose this when an existing LangChain,
    LangGraph, Deep Agents, or OpenClaw application owns the execution boundary.
    Prefer the maintained supported integration over manual wrapping. Read
    [Built-In Integrations Try-Now](references/built-in-integrations-try-now.md).
-3. **Language-specific manual try-now**: choose this when the user's Python,
+4. **Language-specific manual try-now**: choose this when the user's Python,
    Node.js, or Rust application directly owns its tool or LLM call sites and no
    maintained integration is the better boundary. Read
    [Manual Language Try-Now](references/manual-language-try-now.md).
 
-Do not ask the user to choose among all three when their request, manifest, or
+Do not ask the user to choose among all four when their request, manifest, or
 framework already identifies the boundary. For an unspecified request, use the
 CLI path. When more than one CLI agent is available, ask one concise question
 to select the agent.
@@ -41,6 +48,7 @@ Select the try-now path before choosing an install package.
 
 - CLI path -> verify `nemo-relay --version`; if missing, use
   `nemo-relay-install` for the CLI outcome.
+- Hermes Agent native path -> do not install or configure Relay separately.
 - Built-in integration path -> use `nemo-relay-install` for the named
   framework or harness package.
 - Manual language path -> use `nemo-relay-install` for the detected language
@@ -52,10 +60,15 @@ install and get-started skills.
 
 ## Apply The Common First-Value Contract
 
+Do not apply this section to the Hermes Agent native path.
+
 Follow the selected reference, then:
 
 1. Inspect the target environment and existing Relay configuration before
    proposing changes.
+   Treat repository-local `.nemo-relay/config.toml` and
+   `.nemo-relay/plugins.toml` as unsupported project configuration. Do not
+   create, edit, merge, or trust those files as active Relay configuration.
 2. Explain the attachment boundary and show the exact minimal change.
 3. Obtain confirmation before writing configuration, modifying application
    code, or launching a model-consuming run.
@@ -72,6 +85,8 @@ or the Observability plugin make those events inspectable. Keep instrumentation
 and export distinct.
 
 ## Continue With One Plugin
+
+Do not apply this section to the Hermes Agent native path.
 
 Stop the initial try-now workflow when the selected path's success checks pass.
 Then make one additional built-in plugin the primary suggested next step.

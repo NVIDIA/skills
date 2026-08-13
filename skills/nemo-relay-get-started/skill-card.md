@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers new to NeMo Relay who want to try the framework, select the least-complex quick-start path for their environment, and verify initial observable value before production setup. <br>
+Developers and engineers onboarding to NeMo Relay who want to trial the framework, choose the quickest supported path to visible value, and verify initial instrumentation before committing to production setup. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -35,7 +35,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
+**Output Type(s):** [Configuration instructions, Shell commands, Code] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -47,18 +47,18 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 15 tasks (14 positive, 1 negative) in isolated k8s-sandbox pods with 1 attempt per task. <br>
+15 evaluation tasks (14 positive, 1 negative) in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use, checking for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the answer produced is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was found and activated when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
+- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the skill produces correct answers against reference answers. <br>
+- Discoverability: Whether the right skill was found and executed when needed. <br>
+- Effectiveness: Whether the skill helps complete the user's goal and expected workflow. <br>
+- Efficiency: Whether the skill avoids wasted tool or skill usage. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was found and executed. <br>
 - `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
@@ -70,20 +70,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 47% → 85% (+37 points) | 49% → 78% (+29 points) |
-| Security | 93% → 93% (±0 points) | 63% → 73% (+10 points) |
-| Correctness | 19% → 91% (+72 points) | 57% → 85% (+28 points) |
-| Discoverability | 50% → 93% (+43 points) | 48% → 86% (+38 points) |
-| Effectiveness | 30% → 70% (+40 points) | 43% → 66% (+23 points) |
-| Efficiency | 45% → 77% (+32 points) | 31% → 77% (+46 points) |
-
-## Testing Completed: <br>
-**[x] Agent Red-Teaming** <br>
-**[ ] Network Security** <br>
-**[ ] Product Security** <br>
+| Overall | 48% → 86% (+38 points) | 51% → 79% (+29 points) |
+| Security | 100% → 93% (-7 points) | 73% → 80% (+7 points) |
+| Correctness | 25% → 95% (+69 points) | 63% → 88% (+25 points) |
+| Discoverability | 49% → 95% (+46 points) | 48% → 89% (+41 points) |
+| Effectiveness | 28% → 72% (+44 points) | 45% → 65% (+20 points) |
+| Efficiency | 39% → 76% (+37 points) | 25% → 75% (+50 points) |
 
 ## Skill Version(s): <br>
-f23d697 (source: git SHA, committed 2026-07-30) <br>
+db4ed2e (source: git SHA, committed 2026-08-12) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

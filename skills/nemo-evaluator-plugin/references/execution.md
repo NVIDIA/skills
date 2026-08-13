@@ -16,10 +16,10 @@ Use the standalone SDK for the fastest in-process metric loop:
 from nemo_evaluator_sdk import Evaluator, ExactMatchMetric
 
 result = Evaluator().run_sync(
-    metrics=ExactMatchMetric(
+    metrics=[ExactMatchMetric(
         reference="{{item.expected}}",
         candidate="{{item.output}}",
-    ),
+    )],
     dataset=[
         {"expected": "Paris", "output": "Paris"},
         {"expected": "Paris", "output": "London"},

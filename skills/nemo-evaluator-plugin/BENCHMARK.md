@@ -9,8 +9,8 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `nemo-evaluator-plugin`
-- Evaluation date: 2026-08-05
-- Evaluator version: `1.0.0`
+- Evaluation date: 2026-08-12
+- Evaluator version: `1.2.4`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:2983276debf2515c9b9211ae72e26e6b76d1cf5881fb56a42415ac0a4f9a77da` (skill-evaluator-dataset-snapshot/1)
@@ -34,11 +34,11 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 46% → 92% (+46 points) | 65% → 94% (+30 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 40% → 100% (+60 points) | 100% → 100% (±0 points) |
-| Discoverability | 50% → 100% (+50 points) | 44% → 88% (+44 points) |
-| Effectiveness | 10% → 62% (+52 points) | 55% → 85% (+30 points) |
+| Overall | 45% → 95% (+50 points) | 52% → 90% (+38 points) |
+| Security | 100% → 100% (±0 points) | 50% → 100% (+50 points) |
+| Correctness | 40% → 100% (+60 points) | 60% → 80% (+20 points) |
+| Discoverability | 44% → 100% (+56 points) | 50% → 88% (+38 points) |
+| Effectiveness | 10% → 75% (+65 points) | 75% → 85% (+10 points) |
 | Efficiency | 30% → 100% (+70 points) | 25% → 100% (+75 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.

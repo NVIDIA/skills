@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to mechanically migrate existing NeMo Flow codebases, documentation, and configuration to NeMo Relay across all supported language surfaces. <br>
+Developers and engineers migrating existing NeMo Flow applications, libraries, or documentation to NeMo Relay across multiple language surfaces. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,7 +26,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [NeMo Relay GitHub Repository](https://github.com/NVIDIA/NeMo-Relay/) <br>
-- [migrate_from_nemo_flow.py](scripts/migrate_from_nemo_flow.py) <br>
+- [Apache 2.0 License](https://github.com/NVIDIA/NeMo-Relay/blob/main/LICENSE) <br>
 
 
 ## Skill Output: <br>
@@ -36,44 +36,44 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative) in astra-sandbox environment with NVSkills-Eval external profile. <br>
+Evaluated against 5 tasks (4 positive, 1 negative) in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded and executed when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
+- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 81% (+48%) | 78% (+33%) |
-| Discoverability | 4 | 91% (+59%) | 73% (+27%) |
-| Effectiveness | 4 | 50% (+21%) | 56% (+16%) |
-| Efficiency | 4 | 86% (+44%) | 72% (+13%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 55% → 81% (+26 points) | 46% → 73% (+28 points) |
+| Security | 100% → 100% (±0 points) | 80% → 100% (+20 points) |
+| Correctness | 44% → 92% (+48 points) | 44% → 60% (+16 points) |
+| Discoverability | 32% → 91% (+59 points) | 32% → 85% (+52 points) |
+| Effectiveness | 51% → 28% (-22 points) | 33% → 29% (-4 points) |
+| Efficiency | 46% → 92% (+46 points) | 39% → 93% (+54 points) |
 
 ## Skill Version(s): <br>
-0.6.0-alpha.20260715 (source: git tag) <br>
+db4ed2e (source: git SHA, committed 2026-08-12) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

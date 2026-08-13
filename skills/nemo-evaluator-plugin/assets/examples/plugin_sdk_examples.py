@@ -29,10 +29,12 @@ def evaluate_standalone() -> Any:
     from nemo_evaluator_sdk import Evaluator, ExactMatchMetric
 
     return Evaluator().run_sync(
-        metrics=ExactMatchMetric(
-            reference="{{item.expected}}",
-            candidate="{{item.output}}",
-        ),
+        metrics=[
+            ExactMatchMetric(
+                reference="{{item.expected}}",
+                candidate="{{item.output}}",
+            )
+        ],
         dataset=[
             {"expected": "Paris", "output": "Paris"},
             {"expected": "Paris", "output": "London"},

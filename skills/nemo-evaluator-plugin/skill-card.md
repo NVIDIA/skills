@@ -1,5 +1,5 @@
 ## Description: <br>
-Evaluate models, datasets, and agents with the NeMo Evaluator plugin. Use for metric selection, SDK checks, platform jobs, and result retrieval. <br>
+Evaluate models, datasets, and agents with the NeMo Evaluator plugin for metric selection, SDK checks, platform jobs, and result retrieval. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to choose evaluation metrics, validate scoring behavior with the standalone SDK, submit NeMo Platform evaluation jobs, and retrieve results for models and agents. <br>
+Developers and engineers evaluating LLM and agent performance using NeMo Platform's evaluation framework for metric selection, job submission, and result retrieval. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,18 +25,18 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Evaluation Shapes](references/evaluation-shapes.md) <br>
-- [Metric Selection](references/metric-selection.md) <br>
-- [SDK Execution](references/execution.md) <br>
-- [Stored Resources](references/resources.md) <br>
-- [API Auth](references/api-auth.md) <br>
-- [LLM Judge](references/llm-judge.md) <br>
 - [Agent Evaluation](references/agent-evaluation.md) <br>
+- [API Auth](references/api-auth.md) <br>
+- [Evaluation Shapes](references/evaluation-shapes.md) <br>
+- [Execution](references/execution.md) <br>
+- [LLM Judge](references/llm-judge.md) <br>
+- [Metric Selection](references/metric-selection.md) <br>
+- [Resources](references/resources.md) <br>
 - [Troubleshooting](references/troubleshooting.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, API Calls] <br>
+**Output Type(s):** [Shell commands, API Calls, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -48,18 +48,18 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive) in isolated k8s-sandbox pods, with 1 attempt per task. <br>
+1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot, evaluated in k8s-sandbox environment with 1 attempt per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the skill produces correct answers against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded and activated when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal (goal accuracy 50% + behavior check 50%). <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
+- Security: Is it safe to use? <br>
+- Correctness: Is the answer correct? <br>
+- Discoverability: Was the right skill loaded when needed? <br>
+- Effectiveness: Did the skill help complete the task? <br>
+- Efficiency: Did it avoid wasted tool or skill usage? <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was found and executed. <br>
 - `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
@@ -69,17 +69,17 @@ Underlying evaluation signals used in this run: <br>
 
 
 ## Evaluation Results: <br>
-| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+| Measure | Claude Code (Baseline → Skill) | Codex (Baseline → Skill) |
 |---|---:|---:|
-| Overall | 46% → 92% (+46 points) | 65% → 94% (+30 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 40% → 100% (+60 points) | 100% → 100% (±0 points) |
-| Discoverability | 50% → 100% (+50 points) | 44% → 88% (+44 points) |
-| Effectiveness | 10% → 62% (+52 points) | 55% → 85% (+30 points) |
-| Efficiency | 30% → 100% (+70 points) | 25% → 100% (+75 points) |
+| Overall | 45% → 95% (+50) | 52% → 90% (+38) |
+| Security | 100% → 100% (±0) | 50% → 100% (+50) |
+| Correctness | 40% → 100% (+60) | 60% → 80% (+20) |
+| Discoverability | 44% → 100% (+56) | 50% → 88% (+38) |
+| Effectiveness | 10% → 75% (+65) | 75% → 85% (+10) |
+| Efficiency | 30% → 100% (+70) | 25% → 100% (+75) |
 
 ## Skill Version(s): <br>
-fca669b4 (source: git SHA, committed 2026-08-05) <br>
+acfad8e4 (source: git SHA, committed 2026-08-10) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
