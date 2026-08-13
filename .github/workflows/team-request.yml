@@ -118,8 +118,7 @@ jobs:
               def watched:
                 (. // "") |
                 startswith("skills/") or
-                startswith("team-skills/") or
-                startswith("rules/team-rules/");
+                startswith("team-skills/");
               any(.[]; (.filename | watched) or (.previous_filename? | watched))
             ' >/dev/null; then
               has_watched_change=true
@@ -135,7 +134,7 @@ jobs:
             {
               echo "## NVSkills CI request"
               echo
-              echo "Skipped: no changes under \`skills/\`, \`team-skills/\`, or \`rules/team-rules/\`."
+              echo "Skipped: no changes under \`skills/\` or \`team-skills/\`."
             } >> "${GITHUB_STEP_SUMMARY}"
             exit 0
           fi
