@@ -1,0 +1,53 @@
+{
+  "metrics": [
+    {
+      "bundle_kind": "metric-bundle",
+      "bundle_format_version": "v1",
+      "metric_type": "exact-match",
+      "metadata": {
+        "description": null,
+        "labels": {}
+      },
+      "outputs": [
+        {
+          "name": "exact-match",
+          "description": null,
+          "value_json_schema": {
+            "description": "Continuous numeric metric value.",
+            "title": "ContinuousScore",
+            "type": "number"
+          }
+        }
+      ],
+      "secrets": {},
+      "payload": {
+        "metric": {
+          "type": "exact-match",
+          "description": null,
+          "labels": {},
+          "supported_job_types": [
+            "online",
+            "offline"
+          ],
+          "reference": "{{item.expected}}",
+          "candidate": "{{item.output}}"
+        },
+        "digest": "bcd49ec7c31e962c06810501e5ea1c67f1667753b65a5a75db10686f6d992ed2",
+        "kind": "inline"
+      }
+    }
+  ],
+  "dataset": [
+    {
+      "expected": "Paris",
+      "output": "Paris"
+    },
+    {
+      "expected": "Paris",
+      "output": "London"
+    }
+  ],
+  "params": {
+    "parallelism": 2
+  }
+}

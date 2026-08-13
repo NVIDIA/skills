@@ -3121,7 +3121,7 @@
         "codex"
       ],
       "catalog_dir": "nemo-data-designer-plugin",
-      "component": "NeMo Platform",
+      "component": null,
       "has_results": false,
       "average_uplift_pct": null
     },
@@ -3139,7 +3139,7 @@
         "codex"
       ],
       "catalog_dir": "nemo-evaluator-plugin",
-      "component": "NeMo Platform",
+      "component": null,
       "has_results": true,
       "average_uplift_pct": 44.4
     },
@@ -21114,7 +21114,7 @@
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
-      "component": "NeMo Platform",
+      "component": null,
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -21123,7 +21123,7 @@
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
-      "component": "NeMo Platform",
+      "component": null,
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -21132,7 +21132,7 @@
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
-      "component": "NeMo Platform",
+      "component": null,
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -21141,7 +21141,7 @@
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
-      "component": "NeMo Platform",
+      "component": null,
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -21150,7 +21150,7 @@
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
-      "component": "NeMo Platform",
+      "component": null,
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -21159,7 +21159,7 @@
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
-      "component": "NeMo Platform",
+      "component": null,
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -21168,7 +21168,7 @@
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
-      "component": "NeMo Platform",
+      "component": null,
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -21177,7 +21177,7 @@
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
-      "component": "NeMo Platform",
+      "component": null,
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -21186,7 +21186,7 @@
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
-      "component": "NeMo Platform",
+      "component": null,
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -21195,7 +21195,7 @@
     },
     {
       "catalog_dir": "nemo-evaluator-plugin",
-      "component": "NeMo Platform",
+      "component": null,
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
