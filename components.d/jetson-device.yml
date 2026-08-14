@@ -22,6 +22,16 @@ skills:
     catalog_dir: jetson-print-device-info
   - path: skills/jetson-speculative-decoding/
     catalog_dir: jetson-speculative-decoding
+  - path: skills/jetson-video-benchmark/
+    catalog_dir: jetson-video-benchmark
+  - path: skills/jetson-video-capability/
+    catalog_dir: jetson-video-capability
+  - path: skills/jetson-video-pipeline/
+    catalog_dir: jetson-video-pipeline
+  - path: skills/jetson-video-recipe/
+    catalog_dir: jetson-video-recipe
+  - path: skills/jetson-video-setup/
+    catalog_dir: jetson-video-setup
 links:
   contributing: false
   discussions: false
