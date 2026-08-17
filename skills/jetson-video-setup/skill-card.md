@@ -1,5 +1,5 @@
 ## Description: <br>
-Validate and use selective and full activation recompute in Megatron Bridge to reduce GPU memory usage at the cost of extra compute. <br>
+Use when installing, repairing, probing, or verifying native NVIDIA Video Codec SDK or PyNvVideoCodec on Jetson with official encode-to-decode samples, including registered-environment recovery. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,16 +7,16 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers diagnosing activation-memory OOMs and configuring selective or full activation recompute boundaries in Megatron Bridge training recipes. <br>
+Developers and engineers installing, verifying, or repairing NVIDIA Video Codec SDK and PyNvVideoCodec surfaces on Jetson devices. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [No] <br>
-**Credential Type(s):** [None] <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,14 +25,15 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Activation Recomputation (Megatron Bridge docs)](docs/training/activation-recomputation.md) <br>
-- [Megatron Core API Guide](https://docs.nvidia.com/megatron-core/developer-guide/latest/api-guide/index.html) <br>
-- [Performance Tuning Guide](docs/performance-guide.md) <br>
+- [setup-workflow.md](references/setup-workflow.md) <br>
+- [setup-install.md](references/setup-install.md) <br>
+- [setup-output-contract.md](references/setup-output-contract.md) <br>
+- [video-content.md](references/video-content.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Configuration instructions, Analysis] <br>
-**Output Format:** [Markdown with inline Python code blocks] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
+**Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -43,15 +44,15 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 3 positive evaluation tasks covering architecture-aware memory diagnosis, matched Moonlight 16B evidence interpretation, and matched Nemotron 3 Nano capacity evidence interpretation. <br>
+Evaluated against 4 evaluation tasks (4 positive) in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use (no unsafe operations, secret leakage, or unauthorized access). <br>
-- Correctness: Whether the skill produces correct answers against reference ground truth. <br>
-- Discoverability: Whether the right skill is loaded and activated when needed. <br>
-- Effectiveness: Whether the skill helps the agent complete the user's goal and expected workflow. <br>
-- Efficiency: Whether the skill avoids wasted tool or skill usage. <br>
+- Security: Whether the skill is safe to use, checking for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the skill produces correct answers against the reference. <br>
+- Discoverability: Whether the right skill was found and executed when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
+- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
@@ -64,22 +65,17 @@ Underlying evaluation signals used in this run: <br>
 
 
 ## Evaluation Results: <br>
-| Measure | Claude Code (Baseline → Skill) | Codex (Baseline → Skill) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 65% → 98% (+34 pts) | 58% → 98% (+39 pts) |
-| Security | 100% → 100% (±0) | 100% → 100% (±0) |
-| Correctness | 13% → 100% (+87 pts) | 73% → 100% (+27 pts) |
-| Discoverability | 100% → 100% (±0) | 42% → 94% (+52 pts) |
-| Effectiveness | 13% → 91% (+78 pts) | 45% → 95% (+50 pts) |
-| Efficiency | 97% → 100% (+3 pts) | 32% → 100% (+68 pts) |
-
-## Testing Completed: <br>
-**[x] Agent Red-Teaming** <br>
-**[ ] Network Security** <br>
-**[ ] Product Security** <br>
+| Overall | 36% → 81% (+45 points) | 24% → 83% (+58 points) |
+| Security | 50% → 100% (+50 points) | 0% → 100% (+100 points) |
+| Correctness | 35% → 75% (+40 points) | 50% → 95% (+45 points) |
+| Discoverability | 38% → 98% (+61 points) | 33% → 84% (+52 points) |
+| Effectiveness | 24% → 46% (+22 points) | 13% → 46% (+32 points) |
+| Efficiency | 32% → 85% (+53 points) | 26% → 90% (+63 points) |
 
 ## Skill Version(s): <br>
-1.0.0+b7643bd (source: pyproject.toml) <br>
+e61c045 (source: git SHA, committed 2026-08-10) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

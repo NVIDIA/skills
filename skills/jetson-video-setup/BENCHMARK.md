@@ -1,4 +1,4 @@
-# Skill Benchmark: nemo-mbridge-perf-activation-recompute
+# Skill Benchmark: jetson-video-setup
 
 > ✅ **Overall verdict: PASS — Recommended for publication**
 
@@ -8,17 +8,17 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 ## Evaluation Metadata
 
-- Skill: `nemo-mbridge-perf-activation-recompute`
-- Evaluation date: 2026-08-16
-- Evaluator version: `1.2.7`
+- Skill: `jetson-video-setup`
+- Evaluation date: 2026-08-10
+- Evaluator version: `1.1.2`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
-- Tasks: 3 evaluation tasks (3 positive)
-- Dataset digest: `sha256:b55bb3c51b83cb2245c0d7a8969bbac7066177e342bd9b9c316ac7cf26212ef6` (skill-evaluator-dataset-snapshot/1)
+- Tasks: 4 evaluation tasks (4 positive)
+- Dataset digest: `sha256:da01efb8a143276d497b34e33588f31b5cb1d0f128bfa23256ee67a894ccd664` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
-- Environment: `local`
+- Environment: `k8s-sandbox`
 - Tier 3 evidence: required for publication
 
-Tasks ran on the trusted local host; local mode is not sandboxed.
+Each task attempt ran in its own isolated sandbox pod.
 
 ## What This Report Answers
 
@@ -34,12 +34,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 65% → 98% (+34 points) | 58% → 98% (+39 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 13% → 100% (+87 points) | 73% → 100% (+27 points) |
-| Discoverability | 100% → 100% (±0 points) | 42% → 94% (+52 points) |
-| Effectiveness | 13% → 91% (+78 points) | 45% → 95% (+50 points) |
-| Efficiency | 97% → 100% (+3 points) | 32% → 100% (+68 points) |
+| Overall | 36% → 81% (+45 points) | 24% → 83% (+58 points) |
+| Security | 50% → 100% (+50 points) | 0% → 100% (+100 points) |
+| Correctness | 35% → 75% (+40 points) | 50% → 95% (+45 points) |
+| Discoverability | 38% → 98% (+61 points) | 33% → 84% (+52 points) |
+| Effectiveness | 24% → 46% (+22 points) | 13% → 46% (+32 points) |
+| Efficiency | 32% → 85% (+53 points) | 26% → 90% (+63 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.
 
@@ -49,19 +49,17 @@ Example: `47% → 92% (+45 points)` means the skill-assisted run scored 92%, 45 
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 4 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 2 finding(s) |
 | Tier 2 | Semantic deduplication | **NOT RUN** | No result was recorded |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 3 task(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
 
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/nemo-mbridge-perf-activation-recompute/SKILL.md`)
-- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nemo-mbridge-perf-activation-recompute/SKILL.md`)
-- **MEDIUM** SCHEMA/author_missing: Author not specified in metadata (`skills/nemo-mbridge-perf-activation-recompute/SKILL.md`)
-- **LOW** SCHEMA/unexpected_file: Unexpected 'card.yaml' in skill root (`skills/nemo-mbridge-perf-activation-recompute/card.yaml`)
+- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/jetson-video-setup/SKILL.md`)
+- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/jetson-video-setup/SKILL.md`)
 
 </details>
 

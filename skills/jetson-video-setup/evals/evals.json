@@ -1,0 +1,53 @@
+{
+  "skill_name": "jetson-video-setup",
+  "evals": [
+    {
+      "id": "setup-native-only-smoke",
+      "prompt": "Install only the native Video Codec SDK and run an H.264 encode and decode smoke test.",
+      "expected_output": "Native-only setup verified with the official native encoder and decoder.",
+      "assertions": [
+        "Selects only the native SDK and does not install PyNvVideoCodec",
+        "Probes and validates the target before changes, then uses AppEncCuda followed by AppDec",
+        "Reports ready only after the decoder produces a frame from the generated bitstream"
+      ],
+      "expected_skill": "jetson-video-setup",
+      "expected_workflow": "setup"
+    },
+    {
+      "id": "setup-pynvc-only-smoke",
+      "prompt": "Install only PyNvVideoCodec in a new isolated Python environment and run an H.264 encode and decode smoke test.",
+      "expected_output": "Python-only setup verified with wheel-owned encoder and decoder samples.",
+      "assertions": [
+        "Selects only PyNvVideoCodec and does not install the native SDK developer package",
+        "Creates a new isolated Python environment, reports its exact interpreter, and uses that interpreter",
+        "Reports ready only after the wheel-owned encoder output is independently decoded"
+      ],
+      "expected_skill": "jetson-video-setup",
+      "expected_workflow": "setup"
+    },
+    {
+      "id": "setup-reuse-pynvc-smoke",
+      "prompt": "PyNvVideoCodec is already installed. Reuse it and run an H.264 encode and decode smoke test.",
+      "expected_output": "The existing validated Python environment is reused without reinstallation and passes the smoke test.",
+      "assertions": [
+        "Uses the registered environment or asks for the exact interpreter path instead of scanning for environments",
+        "Does not reinstall packages or create another environment when the existing one is valid",
+        "Uses the wheel-owned encoder followed by an independent decoder before reporting ready"
+      ],
+      "expected_skill": "jetson-video-setup",
+      "expected_workflow": "setup"
+    },
+    {
+      "id": "setup-ambiguous-surface-clarification",
+      "prompt": "Is my environment ready to run video SDK work right now? Probe the target and report readiness. (Report-only.)",
+      "expected_output": "A clarification asking whether to inspect native Video Codec SDK, PyNvVideoCodec, or both, with no target probe or action before the user chooses.",
+      "assertions": [
+        "Treats the bare phrase video SDK as ambiguous even though the request is report-only",
+        "Asks whether the user wants native Video Codec SDK, PyNvVideoCodec, or both",
+        "Stops before target inspection, probing, planning, installation, building, or codec operations"
+      ],
+      "expected_skill": "jetson-video-setup",
+      "expected_workflow": "setup"
+    }
+  ]
+}

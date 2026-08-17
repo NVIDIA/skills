@@ -1,0 +1,29 @@
+{
+  "skill_name": "jetson-video-pipeline",
+  "evals": [
+    {
+      "id": "pipeline-dual-surface-encode-decode",
+      "prompt": "Plan equivalent native Video Codec SDK and PyNvVideoCodec H.264 encode-to-decode pipelines with exact artifact handoffs. Do not run them.",
+      "expected_output": "An input-required response asking only for one exact media path or URL before either pipeline is planned.",
+      "assertions": [
+        "Returns input_required and asks only for one exact target-local path or user-supplied HTTP(S) URL",
+        "Stops before probing, authentication, dry-run planning, or operation launch",
+        "Does not choose catalog or synthetic media and makes no execution or pipeline-completion claim"
+      ],
+      "expected_skill": "jetson-video-pipeline",
+      "expected_workflow": "pipeline"
+    },
+    {
+      "id": "pipeline-native-transcode",
+      "prompt": "Plan a native H.264-to-HEVC transcode with an independent decode check. Do not run it.",
+      "expected_output": "An input-required response asking only for one exact H.264 media path or URL before planning the transcode.",
+      "assertions": [
+        "Returns input_required and asks only for one exact target-local H.264 path or user-supplied HTTP(S) URL",
+        "Stops before probing, authentication, dry-run planning, AppTrans, or AppDec",
+        "Does not choose catalog or synthetic media and makes no transcode or verification claim"
+      ],
+      "expected_skill": "jetson-video-pipeline",
+      "expected_workflow": "pipeline"
+    }
+  ]
+}

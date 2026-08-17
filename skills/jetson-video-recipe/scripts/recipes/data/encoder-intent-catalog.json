@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "kind": "nvcodec-encoder-intent-catalog",
+  "version": "1.0-surface-neutral",
+  "recipes": {
+    "conferencing": {
+      "encoder_intent_defaults": {"preset": "p3", "tuning_info": "ultra_low_latency", "rc": "cbr", "gop": 30, "bf": 0, "multipass": "disabled", "lookahead": 0, "bitrate": 3000000, "maxbitrate": 3000000, "vbvbufsize": 300000},
+      "projections": {
+        "native": {"sample_id": "native-appenc-cuda", "sample": "AppEncCuda", "release_family": "13.0"},
+        "pynvc": {"sample_id": "pynvc-basic-encode", "sample": "samples/basic/encode.py", "version": "2.1.0", "official_sample_baseline": "advanced/encode_config_lowlatency.json"}
+      },
+      "assumptions": ["latency is prioritized over compression efficiency", "the application can tolerate strict CBR behavior"],
+      "rationale": {"tuning_info": "starts from the NVENC ultra-low-latency tuning path", "bf": "removes B-frame reordering delay", "lookahead": "removes lookahead queueing", "vbvbufsize": "small starting buffer; measure under network jitter"}
+    },
+    "live_streaming": {
+      "encoder_intent_defaults": {"preset": "p4", "tuning_info": "low_latency", "rc": "cbr", "gop": 60, "bf": 1, "multipass": "fullres", "lookahead": 0, "bitrate": 6000000, "maxbitrate": 6000000, "vbvbufsize": 3000000},
+      "projections": {
+        "native": {"sample_id": "native-appenc-cuda", "sample": "AppEncCuda", "release_family": "13.0"},
+        "pynvc": {"sample_id": "pynvc-basic-encode", "sample": "samples/basic/encode.py", "version": "2.1.0", "official_sample_baseline": "advanced/encode_config_lowlatency.json"}
+      },
+      "assumptions": ["bounded bitrate and moderate latency matter", "one B frame is acceptable only after latency validation"],
+      "rationale": {"tuning_info": "low-latency starting point", "rc": "bounded-rate starting point", "multipass": "quality-oriented candidate that must be throughput-tested", "gop": "roughly two seconds at the default 30 fps"}
+    },
+    "vod": {
+      "encoder_intent_defaults": {"preset": "p6", "tuning_info": "high_quality", "rc": "vbr", "gop": 120, "bf": 3, "multipass": "fullres", "lookahead": 20, "aq": 8, "bitrate": 8000000, "maxbitrate": 12000000, "vbvbufsize": 12000000},
+      "projections": {
+        "native": {"sample_id": "native-appenc-cuda", "sample": "AppEncCuda", "release_family": "13.0"},
+        "pynvc": {"sample_id": "pynvc-basic-encode", "sample": "samples/basic/encode.py", "version": "2.1.0", "official_sample_baseline": "advanced/encode_config.json"}
+      },
+      "assumptions": ["offline throughput is secondary to compression efficiency", "input surfaces remain valid while lookahead consumes them"],
+      "rationale": {"preset": "quality-leaning candidate", "rc": "allows content-dependent bitrate", "lookahead": "candidate for better frame decisions at added latency and memory", "aq": "moderate spatial AQ starting point"}
+    },
+    "archival": {
+      "encoder_intent_defaults": {"preset": "p7", "tuning_info": "high_quality", "rc": "vbr", "gop": 250, "bf": 3, "multipass": "fullres", "lookahead": 28, "aq": 8, "bitrate": 20000000, "maxbitrate": 30000000, "vbvbufsize": 30000000},
+      "projections": {
+        "native": {"sample_id": "native-appenc-cuda", "sample": "AppEncCuda", "release_family": "13.0"},
+        "pynvc": {"sample_id": "pynvc-basic-encode", "sample": "samples/basic/encode.py", "version": "2.1.0", "official_sample_baseline": "advanced/encode_config.json"}
+      },
+      "assumptions": ["quality and size dominate real-time throughput", "the archive workflow accepts long GOPs"],
+      "rationale": {"preset": "slowest quality-leaning starting point", "gop": "long-GOP candidate; random access requirements may require reduction", "multipass": "quality candidate to validate against throughput budget"}
+    },
+    "lossless": {
+      "encoder_intent_defaults": {"preset": "p3", "tuning_info": "lossless", "rc": "constqp", "constqp": "0,0,0", "gop": 30, "bf": 0, "multipass": "disabled", "lookahead": 0},
+      "projections": {
+        "native": {"sample_id": "native-appenc-cuda", "sample": "AppEncCuda", "release_family": "13.0"},
+        "pynvc": {"sample_id": "pynvc-basic-encode", "sample": "samples/basic/encode.py", "version": "2.1.0", "official_sample_baseline": "basic/encode_config.json"}
+      },
+      "assumptions": ["the selected codec/profile/surface supports the requested lossless path", "large output size is acceptable"],
+      "rationale": {"rc": "constant zero QP candidate", "tuning_info": "lossless tuning path", "bf": "simple reorder-free baseline"}
+    }
+  }
+}
