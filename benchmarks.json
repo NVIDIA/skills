@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 336,
-  "result_row_count": 3130,
+  "skill_count": 341,
+  "result_row_count": 3180,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -2942,6 +2942,96 @@
       "average_uplift_pct": 11.0
     },
     {
+      "skill": "jetson-video-benchmark",
+      "evaluation_date": "2026-08-10",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 7,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "jetson-video-benchmark",
+      "component": "Jetson Device",
+      "has_results": true,
+      "average_uplift_pct": 46.4
+    },
+    {
+      "skill": "jetson-video-capability",
+      "evaluation_date": "2026-08-10",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "jetson-video-capability",
+      "component": "Jetson Device",
+      "has_results": true,
+      "average_uplift_pct": 24.5
+    },
+    {
+      "skill": "jetson-video-pipeline",
+      "evaluation_date": "2026-08-10",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "jetson-video-pipeline",
+      "component": "Jetson Device",
+      "has_results": true,
+      "average_uplift_pct": 43.0
+    },
+    {
+      "skill": "jetson-video-recipe",
+      "evaluation_date": "2026-08-10",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "jetson-video-recipe",
+      "component": "Jetson Device",
+      "has_results": true,
+      "average_uplift_pct": 36.3
+    },
+    {
+      "skill": "jetson-video-setup",
+      "evaluation_date": "2026-08-10",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "jetson-video-setup",
+      "component": "Jetson Device",
+      "has_results": true,
+      "average_uplift_pct": 51.8
+    },
+    {
       "skill": "launch-nemo-rl",
       "evaluation_date": "2026-05-28",
       "profile": "external",
@@ -3144,12 +3234,12 @@
     },
     {
       "skill": "nemo-mbridge-perf-activation-recompute",
-      "evaluation_date": "2026-06-15",
-      "profile": "external",
-      "environment": "astra-sandbox",
-      "tasks": 1,
+      "evaluation_date": "2026-08-16",
+      "profile": null,
+      "environment": "local",
+      "tasks": 3,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -3158,7 +3248,7 @@
       "catalog_dir": "nemo-mbridge-perf-activation-recompute",
       "component": "NeMo MBridge",
       "has_results": true,
-      "average_uplift_pct": 44.1
+      "average_uplift_pct": 36.5
     },
     {
       "skill": "nemo-mbridge-perf-cpu-offloading",
@@ -20626,6 +20716,456 @@
       "uplift_pct": -1.0
     },
     {
+      "catalog_dir": "jetson-video-benchmark",
+      "component": "Jetson Device",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "jetson-video-benchmark",
+      "component": "Jetson Device",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 14.0
+    },
+    {
+      "catalog_dir": "jetson-video-benchmark",
+      "component": "Jetson Device",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "jetson-video-benchmark",
+      "component": "Jetson Device",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": 14.0
+    },
+    {
+      "catalog_dir": "jetson-video-benchmark",
+      "component": "Jetson Device",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 72.0
+    },
+    {
+      "catalog_dir": "jetson-video-benchmark",
+      "component": "Jetson Device",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "jetson-video-benchmark",
+      "component": "Jetson Device",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "jetson-video-benchmark",
+      "component": "Jetson Device",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 58.0
+    },
+    {
+      "catalog_dir": "jetson-video-benchmark",
+      "component": "Jetson Device",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 81.0
+    },
+    {
+      "catalog_dir": "jetson-video-benchmark",
+      "component": "Jetson Device",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 82.0
+    },
+    {
+      "catalog_dir": "jetson-video-capability",
+      "component": "Jetson Device",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "jetson-video-capability",
+      "component": "Jetson Device",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": -25.0
+    },
+    {
+      "catalog_dir": "jetson-video-capability",
+      "component": "Jetson Device",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "jetson-video-capability",
+      "component": "Jetson Device",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "jetson-video-capability",
+      "component": "Jetson Device",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": 62.0
+    },
+    {
+      "catalog_dir": "jetson-video-capability",
+      "component": "Jetson Device",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "jetson-video-capability",
+      "component": "Jetson Device",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 74.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "jetson-video-capability",
+      "component": "Jetson Device",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 58.0,
+      "uplift_pct": -17.0
+    },
+    {
+      "catalog_dir": "jetson-video-capability",
+      "component": "Jetson Device",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "jetson-video-capability",
+      "component": "Jetson Device",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 80.0
+    },
+    {
+      "catalog_dir": "jetson-video-pipeline",
+      "component": "Jetson Device",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "jetson-video-pipeline",
+      "component": "Jetson Device",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "jetson-video-pipeline",
+      "component": "Jetson Device",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "jetson-video-pipeline",
+      "component": "Jetson Device",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 30.0,
+      "uplift_pct": -10.0
+    },
+    {
+      "catalog_dir": "jetson-video-pipeline",
+      "component": "Jetson Device",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "jetson-video-pipeline",
+      "component": "Jetson Device",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 72.0
+    },
+    {
+      "catalog_dir": "jetson-video-pipeline",
+      "component": "Jetson Device",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 70.0
+    },
+    {
+      "catalog_dir": "jetson-video-pipeline",
+      "component": "Jetson Device",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 30.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "jetson-video-pipeline",
+      "component": "Jetson Device",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "jetson-video-pipeline",
+      "component": "Jetson Device",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 89.0
+    },
+    {
+      "catalog_dir": "jetson-video-recipe",
+      "component": "Jetson Device",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "jetson-video-recipe",
+      "component": "Jetson Device",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "jetson-video-recipe",
+      "component": "Jetson Device",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "jetson-video-recipe",
+      "component": "Jetson Device",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 13.0
+    },
+    {
+      "catalog_dir": "jetson-video-recipe",
+      "component": "Jetson Device",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "jetson-video-recipe",
+      "component": "Jetson Device",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 79.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "jetson-video-recipe",
+      "component": "Jetson Device",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 21.0
+    },
+    {
+      "catalog_dir": "jetson-video-recipe",
+      "component": "Jetson Device",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "jetson-video-recipe",
+      "component": "Jetson Device",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "jetson-video-recipe",
+      "component": "Jetson Device",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 94.0
+    },
+    {
+      "catalog_dir": "jetson-video-setup",
+      "component": "Jetson Device",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "jetson-video-setup",
+      "component": "Jetson Device",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "jetson-video-setup",
+      "component": "Jetson Device",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "jetson-video-setup",
+      "component": "Jetson Device",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "jetson-video-setup",
+      "component": "Jetson Device",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": 61.0
+    },
+    {
+      "catalog_dir": "jetson-video-setup",
+      "component": "Jetson Device",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.0,
+      "uplift_pct": 52.0
+    },
+    {
+      "catalog_dir": "jetson-video-setup",
+      "component": "Jetson Device",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 46.0,
+      "uplift_pct": 22.0
+    },
+    {
+      "catalog_dir": "jetson-video-setup",
+      "component": "Jetson Device",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 46.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "jetson-video-setup",
+      "component": "Jetson Device",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.0,
+      "uplift_pct": 53.0
+    },
+    {
+      "catalog_dir": "jetson-video-setup",
+      "component": "Jetson Device",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 63.0
+    },
+    {
       "catalog_dir": "launch-nemo-rl",
       "component": "NeMo-RL",
       "dimension": "Security",
@@ -21259,7 +21799,7 @@
       "catalog_dir": "nemo-mbridge-perf-activation-recompute",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -21268,7 +21808,7 @@
       "catalog_dir": "nemo-mbridge-perf-activation-recompute",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 1,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -21277,73 +21817,73 @@
       "catalog_dir": "nemo-mbridge-perf-activation-recompute",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 100.0
+      "uplift_pct": 87.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-activation-recompute",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 87.0,
-      "uplift_pct": 40.0
+      "score_pct": 100.0,
+      "uplift_pct": 27.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-activation-recompute",
       "component": "NeMo MBridge",
       "dimension": "Discoverability",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-activation-recompute",
-      "component": "NeMo MBridge",
-      "dimension": "Discoverability",
-      "num": 1,
-      "agent": "codex",
-      "score_pct": 97.0,
       "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-activation-recompute",
       "component": "NeMo MBridge",
-      "dimension": "Effectiveness",
-      "num": 1,
-      "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 80.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-activation-recompute",
-      "component": "NeMo MBridge",
-      "dimension": "Effectiveness",
-      "num": 1,
+      "dimension": "Discoverability",
+      "num": null,
       "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 54.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-activation-recompute",
-      "component": "NeMo MBridge",
-      "dimension": "Efficiency",
-      "num": 1,
-      "agent": "claude-code",
       "score_pct": 94.0,
-      "uplift_pct": 67.0
+      "uplift_pct": 52.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-activation-recompute",
+      "component": "NeMo MBridge",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 78.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-activation-recompute",
+      "component": "NeMo MBridge",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-activation-recompute",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 1,
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 3.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-activation-recompute",
+      "component": "NeMo MBridge",
+      "dimension": "Efficiency",
+      "num": null,
       "agent": "codex",
-      "score_pct": 96.0,
-      "uplift_pct": -0.0
+      "score_pct": 100.0,
+      "uplift_pct": 68.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-cpu-offloading",

@@ -2089,6 +2089,66 @@
       }
     },
     {
+      "path": "skills/jetson-video-benchmark",
+      "name": "jetson-video-benchmark",
+      "description": "Use when measuring Jetson Video Codec SDK or PyNvVideoCodec encode/decode throughput, comparing presets or surfaces, testing codec-worker capacity with authenticated samples and user media, or producing a documented clock-scaled or clock-and-resolution-scaled planning estimate when representative content is unavailable. Also use for Jetson video requests asking only for PSNR or SSIM results, to apply this performance skill's scope-only response.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "graphics_and_media",
+        "catalog.subdomain": "gpu-development",
+        "audience": "application_developer,platform_engineer,solutions_architect,developer",
+        "discovery.activity_tags": "benchmark,measure,compare,test,profile"
+      }
+    },
+    {
+      "path": "skills/jetson-video-capability",
+      "name": "jetson-video-capability",
+      "description": "Use when Jetson codec, profile, chroma, bit-depth, dimension, engine-count, or operational support must be reconciled using live SDK APIs, authenticated NVIDIA samples, and NVIDIA documentation. Also use for Jetson questions about Netflix, Widevine, or other DRM-protected streaming-service playback to apply the codec-scope boundary.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,application_developer,platform_engineer,solutions_architect,hands_on_builder",
+        "discovery.activity_tags": "validate,inspect,compare,select,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/jetson-video-pipeline",
+      "name": "jetson-video-pipeline",
+      "description": "Use when executing and verifying Jetson Video Codec SDK or PyNvVideoCodec encode/decode, transcode, segmentation, container decode, AV1, or acceptance workflows with exact artifact handoffs.",
+      "metadata": {
+        "product.primary": "Video Codec",
+        "classification.category.primary": "graphics_and_media",
+        "catalog.subdomain": "gpu-development",
+        "audience": "application_developer,developer,platform_engineer",
+        "discovery.activity_tags": "validate,test,convert,debug,package"
+      }
+    },
+    {
+      "path": "skills/jetson-video-recipe",
+      "name": "jetson-video-recipe",
+      "description": "Use when turning a Jetson encoder use case into one validated surface-neutral recipe with native and PyNvVideoCodec projections for codec, preset, rate control, bitrate, latency, format, and profile.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "graphics_and_media",
+        "catalog.subdomain": "gpu-development",
+        "audience": "application_developer,developer,solutions_architect,platform_engineer",
+        "discovery.activity_tags": "convert,configure,validate,generate,optimize"
+      }
+    },
+    {
+      "path": "skills/jetson-video-setup",
+      "name": "jetson-video-setup",
+      "description": "Use when installing, repairing, probing, or verifying native NVIDIA Video Codec SDK or PyNvVideoCodec on Jetson with official encode-to-decode samples, including registered-environment recovery.",
+      "metadata": {
+        "product.primary": "Video Codec",
+        "classification.category.primary": "graphics_and_media",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,application_developer,platform_engineer,hands_on_builder",
+        "discovery.activity_tags": "configure,troubleshoot,validate,recover,inspect"
+      }
+    },
+    {
       "path": "skills/launch-nemo-rl",
       "name": "launch-nemo-rl",
       "description": "Playbook for launching, monitoring, stopping, and debugging NeMo-RL recipes on a Kubernetes cluster via the nrl-k8s CLI. Covers ephemeral vs long-lived RayCluster modes, iterating on runs, and debugging hung or failed training jobs.",
@@ -2235,7 +2295,7 @@
     {
       "path": "skills/nemo-mbridge-perf-activation-recompute",
       "name": "nemo-mbridge-perf-activation-recompute",
-      "description": "Validate and use selective and full activation recompute in Megatron Bridge to reduce GPU memory usage at the cost of extra compute.",
+      "description": "Validate and use selective and full activation recompute in Megatron Bridge to reduce GPU memory usage at the cost of extra compute. Use for activation memory OOMs or regressions involving recompute_granularity, recompute_num_layers, recompute_modules, recompute_method, selective recompute, full recompute, or activation checkpointing.",
       "metadata": {
         "product.primary": "NeMo Megatron Bridge",
         "classification.category.primary": "ai_and_machine_learning",

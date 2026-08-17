@@ -62,6 +62,7 @@
         "jetson-print-device-info",
         "jetson-quick-start",
         "jetson-set-target",
+        "jetson-video-capability",
         "omniverse-cad-to-simready",
         "omniverse-realtime-viewer",
         "omniverse-usd-performance-tuning",
@@ -326,6 +327,10 @@
       "skills": [
         "holohub-module-lifecycle",
         "hsb-ip-create-top",
+        "jetson-video-benchmark",
+        "jetson-video-pipeline",
+        "jetson-video-recipe",
+        "jetson-video-setup",
         "tao-run-on-docker",
         "tilegym-adding-cutile-kernel",
         "tilegym-converting-cutile-to-julia",
