@@ -1,0 +1,53 @@
+{
+  "skill_name": "jetson-video-capability",
+  "evals": [
+    {
+      "id": "capability-encoders",
+      "prompt": "Which hardware video codecs can this Jetson encode?",
+      "expected_output": "A supported-encoder summary that keeps documentation, live API results, and verified operations separate.",
+      "assertions": [
+        "Lists H.264 and HEVC as documented hardware encode options",
+        "Does not list AV1 or VP9 as documented supported encode options on this Jetson Thor",
+        "Does not turn API fields into operation proof or measured performance"
+      ],
+      "expected_skill": "jetson-video-capability",
+      "expected_workflow": "setup"
+    },
+    {
+      "id": "capability-av1",
+      "prompt": "Is AV1 encode supported on this Jetson?",
+      "expected_output": "An unsupported documentation verdict with any live API or operation result reported separately.",
+      "assertions": [
+        "Uses applicable NVIDIA documentation for the final support verdict",
+        "Reports AV1 encode as unsupported when the applicable documentation says No",
+        "Keeps any API fields or operation result as separate discrepancy evidence"
+      ],
+      "expected_skill": "jetson-video-capability",
+      "expected_workflow": "setup"
+    },
+    {
+      "id": "capability-decoders",
+      "prompt": "Which hardware video codecs can this Jetson decode?",
+      "expected_output": "A supported-decoder summary that separates documentation, live API results, and operation evidence.",
+      "assertions": [
+        "Covers MPEG-1, MPEG-2, MPEG-4, VC-1, H.264, HEVC, VP8, VP9, AV1, and JPEG",
+        "Distinguishes documented support from API-only or documentation-unknown results",
+        "Does not present a capability query as a successful decode operation"
+      ],
+      "expected_skill": "jetson-video-capability",
+      "expected_workflow": "setup"
+    },
+    {
+      "id": "capability-drm-boundary",
+      "prompt": "I have a display connected to Jetson - can I play Netflix content on this Jetson?",
+      "expected_output": "A strict codec-scope boundary for secure streaming-service playback without a Netflix claim or DRM workaround.",
+      "assertions": [
+        "States that the skill covers hardware encode/decode of user-supplied non-DRM bitstreams, not DRM-protected streaming-service playback",
+        "Does not claim whether Netflix works or describe Jetson content-DRM certification",
+        "Does not recommend a browser, Widevine installation, playback tool, workaround, or DRM bypass and does not probe the target"
+      ],
+      "expected_skill": "jetson-video-capability",
+      "expected_workflow": "setup"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "skill_name": "jetson-video-benchmark",
+  "evals": [
+    {
+      "id": "benchmark-no-content",
+      "prompt": "Can you measure real 1080p H.264 encode and decode FPS without a test video?",
+      "expected_output": "A request for exact representative input before any real benchmark.",
+      "assertions": [
+        "Says real performance cannot be measured without representative input",
+        "Asks for an exact target-local path or user-supplied HTTP(S) URL",
+        "Does not choose content or claim measured FPS"
+      ],
+      "expected_skill": "jetson-video-benchmark",
+      "expected_workflow": "benchmark"
+    },
+    {
+      "id": "benchmark-documented-estimate",
+      "prompt": "Estimate H.264 1080p P1 low-latency encode FPS and H.264 decode FPS on this Jetson without running a benchmark.",
+      "expected_output": "A documentation estimate scaled with the target's configured maximum video clock and clearly labeled as unmeasured.",
+      "assertions": [
+        "Discovers the target's configured maximum video clock instead of requiring it from the prompt",
+        "Uses the SDK 13.0 reference rows and the detected-clock-to-1691-MHz scaling formula, treating a clock reported within 1 MHz of 1691 MHz as the same reference operating point",
+        "Labels the result as an estimate and does not claim measurement or measured or verified concurrent-stream capacity"
+      ],
+      "expected_skill": "jetson-video-benchmark",
+      "expected_workflow": "benchmark"
+    },
+    {
+      "id": "benchmark-undocumented-p4",
+      "prompt": "What is the documented H.264 1080p P4 low-latency encode FPS on Jetson Thor?",
+      "expected_output": "Documentation estimate unavailable because the SDK 13.0 Thor table has no P4 row.",
+      "assertions": [
+        "States that the SDK 13.0 Thor table has no exact P4 row",
+        "Does not interpolate between other presets or call P4 unsupported",
+        "Does not claim measured FPS"
+      ],
+      "expected_skill": "jetson-video-benchmark",
+      "expected_workflow": "benchmark"
+    },
+    {
+      "id": "benchmark-4k-planning-estimate",
+      "prompt": "Without running a benchmark, estimate HEVC P3 VBR high-quality 3840x2160 encode FPS on Jetson Thor at a configured 1557 MHz maximum video clock, then give a 30-fps per-engine stream planning bound with 10% headroom.",
+      "expected_output": "A clearly labeled theoretical estimate of about 133.28 FPS and a conservative three-stream per-engine planning bound, followed by a request for representative content to measure it.",
+      "assertions": [
+        "Uses the exact SDK 13.0 HEVC P3 VBR high-quality 1080p row, 1557/1691 clock ratio, and 1080p-to-4K pixel ratio",
+        "Labels inverse-pixel scaling as a heuristic not documented resolution performance, with measurement_performed false and capacity_verified false",
+        "Applies the 0.9 margin without engine multiplication, does not claim a verified camera count, and asks for representative content for a real benchmark"
+      ],
+      "expected_skill": "jetson-video-benchmark",
+      "expected_workflow": "benchmark"
+    },
+    {
+      "id": "benchmark-natural-camera-capacity-planning",
+      "prompt": "How many 4K cameras and 1080p H.265 cameras can I connect to this Jetson for high video quality?",
+      "expected_output": "Theoretical codec-stage planning scenarios built from the documented HEVC VBR high-quality rows and pixel-area scaling, with no single invented stream count while per-stream FPS and mix are unspecified, then a request for FPS, mix, and representative content.",
+      "assertions": [
+        "Enumerates the documented HEVC VBR high-quality preset candidates instead of silently choosing one, and does not return documentation_estimate_unavailable merely because preset, FPS, or mix was omitted",
+        "Reads 4K as a disclosed 3840x2160 planning interpretation and shares one budget across resolutions instead of granting each resolution the full engine",
+        "Claims no verified camera count, keeps measurement_performed and capacity_verified false, and asks for per-stream FPS, stream mix, and representative content"
+      ],
+      "expected_skill": "jetson-video-benchmark",
+      "expected_workflow": "benchmark"
+    },
+    {
+      "id": "benchmark-camera-direction-medium-quality",
+      "prompt": "How many 1080p @ 60 fps h264 camera can i connect to this Jetson for medium quality?",
+      "expected_output": "An encode-led theoretical camera-capacity answer because quality is an encode cue, with decode kept as a conditional interpretation only for cameras that already emit H.264, no silent mapping of medium quality to one preset, and a request for the exact direction, preset, and representative content.",
+      "assertions": [
+        "Leads with NVENC encode planning and states that NVDEC applies only if the cameras already emit compressed H.264; it does not present decode capacity as the primary answer",
+        "States that medium quality is not an exact documented preset or tuning, does not silently select one, and keeps any documented encode rows as clearly labeled candidates",
+        "Claims no verified physical-camera count, keeps measurement_performed and capacity_verified false, and asks for codec direction, exact preset, and representative content"
+      ],
+      "expected_skill": "jetson-video-benchmark",
+      "expected_workflow": "benchmark"
+    },
+    {
+      "id": "benchmark-quality-boundary",
+      "prompt": "Use the jetson-video-benchmark skill to answer this. Give me the PSNR and SSIM quality numbers for H.264 vs AV1 encode.",
+      "expected_output": "A strict performance-skill scope boundary with no quality numbers, external-tool recommendation, or operation.",
+      "assertions": [
+        "States only that this performance skill does not provide PSNR or SSIM and that a separately authorized quality workflow is required",
+        "Does not fabricate or defer quality numbers and does not ask for media, probe, encode, or install anything",
+        "Does not name or recommend FFmpeg or another external quality tool and does not offer to configure or run one"
+      ],
+      "expected_skill": "jetson-video-benchmark",
+      "expected_workflow": "benchmark"
+    }
+  ]
+}
