@@ -3918,12 +3918,12 @@
     },
     {
       "skill": "nemotron-speech",
-      "evaluation_date": "2026-05-28",
-      "profile": "external",
+      "evaluation_date": "2026-08-20",
+      "profile": null,
       "environment": "local",
-      "tasks": 12,
-      "attempts_per_task": 2,
-      "pass_threshold_pct": 50.0,
+      "tasks": 18,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -3932,7 +3932,7 @@
       "catalog_dir": "nemotron-speech",
       "component": "Nemotron Speech",
       "has_results": true,
-      "average_uplift_pct": 7.2
+      "average_uplift_pct": 22.3
     },
     {
       "skill": "nv-generate-ct-rflow",
@@ -25129,91 +25129,91 @@
       "catalog_dir": "nemotron-speech",
       "component": "Nemotron Speech",
       "dimension": "Security",
-      "num": 8,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 73.0,
-      "uplift_pct": -2.0
+      "score_pct": 89.0,
+      "uplift_pct": -6.0
     },
     {
       "catalog_dir": "nemotron-speech",
       "component": "Nemotron Speech",
       "dimension": "Security",
-      "num": 8,
+      "num": null,
       "agent": "codex",
-      "score_pct": 78.0,
-      "uplift_pct": -2.0
-    },
-    {
-      "catalog_dir": "nemotron-speech",
-      "component": "Nemotron Speech",
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 11.0
-    },
-    {
-      "catalog_dir": "nemotron-speech",
-      "component": "Nemotron Speech",
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 91.0,
-      "uplift_pct": 6.0
-    },
-    {
-      "catalog_dir": "nemotron-speech",
-      "component": "Nemotron Speech",
-      "dimension": "Discoverability",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 92.0,
-      "uplift_pct": 30.0
-    },
-    {
-      "catalog_dir": "nemotron-speech",
-      "component": "Nemotron Speech",
-      "dimension": "Discoverability",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 71.0,
-      "uplift_pct": -4.0
-    },
-    {
-      "catalog_dir": "nemotron-speech",
-      "component": "Nemotron Speech",
-      "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 84.0,
-      "uplift_pct": 3.0
-    },
-    {
-      "catalog_dir": "nemotron-speech",
-      "component": "Nemotron Speech",
-      "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 4.0
-    },
-    {
-      "catalog_dir": "nemotron-speech",
-      "component": "Nemotron Speech",
-      "dimension": "Efficiency",
-      "num": 8,
-      "agent": "claude-code",
       "score_pct": 81.0,
+      "uplift_pct": 8.0
+    },
+    {
+      "catalog_dir": "nemotron-speech",
+      "component": "Nemotron Speech",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 9.0
+    },
+    {
+      "catalog_dir": "nemotron-speech",
+      "component": "Nemotron Speech",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 9.0
+    },
+    {
+      "catalog_dir": "nemotron-speech",
+      "component": "Nemotron Speech",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "nemotron-speech",
+      "component": "Nemotron Speech",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.0,
       "uplift_pct": 32.0
     },
     {
       "catalog_dir": "nemotron-speech",
       "component": "Nemotron Speech",
-      "dimension": "Efficiency",
-      "num": 8,
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "nemotron-speech",
+      "component": "Nemotron Speech",
+      "dimension": "Effectiveness",
+      "num": null,
       "agent": "codex",
-      "score_pct": 54.0,
-      "uplift_pct": -6.0
+      "score_pct": 80.0,
+      "uplift_pct": 11.0
+    },
+    {
+      "catalog_dir": "nemotron-speech",
+      "component": "Nemotron Speech",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "nemotron-speech",
+      "component": "Nemotron Speech",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 79.0,
+      "uplift_pct": 48.0
     },
     {
       "catalog_dir": "nv-generate-ct-rflow",
