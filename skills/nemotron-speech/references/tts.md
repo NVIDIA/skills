@@ -20,7 +20,8 @@ This skill is **orientation, not catalog**. When a question depends on data that
 |---|---|
 | Current models, container IDs, `NIM_TAGS_SELECTOR` profiles, available voices, supported languages, VRAM minimums | https://docs.nvidia.com/nim/speech/latest/reference/support-matrix/tts.html |
 | Function IDs for cloud (build.nvidia.com) inference | `https://api.nvcf.nvidia.com/v2/nvcf/functions` (auth with `NVIDIA_API_KEY`; filter by `name` and `status=="ACTIVE"`). For human browsing only: `https://build.nvidia.com/<org>/<model>/api` (JS-rendered, not suitable for non-browser fetch tools). |
-| **Runtime feature support per model** — streaming synthesis, SSML, custom dictionaries, sample-rate control, emotional styles | https://docs.nvidia.com/nim/speech/latest/tts/customization/customization.html |
+| **Request-time feature support per model** — SSML, custom dictionaries, `custom_configuration` keys | https://docs.nvidia.com/nim/speech/latest/tts/customization.html |
+| **Voices and emotional styles** | https://docs.nvidia.com/nim/speech/latest/tts/voices.html |
 | **gRPC proto contract** — `SynthesizeSpeechRequest`, `SynthesizeSpeechResponse`, voice metadata fields | https://docs.nvidia.com/nim/speech/latest/reference/api-references/tts/protos.html |
 | **Realtime WebSocket API** — OpenAI-realtime-compatible TTS sessions | https://docs.nvidia.com/nim/speech/latest/reference/api-references/tts/realtime-tts.html |
 | GPU / VRAM / driver minimums, OS prerequisites | https://docs.nvidia.com/nim/speech/latest/get-started/prerequisites.html |
@@ -109,7 +110,8 @@ Fetch the current `CONTAINER_ID` and `NIM_TAGS_SELECTOR` for your chosen model f
 export CONTAINER_ID=<container-id-from-support-matrix>
 export NIM_TAGS_SELECTOR="<selector-from-support-matrix>"
 export LOCAL_NIM_CACHE=~/.cache/nim
-mkdir -p $LOCAL_NIM_CACHE && sudo chown 1000:1000 $LOCAL_NIM_CACHE
+mkdir -p $LOCAL_NIM_CACHE
+sudo chown 1000:1000 $LOCAL_NIM_CACHE
 
 docker run -it --rm --name=$CONTAINER_ID \
   --runtime=nvidia \

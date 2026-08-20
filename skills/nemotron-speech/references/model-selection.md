@@ -12,8 +12,9 @@
 | **Current TTS models, voice lists, supported languages, VRAM** | https://docs.nvidia.com/nim/speech/latest/reference/support-matrix/tts.html |
 | **Current NMT models, language pairs, VRAM** | https://docs.nvidia.com/nim/speech/latest/reference/support-matrix/nmt.html |
 | **ASR per-model feature support** (word boosting, ITN, force_eou, diarization, etc.) | https://docs.nvidia.com/nim/speech/latest/asr/customization/customization.html |
-| **TTS per-model feature support** (SSML, voice list, sample-rate, emotional styles) | https://docs.nvidia.com/nim/speech/latest/tts/customization/customization.html |
-| **NMT per-model feature support** (DNT tags, custom dictionaries, max-length variation, language pairs) | https://docs.nvidia.com/nim/speech/latest/nmt/customization/customization.html |
+| **TTS per-model feature support** (SSML, custom dictionaries, `custom_configuration` keys) | https://docs.nvidia.com/nim/speech/latest/tts/customization.html |
+| **TTS voices and emotional styles** | https://docs.nvidia.com/nim/speech/latest/tts/voices.html |
+| **NMT per-model feature support** (`<dnt>` tags, custom dictionaries, batch translation) | https://docs.nvidia.com/nim/speech/latest/nmt/custom-dictionaries.html |
 | **ASR performance benchmarks** (latency, throughput, RTFX per GPU) | https://docs.nvidia.com/nim/speech/latest/reference/performances/asr/performance.html |
 | **TTS performance benchmarks** | https://docs.nvidia.com/nim/speech/latest/reference/performances/tts/performance.html |
 | **NMT performance benchmarks** | https://docs.nvidia.com/nim/speech/latest/reference/performances/nmt/performance.html |

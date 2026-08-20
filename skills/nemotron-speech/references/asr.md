@@ -124,7 +124,8 @@ export NIM_TAGS_SELECTOR="<selector-from-support-matrix>"
 
 ```bash
 export LOCAL_NIM_CACHE=~/.cache/nim
-mkdir -p $LOCAL_NIM_CACHE && sudo chown 1000:1000 $LOCAL_NIM_CACHE
+mkdir -p $LOCAL_NIM_CACHE
+sudo chown 1000:1000 $LOCAL_NIM_CACHE
 
 docker run -it --rm --name=$CONTAINER_ID \
   --runtime=nvidia \
@@ -148,7 +149,8 @@ Omit `-v $LOCAL_NIM_CACHE:/opt/nim/.cache` to skip caching (re-downloads model o
 
 ```bash
 export NIM_EXPORT_PATH=~/nim_export
-mkdir -p $NIM_EXPORT_PATH && sudo chown 1000:1000 $NIM_EXPORT_PATH
+mkdir -p $NIM_EXPORT_PATH
+sudo chown 1000:1000 $NIM_EXPORT_PATH
 export NIM_TAGS_SELECTOR="name=<model-name>,mode=<str|offline>,model_type=rmir"
 
 ```

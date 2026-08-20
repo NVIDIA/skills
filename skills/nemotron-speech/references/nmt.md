@@ -16,7 +16,7 @@ This skill is **orientation, not catalog**. When a question depends on data that
 |---|---|
 | Current models, container IDs, supported language pairs, VRAM minimums | https://docs.nvidia.com/nim/speech/latest/reference/support-matrix/nmt.html |
 | Function IDs for cloud (build.nvidia.com) inference | `https://api.nvcf.nvidia.com/v2/nvcf/functions` (auth with `NVIDIA_API_KEY`; filter by `name` and `status=="ACTIVE"`). For human browsing only: `https://build.nvidia.com/<org>/<model>/api` (JS-rendered, not suitable for non-browser fetch tools). |
-| **Runtime feature support per model** — `<dnt>` tags, custom DNT dictionaries, max-length variation, batch translation, language code formats | https://docs.nvidia.com/nim/speech/latest/nmt/customization/customization.html |
+| **Runtime feature support per model** — `<dnt>` tags, custom DNT dictionaries, batch translation, language code formats | https://docs.nvidia.com/nim/speech/latest/nmt/custom-dictionaries.html |
 | **gRPC proto contract** — `TranslateTextRequest`, `TranslateTextResponse`, `dnt_phrases`, language code conventions | https://docs.nvidia.com/nim/speech/latest/reference/api-references/nmt/protos.html |
 | GPU / VRAM / driver minimums, OS prerequisites | https://docs.nvidia.com/nim/speech/latest/get-started/prerequisites.html |
 | Latency / throughput benchmarks per model and GPU | https://docs.nvidia.com/nim/speech/latest/reference/performances/nmt/performance.html |
@@ -51,7 +51,8 @@ Fetch the current `CONTAINER_ID` from the support matrix.
 ```bash
 export CONTAINER_ID=<container-id-from-support-matrix>
 export LOCAL_NIM_CACHE=~/.cache/nim
-mkdir -p $LOCAL_NIM_CACHE && sudo chown 1000:1000 $LOCAL_NIM_CACHE
+mkdir -p $LOCAL_NIM_CACHE
+sudo chown 1000:1000 $LOCAL_NIM_CACHE
 
 docker run -it --rm --name=$CONTAINER_ID \
   --runtime=nvidia \

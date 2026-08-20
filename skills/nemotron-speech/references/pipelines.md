@@ -15,7 +15,7 @@ Configure advanced ASR pipeline options when building a custom Riva NIM with `ri
 | **Full `riva-build` parameter list, defaults, decoder/VAD/diarizer options per model family** | https://docs.nvidia.com/nim/speech/latest/asr/customization/pipeline-configuration.html |
 | **Runtime customizations** that don't require a rebuild (`--custom-configuration` keys, runtime VAD / endpointing tuning) | https://docs.nvidia.com/nim/speech/latest/asr/customization/customization.html |
 | **gRPC proto contract** (RecognitionConfig, custom_configuration map, runtime_config map) | https://docs.nvidia.com/nim/speech/latest/reference/api-references/asr/protos.html |
-| **Current NGC artifacts** — `.riva` checkpoints, Silero VAD, Sortformer diarizer, P&C models, exact versions | https://catalog.ngc.nvidia.com/orgs/nim/teams/nvidia/models |
+| **Current NGC artifacts** — `.riva` checkpoints, Silero VAD, Sortformer diarizer, P&C models, exact versions | https://catalog.ngc.nvidia.com/models |
 | **Get all parameters from inside the container** | `riva-build --config-path=pkg://servicemaker.configs.asr --config-name=streaming -h` (or `=offline`) |
 | Which model families support which decoders / VAD / diarization | https://docs.nvidia.com/nim/speech/latest/asr/customization/customization.html |
 
@@ -152,7 +152,7 @@ riva-build --config-path=pkg://servicemaker.configs.asr --config-name=<streaming
   neural_vad.pad_offset=0.08
 ```
 
-The exact NGC path for the Silero VAD `.riva` artifact rotates between releases — fetch the current path from the NGC catalog (https://catalog.ngc.nvidia.com/orgs/nim/teams/nvidia/models).
+The exact NGC path for the Silero VAD `.riva` artifact rotates between releases — fetch the current path from the NGC catalog (https://catalog.ngc.nvidia.com/models).
 
 ### Silero VAD Parameters (runtime-tunable via `--custom-configuration`)
 
@@ -255,7 +255,7 @@ This output is authoritative — defaults shown here are starting points and may
 
 All deployable `.riva` artifacts live under `nim/nvidia` on NGC. Names of model artifacts, their versions, and which artifacts exist (LMs, VAD, diarizers, P&C models) **change per release** — always browse the catalog for the current set:
 
-https://catalog.ngc.nvidia.com/orgs/nim/teams/nvidia/models
+https://catalog.ngc.nvidia.com/models
 
 Use `deployable_vX.Y` versions; `trainable_vX.Y` versions are for NeMo fine-tuning, not deployment.
 

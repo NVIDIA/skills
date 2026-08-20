@@ -90,17 +90,21 @@ The output must show your driver version and GPU(s). If it does, the environment
 export NGC_API_KEY=${your-key-value}
 ```
 
-To persist across sessions:
+To persist across sessions, keep the key in a private file rather than in your shell startup file:
 
 ```bash
-# Bash
-echo "export NGC_API_KEY=${your-key-value}" >> ~/.bashrc
-
-# Zsh
-echo "export NGC_API_KEY=${your-key-value}" >> ~/.zshrc
+umask 077
+printf 'export NGC_API_KEY=%s\n' "${your-key-value}" > ~/.nvidia-ngc-env
+chmod 600 ~/.nvidia-ngc-env
 ```
 
-> **Security note:** Storing credentials in `~/.bashrc` or `~/.zshrc` saves them in plaintext. Any process with read access to those files can extract the key. For production, use a credential manager or a dedicated `.env` file with `chmod 600` permissions and `source` it instead.
+Then add this line to `~/.bashrc` or `~/.zshrc` with your editor:
+
+```bash
+[ -f ~/.nvidia-ngc-env ] && . ~/.nvidia-ngc-env
+```
+
+> **Security note:** Do not write the key itself into `~/.bashrc` or `~/.zshrc`. Those files are often world-readable, so any process running as you can extract the key. Holding it in a `chmod 600` file that your shell sources keeps the credential out of the RC file and off the default-readable path. For production, use a credential manager (for example HashiCorp Vault) instead of an on-disk file.
 
 ## Step 5 — Docker Login to nvcr.io
 
