@@ -4978,6 +4978,27 @@
       "average_uplift_pct": 46.3
     },
     {
+      "skill": "physical-ai-image-attribute-augmentation",
+      "evaluation_date": "2026-08-13",
+      "profile": null,
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.2.4",
+      "dataset_digest": "sha256:08e695fc0c489146e8cb39e6b651ee5592a6da00f5f2ee28611bac05d927f532",
+      "validation_status": null,
+      "tasks": 10,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "physical-ai-image-attribute-augmentation",
+      "component": "Physical AI",
+      "has_results": true,
+      "average_uplift_pct": 34.2
+    },
+    {
       "skill": "physical-ai-infrastructure-setup-and-resilient-scaling",
       "evaluation_date": "2026-05-29",
       "profile": "external",
@@ -5015,27 +5036,6 @@
       "component": "Physical AI",
       "has_results": true,
       "average_uplift_pct": 36.4
-    },
-    {
-      "skill": "physical-ai-people-attribute-search",
-      "evaluation_date": "2026-07-02",
-      "profile": "external",
-      "environment": "astra-sandbox",
-      "evaluator_version": null,
-      "dataset_digest": null,
-      "validation_status": null,
-      "tasks": 10,
-      "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
-      "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "catalog_dir": "physical-ai-people-attribute-search",
-      "component": null,
-      "has_results": true,
-      "average_uplift_pct": 1.2
     },
     {
       "skill": "physical-ai-video-data-augmentation",
@@ -27678,6 +27678,96 @@
       "uplift_pct": 33.0
     },
     {
+      "catalog_dir": "physical-ai-image-attribute-augmentation",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "physical-ai-image-attribute-augmentation",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "physical-ai-image-attribute-augmentation",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 66.0
+    },
+    {
+      "catalog_dir": "physical-ai-image-attribute-augmentation",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.0,
+      "uplift_pct": 22.0
+    },
+    {
+      "catalog_dir": "physical-ai-image-attribute-augmentation",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "physical-ai-image-attribute-augmentation",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "physical-ai-image-attribute-augmentation",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 72.0,
+      "uplift_pct": 26.0
+    },
+    {
+      "catalog_dir": "physical-ai-image-attribute-augmentation",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "physical-ai-image-attribute-augmentation",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "physical-ai-image-attribute-augmentation",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 33.0
+    },
+    {
       "catalog_dir": "physical-ai-neural-reconstruction",
       "component": "Physical AI",
       "dimension": "Security",
@@ -27766,96 +27856,6 @@
       "agent": "codex",
       "score_pct": 91.0,
       "uplift_pct": 40.0
-    },
-    {
-      "catalog_dir": "physical-ai-people-attribute-search",
-      "component": null,
-      "dimension": "Security",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "physical-ai-people-attribute-search",
-      "component": null,
-      "dimension": "Security",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "physical-ai-people-attribute-search",
-      "component": null,
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 84.0,
-      "uplift_pct": 3.0
-    },
-    {
-      "catalog_dir": "physical-ai-people-attribute-search",
-      "component": null,
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 89.0,
-      "uplift_pct": 3.0
-    },
-    {
-      "catalog_dir": "physical-ai-people-attribute-search",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 85.0,
-      "uplift_pct": -1.0
-    },
-    {
-      "catalog_dir": "physical-ai-people-attribute-search",
-      "component": null,
-      "dimension": "Discoverability",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 82.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "physical-ai-people-attribute-search",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 85.0,
-      "uplift_pct": 4.0
-    },
-    {
-      "catalog_dir": "physical-ai-people-attribute-search",
-      "component": null,
-      "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 2.0
-    },
-    {
-      "catalog_dir": "physical-ai-people-attribute-search",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 78.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "physical-ai-people-attribute-search",
-      "component": null,
-      "dimension": "Efficiency",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 76.0,
-      "uplift_pct": 1.0
     },
     {
       "catalog_dir": "physical-ai-video-data-augmentation",
