@@ -5,7 +5,7 @@
 #
 # The verify-authors check requires an @nvidia.com or github-noreply
 # email on every commit. External (non-NVIDIA) contributions are
-# accepted only after a maintainer-run IP review of the contribution.
+# accepted only after a maintainer-run review of the contribution.
 # Once a contribution passes review, a maintainer records the
 # contributor here, and the authors check accepts their email for the
 # listed pull requests only.
