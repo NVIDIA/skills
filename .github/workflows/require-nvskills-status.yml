@@ -78,33 +78,55 @@ jobs:
             local page=1
             local response
             local first_response=""
-            local page_files
-            local all_files='[]'
             local page_count
+            # Accumulate through files, never shell variables passed as argv.
+            # Linux caps a single argument at 128 KiB (MAX_ARG_STRLEN); the
+            # commit payload exceeds that long before the page-30 guard below
+            # can fire, so --argjson died with "Argument list too long" instead
+            # of returning a verdict. See PR #471 (96 files, 865 KiB).
+            local scratch_dir all_files_file page_files_file
+            if ! scratch_dir="$(mktemp -d)" || [ -z "${scratch_dir}" ]; then
+              echo "Unable to create a scratch directory for commit ${commit_sha}." >&2
+              return 1
+            fi
+            all_files_file="${scratch_dir}/all.json"
+            page_files_file="${scratch_dir}/page.json"
+            printf '[]' > "${all_files_file}"
 
             while true; do
               response="$(github_get "https://api.github.com/repos/${owner}/${repo}/commits/${commit_sha}?per_page=100&page=${page}")"
               if [ "${page}" -eq 1 ]; then
                 first_response="${response}"
               fi
-              page_files="$(printf '%s' "${response}" | jq -c '.files // []')"
-              page_count="$(printf '%s' "${page_files}" | jq 'length')"
-              all_files="$(jq -cn \
-                --argjson existing "${all_files}" \
-                --argjson current "${page_files}" \
-                '$existing + $current')"
+              # Keep only what the classifiers below read: .filename and
+              # .previous_filename. The API returns each file's full patch,
+              # which is ~98% of the payload and never inspected. Dropping
+              # .previous_filename here would let a rename INTO a signature
+              # artifact name pass is_generated_signature_artifact_commit,
+              # so both fields are required.
+              printf '%s' "${response}" \
+                | jq -c '[.files[]? | {filename, previous_filename}]' > "${page_files_file}"
+              page_count="$(jq 'length' < "${page_files_file}")"
+              jq -cn \
+                --slurpfile existing "${all_files_file}" \
+                --slurpfile current "${page_files_file}" \
+                '$existing[0] + $current[0]' > "${all_files_file}.new"
+              mv "${all_files_file}.new" "${all_files_file}"
 
               if [ "${page_count}" -lt 100 ]; then
                 break
               fi
               if [ "${page}" -ge 30 ]; then
                 echo "Commit ${commit_sha} has too many files to classify safely." >&2
+                rm -rf "${scratch_dir}"
                 return 1
               fi
               page=$((page + 1))
             done
 
-            printf '%s' "${first_response}" | jq -c --argjson files "${all_files}" '.files = $files'
+            printf '%s' "${first_response}" \
+              | jq -c --slurpfile files "${all_files_file}" '.files = $files[0]'
+            rm -rf "${scratch_dir}"
           }
 
           first_watched_path() {
