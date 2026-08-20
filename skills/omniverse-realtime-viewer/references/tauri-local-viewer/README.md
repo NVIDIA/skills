@@ -13,6 +13,13 @@ For ovrtx C API behavior, FFI behavior, renderer lifecycle guidance, or
 release-specific behavior not covered here, read `references/dependencies` for
 acquisition guidance and supplemental dependency documentation.
 
+If the selected Tauri architecture uses OVStage, confirm the current C/Rust
+bridge and renderer attach path from the OVStage/OVRTX supplemental docs before
+writing FFI. The Rust render thread remains the runtime owner for OVRTX,
+OVStage/session state, ordinals, and publication. OpenUSD queries and OVPhysX
+USD population should use subprocess/worker boundaries unless the exact
+ABI/import path is verified.
+
 This is not a GPU zero-copy renderer. The active display path is:
 
 ```text
@@ -244,6 +251,13 @@ To add a feature, extend `ViewerBackend` first. Use a Tauri command plus
 state. Shared-state reads such as cached tree access and frame-channel
 subscription do not need to enqueue render-thread work.
 
+For optional runtime transforms, pick effects, and physics impulses, prefer the
+capability-extension pattern from `viewer-backend-interface`. Physics impulses
+should normally call a bounded OVPhysX worker and apply returned pose samples on
+the render thread through the parent runtime state; do not use parent-process
+an OVPhysX population path as a workaround for an unverified or failed
+`PhysX.attach_ovstage(stage, read_ordinal=...)` bridge.
+
 ## Picking and Selection
 
 Display and picking use the same render-product pixel coordinate space. A
@@ -281,7 +295,8 @@ The current stage-tree reader is intentionally lightweight:
 
 Do not present this as a full USD stage browser. Use `stage-hierarchy` when the
 app needs robust USD traversal, properties, variants, bounds, or composition
-queries.
+queries. Prefer a worker for OpenUSD/pxr traversal unless direct imports are
+verified against the exact OVRTX/OVStage/USD runtime set.
 
 Stage path resolution accepts an absolute existing path, then tries the current
 directory, parent, and grandparent before returning the original input path.
@@ -300,15 +315,18 @@ The expected controls are:
 writes it every frame. On stage load, reset the camera to the default view before
 rendering.
 
-Frontend pointer handling should use pointer capture plus window-level
-`pointermove`, `pointerup`, and `pointercancel` listeners so drags survive
-WebView edge cases and leaving the canvas bounds.
+Follow `viewer-input-routing`'s Desktop WebView Pointer Lifecycle: pointer
+capture, one active gesture, and window-level `pointermove`, `pointerup`, and
+`pointercancel` cleanup. This keeps Tauri WebView drags correct when the pointer
+leaves the viewport or the WebView routes the final button event differently.
 
 ## Environment Setup and Loader Notes
 
 Runtime setup should prove the app loaded the packaged ovrtx runtime that it
 will use at run time, not only that Rust compiled. Read the local ovrtx C/CMake
 headers or examples before assuming FFI names, library names, or config keys.
+Also read current OVStage headers/examples before assuming attached-stage entry
+points, write-floor APIs, ordinal semantics, or path-dictionary layouts.
 
 On Linux, packaged runtime layouts commonly expose `bin/libovrtx-dynamic.so`;
 do not assume `libovrtx.so` is the load target. On Windows, use the equivalent
@@ -410,7 +428,7 @@ local app's established contracts for:
 ## Definition Of Done
 
 A Tauri ovrtx viewer is not done at compile time. Before handing it off, capture
-evidence for the real desktop runtime path:
+routine evidence for the real desktop runtime path:
 
 - `npm run check` or equivalent TypeScript/Rust validation passes.
 - `npm run build:desktop` or equivalent Tauri package build passes.
@@ -425,3 +443,8 @@ evidence for the real desktop runtime path:
   rendering is expected and available.
 - UI-visible runtime status agrees with backend logs; do not show "ready" when
   the runtime fell back, failed to load, or never opened the stage.
+
+Add focused proof for optional features only when they are exposed: one measured
+runtime transform, one pick effect, or one physics impulse with parent/worker
+boundary, OVStage write/consume ordinals, and nonzero motion when motion was
+requested.

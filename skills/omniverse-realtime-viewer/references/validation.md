@@ -9,9 +9,10 @@ app, test report, or release notes. Do not commit private scene captures,
 customer data, local absolute paths, tokens, environment-specific service URLs, or environment
 specific logs.
 
-## Evidence Checklist
+## Routine Evidence Checklist
 
-Capture at minimum:
+Capture enough routine evidence to prove the generated viewer works on its
+selected delivery path without rerunning every step. Keep it compact:
 
 - startup and dependency command output,
 - first nonblank rendered frame,
@@ -24,6 +25,21 @@ Capture at minimum:
 For browser viewers, prefer Playwright screenshots or app-specific end-to-end
 tests. For local, Tauri, Electron, C++, and headless viewers, capture frames
 from the same `ovrtx` output path used for display or automation.
+
+## Focused Proof Evidence
+
+Use focused proof only for requested capabilities or demo-critical claims. Do
+not wire broad artifact generation into routine CI unless explicitly requested.
+
+- Runtime transform proof: one selected prim, before/after transform or pixels,
+  the command/result message, and confirmation the renderer stayed live.
+- Pick-effect proof: one selected prim, before/after effect state or pixels, and
+  the accepted/rejected capability result.
+- Physics proof: one focused MP4 or frame sequence plus a concise report showing
+  the actual viewer path, selected prim, child/parent OVPhysX process model,
+  OVStage write/consume ordinals, `parent_inprocess_attach_ovstage_used` or `bounded_worker_used`,
+  nonzero
+  displacement/rotation when motion was requested, and server liveness.
 
 ## Report Template
 
@@ -64,6 +80,7 @@ existing validation format.
 | Object selection updates viewport, tree, and property panel | Pass / fail / skipped |  |  |
 | Scene switch clears stale selection and refreshes hierarchy | Pass / fail / skipped |  |  |
 | Render setting or AOV changes verified when requested | Pass / fail / skipped |  |  |
+| Focused proof for requested runtime transform, pick effect, or physics capability | Pass / fail / skipped |  |  |
 | Shutdown, reconnect, or cleanup behavior verified when relevant | Pass / fail / skipped |  |  |
 
 ## Issues And Waivers
@@ -88,5 +105,7 @@ The generated app is ready to share only when:
 - the app can start from documented commands,
 - at least one scene produces a nonblank frame,
 - requested interactions are demonstrated with artifacts,
+- optional runtime transform, pick-effect, and physics claims have focused proof
+  when exposed,
 - failure cases and runtime requirements are documented,
 - validation artifacts are sanitized.

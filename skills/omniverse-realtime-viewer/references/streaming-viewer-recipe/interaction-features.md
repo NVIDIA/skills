@@ -32,6 +32,9 @@ Decision points:
 - If the user wants simple browser navigation, use left drag orbit, middle drag pan, right drag dolly, and wheel zoom.
 - If the stage has an authored camera and the app policy is to use it, initialize viewer camera settings from that camera before allowing interaction.
 - If the user requests camera UI buttons, send high-level camera commands over the data channel; keep continuous pointer input in ovstream input.
+- If the user requests runtime transform controls, expose them as optional
+  backend capabilities and route accepted changes through the render/runtime
+  owner. Do not let React write renderer or OVStage state directly.
 
 Common failure modes:
 
@@ -137,8 +140,10 @@ Critical contracts:
 Decision points:
 
 - Use ovrtx `query_prims` for basic hierarchy roots and prim discovery whenever it provides the needed data.
-- If direct `pxr` imports are stable in the server process, direct query helpers are acceptable for USD features not covered by ovrtx native queries after ovrtx initialization.
-- If imports conflict or the platform is Windows, use a subprocess query mode for those remaining `pxr` queries.
+- Use native runtime queries for basic hierarchy roots and prim discovery
+  whenever they provide the needed data.
+- Use a subprocess query mode for remaining `pxr` queries unless direct imports
+  are explicitly verified for the exact OVRTX/OVStage/USD wheel set.
 - If the user asks for full property editing, treat it as a separate feature and add explicit edit/apply/reload contracts.
 
 Common failure modes:
@@ -177,6 +182,9 @@ Decision points:
 - If the user wants material or renderer internals, read `references/render-settings` before exposing them.
 - If the setting can be applied live through ovrtx attributes, enqueue a render-thread command.
 - If the setting requires stage reload, expose it as an explicit render-profile or scene-load action rather than a live control.
+- If the user wants pick-driven effects or physics impulses, advertise those as
+  separate optional capabilities and use `streaming-messages` extension patterns
+  rather than folding them into generic render settings.
 
 Common failure modes:
 

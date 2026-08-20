@@ -12,15 +12,17 @@ isolation, JSON-lines protocol, value normalization, and prim-path round trip
 discipline apply to properties, variants, metadata, material relationships,
 bounds, and future USD query features.
 
-## Native Stage Query Path
+## Runtime Stage Query Path
 
-For ovrtx 0.3, use `Renderer.query_prims()` / `Renderer.query_prims_async()` as the first path for runtime prim discovery, hierarchy rows, prim type filtering, and attribute-schema inspection. This avoids opening a second USD stage for common tree and inspector work.
+For current OVStage-backed viewers, query the application-owned OVStage runtime
+first for prim discovery, hierarchy rows, prim type filtering, attribute-schema
+inspection, and runtime attribute reads. OVRTX owns rendering, pick results, and
+renderer-visible selection groups; it is not the default scene-data service when
+an OVStage is attached.
 
 ```python
-from ovrtx import AttributeFilterMode, FilterKind
-
-result = renderer.query_prims(
-    attribute_filter_mode=AttributeFilterMode.SPECIFIC,
+result = runtime.query_prims(
+    attribute_filter_mode="specific",
     attribute_names=["visibility", "purpose", "omni:xform"],
 )
 
@@ -33,76 +35,119 @@ for prim_path, attrs in result.items():
     }
 ```
 
-An empty filter matches every prim. Pair it with `AttributeFilterMode.NONE` for the cheapest full-stage path list:
+An empty filter matches every prim. Pair it with the runtime's `none` attribute
+filter mode for the cheapest full-stage path list:
 
 ```python
-all_prims = renderer.query_prims(attribute_filter_mode=AttributeFilterMode.NONE)
+all_prims = runtime.query_prims(attribute_filter_mode="none")
 paths = sorted(all_prims.keys())
 ```
 
 ### AND / OR / NOT Filters
 
-Filters are `(FilterKind, name)` tuples:
+Filters are `(kind, name)` tuples in the app-owned runtime adapter. Map the
+strings below to the pinned OVStage API or, for standalone compatibility, to the
+current OVRTX native query enums:
 
-- `FilterKind.PRIM_TYPE` matches the USD type name, such as `"Mesh"`, `"Camera"`, or `"SphereLight"`.
-- `FilterKind.HAS_ATTRIBUTE` matches prims that expose an attribute, such as `"points"`, `"visibility"`, or `"inputs:Fader"`.
+- `prim_type` matches the USD type name, such as `"Mesh"`, `"Camera"`, or
+  `"SphereLight"`.
+- `has_attribute` matches prims that expose an attribute, such as `"points"`,
+  `"visibility"`, or `"inputs:Fader"`.
 
 The filter lists combine as `require_all` AND, `require_any` OR, and `exclude` NOT:
 
 ```python
-mesh_or_camera_with_visibility = renderer.query_prims(
+mesh_or_camera_with_visibility = runtime.query_prims(
     require_all=[
-        (FilterKind.HAS_ATTRIBUTE, "visibility"),
+        ("has_attribute", "visibility"),
     ],
     require_any=[
-        (FilterKind.PRIM_TYPE, "Mesh"),
-        (FilterKind.PRIM_TYPE, "Camera"),
+        ("prim_type", "Mesh"),
+        ("prim_type", "Camera"),
     ],
     exclude=[
-        (FilterKind.PRIM_TYPE, "Scope"),
-        (FilterKind.HAS_ATTRIBUTE, "omni:hidden"),
+        ("prim_type", "Scope"),
+        ("has_attribute", "omni:hidden"),
     ],
-    attribute_filter_mode=AttributeFilterMode.SPECIFIC,
+    attribute_filter_mode="specific",
     attribute_names=["visibility", "omni:xform"],
 )
 ```
 
-Use `AttributeFilterMode.ALL` only for debugging or rich schema views; it can produce large payloads on production scenes. Use `SPECIFIC` for inspector panels and `NONE` for tree path discovery.
+Use the runtime's all-attribute mode only for debugging or rich schema views; it
+can produce large payloads on production scenes. Use specific attributes for
+inspector panels and no attributes for tree path discovery.
 
 ### Async Queries
 
 Use async queries when a request should not block the render/input callback that received it:
 
 ```python
-op = renderer.query_prims_async(
+op = runtime.query_prims_async(
     require_any=[
-        (FilterKind.PRIM_TYPE, "Mesh"),
-        (FilterKind.PRIM_TYPE, "Xform"),
+        ("prim_type", "Mesh"),
+        ("prim_type", "Xform"),
     ],
-    attribute_filter_mode=AttributeFilterMode.NONE,
+    attribute_filter_mode="none",
 )
 pending = op.wait(timeout_ns=5_000_000_000)
 if pending is not None:
     result = pending.fetch(timeout_ns=100_000_000)
 ```
 
-Keep `renderer.step()`, scene reset/load, and query result integration serialized through the render owner. Do not query while another thread is resetting the stage.
+Keep `renderer.step()`, OVStage population/reset, write-floor advancement, and
+query result integration serialized through the runtime owner. Discard async
+query results whose stage generation no longer matches the active scene.
 
-### `prim_list_handle` Use
+### Standalone OVRTX Query Compatibility
 
-The C query result is grouped by shared attribute schema. Each `ovrtx_query_prim_group_t` includes:
+If an app intentionally uses a standalone renderer-owned stage, current OVRTX
+`Renderer.query_prims()` / `Renderer.query_prims_async()` remain the native
+compatibility path for hierarchy and schema discovery:
+
+```python
+from ovrtx import AttributeFilterMode, FilterKind
+
+result = renderer.query_prims(
+    require_any=[
+        (FilterKind.PRIM_TYPE, "Mesh"),
+        (FilterKind.PRIM_TYPE, "Camera"),
+    ],
+    attribute_filter_mode=AttributeFilterMode.SPECIFIC,
+    attribute_names=["visibility", "omni:xform"],
+)
+```
+
+Do not route new OVStage-backed hierarchy, inspector, transform, material, or
+effect workflows through direct renderer query/read/write APIs. Keep direct
+OVRTX queries for renderer-owned compatibility apps and renderer diagnostics.
+
+### Query Handle Use
+
+Lower-level OVStage or standalone OVRTX C query results may be grouped by shared
+attribute schema. A grouped result can include:
 
 - `prim_count`
 - `attributes`
 - `prim_list_handle`
 
-`prim_list_handle` is a renderer-owned prim-list handle that can be supplied to lower-level binding/read/write descriptors, such as `ovrtx_binding_desc_t::prims_list_handle`, so native code can bulk read or write a whole query group without converting every prim path back to strings.
+`prim_list_handle` is owned by the runtime that created the query. Native code
+can pass the handle to lower-level read/write descriptors from that same runtime
+to bulk read or write a whole query group without converting every prim path back
+to strings.
 
-The Python wrapper currently resolves query groups into `dict[str, dict[str, AttributeInfo]]`, keyed by prim path. For Python code, pass the returned path keys to `read_attribute()`, `read_array_attribute()`, `write_attribute()`, or `map_attribute()`. For C/C++ integrations, preserve the query group and its `prim_list_handle` until all dependent reads or writes are enqueued, and copy any strings you need before releasing C query results.
+Python adapters should resolve query groups into copied
+`dict[str, dict[str, AttributeInfo]]` payloads keyed by prim path. For Python
+code, pass returned path keys to the runtime adapter's `read_attribute()`,
+`read_array_attribute()`, `write_attribute()`, or `map_attribute()` methods. For
+C/C++ integrations, preserve the query group and its `prim_list_handle` only
+until all dependent reads or writes are enqueued, and copy any strings needed
+before releasing native query results.
 
 ### Native Tree Construction
 
-`query_prims()` returns paths, not a nested child API. Build lazy tree rows by deriving parent paths:
+Runtime `query_prims()` returns paths, not a nested child API. Build lazy tree
+rows by deriving parent paths:
 
 ```python
 def parent_path(path: str) -> str:
@@ -121,11 +166,52 @@ def build_child_index(paths: list[str]) -> dict[str, list[str]]:
     return children
 ```
 
-Native hierarchy rows should include `name`, `path`, `type` when known from query filters or reported attributes, and `children` / `hasChildren` derived from the child index. Use `get_root_prim_path` logic below, but derive it from the native path list when possible.
+Hierarchy rows should include `name`, `path`, `type` when known from query
+filters or reported attributes, and `children` / `hasChildren` derived from the
+child index. Use `get_root_prim_path` logic below, but derive it from the
+runtime path list when possible.
+
+### Review Hierarchy Delivery
+
+Choose the tree delivery shape for the scene size and review task:
+
+- **Default for large or unknown scenes:** query the full path list once, retain
+  the active-generation child index, and return immediate children only when a
+  user expands a row. This keeps the initial payload bounded without reducing a
+  Scope or Xform to an unusable leaf.
+- **Capped review snapshot:** for a known modest asset-review scene, return a
+  nested descendant snapshot so Mesh, Material, and Shader prims beneath
+  organizational Scope prims are immediately visible. Require both `max_depth`
+  and `max_nodes`; stop traversal at either limit and mark the response
+  `truncated: true` when more descendants remain.
+
+Use the same row fields in either mode. A capped snapshot must preserve
+`hasChildren: true` for an omitted descendant branch, so the client can request
+that branch later rather than treating truncation as a leaf:
+
+```json
+{
+  "prim_path": "/World",
+  "mode": "reviewSnapshot",
+  "max_depth": 4,
+  "max_nodes": 500,
+  "truncated": true,
+  "children": [
+    {"name": "Geometry", "path": "/World/Geometry", "type": "scope", "hasChildren": true}
+  ]
+}
+```
+
+Do not make an unbounded recursive worker response the default. Keep generation
+tags on cached indices and discard snapshot or expansion results when the active
+scene has changed.
 
 ## pxr Worker Fallback
 
-`pxr_worker.py` is now a fallback for capabilities that native ovrtx 0.3 queries and attribute reads do not fully cover: variant sets, rich USD metadata, and relationship targets such as material bindings. Do not use it as the default hierarchy or scalar-attribute path.
+`pxr_worker.py` is a fallback for capabilities that OVStage runtime queries and
+current standalone OVRTX native queries do not fully cover: variant sets, rich
+USD metadata, and relationship targets such as material bindings. Do not use it
+as the default hierarchy or scalar-attribute path.
 
 Direct `pxr` import requires import discipline:
 
@@ -174,13 +260,13 @@ Lazy tree loading returns immediate children first, then expands individual node
 
 Never hardcode `/World` as the hierarchy root. Different USD assets use different root prims; for example, some large sample scenes use `/stage`.
 
-With native query results, use this order:
+With runtime query results, use this order:
 
 1. `/World` when it exists.
 2. The loaded stage's default prim when a fallback pxr query is already available.
 3. The first pseudo-root child that is not a viewer/session/render prim.
 
-For a native-only tree, derive pseudo-root children from the path list:
+For a runtime-query-only tree, derive pseudo-root children from the path list:
 
 ```python
 def detect_root_prim_path_from_paths(paths: set[str]) -> str:
@@ -224,18 +310,19 @@ Return this path as `root_prim_path` in stage-open responses. Frontend tree init
 
 ## Properties
 
-Prefer native attribute reads for scalar/tensor inspector data. Use `query_prims()` with `AttributeFilterMode.SPECIFIC` to confirm an attribute exists and discover its `AttributeInfo`, then call `read_attribute()` or `read_array_attribute()` from `stage-attribute-reads`.
+Prefer OVStage runtime attribute reads for scalar/tensor inspector data. Use
+`query_prims()` with a specific attribute filter to confirm an attribute exists
+and discover its descriptor, then call the runtime adapter's `read_attribute()`
+or `read_array_attribute()` methods from `stage-attribute-reads`.
 
 ```python
-from ovrtx import AttributeFilterMode, FilterKind
-
-result = renderer.query_prims(
-    require_all=[(FilterKind.HAS_ATTRIBUTE, "omni:xform")],
-    attribute_filter_mode=AttributeFilterMode.SPECIFIC,
+result = runtime.query_prims(
+    require_all=[("has_attribute", "omni:xform")],
+    attribute_filter_mode="specific",
     attribute_names=["omni:xform", "visibility", "purpose"],
 )
 if "/World/Cube" in result:
-    xform_tensor = renderer.read_attribute("omni:xform", ["/World/Cube"])
+    xform_tensor = runtime.read_attribute("omni:xform", ["/World/Cube"])
 ```
 
 Use the pxr fallback only for property categories that still need USD composition services or string target resolution, such as variant sets, metadata, and relationships:
@@ -247,7 +334,10 @@ for attr in prim.GetAttributes():
     props[attr.GetName()] = serialize_value(attr.Get())
 ```
 
-Include type name, visibility, purpose, transform values, material binding, and variants when building selected-prim info. Native reads should supply numeric/tensor attribute values; pxr should fill variant sets, rich metadata, and relationship targets until native APIs cover those at the same fidelity.
+Include type name, visibility, purpose, transform values, material binding, and
+variants when building selected-prim info. OVStage/runtime reads should supply
+numeric/tensor attribute values; pxr should fill variant sets, rich metadata, and
+relationship targets until runtime APIs cover those at the same fidelity.
 
 ## Variants
 
@@ -273,7 +363,10 @@ for desc in Usd.PrimRange(prim):
         mesh_paths.append(str(desc.GetPath()))
 ```
 
-Use descendant mesh expansion when a selected tree path is an Xform or Scope but highlight/picking needs concrete mesh paths.
+Use runtime query filters for descendant mesh expansion when a selected tree path
+is an Xform or Scope but highlight/picking needs concrete mesh paths. Use the pxr
+recursive pattern above only when the fallback worker is already active or when
+the runtime query API cannot supply the needed traversal.
 
 ## Bounding Boxes
 
@@ -367,7 +460,14 @@ Requests: `openStageRequest`, `getChildrenRequest`, `getPropertiesRequest`, `get
 
 ## Native Query Coverage
 
-Native ovrtx 0.3 covers prim discovery, prim-type filters, attribute-presence filters, attribute schema descriptors, scalar reads, array reads, live writes, and mapped writes. Keep `usd-core`/pxr isolated to the fallback categories above. Revisit this split when native APIs expose variant sets, rich metadata, and relationship target traversal at the same level.
+Current runtime query coverage includes prim discovery, prim-type filters,
+attribute-presence filters, attribute schema descriptors, scalar reads, array
+reads, live writes, and mapped writes. In OVStage-backed apps, route this through
+OVStage and its path dictionary/data plane. Direct OVRTX query/read/write APIs
+remain standalone compatibility paths for renderer-owned stages. Keep
+`usd-core`/pxr isolated to the fallback categories above, and revisit this split
+when runtime APIs expose variant sets, rich metadata, and relationship target
+traversal at the same level.
 
 ## Generated Module Checklist - pxr_worker.py
 
@@ -406,14 +506,14 @@ See also: `prim-info-display`, `stage-management`, `camera-controls`, `streaming
 
 ## Adding This To An Existing Omniverse Realtime Viewer
 
-- Add `server/stage_queries.py` around native `query_prims()` for hierarchy and schema discovery.
-- Add `stage-attribute-reads` helpers for native scalar and array property reads.
+- Add `server/stage_queries.py` around OVStage runtime `query_prims()` for hierarchy and schema discovery.
+- Add `stage-attribute-reads` helpers for runtime scalar and array property reads.
 - Add `pxr_worker.py` only when the app needs variants, rich metadata, or relationship target resolution.
 - Keep server state for the active query stage, root children, and expanded-node cache.
 - Add `getChildrenRequest` -> `getChildrenResult` routing for lazy tree expansion.
 - Add `getPropertiesRequest` -> `getPropertiesResponse` when prim info panels need property payloads.
 - Add `getVariantsRequest`, `getVariantsResponse`, and `setVariantRequest` when variants are editable.
-- Open or refresh the query stage whenever `stage-management` loads, reloads, or resets a scene.
+- Refresh query caches and stage-generation tags whenever `stage-management` loads, reloads, or resets a scene.
 - Frontend wires a `StageTree` component to request children on expand and selection on row click.
 - Selection features use hierarchy queries for descendant mesh expansion and selectable path lists.
 - Variant changes should refresh affected children, properties, selectable-path maps, material maps, and selection state.

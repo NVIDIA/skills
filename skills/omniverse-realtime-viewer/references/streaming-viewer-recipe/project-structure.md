@@ -13,7 +13,7 @@ channel, and UI input follows the selected transport's input channel.
 ## Global Rules
 
 - *Before writing any code*, read `references/dependencies`. Its
-  `references/nvidia-runtime.md` file owns acquisition details for `ovrtx`,
+  `nvidia-runtime.md` file owns acquisition details for `ovrtx`,
   `ovstream`, `ovui`, and the `ov-web-rtc` client; do not repeat those locations
   in project structure guidance.
 - *NEVER use WebGL, Three.js, Babylon.js, or any client-side 3D renderer.* All USD rendering is done server-side by `ovrtx`. The browser receives a WebRTC video stream; it displays `<video>`, not `<canvas>` with a 3D scene graph. ovrtx requires an NVIDIA GPU. Do NOT substitute a browser renderer.
@@ -21,7 +21,7 @@ channel, and UI input follows the selected transport's input channel.
   paths documented there, such as OKAS 1 or Brev.
 - Keep the streaming app split into a Python server process and a React browser client. The server owns USD, ovrtx, ovstream, picking, camera state, and scene mutations. The browser owns DOM UI, connection state, and app-level message sends.
 - Do not send rendered pixels through the JSON data channel. Only stream video through ovstream and use JSON messages for app state and commands.
-- Do not forward mouse, keyboard, wheel, or touch input manually as JSON. The WebRTC browser library forwards input through NVST's native input channel as binary `InputEvent` structs; handle them on the server through the ovstream input callback. For SHM Python clients, use `ovstream.ShmClient.send_input_event()`; C clients use `ovstream_shm_client_send_input_event()`. Do not use JSON `mouseInput`. Use `viewer-input-routing` for button normalization, viewport ownership, and click-vs-drag dispatch.
+- Do not forward mouse, keyboard, wheel, or touch input manually as JSON in the normal path. The WebRTC browser library forwards input through NVST's native input channel as binary `InputEvent` structs; handle them on the server through the ovstream input callback. A browser-only `mouseInput` fallback is allowed only after `viewer-input-routing` proves native callbacks are absent while the data channel works, and it replaces native input. For SHM Python clients, use `ovstream.Client(ovstream.ClientType.SHM, stream_name="...").send_input_event(event)`; C clients use `ovstream_client_send_input_event(client, event)`. Use `viewer-input-routing` for button normalization, viewport ownership, and click-vs-drag dispatch.
 - Make one render thread the sole owner of `renderer.step()`, `open_usd()`, `open_usd_from_string()`, reference add/remove APIs, `reset_stage()`, native pick queries, selection outline writes, and live `write_attribute()` calls. Other callbacks enqueue work for that render thread.
 - Register all ovstream callbacks before starting the server. Early connection and data-channel events can otherwise be dropped.
 - Set `OVRTX_SKIP_USD_CHECK=1` before any ovrtx work. Keep import order disciplined: initialize ovrtx first in the streaming server process. Use ovrtx `query_prims` for basic runtime prim discovery; import `pxr` only for USD features not covered by native ovrtx queries.

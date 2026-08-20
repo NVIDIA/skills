@@ -25,10 +25,17 @@ Load only the reference files needed for the current phase:
   widgets and renderer glue from the selected references rather than assuming access
   to dependency source repositories.
 - Do not use WebGL, Three.js, Babylon.js, or client-side 3D rendering. The desktop window displays frames rendered by in-process `ovrtx` through `ovui`.
-- Keep this as one desktop application process unless the user explicitly chooses Electron + SHM or streaming.
+- Keep this as one desktop application process for OVRTX, OVStage/session state
+  when selected, and ovui presentation unless the user explicitly chooses
+  Electron + SHM or streaming. Use workers for risky USD/physics work rather
+  than moving renderer ownership into UI callbacks.
 - Use `ovui` for the native window and focused viewer UI; do not start the full `ovui` editor shell for lightweight viewer requests. Apply `viewer-control-patterns` when choosing native `ovui` controls for settings, actions, and tool modes.
 - Make one UI/render loop the sole owner of `renderer.step()`, stage mutation, native picking, selection outline writes, and live `write_attribute()` calls.
 - Set `OVRTX_SKIP_USD_CHECK=1` before ovrtx work.
+- Keep `pxr` queries and OVPhysX USD population behind process boundaries
+  unless the exact ABI/import path is verified. A failed
+  `PhysX.attach_ovstage(stage, read_ordinal=...)` bridge must not fall back to parent-process
+  OVPhysX population.
 - Never modify user USD files when adding viewer camera, render products, render vars, settings, selection metadata, inline session data, or runtime selection outline attributes.
 - Account for letterboxing when converting ovui mouse coordinates to render-image pixels, and normalize ovui button ids through `viewer-input-routing`.
 - If selected-prim gizmos are requested, read `transform-manipulator` and `prim-transform-safety`; validate that dragging the gizmo moves the prim, not only the handle.
@@ -36,7 +43,8 @@ Load only the reference files needed for the current phase:
 ## Build Order
 
 1. Create the local desktop package and keep UI widgets thin.
-2. Install and verify `ovrtx`, `ovui`, OpenUSD/pxr, NumPy, and optional Warp.
+2. Install and verify `ovrtx`, optional `ovstage`, `ovui`, worker-only
+   OpenUSD/pxr when needed, NumPy, optional Warp, and optional OVPhysX workers.
 3. Build the `ovui` window shell and image display path.
 4. Construct the renderer runtime and scene loader.
 5. Add input routing, camera controls, picking, selection, scene switching, hierarchy/properties, and render settings.
@@ -44,3 +52,5 @@ Load only the reference files needed for the current phase:
 7. Capture validation and review evidence.
 
 See also: `local-viewer`, `ovrtx-rendering`, `stage-loading`, `viewer-input-routing`, `viewer-control-patterns`, `camera-controls`, `native-picking-selection`, `object-selection`, `selection-feedback`, `transform-manipulator`, `prim-transform-safety`, `prim-info-display`, `stage-attribute-reads`, `stage-management`, `render-settings`, `stage-hierarchy`, `stage-queries`, and `viewport-overlays`.
+
+For live data/scene editing driven from controls — mapping a slider, dropdown, or message to either a cheap data-plane array/attribute write (points, `displayColor`, `omni:xform`, timeline) or a structural rebuild — see `cae-cfd-visualization/driving-cae-viz-via-ovstage.md`. It is written for CAE/CFD but generalizes to any viewer that edits live geometry or attributes from the UI. To layer CAE/CFD visualization on top of this recipe, start at `cae-cfd-visualization/README.md`.

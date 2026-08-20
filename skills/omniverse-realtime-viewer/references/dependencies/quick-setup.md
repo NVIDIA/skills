@@ -3,8 +3,8 @@
 ## Quick Setup
 
 Before choosing install commands for NVIDIA runtimes, read
-`nvidia-runtime.md`. It is the source of truth for `ovrtx`, `ovui`,
-`ovstream`, the `ov-web-rtc` browser client, and the current package guidance and
+`nvidia-runtime.md`. It is the source of truth for `ovrtx`, `ovstage`,
+`ovphysx`, `ovui`, `ovstream`, the `ov-web-rtc` browser client, and the current package guidance and
 supplemental documentation for dependency-owned skills, samples, renderer
 examples, widgets, and release notes. For `ovstream`, use the supplemental
 GitHub repository in `nvidia-runtime.md` when the task needs library-owned
@@ -84,8 +84,10 @@ logs, and Python bytecode stay untracked. Include at least `.venv/`, `.cache/`,
 | Dependency | Acquisition path | Needed by |
 |---|---|---|
 | `ovrtx` | See `nvidia-runtime.md` for the current package guidance and supplemental documentation. | Streaming and local Omniverse Realtime Viewers |
+| `ovstage` | See `nvidia-runtime.md` for the current package guidance and supplemental documentation. | Runtime scene substrate for current OVRTX viewer architectures |
+| `ovphysx` | See `nvidia-runtime.md` for the current package guidance and supplemental documentation. | Physics workers or verified attached-stage physics integrations |
 | `ovstream` | See `nvidia-runtime.md` for the current PyPI package and supplemental documentation. | Streaming server only |
-| `usd-core` | `server/requirements.txt`, pinned exactly to `usd-core==24.11` | USD query subprocesses |
+| `usd-core` | Add only for a USD query worker; resolve a release compatible with the selected runtime package set and verify the worker import. | USD query subprocesses |
 | `warp-lang` | `server/requirements.txt`, or `pip install warp-lang` | CUDA frame conversion and GPU utilities |
 | `numpy` | `server/requirements.txt`, or `pip install numpy` | Camera math, matrices, CPU arrays |
 | `ov-web-rtc client` / `@nvidia/ov-web-rtc` | See `nvidia-runtime.md`; use standalone `ovstream` Direct guidance. | Browser streaming client |
@@ -105,7 +107,14 @@ client versions in skill docs, or use ad hoc frontend archives. Use
 - CUDA compute capability 7.0 or newer is recommended.
 - Use one Python environment per app to avoid mixing native libraries.
 - Set `OVRTX_SKIP_USD_CHECK=1` before any `ovrtx` work.
-- Keep `pxr` work out of the process that owns `ovrtx.Renderer`; use a subprocess.
+- Keep `pxr` work out of the process that owns `ovrtx.Renderer` and live
+  OVStage unless the exact ABI/import path is verified; use a subprocess for
+  USD queries by default.
+- Keep OVPhysX USD population out of the parent viewer process unless
+  `PhysX.attach_ovstage(stage, read_ordinal=...)` is verified for the exact installed OVStage/OVPhysX
+  ABI. Use a bounded worker for OVPhysX worker workflows.
+- Let the parent viewer own OVRTX and OVStage runtime state; child workers
+  return structured results such as paths, matrices, and diagnostics.
 - Put ovrtx's bundled plugin libraries first in the dynamic library path when plugin or MDL resolution fails.
 - Use a real display for local desktop UI apps; streaming Omniverse Realtime Viewers do not need an `ovui` window.
 

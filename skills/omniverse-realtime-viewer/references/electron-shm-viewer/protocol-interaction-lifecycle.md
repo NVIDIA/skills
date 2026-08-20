@@ -21,6 +21,9 @@ Common flows:
 | AOV query | `getAvailableAOVs {}` | `availableAOVsResult {aovs,available}` |
 | AOV change | `changeAOVRequest {aov}` | `activeAOVState {active,available,result?}` |
 | Settings | `setRenderSettingRequest {key,value}` / `getRenderSettingsRequest {}` | `renderSettingsChanged {settings,capabilities,result?,applied?,applies_at?,requires_reload?,message?}` |
+| Runtime transform | `runtimeTransformRequest {request_id?,paths,...}` | `runtimeTransformResult {request_id?,result,error?,applied?}` |
+| Pick effect | `pickEffectRequest {request_id?,paths,effect,value?}` | `pickEffectResult {request_id?,result,error?,applied?}` |
+| Physics impulse | `physicsImpulseRequest {request_id?,path,impulse,angular_impulse?,steps?,dt?}` | `physicsImpulseResult {request_id?,result,error?,samples?,summary?}` |
 | Error | none | `viewerError {code,message,detail?}` |
 
 SHM lifecycle messages:
@@ -41,6 +44,9 @@ Protocol rules:
 - Cap large property payloads and return `truncated: true` when needed.
 - Never include frame bytes in JSON.
 - Render setting changes must reject keys outside the backend-advertised capability list. Success means active viewer state changed, or an explicit non-live action was accepted.
+- Optional feature messages must also be capability-gated. Runtime transform,
+  pick-effect, and physics impulse controls are app features, not required parts
+  of every Electron SHM viewer.
 
 ## Input, Camera, And Picking
 
@@ -80,10 +86,10 @@ Example messages:
 Use `viewer-input-routing` for gesture semantics, `camera-controls` for camera
 math, and `object-selection` for native pick query behavior. Use native
 selection outlines for renderer-visible selection feedback: enable outlines at
-renderer creation, configure group styles, write non-zero
-`omni:selectionOutlineGroup` values for selected prims, and write group `0` to
-clear. Do not add legacy segmentation-based picker or outline compositor modules
-for ovrtx 0.3 generated Electron apps.
+renderer creation, configure group styles, assign non-zero groups with the
+native selection-group helper, and clear with group `0`. Do not add legacy
+segmentation-based picker or outline compositor modules for new generated
+Electron apps.
 
 ## Scene Loading, Queries, And Settings
 
@@ -110,6 +116,12 @@ Hierarchy and property query rules:
 Render settings are server state. React sends commands; Python validates and
 applies them on the render loop thread. Persist cross-scene viewer settings
 under a user-configurable path such as `data/viewer-settings.json`.
+
+Runtime transform and pick-effect commands should follow the same server-owned
+state model. If physics impulses are requested, Python should start a bounded
+OVPhysX worker and apply returned pose samples through the parent runtime
+OVStage/session path. Do not use parent-process OVPhysX population as a
+fallback for a failed or unverified `PhysX.attach_ovstage(stage, read_ordinal=...)`.
 
 Do not add lights in inline session layers unless the user requested
 viewer-controlled lighting. Preserve authored scene lighting by default.

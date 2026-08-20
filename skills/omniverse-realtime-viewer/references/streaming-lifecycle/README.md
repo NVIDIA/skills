@@ -123,6 +123,19 @@ Common mismatches:
 
 Always verify active frontend `onCustomEvent` routing.
 
+## AppStreamer Readiness Signals
+
+Use two separate frontend states:
+
+| Signal | Meaning | Allowed actions |
+|---|---|---|
+| `AppStreamer.connect()` resolved | Direct connection and app command channel are ready. | Send initial `openStageRequest`, viewport-input state, and cached app commands. |
+| `onStart` callback | Video has decoded and playback is live. | Mark the video surface live, clear video-loading UI, collect frame stats. |
+
+Do not wait for `onStart` before sending the first app command. Idle servers may
+need that command before they can load a stage and produce the first decoded
+video frame.
+
 ## WebRTC Direct Config Issues
 
 For local development, bypass external STUN/ICE:
@@ -136,15 +149,15 @@ The frontend must not set `mediaServer` or `mediaPort`; media is UDP and
 negotiated through SDP. Use only the standalone `ovstream` Direct fields from
 `streaming-client`: `server` and `signalingPort`. OKAS, Kubernetes, or another
 orchestrator may provide the endpoint and manage lifecycle, but the browser
-WebRTC config must not add Kit/OVC/NVCF/GFN profile fields, sign-in URLs,
-custom signaling paths, or auth/session fields.
+For standalone `ovstream` Direct, WebRTC config must not add connection-profile fields intended for a different streaming product, sign-in URLs, custom signaling paths, or auth/session fields. For NVCF self-hosted deployment, first follow `cloud-deployment/nvcf-self-hosted.md`.
 
 ## Validation Boundary
 
 Do not use a one-shot headless browser screenshot as the sole proof that WebRTC
 video works. It can capture the DOM before ICE/SDP negotiation, data-channel
-open, or the first decoded video frame. For generated viewers, collect validation
-in two layers:
+open, or the first decoded video frame.
+
+Keep routine validation lightweight:
 
 - Server proof: `/healthz` returns `200 ok`, the server logs the first converted
   frame, and dependency verification passed.
@@ -152,6 +165,11 @@ in two layers:
   user action as the UI, waits for the video element to report nonzero decoded
   dimensions and connected app state, then captures a screenshot or validation
   report.
+
+Use focused proof only for requested or demo-critical features. For example,
+capture a short before/after artifact for a runtime transform, pick effect, AOV
+change, or physics impulse, but do not require every generated viewer to produce
+a large end-to-end artifact bundle for features it does not expose.
 
 If browser negotiation fails but the server proof passes, report it as a
 browser/WebRTC validation blocker rather than changing renderer architecture or
