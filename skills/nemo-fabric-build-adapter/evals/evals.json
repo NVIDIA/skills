@@ -1,0 +1,64 @@
+[
+  {
+    "id": "nemo-fabric-build-adapter-001-new-python-adapter",
+    "question": "Build a third-party Python adapter package for AcmeHarness. It must accept normalized models, instructions, MCP servers, and tool policy, support repeated invocations, and expose registered workflows selected by target ID. Define the adapter and target descriptors, lifecycle, discovery metadata, and validation approach.",
+    "expected_skill": "nemo-fabric-build-adapter",
+    "expected_script": null,
+    "ground_truth": "The agent builds against the published adapter contract. It defines a self-contained acme.fabric-adapter.json before implementation, declares only enforced normalized fields and capabilities, lists supported target types, and creates one *.fabric-target.json per registered workflow target with the same contract version, adapter_id, typed entry point, and closed workflow settings schema. It installs adapter and target descriptors under share/nemo-fabric/adapters and share/nemo-fabric/targets, maps the validated AgentConfig at the adapter boundary, implements start/invoke/stop with isolated runtime state, returns safe normalized outcomes, and validates discovery, planning of both resolved descriptors, doctor checks, lifecycle failures, cleanup, and runtime isolation.",
+    "expected_behavior": [
+      "Routes to nemo-fabric-build-adapter",
+      "Uses the published adapter contract and committed JSON Schemas",
+      "Defines a named *.fabric-adapter.json before implementing target translation",
+      "Declares only normalized fields and capabilities the adapter enforces",
+      "Lists supported target types and defines one *.fabric-target.json per registered workflow target",
+      "Keeps adapter and target contract versions aligned and validates workflow settings against the target descriptor",
+      "Installs discovery metadata under share/nemo-fabric/adapters and share/nemo-fabric/targets",
+      "Maps a validated AgentConfig into target-native values at the adapter boundary",
+      "Implements one start, ordered invoke calls, and one stop with isolated runtime state",
+      "Tests discovery, resolution of both descriptors in plan, doctor, failures, cleanup, and two-runtime isolation"
+    ]
+  },
+  {
+    "id": "nemo-fabric-build-adapter-002-native-openai-streaming",
+    "question": "Extend our third-party Python adapter, which uses the common Fabric host, with native OpenAI Chat Completions streaming. The target SDK yields chunks and a separate terminal result. What descriptor capability, lifecycle method, adapter-owned output rules, and tests are required?",
+    "expected_skill": "nemo-fabric-build-adapter",
+    "expected_script": null,
+    "ground_truth": "The agent sets capabilities.streaming only when the adapter implements async invoke_openai_stream(payload, emit). The adapter invokes the target exactly once, awaits emit only for structurally valid openai.chat_completions.chunk/v1 mappings, translates target failures at the adapter boundary, and returns one separate JSON-compatible terminal outcome. It relies on the common host for authenticated loopback NDJSON transport and consumer lifecycle, does not emit SSE or log credentials, and tests empty and multi-chunk streams, invalid target chunks, target failure, one active turn, a separate terminal result, and exactly one target invocation.",
+    "expected_behavior": [
+      "Routes to nemo-fabric-build-adapter",
+      "Declares capabilities.streaming only with an invoke_openai_stream implementation",
+      "Invokes the target exactly once and awaits emit for each valid chunk",
+      "Returns a separate JSON-compatible terminal outcome",
+      "Uses the openai.chat_completions.chunk/v1 profile and valid chat.completion.chunk records",
+      "Relies on the SDK-owned authenticated loopback NDJSON transport rather than SSE or stdout",
+      "Tests empty and multi-chunk streams, invalid target chunks, target failure, one active turn, a separate terminal result, and exactly one target invocation",
+      "Does not conflate native OpenAI streaming with Relay-backed ATOF streaming"
+    ]
+  },
+  {
+    "id": "nemo-fabric-build-adapter-003-consumer-integration-negative",
+    "question": "Add NeMo Fabric to our existing application so it can choose Codex or Hermes Agent, validate configuration, invoke the selected harness, and return normalized results. We are not creating a new harness adapter.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "This is consumer-side SDK integration, not third-party adapter authoring. The agent must not route it to nemo-fabric-build-adapter and should use nemo-fabric-integrate when that skill is available.",
+    "expected_behavior": [
+      "Does not route to nemo-fabric-build-adapter",
+      "Recognizes the request as consumer Python SDK integration",
+      "Routes to nemo-fabric-integrate when it is available",
+      "Does not propose a fabric-adapter.json descriptor or adapter lifecycle"
+    ]
+  },
+  {
+    "id": "nemo-fabric-build-adapter-004-first-party-maintenance-negative",
+    "question": "Add a new first-party adapter inside the NVIDIA NeMo Fabric repository, including workspace packaging, catalogs, CI wiring, repository tests, and release metadata.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "This is repository-internal first-party adapter development. The portable third-party adapter skill must not handle it; the agent should use the repository's contribute-adapter maintainer workflow instead.",
+    "expected_behavior": [
+      "Does not route to nemo-fabric-build-adapter",
+      "Recognizes the request as first-party NeMo Fabric repository maintenance",
+      "Routes to the contribute-adapter maintainer workflow when it is available",
+      "Keeps repository packaging, catalogs, CI, and release wiring out of the portable integration skill"
+    ]
+  }
+]

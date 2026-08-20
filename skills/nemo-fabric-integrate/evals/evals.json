@@ -1,0 +1,74 @@
+[
+  {
+    "id": "nemo-fabric-integrate-001-python-service",
+    "question": "Add NeMo Fabric to this Python service so one request path can run either Codex or Hermes Agent. Keep our existing application configuration as the source of truth, validate the resolved setup before execution, and return normalized result data to the caller.",
+    "expected_skill": "nemo-fabric-integrate",
+    "expected_script": null,
+    "ground_truth": "The agent uses the public nemo_fabric Python SDK, maps the service configuration into an in-memory FabricConfig, selects the adapter through HarnessConfig, validates with plan and doctor, chooses the appropriate runtime lifecycle, and consumes the normalized invocation result without importing internal modules or reimplementing harness control.",
+    "expected_behavior": [
+      "Routes to nemo-fabric-integrate",
+      "Uses only public imports from nemo_fabric",
+      "Translates the service configuration into an in-memory FabricConfig",
+      "Selects Codex or Hermes Agent through HarnessConfig.adapter_id",
+      "Validates the resolved configuration with plan and doctor before execution",
+      "Consumes normalized status, output, artifacts, telemetry, and correlation identifiers",
+      "Does not import _native or manage adapter processes directly"
+    ]
+  },
+  {
+    "id": "nemo-fabric-integrate-002-evaluation-platform",
+    "question": "Integrate NeMo Fabric into our evaluation runner. The runner needs repeated invocations, request correlation, artifact collection, telemetry, and an explicit shutdown point. Credentials must stay in environment variables.",
+    "expected_skill": "nemo-fabric-integrate",
+    "expected_script": null,
+    "ground_truth": "The agent follows the long-lived public SDK runtime workflow: construct a typed in-memory FabricConfig, configure credential environment-variable names, inspect plan and doctor results, start Fabric explicitly, use the runtime as an async context manager, invoke repeatedly with request IDs, read normalized results, and handle a possible FabricRuntimeError from shutdown.",
+    "expected_behavior": [
+      "Routes to nemo-fabric-integrate",
+      "Uses an explicitly started Fabric runtime as an async context manager for repeated invocations",
+      "Keeps credential values out of source and configuration literals",
+      "Calls plan and doctor before starting the runtime",
+      "Preserves request, invocation, and runtime identifiers as opaque correlation values",
+      "Collects normalized artifacts and telemetry from each result",
+      "Treats shutdown as attempted cleanup and handles a possible FabricRuntimeError"
+    ]
+  },
+  {
+    "id": "nemo-fabric-integrate-003-adapter-contribution-negative",
+    "question": "Add a new FooHarness adapter package inside NeMo Fabric, including its descriptor, runner implementation, and repository tests.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "This is a NeMo Fabric repository-maintainer task, not a consumer Python SDK integration. The agent must not route it to nemo-fabric-integrate and should use the repository's contribute-adapter maintainer workflow instead.",
+    "expected_behavior": [
+      "Does not route to nemo-fabric-integrate",
+      "Recognizes the request as repository-internal adapter development",
+      "Routes to the contribute-adapter maintainer workflow when it is available"
+    ]
+  },
+  {
+    "id": "nemo-fabric-integrate-004-overview-negative",
+    "question": "Give me a short conceptual overview of NeMo Fabric and explain when a team would use it.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "This is an explanation request rather than an implementation workflow. The agent answers from product documentation and does not invoke the focused nemo-fabric-integrate skill.",
+    "expected_behavior": [
+      "Does not route to nemo-fabric-integrate",
+      "Treats the request as product explanation rather than SDK implementation",
+      "Does not introduce integration code or configuration unless the user asks for it"
+    ]
+  },
+  {
+    "id": "nemo-fabric-integrate-005-streaming-boundary",
+    "question": "Add streaming to our NeMo Fabric integration. Use native OpenAI Chat Completions chunks when the selected adapter supports them, but keep NeMo Relay available for raw telemetry records. Make early consumer exit safe and preserve the normalized terminal result.",
+    "expected_skill": "nemo-fabric-integrate",
+    "expected_script": null,
+    "ground_truth": "The agent keeps the two streaming paths distinct. For native OpenAI streaming, it checks runtime.supports_openai_streaming, calls runtime.invoke_openai_stream, iterates OpenAIInvokeStream, awaits stream.result(), and calls aclose() after an early exit. For NeMo Relay streaming, it enables Relay in the typed config, starts the runtime with streaming=True, calls runtime.invoke_stream, consumes ATOF records, and separately awaits the normalized terminal result.",
+    "expected_behavior": [
+      "Routes to nemo-fabric-integrate",
+      "Distinguishes native OpenAI streaming from NeMo Relay ATOF streaming",
+      "Checks runtime.supports_openai_streaming before native OpenAI streaming",
+      "Uses invoke_openai_stream for OpenAI Chat Completions chunks",
+      "Uses enable_relay, streaming=True, and invoke_stream for NeMo Relay records",
+      "Awaits stream.result() for the normalized terminal result",
+      "Calls aclose() when the consumer stops iterating early"
+    ]
+  }
+]
