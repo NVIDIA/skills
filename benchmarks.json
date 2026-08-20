@@ -2,7 +2,7 @@
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
   "skill_count": 343,
-  "result_row_count": 3205,
+  "result_row_count": 3210,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -4912,7 +4912,7 @@
       "catalog_dir": "omniverse-realtime-viewer",
       "component": "Physical AI",
       "has_results": true,
-      "average_uplift_pct": 18.0
+      "average_uplift_pct": 16.3
     },
     {
       "skill": "omniverse-usd-performance-tuning",
@@ -27367,9 +27367,27 @@
       "component": "Physical AI",
       "dimension": "Security",
       "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.0,
+      "uplift_pct": -7.0
+    },
+    {
+      "catalog_dir": "omniverse-realtime-viewer",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
       "agent": "codex",
-      "score_pct": 14.0,
-      "uplift_pct": -21.0
+      "score_pct": 7.0,
+      "uplift_pct": -43.0
+    },
+    {
+      "catalog_dir": "omniverse-realtime-viewer",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "omniverse-realtime-viewer",
@@ -27385,9 +27403,27 @@
       "component": "Physical AI",
       "dimension": "Discoverability",
       "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "omniverse-realtime-viewer",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
       "agent": "codex",
-      "score_pct": 77.0,
-      "uplift_pct": 33.0
+      "score_pct": 79.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "omniverse-realtime-viewer",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 10.0
     },
     {
       "catalog_dir": "omniverse-realtime-viewer",
@@ -27395,8 +27431,17 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.0,
-      "uplift_pct": 26.0
+      "score_pct": 95.0,
+      "uplift_pct": 22.0
+    },
+    {
+      "catalog_dir": "omniverse-realtime-viewer",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 69.0,
+      "uplift_pct": 48.0
     },
     {
       "catalog_dir": "omniverse-realtime-viewer",
@@ -27404,8 +27449,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 52.0
+      "score_pct": 82.0,
+      "uplift_pct": 49.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
