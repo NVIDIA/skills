@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers building realtime USD viewer applications using NVIDIA Omniverse RTX rendering, streaming, and interaction capabilities. <br>
+Developers and engineers building USD 3D viewer applications using NVIDIA Omniverse technologies, including local native viewers, cloud-streamed browser viewers, and hybrid desktop apps. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,21 +25,18 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Routing](references/routing.md) <br>
-- [Conventions](references/conventions.md) <br>
+- [Routing Reference](references/routing.md) <br>
+- [Conventions Reference](references/conventions.md) <br>
+- [Validation Reference](references/validation.md) <br>
 - [USD Viewer App](references/usd-viewer-app/README.md) <br>
-- [Streaming vs Local](references/streaming-vs-local/README.md) <br>
 - [Streaming Viewer Recipe](references/streaming-viewer-recipe/README.md) <br>
 - [OVUI Local Viewer Recipe](references/ovui-local-viewer-recipe/README.md) <br>
-- [Electron SHM Viewer](references/electron-shm-viewer/README.md) <br>
-- [OVStage Runtime](references/ovstage-runtime/README.md) <br>
-- [Cloud Deployment](references/cloud-deployment/README.md) <br>
-- [Validation](references/validation.md) <br>
+- [NVIDIA Skills Documentation](https://docs.nvidia.com/skills) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Configuration instructions, Shell commands] <br>
-**Output Format:** [Markdown with inline code blocks] <br>
+**Output Type(s):** [Code, Shell commands, Configuration instructions] <br>
+**Output Format:** [Markdown with inline code blocks and generated source files] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -50,15 +47,15 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 7 evaluation tasks (7 positive) using the skill-evaluator three-tier framework (Tier 1: static validation, Tier 3: live agent evaluation). <br>
+7 evaluation tasks (7 positive) from the skill-evaluator-dataset-snapshot. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Verifies final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Measures goal completion and expected workflow adherence. <br>
-- Efficiency: Evaluates routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Security: Checks whether the skill is safe to use. <br>
+- Correctness: Checks whether the answer is correct. <br>
+- Discoverability: Checks whether the right skill was loaded when needed. <br>
+- Effectiveness: Checks whether the skill helped complete the task. <br>
+- Efficiency: Checks whether the skill avoided wasted tool or skill usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
@@ -73,12 +70,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | Not available | 57% → 75% (+18 points) |
-| Security | Not available | 36% → 14% (-21 points) |
-| Correctness | Not available | 100% → 100% (±0 points) |
-| Discoverability | Not available | 44% → 77% (+33 points) |
-| Effectiveness | Not available | 73% → 98% (+26 points) |
-| Efficiency | Not available | 31% → 84% (+52 points) |
+| Overall | 68% → 88% (+20 points) | 60% → 72% (+12 points) |
+| Security | 93% → 86% (-7 points) | 50% → 7% (-43 points) |
+| Correctness | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
+| Discoverability | 42% → 92% (+50 points) | 45% → 79% (+34 points) |
+| Effectiveness | 82% → 92% (+10 points) | 73% → 95% (+22 points) |
+| Efficiency | 21% → 69% (+48 points) | 33% → 82% (+49 points) |
 
 ## Skill Version(s): <br>
 0.2.0 (source: frontmatter) <br>
