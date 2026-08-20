@@ -330,7 +330,7 @@ jobs:
           # Every catalog skill (defined by SKILL.md) must ship with:
           #   - skill.oms.sig  (detached NVIDIA signature)
           #   - skill-card.md  (skill metadata card)
-          #   - eval data      (Tier-3 NV-ACES dataset). Accepted in any
+          #   - eval data      (Tier-3 evaluation dataset). Accepted in any
           #                     of these forms — semantic equivalence,
           #                     not literal-filename:
           #                       * evals.json anywhere in the skill dir
