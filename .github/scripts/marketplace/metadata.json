@@ -2269,6 +2269,30 @@
       }
     },
     {
+      "path": "skills/nemo-fabric-build-adapter",
+      "name": "nemo-fabric-build-adapter",
+      "description": "Build, migrate, review, and maintain third-party NVIDIA NeMo Fabric adapters against the public adapter contract. Use when creating adapter or target descriptors, mapping AgentConfig into an agent harness or custom-agent runtime, implementing start/invoke/stop, declaring schemas and capabilities, packaging discovery metadata, or assessing adapter conformance. Do not use for consumer applications that only call the NVIDIA NeMo Fabric SDK.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,ai_engineer,platform_engineer,solutions_architect",
+        "discovery.activity_tags": "integrate,extend,configure,validate,package"
+      }
+    },
+    {
+      "path": "skills/nemo-fabric-integrate",
+      "name": "nemo-fabric-integrate",
+      "description": "Use this skill when integrating NVIDIA NeMo Fabric into a consumer application, service, evaluation harness, or platform through the typed Python SDK — translating the consumer's own application, job, or deployment config into an in-memory FabricConfig, choosing the single-invocation convenience API or an explicitly started runtime, validating with plan and doctor, and consuming normalized results, artifacts, and telemetry.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "application_developer,platform_engineer,ai_engineer,ml_engineer,devops_engineer",
+        "discovery.activity_tags": "integrate,configure,validate,deploy,evaluate"
+      }
+    },
+    {
       "path": "skills/nemo-mbridge-mlm-bridge-training",
       "name": "nemo-mbridge-mlm-bridge-training",
       "description": "Run Megatron-LM (MLM) and Megatron Bridge training with mock or real data. Covers correlation testing, available recipes, and multi-GPU examples.",
