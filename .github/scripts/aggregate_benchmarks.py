@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
 """Aggregate per-skill BENCHMARK.md evaluation reports into benchmarks.json.
 
 Walks skills/*/BENCHMARK.md, extracts the evaluation summary, agents, and
@@ -26,8 +28,16 @@ from pathlib import Path
 SUMMARY_FIELDS = {
     "skill": [re.compile(r"^- Skill: `?([^`\n]+)`?\s*$")],
     "evaluation_date": [re.compile(r"^- Evaluation date: (.+)$")],
+    # v1/v2 only. v3 dropped this line along with the NVSkills-Eval name; it
+    # stays None there rather than being inferred. See NO_FABRICATION below.
     "profile": [re.compile(r"^- NVSkills-Eval profile: `?([^`\n]+)`?\s*$")],
     "environment": [re.compile(r"^- Environment: `?([^`\n]+)`?\s*$")],
+    # v3 provenance. Absent from v1/v2, which leave these None.
+    "evaluator_version": [re.compile(r"^- Evaluator version: `?([^`\n]+?)`?\s*$")],
+    # The digest line carries a trailing snapshot name in parentheses, so this
+    # cannot use the trailing-anchored form the other fields use.
+    "dataset_digest": [re.compile(r"^- Dataset digest: `?([^`\s]+)`?")],
+    "validation_status": [re.compile(r"^- Validation status: `?([^`\n]+?)`?\s*$")],
     "tasks": [
         re.compile(r"^- Dataset: (\d+) evaluation tasks?"),          # v1
         re.compile(r"^- Tasks: (\d+) evaluation tasks?"),            # v2
@@ -62,6 +72,14 @@ RESULTS_SECTIONS = {"results", "results at a glance"}
 SUMMARY_ROWS = {"overall"}
 INT_FIELDS = {"tasks", "attempts_per_task"}
 FLOAT_FIELDS = {"pass_threshold_pct"}
+
+# NO_FABRICATION: v3 mentions "50%" once, in a static glossary bullet
+# ("- The 50% attempt pass threshold is a separate per-task gate; ..."). That
+# sentence is byte-identical across skills with 4, 5 and 18 tasks, so it is
+# template prose, not a per-skill measurement. Scraping it would stamp 50.0 on
+# every v3 skill regardless of what it was evaluated against — a fabricated
+# provenance claim in the file whose purpose is recording provenance. Leave
+# pass_threshold_pct None on v3 until SkillEvaluator emits it as a real field.
 
 
 def parse_uplift(raw):
@@ -173,6 +191,39 @@ def parse_benchmark(path: Path) -> dict:
     return entry
 
 
+def null_rate_regressions(old: dict, new: dict) -> dict:
+    """Fields that lost values between two benchmarks.json generations.
+
+    Returns {field: (old_null_count, new_null_count)} for every field whose
+    null count rose, counted only over skills present in BOTH files so that
+    newly added skills cannot register as a regression.
+
+    This is the generic guard against silent degradation: a regeneration can
+    succeed, keep a valid schema, pass --check, and still quietly empty a
+    column when an upstream report format changes. Both the v3 profile /
+    pass_threshold drift and the 2026-08-03 disappearance of
+    cuopt-multi-objective-exploration are that shape.
+    """
+    old_by_skill = {s["skill"]: s for s in old.get("skills", [])}
+    new_by_skill = {s["skill"]: s for s in new.get("skills", [])}
+    common = old_by_skill.keys() & new_by_skill.keys()
+
+    fields = {
+        k
+        for skill in common
+        for k in (*old_by_skill[skill], *new_by_skill[skill])
+        if k != "skill"
+    }
+
+    regressions = {}
+    for field in sorted(fields):
+        was = sum(1 for s in common if old_by_skill[s].get(field) is None)
+        now = sum(1 for s in common if new_by_skill[s].get(field) is None)
+        if now > was:
+            regressions[field] = (was, now)
+    return regressions
+
+
 def average_uplift(results: list):
     uplifts = [
         s["uplift_pct"]
@@ -279,6 +330,13 @@ def main() -> int:
         help="Fail (exit 1) if the checked-in benchmarks.json does not match "
         "what the BENCHMARK.md sources would generate.",
     )
+    ap.add_argument(
+        "--allow-null-regressions",
+        action="store_true",
+        help="Write even when a field lost values against the existing "
+        "benchmarks.json. Use when an upstream report format change has "
+        "genuinely retired a field, so the new state can be landed.",
+    )
     args = ap.parse_args()
     root = args.repo_root.resolve()
     target = root / "benchmarks.json"
@@ -297,6 +355,26 @@ def main() -> int:
             return 1
         print(f"benchmarks.json is up to date ({count} skills)")
         return 0
+
+    if target.exists() and not args.allow_null_regressions:
+        previous = json.loads(target.read_text(encoding="utf-8"))
+        lost = null_rate_regressions(previous, json.loads(payload))
+        if lost:
+            print(
+                "Refusing to write benchmarks.json: fields lost values.\n"
+                "Skills carried these before and would not after:",
+                file=sys.stderr,
+            )
+            for field, (was, now) in lost.items():
+                print(f"  {field}: {was} -> {now} nulls", file=sys.stderr)
+            print(
+                "\nThis usually means an upstream BENCHMARK.md format change "
+                "stopped emitting a field the parser reads.\n"
+                "Either teach the parser the new format, or re-run with "
+                "--allow-null-regressions if the field is genuinely retired.",
+                file=sys.stderr,
+            )
+            return 1
 
     target.write_text(payload, encoding="utf-8")
     print(f"Wrote benchmarks.json: {count} skills")
