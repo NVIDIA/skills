@@ -2,7 +2,7 @@
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
   "skill_count": 343,
-  "result_row_count": 3200,
+  "result_row_count": 3205,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -19,7 +19,6 @@
     "mcore-split-pr",
     "mcore-testing",
     "nemoclaw-user-guide",
-    "omniverse-realtime-viewer",
     "physical-ai-infrastructure-setup-and-resilient-scaling",
     "rag-blueprint",
     "rag-eval",
@@ -4896,21 +4895,24 @@
     },
     {
       "skill": "omniverse-realtime-viewer",
-      "evaluation_date": "2026-05-28",
-      "profile": "external",
-      "environment": null,
-      "evaluator_version": null,
-      "dataset_digest": null,
-      "validation_status": null,
-      "tasks": null,
-      "attempts_per_task": null,
+      "evaluation_date": "2026-08-20",
+      "profile": null,
+      "environment": "local",
+      "evaluator_version": "1.3.2",
+      "dataset_digest": "sha256:22c636e11cd01854316a62aa9e61948dd62ec9d8efda268d6b78487da6c55e82",
+      "validation_status": "passed",
+      "tasks": 7,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
-      "verdict": "FAIL",
-      "agents": [],
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
       "catalog_dir": "omniverse-realtime-viewer",
       "component": "Physical AI",
-      "has_results": false,
-      "average_uplift_pct": null
+      "has_results": true,
+      "average_uplift_pct": 18.0
     },
     {
       "skill": "omniverse-usd-performance-tuning",
@@ -27359,6 +27361,51 @@
       "agent": "codex",
       "score_pct": 83.0,
       "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "omniverse-realtime-viewer",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 14.0,
+      "uplift_pct": -21.0
+    },
+    {
+      "catalog_dir": "omniverse-realtime-viewer",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "omniverse-realtime-viewer",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 77.0,
+      "uplift_pct": 33.0
+    },
+    {
+      "catalog_dir": "omniverse-realtime-viewer",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 26.0
+    },
+    {
+      "catalog_dir": "omniverse-realtime-viewer",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.0,
+      "uplift_pct": 52.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
