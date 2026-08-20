@@ -28,6 +28,21 @@ triggers:
   - Riva WebSocket
   - grpc.nvcf.nvidia.com
   - build.nvidia.com Riva
+  - custom TTS model
+  - fine-tuned TTS
+  - zero-shot TTS
+  - zero-shot voice cloning
+  - TTS pronunciation dictionary
+  - SSML Riva
+  - exaggeration_factor
+  - OGG_OPUS TTS
+  - TTS pipeline configuration
+  - IPA pronunciation TTS
+  - phoneme Riva TTS
+  - custom TTS pronunciation
+  - mispronounced word TTS
+  - how to pronounce Riva TTS
+  - TTS IPA candidates
 version: "1.0.0"
 license: Apache-2.0
 metadata:
@@ -55,6 +70,9 @@ metadata:
     - websocket
     - cloud
     - nvcf
+    - pronunciation
+    - ipa
+    - phoneme
   domain: ml
 ---
 
@@ -93,6 +111,9 @@ Identify the user's task type, then load the corresponding reference file from `
 - Route custom-trained NeMo ASR deployment (`.nemo` → RMIR → NIM) to [`references/asr-custom.md`](references/asr-custom.md).
 - Route ASR pipeline configuration for VAD, diarization, language models, and chunk size to [`references/pipelines.md`](references/pipelines.md).
 - Route TTS deployment or inference for Magpie to [`references/tts.md`](references/tts.md).
+- Route custom or fine-tuned TTS model deployment (`.nemo` → RMIR → NIM) to [`references/tts-custom.md`](references/tts-custom.md).
+- Route TTS synthesis pipeline configuration — SSML, zero-shot voice cloning, applying an existing pronunciation dictionary, audio encoding, sample rate, `custom_configuration` keys — to [`references/tts-pipelines.md`](references/tts-pipelines.md). *(For discovering and constructing the pronunciation itself, use `tts-pronunciation.md`.)*
+- Route TTS pronunciation discovery — finding, testing, and applying IPA pronunciations for specific words or phrases — to [`references/tts-pronunciation.md`](references/tts-pronunciation.md).
 - Route NMT deployment or inference for Riva Translate, language pairs, and DNT tags to [`references/nmt.md`](references/nmt.md).
 
 ## Source of truth
@@ -109,8 +130,13 @@ Top-level landing pages:
 | Prerequisites (driver / GPU / OS) | https://docs.nvidia.com/nim/speech/latest/get-started/prerequisites.html |
 | ASR pipeline configuration | https://docs.nvidia.com/nim/speech/latest/asr/customization/pipeline-configuration.html |
 | ASR runtime customization | https://docs.nvidia.com/nim/speech/latest/asr/customization/customization.html |
+| TTS custom deployment (`.nemo` / `.riva`, `riva-build`, RMIR) | https://docs.nvidia.com/nim/speech/latest/tts/custom-deployment.html |
+| TTS request-time customization (SSML, pronunciation dictionaries, `custom_configuration`) | https://docs.nvidia.com/nim/speech/latest/tts/customization.html |
+| TTS voices and emotional styles | https://docs.nvidia.com/nim/speech/latest/tts/voices.html |
+| TTS zero-shot voice cloning | https://docs.nvidia.com/nim/speech/latest/tts/voice-cloning.html |
+| TTS IPA phone set | https://docs.nvidia.com/nim/speech/latest/tts/phoneme-support.html |
 | Cloud function IDs (per model) | `https://build.nvidia.com/<org>/<model>/api` |
-| NGC catalog | https://catalog.ngc.nvidia.com/orgs/nim/teams/nvidia/models |
+| NGC model catalog | https://catalog.ngc.nvidia.com/models |
 
 ## Examples
 
@@ -121,6 +147,16 @@ Top-level landing pages:
 **"Translate English to German"** → load [`references/nmt.md`](references/nmt.md), follow the 4-step flow.
 
 **"Convert my fine-tuned `.nemo` to a NIM"** → load [`references/asr-custom.md`](references/asr-custom.md) for the 4-phase pipeline and [`references/pipelines.md`](references/pipelines.md) for build-time config.
+
+**"Deploy a custom fine-tuned TTS voice as a NIM"** → load [`references/tts-custom.md`](references/tts-custom.md) for the 4-phase pipeline.
+
+**"Use zero-shot voice cloning with Magpie"** → load [`references/tts-pipelines.md`](references/tts-pipelines.md).
+
+**"Add SSML emphasis tags to my TTS request"** → load [`references/tts-pipelines.md`](references/tts-pipelines.md).
+
+**"'NVIDIA' sounds wrong in my Magpie TTS output — suggest a few IPA options to test"** → load [`references/tts-pronunciation.md`](references/tts-pronunciation.md), generate IPA candidates, synthesize variants, then output all three delivery formats.
+
+**"How do I fix the pronunciation of 'NIM' in Riva TTS with a custom_dictionary in gRPC Python?"** → load [`references/tts-pronunciation.md`](references/tts-pronunciation.md), propose IPA for 'NIM', show wire format and gRPC snippet.
 
 **"Can my GPU run this?"** → load [`references/deployment-readiness-checks.md`](references/deployment-readiness-checks.md) and run the 6-step system check.
 
