@@ -2,115 +2,89 @@
 
 ## Triggers
 
-Use this skill for requests mentioning `read_attribute`, `read_array_attribute`, attribute reads, USD attribute values, DLPack, GPU destinations, `read_attribute_async`, or array attributes.
+Use this skill for requests mentioning `read_attribute`, `read_array_attribute`,
+attribute reads, USD attribute values, DLPack, GPU destinations,
+`read_attribute_async`, array attributes, inspector values, or current runtime
+values.
 
-Use this when inspector panels, query services, or effects need current runtime attribute values from ovrtx 0.3.
+Use this when inspector panels, query services, animation, transform tools, or
+pick effects need current OVStage runtime attribute values. OVRTX renders the
+stage and owns renderer outputs/picks; it is not the default scene data service
+for new OVStage viewers.
 
-For ovrtx attribute query behavior, DLPack behavior, or release-specific read
-APIs not covered here, read `references/dependencies` for acquisition guidance and
-supplemental dependency documentation.
+For pinned OVStage/OVRTX attribute API details and DLPack behavior, read
+`references/dependencies` for acquisition guidance and supplemental dependency
+documentation.
 
 ## Choose The Read API
 
-| API | Shape | Use |
-|---|---|---|
-| `Renderer.read_attribute()` | One value per prim | Scalar, vector, matrix, token/path-id-like values. |
-| `Renderer.read_array_attribute()` | Variable-length tensor per prim | Arrays such as `points`, `normals`, `faceVertexCounts`. |
-| `Renderer.read_attribute_async()` | One value per prim, non-blocking enqueue | Avoid blocking message/input callbacks. |
-| `Renderer.read_array_attribute_async()` | Variable-length arrays, non-blocking enqueue | Large mesh arrays or background inspector reads. |
+Use `stage-queries` first when you do not know whether an attribute exists or
+whether it is scalar or array.
 
-Use `stage-queries` first when you do not know whether an attribute exists or whether it is scalar or array.
+| Runtime read shape | Use |
+|---|---|
+| Scalar/fixed-shape read | One value per prim: transforms, numeric controls, tokens, shader inputs. |
+| Array read | Variable-length arrays such as `points`, `normals`, or `faceVertexCounts`. |
+| Async scalar read | Avoid blocking input/message callbacks or inspector panels. |
+| Async array read | Large mesh arrays or background property previews. |
+
+The exact function names are app/runtime-adapter choices. They should map to the
+pinned OVStage read APIs, validate the active stage generation, and return
+copied DTO values before data crosses UI, transport, reload, or process
+boundaries.
 
 ## Scalar Reads
 
-`read_attribute()` returns a DLPack-compatible tensor with one value per prim:
+Scalar/fixed-shape reads return one value per prim. Convert runtime values to a
+JSON-safe copy before sending them over a data channel:
 
 ```python
 import numpy as np
 
+def read_json_scalar(runtime, attr_name: str, paths: list[str]):
+    values = runtime.read_attribute(attr_name, paths)
+    return np.asarray(values).copy().tolist()
+
 paths = ["/World/Cube"]
-tensor = renderer.read_attribute("omni:xform", paths)
-xforms = np.from_dlpack(tensor).reshape(len(paths), 4, 4)
+xforms = np.asarray(runtime.read_attribute("omni:xform", paths)).reshape(len(paths), 4, 4)
 ```
 
-For scalar numeric or matrix inspector fields, convert to a JSON-safe copy before sending over a data channel:
-
-```python
-def read_json_scalar(renderer, attr_name: str, paths: list[str]):
-    tensor = renderer.read_attribute(attr_name, paths)
-    return np.from_dlpack(tensor).copy().tolist()
-```
+Use current OVStage values for transform bases, inspector fields, and
+pick-effect state. Use pxr only when the UI asks for authored composition
+details that are not represented as runtime attributes.
 
 ## Array Reads
 
-`read_array_attribute()` returns a dict keyed by prim path. Each value is a DLPack-compatible tensor, and lengths may differ per prim:
+Array reads return one array-like value per prim, and lengths may differ:
 
 ```python
-arrays = renderer.read_array_attribute("points", ["/World/MeshA", "/World/MeshB"])
-for path, tensor in arrays.items():
-    points = np.from_dlpack(tensor)
+arrays = runtime.read_array_attribute("points", ["/World/MeshA", "/World/MeshB"])
+for path, values in arrays.items():
+    points = np.asarray(values)
     preview = points[:1000].copy().tolist()
 ```
 
-Use arrays for geometry payloads only when the UI truly needs them. For most inspectors, report counts, dtype, shape, and a capped preview.
+Use arrays for geometry payloads only when the UI truly needs them. For most
+inspectors, report counts, dtype, shape, and a capped preview.
 
-## GPU Destinations
+## GPU Destinations And Async Flow
 
-`read_attribute()` accepts a preallocated DLPack-compatible `dest`. This supports GPU reads without staging through CPU memory:
-
-```python
-import warp as wp
-
-paths = ["/World/Cube", "/World/Sphere"]
-dest = wp.empty((len(paths), 4, 4), dtype=wp.float64, device="cuda:0")
-
-tensor = renderer.read_attribute(
-    "omni:xform",
-    paths,
-    dest=dest,
-    cuda_stream=cuda_stream_handle,
-)
-xforms = wp.from_dlpack(tensor)
-```
-
-When `cuda_stream` is provided, ovrtx coordinates with that stream before and after writing `dest`, and forwards the stream to the DLPack producer where supported. If no stream/event is provided, the caller must ensure `dest` is ready before the read and must synchronize before consuming it elsewhere.
-
-Use `cuda_event` when the read should wait on a CUDA event before writing into `dest`:
+If the pinned OVStage runtime exposes DLPack destinations or async reads, keep
+the source/destination tensors alive until the operation completes and
+synchronize before another consumer reads the data. UI and WebRTC messages must
+receive copied values, never borrowed tensors or mapped views.
 
 ```python
-tensor = renderer.read_attribute(
-    "inputs:Fader",
-    [effect_layer_path],
-    dest=dest,
-    cuda_event=cuda_event_handle,
-)
-```
-
-`read_array_attribute()` does not take `dest`; it allocates one returned tensor per prim.
-
-## Async Flow
-
-Async reads use the operation plus pending-fetch pattern:
-
-```python
-op = renderer.read_attribute_async("omni:xform", paths)
+op = runtime.read_attribute_async("omni:xform", paths)
 pending = op.wait(timeout_ns=5_000_000_000)
 if pending is None:
     return None
 
-tensor = pending.fetch(timeout_ns=100_000_000)
-if tensor is None:
+values = pending.fetch(timeout_ns=100_000_000)
+if values is None:
     return None
 
-xforms = np.from_dlpack(tensor).copy()
-```
-
-Array async reads follow the same lifecycle:
-
-```python
-op = renderer.read_array_attribute_async("points", mesh_paths)
-pending = op.wait(timeout_ns=5_000_000_000)
-arrays = pending.fetch(timeout_ns=100_000_000) if pending is not None else None
+xforms = np.asarray(values).copy()
 ```
 
 Do not access the value until both `wait()` and `fetch()` have succeeded.
@@ -118,34 +92,40 @@ Do not access the value until both `wait()` and `fetch()` have succeeded.
 ## Inspector Pattern
 
 ```python
-from ovrtx import AttributeFilterMode
-
-def inspect_attrs(renderer, path: str, names: list[str]) -> dict:
-    descriptors = renderer.query_prims(
-        attribute_filter_mode=AttributeFilterMode.SPECIFIC,
-        attribute_names=names,
+def inspect_attrs(runtime, path: str, attr_names: list[str]) -> dict:
+    descriptors = runtime.query_prims(
+        attribute_filter_mode="specific",
+        attribute_names=attr_names,
     ).get(path, {})
 
     values = {}
     for name, desc in descriptors.items():
         if desc.is_array:
-            tensor = renderer.read_array_attribute(name, [path])[path]
-            values[name] = np.from_dlpack(tensor)[:1000].copy().tolist()
+            arr = runtime.read_array_attribute(name, [path])[path]
+            values[name] = np.asarray(arr)[:1000].copy().tolist()
         else:
-            tensor = renderer.read_attribute(name, [path])
-            values[name] = np.from_dlpack(tensor).copy().tolist()
+            value = runtime.read_attribute(name, [path])
+            values[name] = np.asarray(value).copy().tolist()
     return values
 ```
 
-Keep pxr fallback for variant sets, relationship targets, and USD metadata until native APIs expose those fields directly as user-readable values.
+Keep pxr fallback for variant sets, relationship targets, material bindings, and
+USD metadata until native runtime APIs expose those fields directly as
+user-readable values.
 
 ## Gotchas
 
-- Native reads return runtime attribute values; they do not replace USD composition services such as variant-set editing.
-- `read_attribute()` is for scalar attributes: one fixed-shape value per prim.
-- `read_array_attribute()` is for variable-length arrays and returns a dict, not a stacked tensor.
-- Keep DLPack-backed views scoped. Take `.copy()` before storing values beyond the mapping/tensor lifetime or sending them to another thread.
-- For GPU `dest`, keep the destination tensor alive until the read completes and any consumer has synchronized.
-- Query descriptors first when a missing attribute would otherwise become an exception path in UI code.
+- OVStage reads return current runtime values; they do not replace USD
+  composition services such as variant-set editing.
+- Scalar reads are for one fixed-shape value per prim.
+- Array reads are for variable-length values and should return a path-keyed
+  result, not a blindly stacked tensor.
+- Keep DLPack-backed or mapped views scoped. Take `.copy()` before storing
+  values beyond the operation lifetime or sending them to another thread.
+- Query descriptors first when a missing attribute would otherwise become an
+  exception path in UI code.
+- Direct OVRTX read APIs are for renderer-owned diagnostics or legacy
+  pre-OVStage samples, not the default inspector path in new viewers.
 
-See also: `stage-queries`, `stage-hierarchy`, `prim-info-display`, `ovrtx-rendering`.
+See also: `stage-queries`, `stage-hierarchy`, `prim-info-display`,
+`ovstage-data-plane`, `ovstage-ovrtx-integration`.

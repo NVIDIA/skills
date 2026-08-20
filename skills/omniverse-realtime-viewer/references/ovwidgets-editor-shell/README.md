@@ -32,7 +32,7 @@ Equivalent launch paths are the `ovwidgets` console script and
 
 ## What OvGear Provides
 
-OvGear is a Kit-free standalone `omni.ui` application rendered through `ovrtx`.
+OvGear is a standalone `omni.ui` application rendered through `ovrtx`.
 It provides:
 
 - RTX viewport with camera controls, frame loop, HUD, pick gesture plumbing,
@@ -179,7 +179,7 @@ eagerly imports `ViewportWidget`.
 - `Application` is a singleton. A second `Application()` in the same process
   asserts; reuse the instance pattern or start a new process.
 - `omni.ui.Frame` builds lazily on the first render frame. State needed by
-  `attach_stage`, `set_adapter`, or selection callbacks should exist in
+  `attach_ovstage`, `set_adapter`, or selection callbacks should exist in
   `__init__`; only actual UI widget construction belongs in frame build methods.
 - For custom sliders, toggles, menus, and property-editor controls, follow
   `viewer-control-patterns`: label controls visibly, keep state in adapters or

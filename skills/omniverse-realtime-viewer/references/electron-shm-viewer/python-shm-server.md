@@ -6,6 +6,7 @@ The Python server is the source of truth for renderer and USD state:
 
 - current stage URL/path and root prim path
 - `ovrtx.Renderer`
+- live OVStage/session state, ordinals, and renderer publication when selected
 - active render product and AOV
 - camera controller
 - selection, hover, native pick-query state, and selection outline groups
@@ -19,8 +20,9 @@ Startup order:
 set OVRTX_SKIP_USD_CHECK=1
 configure OVRTX_BIN_PATH/library path if needed
 import ovrtx
-construct Renderer(RendererConfig(sync_mode=True))
-initialize USD query helper or subprocess if needed
+construct the current renderer/runtime
+initialize OVStage/session state if selected
+initialize USD query subprocess if needed
 initialize ovstream SHM server
 register JSON control callbacks
 load initial stage or enter idle state
@@ -46,6 +48,8 @@ while running:
 Critical server invariants:
 
 - Only the render loop calls ovrtx load/reset/step/write APIs.
+- When OVStage is selected, only the same runtime owner advances ordinals,
+  write floors, renderer attachment, and publication.
 - Callbacks decode messages and enqueue work.
 - `FrameNotReady` is recoverable; keep the latest good frame visible.
 - Repeated non-recoverable render failures should stop stepping and emit a JSON
@@ -56,6 +60,10 @@ Critical server invariants:
   frame.
 - Never mutate the user USD file for viewer camera, render products, render
   vars, settings, or selection metadata.
+- Keep `pxr` queries and OVPhysX USD population outside this parent process
+  unless the exact ABI/import path is verified. A failed `PhysX.attach_ovstage`
+  probe should select the bounded worker path, not parent-process
+  OVPhysX population.
 
 Use `stage-loading` for exact `open_usd()` / `open_usd_from_string()` stage
 details and `ovrtx-rendering` for frame extraction and live write contracts.
@@ -73,7 +81,7 @@ import ovstream
 
 ovstream.initialize()
 server = ovstream.Server(server_type=ovstream.ServerType.SHM)
-server.set_message_callback(on_message)
+server.on_message = on_message
 server.start({"name": shm_name, "width": width, "height": height})
 ```
 
@@ -133,7 +141,7 @@ Pixel rules:
   renderer-owned staging memory.
 - Do not convert in place on shared memory that the server can overwrite.
 - If a BGRA WebGL upload extension is available, use it and skip conversion.
-- When exposing AOV switching, handle ovrtx 0.3 single-tensor and multi-tensor
+- When exposing AOV switching, handle current single-tensor and multi-tensor
   render vars. Select the named image tensor for composite outputs, read params
   separately, and treat image tensors as channel-last (`H x W x C`).
 

@@ -7,7 +7,7 @@ Use this skill for pick objects, click to select, object selection, native picki
 Use this for viewport picking and selected-prim state. Selection visuals live in
 `selection-feedback`; selected-prim properties live in `prim-info-display`.
 
-For ovrtx 0.3, the recommended path is the native picking API documented by
+For ovrtx, the recommended path is the native picking API documented by
 `native-picking-selection`.
 
 For ovrtx selection or picking behavior not covered here, read
@@ -23,14 +23,13 @@ systems for generated apps.
 
 ## Native Picking Facts
 
-- Queue pick work with `Renderer.enqueue_pick_query_async()` in Python or
+- Queue pick work with `Renderer.enqueue_pick_query()` in Python or
   `ovrtx_enqueue_pick_query()` in C/C++.
 - Queue the pick query before the `renderer.step()` that should produce the
   result.
-- The pick rectangle is in RenderProduct pixel coordinates, not browser, window,
-  canvas, CSS, or screen coordinates.
-- `left` and `top` are inclusive. `right` and `bottom` are exclusive, so a click
-  uses `right = left + 1` and `bottom = top + 1`.
+- Convert RenderProduct pixels to top-left normalized coordinates before
+  enqueueing. `left` and `top` are inclusive; use one pixel past the selected
+  bounds for `right` and `bottom`.
 - The consumed step exposes the synthetic render var
   `ovrtx.OVRTX_RENDER_VAR_PICK_HIT` / `OVRTX_RENDER_VAR_PICK_HIT`.
 - Pick hits store prim path IDs. Resolve them with
@@ -38,44 +37,37 @@ systems for generated apps.
   before printing names or updating selection.
 - Multiple pick queries for the same RenderProduct before a single step are not
   queued independently; treat the last query as authoritative.
-- Current picking support requires the picking RenderProduct to run on
-  CUDA-visible GPU 0. Author `uint[] deviceIds = [0]` on that RenderProduct when
-  needed.
+- The synthetic pick-hit output is automatic for the consuming step; do not add
+  `ovrtx_pick_hit` to USD `orderedVars`.
 
 ## Pickability
 
-Mark selectable prims with the native pickable flag. New apps should not build
+Mark selectable prims with the native pickable helper. Pickability is renderer
+interaction state, so the native OVRTX helper remains the right surface here.
+Pass renderer path IDs, such as decoded pick-hit IDs; do not write a legacy
+pickable attribute through `renderer.write_attribute()`. New apps should not build
 or maintain a separate segmentation ID mapping just to decide what can be
 selected.
 
 Python:
 
 ```python
-import numpy as np
-import ovrtx
-
-
-def set_pickable(renderer: ovrtx.Renderer, prim_paths: list[str], enabled: bool) -> None:
-    if not prim_paths:
-        return
-    renderer.write_attribute(
-        prim_paths=prim_paths,
-        attribute_name=ovrtx.OVRTX_ATTR_NAME_PICKABLE,
-        tensor=np.full((len(prim_paths),), 1 if enabled else 0, dtype=np.uint8),
-    )
+def set_pickable(renderer, prim_path_ids: list[int], enabled: bool) -> None:
+    if prim_path_ids:
+        renderer.set_pickable(prim_path_ids, enabled)
 ```
 
 C/C++:
 
 ```c
 // Prefer the native helper when writing C/C++ integration code.
-ovrtx_set_pickable(renderer, prim_paths, prim_path_count, true);
+ovrtx_set_pickable(renderer, prim_path_ids, prim_path_count, true);
 ```
 
 When a frontend sends `makePrimsSelectable` or `makePrimsPickable`, update the
 server's canonical pickable set and write pickability for the changed prims.
 Do not recompute CPU bbox maps or segmentation ID maps as part of the normal
-0.3 selection path.
+ovrtx selection path.
 
 ## Click Pick Flow
 
@@ -83,13 +75,13 @@ Only run selection on a completed click gesture. Camera orbit/pan/zoom drags
 must not also select.
 
 ```python
-def pick_at_render_pixel(renderer, render_product_path: str, x: int, y: int) -> list[str]:
-    renderer.enqueue_pick_query_async(
+def pick_at_render_pixel(renderer, render_product_path: str, x: int, y: int, width: int, height: int) -> list[str]:
+    renderer.enqueue_pick_query(
         render_product_path=render_product_path,
-        left=x,
-        top=y,
-        right=x + 1,
-        bottom=y + 1,
+        left_ndc=x / width,
+        top_ndc=y / height,
+        right_ndc=(x + 1) / width,
+        bottom_ndc=(y + 1) / height,
     )
 
     products = renderer.step(
@@ -115,18 +107,18 @@ Keep UI coordinate conversion outside the picker:
 Drag selection uses the same native API with a larger rectangle:
 
 ```python
-def marquee_pick(renderer, render_product_path: str, x0: int, y0: int, x1: int, y1: int) -> list[str]:
+def marquee_pick(renderer, render_product_path: str, x0: int, y0: int, x1: int, y1: int, width: int, height: int) -> list[str]:
     left = min(x0, x1)
     top = min(y0, y1)
     right = max(x0, x1) + 1
     bottom = max(y0, y1) + 1
 
-    renderer.enqueue_pick_query_async(
+    renderer.enqueue_pick_query(
         render_product_path=render_product_path,
-        left=left,
-        top=top,
-        right=right,
-        bottom=bottom,
+        left_ndc=left / width,
+        top_ndc=top / height,
+        right_ndc=right / width,
+        bottom_ndc=bottom / height,
     )
 
     products = renderer.step(
@@ -209,6 +201,29 @@ For Xform or Scope selection, use `stage-hierarchy` to expand to descendant mesh
 paths only for visual feedback. Preserve the user's selected tree path for the
 stage tree and info panel.
 
+## Runtime Feature Handoff
+
+Selection is not a blanket OVStage write. Keep canonical selected paths in the
+app/runtime controller, use native OVRTX selection groups for outlines, and only
+handoff to OVStage when selection drives runtime data such as transforms,
+material/effect attributes, visibility, physics poses, or reversible
+viewer-owned state.
+
+```text
+native pick result
+  -> resolve prim path IDs for the active stage generation
+  -> update canonical selected paths
+  -> update native OVRTX selection groups/outlines
+  -> dispatch feature commands to the OVStage runtime owner
+  -> feature writes publish at ordinal N
+  -> attached renderer consumes N on its normal render step
+```
+
+Do not let the picker callback perform direct OVRTX material, visibility, or
+`omni:xform` writes. The picker should enqueue intent, and the single runtime
+owner should serialize OVStage writes with the same ordinal publication protocol
+used for camera, animation, transform tools, and physics handoff.
+
 ## Scene Lifecycle
 
 On scene switch or renderer reset:
@@ -222,13 +237,13 @@ On scene switch or renderer reset:
 ## Deprecated Segmentation Fallback
 
 Segmentation-buffer picking from `InstanceSegmentationSD` is a deprecated
-compatibility path for older ovrtx builds or custom post-process tools. It is
-not the recommended ovrtx 0.3 path.
+compatibility path for older OVRTX builds or custom post-process tools. It is
+not the recommended ovrtx path.
 
 Only use the deprecated path when native pick queries are unavailable and the
 user explicitly accepts the limitations: per-frame ID buffers, scene-local IDs,
 ID-to-path mapping, ID drift after reloads, and possible mismatch with UI
-selection. Do not scaffold it in new ovrtx 0.3 apps.
+selection. Do not scaffold it in new ovrtx apps.
 
 ## Gotchas
 
@@ -250,13 +265,17 @@ See also: `viewer-input-routing`, `native-picking-selection`,
 ## Generated Module Checklist - selection_controller.py
 
 - [ ] Converts UI coordinates to RenderProduct pixels before picking.
-- [ ] Queues click picks with `Renderer.enqueue_pick_query_async()`.
+- [ ] Queues click picks with `Renderer.enqueue_pick_query()` using normalized
+      RenderProduct coordinates.
 - [ ] Queues marquee picks with a native pick rectangle.
 - [ ] Decodes `OVRTX_RENDER_VAR_PICK_HIT`.
 - [ ] Resolves prim path IDs before broadcasting selection.
-- [ ] Writes pickability with `OVRTX_ATTR_NAME_PICKABLE` or `ovrtx_set_pickable()`.
+- [ ] Writes pickability with `Renderer.set_pickable()` or
+      `ovrtx_set_pickable()` using renderer path IDs.
 - [ ] Keeps selected paths server/runtime authoritative.
 - [ ] Expands selected Xforms/Scopes to descendant mesh paths only for feedback.
+- [ ] Dispatches transform, effect, visibility, and physics side effects through
+      the OVStage runtime owner instead of direct picker writes.
 - [ ] Clears selection and pending pick state on scene switch.
 - [ ] Does not create `GpuPicker`, `cpu_picking.py`, `seg_outline.py`, or Warp
       outline systems.

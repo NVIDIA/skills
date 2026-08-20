@@ -55,6 +55,11 @@ $USD_ASSET_ROOT/usd_viewer_samples/samples_data/stage02.usd
 
 This is the recommended source for agents needing the official viewer default sample scenes.
 
+When these samples are wrapped for ovrtx without the OmniGraph runtime, inspect
+whether their materials contain compatible `EffectLayer` shader paths. If they
+do, add the `inputs:Fader = 0` override described in `stage-loading` so the
+sample loads in a clean non-highlighted state.
+
 ## NVIDIA Omniverse Downloadable Packs
 
 Source page: `https://docs.omniverse.nvidia.com/usd/latest/usd_content_samples/downloadable_packs.html`

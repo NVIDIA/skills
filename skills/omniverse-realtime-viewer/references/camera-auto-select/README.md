@@ -28,9 +28,21 @@ Evaluate cameras in this order. Stop at the first match.
 | 5 | First camera in scene traversal order | Deterministic fallback. |
 | 6 | Compute bbox-fit camera | Stage has no authored cameras at all. |
 
-## Implementation
+## Runtime Boundary
 
-### Stage Introspection (Python / pxr)
+For an attached OVStage viewer, obtain camera metadata and bounds through the
+application runtime adapter. The adapter owns the active stage, returns copied
+camera DTOs, and applies the selected initial camera through the OVStage data
+plane before publishing its ordinal. Do not open a second `Usd.Stage`, retain a
+USD prim outside that boundary, or use renderer attribute APIs as an alternate
+source of camera state.
+
+The `pxr` helpers below are for an explicitly separate offline/preflight path:
+for example, inspecting a known USD file before an application creates its
+runtime. They are not part of an attached viewer live load, query, or write
+path.
+
+## Offline / Preflight Implementation (Python / pxr)
 
 ```python
 import math
@@ -137,7 +149,7 @@ def compute_bbox_fit_camera(stage: Usd.Stage, fov_deg: float = 60.0):
 
 ### Emitting camera_config.json
 
-During app build or stage load, write a config the frontend can consume:
+During offline preflight, write a config the frontend can consume:
 
 ```python
 import json
@@ -172,25 +184,38 @@ def emit_camera_config(stage: Usd.Stage, output_path: str = "camera_config.json"
 
 ## Integration Points
 
-### Server (stage-loading)
+### Attached OVStage Viewer (stage-loading)
 
-Call `find_best_camera()` immediately after `Usd.Stage.Open()`. If a camera is
-found, set it as the active render camera for the first frame:
+After the runtime owner has populated the composed scene, ask its camera query
+adapter for copied camera metadata, default-camera metadata, and a bounds
+summary. Apply the selected authored camera or bbox-fit pose through the camera
+command adapter. That command owns the OVStage transform/lens writes, waits for
+them, advances the write floor, and returns the committed ordinal for the next
+render.
 
 ```python
-stage = Usd.Stage.Open(stage_path)
-best_camera = find_best_camera(stage)
-if best_camera:
-    # Point the render product at the authored camera
-    renderer.set_active_camera(best_camera)
+camera_state = runtime.camera_queries.initial_view()
+
+if camera_state.authored_camera_path:
+    committed = runtime.camera_commands.use_authored_camera(
+        camera_state.authored_camera_path
+    )
 else:
-    # Use bbox-fit orbit as the session camera
-    fit = compute_bbox_fit_camera(stage)
-    orbit_camera.target = fit["target"]
-    orbit_camera.distance = fit["distance"]
-    orbit_camera.elevation = fit["elevation"]
-    orbit_camera.azimuth = fit["azimuth"]
+    committed = runtime.camera_commands.apply_bbox_fit(camera_state.bbox_fit)
+
+renderer.step(render_products, delta_time, ordinal=committed.ordinal)
 ```
+
+The method names are an application adapter contract, not OVStage API names.
+Implement them from the current OVStage population/query/data-plane examples and
+the current OVRTX attached-stage guidance. Keep all USD and OVStage handles
+inside the runtime owner.
+
+### Offline / Preflight Tool
+
+An offline tool may call `Usd.Stage.Open()` and the helpers above to emit a
+static `camera_config.json`. Treat that output as a hint: the attached viewer
+must re-query its active OVStage generation after population or scene switching.
 
 ### Frontend (streaming-client)
 
@@ -216,6 +241,8 @@ server.
   impressions. The heuristic deprioritizes them.
 - For multi-GPU or multi-viewport setups, each viewport can have its own
   camera. This skill picks the *initial default* only.
+- In an attached viewer, invalidate camera DTOs on a stage-generation change;
+  never reuse an offline `pxr` prim or a previous runtime path handle.
 
 ## See Also
 

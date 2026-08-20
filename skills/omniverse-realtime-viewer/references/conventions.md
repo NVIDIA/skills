@@ -28,8 +28,8 @@ of inventing a local rule.
 - WebRTC input uses the NVST native input channel. The browser streaming
   library forwards binary `InputEvent` structs to ovstream; React does not
   implement client-side 3D camera math or send JSON camera input.
-- SHM input uses `ovstream.ShmClient.send_input_event()` from Python or
-  `ovstream_shm_client_send_input_event()` from C with `InputEvent` structs.
+- SHM input uses `ovstream.Client(ovstream.ClientType.SHM, stream_name="...").send_input_event(event)` from Python or
+  `ovstream_client_send_input_event(client, event)` from C with `InputEvent` structs.
   Do not send JSON `mouseInput` for SHM camera control.
 - In-process transports call the Python/C++ camera, selection, and settings
   APIs directly.
@@ -91,6 +91,13 @@ of inventing a local rule.
   session/composite rebuild is mutating the renderer.
 - Detect the scene root dynamically on the server and pass `root_prim_path` to
   clients instead of hardcoding `/World`.
+
+## Physics And Runtime Simulation
+
+- Keep OVPhysX USD population out of the process that already owns `ovrtx.Renderer` and live OVStage unless a verified `PhysX.attach_ovstage(stage, read_ordinal=...)` bridge is available for the exact installed OVStage/OVPhysX ABI.
+- If `attach_ovstage` is unavailable or reports missing OVStage bridge symbols, run OVPhysX in a bounded child process and hand pose samples back to the parent as structured JSON. The parent writes transforms through OVStage/session state.
+- User or hero USD files remain unmodified. If a visual hero stage lacks physics APIs, generate a temporary child-only physics overlay/copy and map returned transforms back to the live prim paths.
+- Parent viewer debug state should distinguish `parent_inprocess_attach_ovstage_used` from `bounded_worker_used`; a valid subprocess handoff has parent false and child true.
 
 ## Streaming Protocol
 

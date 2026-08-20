@@ -28,19 +28,28 @@ supplemental dependency documentation.
 ## Runtime Setup
 
 Install and activate the selected `ovui` package through `references/dependencies`
-before imports. The lightweight local path imports `pxr` before direct `ovrtx`
-use; other server paths may construct `ovrtx.Renderer` first. Keep the chosen
-import discipline consistent in one process.
+before imports. The lightweight local path should keep the UI/render process
+focused on `ovui`, OVRTX, and live OVStage/session state. Run `pxr` queries in a
+subprocess unless the exact wheel set and import order have been verified for
+the target machine.
 
 ```python
 import asyncio
 import os
 os.environ.setdefault("OVRTX_SKIP_USD_CHECK", "1")
 
-from pxr import Usd, UsdGeom, Sdf
 import ovrtx
 import omni.ui as ui
 ```
+
+For OVStage-backed local apps, the parent desktop process owns stage lifetime,
+ordinals, the write floor, renderer attachment, and publication. Query workers
+and physics workers should exchange JSON or other DTOs, not live stage handles,
+path tokens, DLPack objects, or mapped buffers. If OVPhysX is requested, prefer
+`PhysX.attach_ovstage(stage, read_ordinal=...)` after verifying the exact
+installed OVStage/OVPhysX ABI. If that bridge is unavailable or fails, use a
+bounded worker only when its installed-package API is verified; otherwise report
+the compatibility block.
 
 Run with a real display from the activated environment:
 
@@ -52,11 +61,45 @@ If `renderer.step()` hangs after a crash, use `nvidia-smi` and kill only stale P
 
 ## ovui Window Shell
 
+Use this as the canonical standalone `ovui` bootstrap for generated lightweight
+local viewers in this skill package: initialize once, create one fill-window
+`ui.Window`, paint through one provider, then pass an awaitable render loop to
+`ui.run(...)`. Do not generate `hasattr(ui, "get_app")` or alternate bootstrap
+branches unless a targeted compatibility validation proves the selected wheel
+changed the standalone contract.
+
 Use `fill_app_window=True`; without it the GLFW window can resize while the UI frame remains stuck at the initial dimensions.
 
 ```python
-ui.init("Omniverse Realtime Viewer", width=1280, height=720, max_fps=60)
-window = ui.Window("Omniverse Realtime Viewer", width=1280, height=720, fill_app_window=True, flags=ui.WINDOW_FLAGS_NO_TITLE_BAR)
+import asyncio
+import numpy as np
+import omni.ui as ui
+
+
+def synthetic_rgba(width: int, height: int) -> np.ndarray:
+    x = np.linspace(0, 255, width, dtype=np.uint8)
+    y = np.linspace(0, 255, height, dtype=np.uint8)
+    rgba = np.zeros((height, width, 4), dtype=np.uint8)
+    rgba[:, :, 0] = x[None, :]
+    rgba[:, :, 1] = y[:, None]
+    rgba[:, :, 2] = 64
+    rgba[:, :, 3] = 255
+    return np.ascontiguousarray(rgba)
+
+
+WIDTH = 1280
+HEIGHT = 720
+
+ui.init("Omniverse Realtime Viewer", width=WIDTH, height=HEIGHT, max_fps=60)
+provider = ui.ByteImageProvider()
+window = ui.Window(
+    "Omniverse Realtime Viewer",
+    width=WIDTH,
+    height=HEIGHT,
+    fill_app_window=True,
+    flags=ui.WINDOW_FLAGS_NO_TITLE_BAR,
+)
+
 with window.frame:
     with ui.ZStack(style_type_name_override="Local.Root"):
         ui.Rectangle(style_type_name_override="Local.Root")
@@ -64,21 +107,30 @@ with window.frame:
             build_header(height=50)
             with ui.HStack(spacing=0, height=ui.Fraction(1)):
                 with ui.Frame(width=ui.Fraction(1)):
-                    viewport.build()
+                    ui.ImageWithProvider(
+                        provider,
+                        fill_policy=ui.IwpFillPolicy.IWP_PRESERVE_ASPECT_FIT,
+                    )
                 with ui.Frame(width=ui.Pixel(280)):
                     sidebar.build()
 
+provider.set_data_array(synthetic_rgba(640, 360), [640, 360])
+
+
 async def render_loop():
     while True:
-        app.step_and_present()
-        await asyncio.sleep(0)
+        # Advance viewer state here; ui.run owns presentation.
+        await asyncio.sleep(1.0 / 120.0)
+
 
 ui.run(render_loop())
 ```
 
 Keep the surface focused: black header, large viewport, white/sidebar utility area, green `#76b900` accents. Avoid editor-only affordances unless requested.
 
-`omni.ui.standalone.run()` expects an awaitable coroutine, not a plain callback. Returning from the coroutine ends the app, so long-running viewers should yield with `await asyncio.sleep(0)` after each render/UI tick.
+`ui.init(...)` returns `None`; `ui.run(...)` owns presentation and expects an awaitable coroutine. Returning from the coroutine ends the app, so long-running viewers should yield with `await asyncio.sleep(1.0 / 120.0)` after each state update. Validate this exact bootstrap
+before adding renderer or USD code; if a newer `ovui` wheel changes the contract,
+update this snippet instead of generating defensive bootstrap branches.
 
 ## Header And Load Controls
 

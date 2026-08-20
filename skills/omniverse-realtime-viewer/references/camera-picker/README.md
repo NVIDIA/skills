@@ -83,7 +83,18 @@ Confirms the switch (allows UI to sync if multiple clients are connected):
 
 ## Server Implementation
 
-### Enumerating Cameras
+### Attached OVStage Runtime Contract
+
+For an attached OVStage viewer, camera enumeration and selection belong to the
+application-owned runtime adapter. It returns copied camera DTOs to the
+transport layer and owns all live reads, transforms, lens updates, ordinal
+publication, and stage-generation checks. Do not open another `Usd.Stage` or
+read/write camera state through standalone renderer APIs in this path.
+
+The `pxr` example below is suitable only for a separate offline/preflight tool.
+It must not be called from the live attached viewer.
+
+### Offline / Preflight Enumeration
 
 ```python
 from pxr import Usd, UsdGeom
@@ -103,83 +114,55 @@ def get_camera_list(stage: Usd.Stage) -> list[dict]:
     return cameras
 ```
 
-### Handling `set_camera`
+### Handling `set_camera` in an Attached Viewer
 
 When the server receives `set_camera`:
 
 ```python
 def handle_set_camera(self, payload: dict) -> None:
     camera_path = payload.get("path", "")
-    prim = self.stage.GetPrimAtPath(camera_path)
-    if not prim or not prim.IsA(UsdGeom.Camera):
+    camera = self.runtime.camera_queries.get_camera(camera_path)
+    if camera is None:
         self.send_error(f"Invalid camera path: {camera_path}")
         return
 
-    cam = UsdGeom.Camera(prim)
-    xformable = UsdGeom.Xformable(prim)
-    xform = xformable.ComputeLocalToWorldTransform(Usd.TimeCode.Default())
-
-    # Option A: Copy authored camera transform to the session camera
-    # This preserves orbit controls centered on where the camera looks.
-    self._apply_camera_xform(xform, cam)
-
-    # Option B: Switch the render product to point at the authored prim
-    # self.renderer.set_active_camera(camera_path)
-
+    # The adapter validates the active generation, copies the authored camera
+    # into the session/orbit camera, waits, and publishes the resulting ordinal.
+    committed = self.runtime.camera_commands.use_authored_camera(camera_path)
     self.active_camera = camera_path
     self.broadcast({
         "event_type": "camera_changed",
-        "payload": {"activeCamera": camera_path},
+        "payload": {
+            "activeCamera": camera_path,
+            "stageGeneration": committed.stage_generation,
+        },
     })
-
-
-def _apply_camera_xform(self, xform, cam_schema) -> None:
-    """Apply an authored camera's transform and lens to the session camera."""
-    import numpy as np
-    from pxr import Gf
-
-    # Extract position and orientation
-    eye = xform.ExtractTranslation()
-    forward = xform.TransformDir(Gf.Vec3d(0, 0, -1)).GetNormalized()
-
-    # Compute orbit parameters from the authored camera
-    focal_length = cam_schema.GetFocalLengthAttr().Get() or 50.0
-
-    # Set orbit camera to look from this position in the authored direction
-    # Use a reasonable target distance based on focal length
-    target_distance = focal_length * 0.5  # heuristic: longer lens = farther target
-    target = eye + forward * target_distance
-
-    self.orbit_camera.target = np.array([target[0], target[1], target[2]])
-    self.orbit_camera.distance = target_distance
-    # Recompute azimuth/elevation from the authored transform
-    self.orbit_camera.set_from_eye_and_target(
-        eye=np.array([eye[0], eye[1], eye[2]]),
-        target=np.array([target[0], target[1], target[2]]),
-    )
-
-    # Update focal length on the render camera
-    self.orbit_camera.focal_length = focal_length
 ```
+
+`camera_queries` and `camera_commands` are application adapter boundaries, not
+literal OVStage API names. Build them from the current OVStage query/data-plane
+guidance. The command must publish before the renderer consumes the returned
+ordinal.
 
 ### Sending Camera List on Stage Load
 
 In the stage load handler, after `push_initial_state`:
 
 ```python
-def on_stage_loaded(self, stage: Usd.Stage) -> None:
+def on_stage_loaded(self) -> None:
     # ... existing push_initial_state logic ...
 
-    cameras = get_camera_list(stage)
+    camera_state = self.runtime.camera_queries.list_authored_cameras()
+    cameras = camera_state.cameras
     if cameras:
-        from camera_auto_select import find_best_camera
-        active = find_best_camera(stage) or cameras[0]["path"]
+        active = camera_state.default_camera_path or cameras[0]["path"]
         self.active_camera = active
         self.broadcast({
             "event_type": "camera_list",
             "payload": {
                 "cameras": cameras,
                 "activeCamera": active,
+                "stageGeneration": camera_state.stage_generation,
             },
         })
 ```
@@ -348,8 +331,10 @@ Only activate when the viewport has focus (not when typing in a text field).
 - Some stages nest cameras inside referenced assets (props). Filter to
   cameras that are direct children of a `Cameras` Xform or at the scene root
   to avoid showing internal asset cameras.
-- The orbit controller's `set_from_eye_and_target` must handle both Y-up and
-  Z-up stages. Check `UsdGeom.GetStageUpAxis()`.
+- The runtime camera adapter must preserve both Y-up and Z-up orientation when
+  it converts an authored camera into orbit state.
+- Drop delayed selection commands and camera-list messages when their
+  `stageGeneration` no longer matches the active runtime.
 
 ## See Also
 

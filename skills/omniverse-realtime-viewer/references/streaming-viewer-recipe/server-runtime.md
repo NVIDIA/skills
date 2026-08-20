@@ -2,7 +2,7 @@
 
 ## 2. Install Dependencies And Configure The Environment
 
-*Read `references/dependencies` FIRST.* Its `references/nvidia-runtime.md` file is
+*Read `references/dependencies` FIRST.* Its `nvidia-runtime.md` file is
 the source of truth for NVIDIA runtime locations. Do not guess install paths and
 do not repeat `ovstream`, `ovui`, `ovrtx`, or `ov-web-rtc` client acquisition
 details in this recipe.
@@ -10,12 +10,25 @@ details in this recipe.
 Do this on the server side:
 
 - Install `ovrtx` using the package guidance in `references/dependencies`.
+- Install `ovstage` using the package guidance in `references/dependencies`
+  when the viewer runtime uses OVStage as the live stage substrate.
 - Install `ovstream` using the current package guidance in `references/dependencies`.
   If `ovstream.initialize()` reports missing native StreamSDK libraries, follow
   the current dependency guidance.
 - Install `warp-lang` for CUDA-side channel conversion (`pip install warp-lang`).
 - Install `numpy` for matrices and camera math (`pip install numpy`).
-- Install `usd-core==24.11` only when the server process needs direct `pxr` queries. Pin to 24.11 — newer versions cause TfType schema conflicts with ovrtx. Prefer subprocess query mode on Windows or when USD registry conflicts appear.
+- Install `usd-core` only when the app creates a USD query worker. Resolve a release compatible with the selected runtime package set after reviewing the current upstream runtime documentation and release notes. Keep
+  routine `pxr` imports out of the server process that owns OVRTX and live
+  OVStage unless the exact wheel set and import path are verified.
+- Install `ovphysx` only in a bounded physics worker or an isolated
+  attached-stage compatibility probe. Do not add it to the parent server
+  environment unless the selected architecture has verified
+  `PhysX.attach_ovstage(stage, read_ordinal=...)` for the exact OVStage/OVPhysX ABI.
+- If the streaming server also selects `ovui` or a headless overlay UI package,
+  resolve the Python environment from the current upstream `ovui` docs and
+  package metadata before creating the venv. Plain browser-streaming servers
+  that use only `ovrtx`, `ovstream`, and `warp` should follow those runtime
+  wheels' compatibility instead.
 
 For generated browser viewers, create app-local setup and run wrappers rather
 than pointing users at repo-level scripts. The setup wrapper should install the
@@ -30,11 +43,7 @@ Do this on the frontend side:
 
 - Create a Vite React app (`npm create vite@latest frontend -- --template react-ts`).
 - Configure and install `@nvidia/ov-web-rtc` using `references/dependencies`.
-  Use only the standalone `ovstream` Direct connection pattern from
-  `streaming-client`; do not use Kit, OVC, NVCF, or GFN client connection
-  profiles in the browser WebRTC config. If OKAS or another orchestrator
-  launches the container, convert its exposed endpoint into Direct `server` and
-  `signalingPort` values.
+  For Brev, OKAS, or another portable orchestrator, use the standalone `ovstream` Direct connection pattern from `streaming-client` and convert the exposed endpoint into Direct `server` and `signalingPort` values. For NVCF self-hosted deployment, read `cloud-deployment/nvcf-self-hosted.md` and follow the upstream workflow before selecting the browser connection model.
 - Add normal UI dependencies only when they are part of the requested UI. Keep the core connection path dependency-light.
 
 Set these environment contracts before starting the server:
@@ -52,7 +61,11 @@ Decision points:
 - If the target is local development, use WebRTC signaling port `49100`, stream port defaulting through ovstream, and public IP `127.0.0.1`.
 - If the target is LAN access, expose signaling host and port through frontend URL parameters and environment variables.
 - If the target is cloud deployment, do not invent a new deployment model in this recipe; read `references/cloud-deployment` and keep to supported paths.
-- If running on Windows with `pxr` imports for advanced USD inspection, prefer a separate USD query subprocess rather than importing `pxr` in the ovrtx render process.
+- If the feature needs OpenUSD inspection, prefer a separate USD query
+  subprocess rather than importing `pxr` in the OVRTX/OVStage parent process.
+- If the feature needs OVPhysX, prefer a bounded child worker that returns pose
+  samples as JSON unless the installed `PhysX.attach_ovstage(stage, read_ordinal=...)` bridge has been
+  verified.
 
 Common failure modes:
 
@@ -69,23 +82,34 @@ Read for depth: see `references/dependencies` for install commands, `references/
 Do this:
 
 - In `server/ov_web_viewer_server.py`, parse width, height, target FPS, signaling port, public IP, initial scene URL/path, asset root, and settings path.
-- Construct a single application runtime object that owns the renderer runtime, scene manager, stream server, message router, input router, settings store, and command queue.
-- Follow the canonical startup order: set env, construct an ovrtx renderer with native selection outline support when needed, load the initial stage through `open_usd()` or `open_usd_from_string()`, warm up the renderer, initialize ovstream, register callbacks, start readiness health, then start the render loop.
+- Construct a single application runtime object that owns the renderer runtime,
+  OVStage/session state when selected, scene manager, stream server, message
+  router, input router, settings store, and command queue.
+- Follow the canonical startup order: set env, construct an ovrtx renderer with
+  native selection outline support when needed, create/populate/attach the
+  selected runtime stage path or load the initial stage through the current OVRTX
+  open API, warm up the renderer, initialize ovstream, register callbacks, start
+  readiness health, then start the render loop.
 - Initialize ovstream once, create a WebRTC server, register `on_connection`, `on_message`, and `on_input`, then start the server.
 - Enter one render loop that drains queued commands, updates camera/selection/settings state, steps ovrtx when a scene is loaded, converts the frame to BGRA, and submits video to ovstream.
-- On shutdown, stop streaming, close the ovstream server, close renderer resources if exposed by the API, and call ovstream shutdown exactly once for each initialize call.
+- While a client is connected, submit a fallback or last-good BGRA frame on every
+  tick even when no scene is loaded or a stage load lock is held.
+- On per-server stop, stop streaming and close the ovstream server. Call
+  `ovstream.shutdown()` only from the top-level process-exit path after the
+  final server is closed; do not call it between same-process restarts.
 
 Canonical startup sequence:
 
 ```text
 set OVRTX_SKIP_USD_CHECK=1
-import ovrtx and construct Renderer(RendererConfig(sync_mode=True, selection_outline_enabled=True))
+import ovrtx and construct the current renderer/runtime
 load initial stage:
-  build an inline root USDA that sublayers the user stage and authors viewer render config
-  renderer.open_usd_from_string(inline_root_usda)
-  bind /OVCamera omni:xform
+  populate OVStage or build an inline root USDA that sublayers the user stage and authors viewer render config
+  attach/open with the current OVRTX API
+  write /OVCamera omni:xform through the runtime owner
   initialize native selection outline styles and clear outline groups
 warm up renderer:
+  commit the initial OVStage publication when present
   write camera transform
   step /Render/OVServer/ViewportTexture0 several frames
   probe render vars and allocate persistent BGRA stream buffer
@@ -104,11 +128,17 @@ Critical contracts:
 - Register callbacks before `server.start()`.
 - Keep callbacks fast. They may be called from StreamSDK internal threads.
 - Do not call renderer load/reset/step/write APIs directly from ovstream callbacks. Enqueue work for the render loop.
+- Do not call USD or physics population APIs directly from ovstream callbacks.
+  Queue USD query work to a worker and OVPhysX work to a bounded child process
+  unless a verified attached-stage bridge is active.
 - Guard `send_message` with the connected-client state.
 - Maintain explicit runtime states: starting, idle/no scene, loading, streaming, error, shutting down.
 - Keep the most recent loaded stage URL, root hierarchy summary, selection, render settings, and loading state in server memory so a newly connected browser can receive initial state.
 - Readiness is not liveness: `/healthz` must return `503 not ready` until the render loop has produced and copied the first valid frame, then `200 ok`.
 - Readiness must not depend on an active browser client or on `stream_video()` succeeding. Before any client connects, frame submission can no-op or raise transient no-client/disconnect errors depending on the selected ovstream build.
+- A connected idle client still needs continuous video. Stream a valid fallback
+  frame until the first real stage frame exists, then keep streaming the last
+  good frame during scene-load locks.
 
 Decision points:
 
@@ -122,6 +152,9 @@ Common failure modes:
 - Registering callbacks after `start()` causes missed connection and data-channel events.
 - Calling `renderer.step()` during `reset_stage()`, `open_usd*()`, or reference mutation causes races, stale buffers, or crashes.
 - Sending messages while no client is connected silently loses important state unless the runtime pushes initial state after connection.
+- Calling `ovstream.shutdown()` in a per-request stop path can corrupt native
+  state for later same-process `Server.start()` attempts. Use stop/close for
+  restarts and reserve shutdown for process exit.
 
 Read for depth: see `references/streaming-server` and `references/streaming-lifecycle` for the full lifecycle contract.
 
@@ -139,11 +172,17 @@ Critical contracts:
 - The application calls `renderer.step()` explicitly. ovrtx does not run a hidden app loop for the viewer.
 - Pass the exact viewer RenderProduct path to every step call.
 - Extract `LdrColor` from the returned frame. This is RGBA8 from ovrtx.
-- For AOVs, handle both single-tensor and multi-tensor render var outputs. Single-tensor outputs are consumed directly through DLPack; multi-tensor outputs must select a named image tensor and read params separately. Image tensors are channel-last (`H x W x C`), not channel-first.
+- For AOVs, handle current single-tensor and multi-tensor render var outputs.
+  Single-tensor outputs are consumed directly through DLPack; multi-tensor
+  outputs must select a named image tensor and read params separately. Image
+  tensors are channel-last (`H x W x C`), not channel-first.
 - Map CUDA buffers for streaming. Avoid CPU round trips in the normal streaming path.
 - Keep mapped or converted frame buffers alive until `stream_video()` returns.
 - Use `write_attribute` for live camera transforms and other live state. Write `omni:xform`, not authored `xformOp:*`, for interactive updates.
 - Use the correct transform semantic and create-new prim mode for attributes that may not already exist in Fabric.
+- For OVStage-backed runtimes, prefer publishing live transform and effect
+  changes through OVStage/session state at monotonic ordinals, then let OVRTX
+  render the committed publication.
 
 Decision points:
 
@@ -157,7 +196,9 @@ Common failure modes:
 - `Unable to find RenderProduct prim` means scene setup did not create the path used by `renderer.step()`.
 - Black frame usually means camera relation, render product resolution, render var source, or camera transform is invalid.
 - Red/blue color swap means ovrtx RGBA was submitted to ovstream without BGRA conversion.
-- Live camera changes doing nothing usually means the app wrote `xformOp:transform` instead of `omni:xform`, or used existing-only prim mode.
+- Live camera changes doing nothing usually means the app wrote
+  `xformOp:transform` instead of `omni:xform`, used existing-only prim mode, or
+  published above the OVStage write floor.
 
 Read for depth: see `references/ovrtx-rendering` for the full renderer construction, frame extraction, and live attribute contract.
 
