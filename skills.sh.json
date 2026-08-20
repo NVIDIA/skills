@@ -9,6 +9,8 @@
         "aiq-deploy",
         "aiq-research",
         "i4h-workflow-setup",
+        "nemo-fabric-build-adapter",
+        "nemo-fabric-integrate",
         "nemo-relay-debug-runtime-integration",
         "nemo-relay-get-started",
         "nemo-relay-install",

@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 341,
-  "result_row_count": 3180,
+  "skill_count": 343,
+  "result_row_count": 3200,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -3195,6 +3195,42 @@
       "component": "NeMo AutoModel",
       "has_results": true,
       "average_uplift_pct": 32.5
+    },
+    {
+      "skill": "nemo-fabric-build-adapter",
+      "evaluation_date": "2026-08-19",
+      "profile": null,
+      "environment": "local",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nemo-fabric-build-adapter",
+      "component": "NeMo Fabric",
+      "has_results": true,
+      "average_uplift_pct": 25.9
+    },
+    {
+      "skill": "nemo-fabric-integrate",
+      "evaluation_date": "2026-08-19",
+      "profile": null,
+      "environment": "local",
+      "tasks": 5,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nemo-fabric-integrate",
+      "component": "NeMo Fabric",
+      "has_results": true,
+      "average_uplift_pct": 26.6
     },
     {
       "skill": "nemo-mbridge-mlm-bridge-training",
@@ -21614,6 +21650,186 @@
       "agent": "codex",
       "score_pct": 59.0,
       "uplift_pct": 27.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-build-adapter",
+      "component": "NeMo Fabric",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": -25.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-build-adapter",
+      "component": "NeMo Fabric",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-build-adapter",
+      "component": "NeMo Fabric",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 70.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-build-adapter",
+      "component": "NeMo Fabric",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-build-adapter",
+      "component": "NeMo Fabric",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 19.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-build-adapter",
+      "component": "NeMo Fabric",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 9.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-build-adapter",
+      "component": "NeMo Fabric",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-build-adapter",
+      "component": "NeMo Fabric",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-build-adapter",
+      "component": "NeMo Fabric",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 23.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-build-adapter",
+      "component": "NeMo Fabric",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.0,
+      "uplift_pct": 23.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-integrate",
+      "component": "NeMo Fabric",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-integrate",
+      "component": "NeMo Fabric",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 40.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-integrate",
+      "component": "NeMo Fabric",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 52.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-integrate",
+      "component": "NeMo Fabric",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-integrate",
+      "component": "NeMo Fabric",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-integrate",
+      "component": "NeMo Fabric",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.0,
+      "uplift_pct": 22.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-integrate",
+      "component": "NeMo Fabric",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 73.0,
+      "uplift_pct": 29.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-integrate",
+      "component": "NeMo Fabric",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-integrate",
+      "component": "NeMo Fabric",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "nemo-fabric-integrate",
+      "component": "NeMo Fabric",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 97.0,
+      "uplift_pct": 35.0
     },
     {
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
