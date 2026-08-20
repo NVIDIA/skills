@@ -69,9 +69,9 @@
         "omniverse-realtime-viewer",
         "omniverse-usd-performance-tuning",
         "physical-ai-defect-image-generation",
+        "physical-ai-image-attribute-augmentation",
         "physical-ai-infrastructure-setup-and-resilient-scaling",
         "physical-ai-neural-reconstruction",
-        "physical-ai-people-attribute-search",
         "physical-ai-video-data-augmentation"
       ]
     },
