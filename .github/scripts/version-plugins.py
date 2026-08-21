@@ -409,6 +409,7 @@ class PluginAnalysis:
     head_version: SemVer
     builder_changed_version: bool
     change_kind: str
+    is_new: bool = False
     structural_reasons: list[str] = field(default_factory=list)
 
 
@@ -544,6 +545,7 @@ def analyze_plugin(
         base_spec = None
         base_version = head_version  # placeholder; classify_change handles None spec
         builder_changed_version = True  # everything is new
+        is_new = True
     else:
         base_spec = _merged_spec(base_defaults, base_plugin_yaml)
         try:
@@ -565,6 +567,7 @@ def analyze_plugin(
             )
         else:
             builder_changed_version = False
+        is_new = False
 
     head_plugin_dir = PLUGINS_DIR / name
     head_file_hashes = _hash_plugin_tree(head_plugin_dir)
@@ -593,6 +596,7 @@ def analyze_plugin(
         head_version=head_version,
         builder_changed_version=builder_changed_version,
         change_kind=change_kind,
+        is_new=is_new,
         structural_reasons=reasons,
     )
 
@@ -614,9 +618,16 @@ def decide(analysis: PluginAnalysis) -> tuple[str, str | None]:
       noop    -> nothing changed, nothing to do.
       bump    -> auto-bump (z for content, y for structural). Payload
                  is the new SemVer string.
-      accept  -> builder already changed version; validated OK.
+      accept  -> builder already changed version; validated OK. A newly
+                 introduced plugin is also accepted: there is no prior
+                 version for it to increase from, and `SemVer.parse` in
+                 `analyze_plugin` has already required the initial version
+                 to be a strict MAJOR.MINOR.PATCH.
       fail    -> validation failure; payload is the message.
     """
+    if analysis.is_new:
+        return "accept", None
+
     if analysis.builder_changed_version:
         findings = validate_builder_version(
             analysis.base_version, analysis.head_version
@@ -660,11 +671,12 @@ def print_plan(plan: Plan, apply_mode: bool) -> None:
     if plan.no_ops:
         print(f"── no-op ({len(plan.no_ops)}) ──")
         for a in plan.no_ops:
-            note = (
-                "(builder-set version validated)"
-                if a.builder_changed_version
-                else "(no payload change)"
-            )
+            if a.is_new:
+                note = "(new plugin; initial version accepted)"
+            elif a.builder_changed_version:
+                note = "(builder-set version validated)"
+            else:
+                note = "(no payload change)"
             print(f"  · {a.name} {a.head_version} {note}")
     if plan.bumps:
         verb = "applying" if apply_mode else "would apply"
