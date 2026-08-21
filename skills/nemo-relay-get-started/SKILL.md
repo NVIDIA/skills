@@ -114,6 +114,8 @@ Use another handoff only after the user accepts or declines plugin progression,
 or when the demonstrated boundary does not yet cover the intended workflow:
 
 - Direct application expansion -> `nemo-relay-instrument-calls`
+- Unsupported framework or harness integration ->
+  `nemo-relay-integrate-upstream`
 - Additional exporters or durable observability configuration ->
   `nemo-relay-plugin-observability`
 - A different package or supported integration -> `nemo-relay-install`
