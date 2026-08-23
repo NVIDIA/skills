@@ -9,16 +9,16 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `nemo-mbridge-perf-sequence-packing`
-- Evaluation date: 2026-08-11
-- Evaluator version: `1.2.0`
+- Evaluation date: 2026-08-17
+- Evaluator version: `1.2.7`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:57d3c088dee48ee97547a666ee24dcac45c6cd5cbf699640c3c7d41710f629a1` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
-- Environment: `k8s-sandbox`
+- Environment: `local`
 - Tier 3 evidence: required for publication
 
-Each task attempt ran in its own isolated sandbox pod.
+Tasks ran on the trusted local host; local mode is not sandboxed.
 
 ## What This Report Answers
 
@@ -34,12 +34,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 37% → 91% (+54 points) | 68% → 86% (+18 points) |
+| Overall | 60% → 98% (+38 points) | 56% → 96% (+40 points) |
 | Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 0% → 100% (+100 points) | 100% → 100% (±0 points) |
-| Discoverability | 50% → 100% (+50 points) | 50% → 88% (+38 points) |
-| Effectiveness | 0% → 66% (+66 points) | 74% → 45% (-29 points) |
-| Efficiency | 35% → 90% (+55 points) | 17% → 100% (+83 points) |
+| Correctness | 0% → 100% (+100 points) | 40% → 100% (+60 points) |
+| Discoverability | 100% → 100% (±0 points) | 50% → 88% (+38 points) |
+| Effectiveness | 0% → 88% (+88 points) | 40% → 94% (+54 points) |
+| Efficiency | 100% → 100% (±0 points) | 50% → 100% (+50 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.
 

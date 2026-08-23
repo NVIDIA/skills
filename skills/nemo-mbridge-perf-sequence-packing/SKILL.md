@@ -104,12 +104,20 @@ the packed dataset (asserted in `src/megatron/bridge/data/datasets/sft.py`).
 Custom packed datasets that omit the metadata file will hit an assertion at
 dataset initialization.
 
-In-batch packing for VLM finetuning:
+In-batch packing for GPT SFT and supported VLM finetuning:
 
 ```python
 cfg.dataset.enable_in_batch_packing = True
-cfg.train.micro_batch_size = 2
+cfg.dataset.dataloader_type = "single"
+cfg.train.micro_batch_size = 4
 ```
+
+For local or materialized GPT-SFT JSONL, this keeps the existing mmap-backed
+dataset and performs tokenization lazily. Both prompt/completion
+(`GPTSFTDataset`) and chat (`GPTSFTChatDataset`) preserve their loss-mask
+semantics. Use `dataloader_type="single"` or `"cyclic"` so every DataLoader
+yield is one logical microbatch; GPT-SFT in-batch packing does not support the
+global-batch `"batch"` dataloader.
 
 Energon online packing for Qwen-VL uses Energon's per-worker candidate buffer
 instead of limiting selection to one collator micro batch:
@@ -232,6 +240,14 @@ def prepare_padded_or_packed_sequence_batch(
         return
 ```
 
+GPT-SFT direct-row packing:
+
+```627:671:src/megatron/bridge/data/datasets/gpt_sft.py
+def _collate_in_batch(self, batch):
+    ...
+    return build_mcore_thd_sequence_batch_from_rows(...)
+```
+
 Packed THD runtime constraint:
 
 ```94:108:src/megatron/bridge/training/gpt_step.py
@@ -250,18 +266,19 @@ if cu_seqlens.dim() > 1 and cu_seqlens.size(0) != 1:
 
 ## Pitfalls
 
-1. Offline packed SFT, collate-time VLM packing, and Energon online packing are different features. Offline and Energon packing use physical MBS1; collate-time packing uses MBS greater than one.
-2. When CP is enabled, packed sequence lengths must respect `2 * context_parallel_size` divisibility.
-3. For finetuning with CP, `calculate_per_token_loss=True` and `ddp.average_in_collective=False` are required.
-4. `pad_cu_seqlens=True` also requires `pad_to_max_length=True`.
-5. Packing support is model-family-specific. `Qwen3-Next`, `GLM-4.5`, and `Qwen3.5-VL` contain explicit opt-outs in different paths.
-6. MTP finetuning is documented as incompatible with packed sequences.
-7. Synthetic padding rows, including negative indices remapped through `samples_mapping`, must retain an all-zero loss mask.
-8. `global_batch_size` must be divisible by and no smaller than data parallel size when offline packing uses MBS1.
-9. Derive `pad_seq_to_mult` from CP/TP/SP for both SFT and PEFT; do not hardcode different values by workload type.
-10. `pad_to_max_length` controls final pack width and is conditional on fixed-shape execution requirements.
-11. Energon `packing_buffer_size` is per worker and also affects validation; global/eval batch counts refer to physical packs rather than source conversations.
-12. Exact Energon loader resume requires unchanged shards/splits, DP world size, worker counts, shuffle settings/seed, processor, sequence length, topology, and packing-buffer size.
+1. Offline packed SFT, runtime in-batch packing, and Energon online packing are different features. Offline and Energon packing use physical MBS1; runtime in-batch packing uses MBS greater than one.
+2. GPT-SFT in-batch packing requires `dataloader_type="single"` or `"cyclic"`; it does not support `"batch"`.
+3. When CP is enabled, packed sequence lengths must respect `2 * context_parallel_size` divisibility.
+4. For finetuning with CP, `calculate_per_token_loss=True` and `ddp.average_in_collective=False` are required.
+5. `pad_cu_seqlens=True` also requires `pad_to_max_length=True`.
+6. Packing support is model-family-specific. `Qwen3-Next`, `GLM-4.5`, and `Qwen3.5-VL` contain explicit opt-outs in different paths.
+7. MTP finetuning is documented as incompatible with packed sequences.
+8. Synthetic padding rows, including negative indices remapped through `samples_mapping`, must retain an all-zero loss mask.
+9. `global_batch_size` must be divisible by and no smaller than data parallel size when offline packing uses MBS1.
+10. Derive `pad_seq_to_mult` from CP/TP/SP for both SFT and PEFT; do not hardcode different values by workload type.
+11. `pad_to_max_length` controls final pack width and is conditional on fixed-shape execution requirements.
+12. Energon `packing_buffer_size` is per worker and also affects validation; global/eval batch counts refer to physical packs rather than source conversations.
+13. Exact Energon loader resume requires unchanged shards/splits, DP world size, worker counts, shuffle settings/seed, processor, sequence length, topology, and packing-buffer size.
 
 ## Verification
 
@@ -271,6 +288,8 @@ Use the checked-in unit coverage:
 uv run python -m pytest tests/unit_tests/training/utils/test_packed_seq_utils.py -v && \
 uv run python -m pytest tests/unit_tests/training/test_config.py -k "packed_sequence or enable_in_batch_packing or offline_and_in_batch_packing_are_mutually_exclusive or context_parallel_seq_length_divisibility or context_parallel_finetuning_validations" -v && \
 uv run python -m pytest tests/unit_tests/data/packing/test_in_batch.py -v && \
+uv run python -m pytest tests/unit_tests/data/datasets/test_gpt_sft.py -k "in_batch_packing" -v && \
+uv run python -m pytest tests/unit_tests/data/builders/test_gpt_sft_config.py -v && \
 uv run python -m pytest tests/unit_tests/training/test_vlm_step.py -k "deferred_in_batch_packing or packed_metadata" -v && \
 uv run python -m pytest tests/unit_tests/models/qwen_vl/data/test_energon.py tests/unit_tests/data/builders/test_energon_builder.py -v && \
 uv run python -m pytest tests/unit_tests/tutorials/test_multimodal_data_tutorials.py -k "native_packing_loader" -v && \
@@ -283,5 +302,6 @@ Success criteria:
 - all selected tests pass
 - offline and in-batch configuration validation remains mutually exclusive
 - packed metadata reaches the training step in MCore THD form
+- GPT-SFT in-batch packing rejects the global-batch `"batch"` dataloader
 - native Energon packing restores pending groups exactly and flushes finite partial buffers without dropping samples
 - mapped padding rows do not contribute to loss
