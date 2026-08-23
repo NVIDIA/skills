@@ -79,6 +79,7 @@ known_constraints:
   - pad_seq_to_mult is derived from CP/TP/SP and follows the same rule for SFT and PEFT.
   - pad_to_max_length is conditional on a fixed-width dispatcher, kernel, or CUDA-graph path.
   - VLM in-batch packing requires micro_batch_size > 1.
+  - GPT-SFT in-batch packing requires dataloader_type single or cyclic; batch is unsupported.
   - Energon online packing requires physical micro_batch_size == 1 and counts candidate samples per worker.
   - Energon online packing is mutually exclusive with collate-time in-batch packing and the deferred Qwen step.
   - Energon online packing does not support MTP, CUDA graphs, or pipeline parallelism.

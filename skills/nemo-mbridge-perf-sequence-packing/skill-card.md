@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers configuring sequence packing and long-context training in Megatron-Bridge for LLM and VLM finetuning workloads. <br>
+Developers and ML engineers configuring sequence packing and long-context training for LLM and VLM fine-tuning workflows in Megatron-Bridge. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Not Specified] <br>
-**Credential Type(s):** [None identified] <br>
+**Requires API Key or External Credential:** [No] <br>
+**Credential Type(s):** [None] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -27,7 +27,7 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [Packed Sequences Documentation](docs/training/packed-sequences.md) <br>
 - [Performance Tuning Guide](docs/performance-guide.md) <br>
-- [Megatron Bridge Documentation](https://docs.nvidia.com/nemo/megatron-bridge/latest/) <br>
+- [Hierarchical Context Parallel](docs/training/hierarchical-context-parallel.md) <br>
 
 
 ## Skill Output: <br>
@@ -43,15 +43,15 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 task (1 positive) in isolated k8s-sandbox pods with dataset digest sha256:57d3c088. <br>
+Evaluated against 1 task (1 positive) using evaluator version 1.2.7 in local environment with Tier 3 live agent evaluation. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use (no unsafe operations, secret leakage, or unauthorized access). <br>
-- Correctness: Whether the skill produces correct answers against reference ground truth. <br>
-- Discoverability: Whether the right skill is loaded and activated when needed. <br>
-- Effectiveness: Whether the skill helps complete the user's goal and expected workflow. <br>
-- Efficiency: Whether the skill avoids wasted tool or skill usage. <br>
+- Security: Whether the skill is safe to use (unsafe operations, secret leakage, unauthorized access). <br>
+- Correctness: Whether the answer produced is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded and executed when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (goal accuracy + behavior check). <br>
+- Efficiency: Whether the skill avoided wasted tool or skill usage (routing quality and productive tool use). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
@@ -66,17 +66,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 37% → 91% (+54 points) | 68% → 86% (+18 points) |
+| Overall | 60% → 98% (+38 points) | 56% → 96% (+40 points) |
 | Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 0% → 100% (+100 points) | 100% → 100% (±0 points) |
-| Discoverability | 50% → 100% (+50 points) | 50% → 88% (+38 points) |
-| Effectiveness | 0% → 66% (+66 points) | 74% → 45% (-29 points) |
-| Efficiency | 35% → 90% (+55 points) | 17% → 100% (+83 points) |
-
-## Testing Completed: <br>
-**[x] Agent Red-Teaming** <br>
-**[ ] Network Security** <br>
-**[ ] Product Security** <br>
+| Correctness | 0% → 100% (+100 points) | 40% → 100% (+60 points) |
+| Discoverability | 100% → 100% (±0 points) | 50% → 88% (+38 points) |
+| Effectiveness | 0% → 88% (+88 points) | 40% → 94% (+54 points) |
+| Efficiency | 100% → 100% (±0 points) | 50% → 100% (+50 points) |
 
 ## Skill Version(s): <br>
 1.0.0+b7643bd (source: pyproject.toml) <br>
