@@ -2,7 +2,7 @@
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
   "skill_count": 343,
-  "result_row_count": 3210,
+  "result_row_count": 3215,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -4916,13 +4916,13 @@
     },
     {
       "skill": "omniverse-usd-performance-tuning",
-      "evaluation_date": "2026-07-30",
+      "evaluation_date": "2026-08-21",
       "profile": null,
-      "environment": "k8s-sandbox",
-      "evaluator_version": "0.9.0",
-      "dataset_digest": "sha256:137b9ca69a3516a7fffcdfff70f950f2851e5c425ccd4d9be11fb4ee4161ff8c",
-      "validation_status": null,
-      "tasks": 9,
+      "environment": "local",
+      "evaluator_version": "1.3.2",
+      "dataset_digest": "sha256:e8ce4980d3c355c912e64a23c53712932a49478f0c0839b4d48ca0559aa4083c",
+      "validation_status": "passed",
+      "tasks": 10,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
@@ -4933,7 +4933,7 @@
       "catalog_dir": "omniverse-usd-performance-tuning",
       "component": "Physical AI",
       "has_results": true,
-      "average_uplift_pct": 38.6
+      "average_uplift_pct": 36.2
     },
     {
       "skill": "paidf-anomalygen",
@@ -27457,9 +27457,27 @@
       "component": "Physical AI",
       "dimension": "Security",
       "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "omniverse-usd-performance-tuning",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 11.0
+      "score_pct": 95.0,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "omniverse-usd-performance-tuning",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": 54.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
@@ -27467,8 +27485,17 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 76.0,
-      "uplift_pct": 56.0
+      "score_pct": 86.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "omniverse-usd-performance-tuning",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 99.0,
+      "uplift_pct": 48.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
@@ -27476,8 +27503,17 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 91.0,
-      "uplift_pct": 44.0
+      "score_pct": 88.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "omniverse-usd-performance-tuning",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 74.0,
+      "uplift_pct": 26.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
@@ -27485,8 +27521,17 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 63.0,
-      "uplift_pct": 26.0
+      "score_pct": 89.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "omniverse-usd-performance-tuning",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 44.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
@@ -27494,8 +27539,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 91.0,
-      "uplift_pct": 56.0
+      "score_pct": 97.0,
+      "uplift_pct": 41.0
     },
     {
       "catalog_dir": "paidf-anomalygen",
