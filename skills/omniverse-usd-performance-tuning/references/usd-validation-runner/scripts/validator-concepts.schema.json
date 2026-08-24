@@ -64,7 +64,17 @@
       "required": ["provider", "module", "class_name", "use_for"],
       "properties": {
         "provider": { "enum": ["so", "oav"] },
-        "module": { "type": "string", "minLength": 1 },
+        "module": {
+          "type": "string",
+          "minLength": 1,
+          "$comment": "Current upstream defining module of the rule class, as reported by cls.__module__ on a live registry. Not an import alias."
+        },
+        "module_aliases": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true,
+          "$comment": "Pre-rename module paths for the same rule class, kept so older runtimes still resolve. The executor accepts 'module' or any alias, and additionally accepts any module in the same package family, so a future rename resolves without a registry edit."
+        },
         "class_name": { "type": "string", "minLength": 1 },
         "category": {
           "type": "string",

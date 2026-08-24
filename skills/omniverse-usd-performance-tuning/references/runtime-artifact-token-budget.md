@@ -20,13 +20,17 @@ High-risk artifacts include:
 
 ## Preferred Read Order
 
-1. Read compact structured artifacts first:
+1. Read compact structured artifacts first — but check the size before reading
+   any of them whole (see *Structured artifacts are not automatically small*):
    - `<output_path>/setup-preflight.json`
-   - validator `summary.json`
-   - `summarize_csv.py` compact JSON output
-   - operation `summary.json`
-   - profile metric JSON
-   - optimization report JSON
+   - the validation runner's `validation-report.json`
+   - the batch driver's `<stem>.<sha1-absolute-path-prefix-12>.summary.json`
+   - `<output_path>/baseline_profile.json` and `<output_path>/after_profile.json`
+   - `<output_path>/optimization-report.json`
+
+   A provider CSV or `provider-summary.json` is not on this list because the
+   sanctioned executor path does not write one. If one exists, something outside
+   the path produced it; treat it as a raw artifact under step 2.
 2. If raw context is still needed, read a bounded snapshot:
    - POSIX: `tail -n 80 <log>` or `sed -n '1,80p' <file>`
    - PowerShell: `Get-Content <path> -Tail 80` or
@@ -34,6 +38,24 @@ High-risk artifacts include:
 3. For targeted troubleshooting, search first, then show only nearby lines:
    - `rg -n "ERROR|WARN|failed|exception" <log>`
    - `rg -n -C 3 "<rule-or-prim>" <artifact>`
+
+## Structured artifacts are not automatically small
+
+Step 1 says read the structured artifacts first because they are usually the
+compact ones. Some of them are not. This pipeline routinely writes candidate
+payloads in the megabytes — `dedupe_candidates.json` at 3.0 MB (roughly 758 K
+tokens), `rescan_candidates.json` at 2.0 MB, `candidates_packet.json` at 1.6 MB —
+and reading one of those whole costs more context than the log it was supposed to
+save you from.
+
+- **Under 1 MB:** read it whole.
+- **1 MB or larger:** do not read it whole. Extract the fields you need with a
+  bounded query and read only the result — for example
+  `python3 -c "import json;d=json.load(open(p));print(len(d['candidates']), d['candidates'][:5])"`
+  or `jq '.candidates | length, (.[0:5])' <file>`. Report the artifact path and
+  its size alongside whatever you extracted.
+- Never read a structured artifact above 5 MB into context under any framing.
+  That is the same ceiling step 5 of the stderr guard applies to `stderr.log`.
 
 ## Hard Limits
 

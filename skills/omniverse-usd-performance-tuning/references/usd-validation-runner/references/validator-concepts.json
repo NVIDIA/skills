@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "$comment": "Canonical validator-concept registry for the USD performance-tuning workflow. Single binding layer between agent-facing concept names and runtime rule identity, tier, scope policy, and backing op. Curated by maintainers, not inferred. Resolution key is (module, class_name); category is informational. Tiers/costs are CPU-only worst-case from large-asset evidence (batch-additivity-findings.md); gpu_bound concepts relax on CUDA hosts. Governed by validator-concepts.schema.json.",
+  "$comment": "Canonical validator-concept registry for the USD performance-tuning workflow. Single binding layer between agent-facing concept names and runtime rule identity, tier, scope policy, and backing op. Curated by maintainers, not inferred. Resolution key is (package family of module, class_name): 'module' carries the current upstream path and 'module_aliases' the pre-rename paths, and the executor accepts either, so an upstream package rename does not break resolution. usd_validation_nvidia/omni.asset_validator are one family (oav); usd_optimize/omni.scene.optimizer are the other (so). Module paths here were derived by introspecting a live registry with both providers registered (usd-validation-nvidia 1.20.0 + usd-optimize 1.0.4), not hand-written. Category is informational. Tiers/costs are CPU-only worst-case from large-asset evidence (batch-additivity-findings.md); gpu_bound concepts relax on CUDA hosts. Governed by validator-concepts.schema.json.",
   "concepts": [
     {
       "canonical_name": "primvar_indexability",
@@ -15,14 +15,16 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.indexed_primvars_checker",
+          "module": "usd_optimize.validators.indexed_primvars_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.indexed_primvars_checker"],
           "class_name": "IndexedPrimvarChecker",
           "category": "Omni:Geometry",
           "use_for": ["performance_tuning"]
         },
         {
           "provider": "oav",
-          "module": "omni.asset_validator._geometry_checker",
+          "module": "usd_validation_nvidia.rules._geometry",
+          "module_aliases": ["omni.asset_validator._geometry_checker"],
           "class_name": "IndexedPrimvarChecker",
           "category": "Geometry",
           "tier": 3,
@@ -44,14 +46,16 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.unused_uvs_checker",
+          "module": "usd_optimize.validators.unused_uvs_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.unused_uvs_checker"],
           "class_name": "UnusedUVsChecker",
           "category": "Usd:Performance",
           "use_for": ["performance_tuning"]
         },
         {
           "provider": "oav",
-          "module": "omni.asset_validator._geometry_checker",
+          "module": "usd_validation_nvidia.rules._geometry",
+          "module_aliases": ["omni.asset_validator._geometry_checker"],
           "class_name": "UnusedPrimvarChecker",
           "category": "Geometry",
           "use_for": ["conformance_audit"]
@@ -72,14 +76,16 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.colocated_vertices_checker",
+          "module": "usd_optimize.validators.colocated_vertices_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.colocated_vertices_checker"],
           "class_name": "ColocatedVerticesChecker",
           "category": "Omni:Geometry",
           "use_for": ["performance_tuning"]
         },
         {
           "provider": "oav",
-          "module": "omni.asset_validator._geometry_checker",
+          "module": "usd_validation_nvidia.rules._geometry",
+          "module_aliases": ["omni.asset_validator._geometry_checker"],
           "class_name": "WeldChecker",
           "category": "Geometry",
           "use_for": ["conformance_audit"]
@@ -99,14 +105,16 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.zero_area_faces_checker",
+          "module": "usd_optimize.validators.zero_area_faces_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.zero_area_faces_checker"],
           "class_name": "ZeroAreaFacesChecker",
           "category": "Omni:Geometry",
           "use_for": ["performance_tuning"]
         },
         {
           "provider": "oav",
-          "module": "omni.asset_validator._geometry_checker",
+          "module": "usd_validation_nvidia.rules._geometry",
+          "module_aliases": ["omni.asset_validator._geometry_checker"],
           "class_name": "ZeroAreaFaceChecker",
           "category": "Geometry",
           "use_for": ["conformance_audit"]
@@ -127,14 +135,16 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.nonmanifold_checker",
+          "module": "usd_optimize.validators.nonmanifold_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.nonmanifold_checker"],
           "class_name": "NonManifoldChecker",
           "category": "Omni:Geometry",
           "use_for": ["performance_tuning"]
         },
         {
           "provider": "oav",
-          "module": "omni.asset_validator._geometry_checker",
+          "module": "usd_validation_nvidia.rules._geometry",
+          "module_aliases": ["omni.asset_validator._geometry_checker"],
           "class_name": "ManifoldChecker",
           "category": "Geometry",
           "use_for": ["conformance_audit"]
@@ -155,14 +165,16 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.normals_checker",
+          "module": "usd_optimize.validators.normals_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.normals_checker"],
           "class_name": "NormalsChecker",
           "category": "Usd:Performance",
           "use_for": ["performance_tuning"]
         },
         {
           "provider": "oav",
-          "module": "omni.asset_validator._geometry_checker",
+          "module": "usd_validation_nvidia.rules._geometry",
+          "module_aliases": ["omni.asset_validator._geometry_checker"],
           "class_name": "NormalsValidChecker",
           "category": "Geometry",
           "use_for": ["conformance_audit"]
@@ -183,14 +195,16 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.windings_checker",
+          "module": "usd_optimize.validators.windings_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.windings_checker"],
           "class_name": "WindingsChecker",
           "category": "Usd:Performance",
           "use_for": ["performance_tuning"]
         },
         {
           "provider": "oav",
-          "module": "omni.asset_validator._geometry_checker",
+          "module": "usd_validation_nvidia.rules._geometry",
+          "module_aliases": ["omni.asset_validator._geometry_checker"],
           "class_name": "NormalsWindingsChecker",
           "category": "Geometry",
           "use_for": ["conformance_audit"]
@@ -210,17 +224,13 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.primitive_fit_checker",
+          "module": "usd_optimize.validators.primitive_fit_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.primitive_fit_checker"],
           "class_name": "PrimitiveFitChecker",
           "use_for": ["performance_tuning"]
         }
       ],
-      "parameter_prerequisite": {
-        "op": "fitPrimitives",
-        "param": "tolerance",
-        "question": "What primitive-fit tolerance is acceptable (max deviation from the original mesh)?"
-      },
-      "notes": "Mandatory default opportunity_detector for CAD/BIM/MEP optimization posture. Highest-value reduction for HOOPS-tessellated converted content. Bounded-loss op gated by tolerance."
+      "notes": "Mandatory default opportunity_detector for CAD/BIM/MEP optimization posture. Highest-value reduction for HOOPS-tessellated converted content. The detector sizes the win and does not gate the op: fitPrimitives runs at default args with a notice on piping and large-spatial targets, and prompts only on encapsulated-product or functional-precision ones. Carries no parameter_prerequisite on purpose - a tolerance question here is the ladder that talks an agent out of the fit. See operation-safety.md and the fitPrimitives entry in operations.json."
     },
     {
       "canonical_name": "geom_duplicates",
@@ -235,7 +245,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.duplicate_geometry_checker",
+          "module": "usd_optimize.validators.duplicate_geometry_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.duplicate_geometry_checker"],
           "class_name": "DuplicateGeometryChecker",
           "category": "Usd:Performance",
           "use_for": ["performance_tuning"]
@@ -256,7 +267,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.duplicate_geometry_fuzzy_checker",
+          "module": "usd_optimize.validators.duplicate_geometry_fuzzy_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.duplicate_geometry_fuzzy_checker"],
           "class_name": "FuzzyDuplicateGeometryChecker",
           "category": "Usd:Performance",
           "use_for": ["performance_tuning"]
@@ -277,7 +289,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.duplicate_materials_checker",
+          "module": "usd_optimize.validators.duplicate_materials_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.duplicate_materials_checker"],
           "class_name": "DuplicateMaterialsChecker",
           "use_for": ["performance_tuning"]
         }
@@ -297,7 +310,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.duplicate_face_checker",
+          "module": "usd_optimize.validators.duplicate_face_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.duplicate_face_checker"],
           "class_name": "DuplicateFaceChecker",
           "use_for": ["performance_tuning"]
         }
@@ -316,7 +330,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.isolated_vertices_checker",
+          "module": "usd_optimize.validators.isolated_vertices_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.isolated_vertices_checker"],
           "class_name": "IsolatedVerticesChecker",
           "use_for": ["performance_tuning"]
         }
@@ -335,7 +350,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.zero_extent_checker",
+          "module": "usd_optimize.validators.zero_extent_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.zero_extent_checker"],
           "class_name": "ZeroExtentChecker",
           "use_for": ["performance_tuning"]
         }
@@ -355,7 +371,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.rtx_mesh_count_checker",
+          "module": "usd_optimize.validators.rtx_mesh_count_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.rtx_mesh_count_checker"],
           "class_name": "RtxMeshCountChecker",
           "use_for": ["performance_tuning"]
         }
@@ -375,7 +392,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.small_mesh_checker",
+          "module": "usd_optimize.validators.small_mesh_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.small_mesh_checker"],
           "class_name": "SmallMeshChecker",
           "use_for": ["performance_tuning"]
         }
@@ -394,7 +412,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.sparse_mesh_checker",
+          "module": "usd_optimize.validators.sparse_mesh_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.sparse_mesh_checker"],
           "class_name": "SparseMeshChecker",
           "use_for": ["performance_tuning"]
         }
@@ -413,7 +432,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.high_vertex_count_checker",
+          "module": "usd_optimize.validators.high_vertex_count_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.high_vertex_count_checker"],
           "class_name": "HighVertexCountChecker",
           "use_for": ["performance_tuning"]
         }
@@ -433,7 +453,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.redundant_timesamples_checker",
+          "module": "usd_optimize.validators.redundant_timesamples_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.redundant_timesamples_checker"],
           "class_name": "RedundantTimeSamplesChecker",
           "use_for": ["performance_tuning"]
         }
@@ -452,7 +473,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.empty_leaf_checker",
+          "module": "usd_optimize.validators.empty_leaf_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.empty_leaf_checker"],
           "class_name": "EmptyLeafChecker",
           "use_for": ["performance_tuning"]
         }
@@ -471,7 +493,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.flat_hierarchies_checker",
+          "module": "usd_optimize.validators.flat_hierarchies_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.flat_hierarchies_checker"],
           "class_name": "FlatHierarchiesChecker",
           "use_for": ["performance_tuning"]
         }
@@ -491,7 +514,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.invisible_prims_checker",
+          "module": "usd_optimize.validators.invisible_prims_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.invisible_prims_checker"],
           "class_name": "InvisiblePrimsChecker",
           "use_for": ["performance_tuning"]
         }
@@ -511,7 +535,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.occluded_meshes_checker",
+          "module": "usd_optimize.validators.occluded_meshes_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.occluded_meshes_checker"],
           "class_name": "OccludedMeshesChecker",
           "use_for": ["performance_tuning"]
         }
@@ -531,7 +556,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.find_overlapping_meshes_checker",
+          "module": "usd_optimize.validators.find_overlapping_meshes_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.find_overlapping_meshes_checker"],
           "class_name": "FindOverlappingMeshesChecker",
           "use_for": ["performance_tuning"]
         }
@@ -551,7 +577,8 @@
       "implementations": [
         {
           "provider": "so",
-          "module": "omni.scene.optimizer.validators.coinciding_geometry_checker",
+          "module": "usd_optimize.validators.coinciding_geometry_checker",
+          "module_aliases": ["omni.scene.optimizer.validators.coinciding_geometry_checker"],
           "class_name": "CoincidingGeometryChecker",
           "use_for": ["performance_tuning"]
         }
@@ -571,7 +598,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._base_rules",
+          "module": "usd_validation_nvidia.rules._basic",
+          "module_aliases": ["omni.asset_validator._base_rules"],
           "class_name": "MissingReferenceChecker",
           "use_for": ["safety_gate", "conformance_audit"]
         }
@@ -591,7 +619,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._base_rules",
+          "module": "usd_validation_nvidia.rules._basic",
+          "module_aliases": ["omni.asset_validator._base_rules"],
           "class_name": "ExtentsChecker",
           "use_for": ["performance_tuning", "conformance_audit"]
         }
@@ -611,7 +640,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._base_rules",
+          "module": "usd_validation_nvidia.rules._basic",
+          "module_aliases": ["omni.asset_validator._base_rules"],
           "class_name": "KindChecker",
           "use_for": ["safety_gate", "conformance_audit"]
         }
@@ -631,7 +661,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._base_rules",
+          "module": "usd_validation_nvidia.rules._basic",
+          "module_aliases": ["omni.asset_validator._base_rules"],
           "class_name": "TypeChecker",
           "use_for": ["safety_gate", "conformance_audit"]
         }
@@ -650,7 +681,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._base_rules",
+          "module": "usd_validation_nvidia.rules._basic",
+          "module_aliases": ["omni.asset_validator._base_rules"],
           "class_name": "StageMetadataChecker",
           "use_for": ["safety_gate", "conformance_audit"]
         }
@@ -669,7 +701,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._base_rules",
+          "module": "usd_validation_nvidia.rules._basic",
+          "module_aliases": ["omni.asset_validator._base_rules"],
           "class_name": "PrimEncapsulationChecker",
           "use_for": ["safety_gate", "conformance_audit"]
         }
@@ -688,7 +721,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._layout_checker",
+          "module": "usd_validation_nvidia.rules._layout",
+          "module_aliases": ["omni.asset_validator._layout_checker"],
           "class_name": "DefaultPrimChecker",
           "use_for": ["safety_gate", "conformance_audit"]
         }
@@ -707,7 +741,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._layout_checker",
+          "module": "usd_validation_nvidia.rules._layout",
+          "module_aliases": ["omni.asset_validator._layout_checker"],
           "class_name": "DanglingOverPrimChecker",
           "use_for": ["safety_gate", "conformance_audit"]
         }
@@ -726,7 +761,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._material_checker",
+          "module": "usd_validation_nvidia.rules._materials",
+          "module_aliases": ["omni.asset_validator._material_checker"],
           "class_name": "MaterialPathChecker",
           "use_for": ["safety_gate", "conformance_audit"]
         }
@@ -746,7 +782,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._material_checker",
+          "module": "usd_validation_nvidia.rules._materials",
+          "module_aliases": ["omni.asset_validator._material_checker"],
           "class_name": "UsdDanglingMaterialBinding",
           "use_for": ["safety_gate", "conformance_audit"]
         }
@@ -765,7 +802,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._base_rules",
+          "module": "usd_validation_nvidia.rules._basic",
+          "module_aliases": ["omni.asset_validator._base_rules"],
           "class_name": "TextureChecker",
           "use_for": ["safety_gate", "conformance_audit"]
         }
@@ -784,7 +822,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._base_rules",
+          "module": "usd_validation_nvidia.rules._basic",
+          "module_aliases": ["omni.asset_validator._base_rules"],
           "class_name": "NormalMapTextureChecker",
           "use_for": ["safety_gate", "conformance_audit"]
         }
@@ -803,7 +842,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._layer_checker",
+          "module": "usd_validation_nvidia.rules._layers",
+          "module_aliases": ["omni.asset_validator._layer_checker"],
           "class_name": "LayerSpecChecker",
           "use_for": ["safety_gate", "conformance_audit"]
         }
@@ -822,7 +862,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._layer_checker",
+          "module": "usd_validation_nvidia.rules._layers",
+          "module_aliases": ["omni.asset_validator._layer_checker"],
           "class_name": "UsdAsciiPerformanceChecker",
           "use_for": ["performance_tuning", "conformance_audit"]
         }
@@ -842,7 +883,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._utf8_checker",
+          "module": "usd_validation_nvidia.rules._unicode",
+          "module_aliases": ["omni.asset_validator._utf8_checker"],
           "class_name": "UnicodeNameChecker",
           "use_for": ["safety_gate", "conformance_audit"]
         }
@@ -861,7 +903,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._geometry_checker",
+          "module": "usd_validation_nvidia.rules._geometry",
+          "module_aliases": ["omni.asset_validator._geometry_checker"],
           "class_name": "SubdivisionSchemeChecker",
           "use_for": ["safety_gate", "conformance_audit"]
         }
@@ -880,7 +923,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._geometry_checker",
+          "module": "usd_validation_nvidia.rules._geometry",
+          "module_aliases": ["omni.asset_validator._geometry_checker"],
           "class_name": "ValidateTopologyChecker",
           "use_for": ["conformance_audit"]
         }
@@ -899,7 +943,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._geometry_checker",
+          "module": "usd_validation_nvidia.rules._geometry",
+          "module_aliases": ["omni.asset_validator._geometry_checker"],
           "class_name": "UnusedMeshTopologyChecker",
           "category": "Geometry",
           "use_for": ["conformance_audit"]
@@ -920,7 +965,8 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._geometry_checker",
+          "module": "usd_validation_nvidia.rules._geometry",
+          "module_aliases": ["omni.asset_validator._geometry_checker"],
           "class_name": "NormalsExistChecker",
           "use_for": ["conformance_audit"]
         }
@@ -939,12 +985,13 @@
       "implementations": [
         {
           "provider": "oav",
-          "module": "omni.asset_validator._physics_checker",
+          "module": "usd_validation_nvidia.rules._physics",
+          "module_aliases": ["omni.asset_validator._physics_checker"],
           "class_name": "RigidBodyChecker",
           "use_for": ["conformance_audit"]
         }
       ],
-      "notes": "Physics-tagged stages only. Skip for visualization targets. Representative of the physics_* family (collider/joint/articulation/mass) in _physics_checker; class names to be confirmed against the runtime registry before enabling."
+      "notes": "Selected by the unconditional whole-stage safety-gate row; it is cheap and returns nothing on a stage with no physics, so it costs nothing on visualization targets. Representative of the physics_* family (ColliderChecker/PhysicsJointChecker/ArticulationChecker/MassChecker), all of which live alongside it in usd_validation_nvidia.rules._physics and are confirmed present on the live registry."
     }
   ]
 }

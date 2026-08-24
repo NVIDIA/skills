@@ -81,19 +81,23 @@ completes on any route, `import pxr` succeeds — downstream phases that author 
 
 **Prefer standalone SO + AV when available.** The standalone path is lighter
 (no Kit overhead), deterministic, and sufficient for all optimization and
-validation workflows. The SO package includes
-`omni.scene.optimizer.validators` with `@register_rule` decorators that
-auto-register 25 SO performance validators into OAV when both packages share
-the same Python 3.12 environment. No manual `register_all()` call is needed
-for rule discovery — just ensure both are importable. Selected runs go through
-`usd-validation-runner/scripts/usd_validation_executor.py`, which uses
+validation workflows. The SO package ships 25 performance validators in
+`usd_optimize.validators`, and `register_all()` registers them into OAV when both
+packages share the same Python 3.12 environment. Importing the package is not
+enough — the `@register_rule` decorators are applied inside `register_all()`, and
+the extracted release zip carries no distribution metadata, so OAV's entry-point
+plugin discovery cannot see it either. See
+[so-validator-auto-registration.md](references/so-validator-auto-registration.md).
+Selected runs go through
+`usd-validation-runner/scripts/usd_validation_executor.py`, which calls
+`register_all()` on every rule enumeration and uses
 `ValidationEngine(init_rules=False)` plus `enable_rule()` after resolving each
 scope-note **canonical concept** to a rule class by identity.
 
 > Standalone achieves the same validator coverage as Kit: install
-> `omniverse-asset-validator` via pip into the same venv where the Usd Optimize package
-> is on PYTHONPATH, and the `@register_rule` decorators register Usd Optimize validators
-> at import time.
+> `usd-validation-nvidia` via pip into the same venv where the Usd Optimize package
+> is on PYTHONPATH, then call `usd_optimize.validators.register_all()` to register
+> the Usd Optimize validators.
 
 Standalone is the only runtime for optimization and validation; there is no Kit
 optimization fallback. Kit (USD Composer, Isaac Sim, or Kit SDK) is retained
@@ -109,8 +113,9 @@ Kit is never auto-selected as a silent fallback for SO/AV work.
   the extracted prebuilt Usd Optimize package is missing
   (asset name + download: `references/upstreams/usd-optimize.md`).
 - Standalone Omni usd-validation-nvidia: invoke `install-usd-validation-nvidia-standalone`
-  when missing. Usd Optimize validators auto-register when both packages share the same
-  Python environment.
+  when missing. Once both packages share a Python environment, the Usd Optimize
+  validators still have to be registered by calling
+  `usd_optimize.validators.register_all()`.
 - Opt-in render profiling only: an existing/ user-supplied Kit or USD Composer
   runtime is verified for the Kit→omniperf profiling adjunct (`install-kit` /
   `install-usd-optimize-standalone` are profiling-setup helpers, not a default optimization
@@ -234,16 +239,18 @@ with its dedicated install reference. Follow `references/standalone-runtime.md` 
 the user-facing prompt, Python 3.12 requirement, expected standalone layout,
 and handoff rules.
 
-## Step 4 - Verify Kit path (fallback)
+## Step 4 - Verify the opt-in Kit profiling root
 
-For a Kit root (Step 1.5), verify Usd Optimize and Omni usd-validation-nvidia core
-both load, and capture the runtime versions that Step 1.6 surfaces to the user.
-Use `references/runtime-probe.md` for the exact launcher, import, version, and
-log discipline.
+Run this step only when the user asked for render-time profiling. For a Kit root
+(Step 1.5), verify Usd Optimize and Omni usd-validation-nvidia core both load, and
+capture the runtime versions that Step 1.6 surfaces to the user. Use
+`references/runtime-probe.md` for the exact launcher, import, version, and log
+discipline.
 
 Do not pre-check extension folders, `exts/`, `extscache/`, or any other
 filesystem layout before running the probe. If the probe fails, ask for a
-different Kit path.
+different Kit path, or record the profiling adjunct as unavailable and continue
+on standalone. Optimization and validation do not depend on this step.
 
 ## Step 5 - Continue workflow
 
@@ -254,8 +261,8 @@ After setup:
 3. `usd-validation-runner` for validation; its references own the specific `validate-*` command details.
 4. `usd-optimize-run-validators`, `usd-optimize-interpret-validators`, and `usd-optimize-run-operations` only after runtime setup is ready.
 
-Record the chosen runtime path in the response so later commands use the same
-Kit or standalone environment.
+Record the resolved standalone package path and Python environment in the
+response so later commands run against the same runtime.
 
 ## Step 6 - Print the runtime context header before continuing
 
@@ -284,14 +291,15 @@ for the rest of the session.
 
 - Does not install unless a dedicated install reference is invoked.
 - Does not choose optimization operations or validator scope.
-- Standalone Usd Optimize validators auto-register via `@register_rule` decorators when
-  both `omniverse-asset-validator` and the Usd Optimize package are importable in the
-  same Python 3.12 environment. Kit auto-registers them via its extension
-  session.
+- Standalone Usd Optimize validators require an explicit
+  `usd_optimize.validators.register_all()`; importing the package registers
+  nothing. Measured on both packages: 40 rules before, 40 after a bare import, 65
+  after `register_all()`. Kit registers them through its extension session. See
+  [so-validator-auto-registration.md](references/so-validator-auto-registration.md).
 
 ## Troubleshooting
 
-- If standalone packages are found but the probe fails (import error, version mismatch), fall through to Kit discovery.
-- If multiple valid Kit installs are found, ask the user to choose or record the newest unattended choice.
-- If the Kit probe cannot import Usd Optimize or usd-validation-nvidia, try another Kit path.
+- If standalone packages are found but the probe fails (import error, version mismatch), stop with `needs-runtime-choice` and ask for a different standalone package path or a pip-installable environment. Do not route SO/AV work to Kit.
+- If multiple valid Kit profiling roots are found, ask the user to choose or record the newest unattended choice. This decides the profiling adjunct only; it never changes the optimization runtime.
+- If a Kit profiling root cannot import Usd Optimize or usd-validation-nvidia, record the adjunct as unavailable and continue on standalone. Render-time profiling is the only thing that becomes unavailable.
 - If standalone paths are incomplete, invoke the relevant install reference instead of reusing a bundled validator environment.

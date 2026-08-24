@@ -130,7 +130,7 @@ tail: `merge → vertex-weld-where-contiguous → computeExtents` (§9 below).
 **Direct-authoring fallback.** When the op does not fit (e.g. a GeomSubset-into-one
 result), author the fused `Mesh` directly: concatenate the members' `points`,
 `faceVertexCounts`, `faceVertexIndices`, and per-vertex/face primvars with the
-correct index offsets; author per-material `GeomSubset`s if needed (§4.3);
+correct index offsets; author per-material `GeomSubset`s if needed (§4, step 3);
 re-bind materials; remove the now-redundant member prims.
 
 In both paths:
@@ -167,7 +167,7 @@ stay producible.
 ## 7. Reporting
 
 Record in the manifest `phase4_targets[]`: `reduction_route: merge`,
-`identity_signal` (must be weak — `structure`/`none`), `identity_disposition`,
+`identity_signal` (must be weak — `structural_fallback`/`none`), `identity_disposition`,
 the `merge_boundary` preserved, and the per-(scope × material) grouping.
 
 Emit into the optimization report (`optimization-report.schema.json`):
@@ -228,11 +228,15 @@ invariant ([restructure-mode.md § Edit-Target Invariant](restructure-mode.md#ed
   (archetype-gated merge depth) of this spec; this section owns the per-prototype
   op-chain placement and the eligibility guard it cites.
 - **`pruneLeaves` is stage-level cleanup, not part of the per-prototype chain.**
-  Guard it against **unloaded payloads**: a prim whose payload is not loaded
-  composes no children, so it presents as an empty leaf and is silently pruned.
-  Never run `pruneLeaves` over prims with unloaded payloads (load them first, or
-  scope the op away). See `operation-safety.md` § Caveat: `pruneLeaves` on unloaded
-  payloads, and `ref-remap-mode.md` § Stage-Level Cleanup.
+  Unloaded payloads need no special handling: a prim whose payload is authored
+  but not loaded composes no children and so presents as an empty leaf, but the
+  op's `preserveUnloadedPayloads` argument (default `true`) keeps it, along with
+  any ancestor whose only descendants are such prims. Do not set
+  `preserveUnloadedPayloads: false` unless you intend to drop unloaded-payload
+  prims. Loading payloads across the target subtree first is not a prerequisite —
+  on a large stage that costs a full payload load to solve a problem the op
+  already solves. See `operation-safety.md` and `ref-remap-mode.md`
+  § Stage-Level Cleanup.
 - **Persist with a compacting `Sdf.Layer.Export(tmp) + atomic replace`, not
   `layer.Save()`.** `Save()` appends without garbage-collecting dedup-orphaned
   arrays and silently grows the file; `Export` recompresses and GCs.

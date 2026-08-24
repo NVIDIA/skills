@@ -81,13 +81,20 @@ Plus:
 |--------|-------------------|------------------|
 | cold_open_ms | Faster composition | More composition overhead |
 | warm_open_ms | Faster cached open with sufficient confidence | Slower cached open only when measured with the same low-noise protocol |
-| traverse_ms | Simpler authored scene graph | More authored prims to visit (excludes prototypes) |
-| traverse_full_ms | Lower total traversal cost | More prims including prototypes (diagnostic; not a regression if prototype growth is expected from deduplication) |
+| traverse_ms | Simpler authored scene graph | More authored prims to visit |
 | attribute_resolution_ms | Fewer/simpler attrs | More fallback opinions |
 | transform_ms | Shallower/simpler xforms | Deeper nesting |
-| prim_count | Fewer prims (instancing) | Overs or prototype growth |
-| prim_count_authored | Fewer authored prims | Authored scene grew (unexpected) |
+| prim_count | Fewer authored prims (instancing, dedupe) | Authored scene grew, or overs added |
+| prim_count_with_instance_proxies | Smaller rendered-geometry footprint | More geometry for Hydra to walk |
 | layer_count | Fewer layers (packaging) | Layer explosion |
+
+`traverse_ms` is the only traversal metric. If either input profile carries a
+`traverse_full_ms` or a `prim_count_authored`, it came from the retired
+profile-stage recipe whose `traverse_ms` was inflated by a dead
+`/__Prototype_*` filter running inside the timed loop (see
+[profile-stage § Retired metrics](../profile-stage/README.md#retired-metrics)).
+Do not compare an old profile against a new one. If you can only re-read the
+old JSON, use its `traverse_full_ms` as the traversal number and say so.
 
 ### Full mode comparisons (in addition to quick)
 
@@ -144,8 +151,10 @@ If any metric regressed >5%:
      (see `skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/usd-edit-target-planner/references/output-saving.md`).
    - Load time regression after adding instancing → unexpected, investigate
      prototype count vs instance count ratio.
-   - Prim count increase after deduplication → expected (prototype prims added),
-     not a regression if instances compensate.
+   - Prim count increase after deduplication → prototypes are not the cause;
+     `prim_count` comes from `stage.Traverse()`, which does not visit
+     `/__Prototype_*`. Look for added Xform wrappers or `over` prims in the
+     authored namespace instead.
 4. Recommend whether to keep the optimization, revert, or adjust.
 
 ## Integration with the optimization flow

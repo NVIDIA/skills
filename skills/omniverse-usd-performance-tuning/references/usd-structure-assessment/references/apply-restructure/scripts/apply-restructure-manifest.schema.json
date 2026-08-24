@@ -112,7 +112,11 @@
           "grain_source": {
             "type": "string",
             "enum": ["identity", "structural_fallback"],
-            "description": "Whether the grain came from authored identity (default) or the structural-fallback (coarsest repeating subtree where identity is absent)."
+            "description": "Whether the grain came from authored identity (default) or the structural-fallback (coarsest repeating subtree where identity is absent). When this is structural_fallback, identity_signal is emitted as 'structural_fallback' — the two agree, and 'none' is reserved for a grain that has no fallback justification either."
+          },
+          "intent_confirmed": {
+            "type": "boolean",
+            "description": "The user explicitly confirmed an identity-destroying reduction_route (point_instance / merge) on a unit that would otherwise be refused it — the one exemption to the strong-identity rule. select_frontier.py writes it when it grants the exemption, so the manifest gate can honour the same call instead of re-failing the run. Absent means no confirmation was given."
           },
           "kind_untrusted": {
             "type": "boolean",
