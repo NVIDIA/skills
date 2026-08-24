@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `omniverse-usd-performance-tuning`
-- Evaluation date: 2026-08-21
+- Evaluation date: 2026-08-24
 - Evaluator version: `1.3.2`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 10 evaluation tasks (9 positive, 1 negative)
@@ -45,12 +45,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 55% → 91% (+37 points) | 55% → 91% (+36 points) |
-| Security | 85% → 95% (+10 points) | 80% → 95% (+15 points) |
-| Correctness | 40% → 94% (+54 points) | 44% → 86% (+42 points) |
-| Discoverability | 51% → 99% (+48 points) | 51% → 88% (+38 points) |
-| Effectiveness | 48% → 74% (+26 points) | 45% → 89% (+44 points) |
-| Efficiency | 51% → 95% (+44 points) | 56% → 97% (+41 points) |
+| Overall | 52% → 89% (+37 points) | 56% → 85% (+29 points) |
+| Security | 95% → 100% (+5 points) | 90% → 95% (+5 points) |
+| Correctness | 36% → 92% (+56 points) | 54% → 82% (+28 points) |
+| Discoverability | 46% → 94% (+48 points) | 49% → 84% (+34 points) |
+| Effectiveness | 42% → 71% (+29 points) | 41% → 66% (+25 points) |
+| Efficiency | 43% → 90% (+47 points) | 47% → 98% (+51 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.
 

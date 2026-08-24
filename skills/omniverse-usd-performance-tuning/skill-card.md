@@ -1,5 +1,5 @@
 ## Description: <br>
-Top-level workflow skill for USD performance diagnosis and optimization that handles slow loading, high memory, low FPS, and broad scene-optimization requests. <br>
+Top-level workflow skill for USD performance diagnosis and optimization. Handles slow loading, high memory, low FPS, and broad scene-optimization requests; delegates auth/runtime setup to Phase 0 owners. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to diagnose and optimize USD scene performance, addressing slow loading, high memory usage, low FPS, GPU crashes, and validation failures through structured profiling, structure assessment, and iterative optimization. <br>
+Developers and engineers use this skill to diagnose and optimize USD scene performance, addressing slow loading, high memory consumption, low FPS, and GPU resource issues in NVIDIA Omniverse workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,21 +26,20 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [Workflow Reference](references/workflow.md) <br>
-- [Briefing the Skill](references/briefing-the-skill.md) <br>
 - [Skill Map](references/skill-map.md) <br>
-- [Setup USD Performance Tuning](references/setup-usd-performance-tuning/README.md) <br>
+- [Briefing the Skill](references/briefing-the-skill.md) <br>
+- [Operations Registry](references/operations/README.md) <br>
 - [USD Structure Assessment](references/usd-structure-assessment/README.md) <br>
 - [USD Validation Runner](references/usd-validation-runner/README.md) <br>
-- [USD Optimize Run Operations](references/usd-optimize-run-operations/README.md) <br>
 - [Optimization Report](references/optimization-report/README.md) <br>
-- [Operations Registry](references/operations/README.md) <br>
+- [Upstream USD Optimize](references/upstreams/usd-optimize.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Shell commands, Files, Configuration instructions] <br>
-**Output Format:** [Markdown reports, structured JSON, rendered HTML, optimized USD files] <br>
+**Output Type(s):** [Analysis, Shell commands, Configuration instructions, Files] <br>
+**Output Format:** [Markdown with inline code blocks, structured JSON reports, and rendered HTML] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Structured JSON conforms to optimization-report.schema.json; HTML rendered via render_preview.py; reports include before/after profile metrics] <br>
+**Other Properties Related to Output:** [Produces optimization-report JSON, Markdown summary, and HTML preview via report templates] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -49,35 +48,35 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-10 evaluation tasks (9 positive, 1 negative) from skill-evaluator-dataset-snapshot/1. <br>
+10 evaluation tasks (9 positive, 1 negative) from a curated dataset snapshot. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Verifies final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and followed expected workflow behavior. <br>
-- Efficiency: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
+- Effectiveness: Checks goal completion (50%) and expected workflow adherence (50%). <br>
+- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
 - `skill_execution`: Whether the expected skill was found and executed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 55% → 91% (+37 points) | 55% → 91% (+36 points) |
-| Security | 85% → 95% (+10 points) | 80% → 95% (+15 points) |
-| Correctness | 40% → 94% (+54 points) | 44% → 86% (+42 points) |
-| Discoverability | 51% → 99% (+48 points) | 51% → 88% (+38 points) |
-| Effectiveness | 48% → 74% (+26 points) | 45% → 89% (+44 points) |
-| Efficiency | 51% → 95% (+44 points) | 56% → 97% (+41 points) |
+| Overall | 52% → 89% (+37 points) | 56% → 85% (+29 points) |
+| Security | 95% → 100% (+5 points) | 90% → 95% (+5 points) |
+| Correctness | 36% → 92% (+56 points) | 54% → 82% (+28 points) |
+| Discoverability | 46% → 94% (+48 points) | 49% → 84% (+34 points) |
+| Effectiveness | 42% → 71% (+29 points) | 41% → 66% (+25 points) |
+| Efficiency | 43% → 90% (+47 points) | 47% → 98% (+51 points) |
 
 ## Skill Version(s): <br>
 0.4.1 (source: frontmatter) <br>
