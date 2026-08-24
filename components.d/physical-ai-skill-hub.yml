@@ -1,0 +1,8 @@
+name: Physical AI Skill Hub
+repo: NVIDIA-dev/physical-ai-skill-hub-dev
+description: Omniverse and OpenUSD skills for digital twin performance work — profiling, structural assessment, validation and scene optimization.
+skills:
+  - path: skills/omniverse-usd-performance-tuning/
+    catalog_dir: omniverse-usd-performance-tuning
+links:
+  discussions: false
