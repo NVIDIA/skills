@@ -4916,7 +4916,7 @@
     },
     {
       "skill": "omniverse-usd-performance-tuning",
-      "evaluation_date": "2026-08-21",
+      "evaluation_date": "2026-08-24",
       "profile": null,
       "environment": "local",
       "evaluator_version": "1.3.2",
@@ -4933,7 +4933,7 @@
       "catalog_dir": "omniverse-usd-performance-tuning",
       "component": "Physical AI",
       "has_results": true,
-      "average_uplift_pct": 36.2
+      "average_uplift_pct": 32.8
     },
     {
       "skill": "paidf-anomalygen",
@@ -27458,8 +27458,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 10.0
+      "score_pct": 100.0,
+      "uplift_pct": 5.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
@@ -27468,7 +27468,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 95.0,
-      "uplift_pct": 15.0
+      "uplift_pct": 5.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
@@ -27476,8 +27476,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 54.0
+      "score_pct": 92.0,
+      "uplift_pct": 56.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
@@ -27485,8 +27485,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 86.0,
-      "uplift_pct": 42.0
+      "score_pct": 82.0,
+      "uplift_pct": 28.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
@@ -27494,7 +27494,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 99.0,
+      "score_pct": 94.0,
       "uplift_pct": 48.0
     },
     {
@@ -27503,8 +27503,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 38.0
+      "score_pct": 84.0,
+      "uplift_pct": 34.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
@@ -27512,8 +27512,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 74.0,
-      "uplift_pct": 26.0
+      "score_pct": 71.0,
+      "uplift_pct": 29.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
@@ -27521,8 +27521,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 89.0,
-      "uplift_pct": 44.0
+      "score_pct": 66.0,
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
@@ -27530,8 +27530,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 44.0
+      "score_pct": 90.0,
+      "uplift_pct": 47.0
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
@@ -27539,8 +27539,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 41.0
+      "score_pct": 98.0,
+      "uplift_pct": 51.0
     },
     {
       "catalog_dir": "paidf-anomalygen",
