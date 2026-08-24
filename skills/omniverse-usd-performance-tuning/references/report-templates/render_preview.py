@@ -6,6 +6,13 @@
 The renderer intentionally supports only the small Jinja-compatible subset used
 by the report templates: variable interpolation, for loops, if/else blocks, and
 simple equality checks. It has no third-party runtime dependencies.
+
+Block tags that sit alone on a line are stripped of that line's leading
+whitespace and its trailing newline, matching Jinja's ``lstrip_blocks`` +
+``trim_blocks``. Without that, every ``{% for %}`` iteration carried the newline
+that followed the tag, so each rendered table row was separated by a blank line —
+which ends the table in Markdown, turning the report's tables into loose runs of
+pipe-delimited text.
 """
 from __future__ import annotations
 
@@ -24,6 +31,11 @@ DEFAULT_TEMPLATE = TEMPLATE_DIR / "optimization-report.html.template"
 DEFAULT_OUTPUT = TEMPLATE_DIR / "optimization-report.preview.html"
 TAG_RE = re.compile(r"{%\s*(.*?)\s*%}", re.DOTALL)
 VAR_RE = re.compile(r"{{\s*(.*?)\s*}}", re.DOTALL)
+#: A block tag alone on its line: nothing but whitespace before it, nothing but
+#: whitespace and the newline after it. A tag sharing a line with content (the
+#: HTML template's inline ``{% if group.caveat %}…{% endif %}``) does not match
+#: and keeps its surrounding text exactly.
+STANDALONE_TAG_RE = re.compile(r"^[ \t]*(\{%[^\n]*?%\})[ \t]*\n", re.MULTILINE)
 
 
 def _score_percent(score: object) -> int:
@@ -36,6 +48,83 @@ def _score_display(score: object) -> str:
     if not isinstance(score, (int, float)):
         return "N/A"
     return f"{float(score):.1f}/10"
+
+
+def _flag(value: object) -> str:
+    if value is True:
+        return "yes"
+    if value is False:
+        return "no"
+    return "not recorded"
+
+
+def _count(value: object) -> str:
+    return f"{value:,}" if isinstance(value, int) and not isinstance(value, bool) else "not recorded"
+
+
+def _gate_summary_rows(report: dict) -> list[dict]:
+    """One line each for the machine-readable gate blocks the report carries.
+
+    ``footprint`` used to be the only block with a rendered section, so a reader
+    saw the disk numbers and none of the correctness state. These rows put the
+    preservation, coverage, reuse, and fidelity gates in the deliverable without
+    the agent having to restate them in free text. ``safety_gate`` gets its own
+    section rather than a row — it is the one that can invalidate the run.
+    """
+    rows: list[dict] = []
+
+    pres = report.get("preservation")
+    if isinstance(pres, dict):
+        rows.append({
+            "name": "Preservation (silent loss)",
+            "value": (
+                f"{_count(pres.get('rendered_mesh_count'))} rendered meshes; "
+                f"{_count(pres.get('dangling'))} dangling bindings; "
+                f"distinct geometry bytes preserved: {_flag(pres.get('distinct_geometry_bytes_preserved'))}; "
+                f"bounds preserved: {_flag(pres.get('bounds_preserved'))}"
+            ),
+        })
+
+    coverage = report.get("target_coverage")
+    if isinstance(coverage, dict):
+        entries = [e for e in (coverage.get("entries") or []) if isinstance(e, Mapping)]
+        tally: dict[str, int] = {}
+        for entry in entries:
+            tally[str(entry.get("disposition", "unrecorded"))] = (
+                tally.get(str(entry.get("disposition", "unrecorded")), 0) + 1
+            )
+        breakdown = ", ".join(f"{name} {count}" for name, count in sorted(tally.items()))
+        rows.append({
+            "name": "Phase-4 target coverage",
+            "value": (
+                f"{len(entries)} target(s); ledger complete: {_flag(coverage.get('complete'))}"
+                + (f" ({breakdown})" if breakdown else "")
+            ),
+        })
+
+    structural = report.get("structural_summary")
+    if isinstance(structural, dict):
+        rows.append({
+            "name": "Reuse and descent",
+            "value": (
+                f"reuse measured: {_flag(structural.get('reuse_measured'))}; "
+                f"{_count(structural.get('unique_prototype_count'))} prototypes; "
+                f"descent converged: {_flag(structural.get('frontier_descent_converged'))}"
+            ),
+        })
+
+    fidelity = report.get("fidelity")
+    if isinstance(fidelity, dict):
+        band = fidelity.get("band")
+        rows.append({
+            "name": "Fidelity",
+            "value": (
+                f"max deviation within band: {_flag(fidelity.get('max_deviation_within_band'))}"
+                + (f" (band {band})" if band else "")
+            ),
+        })
+
+    return rows
 
 
 def build_context(report: dict) -> dict:
@@ -78,6 +167,7 @@ def build_context(report: dict) -> dict:
         {"name": key.replace("_", " ").title(), "value": "N/A" if value is None else value}
         for key, value in runtime_profiling.items()
     ]
+    context["gate_summary_rows"] = _gate_summary_rows(report)
     return context
 
 
@@ -206,8 +296,19 @@ def _render_block(template: str, context: Mapping[str, Any], autoescape: bool) -
     return "".join(rendered)
 
 
+def trim_block_tag_lines(template: str) -> str:
+    """Collapse each standalone block tag onto the text around it.
+
+    Jinja's ``lstrip_blocks`` + ``trim_blocks``. A ``{% for %}`` tag on its own
+    line otherwise donates that line's newline to every iteration of the loop
+    body, so an N-row table renders as N rows each preceded by a blank line —
+    and a blank line ends a Markdown table.
+    """
+    return STANDALONE_TAG_RE.sub(lambda match: match.group(1), template)
+
+
 def render_template(template: str, context: Mapping[str, Any], *, autoescape: bool) -> str:
-    return _render_block(template, context, autoescape)
+    return _render_block(trim_block_tag_lines(template), context, autoescape)
 
 
 def main() -> int:

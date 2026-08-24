@@ -17,13 +17,15 @@ See `references/_shared/standard-output-format.md`.
 PyPI wheel isn't released yet; this reference consumes a prebuilt
 `usd_optimize_...release.zip` package from GitHub Releases. Do not clone the Scene
 Optimizer source repo, run `repo.sh`, or depend on repo helper wrappers for
-standalone runtime setup. The package is ~350-380 MB; download + extract takes
+standalone runtime setup. Sizes depend on the USD flavor: the 1.1.0
+`usd_25.11` Linux x86_64 asset is ~174 MiB (~650 MB extracted) and the 1.0.4
+Linux x86_64 asset is ~331 MiB (~920 MB extracted). Download + extract takes
 ~1-2 min on a fast connection. EULA env var **not** needed (no Kit).
 
 Use this reference for standalone Usd Optimize core operations and the
 packaged `omni.scene.optimizer.validators` rules when a Kit runtime is
 unavailable or not desired. For validator execution, pair this package with a
-project-managed `omniverse-asset-validator` environment that can import the
+project-managed `usd-validation-nvidia` environment that can import the
 same SO package. Kit remains useful when automatic extension registration or
 render-time profiling is needed.
 
@@ -36,9 +38,9 @@ have one source of truth.
 > **Python 3.12 is a HARD requirement.** The drop ships `cp312`-only wheels.
 > There is no `abi3`, no `cp310`/`cp311`/`cp313` fallback, and no source
 > build path here. Installing under any other Python will appear to succeed
-> until the first `import omni.scene.optimizer.core`, which fails with a
+> until the first `import usd_optimize.core`, which fails with a
 > cryptic ABI error. Verify `python3.12 --version` **before** downloading
-> the ~330 MB zip.
+> the zip.
 
 ```bash
 python3.12 --version            # required — package is cp312-only, no fallback
@@ -60,14 +62,20 @@ root and skip the download/extract steps.
 
 Prebuilt packages are published as **GitHub release assets** on
 [NVIDIA-Omniverse/usd-optimize](https://github.com/NVIDIA-Omniverse/usd-optimize/releases)
-(Linux x86_64, Linux aarch64, Windows x86_64):
+(Linux x86_64, Linux aarch64, Windows x86_64). The latest release is **1.1.0**:
 
 ```bash
-gh release download v1.0.4 -R NVIDIA-Omniverse/usd-optimize -p '*manylinux*x86_64*'
+gh release list -R NVIDIA-Omniverse/usd-optimize          # confirm the latest tag
+gh release download v1.1.0 -R NVIDIA-Omniverse/usd-optimize \
+  -p 'usd_optimize_usd_25.11_py_3.12@*manylinux_2_35_x86_64.release.zip'
 # or browse: https://github.com/NVIDIA-Omniverse/usd-optimize/releases
 ```
 
-Auto-pick the asset by `uname -s`/`-m`. Without `gh`, use the asset's browser
+Pin the USD flavor in the pattern. 1.1.0 publishes both `usd_25.05` and
+`usd_25.11` builds per platform, so a bare `-p '*manylinux*x86_64*'` matches two
+assets and downloads ~1.1 GB. Use `usd_25.11` unless a caller asks for 25.05.
+
+Auto-pick the platform by `uname -s`/`-m`. Without `gh`, use the asset's browser
 URL from the releases page (no URL-encoding gymnastics needed).
 
 ## Step 3 — Pick install location
@@ -146,29 +154,27 @@ process, so the uv-managed-Python caveat above does not apply.
 python3.12 - <<'PY'
 def operation_count():
     try:
-        from omni.scene.optimizer.core import SceneOptimizerCore
+        from usd_optimize.core import UsdOptimizeCore
 
-        return "SceneOptimizerCore.getInstance", len(SceneOptimizerCore.getInstance().getOperations())
+        return "UsdOptimizeCore.getInstance", len(UsdOptimizeCore.getInstance().getOperations())
     except Exception:
         pass
 
-    from omni.scene.optimizer.core.bindings._omni_scene_optimizer_core import acquire_interface
+    from omni.scene.optimizer.core import SceneOptimizerCore
 
-    iface = acquire_interface()
-    if hasattr(iface, "get_operations"):
-        return "bindings.acquire_interface", len(iface.get_operations())
-    parser = iface.json_parser()
-    return "bindings.json_parser", len(parser.get_supported_operations())
+    return "SceneOptimizerCore.getInstance", len(SceneOptimizerCore.getInstance().getOperations())
 
 surface, count = operation_count()
 print(f"{surface}: {count} operations")
 PY
 ```
 
-Expect >= 40 (the exact count varies by build). This verifies import and
-operation registry only. Operation invocation is defined by
-`usd-optimize-run-operations/references/invocation.md`; do not infer mutation call shapes
-from this install probe.
+Expect >= 40; both 1.0.4 and 1.1.0 report **47**. Prefer the `usd_optimize`
+namespace: `omni.scene.optimizer` still imports on both versions but emits a
+`DeprecationWarning`, and `SceneOptimizerCore` warns in favor of
+`UsdOptimizeCore`. This verifies import and operation registry only. Operation
+invocation is defined by `usd-optimize-run-operations/references/invocation.md`;
+do not infer mutation call shapes from this install probe.
 
 ## Limitations
 
@@ -180,12 +186,26 @@ The drop may include a bundled `validator-venv/`. Do not use it as the default
 runtime — it may lack `numpy` and is slower on large stages. Use a
 project-managed venv with `install-usd-validation-nvidia-standalone` instead.
 
-## SO Validator Auto-Registration
+## SO Validator Registration
 
 See [so-validator-auto-registration.md](../so-validator-auto-registration.md) for
-the shared rule: the standalone SO package's `omni.scene.optimizer.validators`
-auto-register into OAV at import time when both packages share a Python
-environment, and category names confirm discovery only (not validation scope).
+the shared rule on category names confirming discovery only, not validation scope.
+
+**Registration is not automatic.** Measured on both 1.0.4 and 1.1.0: importing
+`usd_optimize.validators` registers **zero** rules. The `@register_rule`
+decorators are applied inside `register_all()`, not at module import, and the
+extracted release zip ships no distribution metadata (no `*.dist-info` /
+`entry_points.txt`), so entry-point discovery cannot find the plugin either.
+Call it explicitly:
+
+```python
+import usd_optimize.validators as sov
+
+sov.register_all()   # returns the 25 rule classes it registered
+```
+
+That takes the registry from 40 rules to 65: 19 added under `Usd:Performance`
+and 6 under `Omni:Geometry`. Identical on 1.0.4 and 1.1.0.
 
 To verify the install can run a scoped concept after `usd-validation-runner`
 has scoped the plan:
@@ -212,20 +232,27 @@ The standalone import is `from omni.asset_validator import ValidationEngine`
 Current expected package family (Kit 110.1 parity):
 
 ```
-usd_optimize_usd_25.11_py_3.12 (version 1.0.4, <platform>.release.zip)
+usd_optimize_usd_25.11_py_3.12 (version 1.1.0, <platform>.release.zip)
 ```
 
-Expected layout after unpack:
+1.0.4 remains the minimum supported runtime. Both are verified; the layouts
+differ only in where per-operation docs live.
+
+Expected layout after unpack (1.1.0):
 
 ```
 $USD_OPTIMIZE_ROOT/
-├── .agents/     # Operation guides and SO skills packaged for agents
-├── python/      # Python modules (omni.scene.optimizer.*)
+├── .agents/     # Agent skills (run-operations, run-validators, ...)
+├── bin/         # Native usdOptimize CLI (1.1.x only)
+├── docs/        # Install notes + operations/<key>.rst per-op guides (1.1.x)
+├── python/      # Python modules (usd_optimize.*, omni.scene.optimizer.* shim)
 ├── usdpy/       # USD Python bindings (pxr.*)
 ├── lib/         # Core shared libraries
-├── extraLibs/   # Additional dependencies
-└── docs/        # Prebuilt package install notes
+└── extraLibs/   # Additional dependencies
 ```
+
+On 1.0.4 there is no `bin/`, per-op guides live at `.agents/operations/<key>.md`,
+and `docs/` holds install notes only. `.agents/` is present on both.
 
 Sentinel check (all runtime dirs plus agent docs must exist for a valid install):
 
@@ -236,6 +263,8 @@ done
 # Per-operation docs: docs/operations.rst (1.1.x packages) or .agents/operations/INDEX.md (1.0.x). Valid if either exists.
 [[ -f "$USD_OPTIMIZE_ROOT/docs/operations.rst" || -f "$USD_OPTIMIZE_ROOT/.agents/operations/INDEX.md" ]] || echo "MISSING: per-operation docs (docs/operations.rst or .agents/operations/INDEX.md)"
 ```
+
+Verified 2026-08-04: this check passes unchanged on extracted 1.0.4 and 1.1.0.
 
 ## Environment for Docker/CI
 

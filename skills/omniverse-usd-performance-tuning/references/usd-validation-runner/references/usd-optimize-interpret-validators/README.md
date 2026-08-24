@@ -9,8 +9,7 @@ Optimizer mechanics for this step are owned by upstream `usd-optimize`.
 
 Resolve the upstream guide without cloning the source repo:
 
-1. `$USD_OPTIMIZE_ROOT/.agents/skills/interpret-validators/SKILL.md`
-2. `$USD_OPTIMIZE_ROOT/.agents/skills/interpret-validators/SKILL.md`
+1. `$USD_OPTIMIZE_ROOT/.agents/skills/interpret-validators/SKILL.md` — the same path on 1.0.x and 1.1.x
 
 If no package root is available, download and extract the prebuilt Usd Optimize release package (current asset name + download: `references/upstreams/usd-optimize.md`) (direct
 archive URLs are in `references/upstreams/usd-optimize.md`), or use the package
@@ -40,9 +39,13 @@ Before producing the curated op chain, re-read and confirm:
 - [ ] **operation-safety.md** — classify each mapped op as lossless or destructive.
 - [ ] **All destructive ops go into the plan.** They are presented for per-op
    user approval — they are NOT silently deferred or omitted.
-- [ ] For each destructive op, read its `parameter_prerequisites` frontmatter
-   in `references/operations/<key>.md`. The canonical question will be asked
-   at approval time.
+- [ ] For each destructive op, look up its entry in
+   `references/operations/operations.json` and read its `parameter_prerequisites`
+   where the entry has one; its canonical question will be asked at approval
+   time. Most confirm-required ops carry no such block — for those, the
+   confirmation is composed from the fallback in `operation-safety.md`
+   §"Fallback: confirm-required ops with no `parameter_prerequisites` block".
+   Either way the op goes into the plan and reaches the user as a decision.
 
 ## Anti-patterns
 
@@ -62,5 +65,7 @@ the user is the anti-pattern. That violates the workflow contract: *"the agent
 lays out the full plan, including any destructive operations the plan would
 invoke, without withholding the plan itself."*
 
-The only legitimate removal path is the user selecting `skip_option` at the
-per-op approval prompt.
+The only legitimate removal path is the user taking the skip at the per-op
+approval prompt — the `skip_option` where the op's `parameter_prerequisites`
+names one, the plain-words skip that `operation-safety.md` requires of the
+fallback prompt otherwise.

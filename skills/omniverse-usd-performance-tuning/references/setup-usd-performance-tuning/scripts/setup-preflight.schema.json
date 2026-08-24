@@ -127,7 +127,7 @@
           "properties": {
             "package": {
               "type": "string",
-              "description": "Package or extension name, e.g. 'omniverse-asset-validator' or 'omni.asset_validator.core'."
+              "description": "Package or extension name, e.g. 'usd-validation-nvidia' (pip distribution) or 'omni.asset_validator' (module)."
             },
             "version": {
               "type": "string",
