@@ -4142,10 +4142,10 @@
     },
     {
       "skill": "nemo-mbridge-perf-sequence-packing",
-      "evaluation_date": "2026-08-11",
+      "evaluation_date": "2026-08-17",
       "profile": null,
-      "environment": "k8s-sandbox",
-      "evaluator_version": "1.2.0",
+      "environment": "local",
+      "evaluator_version": "1.2.7",
       "dataset_digest": "sha256:57d3c088dee48ee97547a666ee24dcac45c6cd5cbf699640c3c7d41710f629a1",
       "validation_status": null,
       "tasks": 1,
@@ -4159,7 +4159,7 @@
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "has_results": true,
-      "average_uplift_pct": 36.3
+      "average_uplift_pct": 39.0
     },
     {
       "skill": "nemo-mbridge-perf-tp-dp-comm-overlap",
@@ -4247,12 +4247,12 @@
     },
     {
       "skill": "nemo-relay-get-started",
-      "evaluation_date": "2026-08-12",
+      "evaluation_date": "2026-08-21",
       "profile": null,
-      "environment": "k8s-sandbox",
-      "evaluator_version": "1.2.4",
+      "environment": "local",
+      "evaluator_version": "1.3.2",
       "dataset_digest": "sha256:d8b84368c53829b1ab95079b2968f8e667766a8d13577bc10331d59a90e243ae",
-      "validation_status": null,
+      "validation_status": "passed",
       "tasks": 15,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
@@ -4264,7 +4264,7 @@
       "catalog_dir": "nemo-relay-get-started",
       "component": "NeMo Relay",
       "has_results": true,
-      "average_uplift_pct": 33.2
+      "average_uplift_pct": 35.2
     },
     {
       "skill": "nemo-relay-install",
@@ -24336,7 +24336,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
@@ -24345,7 +24345,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
@@ -24362,8 +24362,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 66.0,
-      "uplift_pct": 66.0
+      "score_pct": 88.0,
+      "uplift_pct": 88.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
@@ -24371,8 +24371,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 45.0,
-      "uplift_pct": -29.0
+      "score_pct": 94.0,
+      "uplift_pct": 54.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
@@ -24380,8 +24380,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": 55.0
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
@@ -24390,7 +24390,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 83.0
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-tp-dp-comm-overlap",
@@ -24758,8 +24758,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": -7.0
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-relay-get-started",
@@ -24767,8 +24767,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 7.0
+      "score_pct": 90.0,
+      "uplift_pct": 17.0
     },
     {
       "catalog_dir": "nemo-relay-get-started",
@@ -24776,7 +24776,7 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
+      "score_pct": 92.0,
       "uplift_pct": 69.0
     },
     {
@@ -24785,8 +24785,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 25.0
+      "score_pct": 89.0,
+      "uplift_pct": 21.0
     },
     {
       "catalog_dir": "nemo-relay-get-started",
@@ -24795,7 +24795,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 95.0,
-      "uplift_pct": 46.0
+      "uplift_pct": 44.0
     },
     {
       "catalog_dir": "nemo-relay-get-started",
@@ -24803,8 +24803,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 89.0,
-      "uplift_pct": 41.0
+      "score_pct": 90.0,
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "nemo-relay-get-started",
@@ -24812,8 +24812,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 72.0,
-      "uplift_pct": 44.0
+      "score_pct": 68.0,
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "nemo-relay-get-started",
@@ -24821,8 +24821,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 65.0,
-      "uplift_pct": 20.0
+      "score_pct": 70.0,
+      "uplift_pct": 27.0
     },
     {
       "catalog_dir": "nemo-relay-get-started",
@@ -24830,17 +24830,17 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "nemo-relay-get-started",
+      "component": "NeMo Relay",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
       "score_pct": 76.0,
-      "uplift_pct": 37.0
-    },
-    {
-      "catalog_dir": "nemo-relay-get-started",
-      "component": "NeMo Relay",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 75.0,
-      "uplift_pct": 50.0
+      "uplift_pct": 49.0
     },
     {
       "catalog_dir": "nemo-relay-install",
