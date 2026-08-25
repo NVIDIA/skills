@@ -10,5 +10,17 @@
       "Outlines the documented workflow steps from SKILL.md",
       "Does not run commands, scripts, or web searches"
     ]
+  },
+  {
+    "id": "tao-run-automl-container-default",
+    "question": "Plan TAO AutoML for a model whose model skill resolves image model-train:latest. The user chose local Docker but did not mention venv execution. Explain where recommendation training runs and what a host AutoML Python environment is for. Do not execute anything.",
+    "expected_skill": "tao-run-automl",
+    "expected_script": null,
+    "ground_truth": "All child model actions run in model-train:latest. A host Python environment may run AutoML/SDK control-plane code only and does not become the training runtime. Venv model-action execution requires an explicit user request.",
+    "expected_behavior": [
+      "Uses the model skill's resolved container image for recommendation and evaluation jobs",
+      "Treats a host AutoML or SDK venv as control-plane-only",
+      "Does not infer venv training from local Docker or an installed Python stack"
+    ]
   }
 ]

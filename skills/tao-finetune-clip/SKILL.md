@@ -19,6 +19,8 @@ tags:
 
 # CLIP
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Contrastive Language-Image Pre-training model for zero-shot and fine-tuned image classification, image-text retrieval, and embedding extraction. Fine-tuning adapts CLIP's shared image-text embedding space to domain-specific image-caption data.
 
 No default NGC pretrained checkpoint is required for spec construction, but unset checkpoint behavior is action-specific. In the validation-fixes PyTorch image, `export.checkpoint: null` exports the selected CLIP architecture and may initialize weights when pretrained weights are unavailable. Do not assume `inference.checkpoint: null` loads pretrained weights: `clip inference` currently calls the checkpoint loader with `None` and fails before embedding extraction. For PyTorch inference, checkpoint-backed evaluation/export, resume, and retrain flows, resolve and pass an exact checkpoint from the parent train output. For trusted TAO checkpoints produced by the current run or a known parent job, set `TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1` on checkpoint-dependent PyTorch actions so PyTorch 2.6 can load the Lightning checkpoint metadata; do not set this for untrusted checkpoints.
@@ -194,3 +196,4 @@ See `references/spec-param-inference.md` for the model-specific inference mappin
 ## Deployment
 
 - [tao-deploy-clip](references/tao-deploy-clip.md)
+

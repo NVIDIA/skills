@@ -54,7 +54,7 @@ sdk = BrevSDK()                                  # reads platform credentials fr
 runner = AutoMLRunner(
     sdk=sdk,
     skill_dir=SKILL_BANK / "skills" / "models" / model_skill, # resolved skill dir
-    action="train",
+    action=action,                                            # train, distill, prune, quantize, ...
 )
 result = runner.run(
     train_dataset_uri=train_dataset_uri,
@@ -146,6 +146,7 @@ automl = AutoML(
     workspace="/tmp/my_experiment",
     network=network_arch,
     train_specs=my_train_spec_dict,
+    action=action,
     settings={
         "algorithm": "bayesian",
         "metric": "loss",
@@ -181,7 +182,7 @@ print("Best:", automl.get_best().specs)
 | `llm_model` | str | `gcp/google/gemini-3.1-pro-preview` | LLM model name (llm, hybrid, autoresearch) |
 | `llm_api_key` | str | from env | API key for the LLM endpoint |
 | `research_program` | str | None | Free-text research directives for the autoresearch agent |
-| `automl_delete_intermediate_ckpt` | bool | False | Delete non-best checkpoints to save storage. Hyperband-family algorithms defer deletion until bracket completion for safety. |
+| `automl_delete_intermediate_ckpt` | bool | True | Automatically delete cleanup-supported terminal artifacts once they are safe to prune. The active trial/current best, every non-dominated Pareto-front member in a multi-objective search, and Hyperband-family promotion/resume inputs are protected; Hybrid conservatively retains successful trials when full-fidelity provenance is ambiguous. Cleanup-aware SDKs reject remote Docker binds, named volumes, unsafe output ownership, and unbound S3 identities before the first trial because deletion cannot be verified. Set False only when all trial artifacts and their external cleanup lifecycle are intentionally owned. |
 | `override_automl_disabled_params` | bool | False | Include params whose schema `automl_enabled` is False. For advanced users who want to search over params the network author didn't flag for AutoML. |
 
 ### `kpi` metric resolution

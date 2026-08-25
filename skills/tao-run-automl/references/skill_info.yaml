@@ -3,13 +3,13 @@ type: workflow
 prerequisites:
   required:
   - name: model
-    description: A TAO network skill with train defaults and AutoML/HPO notes.
-  - name: train_dataset_uri
-    description: Training dataset URI accessible from the chosen compute backend.
+    description: A TAO network skill with selected-action defaults and AutoML/HPO notes.
+  - name: action_inputs
+    description: Dataset, checkpoint, teacher, calibration, or artifact inputs required by the selected action.
   - name: platform
     description: Compute backend available through the TAO SDK, usually slurm, kubernetes, docker, or brev.
   - name: skill_bank_path
-    description: Path to this skill bank so AutoMLRunner can load model skills and train specs.
+    description: Path to this skill bank so AutoMLRunner can load model skills and selected-action specs.
   optional:
   - name: eval_dataset_uri
     description: Validation or evaluation dataset URI when required by the selected model skill.
@@ -34,5 +34,5 @@ depends_on:
   platform:
   - tao-sdk
   - brev
-description: TAO AutoML/HPO workflow for launching model-agnostic hyperparameter optimization through AutoMLRunner while grounding
-  model-specific details in the selected model skill.
+description: TAO AutoML/HPO workflow for launching model/action-agnostic hyperparameter optimization through AutoMLRunner while grounding
+  model- and action-specific details in the selected model skill.

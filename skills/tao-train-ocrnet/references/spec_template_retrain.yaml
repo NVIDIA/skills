@@ -15,7 +15,7 @@ wandb:
   run_id: ''
 model:
   TPS: false
-  num_fiducial: 3
+  num_fiducial: 20
   backbone: ResNet
   feature_channel: 512
   sequence: BiLSTM

@@ -18,6 +18,8 @@ tags:
 
 # Convert a TAO DAFT Dataset
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 ## Quick start
 
 ```bash
@@ -135,3 +137,4 @@ the full output and partial-read if huge.
   flags (media handling, task subset) via leaf `--help`; a misset
   flag often produces a structurally valid but semantically wrong
   target.
+

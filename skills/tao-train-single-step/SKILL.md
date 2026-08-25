@@ -18,6 +18,8 @@ tags:
 
 # Normal Train
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Standard supervised fine-tuning: train a model on a labeled dataset, optionally evaluate, then optionally export. The most common TAO workflow for adapting a pretrained model to a new dataset.
 
 ## Steps
@@ -29,6 +31,12 @@ Standard supervised fine-tuning: train a model on a labeled dataset, optionally 
 3. **export** — optional, on user request after training
 
 ## Prerequisites
+
+The selected model skill's resolved `container_image` is the default training
+runtime. Do not replace it with a host venv, `uv` environment, generic training
+image, or hand-written trainer unless the user explicitly requests that
+execution mode. SDK/controller Python environments are control-plane-only; the
+model action remains container-backed.
 
 ### Required
 - **model**: A compatible TAO model (e.g., clip, nvdinov2, grounding_dino)
@@ -74,3 +82,4 @@ After platform selection, run
 `scripts/list_tao_platforms.py --platform <platform> --format text` and ask
 only for credentials relevant to that platform, plus any selected-model
 credentials. Do not ask for unrelated platform credentials.
+

@@ -1,6 +1,6 @@
 network_arch: tao-generate-referring-expressions
 type: data
-container_image: tao_toolkit.pyt
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
 gpu_spec_key: null
 required_credentials: []
 actions:

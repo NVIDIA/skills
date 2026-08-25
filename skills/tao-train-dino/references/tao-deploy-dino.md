@@ -10,6 +10,13 @@ Supported actions: `gen_trt_engine`, `evaluate`, `inference`.
 
 ## Quick Start
 
+Set the deploy container once at the top of the session — every command below
+uses it:
+
+```bash
+TAO_DEPLOY_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-deploy  # versions-key: images.tao_toolkit.deploy
+```
+
 ### Generate TensorRT Engine
 
 ```bash
@@ -17,7 +24,7 @@ docker run --gpus all --rm --shm-size=16g \
   -v /path/to/specs:/specs \
   -v /path/to/export:/models \
   -v /path/to/results:/results \
-  nvcr.io/nvidia/tao/tao-toolkit:6.26.3-deploy \
+  "$TAO_DEPLOY_IMAGE" \
   dino gen_trt_engine -e /specs/dino_deploy_gen_trt_engine.yaml
 ```
 
@@ -29,7 +36,7 @@ docker run --gpus all --rm --shm-size=16g \
   -v /path/to/eval/images:/data/images \
   -v /path/to/eval/annotations.json:/data/annotations.json \
   -v /path/to/results:/results \
-  nvcr.io/nvidia/tao/tao-toolkit:6.26.3-deploy \
+  "$TAO_DEPLOY_IMAGE" \
   dino evaluate -e /specs/dino_deploy_evaluate.yaml
 ```
 
@@ -41,7 +48,7 @@ docker run --gpus all --rm --shm-size=16g \
   -v /path/to/infer/images:/data/images \
   -v /path/to/label_map.txt:/data/label_map.txt \
   -v /path/to/results:/results \
-  nvcr.io/nvidia/tao/tao-toolkit:6.26.3-deploy \
+  "$TAO_DEPLOY_IMAGE" \
   dino inference -e /specs/dino_deploy_inference.yaml
 ```
 
