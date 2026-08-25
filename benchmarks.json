@@ -207,14 +207,14 @@
     },
     {
       "skill": "cuopt-install",
-      "evaluation_date": "2026-06-26",
-      "environment": "astra-sandbox",
-      "evaluator_version": null,
-      "dataset_digest": null,
+      "evaluation_date": "2026-08-12",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.2.4",
+      "dataset_digest": "sha256:69515ef8677f7773d6ae7ac097b3a02767971b308d79ba74759f647dd33794c5",
       "validation_status": null,
-      "tasks": 1,
+      "tasks": 7,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -223,7 +223,7 @@
       "catalog_dir": "cuopt-install",
       "component": "cuOpt",
       "has_results": true,
-      "average_uplift_pct": 48.0
+      "average_uplift_pct": 30.7
     },
     {
       "skill": "cuopt-multi-objective-exploration",
@@ -7448,16 +7448,16 @@
       "catalog_dir": "cuopt-install",
       "component": "cuOpt",
       "dimension": "Security",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "score_pct": 86.0,
+      "uplift_pct": -7.0
     },
     {
       "catalog_dir": "cuopt-install",
       "component": "cuOpt",
       "dimension": "Security",
-      "num": 1,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -7466,73 +7466,73 @@
       "catalog_dir": "cuopt-install",
       "component": "cuOpt",
       "dimension": "Correctness",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 70.0
+      "score_pct": 94.0,
+      "uplift_pct": 9.0
     },
     {
       "catalog_dir": "cuopt-install",
       "component": "cuOpt",
       "dimension": "Correctness",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 22.0
+      "score_pct": 100.0,
+      "uplift_pct": 11.0
     },
     {
       "catalog_dir": "cuopt-install",
       "component": "cuOpt",
       "dimension": "Discoverability",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Discoverability",
-      "num": 1,
-      "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 72.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Effectiveness",
-      "num": 1,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 74.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Effectiveness",
-      "num": 1,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 6.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Efficiency",
-      "num": 1,
-      "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 67.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Efficiency",
-      "num": 1,
-      "agent": "codex",
       "score_pct": 96.0,
       "uplift_pct": 69.0
+    },
+    {
+      "catalog_dir": "cuopt-install",
+      "component": "cuOpt",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "cuopt-install",
+      "component": "cuOpt",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 81.0,
+      "uplift_pct": 18.0
+    },
+    {
+      "catalog_dir": "cuopt-install",
+      "component": "cuOpt",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.0,
+      "uplift_pct": 17.0
+    },
+    {
+      "catalog_dir": "cuopt-install",
+      "component": "cuOpt",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": 81.0
+    },
+    {
+      "catalog_dir": "cuopt-install",
+      "component": "cuOpt",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 67.0,
+      "uplift_pct": 63.0
     },
     {
       "catalog_dir": "cuopt-multi-objective-exploration",
