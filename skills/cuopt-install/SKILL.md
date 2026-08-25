@@ -1,6 +1,6 @@
 ---
 name: cuopt-install
-version: "26.08.00"
+version: "26.10.00"
 description: Install cuOpt for Python, C, or server via pip, conda, or Docker; verify the install. For building cuOpt from source, see cuopt-developer.
 license: Apache-2.0
 metadata:
@@ -12,6 +12,7 @@ metadata:
     - python
     - server
 ---
+
 
 
 # cuOpt Install (user)
