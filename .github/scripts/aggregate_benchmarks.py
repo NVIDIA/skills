@@ -28,9 +28,10 @@ from pathlib import Path
 SUMMARY_FIELDS = {
     "skill": [re.compile(r"^- Skill: `?([^`\n]+)`?\s*$")],
     "evaluation_date": [re.compile(r"^- Evaluation date: (.+)$")],
-    # v1/v2 only. v3 dropped this line along with the NVSkills-Eval name; it
-    # stays None there rather than being inferred. See NO_FABRICATION below.
-    "profile": [re.compile(r"^- NVSkills-Eval profile: `?([^`\n]+)`?\s*$")],
+    # RETIRED. v1/v2 emitted "- NVSkills-Eval profile: external". v3 dropped
+    # the line along with the NVSkills-Eval name, which is internal and does
+    # not belong in a published report. The field is retired rather than
+    # carried as a permanently-null column named after an internal tool.
     "environment": [re.compile(r"^- Environment: `?([^`\n]+)`?\s*$")],
     # v3 provenance. Absent from v1/v2, which leave these None.
     "evaluator_version": [re.compile(r"^- Evaluator version: `?([^`\n]+?)`?\s*$")],
@@ -200,7 +201,7 @@ def null_rate_regressions(old: dict, new: dict) -> dict:
 
     This is the generic guard against silent degradation: a regeneration can
     succeed, keep a valid schema, pass --check, and still quietly empty a
-    column when an upstream report format changes. Both the v3 profile /
+    column when an upstream report format changes. Both the v3
     pass_threshold drift and the 2026-08-03 disappearance of
     cuopt-multi-objective-exploration are that shape.
     """

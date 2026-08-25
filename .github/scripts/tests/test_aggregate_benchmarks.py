@@ -9,9 +9,14 @@ layout in circulation:
   v2 — SkillEvaluator 0.9.x  (skills/cuopt-developer, evaluated 2026-06)
   v3 — SkillEvaluator 1.3.x  (skills/nemotron-speech, evaluated 2026-08)
 
-v3 dropped two fields the parser reads (`NVSkills-Eval profile` and
+v3 dropped two fields the parser read (`NVSkills-Eval profile` and
 `Pass threshold`) and added three it does not (`Evaluator version`,
-`Dataset digest`, `Validation status`). These tests pin both halves of that.
+`Dataset digest`, `Validation status`).
+
+`profile` is now retired: NVSkills-Eval is an internal name and does not
+belong in a published report, so the parser no longer looks for it.
+`pass_threshold_pct` is kept and left None on v3 — it is a real provenance
+value that v3 turned into template prose. These tests pin both decisions.
 """
 
 import sys
@@ -67,9 +72,10 @@ class TestNoFabricatedProvenance(unittest.TestCase):
         entry = agg.parse_benchmark(V3)
         self.assertIsNone(entry["pass_threshold_pct"])
 
-    def test_profile_is_none_for_v3(self):
-        entry = agg.parse_benchmark(V3)
-        self.assertIsNone(entry["profile"])
+    def test_profile_is_not_emitted_at_all(self):
+        """Retired field: absent from every entry, both layouts."""
+        self.assertNotIn("profile", agg.parse_benchmark(V3))
+        self.assertNotIn("profile", agg.parse_benchmark(V2))
 
 
 class TestExistingBehaviourStillWorks(unittest.TestCase):
@@ -77,7 +83,6 @@ class TestExistingBehaviourStillWorks(unittest.TestCase):
 
     def test_v2_still_parses_legacy_fields(self):
         entry = agg.parse_benchmark(V2)
-        self.assertEqual(entry["profile"], "external")
         self.assertEqual(entry["pass_threshold_pct"], 50.0)
 
     def test_v3_shared_fields_parse(self):
@@ -95,35 +100,35 @@ class TestNullRateRegressionGuard(unittest.TestCase):
 
     This is the generic guard for the whole class of silent degradation:
     the regeneration succeeds, the schema stays valid, --check passes, and a
-    column quietly goes null. Both the profile/pass_threshold drift and the
+    column quietly goes null. Both the pass_threshold drift and the
     2026-08-03 disappearance of cuopt-multi-objective-exploration are this
     shape.
     """
 
     def test_flags_a_field_that_lost_values(self):
-        old = {"skills": [{"skill": "a", "profile": "external"},
-                          {"skill": "b", "profile": "external"}]}
-        new = {"skills": [{"skill": "a", "profile": None},
-                          {"skill": "b", "profile": None}]}
+        old = {"skills": [{"skill": "a", "environment": "k8s-sandbox"},
+                          {"skill": "b", "environment": "k8s-sandbox"}]}
+        new = {"skills": [{"skill": "a", "environment": None},
+                          {"skill": "b", "environment": None}]}
         regressions = agg.null_rate_regressions(old, new)
-        self.assertIn("profile", regressions)
-        self.assertEqual(regressions["profile"], (0, 2))
+        self.assertIn("environment", regressions)
+        self.assertEqual(regressions["environment"], (0, 2))
 
     def test_silent_on_unchanged_null_rates(self):
-        old = {"skills": [{"skill": "a", "profile": None}]}
-        new = {"skills": [{"skill": "a", "profile": None}]}
+        old = {"skills": [{"skill": "a", "environment": None}]}
+        new = {"skills": [{"skill": "a", "environment": None}]}
         self.assertEqual(agg.null_rate_regressions(old, new), {})
 
     def test_silent_when_a_field_gains_values(self):
-        old = {"skills": [{"skill": "a", "profile": None}]}
-        new = {"skills": [{"skill": "a", "profile": "external"}]}
+        old = {"skills": [{"skill": "a", "environment": None}]}
+        new = {"skills": [{"skill": "a", "environment": "k8s-sandbox"}]}
         self.assertEqual(agg.null_rate_regressions(old, new), {})
 
     def test_ignores_skills_absent_from_the_old_file(self):
         """A newly added skill with empty fields is not a regression."""
-        old = {"skills": [{"skill": "a", "profile": "external"}]}
-        new = {"skills": [{"skill": "a", "profile": "external"},
-                          {"skill": "b", "profile": None}]}
+        old = {"skills": [{"skill": "a", "environment": "k8s-sandbox"}]}
+        new = {"skills": [{"skill": "a", "environment": "k8s-sandbox"},
+                          {"skill": "b", "environment": None}]}
         self.assertEqual(agg.null_rate_regressions(old, new), {})
 
 
