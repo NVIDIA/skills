@@ -1,7 +1,7 @@
 name: tao-train-bevfusion
 network_arch: bevfusion
 automl_enabled: true
-container_image: nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt
+container_image: nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt  # unpinned: BEVFusion requires the 5.5.0 container (mmdet3d); later TAO images drop it
 data_format: default
 gpu_spec_key: train.num_gpus
 actions:

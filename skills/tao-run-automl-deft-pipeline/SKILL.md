@@ -197,3 +197,4 @@ The handoff shape — Phase 1 emits a *spec + checkpoint* (the checkpoint pre-se
 - `references/phase-handoffs.md` — both handoffs, baseline pre-seed, and Phase 3 warm-start, verbatim
 - `references/pitfalls-and-quality-checks.md` — metric pitfalls, run-to-run noise, leakage, compute budget
 - `references/quick-start-example.md` — the customer-facing worked-example message
+

@@ -17,13 +17,68 @@ tags:
 
 # Action Recognition
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Action recognition from video sequences. Supports RGB, optical flow, and joint (multi-stream) input types for classifying temporal actions in video clips.
 
 Set model.pretrained_model_path for pretrained backbone weights.
 
+## Quick Start (docker run)
+
+Docker-native launch — no TAO SDK and no Python on the host. Use the local
+Docker/platform skill instead when it gives a stricter environment-specific
+command (non-root UID mapping, cache redirects, remote daemons).
+
+```bash
+TAO_PYT_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
+TAO_PYT_IMAGE="${TAO_PYT_IMAGE:-$TAO_PYT_IMAGE_DEFAULT}"
+RUN_ROOT="${RUN_ROOT:-$PWD}"
+DOCKER_COMMON=(
+  --rm --gpus all --shm-size=8g
+  --shm-size=8g
+  --ulimit memlock=-1
+  --ulimit stack=67108864
+  -v "$RUN_ROOT/data:/data:ro"
+  -v "$RUN_ROOT/specs:/specs:ro"
+  -v "$RUN_ROOT/results:/results"
+)
+```
+
+Train:
+
+```bash
+docker run "${DOCKER_COMMON[@]}" "$TAO_PYT_IMAGE" \
+  action_recognition train -e /specs/train.yaml
+```
+
+Evaluate:
+
+```bash
+docker run "${DOCKER_COMMON[@]}" "$TAO_PYT_IMAGE" \
+  action_recognition evaluate -e /specs/evaluate.yaml
+```
+
+Inference:
+
+```bash
+docker run "${DOCKER_COMMON[@]}" "$TAO_PYT_IMAGE" \
+  action_recognition inference -e /specs/inference.yaml
+```
+
+Export:
+
+```bash
+docker run "${DOCKER_COMMON[@]}" "$TAO_PYT_IMAGE" \
+  action_recognition export -e /specs/export.yaml
+```
+
+Every action takes its spec with `-e`; `results_dir` is set in the spec or
+overridden on the command line. Mount any pretrained-weights directory the spec
+references, and keep every in-container path consistent across actions.
+
 ## Dataclass Schemas
 
-Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
+Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML for an action requires `schemas/<action>.schema.json` and `references/spec_template_<action>.yaml` to exist and parse. Use the packaged selected-action schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
 
 ## Train Action Policy
 

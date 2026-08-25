@@ -1,7 +1,7 @@
 name: tao-train-nvdinov2
 network_arch: nvdinov2
 automl_enabled: true
-container_image: tao_toolkit.pyt
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
 data_format: ssl
 gpu_spec_key: train.num_gpus
 actions:
@@ -52,6 +52,8 @@ actions:
     upload_excludes:
     - inputs/
 data_sources:
+  # `path` names the managed source artifact. `runtime: extracted_folder`
+  # requires the runner to pass the unpacked directory to the images_dir spec.
   train:
     dataset.train_dataset.images_dir:
       source: train_datasets

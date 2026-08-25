@@ -1,7 +1,7 @@
 name: tao-train-segformer
 network_arch: segformer
 automl_enabled: true
-container_image: tao_toolkit.pyt
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
 data_format: unet
 gpu_spec_key: train.num_gpus
 actions:

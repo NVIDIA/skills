@@ -1,16 +1,17 @@
 ---
 name: tao-run-automl
-description: Run AutoML / hyperparameter optimization (HPO) for NVIDIA TAO networks using AutoMLRunner. Handles algorithm
+description: Run container-backed AutoML / hyperparameter optimization (HPO) for NVIDIA TAO networks using AutoMLRunner. Handles algorithm
   selection (bayesian, hyperband, asha, bohb, llm, hybrid, autoresearch), WandB experiment tracking, job execution on any TAO SDK
   platform, result interpretation, and per-rec custom evaluation hooks. Use when the user mentions TAO AutoML, hyperparameter
   optimization, HPO, automl, automl_settings, AutoMLRunner, tao_automl, bayesian search, hyperband, ASHA, LLM-guided search,
-  autoresearch, or wants to tune training hyperparameters for any TAO network. Platform-agnostic — runs on any SDK (Brev,
+  autoresearch, or wants to tune train/distill/prune/quantize action parameters for any TAO network. Model actions use the model skill's
+  resolved container image by default; venv training requires an explicit user request. Platform-agnostic — runs on any SDK (Brev,
   SLURM, Kubernetes, Docker).
 license: Apache-2.0
 compatibility: Requires docker + nvidia-container-toolkit. Workflows declare additional requirements.
 metadata:
   author: NVIDIA Corporation
-  version: "0.1.0"
+  version: "0.1.1"
 allowed-tools: Read Bash Write
 tags:
 - automl
@@ -23,28 +24,47 @@ tags:
 
 # TAO AutoML
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Run automated hyperparameter optimization for a TAO model by combining:
 
-1. The selected model skill under `skills/models/<network>/`.
+1. The selected model skill under `skills/models/<model_skill>/`.
 2. The selected platform skill under `skills/platform/<platform>/`.
-3. `AutoMLRunner`, which generates recommendations, launches train jobs,
+3. `AutoMLRunner`, which generates recommendations, launches selected action jobs,
    extracts metrics, and feeds results back to the optimizer.
 
 Do not launch until model metadata, platform preflight, data visibility,
 credentials, image choice, and compute shape are all proven.
+
+## Execution Runtime — Hard Gate
+
+Every recommendation, baseline evaluation, per-recommendation evaluation, and
+final evaluation runs in the selected model action's resolved
+`container_image` by default. Resolve it from the model skill before any
+training-environment setup. A local checkpoint or Hugging Face model ID does not
+change this rule.
+
+Use venv-based **model action execution** only when the user explicitly asks for
+venv execution. Never infer venv mode from `local-docker`, local GPUs, an
+installed Python stack, or the presence of `pyproject.toml`. If the execution
+mode is absent, it is container-backed. A host/controller venv installed for
+`tao_automl`, TAO SDK, or a platform adapter is control-plane-only; state this
+clearly and keep all child model actions in the resolved container image.
 
 ## Reference Map
 
 - `references/skill_info.yaml`: this workflow's structured metadata.
 - Split detailed references: `automl-preflight-concepts.md` for prerequisites
   and support checks; `automl-intent-algorithms.md` for search policy;
+  `automl-compression-literature.md` for distill/prune/quantize algorithm
+  sufficiency and future compression-search roadmap;
   `automl-runner-configuration.md` for runner/API/WandB details;
   `automl-advanced-monitoring.md` for hooks, resume, and pitfalls; and
   `automl-examples.md` for conversation examples. `detailed-guide.md` is only
   the map.
 - `skills/models/<network>/SKILL.md`: model-specific dataset requirements, metrics,
   HPO notes, checkpoint handoff, and known failures.
-- `skills/models/<network>/references/skill_info.yaml`: train action contract,
+- `skills/models/<network>/references/skill_info.yaml`: action contract,
   container image, inputs, outputs, upload exclusions, and `mode`.
 - `skills/platform/<platform>/SKILL.md`: selected platform preflight, credentials,
   resource shape, monitoring, and cancellation.
@@ -81,12 +101,12 @@ Before every run:
 
 1. Read the model `SKILL.md` and `references/skill_info.yaml`.
 2. Confirm `automl_enabled: true` for the model or that the model skill
-   explicitly routes train-stage requests to AutoML.
-3. Confirm `<skill_dir>/schemas/train.schema.json` exists and parses. This is
-   the AutoML search-space gate.
+   explicitly routes the selected action to AutoML.
+3. Confirm `<skill_dir>/schemas/<action>.schema.json` exists and parses. This
+   is the AutoML search-space gate.
 4. For non-TAO-Core models such as Cosmos-RL and CLIP, also require
-   `references/spec_template_train.yaml`; otherwise the runner has no complete
-   train defaults.
+   `references/spec_template_<action>.yaml`; otherwise the runner has no
+   complete action defaults.
 5. If any gate fails, do not improvise a search space. Report the missing
    package artifact.
 
@@ -97,8 +117,10 @@ Collect these before runner construction:
 | Input | Requirement |
 |---|---|
 | `model_skill` | Resolved model skill directory under `skills/models/`. Accept user aliases such as `network_arch` only after resolving them to the packaged skill directory. |
+| `network_arch` | Read from the resolved model skill metadata. |
+| `action` | Action to optimize, usually `train`, `distill`, `prune`, or `quantize`. |
 | `platform` | One of the supported TAO platform skills. |
-| `train_dataset` / `eval_dataset` | Use model-specific spec keys and dataset layout. |
+| `train_dataset` / `eval_dataset` / action inputs | Use model-specific spec keys and dataset layout. Non-train actions often also require parent checkpoints, teacher checkpoints, calibration data, or pruned artifacts. |
 | `results_root` | Local, Lustre, or S3 path appropriate for the platform. |
 | `gpu_count`, `num_nodes` | Respect model and platform limits. |
 | `container_image` | Resolve through model metadata and `versions.yaml`; show it to the user. |
@@ -209,6 +231,14 @@ adjustment in `result["history"][i]["adjustments"]`.
 | `pbt` | Long training where schedules should mutate during training. | population and generation budget |
 | `llm`, `hybrid`, `autoresearch` | User explicitly wants LLM-guided search and has an endpoint configured. | LLM endpoint config plus budget |
 
+For `distill`, use the same train-like policy when the distill action performs
+epoch-based optimization and writes checkpoints. For single-shot `prune` and
+`quantize`, default to `bayesian` or `bfbo` unless the action schema/model skill
+declares an epoch-like or calibration-budget field that makes
+`hyperband`/`asha`/`bohb`/`dehb` meaningful. Use `eval_fn` when the selected
+metric must be computed by a follow-up evaluate/inference action after the
+compression action completes.
+
 Prefer the model skill's recommendation over generic defaults. Avoid ASHA or
 Hyperband when the model skill says startup, validation, or checkpoint cost
 dominates short trials.
@@ -219,7 +249,7 @@ Build specs as nested dictionaries. If a model skill lists paths in dotted
 notation for readability, walk the path and assign the nested leaf; do not store
 flat dotted strings as spec keys.
 
-Use the packaged train schema for:
+Use the packaged selected-action schema for:
 
 - `automl_default_parameters`
 - `automl_disabled_parameters`
@@ -323,15 +353,22 @@ valid LLM-guided run.
 At completion:
 
 1. Identify the best recommendation by the selected metric and direction.
-2. Return the best train child job id and its result path.
-3. Resolve the model checkpoint using the model skill's checkpoint metadata and
-   SDK helpers; do not guess filenames such as `latest`.
+2. Return the best child job id and its result path.
+3. Resolve the model checkpoint or action artifact using the model skill's
+   checkpoint/artifact metadata and SDK helpers; do not guess filenames such as
+   `latest`.
 4. Report the exact search space, algorithm, budget, metric, and platform.
 5. Report the automatic baseline eval job id/result path/metric, all
    recommendation metrics, final evaluation status/result path/metric, failed
    recommendations and root causes, elapsed time, and final runtime notes.
 6. If this feeds a workflow such as AutoML + DEFT, pass the winning spec
    overrides and checkpoint through the workflow's declared handoff fields.
+7. With the default retention policy, verify that cleanup-supported, safely
+   prunable terminal trial artifacts were deleted and that the winning
+   training artifacts remain. Report protected promotion/resume parents or
+   conservative Hybrid results explicitly. A remote bind, named volume, or
+   other output route the SDK cannot reclaim must fail retention preflight
+   before the first trial rather than be silently retained.
 
 ## Common Pitfalls
 
@@ -345,3 +382,9 @@ At completion:
 - For gated HuggingFace models, verify `HF_TOKEN` is set without reading it.
 - If all recommendations fail, stop and summarize the shared root cause instead
   of launching more trials.
+- Do not disable `automl_delete_intermediate_ckpt` by default. Keeping every
+  trial can consume one full distributed checkpoint set per recommendation.
+- Do not bypass a retention-preflight failure by disabling cleanup unless the
+  user has explicitly accepted external ownership and manual lifecycle
+  management for every trial artifact.
+

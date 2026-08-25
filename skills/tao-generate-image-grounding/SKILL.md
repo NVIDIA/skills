@@ -21,6 +21,8 @@ tags:
 
 # Image Grounding Pipeline
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Turn `(image, caption)` pairs into per-image grounded annotations: cleaned captions, referring expressions with character spans, and pixel-space bounding boxes for each expression. A single VLM (Gemini or any OpenAI-compatible endpoint) handles both steps.
 
 ## Purpose
@@ -121,5 +123,6 @@ All outputs go to `results_dir/`:
 
 ## Prerequisites
 
-- **Container**: `nvcr.io/nvidia/tao/tao-toolkit:6.26.3-pyt`
+- **Container**: `nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt` <!-- versions-key: images.tao_toolkit.pyt -->
 - **API access**: At least one VLM endpoint (Gemini API key or OpenAI-compatible endpoint capable of image input)
+
