@@ -27,7 +27,8 @@ REPORT = """# Skill Benchmark: foo
 
 - Skill: `foo`
 - Evaluation date: 2026-06-01
-{profile_line}- Environment: `local`
+- Environment: `local`
+{threshold_line}
 - Tasks: 4 evaluation tasks
 - Attempts per task: 1
 
@@ -38,7 +39,7 @@ REPORT = """# Skill Benchmark: foo
 | Accuracy  | 90% (+10%)  |
 """
 
-PROFILE_LINE = "- NVSkills-Eval profile: `external`\n"
+THRESHOLD_LINE = "- Pass threshold: 50%\n"
 
 
 class TestGuardBlocksRegeneration(unittest.TestCase):
@@ -48,7 +49,7 @@ class TestGuardBlocksRegeneration(unittest.TestCase):
         (self.root / "components.d").mkdir()
         self.report = self.root / "skills" / "foo" / "BENCHMARK.md"
         # Baseline: the field is present, benchmarks.json records it.
-        self.report.write_text(REPORT.format(profile_line=PROFILE_LINE))
+        self.report.write_text(REPORT.format(threshold_line=THRESHOLD_LINE))
         (self.root / "benchmarks.json").write_text(agg.generate(self.root))
         self.addCleanup(shutil.rmtree, self.root)
 
@@ -61,7 +62,7 @@ class TestGuardBlocksRegeneration(unittest.TestCase):
             sys.argv = argv
 
     def _drop_the_field(self):
-        self.report.write_text(REPORT.format(profile_line=""))
+        self.report.write_text(REPORT.format(threshold_line=""))
 
     def test_regeneration_succeeds_when_nothing_empties(self):
         self.assertEqual(self._run(), 0)
@@ -81,7 +82,7 @@ class TestGuardBlocksRegeneration(unittest.TestCase):
         self._drop_the_field()
         self.assertEqual(self._run("--allow-null-regressions"), 0)
         written = json.loads((self.root / "benchmarks.json").read_text())
-        self.assertIsNone(written["skills"][0]["profile"])
+        self.assertIsNone(written["skills"][0]["pass_threshold_pct"])
 
 
 if __name__ == "__main__":
