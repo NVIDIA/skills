@@ -73,8 +73,8 @@ For production release checks, prefer strict verification unless there is a docu
 
 Signing should happen after scanning and review:
 
-1. Run SkillSpector against the complete skill directory.
-2. Resolve or accept findings.
+1. Run SkillEvaluator, which runs SkillSpector on the Tier 1 scope documented in the [release checklist](/skills/release-checklist#tier-1-skillspector-scope).
+2. Resolve or accept findings in that scope.
 3. Complete the skill card.
 4. Sign the exact directory that will be published.
 5. Publish `skill.oms.sig` with the skill.

@@ -9,7 +9,7 @@ A skill on its own is a set of statements about what it does and how safe it is.
 
 | Question | Evidence produced | Stage |
 |---|---|---|
-| Is this skill safe to run? | Scan report over the complete bundle | SkillSpector, inside SkillEvaluator Tier 1 |
+| Is this skill safe to run? | Scan report over the Tier 1 staged scope | SkillSpector, inside SkillEvaluator Tier 1 |
 | Does it already exist in the catalog? | Semantic overlap report | SkillEvaluator Tier 2 |
 | Does it improve an agent's output? | `BENCHMARK.md` with per-dimension scores | SkillEvaluator Tier 3 |
 | What does it do, and who owns it? | Skill card | Author, reviewed |
@@ -19,7 +19,7 @@ A skill on its own is a set of statements about what it does and how safe it is.
 
 **[SkillSpector](https://github.com/NVIDIA/SkillSpector) is part of SkillEvaluator.** It is the security scanner that runs as SkillEvaluator's first tier, not a separate step alongside it. Running SkillEvaluator runs SkillSpector.
 
-- **Tier 1 — Validation.** Schema, license, PII, Unicode safety, and the full SkillSpector security scan. Deterministic, and it can fail a skill outright.
+- **Tier 1 — Validation.** Schema, license, PII, Unicode safety, and the SkillSpector security scan over a staged subset of the skill (artifact and evaluation trees excluded). Deterministic, and it can fail a skill outright.
 - **Tier 2 — Deduplication.** Semantic overlap against skills already in the catalog, so the same capability is not published twice under two names.
 - **Tier 3 — Live evaluation.** The skill is exercised by real agents in a sandbox against a task set, with and without the skill loaded. Each dimension is scored in both conditions, and the difference is the skill's measured contribution.
 
@@ -31,8 +31,8 @@ Use this order for skills intended for enterprise deployment as **NVIDIA-Verifie
 
 1. Author the skill with a narrow purpose, clear triggers, and explicit permissions.
 2. Ship an evaluation task set at `evals/evals.json` so Tier 3 has something to measure against.
-3. Run SkillEvaluator against the complete skill directory. Tier 1 includes the SkillSpector scan.
-4. Fix high-risk findings, or record why a finding is accepted.
+3. Run SkillEvaluator against the complete skill directory. Tier 1 includes the SkillSpector scan on its staged scope (see the [release checklist](/skills/release-checklist#tier-1-skillspector-scope)).
+4. Fix high-risk findings in that scope, or record why a finding is accepted.
 5. Review the `BENCHMARK.md` verdict. A skill that does not improve agent performance is not ready, regardless of how it scores on security.
 6. Complete the skill card with owner, license, use case, deployment geography, output shape, risks, and references.
 7. Sign the skill directory and publish the detached `skill.oms.sig` file with the skill.
