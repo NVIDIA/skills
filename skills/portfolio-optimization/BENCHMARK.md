@@ -1,24 +1,33 @@
 # Skill Benchmark: portfolio-optimization
 
-> ✅ **Overall verdict: PASS — Recommended for publication**
+> **Overall verdict: NEUTRAL — One or more dimensions remain below PASS**
 
-## Publication Recommendation
-
-Recommended for publication based on the completed evaluation evidence in this report.
+Live evaluation did not show a material gain or regression. Collect more evidence or improve the skill before making a publication decision.
 
 ## Evaluation Metadata
 
 - Skill: `portfolio-optimization`
-- Evaluation date: 2026-07-30
-- Evaluator version: `0.9.2`
+- Evaluation date: 2026-08-27
+- Evaluator version: `1.3.2`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (2 positive, 2 negative)
-- Dataset digest: `sha256:93d7d58ac9dd6ef70bbdea737d6c97c7ff428b7568edfff7aa9028ec3966bc78` (skill-evaluator-dataset-snapshot/1)
+- Dataset digest: `sha256:97b53fc5f0fc9cbbb6e594394ff89d950c9b5b713c0f4a6594c968dade42869f` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Execution and Provenance
+
+- Validation status: `passed`
+- Report generation: `complete`
+- Evaluator version: `1.3.2`
+- Git commit: `64be1471c5fd4364d27cf503eb8218cb86f36ee2`
+- Content type: requested `auto`, detected `skill`
+- Container image: `gitlab-master.nvidia.com:5005/nvcarps/ci-group/nvcarps-ci/skillevaluator-ci:sha-64be1471c5fd4364d27cf503eb8218cb86f36ee2`
+- Container image digest: `not recorded`
+- Tier 3: requested `true`, executed `true`, status `succeeded`
 
 ## What This Report Answers
 
@@ -34,12 +43,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 64% → 84% (+20 points) | 58% → 72% (+14 points) |
-| Security | 75% → 100% (+25 points) | 75% → 75% (±0 points) |
-| Correctness | 60% → 85% (+25 points) | 60% → 70% (+10 points) |
-| Discoverability | 69% → 88% (+19 points) | 64% → 88% (+23 points) |
-| Effectiveness | 50% → 52% (+2 points) | 33% → 41% (+8 points) |
-| Efficiency | 66% → 96% (+30 points) | 60% → 89% (+29 points) |
+| Overall | Not available | 72% → 74% (+2 points) |
+| Security | Not available | 88% → 100% (+12 points) |
+| Correctness | Not available | 80% → 50% (-30 points) |
+| Discoverability | Not available | 73% → 89% (+16 points) |
+| Effectiveness | Not available | 42% → 37% (-5 points) |
+| Efficiency | Not available | 76% → 94% (+18 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.
 
@@ -49,17 +58,16 @@ Example: `47% → 92% (+45 points)` means the skill-assisted run scored 92%, 45 
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED** | 1 validator(s); 0 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 1 finding(s) |
 | Tier 2 | Semantic deduplication | **NOT RUN** | No result was recorded |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
+| Tier 3 | Live agent evaluation | **NEUTRAL** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
 
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- Schema & Repository Governance: Found skill manifest: SKILL.md
-- AGENT_EVAL: Tier 3 evaluation complete: verdict PASS; best agent claude-code
+- **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'version' is ignored; use 'metadata.version' (`skills/portfolio-optimization/SKILL.md`)
 
 </details>
 
