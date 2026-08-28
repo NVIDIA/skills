@@ -82,6 +82,25 @@ FLOAT_FIELDS = {"pass_threshold_pct"}
 # provenance claim in the file whose purpose is recording provenance. Leave
 # pass_threshold_pct None on v3 until SkillEvaluator emits it as a real field.
 
+# Fields mid-retirement: known to be losing values as cards migrate, so a
+# rising null count is the expected transition rather than a parser break.
+#
+# pass_threshold_pct is read from the "- Pass threshold: N%" line that v1/v2
+# cards carry and v3 cards dropped (see NO_FABRICATION above). Every skill that
+# re-runs CI and lands a v3 card therefore adds exactly one null. Without this
+# exemption the guard blocks every sync that migrates any skill — it fired on
+# cuopt-server-api-python on 2026-08-28 and would fire again on each of the
+# ~100 skills still carrying a v1/v2 value.
+#
+# The drift is still reported, just not treated as blocking: the point of the
+# guard is catching a parser that broke without anyone noticing, and this is
+# the opposite — a change we understand and chose. Every other field stays
+# guarded.
+#
+# Remove this once SkillEvaluator emits the threshold as a real per-run field
+# and the parser reads it again.
+MIGRATING_FIELDS = {"pass_threshold_pct"}
+
 
 def parse_uplift(raw):
     """Convert an uplift cell capture to a float, or None when absent.
@@ -360,6 +379,17 @@ def main() -> int:
     if target.exists() and not args.allow_null_regressions:
         previous = json.loads(target.read_text(encoding="utf-8"))
         lost = null_rate_regressions(previous, json.loads(payload))
+
+        # Report every regression; block only on the ones we did not expect.
+        for field, (was, now) in sorted(lost.items()):
+            if field in MIGRATING_FIELDS:
+                print(
+                    f"note: {field} {was} -> {now} nulls — expected while cards "
+                    "migrate; see MIGRATING_FIELDS.",
+                    file=sys.stderr,
+                )
+        lost = {f: v for f, v in lost.items() if f not in MIGRATING_FIELDS}
+
         if lost:
             print(
                 "Refusing to write benchmarks.json: fields lost values.\n"
