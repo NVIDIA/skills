@@ -18,11 +18,19 @@ on:
     paths:
       - ".github/scripts/marketplace/**"
       - ".github/scripts/aggregate_benchmarks.py"
+      - ".github/scripts/generate_versions.py"
+      - ".github/scripts/versions.schema.json"
+      - ".github/scripts/tests/**"
       - ".github/workflows/generate-skill-metadata.yml"
       - "components.d/**"
       - "skills.sh.json"
-      - "skills/**/BENCHMARK.md"
+      # versions.json tracks every file in a skill directory: the content
+      # digest follows skill.oms.sig, and last_commit/last_modified follow any
+      # change at all. Watching only BENCHMARK.md would skip the check on the
+      # common case of a re-signed skill whose benchmark did not change.
+      - "skills/**"
       - "benchmarks.json"
+      - "versions.json"
   workflow_dispatch:
   workflow_run:
     workflows: ["Sync Skills from Product Repos"]
