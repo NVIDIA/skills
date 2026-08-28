@@ -50,6 +50,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # generate_versions.py reads `git log` per skill directory for the
+          # last_commit/last_modified fields, which a shallow clone cannot
+          # answer.
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -70,6 +75,12 @@ jobs:
 
       - name: Validate benchmarks.json (must match BENCHMARK.md sources)
         run: python3 .github/scripts/aggregate_benchmarks.py --check
+
+      - name: Test versions.json generator
+        run: python3 -m unittest discover -s .github/scripts/tests -p 'test_generate_versions.py'
+
+      - name: Validate versions.json (must match skills/*/skill.oms.sig)
+        run: python3 .github/scripts/generate_versions.py --check
 
   # ---------------------------------------------------------------------
   # Regenerate mode: dispatch or post-sync. AI enrichment allowed.
@@ -113,6 +124,9 @@ jobs:
           python3 .github/scripts/marketplace/generate-skill-metadata.py 2>&1 | tee /tmp/generator.log || rc=$?
           if [ "${rc}" = "0" ]; then
             python3 .github/scripts/aggregate_benchmarks.py 2>&1 | tee -a /tmp/generator.log || rc=$?
+          fi
+          if [ "${rc}" = "0" ]; then
+            python3 .github/scripts/generate_versions.py 2>&1 | tee -a /tmp/generator.log || rc=$?
           fi
           echo "exit_code=${rc}" >> "$GITHUB_OUTPUT"
           exit ${rc}
