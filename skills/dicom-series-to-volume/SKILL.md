@@ -31,6 +31,7 @@ metadata:
 
 ## Prerequisites
 - Runtime requirements: Python packages listed in `runtime.side_effects.pip_packages`.
+- NiBabel 5.4 or newer is required so extreme-oblique axes remain labeled consistently across reorientation.
 - Run commands from the repository root unless an existing section below says otherwise.
 
 ## Limitations
