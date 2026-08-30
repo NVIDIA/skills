@@ -1,16 +1,16 @@
 {
-  "_comment": "Skull-stripped FLAIR brain MRI generation fixture.",
+  "_comment": "MR-Brain v1 axial skull-stripped FLAIR fixture, approximately 250 x 250 x 175 mm FOV.",
   "modality": "mri_flair_skull_stripped",
   "dim": [
     256,
     256,
-    256
+    128
   ],
   "spacing": [
-    1.0,
-    1.0,
-    1.0
+    0.98,
+    0.98,
+    1.37
   ],
   "num_inference_steps": 30,
-  "cfg_guidance_scale": 10
+  "cfg_guidance_scale": 2
 }
