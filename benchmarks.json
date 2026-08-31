@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 343,
-  "result_row_count": 3210,
+  "skill_count": 344,
+  "result_row_count": 3220,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -3492,6 +3492,26 @@
       "component": "Megatron-Core",
       "has_results": false,
       "average_uplift_pct": null
+    },
+    {
+      "skill": "medtech-model-evidence-export",
+      "evaluation_date": "2026-08-29",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.3.2",
+      "dataset_digest": "sha256:20dc012111b0aa3dc1ff37d9ba71d5f505c9fccdf540783bcb0acf6764f3c4b7",
+      "validation_status": "passed",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "medtech-model-evidence-export",
+      "component": "Medical AI Skills",
+      "has_results": true,
+      "average_uplift_pct": 21.6
     },
     {
       "skill": "nemo-automodel-distributed-training",
@@ -21978,6 +21998,96 @@
       "agent": "codex",
       "score_pct": 74.0,
       "uplift_pct": 14.0
+    },
+    {
+      "catalog_dir": "medtech-model-evidence-export",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "medtech-model-evidence-export",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "medtech-model-evidence-export",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "medtech-model-evidence-export",
+      "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "medtech-model-evidence-export",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 99.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "medtech-model-evidence-export",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 27.0
+    },
+    {
+      "catalog_dir": "medtech-model-evidence-export",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "medtech-model-evidence-export",
+      "component": "Medical AI Skills",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 24.0
+    },
+    {
+      "catalog_dir": "medtech-model-evidence-export",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "medtech-model-evidence-export",
+      "component": "Medical AI Skills",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 27.0
     },
     {
       "catalog_dir": "nemo-automodel-distributed-training",

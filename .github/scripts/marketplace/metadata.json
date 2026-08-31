@@ -2221,6 +2221,18 @@
       }
     },
     {
+      "path": "skills/medtech-model-evidence-export",
+      "name": "medtech-model-evidence-export",
+      "description": "Exports sanitized metadata, parameters, reproducibility details, quality metrics, and optional review artifacts from Medical AI inference runs or evidence packs to MLflow. Use after inference, including NV-Generate runs; not for live training tracking, model registration, or clinical use.",
+      "metadata": {
+        "product.primary": "NIM for Healthcare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,data_scientist,developer",
+        "discovery.activity_tags": "extract,integrate,inference,validate,measure"
+      }
+    },
+    {
       "path": "skills/nemo-automodel-distributed-training",
       "name": "nemo-automodel-distributed-training",
       "description": "Guide for selecting and configuring distributed training strategies in NeMo AutoModel, including FSDP2, Megatron FSDP, DDP, and parallelism settings.",
