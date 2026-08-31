@@ -6454,14 +6454,14 @@
     },
     {
       "skill": "vss-manage-alerts",
-      "evaluation_date": "2026-06-14",
-      "environment": "astra-sandbox",
-      "evaluator_version": null,
-      "dataset_digest": null,
-      "validation_status": null,
+      "evaluation_date": "2026-08-31",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.3.2",
+      "dataset_digest": "sha256:92293bf373349be4359dea154089501a437825ab38c47d38348381965aa29a97",
+      "validation_status": "passed",
       "tasks": 7,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -6470,7 +6470,7 @@
       "catalog_dir": "vss-manage-alerts",
       "component": "Video Search and Summarization",
       "has_results": true,
-      "average_uplift_pct": 30.6
+      "average_uplift_pct": 34.5
     },
     {
       "skill": "vss-manage-video-io-storage",
@@ -34783,91 +34783,91 @@
       "catalog_dir": "vss-manage-alerts",
       "component": "Video Search and Summarization",
       "dimension": "Security",
-      "num": 7,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "score_pct": 86.0,
+      "uplift_pct": -14.0
     },
     {
       "catalog_dir": "vss-manage-alerts",
       "component": "Video Search and Summarization",
       "dimension": "Security",
-      "num": 7,
+      "num": null,
       "agent": "codex",
-      "score_pct": 93.0,
-      "uplift_pct": -7.0
+      "score_pct": 64.0,
+      "uplift_pct": -21.0
     },
     {
       "catalog_dir": "vss-manage-alerts",
       "component": "Video Search and Summarization",
       "dimension": "Correctness",
-      "num": 7,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 89.0,
-      "uplift_pct": 55.0
+      "score_pct": 100.0,
+      "uplift_pct": 80.0
     },
     {
       "catalog_dir": "vss-manage-alerts",
       "component": "Video Search and Summarization",
       "dimension": "Correctness",
-      "num": 7,
+      "num": null,
       "agent": "codex",
-      "score_pct": 78.0,
-      "uplift_pct": 33.0
+      "score_pct": 91.0,
+      "uplift_pct": 66.0
     },
     {
       "catalog_dir": "vss-manage-alerts",
       "component": "Video Search and Summarization",
       "dimension": "Discoverability",
-      "num": 7,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 99.0,
-      "uplift_pct": 55.0
+      "score_pct": 100.0,
+      "uplift_pct": 43.0
     },
     {
       "catalog_dir": "vss-manage-alerts",
       "component": "Video Search and Summarization",
       "dimension": "Discoverability",
-      "num": 7,
+      "num": null,
       "agent": "codex",
-      "score_pct": 89.0,
-      "uplift_pct": 26.0
+      "score_pct": 87.0,
+      "uplift_pct": 36.0
     },
     {
       "catalog_dir": "vss-manage-alerts",
       "component": "Video Search and Summarization",
       "dimension": "Effectiveness",
-      "num": 7,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 62.0,
-      "uplift_pct": 44.0
+      "score_pct": 70.0,
+      "uplift_pct": 43.0
     },
     {
       "catalog_dir": "vss-manage-alerts",
       "component": "Video Search and Summarization",
       "dimension": "Effectiveness",
-      "num": 7,
+      "num": null,
       "agent": "codex",
-      "score_pct": 51.0,
+      "score_pct": 65.0,
       "uplift_pct": 27.0
     },
     {
       "catalog_dir": "vss-manage-alerts",
       "component": "Video Search and Summarization",
       "dimension": "Efficiency",
-      "num": 7,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 89.0,
-      "uplift_pct": 51.0
+      "score_pct": 93.0,
+      "uplift_pct": 43.0
     },
     {
       "catalog_dir": "vss-manage-alerts",
       "component": "Video Search and Summarization",
       "dimension": "Efficiency",
-      "num": 7,
+      "num": null,
       "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 22.0
+      "score_pct": 94.0,
+      "uplift_pct": 42.0
     },
     {
       "catalog_dir": "vss-manage-video-io-storage",
