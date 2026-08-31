@@ -306,6 +306,7 @@
         "jetson-llm-benchmark",
         "jetson-llm-serve",
         "jetson-speculative-decoding",
+        "medtech-model-evidence-export",
         "tao-run-inference-service"
       ]
     },
