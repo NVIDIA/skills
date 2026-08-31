@@ -2811,19 +2811,19 @@
     {
       "path": "skills/nv-generate-mr-brain",
       "name": "nv-generate-mr-brain",
-      "description": "Used for generating synthetic brain MRI volumes with NV-Generate-CTMR rflow-mr-brain. Not for production training data.",
+      "description": "Used for generating synthetic T1, T2, FLAIR, SWI, or MRA brain MRI volumes with NV-Generate-CTMR MR-Brain v1. Not for production training data.",
       "metadata": {
         "product.primary": "MONAI",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "vision-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
+        "audience": "developer,research_academic,research_non_academic,ai_engineer,ml_engineer",
         "discovery.activity_tags": "generate,synthesize,validate,inspect"
       }
     },
     {
       "path": "skills/nv-generate-mr-brain-finetune",
       "name": "nv-generate-mr-brain-finetune",
-      "description": "Used for finetuning NV-Generate-CTMR MR-brain diffusion UNet from a NIfTI datalist. Not for clinical or production data approval.",
+      "description": "Used for finetuning NV-Generate-CTMR MR-Brain v1 for T1, T2, FLAIR, SWI, or MRA data from a NIfTI datalist. Not for clinical or production data approval.",
       "metadata": {
         "product.primary": "MONAI",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2871,7 +2871,7 @@
     {
       "path": "skills/nv-segment-ct-finetune",
       "name": "nv-segment-ct-finetune",
-      "description": "Used for smoke or dataset finetuning of NV-Segment-CT VISTA3D on CT NIfTI labels. Not for clinical validation.",
+      "description": "Runs standard or fixed-channel softmax finetuning of NV-Segment-CT VISTA3D on CT NIfTI image/label datasets, with optional MONAI-native MLflow tracking and checkpoint evidence. Uses softmax for predefined, mutually exclusive classes; keeps the standard workflow when point prompts or runtime-variable classes are needed. Not for clinical validation.",
       "metadata": {
         "product.primary": "MONAI",
         "classification.category.primary": "ai_and_machine_learning",
