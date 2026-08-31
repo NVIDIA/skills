@@ -14,6 +14,8 @@ skills:
     catalog_dir: dicom-series-preflight
   - path: skills/dicom-series-to-volume/
     catalog_dir: dicom-series-to-volume
+  - path: skills/medtech-model-evidence-export/
+    catalog_dir: medtech-model-evidence-export
   - path: skills/nv-generate-ct-rflow/
     catalog_dir: nv-generate-ct-rflow
   - path: skills/nv-generate-mr/
