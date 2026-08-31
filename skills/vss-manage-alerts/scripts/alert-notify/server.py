@@ -23,6 +23,7 @@ var (comma-separated, e.g. `slack`, `dashboard`, or `slack,dashboard`).
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import logging
 import os
 import signal
@@ -30,17 +31,13 @@ import sys
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
-from pathlib import Path
 from urllib.parse import urlparse, urlunparse
 
 import httpx
-from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 
 from incident_utils import safe_get
 from notifier_base import NotifierBase, NotifierResult
-
-load_dotenv(Path(__file__).parent / ".env")
 
 logging.basicConfig(
     level=logging.INFO,
@@ -441,9 +438,32 @@ async def send_test():
     return response
 
 
+def _is_loopback(host: str | None) -> bool:
+    """True when the peer address is a loopback address.
+
+    The server binds 0.0.0.0 so the alert bridge can deliver webhooks, so
+    reachability alone cannot be treated as authorization for shutdown.
+    """
+    if not host:
+        return False
+    try:
+        addr = ipaddress.ip_address(host)
+    except ValueError:
+        return False
+    return (getattr(addr, "ipv4_mapped", None) or addr).is_loopback
+
+
 @app.post("/webhook/alert-notify/stop")
-async def stop_server():
-    """Gracefully stop the webhook server."""
+async def stop_server(request: Request):
+    """Gracefully stop the webhook server. Loopback clients only."""
+    peer = request.client.host if request.client else None
+    if not _is_loopback(peer):
+        logger.warning("Rejected stop request from non-loopback client %s", peer)
+        raise HTTPException(
+            status_code=403,
+            detail="Stop is restricted to loopback clients",
+        )
+
     logger.info("Stop requested via API - shutting down")
 
     async def _shutdown():
