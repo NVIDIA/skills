@@ -5440,20 +5440,23 @@
     },
     {
       "skill": "tao-run-on-docker",
-      "evaluation_date": "2026-07-21",
+      "evaluation_date": "2026-08-31",
       "environment": "k8s-sandbox",
-      "evaluator_version": null,
-      "dataset_digest": null,
-      "validation_status": null,
+      "evaluator_version": "1.3.2",
+      "dataset_digest": "sha256:bbd17b170fc3258865f4ece13ea0409ef0fb2e293b7a81d348a8bd54b55ca6e3",
+      "validation_status": "passed",
       "tasks": 1,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
-      "agents": [],
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
       "catalog_dir": "tao-run-on-docker",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 69.5
+      "average_uplift_pct": 46.8
     },
     {
       "skill": "tao-run-on-kubernetes",
@@ -30193,7 +30196,7 @@
       "catalog_dir": "tao-run-on-docker",
       "component": "TAO Toolkit",
       "dimension": "Security",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -30202,7 +30205,7 @@
       "catalog_dir": "tao-run-on-docker",
       "component": "TAO Toolkit",
       "dimension": "Security",
-      "num": 1,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -30211,7 +30214,7 @@
       "catalog_dir": "tao-run-on-docker",
       "component": "TAO Toolkit",
       "dimension": "Correctness",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 100.0
@@ -30220,16 +30223,16 @@
       "catalog_dir": "tao-run-on-docker",
       "component": "TAO Toolkit",
       "dimension": "Correctness",
-      "num": 1,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 100.0
+      "uplift_pct": 80.0
     },
     {
       "catalog_dir": "tao-run-on-docker",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 100.0
@@ -30238,16 +30241,16 @@
       "catalog_dir": "tao-run-on-docker",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 94.0
+      "score_pct": 0.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-run-on-docker",
       "component": "TAO Toolkit",
       "dimension": "Effectiveness",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 83.0
@@ -30256,28 +30259,28 @@
       "catalog_dir": "tao-run-on-docker",
       "component": "TAO Toolkit",
       "dimension": "Effectiveness",
-      "num": 1,
+      "num": null,
       "agent": "codex",
-      "score_pct": 83.0,
-      "uplift_pct": 35.0
+      "score_pct": 53.0,
+      "uplift_pct": 5.0
     },
     {
       "catalog_dir": "tao-run-on-docker",
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
-      "num": 1,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 83.0,
-      "uplift_pct": 83.0
-    },
-    {
-      "catalog_dir": "tao-run-on-docker",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": 1,
-      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-run-on-docker",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 0.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-run-on-kubernetes",
