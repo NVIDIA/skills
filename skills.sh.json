@@ -68,6 +68,7 @@
         "omniverse-cad-to-simready",
         "omniverse-realtime-viewer",
         "omniverse-usd-performance-tuning",
+        "paidf-auto-labeling",
         "physical-ai-defect-image-generation",
         "physical-ai-image-attribute-augmentation",
         "physical-ai-infrastructure-setup-and-resilient-scaling",

@@ -2965,6 +2965,18 @@
       }
     },
     {
+      "path": "skills/paidf-auto-labeling",
+      "name": "paidf-auto-labeling",
+      "description": "Use when a user needs to get started with PAIDF Auto-Labeling, plan a scenario, run or debug a shipped cookbook, author prompts or cookbooks, migrate a pipeline, or configure a stage. Confirm critical inputs (data path, output path, endpoints) and ask when any are missing. This is a router: read the matching reference instead of inventing a workflow.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "ml_engineer,ai_engineer,data_engineer,developer,robotics_developer",
+        "discovery.activity_tags": "get_started,debug,configure,migrate,integrate"
+      }
+    },
+    {
       "path": "skills/physical-ai-defect-image-generation",
       "name": "physical-ai-defect-image-generation",
       "description": "Use when the user wants to orchestrate defect image generation with NVIDIA Cosmos AnomalyGen (Cosmos-Predict2-derived) on OSMO for PCBA, metal surface, and glass inspection. The Day 0 path handles cold-start with USD-to-ROI, image-edit augmentation, and AnomalyGen to create initial PCBA datasets. The Day 1 path performs inference and labeling on real images. This skill helps with first-time asset setup, creation of finetuning checkpoints, and configuring deployment.\nTrigger keywords: defect image generation, dig workflow, dig pipeline, defect image detection workflow, aoi pipeline, aoi anomalygen, usd2roi anomalygen, day 0 pcba, day 1 pcba, day 1 real-photo alignment, day 1 manual roi, metal surface anomaly, glass defect, anomalygen finetune, setup_pcb, setup_metal, setup_glass, setup_pretrained, dig setup, dig datasets, dig pretrained checkpoint, dig image-edit endpoint, cosmos defect generation, cosmos-predict2 defect, cosmos-anomalygen, cosmos predict2 finetune.",

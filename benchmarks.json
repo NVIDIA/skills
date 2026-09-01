@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 344,
-  "result_row_count": 3220,
+  "skill_count": 345,
+  "result_row_count": 3230,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -4729,6 +4729,26 @@
       "component": "TAO Toolkit",
       "has_results": true,
       "average_uplift_pct": 63.5
+    },
+    {
+      "skill": "paidf-auto-labeling",
+      "evaluation_date": "2026-08-31",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.3.2",
+      "dataset_digest": "sha256:0c0f4cddb69a8f4d39d89b44b82995ec2c694f59263fa370a1df8b93467e7b7e",
+      "validation_status": "passed",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "has_results": true,
+      "average_uplift_pct": 43.3
     },
     {
       "skill": "physical-ai-defect-image-generation",
@@ -27401,6 +27421,96 @@
       "agent": "codex",
       "score_pct": 96.0,
       "uplift_pct": 68.0
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 67.0
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 99.0,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.0,
+      "uplift_pct": 54.0
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 63.0
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "physical-ai-defect-image-generation",
