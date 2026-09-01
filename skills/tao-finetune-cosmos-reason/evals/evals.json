@@ -10,5 +10,33 @@
       "Outlines the documented workflow steps from SKILL.md",
       "Does not run commands, scripts, or web searches"
     ]
+  },
+  {
+    "id": "tao-finetune-cosmos-reason-container-runtime",
+    "question": "Plan LoRA fine-tuning of nvidia/Cosmos3-Nano. The user says to run jobs on cosmos-rl:cuda-stack-test and does not request venv execution. State which training runtime to use and whether to create a uv/venv training environment. Do not execute anything.",
+    "expected_skill": "tao-finetune-cosmos-reason",
+    "expected_script": null,
+    "ground_truth": "Use the user-supplied Cosmos-RL image override for all model actions. Do not create a uv/venv training environment; any host Python environment is control-plane-only.",
+    "expected_behavior": [
+      "Routes Cosmos3-Nano to tao-finetune-cosmos-reason",
+      "Uses cosmos-rl:cuda-stack-test as the model-action runtime",
+      "Does not propose a venv, uv training environment, generic image, or custom Transformers trainer"
+    ]
+  },
+  {
+    "id": "tao-finetune-cosmos-reason-wts-single-gb300",
+    "question": "Plan WTS LoRA SFT of nvidia/Cosmos3-Nano on exactly one GB300 using cosmos-rl:cuda-stack-test. The user specifies the number of training epochs but does not request checkpoint or validation cadence overrides. State the pre-launch runtime guards and cadence defaults. Do not execute anything.",
+    "expected_skill": "tao-finetune-cosmos-reason",
+    "expected_script": "scripts/train_wts_gb300.py",
+    "ground_truth": "Use the packaged WTS/GB300 helper in the requested image, one policy shard and no rollout/distillation replicas, zero train/validation dataloader workers with no prefetch factor, and nframes=8. Keep training duration, checkpointing, and validation epoch-based: train.epoch, train.ckpt.save_freq_in_epoch=1, and validation.freq_in_epoch=1. Do not infer step cadence from WTS, GB300, topology, or the runtime image.",
+    "expected_behavior": [
+      "Uses cosmos-rl:cuda-stack-test on exactly one GB300 with policy dp_shard_size 1",
+      "Uses the packaged WTS/GB300 helper and disables unused rollout and distillation replicas",
+      "Sets both dataloader worker counts to zero and removes their prefetch factors",
+      "Uses train.epoch as the training-duration control",
+      "Keeps checkpointing epoch-based with train.ckpt.save_freq_in_epoch=1",
+      "Keeps validation epoch-based with validation.freq_in_epoch=1",
+      "Does not infer step cadence from WTS, GB300, topology, or the runtime image"
+    ]
   }
 ]

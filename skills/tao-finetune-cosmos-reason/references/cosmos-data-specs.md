@@ -90,12 +90,16 @@ For root mode, explain the automatic mapping: `train_root` maps to
 `custom.train_dataset.media_path=train_root`; `eval_root` maps the same way for
 `custom.val_dataset`.
 
-Before train or AutoML runner generation, resolve the action=train container
-image from `references/skill_info.yaml` and `versions.yaml` (or the packaged
-`scripts/resolve_tao_image.py` helper), show the exact image to the user, and
-ask whether to use it or override with `image=<override>`. Do not silently
-launch on the default image. This skill does not package a
+Before train or AutoML runner generation, read the pinned action=train
+container image from `references/skill_info.yaml` (`container_image`), show the
+exact image to the user, and ask whether to use it or override with
+`image=<override>`. Do not silently launch on the default image. This skill does not package a
 `skills/models/tao-finetune-cosmos-reason/config.json` file.
+
+Also read `runtime_requirements.gpu_host` from the same metadata and pass its
+minimum driver, CUDA Toolkit, and Container Toolkit versions to
+`tao-setup-nvidia-gpu-host`. Model-level requirements override the TAO-wide
+platform defaults for this workflow.
 
 For launch preflight, pass the concrete annotation and media paths to the
 shared helper:
@@ -106,19 +110,21 @@ scripts/check_tao_launch_preflight.py --platform slurm \
   --path train_media=/lustre/.../train \
   --path val_annotation=/lustre/.../eval/annotations.json \
   --path val_media=/lustre/.../eval \
-  --gpu-min-count 4 \
-  --gpu-min-memory-gb 80 \
-  --gpu-arch-allowlist cosmos_rl=sm_80,sm_90,sm_100,sm_120
+  --gpu-min-total-memory-gb 256 \
+  --gpu-arch-allowlist cosmos_rl=sm_80,sm_90,sm_100,sm_103,sm_103a,sm_120
 ```
 
-For Cosmos-RL, count and memory are necessary but not sufficient. Treat the run
-as launchable only when the target has at least 4 GPUs with 80GB-class memory or
-higher, the GPU architecture is in the image-supported allowlist above, and the
-normal Docker/platform, S3, and credential preflight checks pass. A remote image
+For Cosmos-RL SFT, require at least 256 GB of cumulative visible GPU memory,
+with no fixed device count or per-device capacity. Set `dp_shard_size` to the
+actual visible GPU count and `dp_replicate_size=1` for a single node. The GPU
+architecture must be in the image-supported allowlist above, the selected image
+must pass its runtime CUDA-stack smoke test, and normal Docker/platform, S3, and
+credential preflight checks must pass. Architecture-specific suffixes such as
+`a` and `f` match the same base SM family. A remote image
 manifest that advertises `linux/arm64` only proves CPU architecture support; it
-does not prove CUDA SM support. Spark/GB10 `sm_121` must be blocked for this
-image unless direct image introspection confirms `sm_121` support or the user
-chooses a newer compatible image.
+does not prove CUDA SM support. `sm_121` must be blocked for this image unless
+direct runtime validation confirms support or the user chooses a compatible
+image.
 
 ### Per-Action Dataset Requirements
 

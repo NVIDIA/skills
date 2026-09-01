@@ -98,7 +98,7 @@ Key columns to read: **Container version**, **Min driver**, **CUDA version**, **
 ### Write the result to phase1_hardware.yaml
 
 ```yaml
-ngc_image: "nvcr.io/nvidia/pytorch:25.03-py3"   # example — use actual lookup result
+ngc_image: "nvcr.io/nvidia/pytorch:25.03-py3"   # unpinned: example — use actual lookup result
 pytorch_version: "2.7.0"                           # from support matrix, not guessed
 ```
 
@@ -108,8 +108,8 @@ If the web search fails (no network, timeout), use the last-known-good image tha
 the driver floor. The only verified-in-production image is:
 
 ```
-driver ≥ 555 → nvcr.io/nvidia/pytorch:24.09-py3  (PyTorch 2.5.0, CUDA 12.6, Python 3.10)
-driver ≥ 535 → nvcr.io/nvidia/pytorch:24.01-py3  (PyTorch 2.3.0, CUDA 12.3, Python 3.10)
+driver ≥ 555 → nvcr.io/nvidia/pytorch:24.09-py3  (PyTorch 2.5.0, CUDA 12.6, Python 3.10)  # unpinned: documented fallback
+driver ≥ 535 → nvcr.io/nvidia/pytorch:24.01-py3  (PyTorch 2.3.0, CUDA 12.3, Python 3.10)  # unpinned: documented fallback
 ```
 
 Log a warning in PROGRESS.md when falling back.
@@ -138,7 +138,7 @@ Use this to advise users on batch sizes and LoRA vs full finetune decisions:
 ## Container Verification Commands
 
 ```bash
-NGC_IMAGE="nvcr.io/nvidia/pytorch:25.01-py3"
+NGC_IMAGE="nvcr.io/nvidia/pytorch:25.01-py3"  # unpinned: example — Phase 2 selects the live tag
 
 # 1. Pull (first time only, ~15-25GB)
 docker pull $NGC_IMAGE
@@ -245,7 +245,7 @@ docker login nvcr.io
 
 After running detection commands, write:
 ```yaml
-ngc_image: nvcr.io/nvidia/pytorch:25.01-py3
+ngc_image: nvcr.io/nvidia/pytorch:25.01-py3  # unpinned: recorded example
 driver_version: "570.86.15"
 driver_major: 570
 cuda_version: "12.7"

@@ -1,0 +1,23 @@
+version: 2
+# Reviewed false positives — NVIDIA/nvskills-ci#67. No content removed.
+rules:
+  - path: "SKILL.md"
+    message: "*ydra*"
+    reason: "Reviewed FP (#67): scoped/standard command in setup or eval content; not malicious."
+  - path: "hooks/mining-package.sh"
+    message: "*HOOK_TRANSCRIPT*"
+    reason: "Reviewed FP (#67): scoped/standard command in setup or eval content; not malicious."
+  - id: "AS*"
+    path: "hooks/mining-package.sh"
+    reason: "Reviewed (#67): references to the skill's own .claude config / report-bundle hook; output stays in user workspace."
+  - id: "LP*"
+    path: "hooks/mining-script-check.sh"
+    reason: "Reviewed FP (#67): declared capability matches the skill's documented required function."
+  - id: "PE*"
+    path: "references/reference-invocation.md"
+    reason: "Reviewed FP (#67): standard infra path/flag refs in docs (SSH/kubeconfig/keyring/etc-passwd/docker), not privilege escalation."
+  - id: "PE*"
+    path: "references/setup.md"
+    reason: "Reviewed FP (#67): standard infra path/flag refs in docs (SSH/kubeconfig/keyring/etc-passwd/docker), not privilege escalation."
+  - path: "hooks/mining-package.sh"
+    reason: "Reviewed FP (#67): Report-bundle hook copies the session transcript into the skill's own output package in the user workspace; reviewed, not exfiltration."

@@ -102,7 +102,7 @@ Run without pausing. Between stages, follow `## Stage Execution`: re-read `loop_
 2. Backfill real per-stage token usage into `loop_log.jsonl` from the Claude Code transcript:
 
    ```bash
-   python ${TAO_SKILL_BANK_PATH}/skills/tao-run-deft-aoi/scripts/align_token_usage.py \
+   python <this-skill-dir>/scripts/align_token_usage.py \
        --log-path ${RESULTS_DIR}/loop_log.jsonl \
        --project-dir ~/.claude/projects/$(pwd | sed 's|/|-|g')
    ```

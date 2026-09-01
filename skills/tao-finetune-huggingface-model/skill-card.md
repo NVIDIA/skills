@@ -1,5 +1,5 @@
 ## Description: <br>
-Fine-tune any HuggingFace CV / VLM / LLM model on local NVIDIA GPUs inside an NGC PyTorch container. <br>
+Fine-tune any HuggingFace CV / VLM / LLM model on local NVIDIA GPUs inside an NGC PyTorch container when no dedicated TAO model skill matches. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,69 +7,74 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to fine-tune HuggingFace computer-vision, VLM, or LLM models on local NVIDIA GPUs with a reproducible, containerized training pipeline. <br>
+Developers and engineers who need to fine-tune a HuggingFace model (full or LoRA) on local NVIDIA GPUs, generate a reproducible training pipeline inside an NGC PyTorch container, and push the fine-tuned model to the HuggingFace Hub. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Optional] <br>
+**Credential Type(s):** [API key] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [NVIDIA Deep Learning Frameworks Support Matrix](https://docs.nvidia.com/deeplearning/frameworks/support-matrix/index.html) <br>
 - [Core Rules](references/core-rules.md) <br>
 - [Detailed Workflow](references/detailed-workflow.md) <br>
-- [Hardware & Container](references/hardware-container.md) <br>
 - [Error Playbook](references/error-playbook.md) <br>
-- [Model Discovery](references/model-discovery.md) <br>
-- [Dataset Patterns](references/dataset-patterns.md) <br>
-- [NVIDIA Deep Learning Frameworks Support Matrix](https://docs.nvidia.com/deeplearning/frameworks/support-matrix/index.html) <br>
+- [Hardware and Container Reference](references/hardware-container.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Shell commands, Configuration instructions, Files] <br>
+**Output Type(s):** [Shell commands, Code, Configuration instructions, Files] <br>
 **Output Format:** [Markdown with inline bash code blocks and generated Python scripts] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Produces a complete training project directory (Dockerfile, Python scripts, config.yaml, trained model checkpoints) and optionally pushes to HuggingFace Hub] <br>
+**Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task in the NVSkills-Eval `external` profile (`astra-sandbox` environment). <br>
+Evaluated against 4 evaluation tasks (4 positive) in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was found and executed. <br>
+- Effectiveness: Equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 100% (+100%) | 97% (+97%) |
-| Discoverability | 1 | 100% (+100%) | 97% (+97%) |
-| Effectiveness | 1 | 74% (+60%) | 90% (+62%) |
-| Efficiency | 1 | 95% (+68%) | 96% (+68%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 40% → 72% (+32 points) | 35% → 46% (+12 points) |
+| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
+| Correctness | 25% → 85% (+60 points) | 40% → 70% (+30 points) |
+| Discoverability | 25% → 61% (+36 points) | 0% → 0% (±0 points) |
+| Effectiveness | 31% → 81% (+50 points) | 33% → 60% (+28 points) |
+| Efficiency | 17% → 31% (+14 points) | 0% → 0% (±0 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

@@ -2,8 +2,9 @@
 name: tao-setup-nvidia-gpu-host
 description: >-
   Host setup for TAO GPU backends. Checks and, after user approval, installs
-  NVIDIA driver branch 580, CUDA Toolkit 13.0, and NVIDIA Container Toolkit
-  1.19.0 for Docker/local-Docker and Kubernetes GPU worker hosts. The
+  minimum-compatible NVIDIA driver, CUDA Toolkit, and NVIDIA Container Toolkit
+  versions for Docker/local-Docker and Kubernetes GPU worker hosts. TAO-wide
+  defaults can be overridden by the selected model's runtime profile. The
   `--check-only` path works on any Linux distribution; `--install` automates
   debian-family (Ubuntu/Debian/Pop!_OS/Mint/Zorin/Raspbian), rhel-family
   (Fedora/RHEL/Rocky/AlmaLinux), and suse-family (openSUSE/SLES) hosts, and
@@ -14,7 +15,7 @@ license: Apache-2.0
 compatibility: Runs `--check-only` on any Linux distribution. `--install` automates Ubuntu 22.04/24.04 + Debian 12 (apt), Fedora + RHEL/Rocky/AlmaLinux 9/10 (dnf), and openSUSE Leap / SLES 15 (zypper). Requires sudo/root, internet access to NVIDIA package repositories (and download.docker.com on rhel-family), and an x86_64 or aarch64 (sbsa) host. Other distributions (Arch, Alpine, Gentoo, NixOS, …) get a clear error that names the version targets and the NVIDIA install-guide URL.
 metadata:
   author: NVIDIA Corporation
-  version: "0.1.0"
+  version: "0.1.1"
 allowed-tools: Read Bash
 tags:
 - setup
@@ -26,12 +27,14 @@ tags:
 
 # NVIDIA GPU Host Setup
 
-Use this setup skill before TAO workflows run on the `docker`, `local-docker`,
-or `kubernetes` backend. It standardizes the host GPU runtime on:
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
 
-- NVIDIA driver branch `580` (open kernel module preferred)
-- CUDA Toolkit package `cuda-toolkit-13-0`
-- NVIDIA Container Toolkit `1.19.0`
+Use this setup skill before TAO workflows run on the `docker`, `local-docker`,
+or `kubernetes` backend. The TAO-wide default minimums are:
+
+- NVIDIA driver `>=580` (open kernel module preferred)
+- CUDA Toolkit `>=13.0`
+- NVIDIA Container Toolkit `>=1.19.0`
 - Docker engine — only installed for `docker` / `local-docker` backends and
   only when Docker is missing. The package picked depends on the distro
   family (`docker.io` on Debian-family by default, `moby-engine` /
@@ -80,7 +83,8 @@ bash skills/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh 
 Docker and Kubernetes workflows must run the check before submitting GPU work:
 
 ```bash
-SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT:-$PWD}/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
+SB="${TAO_SKILL_BANK_PATH:-${TAO_SKILL_BANK_ROOT:-$PWD}}"
+SETUP_SCRIPT="${SB}/skills/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
 
 bash "$SETUP_SCRIPT" --backend docker --check-only || {
   echo "MISSING: TAO GPU host runtime is not ready."
@@ -93,12 +97,33 @@ bash "$SETUP_SCRIPT" --backend docker --check-only || {
 Never install silently. If the check fails, explain what is missing, ask the
 user to authorize the fix, then run the install command and rerun the check.
 
+## Model Runtime Override Contract
+
+Platform defaults apply when a model has no override. A model that needs a
+different validated host stack declares it in
+`references/skill_info.yaml`:
+
+```yaml
+runtime_requirements:
+  gpu_host:
+    min_driver_version: '<version>'
+    min_cuda_version: '<version>'
+    min_container_toolkit_version: '<version>'
+```
+
+Read those values before the final platform preflight and pass them to the
+matching `--min-*-version` flags. Model minimums take precedence for that
+workflow only; do not rewrite the platform defaults or requirements for other
+models. Version checks use numeric lower bounds, so later compatible releases
+pass. Always retain the selected-image GPU smoke test because a version bound
+cannot prove support for a particular GPU architecture.
+
 ## What The Installer Does
 
 The installer dispatches on the detected distribution family. On every
 supported family it adds NVIDIA's CUDA and Container Toolkit repositories
-(if missing), installs the pinned runtime packages, optionally installs
-Docker, wires the NVIDIA Docker runtime, and adds the invoking user to
+(if missing), installs packages that satisfy the active minimums, optionally
+installs Docker, wires the NVIDIA Docker runtime, and adds the invoking user to
 the `docker` group.
 
 Common steps (all families):
@@ -109,9 +134,9 @@ Common steps (all families):
    `.repo` for dnf/zypper).
 3. Installs the matching kernel header / devel package for the running
    kernel.
-4. Installs the driver branch 580 packages, `cuda-toolkit-13-0`, and the
-   Container Toolkit pinned to `1.19.0` (the dpkg-suffixed `1.19.0-1` is
-   the same upstream version expressed for apt).
+4. Installs the current open-driver and Container Toolkit packages from the
+   configured repositories plus the CUDA Toolkit package selected by
+   `--min-cuda-version`, then verifies all three against the active minimums.
 5. For Docker backends and when Docker is missing, installs Docker
    (override / opt-out flags below), enables/starts the daemon, then runs
    `nvidia-ctk runtime configure --runtime=docker` and restarts Docker
@@ -128,9 +153,9 @@ Family-specific package selections:
 | Step | debian-family | rhel-family | suse-family |
 |---|---|---|---|
 | Kernel headers | `linux-headers-$(uname -r)` | `kernel-devel-$(uname -r)`, `kernel-headers-$(uname -r)` | `kernel-default-devel` |
-| Driver | `nvidia-driver-pinning-580`, `nvidia-open-580` (override: `$NVIDIA_DRIVER_PACKAGE_DEBIAN`) | `nvidia-driver-cuda`, `kmod-nvidia-open-dkms` (override: `$NVIDIA_DRIVER_PACKAGE_RHEL`, `$NVIDIA_DRIVER_KMOD_RHEL`) | `nvidia-open-driver-G06-signed-kmp-default` (override: `$NVIDIA_DRIVER_PACKAGE_SUSE`) |
-| CUDA toolkit | `cuda-toolkit-13-0` | `cuda-toolkit-13-0` | `cuda-toolkit-13-0` |
-| Container Toolkit | `nvidia-container-toolkit=1.19.0-1` + base/tools/libs | `nvidia-container-toolkit-1.19.0` + base/tools/libs | same as rhel |
+| Driver | current `nvidia-open` (override: `$NVIDIA_DRIVER_PACKAGE_DEBIAN`) | current `nvidia-driver-cuda`, `kmod-nvidia-open-dkms` (override: `$NVIDIA_DRIVER_PACKAGE_RHEL`, `$NVIDIA_DRIVER_KMOD_RHEL`) | current `nvidia-open-driver-G06-signed-kmp-default` (override: `$NVIDIA_DRIVER_PACKAGE_SUSE`) |
+| CUDA toolkit | package derived from the active minimum, such as `cuda-toolkit-13-0` | same | same |
+| Container Toolkit | current `nvidia-container-toolkit` + base/tools/libs, then minimum-version validation | same | same |
 | Docker | `docker.io` (override: `$DOCKER_PACKAGE_DEBIAN`) | `moby-engine`+`moby-cli` on Fedora when available, else `docker-ce docker-ce-cli containerd.io` from `download.docker.com` | `docker` |
 
 ## Verification
@@ -139,13 +164,14 @@ After installation, verify:
 
 ```bash
 nvidia-smi
-/usr/local/cuda-13.0/bin/nvcc --version
+nvcc --version
 docker info --format '{{json .Runtimes}}' | grep nvidia
-sudo docker run --rm --runtime=nvidia --gpus all ubuntu nvidia-smi
+sudo docker run --rm --runtime=nvidia --gpus all "$TAO_IMAGE" nvidia-smi -L
 ```
 
-Expected `nvidia-smi` output includes driver `580.x` and CUDA Version `13.0`.
-Expected `nvcc` output includes `release 13.0`.
+The detected driver, CUDA Toolkit, and Container Toolkit versions must meet the
+active TAO-wide or model-specific minimums. Then run the selected image's GPU
+smoke test; version comparison alone is not sufficient compatibility proof.
 
 ## Kubernetes Notes
 
@@ -209,13 +235,10 @@ membership on a new login session. Log out and back in, or run
 **Docker runtime still missing**: Restart Docker, then rerun
 `nvidia-ctk runtime configure --runtime=docker`.
 
-**Driver branch detected != 580**: The driver-branch pin is exact on
-debian-family (`nvidia-open-580`). On rhel-/suse-family the script
-installs the latest open driver shipped in NVIDIA's CUDA 13.0 repo for
-the detected distro, which is always ≥ 580. If your host needs a stricter
-pin, set `$NVIDIA_DRIVER_PACKAGE_RHEL` / `$NVIDIA_DRIVER_KMOD_RHEL` /
-`$NVIDIA_DRIVER_PACKAGE_SUSE` to the exact package names you want before
-running `--install`.
+**Detected version is below the active minimum**: Rerun the same command with
+`--install` after approval, preserving any model-specific `--min-*-version`
+flags. Package-name environment overrides select distribution-specific driver
+packages but do not weaken the minimum-version checks.
 
 **Driver installed but `nvidia-smi` fails**: Load the module with
 `sudo modprobe nvidia` or reboot. Secure Boot may require MOK enrollment on

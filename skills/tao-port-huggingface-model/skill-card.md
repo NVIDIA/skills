@@ -9,10 +9,16 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to integrate HuggingFace Computer Vision models into the NVIDIA TAO Toolkit for training, ONNX export, and TensorRT deployment across classification, detection, and segmentation tasks. <br>
+Developers and engineers use this skill to port HuggingFace computer-vision models (classification, detection, segmentation, depth estimation) into the NVIDIA TAO Toolkit, producing a fully integrated trainer, ONNX exporter, and TensorRT deploy pipeline. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Yes] <br>
+**Credential Type(s):** [API key] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
@@ -29,52 +35,51 @@ Mitigation: Review and scan skill before deployment. <br>
 - [phase-7-optimization.md](references/phase-7-optimization.md) <br>
 - [cross-cutting.md](references/cross-cutting.md) <br>
 - [tao-patterns.md](references/tao-patterns.md) <br>
-- [task-type-guide.md](references/task-type-guide.md) <br>
-- [workflow-consistency.md](references/workflow-consistency.md) <br>
+- [TAO Skill Bank (GitHub)](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Shell commands, Configuration instructions, Files] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Code, Shell commands, Configuration instructions] <br>
+**Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive skill-activation case) via NVSkills-Eval external profile. <br>
+1 evaluation task (1 positive), each attempt run in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Final-answer correctness against the reference answer. <br>
+- Discoverability: Whether the expected skill was found and executed when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal (goal completion and expected workflow adherence, equal weight). <br>
+- Efficiency: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 90% (+90%) | 97% (+97%) |
-| Discoverability | 1 | 100% (+100%) | 97% (+97%) |
-| Effectiveness | 1 | 50% (+36%) | 90% (+66%) |
-| Efficiency | 1 | 95% (+68%) | 96% (+68%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 23% → 100% (+76 points) | 38% → 58% (+20 points) |
+| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
+| Correctness | 0% → 100% (+100 points) | 40% → 100% (+60 points) |
+| Discoverability | 0% → 100% (+100 points) | 0% → 0% (±0 points) |
+| Effectiveness | 17% → 98% (+81 points) | 48% → 90% (+42 points) |
+| Efficiency | 0% → 100% (+100 points) | 0% → 0% (±0 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>
