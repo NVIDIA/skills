@@ -66,6 +66,13 @@ Collect:
 6. Preserve the JSON report, textured USDZ output, materials JSON, textures ZIP, and renders ZIP when available.
 7. Continue with the workflow asset path that matches user intent. For simulation validation, prefer the materialized/physics USD unless the user explicitly wants to validate the textured USDZ.
 
+Before the request, the wrapper uses an available OpenUSD runtime to inspect the
+input and package resolved external layers and assets into one USDZ. Texture
+Agent uploads reject unresolved dependencies, including missing source textures,
+and fail before creating a service session. Configure
+`CONTENT_AGENTS_OPENUSD_PYTHON` with a Python 3.12 `pxr` runtime when neither the
+process Python nor a trusted skill-project runtime can inspect the input.
+
 Do not use the upstream `--upload-first` option or the `/pipeline/upload-usd`
 submission path for Texture Agent workflows from this repo. Texture requests
 must submit the USD in the same `POST /pipeline` call that starts the session.

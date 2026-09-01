@@ -6,14 +6,14 @@ license: Apache-2.0
 tools:
   - Read
   - Shell
+allowed-tools: Read Write Bash WebFetch Env
+permissions: [env, file_read, file_write, network, shell]
 compatibility: >
-  Orchestrator skill. Managed Content Agents deployment requires a configured
-  model provider key matching the selected backend, such as NVIDIA_API_KEY,
+  Orchestrator skill. Managed Content Agents deployment requires a configured model provider key matching the selected backend, such as NVIDIA_API_KEY,
   OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_API_KEY, or GEMINI_API_KEY,
   Docker + NVIDIA Container Toolkit + GPU, Python 3.12, and an upstream checkout of
   nvidia-omniverse/content-agents at the ref pinned in upstream-versions.lock.json.
-  Reused/provided endpoints may
-  instead use explicit endpoint and usage-token environment variables.
+  Reused/provided endpoints may instead use explicit endpoint and usage-token environment variables.
   Linux/macOS only.
 metadata:
   author: Omniverse

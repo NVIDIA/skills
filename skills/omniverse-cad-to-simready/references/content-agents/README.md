@@ -118,9 +118,27 @@ uses external layers or asset dependencies, the wrappers inspect dependencies
 with OpenUSD and package the asset as USDZ for upload with
 `UsdUtils.CreateNewUsdzPackage`. The report records this in `upload_info` and
 `upload_packaging`. Prefer this packaging path over flattening because it keeps
-the authored layer structure and referenced assets together for the service. If
-OpenUSD cannot inspect or package dependencies, the wrapper reports the
-unresolved paths instead of silently flattening or dropping references.
+the authored layer structure and referenced assets together for the service.
+When the process Python cannot import `pxr`, the wrappers try
+`CONTENT_AGENTS_OPENUSD_PYTHON`, `USD_CONVERT_CAD_PYTHON`, the skill repository's
+`.venv`, and `uv run --python 3.12` in that order. They never discover or
+execute a `.venv` from the caller's asset directory; `uv` is bound to the
+skill-owned project when one is present and otherwise runs with `--no-project`.
+The same resolver is used for topology inspection, MDL/service-path preparation,
+and dependency packaging. `upload_info` records the selected
+`inspection_runtime`, executable, dependency paths, unresolved paths, packaging
+decision, and package size. If no runtime can inspect a local USD, the wrapper
+fails before creating a service session and asks for an already self-contained
+USDZ or a configured OpenUSD Python instead of silently uploading one raw layer.
+
+Material Agent alone may receive an original USD with unresolved texture paths
+when inspection finds no resolved sidecars, because missing source textures can
+be replaced during material prediction. The report records that exception as
+`missing_textures_passthrough` with a warning. If a missing texture prevents
+OpenUSD from packaging otherwise resolved dependencies, the wrapper fails before
+session creation instead of uploading a root layer that omits those sidecars.
+Missing USD layers or other non-texture dependencies always fail, and Physics
+and Texture Agent uploads reject every unresolved dependency.
 
 ## Rate Limits
 
@@ -198,9 +216,11 @@ and records it under `ignored_issues`; do not retry the same Physics Agent call
 blindly.
 
 If system `python3` cannot import `pxr`, the Material and Physics wrappers try
-`uv run --python 3.12` for OpenUSD topology inspection. The wrappers use the
-same fallback when preparing upload copies that strip missing MDL shader sources
-or clear unresolved service-internal USDZ subasset paths before packaging.
+`uv run --python 3.12` for OpenUSD topology inspection. Upload dependency
+inspection and packaging use the broader fail-closed runtime resolution described
+under Multi-File USD Uploads. Upload-copy preparation also tries the uv runtime
+when stripping missing MDL shader sources or clearing unresolved service-internal
+USDZ subasset paths before packaging.
 
 Texture generation:
 
