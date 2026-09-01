@@ -35,6 +35,7 @@
       "title": "Physical AI",
       "description": "Build and validate AI workflows that interact with the physical world, including robotics, autonomy, simulation, synthetic data, and embodied AI systems.",
       "skills": [
+        "event-video-generation-workflow",
         "holohub-app-lifecycle",
         "holohub-debug-build-run",
         "hsb-app",
@@ -44,6 +45,7 @@
         "hsb-setup",
         "hsb-test",
         "i4h-catheter-navigation-setup",
+        "image-attribute-augmentation-workflow",
         "jetson-build-source",
         "jetson-customize-camera",
         "jetson-customize-fan",
@@ -68,13 +70,15 @@
         "omniverse-cad-to-simready",
         "omniverse-realtime-viewer",
         "omniverse-usd-performance-tuning",
+        "orchestration-setup",
         "paidf-augmentation",
         "paidf-auto-labeling",
         "physical-ai-defect-image-generation",
         "physical-ai-image-attribute-augmentation",
         "physical-ai-infrastructure-setup-and-resilient-scaling",
         "physical-ai-neural-reconstruction",
-        "physical-ai-video-data-augmentation"
+        "physical-ai-video-data-augmentation",
+        "write-dag"
       ]
     },
     {
