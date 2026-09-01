@@ -1,4 +1,4 @@
-name: PAIDF Orchestration
+name: Physical AI Orchestration
 repo: NVIDIA/paidf-orchestration
 description: Build, run and monitor physical AI data factory pipelines for image and video generation and transformation.
 skills:
