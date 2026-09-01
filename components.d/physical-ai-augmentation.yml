@@ -1,4 +1,4 @@
-name: PAIDF Augmentation
+name: Physical AI Augmentation
 repo: NVIDIA/paidf-augmentation
 description: Author, validate, and run Physical AI Data Factory augmentation pipelines for image and video generation and transformation.
 skills:
