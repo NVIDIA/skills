@@ -2989,6 +2989,54 @@
       }
     },
     {
+      "path": "skills/paidf-orchestration-event-video-generation-workflow",
+      "name": "event-video-generation-workflow",
+      "description": "Run the PAIDF Orchestration Event Video Generation DAG on Kubernetes - image-to-video anomaly generation, auto-labeling, and anomaly dataset generation. Select for requests about event video generation, anomaly video generation, image-to-video synthesis, Cosmos3 image2video, anomaly dataset creation, safety/surveillance SDG, or generating person-falling, person-climbing, person-running, fighting, smoking/vaping, fire/smoke, or shoplifting video clips from a seed image. Runs environment setup first when controller readiness is unknown. Not for person-crop clothing/attribute augmentation (that is image-attribute-augmentation-workflow) and not for video style transfer.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "ai_engineer,ml_engineer,application_developer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "orchestrate,generate,synthesize,deploy,configure"
+      }
+    },
+    {
+      "path": "skills/paidf-orchestration-image-attribute-augmentation-workflow",
+      "name": "image-attribute-augmentation-workflow",
+      "description": "Run the PAIDF Orchestration Image Attribute Augmentation DAG on Kubernetes - person-crop clothing augmentation, attribute search, and augmented dataset generation. Select for requests about image attribute augmentation, person attribute search, person re-identification data, clothing augmentation, attribute captions, augmentation payloads, run status, or result retrieval. Runs environment setup first when controller readiness is unknown. Not for video or defect-image generation.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "application_developer,ml_engineer,platform_engineer,devops_engineer,data_scientist",
+        "discovery.activity_tags": "orchestrate,generate,configure,operate,monitor"
+      }
+    },
+    {
+      "path": "skills/paidf-orchestration-setup",
+      "name": "orchestration-setup",
+      "description": "Audit, prepare, and deploy PAIDF Orchestration on a Kubernetes GPU cluster - single-GPU H100/L40S hosts, managed Kubernetes, kubeadm, and similar. Select for requests to set up, install, deploy, configure, or check a PAIDF Orchestration environment; run a workflow on a new or unverified GPU host; connect via kubeconfig; validate GPU compute; deploy the Airflow controller; or choose external versus in-cluster model services. A plain SSH host is not a supported backend.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "devops_engineer,platform_engineer,solutions_architect,ai_engineer,developer",
+        "discovery.activity_tags": "deploy,configure,validate,orchestrate,get_started"
+      }
+    },
+    {
+      "path": "skills/paidf-orchestration-write-dag",
+      "name": "write-dag",
+      "description": "Use when a user describes a custom PAIDF Orchestration pipeline — a specific ordered combination of stages such as augmentation only, auto-labeling only, detection+captioning only, or image attribute augmentation without full auto-labeling — that no existing DAG in airflow/dags/workflows/ covers, and asks for a new Kubernetes DAG. Also use to check that a generated or existing DAG's model/container/prompt choices match an external spec document (e.g. a PAIDF `launchable.md`).",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "application_developer,platform_engineer,devops_engineer,ml_engineer,ai_engineer",
+        "discovery.activity_tags": "orchestrate,generate,configure,deploy,validate"
+      }
+    },
+    {
       "path": "skills/physical-ai-defect-image-generation",
       "name": "physical-ai-defect-image-generation",
       "description": "Use when the user wants to orchestrate defect image generation with NVIDIA Cosmos AnomalyGen (Cosmos-Predict2-derived) on OSMO for PCBA, metal surface, and glass inspection. The Day 0 path handles cold-start with USD-to-ROI, image-edit augmentation, and AnomalyGen to create initial PCBA datasets. The Day 1 path performs inference and labeling on real images. This skill helps with first-time asset setup, creation of finetuning checkpoints, and configuring deployment.\nTrigger keywords: defect image generation, dig workflow, dig pipeline, defect image detection workflow, aoi pipeline, aoi anomalygen, usd2roi anomalygen, day 0 pcba, day 1 pcba, day 1 real-photo alignment, day 1 manual roi, metal surface anomaly, glass defect, anomalygen finetune, setup_pcb, setup_metal, setup_glass, setup_pretrained, dig setup, dig datasets, dig pretrained checkpoint, dig image-edit endpoint, cosmos defect generation, cosmos-predict2 defect, cosmos-anomalygen, cosmos predict2 finetune.",
