@@ -18,6 +18,8 @@ tags:
 
 # TAO Workflow Launch Intake
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Use this skill before launching any TAO workflow or model action.
 
 ## Quick Start

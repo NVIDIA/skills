@@ -1,88 +1,113 @@
-# Evaluation Report
+# Skill Benchmark: dicom-series-preflight
 
-Evaluation of the `dicom-series-preflight` skill before publication through NVSkills-Eval.
-
-This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
-
-## Evaluation Summary
-
-- Skill: `dicom-series-preflight`
-- Evaluation date: 2026-05-31
-- NVSkills-Eval profile: `external`
-- Environment: `local`
-- Dataset: 3 evaluation tasks
-- Attempts per task: 2
-- Pass threshold: 50%
-- Overall verdict: PASS
-
-## Agents Used
-
-- `claude-code`
-- `codex`
-
-## Metrics Used
-
-Reported benchmark dimensions:
-
-- Security: checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access.
-- Correctness: checks whether the agent follows the expected workflow and produces the correct final output.
-- Discoverability: checks whether the agent loads the skill when relevant and avoids using it when irrelevant.
-- Effectiveness: checks whether the agent performs measurably better with the skill than without it.
-- Efficiency: checks whether the agent uses fewer tokens and avoids redundant work.
-
-Underlying evaluation signals used in this run:
-
-- `security` (Security): checks for unsafe operations, secret leakage, and unauthorized access.
-- `skill_execution` (Skill Execution): verifies that the agent loaded the expected skill and workflow.
-- `skill_efficiency` (Efficiency): checks routing quality, decoy avoidance, and redundant tool usage.
-- `accuracy` (Accuracy): grades final-answer correctness against the reference answer.
-- `goal_accuracy` (Goal Accuracy): checks whether the overall user task completed successfully.
-- `behavior_check` (Behavior Check): verifies expected behavior steps, including safety expectations.
-- `token_efficiency` (Token Efficiency): compares token usage with and without the skill.
-
-## Test Tasks
-
-The benchmark dataset contained 3 evaluation tasks:
-
-- Positive tasks: 3 tasks where the skill was expected to activate.
-- Negative tasks: 0 tasks where no skill was expected.
-- Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
-
-Task composition is derived from the evaluation dataset when possible. Entries with `expected_skill` set are treated as positive skill-activation cases, while entries with `expected_skill: null` are treated as negative activation cases.
-
-## Results
-
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 6 | 100% (+0%) | 100% (+17%) |
-| Correctness | 6 | 77% (+3%) | 71% (+10%) |
-| Discoverability | 6 | 76% (+4%) | 58% (+3%) |
-| Effectiveness | 6 | 59% (+8%) | 56% (+6%) |
-| Efficiency | 6 | 55% (+3%) | 46% (+5%) |
-
-Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
-
-## Tier 1: Static Validation Summary
-
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 7 total findings.
-
-Top findings:
-
-- MEDIUM SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/dicom-series-preflight/SKILL.md`)
-- MEDIUM SECURITY/Unknown (LP3): MCP Least Privilege: The skill declares `allowed-tools: Bash` and instructs execution of shell commands (e.g., `python scripts/preflight_seri (`SKILL.md:1`)
-- LOW SCHEMA/unexpected_file: Unexpected 'fixtures' in skill root (`skills/dicom-series-preflight/fixtures`)
-- LOW SCHEMA/unexpected_file: Unexpected 'skill_manifest.yaml' in skill root (`skills/dicom-series-preflight/skill_manifest.yaml`)
-- LOW SCHEMA/unexpected_file: Unexpected 'validators' in skill root (`skills/dicom-series-preflight/validators`)
-
-## Tier 2: Deduplication Summary
-
-Tier 2 validation passed. NVSkills-Eval ran 2 checks and found 0 total findings.
-
-Notable observations:
-
-- Context Deduplication: Collected 4 file(s)
-- Inter-Skill Deduplication: Parsed skill 'dicom-series-preflight': 138 char description
+> ✅ **Overall verdict: PASS — Recommended for publication**
 
 ## Publication Recommendation
 
-The skill is suitable to proceed toward NVSkills-Eval publication based on this benchmark. Skill owners should keep this file with the skill and refresh it when the evaluation dataset, skill behavior, or target agents materially change.
+Recommended for publication based on the completed evaluation evidence in this report.
+
+## Evaluation Metadata
+
+- Skill: `dicom-series-preflight`
+- Evaluation date: 2026-08-30
+- Evaluator version: `1.3.2`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Tasks: 3 evaluation tasks (3 positive)
+- Dataset digest: `sha256:62a39511ef1fe2d4954937d2a8a22b8e447484afd22c4b0ef6cf8e2f26b337ff` (skill-evaluator-dataset-snapshot/1)
+- Attempts per task: 1
+- Environment: `k8s-sandbox`
+- Tier 3 evidence: required for publication
+
+Each task attempt ran in its own isolated sandbox pod.
+
+## Execution and Provenance
+
+- Validation status: `passed`
+- Report generation: `complete`
+- Evaluator version: `1.3.2`
+- Git commit: `64be1471c5fd4364d27cf503eb8218cb86f36ee2`
+- Content type: requested `auto`, detected `skill`
+- Container image: `gitlab-master.nvidia.com:5005/nvcarps/ci-group/nvcarps-ci/skillevaluator-ci:sha-64be1471c5fd4364d27cf503eb8218cb86f36ee2`
+- Container image digest: `not recorded`
+- Tier 3: requested `true`, executed `true`, status `succeeded`
+
+## What This Report Answers
+
+The three-tier evaluation checks whether the skill:
+
+- is safe to use;
+- produces correct answers;
+- is discovered and activated when needed;
+- helps the agent complete the user's goal and expected workflow; and
+- avoids wasted skill and tool usage.
+
+## Results at a Glance
+
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 44% → 84% (+40 points) | 46% → 66% (+20 points) |
+| Security | 100% → 100% (±0 points) | 100% → 33% (-67 points) |
+| Correctness | 7% → 73% (+67 points) | 20% → 80% (+60 points) |
+| Discoverability | 45% → 93% (+48 points) | 42% → 73% (+31 points) |
+| Effectiveness | 19% → 56% (+37 points) | 23% → 56% (+33 points) |
+| Efficiency | 50% → 96% (+46 points) | 45% → 88% (+42 points) |
+
+**How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.
+
+Example: `47% → 92% (+45 points)` means the skill-assisted run scored 92%, 45 percentage points above its 47% no-skill baseline.
+
+## Tier Status
+
+| Tier | Purpose | Status | Evidence |
+|---|---|---|---|
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 5 finding(s) |
+| Tier 2 | Semantic deduplication | **NOT RUN** | No result was recorded |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 3 task(s) |
+
+## Findings and Observations
+
+<details>
+<summary>Show detailed findings and successful checks</summary>
+
+- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/dicom-series-preflight/SKILL.md`)
+- **LOW** SCHEMA/unexpected_file: Unexpected 'fixtures' in skill root (`skills/dicom-series-preflight/fixtures`)
+- **LOW** SCHEMA/unexpected_file: Unexpected 'validators' in skill root (`skills/dicom-series-preflight/validators`)
+- **LOW** SCHEMA/unexpected_file: Unexpected 'skill_manifest.yaml' in skill root (`skills/dicom-series-preflight/skill_manifest.yaml`)
+- **LOW** SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/dicom-series-preflight/SKILL.md`)
+
+</details>
+
+## Scoring Methodology
+
+<details>
+<summary>Show dimension definitions, source signals, and thresholds</summary>
+
+| Dimension | Question | Scored signals |
+|---|---|---|
+| Security | Is it safe to use? | `security` (100%) |
+| Correctness | Is the answer correct? | `accuracy` (100%) |
+| Discoverability | Was the right skill loaded when needed? | `skill_execution` (100%) |
+| Effectiveness | Did the skill help complete the task? | `goal_accuracy` (50%) + `behavior_check` (50%) |
+| Efficiency | Did it avoid wasted tool or skill usage? | `skill_efficiency` (100%) |
+
+- Dimension bands: PASS at 50% or above; NEUTRAL from 40% to below 50%; FAIL below 40%.
+- Overall Tier 3 lift: PASS at +5 points or more; FAIL at -10 points or less; values between those bands are NEUTRAL.
+- Overall verdict: PASS only when every configured dimension passes for at least one supported agent. Lift is reported as diagnostic evidence and does not override this gate.
+- The 50% attempt pass threshold is a separate per-task gate; it is not the dimension pass threshold.
+- Effectiveness is the equal-weight mean of goal completion (`goal_accuracy`) and expected workflow adherence (`behavior_check`).
+- Token efficiency is a separate report-only signal. It does not change a dimension score or the overall verdict.
+
+Signals present in this run:
+
+- `security` (Security): unsafe operations, secret leakage, and unauthorized access.
+- `skill_execution` (Skill Execution): whether the expected skill was found and executed.
+- `skill_efficiency` (Efficiency): routing quality, workspace-aware skill reads, and productive tool use.
+- `accuracy` (Accuracy): final-answer correctness against the reference answer.
+- `goal_accuracy` (Goal Accuracy): whether the user's goal was achieved.
+- `behavior_check` (Behavior Check): whether the expected workflow behavior was followed.
+
+</details>
+
+## Freshness
+
+Regenerate this benchmark when the skill, evaluation dataset, target agent/model, evaluator version, environment, or scoring policy changes.

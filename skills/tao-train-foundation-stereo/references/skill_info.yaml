@@ -1,7 +1,7 @@
 name: tao-train-foundation-stereo
 network_arch: depth_net_stereo
 automl_enabled: true
-container_image: tao_toolkit.pyt
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
 data_format: FSD
 gpu_spec_key: train.num_gpus
 actions:

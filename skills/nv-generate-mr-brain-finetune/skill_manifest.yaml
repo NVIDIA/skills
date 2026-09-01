@@ -19,17 +19,23 @@ upstream_refs:
   - kind: github_repo
     name: NVIDIA-Medtech/NV-Generate-CTMR
     repo_url: https://github.com/NVIDIA-Medtech/NV-Generate-CTMR
-    git_commit: 61c4ec709b84cad468852243c48e250bec732074
-    notes: Recommended default for a new checkout; an explicit caller-provided NV_GENERATE_ROOT is accepted. Uses the existing upstream training and inference scripts.
+    git_commit: da438fec6484cdb6f421f8c7051d954ebefff730
+    notes: Recommended v1 default for a new checkout; an explicit caller-provided NV_GENERATE_ROOT is accepted and recorded. Uses the existing upstream training and inference scripts.
   - kind: huggingface_repo
     name: nvidia/NV-Generate-MR-Brain
     repo_id: nvidia/NV-Generate-MR-Brain
-    revision: 762ddecc59122081d8e04b9fbec9c0deada973f1
+    revision: ef9759bf221265b2704569cdeeac20bbf03b62ee
+    notes: Contains the immutable diff_unet_3d_rflow-mr-brain_v1.pt checkpoint.
+  - kind: huggingface_repo
+    name: nvidia/NV-Generate-CT
+    repo_id: nvidia/NV-Generate-CT
+    revision: 75ac080fb1083c403793563477724c038e7d430c
+    notes: Supplies the immutable autoencoder_v1.pt reused by MR-Brain.
 license: Apache-2.0
 intended_use:
   summary: >
     Engineering-time wrapper around NVIDIA-Medtech/NV-Generate-CTMR's
-    MR-brain diffusion-UNet finetuning workflow. Validates a
+    MR-brain v1 diffusion-UNet finetuning workflow. Validates a
     MONAI-style datalist, stages configs and output paths, and calls the
     existing upstream embedding, training, and optional inference scripts.
   scope: development
@@ -119,10 +125,10 @@ runtime:
   external_assets:
     - kind: upstream_repo
       repo_url: https://github.com/NVIDIA-Medtech/NV-Generate-CTMR
-      install_path: ~/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7
+      install_path: ~/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-da438fe
       install_command: >
         git clone https://github.com/NVIDIA-Medtech/NV-Generate-CTMR.git $NV_GENERATE_ROOT &&
-        git -C $NV_GENERATE_ROOT checkout --detach 61c4ec709b84cad468852243c48e250bec732074 &&
+        git -C $NV_GENERATE_ROOT checkout --detach da438fec6484cdb6f421f8c7051d954ebefff730 &&
         pip install -r $NV_GENERATE_ROOT/requirements.txt
       contains:
         - scripts/download_model_data.py
@@ -133,6 +139,28 @@ runtime:
         - configs/environment_maisi_diff_model_rflow-mr-brain.json
         - configs/config_maisi_diff_model_rflow-mr-brain.json
         - configs/modality_mapping.json
+    - kind: huggingface_repo
+      repo_id: nvidia/NV-Generate-CT
+      revision: 75ac080fb1083c403793563477724c038e7d430c
+      install_path: $NV_GENERATE_ROOT/models/
+      install_command: >
+        python -m huggingface_hub.commands.huggingface_cli download
+        nvidia/NV-Generate-CT models/autoencoder_v1.pt
+        --revision 75ac080fb1083c403793563477724c038e7d430c
+        --local-dir $NV_GENERATE_ROOT
+      contains:
+        - models/autoencoder_v1.pt
+    - kind: huggingface_repo
+      repo_id: nvidia/NV-Generate-MR-Brain
+      revision: ef9759bf221265b2704569cdeeac20bbf03b62ee
+      install_path: $NV_GENERATE_ROOT/models/
+      install_command: >
+        python -m huggingface_hub.commands.huggingface_cli download
+        nvidia/NV-Generate-MR-Brain models/diff_unet_3d_rflow-mr-brain_v1.pt
+        --revision ef9759bf221265b2704569cdeeac20bbf03b62ee
+        --local-dir $NV_GENERATE_ROOT
+      contains:
+        - models/diff_unet_3d_rflow-mr-brain_v1.pt
 limitations:
   - >
     Thin wrapper. Embedding extraction, diffusion training, and optional inference are

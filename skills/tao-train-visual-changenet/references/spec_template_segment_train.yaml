@@ -184,6 +184,15 @@ train:
   num_epochs: 10
   checkpoint_interval: 1
   checkpoint_interval_unit: epoch
+  checkpointer:
+    enable_topk: false
+    replace_periodic: false
+    monitor: val_loss
+    mode: min
+    save_top_k: 1
+    filename: model_best_{epoch:03d}
+    dirpath: ''
+    auto_insert_metric_name: false
   validation_interval: 1
   resume_training_checkpoint_path: ''
   results_dir: ''

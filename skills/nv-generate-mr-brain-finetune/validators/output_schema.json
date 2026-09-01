@@ -83,6 +83,7 @@
         "official_entrypoint",
         "upstream_root",
         "upstream_commit",
+        "upstream_identity",
         "checked_upstream_roots",
         "command",
         "exit_code",
@@ -92,6 +93,17 @@
         "official_entrypoint": {"type": "string"},
         "upstream_root": {"type": ["string", "null"]},
         "upstream_commit": {"type": "string"},
+        "upstream_identity": {
+          "type": ["object", "null"],
+          "required": ["commit", "expected_commit", "commit_match", "tracked_files_clean", "trusted"],
+          "properties": {
+            "commit": {"type": "string"},
+            "expected_commit": {"type": "string"},
+            "commit_match": {"type": "boolean"},
+            "tracked_files_clean": {"type": "boolean"},
+            "trusted": {"type": "boolean"}
+          }
+        },
         "checked_upstream_roots": {"type": "array", "items": {"type": "string"}},
         "command": {"type": "array", "items": {"type": "string"}},
         "command_plan": {"type": "array", "items": {"type": "array", "items": {"type": "string"}}},

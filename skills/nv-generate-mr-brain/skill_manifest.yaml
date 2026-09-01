@@ -19,17 +19,23 @@ upstream_refs:
   - kind: github_repo
     name: NVIDIA-Medtech/NV-Generate-CTMR
     repo_url: https://github.com/NVIDIA-Medtech/NV-Generate-CTMR
-    git_commit: 61c4ec709b84cad468852243c48e250bec732074
-    notes: Recommended default for a new checkout; an explicit caller-provided NV_GENERATE_ROOT is accepted.
+    git_commit: da438fec6484cdb6f421f8c7051d954ebefff730
+    notes: Recommended v1 default for a new checkout; an explicit caller-provided NV_GENERATE_ROOT is accepted and recorded.
   - kind: huggingface_repo
     name: nvidia/NV-Generate-MR-Brain
     repo_id: nvidia/NV-Generate-MR-Brain
-    revision: 762ddecc59122081d8e04b9fbec9c0deada973f1
+    revision: ef9759bf221265b2704569cdeeac20bbf03b62ee
+    notes: Contains the immutable diff_unet_3d_rflow-mr-brain_v1.pt checkpoint.
+  - kind: huggingface_repo
+    name: nvidia/NV-Generate-CT
+    repo_id: nvidia/NV-Generate-CT
+    revision: 75ac080fb1083c403793563477724c038e7d430c
+    notes: Supplies the immutable autoencoder_v1.pt reused by MR-Brain.
 license: Apache-2.0
 intended_use:
   summary: >
     Engineering-time wrapper around NVIDIA-Medtech/NV-Generate-CTMR's
-    rflow-mr-brain image-only synthesis workflow. Invokes
+    rflow-mr-brain v1 image-only synthesis workflow. Invokes
     `python -m scripts.diff_model_infer` with the upstream
     rflow-mr-brain configs and summarizes the generated NIfTI volume.
   scope: development
@@ -129,10 +135,10 @@ runtime:
   external_assets:
     - kind: upstream_repo
       repo_url: https://github.com/NVIDIA-Medtech/NV-Generate-CTMR
-      install_path: ~/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7
+      install_path: ~/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-da438fe
       install_command: >
         git clone https://github.com/NVIDIA-Medtech/NV-Generate-CTMR.git $NV_GENERATE_ROOT &&
-        git -C $NV_GENERATE_ROOT checkout --detach 61c4ec709b84cad468852243c48e250bec732074 &&
+        git -C $NV_GENERATE_ROOT checkout --detach da438fec6484cdb6f421f8c7051d954ebefff730 &&
         pip install -r $NV_GENERATE_ROOT/requirements.txt
       contains:
         - scripts/diff_model_infer.py
@@ -142,14 +148,27 @@ runtime:
         - configs/config_maisi_diff_model_rflow-mr-brain.json
         - configs/modality_mapping.json
     - kind: huggingface_repo
-      repo_id: nvidia/NV-Generate-MR-Brain
+      repo_id: nvidia/NV-Generate-CT
+      revision: 75ac080fb1083c403793563477724c038e7d430c
       install_path: $NV_GENERATE_ROOT/models/
       install_command: >
-        cd $NV_GENERATE_ROOT && python -m scripts.download_model_data
-        --version rflow-mr-brain --root_dir ./ --model_only
+        python -m huggingface_hub.commands.huggingface_cli download
+        nvidia/NV-Generate-CT models/autoencoder_v1.pt
+        --revision 75ac080fb1083c403793563477724c038e7d430c
+        --local-dir $NV_GENERATE_ROOT
       contains:
         - models/autoencoder_v1.pt
-        - models/diff_unet_3d_rflow-mr-brain_v0.pt
+    - kind: huggingface_repo
+      repo_id: nvidia/NV-Generate-MR-Brain
+      revision: ef9759bf221265b2704569cdeeac20bbf03b62ee
+      install_path: $NV_GENERATE_ROOT/models/
+      install_command: >
+        python -m huggingface_hub.commands.huggingface_cli download
+        nvidia/NV-Generate-MR-Brain models/diff_unet_3d_rflow-mr-brain_v1.pt
+        --revision ef9759bf221265b2704569cdeeac20bbf03b62ee
+        --local-dir $NV_GENERATE_ROOT
+      contains:
+        - models/diff_unet_3d_rflow-mr-brain_v1.pt
 
 limitations:
   - >
@@ -173,7 +192,9 @@ validation:
     - {path: skill, eq: nv_generate_mr_brain}
     - {path: invocation.official_entrypoint, eq: "python -m scripts.diff_model_infer"}
     - {path: invocation.exit_code, eq: 0}
+    - {path: invocation.upstream_identity.trusted, eq: true}
     - {path: invocation.model_inventory.all_present, eq: true}
+    - {path: invocation.model_inventory.all_sha256_match, eq: true}
     - {path: output.num_samples, gte: 1}
     - {path: output.all_images_readable, eq: true}
     - {path: output.all_shapes_match_requested, eq: true}

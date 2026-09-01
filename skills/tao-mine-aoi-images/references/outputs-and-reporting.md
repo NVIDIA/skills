@@ -49,7 +49,7 @@ Keep the report tight (600–1200 words). Mining is a deterministic pipeline; th
 - (If a TAO checkpoint:) model_config_path: …
 
 ## 4. Mining Run
-- Command: `docker run … "$DS_IMAGE" tmm nearest_neighbors …` (where `DS_IMAGE` = `tao_toolkit.data_services` from `versions.yaml`)
+- Command: `docker run … "$DS_IMAGE" tmm nearest_neighbors …` (where `DS_IMAGE` = the pinned data-services URI from `versions.yaml`)
 - topn=<topn>, knn_metric=<metric>, filter_by_label=<bool>
 - Reported by `mining_summary.txt`:
   - queries: <N>

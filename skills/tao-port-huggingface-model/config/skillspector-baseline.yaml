@@ -1,0 +1,19 @@
+version: 2
+# Reviewed false positives — NVIDIA/nvskills-ci#67. No content removed.
+rules:
+  - id: "PE*"
+    path: "references/cross-cutting.md"
+    reason: "Reviewed FP (#67): standard infra path/flag refs in docs (SSH/kubeconfig/keyring/etc-passwd/docker), not privilege escalation."
+  - id: "PE*"
+    path: "references/docker-patterns.md"
+    reason: "Reviewed FP (#67): standard infra path/flag refs in docs (SSH/kubeconfig/keyring/etc-passwd/docker), not privilege escalation."
+  - id: "PE*"
+    path: "references/phase-6-container-tests.md"
+    reason: "Reviewed FP (#67): standard infra path/flag refs in docs (SSH/kubeconfig/keyring/etc-passwd/docker), not privilege escalation."
+  - path: "references/workflow-consistency.md"
+    message: "*ydra*"
+    reason: "Reviewed FP (#67): scoped/standard command in setup or eval content; not malicious."
+  - path: "references/phase-0-prereqs.md"
+    reason: "Reviewed FP (#67): Apache-2.0 license header in HTML comment; not an injected instruction."
+  - path: "references/phase-6-container-tests.md"
+    reason: "Reviewed FP (#67): Apache-2.0 license header in HTML comment; not an injected instruction."

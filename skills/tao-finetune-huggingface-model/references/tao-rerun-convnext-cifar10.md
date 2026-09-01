@@ -28,27 +28,27 @@ docker build -t run-convnext-tiny-cifar10:latest .
 
 # 2. Prepare data (subsamples CIFAR-10 5000 train / 1000 eval, renames img→image)
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -v $(pwd):/workspace \
+  -e HF_TOKEN -v $(pwd):/workspace \
   run-convnext-tiny-cifar10:latest \
   -lc "cd /workspace && python prepare_data.py --config config.yaml"
 
 # 3. Smoke test (1 step)
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -e WANDB_MODE=disabled -v $(pwd):/workspace \
+  -e HF_TOKEN -e WANDB_MODE=disabled -v $(pwd):/workspace \
   run-convnext-tiny-cifar10:latest \
   -lc "cd /workspace && python train.py --config config.yaml --smoke --max_steps 1"
 
 # 4. Baseline eval (random 10-class classifier head)
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -v $(pwd):/workspace \
+  -e HF_TOKEN -v $(pwd):/workspace \
   run-convnext-tiny-cifar10:latest \
   -lc "cd /workspace && python run_eval.py --config config.yaml \
        --checkpoint facebook/convnext-tiny-224 --output reports/baseline_results.json"
 
 # 5. Full training (3 epochs on 5000 samples; ~33s on A100)
 docker run -d --name repro_train --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN \
-  -e WANDB_API_KEY=$WANDB_API_KEY -e WANDB_PROJECT=$WANDB_PROJECT \
+  -e HF_TOKEN \
+  -e WANDB_API_KEY -e WANDB_PROJECT=$WANDB_PROJECT \
   -v $(pwd):/workspace \
   run-convnext-tiny-cifar10:latest \
   -lc "cd /workspace && python train.py --config config.yaml 2>&1 | tee logs/train.log"
@@ -56,7 +56,7 @@ docker logs -f repro_train
 
 # 6. Post-train eval + 5 inference samples
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -v $(pwd):/workspace \
+  -e HF_TOKEN -v $(pwd):/workspace \
   run-convnext-tiny-cifar10:latest \
   -lc "cd /workspace && \
        python run_eval.py --config config.yaml --checkpoint checkpoints/final \
@@ -81,7 +81,7 @@ Variance on 1000 eval samples: ±1–2 pts on accuracy across random seeds.
 - Dataset: `cifar10` (5000 train / 1000 eval subset, 10 classes)
 - Training: 3 epochs, bs=32×grad_accum=2 (effective 64), lr=5e-5, warmup_ratio=0.1,
   bf16, transforms: RandomResizedCrop(224) + HFlip + Normalize
-- NGC image: `nvcr.io/nvidia/pytorch:25.01-py3`
+- NGC image: `nvcr.io/nvidia/pytorch:25.01-py3` <!-- unpinned: historical rerun record -->
 
 ## Troubleshooting
 

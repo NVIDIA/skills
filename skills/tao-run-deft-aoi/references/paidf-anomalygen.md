@@ -148,7 +148,7 @@ DS=$WS/augmentation/anomalygen/datasets/<project>
 CKPT=$WS/augmentation/anomalygen/checkpoints/<project>
 COSMOS=$WS/augmentation/anomalygen/base_checkpoints
 RUN_DIR=$WS/results/run_<TS>/iter${N}/anomalygen
-: "${AG_IMAGE:=$(${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/resolve_versions_key.py images.metropolis_sdg.paidf_anomalygen)}"  # reuses Pre-Flight export if set; resolves on demand otherwise
+: "${AG_IMAGE:=nvcr.io/nvidia/paidf-anomalygen:1.0.0}"  # versions-key: images.metropolis_sdg.paidf_anomalygen — reuses Pre-Flight export if set
 mkdir -p $COSMOS $DS $(dirname $CKPT) $RUN_DIR/amp $RUN_DIR/sdg
 chmod 777 $COSMOS $DS $(dirname $CKPT)   # container runs as uid 10000; without this the post-gate bootstrap fails with PermissionError on host-owned mounts
 ```

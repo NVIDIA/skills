@@ -1,0 +1,9 @@
+version: 2
+# Reviewed false positives — NVIDIA/nvskills-ci#67. No content removed.
+rules:
+  - id: "AS*"
+    path: "hooks/rca-package.sh"
+    reason: "Reviewed (#67): references to the skill's own .claude config / report-bundle hook; output stays in user workspace."
+  - id: "LP*"
+    path: "hooks/rca-script-check.sh"
+    reason: "Reviewed FP (#67): declared capability matches the skill's documented required function."
