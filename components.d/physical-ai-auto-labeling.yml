@@ -1,4 +1,4 @@
-name: PAIDF Auto-Labeling
+name: Physical AI Auto-Labeling
 repo: NVIDIA/paidf-auto-labeling
 description: Build and run Physical AI Data Factory auto-labeling pipelines for video enhancement, tracking, captioning, and question generation.
 skills:
