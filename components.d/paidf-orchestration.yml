@@ -1,0 +1,14 @@
+name: PAIDF Orchestration
+repo: NVIDIA/paidf-orchestration
+description: Build, run and monitor physical AI data factory pipelines for image and video generation and transformation.
+skills:
+  - path: skills/write-dag/
+    catalog_dir: paidf-orchestration-write-dag
+  - path: skills/orchestration-setup/
+    catalog_dir: paidf-orchestration-setup
+  - path: skills/event-video-generation-workflow/
+    catalog_dir: paidf-orchestration-event-video-generation-workflow
+  - path: skills/image-attribute-augmentation-workflow/
+    catalog_dir: paidf-orchestration-image-attribute-augmentation-workflow
+links:
+  discussions: false
