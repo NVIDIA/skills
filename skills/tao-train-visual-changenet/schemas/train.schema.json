@@ -38,6 +38,7 @@
     "dataset.segment.augmentation.std",
     "dataset.classify.quant_calibration_dataset",
     "train.cudnn",
+    "train.checkpointer",
     "dataset.segment.quant_calibration_dataset",
     "dataset.classify.test_dataset",
     "dataset.segment.augmentation",
@@ -314,6 +315,16 @@
     "train": {
       "checkpoint_interval": 1,
       "checkpoint_interval_unit": "epoch",
+      "checkpointer": {
+        "auto_insert_metric_name": false,
+        "dirpath": "",
+        "enable_topk": false,
+        "filename": "model_best_{epoch:03d}",
+        "mode": "min",
+        "monitor": "val_loss",
+        "replace_periodic": false,
+        "save_top_k": 1
+      },
       "classify": {
         "cls_weight": [
           1.0,
@@ -1763,7 +1774,12 @@
                 "fan_small_12_p4_hybrid",
                 "fan_base_16_p4_hybrid",
                 "fan_large_16_p4_hybrid",
-                "vit_large_nvdinov2"
+                "vit_large_nvdinov2",
+                "vit_small_dinov3",
+                "vit_small_plus_dinov3",
+                "vit_base_dinov3",
+                "vit_large_dinov3",
+                "vit_huge_plus_dinov3"
               ],
               "title": "Backbone architectures",
               "type": "categorical"
@@ -2059,6 +2075,7 @@
       "automl_disabled_parameters": [
         "train.gpu_ids",
         "train.cudnn",
+        "train.checkpointer",
         "train.optim",
         "train.classify",
         "train.segment",
@@ -2068,6 +2085,16 @@
       "default": {
         "checkpoint_interval": 1,
         "checkpoint_interval_unit": "epoch",
+        "checkpointer": {
+          "auto_insert_metric_name": false,
+          "dirpath": "",
+          "enable_topk": false,
+          "filename": "model_best_{epoch:03d}",
+          "mode": "min",
+          "monitor": "val_loss",
+          "replace_periodic": false,
+          "save_top_k": 1
+        },
         "classify": {
           "cls_weight": [
             1.0,
@@ -2142,6 +2169,73 @@
           ],
           "title": "Checkpoint interval unit",
           "type": "categorical"
+        },
+        "checkpointer": {
+          "automl_enabled": false,
+          "default": {
+            "auto_insert_metric_name": false,
+            "dirpath": "",
+            "enable_topk": false,
+            "filename": "model_best_{epoch:03d}",
+            "mode": "min",
+            "monitor": "val_loss",
+            "replace_periodic": false,
+            "save_top_k": 1
+          },
+          "properties": {
+            "auto_insert_metric_name": {
+              "default": false,
+              "description": "Insert the monitored metric name into the checkpoint filename.",
+              "type": "bool"
+            },
+            "dirpath": {
+              "default": "",
+              "description": "Directory for ranked checkpoints. Leave empty to use the training results directory.",
+              "type": "string"
+            },
+            "enable_topk": {
+              "default": false,
+              "description": "Enable checkpoint ranking by the monitored metric.",
+              "title": "Enable best-checkpoint saving",
+              "type": "bool"
+            },
+            "filename": {
+              "default": "model_best_{epoch:03d}",
+              "description": "Filename pattern for ranked checkpoints.",
+              "title": "Best-checkpoint filename pattern",
+              "type": "string"
+            },
+            "mode": {
+              "default": "min",
+              "description": "Direction used to rank the monitored metric. Use min for val_loss.",
+              "enum": [
+                "min",
+                "max"
+              ],
+              "title": "Monitor mode",
+              "type": "categorical"
+            },
+            "monitor": {
+              "default": "val_loss",
+              "description": "Validation metric used to rank checkpoints.",
+              "title": "Monitored metric",
+              "type": "string"
+            },
+            "replace_periodic": {
+              "default": false,
+              "description": "Replace periodic checkpoint history with the bounded top-K checkpoint set.",
+              "title": "Replace periodic checkpoints",
+              "type": "bool"
+            },
+            "save_top_k": {
+              "default": 1,
+              "description": "Number of ranked checkpoints to retain. Use 1 for best-only retention.",
+              "minimum": 1,
+              "title": "Number of best checkpoints",
+              "type": "int"
+            }
+          },
+          "type": "collection"
         },
         "classify": {
           "automl_disabled_parameters": [

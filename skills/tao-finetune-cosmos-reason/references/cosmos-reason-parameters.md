@@ -53,7 +53,13 @@ For platform-side multi-node setup (sbatch flags on SLURM, Indexed Job + Service
 - **custom.system_prompt**: Instructions prepended to every prompt.
 
 ### Checkpointing
-- **train.ckpt.save_freq_in_epoch**: Save every N epochs. Default 1.
+- **train.ckpt.save_freq_in_epoch**: Save every N epochs. Default 1. Preserve
+  this epoch-based default unless the user explicitly requests step-based
+  checkpointing; dataset and hardware guidance must not override it.
+- **train.ckpt.save_freq**: Save every N optimizer steps. Use this only when the
+  user explicitly requests step-based checkpointing. In that case, omit
+  `save_freq_in_epoch` or set it to `0`; enabling both can cause the current
+  Cosmos-RL image to honor only the epoch cadence.
 - **train.ckpt.max_keep**: Keep N most recent checkpoints. Default 2 for
   AutoML/minimal runs so the best LoRA adapter remains available even when the
   container records the best validation step before later epoch cleanup.
@@ -84,7 +90,12 @@ launcher staging files under `inputs/`, or the broken `best` symlink itself as
 fine-tuned checkpoints for handoff.
 
 ### Validation
-- **validation.freq_in_epoch**: Run validation every N epochs. Too frequent slows training.
+- **validation.freq_in_epoch**: Run validation every N epochs. Default 1.
+  Preserve this epoch-based default unless the user explicitly requests a
+  step-based cadence.
+- **validation.freq**: Run a complete validation pass every N optimizer steps.
+  Use only when explicitly requested and account for the full dataset cost; on
+  WTS, a frequency of 20 dominated total runtime.
 
 ### Logging
 - **logging.logger**: Options: `console`, `wandb`.
@@ -92,7 +103,18 @@ fine-tuned checkpoints for handoff.
 
 ## Hardware
 
-Cosmos-RL models are 8B parameters and benefit from multi-GPU training with FSDP sharding. `dp_shard_size` should equal total GPU count. Recommended: 8x A100 or H100 (80GB each).
+Cosmos-RL models are 8B parameters and use FSDP sharding. SFT requires at least
+256 GB of cumulative visible GPU memory, with no fixed device count or
+per-device capacity. Set `dp_shard_size` to the actual visible GPU count and
+`dp_replicate_size=1` for a single node. The production recommendation remains
+8x A100 or H100 (80 GB each). A single high-memory GB300 is also viable with a
+compatible image, `dp_shard_size=1`, and the WTS/GB300 guards documented in
+`cosmos-reason-wts-gb300.md`. Every visible architecture must be supported by
+the selected image and pass the runtime CUDA-stack smoke test.
+
+Read `runtime_requirements.gpu_host` from `references/skill_info.yaml` and pass
+it as minimum-version overrides to `tao-setup-nvidia-gpu-host`; do not copy the
+values into a platform-wide rule or convert them into exact pins.
 
 ## Error Patterns
 
@@ -115,18 +137,25 @@ do not lower it to tiny values such as 128 for video calibration.
 
 **Stale dataset cache after changing fps/total_pixels**: Change `train.train_policy.dataset.name` to a new unique identifier to force cache regeneration.
 
+**Forked CUDA video decoder returns zero frames**: On a single GB300, nonzero
+train or validation `dataloader_num_workers` can initialize video decoding in a
+forked process before CUDA is ready, producing `total_frames=0` and an invalid
+`nframes` error. Set both worker counts to `0` and remove their prefetch factors.
+
 **Checkpoint save failure (scheduler is None)**: The cosmos-rl trainer crashes with `'NoneType' object has no attribute 'state_dict'` when saving a checkpoint before any training step has executed. This happens when the dataset is too small for the batch size (0 steps per epoch). See the batch size error above.
 
 **You are trying to access a gated repo**: The HuggingFace model `nvidia/Cosmos3-Nano` requires authentication. All ranks will retry in a loop until they time out. Fix: ensure `HF_TOKEN` is set in your environment (e.g., `export HF_TOKEN=...` in your shell) and passed into the container with `-e HF_TOKEN`. The user must also accept the model agreement at <https://huggingface.co/nvidia/Cosmos3-Nano>.
 
-**Cosmos-RL GPU resource and architecture gate**: The actionable launch gate is
-at least 4 GPUs with 80GB-class memory or higher, plus a GPU architecture
-supported by the selected Cosmos-RL image, plus normal platform, container, S3,
-and credential preflight. Run
-`scripts/check_tao_launch_preflight.py --gpu-min-count 4 --gpu-min-memory-gb 80 --gpu-arch-allowlist cosmos_rl=sm_80,sm_90,sm_100,sm_120`
+**Cosmos-RL GPU resource and architecture gate**: For SFT, the actionable
+launch gate is at least 256 GB of cumulative visible GPU memory, a GPU
+architecture supported by the selected Cosmos-RL image, and normal platform,
+container, S3, and credential preflight. Set `dp_shard_size` to the actual GPU
+count and do not require a fixed policy/rollout topology for SFT. Run
+`scripts/check_tao_launch_preflight.py --gpu-min-total-memory-gb 256 --gpu-arch-allowlist cosmos_rl=sm_80,sm_90,sm_100,sm_103,sm_103a,sm_120`
 before launching. If the target architecture is known but cannot be detected
-from the launch host, pass `--gpu-arch sm_XX` explicitly. Spark/GB10 `sm_121`
-is not launchable with this image unless image introspection confirms `sm_121`
+from the launch host, pass `--gpu-arch sm_XX` explicitly. Architecture-specific
+suffixes such as `a` and `f` match the same base SM family. `sm_121` is not
+launchable with this image unless direct runtime validation confirms `sm_121`
 support or a newer compatible image is selected. If a resource-qualified
 platform still fails with a kernel JIT error such as
 `nvrtc: invalid --gpu-architecture`, classify it as an image/toolchain defect to

@@ -31,6 +31,17 @@ require `model.backbone.type: c_radio_v2_vit_base_patch16_224`,
 `dataset.classify.input_map: {SolderLight: 0}` unless the training run used a
 different override set.
 
+**`KeyError: radio.*` loading an NGC classify checkpoint on 7.1**: The 7.0.x-era
+NGC model `nvidia/tao/visual_changenet_classification:visual_changenet_nvpcb_trainable_v1.0`
+is INCOMPATIBLE with the 7.1 `backbone_v2` architecture — loading it raises a
+`KeyError` on `radio.radio.radio.*` keys. There is no 7.1-compatible pretrained
+classify checkpoint published on NGC, so do not try to download a `full_model`
+classify checkpoint for evaluate/inference. Stage the public C-RADIOv2-B backbone
+(see SKILL.md) and TRAIN first, then run evaluate/inference against a checkpoint
+from that 7.1 train under `results_dir`. The backbone is a public HuggingFace
+download needing no NGC org — do not hardcode or assume any registry org;
+resolve any genuine NGC pull's org from `ngc config current`.
+
 **Training does not converge**: Check that `train.classify.cls_weight` is appropriate for your class distribution. If defects are very rare (<1% of samples), increase the defective class weight. Also verify that `fpratio_sampling` is not too low, which would under-sample the majority class.
 
 **Backbone dimension mismatch** (segment only): If the log shows size mismatch

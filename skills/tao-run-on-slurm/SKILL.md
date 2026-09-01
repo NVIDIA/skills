@@ -18,6 +18,8 @@ tags:
 
 # SLURM
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Remote GPU compute platform for clusters managed by SLURM. Jobs are submitted
 from the TAO service or SDK host to a login node over SSH, staged on a shared
 filesystem, submitted with `sbatch`, and executed with `srun` container support.
@@ -31,24 +33,36 @@ the cluster.
 
 ## Preflight + SSH
 
-Confirm `SLURM_USER` and `SLURM_HOSTNAME` are exported and passwordless SSH to a
-login host works (`ssh -o BatchMode=yes`). Optionally install the TAO SDK
-wrapper for Job handles + S3 wrapping (`nvidia-tao-sdk[slurm]`, on public PyPI).
-For private `nvcr.io` images, install `~/.config/enroot/.credentials` on the
-cluster once per (cluster, user): Pyxis/Enroot does not read `NGC_KEY` from the
-job env, and without persistent credentials, auth-gated pulls fail with "Could
-not process JSON input" at job startup. Install it via the `printf | ssh`
-heredoc so the `NGC_KEY` value never lands in shell history, intermediate files,
-or chat output; never `cat`/`echo` the value.
+Run all five steps in order before generating any launcher or submitting any job:
+
+1. **SSH connectivity** — confirm `SLURM_USER` and `SLURM_HOSTNAME` are set and
+   passwordless SSH to the login host works (`ssh -o BatchMode=yes`).
+2. **SDK install** — optionally install the TAO SDK wrapper for Job handles + S3
+   wrapping (`nvidia-tao-sdk[slurm]`, on public PyPI).
+3. **SLURM account** — always resolve `SLURM_ACCOUNT` via
+   `sacctmgr show associations` before generating any scripts. If unset and
+   only one account exists for the user, auto-select it. If multiple exist, list
+   them and require the user to export one. Never submit a job without a verified
+   account — an invalid account causes "Invalid account or account/partition
+   combination" after SQSH conversion has already run.
+4. **GPU partition** — verify at least one partition in `SLURM_PARTITION` exists
+   via `sinfo`. The packaged default `polar,polar3,polar4,grizzly` is valid on
+   CS-OCI-ORD but may not exist on other clusters.
+5. **Enroot credentials** — for private `nvcr.io` images, install
+   `~/.config/enroot/.credentials` on the cluster once per (cluster, user).
+   Pyxis/Enroot does not read `NGC_KEY` from the job env; without persistent
+   credentials, auth-gated pulls fail with "Could not process JSON input". Use
+   the `printf | ssh` heredoc so the `NGC_KEY` value never lands in shell
+   history, intermediate files, or chat output; never `cat`/`echo` the value.
 
 If a preflight check fails, the agent prompts the user to authorize the
 install/fix via Bash. Pip-installable Python requirements are the exception:
 install them automatically, then rerun preflight.
 
-See `references/slurm-ssh-credentials.md` for the full preflight script, the
-enroot-credentials heredoc, prerequisite key setup (keypair, `ssh-copy-id`,
-`known_hosts`, container key mounts, 2FA handling), and the SSH failure
-remediation prompt.
+See `references/slurm-ssh-credentials.md` for the full preflight script,
+account/partition discovery commands, the enroot-credentials heredoc,
+prerequisite key setup (keypair, `ssh-copy-id`, `known_hosts`, container key
+mounts, 2FA handling), and the SSH failure remediation prompt.
 
 ## Storage
 
@@ -73,7 +87,19 @@ direct-spec modes, backend details, and the results-dir default.
 1. Stage compact JSON files for specs, environment, and cloud metadata under
    `<job_dir>/specs`, `<job_dir>/env`, and `<job_dir>/meta`.
 2. Optionally convert the Docker image to a cached SQSH image with
-   `srun -n1 -p <conversion_partition> enroot import`.
+   `srun -n1 -p <conversion_partition> enroot import`. Do NOT use the `cpu`
+   partition for this step — `cpu` has a ~30 min wall-time limit that is
+   shorter than the conversion time for large TAO images (9+ layers, >30 min).
+   Use `cpu_long` (or another partition with ≥2 h limit) and set
+   `SLURM_CONVERSION_PARTITION=cpu_long` and
+   `SLURM_CONVERSION_TIMEOUT_MINUTES=120` before constructing `SlurmSDK`.
+   The SDK validates the SQSH via SquashFS magic bytes before reusing it, so
+   partial files from failed conversions are automatically rejected and
+   reconverted — no manual cleanup needed. See the **SQSH Conversion And
+   Caching** section of `references/slurm-container-execution.md` for the full
+   env-knob table (`SLURM_ENROOT_TEMP_PATH` for xattr-restricted filesystems,
+   memory, force-reconvert), cache/dedup semantics, live-monitoring commands,
+   and manual pre-staging.
 3. Write an sbatch script under `<job_dir>/sbatch/job_<job_id>.sbatch`.
 4. Submit `sbatch --export=ALL <script>`.
 5. Run the container with `srun --container-image=<image> --container-mounts=/lustre`.
@@ -125,11 +151,12 @@ for the full credential list, microservices schema keys, and defaults.
   over the `SSH_AUTH_SOCK` agent-socket fallback.
 - **SLURM_BASE_RESULTS_DIR** (optional): base shared-filesystem path; default
   `/lustre/fsw/portfolios/edgeai/users/<your-dir>` (your per-user Lustre dir).
-- **SLURM_ACCOUNT** (usually required by site policy): account for `#SBATCH --account`.
+- **SLURM_ACCOUNT** (resolve at preflight, not in initial intake): account for
+  `#SBATCH --account`. Auto-discovered via `sacctmgr` during preflight step 3;
+  only ask the user if multiple accounts are found.
 
-Do not ask for `SLURM_ACCOUNT` or `SLURM_BASE_RESULTS_DIR` in the initial
-intake unless the user says their site requires an account, wants a custom
-results root, or the workflow cannot proceed without overriding defaults.
+Do not ask for `SLURM_BASE_RESULTS_DIR` in the initial intake unless the user
+wants a custom results root.
 
 ## Resource defaults
 

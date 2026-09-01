@@ -8,10 +8,10 @@ Direct TAO Deploy command name: `visual_changenet`.
 
 ## Quick Start
 
-Resolve the deploy container URI from `versions.yaml` once at the top of the session — that file is the single source of truth for image tags:
+Use the pinned deploy container URI (stamped from the release manifest):
 
 ```bash
-TAO_DEPLOY_IMAGE=$("${TAO_SKILL_BANK_PATH:?}/scripts/resolve_versions_key.py" images.tao_toolkit.deploy)
+TAO_DEPLOY_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-deploy  # versions-key: images.tao_toolkit.deploy
 ```
 
 Every invocation below uses `"$TAO_DEPLOY_IMAGE"` in place of the literal image URI.

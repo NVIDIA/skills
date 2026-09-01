@@ -18,6 +18,8 @@ tags:
 
 # Depth Net Mono
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Monocular depth estimation using Metric Depth Anything v2 or Relative Depth Anything architectures. Predicts per-pixel depth from single RGB images.
 
 Pretrained checkpoint loading varies by model variant and use case — see the **Pretrained checkpoint loading — use case matrix** in `references/parameters.md`.

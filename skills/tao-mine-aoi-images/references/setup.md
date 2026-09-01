@@ -1,10 +1,10 @@
 # Setup and Environment
 
-The mining and embedding tasks live inside the `tao_toolkit.data_services` image declared in `versions.yaml`. Resolve the concrete URI once at the top of the run, then confirm Docker, the NVIDIA container toolkit, and a GPU are present before doing anything else:
+The mining and embedding tasks live inside the pinned TAO data-services image below. Confirm Docker, the NVIDIA container toolkit, and a GPU are present before doing anything else:
 
 ```bash
-# Resolve tao_toolkit.data_services → concrete nvcr.io/... URI from versions.yaml
-DS_IMAGE=$(python3 -c "import yaml,os; print(yaml.safe_load(open(os.environ['TAO_SKILL_BANK_PATH']+'/versions.yaml'))['images']['tao_toolkit']['data_services'])")
+# Pinned TAO data-services container URI (stamped from the release manifest)
+DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-data-services  # versions-key: images.tao_toolkit.data_services
 echo "DS_IMAGE=$DS_IMAGE"
 
 docker info > /dev/null && echo "OK: docker"
@@ -12,8 +12,6 @@ nvidia-smi > /dev/null && echo "OK: GPU"
 docker image inspect "$DS_IMAGE" > /dev/null \
   || docker pull "$DS_IMAGE"
 ```
-
-`TAO_SKILL_BANK_PATH` is exported by the plugin's `session_start` hook. If it is unset (e.g. running outside the Claude Code plugin), point it at the skill-bank repo root before resolving.
 
 A GPU is required for both the encoder forward pass and the cuML/cuDF k-NN search; both steps will fail without CUDA.
 

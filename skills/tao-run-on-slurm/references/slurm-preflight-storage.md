@@ -13,8 +13,8 @@ Load this file only when the compact `SKILL.md` points here for the current task
 - Pyxis on the compute nodes invokes enroot to import the Docker image. Enroot
 - does NOT read NGC_KEY from the SLURM job env — it requires persistent
 - credentials in ~/.config/enroot/.credentials on the login/compute nodes.
-- Without this, anonymous pulls of nvcr.io/nvstaging/* (or any auth-gated
-- repo) fail with "Could not process JSON input" at job startup. Skip if the
+- Without this, anonymous pulls of auth-gated nvcr.io paths (e.g. any
+- pre-release staging org) fail with "Could not process JSON input" at job startup. Skip if the
 - image is from a public repo.
 - SLURM
 - Prerequisites
@@ -50,8 +50,8 @@ python -c "import tao_sdk" 2>/dev/null || {
 # Pyxis on the compute nodes invokes enroot to import the Docker image. Enroot
 # does NOT read NGC_KEY from the SLURM job env — it requires persistent
 # credentials in ~/.config/enroot/.credentials on the login/compute nodes.
-# Without this, anonymous pulls of nvcr.io/nvstaging/* (or any auth-gated
-# repo) fail with "Could not process JSON input" at job startup. Skip if the
+# Without this, anonymous pulls of auth-gated nvcr.io paths (e.g. any
+# pre-release staging org) fail with "Could not process JSON input" at job startup. Skip if the
 # image is from a public repo.
 if [ -n "$NGC_KEY" ]; then
   REMOTE_CRED_OK=$(ssh -o BatchMode=yes "${SLURM_USER}@${SLURM_HOST}" \
