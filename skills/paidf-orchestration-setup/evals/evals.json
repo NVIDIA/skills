@@ -1,0 +1,110 @@
+[
+  {
+    "id": "one-h100-audit",
+    "question": "Audit my node with one H100 and Kubernetes for image attribute augmentation. Do not change anything yet.",
+    "expected_skill": "orchestration-setup",
+    "expected_behavior": [
+      "Selects environment setup from the natural-language request without requiring a skill name.",
+      "Asks for the kubeconfig path when KUBECONFIG is unset, rather than assuming one.",
+      "Runs the read-only Kubernetes audit first.",
+      "Treats the host vendor as a provider-neutral Kubernetes host.",
+      "Recommends external model endpoints for one H100.",
+      "Does not mutate the cluster."
+    ]
+  },
+  {
+    "id": "ssh-remote-k3s-audit",
+    "question": "Check the H100 cluster reachable as gpu-box through SSH; it uses k3s kubectl.",
+    "expected_skill": "orchestration-setup",
+    "expected_behavior": [
+      "Uses SSH configuration rather than requesting private key contents.",
+      "Uses --kubectl-command k3s kubectl.",
+      "Returns compute and controller readiness separately."
+    ]
+  },
+  {
+    "id": "prepare-requires-approval",
+    "question": "Set up whatever my remote GPU cluster needs for SDG Workflow.",
+    "expected_skill": "orchestration-setup",
+    "expected_behavior": [
+      "Audits before mutation.",
+      "Explains exact namespace, Secret, and optional PVC changes.",
+      "Lists the commands it will run and waits for user approval before executing any of them.",
+      "Does not run make install sdg-controller before presenting the plan."
+    ]
+  },
+  {
+    "id": "setup-and-install-positive",
+    "question": "Deploy the SDG controller on my cluster. I have secrets.env filled in and my kubeconfig at /home/me/kubeconfig.yaml.",
+    "expected_skill": "orchestration-setup",
+    "expected_behavior": [
+      "Uses the kubeconfig path the user gave rather than a repository-relative default.",
+      "Runs make setup to validate secrets and generate the Helm values.",
+      "Runs make install sdg-controller (not bare make install).",
+      "Does not attempt to build or push Docker images.",
+      "Confirms with the user before executing destructive install steps.",
+      "Notes that DAGs are synced from S3 and make sync-dag should be run after code changes."
+    ]
+  },
+  {
+    "id": "nfs-storage-install",
+    "question": "My cluster does not have an NFS StorageClass yet. How do I install one?",
+    "expected_skill": "orchestration-setup",
+    "expected_behavior": [
+      "Instructs the user to run make install nfs.",
+      "Explains the NFS_NODE_HOSTNAME and NFS_SERVER Makefile variables.",
+      "Does not reference microk8s-hostpath."
+    ]
+  },
+  {
+    "id": "dag-update-no-reinstall",
+    "question": "I changed a DAG file. How do I update Airflow without reinstalling the chart?",
+    "expected_skill": "orchestration-setup",
+    "expected_behavior": [
+      "Instructs the user to run make sync-dag.",
+      "Explains that the dag-synchronizer pulls from S3 on a configurable interval.",
+      "Does not recommend make install sdg-controller for a simple DAG update."
+    ]
+  },
+  {
+    "id": "secrets-env-setup",
+    "question": "What secrets do I need before running make setup?",
+    "expected_skill": "orchestration-setup",
+    "expected_behavior": [
+      "Lists NGC_API_KEY, HF_TOKEN, and AWS S3 credentials (bucket, region, key ID, secret).",
+      "Does not mention GITLAB_TOKEN.",
+      "References secrets.env and secrets.env.example.",
+      "Does not describe tool installation as part of make setup."
+    ]
+  },
+  {
+    "id": "kubeconfig-pod-reachable",
+    "question": "My kubeconfig has server: https://127.0.0.1:6443. Will make setup work?",
+    "expected_skill": "orchestration-setup",
+    "expected_behavior": [
+      "Warns that 127.0.0.1 is not reachable from Airflow controller pods.",
+      "Instructs the user to replace it with the node's cluster-reachable IP.",
+      "Does not proceed with make setup until the server address is corrected."
+    ]
+  },
+  {
+    "id": "one-gpu-service-mode",
+    "question": "I have one H100. Should I use internal or external services?",
+    "expected_skill": "orchestration-setup",
+    "expected_behavior": [
+      "Recommends external model endpoints because internal mode requires at least four GPUs.",
+      "Explains that the augmentation worker and controller can still run on the one-GPU cluster.",
+      "Does not require a separate controller cluster."
+    ]
+  },
+  {
+    "id": "docker-only-host-rejected",
+    "question": "I have an H100 machine with Docker but no Kubernetes. Can I run SDG Workflow?",
+    "expected_skill": "orchestration-setup",
+    "expected_behavior": [
+      "Rejects Docker-only as a supported backend.",
+      "Instructs the user to install an appropriate Kubernetes distribution first.",
+      "Does not claim to install Kubernetes automatically."
+    ]
+  }
+]

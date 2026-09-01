@@ -1,0 +1,58 @@
+# SkillSpector baseline — findings listed here are suppressed on future scans.
+# See https://github.com/NVIDIA/SkillSpector/blob/main/docs/SUPPRESSION.md.
+version: 2
+rules:
+  # SKILL.md
+  - id: "PE3"
+    path: "SKILL.md"
+    message: "*KUBECONFIG*"
+    reason: "False positive: defensive documentation instructing the agent how to resolve a user-supplied KUBECONFIG env var safely (never guess a path, never print it); no credential read/exfiltration."
+  - id: "PE3"
+    path: "SKILL.md"
+    message: "*kubeconfig*"
+    reason: "False positive: defensive documentation about handling a user-supplied kubeconfig file; no credential read/exfiltration."
+  - id: "PE3"
+    path: "SKILL.md"
+    message: "*secrets.env*"
+    reason: "False positive: documentation referencing the secrets.env filename the user fills in locally (copied from secrets.env.example); the skill never prints or exfiltrates its contents."
+  - id: "PE3"
+    path: "SKILL.md"
+    message: "*~/.kube/config*"
+    reason: "False positive: instructs the agent to explicitly reject falling back to the default ~/.kube/config path; not a credential read."
+  - id: "PE3"
+    path: "SKILL.md"
+    message: "*.env*"
+    reason: "False positive: prose/comment referencing the secrets.env file by name in a safety instruction; no credential read/exfiltration."
+
+  # references/controller-connection.md
+  - id: "PE3"
+    path: "references/controller-connection.md"
+    message: "*KUBECONFIG*"
+    reason: "False positive: defensive documentation instructing the agent how to resolve a user-supplied KUBECONFIG env var safely; no credential read/exfiltration."
+  - id: "PE3"
+    path: "references/controller-connection.md"
+    message: "*kubeconfig*"
+    reason: "False positive: defensive documentation about handling a user-supplied kubeconfig file; no credential read/exfiltration."
+  - id: "PE3"
+    path: "references/controller-connection.md"
+    message: "*secrets.env*"
+    reason: "False positive: documentation referencing the secrets.env filename the user fills in locally; the skill never prints or exfiltrates its contents."
+
+  # references/topologies.md
+  - id: "PE3"
+    path: "references/topologies.md"
+    message: "*KUBECONFIG*"
+    reason: "False positive: defensive documentation instructing the agent how to resolve a user-supplied KUBECONFIG env var safely; no credential read/exfiltration."
+  - id: "PE3"
+    path: "references/topologies.md"
+    message: "*kubeconfig*"
+    reason: "False positive: defensive documentation about handling a user-supplied kubeconfig file; no credential read/exfiltration."
+  - id: "PE3"
+    path: "references/topologies.md"
+    message: "*secrets.env*"
+    reason: "False positive: documentation referencing the secrets.env filename the user fills in locally; the skill never prints or exfiltrates its contents."
+  - id: "PE3"
+    path: "references/topologies.md"
+    message: "*.env*"
+    reason: "False positive: prose referencing the secrets.env file by name in a safety instruction; no credential read/exfiltration."
+fingerprints: []
