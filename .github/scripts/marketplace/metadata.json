@@ -2965,6 +2965,18 @@
       }
     },
     {
+      "path": "skills/paidf-augmentation",
+      "name": "paidf-augmentation",
+      "description": "Use when authoring or validating PAIDF augmentation YAML configs, or running remote Cosmos Transfer/Predict, image-edit, or image-to-video inference.",
+      "metadata": {
+        "product.primary": "Cosmos",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "ai_engineer,ml_engineer,robotics_developer,developer,data_engineer",
+        "discovery.activity_tags": "configure,validate,inference,generate,evaluate"
+      }
+    },
+    {
       "path": "skills/paidf-auto-labeling",
       "name": "paidf-auto-labeling",
       "description": "Use when a user needs to get started with PAIDF Auto-Labeling, plan a scenario, run or debug a shipped cookbook, author prompts or cookbooks, migrate a pipeline, or configure a stage. Confirm critical inputs (data path, output path, endpoints) and ask when any are missing. This is a router: read the matching reference instead of inventing a workflow.",

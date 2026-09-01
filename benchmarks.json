@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 345,
-  "result_row_count": 3230,
+  "skill_count": 346,
+  "result_row_count": 3240,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -4729,6 +4729,26 @@
       "component": "TAO Toolkit",
       "has_results": true,
       "average_uplift_pct": 53.1
+    },
+    {
+      "skill": "paidf-augmentation",
+      "evaluation_date": "2026-09-01",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.3.2",
+      "dataset_digest": "sha256:9c3c36cce245a4c364498c100260a7dd89cefd98b5fc8d9f51afa348055e4764",
+      "validation_status": "passed",
+      "tasks": 13,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "paidf-augmentation",
+      "component": "Physical AI Augmentation",
+      "has_results": true,
+      "average_uplift_pct": 38.7
     },
     {
       "skill": "paidf-auto-labeling",
@@ -27421,6 +27441,96 @@
       "agent": "codex",
       "score_pct": 0.0,
       "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "paidf-augmentation",
+      "component": "Physical AI Augmentation",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "paidf-augmentation",
+      "component": "Physical AI Augmentation",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 19.0
+    },
+    {
+      "catalog_dir": "paidf-augmentation",
+      "component": "Physical AI Augmentation",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "paidf-augmentation",
+      "component": "Physical AI Augmentation",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "paidf-augmentation",
+      "component": "Physical AI Augmentation",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "paidf-augmentation",
+      "component": "Physical AI Augmentation",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 79.0,
+      "uplift_pct": 31.0
+    },
+    {
+      "catalog_dir": "paidf-augmentation",
+      "component": "Physical AI Augmentation",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "paidf-augmentation",
+      "component": "Physical AI Augmentation",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 48.0
+    },
+    {
+      "catalog_dir": "paidf-augmentation",
+      "component": "Physical AI Augmentation",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "paidf-augmentation",
+      "component": "Physical AI Augmentation",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.0,
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "paidf-auto-labeling",
