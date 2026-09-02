@@ -51,6 +51,13 @@ class TestGuardBlocksRegeneration(unittest.TestCase):
         self.root = Path(tempfile.mkdtemp())
         (self.root / "skills" / "foo").mkdir(parents=True)
         (self.root / "components.d").mkdir()
+        # foo must be registered, or it is an orphan the sync would prune and
+        # the guard deliberately stops tracking. An unregistered fixture would
+        # make these tests pass or fail for a reason unrelated to the parser.
+        (self.root / "components.d" / "demo.yml").write_text(
+            "name: Demo\nrepo: NVIDIA/demo\nskills:\n"
+            "  - path: skills/foo/\n    catalog_dir: foo\n"
+        )
         self.report = self.root / "skills" / "foo" / "BENCHMARK.md"
         # Baseline: both fields present, benchmarks.json records them.
         self._write()
@@ -109,6 +116,13 @@ class TestMigratingFieldExemption(unittest.TestCase):
         self.root = Path(tempfile.mkdtemp())
         (self.root / "skills" / "foo").mkdir(parents=True)
         (self.root / "components.d").mkdir()
+        # foo must be registered, or it is an orphan the sync would prune and
+        # the guard deliberately stops tracking. An unregistered fixture would
+        # make these tests pass or fail for a reason unrelated to the parser.
+        (self.root / "components.d" / "demo.yml").write_text(
+            "name: Demo\nrepo: NVIDIA/demo\nskills:\n"
+            "  - path: skills/foo/\n    catalog_dir: foo\n"
+        )
         self.report = self.root / "skills" / "foo" / "BENCHMARK.md"
         self.report.write_text(
             REPORT.format(environment_line=ENVIRONMENT_LINE, threshold_line=THRESHOLD_LINE)
@@ -160,3 +174,125 @@ class TestMigratingFieldExemption(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestComponentIsADerivedJoin(unittest.TestCase):
+    """`component` is not measurement data and must not gate a PR.
+
+    Every other field in benchmarks.json is parsed out of a skill's
+    BENCHMARK.md. `component` is not: it is joined in from components.d at
+    generation time. That makes it the one field that changes the instant a
+    PR edits components.d, while benchmarks.json cannot be regenerated until
+    the sync has run and renamed the directories on disk.
+
+    On 2026-09-01 that cost a release. #519 renamed catalog_dirs, which is a
+    components.d-only change by design — the sync writes the renamed dirs and
+    prune-orphans deletes the old ones. But:
+
+      * --check regenerated, saw component values move, and failed;
+      * the remedy it printed (regenerate) hit the null guard, because the
+        deregistered dirs still on disk now matched no component and went
+        null: "component: 0 -> 2 nulls";
+      * so the check demanded a regeneration the generator refused to do.
+
+    The only escape was hand-deleting the catalog dirs, which then required a
+    signing run that cannot fire on a fork PR. Two gates, the second caused
+    by the first.
+    """
+
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp())
+        (self.root / "components.d").mkdir()
+        for name in ("foo", "bar"):
+            (self.root / "skills" / name).mkdir(parents=True)
+            (self.root / "skills" / name / "BENCHMARK.md").write_text(
+                REPORT.format(
+                    environment_line=ENVIRONMENT_LINE,
+                    threshold_line=THRESHOLD_LINE,
+                ).replace("`foo`", f"`{name}`")
+            )
+        self._register(foo="Alpha", bar="Alpha")
+        (self.root / "benchmarks.json").write_text(agg.generate(self.root))
+        self.addCleanup(shutil.rmtree, self.root)
+
+    def _register(self, **dirs):
+        """Rewrite components.d so exactly these catalog_dirs are registered."""
+        by_component = {}
+        for catalog_dir, component in dirs.items():
+            by_component.setdefault(component, []).append(catalog_dir)
+        for f in (self.root / "components.d").glob("*.yml"):
+            f.unlink()
+        for component, entries in by_component.items():
+            body = f"name: {component}\nrepo: NVIDIA/demo\nskills:\n"
+            for d in entries:
+                body += f"  - path: skills/{d}/\n    catalog_dir: {d}\n"
+            (self.root / "components.d" / f"{component.lower()}.yml").write_text(body)
+
+    def _run(self, *extra):
+        argv = sys.argv
+        sys.argv = ["aggregate_benchmarks.py", "--repo-root", str(self.root), *extra]
+        try:
+            return agg.main()
+        finally:
+            sys.argv = argv
+
+    # --- --check ---------------------------------------------------------
+
+    def test_check_passes_when_a_skill_moves_component(self):
+        """The #519 case: a registered skill reassigned to another product."""
+        self._register(foo="Alpha", bar="Beta")
+
+        self.assertEqual(self._run("--check"), 0)
+
+    def test_check_passes_when_a_dir_is_deregistered_pending_prune(self):
+        """Deregistered dirs are deleted by prune-orphans after the sync."""
+        self._register(foo="Alpha")
+
+        self.assertEqual(self._run("--check"), 0)
+
+    def test_check_still_fails_on_a_real_measurement_change(self):
+        """Ignoring component must not blind the check to actual drift."""
+        (self.root / "skills" / "foo" / "BENCHMARK.md").write_text(
+            REPORT.format(environment_line="", threshold_line=THRESHOLD_LINE)
+        )
+
+        self.assertEqual(self._run("--check"), 1)
+
+    def test_check_still_fails_when_a_skill_appears(self):
+        (self.root / "skills" / "baz").mkdir(parents=True)
+        (self.root / "skills" / "baz" / "BENCHMARK.md").write_text(
+            REPORT.format(
+                environment_line=ENVIRONMENT_LINE, threshold_line=THRESHOLD_LINE
+            ).replace("`foo`", "`baz`")
+        )
+
+        self.assertEqual(self._run("--check"), 1)
+
+    # --- the null guard --------------------------------------------------
+
+    def test_deregistered_dir_going_null_does_not_block_regeneration(self):
+        """The exact refusal that trapped #519."""
+        self._register(foo="Alpha")
+
+        self.assertEqual(self._run(), 0)
+
+    def test_a_registered_skill_losing_a_field_still_blocks(self):
+        """The orphan exemption must not disarm the guard generally."""
+        (self.root / "skills" / "foo" / "BENCHMARK.md").write_text(
+            REPORT.format(environment_line="", threshold_line=THRESHOLD_LINE)
+        )
+
+        self.assertEqual(self._run(), 1)
+
+    def test_an_exception_without_a_component_is_not_an_orphan(self):
+        """catalog-exceptions membership decides survival, not the component.
+
+        Reading registration off load_component_map() would drop an exception
+        that omits `component:` and silently stop guarding it.
+        """
+        self._register(foo="Alpha")
+        (self.root / "catalog-exceptions.yml").write_text(
+            "exceptions:\n  - dir: bar\n    reason: manually curated\n"
+        )
+
+        self.assertIn("bar", agg.registered_catalog_dirs(self.root))
