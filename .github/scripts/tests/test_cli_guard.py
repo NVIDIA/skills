@@ -296,3 +296,84 @@ class TestComponentIsADerivedJoin(unittest.TestCase):
         )
 
         self.assertIn("bar", agg.registered_catalog_dirs(self.root))
+
+
+class TestOrphanExemptionCannotOverreach(unittest.TestCase):
+    """The exemption must remove exactly the orphan, and only when it can tell.
+
+    Both cases below passed the exemption's first implementation and are the
+    reason it is keyed by catalog_dir with an empty-set rail.
+    """
+
+    REPORT_FOR = staticmethod(
+        lambda skill: REPORT.format(
+            environment_line=ENVIRONMENT_LINE, threshold_line=THRESHOLD_LINE
+        ).replace("`foo`", f"`{skill}`")
+    )
+
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp())
+        (self.root / "components.d").mkdir()
+        self.addCleanup(shutil.rmtree, self.root)
+
+    def _skill(self, catalog_dir, skill_name):
+        d = self.root / "skills" / catalog_dir
+        d.mkdir(parents=True)
+        (d / "BENCHMARK.md").write_text(self.REPORT_FOR(skill_name))
+        return d
+
+    def _register(self, *catalog_dirs):
+        body = "name: Demo\nrepo: NVIDIA/demo\nskills:\n"
+        for d in catalog_dirs:
+            body += f"  - path: skills/{d}/\n    catalog_dir: {d}\n"
+        (self.root / "components.d" / "demo.yml").write_text(body)
+
+    def _run(self, *extra):
+        argv = sys.argv
+        sys.argv = ["aggregate_benchmarks.py", "--repo-root", str(self.root), *extra]
+        try:
+            return agg.main()
+        finally:
+            sys.argv = argv
+
+    def test_a_renamed_pair_sharing_a_skill_name_still_guards_the_live_dir(self):
+        """Old and new dirs carry the same skill name during a rename.
+
+        prune-orphans deletes the old dir in the sync commit — unless it hits
+        PRUNE_CAP, in which case both sit on disk together. Keying the
+        exemption by skill name then excluded the live dir along with the
+        orphan, silently dropping a published skill out of the guard.
+        """
+        self._skill("old-name", "shared-skill")
+        live = self._skill("new-name", "shared-skill")
+        self._register("old-name", "new-name")
+        (self.root / "benchmarks.json").write_text(agg.generate(self.root))
+
+        # Deregister the old dir, and independently break the live one.
+        self._register("new-name")
+        (live / "BENCHMARK.md").write_text(
+            REPORT.format(environment_line="", threshold_line=THRESHOLD_LINE)
+            .replace("`foo`", "`shared-skill`")
+        )
+
+        self.assertEqual(self._run(), 1)
+
+    def test_an_unreadable_components_d_does_not_exempt_the_catalog(self):
+        """No registrations parsed means a broken file, not 350 orphans.
+
+        prune-orphans refuses to delete anything when the declared set is
+        empty for exactly this reason; without the same rail here a single
+        malformed component file disables the guard everywhere.
+        """
+        foo = self._skill("foo", "foo")
+        self._register("foo")
+        (self.root / "benchmarks.json").write_text(agg.generate(self.root))
+
+        for f in (self.root / "components.d").glob("*.yml"):
+            f.unlink()
+        (self.root / "components.d" / "demo.yml").write_text("name: Demo\n")
+        foo.joinpath("BENCHMARK.md").write_text(
+            REPORT.format(environment_line="", threshold_line=THRESHOLD_LINE)
+        )
+
+        self.assertEqual(self._run(), 1)

@@ -224,21 +224,30 @@ def null_rate_regressions(old: dict, new: dict, exclude=frozenset()) -> dict:
     pass_threshold drift and the 2026-08-03 disappearance of
     cuopt-multi-objective-exploration are that shape.
 
-    ``exclude`` drops skills from the comparison entirely. Callers use it for
-    catalog dirs no longer registered in components.d: those are orphans
+    ``exclude`` drops catalog dirs from the comparison entirely. Callers use
+    it for dirs no longer registered in components.d: those are orphans
     awaiting prune-orphans, and their component field going null is the
     deregistration working, not a parser losing data. Counting them made a
     routine catalog_dir rename unlandable — see main().
+
+    Skills are keyed by catalog_dir, not by the skill name in the report. A
+    rename leaves the old and new dirs carrying the *same* skill name, so a
+    name key collides: the two entries overwrite each other here, and an
+    exclusion aimed at the orphan would take the live skill with it. Dir
+    names are unique by construction.
     """
-    old_by_skill = {s["skill"]: s for s in old.get("skills", [])}
-    new_by_skill = {s["skill"]: s for s in new.get("skills", [])}
+    def by_dir(doc):
+        return {s.get("catalog_dir") or s.get("skill"): s
+                for s in doc.get("skills", [])}
+
+    old_by_skill, new_by_skill = by_dir(old), by_dir(new)
     common = (old_by_skill.keys() & new_by_skill.keys()) - set(exclude)
 
     fields = {
         k
         for skill in common
         for k in (*old_by_skill[skill], *new_by_skill[skill])
-        if k != "skill"
+        if k not in ("skill", "catalog_dir")
     }
 
     regressions = {}
@@ -474,10 +483,14 @@ def main() -> int:
         # change that deregistered them. #519 could not be landed at all
         # until this exclusion existed.
         registered = registered_catalog_dirs(root)
+        # prune-orphans refuses to delete anything when the declared set comes
+        # back empty, because a parse error makes every dir look unregistered.
+        # The same reasoning applies here: an empty set would exempt the whole
+        # catalog and silently disable the guard.
         orphans = {
-            s["skill"]
+            s.get("catalog_dir")
             for s in generated.get("skills", [])
-            if s.get("catalog_dir") not in registered
+            if registered and s.get("catalog_dir") not in registered
         }
         if orphans:
             print(
