@@ -45,7 +45,6 @@
         "hsb-setup",
         "hsb-test",
         "i4h-catheter-navigation-setup",
-        "image-attribute-augmentation-workflow",
         "jetson-build-source",
         "jetson-customize-camera",
         "jetson-customize-fan",
