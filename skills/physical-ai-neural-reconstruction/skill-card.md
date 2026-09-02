@@ -1,5 +1,5 @@
 ## Description: <br>
-Router for NVIDIA NuRec/NRE: USDZ rendering, NCore conversion, 3DGS, gRPC sensor sim, PhysicalAI HF datasets. Do NOT use for SimReady or infra setup. <br>
+Router for NVIDIA NuRec/NRE: USDZ rendering, NCore conversion, 3DGS, gRPC sensor sim, carline adaptation, PhysicalAI HF datasets. Do NOT use for SimReady or infra setup. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -28,7 +28,8 @@ Mitigation: Review and scan skill before deployment. <br>
 - [NVIDIA NuRec Skills (upstream)](https://github.com/NVIDIA/nurec-skills) <br>
 - [NCore converter](https://github.com/NVIDIA/ncore) <br>
 - [Asset Harvester](https://github.com/NVIDIA/asset-harvester) <br>
-- [DiffusionHarmonizer](https://huggingface.co/nvidia/DiffusionHarmonizer) <br>
+- [DiffusionHarmonizer (code)](https://github.com/NVIDIA/harmonizer) <br>
+- [DiffusionHarmonizer (model)](https://huggingface.co/nvidia/Harmonizer) <br>
 - [workflows.md](references/workflows.md) <br>
 - [mix-ups.md](references/mix-ups.md) <br>
 - [upstream-fetch.md](references/upstream-fetch.md) <br>
@@ -80,7 +81,8 @@ Underlying evaluation signals used in this run: <br>
 | Efficiency | 4 | 95% (+43%) | 91% (+40%) |
 
 ## Skill Version(s): <br>
-0.3.0 (source: frontmatter, changelog) <br>
+0.4.0 (source: frontmatter, changelog) <br>
+Evaluation results above were measured on 0.3.0; 0.4.0 is a documentation-parity update (upstream paths, GA container names, workflow lettering). <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

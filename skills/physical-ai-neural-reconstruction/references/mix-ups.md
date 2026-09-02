@@ -8,13 +8,15 @@ come back to the router.
 - **NRE's built-in Fixer vs standalone DiffusionHarmonizer.** `nre`'s
   `--enable-difix` flag is an inline NRE rendering feature that runs
   a built-in Fixer / Difix3D+ variant inside the NRE container as it
-  renders. The `nurec-fixer` skill now wraps the standalone public
+  renders. The `nurec-fixer` skill wraps the standalone public
   **NVIDIA DiffusionHarmonizer** release — code at
   <https://github.com/NVIDIA/harmonizer>, model at
-  <https://huggingface.co/nvidia/DiffusionHarmonizer>, paired data at
-  `nvidia/DiffusionHarmonizer-Dataset`, paper
-  <https://arxiv.org/abs/2602.24096>, container
-  `nvcr.io/nvidia/cosmos/cosmos-predict2-container:1.2`. Default to
+  <https://huggingface.co/nvidia/Harmonizer>, paired data at
+  `nvidia/Harmonizer-Dataset`, paper
+  <https://arxiv.org/abs/2602.24096>. Its runtime is the locally
+  built `harmonizer-cosmos-env` image (project `Dockerfile.cosmos`
+  layered on `nvcr.io/nvidia/pytorch:25.10-py3`), and it also pulls
+  the base model `nvidia/Cosmos-Predict2-0.6B-Text2Image`. Default to
   the built-in `--enable-difix` for live rendering; reach for
   `nurec-fixer` when you need the public code/model card, paired
   evaluation, fine-tuning, or fixes on frames that were rendered
@@ -28,6 +30,10 @@ come back to the router.
   Harvester **produces** the per-object `.ply` files; `nre`'s
   `export-external-assets` **packages** them into a USDZ. Always
   Asset Harvester first.
+- **Carline adaptation vs retraining.** Carline adaptation reuses an
+  existing USDZ and renders it through an augmented target rig
+  (`export-custom-rig-trajectory` → `render` → `nurec-fixer`). It is
+  not a retrain and needs no NCore clip.
 - **`Cosmos-Drive-Dreams` vs `PhysicalAI-Autonomous-Vehicles-NuRec`.**
   Both are AV datasets on Hugging Face, both managed by
   `physical-ai-datasets`, but they are different things.
