@@ -211,7 +211,7 @@ def parse_benchmark(path: Path) -> dict:
     return entry
 
 
-def null_rate_regressions(old: dict, new: dict) -> dict:
+def null_rate_regressions(old: dict, new: dict, exclude=frozenset()) -> dict:
     """Fields that lost values between two benchmarks.json generations.
 
     Returns {field: (old_null_count, new_null_count)} for every field whose
@@ -223,10 +223,16 @@ def null_rate_regressions(old: dict, new: dict) -> dict:
     column when an upstream report format changes. Both the v3
     pass_threshold drift and the 2026-08-03 disappearance of
     cuopt-multi-objective-exploration are that shape.
+
+    ``exclude`` drops skills from the comparison entirely. Callers use it for
+    catalog dirs no longer registered in components.d: those are orphans
+    awaiting prune-orphans, and their component field going null is the
+    deregistration working, not a parser losing data. Counting them made a
+    routine catalog_dir rename unlandable — see main().
     """
     old_by_skill = {s["skill"]: s for s in old.get("skills", [])}
     new_by_skill = {s["skill"]: s for s in new.get("skills", [])}
-    common = old_by_skill.keys() & new_by_skill.keys()
+    common = (old_by_skill.keys() & new_by_skill.keys()) - set(exclude)
 
     fields = {
         k
@@ -242,6 +248,72 @@ def null_rate_regressions(old: dict, new: dict) -> dict:
         if now > was:
             regressions[field] = (was, now)
     return regressions
+
+
+def registered_catalog_dirs(repo_root: Path) -> set:
+    """Catalog dirs the sync will keep, by prune-orphans' own rule.
+
+    A dir survives the sync if it is declared in components.d, staged in
+    manual-components.yml, or listed in catalog-exceptions.yml. Anything else
+    under skills/ is deleted in the next sync commit.
+
+    Deliberately not derived from load_component_map(): that maps dir ->
+    component name and so only sees entries that declare one. An exception
+    listed without a component would drop out of the map and be read here as
+    an orphan, quietly losing it the null guard's protection. Membership, not
+    the component value, is what decides whether a dir has a future.
+    """
+    dirs = set()
+    for yml in sorted((repo_root / "components.d").glob("*.yml")):
+        for line in yml.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"^-?\s*catalog_dir:\s*(.+)$", line.strip())
+            if m:
+                dirs.add(m.group(1).strip())
+
+    manual = repo_root / ".github" / "scripts" / "manual-components.yml"
+    if manual.exists():
+        for line in manual.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"^-\s*(\S+)\s*$", line.strip())
+            if m:
+                dirs.add(m.group(1))
+
+    exceptions = repo_root / "catalog-exceptions.yml"
+    if exceptions.exists():
+        for line in exceptions.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"^-?\s*dir:\s*(.+)$", line.strip())
+            if m:
+                dirs.add(m.group(1).strip())
+    return dirs
+
+
+def component_only_difference(existing, payload: str) -> bool:
+    """True when two benchmarks.json bodies agree except on `component`.
+
+    Used to tell a stale product assignment — which a components.d edit
+    creates immediately and the next sync resolves — apart from real drift in
+    the measurements. Everything except the component values must match
+    exactly, including which skills are present, so this cannot mask a skill
+    appearing, vanishing, or changing its numbers.
+
+    A malformed existing file is not a component-only difference; it is a
+    genuine mismatch and the caller should report it as one.
+    """
+    if existing is None:
+        return False
+    try:
+        a, b = json.loads(existing), json.loads(payload)
+    except json.JSONDecodeError:
+        return False
+
+    def strip(doc):
+        doc = json.loads(json.dumps(doc))  # copy; leave the caller's alone
+        for entry in doc.get("skills", []):
+            entry.pop("component", None)
+        for row in doc.get("results", []):
+            row.pop("component", None)
+        return doc
+
+    return strip(a) == strip(b)
 
 
 def average_uplift(results: list):
@@ -367,6 +439,21 @@ def main() -> int:
     if args.check:
         existing = target.read_text(encoding="utf-8") if target.exists() else None
         if existing != payload:
+            # `component` is the one field not parsed from a BENCHMARK.md. It
+            # is joined in from components.d, so it moves the moment a PR
+            # edits a registration — while benchmarks.json cannot be brought
+            # up to date until the sync has renamed the dirs on disk. A
+            # components.d-only PR is therefore *expected* to differ here, and
+            # failing on it demanded a regeneration the null guard below then
+            # refused to perform. Validate the measurements; let the
+            # post-sync regeneration settle the join.
+            if component_only_difference(existing, payload):
+                print(
+                    "benchmarks.json differs only in component assignments, "
+                    "which components.d has changed and the next sync will "
+                    "re-derive. Measurements are up to date."
+                )
+                return 0
             print(
                 "benchmarks.json is out of date with skills/*/BENCHMARK.md.\n"
                 "Regenerate it with: python3 .github/scripts/aggregate_benchmarks.py",
@@ -378,7 +465,28 @@ def main() -> int:
 
     if target.exists() and not args.allow_null_regressions:
         previous = json.loads(target.read_text(encoding="utf-8"))
-        lost = null_rate_regressions(previous, json.loads(payload))
+        generated = json.loads(payload)
+
+        # Catalog dirs still on disk but no longer registered are orphans:
+        # the sync's prune-orphans step deletes them in the same commit that
+        # writes the renamed dirs. Their component is null because the
+        # deregistration worked, so counting it as lost data blocks the very
+        # change that deregistered them. #519 could not be landed at all
+        # until this exclusion existed.
+        registered = registered_catalog_dirs(root)
+        orphans = {
+            s["skill"]
+            for s in generated.get("skills", [])
+            if s.get("catalog_dir") not in registered
+        }
+        if orphans:
+            print(
+                f"note: {len(orphans)} deregistered dir(s) awaiting prune "
+                "excluded from the null guard.",
+                file=sys.stderr,
+            )
+
+        lost = null_rate_regressions(previous, generated, exclude=orphans)
 
         # Report every regression; block only on the ones we did not expect.
         for field, (was, now) in sorted(lost.items()):
