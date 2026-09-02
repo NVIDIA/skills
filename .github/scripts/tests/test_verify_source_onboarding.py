@@ -167,25 +167,46 @@ class RequiredFileTests(unittest.TestCase):
         self.root = Path(self._tmp.name)
         self.addCleanup(self._tmp.cleanup)
 
-    def test_each_skill_card_spelling_is_accepted(self):
-        for card in ("skill-card.md", "SKILLCARD.yaml", "card.yaml"):
+    def test_skill_card_md_is_accepted(self):
+        self.assertEqual(vso.check_skill(make_skill(self.root)), [])
+
+    def test_alternate_card_spelling_alone_is_rejected(self):
+        """The sync requires skill-card.md by name and drops anything else.
+
+        Accepting SKILLCARD.yaml or card.yaml here would pass a skill at
+        onboarding that the next hourly sync silently removes.
+        """
+        for card in ("SKILLCARD.yaml", "card.yaml"):
             with self.subTest(card=card):
                 d = make_skill(self.root, name=f"skill-{card}", card=card)
-                self.assertEqual(vso.check_skill(d), [])
+
+                problems = "\n".join(vso.check_skill(d))
+
+                self.assertIn("skill-card.md", problems)
 
     def test_missing_skill_card_is_reported(self):
         d = make_skill(self.root, omit=("skill-card.md",))
 
         problems = "\n".join(vso.check_skill(d))
 
-        self.assertIn("skill card", problems)
+        self.assertIn("skill-card.md", problems)
 
     def test_missing_evals_is_reported(self):
         d = make_skill(self.root, omit=("evals/evals.json",))
 
         problems = "\n".join(vso.check_skill(d))
 
-        self.assertIn("evals/evals.json", problems)
+        self.assertIn("eval dataset", problems)
+
+    def test_multi_profile_eval_dataset_is_accepted(self):
+        """rag-blueprint, rag-eval and rag-perf ship eval/*.json, not
+        evals/evals.json, and the sync carries them. The gate must too."""
+        d = make_skill(self.root, omit=("evals/evals.json",))
+        (d / "eval").mkdir()
+        (d / "eval" / "h100.json").write_text('{"tasks": []}\n')
+        sign(d)
+
+        self.assertEqual(vso.check_skill(d), [])
 
     def test_missing_skill_md_is_reported(self):
         d = make_skill(self.root, omit=("SKILL.md",))
