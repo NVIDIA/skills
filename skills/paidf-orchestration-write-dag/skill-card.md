@@ -1,5 +1,5 @@
 ## Description: <br>
-Composes a new Kubernetes-only Airflow DAG from existing shared task groups in the PAIDF Orchestration repository, producing a K8s manifest, DAG builder, payload model, and workflow-local callables for custom synthetic data generation pipelines. <br>
+Use when a user describes a custom PAIDF Orchestration pipeline — a specific ordered combination of stages such as augmentation only, auto-labeling only, detection+captioning only, or image attribute augmentation without full auto-labeling — that no existing DAG covers, and asks for a new Kubernetes DAG; also use to check that a generated or existing DAG’s model/container/prompt choices match an external spec document. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,16 +7,16 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers building custom PAIDF Orchestration pipelines use this skill to compose new Kubernetes-only Airflow DAGs from shared task groups when no existing DAG covers the requested stage sequence. <br>
+Developers and engineers use this skill to compose custom Kubernetes-only Airflow DAGs for Physical AI Data Factory (PAIDF) orchestration pipelines, assembling specific ordered combinations of shared task groups for synthetic data generation workflows that no existing checked-in DAG covers. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [Yes] <br>
-**Credential Type(s):** [Cloud Credentials] <br>
+**Credential Type(s):** [Other [Kubernetes cluster credential file]] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,7 +25,7 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Component Skills Excerpt](references/component-skills-excerpt.md) <br>
+- [Component Skills Minimal Excerpt](references/component-skills-excerpt.md) <br>
 
 
 ## Skill Output: <br>
@@ -41,38 +41,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-7 evaluation tasks (7 positive) from a curated skill-evaluator dataset snapshot. <br>
+7 evaluation tasks (7 positive), each run in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks whether the skill helped complete the user's goal (goal completion and expected workflow adherence). <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Correctness: Checks whether the final answer is correct against the reference answer. <br>
+- Discoverability: Checks whether the right skill was found and executed when needed. <br>
+- Effectiveness: Checks whether the skill helped complete the user’s goal (goal completion 50% + expected workflow adherence 50%). <br>
+- Efficiency: Checks whether the skill avoided wasted tool or skill usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_execution`: Whether the expected skill was found and executed. <br>
 - `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `goal_accuracy`: Whether the user’s goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 39% → 85% (+46 points) | 38% → 71% (+33 points) |
-| Security | 71% → 100% (+29 points) | 71% → 50% (-21 points) |
-| Correctness | 37% → 89% (+51 points) | 34% → 89% (+54 points) |
-| Discoverability | 50% → 98% (+48 points) | 37% → 74% (+38 points) |
-| Effectiveness | 12% → 56% (+43 points) | 11% → 53% (+42 points) |
-| Efficiency | 24% → 84% (+59 points) | 39% → 91% (+52 points) |
+| Overall | 41% → 89% (+48 points) | 30% → 82% (+52 points) |
+| Security | 71% → 100% (+29 points) | 43% → 93% (+50 points) |
+| Correctness | 37% → 97% (+60 points) | 31% → 91% (+60 points) |
+| Discoverability | 48% → 99% (+51 points) | 38% → 79% (+41 points) |
+| Effectiveness | 20% → 65% (+45 points) | 9% → 65% (+56 points) |
+| Efficiency | 29% → 85% (+57 points) | 30% → 80% (+50 points) |
 
 ## Skill Version(s): <br>
-1.1.0 (source: pyproject.toml) <br>
+1.0.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

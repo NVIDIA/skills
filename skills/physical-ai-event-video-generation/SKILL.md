@@ -1,31 +1,45 @@
 ---
-name: image-attribute-augmentation-workflow
-description: Run the PAIDF Orchestration Image Attribute Augmentation DAG on Kubernetes - person-crop clothing augmentation, attribute search, and augmented dataset generation. Select for requests about image attribute augmentation, person attribute search, person re-identification data, clothing augmentation, attribute captions, augmentation payloads, run status, or result retrieval. Runs environment setup first when controller readiness is unknown. Not for video or defect-image generation.
+name: physical-ai-event-video-generation
+description: Run the PAIDF Orchestration Event Video Generation DAG on Kubernetes - image-to-video anomaly generation, auto-labeling, and anomaly dataset generation. Select for requests about event video generation, anomaly video generation, image-to-video synthesis, Cosmos3 image2video, anomaly dataset creation, safety/surveillance SDG, or generating person-falling, person-climbing, person-running, fighting, smoking/vaping, fire/smoke, or shoplifting video clips from a seed image. Runs environment setup first when controller readiness is unknown. Not for person-crop clothing/attribute augmentation (that is image-attribute-augmentation-workflow) and not for video style transfer.
+version: "1.0.0"
+license: CC-BY-4.0 AND Apache-2.0
+metadata:
+  owner: NVIDIA
+  service: physical-ai-data-factory
+  version: 1.0.0
+  reviewed: '2026-09-02'
+  author: NVIDIA
+  tags:
+    - physical-ai
+    - paidf-orchestration
+    - event-video-generation
+    - cosmos
 ---
 
-# PAIDF Orchestration — Image Attribute Augmentation
+# PAIDF Orchestration — Event Video Generation
 
-Run the Image Attribute Augmentation DAG end to end: person-crop input preparation, cosmos
-image-edit augmentation, cosmos post-processing, event and person attribute search, augmented
-dataset generation, and result retrieval.
+Run the Event Video Generation DAG end to end: seed-image input preparation, Cosmos3
+image-to-video anomaly augmentation, auto-labeling (detection and tracking, captioning,
+anomaly visual QA, person-attribute visual QA, person attribute search), anomaly dataset
+generation, and result retrieval.
 
 ## DAG selection
 
 The workflow builds one DAG per compute platform from
-`airflow/dags/workflows/image_attribute_augmentation_dag/`:
+`airflow/dags/workflows/event_video_generation_dag/`:
 
 | Platform | DAG ID | Manifest |
 |---|---|---|
-| Kubernetes | `image_attribute_augmentation_dag_k8s` | `image_attribute_augmentation_k8s_manifest.yaml` |
+| Kubernetes | `event_video_generation_dag_k8s` | `event_video_generation_k8s_manifest.yaml` |
 
 Kubernetes is the only platform whose manifest is checked in, so
-`image_attribute_augmentation_dag_k8s` is the only DAG this repository registers. A DAG is
+`event_video_generation_dag_k8s` is the only DAG this repository registers. A DAG is
 registered only if its manifest exists; a missing manifest means the DAG is absent from Airflow
 rather than broken. List the DAGs Airflow actually loaded before triggering, and never name a DAG
 ID that is not in that list.
 
-There is a **single end-to-end pipeline** — there are no augmentation-only or labeling-only DAG
-variants. If a user asks for augmentation without attribute search, tell them the checked-in DAG
+There is a **single end-to-end pipeline** — there are no generation-only or labeling-only DAG
+variants. If a user asks for video generation without auto-labeling, tell them the checked-in DAG
 does not offer that flow rather than inventing a DAG ID.
 
 ## Manual payload entry in the Airflow UI
@@ -45,15 +59,15 @@ repository defaults, CI payloads, or any hardcoded endpoint URL or bucket path.
 
 | Required | Field | What to ask |
 |---|---|---|
-| Always | `input_path` | S3 (or HTTP/HTTPS) URL whose immediate subdirectories are person-ID folders |
+| Always | `input_path` | S3 (or HTTP/HTTPS) URL to a single seed image or a directory of seed images |
 | Always | `output_directory` | Writable S3 URL where results should be written |
 | Always | service mode | `external` (user provides endpoint URLs) or `internal` (DAG deploys services in-cluster) |
 | External mode | `cosmos.vlm_service_url` | Full HTTPS URL for the VLM inference endpoint |
 | External mode | `cosmos.llm_service_url` | Full HTTPS URL for the LLM inference endpoint |
-| External mode | `cosmos.image_edit_service_url` | Full HTTPS URL for the image-edit inference endpoint |
-| Optional | `max_imgs` | Number of person-ID folders to process (default: 1; 0 or negative = all) |
-| Optional | `cosmos.num_augmentation` | Clothing variants per person (default: 1) |
-| Optional | `cosmos.variable_distribution` | Clothing attribute distribution file path (see payload-contract.md) |
+| External mode | `cosmos.image2video_service_url` | Full HTTPS URL for the Cosmos3 image-to-video inference endpoint |
+| Optional | `max_images` | Number of images to process from a directory (default: 10; 0 or negative = all) |
+| Optional | `cosmos.num_augmentation` | Anomaly videos generated per image (default: 1) |
+| Optional | `cosmos.variable_distribution` | anomaly_type / env_type sampling distribution (see payload-contract.md) |
 
 If the user does not provide a required value, ask for it explicitly before proceeding. Do not
 invent or reuse values from previous runs or checked-in files.
@@ -97,8 +111,8 @@ cluster connection was configured. GPU capacity is checked on this cluster.
    If the API is unreachable, route to the environment-setup skill.
 
 3. **Pools** — only if check 2 passes. Required pools with open slots: `k8s_gpu_1`,
-   `default_pool`, and the augmentation pool for the chosen mode
-   (`external_image_edit_service_pool` for external, `iaa_internal_image_edit_service_pool` for
+   `default_pool`, and the image2video pool for the chosen mode
+   (`external_image2video_service_pool` for external, `internal_image2video_service_pool` for
    internal).
 
 4. **Compute-cluster GPUs** — check the cluster (using the cluster connection established above):
@@ -112,10 +126,19 @@ cluster connection was configured. GPU capacity is checked on this cluster.
    ```
 
    The compute cluster is **shared** — other users' runs may be active. Report GPUs as
-   free-versus-total, not just allocatable. External mode needs no GPUs for inference — every task
-   pod (`augmentation`, `cosmos_post_processing`, `event_and_person_attribute_search`) runs on a
-   CPU profile, unlike EVG's `k8s_gpu_task`-profiled auto-labeling stages. Internal mode needs at
-   least one GPU per service replica (VLM, LLM, image-edit = at minimum three).
+   free-versus-total, not just allocatable. Two independent GPU sources, only one of which is
+   mode-dependent:
+   - **Task pods that run local model inference regardless of service mode**:
+     `detection_and_tracking`, `captioning`, and `visual_qa` all run on the `k8s_gpu_task` profile
+     (1 GPU each) — this cost applies in **both** external and internal mode, since these do in-pod
+     inference rather than calling an endpoint. `event_and_person_attribute_search` and
+     `augmentation` run on CPU profiles and cost nothing. **External mode therefore needs a minimum
+     of three GPUs**, not zero.
+   - **Internally deployed endpoints** (`external_services: false`): one GPU per VLM/LLM replica,
+     plus **two** GPUs per image2video replica (`gpu_count: 2`, `host_ipc: true`) — four GPUs for
+     one replica of each service.
+   - **Internal mode total = both sources combined**: the three task-pod GPUs plus the four
+     endpoint GPUs — **at minimum seven GPUs**, not four.
 
 5. **Stale failed pods** — before triggering, check for accumulated failed pods in the compute
    namespace and report them. They are retained by design and do not affect run correctness, but
@@ -143,14 +166,10 @@ and trigger.
 
 ## Bundled tools
 
-- `scripts/upload_images.py`: validate/upload local `<person_id>/<image>.(jpg|jpeg|png)` data.
+- `scripts/upload_images.py`: validate/upload a local seed image or flat directory of seed images.
 - `scripts/payload.py`: render or validate a standalone
-  `ImageAttributeAugmentationDagPayloadConfig`-compatible JSON.
-- `scripts/summarize_results.py`: summarize a downloaded `augmented_data.json` dataset.
-- `scripts/workflow.py`: drive the SDG webserver API — submit a run, poll its status, retrieve
-  results, or cancel a single named run by ID (cancels only that run; does not touch cluster
-  resources or other runs). Requires `WEBSERVER_ENDPOINT` and `NGC_API_KEY`. Prefer the Airflow
-  API path below for normal operation.
+  `EventVideoGenerationDagPayloadConfig`-compatible JSON.
+- `scripts/summarize_results.py`: summarize a downloaded `anomaly_dataset/dataset.json` dataset.
 
 Run commands from this skill directory. Credentials must be inherited from the shell that launched
 the agent; never ask the user to paste secret values into the prompt.
@@ -161,29 +180,34 @@ the agent; never ask the user to paste secret values into the prompt.
    - For local data, validate before upload:
 
      ```bash
-     python scripts/upload_images.py --path /path/to/crops --validate-only
+     python scripts/upload_images.py --path /path/to/seed-images --validate-only
      ```
 
-   - Then upload while preserving the hierarchy:
+   - Then upload:
 
      ```bash
      python scripts/upload_images.py \
-       --path /path/to/crops --destination-path image-attribute-augmentation/my-run
+       --path /path/to/seed-images --destination-path event-video-generation/my-run
      ```
 
-   - For an existing storage URL, use it unchanged after confirming it contains person-ID
-     subdirectories. Each immediate subdirectory of `input_path` is treated as one person ID, and
-     its images are combined into a single horizontal strip per person.
+   - For an existing storage URL, use it unchanged after confirming it names either a single
+     image or a flat directory of images (`.jpg`, `.jpeg`, `.png`, `.bmp`, `.gif`, `.tiff`,
+     `.webp`). Unlike person-crop workflows, there is no subdirectory convention — every matching
+     file directly under `input_path` is one input image. When `input_path` names a directory,
+     the DAG sorts matching files and takes the first `max_images` of them.
 
 2. Select service mode.
-   - `external` requires explicit VLM, LLM, and image-edit endpoint URLs.
+   - `external` requires explicit VLM, LLM, and image2video endpoint URLs.
    - `internal` lets the DAG's service lifecycle deploy all three services in-cluster.
    - Choose service mode independently from controller placement. A local controller may use
      external inference endpoints.
    - Keep nested service mode and output directory consistent with the top level.
-   - On Kubernetes each deployed endpoint claims one GPU from `k8s_gpu_1`, so internal mode needs
-     at least three allocatable GPUs (more if any `replicas` value is raised); external mode needs
-     none for inference.
+   - On Kubernetes, VLM and LLM each claim one GPU from `k8s_gpu_1`, but image2video claims
+     **two** GPUs per replica (`gpu_count: 2`, `host_ipc: true`) — four GPUs for the internally
+     deployed endpoints alone. That's on top of, not instead of, the three GPUs
+     `detection_and_tracking`/`captioning`/`visual_qa` always claim from `k8s_gpu_task` regardless
+     of service mode (see the readiness-check GPU breakdown above): **external mode needs a
+     minimum of three allocatable GPUs, internal mode a minimum of seven** — not zero and four.
 
 3. Read [payload-contract.md](references/payload-contract.md), then render a payload from the
    values collected above. Do not copy checked-in dev or CI payloads — they contain deployment-
@@ -193,26 +217,26 @@ the agent; never ask the user to paste secret values into the prompt.
 
    ```bash
    python scripts/payload.py render \
-     --input-path s3://bucket/input/person-crops/ \
-     --output-directory s3://bucket/output/image-attribute-augmentation/ \
+     --input-path s3://bucket/input/seed-images/ \
+     --output-directory s3://bucket/output/event-video-generation/ \
      --service-mode external \
      --vlm-url https://vlm.example/v1 \
      --llm-url https://llm.example/v1 \
-     --image-edit-url https://image-edit.example/v1 \
-     --max-imgs 10 --num-augmentation 3 \
+     --image2video-url https://image2video.example/v1 \
+     --max-images 10 --num-augmentation 3 \
      --variable-distribution assets/variable-distribution.json \
-     --output /tmp/iaa-payload.json
+     --output /tmp/evg-payload.json
    ```
 
    Internal:
 
    ```bash
    python scripts/payload.py render \
-     --input-path s3://bucket/input/person-crops/ \
-     --output-directory s3://bucket/output/image-attribute-augmentation/ \
+     --input-path s3://bucket/input/seed-images/ \
+     --output-directory s3://bucket/output/event-video-generation/ \
      --service-mode internal \
-     --max-imgs 10 --num-augmentation 3 \
-     --output /tmp/iaa-payload.json
+     --max-images 10 --num-augmentation 3 \
+     --output /tmp/evg-payload.json
    ```
 
    Show the user the rendered payload (or its validated contents) and get explicit confirmation
@@ -278,15 +302,15 @@ the agent; never ask the user to paste secret values into the prompt.
    an AWS profile, or instance role). Never ask the user to paste credentials into the prompt.
    Run artifacts live under `<output_directory>/<run_id>/`, where `<output_directory>` is the
    payload value and `<run_id>` is the `dag_run_id` from step 5. The final dataset is in
-   `augmented_dataset/`:
+   `anomaly_dataset/`:
 
    ```bash
-   aws s3 sync "<output_directory>/<run_id>/augmented_dataset/" /tmp/iaa-results/
-   python scripts/summarize_results.py --results-dir /tmp/iaa-results/augmented_dataset
+   aws s3 sync "<output_directory>/<run_id>/anomaly_dataset/" /tmp/evg-results/
+   python scripts/summarize_results.py --results-dir /tmp/evg-results
    ```
 
-   To inspect intermediate augmented images instead, sync `<output_directory>/<run_id>/cosmos/`
-   and read `output_metadata.json` from each `<person_id>/<augmentation_index>/` folder.
+   To inspect intermediate generated videos instead, sync `<output_directory>/<run_id>/cosmos/`
+   and read `metadata.json` from each `<video_key>/<augmentation_index>/` folder.
 
    Read [outputs.md](references/outputs.md) before interpreting files.
 
@@ -300,8 +324,10 @@ the agent; never ask the user to paste secret values into the prompt.
 - Do not show AWS credentials, Airflow bearer tokens, or S3 signed URLs.
 - Do not start multiple runs unless the user explicitly requests them.
 - Ask for a dataset location if none was supplied; this workflow has no implicit demo dataset.
-- Do not invent augmentation-only or labeling-only DAG IDs — only the DAG listed above exists.
+- Do not invent generation-only or labeling-only DAG IDs — only the DAG listed above exists.
 - Only offer a platform whose manifest exists and whose DAG is loaded in Airflow.
+- Do not route person-crop clothing/attribute augmentation requests here — that is
+  `image-attribute-augmentation-workflow`.
 
 ## References
 

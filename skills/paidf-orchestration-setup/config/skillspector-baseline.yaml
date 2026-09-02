@@ -55,4 +55,22 @@ rules:
     path: "references/topologies.md"
     message: "*.env*"
     reason: "False positive: prose referencing the secrets.env file by name in a safety instruction; no credential read/exfiltration."
+
+  # references/deploy-controller.md
+  - id: "PE3"
+    path: "references/deploy-controller.md"
+    message: "*KUBECONFIG*"
+    reason: "False positive: defensive documentation instructing the agent how to resolve a user-supplied KUBECONFIG env var safely; no credential read/exfiltration."
+  - id: "PE3"
+    path: "references/deploy-controller.md"
+    message: "*kubeconfig*"
+    reason: "False positive: defensive documentation about handling a user-supplied kubeconfig file; no credential read/exfiltration."
+  - id: "PE3"
+    path: "references/deploy-controller.md"
+    message: "*secrets.env*"
+    reason: "False positive: documentation referencing the secrets.env filename the user fills in locally; the skill never prints or exfiltrates its contents."
+  - id: "PE3"
+    path: "references/deploy-controller.md"
+    message: "*.env*"
+    reason: "False positive: prose referencing the secrets.env file by name in a safety instruction; no credential read/exfiltration."
 fingerprints: []

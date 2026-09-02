@@ -1,5 +1,5 @@
 ## Description: <br>
-Use when running image attribute augmentation and auto-labeling workflows on OSMO: flow selection, preflight, submit-time interpolation, monitoring, and output retrieval. <br>
+Run the PAIDF Orchestration Image Attribute Augmentation DAG on Kubernetes — person-crop clothing augmentation, attribute search, and augmented dataset generation. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers running image attribute augmentation and auto-labeling pipelines on NVIDIA OSMO to generate controlled appearance variations and attribute captions for person-crop datasets. <br>
+Developers and engineers use this skill to run image attribute augmentation pipelines on Kubernetes, generating controlled clothing and attribute variations for person-crop datasets in physical AI use cases. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [Yes] <br>
-**Credential Type(s):** [API key] <br>
+**Credential Type(s):** [API key, Cloud Credentials] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,18 +25,15 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Container Images](references/container-images.md) <br>
-- [Augmentation Flow](references/flows/augmentation.md) <br>
-- [Auto Labeling Flow](references/flows/auto_labeling.md) <br>
-- [End-to-End Flow](references/flows/e2e.md) <br>
-- [NIM Deployment](references/nim/README.md) <br>
-- [Setup Guide](references/setup.md) <br>
-- [Troubleshooting](references/troubleshooting.md) <br>
-- [NVIDIA OSMO](https://developer.nvidia.com/osmo) <br>
+- [airflow-direct-api.md](references/airflow-direct-api.md) <br>
+- [outputs.md](references/outputs.md) <br>
+- [payload-contract.md](references/payload-contract.md) <br>
+- [setup-and-preflight.md](references/setup-and-preflight.md) <br>
+- [troubleshooting.md](references/troubleshooting.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Files] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, API Calls] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -48,14 +45,14 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-10 evaluation tasks (7 positive, 3 negative) executed in isolated sandbox pods. <br>
+13 evaluation tasks (11 positive, 2 negative), each run in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks whether the skill helped complete the user's goal and followed expected workflow behavior. <br>
+- Discoverability: Checks whether the expected skill was found and executed. <br>
+- Effectiveness: Checks whether the user's goal was achieved and the expected workflow behavior was followed. <br>
 - Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
@@ -71,12 +68,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 49% → 88% (+38 points) | 55% → 85% (+30 points) |
-| Security | 70% → 100% (+30 points) | 60% → 90% (+30 points) |
-| Correctness | 26% → 92% (+66 points) | 58% → 80% (+22 points) |
-| Discoverability | 57% → 88% (+31 points) | 52% → 83% (+31 points) |
-| Effectiveness | 45% → 72% (+26 points) | 54% → 88% (+35 points) |
-| Efficiency | 48% → 86% (+38 points) | 51% → 85% (+33 points) |
+| Overall | 52% → 77% (+25 points) | 53% → 75% (+22 points) |
+| Security | 85% → 100% (+15 points) | 81% → 96% (+15 points) |
+| Correctness | 43% → 92% (+49 points) | 46% → 85% (+38 points) |
+| Discoverability | 40% → 68% (+28 points) | 37% → 66% (+29 points) |
+| Effectiveness | 46% → 75% (+30 points) | 48% → 66% (+18 points) |
+| Efficiency | 45% → 48% (+4 points) | 53% → 62% (+9 points) |
 
 ## Skill Version(s): <br>
 1.0.0 (source: frontmatter) <br>

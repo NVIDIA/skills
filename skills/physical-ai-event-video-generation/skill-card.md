@@ -1,5 +1,5 @@
 ## Description: <br>
-Run the PAIDF Orchestration Event Video Generation DAG end to end: seed-image input preparation, Cosmos3 image-to-video anomaly augmentation, auto-labeling, anomaly dataset generation, and result retrieval. <br>
+Run the PAIDF Orchestration Event Video Generation DAG on Kubernetes — image-to-video anomaly generation, auto-labeling, and anomaly dataset generation. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,16 +7,16 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to run event video generation workflows on Kubernetes for synthetic data generation of anomaly videos for physical AI use cases such as safety and surveillance. <br>
+Developers and engineers generating synthetic anomaly event videos from seed images for physical AI safety and surveillance use cases, including person-falling, person-climbing, fighting, fire/smoke, and shoplifting scenarios. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [Yes] <br>
-**Credential Type(s):** [Cloud Credentials, API key] <br>
+**Credential Type(s):** [API key, Cloud Credentials] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,11 +25,11 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [airflow-direct-api.md](references/airflow-direct-api.md) <br>
-- [outputs.md](references/outputs.md) <br>
-- [payload-contract.md](references/payload-contract.md) <br>
-- [setup-and-preflight.md](references/setup-and-preflight.md) <br>
-- [troubleshooting.md](references/troubleshooting.md) <br>
+- [Airflow Direct API](references/airflow-direct-api.md) <br>
+- [Outputs](references/outputs.md) <br>
+- [Payload Contract](references/payload-contract.md) <br>
+- [Setup and Preflight](references/setup-and-preflight.md) <br>
+- [Troubleshooting](references/troubleshooting.md) <br>
 
 
 ## Skill Output: <br>
@@ -45,38 +45,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-14 evaluation tasks (12 positive, 2 negative), each run in an isolated sandbox pod. <br>
+14 evaluation tasks (12 positive, 2 negative) in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Checks final-answer correctness against the reference answer. <br>
 - Discoverability: Checks whether the expected skill was found and executed. <br>
-- Effectiveness: Checks whether the user's goal was achieved and expected workflow behavior was followed. <br>
+- Effectiveness: Checks goal completion and expected workflow adherence (equal-weight mean). <br>
 - Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Verifies absence of unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies the expected skill was found and executed. <br>
-- `skill_efficiency`: Verifies routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Detects unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Verifies final-answer correctness against the reference answer. <br>
+- `skill_execution`: Verifies the expected skill was found and executed. <br>
 - `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
 - `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Verifies routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 48% → 87% (+39 points) | 46% → 83% (+37 points) |
-| Security | 79% → 100% (+21 points) | 82% → 89% (+7 points) |
-| Correctness | 36% → 93% (+57 points) | 33% → 83% (+50 points) |
-| Discoverability | 41% → 84% (+43 points) | 33% → 83% (+50 points) |
-| Effectiveness | 49% → 77% (+29 points) | 43% → 72% (+29 points) |
-| Efficiency | 38% → 81% (+43 points) | 40% → 88% (+47 points) |
+| Overall | 48% → 77% (+29 points) | 47% → 78% (+31 points) |
+| Security | 79% → 100% (+21 points) | 82% → 100% (+18 points) |
+| Correctness | 39% → 97% (+59 points) | 36% → 87% (+51 points) |
+| Discoverability | 38% → 64% (+27 points) | 32% → 70% (+38 points) |
+| Effectiveness | 45% → 77% (+32 points) | 44% → 71% (+26 points) |
+| Efficiency | 42% → 47% (+6 points) | 42% → 61% (+19 points) |
 
 ## Skill Version(s): <br>
-1.1.0 (source: pyproject.toml) <br>
+1.0.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

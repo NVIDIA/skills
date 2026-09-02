@@ -1,6 +1,19 @@
 ---
-name: write-dag
+name: paidf-orchestration-write-dag
 description: Use when a user describes a custom PAIDF Orchestration pipeline — a specific ordered combination of stages such as augmentation only, auto-labeling only, detection+captioning only, or image attribute augmentation without full auto-labeling — that no existing DAG in airflow/dags/workflows/ covers, and asks for a new Kubernetes DAG. Also use to check that a generated or existing DAG's model/container/prompt choices match an external spec document (e.g. a PAIDF `launchable.md`).
+version: "1.0.0"
+license: CC-BY-4.0 AND Apache-2.0
+metadata:
+  owner: NVIDIA
+  service: physical-ai-data-factory
+  version: 1.0.0
+  reviewed: '2026-09-02'
+  author: NVIDIA
+  tags:
+    - physical-ai
+    - paidf-orchestration
+    - airflow
+    - dag
 ---
 
 # Write DAG
@@ -289,7 +302,9 @@ that fails fast when `external_services: true` but a required service URL is mis
 
 ## Step 5: Register for Deployment
 
-There is no DB-seeding step in the current deployment flow. Run from the repo root:
+There is no DB-seeding step in the current deployment flow. The deploy command is `make sync-dag`
+(run from the repo root). **DO NOT RUN IT YET** — Step 8 gates this with explicit user confirmation
+after the readiness check:
 
 ```bash
 make sync-dag   # packages and uploads DAGs, plugins, and configs to S3

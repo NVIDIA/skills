@@ -9,16 +9,27 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `physical-ai-image-attribute-augmentation`
-- Evaluation date: 2026-08-13
-- Evaluator version: `1.2.4`
+- Evaluation date: 2026-09-02
+- Evaluator version: `1.3.2`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
-- Tasks: 10 evaluation tasks (7 positive, 3 negative)
-- Dataset digest: `sha256:08e695fc0c489146e8cb39e6b651ee5592a6da00f5f2ee28611bac05d927f532` (skill-evaluator-dataset-snapshot/1)
+- Tasks: 13 evaluation tasks (11 positive, 2 negative)
+- Dataset digest: `sha256:99c88f504e8f80580bc8aeaaa4fa48a2cbf2e11790619156b347231167b6b96b` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Execution and Provenance
+
+- Validation status: `passed`
+- Report generation: `complete`
+- Evaluator version: `1.3.2`
+- Git commit: `82224ec75d08e41cc5b92f7bf935f69c0def4607`
+- Content type: requested `auto`, detected `skill`
+- Container image: `gitlab-master.nvidia.com:5005/nvcarps/ci-group/nvcarps-ci/skillevaluator-ci:sha-82224ec75d08e41cc5b92f7bf935f69c0def4607`
+- Container image digest: `not recorded`
+- Tier 3: requested `true`, executed `true`, status `succeeded`
 
 ## What This Report Answers
 
@@ -34,12 +45,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 49% → 88% (+38 points) | 55% → 85% (+30 points) |
-| Security | 70% → 100% (+30 points) | 60% → 90% (+30 points) |
-| Correctness | 26% → 92% (+66 points) | 58% → 80% (+22 points) |
-| Discoverability | 57% → 88% (+31 points) | 52% → 83% (+31 points) |
-| Effectiveness | 45% → 72% (+26 points) | 54% → 88% (+35 points) |
-| Efficiency | 48% → 86% (+38 points) | 51% → 85% (+33 points) |
+| Overall | 52% → 77% (+25 points) | 53% → 75% (+22 points) |
+| Security | 85% → 100% (+15 points) | 81% → 96% (+15 points) |
+| Correctness | 43% → 92% (+49 points) | 46% → 85% (+38 points) |
+| Discoverability | 40% → 68% (+28 points) | 37% → 66% (+29 points) |
+| Effectiveness | 46% → 75% (+30 points) | 48% → 66% (+18 points) |
+| Efficiency | 45% → 48% (+4 points) | 53% → 62% (+9 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.
 
@@ -49,16 +60,19 @@ Example: `47% → 92% (+45 points)` means the skill-assisted run scored 92%, 45 
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 1 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 4 finding(s) |
 | Tier 2 | Semantic deduplication | **NOT RUN** | No result was recorded |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 10 task(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 13 task(s) |
 
 ## Findings and Observations
 
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'version' is ignored; use 'metadata.version' (`skills/physical-ai-image-attribute-augmentation/SKILL.md`)
+- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/physical-ai-image-attribute-augmentation/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/physical-ai-image-attribute-augmentation/SKILL.md`)
+- **LOW** SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/physical-ai-image-attribute-augmentation/SKILL.md`)
 
 </details>
 

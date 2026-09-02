@@ -22,7 +22,7 @@
     "expected_behavior": [
       "Sets external_services=false consistently across top level and cosmos.",
       "Enables VLM, LLM, and image2video lifecycle services.",
-      "Checks that at least four GPUs are allocatable before triggering (image2video needs two per replica).",
+      "Checks that at least seven GPUs are allocatable before triggering (3 for task pods + 4 for internal endpoints).",
       "Does not use repository dev/CI endpoint URLs."
     ]
   },
