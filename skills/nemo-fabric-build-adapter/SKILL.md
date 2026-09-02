@@ -54,6 +54,9 @@ translation:
 - Set the current `contract_version`, a globally stable `adapter_id`,
   `adapter_kind`, and runner binding.
 - Declare only normalized `config.accepts` fields the implementation enforces.
+- When accepting `instructions.system`, declare the exact supported
+  `config.system_instruction_modes`. New descriptors must not rely on the
+  legacy omitted-value behavior, which means `replace` only.
 - Declare `mcp.auth.oauth2` or `mcp.auth.service_account` only when the adapter
   implements the corresponding MCP authentication mode.
 - Publish closed `settings_schema`, `model_schema`, `tool_definition_schema`,
@@ -105,7 +108,10 @@ Accept a validated `AgentConfig` and translate each declared field once at the
 adapter boundary:
 
 - Resolve named model roles into target-native model clients or settings.
-- Apply normalized instructions and runtime limits only when declared.
+- Apply normalized instructions and runtime limits only when declared. Validate
+  `instructions.system.mode` at the adapter startup boundary as well as during
+  planning; `replace` discards the harness default, while `append` preserves it
+  and adds the configured content after it.
 - Convert MCP servers, tool definitions, tool policy, and skills into native
   target constructs.
 - Resolve workflow entry points and construction settings during `start` in
@@ -196,6 +202,15 @@ the transport envelope or infer failure from fields inside `output`.
 Return `AgentRunStatus.FAILED` with an `AgentRunError` when the target completes
 with a failed outcome. Raise an exception when the adapter cannot produce a
 normalized terminal result.
+
+For in-process Relay SDK telemetry where the adapter owns the invocation-level
+Agent scope, wrap that scope with
+`nemo_fabric_adapters.common.utils.relay_request_context(context.request_id)`.
+The helper uses a UUID request ID as Relay's propagated root and always returns
+`nemo_fabric_request_id` metadata, including for non-UUID request IDs. Do not
+apply this pattern to an external Relay gateway or an upstream integration that
+creates an isolated scope context unless its boundary accepts a per-turn
+propagation context.
 
 ## Handle Custom Agents
 

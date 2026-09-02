@@ -60,5 +60,39 @@
       "Routes to the contribute-adapter maintainer workflow when it is available",
       "Keeps repository packaging, catalogs, CI, and release wiring out of the portable integration skill"
     ]
+  },
+  {
+    "id": "nemo-fabric-build-adapter-005-system-instruction-composition",
+    "question": "Our third-party harness has a native system prompt. Add normalized NeMo Fabric system instructions so consumers can either replace that prompt or append policy text after it. Define the descriptor claims, translation behavior, validation, and tests.",
+    "expected_skill": "nemo-fabric-build-adapter",
+    "expected_script": null,
+    "ground_truth": "The agent declares instructions.system in config.accepts and explicitly lists replace and append in config.system_instruction_modes. Planning rejects modes outside that declaration, and the adapter validates the mode again at startup before applying it. Omitting instructions.system preserves the harness-native prompt, replace discards it, and append preserves it and adds the configured content afterward. Tests cover omission, both supported modes, an unsupported mode, descriptor validation, and startup failure without silently falling back.",
+    "expected_behavior": [
+      "Routes to nemo-fabric-build-adapter",
+      "Declares instructions.system in config.accepts",
+      "Declares the exact supported values in config.system_instruction_modes",
+      "Preserves the harness-native prompt when instructions.system is omitted",
+      "Implements replace and append with distinct composition semantics",
+      "Validates the selected mode during planning and again at adapter startup",
+      "Rejects unsupported modes instead of falling back or silently ignoring them",
+      "Tests omission, replacement, append composition, descriptor claims, and unsupported-mode failure"
+    ]
+  },
+  {
+    "id": "nemo-fabric-build-adapter-006-relay-request-correlation",
+    "question": "Our in-process third-party adapter uses the common Fabric host and owns the invocation-level NeMo Relay Agent scope. Propagate each Fabric request ID into Relay while preserving useful correlation for both UUID and non-UUID request IDs. Explain the boundary and validation.",
+    "expected_skill": "nemo-fabric-build-adapter",
+    "expected_script": null,
+    "ground_truth": "The agent wraps the adapter-owned invocation-level Agent scope with nemo_fabric_adapters.common.utils.relay_request_context(context.request_id). A UUID request ID becomes Relay's propagated root, while every request ID is also emitted as nemo_fabric_request_id metadata; non-UUID values remain metadata only. The adapter does not apply this pattern to an external Relay gateway or an upstream integration that creates an isolated scope unless that boundary accepts a per-turn propagation context. Tests cover UUID and non-UUID IDs, metadata, scope cleanup, and the unsupported boundary without leaking scope state.",
+    "expected_behavior": [
+      "Routes to nemo-fabric-build-adapter",
+      "Uses relay_request_context with RuntimeContext.request_id",
+      "Uses a UUID request ID as Relay's propagated root",
+      "Always preserves the original value as nemo_fabric_request_id metadata",
+      "Keeps non-UUID request IDs in metadata without treating them as propagated UUID roots",
+      "Applies the helper only when the adapter owns the invocation-level Agent scope",
+      "Does not claim the same behavior for external gateways or isolated upstream scope boundaries",
+      "Tests UUID and non-UUID correlation plus scope cleanup"
+    ]
   }
 ]

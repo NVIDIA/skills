@@ -70,5 +70,22 @@
       "Awaits stream.result() for the normalized terminal result",
       "Calls aclose() when the consumer stops iterating early"
     ]
+  },
+  {
+    "id": "nemo-fabric-integrate-006-system-instruction-modes",
+    "question": "Our platform optionally supplies a system policy to different NeMo Fabric harnesses. Some jobs must preserve the harness-native prompt and append the policy, some must replace it, and jobs without a policy must leave the native prompt untouched. Map this through the public Python SDK and validate compatibility before execution.",
+    "expected_skill": "nemo-fabric-integrate",
+    "expected_script": null,
+    "ground_truth": "The agent maps a present policy to InstructionsConfig(system=InstructionConfig(content=..., mode=...)) and omits instructions entirely when no policy is configured. replace replaces the harness-native instruction; append preserves it and adds the configured policy afterward. The consumer does not concatenate harness prompts itself. It calls plan before startup so the selected adapter descriptor can reject an unsupported mode, and it does not assume every adapter supports append merely because replace is the default.",
+    "expected_behavior": [
+      "Routes to nemo-fabric-integrate",
+      "Uses public InstructionsConfig and InstructionConfig types",
+      "Omits instructions when the platform has no system policy",
+      "Maps the platform's explicit replace or append choice to InstructionConfig.mode",
+      "Does not concatenate or reproduce the harness-native prompt in consumer code",
+      "Uses plan before startup to validate the selected adapter's declared instruction modes",
+      "Does not assume append is supported by every adapter",
+      "Keeps replace and append semantics distinct"
+    ]
   }
 ]

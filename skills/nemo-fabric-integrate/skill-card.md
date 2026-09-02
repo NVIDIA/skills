@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when integrating NVIDIA NeMo Fabric into a consumer application, service, evaluation harness, or platform through the typed Python SDK — translating the consumer's own application, job, or deployment config into an in-memory FabricConfig, choosing the single-invocation convenience API or an explicitly started runtime, validating with plan and doctor, and consuming normalized results, artifacts, and telemetry. <br>
+Use this skill when integrating NVIDIA NeMo Fabric into a consumer application, service, evaluation harness, or platform through the typed Python SDK — translating the consumer’s own application, job, or deployment config into an in-memory FabricConfig, choosing the single-invocation convenience API or an explicitly started runtime, validating with plan and doctor, and consuming normalized results, artifacts, and telemetry. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -25,13 +25,13 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Config Mapping Reference](references/config-mapping.md) <br>
-- [Results and Errors Reference](references/results-and-errors.md) <br>
-- [SDK API Inventory](references/sdk-api-inventory.md) <br>
+- [config-mapping.md](references/config-mapping.md) <br>
+- [results-and-errors.md](references/results-and-errors.md) <br>
+- [sdk-api-inventory.md](references/sdk-api-inventory.md) <br>
 - [Python SDK Guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/sdk/python.mdx) <br>
 - [NeMo Fabric Overview](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/about-nemo-fabric/overview.mdx) <br>
 - [Installation Guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/getting-started/install.mdx) <br>
-- [Code Review Agent Example](https://github.com/NVIDIA/NeMo-Fabric/tree/main/examples/code_review_agent) <br>
+- [code_review_agent Example](https://github.com/NVIDIA/NeMo-Fabric/tree/main/examples/code_review_agent) <br>
 
 
 ## Skill Output: <br>
@@ -47,38 +47,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-5 evaluation tasks (3 positive, 2 negative) from skill-evaluator-dataset-snapshot/1. <br>
+6 evaluation tasks (4 positive, 2 negative), each run in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the final answer is correct against the reference answer. <br>
+- Correctness: Final-answer correctness against the reference answer. <br>
 - Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helps complete the user's goal and follows expected workflow behavior. <br>
-- Efficiency: Whether the skill avoids wasted tool or skill usage through quality routing and productive tool use. <br>
+- Effectiveness: Whether the skill helped complete the user’s goal and expected workflow (equal-weight mean of goal completion and behavior check). <br>
+- Efficiency: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
-- `skill_execution`: Verifies the expected skill was found and executed. <br>
-- `goal_accuracy`: Checks whether the user's goal was achieved. <br>
-- `behavior_check`: Checks whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `goal_accuracy`: Whether the user’s goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 57% → 87% (+30 points) | 56% → 79% (+23 points) |
-| Security | 90% → 100% (+10 points) | 40% → 40% (±0 points) |
-| Correctness | 32% → 84% (+52 points) | 60% → 88% (+28 points) |
-| Discoverability | 66% → 91% (+25 points) | 61% → 84% (+22 points) |
-| Effectiveness | 44% → 73% (+29 points) | 56% → 87% (+31 points) |
-| Efficiency | 51% → 86% (+34 points) | 62% → 97% (+35 points) |
+| Overall | 51% → 79% (+28 points) | 54% → 80% (+26 points) |
+| Security | 100% → 67% (-33 points) | 83% → 58% (-25 points) |
+| Correctness | 10% → 87% (+77 points) | 33% → 87% (+53 points) |
+| Discoverability | 66% → 93% (+27 points) | 59% → 86% (+27 points) |
+| Effectiveness | 22% → 70% (+48 points) | 33% → 73% (+40 points) |
+| Efficiency | 57% → 78% (+21 points) | 60% → 96% (+36 points) |
 
 ## Skill Version(s): <br>
-134c829 (source: git SHA, committed 2026-08-14) <br>
+ae47327 (source: git SHA, committed 2026-09-02) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

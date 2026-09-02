@@ -21,7 +21,7 @@ Import these from the top-level `nemo_fabric` package:
 | `WorkflowConfig` | Registered `target_id` and immutable construction settings. |
 | `DiscoveryConfig` | Explicit local descriptor files and directories. |
 | `ModelConfig` | Provider, model, credentials (`api_key_env`), endpoint, and sampling. |
-| `InstructionsConfig` / `InstructionConfig` | Portable agent instructions and replacement mode. |
+| `InstructionsConfig` / `InstructionConfig` | Portable agent instructions with `replace` or `append` composition. |
 | `RuntimeConfig` | Input/output labels, artifact location, invocation timeout, and harness turn limit. |
 | `EnvironmentConfig` | Execution environment, workspace, and harness-visible variables. |
 | `ToolsConfig` / `ToolDefinitionConfig` | Named tool and tool-group definitions plus selection and blocking policy. |
@@ -39,6 +39,11 @@ Claude and Codex validate every model role against their descriptor-owned
 `model_schema`. Provider identifiers outside their native `anthropic` and
 `openai` paths require both `ModelConfig.base_url` and
 `ModelConfig.api_key_env`; undeclared `ModelConfig.settings` also fail planning.
+
+Omit `instructions.system` to preserve the harness's native system instruction.
+When present, `InstructionConfig.mode` defaults to `replace`; set it to
+`append` only when the selected adapter descriptor advertises that mode.
+Planning rejects unsupported modes before adapter startup.
 
 ## Build And Shape
 
@@ -81,7 +86,10 @@ config = FabricConfig(
     },
     instructions=(
         InstructionsConfig(
-            system=InstructionConfig(content=job.system_instruction),
+            system=InstructionConfig(
+                content=job.system_instruction,
+                mode=job.system_instruction_mode,
+            ),
         )
         if job.system_instruction is not None
         else None
