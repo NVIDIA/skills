@@ -1,309 +1,327 @@
 ---
 name: physical-ai-image-attribute-augmentation
-description: >-
-  Use when running image attribute augmentation and
-  auto-labeling workflows on OSMO: flow selection, preflight, submit-time
-  interpolation, monitoring, and output retrieval. Trigger keywords: people
-  attribute search, Image Attribute Augmentation, person augmentation, attribute search, person
-  re-identification, clothing augmentation, person crop augmentation.
+description: Run the PAIDF Orchestration Image Attribute Augmentation DAG on Kubernetes - person-crop clothing augmentation, attribute search, and augmented dataset generation. Select for requests about image attribute augmentation, person attribute search, person re-identification data, clothing augmentation, attribute captions, augmentation payloads, run status, or result retrieval. Runs environment setup first when controller readiness is unknown. Not for video or defect-image generation.
+version: "1.0.0"
 license: CC-BY-4.0 AND Apache-2.0
 metadata:
   owner: NVIDIA
   service: physical-ai-data-factory
   version: 1.0.0
-  reviewed: '2026-06-05'
-  author: NVIDIA Physical AI Team <physical-ai@nvidia.com>
+  reviewed: '2026-09-02'
+  author: NVIDIA
   tags:
     - physical-ai
+    - paidf-orchestration
     - image-attribute-augmentation
-    - person-augmentation
-    - auto-labeling
-    - image-edit
+    - cosmos
 ---
 
-# Physical AI Image Attribute Augmentation Workflow Orchestrator
+# PAIDF Orchestration — Image Attribute Augmentation
 
-Default workflow skill for Image Attribute Augmentation execution on OSMO. It owns flow selection,
-preflight, submit-time interpolation, monitoring, and output retrieval.
+Run the Image Attribute Augmentation DAG end to end: person-crop input preparation, cosmos
+image-edit augmentation, cosmos post-processing, event and person attribute search, augmented
+dataset generation, and result retrieval.
 
-## Purpose
+## DAG selection
 
-Run the Image Attribute Augmentation and auto-labeling pipeline safely and
-reproducibly from preflight to output download.
+The workflow builds one DAG per compute platform from
+`airflow/dags/workflows/image_attribute_augmentation_dag/`:
 
-The Image Attribute Augmentation pipeline augments the **subject** in existing
-crop datasets by generating controlled appearance variations (image-domain) and
-synonymous attribute captions (text-domain). The subject is a person today
-(clothing/appearance attributes), but the same pipeline generalizes to other
-subjects — e.g. robots, forklifts, or vehicles in a simulation. It uses the
-`paidf-augmentation` container for image-edit augmentation with MCQ
-verification, and the `paidf-auto-labeling` container for subject-attribute
-captioning (currently the shipped `person_attributes` question bank).
-
-Do NOT use this skill for container-internal tuning-only questions.
-
-## Prerequisites
-
-Confirm these before running preflight or any submit. Missing required secrets
-surface as `USER_INPUT_REQUIRED:` from `scripts/preflight_credentials.sh`.
-
-| Requirement | How it is satisfied | Used for |
+| Platform | DAG ID | Manifest |
 |---|---|---|
-| NGC API key (optional) | `NGC_API_KEY`, `NGC_CLI_API_KEY`, or compatible `nvapi-*` token | Optional for `nvcr_io` credential refresh; default Image Attribute Augmentation image refs are public |
-| Hugging Face token | `HF_TOKEN` (or `HUGGING_FACE_HUB_TOKEN`), or a cached token at `~/.cache/huggingface/token` | Creates the OSMO `hf_token` credential |
-| OSMO CLI access | `osmo` on `PATH`, logged in, with a default profile and a registered DATA credential profile matching `storage_url` | Submitting/monitoring workflows and listing/downloading objects |
-| GPU pool | At least one `ONLINE` pool in `osmo pool list --mode free` | Scheduling setup + worker tasks |
-| Image Edit endpoint | In-cluster NIM `qwen-image-edit-2511` (reused if healthy, else deployed via the NIM operator); external opt-in via `image_edit_url` | Image-domain augmentation |
-| VLM endpoint | In-cluster NIM `qwen3-vl` (shared with VDA); external opt-in via `vlm_url` | MCQ verification and person-attribute captioning |
-| LLM endpoint | In-cluster NIM `qwen25-14b` (shared with VDA); external opt-in via `llm_url` | MCQ question generation |
+| Kubernetes | `image_attribute_augmentation_dag_k8s` | `image_attribute_augmentation_k8s_manifest.yaml` |
 
-## Instructions
+Kubernetes is the only platform whose manifest is checked in, so
+`image_attribute_augmentation_dag_k8s` is the only DAG this repository registers. A DAG is
+registered only if its manifest exists; a missing manifest means the DAG is absent from Airflow
+rather than broken. List the DAGs Airflow actually loaded before triggering, and never name a DAG
+ID that is not in that list.
 
-Execute these as an ordered sequence of gates. Each **Gate** must pass before
-continuing; on failure, stop and resolve it (do not skip ahead or submit).
+There is a **single end-to-end pipeline** — there are no augmentation-only or labeling-only DAG
+variants. If a user asks for augmentation without attribute search, tell them the checked-in DAG
+does not offer that flow rather than inventing a DAG ID.
 
-1. **Gate — Select the workflow.** Map the user's intent to exactly one flow
-   using the "Pick the right workflow" table below: augment/image-edit only →
-   `augmentation`; caption/label only → `auto_labeling`; full augment + caption
-   → `e2e`. Default to `e2e` **only** when the request is the full pipeline or
-   genuinely ambiguous — never default past an explicit "augment only" or
-   "label only" request, or you run the wrong pipeline.
-2. **Provide a tentative execution-time overview** before starting run actions.
-3. **Gate — Derive the dataset source.** Split the dataset URL at the
-   `/datasets/` segment: the part **before** it is `storage_url`, the part
-   **after** it is `dataset`. The workflow re-inserts that segment
-   (`{{storage_url}}/datasets/{{dataset}}`), so put `/datasets/` in **neither**
-   value — including it duplicates the path and the submit fails.
-   Example: `s3://metro-pas/datasets/reid-crops` → `storage_url=s3://metro-pas`,
-   `dataset=reid-crops`. Never guess or reuse a stale `storage_url`; if no
-   dataset is provided, ask for one. Do not proceed without both values.
-4. **Gate — Inference endpoints ready (non-negotiable).** Before submit, verify
-   each required NIM endpoint is healthy: `qwen-image-edit-2511` (image edit),
-   `qwen3-vl` (VLM), `qwen25-14b` (LLM). For any that is missing/unhealthy,
-   deploy it once via `references/nim/README.md` (a prerequisite, not a user
-   decision — do not pause to ask), then re-check readiness up to 3 times over
-   ~10 minutes. **Stop condition:** if an endpoint is still unhealthy after that
-   bound, do not retry further and do not submit — report the failing endpoint
-   and its deploy logs to the user and stop. Proceed only when all three respond
-   healthy.
-5. **Gate — Preflight and readiness.** Run
-   `scripts/preflight_credentials.sh --workflow assets/configs/osmo/<flow>.yaml`
-   and read the result. **PASS →** continue. If the output contains
-   `USER_INPUT_REQUIRED:`, ask one concise unblock question and re-run. Do not
-   submit until preflight passes.
-6. **Gate — Validate custom inputs (security).** Treat `cookbook` and every
-   `--set-string` value as untrusted. Accept only a known cookbook name and
-   values with no shell metacharacters (`;`, `|`, `&`, `$`, backticks, quotes,
-   spaces, newlines). **On any invalid value → stop, report which value was
-   rejected, and do not submit.** Only when every value passes → continue to
-   step 7.
-7. **Submit** the workflow with the validated interpolation values, then monitor
-   to completion.
-8. **Retrieve outputs** and summarize task outcomes.
+## Manual payload entry in the Airflow UI
 
-Use `run_script(...)` for script execution. Canonical examples:
+If the user wants to enter their own payload directly in the Airflow UI rather than have you
+construct and trigger one, your job is limited to getting them to the UI: confirm controller
+readiness, ensure `make port-forward` is running (see
+[airflow-direct-api.md](references/airflow-direct-api.md#port-forward-ui-access)), and report the
+reachable URL. Do not render a payload, run preflight, or trigger a run yourself in this case —
+the user is doing that from the UI. Resume monitoring (step 6 below) once they tell you a run has
+been triggered; you can find it via the Airflow API without needing the payload they used.
 
-```python
-run_script("bash scripts/preflight_credentials.sh --workflow assets/configs/osmo/e2e.yaml")
-```
+## Scope
 
-## Available Scripts
+**Before building any payload, collect all of the following from the user.** Do not fall back to
+repository defaults, CI payloads, or any hardcoded endpoint URL or bucket path.
 
-Use script-level `--help` for exact arguments.
-
-| Script | Role |
-|---|---|
-| `scripts/preflight_credentials.sh` | Secrets/control-plane preflight and workflow image access checks |
-| `scripts/augmentation_worker.sh` | Image-edit augmentation worker (preprocess, config gen, augment, post-process) |
-| `scripts/auto_labeling_worker.sh` | Person-attribute captioning worker |
-| `scripts/endpoint_common.sh` | Shared endpoint health/auth helpers |
-
-## Supported Flows
-
-| Flow | OSMO YAML | Group sequence | Typical use |
-|---|---|---|---|
-| `e2e` | `assets/configs/osmo/e2e.yaml` | setup -> augmentation -> auto_labeling | Full pipeline: augment person crops then generate captions |
-| `augmentation` | `assets/configs/osmo/augmentation.yaml` | setup -> augmentation | Image-edit augmentation only, no captioning |
-| `auto_labeling` | `assets/configs/osmo/auto_labeling.yaml` | setup -> auto_labeling | Captioning only on pre-augmented person crops |
-
-### Pick the right workflow for the user's request
-
-| User intent | Workflow |
-|---|---|
-| "Augment person crops and generate captions" / "full Image Attribute Augmentation pipeline" | `e2e` |
-| "Generate clothing variations" / "augment only" / "image edit" | `augmentation` |
-| "Caption augmented images" / "generate search queries" / "label only" | `auto_labeling` |
-
-## Disambiguation: handle vague requests before committing
-
-Default to autonomy: ask only when missing information blocks execution.
-
-### Autonomous defaults (do NOT ask)
-
-- Select the flow per Instructions Gate 1; default to `e2e` only when the request is the full pipeline or ambiguous (not for explicit augment-only / label-only).
-- If cookbook is not specified, default to `default`.
-- If `n_augmentations` is not specified, default to `3`.
-- After any stage completes successfully, continue to the next stage immediately.
-
-### Triggers that should pause for disambiguation
-
-| Missing input | Why it matters | Ask |
+| Required | Field | What to ask |
 |---|---|---|
-| `USER_INPUT_REQUIRED` from preflight | Required secret is missing | Ask one concise unblock question |
-| Storage backend prefix cannot be derived | Wrong scheme causes runtime storage auth mismatch | "What is the backend-native root prefix for this run?" |
-| No ONLINE GPU pool/platform | Workflow cannot schedule | "Which GPU pool/platform should this run target?" |
-| NIM deploy fails and no external URLs given | Workers cannot connect to models | "Provide Image Edit / VLM / LLM endpoint URLs, or grant GPU capacity for the NIM operator deploy." |
+| Always | `input_path` | S3 (or HTTP/HTTPS) URL whose immediate subdirectories are person-ID folders |
+| Always | `output_directory` | Writable S3 URL where results should be written |
+| Always | service mode | `external` (user provides endpoint URLs) or `internal` (DAG deploys services in-cluster) |
+| External mode | `cosmos.vlm_service_url` | Full HTTPS URL for the VLM inference endpoint |
+| External mode | `cosmos.llm_service_url` | Full HTTPS URL for the LLM inference endpoint |
+| External mode | `cosmos.image_edit_service_url` | Full HTTPS URL for the image-edit inference endpoint |
+| Optional | `max_imgs` | Number of person-ID folders to process (default: 1; 0 or negative = all) |
+| Optional | `cosmos.num_augmentation` | Clothing variants per person (default: 1) |
+| Optional | `cosmos.variable_distribution` | Clothing attribute distribution file path (see payload-contract.md) |
 
-## Step 0: Select Flow and Gather Inputs
+If the user does not provide a required value, ask for it explicitly before proceeding. Do not
+invent or reuse values from previous runs or checked-in files.
 
-### Input data policy
+**Always run the following readiness checks before triggering a run.** The checks are
+short-circuiting — stop at the first failure and route to the environment-setup skill immediately.
 
-- Image Attribute Augmentation requires person-crop images organized as `<person_id>/<view>.jpg` subdirectories.
-- Always preserve user-provided dataset inputs as first-class.
-- Never replace an explicit user dataset with demo assets.
-- If no dataset is provided, ask for one (Image Attribute Augmentation has no built-in demo dataset).
+**Before any check**, establish the cluster connection. The cluster is reached only through
+credentials the user supplies — they are never part of the repository. Check whether the cluster
+credential file path is already exported in the shell environment; if not, ask the user for the
+absolute path before running any cluster command. Never assume a path or fall back to any on-disk
+default — see [setup-and-preflight.md](references/setup-and-preflight.md#cluster-access) for the
+full procedure.
 
-Collect only missing values:
+The controller (Airflow) and DAG compute tasks run on the same cluster unless a different remote
+cluster connection was configured. GPU capacity is checked on this cluster.
 
-1. Dataset source (`storage_url` + `dataset`) — a **derived** value: split the
-   dataset URL at `/datasets/` per Instructions Gate 3
-   (`s3://metro-pas/datasets/reid-crops` → `storage_url=s3://metro-pas`,
-   `dataset=reid-crops`). Put `/datasets/` in neither value; never guess.
-2. Flow — select per Instructions Gate 1 (augment-only → `augmentation`, label-only → `auto_labeling`, else `e2e`).
-3. OSMO `gpu_platform` (auto-select when unambiguous).
-4. Endpoint URLs for Image Edit, VLM, and LLM — optional; default to in-cluster
-   NIMs and only set for external endpoints.
-5. Number of augmentations per person ID (default: 3).
-
-Generate run stamp before each submit:
-
-```bash
-STAMP=$(cat /proc/sys/kernel/random/uuid | cut -c1-8)
-RUN_ID="run-$STAMP"
-```
-
-## Execution Time Overview (required before run)
-
-Before running any mutating command, provide a short ETA overview.
-
-Baseline ranges:
-
-| Phase | Typical duration |
-|---|---|
-| Credentials + preflight | ~1-2 min |
-| Workflow submit + queue/start | ~1-3 min |
-
-Workflow runtime (depends on dataset size and endpoint latency):
-
-| Flow | Per-image time | Typical dataset (100 images, 3 augs) |
-|---|---|---|
-| `augmentation` | ~2.5-3 min/image | ~4-5 hours |
-| `auto_labeling` | ~1-2 min/image | ~2-3 hours |
-| `e2e` | ~3.5-5 min/image | ~6-8 hours |
-
-## Common Preconditions (all flows)
-
-1. **Credential and control-plane preflight**
+1. **Controller pods** — check that the Airflow controller pods (not DAG task pods) are Running.
+   DAG task pods in `Pending` or `Failed` state are normal and must not be mistaken for controller
+   failures:
 
    ```bash
-   bash scripts/preflight_credentials.sh --workflow assets/configs/osmo/<flow>.yaml
+   kubectl get pods -n sdg-workflow -l "release=sdg-workflow-controller"
    ```
 
-   If output contains `USER_INPUT_REQUIRED:`, ask one concise unblock question.
+   All pods matching the `release=sdg-workflow-controller` label must be `Running`. If the
+   namespace is absent, this is a first-install condition — route to the environment-setup skill,
+   do not diagnose further.
 
-2. **Storage interpolation policy**
+2. **Airflow API** — reachable only if check 1 passes. First establish `AIRFLOW_URL` from the
+   Kubernetes ClusterIP (always routable from the host, no port-forward required):
 
-   `storage_url` must be derived from the actual dataset/upload backend.
-   Never silently default to stale values on mismatched backends.
+   ```bash
+   AIRFLOW_URL="http://$(kubectl get svc -n sdg-workflow \
+     sdg-workflow-controller-api-server \
+     -o jsonpath='{.spec.clusterIP}'):8080"
+   ```
 
-3. **Inference policy (non-negotiable)** — endpoint readiness is executed at
-   **Instructions Gate 4** (verify → deploy once → bounded re-check → stop and
-   escalate on failure). This section only adds the standing constraints:
+   Then confirm the target DAG is loaded and `is_paused: False`. See
+   [airflow-direct-api.md](references/airflow-direct-api.md) for the full auth + check sequence.
+   If the API is unreachable, route to the environment-setup skill.
 
-   - Image Attribute Augmentation does NOT launch inference servers inside the OSMO workflow; workers
-     consume the `image_edit_url` / `vlm_url` / `llm_url` endpoints.
-   - External endpoints are opt-in only (explicit request or explicit URLs);
-     only then override the `*_url` values at submit.
-   - Never scale down/delete existing NIMs to free GPUs.
+3. **Pools** — only if check 2 passes. Required pools with open slots: `k8s_gpu_1`,
+   `default_pool`, and the augmentation pool for the chosen mode
+   (`external_image_edit_service_pool` for external, `iaa_internal_image_edit_service_pool` for
+   internal).
 
-## Submit (all flows)
+4. **Compute-cluster GPUs** — check the cluster (using the cluster connection established above):
 
-Every flow uses the same submit shape; only the workflow YAML changes.
+   ```bash
+   kubectl get nodes \
+     -o custom-columns='NAME:.metadata.name,GPU_ALLOC:.status.allocatable.nvidia\.com/gpu'
+   # Also check pods already consuming GPUs — capacity ≠ availability on a shared cluster
+   kubectl get pods -n sdg-workflow \
+     --field-selector=status.phase=Running -o wide
+   ```
 
-```bash
-SKILLS_DIR="$(cd "$(git rev-parse --show-toplevel)/skills/physical-ai-image-attribute-augmentation" && pwd)"
-STAMP=$(cat /proc/sys/kernel/random/uuid | cut -c1-8)
-osmo workflow submit assets/configs/osmo/<flow>.yaml \
-  --pool <pool> \
-  --set-string \
-    dataset=<dataset> \
-    run_id=run-$STAMP \
-    storage_url=<backend-prefix> \
-    gpu_platform=<gpu-platform> \
-    skills_dir="$SKILLS_DIR"
-```
+   The compute cluster is **shared** — other users' runs may be active. Report GPUs as
+   free-versus-total, not just allocatable. External mode needs no GPUs for inference — every task
+   pod (`augmentation`, `cosmos_post_processing`, `event_and_person_attribute_search`) runs on a
+   CPU profile, unlike EVG's `k8s_gpu_task`-profiled auto-labeling stages. Internal mode needs at
+   least one GPU per service replica (VLM, LLM, image-edit = at minimum three).
 
-Endpoints default to the in-cluster NIMs (`image_edit_url` / `vlm_url` /
-`llm_url`); deploy/reuse them per the Inference policy above. Do not pass these
-unless using external endpoints.
+5. **Stale failed pods** — before triggering, check for accumulated failed pods in the compute
+   namespace and report them. They are retained by design and do not affect run correctness, but
+   they consume namespace quota and clutter log searches:
 
-Compatibility note:
-- Use exactly one `--set-string` flag and pass all key/value pairs after it.
-- Do not repeat `--set`/`--set-string` flags in the same command.
+   ```bash
+   kubectl get pods -n sdg-workflow \
+     --field-selector=status.phase=Failed \
+     -o custom-columns='NAME:.metadata.name,AGE:.metadata.creationTimestamp,DAG:.metadata.labels.dag_id'
+   ```
 
-Common optional overrides (append to the same `--set-string` list). These
-values are passed through to the augmentation worker and used to build its
-command, so validate them first per Instructions Gate 6 — accept only a known
-`cookbook` name and values free of shell metacharacters:
+   Clean up only pods whose `dag_id` label matches a run you own, after confirming with the user.
 
-```bash
-cookbook=<cookbook_name> \
-n_augmentations=<count> \
-image_edit_url=<image-edit-endpoint> \
-vlm_url=<vlm-endpoint> \
-llm_url=<llm-endpoint>
-```
+Document each check result explicitly.
 
-## OSMO Monitoring
+**If any check fails**: invoke the environment-setup skill automatically — do not wait for the user
+to say "set up" or ask them to name the skill.
 
-```bash
-# Workflow status + task states
-osmo workflow query <workflow_id> --format-type json \
-  | jq '{status, tasks: [.groups[].tasks[] | {name, status, exit_code}]}'
+**If the user's request implies first-time or explicit deployment** ("deploy", "install", "set up",
+"reinstall", "redeploy", "full setup"): invoke the environment-setup skill even if all checks
+pass, and confirm the planned commands first.
 
-# Logs for a specific task
-osmo workflow logs <workflow_id> --task <task_name> -n 200
+**If all checks pass** and the user only wants to run the workflow: proceed directly to payload
+and trigger.
 
-# Output retrieval
-osmo data list --no-pager <output_url>
-osmo data download <output_url> <local_dir>/
-```
+## Bundled tools
 
-For runs expected to exceed two minutes, send heartbeat updates at least every
-two minutes.
+- `scripts/upload_images.py`: validate/upload local `<person_id>/<image>.(jpg|jpeg|png)` data.
+- `scripts/payload.py`: render or validate a standalone
+  `ImageAttributeAugmentationDagPayloadConfig`-compatible JSON.
+- `scripts/summarize_results.py`: summarize a downloaded `augmented_data.json` dataset.
+- `scripts/workflow.py`: drive the SDG webserver API — submit a run, poll its status, retrieve
+  results, or cancel a single named run by ID (cancels only that run; does not touch cluster
+  resources or other runs). Requires `WEBSERVER_ENDPOINT` and `NGC_API_KEY`. Prefer the Airflow
+  API path below for normal operation.
 
-## Post-Run Output
+Run commands from this skill directory. Credentials must be inherited from the shell that launched
+the agent; never ask the user to paste secret values into the prompt.
 
-After successful completion, the output directory contains:
+## Procedure
 
-For `augmentation` / `e2e`:
-- `<person_id>/aug_<n>/output.jpg` — augmented multi-pane image
-- `<person_id>/aug_<n>/output.txt` — natural-language caption
-- `<person_id>/aug_<n>/output_metadata.json` — verification results
-- `dataset/augmented_data.json` — structured dataset with attributes and queries
-- `dataset/augmented_imgs/` — split per-view crops
+1. Determine the input source.
+   - For local data, validate before upload:
 
-For `auto_labeling`:
-- `caption_<id>/task/open_qa.json` — person-attribute captions grouped by question bank
+     ```bash
+     python scripts/upload_images.py --path /path/to/crops --validate-only
+     ```
 
-## Supporting files
+   - Then upload while preserving the hierarchy:
 
-Use these canonical locations:
+     ```bash
+     python scripts/upload_images.py \
+       --path /path/to/crops --destination-path image-attribute-augmentation/my-run
+     ```
 
-- Workflows: `assets/configs/osmo/*.yaml`
-- Runtime scripts: `scripts/*.sh`
-- Flow walkthroughs: `references/flows/*.md`
-- Setup and triage: `references/setup.md`, `references/troubleshooting.md`
-- Images: `references/container-images.md`
-- Cookbook tuning: `assets/cookbooks/default/README.md`
+   - For an existing storage URL, use it unchanged after confirming it contains person-ID
+     subdirectories. Each immediate subdirectory of `input_path` is treated as one person ID, and
+     its images are combined into a single horizontal strip per person.
 
+2. Select service mode.
+   - `external` requires explicit VLM, LLM, and image-edit endpoint URLs.
+   - `internal` lets the DAG's service lifecycle deploy all three services in-cluster.
+   - Choose service mode independently from controller placement. A local controller may use
+     external inference endpoints.
+   - Keep nested service mode and output directory consistent with the top level.
+   - On Kubernetes each deployed endpoint claims one GPU from `k8s_gpu_1`, so internal mode needs
+     at least three allocatable GPUs (more if any `replicas` value is raised); external mode needs
+     none for inference.
+
+3. Read [payload-contract.md](references/payload-contract.md), then render a payload from the
+   values collected above. Do not copy checked-in dev or CI payloads — they contain deployment-
+   specific endpoint URLs and bucket paths that must not be inherited by user runs.
+
+   External:
+
+   ```bash
+   python scripts/payload.py render \
+     --input-path s3://bucket/input/person-crops/ \
+     --output-directory s3://bucket/output/image-attribute-augmentation/ \
+     --service-mode external \
+     --vlm-url https://vlm.example/v1 \
+     --llm-url https://llm.example/v1 \
+     --image-edit-url https://image-edit.example/v1 \
+     --max-imgs 10 --num-augmentation 3 \
+     --variable-distribution assets/variable-distribution.json \
+     --output /tmp/iaa-payload.json
+   ```
+
+   Internal:
+
+   ```bash
+   python scripts/payload.py render \
+     --input-path s3://bucket/input/person-crops/ \
+     --output-directory s3://bucket/output/image-attribute-augmentation/ \
+     --service-mode internal \
+     --max-imgs 10 --num-augmentation 3 \
+     --output /tmp/iaa-payload.json
+   ```
+
+   Show the user the rendered payload (or its validated contents) and get explicit confirmation
+   before proceeding. Only continue to preflight and triggering if they confirm; if they want
+   changes, re-render and re-confirm.
+
+4. Preflight the DAG through the Airflow API. Check that the DAG is loaded, required pools have
+   slots, and controller pods are healthy — see
+   [airflow-direct-api.md#preflight-direct-path](references/airflow-direct-api.md#preflight-direct-path).
+   Confirm presence only; never print credential values.
+
+5. Submit exactly one DAG run. Pass the payload from step 3 as `conf.payload` — see
+   [airflow-direct-api.md#trigger-a-run](references/airflow-direct-api.md#trigger-a-run) for the
+   full request shape. Record and return the `dag_run_id`, input path, output directory, and
+   service mode.
+
+6. Immediately after triggering — without waiting to be asked — monitor the run until it reaches
+   a terminal state (`success` or `failed`). Poll the Airflow API every 60–120 seconds:
+
+   ```bash
+   # Poll run state
+   RESPONSE=$(curl -s -H "Authorization: Bearer $TOKEN" \
+     "$AIRFLOW_URL/api/v2/dags/$DAG_ID/dagRuns/$RUN_ID")
+   RESPONSE="$RESPONSE" python3 -c "import json, os; print(json.loads(os.environ['RESPONSE'])['state'])"
+   ```
+
+   For a per-task breakdown when state is `running` or `failed`, see
+   [airflow-direct-api.md](references/airflow-direct-api.md#per-task-breakdown-useful-for-diagnosing-failures).
+
+   Stop polling as soon as the run state is `success` or `failed`. Use the polling loop that
+   fits your runtime — a shell `while` loop, a background process, or a tool-native scheduler.
+   Do not block the user waiting for each poll; report state changes as they occur.
+
+   Tell the user they can also watch progress live in the Airflow UI. `make port-forward` runs in
+   the foreground and never exits, so start it as a background job — and prefer that the user runs
+   it in their own terminal, since an agent-owned forward dies with the session. Resolve the host's
+   real address rather than reporting a placeholder or `localhost`, which is meaningless from
+   another machine:
+
+   ```bash
+   HOST_IP=$(hostname -I | awk '{print $1}')
+   echo "Airflow UI: http://$HOST_IP:8080"
+   ```
+
+   Default credentials are `admin`/`admin`, defined in `deploy/values.yaml` under
+   `airflow.createUserJob.defaultUser` (not `webserver.defaultUser`). Update them before
+   production use.
+
+   For a full per-task breakdown see
+   [airflow-direct-api.md](references/airflow-direct-api.md#per-task-breakdown-useful-for-diagnosing-failures).
+
+   To stop an in-progress run: open the Airflow UI, find the active DagRun, locate the running
+   task, and mark it **Failed** (task menu → Mark Failed). This triggers the DAG's shutdown path,
+   cleaning up Deployments, Services, and GPU pods. Do not delete the DagRun or the DAG — that
+   bypasses cleanup and leaves stale cluster resources.
+
+7. After the run reaches `success` or `failed`, ask the user:
+   **"Would you like to download and analyze the results?"**
+   Do not download automatically — wait for confirmation.
+
+   If the user confirms, use whatever AWS credentials are already available in the shell
+   environment (standard `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_DEFAULT_REGION`,
+   an AWS profile, or instance role). Never ask the user to paste credentials into the prompt.
+   Run artifacts live under `<output_directory>/<run_id>/`, where `<output_directory>` is the
+   payload value and `<run_id>` is the `dag_run_id` from step 5. The final dataset is in
+   `augmented_dataset/`:
+
+   ```bash
+   aws s3 sync "<output_directory>/<run_id>/augmented_dataset/" /tmp/iaa-results/
+   python scripts/summarize_results.py --results-dir /tmp/iaa-results/augmented_dataset
+   ```
+
+   To inspect intermediate augmented images instead, sync `<output_directory>/<run_id>/cosmos/`
+   and read `output_metadata.json` from each `<person_id>/<augmentation_index>/` folder.
+
+   Read [outputs.md](references/outputs.md) before interpreting files.
+
+## Guardrails
+
+- **Never use default endpoint URLs, bucket paths, or input paths from the codebase or
+  checked-in payloads.** Always ask the user for every deployment-specific value before building
+  a payload. If a required value is missing, stop and ask — do not substitute a guess.
+- Preserve explicit user inputs and endpoint/model selections throughout the session.
+- Do not submit if payload validation, local dataset validation, or Airflow preflight fails.
+- Do not show AWS credentials, Airflow bearer tokens, or S3 signed URLs.
+- Do not start multiple runs unless the user explicitly requests them.
+- Ask for a dataset location if none was supplied; this workflow has no implicit demo dataset.
+- Do not invent augmentation-only or labeling-only DAG IDs — only the DAG listed above exists.
+- Only offer a platform whose manifest exists and whose DAG is loaded in Airflow.
+
+## References
+
+- Read [setup-and-preflight.md](references/setup-and-preflight.md) for environment, storage, and
+  policy requirements.
+- Read [payload-contract.md](references/payload-contract.md) when creating or changing a payload.
+- Read [outputs.md](references/outputs.md) when retrieving or interpreting results.
+- Read [troubleshooting.md](references/troubleshooting.md) after validation, API, or runtime errors.
+- Read [airflow-direct-api.md](references/airflow-direct-api.md) for all Airflow interactions:
+  preflight, triggering, monitoring, per-task breakdown, and log retrieval.

@@ -1,4 +1,4 @@
-# Skill Benchmark: image-attribute-augmentation-workflow
+# Skill Benchmark: physical-ai-event-video-generation
 
 > ✅ **Overall verdict: PASS — Recommended for publication**
 
@@ -8,12 +8,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 ## Evaluation Metadata
 
-- Skill: `image-attribute-augmentation-workflow`
-- Evaluation date: 2026-09-01
+- Skill: `physical-ai-event-video-generation`
+- Evaluation date: 2026-09-02
 - Evaluator version: `1.3.2`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
-- Tasks: 13 evaluation tasks (11 positive, 2 negative)
-- Dataset digest: `sha256:99c88f504e8f80580bc8aeaaa4fa48a2cbf2e11790619156b347231167b6b96b` (skill-evaluator-dataset-snapshot/1)
+- Tasks: 14 evaluation tasks (12 positive, 2 negative)
+- Dataset digest: `sha256:284eed42522107dfe074b0434440aec51f8398f48d51f34e9706513fcdc72fa2` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 3 evidence: required for publication
@@ -25,9 +25,9 @@ Each task attempt ran in its own isolated sandbox pod.
 - Validation status: `passed`
 - Report generation: `complete`
 - Evaluator version: `1.3.2`
-- Git commit: `fed6620cbc44a5e8d7e78ab0dd044258b667efc7`
+- Git commit: `82224ec75d08e41cc5b92f7bf935f69c0def4607`
 - Content type: requested `auto`, detected `skill`
-- Container image: `gitlab-master.nvidia.com:5005/nvcarps/ci-group/nvcarps-ci/skillevaluator-ci:sha-fed6620cbc44a5e8d7e78ab0dd044258b667efc7`
+- Container image: `gitlab-master.nvidia.com:5005/nvcarps/ci-group/nvcarps-ci/skillevaluator-ci:sha-82224ec75d08e41cc5b92f7bf935f69c0def4607`
 - Container image digest: `not recorded`
 - Tier 3: requested `true`, executed `true`, status `succeeded`
 
@@ -45,12 +45,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 51% → 90% (+39 points) | 50% → 84% (+34 points) |
-| Security | 92% → 100% (+8 points) | 69% → 100% (+31 points) |
-| Correctness | 43% → 95% (+52 points) | 45% → 88% (+43 points) |
-| Discoverability | 36% → 87% (+51 points) | 38% → 80% (+42 points) |
-| Effectiveness | 46% → 79% (+34 points) | 49% → 61% (+13 points) |
-| Efficiency | 39% → 89% (+50 points) | 47% → 90% (+44 points) |
+| Overall | 48% → 77% (+29 points) | 47% → 78% (+31 points) |
+| Security | 79% → 100% (+21 points) | 82% → 100% (+18 points) |
+| Correctness | 39% → 97% (+59 points) | 36% → 87% (+51 points) |
+| Discoverability | 38% → 64% (+27 points) | 32% → 70% (+38 points) |
+| Effectiveness | 45% → 77% (+32 points) | 44% → 71% (+26 points) |
+| Efficiency | 42% → 47% (+6 points) | 42% → 61% (+19 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.
 
@@ -60,18 +60,19 @@ Example: `47% → 92% (+45 points)` means the skill-assisted run scored 92%, 45 
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 3 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 4 finding(s) |
 | Tier 2 | Semantic deduplication | **NOT RUN** | No result was recorded |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 13 task(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 14 task(s) |
 
 ## Findings and Observations
 
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/image-attribute-augmentation-workflow/SKILL.md`)
-- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/image-attribute-augmentation-workflow/SKILL.md`)
-- **MEDIUM** SCHEMA/author_missing: Author not specified in metadata (`skills/image-attribute-augmentation-workflow/SKILL.md`)
+- **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'version' is ignored; use 'metadata.version' (`skills/physical-ai-event-video-generation/SKILL.md`)
+- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/physical-ai-event-video-generation/SKILL.md`)
+- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/physical-ai-event-video-generation/SKILL.md`)
+- **LOW** SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/physical-ai-event-video-generation/SKILL.md`)
 
 </details>
 

@@ -1,4 +1,4 @@
-# Skill Benchmark: orchestration-setup
+# Skill Benchmark: paidf-orchestration-setup
 
 > ✅ **Overall verdict: PASS — Recommended for publication**
 
@@ -8,8 +8,8 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 ## Evaluation Metadata
 
-- Skill: `orchestration-setup`
-- Evaluation date: 2026-09-01
+- Skill: `paidf-orchestration-setup`
+- Evaluation date: 2026-09-02
 - Evaluator version: `1.3.2`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 10 evaluation tasks (10 positive)
@@ -25,9 +25,9 @@ Each task attempt ran in its own isolated sandbox pod.
 - Validation status: `passed`
 - Report generation: `complete`
 - Evaluator version: `1.3.2`
-- Git commit: `fed6620cbc44a5e8d7e78ab0dd044258b667efc7`
+- Git commit: `82224ec75d08e41cc5b92f7bf935f69c0def4607`
 - Content type: requested `auto`, detected `skill`
-- Container image: `gitlab-master.nvidia.com:5005/nvcarps/ci-group/nvcarps-ci/skillevaluator-ci:sha-fed6620cbc44a5e8d7e78ab0dd044258b667efc7`
+- Container image: `gitlab-master.nvidia.com:5005/nvcarps/ci-group/nvcarps-ci/skillevaluator-ci:sha-82224ec75d08e41cc5b92f7bf935f69c0def4607`
 - Container image digest: `not recorded`
 - Tier 3: requested `true`, executed `true`, status `succeeded`
 
@@ -45,12 +45,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 62% → 93% (+31 points) | 61% → 64% (+3 points) |
-| Security | 80% → 90% (+10 points) | 80% → 80% (±0 points) |
+| Overall | 64% → 93% (+28 points) | 62% → 71% (+10 points) |
+| Security | 90% → 90% (±0 points) | 80% → 90% (+10 points) |
 | Correctness | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Discoverability | 37% → 94% (+57 points) | 39% → 41% (+2 points) |
-| Effectiveness | 68% → 89% (+22 points) | 70% → 72% (+2 points) |
-| Efficiency | 24% → 93% (+68 points) | 18% → 29% (+11 points) |
+| Discoverability | 36% → 94% (+58 points) | 37% → 51% (+14 points) |
+| Effectiveness | 68% → 92% (+24 points) | 69% → 78% (+10 points) |
+| Efficiency | 28% → 88% (+59 points) | 22% → 36% (+15 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.
 
@@ -60,7 +60,7 @@ Example: `47% → 92% (+45 points)` means the skill-assisted run scored 92%, 45 
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 3 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 4 finding(s) |
 | Tier 2 | Semantic deduplication | **NOT RUN** | No result was recorded |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 10 task(s) |
 
@@ -69,9 +69,10 @@ Example: `47% → 92% (+45 points)` means the skill-assisted run scored 92%, 45 
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/orchestration-setup/SKILL.md`)
-- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/orchestration-setup/SKILL.md`)
-- **MEDIUM** SCHEMA/author_missing: Author not specified in metadata (`skills/orchestration-setup/SKILL.md`)
+- **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'version' is ignored; use 'metadata.version' (`skills/paidf-orchestration-setup/SKILL.md`)
+- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/paidf-orchestration-setup/SKILL.md`)
+- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/paidf-orchestration-setup/SKILL.md`)
+- **LOW** SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/paidf-orchestration-setup/SKILL.md`)
 
 </details>
 

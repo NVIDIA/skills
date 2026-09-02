@@ -1,4 +1,4 @@
-# Skill Benchmark: write-dag
+# Skill Benchmark: paidf-orchestration-write-dag
 
 > ✅ **Overall verdict: PASS — Recommended for publication**
 
@@ -8,8 +8,8 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 ## Evaluation Metadata
 
-- Skill: `write-dag`
-- Evaluation date: 2026-09-01
+- Skill: `paidf-orchestration-write-dag`
+- Evaluation date: 2026-09-02
 - Evaluator version: `1.3.2`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 7 evaluation tasks (7 positive)
@@ -25,9 +25,9 @@ Each task attempt ran in its own isolated sandbox pod.
 - Validation status: `passed`
 - Report generation: `complete`
 - Evaluator version: `1.3.2`
-- Git commit: `fed6620cbc44a5e8d7e78ab0dd044258b667efc7`
+- Git commit: `82224ec75d08e41cc5b92f7bf935f69c0def4607`
 - Content type: requested `auto`, detected `skill`
-- Container image: `gitlab-master.nvidia.com:5005/nvcarps/ci-group/nvcarps-ci/skillevaluator-ci:sha-fed6620cbc44a5e8d7e78ab0dd044258b667efc7`
+- Container image: `gitlab-master.nvidia.com:5005/nvcarps/ci-group/nvcarps-ci/skillevaluator-ci:sha-82224ec75d08e41cc5b92f7bf935f69c0def4607`
 - Container image digest: `not recorded`
 - Tier 3: requested `true`, executed `true`, status `succeeded`
 
@@ -45,12 +45,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 39% → 85% (+46 points) | 38% → 71% (+33 points) |
-| Security | 71% → 100% (+29 points) | 71% → 50% (-21 points) |
-| Correctness | 37% → 89% (+51 points) | 34% → 89% (+54 points) |
-| Discoverability | 50% → 98% (+48 points) | 37% → 74% (+38 points) |
-| Effectiveness | 12% → 56% (+43 points) | 11% → 53% (+42 points) |
-| Efficiency | 24% → 84% (+59 points) | 39% → 91% (+52 points) |
+| Overall | 41% → 89% (+48 points) | 30% → 82% (+52 points) |
+| Security | 71% → 100% (+29 points) | 43% → 93% (+50 points) |
+| Correctness | 37% → 97% (+60 points) | 31% → 91% (+60 points) |
+| Discoverability | 48% → 99% (+51 points) | 38% → 79% (+41 points) |
+| Effectiveness | 20% → 65% (+45 points) | 9% → 65% (+56 points) |
+| Efficiency | 29% → 85% (+57 points) | 30% → 80% (+50 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.
 
@@ -60,7 +60,7 @@ Example: `47% → 92% (+45 points)` means the skill-assisted run scored 92%, 45 
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 2 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 3 finding(s) |
 | Tier 2 | Semantic deduplication | **NOT RUN** | No result was recorded |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 7 task(s) |
 
@@ -69,8 +69,9 @@ Example: `47% → 92% (+45 points)` means the skill-assisted run scored 92%, 45 
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/write-dag/SKILL.md`)
-- **MEDIUM** SCHEMA/author_missing: Author not specified in metadata (`skills/write-dag/SKILL.md`)
+- **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'version' is ignored; use 'metadata.version' (`skills/paidf-orchestration-write-dag/SKILL.md`)
+- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/paidf-orchestration-write-dag/SKILL.md`)
+- **LOW** SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/paidf-orchestration-write-dag/SKILL.md`)
 
 </details>
 

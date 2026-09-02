@@ -86,16 +86,8 @@ K3s and kubeadm), rewrite it to the node's cluster-reachable IP (for example
 
 ### Deploy steps
 
-There are two targets:
-
-1. `make setup` — validates secrets from `secrets.env` and generates the Helm values for install.
-   Does not install Kubernetes or any system tools.
-2. `make install sdg-controller` — packages Airflow Python runtime deps, uploads DAGs and plugins
-   to S3, runs `helm dependency update`, uninstalls any prior release, then
-   `helm upgrade --install` into `sdg-workflow` with a 10-minute timeout. Images are pulled from
-   NGC; no local image build occurs.
-
-There is no bare `make install`.
+See [deploy-controller.md](deploy-controller.md) for the full `make setup` /
+`make install sdg-controller` walkthrough.
 
 ### Storage
 
