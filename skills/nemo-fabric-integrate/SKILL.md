@@ -118,7 +118,10 @@ def to_fabric_config(job) -> FabricConfig:
         },
         instructions=(
             InstructionsConfig(
-                system=InstructionConfig(content=job.system_instruction),
+                system=InstructionConfig(
+                    content=job.system_instruction,
+                    mode=job.system_instruction_mode,
+                ),
             )
             if job.system_instruction is not None
             else None
