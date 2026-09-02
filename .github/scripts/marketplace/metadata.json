@@ -2989,6 +2989,30 @@
       }
     },
     {
+      "path": "skills/paidf-orchestration-event-video-generation-workflow",
+      "name": "event-video-generation-workflow",
+      "description": "Run the PAIDF Orchestration Event Video Generation DAG on Kubernetes - image-to-video anomaly generation, auto-labeling, and anomaly dataset generation. Select for requests about event video generation, anomaly video generation, image-to-video synthesis, Cosmos3 image2video, anomaly dataset creation, safety/surveillance SDG, or generating person-falling, person-climbing, person-running, fighting, smoking/vaping, fire/smoke, or shoplifting video clips from a seed image. Runs environment setup first when controller readiness is unknown. Not for person-crop clothing/attribute augmentation (that is image-attribute-augmentation-workflow) and not for video style transfer.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "ai_engineer,ml_engineer,application_developer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "orchestrate,generate,synthesize,deploy,configure"
+      }
+    },
+    {
+      "path": "skills/paidf-orchestration-image-attribute-augmentation-workflow",
+      "name": "image-attribute-augmentation-workflow",
+      "description": "Run the PAIDF Orchestration Image Attribute Augmentation DAG on Kubernetes - person-crop clothing augmentation, attribute search, and augmented dataset generation. Select for requests about image attribute augmentation, person attribute search, person re-identification data, clothing augmentation, attribute captions, augmentation payloads, run status, or result retrieval. Runs environment setup first when controller readiness is unknown. Not for video or defect-image generation.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "application_developer,ml_engineer,platform_engineer,devops_engineer,data_scientist",
+        "discovery.activity_tags": "orchestrate,generate,configure,operate,monitor"
+      }
+    },
+    {
       "path": "skills/paidf-orchestration-setup",
       "name": "orchestration-setup",
       "description": "Audit, prepare, and deploy PAIDF Orchestration on a Kubernetes GPU cluster - single-GPU H100/L40S hosts, managed Kubernetes, kubeadm, and similar. Select for requests to set up, install, deploy, configure, or check a PAIDF Orchestration environment; run a workflow on a new or unverified GPU host; connect via kubeconfig; validate GPU compute; deploy the Airflow controller; or choose external versus in-cluster model services. A plain SSH host is not a supported backend.",
@@ -3022,18 +3046,6 @@
         "catalog.subdomain": "physical-ai",
         "audience": "developer,ai_engineer,ml_engineer",
         "discovery.activity_tags": "orchestrate,generate,synthesize,fine_tune,configure"
-      }
-    },
-    {
-      "path": "skills/physical-ai-event-video-generation",
-      "name": "event-video-generation-workflow",
-      "description": "Run the PAIDF Orchestration Event Video Generation DAG on Kubernetes - image-to-video anomaly generation, auto-labeling, and anomaly dataset generation. Select for requests about event video generation, anomaly video generation, image-to-video synthesis, Cosmos3 image2video, anomaly dataset creation, safety/surveillance SDG, or generating person-falling, person-climbing, person-running, fighting, smoking/vaping, fire/smoke, or shoplifting video clips from a seed image. Runs environment setup first when controller readiness is unknown. Not for person-crop clothing/attribute augmentation (that is image-attribute-augmentation-workflow) and not for video style transfer.",
-      "metadata": {
-        "product.primary": "Physical AI Dataset",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "physical-ai",
-        "audience": "ai_engineer,ml_engineer,application_developer,platform_engineer,devops_engineer",
-        "discovery.activity_tags": "orchestrate,generate,synthesize,deploy,configure"
       }
     },
     {
