@@ -3063,7 +3063,7 @@
     {
       "path": "skills/physical-ai-neural-reconstruction",
       "name": "physical-ai-neural-reconstruction",
-      "description": "Router for NVIDIA NuRec/NRE: USDZ rendering, NCore conversion, 3DGS, gRPC sensor sim, PhysicalAI HF datasets. Do NOT use for SimReady or infra setup.",
+      "description": "Router for NVIDIA NuRec/NRE: USDZ rendering, NCore conversion, 3DGS, gRPC sensor sim, carline adaptation, PhysicalAI HF datasets. Do NOT use for SimReady or infra setup.",
       "metadata": {
         "product.primary": "NuRec",
         "classification.category.primary": "physical_ai",
