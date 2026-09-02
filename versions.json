@@ -193,23 +193,23 @@
     {
       "name": "dicom-metadata-extract",
       "path": "skills/dicom-metadata-extract",
-      "content_digest": "sha256:31b8e173f3ec06fa748ef493f78ae9f546be2c1bfad9bb2ac321e933fa9bd311",
-      "last_commit": "a7c1463403ba9ac3d686e2e7397d3eac40572999",
-      "last_modified": "2026-05-31"
+      "content_digest": "sha256:89b2b0042b9d22aca81757c3fce00d57a645b274f1f3193696ee07566b8fc35e",
+      "last_commit": "ed66cf2a616eef1e19cff6f178eb2a87a4ba6752",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "dicom-series-preflight",
       "path": "skills/dicom-series-preflight",
-      "content_digest": "sha256:49e1b1b5c96c7eadc73473c99c3170da16c322733af61e0e1e596f76c4c760ab",
-      "last_commit": "a7c1463403ba9ac3d686e2e7397d3eac40572999",
-      "last_modified": "2026-05-31"
+      "content_digest": "sha256:c0f45a914f05fafb8275c665de6a498c4623a813b5aaf7c54bdbfcc4468f3aaa",
+      "last_commit": "ed66cf2a616eef1e19cff6f178eb2a87a4ba6752",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "dicom-series-to-volume",
       "path": "skills/dicom-series-to-volume",
-      "content_digest": "sha256:934d3a80a990447463f7e25265a5188d4599241d06d465a0ba1ac0b3ede9025c",
-      "last_commit": "a7c1463403ba9ac3d686e2e7397d3eac40572999",
-      "last_modified": "2026-05-31"
+      "content_digest": "sha256:10b57a1017e493bfc3975af33c4516dd8ebfa12c8a7e0c8cff8c919d487aff67",
+      "last_commit": "ed66cf2a616eef1e19cff6f178eb2a87a4ba6752",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "digital-health-clinical-asr-build",
@@ -1297,6 +1297,13 @@
       "last_modified": "2026-05-29"
     },
     {
+      "name": "medtech-model-evidence-export",
+      "path": "skills/medtech-model-evidence-export",
+      "content_digest": "sha256:7696036664cf8d8e10735966712d69c01706312a29a51bdd01fa4404fd62a6cc",
+      "last_commit": "b459e6cf3aafd04e257b7c42ad3f78fd18a93164",
+      "last_modified": "2026-08-31"
+    },
+    {
       "name": "nemo-automodel-distributed-training",
       "path": "skills/nemo-automodel-distributed-training",
       "content_digest": "sha256:af07e4932c5a3939f44d9be54f66867e56c77016f5cc407c879401e832d6260c",
@@ -1642,16 +1649,16 @@
     {
       "name": "nv-generate-mr-brain",
       "path": "skills/nv-generate-mr-brain",
-      "content_digest": "sha256:d57e60c057314f9e5b72bc3cebf7eb6f1817e524631984c93ea26c2309a80888",
-      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
-      "last_modified": "2026-07-08"
+      "content_digest": "sha256:f069e148d9598812bdceea95ac3ad8e753c1502dcabea5e04d6d4546cb47eb09",
+      "last_commit": "ed66cf2a616eef1e19cff6f178eb2a87a4ba6752",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "nv-generate-mr-brain-finetune",
       "path": "skills/nv-generate-mr-brain-finetune",
-      "content_digest": "sha256:e14127a3c4a34518fdf9091886597fe4783b3ba0a6040ae5a00523125717cfe0",
-      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
-      "last_modified": "2026-07-08"
+      "content_digest": "sha256:5c1aea1dada0a75c9be8b02a8b004e60112d01d9772f972cf691cfa3e6a68fc0",
+      "last_commit": "ed66cf2a616eef1e19cff6f178eb2a87a4ba6752",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "nv-generate-vae-finetune",
@@ -1677,16 +1684,16 @@
     {
       "name": "nv-segment-ct-finetune",
       "path": "skills/nv-segment-ct-finetune",
-      "content_digest": "sha256:c8d857ded655238f8f1186bb9dd8fa7f25c958ae201359db15960104845d09f9",
-      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
-      "last_modified": "2026-07-08"
+      "content_digest": "sha256:21b3ea42d9cc93bfa04f0241be0a0ff108797cc5aa6cfb57da3b0921bf85e735",
+      "last_commit": "ed66cf2a616eef1e19cff6f178eb2a87a4ba6752",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "nv-segment-ctmr",
       "path": "skills/nv-segment-ctmr",
-      "content_digest": "sha256:3e721545e63bebac64bf91886ce57eefd619afdcf3306f9f2e2eae55ab9fa304",
-      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
-      "last_modified": "2026-07-08"
+      "content_digest": "sha256:accd2237220f39556d88d6d751db1a8f07dd8604123e1518dc62f4194d1dc5e3",
+      "last_commit": "ed66cf2a616eef1e19cff6f178eb2a87a4ba6752",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "nvidia-skill-finder",
@@ -1698,9 +1705,9 @@
     {
       "name": "omniverse-cad-to-simready",
       "path": "skills/omniverse-cad-to-simready",
-      "content_digest": "sha256:7148ee5756c78e1f2cf1d04f07783452fbe97accbbf42df582c314eb860af0c1",
-      "last_commit": "aa116673017bf75f9885edabab34d8ec883c0a3a",
-      "last_modified": "2026-08-12"
+      "content_digest": "sha256:d04ef24c0c75416299ac484d324f3b450bec8f9976fe27d607b9e558ea30d8c0",
+      "last_commit": "ff7a9a96a123e3c50748e04953e085b4c0cc1075",
+      "last_modified": "2026-09-01"
     },
     {
       "name": "omniverse-realtime-viewer",
@@ -1719,9 +1726,37 @@
     {
       "name": "paidf-anomalygen",
       "path": "skills/paidf-anomalygen",
-      "content_digest": "sha256:0bae8275f9a3a14bf4d18efa55e41176c307e946e4c0dcbc095be4f143fad3cd",
-      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
-      "last_modified": "2026-07-27"
+      "content_digest": "sha256:646a7187d47367802af818c0374d449eadaec8c27007c19fcdbeeecdecca25c9",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
+    },
+    {
+      "name": "paidf-augmentation",
+      "path": "skills/paidf-augmentation",
+      "content_digest": "sha256:6f08182ab0d6b948c0cd499812e3613ce4de1d5a7e3a40322d843dc1dca8f62e",
+      "last_commit": "e21ac3efa353355862d208d40240035c074a1302",
+      "last_modified": "2026-08-31"
+    },
+    {
+      "name": "paidf-auto-labeling",
+      "path": "skills/paidf-auto-labeling",
+      "content_digest": "sha256:d19a4d6e35edf75137ca7443c1a499fa91a5422dd747732004bf5fc028ce0602",
+      "last_commit": "7ba295872d03de3e5362ec07eddeb1850144f42e",
+      "last_modified": "2026-08-31"
+    },
+    {
+      "name": "paidf-orchestration-setup",
+      "path": "skills/paidf-orchestration-setup",
+      "content_digest": "sha256:fbe9150428018ef15b4cf5874b3f03789a3a8ea86b8fd0c07a4e6889991d52dc",
+      "last_commit": "1e08e5b597ef6847e79041f3f4dc86887155ab69",
+      "last_modified": "2026-09-02"
+    },
+    {
+      "name": "paidf-orchestration-write-dag",
+      "path": "skills/paidf-orchestration-write-dag",
+      "content_digest": "sha256:21dc1399456096c56ba7d1dad51f1a1c29ee38088a8ee8f03b7f00b4a8b21d46",
+      "last_commit": "1e08e5b597ef6847e79041f3f4dc86887155ab69",
+      "last_modified": "2026-09-02"
     },
     {
       "name": "physical-ai-defect-image-generation",
@@ -1731,11 +1766,18 @@
       "last_modified": "2026-06-23"
     },
     {
+      "name": "physical-ai-event-video-generation",
+      "path": "skills/physical-ai-event-video-generation",
+      "content_digest": "sha256:7215677b4671cdac27e1e8644acaccde089c2d545ae7b8ade2ed3492f96f2eb1",
+      "last_commit": "1e08e5b597ef6847e79041f3f4dc86887155ab69",
+      "last_modified": "2026-09-02"
+    },
+    {
       "name": "physical-ai-image-attribute-augmentation",
       "path": "skills/physical-ai-image-attribute-augmentation",
-      "content_digest": "sha256:ffb7f9671b35a25d3902d192f00a794f6bf056be20f0fd8e0f45ed42c9ea6ded",
-      "last_commit": "56b41f669819bfea2e1d7659442b2a997ff34fb6",
-      "last_modified": "2026-08-20"
+      "content_digest": "sha256:92c2af68bddbf020ede6cdcc956462d11e769378a2f9d7924d0c852264ceea96",
+      "last_commit": "1e08e5b597ef6847e79041f3f4dc86887155ab69",
+      "last_modified": "2026-09-02"
     },
     {
       "name": "physical-ai-infrastructure-setup-and-resilient-scaling",
@@ -1831,16 +1873,16 @@
     {
       "name": "tao-analyze-changenet-rca",
       "path": "skills/tao-analyze-changenet-rca",
-      "content_digest": "sha256:1e79465da5725bf7e9fbc9f5dc2f74877efa840f5f51b87c31d0a9595200f121",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:29d454775906030cc8dfe26f4c0cd34a2c94dae46b21ed6830316a723fbeaf69",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-analyze-gaps-visual-changenet",
       "path": "skills/tao-analyze-gaps-visual-changenet",
-      "content_digest": "sha256:803eb27eb082dec5aff993c5f9ee8582874f1813718b7d725db1e0d7a81c8144",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:da92ae9dfb70c4332283722d9e8c7a063f779d0f4d75ab6bfa6f1a67cd144814",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-analyze-gaps-vlm-bcq",
@@ -1866,23 +1908,23 @@
     {
       "name": "tao-finetune-cosmos-embed",
       "path": "skills/tao-finetune-cosmos-embed",
-      "content_digest": "sha256:e1b1237224d19a49739bbb1b5889b7bb4f244ac563c92e3618148b56fc1a45c5",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:d4aae9ce3d51211880b3212ee626613d06313fe7dfbb12643b8020970af31539",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-finetune-cosmos-reason",
       "path": "skills/tao-finetune-cosmos-reason",
-      "content_digest": "sha256:826403f558eab1bdb7faef6e7f6d4bfc0d672d4f442887c9190f14320156cbce",
-      "last_commit": "2dceed62b9edac32db67a0f0cf7d0fdd88765ce0",
-      "last_modified": "2026-06-29"
+      "content_digest": "sha256:b3cdbd13c10e163b63b764ba80cd692b70b59a2ff5278733460c39e916f7ceaa",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-finetune-huggingface-model",
       "path": "skills/tao-finetune-huggingface-model",
-      "content_digest": "sha256:55b94d743f750afb3073a0850c105a2142b3f420d8dacf504393044f32e2c653",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:47bd6e54ab07204c89d2d4a821a07a54e1c7a5e2b3f4168ae2c769b5a270742d",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-generate-image-grounding",
@@ -1908,9 +1950,9 @@
     {
       "name": "tao-launch-workflow",
       "path": "skills/tao-launch-workflow",
-      "content_digest": "sha256:1d554506f9063336e5495abd307fed77569a6e006e54f765589806ce5dfa82ff",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:f6297c051fa9e3d91f0c15ece5418729a4796cde6d23edc5cd93a5899d67590a",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-list-capabilities",
@@ -1922,23 +1964,23 @@
     {
       "name": "tao-mine-aoi-images",
       "path": "skills/tao-mine-aoi-images",
-      "content_digest": "sha256:18865b8957543ec71f09627b15abe0d96a07e788a59dc1869dd3cb41f0995d7c",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:a8bd8e3b0de3468080b28acd827eec8761ce40ab3c797364309ac6f96f7419b5",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-port-huggingface-model",
       "path": "skills/tao-port-huggingface-model",
-      "content_digest": "sha256:767a1fefdd0e0391b06d8f85f378a9231939d7ab3f964af830a2f9bb2d80e6d3",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:128ffd7c8b77d6fd384f9773211d42e01be2bfb11e605dd0f10a74078ae28a2b",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-route-visual-changenet-samples",
       "path": "skills/tao-route-visual-changenet-samples",
-      "content_digest": "sha256:0f49c800c447343962de872495801c9ff115194713ba241bfd886edda6a0f9cc",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:1ff1d267dac5b0a2de61991dc66c16a33be2e2c5f2f291d23a7620b9f72550eb",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-run-automl",
@@ -1957,9 +1999,9 @@
     {
       "name": "tao-run-deft-aoi",
       "path": "skills/tao-run-deft-aoi",
-      "content_digest": "sha256:ea88a99c2bc0ede7cfecc31c80ed1b6077f457bf935af80ae2a7760fe66c1f04",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:182ee919486e37032e91b906fff7f6e2d7420b171509b906ffbe89f2dde46443",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-run-inference-service",
@@ -1978,44 +2020,44 @@
     {
       "name": "tao-run-on-docker",
       "path": "skills/tao-run-on-docker",
-      "content_digest": "sha256:82776db668db2e466f397446c88c38f9f38472ee5c6df8a7a9dcb1a50843fa73",
-      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
-      "last_modified": "2026-07-27"
+      "content_digest": "sha256:2ad98d2b48fba6b52c289e2e3384af09c1d2a6a6e9a4807c4065e808dc973d37",
+      "last_commit": "7f739e62a2334e34676a32e30f253714674b0199",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-run-on-kubernetes",
       "path": "skills/tao-run-on-kubernetes",
-      "content_digest": "sha256:b33252e01a508247b8a91ba2c3025fee80c40d11b8576bf2f9dbbeaa4d57579f",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:a3a6278be53076fb3889bafc85fa6ad36c7bf6125b684f4ec3acbc185f637b93",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-run-on-local-docker",
       "path": "skills/tao-run-on-local-docker",
-      "content_digest": "sha256:f7b6e64541aedf021b689660432ec7d86d6179f999035d7b71b637244c918a0c",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:a28ee7e8a52f1770d0093493c580c9366ed48720514daf8069e5fa9bdda683c3",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-run-on-slurm",
       "path": "skills/tao-run-on-slurm",
-      "content_digest": "sha256:ab8ea26c5c7a8720f436f2de0c29525f5bf77dee01996bf923228855e78a9373",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:f39793d165998ecaebccc9aebad212146f722374b6711e409cbcad4cb32cafca",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-run-platform",
       "path": "skills/tao-run-platform",
-      "content_digest": "sha256:a6a92c1abd2cdb9bb0140746752c44e86f83769a6fdec9be017e7150fc4aeef7",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:120cf43b24072cb1dc3b4fc9c5084e82822fa6425abb113d920d8bfdc8b0d771",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-setup-nvidia-gpu-host",
       "path": "skills/tao-setup-nvidia-gpu-host",
-      "content_digest": "sha256:78790b1d5e6f669e23984871c7d5b08b0a2c35bb50bec406edf6bd1b4e3defbf",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:d5c82c49fe3c84d7c375d3bd7d5f2aaffff367a28891b89dbb5f2c855f8d184b",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-train-action-recognition",
@@ -2048,9 +2090,9 @@
     {
       "name": "tao-train-depth-anything-v2",
       "path": "skills/tao-train-depth-anything-v2",
-      "content_digest": "sha256:ef688504e188cb6ad46c3e176aad6f4e0b2077250ece4288a315ce63ce80ba49",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:9ca88a0d5cba75fad2c2d2440ca03e5dc5511cb98a956fa7827e67c7ec6efd5b",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-train-dino",
@@ -2062,16 +2104,16 @@
     {
       "name": "tao-train-fast-foundation-stereo",
       "path": "skills/tao-train-fast-foundation-stereo",
-      "content_digest": "sha256:7653519f98af64d2acf5016f6b5c39e9589db7c2b5ffdccddb2b889b05b6d679",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:ae9e8fabc47945bc131f3fb361ee192814a665564d25cd010b76d28378829436",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-train-foundation-stereo",
       "path": "skills/tao-train-foundation-stereo",
-      "content_digest": "sha256:0df914fd9e9871c00fe92c70dda1f72427be26e290842bf6a53cf02fa30137f0",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:5bbe90cc7d6b9d8b52d0d9665e67451e9c00d6a62f605c47256b878236c6c868",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-train-grounding-dino",
@@ -2216,9 +2258,9 @@
     {
       "name": "tao-train-visual-changenet",
       "path": "skills/tao-train-visual-changenet",
-      "content_digest": "sha256:462883e2a355632e779a4ec915d358bb06b4e824a98d186ba2616f2373fb2f12",
-      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
-      "last_modified": "2026-06-22"
+      "content_digest": "sha256:e572add28a8e32b02f9a1b7836becb064ae911528be8d07b7b9822e96f3ff7f6",
+      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "tao-validate-dataset-format",
@@ -2335,9 +2377,9 @@
     {
       "name": "vss-manage-alerts",
       "path": "skills/vss-manage-alerts",
-      "content_digest": "sha256:40d2286559d25f59391b48773acdde5cf94a5fabf8baaa4ba8c87bd42a60f466",
-      "last_commit": "6d3f8076691962dd09de2bd8ea0e5683e0f3bb7a",
-      "last_modified": "2026-06-15"
+      "content_digest": "sha256:eb574ba78055b3d74d6b6b9847095a6e756c0f330f5d1259545099ef9652fa71",
+      "last_commit": "85d89b0017e2486f941e3b902d8134e0f6aa4086",
+      "last_modified": "2026-08-31"
     },
     {
       "name": "vss-manage-video-io-storage",
