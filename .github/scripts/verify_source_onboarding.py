@@ -30,8 +30,8 @@ fetches the source at the component's ``ref`` and checks that:
 
   * every file listed in ``skill.oms.sig`` is present and still hashes to its
     signed digest;
-  * ``SKILL.md``, ``skill.oms.sig``, a skill card and ``evals/evals.json``
-    exist;
+  * ``SKILL.md``, ``skill.oms.sig``, ``skill-card.md`` and an eval dataset
+    exist, applying the same filename rules the hourly sync applies;
   * ``BENCHMARK.md`` reports an overall verdict of PASS backed by real
     measurements.
 
@@ -66,12 +66,13 @@ import verify_content_integrity as vci  # noqa: E402
 COMPONENTS_DIR = Path("components.d")
 SIG_NAME = vci.SIG_NAME
 
-# Required alongside the signature. A skill card is required too, but its
-# filename is not settled: all three spellings below are in active use in the
-# catalog today (skill-card.md 343, SKILLCARD.yaml 47, card.yaml 18), so any
-# one of them satisfies the requirement.
-REQUIRED_FILES = ("SKILL.md", SIG_NAME, "BENCHMARK.md", "evals/evals.json")
-CARD_NAMES = ("skill-card.md", "SKILLCARD.yaml", "card.yaml")
+# Required alongside the signature. The card name is exactly skill-card.md:
+# the hourly sync drops a skill that lacks that file (sync-skills.yml), so
+# accepting SKILLCARD.yaml or card.yaml here would pass a skill at onboarding
+# that the next sync silently removes. Both spellings do appear in the catalog
+# (SKILLCARD.yaml 47, card.yaml 18) but always *alongside* skill-card.md,
+# which all 350 published skills carry — no skill relies on an alternate.
+REQUIRED_FILES = ("SKILL.md", SIG_NAME, "BENCHMARK.md", "skill-card.md")
 
 RE_REPO = re.compile(r"^repo:\s*(\S+)\s*$")
 RE_REF = re.compile(r"^ref:\s*(\S+)\s*$")
@@ -175,14 +176,32 @@ def check_signature(skill_dir: Path) -> list[str]:
             for p in vci.verify_skill(skill_dir)]
 
 
+def has_eval_dataset(skill_dir: Path) -> bool:
+    """Mirror the eval-dataset rule the hourly sync applies.
+
+    The sync accepts an ``evals.json`` at any depth, or any ``*.json`` under
+    ``evals/`` or ``eval/``, which is what lets multi-profile datasets through
+    (rag-blueprint, rag-eval and rag-perf ship ``eval/*.json`` rather than the
+    canonical single file). Requiring ``evals/evals.json`` exactly would fail
+    an onboarding PR the sync would carry happily.
+    """
+    if any(skill_dir.rglob("evals.json")):
+        return True
+    return any(
+        (skill_dir / sub).is_dir() and any((skill_dir / sub).glob("*.json"))
+        for sub in ("evals", "eval")
+    )
+
+
 def check_required_files(skill_dir: Path) -> list[str]:
     problems = []
     for rel in REQUIRED_FILES:
         if not (skill_dir / rel).is_file():
             problems.append(f"{rel}: MISSING — required for onboarding")
-    if not any((skill_dir / c).is_file() for c in CARD_NAMES):
+    if not has_eval_dataset(skill_dir):
         problems.append(
-            "skill card: MISSING — expected one of " + ", ".join(CARD_NAMES)
+            "eval dataset: MISSING — expected evals/evals.json, or any "
+            "*.json under evals/ or eval/"
         )
     return problems
 
