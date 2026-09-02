@@ -1334,16 +1334,16 @@
     {
       "name": "nemo-fabric-build-adapter",
       "path": "skills/nemo-fabric-build-adapter",
-      "content_digest": "sha256:37ecf5b6282679ad782111c1e4e37ca648c935f0407669d28e23b344b639b217",
-      "last_commit": "c397c30ac3da2f04169145bc7477db6885125722",
-      "last_modified": "2026-08-20"
+      "content_digest": "sha256:860482c2ef24890c89be004ca7017a73a4a0d111f110c0f5c71731e91fdd9e1e",
+      "last_commit": "353cfd90352f66e8d1bb4bb4844a717667d19c26",
+      "last_modified": "2026-09-02"
     },
     {
       "name": "nemo-fabric-integrate",
       "path": "skills/nemo-fabric-integrate",
-      "content_digest": "sha256:c3bd3f2bd4ab645464036e95c5b845dab55f5e63db5737e066ae5d1b1874d850",
-      "last_commit": "c397c30ac3da2f04169145bc7477db6885125722",
-      "last_modified": "2026-08-20"
+      "content_digest": "sha256:69f1546d965340eb35e1df5f018100d911a383688f5253d1e86797195462e5e8",
+      "last_commit": "353cfd90352f66e8d1bb4bb4844a717667d19c26",
+      "last_modified": "2026-09-02"
     },
     {
       "name": "nemo-mbridge-mlm-bridge-training",
