@@ -1,5 +1,5 @@
 ## Description: <br>
-Router for NVIDIA NuRec/NRE: USDZ rendering, NCore conversion, 3DGS, gRPC sensor sim, carline adaptation, PhysicalAI HF datasets. Do NOT use for SimReady or infra setup. <br>
+Router for NVIDIA NuRec/NRE: USDZ rendering, NCore conversion, 3DGS, gRPC sensor sim, carline adaptation, PhysicalAI HF datasets. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers working with NVIDIA Neural Reconstruction (NuRec) workflows who need to identify and route requests to the correct upstream sibling skill for 3D scene rendering, sensor data conversion, dataset access, object harvesting, and reconstruction quality evaluation. <br>
+Developers and engineers working with NVIDIA Physical AI workflows who need to route neural reconstruction requests to the correct upstream NuRec sibling skill for USDZ rendering, NCore conversion, 3D Gaussian Splatting, sensor simulation, dataset management, and object harvesting. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,63 +26,62 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [NVIDIA NuRec Skills (upstream)](https://github.com/NVIDIA/nurec-skills) <br>
-- [NCore converter](https://github.com/NVIDIA/ncore) <br>
-- [Asset Harvester](https://github.com/NVIDIA/asset-harvester) <br>
-- [DiffusionHarmonizer (code)](https://github.com/NVIDIA/harmonizer) <br>
-- [DiffusionHarmonizer (model)](https://huggingface.co/nvidia/Harmonizer) <br>
-- [workflows.md](references/workflows.md) <br>
-- [mix-ups.md](references/mix-ups.md) <br>
-- [upstream-fetch.md](references/upstream-fetch.md) <br>
-- [teardown.md](references/teardown.md) <br>
-- [maintenance.md](references/maintenance.md) <br>
+- [NVIDIA NCore](https://github.com/NVIDIA/ncore) <br>
+- [NVIDIA Asset Harvester](https://github.com/NVIDIA/asset-harvester) <br>
+- [NVIDIA Harmonizer (DiffusionHarmonizer)](https://github.com/NVIDIA/harmonizer) <br>
+- [NVIDIA PhysicalAI Datasets on Hugging Face](https://huggingface.co/nvidia) <br>
+- [Workflows reference](references/workflows.md) <br>
+- [Mix-ups and naming overlaps](references/mix-ups.md) <br>
+- [Upstream fetch recipe](references/upstream-fetch.md) <br>
+- [Maintenance guide](references/maintenance.md) <br>
+- [Teardown guide](references/teardown.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Configuration instructions, Shell commands] <br>
+**Output Type(s):** [Analysis, Shell commands, Configuration instructions] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 internal skill-activation tasks (3 positive, 1 negative) via NVSkills-Eval external profile in astra-sandbox environment. <br>
+4 evaluation tasks (3 positive, 1 negative) run in isolated sandbox pods, evaluated against the skill-evaluator-dataset-snapshot/1 dataset. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
+- Effectiveness: Checks whether the skill helped complete the user's goal (goal completion and expected workflow adherence, equally weighted). <br>
+- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Detects unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies whether the expected skill was found and executed. <br>
+- `skill_efficiency`: Measures routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `accuracy`: Measures final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Measures whether the user's goal was achieved. <br>
+- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 93% (+52%) | 91% (+34%) |
-| Discoverability | 4 | 100% (+56%) | 95% (+51%) |
-| Effectiveness | 4 | 79% (+52%) | 81% (+36%) |
-| Efficiency | 4 | 95% (+43%) | 91% (+40%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 55% → 93% (+38 points) | 66% → 87% (+21 points) |
+| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
+| Correctness | 35% → 95% (+60 points) | 90% → 90% (±0 points) |
+| Discoverability | 62% → 100% (+38 points) | 62% → 92% (+30 points) |
+| Effectiveness | 26% → 78% (+51 points) | 44% → 61% (+17 points) |
+| Efficiency | 53% → 95% (+42 points) | 34% → 92% (+58 points) |
 
 ## Skill Version(s): <br>
-0.4.0 (source: frontmatter, changelog) <br>
-Evaluation results above were measured on 0.3.0; 0.4.0 is a documentation-parity update (upstream paths, GA container names, workflow lettering). <br>
+0.4.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
