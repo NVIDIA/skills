@@ -9,10 +9,16 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers expanding real-image augmentation queues for VCN AOI training iterations by mining nearest-neighbour source images from a pool against gap-analysis targets. <br>
+Developers and engineers use this skill to mine nearest-neighbour source images from a pool for downstream training augmentation, as the step after gap analysis or routing in a Visual ChangeNet AOI pipeline. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
@@ -32,41 +38,41 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). <br>
+1 evaluation task (1 positive), evaluated in isolated sandbox pods with Tier 3 live agent evaluation. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
+- Effectiveness: Checks whether the skill helped complete the user's goal and expected workflow (equal-weight mean of goal completion and behavior adherence). <br>
+- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Verifies no unsafe operations, secret leakage, or unauthorized access occurred. <br>
+- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
+- `skill_execution`: Verifies the expected skill was found and executed. <br>
+- `goal_accuracy`: Verifies the user's goal was achieved. <br>
+- `behavior_check`: Verifies the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Verifies routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 100% (+62%) | 20% (+20%) |
-| Discoverability | 1 | 88% (+42%) | 0% (+0%) |
-| Effectiveness | 1 | 90% (+90%) | 48% (+34%) |
-| Efficiency | 1 | 75% (+46%) | 28% (-0%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 37% → 95% (+58 points) | 33% → 53% (+19 points) |
+| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
+| Correctness | 0% → 100% (+100 points) | 40% → 100% (+60 points) |
+| Discoverability | 50% → 100% (+50 points) | 0% → 0% (±0 points) |
+| Effectiveness | 0% → 100% (+100 points) | 27% → 63% (+37 points) |
+| Efficiency | 36% → 75% (+39 points) | 0% → 0% (±0 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

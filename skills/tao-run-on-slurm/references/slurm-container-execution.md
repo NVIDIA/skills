@@ -24,6 +24,54 @@ Image formats accepted by the handler:
 SQSH conversion is cached by image name. For `:latest` images, cached SQSH is
 used unless `force_reconvert_latest` is enabled.
 
+## SQSH Conversion And Caching
+
+Pyxis pulls Docker images through enroot on the compute node. Without a
+pre-converted SQSH, every job pays the pull/extract cost inside its GPU
+allocation — on clusters with GPU-idle reapers that can kill the job outright.
+The SDK therefore converts once on a CPU partition and caches the result.
+Keep SQSH conversion enabled; do not disable it to route around conversion
+failures — fix the conversion instead.
+
+**Environment knobs** (read at `SlurmSDK` construction):
+
+| Env var | Default | Notes |
+|---|---|---|
+| `SLURM_USE_SQSH` | `true` | Leave enabled; direct pulls burn GPU allocation time. |
+| `SLURM_SQSH_CACHE_DIR` | base results dir | Where `.sqsh` files land. |
+| `SLURM_CONVERSION_PARTITION` | `cpu` | Must have wall-time ≥ conversion time. Large TAO images (9+ layers) take >30 min — pick a long-limit CPU partition (e.g. `cpu_long`) when the default partition caps at ~30 min. |
+| `SLURM_CONVERSION_TIMEOUT_MINUTES` | `30` | Raise to 120 for large images. |
+| `SLURM_CONVERSION_MEMORY_GB` | `32` | Extraction memory. |
+| `SLURM_ENROOT_TEMP_PATH` | `<cache_dir>/.enroot-tmp` | Layer-extraction workspace. **Must be on a filesystem with xattr support** — some shared filesystems (certain Lustre configs) reject enroot's whiteout conversion with "Operation not permitted". Node-local `/tmp` is usually safe; beware shared-path symlinks that resolve to a restricted filesystem, which make an override a silent no-op. |
+| `SLURM_FORCE_RECONVERT_LATEST` | `false` | Re-convert `:latest` tags. |
+
+**Cache semantics:** conversion runs once per image name, then every job — and
+every future session — reuses the cached file. The SDK verifies the SquashFS
+magic bytes (`hsqs`) before reuse, so partial files from killed conversions
+are rejected and re-converted automatically; no manual cleanup needed.
+Concurrent sessions dedupe via a deterministic job name (`tao-sqsh-<hash>`) —
+a second session waits on the in-flight conversion instead of double-writing.
+
+**Monitoring a conversion:**
+
+```bash
+squeue -u $USER -n tao-sqsh-<hash>            # scheduler state
+sattach <slurm_job_id>.0                       # live stdout (Ctrl+C detaches, job unaffected)
+ls -lh <cache_dir>/<image>.sqsh*               # .partial appears in the final squashfs-write phase
+```
+
+The phase sequence in the live log is: authenticate → fetch manifest →
+download layers → extract layers → convert whiteouts → create squashfs.
+Time-limit kills usually land in extract; xattr failures land in convert
+whiteouts.
+
+**Pre-staging manually** (avoids the first job paying conversion latency):
+
+```bash
+sbatch -p <long_cpu_partition> -A <account> -t 2:00:00 --mem=64G \
+  --wrap="enroot import -o <cache_dir>/<name>.sqsh docker://<registry>#<image>:<tag>"
+```
+
 ## Monitoring
 
 - Scheduler status comes from the stored SLURM job id via `squeue` or `sacct`.
@@ -65,7 +113,7 @@ SLURM is the platform of choice for large multi-node runs — pass `num_nodes > 
 
 ```python
 job = sdk.create_job(
-    image='nvcr.io/nvidia/tao/tao-toolkit:6.26.3-pyt',
+    image='nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt',  # versions-key: images.tao_toolkit.pyt
     command='torchrun --nnodes=$WORLD_SIZE --nproc-per-node=$NUM_GPU_PER_NODE '
             '--node-rank=$NODE_RANK --master-addr=$MASTER_ADDR --master-port=$MASTER_PORT '
             'train.py',
@@ -164,7 +212,7 @@ ep = build_entrypoint(
 
 sdk = SlurmSDK()  # reads SLURM_USER, SLURM_HOSTNAME, SLURM_BASE_RESULTS_DIR from env
 job = sdk.create_job(
-    image='nvcr.io/nvidia/tao/tao-toolkit:6.26.3-pyt',
+    image='nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt',  # versions-key: images.tao_toolkit.pyt
     command=ep['command'],
     gpu_count=8,
     num_nodes=2,                                           # multi-node supported
@@ -201,7 +249,16 @@ permissions, `known_hosts`, and key mounts. Re-run the
 
 **Local dataset path rejected**: Convert it to `lustre:///...` or copy it onto shared storage.
 
-**SQSH conversion timeout**: Increase `sqsh_conversion_timeout_minutes`, use a smaller image, or pre-stage the SQSH image.
+**SQSH conversion timeout / whiteout failure**: Two failure modes — a
+conversion-partition wall-time limit shorter than the conversion time
+(`CANCELLED ... DUE TO TIME LIMIT` during layer extraction), or a shared
+filesystem without xattr support rejecting whiteout conversion
+(`enroot-aufs2ovlfs: ... Operation not permitted`). Both are fixed with the
+environment knobs in [SQSH Conversion And Caching](#sqsh-conversion-and-caching):
+`SLURM_CONVERSION_PARTITION`/`SLURM_CONVERSION_TIMEOUT_MINUTES` for the former,
+`SLURM_ENROOT_TEMP_PATH` (point it at node-local scratch) for the latter.
+Partial SQSH files are auto-rejected via magic-byte validation; no manual
+cleanup needed.
 
 **Pyxis or Enroot unavailable**: The generated sbatch script depends on
 `srun --container-image`. Ask the cluster admin to enable Pyxis/Enroot or use a

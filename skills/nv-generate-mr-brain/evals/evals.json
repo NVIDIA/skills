@@ -1,13 +1,14 @@
 [
   {
     "id": "generate-brain-mri-t1",
-    "question": "Generate a synthetic T1 brain MRI from /data/brain_request.json using nv-generate-mr-brain.",
+    "question": "Prepare a reproducible NV-Generate MR-Brain v1 command for a synthetic T1 brain MRI request at /data/brain_request.json. This is a command-shape review only; do not install packages, download weights, or start GPU inference in this environment.",
     "expected_skill": "nv-generate-mr-brain",
-    "ground_truth": "The agent runs scripts/run_mr_brain.py with the config path, --modality mri_t1, --output-dir, and --random-seed.",
+    "ground_truth": "The agent emits the scripts/run_mr_brain.py command with the supplied config path, --modality mri_t1, --output-dir, and --random-seed; it does not execute setup or inference.",
     "expected_behavior": [
       "the command uses skills/nv-generate-mr-brain/scripts/run_mr_brain.py",
       "the command includes --modality mri_t1",
       "the command includes an explicit --output-dir",
+      "the command includes an explicit --random-seed",
       "the agent states the generated image is synthetic and not for clinical interpretation"
     ]
   },
@@ -19,6 +20,18 @@
     "expected_behavior": [
       "the agent names mri_flair_skull_stripped exactly",
       "the command shape still uses scripts/run_mr_brain.py",
+      "the agent does NOT claim clinical or production-training validity"
+    ]
+  },
+  {
+    "id": "generate-brain-mra-v1",
+    "question": "Prepare an NV-Generate MR-Brain v1 command for an axial MRA request at /data/mra_request.json.",
+    "expected_skill": "nv-generate-mr-brain",
+    "ground_truth": "The agent uses scripts/run_mr_brain.py with --modality mri_mra and warns that upstream reports sparse MRA training coverage.",
+    "expected_behavior": [
+      "the command uses skills/nv-generate-mr-brain/scripts/run_mr_brain.py",
+      "the command includes --modality mri_mra",
+      "the agent mentions sparse MRA training coverage or that MRA output quality is not guaranteed",
       "the agent does NOT claim clinical or production-training validity"
     ]
   }

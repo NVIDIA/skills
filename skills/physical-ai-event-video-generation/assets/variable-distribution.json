@@ -1,0 +1,17 @@
+{
+  "variables": {
+    "anomaly_type": {
+      "person_falling": 0.3,
+      "person_climbing": 0.15,
+      "person_running": 0.15,
+      "smoking_or_vaping": 0.1,
+      "person_fighting": 0.1,
+      "fire_or_smoke": 0.1,
+      "stealing_or_shoplifting": 0.1
+    },
+    "env_type": {
+      "warehouse": 0.7,
+      "retail": 0.3
+    }
+  }
+}

@@ -1,8 +1,8 @@
 ---
 name: tao-analyze-gaps-visual-changenet
-description: Performs gap analysis on NVIDIA TAO VCN Classify (Visual Component Net) experiments by invoking the data-services container (`tao_toolkit.data_services` from `versions.yaml`) directly via `docker run … gap_analysis vcn_aoi …` — picks the optimal decision threshold, ranks per-sample weakness, and emits a top-K weakest parquet expanded per-lighting for downstream augmentation. Use when analyzing VCN classification failures, picking SDA augmentation targets, or auditing PASS/NO_PASS boundary cases.
+description: Performs gap analysis on NVIDIA TAO VCN Classify (Visual Component Net) experiments by invoking the pinned TAO data-services container directly via `docker run … gap_analysis vcn_aoi …` — picks the optimal decision threshold, ranks per-sample weakness, and emits a top-K weakest parquet expanded per-lighting for downstream augmentation. Use when analyzing VCN classification failures, picking SDA augmentation targets, or auditing PASS/NO_PASS boundary cases.
 license: Apache-2.0
-compatibility: Requires docker + nvidia-container-toolkit and a CUDA GPU. Pulls the `tao_toolkit.data_services` image declared in `versions.yaml` at the skill bank root.
+compatibility: Requires docker + nvidia-container-toolkit and a CUDA GPU. Pulls the TAO data-services container pinned in this skill.yaml` at the skill bank root.
 metadata:
   author: NVIDIA Corporation
   version: "0.1.0"
@@ -16,9 +16,11 @@ tags:
 
 # TAO VCN Classify Gap Analysis Skill
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 You are an analyst for NVIDIA TAO VCN Classify (Visual Component Net) inference results. Your job is to identify the **weakest samples per ground-truth label** by measuring signed distance from the decision threshold *in the wrong direction*, then surface them for downstream augmentation or relabeling.
 
-This skill is intentionally lightweight. VCN's classify head is a single-score binary boundary (PASS vs NO_PASS by `siamese_score`), so the analysis is computational, not investigative. The whole computation lives behind one direct `docker run` invocation against the `tao_toolkit.data_services` image declared in `versions.yaml` (resolved at runtime — see Setup). The container's entrypoint takes `<category> <action> [hydra overrides...]`; we pass `gap_analysis vcn_aoi key=value …`. Each override is a bare Hydra `key=value` that selectively overrides the script's `GapAnalysisConfig` schema (defaults are baked into the container; introspect with `docker run ... gap_analysis vcn_aoi --cfg=job`). (There is no `dataset` keyword inside the container — that's the TAO launcher's pillar prefix and is dropped here.) You do **not** need delegated analysis, multi-phase image audits, or component-type clustering — VCN does not expose those dimensions. View only a small set of representative weak samples to qualify the gaps after the container returns.
+This skill is intentionally lightweight. VCN's classify head is a single-score binary boundary (PASS vs NO_PASS by `siamese_score`), so the analysis is computational, not investigative. The whole computation lives behind one direct `docker run` invocation against the pinned TAO data-services image (see Setup). The container's entrypoint takes `<category> <action> [hydra overrides...]`; we pass `gap_analysis vcn_aoi key=value …`. Each override is a bare Hydra `key=value` that selectively overrides the script's `GapAnalysisConfig` schema (defaults are baked into the container; introspect with `docker run ... gap_analysis vcn_aoi --cfg=job`). (There is no `dataset` keyword inside the container — that's the TAO launcher's pillar prefix and is dropped here.) You do **not** need delegated analysis, multi-phase image audits, or component-type clustering — VCN does not expose those dimensions. View only a small set of representative weak samples to qualify the gaps after the container returns.
 
 CLI surface can shift between data-services container builds. If a `gap_analysis vcn_aoi` invocation fails on argument parsing, introspect the actual schema once per image with `docker run --rm "$DS_IMAGE" gap_analysis vcn_aoi --cfg=job` and reconcile any renamed keys (e.g. `inference_csv` vs `inference_results_dir`, `output_dir` vs `results_dir`) before retrying. Output parquet name is `kpi_gaps.parquet`.
 
@@ -35,11 +37,11 @@ CLI surface can shift between data-services container builds. If a `gap_analysis
 
 ## Setup
 
-The threshold sweep, weakness ranking, and per-lighting expansion all run inside the `tao_toolkit.data_services` image declared in `versions.yaml`. Resolve the concrete URI once at the top of the run, then confirm Docker, the NVIDIA container toolkit, and a GPU are present and ensure the image is cached:
+The threshold sweep, weakness ranking, and per-lighting expansion all run inside the pinned TAO data-services image below. Confirm Docker, the NVIDIA container toolkit, and a GPU are present and ensure the image is cached:
 
 ```bash
-# Resolve tao_toolkit.data_services → concrete nvcr.io/... URI from versions.yaml
-DS_IMAGE=$(python3 -c "import yaml,os; print(yaml.safe_load(open(os.environ['TAO_SKILL_BANK_PATH']+'/versions.yaml'))['images']['tao_toolkit']['data_services'])")
+# Pinned TAO data-services container URI (stamped from the release manifest)
+DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-data-services  # versions-key: images.tao_toolkit.data_services
 echo "DS_IMAGE=$DS_IMAGE"
 
 docker info > /dev/null && echo "OK: docker"
@@ -48,7 +50,7 @@ docker image inspect "$DS_IMAGE" > /dev/null \
   || docker pull "$DS_IMAGE"
 ```
 
-`TAO_SKILL_BANK_PATH` is usually exported by the installed skill bank. If it is unset, point it at the skill-bank repo root before resolving. A GPU is required; aborting early on a GPU-less host saves a confusing late error.
+A GPU is required; aborting early on a GPU-less host saves a confusing late error.
 
 Three setup rules are load-bearing and easy to get wrong:
 
@@ -121,7 +123,7 @@ MIN_RECALL=1.0                       # zero-miss default; lower if KPI relaxes
 TOP_K=50                             # per-label augmentation budget
 OUT="$EXP_DIR/rca_results/$(date +%Y-%m-%d_%H%M%S)"
 SPEC="$OUT/vcn_aoi_spec.yaml"
-IMG=$(python3 -c "import yaml,os; print(yaml.safe_load(open(os.environ['TAO_SKILL_BANK_PATH']+'/versions.yaml'))['images']['tao_toolkit']['data_services'])")
+IMG=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-data-services  # versions-key: images.tao_toolkit.data_services
 
 mkdir -p "$OUT"
 
@@ -202,7 +204,7 @@ Write `RCA_Report.md` as a tight (1000–1800 word) computational gap analysis �
 
 ## Execution Order
 
-1. Resolve `DS_IMAGE` from `versions.yaml` (`images.tao_toolkit.data_services`), then run `docker info`, `nvidia-smi`, and `docker image inspect "$DS_IMAGE"` (pulling if missing) once to confirm the environment. Abort with a clear message if any fail.
+1. Set `DS_IMAGE` to the pinned data-services URI (see Setup), then run `docker info`, `nvidia-smi`, and `docker image inspect "$DS_IMAGE"` (pulling if missing) once to confirm the environment. Abort with a clear message if any fail.
 2. Run `date +%Y-%m-%d_%H%M%S` to get the timestamp; create `<experiment_result_dir>/rca_results/<timestamp>/`.
 3. Write `vcn_aoi_spec.yaml` into the timestamped dir with `min_recall` and `top_k_per_label` filled in. Keep it under `$WORKSPACE` so the `-e` path resolves inside the container.
 4. Run `docker run … "$DS_IMAGE" gap_analysis vcn_aoi -e vcn_aoi_spec.yaml inference_results_dir=… train_config=… kpi_media_path=… output_dir=…`. The container writes `kpi_gaps.parquet`, `threshold.txt`, `metrics.json`, `weak_samples_breakdown.txt` into `results_dir`. Print the chosen threshold and kept-row counts to stdout so the script-check hook can verify the run produced output.

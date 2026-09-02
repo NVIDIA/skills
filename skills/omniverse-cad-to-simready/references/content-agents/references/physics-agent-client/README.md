@@ -94,6 +94,13 @@ to the local wrapper when it packages the materialized USD for Physics Agent.
 The report records this as
 `physics_upload_info.cleared_unresolved_service_asset_paths`.
 
+After preparing the upload copy, the wrapper uses an available OpenUSD runtime
+to inspect the prepared layer and packages all resolved layers and assets into
+one USDZ for upload. Physics Agent does not accept unresolved dependencies: a
+missing texture, payload, reference, or other sidecar fails locally before the
+service session is created. Configure `CONTENT_AGENTS_OPENUSD_PYTHON` when the
+process Python cannot import `pxr` and no trusted skill-project OpenUSD runtime is available.
+
 For the GZIO connector test asset, the materialized USD has one combined mesh with six `GeomSubset` partitions. Running Physics Agent with these flags produced six split mesh parts and six corresponding rigid bodies instead of one rigid body on the combined mesh.
 
 This optimizer path is a preprocessing hint, not a guarantee that the Physics

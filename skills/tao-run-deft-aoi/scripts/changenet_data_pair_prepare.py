@@ -208,7 +208,7 @@ def main():
     parser.add_argument(
         "--input-dir",
         required=True,
-        help="Directory containing input (NG) images",
+        help="Directory of NG defect images (the ChangeNet input_path side)",
     )
     parser.add_argument(
         "--golden-dir",

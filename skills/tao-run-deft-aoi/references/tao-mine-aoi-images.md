@@ -2,8 +2,8 @@
 
 Read this when the parent runs the `data_mining` stage (embed-then-mine workflow).
 The underlying skill `tao-skill-bank:tao-mine-aoi-images` (`skills/data/tao-mine-aoi-images/SKILL.md`)
-owns the full docker invocation (three calls into the `tao_toolkit.data_services`
-image resolved from `versions.yaml` at runtime), encoder consistency requirement,
+owns the full docker invocation (three calls into the pinned TAO data-services
+image), encoder consistency requirement,
 output schema, and common pitfalls. This file only covers the DEFT-loop-specific
 overlay: required inputs, three-step order, output layout, and `deft_state.json`
 / `loop_log.jsonl` updates.
@@ -39,7 +39,7 @@ This is a warning, not a hard stop — k-NN by embedding can still pull rows of 
 2. **Embed source pool** (`embedding image_embeddings … input_parquet=<source_pool_parquet>`) → `source_embeddings.parquet`; use the **identical** `model` and `model_path` as Step 1
 3. **Mine nearest neighbours** (`tmm nearest_neighbors …`) → `mined.parquet` + `mining_summary.txt`
 
-All three steps use the `tao_toolkit.data_services` image declared in `versions.yaml` (resolved into `$DS_IMAGE` at the top of the run — see `skills/data/tao-mine-aoi-images/SKILL.md` § Setup). Mount the workspace root at an identical path inside the container (`-v $WORKSPACE:$WORKSPACE`) so absolute paths in parquet args resolve the same on both sides.
+All three steps use the pinned TAO data-services image (set as `$DS_IMAGE` at the top of the run — see `skills/data/tao-mine-aoi-images/SKILL.md` § Setup). Mount the workspace root at an identical path inside the container (`-v $WORKSPACE:$WORKSPACE`) so absolute paths in parquet args resolve the same on both sides.
 
 **Pre-create `experiment_specs/`.** Both `embedding image_embeddings` and `tmm nearest_neighbors` are Hydra-driven and abort with `Primary config directory not found` if no `experiment_specs/` directory exists at the container's working dir. The container does not auto-create it. Before each docker run, `mkdir -p <mining_dir>/experiment_specs/` on the host (the mount makes it visible inside the container), or pass `-w <mining_dir>` and let Hydra find an empty dir there. An empty directory is sufficient — the CLI supplies its own spec via flags. Without this, both steps 1+2 (embedding) and step 3 (mining) fail with the same opaque Hydra error.
 

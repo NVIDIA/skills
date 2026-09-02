@@ -4,7 +4,7 @@ description: Kubernetes execution platform — submits TAO container jobs as sin
   Use when running on EKS / GKE / AKS / on-prem clusters with the NVIDIA GPU Operator installed, or when integrating TAO
   into an existing k8s-native ML platform.
 license: Apache-2.0
-compatibility: Requires GPU worker nodes with NVIDIA driver branch 580, CUDA Toolkit 13.0, and NVIDIA Container Toolkit 1.19.0; the nvidia-tao-sdk Python package with the kubernetes extra (pip install 'nvidia-tao-sdk[kubernetes]'); an authenticated cluster; and the NVIDIA GPU Operator or device plugin.
+compatibility: Requires GPU worker nodes with NVIDIA driver 580 or newer, CUDA Toolkit 13.0 or newer, and NVIDIA Container Toolkit 1.19.0 or newer unless the selected model declares different minimums in runtime_requirements.gpu_host; also requires the nvidia-tao-sdk Python package with the kubernetes extra, an authenticated cluster, and the NVIDIA GPU Operator or device plugin.
 metadata:
   author: NVIDIA Corporation
   version: "0.1.0"
@@ -18,6 +18,8 @@ tags:
 ---
 
 # Kubernetes
+
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
 
 Submits TAO container jobs as Kubernetes Jobs. Works on any cluster reachable via kubeconfig (EKS / GKE / AKS / on-prem) or in-cluster service account (when the SDK runs inside a pod).
 
@@ -34,21 +36,21 @@ Operator/device plugin present.
 # Set TAO_K8S_SKIP_NODE_RUNTIME_CHECK=1 only when using managed GPU nodes whose
 # driver/toolkit lifecycle is owned by the cloud provider or GPU Operator policy.
 if [ "${TAO_K8S_SKIP_NODE_RUNTIME_CHECK:-0}" != "1" ]; then
-  TAO_SKILL_BANK_ROOT="${TAO_SKILL_BANK_ROOT:-$PWD}"
-  SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT}/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
+  SB="${TAO_SKILL_BANK_PATH:-${TAO_SKILL_BANK_ROOT:-$PWD}}"
+  SETUP_SCRIPT="${SB}/skills/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
 
   bash "$SETUP_SCRIPT" --backend kubernetes --check-only || {
     echo "MISSING: TAO Kubernetes GPU node runtime is not ready."
     echo "For self-managed GPU nodes, run after user approval:"
     echo "  bash \"$SETUP_SCRIPT\" --backend kubernetes --install --yes"
-    echo "For managed clusters, verify the node image/GPU Operator policy installs driver 580 and toolkit 1.19.0, then set TAO_K8S_SKIP_NODE_RUNTIME_CHECK=1."
+    echo "For managed clusters, verify the node image/GPU Operator policy satisfies the selected model's runtime requirements, then set TAO_K8S_SKIP_NODE_RUNTIME_CHECK=1."
     exit 1
   }
 fi
 
 # 1. SDK + kubernetes extra installed.
-# nvidia-tao-sdk is on public PyPI; pin lives in versions.yaml (wheels.tao_sdk_kubernetes).
-PIN=$("${TAO_SKILL_BANK_PATH:?}/scripts/resolve_versions_key.py" wheels.tao_sdk_kubernetes)
+# nvidia-tao-sdk is on public PyPI; the pin below is stamped from the release manifest.
+PIN="nvidia-tao-sdk[kubernetes]==7.1.0rc42"  # versions-key: wheels.tao_sdk_kubernetes
 python -c "import tao_sdk" 2>/dev/null || {
   echo "Installing missing Python requirement: $PIN"
   python -m pip install "$PIN"
@@ -77,6 +79,11 @@ if command -v kubectl >/dev/null 2>&1; then
   fi
 fi
 ```
+
+For self-managed nodes, if the selected model declares
+`runtime_requirements.gpu_host`, pass the corresponding `--min-*-version`
+flags to check and install commands. On managed clusters, require the provider
+node image or GPU Operator policy to satisfy that model profile.
 
 The GPU node runtime check is mandatory for self-managed nodes. For managed
 clusters where the client is not running on a GPU worker, verify the provider
@@ -117,7 +124,7 @@ from tao_sdk.platforms.kubernetes import KubernetesSDK
 
 sdk = KubernetesSDK()  # auto-detects auth
 job = sdk.create_job(
-    image='nvcr.io/nvidia/tao/tao-toolkit:6.26.3-pyt',
+    image='nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt',  # versions-key: images.tao_toolkit.pyt
     command='dino train -e /tmp/spec.yaml',
     gpu_count=1,
     env_vars={'NGC_KEY': os.environ['NGC_KEY']},
@@ -163,9 +170,19 @@ analysis = sdk.get_failure_analysis(job.id)
 
 ```python
 sdk.cancel_job(job.id)  # delete_namespaced_job with propagation_policy="Foreground"
+
+# For a confirmed-terminal S3-backed job, remove the exact UID-bound Job/pods
+# and then its job-scoped result prefix.
+sdk.delete_job_artifacts(job.id)
 ```
 
-`ttl_seconds_after_finished=3600` means completed Jobs auto-delete after 1h. To cancel an in-flight Job, `cancel_job` deletes it and its pods immediately.
+Completed Jobs are not TTL-deleted: their UID and terminal evidence remain
+available for safe recovery after an SDK restart. To cancel an in-flight Job,
+`cancel_job` deletes it and its pods with foreground propagation and reports
+success only after the writers are absent. For cleanup-supported S3 jobs,
+`delete_job_artifacts` first verifies and removes that exact terminal Job and
+its pods, then verifies deletion of the job-scoped S3 prefix. A same-name Job
+with a different UID is never deleted.
 
 ## GPU Operator dependency
 
@@ -207,7 +224,7 @@ Pass `num_nodes > 1` to `create_job()` to run distributed training across N pods
 
 ```python
 job = sdk.create_job(
-    image='nvcr.io/nvidia/tao/tao-toolkit:6.26.3-pyt',
+    image='nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt',  # versions-key: images.tao_toolkit.pyt
     command='dino train -e /tmp/spec.yaml',  # TAO entrypoint reads spec.train.num_nodes; env vars are wired by the container
     gpu_count=8,           # GPUs per node
     num_nodes=4,           # 4 × 8 = 32 GPUs total
@@ -220,7 +237,7 @@ For raw `torchrun`-based commands (non-TAO containers):
 
 ```python
 job = sdk.create_job(
-    image='nvcr.io/nvidia/pytorch:25.08-py3',
+    image='nvcr.io/nvidia/pytorch:25.08-py3',  # unpinned: NGC PyTorch base image example, not TAO release-cadenced
     command='torchrun --nnodes=$NNODES --nproc-per-node=$NPROC_PER_NODE --node-rank=$NODE_RANK '
             '--master-addr=$MASTER_ADDR --master-port=$MASTER_PORT train.py',
     gpu_count=8,
@@ -258,12 +275,15 @@ The TAO SDK's Indexed Job path is intentionally simple and dependency-free; if y
 
 **`No nvidia.com/gpu resources allocatable on the cluster`** — the GPU Operator (or NVIDIA Device Plugin) isn't installed. Install per the link above; verify with `kubectl get nodes -o jsonpath='{.items[*].status.allocatable}'`.
 
-**`ImagePullBackOff` / `ErrImagePull`** — the cluster can't pull the image. For nvcr.io: pre-create an image-pull secret in the namespace and pass its name via the `image_pull_secret` argument:
+**`ImagePullBackOff` / `ErrImagePull`** — the cluster can't pull the image. For nvcr.io: pre-create an image-pull secret in the namespace and pass its name via the `image_pull_secret` argument. Feed the key over stdin — `kubectl create secret docker-registry --docker-password=$NGC_KEY` would put the secret in argv, visible in the host's process table and shell history: <!-- lint-ok: secret-on-argv -->
 ```bash
-kubectl create secret docker-registry ngc-pull-secret \
-  --docker-server=nvcr.io \
-  --docker-username='$oauthtoken' \
-  --docker-password=$NGC_KEY -n tao-jobs
+kubectl create secret generic ngc-pull-secret -n tao-jobs \
+  --type=kubernetes.io/dockerconfigjson \
+  --from-file=.dockerconfigjson=/dev/stdin <<EOF
+{"auths": {"nvcr.io": {"username": "\$oauthtoken", "password": "${NGC_KEY}"}}}
+EOF
+# Verify without reading the secret back:
+kubectl get secret ngc-pull-secret -n tao-jobs >/dev/null && echo SECRET_OK
 ```
 
 **Pod stays `Pending` forever** — `get_job_replicas(job_id)` will show the readiness_issue. Common causes: insufficient GPU capacity (`Insufficient nvidia.com/gpu`), no node matches `node_selector`, missing image-pull secret, or PVC mount failure.

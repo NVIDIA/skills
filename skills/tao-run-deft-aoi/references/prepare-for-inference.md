@@ -67,8 +67,8 @@ jq . ${RESULTS_DIR}/best_model.json
 cp ${RESULTS_DIR}/best_model_inference_spec.yaml /tmp/my_inference.yaml
 # … set the four CONSUMER fields …
 
-# 3. Resolve the TAO pyt image URI from versions.yaml (single source of truth).
-TAO_PYT_IMAGE=$("${TAO_SKILL_BANK_PATH:?}/scripts/resolve_versions_key.py" images.tao_toolkit.pyt)
+# 3. Pinned TAO pyt image URI (stamped from the release manifest).
+TAO_PYT_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
 
 # 4. Run inference. Mount paths from best_model.json into the container.
 docker run --rm --gpus all --shm-size=8g \

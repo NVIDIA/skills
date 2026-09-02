@@ -24,6 +24,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "shared"))
 from script_utils import check_result as _check, emit_json_report
 
 from content_agent_material_cleanup import cleanup_material_output
+from openusd_upload_prep import openusd_python_commands as _openusd_python_commands
+from openusd_upload_prep import prepare_upload_asset_portable as _prepare_upload_asset
 from preflight_manifest import load_preflight_manifest, preflight_required, preflight_status_check, ready_service_url
 
 
@@ -404,77 +406,6 @@ def _post_pipeline(asset_path: Path, base_url: str, token: str | None, fields: d
     return str(session_id)
 
 
-def _layer_identifier(layer: Any) -> str:
-    return str(getattr(layer, "realPath", None) or getattr(layer, "identifier", "") or "")
-
-
-def _prepare_upload_asset(asset_path: Path, output_directory: Path) -> tuple[Path, dict[str, Any]]:
-    upload_info: dict[str, Any] = {
-        "asset_path": str(asset_path),
-        "dependency_layers": [],
-        "dependency_assets": [],
-        "dependency_count": 0,
-        "inspection_error": None,
-        "packaging": "none",
-        "package_size_bytes": None,
-        "path": str(asset_path),
-        "unresolved_paths": [],
-    }
-    if asset_path.suffix.lower() == ".usdz":
-        upload_info["packaging"] = "already_usdz"
-        return asset_path, upload_info
-
-    try:
-        from pxr import UsdUtils
-    except Exception as exc:
-        upload_info["inspection_error"] = f"OpenUSD dependency inspection is unavailable: {exc}"
-        return asset_path, upload_info
-
-    try:
-        layers, assets, unresolved_paths = UsdUtils.ComputeAllDependencies(str(asset_path))
-    except Exception as exc:
-        upload_info["inspection_error"] = f"Could not inspect USD dependencies: {exc}"
-        return asset_path, upload_info
-
-    root_path = asset_path.resolve()
-    dependency_layers: list[str] = []
-    for layer in layers:
-        identifier = _layer_identifier(layer)
-        if not identifier:
-            continue
-        try:
-            if Path(identifier).resolve() == root_path:
-                continue
-        except OSError:
-            pass
-        dependency_layers.append(identifier)
-
-    dependency_assets = [str(asset) for asset in assets]
-    unresolved = [str(path) for path in unresolved_paths]
-    upload_info["dependency_layers"] = dependency_layers
-    upload_info["dependency_assets"] = dependency_assets
-    upload_info["unresolved_paths"] = unresolved
-    upload_info["dependency_count"] = len(dependency_layers) + len(dependency_assets)
-
-    if unresolved:
-        raise RuntimeError("Cannot package USD for Content Agents upload; unresolved dependencies: " + ", ".join(unresolved))
-    if upload_info["dependency_count"] == 0:
-        return asset_path, upload_info
-
-    output_directory.mkdir(parents=True, exist_ok=True)
-    package_path = output_directory / f"{asset_path.stem}_content_agents_upload.usdz"
-    if package_path.exists():
-        package_path.unlink()
-    ok = UsdUtils.CreateNewUsdzPackage(str(asset_path), str(package_path))
-    if not ok or not package_path.exists() or package_path.stat().st_size == 0:
-        raise RuntimeError(f"OpenUSD failed to package USD dependencies for Content Agents upload: {package_path}")
-
-    upload_info["packaging"] = "usdz"
-    upload_info["path"] = str(package_path.resolve())
-    upload_info["package_size_bytes"] = package_path.stat().st_size
-    return package_path, upload_info
-
-
 def _is_unresolved_service_asset_path(path: str) -> bool:
     lower = path.lower()
     return ".usdz[" in lower and lower.startswith(
@@ -581,37 +512,57 @@ def _stage_mdl_safe_upload_asset(asset_path: Path, label: str) -> tuple[Path, di
 
 
 def _stage_mdl_safe_upload_asset_external(asset_path: Path, label: str) -> tuple[Path, dict[str, Any]]:
-    uv = shutil.which("uv")
     info: dict[str, Any] = {
         "staged": False,
         "path": str(asset_path),
         "stripped_mdl_source_assets": 0,
+        "cleared_unresolved_service_asset_paths": 0,
         "warning": None,
     }
-    if not uv:
-        info["warning"] = "uv was not found on PATH for alternate OpenUSD Python upload prep"
-        return asset_path, info
-    command = [uv, "run", "--python", "3.12", "python", "-c", MDL_UPLOAD_PREP_SNIPPET, str(asset_path), label]
-    try:
-        completed = subprocess.run(command, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=120, check=False)
-    except Exception as exc:
-        info["warning"] = f"Alternate OpenUSD Python upload prep failed to launch: {exc}"
-        return asset_path, info
-    if completed.returncode != 0:
-        detail = (completed.stderr or completed.stdout or "").strip()
-        info["warning"] = f"Alternate OpenUSD Python upload prep failed: {detail[:500]}"
-        return asset_path, info
-    try:
-        payload = json.loads(completed.stdout)
-    except json.JSONDecodeError as exc:
-        info["warning"] = f"Alternate OpenUSD Python upload prep returned invalid JSON: {exc}"
-        return asset_path, info
-    if not isinstance(payload, dict):
-        info["warning"] = "Alternate OpenUSD Python upload prep returned a non-object payload"
-        return asset_path, info
-    if payload.get("staged") and payload.get("path"):
-        return Path(str(payload["path"])), payload
-    return asset_path, payload
+    errors: list[str] = []
+    for prefix, runtime_label in _openusd_python_commands():
+        command = [*prefix, "-c", MDL_UPLOAD_PREP_SNIPPET, str(asset_path), label]
+        try:
+            completed = subprocess.run(
+                command,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=120,
+                check=False,
+            )
+        except Exception as exc:
+            errors.append(f"{runtime_label}: failed to launch: {exc}")
+            continue
+        if completed.returncode != 0:
+            detail = (completed.stderr or completed.stdout or "").strip()
+            errors.append(f"{runtime_label}: {detail[:500]}")
+            continue
+        output_lines = completed.stdout.strip().splitlines()
+        if not output_lines:
+            errors.append(f"{runtime_label}: returned no result")
+            continue
+        try:
+            payload = json.loads(output_lines[-1])
+        except json.JSONDecodeError as exc:
+            errors.append(f"{runtime_label}: returned invalid JSON: {exc}")
+            continue
+        if not isinstance(payload, dict):
+            errors.append(f"{runtime_label}: returned a non-object payload")
+            continue
+        payload["prep_runtime"] = runtime_label
+        payload["prep_executable"] = prefix[0]
+        if payload.get("staged") and payload.get("path"):
+            staged_path = Path(str(payload["path"]))
+            if not staged_path.is_file():
+                errors.append(f"{runtime_label}: staged upload does not exist: {staged_path}")
+                continue
+            return staged_path, payload
+        return asset_path, payload
+
+    detail = "; ".join(errors) if errors else "no alternate OpenUSD runtime found"
+    info["warning"] = f"No working alternate OpenUSD Python runtime staged the upload: {detail}"
+    return asset_path, info
 
 
 def _stage_physics_upload_asset(asset_path: Path) -> tuple[Path, dict[str, Any]]:
@@ -623,22 +574,43 @@ def _stage_material_upload_asset(asset_path: Path) -> tuple[Path, dict[str, Any]
 
 
 def _inspect_usd_topology_external(asset_path: Path) -> dict[str, Any]:
-    uv = shutil.which("uv")
-    if not uv:
-        return {"inspected": False, "reason": "uv was not found on PATH for alternate OpenUSD Python inspection"}
-    command = [uv, "run", "--python", "3.12", "python", "-c", USD_TOPOLOGY_INSPECTION_SNIPPET, str(asset_path)]
-    try:
-        completed = subprocess.run(command, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=120, check=False)
-    except Exception as exc:
-        return {"inspected": False, "reason": f"Alternate OpenUSD Python inspection failed to launch: {exc}"}
-    if completed.returncode != 0:
-        detail = (completed.stderr or completed.stdout or "").strip()
-        return {"inspected": False, "reason": f"Alternate OpenUSD Python inspection failed: {detail[:500]}"}
-    try:
-        payload = json.loads(completed.stdout)
-    except json.JSONDecodeError as exc:
-        return {"inspected": False, "reason": f"Alternate OpenUSD Python inspection returned invalid JSON: {exc}"}
-    return payload if isinstance(payload, dict) else {"inspected": False, "reason": "Alternate OpenUSD Python inspection returned a non-object payload"}
+    errors: list[str] = []
+    for prefix, runtime_label in _openusd_python_commands():
+        command = [*prefix, "-c", USD_TOPOLOGY_INSPECTION_SNIPPET, str(asset_path)]
+        try:
+            completed = subprocess.run(
+                command,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=120,
+                check=False,
+            )
+        except Exception as exc:
+            errors.append(f"{runtime_label}: failed to launch: {exc}")
+            continue
+        if completed.returncode != 0:
+            detail = (completed.stderr or completed.stdout or "").strip()
+            errors.append(f"{runtime_label}: {detail[:500]}")
+            continue
+        output_lines = completed.stdout.strip().splitlines()
+        if not output_lines:
+            errors.append(f"{runtime_label}: returned no result")
+            continue
+        try:
+            payload = json.loads(output_lines[-1])
+        except json.JSONDecodeError as exc:
+            errors.append(f"{runtime_label}: returned invalid JSON: {exc}")
+            continue
+        if not isinstance(payload, dict):
+            errors.append(f"{runtime_label}: returned a non-object payload")
+            continue
+        payload["inspection_runtime"] = runtime_label
+        payload["inspection_executable"] = prefix[0]
+        return payload
+
+    detail = "; ".join(errors) if errors else "no alternate OpenUSD runtime found"
+    return {"inspected": False, "reason": f"No working alternate OpenUSD Python runtime inspected the stage: {detail}"}
 
 
 def _wait_for_status(
@@ -928,7 +900,6 @@ def _inspect_usd_topology(asset_path: Path) -> dict[str, Any]:
     except Exception as exc:
         external = _inspect_usd_topology_external(asset_path)
         if external.get("inspected"):
-            external["inspection_runtime"] = "uv-python-3.12"
             return external
         result["reason"] = (
             f"OpenUSD Python APIs are unavailable: {exc}. "
@@ -1671,10 +1642,20 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 )
 
     try:
-        upload_asset_path, upload_info = _prepare_upload_asset(asset_path, output_directory)
+        upload_asset_path, upload_info = _prepare_upload_asset(
+            asset_path,
+            output_directory,
+            allow_missing_textures=agent_key == "material",
+        )
     except Exception as exc:
         checks.append(_check("upload_asset_prepared", False, str(exc)))
-        report["upload_asset_path"] = str(asset_path)
+        failed_upload_info = getattr(exc, "upload_info", None)
+        if isinstance(failed_upload_info, dict):
+            report["upload_info"] = failed_upload_info
+            report["upload_dependency_count"] = int(failed_upload_info.get("dependency_count") or 0)
+        report["upload_asset_path"] = str(
+            failed_upload_info.get("path", asset_path) if isinstance(failed_upload_info, dict) else asset_path
+        )
         report["upload_packaging"] = "failed"
         report["errors"] = [check["message"] for check in checks if check["severity"] == "error" and not check["passed"]]
         return report
@@ -1683,9 +1664,17 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     report["upload_packaging"] = upload_info["packaging"]
     report["upload_dependency_count"] = upload_info["dependency_count"]
     report["upload_info"] = upload_info
-    if upload_info["inspection_error"]:
-        checks.append(_check("upload_dependency_inspection_skipped", True, upload_info["inspection_error"], "info"))
-    elif upload_info["packaging"] == "usdz":
+    if upload_info.get("warning"):
+        report["warnings"].append(str(upload_info["warning"]))
+        checks.append(
+            _check(
+                "upload_missing_textures_accepted",
+                True,
+                str(upload_info["warning"]),
+                "warning",
+            )
+        )
+    if upload_info["packaging"] == "usdz":
         checks.append(
             _check(
                 "upload_asset_packaged",
@@ -1696,6 +1685,15 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         )
     elif upload_info["packaging"] == "already_usdz":
         checks.append(_check("upload_asset_already_packaged", True, "Input asset is already a USDZ package", "info"))
+    elif upload_info["packaging"] == "missing_textures_passthrough":
+        checks.append(
+            _check(
+                "upload_asset_missing_textures_passthrough",
+                True,
+                "Uploading the original USD because Material Agent permits unresolved texture inputs",
+                "info",
+            )
+        )
     else:
         checks.append(_check("upload_asset_single_file", True, "No external USD dependencies detected for upload", "info"))
 

@@ -121,7 +121,7 @@ docker build -t run-<short>:latest .
 ```bash
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
-  -e HF_TOKEN=$HF_TOKEN \
+  -e HF_TOKEN \
   -e HF_HOME=/workspace/.cache/huggingface \
   -v $(pwd)/$OUTPUT_DIR:/workspace \
   run-<short>:latest \
@@ -139,7 +139,7 @@ For `source = local`, also bind-mount the dataset path read-only:
 ```bash
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
-  -e HF_TOKEN=$HF_TOKEN -e WANDB_MODE=disabled \
+  -e HF_TOKEN -e WANDB_MODE=disabled \
   -e HF_HOME=/workspace/.cache/huggingface \
   -e PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
   -v $(pwd)/$OUTPUT_DIR:/workspace \
@@ -159,7 +159,7 @@ Any failure → STOP. Do not launch full training.
 ```bash
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
-  -e HF_TOKEN=$HF_TOKEN \
+  -e HF_TOKEN \
   -e HF_HOME=/workspace/.cache/huggingface \
   -v $(pwd)/$OUTPUT_DIR:/workspace \
   run-<short>:latest \
@@ -174,8 +174,8 @@ Skip if `skip_baseline: true` in `config.yaml`.
 ```bash
 docker run -d --name hft_train --gpus all --shm-size=16g --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
-  -e HF_TOKEN=$HF_TOKEN \
-  -e WANDB_API_KEY=$WANDB_API_KEY -e WANDB_PROJECT=$WANDB_PROJECT \
+  -e HF_TOKEN \
+  -e WANDB_API_KEY -e WANDB_PROJECT=$WANDB_PROJECT \
   -e WANDB_RUN_NAME=$WANDB_RUN_NAME \
   -e HF_HOME=/workspace/.cache/huggingface \
   -e PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
@@ -193,7 +193,7 @@ Multi-GPU: prepend `torchrun --nproc_per_node=$gpu_count` to `python train.py`.
 ```bash
 docker run --rm --gpus all --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
-  -e HF_TOKEN=$HF_TOKEN \
+  -e HF_TOKEN \
   -e HF_HOME=/workspace/.cache/huggingface \
   -v $(pwd)/$OUTPUT_DIR:/workspace \
   run-<short>:latest \
@@ -209,7 +209,7 @@ Subsequent eval / infer / push must use `checkpoints/merged` instead of
 ```bash
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
-  -e HF_TOKEN=$HF_TOKEN \
+  -e HF_TOKEN \
   -e HF_HOME=/workspace/.cache/huggingface \
   -v $(pwd)/$OUTPUT_DIR:/workspace \
   run-<short>:latest \
@@ -224,7 +224,7 @@ For LoRA, replace `checkpoints/final` → `checkpoints/merged`.
 ```bash
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
-  -e HF_TOKEN=$HF_TOKEN \
+  -e HF_TOKEN \
   -e HF_HOME=/workspace/.cache/huggingface \
   -v $(pwd)/$OUTPUT_DIR:/workspace \
   run-<short>:latest \

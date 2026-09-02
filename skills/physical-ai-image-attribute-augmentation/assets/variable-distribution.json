@@ -1,0 +1,39 @@
+{
+  "variables": {
+    "top_outer_color": {
+      "black": 0.5,
+      "blue": 0.5
+    },
+    "top_outer_type": {
+      "hoodie": 0.5,
+      "vest": 0.5
+    },
+    "bottom_type": {
+      "jeans": 0.5,
+      "shorts": 0.5
+    },
+    "bottom_color": {
+      "black": 0.5,
+      "blue": 0.5
+    },
+    "shoe_type": {
+      "boots": 0.5,
+      "sneakers": 0.5
+    }
+  },
+  "conditional_variables": {
+    "shoe_color": {
+      "depends_on": "shoe_type",
+      "distributions": {
+        "boots": {
+          "black": 0.5,
+          "brown": 0.5
+        },
+        "sneakers": {
+          "black": 0.5,
+          "white": 0.5
+        }
+      }
+    }
+  }
+}

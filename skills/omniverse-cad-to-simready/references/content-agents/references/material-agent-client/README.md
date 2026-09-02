@@ -77,6 +77,19 @@ files are not needed for Material Agent prediction, and they can block USDZ
 upload packaging. The report records this as `material_upload_info.staged=true`
 with `stripped_mdl_source_assets`.
 
+The wrapper then performs mandatory dependency inspection using an available
+OpenUSD runtime and packages every resolvable sidecar into the uploaded USDZ.
+Material Agent has one explicit exception: unresolved texture extensions may
+pass through in the original USD with an `upload_info.warning` when dependency
+inspection finds no resolved sidecars, because material prediction can replace
+missing source textures. When a missing texture prevents packaging one or more
+resolved dependencies, the wrapper fails locally rather than upload a root layer
+that drops those sidecars.
+Missing USD layers and all other non-texture dependencies fail locally before a
+service session is created. Set
+`CONTENT_AGENTS_OPENUSD_PYTHON` to a Python 3.12 interpreter with `pxr` when the
+process runtime and trusted skill-project fallback cannot perform this inspection.
+
 ## Output Cleanup
 
 After the required materialized USD artifact is downloaded, the wrapper runs a

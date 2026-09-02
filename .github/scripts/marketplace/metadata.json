@@ -2221,6 +2221,18 @@
       }
     },
     {
+      "path": "skills/medtech-model-evidence-export",
+      "name": "medtech-model-evidence-export",
+      "description": "Exports sanitized metadata, parameters, reproducibility details, quality metrics, and optional review artifacts from Medical AI inference runs or evidence packs to MLflow. Use after inference, including NV-Generate runs; not for live training tracking, model registration, or clinical use.",
+      "metadata": {
+        "product.primary": "NIM for Healthcare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,data_scientist,developer",
+        "discovery.activity_tags": "extract,integrate,inference,validate,measure"
+      }
+    },
+    {
       "path": "skills/nemo-automodel-distributed-training",
       "name": "nemo-automodel-distributed-training",
       "description": "Guide for selecting and configuring distributed training strategies in NeMo AutoModel, including FSDP2, Megatron FSDP, DDP, and parallelism settings.",
@@ -2811,19 +2823,19 @@
     {
       "path": "skills/nv-generate-mr-brain",
       "name": "nv-generate-mr-brain",
-      "description": "Used for generating synthetic brain MRI volumes with NV-Generate-CTMR rflow-mr-brain. Not for production training data.",
+      "description": "Used for generating synthetic T1, T2, FLAIR, SWI, or MRA brain MRI volumes with NV-Generate-CTMR MR-Brain v1. Not for production training data.",
       "metadata": {
         "product.primary": "MONAI",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "vision-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
+        "audience": "developer,research_academic,research_non_academic,ai_engineer,ml_engineer",
         "discovery.activity_tags": "generate,synthesize,validate,inspect"
       }
     },
     {
       "path": "skills/nv-generate-mr-brain-finetune",
       "name": "nv-generate-mr-brain-finetune",
-      "description": "Used for finetuning NV-Generate-CTMR MR-brain diffusion UNet from a NIfTI datalist. Not for clinical or production data approval.",
+      "description": "Used for finetuning NV-Generate-CTMR MR-Brain v1 for T1, T2, FLAIR, SWI, or MRA data from a NIfTI datalist. Not for clinical or production data approval.",
       "metadata": {
         "product.primary": "MONAI",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2871,7 +2883,7 @@
     {
       "path": "skills/nv-segment-ct-finetune",
       "name": "nv-segment-ct-finetune",
-      "description": "Used for smoke or dataset finetuning of NV-Segment-CT VISTA3D on CT NIfTI labels. Not for clinical validation.",
+      "description": "Runs standard or fixed-channel softmax finetuning of NV-Segment-CT VISTA3D on CT NIfTI image/label datasets, with optional MONAI-native MLflow tracking and checkpoint evidence. Uses softmax for predefined, mutually exclusive classes; keeps the standard workflow when point prompts or runtime-variable classes are needed. Not for clinical validation.",
       "metadata": {
         "product.primary": "MONAI",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2953,6 +2965,54 @@
       }
     },
     {
+      "path": "skills/paidf-augmentation",
+      "name": "paidf-augmentation",
+      "description": "Use when authoring or validating PAIDF augmentation YAML configs, or running remote Cosmos Transfer/Predict, image-edit, or image-to-video inference.",
+      "metadata": {
+        "product.primary": "Cosmos",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "ai_engineer,ml_engineer,robotics_developer,developer,data_engineer",
+        "discovery.activity_tags": "configure,validate,inference,generate,evaluate"
+      }
+    },
+    {
+      "path": "skills/paidf-auto-labeling",
+      "name": "paidf-auto-labeling",
+      "description": "Use when a user needs to get started with PAIDF Auto-Labeling, plan a scenario, run or debug a shipped cookbook, author prompts or cookbooks, migrate a pipeline, or configure a stage. Confirm critical inputs (data path, output path, endpoints) and ask when any are missing. This is a router: read the matching reference instead of inventing a workflow.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "ml_engineer,ai_engineer,data_engineer,developer,robotics_developer",
+        "discovery.activity_tags": "get_started,debug,configure,migrate,integrate"
+      }
+    },
+    {
+      "path": "skills/paidf-orchestration-setup",
+      "name": "paidf-orchestration-setup",
+      "description": "Audit, prepare, and deploy PAIDF Orchestration on a Kubernetes GPU cluster - single-GPU H100/L40S hosts, managed Kubernetes, kubeadm, and similar. Select for requests to set up, install, deploy, configure, or check a PAIDF Orchestration environment; run a workflow on a new or unverified GPU host; connect via kubeconfig; validate GPU compute; deploy the Airflow controller; or choose external versus in-cluster model services. A plain SSH host is not a supported backend.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "devops_engineer,platform_engineer,solutions_architect,ai_engineer,developer",
+        "discovery.activity_tags": "deploy,configure,validate,orchestrate,get_started"
+      }
+    },
+    {
+      "path": "skills/paidf-orchestration-write-dag",
+      "name": "paidf-orchestration-write-dag",
+      "description": "Use when a user describes a custom PAIDF Orchestration pipeline — a specific ordered combination of stages such as augmentation only, auto-labeling only, detection+captioning only, or image attribute augmentation without full auto-labeling — that no existing DAG in airflow/dags/workflows/ covers, and asks for a new Kubernetes DAG. Also use to check that a generated or existing DAG's model/container/prompt choices match an external spec document (e.g. a PAIDF `launchable.md`).",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "application_developer,platform_engineer,devops_engineer,ml_engineer,ai_engineer",
+        "discovery.activity_tags": "orchestrate,generate,configure,deploy,validate"
+      }
+    },
+    {
       "path": "skills/physical-ai-defect-image-generation",
       "name": "physical-ai-defect-image-generation",
       "description": "Use when the user wants to orchestrate defect image generation with NVIDIA Cosmos AnomalyGen (Cosmos-Predict2-derived) on OSMO for PCBA, metal surface, and glass inspection. The Day 0 path handles cold-start with USD-to-ROI, image-edit augmentation, and AnomalyGen to create initial PCBA datasets. The Day 1 path performs inference and labeling on real images. This skill helps with first-time asset setup, creation of finetuning checkpoints, and configuring deployment.\nTrigger keywords: defect image generation, dig workflow, dig pipeline, defect image detection workflow, aoi pipeline, aoi anomalygen, usd2roi anomalygen, day 0 pcba, day 1 pcba, day 1 real-photo alignment, day 1 manual roi, metal surface anomaly, glass defect, anomalygen finetune, setup_pcb, setup_metal, setup_glass, setup_pretrained, dig setup, dig datasets, dig pretrained checkpoint, dig image-edit endpoint, cosmos defect generation, cosmos-predict2 defect, cosmos-anomalygen, cosmos predict2 finetune.",
@@ -2965,9 +3025,21 @@
       }
     },
     {
+      "path": "skills/physical-ai-event-video-generation",
+      "name": "physical-ai-event-video-generation",
+      "description": "Run the PAIDF Orchestration Event Video Generation DAG on Kubernetes - image-to-video anomaly generation, auto-labeling, and anomaly dataset generation. Select for requests about event video generation, anomaly video generation, image-to-video synthesis, Cosmos3 image2video, anomaly dataset creation, safety/surveillance SDG, or generating person-falling, person-climbing, person-running, fighting, smoking/vaping, fire/smoke, or shoplifting video clips from a seed image. Runs environment setup first when controller readiness is unknown. Not for person-crop clothing/attribute augmentation (that is image-attribute-augmentation-workflow) and not for video style transfer.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "ai_engineer,ml_engineer,data_engineer,application_developer,devops_engineer",
+        "discovery.activity_tags": "generate,synthesize,orchestrate,deploy,configure"
+      }
+    },
+    {
       "path": "skills/physical-ai-image-attribute-augmentation",
       "name": "physical-ai-image-attribute-augmentation",
-      "description": "Use when running image attribute augmentation and auto-labeling workflows on OSMO: flow selection, preflight, submit-time interpolation, monitoring, and output retrieval. Trigger keywords: people attribute search, Image Attribute Augmentation, person augmentation, attribute search, person re-identification, clothing augmentation, person crop augmentation.",
+      "description": "Run the PAIDF Orchestration Image Attribute Augmentation DAG on Kubernetes - person-crop clothing augmentation, attribute search, and augmented dataset generation. Select for requests about image attribute augmentation, person attribute search, person re-identification data, clothing augmentation, attribute captions, augmentation payloads, run status, or result retrieval. Runs environment setup first when controller readiness is unknown. Not for video or defect-image generation.",
       "metadata": {
         "product.primary": "Physical AI Dataset",
         "classification.category.primary": "physical_ai",
@@ -3147,7 +3219,7 @@
     {
       "path": "skills/tao-analyze-gaps-visual-changenet",
       "name": "tao-analyze-gaps-visual-changenet",
-      "description": "Performs gap analysis on NVIDIA TAO VCN Classify (Visual Component Net) experiments by invoking the data-services container (`tao_toolkit.data_services` from `versions.yaml`) directly via `docker run … gap_analysis vcn_aoi …` — picks the optimal decision threshold, ranks per-sample weakness, and emits a top-K weakest parquet expanded per-lighting for downstream augmentation. Use when analyzing VCN classification failures, picking SDA augmentation targets, or auditing PASS/NO_PASS boundary cases.",
+      "description": "Performs gap analysis on NVIDIA TAO VCN Classify (Visual Component Net) experiments by invoking the pinned TAO data-services container directly via `docker run … gap_analysis vcn_aoi …` — picks the optimal decision threshold, ranks per-sample weakness, and emits a top-K weakest parquet expanded per-lighting for downstream augmentation. Use when analyzing VCN classification failures, picking SDA augmentation targets, or auditing PASS/NO_PASS boundary cases.",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -3207,7 +3279,7 @@
     {
       "path": "skills/tao-finetune-cosmos-reason",
       "name": "tao-finetune-cosmos-reason",
-      "description": "Cosmos3-Nano video QA supervised fine-tuning with FSDP parallelism. Use when training or evaluating video question-answering models, fine-tuning Cosmos3-Nano or compatible Cosmos Reason models with SFT/LoRA, or working with Cosmos-RL. Trigger phrases include \"fine-tune Cosmos\", \"Cosmos3 Nano Reasoner\", \"Cosmos-RL SFT\", \"video QA fine-tune\", \"Cosmos3-Nano training\".",
+      "description": "Cosmos3-Nano video QA supervised fine-tuning with FSDP parallelism across variable-width GPU configurations. Use when training or evaluating video question-answering models, fine-tuning Cosmos3-Nano or compatible Cosmos Reason models with SFT/LoRA, or working with Cosmos-RL. Trigger phrases include \"fine-tune Cosmos\", \"Cosmos3 Nano Reasoner\", \"Cosmos-RL SFT\", \"video QA fine-tune\", \"Cosmos3-Nano training\".",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -3219,7 +3291,7 @@
     {
       "path": "skills/tao-finetune-huggingface-model",
       "name": "tao-finetune-huggingface-model",
-      "description": "Fine-tune any HuggingFace CV / VLM / LLM model on local NVIDIA GPUs inside an NGC PyTorch container. Use when the user wants to fine-tune a HuggingFace model (full or LoRA), train a vision / VLM / LLM model end-to-end, generate a reproducible HF training pipeline, smoke-test a HuggingFace model locally before scale-up, push a fine-tuned model to the HF Hub with a model card, or emit a self-contained rerun skill for an existing HuggingFace finetune. Supports image classification, object detection, semantic / instance / panoptic segmentation, depth estimation, image-text-to-text VLM (SFT / LoRA), and LLM SFT / DPO / GRPO. Six-step workflow: inspect and qualify, hardware and NGC image, research, generate and smoke, train + eval + infer, push and emit rerun skill.\n",
+      "description": "Fine-tune any HuggingFace CV / VLM / LLM model on local NVIDIA GPUs inside an NGC PyTorch container when no dedicated TAO model skill matches. Use when the user wants to fine-tune a HuggingFace model (full or LoRA), train a vision / VLM / LLM model end-to-end, generate a reproducible HF training pipeline, smoke-test a HuggingFace model locally before scale-up, push a fine-tuned model to the HF Hub with a model card, or emit a self-contained rerun skill for an existing HuggingFace finetune. Supports image classification, object detection, semantic / instance / panoptic segmentation, depth estimation, image-text-to-text VLM (SFT / LoRA), and LLM SFT / DPO / GRPO. Six-step workflow: inspect and qualify, hardware and NGC image, research, generate and smoke, train + eval + infer, push and emit rerun skill. Do not use for any Hugging Face model ID claimed by a dedicated `skills/models/*` skill; the model skill and its declared execution environment take precedence.\n",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -3447,7 +3519,7 @@
     {
       "path": "skills/tao-setup-nvidia-gpu-host",
       "name": "tao-setup-nvidia-gpu-host",
-      "description": "Host setup for TAO GPU backends. Checks and, after user approval, installs NVIDIA driver branch 580, CUDA Toolkit 13.0, and NVIDIA Container Toolkit 1.19.0 for Docker/local-Docker and Kubernetes GPU worker hosts. The `--check-only` path works on any Linux distribution; `--install` automates debian-family (Ubuntu/Debian/Pop!_OS/Mint/Zorin/Raspbian), rhel-family (Fedora/RHEL/Rocky/AlmaLinux), and suse-family (openSUSE/SLES) hosts, and prints actionable manual-install steps for everything else. Use when the user asks to \"set up an NVIDIA GPU host\", \"check TAO Docker GPU runtime\", or prepare a Kubernetes GPU worker for TAO.",
+      "description": "Host setup for TAO GPU backends. Checks and, after user approval, installs minimum-compatible NVIDIA driver, CUDA Toolkit, and NVIDIA Container Toolkit versions for Docker/local-Docker and Kubernetes GPU worker hosts. TAO-wide defaults can be overridden by the selected model's runtime profile. The `--check-only` path works on any Linux distribution; `--install` automates debian-family (Ubuntu/Debian/Pop!_OS/Mint/Zorin/Raspbian), rhel-family (Fedora/RHEL/Rocky/AlmaLinux), and suse-family (openSUSE/SLES) hosts, and prints actionable manual-install steps for everything else. Use when the user asks to \"set up an NVIDIA GPU host\", \"check TAO Docker GPU runtime\", or prepare a Kubernetes GPU worker for TAO.",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "infrastructure",

@@ -1,8 +1,9 @@
 ---
 name: nv-generate-mr-brain
-description: Used for generating synthetic brain MRI volumes with NV-Generate-CTMR rflow-mr-brain. Not for production training data.
+description: Used for generating synthetic T1, T2, FLAIR, SWI, or MRA brain MRI volumes with NV-Generate-CTMR MR-Brain v1. Not for production training data.
 license: Apache-2.0
-allowed-tools: Bash
+allowed-tools: Bash, Read, Write, WebFetch, Env
+permissions: [env, file_read, file_write, network, shell]
 metadata:
   author: NVIDIA MedTech Team
   tags:
@@ -14,7 +15,7 @@ metadata:
 # NV-Generate-MR-Brain
 
 ## Purpose
-- Used for generating synthetic brain MRI volumes with NV-Generate-CTMR rflow-mr-brain. Not for production training data.
+- Used for generating synthetic T1, T2, FLAIR, SWI, or MRA brain MRI volumes with NV-Generate-CTMR rflow-mr-brain v1. Not for production training data.
 - Use the wrapper exactly as documented; do not replace the upstream entrypoint with a handwritten implementation.
 - Do not write custom inference code for normal runs. The wrapper owns config staging, output paths, and validation.
 - Manifest I/O: inputs are `model_config_override`; outputs are `synthetic_mr_brain_volumes` and `result_json`.
@@ -23,9 +24,33 @@ metadata:
 - Read `skill_manifest.yaml` before changing arguments, side effects, or validation gates.
 - Run `scripts/run_mr_brain.py` through the documented command below; keep outputs under a caller-provided run directory.
 - If a host agent exposes `run_script`, use `run_script("scripts/run_mr_brain.py", args=[...])`; otherwise run the Bash/Python command shown below.
-- Emit a single bash code block, and keep the `python -m pip install -r "$NV_GENERATE_ROOT/requirements.txt"` step in that same command — the runtime may be a fresh environment without `nibabel`/MONAI, so dropping the install fails with `ModuleNotFoundError`.
+- For a command-shape review, do not install packages, clone repositories,
+  download weights, or start GPU inference. Emit only the exact wrapper command
+  with the supplied config path plus explicit `--output-dir`, `--modality`, and
+  `--random-seed` values.
+- For an executable run, emit a single bash code block and keep the
+  `python -m pip install -r "$NV_GENERATE_ROOT/requirements.txt"` step in that
+  same command — the runtime may be a fresh environment without
+  `nibabel`/MONAI, so dropping the install fails with `ModuleNotFoundError`.
+- If `--modality mri_mra` is selected, state that upstream reports sparse MRA
+  training coverage and that output quality is not guaranteed.
 - Do not add `rm`, `mkdir`, or any cleanup of `--output-dir`; the wrapper creates it. Use a fresh `--output-dir` instead of deleting one.
 - Check the emitted JSON and paired verifier guidance before treating the run as evidence.
+
+## Examples
+
+Command-shape review only (no setup or execution):
+
+```bash
+python skills/nv-generate-mr-brain/scripts/run_mr_brain.py \
+  PATH_TO_MR_BRAIN_CONFIG.json \
+  --output-dir runs/nv_generate_mr_brain_demo \
+  --modality mri_t1 \
+  --random-seed 1234
+```
+
+For an executable run, use the setup-aware command under
+[Usage](#usage).
 
 ## Available Scripts
 | Script | Purpose | Arguments |
@@ -51,7 +76,7 @@ metadata:
 | Validation gate failure | Output violated a declared engineering invariant. | Keep the failed evidence pack and use the gate message to repair inputs or wrapper code. |
 
 Wraps the upstream
-[`NVIDIA-Medtech/NV-Generate-CTMR`](https://github.com/NVIDIA-Medtech/NV-Generate-CTMR/tree/61c4ec709b84cad468852243c48e250bec732074)
+[`NVIDIA-Medtech/NV-Generate-CTMR`](https://github.com/NVIDIA-Medtech/NV-Generate-CTMR/tree/da438fec6484cdb6f421f8c7051d954ebefff730)
 MR brain image-only generation workflow. The wrapper does not reimplement
 diffusion sampling or autoencoder decoding. It stages config overrides, runs
 the documented `python -m scripts.diff_model_infer` command for
@@ -63,7 +88,7 @@ the documented `python -m scripts.diff_model_infer` command for
 For user run commands, use this repo-root wrapper path exactly:
 
 ```bash
-export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7}" && \
+export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-da438fe}" && \
 python -m pip install -r "$NV_GENERATE_ROOT/requirements.txt" && \
 python skills/nv-generate-mr-brain/scripts/run_mr_brain.py PATH_TO_MR_BRAIN_CONFIG.json --output-dir OUT_DIR --modality mri_t1 --random-seed 1234
 ```
@@ -78,8 +103,8 @@ pinned default checkout once:
 
 ```bash
 if [ -z "${NV_GENERATE_ROOT:-}" ]; then
-  export NV_GENERATE_COMMIT=61c4ec709b84cad468852243c48e250bec732074
-  export NV_GENERATE_ROOT="$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7"
+  export NV_GENERATE_COMMIT=da438fec6484cdb6f421f8c7051d954ebefff730
+  export NV_GENERATE_ROOT="$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-da438fe"
   if [ ! -d "$NV_GENERATE_ROOT/.git" ]; then
     git clone https://github.com/NVIDIA-Medtech/NV-Generate-CTMR.git "$NV_GENERATE_ROOT"
     git -C "$NV_GENERATE_ROOT" checkout --detach "$NV_GENERATE_COMMIT"
@@ -88,12 +113,29 @@ fi
 pip install -r "$NV_GENERATE_ROOT/requirements.txt"
 ```
 
-Download the MR-brain weights:
+The wrapper executes upstream code only when `NV_GENERATE_ROOT` is at the exact
+manifest commit and its tracked files are clean. Keep model weights untracked
+under `models/`, and use the wrapper override JSON instead of editing upstream
+configs. Child processes receive only an allowlist of runtime, CUDA, locale,
+and certificate variables; API keys, tokens, passwords, and unrelated parent
+environment values are not forwarded.
+
+Download the reused autoencoder and MR-Brain v1 checkpoint from their exact
+manifest revisions:
 
 ```bash
-cd "$NV_GENERATE_ROOT"
-python -m scripts.download_model_data --version rflow-mr-brain --root_dir ./ --model_only
+python -m huggingface_hub.commands.huggingface_cli download \
+  nvidia/NV-Generate-CT models/autoencoder_v1.pt \
+  --revision 75ac080fb1083c403793563477724c038e7d430c \
+  --local-dir "$NV_GENERATE_ROOT"
+python -m huggingface_hub.commands.huggingface_cli download \
+  nvidia/NV-Generate-MR-Brain models/diff_unet_3d_rflow-mr-brain_v1.pt \
+  --revision ef9759bf221265b2704569cdeeac20bbf03b62ee \
+  --local-dir "$NV_GENERATE_ROOT"
 ```
+
+The wrapper verifies both downloaded files against their published Git LFS
+SHA-256 object IDs before launching inference.
 
 Runtime needs an NVIDIA GPU with at least 16 GB VRAM. There is no CPU
 fallback in the upstream path.
@@ -112,7 +154,7 @@ weights do not imply cached Python packages. If setup requires `cd "$NV_GENERATE
 ## Usage
 
 ```bash
-export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-61c4ec7}" && \
+export NV_GENERATE_ROOT="${NV_GENERATE_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Generate-CTMR-da438fe}" && \
 python -m pip install -r "$NV_GENERATE_ROOT/requirements.txt" && \
 python skills/nv-generate-mr-brain/scripts/run_mr_brain.py \
   PATH_TO_MR_BRAIN_CONFIG.json \
@@ -128,11 +170,19 @@ explicitly asked to run that fixture. If the user says "the request is at
 argument to `scripts/run_mr_brain.py`.
 
 Supported MR-brain modality names are `mri`, `mri_t1`, `mri_t2`,
-`mri_flair`, `mri_swi`, `mri_t1_skull_stripped`,
-`mri_t2_skull_stripped`, `mri_flair_skull_stripped`, and
-`mri_swi_skull_stripped`. These map to the upstream
+`mri_flair`, `mri_mra`, `mri_swi`, `mri_t1_skull_stripped`,
+`mri_t2_skull_stripped`, `mri_flair_skull_stripped`,
+`mri_mra_skull_stripped`, and `mri_swi_skull_stripped`. These map to the upstream
 `configs/modality_mapping.json` IDs documented in the README.
 For FOV and setup details, see `references/fov-and-downloads.md`.
+
+The pinned v1 config ships axial T1w defaults of `dim=[256,256,128]`,
+`spacing=[0.94,0.94,1.36]`, 30 inference steps, and
+`cfg_guidance_scale=2`. Keep the staged config value unless a model-specific
+validation justifies an override; older examples may describe the v0
+`256^3`/1 mm geometry or guidance scale 10. MRA is supported by v1, but the
+upstream training-data report contains few MRA scans, so output quality is not
+guaranteed.
 
 The fixture argument is a small JSON override for
 `configs/config_maisi_diff_model_rflow-mr-brain.json`. Pass `default` to use

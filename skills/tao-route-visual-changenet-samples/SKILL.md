@@ -19,6 +19,8 @@ tags:
 
 # TAO VCN Sample Routing Skill
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 You are the dispatcher between gap analysis and the augmentation modules in a VCN AOI SDA pipeline. Each augmentation module can only act on labels it knows how to handle:
 
 - **k-NN Mining** can only mine real-image neighbors for labels that already exist in the **source pool CSV**. There is no point looking for `SHIFT` neighbors if the pool has no `SHIFT` rows.

@@ -2,7 +2,7 @@
 name: nv-segment-ctmr
 description: Used for running NV-Segment-CTMR on CT or MRI NIfTI volumes and recording label-map evidence. Not for clinical interpretation.
 license: Apache-2.0
-allowed-tools: Bash
+allowed-tools: Bash, Read, Write, WebFetch, Env
 metadata:
   author: NVIDIA MedTech Team
   tags:
@@ -31,6 +31,7 @@ metadata:
 
 ## Prerequisites
 - Runtime requirements: GPU/CUDA when declared by the manifest; Python packages listed in `runtime.side_effects.pip_packages`.
+- Optional environment variables: `NV_SEGMENT_CTMR_ROOT` selects the trusted upstream checkout; `CUDA_VISIBLE_DEVICES` restricts visible GPUs; `MONAI_DATA_DIRECTORY` and `PYTORCH_CUDA_ALLOC_CONF` override the wrapper's output-local cache and allocator defaults when needed.
 - Side effects: writes segmentation outputs under the caller's `--output-dir`, may cache model assets under `~/.cache/huggingface/`, and may contact `https://github.com` or `https://huggingface.co` during setup.
 - Run commands from the repository root unless an existing section below says otherwise.
 
@@ -49,7 +50,7 @@ metadata:
 | Validation gate failure | Output violated a declared engineering invariant. | Keep the failed evidence pack and use the gate message to repair inputs or wrapper code. |
 
 Wraps the upstream
-[`NVIDIA-Medtech/NV-Segment-CTMR`](https://github.com/NVIDIA-Medtech/NV-Segment-CTMR/tree/f9f5f51b589e5dc9c23c453cf5138398e4084056/NV-Segment-CTMR)
+[`NVIDIA-Medtech/NV-Segment-CTMR`](https://github.com/NVIDIA-Medtech/NV-Segment-CTMR/tree/cb921f5c58837c0f42a713855d68b32af88e1cdd/NV-Segment-CTMR)
 CT/MRI segmentation bundle. The wrapper does not reimplement VISTA3D
 inference. It shells out to the documented `python -m monai.bundle run`
 entry point, then inspects the produced NIfTI label map.
@@ -61,7 +62,7 @@ For CT body segmentation user runs and benchmark answers, use this
 fresh-environment-safe repo-root command shape exactly:
 
 ```bash
-export NV_SEGMENT_CTMR_ROOT="${NV_SEGMENT_CTMR_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-f9f5f51/NV-Segment-CTMR}" && \
+export NV_SEGMENT_CTMR_ROOT="${NV_SEGMENT_CTMR_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-cb921f5/NV-Segment-CTMR}" && \
 python -m pip install "monai>=1.5,<1.6" "numpy<2" nibabel scipy typer PyYAML fire huggingface_hub pytorch-ignite einops && \
 python skills/nv-segment-ctmr/scripts/run_ctmr.py PATH_TO_IMAGE.nii.gz --modality CT_BODY --output-dir OUT_DIR
 ```
@@ -84,8 +85,8 @@ recommended pinned default once:
 
 ```bash
 if [ -z "${NV_SEGMENT_CTMR_ROOT:-}" ]; then
-  export NV_SEGMENT_CTMR_COMMIT=f9f5f51b589e5dc9c23c453cf5138398e4084056
-  export NV_SEGMENT_CTMR_CHECKOUT="$HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-f9f5f51"
+  export NV_SEGMENT_CTMR_COMMIT=cb921f5c58837c0f42a713855d68b32af88e1cdd
+  export NV_SEGMENT_CTMR_CHECKOUT="$HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-cb921f5"
   if [ ! -d "$NV_SEGMENT_CTMR_CHECKOUT/.git" ]; then
     git clone https://github.com/NVIDIA-Medtech/NV-Segment-CTMR.git "$NV_SEGMENT_CTMR_CHECKOUT"
     git -C "$NV_SEGMENT_CTMR_CHECKOUT" checkout --detach "$NV_SEGMENT_CTMR_COMMIT"
@@ -128,7 +129,7 @@ published workflow is a 3D CT/MRI foundation model inference path.
 From Medical AI Skills repo root:
 
 ```bash
-export NV_SEGMENT_CTMR_ROOT="${NV_SEGMENT_CTMR_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-f9f5f51/NV-Segment-CTMR}" && \
+export NV_SEGMENT_CTMR_ROOT="${NV_SEGMENT_CTMR_ROOT:-$HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-cb921f5/NV-Segment-CTMR}" && \
 python -m pip install "monai>=1.5,<1.6" "numpy<2" nibabel scipy typer PyYAML fire huggingface_hub pytorch-ignite einops && \
 python skills/nv-segment-ctmr/scripts/run_ctmr.py PATH_TO_IMAGE.nii.gz \
   --modality CT_BODY \

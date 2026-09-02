@@ -2,7 +2,7 @@
 name: tao-finetune-huggingface-model
 description: >
   Fine-tune any HuggingFace CV / VLM / LLM model on local NVIDIA GPUs inside an
-  NGC PyTorch container. Use when the user wants to fine-tune a HuggingFace
+  NGC PyTorch container when no dedicated TAO model skill matches. Use when the user wants to fine-tune a HuggingFace
   model (full or LoRA), train a vision / VLM / LLM model end-to-end, generate a
   reproducible HF training pipeline, smoke-test a HuggingFace model locally
   before scale-up, push a fine-tuned model to the HF Hub with a model card, or
@@ -11,7 +11,9 @@ description: >
   panoptic segmentation, depth estimation, image-text-to-text VLM (SFT / LoRA),
   and LLM SFT / DPO / GRPO. Six-step workflow: inspect and qualify, hardware
   and NGC image, research, generate and smoke, train + eval + infer, push and
-  emit rerun skill.
+  emit rerun skill. Do not use for any Hugging Face model ID claimed by a
+  dedicated `skills/models/*` skill; the model skill and its declared execution
+  environment take precedence.
 license: Apache-2.0
 tags:
   - finetuning
@@ -29,10 +31,46 @@ allowed-tools: Read Bash Write
 
 # tao-finetune-huggingface-model
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Local NVIDIA GPU fine-tuning for HuggingFace models, grounded in live-fetched
 documentation with curated references as a fallback safety net. One NGC container,
 a few focused scripts, one push to HF Hub. Follow the rules in this file; don't
 improvise.
+
+## Dedicated-model routing gate
+
+Before Step 1 or any probe, image selection, package install, venv creation, or
+training-code generation, resolve `model_id` against the packaged model-owner
+registry. Use the absolute skill-bank root from which this file was loaded:
+
+```bash
+python <bank-root>/scripts/resolve_tao_model.py \
+  --skill-bank <bank-root> \
+  --model "$MODEL_ID" \
+  --format json
+```
+
+The resolver matches model metadata, including `huggingface_model_ids`,
+`network_arch`, skill names, and legacy aliases. Routing is internal: a model ID
+and task are enough. Never require prompt boilerplate about skills, containers,
+or checkpoint formats.
+
+- Exit `0`: stop this workflow and follow the owning model skill's environment,
+  action metadata, preflight, and checkpoint preparation.
+- Exit `3`: no packaged model skill owns the ID. This is the only result that
+  permits Step 1 of the generic workflow.
+- Any other nonzero exit: ownership discovery is broken or ambiguous. Stop and
+  resolve that error; do not silently fall back to generic Hugging Face
+  training.
+
+Hugging Face hosting never overrides ownership. Do not use this workflow to
+bypass a matched skill or ask the user to prescribe its internal preparation.
+For example, `nvidia/Cosmos3-Nano` routes to `tao-finetune-cosmos-reason`.
+
+Do not create a host training venv in this workflow. Its default execution path
+is the NGC container documented below; any venv-based training path requires an
+explicit user request.
 
 **Order of authority (highest first):**
 
@@ -220,7 +258,7 @@ PyTorch NGC container section, pick the highest-versioned image where
 `aN`/`bN`/`rcN` PyTorch tag — NGC validates the full image; pick the newest
 CUDA-aligned one and let `compat-workarounds.md` handle per-version issues. If the
 matrix is unreachable, use the fallbacks in `references/hardware-container.md`;
-default `nvcr.io/nvidia/pytorch:24.09-py3` (driver ≥ 545; SDPA+GQA bug — if
+default `nvcr.io/nvidia/pytorch:24.09-py3` <!-- unpinned: documented fallback --> (driver ≥ 545; SDPA+GQA bug — if
 `num_key_value_heads < num_attention_heads`, set `attn_implementation: "eager"`).
 Record `ngc_image` in `config.yaml`.
 
