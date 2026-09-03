@@ -1745,6 +1745,13 @@
       "last_modified": "2026-08-31"
     },
     {
+      "name": "paidf-curation-and-retrieval",
+      "path": "skills/paidf-curation-and-retrieval",
+      "content_digest": "sha256:18dced75e582b3d7b106d6b862d38cbd87c9dbfb97576f58b080b917bf48dc56",
+      "last_commit": "b2ff05ff6eca47ab7c6ddca5af7c8422ecef0585",
+      "last_modified": "2026-09-03"
+    },
+    {
       "name": "paidf-orchestration-setup",
       "path": "skills/paidf-orchestration-setup",
       "content_digest": "sha256:fbe9150428018ef15b4cf5874b3f03789a3a8ea86b8fd0c07a4e6889991d52dc",

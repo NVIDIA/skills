@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 349,
-  "result_row_count": 3265,
+  "skill_count": 350,
+  "result_row_count": 3275,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -4769,6 +4769,26 @@
       "component": "Physical AI Auto-Labeling",
       "has_results": true,
       "average_uplift_pct": 43.3
+    },
+    {
+      "skill": "paidf-curation-and-retrieval",
+      "evaluation_date": "2026-09-02",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.3.2",
+      "dataset_digest": "sha256:042681c515dffad615f864930465ed62da31beed62934ac2d384f86755134fcd",
+      "validation_status": "passed",
+      "tasks": 13,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "has_results": true,
+      "average_uplift_pct": 38.2
     },
     {
       "skill": "paidf-orchestration-setup",
@@ -27636,6 +27656,96 @@
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 4.0
+    },
+    {
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 96.0,
+      "uplift_pct": 12.0
+    },
+    {
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 51.0
+    },
+    {
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 43.0
+    },
+    {
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 77.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 39.0
+    },
+    {
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 78.0,
+      "uplift_pct": 46.0
+    },
+    {
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.0,
+      "uplift_pct": 58.0
     },
     {
       "catalog_dir": "paidf-orchestration-setup",
