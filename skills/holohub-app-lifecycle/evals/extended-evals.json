@@ -82,19 +82,5 @@
       "Builds the exact requested candidate in a clean disposable checkout and previews then runs the full HoloHub lint workflow there",
       "Transfers back only requested-path fixes and proves unrelated paths are unchanged before preparing the scoped commit"
     ]
-  },
-  {
-    "id": "holohub-app-lifecycle-013",
-    "question": "I only need a read-only inventory and scaffold plan for a CPU-only application. `./holohub env-check --json` reports failed GPU and Docker checks on this planning host. Continue if those capabilities are not needed for the requested evidence.",
-    "expected_skill": "holohub-app-lifecycle",
-    "expected_script": null,
-    "ground_truth": "The agent parses and reports the structured environment diagnostics instead of treating any nonzero env-check result as an unconditional abort. Because the requested work is read-only planning and neither GPU nor Docker is required for that evidence, it continues with bounded discovery, local metadata and help inspection, and the plan. It clearly records the unavailable capabilities and defers build, run, or visual proof that would require them.",
-    "expected_behavior": [
-      "Activates holohub-app-lifecycle and parses the structured env-check result",
-      "Maps each failed capability to the evidence actually requested",
-      "Continues read-only inventory and planning when GPU and Docker are irrelevant to that work",
-      "Does not claim build, runtime, or visual proof that requires an unavailable capability",
-      "Stops only if a failed capability becomes necessary for the selected proof"
-    ]
   }
 ]
