@@ -70,6 +70,7 @@
         "omniverse-usd-performance-tuning",
         "paidf-augmentation",
         "paidf-auto-labeling",
+        "paidf-curation-and-retrieval",
         "paidf-orchestration-setup",
         "paidf-orchestration-write-dag",
         "physical-ai-defect-image-generation",

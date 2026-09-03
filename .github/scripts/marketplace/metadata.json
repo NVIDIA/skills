@@ -2989,6 +2989,18 @@
       }
     },
     {
+      "path": "skills/paidf-curation-and-retrieval",
+      "name": "paidf-curation-and-retrieval",
+      "description": "Use when operating PAIDF Curation and Retrieval or NVIDIA Cosmos Curator pipelines (split, filter, caption, embed, dedup, shard, image annotate) or PAIDF Data Mining nearest-neighbor matching on Curator embeddings. Activate for Make or CLI pipeline config, GPU run preflight, FFmpeg sidecar, SAM3 keys, or Curator-to-TAO handoff. Do not use for generic ETL, vector-database RAG, model training, orchestration, or embeddings outside Cosmos Curator and PAIDF Data Mining.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "data_engineer,ml_engineer,ai_engineer,robotics_developer,developer",
+        "discovery.activity_tags": "operate,configure,transform,extract,validate"
+      }
+    },
+    {
       "path": "skills/paidf-orchestration-setup",
       "name": "paidf-orchestration-setup",
       "description": "Audit, prepare, and deploy PAIDF Orchestration on a Kubernetes GPU cluster - single-GPU H100/L40S hosts, managed Kubernetes, kubeadm, and similar. Select for requests to set up, install, deploy, configure, or check a PAIDF Orchestration environment; run a workflow on a new or unverified GPU host; connect via kubeconfig; validate GPU compute; deploy the Airflow controller; or choose external versus in-cluster model services. A plain SSH host is not a supported backend.",
