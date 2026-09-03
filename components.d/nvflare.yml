@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: NVIDIA FLARE
+repo: NVIDIA/NVFlare
+ref: main
+description: >-
+  Agent skills for converting training code to federated workflows,
+  diagnosing jobs, collecting federated statistics, and running Auto-FL
+  with NVIDIA FLARE.
+skills:
+  - path: skills/nvflare-autofl
+    catalog_dir: nvflare-autofl
+  - path: skills/nvflare-autofl-report
+    catalog_dir: nvflare-autofl-report
+  - path: skills/nvflare-convert-huggingface
+    catalog_dir: nvflare-convert-huggingface
+  - path: skills/nvflare-convert-lightning
+    catalog_dir: nvflare-convert-lightning
+  - path: skills/nvflare-convert-pytorch
+    catalog_dir: nvflare-convert-pytorch
+  - path: skills/nvflare-diagnose-job
+    catalog_dir: nvflare-diagnose-job
+  - path: skills/nvflare-fed-stats
+    catalog_dir: nvflare-fed-stats
+  - path: skills/nvflare-orient
+    catalog_dir: nvflare-orient
+  - path: skills/nvflare-shared
+    catalog_dir: nvflare-shared
