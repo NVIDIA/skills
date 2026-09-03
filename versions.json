@@ -739,23 +739,23 @@
     {
       "name": "holohub-app-lifecycle",
       "path": "skills/holohub-app-lifecycle",
-      "content_digest": "sha256:73582e5fcf493ef832e5579281934aa5441afc5624b912482bfbfa6b41a4ceba",
-      "last_commit": "0bab10911671da845be68326750f6c4693854b2d",
-      "last_modified": "2026-08-06"
+      "content_digest": "sha256:b8061abb3fd732ec793e717a0deaace05e590db489e3ae27a2c86108c9430687",
+      "last_commit": "c4c9a315caaa4eccf414d577169d9f51641ede2b",
+      "last_modified": "2026-09-03"
     },
     {
       "name": "holohub-debug-build-run",
       "path": "skills/holohub-debug-build-run",
-      "content_digest": "sha256:a2dc8d5c0c08414ac888bcc1c870cc6182252f5acab8a1b69e77268011417cb9",
-      "last_commit": "0bab10911671da845be68326750f6c4693854b2d",
-      "last_modified": "2026-08-06"
+      "content_digest": "sha256:58d66a3ca368ddb5e68638912fccbe08cf246ac1911b4f625d1018b2d1a99fd2",
+      "last_commit": "c4c9a315caaa4eccf414d577169d9f51641ede2b",
+      "last_modified": "2026-09-03"
     },
     {
       "name": "holohub-module-lifecycle",
       "path": "skills/holohub-module-lifecycle",
-      "content_digest": "sha256:0f53a6cb652d567ce23204c49acbc85d2e3f3d10f10242c3da9290f00323cd17",
-      "last_commit": "0bab10911671da845be68326750f6c4693854b2d",
-      "last_modified": "2026-08-06"
+      "content_digest": "sha256:1970a736218398e060acb4fcb4fd35591833896a71329dfaaa8043d2a7aa1288",
+      "last_commit": "c4c9a315caaa4eccf414d577169d9f51641ede2b",
+      "last_modified": "2026-09-03"
     },
     {
       "name": "holoscan-install-conda",
