@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers building, testing, and validating HoloHub applications through the complete lifecycle from scaffolding to reviewable evidence. <br>
+Developers and engineers building, testing, and shipping HoloHub applications through the ./holohub CLI workflow, from scaffolding and implementation to visual evidence collection and flow benchmarking. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,9 +25,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [HoloHub Application Workflow](references/application-workflow.md) <br>
-- [HoloHub Flow Benchmarking](references/flow-benchmarking.md) <br>
-- [./holohub CLI Contract](references/holohub-cli-contract.md) <br>
+- [HoloHub application workflow](references/application-workflow.md) <br>
+- [HoloHub flow benchmarking](references/flow-benchmarking.md) <br>
+- [holohub CLI contract](references/holohub-cli-contract.md) <br>
 - [NVIDIA HoloHub (GitHub)](https://github.com/nvidia-holoscan/holohub) <br>
 
 
@@ -44,38 +44,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (2 positive, 2 negative) in isolated k8s-sandbox pods, 1 attempt per task. <br>
+5 evaluation tasks (3 positive, 2 negative), each in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helps complete the user's goal and expected workflow (goal_accuracy 50% + behavior_check 50%). <br>
-- Efficiency: Whether routing is accurate and tool use is productive without waste. <br>
+- Discoverability: Whether the right skill was found and executed when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and followed expected workflow behavior. <br>
+- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 67% → 95% (+28 points) | 61% → 80% (+18 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 40% → 85% (+45 points) | 45% → 85% (+40 points) |
-| Discoverability | 75% → 100% (+25 points) | 73% → 73% (±0 points) |
-| Effectiveness | 45% → 88% (+43 points) | 35% → 69% (+35 points) |
-| Efficiency | 75% → 100% (+25 points) | 53% → 71% (+18 points) |
+| Overall | 74% → 95% (+22 points) | 69% → 83% (+14 points) |
+| Security | 90% → 100% (+10 points) | 100% → 100% (±0 points) |
+| Correctness | 88% → 88% (±0 points) | 68% → 84% (+16 points) |
+| Discoverability | 70% → 100% (+31 points) | 69% → 76% (+7 points) |
+| Effectiveness | 57% → 89% (+32 points) | 55% → 74% (+19 points) |
+| Efficiency | 63% → 100% (+37 points) | 51% → 80% (+29 points) |
 
 ## Skill Version(s): <br>
-bd405993 (source: git SHA, committed 2026-08-05) <br>
+2aa6ab69 (source: git SHA, committed 2026-09-02) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
