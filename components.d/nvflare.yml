@@ -3,7 +3,7 @@
 
 name: NVIDIA FLARE
 repo: NVIDIA/NVFlare
-ref: main
+ref: 2.9
 description: >-
   Agent skills for converting training code to federated workflows,
   diagnosing jobs, collecting federated statistics, and running Auto-FL
