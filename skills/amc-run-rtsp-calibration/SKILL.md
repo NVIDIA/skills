@@ -6,6 +6,7 @@ service: "auto-magic-calib"
 version: "1.0.0"
 reviewed: "2026-06-15"
 license: "Apache-2.0"
+permissions: [env, file_read, network]
 metadata:
   author: "Shubham Agrawal <shuagrawal@nvidia.com>"
   tags: [amc, calibration, rtsp, vios, rest-api, camera, python]
@@ -38,7 +39,7 @@ Never reuse files from the bundled sample dataset, extracted sample zip, `assets
 
 ## Data Privacy
 
-RTSP URLs may contain usernames, passwords, hostnames, or network topology. Do not print full RTSP URLs if credentials are embedded. Pass VIOS tokens through environment variables or secure host prompts; do not echo tokens in chat, logs, or final answers.
+RTSP URLs may contain usernames, passwords, hostnames, or network topology. Do not print full RTSP URLs if credentials are embedded. This skill does not handle bearer credentials; if the VIOS deployment requires authentication, stop and hand the user to a manual admin-managed workflow instead of collecting or relaying secrets in chat, scripts, or logs.
 
 ## What to Ask the User
 
@@ -76,7 +77,6 @@ Posting the settings file replaces UI Step 3 and may pin `detector` or `detector
 6. `sensor_id` per stream if the cameras are already registered in VIOS. Leave unset for auto-registration.
 7. Ground truth zip (`GT.zip`) for evaluation metrics.
 8. Focal lengths, one per camera.
-9. VIOS bearer token, if the VIOS deployment requires one.
 10. Whether to run VGGT refinement after AMC completes, only when the project reports `vggt_state == "READY"`.
 
 ## Instructions
@@ -100,8 +100,7 @@ VIOS_BASE_URL=""
 
 # Default local VIOS port.
 if curl -sf http://localhost:30888/vst/api/v1/sensor/list >/dev/null 2>&1; then
-  HOST_IP=$(grep ^HOST_IP "$REPO_ROOT/compose/.env" 2>/dev/null | cut -d= -f2)
-  VIOS_BASE_URL="http://${HOST_IP:-localhost}:30888"
+  VIOS_BASE_URL="http://localhost:30888"
   echo "VIOS detected at $VIOS_BASE_URL"
 fi
 
@@ -110,16 +109,16 @@ if [ -z "$VIOS_BASE_URL" ]; then
   VIOS_BASE_URL=$(docker exec auto-magic-calib-ms-1 printenv VIOS_BASE_URL 2>/dev/null)
 fi
 
-# Compose environment file.
-if [ -z "$VIOS_BASE_URL" ]; then
-  VIOS_BASE_URL=$(grep ^VIOS_BASE_URL "$REPO_ROOT/compose/.env" 2>/dev/null | cut -d= -f2-)
-fi
-
 if [ -n "$VIOS_BASE_URL" ]; then
   curl -sf "${VIOS_BASE_URL}/vst/api/v1/sensor/list" >/dev/null \
     && echo "VIOS up at $VIOS_BASE_URL" \
     || { echo "VIOS_BASE_URL=$VIOS_BASE_URL is set but not responding"; VIOS_BASE_URL=""; }
 fi
+
+[ -n "$VIOS_BASE_URL" ] || {
+  echo "VIOS is not reachable. Export VIOS_BASE_URL=http://<VIOS_HOST>:30888 and relaunch the AMC microservice." >&2
+  exit 1
+}
 ```
 
 If VIOS is not reachable, ask the user to deploy VIOS and provide the base URL. Do not start RTSP capture until `${VIOS_BASE_URL}/vst/api/v1/sensor/list` returns 200.
@@ -159,8 +158,7 @@ Content-Type: application/json
     {"rtsp_url": "rtsp://...", "camera_name": "cam_01", "sensor_id": null}
   ],
   "duration_seconds": 180,
-  "vios_token": null,
-  "ssl_verify": false
+  "ssl_verify": true
 }
 ```
 
@@ -201,7 +199,6 @@ Need to stop early: `POST /v1/rtsp/capture/<project_id>/<session_id>/stop`. A pa
 Other session endpoints:
 
 - `GET /v1/rtsp/sessions/<project_id>` - list sessions for a project.
-- `DELETE /v1/rtsp/session/<project_id>/<session_id>` - delete a session record.
 
 ### Step 4 - Upload Settings, Alignment, Layout, and Optional Files
 
@@ -225,11 +222,12 @@ Before continuing after UI Step 4, verify:
 PROJECT_ID=<project_id>
 : "${REPO_ROOT:?set REPO_ROOT to the auto-magic-calib checkout. Run amc-setup-calibration-stack Step 0b first.}"
 grep -q "AutoMagicCalib" "$REPO_ROOT/README.md" 2>/dev/null && grep -q "auto-magic-calib-ms" "$REPO_ROOT/compose/ms/compose.yml" 2>/dev/null || { echo "ERROR: REPO_ROOT is not an auto-magic-calib checkout: $REPO_ROOT" >&2; exit 1; }
-PROJECT_DIR_REL=$(grep ^PROJECT_DIR "$REPO_ROOT/compose/.env" 2>/dev/null | cut -d= -f2 | tr -d '[:space:]')
-HOST_PROJECTS=$(cd "$REPO_ROOT/compose" && realpath "${PROJECT_DIR_REL:-../../projects}")
+HOST_PROJECTS="${PROJECTS_DIR:-$(cd "$REPO_ROOT" && realpath projects)}"
 ls "$HOST_PROJECTS/project_${PROJECT_ID}/manual_adjustment/"
 # Expected: alignment_data.json, layout.png
 ```
+
+If the AMC stack stores project outputs outside the default `projects/` directory, set `PROJECTS_DIR` explicitly before running the check above. Do not read `compose/.env` for project paths during this workflow.
 
 ### Step 5 - Verify, Calibrate, Poll, and Fetch Results
 
@@ -340,7 +338,7 @@ export STREAMS_JSON='[
 ]'
 ```
 
-Optional env vars are `CALIB_ASSET_DIR`, `CONFIG_FILE`, `ALIGNMENT_JSON`, `LAYOUT_PNG`, `GT_ZIP`, `FOCAL_LENGTHS`, `DETECTOR_TYPE`, `AMC_UI_URL`, `VIOS_TOKEN`, `SSL_VERIFY`, `RUN_VGGT`, `REPO_ROOT`, and `PROJECTS_DIR`.
+Optional env vars are `CALIB_ASSET_DIR`, `CONFIG_FILE`, `ALIGNMENT_JSON`, `LAYOUT_PNG`, `GT_ZIP`, `FOCAL_LENGTHS`, `DETECTOR_TYPE`, `AMC_UI_URL`, `SSL_VERIFY`, `RUN_VGGT`, `REPO_ROOT`, and `PROJECTS_DIR`. `SSL_VERIFY` defaults to `true`; only set `SSL_VERIFY=false` for loopback testing. If the VIOS deployment requires bearer authentication, stop and use a manual admin-managed capture flow instead of routing credentials through this skill.
 
 ## Success Criteria
 

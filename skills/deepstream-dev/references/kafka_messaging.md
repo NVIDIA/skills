@@ -57,12 +57,12 @@ sudo apt-get install -y mosquitto-clients    # CLI tools for testing
 **IMPORTANT**: `nvmsgbroker` is a **SINK component** that terminates the pipeline branch. It cannot have downstream components.
 
 For **headless pipelines** (Kafka only, no display):
-```
+```text
 Source -> Decoder -> Muxer -> Inference -> Tracker -> Message Converter -> Message Broker (sink)
 ```
 
 For **pipelines with both Kafka and display**, use `tee` to split paths:
-```
+```text
 Source -> Decoder -> Muxer -> Inference -> Tracker -> Tee
                                                       |-> [Metadata Branch] Message Converter -> Message Broker (sink)
                                                       |-> [Video Branch] Tiler -> OSD -> Converter -> Renderer (sink)
@@ -398,7 +398,7 @@ def kafka_legacy_custom_generator(video_paths, infer_config, kafka_config, label
 #### Kafka Broker Configuration File
 
 **kafka_broker_config.txt**:
-```
+```ini
 [broker]
 enable=1
 broker-ip-port=localhost:9092
@@ -413,7 +413,7 @@ topic=deepstream-analytics
 #### Message Converter Configuration File
 
 **msgconv_config.txt**:
-```
+```ini
 [message-converter]
 enable=1
 # Message format: deepstream or custom
@@ -584,7 +584,7 @@ class KafkaMetadataSender(BatchMetadataOperator):
 
     def _on_send_error(self, exception):
         """Callback for failed message send"""
-        print(f"Failed to send message to Kafka: {exception}")
+        print(f"Kafka publish failed: {exception}")
         self.error_count += 1
 
     def flush(self):
@@ -909,7 +909,7 @@ def test_kafka_consumer(bootstrap_servers, topic):
 
 ## Architecture
 
-```
+```text
 Pipeline -> nvmsgconv -> nvmsgbroker -> External Broker
               |              |
               |              +-- Protocol Adaptor Library
@@ -1312,24 +1312,32 @@ pipeline.add("nvmsgbroker", "msgbroker", {
 
 ```bash
 # Add Confluent repository
-sudo mkdir -p /etc/apt/keyrings
-wget -qO - https://packages.confluent.io/deb/7.8/archive.key | gpg \
-  --dearmor | sudo tee /etc/apt/keyrings/confluent.gpg > /dev/null
+sudo mkdir -p /usr/share/confluent-repo
+wget -qO /tmp/confluent-archive.key https://packages.confluent.io/deb/7.8/archive.key
+gpg --dearmor --output /tmp/confluent.gpg /tmp/confluent-archive.key
+sudo cp /tmp/confluent.gpg /usr/share/confluent-repo/confluent.gpg
+sudo chmod 0644 /usr/share/confluent-repo/confluent.gpg
+rm -f /tmp/confluent-archive.key /tmp/confluent.gpg
 
 CP_DIST=$(lsb_release -cs)
-echo "Types: deb
+cat <<EOF >/tmp/confluent-platform.sources
+Types: deb
 URIs: https://packages.confluent.io/deb/8.0
 Suites: stable
 Components: main
 Architectures: $(dpkg --print-architecture)
-Signed-by: /etc/apt/keyrings/confluent.gpg
+Signed-By: /usr/share/confluent-repo/confluent.gpg
 
 Types: deb
 URIs: https://packages.confluent.io/clients/deb/
 Suites: ${CP_DIST}
 Components: main
 Architectures: $(dpkg --print-architecture)
-Signed-By: /etc/apt/keyrings/confluent.gpg" | sudo tee /etc/apt/sources.list.d/confluent-platform.sources > /dev/null
+Signed-By: /usr/share/confluent-repo/confluent.gpg
+EOF
+sudo cp /tmp/confluent-platform.sources /etc/apt/sources.list.d/confluent-platform.sources
+sudo chmod 0644 /etc/apt/sources.list.d/confluent-platform.sources
+rm -f /tmp/confluent-platform.sources
 
 # Install dependencies
 sudo apt-get update
@@ -1657,7 +1665,7 @@ sudo make install
 #### Connection String
 
 Full Azure IoT Hub connection string:
-```
+```text
 HostName=<my-hub>.azure-devices.net;DeviceId=<device_id>;SharedAccessKey=<my-policy-key>
 ```
 

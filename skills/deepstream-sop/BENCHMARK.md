@@ -7,10 +7,10 @@ This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the s
 ## Evaluation Summary
 
 - Skill: `deepstream-sop`
-- Evaluation date: 2026-06-25
+- Evaluation date: 2026-07-13
 - NVSkills-Eval profile: `internal`
 - Environment: `astra-sandbox`
-- Dataset: 5 evaluation tasks
+- Dataset: 10 evaluation tasks
 - Attempts per task: 1
 - Pass threshold: 50%
 - Overall verdict: PASS
@@ -42,23 +42,17 @@ Underlying evaluation signals used in this run:
 
 ## Test Tasks
 
-The benchmark dataset contained 5 evaluation tasks:
-
-- Positive tasks: 3 tasks where the skill was expected to activate.
-- Negative tasks: 2 tasks where no skill was expected.
-- Unlabeled tasks: 0 tasks where positive/negative intent could not be inferred.
-
-Task composition is derived from the evaluation dataset when possible. Entries with `expected_skill` set are treated as positive skill-activation cases, while entries with `expected_skill: null` are treated as negative activation cases.
+The benchmark included 10 recorded Tier 3 trials, but the source evaluation dataset was not available in this report payload.
 
 ## Results
 
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 5 | 100% (+0%) | 100% (+0%) |
-| Correctness | 5 | 98% (+36%) | 84% (+22%) |
-| Discoverability | 5 | 95% (+28%) | 84% (+18%) |
-| Effectiveness | 5 | 77% (+34%) | 71% (+28%) |
-| Efficiency | 5 | 80% (+18%) | 78% (+16%) |
+| Security | 5 | 100% (+0%) | 90% (+0%) |
+| Correctness | 5 | 93% (+34%) | 83% (+19%) |
+| Discoverability | 5 | 95% (+34%) | 88% (+19%) |
+| Effectiveness | 5 | 73% (+28%) | 67% (+21%) |
+| Efficiency | 5 | 80% (+21%) | 83% (+18%) |
 
 Score values show skill-assisted performance. Values in parentheses show uplift versus the no-skill baseline when baseline data is available.
 

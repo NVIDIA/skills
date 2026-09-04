@@ -79,15 +79,16 @@ GST_DEBUG=0 gst-launch-1.0 -e ${PIPELINE} 2>&1 | grep -v "^$" || true
 
 END_TIME=$(date +%s%N)
 ELAPSED_NS=$((END_TIME - START_TIME))
-ELAPSED_SEC=$(echo "scale=2; $ELAPSED_NS / $NS_PER_SEC" | bc)
-FPS=$(echo "scale=1; $TOTAL_FRAMES / $ELAPSED_SEC" | bc)
-REALTIME=$(echo "scale=2; $FPS / (${NUM_STREAMS} * ${VIDEO_FPS})" | bc)
+# awk instead of bc (bc is not installed in the DeepStream container; awk always is)
+ELAPSED_SEC=$(awk "BEGIN{printf \"%.2f\", $ELAPSED_NS / $NS_PER_SEC}")
+FPS=$(awk "BEGIN{printf \"%.1f\", $TOTAL_FRAMES / $ELAPSED_SEC}")
+REALTIME=$(awk "BEGIN{printf \"%.2f\", $FPS / (${NUM_STREAMS} * ${VIDEO_FPS})}")
 
 echo ""
 echo "=== Results ==="
 echo "Wall time:     ${ELAPSED_SEC}s"
 echo "Total frames:  ${TOTAL_FRAMES}"
 echo "Throughput:    ${FPS} img/s"
-echo "Per-stream:    $(echo "scale=1; $FPS / $NUM_STREAMS" | bc) fps"
+echo "Per-stream:    $(awk "BEGIN{printf \"%.1f\", $FPS / $NUM_STREAMS}") fps"
 echo "Real-time factor: ${REALTIME}x (${NUM_STREAMS} streams @ ${VIDEO_FPS}fps)"
 echo "==============="

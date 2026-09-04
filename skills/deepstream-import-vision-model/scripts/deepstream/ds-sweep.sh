@@ -72,12 +72,12 @@ mkdir -p "$(dirname "${DS_ERR_LOG}")"
 : > "${DS_ERR_LOG}"
 echo "[ds-sweep] GStreamer stderr → ${DS_ERR_LOG}"
 
-# TIMING_CACHE="${ENGINES_DIR}/timing.cache"  # used by caller (nv-engine-build), not sweep
+# TIMING_CACHE="${ENGINES_DIR}/timing.cache"  # used by the engine-build phase, not sweep
 NS_PER_SEC=$(( 1000 * 1000 * 1000 ))  # nanoseconds per second (date +%s%N divisor)
 FPS_THRESHOLD=30          # target fps/stream in DeepStream
 DS_EFFICIENCY=0.65        # DS is ~65% of trtexec throughput (GStreamer pipeline overhead
                           # includes muxer, memory mgmt, custom parser, metadata — measured)
-TRT_QPS_TARGET=$(echo "scale=4; ${FPS_THRESHOLD} / ${DS_EFFICIENCY}" | bc)  # ~46.2 QPS
+TRT_QPS_TARGET=$(awk "BEGIN{printf \"%.4f\", ${FPS_THRESHOLD} / ${DS_EFFICIENCY}}")  # ~46.2 QPS (awk: bc absent in container)
 PROBE_SIZES=(1 4 8)       # fast trtexec probe batch sizes
 PROBE_DURATION=10         # seconds per trtexec probe run
 # NEVER use filesrc num-buffers as a frame count — num-buffers counts file byte blocks (4096B),
@@ -187,6 +187,7 @@ BS_LOWER=$(( BS_PRED - BS_STEP ))
 best_bs=1
 best_fps_stream=0
 best_ips=0
+had_valid_ds_run=false
 
 for BS in "${CANDIDATES[@]}"; do
     echo ""
@@ -204,30 +205,48 @@ for BS in "${CANDIDATES[@]}"; do
     # actual frames = ACTUAL_FRAMES_PER_STREAM × BS (no num-buffers limit on filesrc —
     # let each source read to natural EOS so we always process the full video)
     TOTAL_FRAMES=$((ACTUAL_FRAMES_PER_STREAM * BS))
-    SOURCES=""
-    for i in $(seq 0 $((BS - 1))); do
-        SOURCES+="filesrc location=${VIDEO} ! qtdemux ! queue ! h264parse ! queue ! nvv4l2decoder ! queue ! mux.sink_${i} "
+    # Build SOURCES as an array so a VIDEO path containing spaces or glob
+    # characters survives shell expansion intact.
+    SOURCES=()
+    for ((i = 0; i < BS; i++)); do
+        SOURCES+=(
+            filesrc "location=${VIDEO}" !
+            qtdemux ! queue ! h264parse ! queue ! nvv4l2decoder ! queue !
+            "mux.sink_${i}"
+        )
     done
 
     START_TIME=$(date +%s%N)
+    GST_RC=0
     GST_DEBUG=0 gst-launch-1.0 -e \
-        ${SOURCES} \
+        "${SOURCES[@]}" \
         nvstreammux name=mux batch-size=${BS} width=${MUXER_W} height=${MUXER_H} batched-push-timeout=40000 ! \
         queue ! \
         nvinfer config-file-path="${BS_CONFIG}" ! \
         queue ! \
-        fakesink sync=0 2>>"${DS_ERR_LOG}" || true
+        fakesink sync=0 2>>"${DS_ERR_LOG}" || GST_RC=$?
     END_TIME=$(date +%s%N)
+    ELAPSED_NS=$(( END_TIME - START_TIME ))
+
+    # Reject runs that exited non-zero or finished implausibly fast — both
+    # indicate a plugin/config error rather than a real benchmark result.
+    # Scoring such a run would produce divide-by-zero or a bogus high FPS.
+    if [ "${GST_RC}" -ne 0 ] || [ "${ELAPSED_NS}" -lt "${NS_PER_SEC}" ]; then
+        echo "  [fail] gst-launch exit=${GST_RC} elapsed_ns=${ELAPSED_NS} — see ${DS_ERR_LOG}" >&2
+        continue
+    fi
+    had_valid_ds_run=true
 
     # Warn if the pipeline wrote anything to stderr — likely a plugin/config error
     if [ -s "${DS_ERR_LOG}" ]; then
         echo "  [warn] GStreamer stderr output captured — see ${DS_ERR_LOG} for details" >&2
     fi
 
-    ELAPSED_SEC=$(echo "scale=2; $(( END_TIME - START_TIME )) / $NS_PER_SEC" | bc)
-    DS_IPS=$(echo "scale=1; ${TOTAL_FRAMES} / ${ELAPSED_SEC}" | bc)
-    DS_FPS_STREAM=$(echo "scale=1; ${DS_IPS} / ${BS}" | bc)
-    DS_REALTIME=$(echo "scale=2; ${DS_FPS_STREAM} / ${FPS_THRESHOLD}" | bc)
+    # awk instead of bc (bc is not installed in the DeepStream container; awk always is)
+    ELAPSED_SEC=$(awk "BEGIN{printf \"%.2f\", ${ELAPSED_NS} / $NS_PER_SEC}")
+    DS_IPS=$(awk "BEGIN{printf \"%.1f\", ${TOTAL_FRAMES} / ${ELAPSED_SEC}}")
+    DS_FPS_STREAM=$(awk "BEGIN{printf \"%.1f\", ${DS_IPS} / ${BS}}")
+    DS_REALTIME=$(awk "BEGIN{printf \"%.2f\", ${DS_FPS_STREAM} / ${FPS_THRESHOLD}}")
     DS_FPS_INT=$(echo "${DS_FPS_STREAM}" | cut -d. -f1)
     DS_IPS_INT=$(echo "${DS_IPS}" | cut -d. -f1)
 
@@ -243,6 +262,15 @@ for BS in "${CANDIDATES[@]}"; do
         echo "  -> FAIL (<${FPS_THRESHOLD} fps/stream), trying lower..."
     fi
 done
+
+# Abort if no candidate produced a valid DS run — emitting a default BS_OPT=1
+# in this case would mislead the caller into building a production engine on
+# top of a broken sweep.
+if [ "${had_valid_ds_run}" != true ]; then
+    echo "ERROR: no valid DeepStream confirmation run completed — see ${DS_ERR_LOG}" >&2
+    echo "       refusing to emit ${ENGINES_DIR}/bs_opt.txt" >&2
+    exit 1
+fi
 
 # Write results
 echo ""
@@ -271,7 +299,7 @@ echo "batch,qps,imgs_per_sec"
 for i in "${!PROBE_BS_ARR[@]}"; do
     BS="${PROBE_BS_ARR[$i]}"
     QPS="${PROBE_QPS_ARR[$i]}"
-    IPS=$(echo "scale=0; ${QPS} * ${BS}" | bc)
+    IPS=$(awk "BEGIN{printf \"%d\", ${QPS} * ${BS}}")
     echo "${BS},${QPS},${IPS}"
 done
 

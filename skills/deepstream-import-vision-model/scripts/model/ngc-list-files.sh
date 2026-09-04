@@ -56,17 +56,15 @@ else
     NGC_BASE="https://api.ngc.nvidia.com/v2/models/${NGC_ORG}/${MODEL_NAME}/versions/${NGC_VERSION}/files"
 fi
 
-JSON="$(curl -fsSL --proto '=https' --tlsv1.2 --max-time 30 "${NGC_BASE}/" 2>/dev/null || true)"
-
-if [[ -z "$JSON" ]]; then
+if ! JSON="$(curl -fsSL --proto '=https' --tlsv1.2 --max-time 30 "${NGC_BASE}/" 2>/dev/null)"; then
     echo "ERROR: Could not retrieve file list from NGC API" >&2
     echo "URL: ${NGC_BASE}/" >&2
     exit 1
 fi
 
-python3 - "$JSON" <<'PYEOF'
+python3 - "$JSON" "${NGC_BASE}/" <<'PYEOF'
 import json, sys
-data = sys.argv[1]
+data, url = sys.argv[1], sys.argv[2]
 try:
     files = json.loads(data)
 except json.JSONDecodeError as e:
@@ -76,7 +74,10 @@ if isinstance(files, list):
     names = [f.get("name", "") for f in files if isinstance(f, dict)]
 else:
     names = [f.get("name", "") for f in files.get("modelFiles", []) if isinstance(f, dict)]
+names = [n for n in names if n]
+if not names:
+    print(f"ERROR: NGC API returned no model files at {url}", file=sys.stderr)
+    sys.exit(1)
 for n in names:
-    if n:
-        print(n)
+    print(n)
 PYEOF

@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides AI coding assistants in building, deploying, evaluating, debugging, and measuring latency for the NVIDIA DeepStream SOP Inference Microservice — a GPU-accelerated FastAPI service that detects whether operators perform assembly-line steps in order via event boundary detection (GEBD) plus VLM classification. <br>
+Use this skill when building, deploying, evaluating, debugging, or measuring latency for the DeepStream SOP Inference Microservice — a GPU-accelerated FastAPI service that detects whether operators perform assembly-line steps in order via event boundary detection (GEBD) plus VLM classification. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers building, extending, deploying, or debugging the NVIDIA DeepStream SOP Inference Microservice for GPU-accelerated temporal action detection and VLM-based SOP compliance monitoring on industrial video feeds. <br>
+Developers and engineers building, deploying, and debugging GPU-accelerated SOP compliance monitoring pipelines that detect whether operators perform assembly-line steps in order on industrial video feeds. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [Not Specified] <br>
-**Credential Type(s):** [None identified] <br>  
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -26,13 +26,13 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [NVIDIA SOP Monitoring Blueprints](https://github.com/NVIDIA/sop-monitoring-blueprints/tree/main/microservices/sop-inference-bp) <br>
-- [MCG-NJU/DDM (Generic Event Boundary Detection)](https://github.com/MCG-NJU/DDM) <br>
+- [DDM (Dense Boundary Detection Model)](https://github.com/MCG-NJU/DDM) <br>
 - [Agent Skills Specification](https://agentskills.io/specification) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Code, Configuration instructions, Shell commands] <br>
-**Output Format:** [Markdown with inline code blocks] <br>
+**Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -43,7 +43,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 5 evaluation tasks (3 positive skill-activation, 2 negative) via NVSkills-Eval internal profile in astra-sandbox environment. <br>
+Evaluated against 10 internal evaluation tasks using NVSkills-Eval 3-Tier Evaluation (internal profile, astra-sandbox environment). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -67,11 +67,11 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Dimension | Num | `claude-code` | `codex` |
 |---|---:|---:|---:|
-| Security | 5 | 100% (+0%) | 100% (+0%) |
-| Correctness | 5 | 98% (+36%) | 84% (+22%) |
-| Discoverability | 5 | 95% (+28%) | 84% (+18%) |
-| Effectiveness | 5 | 77% (+34%) | 71% (+28%) |
-| Efficiency | 5 | 80% (+18%) | 78% (+16%) |
+| Security | 5 | 100% (+0%) | 90% (+0%) |
+| Correctness | 5 | 93% (+34%) | 83% (+19%) |
+| Discoverability | 5 | 95% (+34%) | 88% (+19%) |
+| Effectiveness | 5 | 73% (+28%) | 67% (+21%) |
+| Efficiency | 5 | 80% (+21%) | 83% (+18%) |
 
 ## Skill Version(s): <br>
 1.0.0 (source: frontmatter) <br>
