@@ -8,7 +8,8 @@ description: >-
   Agent skills for converting training code to federated workflows,
   diagnosing jobs, collecting federated statistics, and running Auto-FL
   with NVIDIA FLARE. Install the complete NVFlare skill set together so
-  each workflow has its required shared references.
+  each workflow has its required shared references. Run
+  `npx skills add nvidia/skills` to install.
 links:
   security: false
 skills:
