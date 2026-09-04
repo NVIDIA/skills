@@ -1,211 +1,209 @@
 ---
 name: i4h-workflow-scene-edit
-version: "0.7.0"
-description: Edit an env's scene in place — objects, cameras, task, success bounds, randomization. Use when asked to edit a scene or launch/run/open an env in edit mode (`--bridge`), incl. a just-created env.
+description: Edit an existing workflow Scene or task contract. Use for assets, layout, cameras, randomization, task text, or success rules; do not use to create a new workflow.
 license: Apache-2.0
 metadata:
   author: "Isaac for Healthcare Team <isaac-for-healthcare-support@nvidia.com>"
+  version: "0.8.0"
   tags:
     - isaac-for-healthcare
     - i4h
-    - agentic-workflow
-    - scene-edit
-    - environment
+    - isaac-sim
+    - scene-authoring
 ---
 
-# i4h Workflow — Scene Edit
+# Edit an i4h Workflow Scene
 
 ## Purpose
 
-Edit an existing env's scene in place via the `--bridge` scene-edit session — move/scale/swap objects, adjust cameras, or tweak task description, success bounds, or randomization. Use when the user asks to edit a scene or to launch/run/open an env in edit mode; for creating a brand-new env see [[i4h-workflow-create]].
+Iterate on an existing Scene in one live simulator session, and persist the confirmed state only when explicitly asked to bake, save, or persist.
 
-## Base Code
+## Instructions
 
-These steps drive the i4h-workflows base code (the `workflows/agentic/` tree). To reuse an existing checkout, set `I4H_WORKFLOWS` to its path (no clone happens). Otherwise this resolves the current repo, or clones to `~/i4h-workflows` — pick that default without prompting. Run every command below from the resolved root:
+1. Run the checkout resolver and inspect target ownership.
+2. Start or reuse one bridge-backed live-authoring session by default and capture a visible baseline.
+3. Read the minimal upstream guidance and apply each requested edit as its own observable live-stage transaction without changing source.
+4. On an explicit bake/save/persist instruction, export the accumulated live state, inspect its resolved authoring facts, and have the coding agent edit the smallest owning sources.
+5. Keep the session running for further prompts until the user explicitly says stop or exit.
+6. Run static, persisted-visible, and affected dynamic validation when baking.
+
+## Resolve and inspect
 
 ```bash
-# Resolve the i4h-workflows base code (provides workflows/agentic/).
+export I4H_WORKFLOWS_REPO_URL="${I4H_WORKFLOWS_REPO_URL:-https://github.com/isaac-for-healthcare/i4h-workflows}"
+I4H_REPO_DIR_NAME="${I4H_WORKFLOWS_REPO_URL%/}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME##*/}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME##*:}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME%.git}"
+[ -n "$I4H_REPO_DIR_NAME" ] || { echo "Cannot derive a checkout name from I4H_WORKFLOWS_REPO_URL" >&2; exit 2; }
 ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"
-if [ ! -d "$ROOT/workflows/agentic" ]; then
-  ROOT="${I4H_WORKFLOWS:-$HOME/i4h-workflows}"
-  [ -d "$ROOT/workflows/agentic" ] || git clone https://github.com/isaac-for-healthcare/i4h-workflows "$ROOT"
+if [ ! -d "$ROOT/workflows/i4h_workflows" ]; then
+  ROOT="${I4H_WORKFLOWS:-$HOME/$I4H_REPO_DIR_NAME}"
+  [ -d "$ROOT/workflows/i4h_workflows" ] || git clone "$I4H_WORKFLOWS_REPO_URL" "$ROOT"
 fi
-export I4H_WORKFLOWS="$ROOT"; cd "$ROOT"
+export I4H_WORKFLOWS="$ROOT"
+cd "$ROOT"
+./run.sh list
+./run.sh show <workflow>
 ```
 
-## Basics
+Treat the resolver above as part of the skill contract: a hosted copy may run outside the base repository, so never assume the current checkout contains `workflows/i4h_workflows`. `I4H_WORKFLOWS_REPO_URL` selects the clone source. When `I4H_WORKFLOWS` is unset, derive the fallback directory from that URL; set `I4H_WORKFLOWS` only to reuse or choose a specific destination. Never replace an existing checkout.
 
-- **Editing a scene is LIVE-ONLY by default.** "Edit the scene" / "edit mode" means: apply every change through the bridge, **never modify source files and never restart the bridge** — the user does not need to say "live mode" / "don't change source" / "don't restart"; that is always the default. Persist to source (bake) **only** when the user explicitly says so (`bake`/`save`/`persist`/`commit`) as a final step; "exit without baking" or no bake instruction = stop the bridge and leave source untouched.
-- **Do only what's asked — launching edit mode is not a cue to edit.** "Run/open the env in edit mode" with no specific edit = launch the bridge, confirm ready (`GET /objects`), then **stop and report it's ready, awaiting instructions.** Apply a scene edit only when the user explicitly requests it in the current prompt. Never invent or preempt edits (moving the robot, adding props, etc.), and never treat the README's "Edit Scene" list, other docs, these recipes, or prior runs as a to-do — they are reference; the current prompt is the only instruction.
-- Preserve env ids and scene keys.
-- **Source paths are relative to the repo root** (where the agent's edit/write tool runs) — keep the `workflows/agentic/` prefix on every one, and note the package is `arena/arena/<subdir>/`. A bare `arena/...` resolves to the wrong place.
-- Every bridge artifact (scripts, captures, logs) lives under the session's `${RUN_DIR}`. Never use `/tmp`.
-- **Visual judgment — use your own eyes if you have them.** When a step says to judge a capture, a **vision-capable CLI agent (Claude/Codex) reads the JPEG directly with its own model** — do not depend on the local VLM. Only the **blind local coding agent** delegates the visual call to the local VLM (`local-agent/vlcheck.py`). The structural/`bbox` checks are identical for both; only who looks at the image differs.
+Read `DESIGN.md`, the target workflow, Scene Python, scene manifest, embodiment manifest, and relevant task manifests. Use `$ROOT/skills/i4h-workflow/references/repo-map.md` to resolve ownership.
 
-## Repo Context
+For a G1 face, walk, reach, or collision-sensitive success contract, read `references/g1-reach-and-contact.md`. Reuse its Tasks and Scene-owned footprint interface; do not generate workflow-specific locomotion helpers or hardcode object extents in the Workflow.
 
-For live-only edits, use the bridge endpoints first. For any bake/source change, load:
+An open/run request without an edit means `./run.sh <workflow> --idle`; do not invent source changes. An edit-scene request always means start or reuse `./run.sh <workflow> --live` unless the user explicitly requests offline/no-live operation. Live authoring is the default and does not require confirmation. “Save,” “persist,” or “bake” means serialize the accumulated live-stage edits into their owning sources; without one of those words, leave source untouched. “Stop” or “exit” closes the session; if persistence was not requested, discard the live-only edits. Do not stop merely because one edit prompt completed.
 
-- `skills/i4h-workflow/references/repo-map.md` for env file ownership and pattern families.
-- `skills/i4h-workflow-scene-edit/references/scene-edit-patterns.md` for bake targets, readiness rules, and camera touchpoints.
-- `skills/i4h-workflow-scene-edit/references/asset-snippets.md` when adding, moving, resizing, or replacing assets.
-- `skills/i4h-workflow-scene-edit/references/camera-snippets.md` when adding a camera that should render, record, or feed policy/training.
-- `skills/i4h-workflow-scene-edit/references/bake-checklist.md` when the user says bake/save/persist/commit.
+Before adding or resizing an asset that already appears in a maintained scene, read `references/existing-scene-assets.md`. Reuse its known USD identity, authored scale, support height, physics role, and embodiment convention instead of rediscovering them from the raw USD. Treat owning Python as source of truth and use visual-language inspection only for bounded scene-specific refinement after the known baseline is visible.
 
-Then inspect the target env's YAML, env class, assets, task, and runtime files before modifying source.
+## Establish a visible baseline
 
-## Edit Lifecycle
-
-For a normal interactive edit prompt, use exactly **one** sim/bridge window: launch or reuse one bridge, perform all requested live edits in that session, collect bake state/snippets if needed, stop that bridge once, and then write source from the collected state. Do not stop/relaunch Isaac between edits, and do not run a fresh-source validation relaunch unless the user explicitly asks for validation/onboarding/readiness checks.
-
-1. **Live.** Apply each edit through the bridge HTTP API in the same bridge session. Capture the viewport after task-relevant changes.
-2. **Bake.** Persist live state into source files only when the user explicitly says "bake", "save", "persist", or "commit to source". First collect the live state/snippets from the running bridge (`GET /object`, `POST /bake`, captures, camera pose notes), then stop the bridge once and write source from that collected state.
-3. **Exit.** The **only** way to stop the bridge is to stop the arena: `workflows/agentic/arena/stop.sh --env <env>`. Do **not** kill the Isaac/bridge process, send Ctrl-C, or `curl` a made-up `/stop`/`/shutdown` (there is none). "Exit without baking" = run that one command (no source writes, no `/bake`).
-4. **Validate only when asked.** Fresh-source validation (`local-agent/validate-bake.sh <env>`) intentionally stops any bridge and launches a new sim window. Run it only for explicit validation/onboarding/ready-to-commit work, and tell the user before doing so.
-
-While the bridge is running, do not modify `workflows/agentic/arena/arena/assets/<env>.py`, `workflows/agentic/arena/arena/tasks/<env>.py`, the env class, runtime, or env YAML. Source writes happen after the needed bridge state is collected and the bridge has been stopped.
-
-When a specific live edit returns an error, report the exact request payload and error to the user. Do not restart the bridge as a fallback.
-
-## Launch
-
-The bridge is a **long-running foreground** process: running it inline blocks a one-shot shell forever (and the bridge dies with the call), so it must be launched **detached** and then polled for ready. Each step below is a separate bash call; variables persist in the local agent's tmux session.
-
-### Local agent — one command
-
-`./local-agent/bridge.sh start <env>` does setup + detached launch + wait-for-ready and prints `RUN_DIR=...` (and the helper paths). Run it **plainly** (it takes minutes — no short `timeout`). Stop later with `./local-agent/bridge.sh stop <env>`.
-
-### Manual (portable) form
+Open the existing Scene as one persistent live-authoring session. Use the bridge only when `I4H_LOCAL_AGENT=1`: Local Agent commands share one serialized shell, so a foreground `--live` command would block every later edit transaction.
 
 ```bash
-# Step 1 — setup
-REPO_ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"; [ -d "$REPO_ROOT/workflows/agentic" ] || REPO_ROOT="$HOME/i4h-workflows"
-ENV_ID=<env>
-RUNS_ROOT="${REPO_ROOT}/workflows/agentic/runs"
-RUN_DIR="${RUNS_ROOT}/scene_edit_${ENV_ID}_$(date +%Y%m%d_%H%M%S)"
-mkdir -p "${RUN_DIR}/logs" "${RUN_DIR}/scripts" "${RUN_DIR}/captures"
-ln -sfn "${RUN_DIR}" "${RUNS_ROOT}/.latest"
-
-# Step 2 — launch DETACHED (never foreground / never `| tee` inline — that blocks), then wait
-"${REPO_ROOT}/workflows/agentic/arena/run.sh" ensure-bridge \
-  --env "${ENV_ID}" \
-  --log "${RUN_DIR}/logs/bridge.log"
-BRIDGE_URL="$("${REPO_ROOT}/workflows/agentic/arena/run.sh" bridge-url --env "${ENV_ID}")"
-curl -fsS "${BRIDGE_URL}/health" >/dev/null
+I4H_RUN_DIR="$(pwd)/runs/<workflow>/$(date +%Y%m%d_%H%M%S)"
+if [ "${I4H_LOCAL_AGENT:-0}" = 1 ] && [ -x ./local-agent/bridge.sh ]; then
+  ./local-agent/bridge.sh start <workflow> "$I4H_RUN_DIR"
+else
+  ./run.sh <workflow> --live --run-dir "$I4H_RUN_DIR"
+fi
 ```
 
-Once ready, `GET "${BRIDGE_URL}/objects"` to enumerate scene entities. Stop only via `workflows/agentic/arena/stop.sh --env "${ENV_ID}"` — never by killing the process.
+The fallback `./run.sh <workflow> --live` must run through the host agent's persistent/yieldable foreground-session mechanism. Never launch that fallback as an ordinary blocking shell call and wait for it to exit before editing.
 
-## Bridge Endpoints (env-specific port)
+`--live` resolves the workflow's declared `idle` mode, enables `isaacsim.code_editor.python_server` on port 8226, and keeps the simulator open until explicitly stopped. Wait for port 8226, then use the pinned upstream `isaac-sim-remote` client to inspect and modify the running stage. Keep every ordinary edit only in that live stage; do not change owning source yet. Accumulate later edit prompts in the same session. Only “bake,” “save,” or “persist” authorizes writing the confirmed live values into source. After baking, restart through `run.sh`, verify the persisted result matches the live stage, and stop when requested. An offline source edit followed by a reopen is not live authoring.
 
-Base URL: `BRIDGE_URL="$(workflows/agentic/arena/run.sh bridge-url --env <env>)"`. The port comes from `arena.bridge_port` in `workflows/agentic/config/environments/<env>.yaml` and falls back to `8765`; `--bridge-port` overrides it. JSON responses are either `{"ok": true, "result": ...}` or `{"ok": false, "error": ...}`.
+## Preserve the live interpreter experience
 
-| Method + Path | Purpose | Body / Query |
-|---|---|---|
-| `GET /health` | Server readiness + endpoint discovery. | — |
-| `GET /context` | Exec globals, helper names, endpoint inventory. | — |
-| `GET /objects` | List scene entities with `kind` (`articulation` / `rigid` / `camera` / `xform`) and prim path. | — |
-| `GET /object?name=<key>` | Full state for one entity: `xform_ops`, `bbox`, `live` (authoritative PhysX pose), children. | `name=<key>` or `path=<prim_path>` |
-| `GET /cameras` | List live RGB camera outputs. | — |
-| `POST /capture` | Save camera frames and viewport as JPEG. | `{"output_dir": "<abs>", "viewport": true, "cameras": ["<name>", ...]}` |
-| `POST /object/teleport` | Live-set pose for rigid bodies and articulations. | `{"name": "<key>", "translation": [x,y,z], "rotation_wxyz": [w,x,y,z], "zero_velocity": true, "env_index": 0}` |
-| `POST /script` | Run a trusted absolute Python file on Isaac's main loop. Globals: `ctx`, `env`, `app`, `args`, `helpers`, `stage`, `get_stage`. | `{"path": "/abs/path/to/script.py"}` |
-| `POST /bake` | Return Python snippets reflecting the current live xform of named entities. | `{"names": ["<key>", ...]}` |
+Treat a compound prompt as an ordered stream of edits, not as one batch script. Run one bridge transaction for one user-visible operation, wait for its viewport update, inspect its result, and only then apply the next operation. For example, adding a table, two tools, two trays, and a robot is six live transactions. Never hide all requested edits inside one remote Python file or patch owning source while the user is waiting for the stage to change.
 
-After a teleport, read the `live` field from `GET /object?name=<key>` to verify. The `bbox` field is USD-derived and may lag a physics step.
-
-## Edit Matrix
-
-| Edit | Live (bridge) | Bake target |
-|---|---|---|
-| Move/rotate rigid object | `POST /object/teleport` | `workflows/agentic/arena/arena/assets/<env>.py` `init_state.pos`/`rot` |
-| Move/rotate truly-static XformPrim (no physics body anywhere in the USD — lights, decals) | `POST /script` → `xformOp:translate` / `xformOp:orient` | `workflows/agentic/arena/arena/assets/<env>.py` `init_state.pos` |
-| Move/rotate `AssetBaseCfg` whose USD embeds a rigid body (e.g. `SCISSOR_TRAY_USD` trays/fixtures — kinematic **child mesh**) | `POST /script` → `helpers.move("<key>", pos=/dpos=)` — drives the child PhysX body (raw USD writes snap back; see recipe) | `workflows/agentic/arena/arena/assets/<env>.py` `init_state.pos` |
-| Rescale a prim | **Live-added / bridge-spawned prim → re-spawn at the new size** (delete + `CuboidCfg(new).func` + re-rest; see "Resize a live-added prim"). **Do NOT use `xformOp:scale` on it — that scales its *position* (flings it off-screen), NOT its size.** `xformOp:scale` is only for an existing scene-asset prim. | `workflows/agentic/arena/arena/assets/<env>.py` `spawn=...scale` |
-| Move robot stand | `POST /object/teleport name=robot` | `workflows/agentic/arena/arena/environments/<env>_environment.py` `embodiment.set_initial_pose(...)` |
-| Add a new prim | `POST /script` → **`sim_utils.CuboidCfg(...).func(path, cfg)` + `helpers.move(...)`** (see "Add a prim live" recipe) — NOT raw `pxr` USD authoring; a live-added body isn't GPU-simulated, so place it at rest height, don't tensor-query it | `workflows/agentic/arena/arena/assets/<env>.py` + `make_*_scene_assets()` |
-| Toggle gravity | `POST /script` → set `physxRigidBody:disableGravity`; zero `root_lin_vel_w` / `root_ang_vel_w` | `workflows/agentic/arena/arena/assets/<env>.py` `rigid_props.disable_gravity` |
-| Toggle kinematic | `POST /script` → flip `physics:kinematicEnabled` | `workflows/agentic/arena/arena/assets/<env>.py` `rigid_props.kinematic_enabled` |
-| Change mass / collider props | `POST /script` → write `physxRigidBody:*` / `physxCollision:*` | `workflows/agentic/arena/arena/assets/<env>.py` `mass_props` / `collision_props` |
-| Swap a USD reference | `POST /script` → `prim.GetReferences().SetReferences(...)` | `workflows/agentic/arena/arena/assets/<env>.py` `spawn.usd_path` |
-| Add/remove a camera | Use the live bridge to choose the pose from viewport/object state; do not live-register a new IsaacLab sensor. | See "Adding a Camera" — bake **env-locally**, never in the shared embodiment |
-| Change task wording | preview only | env YAML `policy.language_instruction` / `task_description` |
-| Change success rule | `POST /script` → swap term on `env.unwrapped.termination_manager` | `workflows/agentic/arena/arena/tasks/<env>.py` |
-| Change reset randomization range | `POST /script` → mutate `EventTerm.pose_range`; `env.reset()` | `workflows/agentic/arena/arena/tasks/<env>.py` events cfg |
-
-## Live-Edit Recipes
-
-Keep `SKILL.md` as the router and load `references/scene-edit-patterns.md` for the detailed bridge recipes. Load `references/asset-snippets.md` for copyable object/asset snippets. The mandatory live-edit rules are:
-
-- Rigid bodies and articulations move through `POST /object/teleport`, then verify with the object's `live` pose.
-- Robot stand moves use `POST /object/teleport` with `name=robot`; derive x/y/yaw from the table bbox and current robot pose, keep the current live z, and verify the settled live pose over multiple reads.
-- For G1 or any floating-base robot stand move, an immediate successful teleport is not stability proof. Sample `GET /object?name=robot` for at least 10-15 seconds after the move (for example once per second). Treat continuous z drop, growing roll/pitch, or x/y drift as a fall; if that happens, revert to the last stable pose or adjust target/standoff/yaw and re-test before continuing to camera work or bake.
-- Embedded kinematic `AssetBaseCfg` props/support surfaces use `helpers.move`. Raw USD translation can snap back because PhysX owns the body pose.
-- Live-added bodies must be spawned through IsaacLab cfgs plus `helpers.move`, placed directly at their resting height, and never tensor-queried until a relaunch registers them with the GPU pipeline.
-- Live-added prim resize is delete + re-spawn + re-rest. `xformOp:scale` is only for existing scene assets, not bridge-spawned bodies.
-- Capture after each task-relevant edit and judge the image plus structural state before reporting success.
-
-## Adding a Camera
-
-Do not initialize a new IsaacLab `Camera`/`TiledCamera` sensor through a live `/script`. On this workflow, runtime sensor registration can block the Isaac main loop and leave `/script`, `/cameras`, and `/bake` timing out while `/health` still responds. Use the live bridge to inspect objects, verify the current viewport/pose, and choose the camera eye/target. Then bake the camera as an env-local source sensor. Verify the baked camera with `local-agent/validate-bake.sh <env>` plus camera captures only when running the explicit fresh-source validation gate. A temporary USD-only camera prim may be used only to reason about placement; it does not prove downstream policy/dataset readiness. Load `references/camera-snippets.md` for source/YAML/policy/dataset wiring.
-
-For "room camera based on current perspective view", treat the viewport as only the first pose guess. Capture the room camera before baking; it must show the main task area and task-relevant objects after all requested edits, including the support surface, robot/table relationship, tools/destinations, and newly added objects. A frame that cuts off the robot body, head/hands, table, trays/tools, or new object at an image edge is a failed candidate; do not call it "whole room" or bake it. If the frame clips or hides those objects, zoom out before baking by moving the camera farther from the task look-at point and/or widening the lens, then capture again and bake only the validated view. Leave extra margin for the baked 4:3 sensor because it can be narrower than a 16:9 viewport capture.
-
-For bake, load `references/scene-edit-patterns.md` and apply the camera checklist in one pass: env-local sensor, matching task `observations.policy` term, YAML `zenoh.camera_names`, policy camera list, dataset mapping, and any stack-specific modality config. Never add an env-specific camera to a shared embodiment class, and re-record demos after changing policy/dataset cameras.
-
-## Durable Touchpoints (bake targets)
-
-- `workflows/agentic/arena/arena/environments/<env>_environment.py`: env wiring, robot stand pose.
-- `workflows/agentic/arena/arena/assets/<env>.py`: static scene assets.
-- `workflows/agentic/arena/arena/tasks/<env>.py`: reset randomization, success, task text.
-- `workflows/agentic/arena/arena/runtimes/<env>.py`: runtime-specific camera/state/action logic.
-- `workflows/agentic/config/environments/<env>.yaml`: cameras, policy language, dataset mappings.
-
-## Notes
-
-- `assemble_trocar` is inference-only. Do not add train hooks during a scene edit.
-- If adding/removing cameras, update `policy.data_config`, `dataset.camera_mappings`, and the train modality config together.
-- Scissor SO-ARM generates `meta/modality.json` from YAML splits and does not need `dataset.modality_template_path`. G1 locomanip and assemble-trocar do.
-
-## Verify (after bake)
-
-For a normal interactive "edit, bake, and stop" prompt, do not relaunch Isaac after stopping the edit bridge. Run the cheap static checks and report that fresh-source validation was not run unless requested:
+Use the one-operation helper from the workflow root for common edits:
 
 ```bash
-python -m py_compile <changed-python-files>
-python - <<'PY'
-import yaml, pathlib
-for p in pathlib.Path('workflows/agentic/config/environments').glob('*.yaml'):
-    yaml.safe_load(p.read_text())
-PY
-workflows/agentic/arena/run.sh  --env <env> --dry-run      # necessary, NOT sufficient
-workflows/agentic/policy/run.sh --env <env> --dry-run
+arena/.venv/bin/python scripts/live_scene_edit.py add-known-asset \
+  --asset surgical_table \
+  --prim-path /World/envs/env_0/Table \
+  --position 0,0,0
+
+arena/.venv/bin/python scripts/live_scene_edit.py add-cube \
+  --prim-path /World/envs/env_0/RedCube \
+  --position 0,0,0.3 \
+  --size 0.1 \
+  --color 1,0,0
+
+arena/.venv/bin/python scripts/live_scene_edit.py scale-by \
+  --prim-path /World/envs/env_0/RedCube \
+  --factor 2
+
+arena/.venv/bin/python scripts/live_scene_edit.py set-transform \
+  --prim-path /World/envs/env_0/Robot \
+  --position=-4.64,0,0.8 \
+  --rotation 0,0,0
+
+arena/.venv/bin/python scripts/live_scene_edit.py set-view \
+  --eye 2.6,-7,3.4 \
+  --target=-1.8,0,0.75
+
+arena/.venv/bin/python scripts/live_scene_edit.py camera-from-view \
+  --prim-path /World/envs/env_0/RoomCamera
+
+arena/.venv/bin/python scripts/live_scene_edit.py capture-camera \
+  --prim-path /World/envs/env_0/RoomCamera \
+  --output-path "$I4H_RUN_DIR/room-camera.png"
 ```
 
-For validation, onboarding readiness, ready-to-commit checks, or a full bake gate, load `references/bake-checklist.md` and run `local-agent/validate-bake.sh <env>`. That gate intentionally opens a fresh sim window; `RESULT: PASS` is required for validation work.
+When a comma-separated vector begins with a negative number, bind it with `=` (for example, `--position=-0.5,0.5,0.1`) so the argument parser does not treat the value as another option.
 
-## Prerequisites
+<!-- markdownlint-disable-next-line MD013 -->
+The helper intentionally accepts one operation per invocation, selects the affected prim, advances visible render updates, and prints the resulting world bounds. Prefer `add-known-asset` for catalogued Healthcare assets: it reuses canonical USD, scale, orientation, physics metadata, attached-camera metadata, embodiment metadata, and expected metric bounds, then rejects a result whose size differs by more than 20%. The `g1` preset must create the standard `head` camera below the live robot preview; treat a missing camera prim as a failed robot edit, activate it, and verify its view before continuing. If no executable preset exists, warm-start from `references/existing-scene-assets.md` and its owning source before using generic `add-usd`. Both asset-add commands place the reference below a transform wrapper so a referenced asset's authored root transform cannot discard the requested live position, rotation, or scale. `add-known-asset`, `add-usd`, `add-cube`, and `camera-from-view` tag their prims for deterministic export; pass `--name` or `--alias` when the source/manifest name cannot be derived generically from the prim path. Inspect bounds before continuing. Use `capture-camera` for fast visible camera checks: it activates the requested camera, schedules a synchronous `FileCapture`, advances the renderer, and rejects an absent, empty, or stale output. Do not use the upstream asynchronous viewport screenshot helper in the persistent bridge session. Use `activate-camera` when capture is unnecessary and `inspect` for one-prim verification. Use raw `isaacsim_send.py` only for an operation the helper does not support, and still send one observable edit per call; record any untagged prim explicitly when baking.
 
-- Workflow set up via [[i4h-workflow-setup]] (`.venv` present); the `arena/run.sh --bridge` launch depends on it.
-- An existing env id with its scene keys (the bridge edits an env in place; preserve its ids).
-- A GPU host able to launch Isaac Sim for the bridge session.
+Infer ordinary support relationships from the requested workspace and measured bounds. A robot or object intended for a table, cart, tray, pad, or floor must have its lower support bound aligned with that surface and its footprint plausibly contained by it; do not accept a floor-mounted, floating, or visibly interpenetrating placement merely because every named asset is present. Include those support relationships in the bounded visual rubric before baking.
 
-## Limitations
+Send a short progress update while the scene visibly changes. Do not spend extended time designing the eventual source representation before the first requested live edit. Inspect ownership and prepare baking after the live result exists.
 
-- Live edits are not persisted until an explicit bake; only bake on user request ("bake"/"save"/"persist"/"commit to source").
-- Support-surface rescale is source-only (`spawn.scale`) — moving an `AssetBaseCfg` surface live moves only the visual, not the collision mesh, so props fall through; relaunch to apply.
-- A live-added body is not GPU-simulated and must not be tensor-queried (a manual `create_rigid_body_view(...).get_transforms()` is a fatal CUDA fault); relaunch to simulate it.
-- While the bridge runs, do not edit `workflows/agentic/arena/arena/assets/<env>.py`, `workflows/agentic/arena/arena/tasks/<env>.py`, the env class, runtime, or env YAML.
+## Session lifecycle
+
+- On the first “edit scene” prompt, use `local-agent/bridge.sh` only when `I4H_LOCAL_AGENT=1`; otherwise launch `./run.sh <workflow> --live` through a persistent/yieldable host session. Wait for port 8226.
+- On every later scene prompt, detect and reuse the open bridge session; do not reset or relaunch the Scene unless the requested change requires it.
+- Apply each add/move/rotate/scale/material/camera operation separately to the same live stage, select the affected prim, advance the viewport, and verify it before continuing.
+- After adding a robot, verify every camera declared by its authoring preset. For G1, require the live `Robot/Asset/head_link/RobotHeadCam` preview and bake with a registered G1 embodiment whose `robot_head_cam` sensor is exposed through the `head` alias.
+- Return control to the user after each prompt while leaving the simulator and bridge running.
+- Bake only on explicit authorization. Baking does not imply stop unless the user also says stop/exit.
+- On stop/exit without bake, close the session and leave source unchanged. A Local Agent session closes with `./local-agent/bridge.sh stop <workflow>`.
+- Use offline/source-first editing only when the user explicitly disables live mode or the bridge cannot operate. Report a bridge blocker before using that fallback; never silently substitute it.
+
+## Use upstream Isaac Sim skills
+
+Read `references/isaacsim-skill-routing.md`, then load only the upstream skills required by the request. State the selection before editing. Use current upstream semantics for generic physics, cameras, sensors, USD, rendering, and spatial reasoning; integrate them through the closest current i4h Scene pattern.
+
+## Iterate live, then let the coding agent bake
+
+Apply requested asset, layout, physics, camera, and transform changes through port 8226 first. For a compound prompt, preserve its order and inspect the live stage after each individual operation. Do not preemptively patch files merely because their eventual owner is known.
+
+When explicitly asked to bake/save/persist, export the confirmed live values and resolve the reusable catalog facts without launching another simulator:
+
+```bash
+I4H_RUN_DIR="runs/<workflow>/<YYYYMMDD_HHMMSS>"
+mkdir -p "$I4H_RUN_DIR"
+
+arena/.venv/bin/python scripts/live_scene_edit.py export-scene \
+  --workflow <workflow> \
+  --root-path /World/envs/env_0 \
+  --output-path "$I4H_RUN_DIR/live_scene.json"
+
+arena/.venv/bin/python scripts/authoring_info.py snapshot \
+  <workflow> "$I4H_RUN_DIR/live_scene.json"
+```
+
+`export-scene` records every helper-managed asset, primitive, robot, and camera with its confirmed transform and camera optics. Keep that snapshot in the run directory as authoring evidence. Pass a previous run snapshot through `--baseline` only when a later live export needs to merge it: existing prims are re-read from the current stage, newly tagged prims are added, and removed prims are omitted. `authoring_info.py` is read-only; it validates the snapshot and returns code-ready catalog metadata and derived manifest capabilities immediately. It never generates or edits workflow code.
+
+The coding agent then patches the existing asset, Scene, and manifest templates using the closest maintained source pattern. Commit only those owning sources; do not commit the exported authoring snapshot or treat it as a second Scene contract. Never copy a reusable USD path, canonical scale, mass, embodiment registry name, action contract, attached camera, or camera alias from memory: query `authoring_info.py asset <preset>` or the complete snapshot report, then use the catalog from owning source. Scene-specific names, placement, camera optics, and explicit overrides come from the snapshot.
+
+Write only to the owning layer:
+
+- Bake assets, layout, physics, cameras, randomization, view aliases, actuation mapping, or reset hooks into Scene/asset/envcfg source.
+- Bake cross-boundary camera/object names, control rate, cap, or mode overrides into the scene manifest.
+- Bake mode composition and goal semantics into the workflow.
+- Bake reusable behavior into a Task.
+- Bake cross-process robot labels, calibration, or teleop devices into the embodiment manifest.
+- Bake a policy prompt, camera, observation, model, or training contract into the remote-task manifest.
+
+Preserve the quaternion convention at each concrete API boundary. Do not add compatibility conversions or duplicate catalog facts across Python and YAML.
+
+For a camera based on the current perspective, treat the viewport pose as an initial estimate. Compute and validate a stable live look-at from task-relevant bounds. On bake, add the confirmed env-local camera through the closest Scene pattern, declare it in the manifest, and verify every recording/policy consumer that should receive it.
+
+## Validate
+
+```bash
+./run.sh show <workflow> --mode <affected-mode>
+./run.sh lint <workflow> --mode <affected-mode>
+./run.sh lint --all
+uvx ruff check --config pyproject.toml <changed-python-files...>
+```
+
+Run focused tests through each affected component's uv project. After the coding agent's static validation, reopen once with `./run.sh <workflow> --live`, compare every requested visual change and declared camera against the exported snapshot, then stop when requested. Do not add extra restarts between export, source editing, and this persisted-visible check. Run affected dynamic modes when physics, reset, actuation, policy observations, task behavior, or success changed. Idle is insufficient for those changes.
+
+When success excludes collision, dynamic validation must include a forced-contact negative case and a fresh-reset recovery case from `references/g1-reach-and-contact.md`. Do not call the success rule validated if its configured contact signal has only ever returned false.
+
+Stop leftovers with `./stop.sh all`.
 
 ## Troubleshooting
 
-- **Error:** `.venv` / import fails or bridge won't launch - Cause: workflow not set up. Fix: run [[i4h-workflow-setup]] first.
-- **Error:** `GET /objects` / bridge URL unreachable - Cause: bridge not ready yet or wrong env URL. Fix: set `BRIDGE_URL="$(workflows/agentic/arena/run.sh bridge-url --env <env>)"` and wait for `[agentic-arena] scene-edit bridge ready` in `${RUN_DIR}/logs/bridge.log` before calling endpoints.
-- **Error:** object moves for one frame then snaps back - Cause: it's a kinematic embedded rigid body (`SCISSOR_TRAY_USD`/`SCISSOR_TABLE_USD`), so `/object/teleport` and raw `xformOp:translate` don't hold. Fix: use `helpers.move("<key>", ...)` to drive the PhysX body.
-- **Error:** a live edit returns `{"ok": false, "error": ...}` - Cause: invalid request for that entity. Fix: report the exact payload and error to the user; do not restart the bridge as a fallback.
+Fix manifest/workflow lint before launch. If the rendered result differs, compare the baseline, authored prims, bounds, cameras, and owning source before retrying.
 
-## Final Response
+## Prerequisites
 
-Live session: report each bridge action, verified live pose, capture path, and whether source was baked from the collected bridge state.
+Require a supported existing workflow, complete simulator setup, and the relevant upstream Isaac Sim skills for generic scene semantics.
 
-After bake: report files touched, cheap static check results, and final bridge state. Report fresh-source validation results only if the user explicitly asked for that validation gate.
+## Limitations
+
+Use `i4h-workflow-create` for a new workflow. Live idle validates stationary layout but not physics, actuation, policy observations, or success. A live session is process-local; export before stopping because unexported edits are lost if it dies. The live helper covers common assets, raw USDs, cubes, transforms, cameras, inspection, capture, and export; the coding agent handles source authoring and any semantics outside those utilities.
+
+## Examples
+
+- `Add a red cube, move G1, add a room camera, bake all changes, and stop.` → keep one bridge-backed simulator session open, apply the three edits live in order, export and inspect one snapshot at “bake,” patch and statically validate the owning source, reopen once for persisted-visible validation, and stop.
+
+## Completion gate
+
+Report upstream skills used, live session/bridge status, edits applied live, whether persistence was authorized, owning sources changed only during bake, static tests, live and persisted visible observations, camera checks, dynamic rollout results including collision-negative evidence when applicable, clean stop status, and any unresolved mismatch.

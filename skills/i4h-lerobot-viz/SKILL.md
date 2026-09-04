@@ -1,105 +1,96 @@
 ---
 name: i4h-lerobot-viz
-version: "0.6.0"
-description: Serve the LeRobot HTML visualizer for a converted dataset in a browser. Use when asked to visualize, inspect, or open a LeRobot dataset; not for converting HDF5 (use [[i4h-workflow-dataset-convert]]).
+description: Serve and visually inspect a converted LeRobot dataset in the browser. Use for videos and state/action timelines; do not use for raw workflow HDF5 or incomplete conversion output.
 license: Apache-2.0
 metadata:
   author: "Isaac for Healthcare Team <isaac-for-healthcare-support@nvidia.com>"
+  version: "0.8.0"
   tags:
     - isaac-for-healthcare
     - i4h
+    - dataset
     - lerobot
     - visualization
-    - dataset
 ---
 
-# i4h Workflow — LeRobot Viz
+# Visualize a LeRobot Dataset
 
 ## Purpose
 
-Serve the LeRobot HTML visualizer for a converted dataset in a browser. Use when the user asks to visualize, inspect, or open a LeRobot dataset.
+Serve one completed local dataset and verify its episode videos and timelines in a browser.
 
-## Base Code
+## Instructions
 
-These steps drive the i4h-workflows base code (the `workflows/agentic/` tree). To reuse an existing checkout, set `I4H_WORKFLOWS` to its path (no clone happens). Otherwise this resolves the current repo, or clones to `~/i4h-workflows` — pick that default without prompting. Run every command below from the resolved root:
+1. Resolve the base checkout and one completed LeRobot dataset.
+2. Launch its managed local server.
+3. Open the printed URL.
+4. Inspect videos, timelines, episode count, and cleanup state.
+
+## Resolve the dataset
 
 ```bash
-# Resolve the i4h-workflows base code (provides workflows/agentic/).
+export I4H_WORKFLOWS_REPO_URL="${I4H_WORKFLOWS_REPO_URL:-https://github.com/isaac-for-healthcare/i4h-workflows}"
+I4H_REPO_DIR_NAME="${I4H_WORKFLOWS_REPO_URL%/}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME##*/}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME##*:}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME%.git}"
+[ -n "$I4H_REPO_DIR_NAME" ] || { echo "Cannot derive a checkout name from I4H_WORKFLOWS_REPO_URL" >&2; exit 2; }
 ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"
-if [ ! -d "$ROOT/workflows/agentic" ]; then
-  ROOT="${I4H_WORKFLOWS:-$HOME/i4h-workflows}"
-  [ -d "$ROOT/workflows/agentic" ] || git clone https://github.com/isaac-for-healthcare/i4h-workflows "$ROOT"
+if [ ! -d "$ROOT/workflows/i4h_workflows" ]; then
+  ROOT="${I4H_WORKFLOWS:-$HOME/$I4H_REPO_DIR_NAME}"
+  [ -d "$ROOT/workflows/i4h_workflows" ] || git clone "$I4H_WORKFLOWS_REPO_URL" "$ROOT"
 fi
-export I4H_WORKFLOWS="$ROOT"; cd "$ROOT"
+export I4H_WORKFLOWS="$ROOT"
+cd "$ROOT"
+find runs "${HF_LEROBOT_HOME:-$HOME/.cache/huggingface/lerobot}" \
+  -name info.json -path '*/meta/*' -printf '%T@ %h\n' 2>/dev/null \
+  | sort -nr | head
 ```
 
-## Basics
+Treat the resolver above as part of the skill contract: a hosted copy may run outside the base repository, so never assume the current checkout contains `workflows/i4h_workflows`. `I4H_WORKFLOWS_REPO_URL` selects the clone source. When `I4H_WORKFLOWS` is unset, derive the fallback directory from that URL; set `I4H_WORKFLOWS` only to reuse or choose a specific destination. Never replace an existing checkout.
 
-- Input is a converted LeRobot dataset directory containing `meta/info.json`.
-- Use for visual checks after conversion or video augmentation.
+Use the explicit/current-chain converted directory. Otherwise select the newest candidate and state the choice. Require `<dataset>/meta/info.json`; route raw HDF5 to `i4h-workflow-dataset-convert`.
 
-## Run
+## Serve
 
-Run the steps below in order. Each step is a separate bash call; variables persist in the local agent's tmux session.
-
-### Step 1 — setup and resolve dataset
+Pass an absolute local path:
 
 ```bash
-REPO_ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"; [ -d "$REPO_ROOT/workflows/agentic" ] || REPO_ROOT="$HOME/i4h-workflows"
-RUNS_ROOT="${REPO_ROOT}/workflows/agentic/runs"
-
-# Point DATASET_DIR at a converted LeRobot dataset dir (absolute; must contain meta/info.json),
-# produced by [[i4h-workflow-dataset-convert]]. List candidates:
-#   find "${RUNS_ROOT}" "${HF_LEROBOT_HOME:-$HOME/.cache/huggingface/lerobot}" -name info.json -path '*/meta/*' -printf '%h\n' | sed 's#/meta$##' | sort -u
-DATASET_DIR="${DATASET_DIR:-}"
-if [ ! -f "${DATASET_DIR%/}/meta/info.json" ]; then
-  echo "viz: set DATASET_DIR to a LeRobot dataset dir with meta/info.json (got '${DATASET_DIR:-<unset>}'). Candidates:" >&2
-  find "${RUNS_ROOT}" "${HF_LEROBOT_HOME:-$HOME/.cache/huggingface/lerobot}" -name info.json -path '*/meta/*' -printf '%h\n' 2>/dev/null | sed 's#/meta$##' | sort -u | head
-  exit 1
-fi
-
-RUN_DIR="${RUNS_ROOT}/viz_$(date +%Y%m%d_%H%M%S)"
-mkdir -p "${RUN_DIR}/logs" "${RUN_DIR}/viz_state"
-ln -sfn "${RUN_DIR}" "${RUNS_ROOT}/.latest"
+DATASET_DIR=/absolute/path/to/lerobot/dataset
+STATE_DIR=/absolute/path/to/run/viz-state
+tools/dataset/scripts/viz.sh "$DATASET_DIR" --state-dir "$STATE_DIR"
 ```
 
-### Step 2 — serve visualizer
+The script selects a free local port, waits for HTTP readiness, and prints the URL, PID, state files, log, and exact stop command. Keep it running only while the user wants access.
 
-```bash
-"${REPO_ROOT}/workflows/agentic/dataset/viz.sh" "${DATASET_DIR}" \
-  --state-dir "${RUN_DIR}/viz_state" \
-  2>&1 | tee "${RUN_DIR}/logs/viz.log"
-```
+## Verify visually
 
-## Notes
+Open the printed URL. Confirm:
 
-- The dataset path must be absolute. `viz.sh` treats relative paths as Hugging Face repo ids and looks them up under `~/.cache/huggingface/lerobot/<path>`.
-- Override `--state-dir` only when the caller provides one.
+- the requested episode list loads
+- every expected camera video renders
+- state and action timelines render with plausible dimensions and motion
+- episode count and task text match `meta/info.json`
+- no blank page, missing video, or wrong dataset is being served
 
-## Verify
-
-- The visualizer prints a local URL (e.g. `http://127.0.0.1:9090/`).
-- Videos and joint timelines load in the browser.
-
-## Prerequisites
-
-- Workflow set up via [[i4h-workflow-setup]] (the `.venv` must exist).
-- A converted LeRobot dataset directory containing `meta/info.json` (see [[i4h-workflow-dataset-convert]]).
-- An absolute path to that dataset directory.
-
-## Limitations
-
-- Input must be a converted LeRobot dataset directory with `meta/info.json`; intended for visual checks after conversion or video augmentation.
-- The dataset path must be absolute; `viz.sh` treats relative paths as Hugging Face repo ids and looks them up under `~/.cache/huggingface/lerobot/<path>`.
-- Override `--state-dir` only when the caller provides one.
+Reuse a live server only when its target dataset matches. Otherwise stop it using its printed state directory and port, then start the requested dataset.
 
 ## Troubleshooting
 
-- **Error:** `.venv` not found / module import fails - Cause: workflow not set up. Fix: run [[i4h-workflow-setup]] first.
-- **Error:** dataset resolved as a Hugging Face repo id / not found - Cause: a relative dataset path was passed. Fix: pass the absolute path to the dataset directory.
-- **Error:** no `meta/info.json` - Cause: directory is not a converted LeRobot dataset. Fix: convert first with [[i4h-workflow-dataset-convert]].
-- **Error:** address/port already in use - Cause: a visualizer is already serving that local URL. Fix: stop the existing process before starting a new one.
+If startup or the page fails, inspect `meta/info.json`, videos, the printed server log, and port ownership before restarting.
 
-## Final Response
+## Prerequisites
 
-Report dataset path, visualizer URL, stop command, startup failures.
+Require the dataset tool environment and a completed LeRobot dataset with `meta/info.json`.
+
+## Limitations
+
+The visualizer does not accept raw workflow HDF5 or repair incomplete metadata/videos.
+
+## Examples
+
+- `Open the latest converted LeRobot dataset for inspection.` → choose the newest verified dataset, serve it, and report the observed videos/timelines plus cleanup command.
+
+## Completion gate
+
+Report dataset path, repo id, local URL, episode/camera/timeline observations, PID/state directory, and exact cleanup command.

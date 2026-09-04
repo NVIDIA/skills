@@ -1,5 +1,5 @@
 ## Description: <br>
-Validate, evaluate, or run i4h envs. Use for policy/checkpoint rollouts and scripted state-machine smoke runs. <br>
+Run the root-level workflow runtime policy or rule-based rollouts and verify simulator success. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers validating Isaac for Healthcare (i4h) policy or checkpoint rollouts by running evaluation episodes against simulation environments and recording verification HDF5 data. <br>
+Developers and engineers use this skill to validate Isaac for Healthcare simulation workflows by running policy or rule-based rollouts and verifying simulator success for evaluation, checkpoints, or local controllers. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,53 +26,54 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [Isaac for Healthcare Workflows](https://github.com/isaac-for-healthcare/i4h-workflows) <br>
+- [Agent Skills Specification](https://agentskills.io/specification) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Files, Analysis] <br>
+**Output Type(s):** [Shell commands, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 9 tasks (9 positive activation, 0 negative) in astra-sandbox environment with NVSkills-Eval external profile. <br>
+20 evaluation tasks (20 positive), each run in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Is it safe to use? Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Is the answer correct? Measures final-answer correctness against the reference answer. <br>
+- Discoverability: Was the right skill loaded when needed? Checks whether the expected skill was found and executed. <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Did it avoid wasted tool or skill usage? Measures routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 8 | 100% (+0%) | 94% (-6%) |
-| Correctness | 8 | 71% (+47%) | 68% (+44%) |
-| Discoverability | 8 | 95% (+57%) | 70% (+26%) |
-| Effectiveness | 8 | 48% (+46%) | 51% (+48%) |
-| Efficiency | 8 | 84% (+46%) | 63% (+12%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 38% → 66% (+28 points) | Not available |
+| Security | 95% → 40% (-55 points) | Not available |
+| Correctness | 7% → 91% (+84 points) | Not available |
+| Discoverability | 48% → 83% (+36 points) | Not available |
+| Effectiveness | 4% → 31% (+27 points) | Not available |
+| Efficiency | 37% → 86% (+50 points) | Not available |
 
 ## Skill Version(s): <br>
-0.6.1 (source: frontmatter) <br>
+0.8.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -1,14 +1,17 @@
 [
   {
-    "id": "i4h-workflow-dataset-teleop-readme-quick-five",
-    "question": "Run teleop for 5 episodes.",
+    "id": "i4h-workflow-dataset-teleop-g1-keyboard-five",
+    "question": "Record 5 keyboard teleop demonstrations for locomanip tray pick and place.",
     "expected_skill": "i4h-workflow-dataset-teleop",
-    "ground_truth": "This README Quick Run prompt routes to teleop recording for the active/new env with five episodes.",
+    "ground_truth": "This G1 teleop prompt routes to visible keyboard_23d demonstration recording with a human operator for five episodes.",
     "expected_behavior": [
       "routes to i4h-workflow-dataset-teleop",
-      "uses the current or recently created env context",
-      "sets EPISODES to 5",
-      "records teleoperated demos to HDF5",
+      "maps the prompt to locomanip_tray_pick_and_place",
+      "selects the supported keyboard_23d device",
+      "keeps the simulator visible and requires a human operator",
+      "runs five episodes through the normal teleop action path",
+      "records the demonstrations to HDF5",
+      "inspects segments, action motion, cameras, and target progress after recording",
       "reports the output HDF5 path"
     ]
   },
@@ -22,6 +25,19 @@
       "maps scissor pick-and-place to scissor_pick_and_place",
       "selects keyboard teleoperation",
       "records five demos to HDF5"
+    ]
+  },
+  {
+    "id": "i4h-workflow-dataset-teleop-specialty-endoluminal-patient-twin",
+    "question": "Start endoluminal_navigation teleop with the prepared s0011 patient twin.",
+    "expected_skill": "i4h-workflow-dataset-teleop",
+    "ground_truth": "This endoluminal specialty prompt launches the declared keyboard teleop mode with the prepared s0011 patient-twin manifest and leaves control to the human operator.",
+    "expected_behavior": [
+      "routes to i4h-workflow-dataset-teleop",
+      "requires the generated s0011 patient_twin.yaml to exist",
+      "uses endoluminal_navigation teleop mode with its default keyboard device",
+      "keeps the simulator visible and in the foreground",
+      "requires a human operator and never pretends to provide keyboard input"
     ]
   }
 ]
