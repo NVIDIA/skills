@@ -63,7 +63,7 @@
     {
       "path": "skills/amc-run-video-calibration",
       "name": "amc-run-video-calibration",
-      "description": "Calibrate a new dataset from pre-recorded video files via the AutoMagicCalib REST API. Use when user has local MP4s and says 'calibrate my videos', 'run AMC on these videos', or similar. For RTSP/live streams, use amc-run-rtsp-calibration instead.",
+      "description": "Calibrates pre-recorded `cam_*.mp4` datasets through the AutoMagicCalib REST API. Use for user-supplied local MP4s; route live RTSP streams to `amc-run-rtsp-calibration`.",
       "metadata": {
         "product.primary": "DeepStream SDK",
         "classification.category.primary": "ai_and_machine_learning",
@@ -279,7 +279,7 @@
     {
       "path": "skills/deepstream-import-vision-model",
       "name": "deepstream-import-vision-model",
-      "description": "Use this skill to bring any vision model from HuggingFace or NVIDIA NGC into an NVIDIA DeepStream pipeline with end-to-end automation: ONNX download, SafeTensors export, TRT engine build, custom nvinfer bbox parser, multi-stream benchmark, and PDF report. Object detection models only.\n",
+      "description": "Use this skill to bring a supported object-detection vision model from HuggingFace or NVIDIA NGC into an NVIDIA DeepStream pipeline with end-to-end automation: ONNX download, SafeTensors export, TRT engine build, custom nvinfer bbox parser, multi-stream benchmark, and PDF report. Object detection models only.\n",
       "metadata": {
         "product.primary": "DeepStream SDK",
         "classification.category.primary": "ai_and_machine_learning",
