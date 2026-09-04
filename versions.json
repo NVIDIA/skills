@@ -25,23 +25,23 @@
     {
       "name": "amc-run-rtsp-calibration",
       "path": "skills/amc-run-rtsp-calibration",
-      "content_digest": "sha256:1f12cd5abebdd7786285e4b81fb317f2cc94248f88a6f782ef29a09cc49d1afc",
-      "last_commit": "a8ca7bc1ddc433e91520892b087c5a704e34fdb2",
-      "last_modified": "2026-08-12"
+      "content_digest": "sha256:7b48e2a0fe6ac9ac1dec34cd24482f3b5980cdbb0e597bed0622b809504603da",
+      "last_commit": "6d034104a85ed75c705535c0d9dd961412fd6be3",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "amc-run-sample-calibration",
       "path": "skills/amc-run-sample-calibration",
-      "content_digest": "sha256:1c4a8710911a1d9c33153f977d24f230169c4f0aecaebf37defa71453920cf41",
-      "last_commit": "de3c29225040d96960f77c327d9c5eef0a1acdba",
-      "last_modified": "2026-07-14"
+      "content_digest": "sha256:39a60c9659af6910187dd4de3eb295d4201cbd0279c3debc5cf56a33c8b10b87",
+      "last_commit": "6d034104a85ed75c705535c0d9dd961412fd6be3",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "amc-run-video-calibration",
       "path": "skills/amc-run-video-calibration",
-      "content_digest": "sha256:fbce1aaef3cb2ffc4637cfa166820d7ea8e9c9db618a665b21191b873e49bf67",
-      "last_commit": "de3c29225040d96960f77c327d9c5eef0a1acdba",
-      "last_modified": "2026-07-14"
+      "content_digest": "sha256:832adf08fe30647364d123b92fc54138ed992cc6c50de8a7464ca7b143b321e1",
+      "last_commit": "6d034104a85ed75c705535c0d9dd961412fd6be3",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "amc-setup-calibration-stack",
@@ -151,9 +151,9 @@
     {
       "name": "deepstream-dev",
       "path": "skills/deepstream-dev",
-      "content_digest": "sha256:397217e43a62f8e3f7f55ff3862492ef113ec2944b59aac7834356c9debec762",
-      "last_commit": "de3c29225040d96960f77c327d9c5eef0a1acdba",
-      "last_modified": "2026-07-14"
+      "content_digest": "sha256:e9c84553d75c447adb2282f78a928f820a6456d84b74505e141cb08d57935232",
+      "last_commit": "6d034104a85ed75c705535c0d9dd961412fd6be3",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "deepstream-generate-pipeline",
@@ -165,9 +165,9 @@
     {
       "name": "deepstream-import-vision-model",
       "path": "skills/deepstream-import-vision-model",
-      "content_digest": "sha256:65cc0c009669db65516c3c744bb5a982f57cc936e4b5ca3d17af9a43fb82055c",
-      "last_commit": "de3c29225040d96960f77c327d9c5eef0a1acdba",
-      "last_modified": "2026-07-14"
+      "content_digest": "sha256:811986b26074f5b711df6f8581d34208919ab8a3c9261332a43b044ba486f084",
+      "last_commit": "6d034104a85ed75c705535c0d9dd961412fd6be3",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "deepstream-profile-pipeline",
@@ -186,9 +186,9 @@
     {
       "name": "deepstream-sop",
       "path": "skills/deepstream-sop",
-      "content_digest": "sha256:18f1d7757db037153e65d5d8a23fde0f87eca1b90290561e1dab6eeed4a4b7bd",
-      "last_commit": "4cb109230e78b1176e85e7bd9d5b4f36d92fbc9b",
-      "last_modified": "2026-07-01"
+      "content_digest": "sha256:a6e9de0fa22b505f349734532b020646e151790616f5922e49f4e279da5a6ea4",
+      "last_commit": "6d034104a85ed75c705535c0d9dd961412fd6be3",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "dicom-metadata-extract",
