@@ -1,12 +1,12 @@
 [
   {
     "id": "i4h-workflow-dataset-replay-readme-quick-second-episode",
-    "question": "Replay second episode.",
+    "question": "Replay the second episode.",
     "expected_skill": "i4h-workflow-dataset-replay",
     "ground_truth": "This README Quick Run prompt routes to HDF5 replay using the latest recorded run and episode index 1.",
     "expected_behavior": [
       "routes to i4h-workflow-dataset-replay",
-      "resolves the latest recorded HDF5 from workflows/agentic/runs",
+      "resolves the latest recorded HDF5 from ./runs",
       "interprets second episode as episode index 1",
       "launches replay in Isaac Sim rather than policy validation"
     ]

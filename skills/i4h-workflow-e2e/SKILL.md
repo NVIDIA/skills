@@ -1,123 +1,102 @@
 ---
 name: i4h-workflow-e2e
-version: "0.6.0"
-description: Run the full end-to-end agentic pipeline (record → mimic → annotate → replay → convert → visualize → finetune → validate). Use when asked to run the whole pipeline or do an e2e, smoke, or demo run.
+description: Run the maintained workflow data-to-policy pipeline from recording through checkpoint validation. Use for full end-to-end requests; do not use for one individual stage.
 license: Apache-2.0
 metadata:
   author: "Isaac for Healthcare Team <isaac-for-healthcare-support@nvidia.com>"
+  version: "0.8.0"
   tags:
     - isaac-for-healthcare
     - i4h
-    - agentic-workflow
-    - end-to-end
-    - pipeline
+    - robotics
+    - data-to-policy
 ---
 
-# i4h Workflow — End-to-End
+# Run the Workflow End-to-End Pipeline
 
 ## Purpose
 
-Run the full end-to-end agentic pipeline (record, mimic, annotate/filter, replay, convert, visualize, finetune, validate). Use when the user asks to run the full pipeline, smoke the whole workflow, demo the workflow, or do an e2e run.
+Use the maintained driver so stage resolution, artifacts, logs, and checkpoint handoff stay consistent with current workflow/task manifests.
 
-## Base Code
+## Instructions
 
-These steps drive the i4h-workflows base code (the `workflows/agentic/` tree). To reuse an existing checkout, set `I4H_WORKFLOWS` to its path (no clone happens). Otherwise this resolves the current repo, or clones to `~/i4h-workflows` — pick that default without prompting. Run every command below from the resolved root:
+1. Resolve the base checkout and policy workflow.
+2. Require a successful driver dry-run.
+3. Execute the maintained driver in the foreground.
+4. Inspect every stage artifact before reporting completion.
+
+## Resolve the checkout
 
 ```bash
-# Resolve the i4h-workflows base code (provides workflows/agentic/).
+export I4H_WORKFLOWS_REPO_URL="${I4H_WORKFLOWS_REPO_URL:-https://github.com/isaac-for-healthcare/i4h-workflows}"
+I4H_REPO_DIR_NAME="${I4H_WORKFLOWS_REPO_URL%/}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME##*/}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME##*:}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME%.git}"
+[ -n "$I4H_REPO_DIR_NAME" ] || { echo "Cannot derive a checkout name from I4H_WORKFLOWS_REPO_URL" >&2; exit 2; }
 ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"
-if [ ! -d "$ROOT/workflows/agentic" ]; then
-  ROOT="${I4H_WORKFLOWS:-$HOME/i4h-workflows}"
-  [ -d "$ROOT/workflows/agentic" ] || git clone https://github.com/isaac-for-healthcare/i4h-workflows "$ROOT"
+if [ ! -d "$ROOT/workflows/i4h_workflows" ]; then
+  ROOT="${I4H_WORKFLOWS:-$HOME/$I4H_REPO_DIR_NAME}"
+  [ -d "$ROOT/workflows/i4h_workflows" ] || git clone "$I4H_WORKFLOWS_REPO_URL" "$ROOT"
 fi
-export I4H_WORKFLOWS="$ROOT"; cd "$ROOT"
+export I4H_WORKFLOWS="$ROOT"
+cd "$ROOT"
 ```
 
-## Basics
+Treat this resolver as part of the skill contract: a hosted copy may run outside the base repository, so never assume the current checkout contains `workflows/i4h_workflows`. `I4H_WORKFLOWS_REPO_URL` selects the clone source. When `I4H_WORKFLOWS` is unset, derive the fallback directory from that URL; set `I4H_WORKFLOWS` only to reuse or choose a specific destination. Never replace an existing checkout.
 
-- **Env config (source of truth):** `workflows/agentic/config/environments/<env>.yaml` — drives every stage for `<env>` (robot, task, policy, cameras, `arena.max_timesteps`, `dataset.*` mappings).
-- Use the e2e script for full pipeline runs.
-- For per-stage work, use the corresponding dataset/finetune/validate skills.
-- `assemble_trocar` is inference-only; the e2e script skips finetune and checkpoint validation for it.
+Require the workflow's `policy` mode. The driver discovers the remote task, embodiment, task text, and trainability from live workflow/task manifests.
 
-## Dry Run
+## Dry-run first
 
 ```bash
-REPO_ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"; [ -d "$REPO_ROOT/workflows/agentic" ] || REPO_ROOT="$HOME/i4h-workflows"
-"${REPO_ROOT}/workflows/agentic/scripts/e2e/run.sh" --dry-run --env <env>
+./scripts/e2e/run.sh --env <workflow> --dry-run
 ```
 
-## Run
+Require exit status 0 and inspect every printed command and artifact path. The dry-run is the source of truth for current stages and backend ownership.
 
-Run the steps below in order. Each step is a separate bash call; variables persist in the local agent's tmux session.
-
-For Claude Code `--print` or any other noninteractive runner, keep Step 2 in the foreground. This is a validation requirement: do not use Claude background tasks, async task mode, Bash background mode, `&`, `nohup`, `tmux`, `disown`, or any detached process/task id, and do not answer that the pipeline is still running. Do not return until `run.sh` exits and you have inspected `logs/SUMMARY.txt` on success, or the failing stage log on failure. Report the run dir, skipped stages, per-stage status, key artifacts, and cleanup/stop status before finishing.
-
-### Step 1 — setup
+## Run in the foreground
 
 ```bash
-REPO_ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"; [ -d "$REPO_ROOT/workflows/agentic" ] || REPO_ROOT="$HOME/i4h-workflows"
+./scripts/e2e/run.sh --env <workflow>
 ```
 
-### Step 2 — e2e pipeline
+Use `--run-dir` only when the caller needs a specific location. Apply `--skip-mimic`, `--skip-annotate`, `--skip-replay`, or `--skip-viz` only when the user explicitly omits that optional stage or a documented smoke profile requires it.
 
-```bash
-"${REPO_ROOT}/workflows/agentic/scripts/e2e/run.sh" --env <env>
-```
+Keep the driver as this agent's foreground tool call. Do not use a subagent, monitor task, shell backgrounding, `nohup`, `tmux`, or a detached process. Poll until exit.
 
-## Flags
+The driver performs full setup, then owns its stage sequence, timestamped run directory, `runs/.latest` link, and per-stage logs. Do not replace it with a manually assembled subset.
 
-- `--skip-mimic`, `--skip-annotate`, `--skip-replay`, `--skip-viz`
-- `--from-stage <stage> --run-dir <existing-run>` resumes from a prior run.
-- Policy record/verify stages open the sim window by default. Set `ARENA_HEADLESS=1` before `run.sh` only when the user explicitly asks for headless/no-window execution.
+## Verify
 
-Stages: `setup record mimic annotate replay convert viz finetune validate summary`.
+On success, inspect the printed summary and artifacts:
 
-## Outputs
+- policy recording
+- expanded/filtered HDF5 as applicable
+- visible replay result when enabled
+- LeRobot metadata, parquet, and videos
+- visualizer URL/content when enabled
+- training logs and exact checkpoint when trainable
+- checkpoint validation recording and final success summary
 
-The script prints `RUN_DIR` and symlinks it to `runs/.latest`. Subdirs:
-
-- `logs/` — per-stage logs, `workflow.log` (full teed output), and `logs/SUMMARY.txt` (the final summary report)
-- `data/`
-- `lerobot/`
-- `checkpoint/` (trainable envs only)
-
-## Monitor
-
-`run.sh` runs every stage in the foreground and returns only when the whole pipeline ends, so track a long run from a **separate shell** (do not expect to query it from the shell that launched it):
-
-```bash
-tail -f "${REPO_ROOT}/workflows/agentic/runs/.latest/logs/workflow.log"   # live per-stage progress
-cat    "${REPO_ROOT}/workflows/agentic/runs/.latest/logs/SUMMARY.txt"     # final report (once DONE)
-```
-
-## Stop
-
-### Step 3 — stop (if needed)
-
-```bash
-"${REPO_ROOT}/workflows/agentic/stop.sh" all --env <env>
-```
-
-## Prerequisites
-
-- Workflow set up via [[i4h-workflow-setup]] (the `.venv` must exist); `setup` is also the first pipeline stage.
-- A valid `--env` name to drive the run.
-- For per-stage work, use the corresponding dataset/finetune/validate skills instead.
-
-## Limitations
-
-- `assemble_trocar` is inference-only; the e2e script skips finetune and checkpoint validation for it.
-- `checkpoint/` outputs are produced for trainable envs only.
-- Resuming requires both `--from-stage <stage>` and `--run-dir <existing-run>`.
+On failure, stop at the first failed stage, inspect that stage's log, preserve the run directory, and repair the owning stage before rerunning. Do not skip a required failure merely to obtain a green summary. Stop leftovers with `./stop.sh all`.
 
 ## Troubleshooting
 
-- **Error:** `.venv` not found / module import fails - Cause: workflow not set up. Fix: run [[i4h-workflow-setup]] first.
-- **Error:** env not recognized - Cause: wrong `--env` name. Fix: pass a valid env name; dry-run first with `--dry-run --env <env>`.
-- **Error:** resume fails to find prior outputs - Cause: `--from-stage` used without a matching `--run-dir`. Fix: pass `--from-stage <stage> --run-dir <existing-run>`.
-- **Error:** stale processes block a rerun - Cause: a previous pipeline session is still running. Fix: run `stop.sh all --env <env>` before retrying.
+Use the first failed stage and its log to choose the owning stage skill. Preserve the run directory and rerun only after that stage verifies its output.
 
-## Final Response
+## Prerequisites
 
-Report env, run dir, skipped stages, per-stage success/failure, key artifact paths.
+Require a policy workflow plus host, simulator, backend, VLM, dataset, training, and visualization dependencies for every enabled stage.
+
+## Limitations
+
+The pipeline supports only workflows with a policy mode; inference-only Tasks skip fine-tuning and checkpoint validation.
+
+## Examples
+
+- `Run end-to-end smoke pipeline for scissor pick-and-place.` → dry-run, execute the driver, and report each recording-to-validation stage.
+
+## Completion gate
+
+Report workflow/task/embodiment/trainability, dry-run result, run directory, every stage outcome and skip, dataset/visualizer/checkpoint/verification artifacts, final exit status, and cleanup state.

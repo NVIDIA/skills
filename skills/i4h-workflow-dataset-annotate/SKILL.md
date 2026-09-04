@@ -1,10 +1,10 @@
 ---
 name: i4h-workflow-dataset-annotate
-version: "0.6.0"
-description: Use a VLM to verify whether each episode satisfies the env's task description. Use when the user asks to annotate, label episodes, filter demos, or gate finetuning on a success classifier.
+description: Grade or filter workflow HDF5 episodes with an OpenAI-compatible vision model. Use for visual success labels; do not use for replay, policy evaluation, or recordings without frames.
 license: Apache-2.0
 metadata:
   author: "Isaac for Healthcare Team <isaac-for-healthcare-support@nvidia.com>"
+  version: "0.8.0"
   tags:
     - isaac-for-healthcare
     - i4h
@@ -13,197 +13,122 @@ metadata:
     - vlm
 ---
 
-# i4h Workflow — Annotate Dataset
+# Annotate Workflow Recordings
 
 ## Purpose
 
-Use a VLM to verify whether each episode satisfies the env's task description. Use when the user asks to annotate, label episodes, filter demos, or gate finetuning on a success classifier.
+Grade sampled camera frames against a natural-language success criterion while keeping VLM labels separate from simulator success.
 
-## Base Code
+## Instructions
 
-These steps drive the i4h-workflows base code (the `workflows/agentic/` tree). To reuse an existing checkout, set `I4H_WORKFLOWS` to its path (no clone happens). Otherwise this resolves the current repo, or clones to `~/i4h-workflows` — pick that default without prompting. Run every command below from the resolved root:
+1. Run the checkout resolver and select one HDF5 and one criterion.
+2. Test camera sampling and the vision endpoint.
+3. Run grading and optional filtering on every selected episode.
+4. Compare verdict and output counts.
+
+## Resolve input and criterion
 
 ```bash
-# Resolve the i4h-workflows base code (provides workflows/agentic/).
+export I4H_WORKFLOWS_REPO_URL="${I4H_WORKFLOWS_REPO_URL:-https://github.com/isaac-for-healthcare/i4h-workflows}"
+I4H_REPO_DIR_NAME="${I4H_WORKFLOWS_REPO_URL%/}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME##*/}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME##*:}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME%.git}"
+[ -n "$I4H_REPO_DIR_NAME" ] || { echo "Cannot derive a checkout name from I4H_WORKFLOWS_REPO_URL" >&2; exit 2; }
 ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"
-if [ ! -d "$ROOT/workflows/agentic" ]; then
-  ROOT="${I4H_WORKFLOWS:-$HOME/i4h-workflows}"
-  [ -d "$ROOT/workflows/agentic" ] || git clone https://github.com/isaac-for-healthcare/i4h-workflows "$ROOT"
+if [ ! -d "$ROOT/workflows/i4h_workflows" ]; then
+  ROOT="${I4H_WORKFLOWS:-$HOME/$I4H_REPO_DIR_NAME}"
+  [ -d "$ROOT/workflows/i4h_workflows" ] || git clone "$I4H_WORKFLOWS_REPO_URL" "$ROOT"
 fi
-export I4H_WORKFLOWS="$ROOT"; cd "$ROOT"
+export I4H_WORKFLOWS="$ROOT"
+cd "$ROOT"
+find runs -name '*.hdf5' -type f -printf '%T@ %p\n' | sort -nr | head
 ```
 
-## Basics
+Treat the resolver above as part of the skill contract: a hosted copy may run outside the base repository, so never assume the current checkout contains `workflows/i4h_workflows`. `I4H_WORKFLOWS_REPO_URL` selects the clone source. When `I4H_WORKFLOWS` is unset, derive the fallback directory from that URL; set `I4H_WORKFLOWS` only to reuse or choose a specific destination. Never replace an existing checkout.
 
-- Annotation is optional. Do not run it during validation unless the user requests labels.
-- For natural-language prompts such as "Run Annotation on all recorded episodes", annotate all episodes in one selected HDF5 recording, not every historical HDF5 under `workflows/agentic/runs/`. If the user does not name an HDF5, choose the latest annotatable recording: first look inside `runs/.latest` when it contains an HDF5, otherwise pick the newest non-annotation `.hdf5` under `workflows/agentic/runs/`. Only batch across multiple HDF5 files when the user explicitly asks for all historical recordings, every HDF5 file, or a batch annotation run.
-- **Env config (source of truth):** the annotator reads the success criterion (`policy.task_description`) from `workflows/agentic/config/environments/<env>.yaml`. Pass `--task-description` to override.
-- Talks to an OpenAI-compatible endpoint via `--base-url` (default `http://localhost:8000/v1`) and `--model` (default `Qwen/Qwen3-VL-8B-Instruct`). Point both at a running vision-model server. Do not use text-only/code models such as `qwen3-coder-next`; offline annotation sends image inputs and requires a VLM.
-- Keep every annotation artifact inside `workflows/agentic/runs/<run>/`. Do not create or access `/tmp/annotate_*` or other external temp directories.
+Use the explicit/current-chain HDF5. “All recorded episodes” means every episode in that selected file, not every historical run. Inspect it and use the user's explicit success criterion when supplied; otherwise combine the source Scene manifest instruction with the workflow's visible terminal goal semantics. Phrase placement success as the object reaching and remaining at its target, not as the robot continuing to hold it.
 
-## Start VLM
+## Resolve the endpoint
 
-> **Skip this section if an OpenAI-compatible endpoint serving a vision model is already running** — just set `VLM_BASE_URL`/`VLM_MODEL` in Run to point at it. A local-agent server running `qwen3-coder-next` does not qualify because it is text-only. `annotator/vllm.sh` defaults to port `8000`, so starting it on top of an existing server collides; don't.
-
-Run the steps below in order. Each step is a separate bash call; variables persist in the local agent's tmux session.
-
-For readiness, use `workflows/agentic/annotator/vllm.sh ensure`. Do not replace it with raw `docker ps`, fixed sleeps, ad hoc model-listing HTTP probes, or separate manual wait steps; the helper owns the start-and-wait policy.
-
-### Step 1 — start VLM (if needed)
-
-Run this exact command. Do not add `sleep`, `status`, `curl`, or shell control operators around it:
+Use a caller-provided OpenAI-compatible vision endpoint/model first. Local Agent exposes that configuration as `I4H_AGENT_VL_BASE_URL`, `I4H_AGENT_VL_MODEL`, and either `I4H_AGENT_VL_API_KEY` or `I4H_AGENT_API_KEY`. Map those generic agent variables to the annotator without printing the credential:
 
 ```bash
-REPO_ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"; [ -d "$REPO_ROOT/workflows/agentic" ] || REPO_ROOT="$HOME/i4h-workflows"
-"${REPO_ROOT}/workflows/agentic/annotator/vllm.sh" ensure
-```
-
-## Run (Offline HDF5)
-
-Run the steps below in order. Each step is a separate bash call; variables persist in the local agent's tmux session.
-
-### Step 1 — setup and resolve HDF5
-
-```bash
-REPO_ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"; [ -d "$REPO_ROOT/workflows/agentic" ] || REPO_ROOT="$HOME/i4h-workflows"
-ENV_ID=scissor_pick_and_place
-RUNS_ROOT="${REPO_ROOT}/workflows/agentic/runs"
-
-# LLM endpoint + model (OpenAI-compatible vLLM). Defaults match annotator/vllm.sh; override to use an
-# external vision server — e.g. VLM_BASE_URL=http://localhost:8000/v1 VLM_MODEL=qwen3-vl-32b
-VLM_BASE_URL="${VLM_BASE_URL:-http://localhost:8000/v1}"
-VLM_MODEL="${VLM_MODEL:-Qwen/Qwen3-VL-8B-Instruct}"
-
-# Point HDF5_PATH at a real recording (absolute path). Recordings come from teleop, mimic, or
-# validate (which writes data/verify.hdf5 under each runs/eval_* dir). If HDF5_PATH is not set,
-# choose one recording: an HDF5 inside runs/.latest if present, otherwise the newest non-annotation
-# HDF5 under runs/. "All recorded episodes" means all episodes inside this one HDF5.
-HDF5_PATH="${HDF5_PATH:-}"
-if [ ! -f "${HDF5_PATH}" ]; then
-  LATEST_RUN="$(readlink -f "${RUNS_ROOT}/.latest" 2>/dev/null || true)"
-  if [ -n "${LATEST_RUN}" ] && [ -d "${LATEST_RUN}" ]; then
-    HDF5_PATH="$(
-      find "${LATEST_RUN}" -name '*.hdf5' -type f -printf '%T@ %p\n' 2>/dev/null \
-        | sort -nr | awk 'NR==1 { $1=""; sub(/^ /, ""); print; exit }'
-    )"
-  fi
+VLM_ARGS=()
+if [ -n "${I4H_AGENT_VL_BASE_URL:-}" ] && [ -n "${I4H_AGENT_VL_MODEL:-}" ]; then
+  I4H_VLM_URL="${I4H_AGENT_VL_BASE_URL%/}"
+  case "$I4H_VLM_URL" in */v1) ;; *) I4H_VLM_URL="$I4H_VLM_URL/v1" ;; esac
+  export I4H_VLM_URL
+  export OPENAI_API_KEY="${I4H_AGENT_VL_API_KEY:-${I4H_AGENT_API_KEY:-EMPTY}}"
+  VLM_ARGS=(--model "$I4H_AGENT_VL_MODEL")
 fi
-if [ ! -f "${HDF5_PATH}" ]; then
-  HDF5_PATH="$(
-    find "${RUNS_ROOT}" \( -path '*/annotate_*' -o -path '*/.latest' \) -prune -o \
-      -name '*.hdf5' -type f -printf '%T@ %p\n' 2>/dev/null \
-      | sort -nr | awk 'NR==1 { $1=""; sub(/^ /, ""); print; exit }'
-  )"
-fi
-if [ ! -f "${HDF5_PATH}" ]; then
-  echo "annotate: set HDF5_PATH to an existing .hdf5 (got '${HDF5_PATH:-<unset>}'). Candidates:" >&2
-  find "${RUNS_ROOT}" \( -path '*/annotate_*' -o -path '*/.latest' \) -prune -o \
-    -name '*.hdf5' -type f -printf '%TY-%Tm-%Td %TH:%TM  %p\n' 2>/dev/null | sort -r | head
-  exit 1
-fi
-
-RUN_DIR="${RUNS_ROOT}/annotate_${ENV_ID}_$(date +%Y%m%d_%H%M%S)"
-mkdir -p "${RUN_DIR}/data" "${RUN_DIR}/logs" "${RUN_DIR}/tmp"
-ln -sfn "${RUN_DIR}" "${RUNS_ROOT}/.latest"
 ```
 
-### Step 2 — annotate offline
+If no caller-provided endpoint/model is available, start the repository's local service:
 
 ```bash
-TMPDIR="${RUN_DIR}/tmp" "${REPO_ROOT}/workflows/agentic/annotator/run.sh" \
-  --env "${ENV_ID}" \
-  --base-url "${VLM_BASE_URL}" \
-  --model "${VLM_MODEL}" \
-  --output "${RUN_DIR}/annotations.jsonl" \
-  offline \
-  --hdf5-path "${HDF5_PATH}" \
-  --filter "${RUN_DIR}/data/filtered.hdf5" \
-  > "${RUN_DIR}/logs/annotator.log" 2>&1
+tools/annotator/scripts/vllm.sh ensure
 ```
 
-### Step 3 — summarize annotations
+Record whether this invocation started it. Do not hard-code a model name in the skill; use the CLI/service defaults unless the user supplies one.
+
+## Dry-run sampling when needed
 
 ```bash
-SUCCESS_COUNT=$(grep -c '"success": true' "${RUN_DIR}/annotations.jsonl" 2>/dev/null || true)
-FAILURE_COUNT=$(grep -c '"success": false' "${RUN_DIR}/annotations.jsonl" 2>/dev/null || true)
-printf 'annotations: success=%s failure=%s\n' "${SUCCESS_COUNT}" "${FAILURE_COUNT}"
-grep -E "Traceback|Error|FAILED" "${RUN_DIR}/logs/annotator.log" || true
+uv run --project tools/annotator i4h-annotator \
+  --task "<success criterion>" \
+  --dry-run \
+  offline /absolute/path/to/recording.hdf5
 ```
 
-### Step 4 — stop VLM (only if you started it in Start VLM)
+Use this to verify cameras and sampled frames without transmitting images.
 
-Skip when using an external server (e.g. the local-agent one) — it would kill that server.
+## Grade and filter
 
 ```bash
-"${REPO_ROOT}/workflows/agentic/annotator/vllm.sh" stop
+RUN_DIR="$(pwd)/runs/<workflow>/$(date +%Y%m%d_%H%M%S)"
+mkdir -p "$RUN_DIR"
+uv run --project tools/annotator i4h-annotator \
+  --task "<success criterion>" \
+  "${VLM_ARGS[@]}" \
+  offline /absolute/path/to/recording.hdf5 \
+  --write
 ```
 
-## Live Mode
+Add global `--base-url`, `--model`, `--camera`, or `--frames` only when selected. Add offline `--node` only for a requested segment. Add `--filter "$RUN_DIR/filtered.hdf5"` only when filtering was requested; a summarize-only prompt must grade all episodes without requiring at least one success. Keep credentials in environment variables; never print them.
 
-Annotate the latest camera frames from a **running** policy/Arena session over Zenoh (cameras default to the env config). Use only when such a session is already up and the user asks for live judging.
-
-Run the steps below in order. Each step is a separate bash call; variables persist in the local agent's tmux session.
-
-### Step 1 — setup
+Stop the local VLM only if this invocation started it:
 
 ```bash
-REPO_ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"; [ -d "$REPO_ROOT/workflows/agentic" ] || REPO_ROOT="$HOME/i4h-workflows"
-ENV_ID=scissor_pick_and_place
-RUNS_ROOT="${REPO_ROOT}/workflows/agentic/runs"
-VLM_BASE_URL="${VLM_BASE_URL:-http://localhost:8000/v1}"
-VLM_MODEL="${VLM_MODEL:-Qwen/Qwen3-VL-8B-Instruct}"
-RUN_DIR="${RUNS_ROOT}/annotate_live_${ENV_ID}_$(date +%Y%m%d_%H%M%S)"
-mkdir -p "${RUN_DIR}/tmp"
+tools/annotator/scripts/vllm.sh stop
 ```
-
-### Step 2 — annotate live
-
-```bash
-TMPDIR="${RUN_DIR}/tmp" "${REPO_ROOT}/workflows/agentic/annotator/run.sh" \
-  --env "${ENV_ID}" \
-  --base-url "${VLM_BASE_URL}" \
-  --model "${VLM_MODEL}" \
-  --output "${RUN_DIR}/live.jsonl" \
-  live \
-  --count 5 \
-  --interval 2.0 \
-  --timeout 30.0
-```
-
-- `--count 0` runs forever; `--interval` is seconds between snapshots; `--timeout` is how long to wait for first frames from every camera.
-- `--min-success-frames N` (needs a finite `--count`) exits non-zero unless at least N sampled snapshots pass — use it as a gate.
-- `--dump-frames-dir DIR` saves sampled frames; add `--dump-frames-only` to dump without calling the VLM.
-- `--cameras a,b` overrides the env's Zenoh camera names.
 
 ## Verify
 
-- `annotations.jsonl` exists.
-- Filtered HDF5 exists when `--filter` was passed.
-- Tally success/failure counts from the JSONL before reporting.
+Inspect the annotator summary. If filtering was requested, also inspect the filtered file:
 
-## Prerequisites
+```bash
+uv run --project tools/dataset i4h-dataset inspect "$RUN_DIR/filtered.hdf5" --segments
+```
 
-- Workflow set up via [[i4h-workflow-setup]] (the `.venv` must exist).
-- An existing HDF5 recording to annotate (set `HDF5_PATH` to an absolute path; the Run block lists candidates if it's unset or wrong).
-- A reachable OpenAI-compatible endpoint serving a vision model — either start the annotator's own (`annotator/vllm.sh start`) or point `VLM_BASE_URL`/`VLM_MODEL` at an existing vision server. The current `qwen3-coder-next` local-agent endpoint is not sufficient because it is text-only.
-- Annotation is optional — only run it when the user requests labels.
-
-## Limitations
-
-- Annotation is optional and is not run during validation unless requested.
-- Requires a reachable OpenAI-compatible vLLM server; defaults to `localhost:8000/v1`.
-- Live mode applies only when a policy/Arena session is already running and the user requests live judging.
-- The annotator reads task text from the env YAML; override per-run with `--task-description`.
+Require a verdict for every selected episode and reconcile pass/fail counts plus filtered counts when applicable. Treat endpoint errors, absent cameras, partial writes, and unexplained zero-episode output as failure. An all-failure verdict set is a valid completed grading run for summarize-only prompts; it is not a valid filtered dataset.
 
 ## Troubleshooting
 
-- **Error:** `.venv` not found / module import fails - Cause: workflow not set up. Fix: run [[i4h-workflow-setup]] first.
-- **Error:** connection refused at `localhost:8000/v1` - Cause: no vLLM at `VLM_BASE_URL`. Fix: start one (`annotator/vllm.sh start`) or set `VLM_BASE_URL`/`VLM_MODEL` to a running server.
-- **Error:** model not found / 404 from the endpoint - Cause: `VLM_MODEL` is not the id the server actually serves. Fix: set `VLM_MODEL` to the served name (e.g. `qwen3-vl-32b`; check `curl ${VLM_BASE_URL}/models`).
-- **Error:** image input unsupported / bad request from a text model - Cause: the endpoint is serving a text-only/code model such as `qwen3-coder-next`. Fix: use a vision model endpoint such as Qwen3-VL for annotation.
-- **Error:** input HDF5 not found - Cause: `HDF5_PATH` unset or not a real file. Fix: pick an absolute path from the candidates the Run block prints.
-- **Error:** filtered HDF5 missing - Cause: `--filter` was not passed. Fix: add `--filter <path>` to write the filtered dataset.
+Check camera sampling before endpoint/authentication errors. Never accept partial writes or a filtered file with an unexplained zero count.
 
-## Final Response
+## Prerequisites
 
-Report env, input HDF5, annotations path, filtered HDF5 (if any), success/failure counts, VLM blockers.
+Require a readable workflow HDF5 with camera frames and, unless dry-running, a reachable OpenAI-compatible vision endpoint.
+
+## Limitations
+
+Visual grading cannot recover missing frames or prove simulator state that is not visible.
+
+## Examples
+
+- `Run annotation on all recorded episodes and summarize.` → select the current HDF5, grade every episode, verify the filtered file, and report pass/fail counts.
+
+## Completion gate
+
+Report source HDF5, selected criterion/camera/model/endpoint origin, graded pass/fail counts, filtered path/count when requested, dry-run result if used, and local-service cleanup.
