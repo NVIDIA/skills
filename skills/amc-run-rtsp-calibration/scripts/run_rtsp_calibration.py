@@ -1,6 +1,20 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """Run AMC calibration from live RTSP streams recorded through VIOS."""
-
+import ipaddress
 import json
 import os
 import sys
@@ -40,6 +54,30 @@ def _normalize_base_url(value):
     return base if base.endswith("/v1") else f"{base}/v1"
 
 
+def _url_scheme(value):
+    try:
+        return urlsplit(value).scheme.lower()
+    except (AttributeError, TypeError, ValueError):
+        return ""
+
+
+def _url_host(value):
+    try:
+        return urlsplit(value).hostname or ""
+    except (AttributeError, TypeError, ValueError):
+        return ""
+
+
+def _is_loopback_url(value):
+    host = _url_host(value)
+    if host == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
+
+
 def _redact_rtsp_url(url):
     try:
         parts = urlsplit(url)
@@ -48,7 +86,7 @@ def _redact_rtsp_url(url):
         host = parts.hostname or ""
         port = f":{parts.port}" if parts.port else ""
         return urlunsplit((parts.scheme, f"<redacted>@{host}{port}", parts.path, parts.query, parts.fragment))
-    except Exception:
+    except (AttributeError, TypeError, ValueError):
         return "<redacted-rtsp-url>"
 
 
@@ -140,7 +178,7 @@ def _default_ui_url(base_url):
         parts = urlsplit(base_url.rstrip("/"))
         host = parts.hostname or "<HOST_IP>"
         return f"{parts.scheme or 'http'}://{host}:5000"
-    except Exception:
+    except (AttributeError, TypeError, ValueError):
         return "http://<HOST_IP>:5000"
 
 
@@ -149,7 +187,7 @@ def _detector_from_config(path):
         return None
     try:
         cfg = json.loads(path.read_text())
-    except Exception:
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         return None
     det = cfg.get("detector") or cfg.get("detector_type")
     return det if det in ("resnet", "transformer") else None
@@ -187,8 +225,7 @@ GT_ZIP = _env_path("GT_ZIP")
 FOCAL_LENGTHS = _env_float_list("FOCAL_LENGTHS")
 DETECTOR_TYPE = os.environ.get("DETECTOR_TYPE")
 RUN_VGGT = _env_bool("RUN_VGGT", False)
-VIOS_TOKEN = os.environ.get("VIOS_TOKEN") or None
-SSL_VERIFY = _env_bool("SSL_VERIFY", False)
+SSL_VERIFY = _env_bool("SSL_VERIFY", True)
 VIOS_BASE_URL = os.environ.get("VIOS_BASE_URL", "").rstrip("/")
 REQUIRE_VIOS_HEALTH = _env_bool("REQUIRE_VIOS_HEALTH", True)
 
@@ -208,6 +245,11 @@ for label, path in (
         raise SystemExit(f"{label} set but path not found: {path}")
 if CALIB_ASSET_DIR and not CALIB_ASSET_DIR.is_dir():
     raise SystemExit(f"CALIB_ASSET_DIR must be a directory: {CALIB_ASSET_DIR}")
+if not SSL_VERIFY and not _is_loopback_url(BASE_URL):
+    raise SystemExit(
+        "SSL_VERIFY=false is only allowed for loopback AMC endpoints. Use HTTPS with certificate "
+        "verification enabled for remote services."
+    )
 
 CONFIG_FILE = _resolve_local(
     CONFIG_FILE,
@@ -242,6 +284,10 @@ if not local_asset_source:
         raise SystemExit("Stopped before capture; provide a local asset path or use the AMC UI.")
 
 s = requests.Session()
+s.verify = SSL_VERIFY
+
+if not SSL_VERIFY:
+    print("[0] WARNING: SSL certificate verification is disabled for loopback AMC access only.")
 
 print("[0] Checking AMC microservice")
 _check_amc_ready(s, BASE_URL)
@@ -296,7 +342,6 @@ print(f"\n[2] Created project: {project_id}")
 capture_body = {
     "streams": STREAMS,
     "duration_seconds": DURATION_SECONDS,
-    "vios_token": VIOS_TOKEN,
     "ssl_verify": SSL_VERIFY,
 }
 r = s.post(f"{BASE_URL}/rtsp/capture/{project_id}", json=capture_body, timeout=30)
@@ -454,8 +499,8 @@ while time.time() - start < 5400:
             print("    --- last calibration log lines ---")
             for line in log_lines[-20:]:
                 print(f"    {line}")
-        except Exception:
-            pass
+        except requests.RequestException as exc:
+            print(f"    warning: could not fetch calibration log tail: {exc}")
         raise RuntimeError(f"ERROR state -- full log: GET {BASE_URL}/amc/calibrate/{project_id}/log")
     time.sleep(10)
 else:

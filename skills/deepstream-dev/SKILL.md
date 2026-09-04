@@ -2,6 +2,8 @@
 name: deepstream-dev
 description: NVIDIA DeepStream SDK development with Python pyservicemaker API. Use when building video analytics pipelines, GStreamer-based video processing, TensorRT inference integration, object detection/tracking, or Kafka/message broker integration.
 owner: NVIDIA CORPORATION
+metadata:
+  author: "NVIDIA CORPORATION <info@nvidia.com>"
 service: deepstream
 version: 1.1.1
 reviewed: 2026-04-24
@@ -9,6 +11,8 @@ license: CC-BY-4.0 AND Apache-2.0
 ---
 
 # DeepStream Development Skill
+
+This skill requires access to all of the reference documents listed in the `references/` directory below. Ensure they are available before executing the workflow.
 
 When this skill is active, **ALWAYS read the relevant reference documents** before generating code. Do NOT rely on memory - the reference documents contain critical details about exact property names, correct API usage, and common pitfalls.
 
@@ -24,7 +28,7 @@ When this skill is active, **ALWAYS read the relevant reference documents** befo
 
 ### Typical Pipeline Flow
 
-```
+```text
 Source → Stream Muxer → Inference → [Tracker] → OSD → Renderer
 ```
 Components in `[brackets]` are **optional** -- only add them when the user explicitly requests them.
@@ -72,6 +76,19 @@ DeepStream uses NVIDIA Video Memory Manager (NVMM) for zero-copy GPU buffer tran
    import platform
    sink_type = "nv3dsink" if platform.processor() == "aarch64" else "nveglglessink"
    ```
+   - For WSL2 Ubuntu 24 Docker, this default selection must be overridden.
+   - **WSL2 + Ubuntu 24 Docker**: If `/proc/version` contains `microsoft` or `wsl`
+     and `/etc/os-release` has `VERSION_ID="24.04"`, the generated app must never create
+     a display branch or display sink (`nveglglessink`, `nv3dsink`, etc.), even if the
+     prompt asks for display. Do not rely on a `--no-display` flag for this case.
+     Generate encoded MP4 output only (`nvv4l2h264enc` -> `h264parse` ->
+     `mp4mux`/`qtmux` -> `filesink`) and make the default run path write the annotated
+     video file. In the generated `README.md`, explicitly explain that WSL2 Ubuntu 24
+     Docker is MP4-output-only because display sinks are disabled by a known issue.
+     If the user explicitly requested display, add an inline code comment and README note
+     explaining: `Display requested but disabled due to WSL2 Ubuntu 24 Docker limitation — MP4 output generated instead.`
+   - **Non-WSL targets**: Do not add WSL-specific behavior or WSL limitation text to
+     generated apps or READMEs. Use the normal platform display sink selection above.
 
 6. **Buffer Cloning**: Always clone buffers for async processing
    ```python
@@ -121,7 +138,7 @@ DeepStream uses NVIDIA Video Memory Manager (NVMM) for zero-copy GPU buffer tran
    **Symptom of mismatch**: If `cluster-mode: 2` is used with a post-NMS `[N, 6]` output, bounding boxes appear shifted by 45° or 135° from the actual objects (DeepStream's NMS incorrectly re-processes already-final coordinates).
    If you see tilted or rotated boxes, also check the OBB / `rotation_angle` note in `references/nvinfer_config.md`: for non-OBB models, value-initialize `NvDsInferObjectDetectionInfo` with `obj{}` and keep `rotation_angle = 0`; plain `NvDsInferObjectDetectionInfo obj;` leaves fields uninitialized.
 
-14. **Virtual Environment Must Include pyservicemaker**: `pyservicemaker` is installed system-wide but is NOT accessible from a standard Python virtual environment. When a task requires a venv (e.g., for model download/conversion pip dependencies), **always install `pyservicemaker` and `pyyaml` inside the venv**. The venv setup in generated code and README must always include:
+14. **Virtual Environment Must Include pyservicemaker**: `pyservicemaker` is installed system-wide but is NOT accessible from a standard Python virtual environment. When a task requires a venv (e.g., for model download/conversion pip dependencies), **always install `pyservicemaker` and `pyyaml` inside the venv**; do not rewrite pyservicemaker pipeline code into non-pyservicemaker code to work around a missing import. The venv setup in generated code and README must always include:
     ```bash
     python3 -m venv venv
     source venv/bin/activate
@@ -173,6 +190,7 @@ DeepStream uses NVIDIA Video Memory Manager (NVMM) for zero-copy GPU buffer tran
 | `min-boxes` unknown key warning | Use `minBoxes` (camelCase) in `class-attrs-*` sections, not `min-boxes` |
 | Secondary GIE inactive | Set `process-mode: 2`, check `operate-on-gie-id` |
 | Tee/dynamic source stuck PAUSED | Set `async: 0` on **ALL** sink elements |
+| WSL2 Ubuntu 24 display sink requested | Do not use display sinks due to a known bug; write MP4 with `filesink` and document the WSL limitation in README |
 | RTSP no data/reconnecting | Test URL with ffplay, check credentials |
 | `RuntimeError: Probe failure` | `measure_fps_probe` cannot attach to sink elements; use `nvinfer` or `nvosdbin` instead |
 | `setDimensions` negative dims / engine build failed | Add `infer-dims=C;H;W` for dynamic ONNX models (e.g., `infer-dims=3;640;640`) |

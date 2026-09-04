@@ -11,9 +11,9 @@ The model directory is: `$ARGUMENTS`
 >
 > **The ONLY permitted way to generate the HTML + PDF:**
 > ```bash
-> python3 skills/deepstream-import-vision-model/scripts/report/md-to-html-pdf.py \
+> python3 .claude/skills/deepstream-import-vision-model/scripts/report/md-to-html-pdf.py \
 >   models/$MODEL_NAME/reports/benchmark_report.md \
->   skills/deepstream-import-vision-model/scripts/report/report-style.css \
+>   .claude/skills/deepstream-import-vision-model/scripts/report/report-style.css \
 >   models/$MODEL_NAME/reports/ \
 >   $MODEL_NAME
 > ```
@@ -79,17 +79,13 @@ STEP8_START=$(date +%s.%N)
 MODEL_DIR="${ARGUMENTS%/}"
 MODEL_NAME=$(basename "$MODEL_DIR")
 
-# Locate engine — pick the LARGEST batch engine (sort -V ensures numeric sort, tail picks highest)
-ENGINE=$(ls models/$MODEL_NAME/benchmarks/engines/*_dynamic_b*.engine 2>/dev/null | sort -V | tail -1)
-[ -z "$ENGINE" ] && { echo "ERROR: No engine found in models/$MODEL_NAME/benchmarks/engines/ — run Steps 4-5 first (references/engine-build.md)"; exit 1; }
-MAX_BS=$(echo "$ENGINE" | grep -oP '_b\K[0-9]+(?=\.engine)')
-MODEL_FILENAME=$(basename "$ENGINE" | sed 's/_dynamic_b[0-9]*.engine//')
-echo "Using engine: $ENGINE (MAX_BS=$MAX_BS)"
+# Engine + MAX_BS + MODEL_FILENAME from the shared resolver (scripts/model/resolve-engine.sh).
+eval "$(bash .claude/skills/deepstream-import-vision-model/scripts/model/resolve-engine.sh "$MODEL_NAME")" || exit 1
 
 # Extract input name and spatial dims from ONNX (needed for reference commands in the report)
 ONNX_FILE=$(ls models/$MODEL_NAME/model/*.onnx 2>/dev/null | grep -v '_dynamic' | head -1)
 if [ -n "$ONNX_FILE" ]; then
-  INSPECT_OUT=$(python3 skills/deepstream-import-vision-model/scripts/model/inspect-onnx.py "$ONNX_FILE" 2>/dev/null)
+  INSPECT_OUT=$(python3 .claude/skills/deepstream-import-vision-model/scripts/model/inspect-onnx.py "$ONNX_FILE" 2>/dev/null)
   INPUT_NAME=$(echo "$INSPECT_OUT" | grep -oP 'input_name:\s*\K\S+')
   H=$(echo "$INSPECT_OUT" | grep -oP 'height:\s*\K[0-9]+')
   W=$(echo "$INSPECT_OUT" | grep -oP 'width:\s*\K[0-9]+')
@@ -118,11 +114,15 @@ imgs = float('$QPS_BS_MAX') * $MAX_BS
 print(round(imgs, 2), int(math.floor(imgs / 30)))
 ")
 
-# Parse DeepStream Run 1 and Run 2 FPS from logs written by ds-run-pipeline
+# Parse DeepStream Run 1 and Run 2 FPS from logs written by pipeline-run
 # Fixed filename pattern: benchmarks/ds/ds_s{N}_run1.log and ds_s{N}_run2.log
 # Use glob to find them (N varies per model) then extract N from filename
 DS_LOG_RUN1=$(ls models/$MODEL_NAME/benchmarks/ds/ds_s*_run1.log 2>/dev/null | head -1)
-DS_LOG_RUN2=$(ls models/$MODEL_NAME/benchmarks/ds/ds_s*_run2.log 2>/dev/null | head -1)
+# Step 7's convergence loop can leave SEVERAL run2 logs (e.g. s17 -> s11 failed -> s9 passed).
+# Lexicographic `head -1` picks ds_s11 over ds_s9, reporting the NON-real-time run as the
+# validated result. Convergence steps downward, so the converged log is the newest — pick by mtime.
+# (`sort -V | tail -1` is NOT correct here: it re-selects the highest N, i.e. the failing run.)
+DS_LOG_RUN2=$(ls -t models/$MODEL_NAME/benchmarks/ds/ds_s*_run2.log 2>/dev/null | head -1)
 [ -z "$DS_LOG_RUN1" ] && { echo "ERROR: No DS Run 1 log found at benchmarks/ds/ds_s*_run1.log — run Steps 6-7 first (references/pipeline-run.md)"; exit 1; }
 [ -z "$DS_LOG_RUN2" ] && { echo "ERROR: No DS Run 2 log found at benchmarks/ds/ds_s*_run2.log — run Steps 6-7 first (references/pipeline-run.md)"; exit 1; }
 
@@ -213,7 +213,7 @@ All Python scripts in this step run inside the **shared venv** at `build/.venv_o
 source build/.venv_optimum/bin/activate
 ```
 
-Generate exactly **5 charts** using `matplotlib` in `models/{model_name}/reports/charts/`. Use the script at `skills/deepstream-import-vision-model/scripts/report/generate-benchmark-charts.py` or generate manually. Chart names are fixed — do not rename them.
+Generate exactly **5 charts** using `matplotlib` in `models/{model_name}/reports/charts/`. Use the script at `.claude/skills/deepstream-import-vision-model/scripts/report/generate-benchmark-charts.py` or generate manually. Chart names are fixed — do not rename them.
 
 | Filename | Content | Chart type |
 |----------|---------|------------|
@@ -459,7 +459,7 @@ trtexec --loadEngine=$(basename $ENGINE) --shapes=${INPUT_NAME}:${MAX_BS}x3x${H}
 
 ### Custom Parser Build
 \`\`\`bash
-cd models/${MODEL_NAME}/parser && make DEEPSTREAM_DIR=/opt/nvidia/deepstream/deepstream CUDA_VER=12
+cd models/${MODEL_NAME}/parser && make DEEPSTREAM_DIR=/opt/nvidia/deepstream/deepstream CUDA_VER=13.2
 \`\`\`
 MDEOF
 echo "benchmark_report.md written: $(wc -l < models/$MODEL_NAME/reports/benchmark_report.md) lines"
@@ -485,9 +485,14 @@ echo "All 5 charts verified OK"
 Then run the canonical pipeline script — this generates BOTH the HTML and PDF correctly:
 
 ```bash
-python3 skills/deepstream-import-vision-model/scripts/report/md-to-html-pdf.py \
+# setup.sh apt-installs wkhtmltopdf INSIDE the container, so it does NOT survive the ephemeral
+# `--rm` bootstrap container. Every later `docker run --rm` starts without it and the PDF step
+# silently degrades to HTML-only. Ensure it is present in THIS invocation before rendering.
+command -v wkhtmltopdf >/dev/null 2>&1 || { apt-get update -qq && apt-get install -y -qq wkhtmltopdf; }
+
+python3 .claude/skills/deepstream-import-vision-model/scripts/report/md-to-html-pdf.py \
   models/$MODEL_NAME/reports/benchmark_report.md \
-  skills/deepstream-import-vision-model/scripts/report/report-style.css \
+  .claude/skills/deepstream-import-vision-model/scripts/report/report-style.css \
   models/$MODEL_NAME/reports/ \
   $MODEL_NAME
 ```
@@ -506,7 +511,7 @@ After generating markdown, HTML, and PDF, record step timing:
 
 ```bash
 STEP8_END=$(date +%s.%N)
-STEP8_DURATION=$(echo "$STEP8_END - $STEP8_START" | bc)
+STEP8_DURATION=$(python3 -c "print(round($STEP8_END - $STEP8_START, 2))")   # bc is not in the container; python3 always is
 echo "[Step 8] Report generation completed in ${STEP8_DURATION}s"
 ```
 

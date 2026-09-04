@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers validating that a freshly-launched AutoMagicCalib microservice works end-to-end by running calibration against the bundled sample dataset with ground truth. <br>
+Developers and engineers use this skill to sanity-check a running AutoMagicCalib stack with the bundled sample dataset, verifying end-to-end calibration works before running on real data. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Not Specified] <br>
-**Credential Type(s):** [None identified] <br>
+**Requires API Key or External Credential:** [No] <br>
+**Credential Type(s):** [None] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,6 +25,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [AMC Setup Calibration Stack Skill](skills/amc-setup-calibration-stack/SKILL.md) <br>
+- [AMC Run Video Calibration Skill](skills/amc-run-video-calibration/SKILL.md) <br>
+- [AMC Run RTSP Calibration Skill](skills/amc-run-rtsp-calibration/SKILL.md) <br>
 
 
 ## Skill Output: <br>
@@ -34,41 +37,46 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 5 evaluation tasks (3 positive skill-activation, 2 negative) in the NVSkills-Eval internal profile. <br>
+5 evaluation tasks (3 positive, 2 negative) in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was found and executed. <br>
+- Effectiveness: Checks whether the user's goal was achieved and expected workflow behavior was followed. <br>
+- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | Claude Code (`claude-code`) | Codex (`codex`) |
-|---|---:|---:|---:|
-| Security | 5 | 100% (+0%) | 100% (+0%) |
-| Correctness | 5 | 95% (+48%) | 97% (+52%) |
-| Discoverability | 5 | 82% (+14%) | 93% (+28%) |
-| Effectiveness | 5 | 93% (+51%) | 90% (+51%) |
-| Efficiency | 5 | 75% (+7%) | 84% (+19%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 66% → 99% (+33 points) | 64% → 90% (+27 points) |
+| Security | 100% → 100% (±0 points) | 80% → 70% (-10 points) |
+| Correctness | 36% → 100% (+64 points) | 48% → 100% (+52 points) |
+| Discoverability | 69% → 100% (+31 points) | 62% → 92% (+30 points) |
+| Effectiveness | 57% → 100% (+43 points) | 59% → 93% (+34 points) |
+| Efficiency | 68% → 95% (+27 points) | 69% → 95% (+27 points) |
+
+## Testing Completed: <br>
+**[x] Agent Red-Teaming** <br>
+**[ ] Network Security** <br>
+**[ ] Product Security** <br>
 
 ## Skill Version(s): <br>
 1.0.0 (source: frontmatter) <br>

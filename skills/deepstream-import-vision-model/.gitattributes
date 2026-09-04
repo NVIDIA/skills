@@ -1,0 +1,22 @@
+# Keep scripts LF on every platform. Without this, a Windows checkout with core.autocrlf=true
+# rewrites the shell scripts to CRLF, and bash-in-container then fails on the '\r' in the shebang
+# / `set -euo pipefail`. Every script in this skill runs inside a Linux container, so LF is required.
+* text=auto eol=lf
+*.sh text eol=lf
+*.ps1 text eol=lf
+*.py text eol=lf
+*.c text eol=lf
+*.cpp text eol=lf
+Makefile text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.txt text eol=lf
+# Binary assets (never line-ending-converted)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.onnx binary
+*.engine binary

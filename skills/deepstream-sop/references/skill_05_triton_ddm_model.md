@@ -238,7 +238,7 @@ are **never loaded together**; exactly one runtime is chosen per process.
 1. **Cached engine** — if a file exists at `DDM_TRT_ENGINE_OUTPUT_PATH` and its embedded input
    shape `(2*FRAMES_PER_SIDE+1, 3, DS_ACTION_IN_RESOLUTION, DS_ACTION_IN_RESOLUTION)` **and**
    batch size (`SEQUENCE_BATCH`) match the current env, it is reused as-is.
-   ⚠️ **Precision is NOT re-checked** — switching `DDM_TRT_PRECISION` (fp32/fp16/bf16) keeps
+   ⚠ **Precision is NOT re-checked** — switching `DDM_TRT_PRECISION` (fp32/fp16/bf16) keeps
    using an existing engine; delete the engine file to force a rebuild.
 2. **Build on the fly** — otherwise a subprocess runs `scripts/tensorrt/export_ddm_to_tensorrt.py`
    (PyTorch ckpt → ONNX opset 18 → TRT engine), writing a `.tmp` file and atomically renaming on

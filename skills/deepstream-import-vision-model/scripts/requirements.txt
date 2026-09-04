@@ -1,0 +1,42 @@
+# Python dependencies for deepstream-import-vision-model (installed into build/.venv_optimum).
+# Run INSIDE nvcr.io/nvidia/deepstream:9.1-triton-multiarch via setup.sh — NOT on the host.
+# Release target: DeepStream 9.1 Triton image (Python 3.12); run the GPU validation matrix before signing.
+#
+# NOTE on torch: the default linux-x86_64 PyPI wheel for torch 2.13.0 bundles a CUDA 13 runtime
+# (nvidia-cudnn-cu13 / nccl-cu13 / cusparselt-cu13). It relies on NVIDIA driver compatibility rather
+# than the container CUDA toolkit; no special --index-url is needed. This replaces the previous
+# torch 2.6.0 / cu124 pin. 2.13.0 is the first torch release with zero open OSV advisories.
+# (Same torch/torchvision pins the sibling deepstream-eval-and-finetune skill uses.)
+#
+# VALIDATED end-to-end on 2026-08-04 in nvcr.io/nvidia/deepstream:9.1-triton-multiarch (H100):
+#   setup.sh resolved and installed this exact set; SafeTensors -> ONNX -> TRT 10.16 FP16
+#   dynamic-shape engine built and PASSED trtexec for both
+#     PekingU/rtdetr_r50vd  (default model)  65.0 qps, 15.37 ms
+#     hustvl/yolos-tiny                     171.9 qps,  5.81 ms
+#   ONNX Runtime confirmed a working dynamic batch dimension at batch 1/3/8.
+#   Still to confirm on the full release matrix: Jetson/aarch64 and the non-H100 GPU lineup.
+#
+# NOTE on the export path: SafeTensors -> ONNX goes through scripts/model/safetensors_to_onnx.py
+# (direct torch.onnx.export), NOT optimum-cli. optimum was removed because it pinned transformers
+# below 4.54.0 (and optimum-onnx below 4.58.0), while the transformers RCE (GHSA-29pf-2h5f-8g72)
+# is fixed only in 5.3.0 and the model-init arbitrary code execution (GHSA-fgcw-684q-jj6r) only in
+# 5.5.0 — so no transformers 4.x release cleared them. optimum 2.1.0 also removed the `onnx`
+# subcommand entirely, making that path a dead end regardless.
+
+# --- ONNX export (SafeTensors -> ONNX, via torch.onnx.export) ---
+torch==2.13.0
+torchvision==0.28.0        # torchvision 0.28.0 requires torch==2.13.0 exactly
+transformers==5.14.1
+onnx==1.22.0
+onnxruntime==1.27.0
+onnxscript==0.7.0          # required by the torch.onnx.export dynamo backend
+huggingface_hub==1.26.0    # transformers 5.14.1 requires >=1.5.0,<2.0
+tokenizers==0.22.2         # highest STABLE release inside transformers' >=0.22.0,<=0.23.0 range
+                           # (0.23.0 was never released as final; 0.23.1 exceeds the ceiling)
+safetensors==0.8.0         # transformers 5.14.1 requires >=0.8.0
+
+# --- report: charts + markdown->HTML (PDF via wkhtmltopdf, apt-installed in the container by setup.sh) ---
+matplotlib==3.10.9
+numpy==1.26.4
+markdown==3.10.2
+reportlab==4.5.1
