@@ -900,93 +900,93 @@
     {
       "name": "i4h-lerobot-viz",
       "path": "skills/i4h-lerobot-viz",
-      "content_digest": "sha256:4dccc3bf7142818b7e31a0e491a236a9249e2affe4ac680fb2806077aaf36c21",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
+      "content_digest": "sha256:1d666e935707985610461675b57c46ddc9e4101fc0798919d6e62addc48c46fe",
+      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "i4h-workflow",
       "path": "skills/i4h-workflow",
-      "content_digest": "sha256:67df284011c72ec4d1fa51f0feefc50adfa695b5cb1de538fca1e0e0eb6d41c8",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
+      "content_digest": "sha256:7989cfe8ec4d4610162353f1e5c1e2a639692b729b3de06c6cd6b8f7553caeab",
+      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "i4h-workflow-create",
       "path": "skills/i4h-workflow-create",
-      "content_digest": "sha256:1fe0683dad912f6ccf79382bf67dd15935a50c6c12ce299ee12572430143725a",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
+      "content_digest": "sha256:66531af4230c1e64f50c2cf425c38991e7b40c31aad45dcda5cf7db0ef5143c5",
+      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "i4h-workflow-dataset-annotate",
       "path": "skills/i4h-workflow-dataset-annotate",
-      "content_digest": "sha256:bcf4bdcb2fba7854ba9c5f385952d5b7aad7275c2f5e8e470393b2f86afeefac",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
+      "content_digest": "sha256:5328a4819ad94ccf2b7219cb39dbad8d5ddfb7484d108f3ecf1201b9dead281c",
+      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "i4h-workflow-dataset-convert",
       "path": "skills/i4h-workflow-dataset-convert",
-      "content_digest": "sha256:e240c48a353c02dd2c4713bac0fb982c94f5fe7beac90e609bec8d1359d5f792",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
+      "content_digest": "sha256:78df74e7e64ca4b6f89775ff524fe11885b91fa7da594de938ea22fbd3f0973b",
+      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "i4h-workflow-dataset-mimic",
       "path": "skills/i4h-workflow-dataset-mimic",
-      "content_digest": "sha256:64d02cfad992b8392d154dc19ebfa294ebd884ddebbc3d2763a7e9584c57882a",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
+      "content_digest": "sha256:2be9818b2b8bff4494831f00ddaf4fba0e94c241ffd95daa440268dea42e3e89",
+      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "i4h-workflow-dataset-replay",
       "path": "skills/i4h-workflow-dataset-replay",
-      "content_digest": "sha256:327e84832bb02384411816c773fa30df7cbeb9f408ff40cd1430fb7a34f0c72d",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
+      "content_digest": "sha256:30b5e4507ea90da8c5acf64b30284ea6c4b5edbdb562fb3b8c41d5add0ea58cb",
+      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "i4h-workflow-dataset-teleop",
       "path": "skills/i4h-workflow-dataset-teleop",
-      "content_digest": "sha256:ce677e6ee6d54ff1abb0681688bd87afde970af4e526e5677fadd9b8ba29bc5c",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
+      "content_digest": "sha256:6a216984bf45ffa18f11822b4a56c60203266818c483c2d7254a5edeca14f587",
+      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "i4h-workflow-e2e",
       "path": "skills/i4h-workflow-e2e",
-      "content_digest": "sha256:1f8cb4d53162a846e2a8df2e6f8826bc34a1ff923d6fd1178307eee391dcd975",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
+      "content_digest": "sha256:3a65e8fbaf624dc2b28276e11c09bf3e307971eabb2951c4722b4a26d28110f1",
+      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "i4h-workflow-finetune",
       "path": "skills/i4h-workflow-finetune",
-      "content_digest": "sha256:64e252ececc8e88b239f4cd7a9c2520bf67f4667838a252372802f80e07ace5e",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
+      "content_digest": "sha256:84057e23240a9c2d62b677d4acdac8aa48e88385042d47834132ee014fc712a0",
+      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "i4h-workflow-scene-edit",
       "path": "skills/i4h-workflow-scene-edit",
-      "content_digest": "sha256:2567048af1288c02b5859dde02a1c852b30993a6d312213c902649ed9983069f",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
+      "content_digest": "sha256:efd5edb2b51aa89bc42e96dcf5beb775a1357592c98fe6875c39705fbcc30c88",
+      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "i4h-workflow-setup",
       "path": "skills/i4h-workflow-setup",
-      "content_digest": "sha256:4f6ce18e08153a4af469a8781a3208ba670a0cdf1fcbc5d600079c0cbb1a74ca",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
+      "content_digest": "sha256:4342d46adbc2da7cdc0ca75e573bea139c2f7ec45fc55fe506f5316e1e44191d",
+      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "i4h-workflow-validate",
       "path": "skills/i4h-workflow-validate",
-      "content_digest": "sha256:6618c0f0cda0c1ba1f6cb71684a2580a0282e19663f034bc9ac48090246cece5",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
+      "content_digest": "sha256:5d1b1b3b292002e91c42bbca2c9e05f21a3ecd428184e9c0ca526711985431e1",
+      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
+      "last_modified": "2026-09-04"
     },
     {
       "name": "jetson-build-source",
