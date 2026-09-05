@@ -1,0 +1,4 @@
+interface:
+  display_name: "Train Workflow Policy with RL"
+  short_description: "Train, evaluate, and export Workflow RL policies"
+  default_prompt: "Use $i4h-workflow-train-rl to add, train, evaluate, export, and validate an online-RL policy for a Workflow."
