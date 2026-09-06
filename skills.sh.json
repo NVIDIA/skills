@@ -8,7 +8,6 @@
       "skills": [
         "aiq-deploy",
         "aiq-research",
-        "i4h-workflow-setup",
         "nemo-fabric-build-adapter",
         "nemo-fabric-integrate",
         "nemo-relay-debug-runtime-integration",
@@ -370,6 +369,7 @@
         "holoscan-install-source",
         "holoscan-install-wheel",
         "holoscan-setup",
+        "i4h-workflow-setup",
         "jetson-customize-clocks",
         "jetson-generate-kb",
         "jetson-headless-mode",
