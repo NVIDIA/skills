@@ -1453,30 +1453,6 @@
       }
     },
     {
-      "path": "skills/i4h-catheter-navigation-e2e",
-      "name": "i4h-catheter-navigation-e2e",
-      "description": "End-to-end smoke for catheter navigation covering setup, digital twin, DRR, and unit tests. Use when asked to run the full catheter workflow smoke or demo the v0.7 pipeline.",
-      "metadata": {
-        "product.primary": "Isaac for Healthcare",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "robotics-simulation",
-        "audience": "application_developer,simulation_engineer,robotics_developer,developer",
-        "discovery.activity_tags": "test,validate,get_started,configure"
-      }
-    },
-    {
-      "path": "skills/i4h-catheter-navigation-smoke",
-      "name": "i4h-catheter-navigation-smoke",
-      "description": "Run CPU-only fluorosim smoke tests (imports, preprocessing, CLI parsers). Use when asked to smoke-test catheter navigation in CI or without a GPU.",
-      "metadata": {
-        "product.primary": "Isaac for Healthcare",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "simulation-modeling",
-        "audience": "developer,devops_engineer,application_developer,platform_engineer",
-        "discovery.activity_tags": "test,validate,debug,integrate"
-      }
-    },
-    {
       "path": "skills/i4h-lerobot-viz",
       "name": "i4h-lerobot-viz",
       "description": "Serve and visually inspect a converted LeRobot dataset in the browser. Use for videos and state/action timelines; do not use for raw workflow HDF5 or incomplete conversion output.",

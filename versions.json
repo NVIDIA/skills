@@ -849,20 +849,6 @@
       "last_modified": "2026-06-04"
     },
     {
-      "name": "i4h-catheter-navigation-e2e",
-      "path": "skills/i4h-catheter-navigation-e2e",
-      "content_digest": "sha256:c2dab139d73fceb668b55303992105c62bc19d91de6feaa82734f4fb765077f7",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
-    },
-    {
-      "name": "i4h-catheter-navigation-smoke",
-      "path": "skills/i4h-catheter-navigation-smoke",
-      "content_digest": "sha256:a87e269cc11b3db9c1cece84e820518419ad5f1e9964b8a93e71de56bec5801b",
-      "last_commit": "0f232163d64d9f0e36e3c2eecda46a4e9a470ac6",
-      "last_modified": "2026-07-21"
-    },
-    {
       "name": "i4h-lerobot-viz",
       "path": "skills/i4h-lerobot-viz",
       "content_digest": "sha256:1d666e935707985610461675b57c46ddc9e4101fc0798919d6e62addc48c46fe",

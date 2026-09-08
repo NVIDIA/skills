@@ -101,7 +101,6 @@
       "title": "Robotics Simulation",
       "description": "Build and run robotics simulation workflows for training, testing, validation, synthetic data generation, and scenario coverage.",
       "skills": [
-        "i4h-catheter-navigation-e2e",
         "i4h-workflow-create",
         "i4h-workflow-dataset-replay",
         "i4h-workflow-scene-edit",
@@ -214,7 +213,6 @@
         "earth2studio-deterministic-forecast",
         "earth2studio-discover",
         "earth2studio-install",
-        "i4h-catheter-navigation-smoke",
         "physicsnemo-discover",
         "physicsnemo-shard-tensor"
       ]
