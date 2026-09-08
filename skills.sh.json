@@ -8,7 +8,6 @@
       "skills": [
         "aiq-deploy",
         "aiq-research",
-        "i4h-workflow-setup",
         "nemo-fabric-build-adapter",
         "nemo-fabric-integrate",
         "nemo-relay-debug-runtime-integration",
@@ -43,7 +42,6 @@
         "hsb-ip-packetizer",
         "hsb-setup",
         "hsb-test",
-        "i4h-catheter-navigation-setup",
         "jetson-build-source",
         "jetson-customize-camera",
         "jetson-customize-fan",
@@ -93,6 +91,7 @@
         "i4h-workflow-dataset-teleop",
         "i4h-workflow-e2e",
         "i4h-workflow-finetune",
+        "i4h-workflow-train-rl",
         "jetson-customize-pcie",
         "jetson-customize-pinmux",
         "jetson-validate-image"
@@ -215,19 +214,9 @@
         "earth2studio-deterministic-forecast",
         "earth2studio-discover",
         "earth2studio-install",
-        "i4h-catheter-navigation",
-        "i4h-catheter-navigation-render-drr",
         "i4h-catheter-navigation-smoke",
-        "i4h-catheter-navigation-viewport",
         "physicsnemo-discover",
         "physicsnemo-shard-tensor"
-      ]
-    },
-    {
-      "title": "Digital Twins",
-      "description": "Build, simulate, connect, and operate digital representations of physical systems, environments, factories, and assets.",
-      "skills": [
-        "i4h-catheter-navigation-digital-twin"
       ]
     },
     {
@@ -370,6 +359,7 @@
         "holoscan-install-source",
         "holoscan-install-wheel",
         "holoscan-setup",
+        "i4h-workflow-setup",
         "jetson-customize-clocks",
         "jetson-generate-kb",
         "jetson-headless-mode",
