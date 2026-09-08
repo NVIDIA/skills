@@ -15,6 +15,10 @@ The properties that matter to a consumer, and what breaks if they fail:
   removal detection     A generated file stays schema-valid with one fewer
                         entry, which is how a skill silently vanished from
                         metadata.json on 2026-08-03.
+  removal intent        A team that deregisters a skill in components.d
+                        expects it to leave versions.json; blocking that made
+                        every post-deregistration regeneration fail, so the
+                        guard keys on registration rather than on absence.
 """
 
 import base64
@@ -120,6 +124,34 @@ class TestRemovedSkills(unittest.TestCase):
         old = {"skills": [{"name": "c"}, {"name": "a"}, {"name": "b"}]}
         new = {"skills": []}
         self.assertEqual(gv.removed_skills(new, old), ["a", "b", "c"])
+
+
+class TestBlockingRemovals(unittest.TestCase):
+    """Which removals stop the write.
+
+    Both directions matter. Blocking a deregistered skill wedges the hourly
+    regeneration permanently, because the guard compares against a checked-in
+    file that can then never be updated. Exempting a registered one restores
+    the 2026-08-03 silent-loss bug.
+    """
+
+    def test_deregistered_skill_is_not_blocking(self):
+        self.assertEqual(gv.blocking_removals(["retired"], {"kept"}), [])
+
+    def test_still_registered_skill_is_blocking(self):
+        self.assertEqual(gv.blocking_removals(["kept"], {"kept"}), ["kept"])
+
+    def test_mixed_removals_block_only_the_registered_one(self):
+        self.assertEqual(
+            gv.blocking_removals(["retired", "kept"], {"kept"}), ["kept"])
+
+    def test_empty_registry_blocks_everything(self):
+        """A failed components.d parse must not disable the guard."""
+        self.assertEqual(
+            gv.blocking_removals(["a", "b"], set()), ["a", "b"])
+
+    def test_no_removals_is_never_blocking(self):
+        self.assertEqual(gv.blocking_removals([], {"kept"}), [])
 
 
 class TestValidate(unittest.TestCase):
