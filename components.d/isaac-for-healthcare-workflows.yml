@@ -35,7 +35,3 @@ skills:
     catalog_dir: i4h-workflow-e2e
   - path: skills/i4h-lerobot-viz/
     catalog_dir: i4h-lerobot-viz
-  - path: skills/i4h-catheter-navigation-smoke/
-    catalog_dir: i4h-catheter-navigation-smoke
-  - path: skills/i4h-catheter-navigation-e2e/
-    catalog_dir: i4h-catheter-navigation-e2e
