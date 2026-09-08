@@ -1453,30 +1453,6 @@
       }
     },
     {
-      "path": "skills/i4h-catheter-navigation",
-      "name": "i4h-catheter-navigation",
-      "description": "Overview of `workflows/catheter_navigation/` (fluorosim DRR, XPBD physics, vasculature digital twin). Use when the user asks what the catheter navigation workflow is, what's supported, or where to start.",
-      "metadata": {
-        "product.primary": "Isaac for Healthcare",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "simulation-modeling",
-        "audience": "developer,simulation_engineer,application_developer,clinician",
-        "discovery.activity_tags": "get_started,summarize,select,inspect"
-      }
-    },
-    {
-      "path": "skills/i4h-catheter-navigation-digital-twin",
-      "name": "i4h-catheter-navigation-digital-twin",
-      "description": "Build a patient vasculature digital twin from CT (preprocess + segment). Use when asked to preprocess CT, segment vessels, extract centerline, or prepare ct_cache for viewport/DRR.",
-      "metadata": {
-        "product.primary": "Isaac for Healthcare",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "digital-twins",
-        "audience": "application_developer,simulation_engineer,ai_engineer,developer",
-        "discovery.activity_tags": "extract,transform,generate,configure"
-      }
-    },
-    {
       "path": "skills/i4h-catheter-navigation-e2e",
       "name": "i4h-catheter-navigation-e2e",
       "description": "End-to-end smoke for catheter navigation covering setup, digital twin, DRR, and unit tests. Use when asked to run the full catheter workflow smoke or demo the v0.7 pipeline.",
@@ -1486,30 +1462,6 @@
         "catalog.subdomain": "robotics-simulation",
         "audience": "application_developer,simulation_engineer,robotics_developer,developer",
         "discovery.activity_tags": "test,validate,get_started,configure"
-      }
-    },
-    {
-      "path": "skills/i4h-catheter-navigation-render-drr",
-      "name": "i4h-catheter-navigation-render-drr",
-      "description": "Render a single DRR fluoroscopy frame from a CT cache or synthetic phantom. Use when asked to render DRR, generate a fluoro image, or smoke-test the Slang renderer.",
-      "metadata": {
-        "product.primary": "Isaac for Healthcare",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "simulation-modeling",
-        "audience": "application_developer,simulation_engineer,developer",
-        "discovery.activity_tags": "generate,validate,test,debug"
-      }
-    },
-    {
-      "path": "skills/i4h-catheter-navigation-setup",
-      "name": "i4h-catheter-navigation-setup",
-      "description": "Verify host/GPU requirements and PYTHONPATH for the catheter navigation workflow. Use when asked to set up, install, or bootstrap catheter_navigation, or when hitting import/GPU/slangpy errors.",
-      "metadata": {
-        "product.primary": "Isaac for Healthcare",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "physical-ai",
-        "audience": "developer,application_developer,robotics_developer,simulation_engineer,devops_engineer",
-        "discovery.activity_tags": "get_started,configure,troubleshoot,debug,validate"
       }
     },
     {
@@ -1525,21 +1477,9 @@
       }
     },
     {
-      "path": "skills/i4h-catheter-navigation-viewport",
-      "name": "i4h-catheter-navigation-viewport",
-      "description": "Launch the interactive Slang fluoroscopy viewport with XPBD catheter physics. Use when asked to open the viewport, teleop a catheter, or demo fluoro navigation.",
-      "metadata": {
-        "product.primary": "Isaac for Healthcare",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "simulation-modeling",
-        "audience": "simulation_engineer,application_developer,developer,robotics_developer",
-        "discovery.activity_tags": "operate,get_started,test,configure"
-      }
-    },
-    {
       "path": "skills/i4h-lerobot-viz",
       "name": "i4h-lerobot-viz",
-      "description": "Serve the LeRobot HTML visualizer for a converted dataset in a browser. Use when asked to visualize, inspect, or open a LeRobot dataset; not for converting HDF5 (use [[i4h-workflow-dataset-convert]]).",
+      "description": "Serve and visually inspect a converted LeRobot dataset in the browser. Use for videos and state/action timelines; do not use for raw workflow HDF5 or incomplete conversion output.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1551,19 +1491,19 @@
     {
       "path": "skills/i4h-workflow",
       "name": "i4h-workflow",
-      "description": "Overview of `workflows/agentic/` (IsaacLab-Arena + GR00T/openpi). Use when the user asks what i4h workflow is, what's supported, or where to start.",
+      "description": "Orient users to the i4h workflow runtime and route them to the correct stage skill. Use for architecture, support, or where-to-start questions; do not execute a known stage.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "robotics",
         "audience": "robotics_developer,simulation_engineer,ml_engineer,ai_engineer,developer",
-        "discovery.activity_tags": "get_started,summarize,select,orchestrate"
+        "discovery.activity_tags": "get_started,select,orchestrate,troubleshoot"
       }
     },
     {
       "path": "skills/i4h-workflow-create",
       "name": "i4h-workflow-create",
-      "description": "Create a new agentic env by forking an existing env. Use for new env/task scaffolding, not scene edits or baking.",
+      "description": "Create a minimal blank Workflow scaffold with a Scene containing ground and light plus an idle run mode. Use for fast new Workflow scaffolding.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1575,31 +1515,31 @@
     {
       "path": "skills/i4h-workflow-dataset-annotate",
       "name": "i4h-workflow-dataset-annotate",
-      "description": "Use a VLM to verify whether each episode satisfies the env's task description. Use when the user asks to annotate, label episodes, filter demos, or gate finetuning on a success classifier.",
+      "description": "Grade or filter workflow HDF5 episodes with an OpenAI-compatible vision model. Use for visual success labels; do not use for replay, policy evaluation, or recordings without frames.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "robotics",
         "audience": "robotics_developer,ml_engineer,ai_engineer,developer",
-        "discovery.activity_tags": "classify,validate,evaluate,fine_tune"
+        "discovery.activity_tags": "classify,validate,evaluate,assess"
       }
     },
     {
       "path": "skills/i4h-workflow-dataset-convert",
       "name": "i4h-workflow-dataset-convert",
-      "description": "Convert an agentic HDF5 recording into a LeRobot dataset (parquet, meta, videos). Use when asked to convert HDF5, prepare for training, or export to LeRobot; not for viewing — use [[i4h-lerobot-viz]].",
+      "description": "Convert workflow HDF5 recordings to LeRobot datasets for training or browser inspection. Use for conversion; do not use for replay, augmentation, or raw-data repair.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "robotics",
         "audience": "robotics_developer,ml_engineer,data_engineer,ai_engineer,developer",
-        "discovery.activity_tags": "convert,transform,fine_tune,train,integrate"
+        "discovery.activity_tags": "convert,transform,inspect,train,integrate"
       }
     },
     {
       "path": "skills/i4h-workflow-dataset-mimic",
       "name": "i4h-workflow-dataset-mimic",
-      "description": "Expand an HDF5 recording by cloning trajectories with action/state noise. Use when asked to mimic, expand, or augment a dataset; not for recording new demos (use [[i4h-workflow-dataset-teleop]]).",
+      "description": "Expand workflow HDF5 demonstrations with action jitter, optionally scoped to node segments. Use for synthetic variants; do not use to collect data, alter state directly, or generate new images.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1611,7 +1551,7 @@
     {
       "path": "skills/i4h-workflow-dataset-replay",
       "name": "i4h-workflow-dataset-replay",
-      "description": "Replay a recorded HDF5 episode inside Isaac Sim for visual verification. Use when the user asks to replay, play back, or step through an HDF5 recording.",
+      "description": "Replay a workflow HDF5 episode through its original Scene. Use for visual trajectory and recording verification; do not use for policy evaluation or LeRobot data.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1623,7 +1563,7 @@
     {
       "path": "skills/i4h-workflow-dataset-teleop",
       "name": "i4h-workflow-dataset-teleop",
-      "description": "Record episodes for an agentic env via teleoperation (keyboard, SO-ARM leader, or VR) into HDF5. Use when the user wants to teleop or record human demos.",
+      "description": "Record demonstrations through a workflow's teleop Task into workflow HDF5. Use for keyboard, leader, VR, or bus input; do not use for policy evaluation or autonomous rule-based Tasks.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1635,7 +1575,7 @@
     {
       "path": "skills/i4h-workflow-e2e",
       "name": "i4h-workflow-e2e",
-      "description": "Run the full end-to-end agentic pipeline (record → mimic → annotate → replay → convert → visualize → finetune → validate). Use when asked to run the whole pipeline or do an e2e, smoke, or demo run.",
+      "description": "Run the maintained workflow data-to-policy pipeline from recording through checkpoint validation. Use for full end-to-end requests; do not use for one individual stage.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1647,7 +1587,7 @@
     {
       "path": "skills/i4h-workflow-finetune",
       "name": "i4h-workflow-finetune",
-      "description": "Fine-tune a GR00T or openpi PI0 policy on a LeRobot dataset. Use when asked to finetune, train, or post-train a policy on demos; not for evaluating a checkpoint (use [[i4h-workflow-validate]]).",
+      "description": "Fine-tune a manifest-backed GR00T or openpi remote Task on compatible LeRobot data. Use for training; do not use for inference-only Tasks or checkpoint rollout.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1659,7 +1599,7 @@
     {
       "path": "skills/i4h-workflow-scene-edit",
       "name": "i4h-workflow-scene-edit",
-      "description": "Edit an env's scene in place — objects, cameras, task, success bounds, randomization. Use when asked to edit a scene or launch/run/open an env in edit mode (`--bridge`), incl. a just-created env.",
+      "description": "Edit an existing workflow Scene or task contract. Use for assets, layout, cameras, randomization, task text, or success rules; do not use to create a new workflow.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1671,19 +1611,31 @@
     {
       "path": "skills/i4h-workflow-setup",
       "name": "i4h-workflow-setup",
-      "description": "Verify host requirements and run `workflows/agentic/setup.sh`. Use when asked to set up, install, or bootstrap the agentic workflow, or hits missing `.venv`, third-party checkout, or engine errors.",
+      "description": "Preflight and set up the root-level workflow runtime. Use for installation, missing component environments, or third-party failures; do not use for rollout validation.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "agentic-ai",
+        "catalog.subdomain": "infrastructure",
         "audience": "devops_engineer,platform_engineer,developer,ai_engineer,application_developer",
-        "discovery.activity_tags": "get_started,configure,troubleshoot,validate,deploy"
+        "discovery.activity_tags": "get_started,configure,troubleshoot,inspect,assess"
+      }
+    },
+    {
+      "path": "skills/i4h-workflow-train-rl",
+      "name": "i4h-workflow-train-rl",
+      "description": "Use when training, evaluating, or exporting Workflow policies with online RSL-RL or RLinf, including RL checkpoint and Workflow handoff.",
+      "metadata": {
+        "product.primary": "Isaac for Healthcare",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "robotics",
+        "audience": "robotics_developer,ml_engineer,ai_engineer,simulation_engineer,developer",
+        "discovery.activity_tags": "train,evaluate,deploy,configure,validate"
       }
     },
     {
       "path": "skills/i4h-workflow-validate",
       "name": "i4h-workflow-validate",
-      "description": "Validate, evaluate, or run i4h envs. Use for policy/checkpoint rollouts and scripted state-machine smoke runs.",
+      "description": "Run the root-level workflow runtime policy or rule-based rollouts and verify simulator success. Use for evaluation, checkpoints, or local controllers; do not use for replay or dataset annotation.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
