@@ -37,6 +37,8 @@ from pathlib import Path
 
 import jsonschema
 
+import aggregate_benchmarks as ab
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SKILLS_DIR = REPO_ROOT / "skills"
 OUTPUT = REPO_ROOT / "versions.json"
@@ -112,6 +114,24 @@ def removed_skills(new: dict, old: dict) -> list[str]:
                   - {s["name"] for s in new["skills"]})
 
 
+def blocking_removals(gone: list[str], registered: set[str]) -> list[str]:
+    """Removals that must stop the write, given the registered skill set.
+
+    A skill whose components.d entry was dropped is *expected* to leave the
+    output: the sync prunes its directory and versions.json follows. The case
+    this guard exists for is the opposite one -- a skill still registered that
+    vanished anyway, which is how cuopt-multi-objective-exploration
+    disappeared on 2026-08-03. Registration is what separates them.
+
+    An empty ``registered`` means the parse failed rather than that nothing is
+    registered, so nothing is exempt; otherwise a bad parse would silently
+    switch the guard off.
+    """
+    if not registered:
+        return list(gone)
+    return [name for name in gone if name in registered]
+
+
 def serialize(doc: dict) -> str:
     return json.dumps(doc, indent=2, ensure_ascii=False) + "\n"
 
@@ -133,13 +153,19 @@ def main() -> int:
     # rather than a wall — but it must be deliberate.
     if OUTPUT.is_file():
         gone = removed_skills(doc, json.loads(OUTPUT.read_text()))
-        if gone and not args.allow_removals:
-            print(f"Refusing to write versions.json: {len(gone)} skill(s) "
-                  f"disappeared from the output.", file=sys.stderr)
-            for name in gone:
+        blocking = blocking_removals(gone, ab.registered_catalog_dirs(REPO_ROOT))
+        expected = [name for name in gone if name not in blocking]
+        if expected:
+            print(f"note: {len(expected)} deregistered skill(s) removed from "
+                  f"versions.json: {', '.join(expected)}", file=sys.stderr)
+        if blocking and not args.allow_removals:
+            print(f"Refusing to write versions.json: {len(blocking)} skill(s) "
+                  f"disappeared while still registered in components.d.",
+                  file=sys.stderr)
+            for name in blocking:
                 print(f"  - {name}", file=sys.stderr)
-            print("\nIf these were deregistered in components.d, re-run with "
-                  "--allow-removals.", file=sys.stderr)
+            print("\nDrop their components.d entries if the removal is "
+                  "intended, or re-run with --allow-removals.", file=sys.stderr)
             return 1
 
     rendered = serialize(doc)
