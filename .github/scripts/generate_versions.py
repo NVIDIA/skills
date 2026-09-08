@@ -156,8 +156,8 @@ def main() -> int:
         blocking = blocking_removals(gone, ab.registered_catalog_dirs(REPO_ROOT))
         expected = [name for name in gone if name not in blocking]
         if expected:
-            print(f"note: {len(expected)} deregistered skill(s) removed from "
-                  f"versions.json: {', '.join(expected)}", file=sys.stderr)
+            print(f"note: detected {len(expected)} deregistered skill(s) absent "
+                  f"from generated output: {', '.join(expected)}", file=sys.stderr)
         if blocking and not args.allow_removals:
             print(f"Refusing to write versions.json: {len(blocking)} skill(s) "
                   f"disappeared while still registered in components.d.",

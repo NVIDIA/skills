@@ -22,10 +22,14 @@ The properties that matter to a consumer, and what breaks if they fail:
 """
 
 import base64
+import contextlib
+import io
 import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -152,6 +156,30 @@ class TestBlockingRemovals(unittest.TestCase):
 
     def test_no_removals_is_never_blocking(self):
         self.assertEqual(gv.blocking_removals([], {"kept"}), [])
+
+
+class TestRemovalDiagnostics(unittest.TestCase):
+    def test_check_does_not_claim_a_deregistration_was_written(self):
+        """--check reports intent without implying it changed versions.json."""
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "versions.json"
+            output.write_text(json.dumps({"skills": [{"name": "retired"}]}))
+            stderr = io.StringIO()
+            with (
+                mock.patch.object(gv, "OUTPUT", output),
+                mock.patch.object(gv, "build", return_value={"skills": []}),
+                mock.patch.object(gv, "validate"),
+                mock.patch.object(
+                    gv.ab, "registered_catalog_dirs", return_value={"kept"}
+                ),
+                mock.patch.object(sys, "argv", ["generate_versions.py", "--check"]),
+                contextlib.redirect_stderr(stderr),
+            ):
+                self.assertEqual(gv.main(), 1)
+
+            message = stderr.getvalue()
+            self.assertIn("detected 1 deregistered skill(s)", message)
+            self.assertNotIn("removed from versions.json", message)
 
 
 class TestValidate(unittest.TestCase):
