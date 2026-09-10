@@ -4,7 +4,7 @@ description: Use for CUDA-Q setup, simulation targets, QPU access, and @cudaq.ke
 skills:
   - path: skills/cudaq-guide/
     catalog_dir: cudaq-guide
-  - path: skills/qiskit-to-cudaq/
-    catalog_dir: qiskit-to-cudaq
+  - path: skills/cudaq-importing/
+    catalog_dir: cudaq-importing
 links:
   contributing: Contributing.md
