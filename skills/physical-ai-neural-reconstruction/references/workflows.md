@@ -50,8 +50,12 @@ training anything.
 1. `ncore` — make sure the original NCore clip is still on disk;
    Asset Harvester needs it to crop the object views.
 2. `asset-harvester` — point it at the object IDs you care about.
-   For each one, it produces a `.ply` (3D Gaussian model) plus a
-   `metadata.yaml` (size, position, label).
+   For each one it produces a `.ply` (3D Gaussian model). Harvesting
+   does **not** emit `metadata.yaml`; that comes from the separate
+   NuRec-handoff step (`generate_external_assets_metadata.py`) and
+   carries `ply_file`, `label_class` and `cuboids_dims`. Run it — step
+   3 **requires** it, since `--external-assets-dir` must contain
+   `metadata.yaml`.
 3. `nre` — package those `.ply` files into the USDZ with
    `export-external-assets` and edit the scene with
    `serve-grpc --enable-editing-actors` plus

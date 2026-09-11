@@ -17,7 +17,8 @@ sibling skills:
    - `nre` — `nvcr.io/nvidia/nre/nre-ga` +
      `nvcr.io/nvidia/nre/nre-tools-ga`, NRE `release_26.04`
    - `asset-harvester` — <https://github.com/NVIDIA/asset-harvester>,
-     `nvidia/asset-harvester` on Hugging Face
+     `nvidia/asset-harvester` on Hugging Face. The **skill itself** now
+     ships from that repo too (`skills/asset-harvester/`).
    - `nurec-fixer` — <https://github.com/NVIDIA/harmonizer>,
      `nvidia/Harmonizer`, base image
      `nvcr.io/nvidia/pytorch:25.10-py3`
@@ -33,6 +34,8 @@ sibling skills:
    it moves, update `metadata.upstream` and
    `references/upstream-fetch.md`.
 
-Treat the upstream `nurec-index` as authoritative; this skill mirrors
-only the picker tables, the workflow ordering, and the upstream fetch
-recipe.
+Treat the upstream `nurec-index` as authoritative **for the routing
+taxonomy and workflow ordering**; this skill mirrors only the picker
+tables, the workflow ordering, and the upstream fetch recipe. It is not
+authoritative for `asset-harvester`, which is maintained in
+<https://github.com/NVIDIA/asset-harvester>.

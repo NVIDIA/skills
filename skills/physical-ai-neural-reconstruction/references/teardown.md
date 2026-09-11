@@ -10,7 +10,7 @@ workflow:
 |---------------|------------------------|--------------------------|
 | `nre` | ~120 GB images + caches + per-run outputs | `nre/SKILL.md#teardown` + `nre/references/teardown.md` |
 | `nurec-fixer` | 100 GB+ possible (Cosmos image / build cache, HF model + dataset, checkout, outputs) | `nurec-fixer/SKILL.md#teardown` + `nurec-fixer/references/teardown.md` |
-| `asset-harvester` | ~30 GB conda envs + checkpoints + outputs | `asset-harvester/references/troubleshooting.md#teardown` |
+| `asset-harvester` | ~60 GB+ — checkpoints (~12.8 GB), two conda envs (~10–15 GB each), benchmark assets, outputs | [`skills/asset-harvester/references/troubleshooting.md#teardown`](https://github.com/NVIDIA/asset-harvester/blob/main/skills/asset-harvester/references/troubleshooting.md#teardown) |
 | `ncore` | clip-dependent | NCore shards live under `<dataset_dir>/`; delete after `nre` training is done |
 | `physical-ai-datasets` | dataset-dependent | HF caches under `${HF_HOME:-$HOME/.cache/huggingface}/hub/`; remove the per-dataset directory |
 
