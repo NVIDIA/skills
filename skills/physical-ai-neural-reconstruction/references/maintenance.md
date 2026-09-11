@@ -15,7 +15,8 @@ sibling skills:
    still match each sibling's frontmatter `metadata:` block:
    - `ncore` — <https://github.com/NVIDIA/ncore>, release `2026.04`
    - `nre` — `nvcr.io/nvidia/nre/nre-ga` +
-     `nvcr.io/nvidia/nre/nre-tools-ga`, NRE `release_26.04`
+     `nvcr.io/nvidia/nre/nre-tools-ga`, NRE 26.04 (image tags `26.04.01` / `26.04` / `latest`;
+     the release name `release_26.04` is not an image tag)
    - `asset-harvester` — <https://github.com/NVIDIA/asset-harvester>,
      `nvidia/asset-harvester` on Hugging Face
    - `nurec-fixer` — <https://github.com/NVIDIA/harmonizer>,
