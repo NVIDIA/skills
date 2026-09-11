@@ -87,7 +87,7 @@
     {
       "path": "skills/cudaq-guide",
       "name": "cudaq-guide",
-      "description": "CUDA-Q onboarding guide for installation, test programs, GPU simulation, QPU hardware, and quantum applications.",
+      "description": "Use for CUDA-Q setup, simulation targets, QPU access, and @cudaq.kernel authoring guidance.",
       "metadata": {
         "product.primary": "CUDA-Q",
         "classification.category.primary": "accelerated_computing",

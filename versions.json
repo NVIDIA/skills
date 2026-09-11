@@ -53,9 +53,9 @@
     {
       "name": "cudaq-guide",
       "path": "skills/cudaq-guide",
-      "content_digest": "sha256:bb33b7c423e67a261bc38dee63419e00361d8f4349332ee33da1015c8049f298",
-      "last_commit": "6d46c9948d3ae051da8d7e58e10eebb0e236387c",
-      "last_modified": "2026-05-29"
+      "content_digest": "sha256:b16e706ddfe2a5ac0e84aaa36d02a9fda8048212dde76c8a13874241a49bd41f",
+      "last_commit": "f382077400e4fbb65b9e0cc8613f945b86ab4b0e",
+      "last_modified": "2026-09-11"
     },
     {
       "name": "cuopt-developer",
