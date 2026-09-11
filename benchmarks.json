@@ -167,15 +167,15 @@
     },
     {
       "skill": "cudaq-guide",
-      "evaluation_date": "2026-05-29",
-      "environment": "local",
-      "evaluator_version": null,
-      "dataset_digest": null,
+      "evaluation_date": "2026-09-11",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:7884d2878ed008a3969a7668a02fb2f9fda8e70495368a69ca8bf4ce1f6071dd",
       "validation_status": null,
-      "tasks": 9,
-      "attempts_per_task": 2,
-      "pass_threshold_pct": 50.0,
-      "verdict": "PASS",
+      "tasks": 13,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "INCOMPLETE",
       "agents": [
         "claude-code",
         "codex"
@@ -183,7 +183,7 @@
       "catalog_dir": "cudaq-guide",
       "component": "CUDA-Q",
       "has_results": true,
-      "average_uplift_pct": 11.7
+      "average_uplift_pct": 8.72
     },
     {
       "skill": "cuopt-developer",
@@ -7312,7 +7312,7 @@
       "catalog_dir": "cudaq-guide",
       "component": "CUDA-Q",
       "dimension": "Security",
-      "num": 8,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -7321,82 +7321,82 @@
       "catalog_dir": "cudaq-guide",
       "component": "CUDA-Q",
       "dimension": "Security",
-      "num": 8,
+      "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "score_pct": 92.3,
+      "uplift_pct": 7.7
     },
     {
       "catalog_dir": "cudaq-guide",
       "component": "CUDA-Q",
       "dimension": "Correctness",
-      "num": 8,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 12.0
+      "uplift_pct": 12.3
     },
     {
       "catalog_dir": "cudaq-guide",
       "component": "CUDA-Q",
       "dimension": "Correctness",
-      "num": 8,
+      "num": null,
       "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 3.0
+      "score_pct": 95.4,
+      "uplift_pct": 3.1
     },
     {
       "catalog_dir": "cudaq-guide",
       "component": "CUDA-Q",
       "dimension": "Discoverability",
-      "num": 8,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 33.0
+      "score_pct": 97.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "cudaq-guide",
       "component": "CUDA-Q",
       "dimension": "Discoverability",
-      "num": 8,
+      "num": null,
       "agent": "codex",
-      "score_pct": 82.0,
-      "uplift_pct": 17.0
+      "score_pct": 93.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "cudaq-guide",
       "component": "CUDA-Q",
       "dimension": "Effectiveness",
-      "num": 8,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 7.0
+      "score_pct": 85.4,
+      "uplift_pct": 18.3
     },
     {
       "catalog_dir": "cudaq-guide",
       "component": "CUDA-Q",
       "dimension": "Effectiveness",
-      "num": 8,
+      "num": null,
       "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 3.0
+      "score_pct": 84.8,
+      "uplift_pct": 10.9
     },
     {
       "catalog_dir": "cudaq-guide",
       "component": "CUDA-Q",
       "dimension": "Efficiency",
-      "num": 8,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 82.0,
-      "uplift_pct": 26.0
+      "score_pct": 91.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "cudaq-guide",
       "component": "CUDA-Q",
       "dimension": "Efficiency",
-      "num": 8,
+      "num": null,
       "agent": "codex",
-      "score_pct": 73.0,
-      "uplift_pct": 16.0
+      "score_pct": 75.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "cuopt-developer",
