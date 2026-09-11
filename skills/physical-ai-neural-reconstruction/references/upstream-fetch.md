@@ -1,15 +1,37 @@
 # Locating and Fetching Upstream Skills
 
-The canonical NuRec router (named `nurec-index`) and its five sibling
-skills live in `https://github.com/NVIDIA/nurec-skills` under
-`skills/<name>/SKILL.md`. The repo also exposes `.agents/skills` as a
+The canonical NuRec router (named `nurec-index`) and four of its five
+sibling skills live in `https://github.com/NVIDIA/nurec-skills` under
+`skills/<name>/SKILL.md`. **`asset-harvester` is the exception** — it is
+maintained in its own product repo; see the next section.
+
+The `nurec-skills` repo also exposes `.agents/skills` as a
 symlink onto `skills/`, so both paths resolve to the same tree. Refer
 to a sibling skill by its `name:` (e.g. `nre`) — that name is portable
 across agent runtimes that implement the `agentskills.io` standard.
 The folder name always matches the skill `name:` (e.g. the `ncore`
 skill lives at `skills/ncore/`).
 
+## `asset-harvester` — fetched from its own repo
+
+That skill ships from
+[`NVIDIA/asset-harvester`](https://github.com/NVIDIA/asset-harvester) under
+`skills/asset-harvester/` and is maintained there.
+
+**Do not read it from a `nurec-skills` checkout.** That copy still exists but
+is no longer updated, so reading it silently yields stale guidance instead of
+failing.
+
+Fetch it as you would any other upstream. **[Ask before
+cloning](#ask-before-cloning)** applies here too — it is a network fetch plus
+a local write. Companion files (`references/`, `scripts/`) sit beside its
+`SKILL.md`.
+
 ## Where to look on the local disk (try in order)
+
+This applies to the four `nurec-skills`-hosted siblings only. It does **not**
+override the `asset-harvester` exception above — a local copy of that one may
+be the stale `nurec-skills` version, so do not read it from here.
 
 1. `.agents/skills/<name>/SKILL.md` (Cursor, Codex, NemoClaw)
 2. `.claude/skills/<name>/SKILL.md` (Claude Code)
