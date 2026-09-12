@@ -1,37 +1,83 @@
 ---
 name: nemo-retriever
-description: "Use when the user wants to search, query, extract, transcribe, describe, quote, filter, or aggregate across documents — PDFs, scanned forms / images (`.jpg` `.png` `.tiff`), Office (`.docx` `.pptx`), text (`.html` `.txt`), audio (`.mp3` `.wav` `.m4a`), or video (`.mp4` `.mov`). Prefer this over native Read / Grep for multi-file or non-PDF corpora. Not for: editing files, web browsing, single-file plain-text lookups, fine-tuning."
+description: Use when searching, extracting, ingesting, or querying a document collection with the NeMo Retriever 26.8.1 CLI, including local LanceDB indexes and deployed Retriever services. Use for PDFs, images, Office files, HTML, text, audio, and video; not for editing documents or web search.
 license: Apache-2.0
-allowed-tools: Bash Write Read
 ---
 
-# nemo-retriever
+# NeMo Retriever
 
-The `retriever` CLI indexes a folder of PDFs into LanceDB (`retriever ingest`) and serves vector search over it (`retriever query`). For any task about searching/answering questions across a folder of PDFs, use this CLI — do not write a custom RAG.
+Use the `retriever` CLI. Prefer it over hand-built retrieval
+code.
 
-**Beyond PDFs and beyond semantic search.** `retriever ingest` also handles images, Office, HTML, TXT, audio, and video — see `references/setup.md` for the per-format recipe and `references/install.md` for the install extras (`[multimedia]`, libreoffice, ffmpeg). For non-semantic operations — page filter, verbatim quote with citation, corpus-level aggregate, chart/image caption hits — see `references/query.md`. Don't fall back to native Read/Grep/Python on non-PDF inputs.
+## Install only when missing
 
-## Install (if `retriever` is missing)
+Create a project-local Python environment:
 
-If `command -v retriever` returns nothing, follow `references/install.md` to install the NeMo Retriever Library before proceeding. It prints `RETRIEVER_VENV=<path>`; substitute that path for `<RETRIEVER_VENV>` in every example in this skill (setup, query, troubleshooting, and the CLI references).
+```bash
+uv venv .venv --python 3.12
+export PATH="$PWD/.venv/bin:$PATH"
+```
 
-## Workflow — read the reference for the current phase, then execute
+Install the package variant required by the workflow:
 
-| Turn type | Read this once | Then execute |
-| :--- | :--- | :--- |
-| **Setup turn** (first turn — `./lancedb/nv-ingest.lance` doesn't exist) | `references/setup.md` | Build the index |
-| **Query turn** (every subsequent turn — user asks a question) | `references/query.md` | One `retriever query` call |
-| Anything errored or returned empty | `references/troubleshooting.md` | Apply the named recovery; do not improvise |
+```bash
+# Remote NIM or service client
+uv pip install --python .venv/bin/python "nemo-retriever==26.8.1"
 
-For the full `retriever ingest` / `retriever query` CLI specs, see `references/cli/ingest.md` and `references/cli/query.md`. You do not need these for routine turns — `<RETRIEVER_VENV>/bin/retriever <subcommand> --help` is faster.
+# Local GPU ingestion
+uv pip install --python .venv/bin/python "nemo-retriever[local]==26.8.1"
 
-Before ingesting a mixed folder, inventory extensions (`find <dir> -name '*.*' | sed 's/.*\.//' | sort -u`) — `--input-type=auto` silently drops anything outside the supported set. See `references/troubleshooting.md` "Unsupported file types".
+# Local service using Hugging Face models
+uv pip install --python .venv/bin/python \
+  "nemo-retriever[service,local]==26.8.1"
 
-## Hard limits (apply to every turn)
+# Local audio or video ingestion
+uv pip install --python .venv/bin/python \
+  "nemo-retriever[local,multimedia]==26.8.1"
+```
 
-- **Setup turn**: build the index in one shell command (see `references/setup.md`). STOP after the index lands.
-- **Query turn**: at most **2 Bash calls** — 1 `retriever query`, +1 optional targeted text-extract per `references/query.md`. Reply and then STOP.
-- **No narration between tool calls.** Tokens you emit between calls become input + cached input for every later turn — quadratic cost. Go straight from reading the summary to writing the JSON file.
-- **Banned**: `TodoWrite`, Glob, Grep, `Read` of whole PDFs, re-running setup, spawning subagents, speculative "confirmation" calls.
+Do not clone NeMo Retriever or install from a Git URL. If `retriever` is already
+on `PATH`, use that installation.
 
-Long query turns (5+ tool calls, 1M+ cache-read tokens) cost ~5× a disciplined turn and almost always still produce the wrong answer. **Answering partially beats timing out.**
+## Local workflow
+
+Build a local index:
+
+```bash
+retriever ingest <file-or-directory> \
+  --lancedb-uri lancedb --table-name nemo-retriever
+```
+
+Query it:
+
+```bash
+retriever query "<question>" \
+  --lancedb-uri lancedb --table-name nemo-retriever \
+  --top-k 5 --format evidence
+```
+
+Use `retriever ingest batch` only for an explicitly requested Ray batch run.
+
+## Service workflow
+
+Use these forms for an already deployed Retriever service:
+
+```bash
+retriever ingest service <file-or-directory> \
+  --service-url "$RETRIEVER_SERVICE_URL"
+
+retriever query service "<question>" \
+  --service-url "$RETRIEVER_SERVICE_URL" \
+  --top-k 5 --format evidence
+```
+
+Set `NEMO_RETRIEVER_API_TOKEN` when the service requires Bearer authentication.
+Do not pass local LanceDB flags to the service commands.
+
+## Rules
+
+- Use the existing index or service when one is provided; do not rebuild it.
+- Use `retriever ingest --help`, `retriever query --help`, or the relevant
+  `batch` / `service` help for options not shown here.
+- Answer only from retrieved evidence; preserve source and page metadata when
+  the task requests citations.

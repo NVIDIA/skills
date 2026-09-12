@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers adding or modifying model architecture support in NeMo AutoModel, such as LLM, VLM, and MoE model files, custom layers, state-dict adapters, registry entries, and capability flags. <br>
+Developers and engineers adding or modifying model architecture support in NeMo AutoModel, including LLM, VLM, and MoE model files, custom layers, state-dict adapters, registry entries, Hugging Face config mapping, and capability flags. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,15 +25,15 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [llm-patterns.md](llm-patterns.md) <br>
-- [moe-patterns.md](moe-patterns.md) <br>
-- [vlm-patterns.md](vlm-patterns.md) <br>
-- [capabilities-and-precision.md](capabilities-and-precision.md) <br>
+- [LLM Patterns](llm-patterns.md) <br>
+- [MoE Patterns](moe-patterns.md) <br>
+- [VLM Patterns](vlm-patterns.md) <br>
+- [Capabilities and Precision](capabilities-and-precision.md) <br>
 - [NeMo AutoModel Documentation](https://docs.nvidia.com/nemo/automodel/latest/index.html) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Configuration instructions, Shell commands] <br>
+**Output Type(s):** [Code, Configuration instructions, Analysis] <br>
 **Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -45,38 +45,39 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 3 positive evaluation tasks in isolated sandbox pods. <br>
+Evaluated against 3 tasks (3 positive) from a pinned dataset snapshot, each attempt in an isolated sandbox pod. Tasks cover dense LLM onboarding, MoE state-dict adapter mapping, and VLM onboarding. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use (unsafe operations, secret leakage, unauthorized access). <br>
-- Correctness: Whether the answer produced is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded and activated when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and followed expected workflow behavior. <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
+- Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded when needed — skill selection, decoy avoidance, and workflow execution. <br>
+- Effectiveness: Whether the skill helped complete the task — equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage — 50% tool-call productivity and 50% token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
-| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+| Measure | Claude Code (Skill) | Codex (Skill) |
 |---|---:|---:|
-| Overall | 49% → 98% (+49 points) | 45% → 98% (+53 points) |
-| Security | 67% → 100% (+33 points) | 50% → 100% (+50 points) |
-| Correctness | 60% → 100% (+40 points) | 60% → 100% (+40 points) |
-| Discoverability | 48% → 100% (+52 points) | 33% → 94% (+60 points) |
-| Effectiveness | 40% → 91% (+50 points) | 61% → 98% (+37 points) |
-| Efficiency | 29% → 100% (+71 points) | 20% → 100% (+80 points) |
+| Overall | 98.2% | 95.8% |
+| Security | 100.0% | 100.0% |
+| Correctness | 100.0% | 100.0% |
+| Discoverability | 100.0% | 91.7% |
+| Effectiveness | 93.5% | 89.2% |
+| Efficiency | 97.2% | 98.2% |
 
 ## Skill Version(s): <br>
-v1.2.1+7febc6e (source: pyproject.toml) <br>
+v1.2.1+4214430 (source: pyproject.toml) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
