@@ -14,9 +14,9 @@ Reference implementations:
 | Aspect | Dense LLM | MoE LLM |
 |--------|-----------|---------|
 | Base classes | `HFCheckpointingMixin, PreTrainedModel` | `HFCheckpointingMixin, nn.Module, MoEFSDPSyncMixin` |
-| MLP | `CombinedGateUpMLP` for all layers | `MLP` for dense layers, `MoE` for expert layers |
+| MLP | Model-owned dense MLP, such as separate SwiGLU projections | `MLP` for dense layers, `MoE` for expert layers |
 | Config | HF config only | HF config + `MoEConfig` dataclass |
-| State dict adapter | `CombinedProjectionStateDictAdapter` | Custom adapter with `MoESplitExpertsStateDictMixin` |
+| State dict adapter | Omit for HF-compatible weights; model-owned conversion for different layouts | Custom adapter for differing expert layouts, often with `MoESplitExpertsStateDictMixin` |
 | Parallelism | FSDP + TP + PP | FSDP + TP + PP + Expert Parallelism (EP) |
 | Forward signature | Standard HF-compatible | Custom (no `CausalLMOutputWithPast`, returns raw tensors) |
 

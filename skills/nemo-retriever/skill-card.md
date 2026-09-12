@@ -1,5 +1,5 @@
 ## Description: <br>
-Use when the user wants to search, query, extract, transcribe, describe, quote, filter, or aggregate across documents — PDFs, scanned forms / images (.jpg .png .tiff), Office (.docx .pptx), text (.html .txt), audio (.mp3 .wav .m4a), or video (.mp4 .mov). <br>
+Use when searching, extracting, ingesting, or querying a document collection with the NeMo Retriever 26.8.1 CLI, including local LanceDB indexes and deployed Retriever services. Use for PDFs, images, Office files, HTML, text, audio, and video; not for editing documents or web search. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,70 +9,72 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to search, query, extract, or aggregate information across multimodal document collections including PDFs, images, Office files, audio, and video for retrieval-augmented generation workflows. <br>
+Developers and engineers use this skill to search, extract, ingest, and query document collections using the NeMo Retriever CLI, supporting PDFs, images, Office files, HTML, text, audio, and video formats. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Optional] <br>
+**Credential Type(s):** [API key] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Install Guide](references/install.md) <br>
-- [Setup Guide](references/setup.md) <br>
-- [Query Guide](references/query.md) <br>
-- [Troubleshooting](references/troubleshooting.md) <br>
-- [CLI: ingest](references/cli/ingest.md) <br>
-- [CLI: query](references/cli/query.md) <br>
 - [NeMo Retriever Library Documentation](https://docs.nvidia.com/nemo/retriever/latest/extraction/overview/) <br>
+- [NeMo Retriever GitHub (26.08 branch)](https://github.com/NVIDIA/NeMo-Retriever/tree/26.08) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, JSON] <br>
-**Output Format:** [Markdown with inline bash code blocks and JSON query results] <br>
+**Output Type(s):** [Shell commands, Analysis] <br>
+**Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative), 2 attempts per task, 50% pass threshold. Overall verdict: PASS. <br>
+4 evaluation tasks (3 positive, 1 negative), each running 3 attempts in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded and activated when needed, and decoys were avoided. <br>
+- Effectiveness: Whether the skill helped complete the user's goal (50% goal completion + 50% expected workflow adherence). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool-call productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity — measures whether the skill avoided unnecessary tool calls. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 8 | 100% (+14%) | 88% (+0%) |
-| Correctness | 8 | 77% (+4%) | 69% (-0%) |
-| Discoverability | 8 | 95% (-0%) | 68% (+5%) |
-| Effectiveness | 8 | 45% (-3%) | 47% (-2%) |
-| Efficiency | 8 | 85% (+1%) | 62% (+0%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 78.3% | 72.2% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 27.5% → 90.0% (+62.5 points) | 26.0% → 70.0% (+44.0 points) |
+| Discoverability | 78.3% | 73.3% |
+| Effectiveness | 31.9% → 41.3% (+9.4 points) | 20.5% → 40.0% (+19.5 points) |
+| Efficiency | 82.0% | 77.5% |
 
 ## Skill Version(s): <br>
-b331d0f7 (source: git SHA, committed 2026-05-29) <br>
+e971432a (source: git SHA, committed 2026-09-11) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

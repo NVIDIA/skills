@@ -2,7 +2,7 @@
 name: "cudaq-guide"
 title: "CUDA-Q Guide"
 description: "Use for CUDA-Q setup, simulation targets, QPU access, and @cudaq.kernel authoring guidance."
-version: "1.1.1"
+version: "1.1.2"
 author: "CUDA-Q Team <cuda-quantum@nvidia.com>"
 tags: [cuda-quantum, quantum-computing, onboarding, getting-started, authoring, kernels, nvidia]
 tools: [Read, Glob, Grep]

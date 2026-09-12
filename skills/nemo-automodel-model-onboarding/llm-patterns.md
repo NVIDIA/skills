@@ -16,12 +16,13 @@ A dense LLM typically needs these files:
 components/models/<name>/
   __init__.py
   model.py
-  state_dict_adapter.py
+  state_dict_adapter.py   # Only if HF weight names or tensor layouts need conversion
   rope_utils.py           # Only if RoPE differs from Llama
 ```
 
-Most dense LLMs can reuse the standard `CombinedGateUpMLP` and `CombinedQKVAttentionMixin` without a separate `layers.py`.
-However, before reusing a standard template module, make sure they are numerically equivalent.
+Start from the current Llama, Qwen2, or Qwen3 implementation and verify numerical
+equivalence before reusing its attention or MLP pattern. These models preserve
+separate HF-compatible projections; combined projections are not a requirement.
 
 ---
 
@@ -30,8 +31,7 @@ However, before reusing a standard template module, make sure they are numerical
 ```python
 from nemo_automodel.components.models.common import (
     BackendConfig,
-    CombinedGateUpMLP,
-    CombinedQKVAttentionMixin,
+    initialize_linear_module,
     initialize_rms_norm_module,
 )
 from nemo_automodel.components.models.common.hf_checkpointing_mixin import HFCheckpointingMixin
@@ -39,106 +39,28 @@ from nemo_automodel.components.models.common.hf_checkpointing_mixin import HFChe
 
 ---
 
-## Attention Class (CombinedQKVAttentionMixin)
+## Attention and MLP Weight Layouts
 
-Every custom attention class must inherit `CombinedQKVAttentionMixin` and `nn.Module`. The mixin provides `setup_qkv_projection()` and `compute_qkv()`.
+Use the current `LlamaAttention` and `LlamaMLP` in
+`components/models/llama/model.py` as references for separate projections:
 
-```python
-class NewModelAttention(CombinedQKVAttentionMixin, nn.Module):
-    def __init__(self, config, layer_idx: int):
-        super().__init__()
-        self.config = config
-        self.layer_idx = layer_idx
-        self.head_dim = getattr(config, "head_dim", config.hidden_size // config.num_attention_heads)
-        self.num_key_value_groups = config.num_attention_heads // config.num_key_value_heads
-        self.scaling = self.head_dim ** -0.5
+- Attention has `q_proj`, `k_proj`, `v_proj`, and `o_proj`. Q weights have shape
+  `[num_attention_heads * head_dim, hidden_size]`; K/V weights have shape
+  `[num_key_value_heads * head_dim, hidden_size]`. Preserve the reference bias
+  policy and apply the model's backend selection to each projection.
+- SwiGLU has `gate_proj`, `up_proj`, and `down_proj`. Gate/up weights have shape
+  `[intermediate_size, hidden_size]`; down weights have shape
+  `[hidden_size, intermediate_size]`. Preserve the reference activation and bias.
 
-        # Combined QKV projection -- ALWAYS use this
-        self.setup_qkv_projection(
-            hidden_size=config.hidden_size,
-            num_attention_heads=config.num_attention_heads,
-            num_key_value_heads=config.num_key_value_heads,
-            head_dim=self.head_dim,
-            bias=config.attention_bias,  # False for Llama, True for Qwen2
-        )
+Implement the model's own attention and MLP classes with these names and layouts
+when they match HF. Thread `BackendConfig` through construction and use
+`initialize_linear_module` for the selected linear backend. Verify forward and
+backward parity for every rewritten layer.
 
-        self.o_proj = nn.Linear(
-            config.num_attention_heads * self.head_dim,
-            config.hidden_size,
-            bias=config.attention_bias,
-        )
-
-    def forward(self, hidden_states, position_embeddings, attention_mask, ...):
-        input_shape = hidden_states.shape[:-1]
-        hidden_shape = (*input_shape, -1, self.head_dim)
-
-        # compute_qkv handles the interleaved layout split
-        q, k, v = self.compute_qkv(hidden_states)
-
-        query_states = q.view(hidden_shape).transpose(1, 2)
-        key_states = k.view(hidden_shape).transpose(1, 2)
-        value_states = v.view(hidden_shape).transpose(1, 2)
-
-        # Apply RoPE
-        cos, sin = position_embeddings
-        query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin)
-
-        # Attention (use HF's attention interface)
-        attention_interface = eager_attention_forward
-        if self.config._attn_implementation != "eager":
-            attention_interface = ALL_ATTENTION_FUNCTIONS[self.config._attn_implementation]
-
-        attn_output, attn_weights = attention_interface(
-            self, query_states, key_states, value_states, attention_mask,
-            dropout=0.0 if not self.training else self.attention_dropout,
-            scaling=self.scaling,
-            **kwargs,
-        )
-
-        attn_output = attn_output.reshape(*input_shape, -1).contiguous()
-        attn_output = self.o_proj(attn_output)
-        return attn_output, attn_weights
-```
-
-### QKV interleaved layout
-
-The `qkv_proj` weight is stored in KV-head-grouped interleaved order:
-
-```
-[Q_group_0 | K_0 | V_0 | Q_group_1 | K_1 | V_1 | ...]
-```
-
-Where each group has `(group_size * head_dim)` Q rows, `head_dim` K rows, `head_dim` V rows. This layout ensures `ColwiseParallel` TP sharding gives each rank complete KV-head groups. The `compute_qkv()` method handles the split.
-
----
-
-## MLP (CombinedGateUpMLP)
-
-For standard SwiGLU models, use `CombinedGateUpMLP` directly:
-
-```python
-from nemo_automodel.components.models.common import CombinedGateUpMLP
-
-class NewModelDecoderLayer(GradientCheckpointingLayer):
-    def __init__(self, config, layer_idx, backend):
-        super().__init__()
-        self.self_attn = NewModelAttention(config=config, layer_idx=layer_idx)
-        self.mlp = CombinedGateUpMLP(config=config)  # Uses config.hidden_act, config.intermediate_size
-        self.input_layernorm = initialize_rms_norm_module(
-            backend.rms_norm, config.hidden_size, eps=config.rms_norm_eps,
-        )
-        self.post_attention_layernorm = initialize_rms_norm_module(
-            backend.rms_norm, config.hidden_size, eps=config.rms_norm_eps,
-        )
-```
-
-`CombinedGateUpMLP` expects these config attributes:
-- `hidden_size` -- model dimension
-- `intermediate_size` -- MLP intermediate dimension
-- `hidden_act` -- activation name (e.g., `"silu"` for SwiGLU)
-- `mlp_bias` (optional, defaults to `False`) -- whether to use bias
-
-The gate_up weight uses a row-interleaved layout: `[gate_0, up_0, gate_1, up_1, ...]`
+If a model combines projections that HF stores separately, document its exact
+packing order and provide a model-owned state dict adapter. Matching tensor sizes alone does not
+prove the same axis order or interleaving. Do not fuse or split projections
+solely to add or remove an adapter.
 
 ---
 
@@ -152,8 +74,8 @@ from transformers.modeling_layers import GradientCheckpointingLayer
 class NewModelDecoderLayer(GradientCheckpointingLayer):
     def __init__(self, config, layer_idx: int, backend: BackendConfig):
         super().__init__()
-        self.self_attn = NewModelAttention(config=config, layer_idx=layer_idx)
-        self.mlp = CombinedGateUpMLP(config=config)
+        self.self_attn = NewModelAttention(config=config, layer_idx=layer_idx, backend=backend)
+        self.mlp = NewModelMLP(config=config, backend=backend)
         self.input_layernorm = initialize_rms_norm_module(
             backend.rms_norm, config.hidden_size, eps=config.rms_norm_eps,
         )
@@ -233,8 +155,7 @@ class NewModelForCausalLM(HFCheckpointingMixin, NewModelPreTrainedModel):
         self.vocab_size = config.vocab_size
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
 
-        # State dict adapter for HF<->custom conversion
-        self.state_dict_adapter = NewModelStateDictAdapter(config=self.config)
+        # Separate HF-compatible projections need no state dict adapter.
         self.post_init()
         if getattr(config, "tie_word_embeddings", False):
             self.tie_weights()
@@ -325,7 +246,7 @@ from nemo_automodel.components.models.common import (
 # Norm: selects TE or torch implementation
 self.norm = initialize_rms_norm_module(backend.rms_norm, hidden_size, eps=eps)
 
-# Linear: selects TE or torch implementation (used in MoE models, not in CombinedQKV models)
+# Linear: selects the configured implementation while preserving weight names and shapes
 self.proj = initialize_linear_module(backend.linear, in_features, out_features, bias=False)
 ```
 
@@ -341,40 +262,16 @@ if self.config._attn_implementation != "eager":
 
 ## State Dict Adapter
 
-For standard dense LLMs with combined QKV + combined gate_up, inherit `CombinedProjectionStateDictAdapter` directly. No overrides needed:
+Most custom models need a `StateDictAdapter` from
+`components/checkpoint/state_dict_adapter.py`. Implement `from_hf()` and
+`to_hf()` in the model package and test both conversion directions.
 
-```python
-# state_dict_adapter.py
-from nemo_automodel.components.models.common.combined_projection.state_dict_adapter import (
-    CombinedProjectionStateDictAdapter,
-)
+Llama, Qwen2, and Qwen3 are exceptions: their HF names and tensor layouts match,
+so they omit the adapter file and attribute. Keep the model's weight-tying logic.
 
-class NewModelStateDictAdapter(CombinedProjectionStateDictAdapter):
-    def __init__(self, config):
-        super().__init__(config)
-```
-
-The base class handles:
-- **from_hf()**: Merges separate `q_proj`, `k_proj`, `v_proj` into interleaved `qkv_proj`; merges `gate_proj`, `up_proj` into interleaved `gate_up_proj`; ties `lm_head.weight` to `embed_tokens.weight` when missing
-- **to_hf()**: Splits `qkv_proj` back to separate projections; splits `gate_up_proj` back; handles LoRA/DoRA adapter weights
-
-### When to override
-
-Override `from_hf()` / `to_hf()` when the model has:
-- Non-standard projection names (not `q_proj`/`k_proj`/`v_proj` or `gate_proj`/`up_proj`)
-- Additional weight transformations (e.g., FP8 dequantization in DeepSeek-V3)
-- Custom layers that need key renaming
-
-### DTensor bias handling
-
-The base class provides `_gather_1d_bias()` and `_restore_1d_bias()` for safe bias manipulation under TP. 1-D bias tensors are FSDP-sharded on dim 0, and the interleaved layout may not divide evenly across shards. The helpers all-gather the bias, perform the reshape, and re-shard:
-
-```python
-q_bias, orig = self._gather_1d_bias(hf_state_dict[q_bias_key])
-k_bias, _ = self._gather_1d_bias(hf_state_dict[k_bias_key])
-v_bias, _ = self._gather_1d_bias(hf_state_dict[v_bias_key])
-qkv_bias = self._restore_1d_bias(self._interleave_qkv(q_bias, k_bias, v_bias), orig)
-```
+Evaluate `supports_low_memory_dcp_load` per Section 2.6 of [SKILL.md](./SKILL.md).
+For distributed conversions, test tensor shapes, DTensor placements, values,
+and rank ownership with real distributed execution.
 
 ---
 
@@ -427,7 +324,7 @@ Common values:
 - `"colwise"` -- shard output dim
 - `"rowwise"` -- shard input dim (rows)
 
-The TP plan for internal layers (attention projections, MLP) is typically handled by the parallelizer based on attribute names (`qkv_proj`, `o_proj`, `gate_up_proj`, `down_proj`).
+The TP plan for internal layers (attention projections, MLP) is typically handled by the parallelizer based on attribute names (`q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`).
 
 ### _pp_plan
 

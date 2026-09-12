@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill for CUDA-Q installation, GPU simulation target selection, QPU access setup, multi-GPU execution, and Python @cudaq.kernel authoring guidance. <br>
+Developers and engineers use this skill for CUDA-Q quantum-classical programming setup, GPU and QPU simulation target selection, and Python @cudaq.kernel authoring guidance. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -43,23 +43,23 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-13 evaluation tasks (10 positive, 3 negative), 3 attempts per task in isolated sandbox pods. <br>
+13 evaluation tasks (10 positive, 3 negative) with 3 attempts per task in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against reference answers. <br>
-- Discoverability: Checks whether the expected skill was selected and activated when needed. <br>
-- Effectiveness: Checks whether the skill helped the agent complete the user's goal and follow expected workflow. <br>
-- Efficiency: Checks tool-call productivity and token usage efficiency. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Checks whether the user's goal was achieved and the expected workflow behavior was followed. <br>
+- Efficiency: Checks tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_execution`: Whether the expected skill was selected and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
+- `skill_efficiency`: Tool-call productivity. <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
@@ -67,15 +67,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.9% | 88.2% |
-| Security | 100.0% → 100.0% (±0.0 pts) | 84.6% → 92.3% (+7.7 pts) |
-| Correctness | 87.7% → 100.0% (+12.3 pts) | 92.3% → 95.4% (+3.1 pts) |
-| Discoverability | 97.5% | 93.0% |
-| Effectiveness | 67.1% → 85.4% (+18.3 pts) | 73.9% → 84.8% (+10.9 pts) |
-| Efficiency | 91.6% | 75.7% |
+| Overall | 93.6% | 89.2% |
+| Security | 100.0% → 100.0% (±0.0 points) | 85.7% → 92.3% (+6.6 points) |
+| Correctness | 92.3% → 98.5% (+6.2 points) | 90.0% → 98.5% (+8.5 points) |
+| Discoverability | 97.5% | 92.0% |
+| Effectiveness | 69.2% → 79.9% (+10.7 points) | 66.0% → 86.1% (+20.1 points) |
+| Efficiency | 91.9% | 77.1% |
 
 ## Skill Version(s): <br>
-1.1.1 (source: frontmatter) <br>
+1.1.2 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
