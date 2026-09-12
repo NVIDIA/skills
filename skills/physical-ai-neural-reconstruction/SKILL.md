@@ -38,7 +38,7 @@ metadata:
         folder: nre/
         upstream: nvcr.io/nvidia/nre/nre-ga
         tools_container: nvcr.io/nvidia/nre/nre-tools-ga
-        release_tag: release_26.04
+        release_tag: "26.04"  # NRE release; NGC image tags are 26.04.01 / 26.04 / 26 / latest (not `release_26.04`)
       - name: asset-harvester
         folder: asset-harvester/
         upstream: https://github.com/NVIDIA/asset-harvester
@@ -233,7 +233,7 @@ checkout.
 |------|-----------------|--------------|
 | `physical-ai-datasets` | `skills/physical-ai-datasets/` | Catalog and download recipes for every NVIDIA Physical AI dataset on Hugging Face (driving, robotics, manipulation, NuRec scenes, benchmarks). |
 | `ncore` | `skills/ncore/` | Converts any sensor recording to NCore V4 (the format NRE needs), upstream release `2026.04`. Also covers writing a new converter. |
-| `nre` | `skills/nre/` | The Neural Reconstruction Engine itself (`nvcr.io/nvidia/nre/nre-ga`, `nvcr.io/nvidia/nre/nre-tools-ga`, NRE `release_26.04`). Trains, performs carline adaptation, renders (locally, via warm `serve-grpc` + thin Python client / `batch_render_rgb`, or to an external simulator), exports meshes / point clouds / depth, edits actors, evaluates quality. |
+| `nre` | `skills/nre/` | The Neural Reconstruction Engine itself (`nvcr.io/nvidia/nre/nre-ga`, `nvcr.io/nvidia/nre/nre-tools-ga`, NRE 26.04 — image tags `26.04.01` / `26.04` / `latest`). Trains, performs carline adaptation, renders (locally, via warm `serve-grpc` + thin Python client / `batch_render_rgb`, or to an external simulator), exports meshes / point clouds / depth, edits actors, evaluates quality. |
 | `asset-harvester` | `skills/asset-harvester/` | Open-source Apache-2.0 pipeline (SparseViewDiT + TokenGS) that extracts individual 3D objects from sparse views in a driving clip and saves them as `.ply` Gaussian splats with metadata. |
 | `nurec-fixer` | `skills/nurec-fixer/` | Standalone NVIDIA **DiffusionHarmonizer** workflow — public successor to the older Fixer / Difix3D+ recipes — that cleans rendered frames, harmonizes inserted actors, evaluates PSNR/LPIPS, and optionally fine-tunes the model. |
 
@@ -321,7 +321,8 @@ Companion files (`references/`, `scripts/`, `assets/`) live next to
   or fixes on previously rendered frames.
 - Do not invent NRE / NCore / DiffusionHarmonizer commands from
   memory. Re-read the upstream sibling skill — versions move fast
-  (NRE `release_26.04` and NCore `2026.04` are the current pins).
+  (NRE 26.04 — pull `nvcr.io/nvidia/nre/nre-ga:26.04.01` or `:26.04`; the release name
+  `release_26.04` is not a valid image tag — and NCore `2026.04` are the current pins).
 - This router does not deploy infrastructure. Route AKS / OSMO /
   NIM Operator setup to
   `physical-ai-infrastructure-setup-and-resilient-scaling`.
@@ -362,7 +363,7 @@ Companion files (`references/`, `scripts/`, `assets/`) live next to
 | `test -f .../.agents/skills/SKILL.md` fails | Wrong upstream path — the index lives at `skills/nurec-index/SKILL.md` | Use `skills/nurec-index/SKILL.md` (or the `.agents/skills/` symlink alias) |
 | `403`/`401` pulling `nvidia/PhysicalAI-*` from HF | Gated license not accepted, or `HF_TOKEN` unset / wrong scope | Accept the gated license on Hugging Face, then `hf auth login` with a token that has `read` access |
 | `denied: requested access to the resource is denied` from `nvcr.io/nvidia/nre/*` | Missing or expired NGC key | `docker login nvcr.io` with `$oauthtoken` / `${NGC_CLI_API_KEY:-$NGC_API_KEY}`; rotate at `org.ngc.nvidia.com/setup/api-key` if needed |
-| `manifest unknown` / `not found` pulling an NRE image | Pulling the legacy un-suffixed name or a tag that channel never published | Pull the GA names `nvcr.io/nvidia/nre/nre-ga:latest` and `nvcr.io/nvidia/nre/nre-tools-ga:latest` |
+| `manifest unknown` / `not found` pulling an NRE image | Pulling the legacy un-suffixed name, or a release *name* used as a tag (e.g. `:release_26.04` — the GA channel publishes `26.04.01`, `26.04`, `26`, `latest`) | Pull the GA names with a published tag: `nvcr.io/nvidia/nre/nre-ga:26.04.01` (or `:latest`) and `nvcr.io/nvidia/nre/nre-tools-ga:latest`; list tags on the NGC catalog page for `nvidia/nre/nre-ga` |
 | `--renderer` or `export-custom-rig-trajectory` rejected as unknown | Cached image is older than `26.04` / `26.03` | Pull a `26.04+` GA image; `--image-format jpeg` works on every family, so don't fall back to PNG |
 | NRE refuses to load a clip ("not valid NCore V4") | Recording was not converted | Run the `ncore` skill before invoking `nre` |
 | `serve-grpc` cold-start latency dominates a Python loop | One-shot Docker invocation per render | Use the `nre` warm `serve-grpc` + thin Python client (`batch_render_rgb`) recipe; the warm fast path needs a `26.04+` image |
