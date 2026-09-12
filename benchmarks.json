@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 344,
-  "result_row_count": 3195,
+  "skill_count": 346,
+  "result_row_count": 3215,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -184,6 +184,26 @@
       "component": "CUDA-Q",
       "has_results": true,
       "average_uplift_pct": 8.68
+    },
+    {
+      "skill": "cudaq-importing",
+      "evaluation_date": "2026-09-11",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:85489ea0e566f515affb2b77d430f181d4180dffc638531af9c99f85f899a055",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "cudaq-importing",
+      "component": "CUDA-Q",
+      "has_results": true,
+      "average_uplift_pct": 7.83
     },
     {
       "skill": "cuopt-developer",
@@ -4155,6 +4175,26 @@
       "average_uplift_pct": 22.57
     },
     {
+      "skill": "nemo-retriever-mcp",
+      "evaluation_date": "2026-09-12",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:66c211f3143896abe07a31fd20994bea25e2de26ead9f3ede9af351fcbc969e5",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nemo-retriever-mcp",
+      "component": "NeMo Retriever",
+      "has_results": true,
+      "average_uplift_pct": 27.3
+    },
+    {
       "skill": "nemo-rl-auto-research",
       "evaluation_date": "2026-06-01",
       "environment": "local",
@@ -7396,6 +7436,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 77.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cudaq-importing",
+      "component": "CUDA-Q",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "cudaq-importing",
+      "component": "CUDA-Q",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "cudaq-importing",
+      "component": "CUDA-Q",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "cudaq-importing",
+      "component": "CUDA-Q",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "cudaq-importing",
+      "component": "CUDA-Q",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cudaq-importing",
+      "component": "CUDA-Q",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cudaq-importing",
+      "component": "CUDA-Q",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.8,
+      "uplift_pct": 10.6
+    },
+    {
+      "catalog_dir": "cudaq-importing",
+      "component": "CUDA-Q",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.1,
+      "uplift_pct": 16.4
+    },
+    {
+      "catalog_dir": "cudaq-importing",
+      "component": "CUDA-Q",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 76.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cudaq-importing",
+      "component": "CUDA-Q",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.6,
       "uplift_pct": null
     },
     {
@@ -24676,6 +24806,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 77.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-retriever-mcp",
+      "component": "NeMo Retriever",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 6.2
+    },
+    {
+      "catalog_dir": "nemo-retriever-mcp",
+      "component": "NeMo Retriever",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "nemo-retriever-mcp",
+      "component": "NeMo Retriever",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 60.0,
+      "uplift_pct": 42.5
+    },
+    {
+      "catalog_dir": "nemo-retriever-mcp",
+      "component": "NeMo Retriever",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 44.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "nemo-retriever-mcp",
+      "component": "NeMo Retriever",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-retriever-mcp",
+      "component": "NeMo Retriever",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-retriever-mcp",
+      "component": "NeMo Retriever",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 50.6,
+      "uplift_pct": 11.3
+    },
+    {
+      "catalog_dir": "nemo-retriever-mcp",
+      "component": "NeMo Retriever",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 44.3,
+      "uplift_pct": 15.8
+    },
+    {
+      "catalog_dir": "nemo-retriever-mcp",
+      "component": "NeMo Retriever",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-retriever-mcp",
+      "component": "NeMo Retriever",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.9,
       "uplift_pct": null
     },
     {

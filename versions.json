@@ -58,6 +58,13 @@
       "last_modified": "2026-09-11"
     },
     {
+      "name": "cudaq-importing",
+      "path": "skills/cudaq-importing",
+      "content_digest": "sha256:fd23ed27cd6e22ee694478ac987348c3be1c1d3ba95ffc4b3e32c5cf4bcbbd6f",
+      "last_commit": "4b64e3cfdb359e7e4ce0644460566800c1f03d55",
+      "last_modified": "2026-09-12"
+    },
+    {
       "name": "cuopt-developer",
       "path": "skills/cuopt-developer",
       "content_digest": "sha256:2146d5b9c801f3298e75179f6bd898c42a2c0ca26531fb2313b39449b99cf281",
@@ -1519,6 +1526,13 @@
       "content_digest": "sha256:4e3b83d18361842fe98cae8e34f935087db659a053be90d4431fa6e0f4f37837",
       "last_commit": "46293cb1dcc3b6984f1569cf8d819a387d5a9916",
       "last_modified": "2026-09-11"
+    },
+    {
+      "name": "nemo-retriever-mcp",
+      "path": "skills/nemo-retriever-mcp",
+      "content_digest": "sha256:61aa1e05217f2f8cf25a4da925853d20be758a0a0c8c19a7cfa7e72c1597bec0",
+      "last_commit": "4b64e3cfdb359e7e4ce0644460566800c1f03d55",
+      "last_modified": "2026-09-12"
     },
     {
       "name": "nemo-rl-auto-research",

@@ -97,6 +97,18 @@
       }
     },
     {
+      "path": "skills/cudaq-importing",
+      "name": "cudaq-importing",
+      "description": "Use when porting circuits from another framework (e.g. Qiskit) into CUDA-Q kernels while preserving the source algorithm and validation fidelity.",
+      "metadata": {
+        "product.primary": "CUDA-Q",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "quantum-computing",
+        "audience": "quantum_researcher,application_developer,hpc_developer,research_academic,developer",
+        "discovery.activity_tags": "migrate,convert,integrate,validate,transform"
+      }
+    },
+    {
       "path": "skills/cuopt-developer",
       "name": "cuopt-developer",
       "description": "Modify, build, test, debug, and contribute to NVIDIA cuOpt (C++/CUDA, Python, server, CI). Use for solver internals, PRs, DCO, and code conventions.",
@@ -2602,6 +2614,18 @@
         "catalog.subdomain": "agentic-ai",
         "audience": "developer,ai_engineer,data_engineer",
         "discovery.activity_tags": "extract,inspect,integrate,configure"
+      }
+    },
+    {
+      "path": "skills/nemo-retriever-mcp",
+      "name": "nemo-retriever-mcp",
+      "description": "Use when a task needs to search or add documents through NeMo Retriever MCP.",
+      "metadata": {
+        "product.primary": "NeMo Retriever",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "ai_engineer,application_developer,developer,ml_engineer,data_engineer",
+        "discovery.activity_tags": "integrate,extract,orchestrate,operate"
       }
     },
     {
