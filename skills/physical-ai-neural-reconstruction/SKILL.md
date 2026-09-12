@@ -40,7 +40,8 @@ metadata:
         tools_container: nvcr.io/nvidia/nre/nre-tools-ga
         release_tag: release_26.04
       - name: asset-harvester
-        folder: asset-harvester/
+        skill_repo: https://github.com/NVIDIA/asset-harvester
+        skill_path: skills/asset-harvester/
         upstream: https://github.com/NVIDIA/asset-harvester
         hf_model: https://huggingface.co/nvidia/asset-harvester
       - name: nurec-fixer
@@ -58,7 +59,7 @@ metadata:
 
 This is a **thin router** for NVIDIA Neural Reconstruction (NuRec)
 requests. It points at the upstream `nurec-index` skill at
-`https://github.com/NVIDIA/nurec-skills` and its five sibling skills
+`https://github.com/NVIDIA/nurec-skills` and its sibling skills
 (`physical-ai-datasets`, `ncore`, `nre`, `asset-harvester`,
 `nurec-fixer`). Use this skill to:
 
@@ -122,11 +123,14 @@ fetching the upstream. Downstream sibling skills require:
   `references/ngc-and-registry.md`).
 - **Hugging Face token** (`HF_TOKEN`) with the gated licenses
   **accepted in advance** on Hugging Face: `nvidia/PhysicalAI-*`
-  datasets, `nvidia/asset-harvester`, `nvidia/Harmonizer`, and
-  `nvidia/Cosmos-Predict2-0.6B-Text2Image`.
+  datasets, `nvidia/Harmonizer`, and
+  `nvidia/Cosmos-Predict2-0.6B-Text2Image`. The
+  `nvidia/asset-harvester` checkpoints themselves are public; its
+  optional DINOv3, Llama Guard and SAM 3D Body models are gated.
 - **Python 3.10+** with `huggingface_hub` installed;
   `pip install nvidia-ncore` for `ncore`; conda (Miniconda /
-  Miniforge) plus GCC 10–13 for `asset-harvester`.
+  Miniforge) for `asset-harvester`; it needs a GCC that `nvcc` accepts
+  (10–13 is the tested range, but `setup.sh` selects its own compiler).
 - **(Optional)** CARLA, Isaac Sim 5.1, or AlpaSim for simulator
   integration over `serve-grpc`.
 
@@ -226,15 +230,16 @@ Open that file when the user's task spans more than one sibling skill.
 ## Sibling skills (upstream)
 
 Refer to a sibling by its **name** — that is the portable identifier.
-The folder column is only where it lives in a local `nurec-skills`
-checkout.
+The folder column is where it lives in a local `nurec-skills` checkout,
+except where a repo is named — `asset-harvester` ships from its own
+product repo.
 
 | Name | Upstream folder | What it does |
 |------|-----------------|--------------|
 | `physical-ai-datasets` | `skills/physical-ai-datasets/` | Catalog and download recipes for every NVIDIA Physical AI dataset on Hugging Face (driving, robotics, manipulation, NuRec scenes, benchmarks). |
 | `ncore` | `skills/ncore/` | Converts any sensor recording to NCore V4 (the format NRE needs), upstream release `2026.04`. Also covers writing a new converter. |
 | `nre` | `skills/nre/` | The Neural Reconstruction Engine itself (`nvcr.io/nvidia/nre/nre-ga`, `nvcr.io/nvidia/nre/nre-tools-ga`, NRE `release_26.04`). Trains, performs carline adaptation, renders (locally, via warm `serve-grpc` + thin Python client / `batch_render_rgb`, or to an external simulator), exports meshes / point clouds / depth, edits actors, evaluates quality. |
-| `asset-harvester` | `skills/asset-harvester/` | Open-source Apache-2.0 pipeline (SparseViewDiT + TokenGS) that extracts individual 3D objects from sparse views in a driving clip and saves them as `.ply` Gaussian splats with metadata. |
+| `asset-harvester` | [`NVIDIA/asset-harvester`](https://github.com/NVIDIA/asset-harvester) → `skills/asset-harvester/` | Open-source Apache-2.0 pipeline (SparseViewDiT + TokenGS) that extracts individual 3D objects from sparse views in a driving clip and saves them as `.ply` Gaussian splats, optionally emitting `metadata.yaml` for the NuRec handoff. |
 | `nurec-fixer` | `skills/nurec-fixer/` | Standalone NVIDIA **DiffusionHarmonizer** workflow — public successor to the older Fixer / Difix3D+ recipes — that cleans rendered frames, harmonizes inserted actors, evaluates PSNR/LPIPS, and optionally fine-tunes the model. |
 
 For naming overlaps (NRE vs Fixer, ncore vs nre, AV-NuRec vs
@@ -244,13 +249,19 @@ Cosmos-Drive-Dreams, NuRec vs SimReady) see
 ## Locate and fetch the upstream skills
 
 Try the local disk first, in this order — a sibling skill already
-installed in the runtime is always preferable to a network fetch:
+installed in the runtime is preferable to a network fetch. This applies
+to the `nurec-skills`-hosted siblings; `asset-harvester` is fetched from
+its own repo (see `references/upstream-fetch.md`):
 
 1. `.agents/skills/<name>/SKILL.md` (Cursor, Codex, NemoClaw)
 2. `.claude/skills/<name>/SKILL.md` (Claude Code)
 3. `.cursor/skills/<name>/SKILL.md` (project-scoped)
 4. `~/.cursor/skills/<name>/SKILL.md` (personal skills)
 5. An existing `nurec-skills` clone under the shared upstream root.
+
+**This order covers the `nurec-skills`-hosted siblings only.**
+`asset-harvester` is not among them — see
+[`references/upstream-fetch.md`](references/upstream-fetch.md).
 
 **Only if none of those exist**, ask the user for explicit consent
 before cloning. A `git clone` is a network fetch of an external
@@ -296,8 +307,9 @@ Companion files (`references/`, `scripts/`, `assets/`) live next to
 - Refer to sibling skills by their `name:` (e.g. `nre`), not by repo
   path. Folder layouts can change; the name is portable.
 - **Never `git clone` the upstream without explicit user consent.**
-  Exhaust the local lookup order first, show the exact command, and
-  clone only into a path the user agreed to — never silently into
+  For the `nurec-skills` siblings, exhaust the local lookup order
+  first, show the exact command, and clone only into a path the user
+  agreed to — never silently into
   `/tmp`. Do not scan broad developer workspaces such as `~/Codes` or
   reuse unrelated old clones.
 - Use the GA container channel: `nvcr.io/nvidia/nre/nre-ga` and
@@ -331,16 +343,18 @@ Companion files (`references/`, `scripts/`, `assets/`) live next to
 - **Router only.** This skill never executes mutating NuRec commands.
   All training, rendering, conversion, and harmonization happens in
   upstream sibling skills.
-- **Upstream-pinned.** Recipes live in
-  `https://github.com/NVIDIA/nurec-skills`, which evolves outside
+- **Upstream-pinned.** Most recipes live in
+  `https://github.com/NVIDIA/nurec-skills`; `asset-harvester` lives in
+  `https://github.com/NVIDIA/asset-harvester`, which evolves outside
   this repo. Stale clones can drift; always refresh the upstream
   before relying on a sibling skill.
 - **Hand-curated catalogue.** A newly-added upstream sibling is not
   discoverable here until someone edits the tables (see
   [`references/maintenance.md`](references/maintenance.md)).
-- **Gated content.** `nvidia/PhysicalAI-*`, `nvidia/asset-harvester`,
-  `nvidia/Harmonizer`, and `nvidia/Cosmos-Predict2-0.6B-Text2Image`
-  require the user to accept license terms on Hugging Face first.
+- **Gated content.** `nvidia/PhysicalAI-*`, `nvidia/Harmonizer`, and
+  `nvidia/Cosmos-Predict2-0.6B-Text2Image` require the user to accept
+  license terms on Hugging Face first. For `asset-harvester` only its
+  optional DINOv3, Llama Guard and SAM 3D Body models are gated.
   The router cannot bypass this.
 - **Heavy footprint.** A complete NuRec workflow can leave 150 GB+
   on disk. See [`references/teardown.md`](references/teardown.md).
@@ -387,5 +401,8 @@ Procedure for adding new sibling skills, renames, or upstream URL
 changes lives in [`references/maintenance.md`](references/maintenance.md).
 Treat the upstream `nurec-index` at
 <https://github.com/NVIDIA/nurec-skills/blob/main/skills/nurec-index/SKILL.md>
-as authoritative; this skill mirrors only the picker tables, the
-workflow ordering, and the upstream fetch recipe.
+as authoritative **for the routing taxonomy and workflow ordering**;
+this skill mirrors only the picker tables, the workflow ordering, and
+the upstream fetch recipe. It is not authoritative for
+`asset-harvester`, which is maintained in
+<https://github.com/NVIDIA/asset-harvester>.
