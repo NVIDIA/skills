@@ -2595,13 +2595,13 @@
     {
       "path": "skills/nemo-retriever",
       "name": "nemo-retriever",
-      "description": "Use when the user wants to search, query, extract, transcribe, describe, quote, filter, or aggregate across documents — PDFs, scanned forms / images (`.jpg` `.png` `.tiff`), Office (`.docx` `.pptx`), text (`.html` `.txt`), audio (`.mp3` `.wav` `.m4a`), or video (`.mp4` `.mov`). Prefer this over native Read / Grep for multi-file or non-PDF corpora. Not for: editing files, web browsing, single-file plain-text lookups, fine-tuning.",
+      "description": "Use when searching, extracting, ingesting, or querying a document collection with the NeMo Retriever 26.8.1 CLI, including local LanceDB indexes and deployed Retriever services. Use for PDFs, images, Office files, HTML, text, audio, and video; not for editing documents or web search.",
       "metadata": {
         "product.primary": "NeMo Retriever",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "developer,ai_engineer,data_engineer",
-        "discovery.activity_tags": "extract,inspect,summarize,configure"
+        "discovery.activity_tags": "extract,inspect,integrate,configure"
       }
     },
     {

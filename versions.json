@@ -53,8 +53,8 @@
     {
       "name": "cudaq-guide",
       "path": "skills/cudaq-guide",
-      "content_digest": "sha256:b16e706ddfe2a5ac0e84aaa36d02a9fda8048212dde76c8a13874241a49bd41f",
-      "last_commit": "f382077400e4fbb65b9e0cc8613f945b86ab4b0e",
+      "content_digest": "sha256:1a71ecd2bcb906fdfadceb9dead2211135ed0b3327ff05c415da1821669b3555",
+      "last_commit": "46293cb1dcc3b6984f1569cf8d819a387d5a9916",
       "last_modified": "2026-09-11"
     },
     {
@@ -1278,16 +1278,16 @@
     {
       "name": "nemo-automodel-model-onboarding",
       "path": "skills/nemo-automodel-model-onboarding",
-      "content_digest": "sha256:7d1165c8f1d25ea8303b4058c72f17351d36c7ae5400361a2e11f2d577bc3fe5",
-      "last_commit": "4e80e505b1d0c16f6a391aef01aea9a299339dea",
-      "last_modified": "2026-08-01"
+      "content_digest": "sha256:0a0c795b9fe470caf654d54cd40fed64524baffffe986e862c9b071777e75533",
+      "last_commit": "46293cb1dcc3b6984f1569cf8d819a387d5a9916",
+      "last_modified": "2026-09-11"
     },
     {
       "name": "nemo-automodel-recipe-development",
       "path": "skills/nemo-automodel-recipe-development",
-      "content_digest": "sha256:beb99bc3fc68a4ad29b88d88fc5ecd4da176b24a4c200c000a1982da230dd251",
-      "last_commit": "e37c0a0aa49eea95122d3ec27bbeaa001f40b773",
-      "last_modified": "2026-06-29"
+      "content_digest": "sha256:545928b755153f33a012486227bf5ed8418f6f0d415c3b0b2935e19898b9ca37",
+      "last_commit": "46293cb1dcc3b6984f1569cf8d819a387d5a9916",
+      "last_modified": "2026-09-11"
     },
     {
       "name": "nemo-fabric-build-adapter",
@@ -1516,9 +1516,9 @@
     {
       "name": "nemo-retriever",
       "path": "skills/nemo-retriever",
-      "content_digest": "sha256:85d31f4dfdd5e818c47da130ec6f05ce4d95e106929c4300e441185d4e67b7cf",
-      "last_commit": "57a2f8743a622281160f823c9a835b5faae3973d",
-      "last_modified": "2026-06-01"
+      "content_digest": "sha256:4e3b83d18361842fe98cae8e34f935087db659a053be90d4431fa6e0f4f37837",
+      "last_commit": "46293cb1dcc3b6984f1569cf8d819a387d5a9916",
+      "last_modified": "2026-09-11"
     },
     {
       "name": "nemo-rl-auto-research",
