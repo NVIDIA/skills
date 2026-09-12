@@ -21,6 +21,7 @@
         "nemo-relay-plugin-build",
         "nemo-relay-plugin-observability",
         "nemo-retriever",
+        "nemo-retriever-mcp",
         "nemoclaw-user-guide",
         "nemotron-policy-generator",
         "nvidia-skill-finder",
@@ -344,7 +345,8 @@
       "title": "Quantum Computing",
       "description": "Build, run, and validate quantum and hybrid quantum-classical applications, including CUDA-Q development workflows.",
       "skills": [
-        "cudaq-guide"
+        "cudaq-guide",
+        "cudaq-importing"
       ]
     },
     {
