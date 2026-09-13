@@ -2857,6 +2857,114 @@
       }
     },
     {
+      "path": "skills/nvflare-autofl",
+      "name": "nvflare-autofl",
+      "description": "Use for agent-assisted Auto-FL optimization of an existing NVFLARE job in simulation, POC, or production. Do not use for code conversion, diagnosis-only work, or deployment setup.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,platform_engineer,developer",
+        "discovery.activity_tags": "optimize,evaluate,benchmark,compare,train"
+      }
+    },
+    {
+      "path": "skills/nvflare-autofl-report",
+      "name": "nvflare-autofl-report",
+      "description": "Generate a reproducible final report, literature-outcome synthesis, JSON summary, and refreshed progress plot for a stopped or interrupted NVFLARE Auto-FL campaign.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,data_scientist,ai_engineer,developer,platform_engineer",
+        "discovery.activity_tags": "generate,summarize,synthesize,evaluate,recover"
+      }
+    },
+    {
+      "path": "skills/nvflare-convert-huggingface",
+      "name": "nvflare-convert-huggingface",
+      "description": "Convert existing Hugging Face Transformers Trainer or TRL SFTTrainer training code into an NVFLARE federated job using flare.patch(trainer), local validation, and job export; use when the user names Hugging Face or preliminary source inspection identifies one Hugging Face owner, and not for manual PyTorch loops, Lightning, inference-only pipelines, deployment, or experiment workflows.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,data_scientist",
+        "discovery.activity_tags": "convert,train,validate,package,integrate"
+      }
+    },
+    {
+      "path": "skills/nvflare-convert-lightning",
+      "name": "nvflare-convert-lightning",
+      "description": "Convert existing PyTorch Lightning training code into an NVFLARE federated job using the Lightning Client API patch, local validation, and job export; use only when the request names federated/NVFLARE conversion or asks multiple sites to train collaboratively while keeping each site's data local, and either names PyTorch Lightning or preliminary source inspection identifies one Lightning owner; do not use for non-federated Lightning work such as DDP, profiling, inference serving, or training-loop changes, nor for plain PyTorch, TensorFlow/Keras, other frameworks, deployment, POC/production lifecycle, or experiment workflows.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,developer",
+        "discovery.activity_tags": "convert,integrate,train,validate,package"
+      }
+    },
+    {
+      "path": "skills/nvflare-convert-pytorch",
+      "name": "nvflare-convert-pytorch",
+      "description": "Convert existing plain or manual PyTorch training code into an NVFLARE federated job using Client API model exchange, local validation, and job export; use when the user names plain PyTorch or preliminary source inspection identifies one plain-PyTorch owner, and not for Lightning, other frameworks, deployment, POC/production lifecycle, or experiment workflows.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "convert,train,validate,package,integrate"
+      }
+    },
+    {
+      "path": "skills/nvflare-diagnose-job",
+      "name": "nvflare-diagnose-job",
+      "description": "Use when the user asks why a reported NVFLARE job failure signal occurred: the job failed, stalled, timed out, lost clients, ended with EXECUTION_EXCEPTION, or produced suspicious errors. Diagnose in simulation, POC, or production by collecting bounded evidence and mapping failure patterns to recovery actions.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,devops_engineer,platform_engineer,ai_engineer,production_operator",
+        "discovery.activity_tags": "troubleshoot,debug,recover,inspect,operate"
+      }
+    },
+    {
+      "path": "skills/nvflare-fed-stats",
+      "name": "nvflare-fed-stats",
+      "description": "Compute federated statistics over tabular data (count, sum, mean, stddev, var, histogram, quantile, noise-protected min/max) and image data (count, failure_count, pixel-intensity histogram) across NVFLARE sites via FedStatsRecipe — automatic and non-interactive from the dataset, feature names (header or supplied), and optionally a README or notes declaring which statistics to compute; do not use for model training conversion, hierarchical statistics, deployment, POC/production lifecycle, or failed-job diagnosis.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "data-science",
+        "audience": "ml_engineer,data_scientist,developer,data_engineer,ai_engineer",
+        "discovery.activity_tags": "measure,summarize,assess,generate"
+      }
+    },
+    {
+      "path": "skills/nvflare-orient",
+      "name": "nvflare-orient",
+      "description": "Route open-ended NVFLARE advice and only conversion requests whose preliminary source inspection reports unresolved or conflicting ownership; never load this skill merely to inspect a concrete conversion request before selecting its detected framework converter.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer,solutions_architect",
+        "discovery.activity_tags": "select,orchestrate,inspect,convert,configure"
+      }
+    },
+    {
+      "path": "skills/nvflare-shared",
+      "name": "nvflare-shared",
+      "description": "Internal NVFLARE conversion references and templates. Use only when another NVFLARE skill directs you to a shared workflow, policy, or asset.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "convert,configure,validate,integrate"
+      }
+    },
+    {
       "path": "skills/nvidia-skill-finder",
       "name": "nvidia-skill-finder",
       "description": "Use for NVIDIA-related requests where an NVIDIA skill might help, even if the user did not ask for a skill. Trigger on NVIDIA products, hardware, software, SDKs, GPUs, Jetson/JetPack/L4T/BSP/SDK Manager/driver/flashing/setup, CUDA, NIM, NeMo, Omniverse/OpenUSD/SimReady, RAPIDS/cuDF, cuPyNumeric, cuOpt, Dynamo, Holoscan, TensorRT, DeepStream, VSS, TAO, NGC/NVCF. Do not use for generic non-NVIDIA route, optimize, deploy, AI, video, data, or infrastructure tasks.",
