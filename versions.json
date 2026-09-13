@@ -1668,6 +1668,69 @@
       "last_modified": "2026-08-31"
     },
     {
+      "name": "nvflare-autofl",
+      "path": "skills/nvflare-autofl",
+      "content_digest": "sha256:56a440a829563823c6691a24d40264b68cd27bacfd654c88c33c7daa8a771930",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-autofl-report",
+      "path": "skills/nvflare-autofl-report",
+      "content_digest": "sha256:df3e310c28d4b7a45622334dd7d710736cdd004ff3afbfcde5fd2aadca56dfe2",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-convert-huggingface",
+      "path": "skills/nvflare-convert-huggingface",
+      "content_digest": "sha256:8dfdd1749879e2e4260539f51cceffab7693e66deadadb35cbaf46457e47c00a",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-convert-lightning",
+      "path": "skills/nvflare-convert-lightning",
+      "content_digest": "sha256:80b642eddbf89d493b21f50017562a3a01d477498f5ef804086b2a3b6f45dba8",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-convert-pytorch",
+      "path": "skills/nvflare-convert-pytorch",
+      "content_digest": "sha256:a39624c4438324f62f80b32e731843d0e25885e26ca8ea948da488f0f0cfaa55",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-diagnose-job",
+      "path": "skills/nvflare-diagnose-job",
+      "content_digest": "sha256:5c40476d6e3f3b6e9fe4b1e3b5a996ceb71f76e499b4e286a70123decaa54785",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-fed-stats",
+      "path": "skills/nvflare-fed-stats",
+      "content_digest": "sha256:26dcb728e5b0fb6f31572ad1de0c33c2fda19747e0992b1e21aba542a3de7dba",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-orient",
+      "path": "skills/nvflare-orient",
+      "content_digest": "sha256:853ba8a64c84cf27694fd5ea2ed39cfd6262539c8c8c88e952e5b92f016644ba",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-shared",
+      "path": "skills/nvflare-shared",
+      "content_digest": "sha256:ea8b3b84962cda04f54ec362139076c68dc585d7156440ad2c176ba38cb531b4",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
       "name": "nvidia-skill-finder",
       "path": "skills/nvidia-skill-finder",
       "content_digest": "sha256:7b680337b798b61256500d08095717541a89e4a523a0530867c49f98263ceb95",

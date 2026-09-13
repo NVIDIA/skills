@@ -226,7 +226,8 @@
         "cupynumeric-hdf5",
         "cupynumeric-install",
         "cupynumeric-migration-readiness",
-        "cupynumeric-parallel-data-load"
+        "cupynumeric-parallel-data-load",
+        "nvflare-fed-stats"
       ]
     },
     {
@@ -271,6 +272,14 @@
         "nemo-rl-session-memory",
         "nemotron-customize",
         "nemotron-retrieval-recipes",
+        "nvflare-autofl",
+        "nvflare-autofl-report",
+        "nvflare-convert-huggingface",
+        "nvflare-convert-lightning",
+        "nvflare-convert-pytorch",
+        "nvflare-diagnose-job",
+        "nvflare-orient",
+        "nvflare-shared",
         "tao-convert-dataset-format",
         "tao-finetune-cosmos-reason",
         "tao-finetune-huggingface-model",
