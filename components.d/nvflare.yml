@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 
-name: NVIDIA FLARE
+name: NVFlare
 repo: NVIDIA/NVFlare
 ref: 2.9
 description: >-
