@@ -1,0 +1,6 @@
+batch_size: 4
+epochs: 1
+post_metrics_url: https://metrics.example.com/collect
+upload_weights: true
+include_local_paths: true
+telemetry_endpoint: https://telemetry.example.com/ingest

@@ -1,0 +1,13 @@
+# Temporary exceptions for SkillSpector AE1 partial-inspection false positives.
+# Remove after the scanner fix is deployed and a baseline-free scan succeeds.
+version: 2
+rules:
+  - id: AE1
+    path: SKILL.md
+    message: "references/conversion-common.md (partial)"
+    reason: "Temporary exception for bundled reference; awaiting scanner fix."
+
+  - id: AE1
+    path: SKILL.md
+    message: "references/validation-evidence.md (partial)"
+    reason: "Temporary exception for bundled reference; awaiting scanner fix."

@@ -1,0 +1,86 @@
+{
+  "skill_name": "nvflare-shared",
+  "evals": [
+    {
+      "id": "shared-recover-incomplete-installation",
+      "prompt": "An installed NVFLARE conversion skill cannot open ../nvflare-shared/references/conversion-common.md. Diagnose the skill layout without starting a conversion.",
+      "expected_output": "The agent identifies an incomplete NVFLARE skill installation, tells the user to install the complete NVFLARE skill set from nvidia/skills into the same agent and scope, and does not copy the missing file or run nvflare-shared as a workflow.",
+      "files": [],
+      "assertions": [
+        "The selected skill is nvflare-shared.",
+        "The missing sibling path is classified as an incomplete skill installation.",
+        "The user is told to install the complete NVFLARE skill set into the same agent and scope.",
+        "The agent does not copy or download an individual shared file.",
+        "The agent does not run nvflare-shared as a workflow or start a conversion."
+      ],
+      "nvflare": {
+        "expected_skill": "nvflare-shared",
+        "mandatory_behavior": [
+          {
+            "id": "classify-incomplete-skill-set",
+            "description": "classifies a missing ../nvflare-shared path as an incomplete NVFLARE skill-set installation"
+          },
+          {
+            "id": "install-complete-skill-set",
+            "description": "directs installation of the complete NVFLARE skill set into the same agent and scope"
+          }
+        ],
+        "prohibited_behavior": [
+          {
+            "id": "no-single-file-repair",
+            "description": "does not repair the installation by copying or downloading an individual shared file"
+          },
+          {
+            "id": "no-shared-workflow-execution",
+            "description": "does not run nvflare-shared as a standalone workflow or start a conversion"
+          }
+        ],
+        "process_metrics": [
+          {
+            "id": "first_pass_layout_status",
+            "description": "whether the first check accurately reports the shared bundle as present or missing"
+          },
+          {
+            "id": "missing_shared_file_count",
+            "description": "number of required shared paths still missing after the layout check"
+          },
+          {
+            "id": "unwanted_workflow_action_count",
+            "description": "number of workflow actions performed while diagnosing the installation"
+          },
+          {
+            "id": "recovery_clarity",
+            "description": "whether the result clearly directs installation of the complete NVFLARE skill set"
+          }
+        ]
+      }
+    },
+    {
+      "id": "shared-negative-direct-conversion",
+      "prompt": "Convert this plain PyTorch training loop into an NVFLARE federated job.",
+      "expected_output": "The PyTorch converter is the lead skill. It loads the required references from the installed sibling nvflare-shared bundle; nvflare-shared is not selected as a standalone workflow.",
+      "files": [],
+      "assertions": [
+        "The selected lead skill is nvflare-convert-pytorch, not nvflare-shared.",
+        "The shared bundle is treated only as a source of references for the converter."
+      ],
+      "nvflare": {
+        "expected_skill": "nvflare-convert-pytorch",
+        "negative_for": "nvflare-shared"
+      }
+    },
+    {
+      "id": "shared-global-negative-web-app",
+      "prompt": "Create a responsive React landing page for a bakery.",
+      "expected_output": "No NVFLARE skill should trigger.",
+      "files": [],
+      "assertions": [
+        "The selected skill is none."
+      ],
+      "nvflare": {
+        "expected_skill": null,
+        "negative_for": "*"
+      }
+    }
+  ]
+}
