@@ -1,0 +1,17 @@
+# Temporary exceptions for SkillSpector AE1 partial-inspection false positives.
+# Remove after the scanner fix is deployed and a baseline-free scan succeeds.
+version: 2
+rules:
+  - id: AE1
+    path: SKILL.md
+    message: "scripts/run_job_campaign.py (partial)"
+    reason: "Temporary exception for bundled script; awaiting scanner fix."
+  - id: AE1
+    path: SKILL.md
+    message: "scripts/job_importer.py (partial)"
+    reason: "Temporary exception for bundled script; awaiting scanner fix."
+
+  - id: AE1
+    path: SKILL.md
+    message: "SKILL.md (partial)"
+    reason: "Temporary exception for scanner self-reference; awaiting scanner fix."
