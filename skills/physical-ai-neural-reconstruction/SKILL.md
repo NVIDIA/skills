@@ -103,82 +103,31 @@ then follow that skill's body.
 ## Prerequisites
 
 The router itself has no runtime prerequisites beyond `git` for
-fetching the upstream. Downstream sibling skills require:
+fetching the upstream. Downstream sibling skills need Linux x86_64, an
+NVIDIA GPU (Ampere+, CUDA 12.8, >= 24 GB VRAM), Docker plus the NVIDIA
+Container Toolkit, an NGC API key, a Hugging Face token with the
+relevant gated licenses already accepted, and Python 3.10+.
 
-- **Linux x86_64** — aarch64 is not supported by `nre`.
-- **NVIDIA GPU + driver** — CUDA 12.8 capability and >= 24 GB VRAM
-  (48 GB+ recommended). Ampere (A100/A10/A40/RTX A6000), Ada
-  (L20/L40/L40S), Hopper (H100/H20): R550+ required, R570+
-  recommended. Blackwell (RTX Pro 6000D): R580+.
-  `asset-harvester` needs driver >= 570 and ~16 GB VRAM.
-- **Docker >= 23.0.1 + NVIDIA Container Toolkit >= 1.13.5** — for the
-  `nre`, `nre-tools`, and `nurec-fixer` containers
-  (`nvcr.io/nvidia/nre/nre-ga:latest`,
-  `nvcr.io/nvidia/nre/nre-tools-ga:latest`, and the locally-built
-  `harmonizer-cosmos-env` image layered on
-  `nvcr.io/nvidia/pytorch:25.10-py3`).
-- **NGC API key** — for pulling `nvcr.io` containers. Resolution
-  order is `$NGC_CLI_API_KEY` first, then `$NGC_API_KEY`, and only
-  then prompt the user (see `nre`'s
-  `references/ngc-and-registry.md`).
-- **Hugging Face token** (`HF_TOKEN`) with the gated licenses
-  **accepted in advance** on Hugging Face: `nvidia/PhysicalAI-*`
-  datasets, `nvidia/Harmonizer`, and
-  `nvidia/Cosmos-Predict2-0.6B-Text2Image`. The
-  `nvidia/asset-harvester` checkpoints themselves are public; its
-  optional DINOv3, Llama Guard and SAM 3D Body models are gated.
-- **Python 3.10+** with `huggingface_hub` installed;
-  `pip install nvidia-ncore` for `ncore`; conda (Miniconda /
-  Miniforge) for `asset-harvester`; it needs a GCC that `nvcc` accepts
-  (10–13 is the tested range, but `setup.sh` selects its own compiler).
-- **(Optional)** CARLA, Isaac Sim 5.1, or AlpaSim for simulator
-  integration over `serve-grpc`.
-
-Prefer each sibling's `scripts/validate_setup.py` (present in `nre`,
-`asset-harvester`, and `nurec-fixer`) over hand-written checks. For
-skills without one (`ncore`, `physical-ai-datasets`, this router),
-verify secrets without echoing values:
-
-```bash
-hf auth whoami
-[ -n "${HF_TOKEN:-}" ]         && echo "HF_TOKEN length=${#HF_TOKEN}"                 || echo "HF_TOKEN unset"
-[ -n "${NGC_CLI_API_KEY:-}" ]  && echo "NGC_CLI_API_KEY length=${#NGC_CLI_API_KEY}"   || echo "NGC_CLI_API_KEY unset"
-[ -n "${NGC_API_KEY:-}" ]      && echo "NGC_API_KEY length=${#NGC_API_KEY}"           || echo "NGC_API_KEY unset"
-```
-
-See [`references/secrets-handling.md`](references/secrets-handling.md)
-for the bash anti-patterns to avoid.
+Full per-skill detail — driver floors, container names, key resolution
+order, which Hugging Face assets are gated, and how to verify secrets
+without echoing them — is in
+[`references/prerequisites.md`](references/prerequisites.md). Prefer
+each sibling's `scripts/validate_setup.py` over hand-written checks.
 
 ## What is NuRec?
 
-**NuRec** (NVIDIA Omniverse Neural Reconstruction) takes camera,
+**NuRec** (NVIDIA Omniverse Neural Reconstruction) turns camera,
 LiDAR, radar, or stereo recordings — typically from a self-driving car
-or a robot — and turns them into a 3D scene you can re-render from any
-viewpoint. Names that come up a lot:
+or a robot — into a 3D scene that can be re-rendered from any
+viewpoint. A typical project runs in three stages: get the input
+(convert a recording with `ncore`, or download a ready-made dataset
+with `physical-ai-datasets`), train the reconstruction (`nre`, which
+emits a USDZ), then render new views (`nre`). Projects that only want
+to *use* a scene NVIDIA already published skip the training stage.
 
-- **NRE** — "Neural Reconstruction Engine". NuRec is the product; NRE
-  is the engine that trains and renders. Both route to the upstream
-  `nre` skill.
-- **USDZ** — the file format of a trained scene. A zip archive that
-  Omniverse, Isaac Sim, and CARLA can open.
-- **NCore V4** — the input format NRE consumes. Raw recordings must be
-  converted to NCore V4 before training.
-- **3DGUT / 3DGRT** — the two 3D Gaussian Splatting flavours used
-  internally by NRE. The default Hydra recipe picks one; most users
-  never set it manually.
-
-A typical NuRec project has three stages:
-
-1. **Get the input** — convert your own recording to NCore V4
-   (`ncore`), or download a pre-converted dataset
-   (`physical-ai-datasets`).
-2. **Train the reconstruction** — feed NCore V4 to NRE; out comes a
-   USDZ (`nre`).
-3. **Render new views** — render images, videos, or LiDAR sweeps from
-   the USDZ (`nre`).
-
-Projects that just want to *use* an existing NVIDIA-published scene
-skip step 2.
+Background on the vocabulary — NRE vs NuRec, USDZ, NCore V4, 3DGUT /
+3DGRT — is in
+[`references/what-is-nurec.md`](references/what-is-nurec.md).
 
 ## Pick a skill
 
@@ -297,8 +246,9 @@ cat "$UPSTREAM_ROOT/nurec-skills/skills/nurec-index/SKILL.md"  # upstream router
 cat "$UPSTREAM_ROOT/nurec-skills/skills/<folder>/SKILL.md"     # sibling
 ```
 
-Companion files (`references/`, `scripts/`, `assets/`) live next to
-**the sibling's** `SKILL.md`, not next to this router.
+Companion files (`references/`, `scripts/`, `assets/`) ship inside
+**the sibling's own skill directory**, alongside its skill definition
+— not next to this router.
 
 ## Hard Rules
 
@@ -370,20 +320,12 @@ Companion files (`references/`, `scripts/`, `assets/`) live next to
 
 ## Troubleshooting
 
-| Error / symptom | Likely cause | Solution |
-|-----------------|--------------|----------|
-| `nurec-skills` clone missing or empty | Upstream not fetched yet | Walk the local lookup order, then ask consent and run the clone block in [Locate and fetch the upstream skills](#locate-and-fetch-the-upstream-skills) |
-| `test -f .../.agents/skills/SKILL.md` fails | Wrong upstream path — the index lives at `skills/nurec-index/SKILL.md` | Use `skills/nurec-index/SKILL.md` (or the `.agents/skills/` symlink alias) |
-| `403`/`401` pulling `nvidia/PhysicalAI-*` from HF | Gated license not accepted, or `HF_TOKEN` unset / wrong scope | Accept the gated license on Hugging Face, then `hf auth login` with a token that has `read` access |
-| `denied: requested access to the resource is denied` from `nvcr.io/nvidia/nre/*` | Missing or expired NGC key | `docker login nvcr.io` with `$oauthtoken` / `${NGC_CLI_API_KEY:-$NGC_API_KEY}`; rotate at `org.ngc.nvidia.com/setup/api-key` if needed |
-| `manifest unknown` / `not found` pulling an NRE image | Pulling the legacy un-suffixed name or a tag that channel never published | Pull the GA names `nvcr.io/nvidia/nre/nre-ga:latest` and `nvcr.io/nvidia/nre/nre-tools-ga:latest` |
-| `--renderer` or `export-custom-rig-trajectory` rejected as unknown | Cached image is older than `26.04` / `26.03` | Pull a `26.04+` GA image; `--image-format jpeg` works on every family, so don't fall back to PNG |
-| NRE refuses to load a clip ("not valid NCore V4") | Recording was not converted | Run the `ncore` skill before invoking `nre` |
-| `serve-grpc` cold-start latency dominates a Python loop | One-shot Docker invocation per render | Use the `nre` warm `serve-grpc` + thin Python client (`batch_render_rgb`) recipe; the warm fast path needs a `26.04+` image |
-| Output files are owned by `root` after a `docker run` | `-u $(id -u):$(id -g)` was missing | `sudo chown -R "$(id -u):$(id -g)" <output_dir>`; add the `-u` flag next time |
-| Frames have ghosting / floaters / flicker after rendering | Inline cleanup not enabled | Re-render with `nre --enable-difix`, or post-process with `nurec-fixer` (DiffusionHarmonizer) |
-| Stale names (`ncore-data-conversion`, `nvidia/Fixer`, `nvidia/DiffusionHarmonizer` weights) in agent output | Out-of-date cached skill | Update to `ncore` and `nurec-fixer`; the model now lives at `nvidia/Harmonizer` — see [`references/maintenance.md`](references/maintenance.md) |
-| Bash anti-pattern `${HF_TOKEN:+yes}${HF_TOKEN:-no}` echoed token value | Misuse of bash parameter expansion | Rotate the token; use `hf auth whoami` or length-only checks (see [`references/secrets-handling.md`](references/secrets-handling.md)) |
+Routing-level symptoms — a missing upstream clone, gated-asset `403`s,
+NGC login failures, `manifest unknown` on an NRE image, stale cached
+skill names — are tabulated in
+[`references/troubleshooting.md`](references/troubleshooting.md).
+Symptoms specific to a sibling's own commands belong to that sibling's
+skill.
 
 ## Cross-skill teardown
 
