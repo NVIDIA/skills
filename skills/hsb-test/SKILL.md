@@ -31,6 +31,8 @@ metadata:
 
 # HSB QA Test Runner
 
+<!-- NVSkills public-fork end-to-end test; do not merge. -->
+
 Use this skill when the user wants to execute a QA test plan against an HSB board and devkit. The skill reads a test document (local file or web link), filters tests to those that can run automatically on the user's specific hardware setup, executes each test with pass/fail evaluation, and produces a comprehensive results report.
 
 This skill assumes the devkit is already set up (SSH, demo container built, host configured, board connected). If setup is not complete, it will offer to invoke `/hsb-setup` first.
