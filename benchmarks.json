@@ -5030,13 +5030,13 @@
     },
     {
       "skill": "physical-ai-neural-reconstruction",
-      "evaluation_date": "2026-09-02",
+      "evaluation_date": "2026-09-15",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:be81cdb0740b0f4d42cef1ea2512c5ce39842d5218a9e6cb9d87a601834fadc4",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 4,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -5046,7 +5046,7 @@
       "catalog_dir": "physical-ai-neural-reconstruction",
       "component": "Physical AI",
       "has_results": true,
-      "average_uplift_pct": 29.6
+      "average_uplift_pct": 24.72
     },
     {
       "skill": "physical-ai-video-data-augmentation",
@@ -28343,7 +28343,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 95.0,
-      "uplift_pct": 60.0
+      "uplift_pct": 61.7
     },
     {
       "catalog_dir": "physical-ai-neural-reconstruction",
@@ -28351,8 +28351,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 0.0
+      "score_pct": 100.0,
+      "uplift_pct": 5.0
     },
     {
       "catalog_dir": "physical-ai-neural-reconstruction",
@@ -28361,7 +28361,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 38.0
+      "uplift_pct": null
     },
     {
       "catalog_dir": "physical-ai-neural-reconstruction",
@@ -28369,35 +28369,35 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 30.0
-    },
-    {
-      "catalog_dir": "physical-ai-neural-reconstruction",
-      "component": "Physical AI",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 78.0,
-      "uplift_pct": 51.0
-    },
-    {
-      "catalog_dir": "physical-ai-neural-reconstruction",
-      "component": "Physical AI",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 61.0,
-      "uplift_pct": 17.0
-    },
-    {
-      "catalog_dir": "physical-ai-neural-reconstruction",
-      "component": "Physical AI",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
       "score_pct": 95.0,
-      "uplift_pct": 42.0
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "physical-ai-neural-reconstruction",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 79.4,
+      "uplift_pct": 57.2
+    },
+    {
+      "catalog_dir": "physical-ai-neural-reconstruction",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 69.4,
+      "uplift_pct": 24.4
+    },
+    {
+      "catalog_dir": "physical-ai-neural-reconstruction",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.4,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "physical-ai-neural-reconstruction",
@@ -28405,8 +28405,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 58.0
+      "score_pct": 83.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "physical-ai-video-data-augmentation",
