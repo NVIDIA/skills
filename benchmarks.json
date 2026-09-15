@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 355,
-  "result_row_count": 3275,
+  "skill_count": 365,
+  "result_row_count": 3370,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -27,15 +27,15 @@
   "skills": [
     {
       "skill": "accelerated-computing-cudf",
-      "evaluation_date": "2026-05-29",
-      "environment": "local",
-      "evaluator_version": null,
-      "dataset_digest": null,
+      "evaluation_date": "2026-09-11",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:307ff81fa3f0d04ee89889dcedc5ac0208fc0eb5dba112e1c8ed515a08fa3ba9",
       "validation_status": null,
       "tasks": 13,
-      "attempts_per_task": 2,
-      "pass_threshold_pct": 50.0,
-      "verdict": "PASS",
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "INCOMPLETE",
       "agents": [
         "claude-code",
         "codex"
@@ -43,7 +43,7 @@
       "catalog_dir": "accelerated-computing-cudf",
       "component": "cuDF",
       "has_results": true,
-      "average_uplift_pct": 11.0
+      "average_uplift_pct": -3.73
     },
     {
       "skill": "aiq-deploy",
@@ -164,6 +164,166 @@
       "component": "DeepStream",
       "has_results": true,
       "average_uplift_pct": 23.3
+    },
+    {
+      "skill": "kermt-add-cmim-pretrain",
+      "evaluation_date": "2026-09-14",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:67190f2c3c6d387ac214662edede46001c6cf423a2cd1b21f2ba57a5584b1e42",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
+      "component": "BioNeMo KERMT",
+      "has_results": true,
+      "average_uplift_pct": 30.63
+    },
+    {
+      "skill": "kermt-continue-pretrain",
+      "evaluation_date": "2026-09-14",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:f5e787fbd9dc575e68c455c1076c60078b1cf859aa0fd4001e50e261fb8a7e46",
+      "validation_status": null,
+      "tasks": 5,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-kermt-continue-pretrain",
+      "component": "BioNeMo KERMT",
+      "has_results": true,
+      "average_uplift_pct": 29.17
+    },
+    {
+      "skill": "kermt-embed",
+      "evaluation_date": "2026-09-15",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:150b82ffdc6a29ff51ba6509f4ed70d6074e5944b957cdbd6c76f42ea048a482",
+      "validation_status": null,
+      "tasks": 5,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-kermt-embed",
+      "component": "BioNeMo KERMT",
+      "has_results": true,
+      "average_uplift_pct": 21.43
+    },
+    {
+      "skill": "kermt-finetune",
+      "evaluation_date": "2026-09-15",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:78e80c1a73622d5a07c1526f6270c42770347f5faa77969107e6cc60de50bc41",
+      "validation_status": null,
+      "tasks": 5,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-kermt-finetune",
+      "component": "BioNeMo KERMT",
+      "has_results": true,
+      "average_uplift_pct": 29.8
+    },
+    {
+      "skill": "kermt-infer",
+      "evaluation_date": "2026-09-15",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:517c8a976ea37ee217ad5779f5e01f7533ffb45540b1496c22de3dd14d114490",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-kermt-infer",
+      "component": "BioNeMo KERMT",
+      "has_results": true,
+      "average_uplift_pct": 25.2
+    },
+    {
+      "skill": "kermt-monitor",
+      "evaluation_date": "2026-09-15",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:07abc6b8571fbe0834b32b54b3b59557850ed1cf086115b3a90f60a77bf55546",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-kermt-monitor",
+      "component": "BioNeMo KERMT",
+      "has_results": true,
+      "average_uplift_pct": 34.45
+    },
+    {
+      "skill": "kermt-pretrain-scratch",
+      "evaluation_date": "2026-09-15",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:9e8d2c01c27435b23630efc8c43be8af9a181db81ff28ec5b78b169ec8877548",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-kermt-pretrain-scratch",
+      "component": "BioNeMo KERMT",
+      "has_results": true,
+      "average_uplift_pct": 26.6
+    },
+    {
+      "skill": "kermt-setup",
+      "evaluation_date": "2026-09-15",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:acc9600691efbd2c4b9356f2ca6f5e3a58ccccbf8772a88bf444c1b00baa43e3",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-kermt-setup",
+      "component": "BioNeMo KERMT",
+      "has_results": true,
+      "average_uplift_pct": 29.48
     },
     {
       "skill": "cudaq-guide",
@@ -327,13 +487,13 @@
     },
     {
       "skill": "cuopt-server-api-python",
-      "evaluation_date": "2026-08-25",
-      "environment": "local",
-      "evaluator_version": "1.3.2",
+      "evaluation_date": "2026-09-15",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:89ad304517df359a8c33a1f67da3ad9df8aeae5ec234d2adbed1593bf49c4ebc",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 8,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -343,7 +503,7 @@
       "catalog_dir": "cuopt-server-api-python",
       "component": "cuOpt",
       "has_results": true,
-      "average_uplift_pct": 33.9
+      "average_uplift_pct": 27.32
     },
     {
       "skill": "cupynumeric-hdf5",
@@ -574,13 +734,13 @@
     },
     {
       "skill": "dicom-metadata-extract",
-      "evaluation_date": "2026-08-30",
+      "evaluation_date": "2026-09-14",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:1c4acd30852c7efd65d9d439bca3bcb67f590e7024f3e1cdfbbfc3f6660f1771",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 2,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -590,17 +750,17 @@
       "catalog_dir": "dicom-metadata-extract",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 24.3
+      "average_uplift_pct": 20.57
     },
     {
       "skill": "dicom-series-preflight",
-      "evaluation_date": "2026-08-30",
+      "evaluation_date": "2026-09-14",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:62a39511ef1fe2d4954937d2a8a22b8e447484afd22c4b0ef6cf8e2f26b337ff",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 3,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -610,17 +770,17 @@
       "catalog_dir": "dicom-series-preflight",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 29.7
+      "average_uplift_pct": 27.12
     },
     {
       "skill": "dicom-series-to-volume",
-      "evaluation_date": "2026-08-30",
+      "evaluation_date": "2026-09-14",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:bfacb419e825a1845f5733e67b39a317b761af0a12a5e2b640238ea1106733e4",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 2,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -630,7 +790,7 @@
       "catalog_dir": "dicom-series-to-volume",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 14.7
+      "average_uplift_pct": 36.15
     },
     {
       "skill": "digital-health-clinical-asr-build",
@@ -1948,6 +2108,46 @@
       "component": "Earth2Studio",
       "has_results": true,
       "average_uplift_pct": 1.1
+    },
+    {
+      "skill": "foundationpose-pipeline",
+      "evaluation_date": "2026-09-14",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:f671734a1317f7de7e137bc852a4c77987f93e55e68492747533d3ed7b5f81dd",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "foundationpose-pipeline",
+      "component": "FoundationPose Perception Pipeline",
+      "has_results": true,
+      "average_uplift_pct": 19.6
+    },
+    {
+      "skill": "foundationpose-setup",
+      "evaluation_date": "2026-09-14",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:630465a8eabab5dc1555b505a71728ed5e9bf504f29da89fde0808baaa447d61",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "foundationpose-setup",
+      "component": "FoundationPose Perception Pipeline",
+      "has_results": true,
+      "average_uplift_pct": 15.42
     },
     {
       "skill": "holohub-app-lifecycle",
@@ -3416,13 +3616,13 @@
     },
     {
       "skill": "medtech-model-evidence-export",
-      "evaluation_date": "2026-08-29",
+      "evaluation_date": "2026-09-14",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:20dc012111b0aa3dc1ff37d9ba71d5f505c9fccdf540783bcb0acf6764f3c4b7",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 4,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -3432,7 +3632,7 @@
       "catalog_dir": "medtech-model-evidence-export",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 21.6
+      "average_uplift_pct": 40.25
     },
     {
       "skill": "nemo-automodel-distributed-training",
@@ -4296,15 +4496,15 @@
     },
     {
       "skill": "nemotron-asr-finetune",
-      "evaluation_date": "2026-07-15",
-      "environment": "astra-sandbox",
-      "evaluator_version": null,
-      "dataset_digest": null,
+      "evaluation_date": "2026-09-11",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:1265bdc5a4c5f3bcc2526b4d79cee536998a77dcc82765150ae3cbc7bcb05c2d",
       "validation_status": null,
-      "tasks": 9,
-      "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
-      "verdict": "PASS",
+      "tasks": 17,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "INCOMPLETE",
       "agents": [
         "claude-code",
         "codex"
@@ -4312,7 +4512,7 @@
       "catalog_dir": "nemotron-asr-finetune",
       "component": "Nemotron Speech",
       "has_results": true,
-      "average_uplift_pct": 28.0
+      "average_uplift_pct": 17.4
     },
     {
       "skill": "nemotron-customize",
@@ -4376,13 +4576,13 @@
     },
     {
       "skill": "nemotron-speech",
-      "evaluation_date": "2026-08-20",
-      "environment": "local",
-      "evaluator_version": "1.3.2",
+      "evaluation_date": "2026-09-15",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:7da18a129d0ad5efdc392d764333668f68f9acf996152684bc2464427afdb20f",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 18,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -4392,7 +4592,7 @@
       "catalog_dir": "nemotron-speech",
       "component": "Nemotron Speech",
       "has_results": true,
-      "average_uplift_pct": 22.3
+      "average_uplift_pct": 18.87
     },
     {
       "skill": "nv-generate-ct-rflow",
@@ -4436,13 +4636,13 @@
     },
     {
       "skill": "nv-generate-mr-brain",
-      "evaluation_date": "2026-08-29",
+      "evaluation_date": "2026-09-14",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:cd7314cae4d2269a61962e6b3e8e7cc821983453218701162a4526ceecd5ee28",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 3,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -4452,17 +4652,17 @@
       "catalog_dir": "nv-generate-mr-brain",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 47.0
+      "average_uplift_pct": 46.83
     },
     {
       "skill": "nv-generate-mr-brain-finetune",
-      "evaluation_date": "2026-08-29",
+      "evaluation_date": "2026-09-14",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:b454dd144a46b515c2d9de6de25fc7fb92c1ed1c66479f52678fa03cb000bc64",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 2,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -4472,7 +4672,7 @@
       "catalog_dir": "nv-generate-mr-brain-finetune",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 40.9
+      "average_uplift_pct": 28.33
     },
     {
       "skill": "nv-generate-vae-finetune",
@@ -4536,13 +4736,13 @@
     },
     {
       "skill": "nv-segment-ct-finetune",
-      "evaluation_date": "2026-08-29",
+      "evaluation_date": "2026-09-14",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:d41af257bcccc6bfdc4eeff8f516d55c89024acd4b8ebe5452e2c34717040a83",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 4,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -4552,17 +4752,17 @@
       "catalog_dir": "nv-segment-ct-finetune",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 37.1
+      "average_uplift_pct": 20.07
     },
     {
       "skill": "nv-segment-ctmr",
-      "evaluation_date": "2026-08-29",
+      "evaluation_date": "2026-09-14",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:d9381987f6fd5c438605f95aa26c4d59861ee8ddca4c7510f334009092399308",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 2,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -4572,7 +4772,7 @@
       "catalog_dir": "nv-segment-ctmr",
       "component": "Medical AI Skills",
       "has_results": true,
-      "average_uplift_pct": 38.9
+      "average_uplift_pct": 24.77
     },
     {
       "skill": "nvflare-autofl",
@@ -5110,15 +5310,15 @@
     },
     {
       "skill": "portfolio-optimization",
-      "evaluation_date": "2026-08-27",
+      "evaluation_date": "2026-09-14",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:97b53fc5f0fc9cbbb6e594394ff89d950c9b5b713c0f4a6594c968dade42869f",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 4,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
-      "verdict": "NEUTRAL",
+      "verdict": "PASS",
       "agents": [
         "claude-code",
         "codex"
@@ -5126,7 +5326,7 @@
       "catalog_dir": "portfolio-optimization",
       "component": "Portfolio Optimization",
       "has_results": true,
-      "average_uplift_pct": 2.2
+      "average_uplift_pct": 11.55
     },
     {
       "skill": "rag-blueprint",
@@ -6902,16 +7102,16 @@
       "catalog_dir": "accelerated-computing-cudf",
       "component": "cuDF",
       "dimension": "Security",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 92.0,
-      "uplift_pct": 12.0
+      "num": null,
+      "agent": "codex",
+      "score_pct": 69.2,
+      "uplift_pct": -7.7
     },
     {
       "catalog_dir": "accelerated-computing-cudf",
       "component": "cuDF",
-      "dimension": "Security",
-      "num": 8,
+      "dimension": "Correctness",
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -6919,74 +7119,29 @@
     {
       "catalog_dir": "accelerated-computing-cudf",
       "component": "cuDF",
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 10.0
-    },
-    {
-      "catalog_dir": "accelerated-computing-cudf",
-      "component": "cuDF",
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 8.0
-    },
-    {
-      "catalog_dir": "accelerated-computing-cudf",
-      "component": "cuDF",
       "dimension": "Discoverability",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 84.0,
-      "uplift_pct": 26.0
-    },
-    {
-      "catalog_dir": "accelerated-computing-cudf",
-      "component": "cuDF",
-      "dimension": "Discoverability",
-      "num": 8,
+      "num": null,
       "agent": "codex",
-      "score_pct": 68.0,
-      "uplift_pct": 15.0
+      "score_pct": 81.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "accelerated-computing-cudf",
       "component": "cuDF",
       "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": 5.0
-    },
-    {
-      "catalog_dir": "accelerated-computing-cudf",
-      "component": "cuDF",
-      "dimension": "Effectiveness",
-      "num": 8,
+      "num": null,
       "agent": "codex",
-      "score_pct": 86.0,
-      "uplift_pct": -0.0
+      "score_pct": 90.9,
+      "uplift_pct": -3.5
     },
     {
       "catalog_dir": "accelerated-computing-cudf",
       "component": "cuDF",
       "dimension": "Efficiency",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 61.0,
-      "uplift_pct": 24.0
-    },
-    {
-      "catalog_dir": "accelerated-computing-cudf",
-      "component": "cuDF",
-      "dimension": "Efficiency",
-      "num": 8,
+      "num": null,
       "agent": "codex",
-      "score_pct": 50.0,
-      "uplift_pct": 10.0
+      "score_pct": 82.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "aiq-deploy",
@@ -7527,6 +7682,726 @@
       "agent": "codex",
       "score_pct": 85.0,
       "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 86.7
+    },
+    {
+      "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": -6.4
+    },
+    {
+      "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 99.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 55.6,
+      "uplift_pct": 35.6
+    },
+    {
+      "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 65.0,
+      "uplift_pct": 17.9
+    },
+    {
+      "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-continue-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-continue-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 27.3
+    },
+    {
+      "catalog_dir": "bionemo-kermt-continue-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 72.6
+    },
+    {
+      "catalog_dir": "bionemo-kermt-continue-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 33.4
+    },
+    {
+      "catalog_dir": "bionemo-kermt-continue-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-continue-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 82.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-continue-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 34.0,
+      "uplift_pct": 16.7
+    },
+    {
+      "catalog_dir": "bionemo-kermt-continue-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 48.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-continue-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 79.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-continue-pretrain",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-embed",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 7.7
+    },
+    {
+      "catalog_dir": "bionemo-kermt-embed",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 14.3
+    },
+    {
+      "catalog_dir": "bionemo-kermt-embed",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 59.4
+    },
+    {
+      "catalog_dir": "bionemo-kermt-embed",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.0,
+      "uplift_pct": 4.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-embed",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-embed",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-embed",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 47.5,
+      "uplift_pct": 22.1
+    },
+    {
+      "catalog_dir": "bionemo-kermt-embed",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 51.5,
+      "uplift_pct": 21.1
+    },
+    {
+      "catalog_dir": "bionemo-kermt-embed",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-embed",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-finetune",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 11.5
+    },
+    {
+      "catalog_dir": "bionemo-kermt-finetune",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 71.4,
+      "uplift_pct": 44.1
+    },
+    {
+      "catalog_dir": "bionemo-kermt-finetune",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 72.9
+    },
+    {
+      "catalog_dir": "bionemo-kermt-finetune",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.4,
+      "uplift_pct": 13.2
+    },
+    {
+      "catalog_dir": "bionemo-kermt-finetune",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-finetune",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 79.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-finetune",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 51.0,
+      "uplift_pct": 32.1
+    },
+    {
+      "catalog_dir": "bionemo-kermt-finetune",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 35.7,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-finetune",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 79.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-finetune",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 69.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-infer",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-infer",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-infer",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-infer",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-infer",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-infer",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-infer",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 35.0,
+      "uplift_pct": 9.1
+    },
+    {
+      "catalog_dir": "bionemo-kermt-infer",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 34.4,
+      "uplift_pct": 12.1
+    },
+    {
+      "catalog_dir": "bionemo-kermt-infer",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 81.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-infer",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-monitor",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-monitor",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-monitor",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 72.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-monitor",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 70.0,
+      "uplift_pct": 38.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-monitor",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-monitor",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-monitor",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 79.4,
+      "uplift_pct": 47.9
+    },
+    {
+      "catalog_dir": "bionemo-kermt-monitor",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 51.3,
+      "uplift_pct": 23.8
+    },
+    {
+      "catalog_dir": "bionemo-kermt-monitor",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-monitor",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-pretrain-scratch",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": -25.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-pretrain-scratch",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-pretrain-scratch",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 83.3
+    },
+    {
+      "catalog_dir": "bionemo-kermt-pretrain-scratch",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": -1.4
+    },
+    {
+      "catalog_dir": "bionemo-kermt-pretrain-scratch",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-pretrain-scratch",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-pretrain-scratch",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 55.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-pretrain-scratch",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 48.1,
+      "uplift_pct": 17.7
+    },
+    {
+      "catalog_dir": "bionemo-kermt-pretrain-scratch",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-pretrain-scratch",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 76.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-setup",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 50.0,
+      "uplift_pct": -50.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-setup",
+      "component": "BioNeMo KERMT",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-setup",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-setup",
+      "component": "BioNeMo KERMT",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-setup",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-setup",
+      "component": "BioNeMo KERMT",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-setup",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 78.8,
+      "uplift_pct": 46.9
+    },
+    {
+      "catalog_dir": "bionemo-kermt-setup",
+      "component": "BioNeMo KERMT",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 70.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "bionemo-kermt-setup",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-kermt-setup",
+      "component": "BioNeMo KERMT",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 82.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "cudaq-guide",
@@ -8264,7 +9139,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 31.0
+      "uplift_pct": 9.1
     },
     {
       "catalog_dir": "cuopt-server-api-python",
@@ -8273,7 +9148,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 25.0
+      "uplift_pct": 32.0
     },
     {
       "catalog_dir": "cuopt-server-api-python",
@@ -8281,8 +9156,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.0,
-      "uplift_pct": 10.0
+      "score_pct": 100.0,
+      "uplift_pct": 32.7
     },
     {
       "catalog_dir": "cuopt-server-api-python",
@@ -8291,7 +9166,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 56.0
+      "uplift_pct": null
     },
     {
       "catalog_dir": "cuopt-server-api-python",
@@ -8299,8 +9174,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 93.0,
-      "uplift_pct": 48.0
+      "score_pct": 94.4,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "cuopt-server-api-python",
@@ -8308,8 +9183,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 38.0
+      "score_pct": 95.2,
+      "uplift_pct": 47.4
     },
     {
       "catalog_dir": "cuopt-server-api-python",
@@ -8317,8 +9192,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 15.0
+      "score_pct": 91.2,
+      "uplift_pct": 42.7
     },
     {
       "catalog_dir": "cuopt-server-api-python",
@@ -8326,8 +9201,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.0,
-      "uplift_pct": 53.0
+      "score_pct": 96.1,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "cuopt-server-api-python",
@@ -8335,8 +9210,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 63.0
+      "score_pct": 86.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "cupynumeric-hdf5",
@@ -9289,8 +10164,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "score_pct": 50.0,
+      "uplift_pct": -50.0
     },
     {
       "catalog_dir": "dicom-metadata-extract",
@@ -9307,8 +10182,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 70.0,
-      "uplift_pct": 40.0
+      "score_pct": 80.0,
+      "uplift_pct": 55.0
     },
     {
       "catalog_dir": "dicom-metadata-extract",
@@ -9316,8 +10191,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 30.0
+      "score_pct": 100.0,
+      "uplift_pct": 85.0
     },
     {
       "catalog_dir": "dicom-metadata-extract",
@@ -9325,8 +10200,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 50.0
+      "score_pct": 91.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "dicom-metadata-extract",
@@ -9334,8 +10209,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 78.0,
-      "uplift_pct": 34.0
+      "score_pct": 75.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "dicom-metadata-extract",
@@ -9344,7 +10219,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 55.0,
-      "uplift_pct": 17.0
+      "uplift_pct": 26.7
     },
     {
       "catalog_dir": "dicom-metadata-extract",
@@ -9352,8 +10227,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 60.0,
-      "uplift_pct": 24.0
+      "score_pct": 85.0,
+      "uplift_pct": 56.7
     },
     {
       "catalog_dir": "dicom-metadata-extract",
@@ -9361,8 +10236,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": 62.0
+      "score_pct": 84.8,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "dicom-metadata-extract",
@@ -9370,8 +10245,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 82.0,
-      "uplift_pct": 36.0
+      "score_pct": 74.8,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "dicom-series-preflight",
@@ -9379,8 +10254,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "score_pct": 66.7,
+      "uplift_pct": -33.3
     },
     {
       "catalog_dir": "dicom-series-preflight",
@@ -9388,8 +10263,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 33.0,
-      "uplift_pct": -67.0
+      "score_pct": 66.7,
+      "uplift_pct": -33.3
     },
     {
       "catalog_dir": "dicom-series-preflight",
@@ -9397,8 +10272,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 73.0,
-      "uplift_pct": 67.0
+      "score_pct": 80.0,
+      "uplift_pct": 77.1
     },
     {
       "catalog_dir": "dicom-series-preflight",
@@ -9407,7 +10282,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 80.0,
-      "uplift_pct": 60.0
+      "uplift_pct": 77.5
     },
     {
       "catalog_dir": "dicom-series-preflight",
@@ -9415,8 +10290,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": 48.0
+      "score_pct": 88.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "dicom-series-preflight",
@@ -9424,8 +10299,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 73.0,
-      "uplift_pct": 31.0
+      "score_pct": 81.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "dicom-series-preflight",
@@ -9433,8 +10308,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 56.0,
-      "uplift_pct": 37.0
+      "score_pct": 56.1,
+      "uplift_pct": 42.5
     },
     {
       "catalog_dir": "dicom-series-preflight",
@@ -9442,8 +10317,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 56.0,
-      "uplift_pct": 33.0
+      "score_pct": 49.7,
+      "uplift_pct": 32.2
     },
     {
       "catalog_dir": "dicom-series-preflight",
@@ -9451,8 +10326,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 46.0
+      "score_pct": 85.2,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "dicom-series-preflight",
@@ -9460,8 +10335,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 42.0
+      "score_pct": 79.8,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "dicom-series-to-volume",
@@ -9487,8 +10362,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 80.0,
-      "uplift_pct": 30.0
+      "score_pct": 100.0,
+      "uplift_pct": 85.0
     },
     {
       "catalog_dir": "dicom-series-to-volume",
@@ -9505,8 +10380,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 19.0
+      "score_pct": 80.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "dicom-series-to-volume",
@@ -9514,8 +10389,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 0.0
+      "score_pct": 80.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "dicom-series-to-volume",
@@ -9523,8 +10398,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 79.0,
-      "uplift_pct": 22.0
+      "score_pct": 97.5,
+      "uplift_pct": 65.6
     },
     {
       "catalog_dir": "dicom-series-to-volume",
@@ -9532,8 +10407,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": -2.0
+      "score_pct": 96.3,
+      "uplift_pct": 16.3
     },
     {
       "catalog_dir": "dicom-series-to-volume",
@@ -9541,8 +10416,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.0,
-      "uplift_pct": 27.0
+      "score_pct": 83.4,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "dicom-series-to-volume",
@@ -9550,8 +10425,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 1.0
+      "score_pct": 81.2,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "digital-health-clinical-asr-build",
@@ -15582,6 +16457,186 @@
       "agent": "codex",
       "score_pct": 43.0,
       "uplift_pct": -3.0
+    },
+    {
+      "catalog_dir": "foundationpose-pipeline",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "foundationpose-pipeline",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "foundationpose-pipeline",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 43.3
+    },
+    {
+      "catalog_dir": "foundationpose-pipeline",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "foundationpose-pipeline",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "foundationpose-pipeline",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "foundationpose-pipeline",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 51.4
+    },
+    {
+      "catalog_dir": "foundationpose-pipeline",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.5,
+      "uplift_pct": 7.9
+    },
+    {
+      "catalog_dir": "foundationpose-pipeline",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 79.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "foundationpose-pipeline",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "foundationpose-setup",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "foundationpose-setup",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "foundationpose-setup",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "foundationpose-setup",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "foundationpose-setup",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "foundationpose-setup",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "foundationpose-setup",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.4,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "foundationpose-setup",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.8,
+      "uplift_pct": 17.5
+    },
+    {
+      "catalog_dir": "foundationpose-setup",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 78.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "foundationpose-setup",
+      "component": "FoundationPose Perception Pipeline",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "holohub-app-lifecycle",
@@ -21629,7 +22684,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 33.3
     },
     {
       "catalog_dir": "medtech-model-evidence-export",
@@ -21638,7 +22693,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 10.0
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "medtech-model-evidence-export",
@@ -21647,7 +22702,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 35.0
+      "uplift_pct": 62.2
     },
     {
       "catalog_dir": "medtech-model-evidence-export",
@@ -21655,8 +22710,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 99.0,
-      "uplift_pct": 25.0
+      "score_pct": 95.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "medtech-model-evidence-export",
@@ -21664,8 +22719,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 27.0
+      "score_pct": 80.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "medtech-model-evidence-export",
@@ -21673,8 +22728,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 89.0,
-      "uplift_pct": 36.0
+      "score_pct": 78.1,
+      "uplift_pct": 46.8
     },
     {
       "catalog_dir": "medtech-model-evidence-export",
@@ -21682,8 +22737,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 24.0
+      "score_pct": 78.1,
+      "uplift_pct": 39.2
     },
     {
       "catalog_dir": "medtech-model-evidence-export",
@@ -21691,8 +22746,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.0,
-      "uplift_pct": 32.0
+      "score_pct": 86.8,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "medtech-model-evidence-export",
@@ -21700,8 +22755,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 96.0,
-      "uplift_pct": 27.0
+      "score_pct": 95.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemo-automodel-distributed-training",
@@ -25442,91 +26497,46 @@
       "catalog_dir": "nemotron-asr-finetune",
       "component": "Nemotron Speech",
       "dimension": "Security",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nemotron-asr-finetune",
-      "component": "Nemotron Speech",
-      "dimension": "Security",
-      "num": 8,
+      "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 11.0
-    },
-    {
-      "catalog_dir": "nemotron-asr-finetune",
-      "component": "Nemotron Speech",
-      "dimension": "Correctness",
-      "num": 8,
-      "agent": "claude-code",
       "score_pct": 80.0,
-      "uplift_pct": 28.0
+      "uplift_pct": 2.2
     },
     {
       "catalog_dir": "nemotron-asr-finetune",
       "component": "Nemotron Speech",
       "dimension": "Correctness",
-      "num": 8,
+      "num": null,
       "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 27.0
+      "score_pct": 82.0,
+      "uplift_pct": 19.8
     },
     {
       "catalog_dir": "nemotron-asr-finetune",
       "component": "Nemotron Speech",
       "dimension": "Discoverability",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 86.0,
-      "uplift_pct": 47.0
-    },
-    {
-      "catalog_dir": "nemotron-asr-finetune",
-      "component": "Nemotron Speech",
-      "dimension": "Discoverability",
-      "num": 8,
+      "num": null,
       "agent": "codex",
-      "score_pct": 93.0,
-      "uplift_pct": 50.0
+      "score_pct": 92.1,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemotron-asr-finetune",
       "component": "Nemotron Speech",
       "dimension": "Effectiveness",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 64.0,
-      "uplift_pct": 20.0
-    },
-    {
-      "catalog_dir": "nemotron-asr-finetune",
-      "component": "Nemotron Speech",
-      "dimension": "Effectiveness",
-      "num": 8,
+      "num": null,
       "agent": "codex",
-      "score_pct": 76.0,
-      "uplift_pct": 24.0
+      "score_pct": 64.7,
+      "uplift_pct": 30.2
     },
     {
       "catalog_dir": "nemotron-asr-finetune",
       "component": "Nemotron Speech",
       "dimension": "Efficiency",
-      "num": 8,
-      "agent": "claude-code",
-      "score_pct": 83.0,
-      "uplift_pct": 36.0
-    },
-    {
-      "catalog_dir": "nemotron-asr-finetune",
-      "component": "Nemotron Speech",
-      "dimension": "Efficiency",
-      "num": 8,
+      "num": null,
       "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 37.0
+      "score_pct": 76.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemotron-customize",
@@ -25804,8 +26814,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 89.0,
-      "uplift_pct": -6.0
+      "score_pct": 88.9,
+      "uplift_pct": 16.4
     },
     {
       "catalog_dir": "nemotron-speech",
@@ -25813,8 +26823,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 81.0,
-      "uplift_pct": 8.0
+      "score_pct": 86.1,
+      "uplift_pct": 15.3
     },
     {
       "catalog_dir": "nemotron-speech",
@@ -25822,8 +26832,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 9.0
+      "score_pct": 94.4,
+      "uplift_pct": 12.4
     },
     {
       "catalog_dir": "nemotron-speech",
@@ -25831,8 +26841,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 9.0
+      "score_pct": 93.3,
+      "uplift_pct": 11.6
     },
     {
       "catalog_dir": "nemotron-speech",
@@ -25840,8 +26850,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 45.0
+      "score_pct": 98.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemotron-speech",
@@ -25849,8 +26859,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 89.0,
-      "uplift_pct": 32.0
+      "score_pct": 91.8,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemotron-speech",
@@ -25858,8 +26868,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 88.0,
-      "uplift_pct": 28.0
+      "score_pct": 89.2,
+      "uplift_pct": 30.2
     },
     {
       "catalog_dir": "nemotron-speech",
@@ -25867,8 +26877,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 11.0
+      "score_pct": 81.5,
+      "uplift_pct": 27.3
     },
     {
       "catalog_dir": "nemotron-speech",
@@ -25876,8 +26886,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 88.0,
-      "uplift_pct": 39.0
+      "score_pct": 78.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemotron-speech",
@@ -25885,8 +26895,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 79.0,
-      "uplift_pct": 48.0
+      "score_pct": 58.9,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nv-generate-ct-rflow",
@@ -26102,7 +27112,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 47.0
+      "uplift_pct": 64.0
     },
     {
       "catalog_dir": "nv-generate-mr-brain",
@@ -26110,8 +27120,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": 40.0
+      "score_pct": 91.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nv-generate-mr-brain",
@@ -26119,8 +27129,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 38.0
+      "score_pct": 93.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nv-generate-mr-brain",
@@ -26128,8 +27138,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 82.0
+      "score_pct": 96.7,
+      "uplift_pct": 78.3
     },
     {
       "catalog_dir": "nv-generate-mr-brain",
@@ -26137,8 +27147,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 49.0
+      "score_pct": 96.7,
+      "uplift_pct": 58.7
     },
     {
       "catalog_dir": "nv-generate-mr-brain",
@@ -26146,8 +27156,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 61.0
+      "score_pct": 98.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nv-generate-mr-brain",
@@ -26155,8 +27165,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 73.0
+      "score_pct": 98.2,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nv-generate-mr-brain-finetune",
@@ -26192,7 +27202,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 10.0
     },
     {
       "catalog_dir": "nv-generate-mr-brain-finetune",
@@ -26201,7 +27211,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 59.0
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nv-generate-mr-brain-finetune",
@@ -26209,8 +27219,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 91.0,
-      "uplift_pct": 50.0
+      "score_pct": 92.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nv-generate-mr-brain-finetune",
@@ -26219,7 +27229,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 90.0,
-      "uplift_pct": 60.0
+      "uplift_pct": 70.0
     },
     {
       "catalog_dir": "nv-generate-mr-brain-finetune",
@@ -26228,7 +27238,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 90.0,
-      "uplift_pct": 25.0
+      "uplift_pct": 30.0
     },
     {
       "catalog_dir": "nv-generate-mr-brain-finetune",
@@ -26236,8 +27246,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 73.0
+      "score_pct": 97.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nv-generate-mr-brain-finetune",
@@ -26245,8 +27255,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 82.0
+      "score_pct": 97.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nv-generate-vae-finetune",
@@ -26525,7 +27535,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 12.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nv-segment-ct-finetune",
@@ -26534,15 +27544,6 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 95.0,
       "uplift_pct": 25.0
     },
     {
@@ -26550,36 +27551,45 @@
       "component": "Medical AI Skills",
       "dimension": "Correctness",
       "num": null,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 15.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Discoverability",
-      "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 54.0
-    },
-    {
-      "catalog_dir": "nv-segment-ct-finetune",
-      "component": "Medical AI Skills",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 89.0,
+      "score_pct": 95.0,
       "uplift_pct": 39.0
     },
     {
       "catalog_dir": "nv-segment-ct-finetune",
       "component": "Medical AI Skills",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-segment-ct-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 99.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nv-segment-ct-finetune",
+      "component": "Medical AI Skills",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nv-segment-ct-finetune",
+      "component": "Medical AI Skills",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 82.0,
-      "uplift_pct": 51.0
+      "score_pct": 85.4,
+      "uplift_pct": 50.1
     },
     {
       "catalog_dir": "nv-segment-ct-finetune",
@@ -26587,8 +27597,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 36.0
+      "score_pct": 86.7,
+      "uplift_pct": 6.3
     },
     {
       "catalog_dir": "nv-segment-ct-finetune",
@@ -26596,8 +27606,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": 65.0
+      "score_pct": 81.1,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nv-segment-ct-finetune",
@@ -26605,8 +27615,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 91.0,
-      "uplift_pct": 74.0
+      "score_pct": 96.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nv-segment-ctmr",
@@ -26614,17 +27624,17 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "nv-segment-ctmr",
-      "component": "Medical AI Skills",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nv-segment-ctmr",
+      "component": "Medical AI Skills",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 50.0,
+      "uplift_pct": -50.0
     },
     {
       "catalog_dir": "nv-segment-ctmr",
@@ -26642,7 +27652,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "nv-segment-ctmr",
@@ -26650,8 +27660,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 88.0,
-      "uplift_pct": 44.0
+      "score_pct": 95.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nv-segment-ctmr",
@@ -26659,8 +27669,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 31.0
+      "score_pct": 85.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nv-segment-ctmr",
@@ -26668,8 +27678,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 48.0,
-      "uplift_pct": 12.0
+      "score_pct": 66.7,
+      "uplift_pct": 40.7
     },
     {
       "catalog_dir": "nv-segment-ctmr",
@@ -26677,8 +27687,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 75.0,
-      "uplift_pct": 32.0
+      "score_pct": 95.0,
+      "uplift_pct": 67.9
     },
     {
       "catalog_dir": "nv-segment-ctmr",
@@ -26686,8 +27696,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 92.0,
-      "uplift_pct": 63.0
+      "score_pct": 81.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nv-segment-ctmr",
@@ -26695,8 +27705,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 47.0
+      "score_pct": 68.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nvflare-autofl",
@@ -28683,9 +29693,27 @@
       "component": "Portfolio Optimization",
       "dimension": "Security",
       "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": 12.5
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Security",
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 12.0
+      "uplift_pct": 12.5
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "portfolio-optimization",
@@ -28693,8 +29721,17 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 50.0,
-      "uplift_pct": -30.0
+      "score_pct": 45.0,
+      "uplift_pct": -2.5
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "portfolio-optimization",
@@ -28702,8 +29739,17 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 89.0,
-      "uplift_pct": 16.0
+      "score_pct": 87.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 51.2,
+      "uplift_pct": 12.7
     },
     {
       "catalog_dir": "portfolio-optimization",
@@ -28711,8 +29757,17 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 37.0,
-      "uplift_pct": -5.0
+      "score_pct": 39.3,
+      "uplift_pct": 14.1
+    },
+    {
+      "catalog_dir": "portfolio-optimization",
+      "component": "Portfolio Optimization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.8,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "portfolio-optimization",
@@ -28720,8 +29775,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 18.0
+      "score_pct": 90.8,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "rtvi-cv-customize-model",

@@ -84,6 +84,8 @@
       "title": "Robotics",
       "description": "Build, deploy, test, and operate robotic systems, robot policies, robot applications, and robot development workflows.",
       "skills": [
+        "foundationpose-pipeline",
+        "foundationpose-setup",
         "i4h-lerobot-viz",
         "i4h-workflow",
         "i4h-workflow-dataset-annotate",
@@ -236,6 +238,12 @@
       "skills": [
         "dali-dynamic-mode",
         "data-designer",
+        "kermt-add-cmim-pretrain",
+        "kermt-continue-pretrain",
+        "kermt-finetune",
+        "kermt-monitor",
+        "kermt-pretrain-scratch",
+        "kermt-setup",
         "launch-nemo-rl",
         "mcore-create-issue",
         "mcore-linting-and-formatting",
@@ -309,6 +317,8 @@
         "jetson-llm-benchmark",
         "jetson-llm-serve",
         "jetson-speculative-decoding",
+        "kermt-embed",
+        "kermt-infer",
         "medtech-model-evidence-export",
         "tao-run-inference-service"
       ]

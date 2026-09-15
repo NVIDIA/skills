@@ -4,9 +4,9 @@
     {
       "name": "accelerated-computing-cudf",
       "path": "skills/accelerated-computing-cudf",
-      "content_digest": "sha256:4a42469b28c81689dea379388d555f574035795773eec55f542d15cad637fd19",
-      "last_commit": "1f6f560df6257218e4a27f9fd5fc940078bfd140",
-      "last_modified": "2026-05-29"
+      "content_digest": "sha256:df67c51363357414ba634b62489f5a88c36d95d14d6e74fa82f1ad8a6b540ad7",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "aiq-deploy",
@@ -49,6 +49,62 @@
       "content_digest": "sha256:3335500eaec1cc41912bc0664b6ab21e7f4e8764a93c482f846288a4a8b0ace1",
       "last_commit": "de3c29225040d96960f77c327d9c5eef0a1acdba",
       "last_modified": "2026-07-14"
+    },
+    {
+      "name": "bionemo-kermt-add-cmim-pretrain",
+      "path": "skills/bionemo-kermt-add-cmim-pretrain",
+      "content_digest": "sha256:cb2294cee2287ea6647c5253a5a3dd5e5ed2defbd11e89388d8e326b74e65da4",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-kermt-continue-pretrain",
+      "path": "skills/bionemo-kermt-continue-pretrain",
+      "content_digest": "sha256:7da12a9b27bfd4ca6928e8f0bc2445e89814bf26e4ccc5af84bf0982659cab69",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-kermt-embed",
+      "path": "skills/bionemo-kermt-embed",
+      "content_digest": "sha256:3e801ca2c19b1763a14145260f4388167b412ce9c2e65b31b983351061a492a5",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-kermt-finetune",
+      "path": "skills/bionemo-kermt-finetune",
+      "content_digest": "sha256:85c32d5818c8a26a80196d66b14675e5f0183236bdf7f53f66ee87850e1534ad",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-kermt-infer",
+      "path": "skills/bionemo-kermt-infer",
+      "content_digest": "sha256:da60058df885af1520e14f31cd963438f1995374ab35a84a89d8b7aa647cd3bc",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-kermt-monitor",
+      "path": "skills/bionemo-kermt-monitor",
+      "content_digest": "sha256:f68d11c26e056ee5e9d392d6bc919b283b18626bd452bcbd0c0610c3ceafc7bd",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-kermt-pretrain-scratch",
+      "path": "skills/bionemo-kermt-pretrain-scratch",
+      "content_digest": "sha256:8b1113d51653f9c78c23415782be72e41eb55187ab03198aa2e5213a53c78be8",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-kermt-setup",
+      "path": "skills/bionemo-kermt-setup",
+      "content_digest": "sha256:53ce1b9f89fa19fb0e08472b7109d2604622f625f3743c2ed3e4297dc035f779",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "cudaq-guide",
@@ -109,9 +165,9 @@
     {
       "name": "cuopt-server-api-python",
       "path": "skills/cuopt-server-api-python",
-      "content_digest": "sha256:13da3625662af8e4b5634a2c9e1e76be0621c8114b17b5608efffbf0836c13a9",
-      "last_commit": "14cee0f8e4490eee99f5f3af09d8bbb3e85374de",
-      "last_modified": "2026-08-27"
+      "content_digest": "sha256:164bc205760fec78fa86c761613b00b8d6110e985aa5693e035d06872e44b0a5",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "cupynumeric-hdf5",
@@ -200,23 +256,23 @@
     {
       "name": "dicom-metadata-extract",
       "path": "skills/dicom-metadata-extract",
-      "content_digest": "sha256:89b2b0042b9d22aca81757c3fce00d57a645b274f1f3193696ee07566b8fc35e",
-      "last_commit": "ed66cf2a616eef1e19cff6f178eb2a87a4ba6752",
-      "last_modified": "2026-08-31"
+      "content_digest": "sha256:ac05b7f648c31f2bb3426e01bed81f4d8a5c8b7947273513f9ad00cfbc8bad92",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "dicom-series-preflight",
       "path": "skills/dicom-series-preflight",
-      "content_digest": "sha256:c0f45a914f05fafb8275c665de6a498c4623a813b5aaf7c54bdbfcc4468f3aaa",
-      "last_commit": "ed66cf2a616eef1e19cff6f178eb2a87a4ba6752",
-      "last_modified": "2026-08-31"
+      "content_digest": "sha256:adbe8f799f3fb15f83035cda0ee03101adc4fd974ac0347ab0c3c0847b4073df",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "dicom-series-to-volume",
       "path": "skills/dicom-series-to-volume",
-      "content_digest": "sha256:10b57a1017e493bfc3975af33c4516dd8ebfa12c8a7e0c8cff8c919d487aff67",
-      "last_commit": "ed66cf2a616eef1e19cff6f178eb2a87a4ba6752",
-      "last_modified": "2026-08-31"
+      "content_digest": "sha256:a63a39aae2b9a6589a7ff39b20ec577ae900a4d2412fc520bee68906c610043c",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "digital-health-clinical-asr-build",
@@ -744,6 +800,20 @@
       "last_modified": "2026-05-29"
     },
     {
+      "name": "foundationpose-pipeline",
+      "path": "skills/foundationpose-pipeline",
+      "content_digest": "sha256:8ab51cf9ccba291b0a21a8024dbee1d229548c1534777bdec58a7183844a5ae7",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "foundationpose-setup",
+      "path": "skills/foundationpose-setup",
+      "content_digest": "sha256:afa44f739e4e4ca2469206d75fb70148de74ca2cda65347c62283779ab4141c7",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
       "name": "holohub-app-lifecycle",
       "path": "skills/holohub-app-lifecycle",
       "content_digest": "sha256:b8061abb3fd732ec793e717a0deaace05e590db489e3ae27a2c86108c9430687",
@@ -1264,9 +1334,9 @@
     {
       "name": "medtech-model-evidence-export",
       "path": "skills/medtech-model-evidence-export",
-      "content_digest": "sha256:7696036664cf8d8e10735966712d69c01706312a29a51bdd01fa4404fd62a6cc",
-      "last_commit": "b459e6cf3aafd04e257b7c42ad3f78fd18a93164",
-      "last_modified": "2026-08-31"
+      "content_digest": "sha256:4e47f893327ea3cea6aad4889c25dea5db49b810725f3917c0845b2390f12ef7",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "nemo-automodel-distributed-training",
@@ -1572,9 +1642,9 @@
     {
       "name": "nemotron-asr-finetune",
       "path": "skills/nemotron-asr-finetune",
-      "content_digest": "sha256:741eea1d1468e8b29eb0fe2d7584e65f59881a22e2a96f986088ea56861f6a15",
-      "last_commit": "f64fa0e6135231263745114752084785bc3e1beb",
-      "last_modified": "2026-07-17"
+      "content_digest": "sha256:5b73f16432d3c09b28a604d6f9cb62205f84581e0cc0ad61bffab59cfea3741c",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "nemotron-customize",
@@ -1600,9 +1670,9 @@
     {
       "name": "nemotron-speech",
       "path": "skills/nemotron-speech",
-      "content_digest": "sha256:6d4b66de7e358cb1580a885d0e0674980bbd35b71d5dae9689b6776cfd51b81b",
-      "last_commit": "9a18c0cf764bda42c32a43152350284bc2e32069",
-      "last_modified": "2026-08-20"
+      "content_digest": "sha256:a24370802c3cf9dfdf830204ac93b862f20831d7c6d4c7351f88c64cd627de83",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "nv-generate-ct-rflow",
@@ -1621,16 +1691,16 @@
     {
       "name": "nv-generate-mr-brain",
       "path": "skills/nv-generate-mr-brain",
-      "content_digest": "sha256:f069e148d9598812bdceea95ac3ad8e753c1502dcabea5e04d6d4546cb47eb09",
-      "last_commit": "ed66cf2a616eef1e19cff6f178eb2a87a4ba6752",
-      "last_modified": "2026-08-31"
+      "content_digest": "sha256:48c8efaa8609232389e58a10606d76676168b3c07da4ee76390ffc390bd3128a",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "nv-generate-mr-brain-finetune",
       "path": "skills/nv-generate-mr-brain-finetune",
-      "content_digest": "sha256:5c1aea1dada0a75c9be8b02a8b004e60112d01d9772f972cf691cfa3e6a68fc0",
-      "last_commit": "ed66cf2a616eef1e19cff6f178eb2a87a4ba6752",
-      "last_modified": "2026-08-31"
+      "content_digest": "sha256:6075d9d579124650d221075a68e4c5da0c1c4c6e584a04ab17df28817d68cfd8",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "nv-generate-vae-finetune",
@@ -1656,16 +1726,16 @@
     {
       "name": "nv-segment-ct-finetune",
       "path": "skills/nv-segment-ct-finetune",
-      "content_digest": "sha256:21b3ea42d9cc93bfa04f0241be0a0ff108797cc5aa6cfb57da3b0921bf85e735",
-      "last_commit": "ed66cf2a616eef1e19cff6f178eb2a87a4ba6752",
-      "last_modified": "2026-08-31"
+      "content_digest": "sha256:1d2971649d78d1d233b9efc770d61eb3a5acd5d600fd259e6b9fc7b9d8b2a67f",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "nv-segment-ctmr",
       "path": "skills/nv-segment-ctmr",
-      "content_digest": "sha256:accd2237220f39556d88d6d751db1a8f07dd8604123e1518dc62f4194d1dc5e3",
-      "last_commit": "ed66cf2a616eef1e19cff6f178eb2a87a4ba6752",
-      "last_modified": "2026-08-31"
+      "content_digest": "sha256:299426367dc8ac392b3d35e5aab31fb536b78fb1605b2372da8acdbb8e581016",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "nvflare-autofl",
@@ -1859,9 +1929,9 @@
     {
       "name": "portfolio-optimization",
       "path": "skills/portfolio-optimization",
-      "content_digest": "sha256:76074200989bd120563c3bccd376f1102f25b631118fedaeccb1b7a278d7b8eb",
-      "last_commit": "14cee0f8e4490eee99f5f3af09d8bbb3e85374de",
-      "last_modified": "2026-08-27"
+      "content_digest": "sha256:317052325fa8809753ac9c6f4b015f21d639fcf13c19b996f52793ba8aca1601",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "rag-blueprint",
