@@ -323,8 +323,8 @@ Companion files (`references/`, `scripts/`, `assets/`) ship inside
 
 Routing-level symptoms — a missing upstream clone, gated-asset `403`s,
 NGC login failures, `manifest unknown` on an NRE image, stale cached
-skill names — are tabulated in the companion file
-`references/troubleshooting.md`.
+skill names — are tabulated in the troubleshooting companion file that
+ships alongside this skill.
 Symptoms specific to a sibling's own commands belong to that sibling's
 skill.
 
