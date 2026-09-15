@@ -1831,9 +1831,9 @@
     {
       "name": "physical-ai-neural-reconstruction",
       "path": "skills/physical-ai-neural-reconstruction",
-      "content_digest": "sha256:4fcc7e0b3c5932a6d9360544fcbc286a426f1b7002ea302507f39341b906ba36",
-      "last_commit": "e2009809869de195f7f4cb20881197851ef2e387",
-      "last_modified": "2026-09-02"
+      "content_digest": "sha256:be55a248effc47dcea5beb5ed36d09467463f6fccadc8d35947c68799882d3d8",
+      "last_commit": "597365549785598e5486abc427cfb095ebc0b59d",
+      "last_modified": "2026-09-15"
     },
     {
       "name": "physical-ai-video-data-augmentation",
