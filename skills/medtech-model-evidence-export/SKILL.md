@@ -5,7 +5,7 @@ license: Apache-2.0
 allowed-tools: Bash
 permissions: [env, file_read, file_write, network, shell]
 metadata:
-  author: "NVIDIA MedTech <noreply@nvidia.com>"
+  author: 'NVIDIA MedTech <noreply@nvidia.com>'
 ---
 
 # Medtech Model Evidence Export to MLflow

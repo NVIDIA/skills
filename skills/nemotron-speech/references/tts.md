@@ -62,15 +62,25 @@ For **runtime feature questions** (voice list, SSML, streaming format): fetch or
 **Function ID lookup (JSON, scriptable, no hardcoding):**
 
 ```bash
+NVCF_FUNCTIONS_JSON=$(mktemp)
+trap 'rm -f "$NVCF_FUNCTIONS_JSON"' EXIT
+
 curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
-  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized" \
-  | python3 -c "
-import sys, json, re
+  --output "$NVCF_FUNCTIONS_JSON" \
+  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized"
+
+python3 - "$NVCF_FUNCTIONS_JSON" <<'PY'
+import json
+import re
+import sys
+
 pat = re.compile(r'magpie|tts', re.I)
-for f in json.load(sys.stdin).get('functions', []):
+with open(sys.argv[1], encoding="utf-8") as response:
+    functions = json.load(response).get('functions', [])
+for f in functions:
     if f.get('status') == 'ACTIVE' and pat.search(f.get('name','')):
         print(f['id'], f['name'])
-"
+PY
 ```
 
 Pick the `id` of the function whose `name` matches your model.
@@ -192,14 +202,26 @@ This recipe uses only the `nvidia-riva-client` pip package — no `python-client
 **Cloud — discover function-id, then synthesize:**
 
 ```bash
-FID=$(curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
-  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized" \
-  | python3 -c "
-import sys, json
-for f in json.load(sys.stdin).get('functions', []):
+NVCF_FUNCTIONS_JSON=$(mktemp)
+trap 'rm -f "$NVCF_FUNCTIONS_JSON"' EXIT
+
+curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
+  --output "$NVCF_FUNCTIONS_JSON" \
+  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized"
+
+FID=$(python3 - "$NVCF_FUNCTIONS_JSON" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as response:
+    functions = json.load(response).get('functions', [])
+for f in functions:
     if f.get('status') == 'ACTIVE' and f.get('name','').removeprefix('ai-') == 'magpie-tts-multilingual':
         print(f['id']); break
-")
+PY
+)
+
+test -n "$FID" || { echo "No matching active NVCF function found" >&2; exit 1; }
 
 # Replace VOICE with a value returned by --list-voices.
 TEXT="Hello from NVIDIA TTS." OUT=out.wav SERVER=grpc.nvcf.nvidia.com:443 \

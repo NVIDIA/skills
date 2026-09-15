@@ -7,16 +7,16 @@ This skill is for research and development only. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to convert single-series CT DICOM directories into HU-scaled NIfTI volumes with affine geometry for engineering verification and development workflows. <br>
+Developers and engineers converting single-series CT DICOM directories to HU-scaled NIfTI volumes with affine and orientation metadata for engineering verification workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Not Specified] <br>
-**Credential Type(s):** [None identified] <br>
+**Requires API Key or External Credential:** [No] <br>
+**Credential Type(s):** [None] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -26,13 +26,14 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [BENCHMARK.md](BENCHMARK.md) <br>
+- [skill_manifest.yaml](skill_manifest.yaml) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Files, Analysis] <br>
-**Output Format:** [NIfTI volume (.nii.gz) with JSON summary] <br>
+**Output Format:** [NIfTI volume (.nii.gz) and JSON summary] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Key output fields: n_slices, series_instance_uid, output.path, output.shape, output.spacing, output.axcodes, output.affine, hu_range, runtime.conversion_seconds] <br>
+**Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -41,35 +42,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-2 evaluation tasks (1 positive, 1 negative) per agent, each in an isolated sandbox pod. Dataset: skill-evaluator-dataset-snapshot/1. <br>
+2 evaluation tasks (1 positive, 1 negative) with 3 attempts per task, each in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Whether the skill is safe to use: checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the answer is correct: final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded when needed: checks skill execution and routing. <br>
-- Effectiveness: Whether the skill helped complete the task: equal-weight mean of goal completion and expected workflow adherence. <br>
-- Efficiency: Whether wasted tool or skill usage was avoided: routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Correctness: Whether the answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal (50% goal completion + 50% expected workflow adherence). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool-call productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 70% → 90% (+20 points) | 83% → 93% (+10 points) |
-| Security | 100% → 100% (±0 points) | 50% → 100% (+50 points) |
-| Correctness | 50% → 80% (+30 points) | 100% → 100% (±0 points) |
-| Discoverability | 75% → 94% (+19 points) | 84% → 84% (±0 points) |
-| Effectiveness | 56% → 79% (+22 points) | 92% → 90% (-2 points) |
-| Efficiency | 70% → 97% (+27 points) | 89% → 90% (+1 points) |
+| Overall | 92.2% | 91.5% |
+| Security | 100.0% → 100.0% (±0.0 points) | 50.0% → 100.0% (+50.0 points) |
+| Correctness | 15.0% → 100.0% (+85.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 80.0% | 80.0% |
+| Effectiveness | 31.9% → 97.5% (+65.6 points) | 80.0% → 96.3% (+16.3 points) |
+| Efficiency | 83.4% | 81.2% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: skill_manifest.yaml) <br>

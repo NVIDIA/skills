@@ -4,7 +4,7 @@ description: Used for header-only preflight of one DICOM series folder before co
 license: Apache-2.0
 allowed-tools: Bash
 metadata:
-  author: NVIDIA MedTech Team
+  author: 'NVIDIA MedTech Team'
   tags:
     - MedTech
     - DICOM

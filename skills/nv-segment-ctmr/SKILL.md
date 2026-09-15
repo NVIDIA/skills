@@ -4,7 +4,7 @@ description: Used for running NV-Segment-CTMR on CT or MRI NIfTI volumes and rec
 license: Apache-2.0
 allowed-tools: Bash, Read, Write, WebFetch, Env
 metadata:
-  author: NVIDIA MedTech Team
+  author: 'NVIDIA MedTech Team'
   tags:
     - MedTech
     - CT-MR

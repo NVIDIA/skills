@@ -1,0 +1,58 @@
+{
+  "skill_name": "foundationpose-setup",
+  "evals": [
+    {
+      "id": "setup-explicit-os-floor",
+      "prompt": "Use foundationpose-setup to assess this FoundationPose perception pipeline host: Ubuntu 22.04, glibc 2.35, GLIBCXX_3.4.30, NVIDIA driver 590, CUDA toolkit 13.0, Docker GPU access working. The built library fails with GLIBC_2.38 not found. Write a short diagnosis and next step to diagnosis.md in the current directory. Use these supplied facts; do not install packages, clone repositories, or change the host.",
+      "expected_output": "diagnosis.md identifies glibc/GLIBCXX as the blocker, states the >=2.38 / GLIBCXX_3.4.31 floor and a supported runtime such as Ubuntu 24.04. It defers installation and does not propose a venv or LD_LIBRARY_PATH fix for old system libc.",
+      "assertions": [
+        "Creates diagnosis.md from the supplied host facts.",
+        "Identifies the unsupported libc/libstdc++ runtime before any dependency installation.",
+        "Recommends a supported OS/runtime and does not replace system libc or change library paths as the fix."
+      ],
+      "expected_skill": "foundationpose-setup",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "setup-implicit-repair",
+      "prompt": "My FoundationPose perception pipeline venv already contains editable SAM3. I need to add TAO Deploy depth. A plain nvidia-tao-deploy install pulled numpy 2 and SAM3 stopped importing. From the supplied facts, write repair.md with ordered repair commands and explain how to preserve SAM3 on future uv syncs. The repo uses numpy<2, scipy<1.16, opencv-python<5, and a foundationpose extra. Do not execute installs or clone anything.",
+      "expected_output": "repair.md restores declared pins via uv sync --inexact --extra foundationpose, installs nvidia-tao-deploy==7.1.0 with --no-deps and pycuda into .venv, and verifies numpy 1.26.x. It explains the out-of-band packages, toolkit prerequisite for pycuda, and why a conflicting tao extra is inappropriate.",
+      "assertions": [
+        "Creates repair.md with executable repair commands for the product venv.",
+        "Preserves out-of-band packages using --inexact on subsequent syncs.",
+        "Uses nvidia-tao-deploy==7.1.0 with --no-deps and calls out the CUDA toolkit prerequisite for pycuda.",
+        "Verifies numpy compatibility without adding a conflicting tao extra."
+      ],
+      "expected_skill": "foundationpose-setup",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "setup-context-engine-shape",
+      "prompt": "We are preparing the FoundationPose perception pipeline with an existing dynamic TAO FoundationStereo ONNX. The host dependencies work. T-LESS is downloaded but has not been adapted, and a colleague suggests building an FP16 engine using the raw image size. Write engine-plan.md explaining the order and commands for a reliable accuracy baseline. Use placeholders for dataset paths, profile, and ONNX. Do not download, build, adapt, or clone anything.",
+      "expected_output": "engine-plan.md orders profile-driven BOP adaptation before build_tao_engine.py with --config and --shape-from-scene on an adapted scene, uses FP32/static defaults and the profile max-width, sets overrides.depth.engine relative to the profile, and requires scene smoke validation without cropping. It explains that raw dimensions are not rectified dimensions and engines/sidecars depend on this GPU and TensorRT.",
+      "assertions": [
+        "Creates engine-plan.md with adaptation before scene-derived engine construction.",
+        "Uses --config and --shape-from-scene instead of raw-image dimensions.",
+        "Keeps FP32 for the baseline and records the per-profile engine setting.",
+        "Requires backend/normalization and no-cropping verification on an adapted scene."
+      ],
+      "expected_skill": "foundationpose-setup",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "setup-negative-dataset-results",
+      "prompt": "The FoundationPose perception pipeline is already installed and verified. I only need a plain-language interpretation: baseline matched 100 predictions with 80% within 5 mm; candidate matched 50 with 90% within 5 mm. Can I claim a clear improvement? Do not install or run anything.",
+      "expected_output": "Explains the changed matched population prevents a clear overall accuracy improvement claim; higher conditional rate may reflect easier survivors. No setup workflow is invoked.",
+      "assertions": [
+        "Does not read or invoke foundationpose-setup.",
+        "Explains the coverage/population confound and does not start an environment installation."
+      ],
+      "expected_skill": null,
+      "expected_script": null,
+      "files": []
+    }
+  ]
+}

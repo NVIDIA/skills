@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to extract structured metadata from DICOM medical imaging files and flag the presence of standard-tag PHI before sharing or further processing. <br>
+Developers and engineers use this skill to extract selected DICOM metadata and flag standard-tag PHI presence before sharing or processing medical imaging files externally. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,13 +25,14 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Skill Manifest](skill_manifest.yaml) <br>
-- [Output Schema](validators/output_schema.json) <br>
+- [Output JSON Schema](validators/output_schema.json) <br>
 - [Agent Guide](AGENTS.md) <br>
+- [Skill Benchmark](BENCHMARK.md) <br>
+- [Skill Manifest](skill_manifest.yaml) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis] <br>
+**Output Type(s):** [JSON, Analysis] <br>
 **Output Format:** [JSON] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -43,35 +44,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-2 evaluation tasks (2 positive) from a versioned dataset snapshot, each run in isolated sandbox pods. <br>
+Evaluated against 2 evaluation tasks (2 positive) with 3 attempts per task in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded and executed when needed. <br>
-- Effectiveness: Whether the skill helped the agent complete the user's goal and expected workflow. <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
+- Correctness: Whether the extracted metadata answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded and activated when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (equal-weight mean of goal completion and behavior adherence). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool-call productivity, 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 49% → 82% (+34 points) | 55% → 70% (+15 points) |
-| Security | 100% → 100% (±0 points) | 100% → 50% (-50 points) |
-| Correctness | 30% → 70% (+40 points) | 50% → 80% (+30 points) |
-| Discoverability | 44% → 94% (+50 points) | 44% → 78% (+34 points) |
-| Effectiveness | 38% → 55% (+17 points) | 36% → 60% (+24 points) |
-| Efficiency | 32% → 93% (+62 points) | 46% → 82% (+36 points) |
+| Overall | 72.3% — baseline ran, but no comparable score was available; uplift unavailable | 77.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 50.0% (-50.0 points) | 100.0% → 50.0% (-50.0 points) |
+| Correctness | 25.0% → 80.0% (+55.0 points) | 15.0% → 100.0% (+85.0 points) |
+| Discoverability | 91.5% — baseline ran, but no comparable score was available; uplift unavailable | 75.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 28.3% → 55.0% (+26.7 points) | 28.3% → 85.0% (+56.7 points) |
+| Efficiency | 84.8% — baseline ran, but no comparable score was available; uplift unavailable | 74.8% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
 0.1.0 (source: skill_manifest.yaml) <br>

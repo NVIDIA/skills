@@ -1,6 +1,6 @@
 ---
 name: "nemotron-speech"
-description: Routes NVIDIA Nemotron Speech (Riva) NIM tasks — deploys, runs, and tests ASR, TTS, and NMT NIMs on build.nvidia.com or self-hosted.
+description: Routes NVIDIA Nemotron Speech (Formerly Riva) NIM tasks — deploys, runs, and tests ASR, TTS, and NMT NIMs on build.nvidia.com or self-hosted.
 triggers:
   - Nemotron Speech
   - deploy Riva NIM

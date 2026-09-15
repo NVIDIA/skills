@@ -4,7 +4,7 @@ description: Used for converting one CT DICOM series folder to a HU NIfTI volume
 license: Apache-2.0
 allowed-tools: Bash
 metadata:
-  author: NVIDIA MedTech Team
+  author: 'NVIDIA MedTech Team'
   tags:
     - MedTech
     - DICOM

@@ -1,0 +1,52 @@
+{
+  "_about": "Default hyperparameters applied by kermt-continue-pretrain and kermt-add-cmim-pretrain. Values target a workstation-scale hybrid pretrain. The skill echoes the applied set back to the user on every invocation; override any value with the corresponding CLI flag.",
+
+  "training": {
+    "_about": "Optimizer and training schedule. Apply to all pretrain workflows.",
+    "batch_size": 256,
+    "dropout": 0.1,
+    "epochs": 30,
+    "init_lr": 1e-5,
+    "max_lr": 1.5e-4,
+    "final_lr": 1e-5,
+    "warmup_epochs": 20,
+    "weight_decay": 1e-7,
+    "save_interval": 100,
+    "seed": 0,
+    "tensorboard": true,
+    "use_cuikmolmaker_featurization": true
+  },
+
+  "loss": {
+    "_about": "Loss-weighting knobs. contrastive_temperature applies only when the model has a contrast head (hybrid). vocab_loss_weight applies when the model has a vocab head (cmim or hybrid). The runner detects the model type from the checkpoint and ignores irrelevant entries.",
+    "contrastive_temperature": 0.1,
+    "vocab_loss_weight": 1.0
+  },
+
+  "add_cmim_decoder": {
+    "_about": "Used by kermt-add-cmim-pretrain when constructing the new cMIM decoder + latent_dist on top of a loaded grover-base encoder, and by kermt-pretrain-scratch when the pretrain target is cmim or hybrid. Ignored by kermt-continue-pretrain (those dimensions come from the ckpt's saved_args). Values match the manuscript's hybrid pretrain configuration: latent_dim=512, 8-head, 3-layer decoder (cf. `_PRESET_LATENT_DIM` / `_PRESET_DECODER_FFN_HIDDEN_SIZE` in launch-KERMT-pretrain-slurm.sh, both presets).",
+    "latent_dim": 512,
+    "contrastive_temperature": 0.1,
+    "decoder_num_layers": 3,
+    "decoder_num_attention_heads": 8,
+    "decoder_ffn_hidden_size": 2048,
+    "decoder_dropout": 0.1,
+    "decoder_max_seq_len": 512,
+    "decoder_positional_encoding": "rope",
+    "decoder_gate_self_attn": false,
+    "decoder_gate_cross_attn": false
+  },
+
+  "arch": {
+    "_about": "Encoder architecture defaults — used ONLY by kermt-pretrain-scratch (fresh model from corpus, no starting ckpt). kermt-continue-pretrain and kermt-add-cmim-pretrain ignore this block and pull arch from the loaded checkpoint instead; the runner aborts if user-supplied arch flags mismatch the ckpt's saved_args.",
+    "hidden_size": 800,
+    "depth": 6,
+    "num_attn_head": 4,
+    "activation": "PReLU",
+    "backbone": "gtrans",
+    "embedding_output_type": "both",
+    "self_attention": false
+  },
+
+  "_about_gpu_selection": "GPU selection is auto-detected at runtime, not a default here. The pretrain runner uses torch.cuda.device_count() and dispatches single-GPU or DDP accordingly. Override with --gpus 0,2 if you want a specific subset."
+}

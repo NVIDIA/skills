@@ -125,15 +125,25 @@ This recipe uses only the `nvidia-riva-client` pip package — no `python-client
 First, discover the function-id. Pick a **specific** model rather than relying on a broad regex — multiple NMT functions are typically active and some may be paused or returning 502 at any given time. To list everything currently active:
 
 ```bash
+NVCF_FUNCTIONS_JSON=$(mktemp)
+trap 'rm -f "$NVCF_FUNCTIONS_JSON"' EXIT
+
 curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
-  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized" \
-  | python3 -c "
-import sys, json, re
+  --output "$NVCF_FUNCTIONS_JSON" \
+  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized"
+
+python3 - "$NVCF_FUNCTIONS_JSON" <<'PY'
+import json
+import re
+import sys
+
 pat = re.compile(r'nmt|translate|megatron-nmt|seamless', re.I)
-for f in json.load(sys.stdin).get('functions', []):
+with open(sys.argv[1], encoding="utf-8") as response:
+    functions = json.load(response).get('functions', [])
+for f in functions:
     if f.get('status') == 'ACTIVE' and pat.search(f.get('name','')):
         print(f['id'], f['name'])
-"
+PY
 ```
 
 Pick the `id` of the function whose `name` matches your model. Function IDs rotate per release — never hardcode them; always resolve fresh via this API.
@@ -143,14 +153,26 @@ For interactive browsing only: `https://build.nvidia.com/<org>/<model>/api`. Tha
 Then anchor on a specific name (replace `riva-translate-1_6b` with whichever you picked):
 
 ```bash
-FID=$(curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
-  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized" \
-  | python3 -c "
-import sys, json
-for f in json.load(sys.stdin).get('functions', []):
+NVCF_FUNCTIONS_JSON=$(mktemp)
+trap 'rm -f "$NVCF_FUNCTIONS_JSON"' EXIT
+
+curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
+  --output "$NVCF_FUNCTIONS_JSON" \
+  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized"
+
+FID=$(python3 - "$NVCF_FUNCTIONS_JSON" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as response:
+    functions = json.load(response).get('functions', [])
+for f in functions:
     if f.get('status') == 'ACTIVE' and f.get('name','').removeprefix('ai-') == 'riva-translate-1_6b':
         print(f['id']); break
-")
+PY
+)
+
+test -n "$FID" || { echo "No matching active NVCF function found" >&2; exit 1; }
 
 TEXT="Hello, how are you today?" SRC=en TGT=de SERVER=grpc.nvcf.nvidia.com:443 FID=$FID python3 - <<'PY'
 import os, riva.client

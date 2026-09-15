@@ -51,6 +51,7 @@ import subprocess
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 import venv
 from importlib.metadata import PackageNotFoundError
@@ -445,12 +446,36 @@ def _copy_upstream_config(name: str, *, overwrite_if_different: bool = False) ->
     return False
 
 
+class _NoLabelDictRedirects(urllib.request.HTTPRedirectHandler):
+    """Keep the pinned label dictionary request on its reviewed HTTPS origin."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
 def _download_label_dict(dst: Path) -> bool:
     if dst.exists():
         return False
-    dst.parent.mkdir(parents=True, exist_ok=True)
     try:
-        with urllib.request.urlopen(LABEL_DICT_URL, timeout=30) as response:
+        source = urllib.parse.urlsplit(LABEL_DICT_URL)
+        allowed_source = (
+            source.scheme == "https"
+            and source.hostname == "raw.githubusercontent.com"
+            and source.port in (None, 443)
+            and source.username is None
+            and source.password is None
+            and not source.fragment
+        )
+    except ValueError:
+        return False
+    if not allowed_source:
+        return False
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    # Check the scheme/origin before I/O and reject every redirect. In particular,
+    # a response cannot downgrade HTTPS or send the request to another host.
+    opener = urllib.request.build_opener(_NoLabelDictRedirects())
+    try:
+        with opener.open(LABEL_DICT_URL, timeout=30) as response:
             payload = response.read()
     except (OSError, urllib.error.URLError):
         return False
@@ -1387,8 +1412,10 @@ def compare_checkpoint_weights(reference: Path, candidate: Path) -> dict:
     try:
         import torch  # type: ignore
 
-        ref_obj = torch.load(reference, map_location="cpu", weights_only=False)
-        cand_obj = torch.load(candidate, map_location="cpu", weights_only=False)
+        # Only tensor state dictionaries and safe primitive metadata are needed.
+        # Unsupported checkpoint objects fail closed; never retry unsafe pickle.
+        ref_obj = torch.load(reference, map_location="cpu", weights_only=True)
+        cand_obj = torch.load(candidate, map_location="cpu", weights_only=True)
         ref_state = _extract_state_dict(ref_obj)
         cand_state = _extract_state_dict(cand_obj)
         if ref_state is None or cand_state is None:

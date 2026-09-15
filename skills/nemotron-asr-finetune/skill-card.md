@@ -1,5 +1,5 @@
 ## Description: <br>
-Orchestration skill for NVIDIA Nemotron Speech (Riva) / NeMo ASR domain and language adaptation that scopes the task, picks the cheapest sufficient path (word boosting, n-gram LM, or fine-tuning), delegates each stage to the right sub-skill, and answers cost/time/data questions along the way. <br>
+Orchestration skill for NVIDIA Nemotron Speech (Riva) / NeMo ASR domain and language adaptation. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to improve or customize NVIDIA Nemotron Speech / Riva ASR for a specific domain or language, including reducing WER, adding a language, or planning a fine-tune pipeline. <br>
+Developers and engineers who need to improve NVIDIA Nemotron Speech / Riva ASR accuracy for a specific domain or language, including planning the customization path and sequencing training, evaluation, and deployment stages. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Yes] <br>
-**Credential Type(s):** [API key] <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,58 +25,63 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [NVIDIA Speech NIM Documentation](https://docs.nvidia.com/nim/speech/latest/index.html) <br>
+- [NIM Speech Docs Home](https://docs.nvidia.com/nim/speech/latest/index.html) <br>
 - [ASR Customization Guide](https://docs.nvidia.com/nim/speech/latest/asr/customization/customization.html) <br>
 - [ASR Support Matrix](https://docs.nvidia.com/nim/speech/latest/reference/support-matrix/asr.html) <br>
 - [Riva ASR Tutorials](https://github.com/nvidia-riva/tutorials) <br>
 - [Tokenizer Extension to New Language + Acoustic Fine-Tune](https://github.com/nvidia-riva/tutorials/blob/main/asr-extend-tokenizer-to-newlang-ft-acoustic-model.ipynb) <br>
+- [Orchestration Workflow Reference](references/workflow.md) <br>
+- [Path Selection Reference](references/path-selection.md) <br>
+- [Planning Answers Reference](references/planning-answers.md) <br>
+- [Sub-Skills Registry](references/sub-skills.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Configuration instructions, Shell commands] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Analysis, Configuration instructions] <br>
+**Output Format:** [Markdown] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 9 evaluation tasks (6 positive activation, 3 negative activation) with 1 attempt per task in the astra-sandbox environment. <br>
+17 evaluation tasks (14 positive, 3 negative), 3 attempts per task in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Whether the skill is safe to use: checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the answer is correct, measured by final-answer accuracy against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded when needed: skill selection, decoy avoidance, and workflow execution. <br>
+- Effectiveness: Whether the skill helped complete the task, combining goal completion (50%) and expected workflow adherence (50%). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage, combining tool-call productivity (50%) and token efficiency (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability, not Efficiency). <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 8 | 100% (+0%) | 100% (+11%) |
-| Correctness | 8 | 80% (+28%) | 88% (+27%) |
-| Discoverability | 8 | 86% (+47%) | 93% (+50%) |
-| Effectiveness | 8 | 64% (+20%) | 76% (+24%) |
-| Efficiency | 8 | 83% (+36%) | 88% (+37%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | Not available | 79.1% |
+| Security | Not available | 77.8% → 80.0% (+2.2 points) |
+| Correctness | Not available | 62.2% → 82.0% (+19.8 points) |
+| Discoverability | Not available | 92.1% |
+| Effectiveness | Not available | 34.5% → 64.7% (+30.2 points) |
+| Efficiency | Not available | 76.7% |
 
 ## Skill Version(s): <br>
-1.0.0 (source: frontmatter) <br>
+1.3.0 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

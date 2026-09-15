@@ -13,6 +13,7 @@ metadata:
     - deployment
 ---
 
+
 # cuOpt Server — Deploy and client (Python/curl)
 
 This skill covers **starting the server** and **client examples** (curl, Python). Server has no separate C API (clients can be any language).
@@ -61,9 +62,7 @@ For production, pin rather than float: `latest-*` tags are mutable and can silen
 
 ## Verify
 
-```bash
-curl http://localhost:8000/cuopt/health
-```
+Confirm the server is up by requesting `GET /cuopt/health` on the local port (e.g. `http://localhost:8000/cuopt/health`) — a healthy server returns HTTP 200.
 
 ## Instructions
 

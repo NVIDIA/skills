@@ -1,0 +1,4 @@
+interface:
+  display_name: "FoundationPose Setup"
+  short_description: "Install and repair the FoundationPose perception pipeline"
+  default_prompt: "Use $foundationpose-setup to prepare the FoundationPose perception pipeline environment with TAO Deploy depth."
