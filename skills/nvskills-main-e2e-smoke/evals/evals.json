@@ -1,0 +1,38 @@
+[
+  {
+    "id": "nvskills-main-e2e-smoke-001",
+    "question": "Use the NVSkills main workflow smoke-test skill and report its result.",
+    "expected_skill": "nvskills-main-e2e-smoke",
+    "expected_script": "check.py",
+    "ground_truth": "The agent reads the skill instructions, runs scripts/check.py, and reports NVSKILLS_MAIN_E2E_OK.",
+    "expected_behavior": [
+      "Read nvskills-main-e2e-smoke/SKILL.md",
+      "Executed check.py",
+      "Reported NVSKILLS_MAIN_E2E_OK",
+      "Did not modify files or access the network"
+    ]
+  },
+  {
+    "id": "nvskills-main-e2e-smoke-002",
+    "question": "Verify the NVIDIA/skills and nvskills-ci main workflow integration.",
+    "expected_skill": "nvskills-main-e2e-smoke",
+    "expected_script": "check.py",
+    "ground_truth": "The agent invokes the main workflow smoke-test skill and returns its deterministic success message.",
+    "expected_behavior": [
+      "Selected nvskills-main-e2e-smoke",
+      "Executed check.py",
+      "Returned the exact success message"
+    ]
+  },
+  {
+    "id": "nvskills-main-e2e-smoke-negative-001",
+    "question": "What is the capital of France?",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "Paris is the capital of France.",
+    "expected_behavior": [
+      "Answered without invoking nvskills-main-e2e-smoke",
+      "Did not execute check.py"
+    ]
+  }
+]
