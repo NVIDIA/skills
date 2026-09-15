@@ -1,0 +1,13 @@
+{
+  "repo_id": "nvidia/NV-KERMT-70M-v2",
+  "revision": "7df5eb3179235fdea1e8124db73215da33d77dce",
+  "ckpt_name": "kermt_contrastive_v2.0.pt",
+  "vocab_files": [
+    "pretrain_atom_vocab.json",
+    "pretrain_bond_vocab.json",
+    "pretrain_smiles_vocab.pkl"
+  ],
+  "model_type": "hybrid",
+  "license": "NVIDIA Open Model License",
+  "license_url": "https://huggingface.co/nvidia/NV-KERMT-70M-v2"
+}

@@ -14,7 +14,9 @@
 # limitations under the License.
 
 import importlib.util
+import io
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -23,6 +25,82 @@ spec = importlib.util.spec_from_file_location("run_finetune", SCRIPT)
 mod = importlib.util.module_from_spec(spec)
 assert spec.loader is not None
 spec.loader.exec_module(mod)
+
+
+def test_download_label_dict_uses_reviewed_https_origin(tmp_path, monkeypatch):
+    calls = []
+
+    def open_source(url, *, timeout):
+        calls.append((url, timeout))
+        return io.BytesIO(b'{"lung tumor": 23}\n')
+
+    def build_opener(handler):
+        assert isinstance(handler, mod._NoLabelDictRedirects)
+        return SimpleNamespace(open=open_source)
+
+    monkeypatch.setattr(mod.urllib.request, "build_opener", build_opener)
+    dst = tmp_path / "bundle" / "label_dict.json"
+
+    assert mod._download_label_dict(dst) is True
+    assert calls == [(mod.LABEL_DICT_URL, 30)]
+    assert mod.json.loads(dst.read_text()) == {"lung tumor": 23}
+    # A cache hit must not issue a second request or overwrite the saved file.
+    assert mod._download_label_dict(dst) is False
+    assert len(calls) == 1
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://raw.githubusercontent.com/labels.json",
+        "file:///tmp/labels.json",
+        "ftp://raw.githubusercontent.com/labels.json",
+        "custom://raw.githubusercontent.com/labels.json",
+        "https://example.invalid/labels.json",
+        "https://raw.githubusercontent.com.example.invalid/labels.json",
+        "https://example-user@raw.githubusercontent.com/labels.json",
+        "https://raw.githubusercontent.com:80/labels.json",
+        "https://raw.githubusercontent.com:invalid/labels.json",
+        "https://raw.githubusercontent.com/labels.json#fragment",
+    ],
+)
+def test_download_label_dict_rejects_other_origins_before_io(tmp_path, monkeypatch, url):
+    def unexpected_opener(*args, **kwargs):
+        pytest.fail("invalid download source must be rejected before opening a connection")
+
+    monkeypatch.setattr(mod, "LABEL_DICT_URL", url)
+    monkeypatch.setattr(mod.urllib.request, "build_opener", unexpected_opener)
+    dst = tmp_path / "not-created" / "label_dict.json"
+
+    assert mod._download_label_dict(dst) is False
+    assert not dst.parent.exists()
+
+
+@pytest.mark.parametrize(
+    "newurl",
+    [
+        "http://raw.githubusercontent.com/labels.json",
+        "https://example.invalid/labels.json",
+        "file:///tmp/labels.json",
+        "https://raw.githubusercontent.com/other.json",
+    ],
+)
+def test_label_dict_redirect_handler_rejects_all_redirects(newurl):
+    handler = mod._NoLabelDictRedirects()
+    request = mod.urllib.request.Request(mod.LABEL_DICT_URL)
+    assert handler.redirect_request(request, None, 302, "Found", {}, newurl) is None
+
+
+def test_download_label_dict_handles_rejected_redirect(tmp_path, monkeypatch):
+    def open_source(url, *, timeout):
+        raise mod.urllib.error.HTTPError(url, 302, "redirect rejected", {}, None)
+
+    monkeypatch.setattr(
+        mod.urllib.request, "build_opener", lambda _: SimpleNamespace(open=open_source)
+    )
+    dst = tmp_path / "bundle" / "label_dict.json"
+    assert mod._download_label_dict(dst) is False
+    assert not dst.exists()
 
 
 def test_prepare_bundle_files_stages_train_configs_from_local_upstream(tmp_path, monkeypatch):
@@ -345,6 +423,63 @@ def test_compare_checkpoint_weights_detects_changed_tensor(tmp_path):
     assert comparison["weights_identical"] is False
     assert comparison["differing_tensors"] == 1
     assert comparison["max_abs_diff"] == 1.0
+
+
+@pytest.mark.parametrize("state_key", ["state_dict", "model", "network"])
+def test_compare_checkpoint_weights_loads_nested_state_safely(tmp_path, monkeypatch, state_key):
+    torch = pytest.importorskip("torch")
+    reference = tmp_path / "reference.pt"
+    candidate = tmp_path / "candidate.pt"
+    state = {"layer.weight": torch.ones(2, 2)}
+    torch.save(state, reference)
+    torch.save({state_key: state, "epoch": 1, "metrics": {"dice": 0.5}}, candidate)
+    original_load = torch.load
+    calls = []
+
+    def restricted_load(path, *, map_location, weights_only):
+        calls.append(path)
+        assert map_location == "cpu"
+        assert weights_only is True
+        return original_load(path, map_location=map_location, weights_only=weights_only)
+
+    monkeypatch.setattr(torch, "load", restricted_load)
+    comparison = mod.compare_checkpoint_weights(reference, candidate)
+
+    assert calls == [reference, candidate]
+    assert comparison["compared"] is True
+    assert comparison["weights_identical"] is True
+
+
+@pytest.mark.parametrize("unsupported_checkpoint", ["reference", "candidate"])
+def test_compare_checkpoint_weights_rejects_objects_without_unsafe_retry(
+    tmp_path, monkeypatch, unsupported_checkpoint
+):
+    torch = pytest.importorskip("torch")
+    reference = tmp_path / "reference.pt"
+    candidate = tmp_path / "candidate.pt"
+    state = {"layer.weight": torch.ones(2, 2)}
+    torch.save(state, reference)
+    torch.save(state, candidate)
+    rejected = reference if unsupported_checkpoint == "reference" else candidate
+    # Harmless custom metadata exercises the restricted unpickler's rejection;
+    # no executable payload or unrestricted load is needed for this regression.
+    torch.save({"state_dict": state, "metadata": SimpleNamespace(epoch=1)}, rejected)
+    original_load = torch.load
+    calls = []
+
+    def restricted_load(path, *, map_location, weights_only):
+        calls.append(path)
+        assert map_location == "cpu"
+        assert weights_only is True
+        return original_load(path, map_location=map_location, weights_only=weights_only)
+
+    monkeypatch.setattr(torch, "load", restricted_load)
+    comparison = mod.compare_checkpoint_weights(reference, candidate)
+
+    assert comparison["compared"] is False
+    assert comparison["weights_identical"] is None
+    assert "error" in comparison
+    assert calls == ([reference] if rejected == reference else [reference, candidate])
 
 
 def test_mlflow_tracking_uses_monai_builtin_without_training_overrides(tmp_path):

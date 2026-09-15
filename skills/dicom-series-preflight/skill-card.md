@@ -1,7 +1,7 @@
 ## Description: <br>
 Used for header-only preflight of one DICOM series folder before conversion or inference. Not for de-identification or clinical clearance. <br>
 
-This skill is ready for commercial/non-commercial use. <br>
+This skill is for research and development only. <br>
 
 ## Owner
 NVIDIA <br>
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to perform header-only preflight checks on DICOM series directories before conversion or model inference, verifying orientation consistency, spacing, and PHI-tag presence. <br>
+Developers and engineers use this skill to run a header-only preflight scan of a DICOM series directory, checking orientation, spacing consistency, and PHI-tag presence before conversion or model inference. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,15 +25,15 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [skill_manifest.yaml](skill_manifest.yaml) <br>
-- [BENCHMARK.md](BENCHMARK.md) <br>
+- [Skill Manifest](skill_manifest.yaml) <br>
+- [Skill Benchmark](BENCHMARK.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis] <br>
+**Output Type(s):** [Analysis, Files] <br>
 **Output Format:** [JSON] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Emits structured preflight JSON with inventory, orientation axcodes, PHI flags, findings, and a verdict of pass, warn, or fail] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -42,35 +42,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-3 evaluation tasks (3 positive), each run in an isolated sandbox pod. <br>
+3 evaluation tasks across DICOM preflight scenarios (3 positive cases), each with 3 attempts per agent in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use, checking for unsafe operations, secret leakage, and unauthorized access. <br>
+- Security: Whether the skill is safe to use: checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (equal-weight mean of goal accuracy and behavior check). <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage, measuring routing quality and productive tool use. <br>
+- Discoverability: Whether the right skill was loaded and activated when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal, combining goal completion (50%) and expected workflow adherence (50%). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage, combining tool-call productivity (50%) and token efficiency (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 44% → 84% (+40 points) | 46% → 66% (+20 points) |
-| Security | 100% → 100% (±0 points) | 100% → 33% (-67 points) |
-| Correctness | 7% → 73% (+67 points) | 20% → 80% (+60 points) |
-| Discoverability | 45% → 93% (+48 points) | 42% → 73% (+31 points) |
-| Effectiveness | 19% → 56% (+37 points) | 23% → 56% (+33 points) |
-| Efficiency | 50% → 96% (+46 points) | 45% → 88% (+42 points) |
+| Overall | 75.3% | 71.6% |
+| Security | 100.0% → 66.7% (-33.3 pts) | 100.0% → 66.7% (-33.3 pts) |
+| Correctness | 2.9% → 80.0% (+77.1 pts) | 2.5% → 80.0% (+77.5 pts) |
+| Discoverability | 88.3% | 81.7% |
+| Effectiveness | 13.6% → 56.1% (+42.5 pts) | 17.5% → 49.7% (+32.2 pts) |
+| Efficiency | 85.2% | 79.8% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: skill_manifest.yaml) <br>

@@ -1,0 +1,11 @@
+{
+  "_about": "Default settings applied by kermt-infer. Inference is a stateless forward pass — no training schedule, no LR, no FFN sizing. The skill echoes the applied set back to the user on every invocation; override any value with the corresponding CLI flag.",
+
+  "runtime": {
+    "_about": "Runtime knobs.",
+    "batch_size": 32,
+    "seed": 0
+  },
+
+  "_about_gpu_selection": "GPU selection is auto-detected at runtime, not a default here. Inference defaults to GPU 0; override with --gpus 0 (the single id you want)."
+}

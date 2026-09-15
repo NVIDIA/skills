@@ -5,7 +5,7 @@ license: Apache-2.0
 allowed-tools: Bash
 permissions: [file_read, file_write, shell]
 metadata:
-  author: NVIDIA MedTech Team
+  author: 'NVIDIA MedTech Team'
   tags:
     - MedTech
     - DICOM

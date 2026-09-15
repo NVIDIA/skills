@@ -4,7 +4,7 @@ description: Runs standard or fixed-channel softmax finetuning of NV-Segment-CT 
 license: Apache-2.0
 allowed-tools: Bash, Read, Write, WebFetch, Env
 metadata:
-  author: "NVIDIA MedTech <noreply@nvidia.com>"
+  author: 'NVIDIA MedTech <noreply@nvidia.com>'
   tags:
     - MedTech
     - CT
@@ -23,6 +23,7 @@ metadata:
 
 ## Instructions
 
+- Run only the caller-requested preset, dataset, output directory, and compute budget. Dependency setup and remote tracking require the caller's approval. After reporting the result, stop; further training, publishing, or deployment is a separate request.
 - Run `scripts/run_finetune.py`; do not patch files under `bundle/` or upstream checkouts during normal skill use.
 - For standalone Bash, include the fresh-environment setup line before the wrapper; benchmark venvs start empty.
 - Run the committed script in place from the repo root. Do not copy this skill to a runtime directory, and do not use `rm` or cleanup commands in generated invocations.
@@ -56,7 +57,9 @@ For `--label-mapping '[[1,3],[2,13]]'`, channel 0 is background, channel 1 repre
 - Runtime packages from `skill_manifest.yaml`, especially `monai==1.4.0`, `numpy<2`, `nibabel`, `scipy`, `typer`, `PyYAML`, `fire`, `pytorch-ignite`, `einops`, and `huggingface_hub`. Install `mlflow>=2.10,<4` when MLflow tracking is enabled.
 - Optional environment variables: `CUDA_VISIBLE_DEVICES` restricts visible GPUs; `NPROC_PER_NODE` overrides GPU count and values `>=2` select multi-GPU mode for non-sanity runs; `NVSEG_FINETUNE_AUTO_VENV=0` disables the cached MONAI 1.4 compatibility environment. Remote tracking may use `DATABRICKS_CONFIG_PROFILE`, `DATABRICKS_HOST`, `DATABRICKS_TOKEN`, `MLFLOW_TRACKING_CLIENT_CERT_PATH`, `MLFLOW_TRACKING_INSECURE_TLS`, `MLFLOW_TRACKING_PASSWORD`, `MLFLOW_TRACKING_SERVER_CERT_PATH`, `MLFLOW_TRACKING_TOKEN`, or `MLFLOW_TRACKING_USERNAME`; these variables are forwarded only when MLflow is explicitly enabled, and unrelated credentials are not forwarded.
 - `--softmax` also needs the pinned NVIDIA-Medtech source checkout. Set `NV_SEGMENT_CT_ROOT` to its `NV-Segment-CT` directory, or set `NV_SEGMENT_CTMR_ROOT` to the sibling `NV-Segment-CTMR` directory. The wrapper reads the official softmax config and implementation in place and writes generated overrides only under `--output-dir`.
-- Side effects: writes generated bundle configs under `skills/nv-segment-ct-finetune/bundle/configs/`, including `skills/nv-segment-ct-finetune/bundle/configs/auto_override.json`, `skills/nv-segment-ct-finetune/bundle/configs/train_continual_task06_lung.json`, and `skills/nv-segment-ct-finetune/bundle/configs/dfw_no_logging.json`; writes checkpoints/evidence under `--output-dir` and local tracking data under `<output-dir>/mlruns` when enabled; may create the MONAI compatibility environment under `~/.cache/nvidia-skills/venvs/nv-segment-ct-finetune-monai14/`; may cache model assets under `~/.cache/huggingface/`; and may contact `https://huggingface.co`, `https://raw.githubusercontent.com`, or `https://<caller-provided-mlflow-or-databricks-workspace>` when remote tracking is explicitly enabled.
+- Run outputs: generated bundle configs under `skills/nv-segment-ct-finetune/bundle/configs/`, including `auto_override.json`, `train_continual_task06_lung.json`, and `dfw_no_logging.json`; checkpoints/evidence under `--output-dir`; and local tracking data under `<output-dir>/mlruns` when enabled.
+- Dependency cache locations: `~/.cache/nvidia-skills/venvs/nv-segment-ct-finetune-monai14/` for MONAI compatibility packages and `~/.cache/huggingface/` for model assets. These are reusable runtime files, not agent instructions or authorization for another run. Set `NVSEG_FINETUNE_AUTO_VENV=0` when compatibility-environment setup is not approved; then use a caller-provided compatible environment.
+- Network access: model/config downloads use `https://huggingface.co` and `https://raw.githubusercontent.com`; remote tracking contacts only the caller-approved MLflow or Databricks destination when explicitly enabled. The label-dictionary download accepts HTTPS on the pinned source host and rejects redirects.
 
 Fresh environment setup:
 
@@ -200,7 +203,7 @@ Check `output.json` in the run directory first:
 - `formal_pretrained_val_dice` and `formal_finetuned_val_dice`: original-spacing pre/post scores when formal eval is enabled.
 - `training_start_val_dice`, `val_dice_per_epoch`, and `training_best_val_dice`: training-time validation trace.
 - `finetuned_ckpt_matches_pretrained_weights`: detects the standard workflow's epoch-0 checkpoint trap when `val_at_start=true`; softmax uses a different checkpoint architecture.
-- `recommended_ckpt`: checkpoint to keep. Do not blindly use the last epoch, `model_finetune.pt`, or `model_softmax.pt` without checking the recorded workflow and metrics.
+- `recommended_ckpt`: checkpoint recommendation derived from the recorded workflow and metrics. Inspect those records before selecting a checkpoint; the last epoch or a filename alone is not evidence of improvement. Report the recommendation to the caller; deployment is outside this skill's scope.
 - `invocation.mlflow_tracking`: selected tracking URI, experiment name, and optional run name, or `null` when tracking was disabled.
 - `runtime.oom`, `runtime.peak_gpu_mb`, and phase logs: distinguish OOM, slow validation, and process failure.
 
@@ -209,6 +212,7 @@ Decision rule: prefer formal original-spacing pre/post scores when present; reje
 ## Limitations
 
 - Thin wrapper. Training, validation, transforms, and checkpointing are delegated to the upstream bundle in `bundle/`.
+- Tensor comparison uses restricted `weights_only=True` checkpoint loading. Unsupported serialized objects produce a comparison error; they are not retried with unrestricted pickle loading. This comparison is not a security audit of the upstream training/checkpoint loader.
 - Reproduction record only: the successful five-epoch Task06 run used Python
   `3.12.3`, PyTorch `2.12.0+cu130` with CUDA `13.0`, MONAI `1.4.0`, NumPy
   `1.26.4`, PyTorch-Ignite `0.5.4`, NiBabel `5.4.2`, SciPy `1.16.0`, einops

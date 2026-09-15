@@ -5,7 +5,7 @@ license: Apache-2.0
 allowed-tools: Bash, Read, Write, WebFetch, Env
 permissions: [env, file_read, file_write, network, shell]
 metadata:
-  author: NVIDIA MedTech Team
+  author: 'NVIDIA MedTech Team'
   tags:
     - MedTech
     - MRI
