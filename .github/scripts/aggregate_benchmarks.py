@@ -99,7 +99,26 @@ FLOAT_FIELDS = {"pass_threshold_pct"}
 #
 # Remove this once SkillEvaluator emits the threshold as a real per-run field
 # and the parser reads it again.
-MIGRATING_FIELDS = {"pass_threshold_pct"}
+#
+# ---
+#
+# validation_status is read from the "- Validation status: `passed`" line that
+# v1/v2 cards carry and SkillEvaluator 1.5.x dropped. It is the same shape of
+# change as pass_threshold_pct above, and it fired on 2026-09-15: the sync that
+# landed 10 BioNeMo KERMT/FoundationPose skills plus a re-signed nemotron-speech
+# took validation_status from 248 to 259 nulls and blocked the regeneration on
+# every hourly run until this exemption.
+#
+# Worth recording why this is not worth deriving from another field: the line
+# carries exactly one value. All 96 cards that still emit it say `passed`, and
+# none has ever said anything else, so it distinguishes nothing. Those 96 are
+# also precisely the 96 cards still carrying the internal CI image path, i.e.
+# the set last signed before 1.5.4 — so the field reaches zero on its own as
+# those teams re-sign, and inferring it from the verdict or the Tier 1 row
+# would assert something the original line never claimed.
+#
+# Remove this once no card emits the line and the field is dropped outright.
+MIGRATING_FIELDS = {"pass_threshold_pct", "validation_status"}
 
 
 def parse_uplift(raw):
