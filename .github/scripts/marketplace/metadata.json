@@ -85,6 +85,102 @@
       }
     },
     {
+      "path": "skills/bionemo-kermt-add-cmim-pretrain",
+      "name": "kermt-add-cmim-pretrain",
+      "description": "Convert a grover_base checkpoint (encoder-only or encoder + vocab heads) into a hybrid checkpoint by adding a randomly-initialized cMIM decoder + latent_dist, then continue pretraining on the user's corpus as hybrid (vocab + contrast). Effectively kermt-continue-pretrain with a one-time ckpt-conversion step prepended.",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "computational_biologist,research_academic,ml_engineer,research_non_academic,ai_engineer",
+        "discovery.activity_tags": "convert,train,extend,configure,integrate"
+      }
+    },
+    {
+      "path": "skills/bionemo-kermt-continue-pretrain",
+      "name": "kermt-continue-pretrain",
+      "description": "Continue KERMT pretraining on a custom SMILES corpus with a grover_base, cmim, or hybrid checkpoint. Use a local checkpoint or optionally download a pinned Hugging Face model bundle using HF_TOKEN if configured. Run containerized training and write model bundles, prepared data, logs, and checkpoints to user-selected host directories.",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "computational_biologist,ml_engineer,research_academic,data_scientist,bioinformatician",
+        "discovery.activity_tags": "train,fine_tune,configure,package,deploy"
+      }
+    },
+    {
+      "path": "skills/bionemo-kermt-embed",
+      "name": "kermt-embed",
+      "description": "Extract per-molecule embeddings from any encoder-bearing KERMT checkpoint. Use a local checkpoint or optionally download a pinned Hugging Face model bundle using HF_TOKEN if configured. Run containerized embedding extraction and write model bundles, per-readout .npy embeddings, canonical SMILES, and validity arrays to user-selected host directories.",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,research_academic,ml_engineer,data_scientist",
+        "discovery.activity_tags": "extract,inference,generate,validate,integrate"
+      }
+    },
+    {
+      "path": "skills/bionemo-kermt-finetune",
+      "name": "kermt-finetune",
+      "description": "Finetune a pretrained KERMT encoder on a labeled CSV. Validate the checkpoint and data, prepare features, and run containerized training. Use a local checkpoint or optionally download a pinned Hugging Face model bundle using HF_TOKEN if configured. Write model bundles, prepared data, logs, and trained models to user-selected host directories.",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "computational_biologist,ml_engineer,bioinformatician,data_scientist,research_academic",
+        "discovery.activity_tags": "fine_tune,train,validate,configure,evaluate"
+      }
+    },
+    {
+      "path": "skills/bionemo-kermt-infer",
+      "name": "kermt-infer",
+      "description": "Run predictions with a finetuned KERMT checkpoint on a SMILES-only CSV. The skill validates that the input ckpt has task FFN heads (refuses pretrain ckpts with a redirect to kermt-finetune), validates the CSV, prepares the data (clean + rdkit_2d features), then launches main.py predict inside the kermt container (blocking, minutes-scale).",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,research_academic,data_scientist,ml_engineer,application_developer",
+        "discovery.activity_tags": "inference,validate,transform,operate"
+      }
+    },
+    {
+      "path": "skills/bionemo-kermt-monitor",
+      "name": "kermt-monitor",
+      "description": "Check progress for a detached KERMT run (pretrain, finetune, or any kermt_run_detached invocation). Reads run.json, queries docker for container state, tails the pretrain/finetune log, and parses progress lines (epoch, step, val loss).",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,computational_biologist,bioinformatician,research_academic,devops_engineer",
+        "discovery.activity_tags": "monitor,train,fine_tune,inspect,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/bionemo-kermt-pretrain-scratch",
+      "name": "kermt-pretrain-scratch",
+      "description": "Pretrain a fresh KERMT model from scratch on a user-provided corpus. Builds a new vocabulary from the corpus, instantiates the model architecture from defaults, and launches pretrain_ddp.py inside the kermt container (detached for long runs). Unlike kermt-continue-pretrain, no starting checkpoint is loaded — the model is randomly initialized.",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,computational_biologist,research_academic,data_scientist,ai_engineer",
+        "discovery.activity_tags": "train,configure,scale,operate"
+      }
+    },
+    {
+      "path": "skills/bionemo-kermt-setup",
+      "name": "kermt-setup",
+      "description": "Bootstrap the KERMT agent environment — verify host docker + nvidia-container-toolkit, build the kermt:latest image from the repo's Dockerfile if it doesn't yet exist, and run a GPU smoke test inside the container. Every other kermt-* skill depends on this; invoke it first.",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "application_developer,ml_engineer,computational_biologist,bioinformatician,devops_engineer",
+        "discovery.activity_tags": "get_started,configure,validate,test,deploy"
+      }
+    },
+    {
       "path": "skills/cudaq-guide",
       "name": "cudaq-guide",
       "description": "Use for CUDA-Q setup, simulation targets, QPU access, and @cudaq.kernel authoring guidance.",
@@ -1270,6 +1366,30 @@
         "catalog.subdomain": "simulation-modeling",
         "audience": "developer,data_scientist,research_academic",
         "discovery.activity_tags": "get_started,configure,validate"
+      }
+    },
+    {
+      "path": "skills/foundationpose-pipeline",
+      "name": "foundationpose-pipeline",
+      "description": "Adapt BOP datasets, run the FoundationPose perception pipeline with TAO depth, and evaluate or re-score pose results. Use for dataset runs and result comparisons; environment installation belongs to foundationpose-setup.",
+      "metadata": {
+        "product.primary": "Isaac Perception",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "robotics",
+        "audience": "robotics_developer,ai_engineer,ml_engineer,developer",
+        "discovery.activity_tags": "inference,evaluate,benchmark,compare,convert"
+      }
+    },
+    {
+      "path": "skills/foundationpose-setup",
+      "name": "foundationpose-setup",
+      "description": "Install or repair the FoundationPose perception pipeline and build its FoundationStereo TensorRT engines. Use for SAM3/TAO dependency conflicts, CUDA library failures, and depth-engine shape or precision decisions.",
+      "metadata": {
+        "product.primary": "Isaac Perception",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "robotics",
+        "audience": "robotics_developer,application_developer,ml_engineer,ai_engineer,devops_engineer",
+        "discovery.activity_tags": "troubleshoot,configure,get_started,debug,deploy"
       }
     },
     {
@@ -2739,7 +2859,7 @@
     {
       "path": "skills/nemotron-speech",
       "name": "nemotron-speech",
-      "description": "Routes NVIDIA Nemotron Speech (Riva) NIM tasks — deploys, runs, and tests ASR, TTS, and NMT NIMs on build.nvidia.com or self-hosted.",
+      "description": "Routes NVIDIA Nemotron Speech (Formerly Riva) NIM tasks — deploys, runs, and tests ASR, TTS, and NMT NIMs on build.nvidia.com or self-hosted.",
       "metadata": {
         "product.primary": "Riva",
         "classification.category.primary": "ai_and_machine_learning",
