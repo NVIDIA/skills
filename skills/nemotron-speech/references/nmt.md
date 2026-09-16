@@ -16,7 +16,7 @@ This skill is **orientation, not catalog**. When a question depends on data that
 |---|---|
 | Current models, container IDs, supported language pairs, VRAM minimums | https://docs.nvidia.com/nim/speech/latest/reference/support-matrix/nmt.html |
 | Function IDs for cloud (build.nvidia.com) inference | `https://api.nvcf.nvidia.com/v2/nvcf/functions` (auth with `NVIDIA_API_KEY`; filter by `name` and `status=="ACTIVE"`). For human browsing only: `https://build.nvidia.com/<org>/<model>/api` (JS-rendered, not suitable for non-browser fetch tools). |
-| **Runtime feature support per model** — `<dnt>` tags, custom DNT dictionaries, max-length variation, batch translation, language code formats | https://docs.nvidia.com/nim/speech/latest/nmt/customization/customization.html |
+| **Runtime feature support per model** — `<dnt>` tags, custom DNT dictionaries, batch translation, language code formats | https://docs.nvidia.com/nim/speech/latest/nmt/custom-dictionaries.html |
 | **gRPC proto contract** — `TranslateTextRequest`, `TranslateTextResponse`, `dnt_phrases`, language code conventions | https://docs.nvidia.com/nim/speech/latest/reference/api-references/nmt/protos.html |
 | GPU / VRAM / driver minimums, OS prerequisites | https://docs.nvidia.com/nim/speech/latest/get-started/prerequisites.html |
 | Latency / throughput benchmarks per model and GPU | https://docs.nvidia.com/nim/speech/latest/reference/performances/nmt/performance.html |
@@ -51,7 +51,8 @@ Fetch the current `CONTAINER_ID` from the support matrix.
 ```bash
 export CONTAINER_ID=<container-id-from-support-matrix>
 export LOCAL_NIM_CACHE=~/.cache/nim
-mkdir -p $LOCAL_NIM_CACHE && sudo chown 1000:1000 $LOCAL_NIM_CACHE
+mkdir -p $LOCAL_NIM_CACHE
+sudo chown 1000:1000 $LOCAL_NIM_CACHE
 
 docker run -it --rm --name=$CONTAINER_ID \
   --runtime=nvidia \
@@ -124,15 +125,25 @@ This recipe uses only the `nvidia-riva-client` pip package — no `python-client
 First, discover the function-id. Pick a **specific** model rather than relying on a broad regex — multiple NMT functions are typically active and some may be paused or returning 502 at any given time. To list everything currently active:
 
 ```bash
+NVCF_FUNCTIONS_JSON=$(mktemp)
+trap 'rm -f "$NVCF_FUNCTIONS_JSON"' EXIT
+
 curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
-  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized" \
-  | python3 -c "
-import sys, json, re
+  --output "$NVCF_FUNCTIONS_JSON" \
+  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized"
+
+python3 - "$NVCF_FUNCTIONS_JSON" <<'PY'
+import json
+import re
+import sys
+
 pat = re.compile(r'nmt|translate|megatron-nmt|seamless', re.I)
-for f in json.load(sys.stdin).get('functions', []):
+with open(sys.argv[1], encoding="utf-8") as response:
+    functions = json.load(response).get('functions', [])
+for f in functions:
     if f.get('status') == 'ACTIVE' and pat.search(f.get('name','')):
         print(f['id'], f['name'])
-"
+PY
 ```
 
 Pick the `id` of the function whose `name` matches your model. Function IDs rotate per release — never hardcode them; always resolve fresh via this API.
@@ -142,14 +153,26 @@ For interactive browsing only: `https://build.nvidia.com/<org>/<model>/api`. Tha
 Then anchor on a specific name (replace `riva-translate-1_6b` with whichever you picked):
 
 ```bash
-FID=$(curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
-  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized" \
-  | python3 -c "
-import sys, json
-for f in json.load(sys.stdin).get('functions', []):
+NVCF_FUNCTIONS_JSON=$(mktemp)
+trap 'rm -f "$NVCF_FUNCTIONS_JSON"' EXIT
+
+curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
+  --output "$NVCF_FUNCTIONS_JSON" \
+  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized"
+
+FID=$(python3 - "$NVCF_FUNCTIONS_JSON" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as response:
+    functions = json.load(response).get('functions', [])
+for f in functions:
     if f.get('status') == 'ACTIVE' and f.get('name','').removeprefix('ai-') == 'riva-translate-1_6b':
         print(f['id']); break
-")
+PY
+)
+
+test -n "$FID" || { echo "No matching active NVCF function found" >&2; exit 1; }
 
 TEXT="Hello, how are you today?" SRC=en TGT=de SERVER=grpc.nvcf.nvidia.com:443 FID=$FID python3 - <<'PY'
 import os, riva.client

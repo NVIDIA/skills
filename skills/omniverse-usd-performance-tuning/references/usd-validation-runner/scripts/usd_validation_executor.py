@@ -16,11 +16,15 @@ root cause of "every run finds a different solution and it takes forever."
 
 Contract (no ambiguity, no fallbacks)
 -------------------------------------
-1. Identity is ``(module, class_name)``, sourced from ``validator-concepts.json``.
-   Concept -> implementation -> rule class is resolved by identity, never by
-   bare name.
-2. Resolution is fail-closed: zero matches raises, more than one match raises.
-   The executor never "best-guesses" a rule.
+1. Identity is ``(package family of module, class_name)``, sourced from
+   ``validator-concepts.json``. Concept -> implementation -> rule class is
+   resolved by identity, never by bare name. The family is the stable part:
+   ``usd_validation_nvidia`` and ``omni.asset_validator`` are one provider
+   family, ``usd_optimize`` and ``omni.scene.optimizer`` are the other, so an
+   upstream module rename inside a family still resolves. That is what keeps
+   the two ``IndexedPrimvarChecker`` classes apart while tolerating drift.
+2. Resolution is fail-closed: zero matches raises, more than one *distinct*
+   class matches raises. The executor never "best-guesses" a rule.
 3. The Python validation runtime is required. If it cannot be imported, the
    executor raises ``ValidationRuntimeUnavailable`` and the caller records
    ``blocked_validation_runtime`` in the coverage ledger. There is no CLI path.
@@ -34,9 +38,10 @@ without those packages present.
 """
 from __future__ import annotations
 
+import importlib
 import json
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
@@ -52,6 +57,14 @@ RESOLVED_STATUSES = frozenset(
     }
 )
 
+#: The subset of ``RESOLVED_STATUSES`` where a validator actually ran against the
+#: stage. The other three -- ``user_declined``, ``timeout_recorded`` and
+#: ``blocked_validation_runtime`` -- are resolved in the sense that we know what
+#: happened, and they all mean the same thing about the asset: nothing was
+#: checked. Keeping the two sets apart is what stops "we know we did not look"
+#: from being reported as "we looked and it was fine".
+VALIDATED_STATUSES = frozenset({"probed_with_findings", "probed_clean"})
+
 DEFAULT_REGISTRY_PATH = (
     Path(__file__).resolve().parent.parent / "references" / "validator-concepts.json"
 )
@@ -59,6 +72,10 @@ DEFAULT_REGISTRY_PATH = (
 
 class ConceptResolutionError(RuntimeError):
     """A concept name or its identity could not be resolved unambiguously."""
+
+
+class ScopeNoteContractError(RuntimeError):
+    """A scope note is internally inconsistent, so it cannot be executed as written."""
 
 
 class ValidationRuntimeUnavailable(RuntimeError):
@@ -73,6 +90,35 @@ _RUNTIME_UNAVAILABLE = (
 )
 
 
+#: Package families. Both the current and the pre-rename package roots of a
+#: provider map to the same family key, which is the part of rule identity that
+#: has survived every upstream rename so far (``omni.asset_validator.*`` ->
+#: ``usd_validation_nvidia.rules.*``, ``omni.scene.optimizer.validators.*`` ->
+#: ``usd_optimize.validators.*``). Matching on (family, class_name) is therefore
+#: version-tolerant while still telling the two providers apart — which is the
+#: whole point, because ``IndexedPrimvarChecker`` is registered by both.
+#: Longest prefix wins, so a new root can be added without reordering.
+_MODULE_FAMILIES: dict[str, str] = {
+    "usd_validation_nvidia": "oav",
+    "omni.asset_validator": "oav",
+    "usd_optimize": "so",
+    "omni.scene": "so",
+}
+
+
+def module_family(module: str) -> str | None:
+    """Return the provider family (``oav`` / ``so``) owning ``module``.
+
+    ``None`` for a module outside every known family; callers then fall back to
+    exact-module matching rather than widening the match.
+    """
+    best: tuple[int, str | None] = (0, None)
+    for prefix, family in _MODULE_FAMILIES.items():
+        if (module == prefix or module.startswith(prefix + ".")) and len(prefix) > best[0]:
+            best = (len(prefix), family)
+    return best[1]
+
+
 @dataclass(frozen=True)
 class ResolvedImplementation:
     """A concept resolved to a single runtime rule identity."""
@@ -85,6 +131,9 @@ class ResolvedImplementation:
     scope_policy: str
     backing_op: str | None
     gpu_bound: bool
+    #: Pre-rename module paths for the same class, accepted as equal identities
+    #: so an older runtime still resolves. Never used to widen across families.
+    module_aliases: tuple[str, ...] = field(default=())
 
 
 # --------------------------------------------------------------------------- #
@@ -146,6 +195,7 @@ def resolve_implementation(
         scope_policy=concept["scope_policy"],
         backing_op=concept["backing_op"],
         gpu_bound=bool(concept["gpu_bound"]),
+        module_aliases=tuple(impl.get("module_aliases", ())),
     )
 
 
@@ -239,6 +289,43 @@ _REGISTRY_SHAPE_ACCESSORS: dict[str, Callable[[Any], Any]] = {
 }
 
 
+#: Module names to try when registering the Usd Optimize rule set, current path
+#: first. Both names resolve to the same module object on 1.0.4.
+_USD_OPTIMIZE_VALIDATOR_MODULES = ("usd_optimize.validators", "omni.scene.optimizer.validators")
+
+
+def _register_usd_optimize_rules() -> str | None:
+    """Register the Usd Optimize rules into the shared rule registry.
+
+    Importing the package does **not** register anything: the ``@register_rule``
+    decorators are applied inside ``register_all()`` (verified on usd-optimize
+    1.0.4 — the module body is plain re-exports plus a ``_RULE_CATEGORIES``
+    tuple). Without this call the registry holds only the 40 usd-validation-nvidia
+    rules and every Usd Optimize concept fails to resolve.
+
+    Entry points do not cover this deployment. usd-validation-nvidia does ship a
+    plugin system (``usd_validation_nvidia/_plugins.py``, entry-point group
+    ``usd_validation_nvidia``, objects with ``on_startup()``/``on_shutdown()``),
+    but it discovers plugins through ``importlib.metadata``, which reads
+    *installed distribution* metadata. The skill consumes Usd Optimize as an
+    extracted release zip on ``PYTHONPATH`` with no dist-info, egg-info, or
+    entry_points.txt, so it is structurally invisible to that discovery no matter
+    what upstream declares. Explicit registration is the only mechanism
+    available in this deployment shape.
+
+    ``register_all()`` is idempotent (it skips rules that already have a
+    category), so calling it on every enumeration is safe. Returns the module
+    name that registered, or ``None`` when Usd Optimize is not installed.
+    """
+    for module_name in _USD_OPTIMIZE_VALIDATOR_MODULES:
+        try:
+            importlib.import_module(module_name).register_all()
+            return module_name
+        except (ImportError, AttributeError):
+            continue
+    return None
+
+
 def iter_registered_rules(rule_registry: Any) -> Iterable[type]:
     """Yield every registered rule *class* (collision-aware enumeration).
 
@@ -246,11 +333,7 @@ def iter_registered_rules(rule_registry: Any) -> Iterable[type]:
     to the differing registry shapes across runtimes but never collapses rules
     to bare names. Fail-closed: if no enumeration entry point is found, raises.
     """
-    # Usd Optimize registers its rules on import for discovery.
-    try:
-        import omni.scene.optimizer.validators  # type: ignore  # noqa: F401
-    except ImportError:  # pragma: no cover - environment dependent
-        pass
+    _register_usd_optimize_rules()
 
     # Probe the known registry shapes in order via the explicit allowlist above;
     # the first accessor to yield a non-None result wins. Matching stays
@@ -275,27 +358,62 @@ def iter_registered_rules(rule_registry: Any) -> Iterable[type]:
             yield rule_cls
 
 
-def resolve_rule_class(rule_registry: Any, module: str, class_name: str) -> type:
+def resolve_rule_class(
+    rule_registry: Any,
+    module: str,
+    class_name: str,
+    *,
+    module_aliases: Iterable[str] = (),
+) -> type:
     """Resolve ``(module, class_name)`` to exactly one registered rule class.
 
     This is the collision-safe core. ``IndexedPrimvarChecker`` exists twice by
-    bare name but is unique by ``(module, __name__)``. Fail-closed on zero or
-    multiple matches.
+    bare name; it is disambiguated here by the *provider family* of ``module``,
+    never by bare name.
+
+    Matching is deliberately version-tolerant. An exact ``__module__`` hit wins.
+    Failing that, any registered class of the same name whose module belongs to
+    the same provider family as the requested one is accepted — so a submodule
+    reshuffle or a package rename inside a family (``omni.asset_validator._base_rules``
+    -> ``usd_validation_nvidia.rules._basic``) resolves without a registry edit,
+    while a *cross-family* class of the same name never does. A module outside
+    every known family falls back to exact matching only.
+
+    Fail-closed: zero matches raises, and more than one distinct class raises.
     """
-    matches = [
+    accepted_modules = {module, *module_aliases}
+    accepted_families = {f for f in map(module_family, accepted_modules) if f}
+
+    same_name = [
         rule_cls
         for rule_cls in iter_registered_rules(rule_registry)
-        if rule_cls.__module__ == module and rule_cls.__name__ == class_name
+        if rule_cls.__name__ == class_name
     ]
+    matches: list[type] = []
+    for rule_cls in same_name:
+        if rule_cls.__module__ in accepted_modules or (
+            accepted_families and module_family(rule_cls.__module__) in accepted_families
+        ):
+            if not any(rule_cls is seen for seen in matches):
+                matches.append(rule_cls)
+
     if not matches:
+        near = sorted(f"{c.__module__}.{c.__name__}" for c in same_name)
         raise ConceptResolutionError(
             f"Rule not registered in this runtime: {module}.{class_name}. "
-            f"Confirm the providing package was imported."
+            f"Registered classes named '{class_name}': {near or 'none'}. "
+            f"If the list is empty the providing package was never imported "
+            f"(Usd Optimize rules need register_all(), not a bare import); if it "
+            f"is non-empty the registry's module identity has drifted out of the "
+            f"'{module_family(module) or 'unknown'}' provider family — update "
+            f"validator-concepts.json 'module' and keep the old path in "
+            f"'module_aliases'."
         )
     if len(matches) > 1:
+        found = sorted(f"{c.__module__}.{c.__name__}" for c in matches)
         raise ConceptResolutionError(
             f"Ambiguous rule identity: {module}.{class_name} matched "
-            f"{len(matches)} registered classes."
+            f"{len(matches)} registered classes: {found}."
         )
     return matches[0]
 
@@ -366,7 +484,12 @@ def validate_concepts(
     engine = engine_cls(init_rules=False)
     for canonical_name in concepts:
         impl = resolve_implementation(reg, canonical_name, provider=provider)
-        rule_cls = resolve_rule_class(rule_registry, impl.module, impl.class_name)
+        rule_cls = resolve_rule_class(
+            rule_registry,
+            impl.module,
+            impl.class_name,
+            module_aliases=impl.module_aliases,
+        )
         engine.enable_rule(rule_cls)
 
     stage = open_scoped_stage(stage_path, mask_paths)
@@ -430,6 +553,33 @@ def _iter_execution_units(
         yield {"target": "<whole_stage>", "concept": concept}, []
 
 
+def assert_targets_cover_concepts(scope_note: dict[str, Any]) -> None:
+    """Fail closed when a selected concept has no ``targets[]`` entry to execute it.
+
+    ``concepts[]`` is what Deterministic Selection produced; ``targets[]`` is the
+    only list the executor iterates. Nothing else ties them together, so a scope
+    note that lists all 15 whole-stage safety gates under ``concepts[]`` and
+    writes one target used to execute one gate and still report
+    ``coverage_ledger.complete: true`` / ``summary.status: PASS`` — silently, with
+    14 correctness preconditions never run. The completion gate only counts what
+    was planned as a target, so it cannot see the gap; this check can.
+
+    Raises ``ScopeNoteContractError`` naming every unexecuted concept.
+    """
+    selected = list(scope_note.get("concepts", []))
+    targeted = {t["concept"] for t in scope_note.get("targets", [])}
+    missing = sorted(set(selected) - targeted)
+    if missing:
+        raise ScopeNoteContractError(
+            f"Scope note selects {len(selected)} concept(s) but "
+            f"{len(missing)} of them have no targets[] entry, so they would "
+            f"never execute while the coverage ledger still reported complete: "
+            f"{', '.join(missing)}. Add one targets[] entry per selected concept "
+            f"(whole-stage concepts need only {{'concept': '<name>'}}), or drop "
+            f"the concept from concepts[] with the reason in selection_reason."
+        )
+
+
 def _expand_target(target: dict[str, Any]) -> Iterable[dict[str, str]]:
     """Yield one ``{target, concept}`` per concrete path/pair (ledger identity).
 
@@ -463,8 +613,12 @@ def run_scope_note(
       - subprocess timeout  -> ``timeout_recorded`` (retry masked/standalone)
       - runtime unavailable -> ``blocked_validation_runtime``
     Resolution failures (unknown/ambiguous concept) are NOT swallowed — they
-    raise, because they indicate a malformed plan, not a runtime condition.
+    raise, because they indicate a malformed plan, not a runtime condition. So
+    does a scope note whose ``concepts[]`` selection is not fully covered by
+    ``targets[]`` (see ``assert_targets_cover_concepts``); that check runs before
+    any validator, so a note that would under-execute never produces a report.
     """
+    assert_targets_cover_concepts(scope_note)
     reg = registry if registry is not None else load_registry()
     run = concept_runner if concept_runner is not None else validate_concepts
 
@@ -510,13 +664,21 @@ def run_scope_note(
             })
 
     complete = coverage_complete(scope_note.get("targets", []), ledger)
+    # A planned unit that never ran cannot contribute a finding, so error_count
+    # stays 0 and every clean-looking aggregate would read PASS. Gate on what was
+    # actually validated, not merely on what was dispositioned.
+    all_validated = bool(ledger) and all(e["status"] in VALIDATED_STATUSES for e in ledger)
     return {
         "schemaVersion": "1.0.0",
         "phase": phase,
         "stage": {"identifier": stage_path},
         "validators": validators,
         "summary": {
-            "status": "BLOCKED" if not complete else ("FAIL" if error_count else "PASS"),
+            "status": (
+                "BLOCKED"
+                if not complete or not all_validated
+                else ("FAIL" if error_count else "PASS")
+            ),
             "errorCount": error_count,
             "warningCount": 0,
         },
@@ -574,7 +736,49 @@ def subprocess_concept_runner(
                 "registry_path": str(registry_path) if registry_path else None,
             }
         )
-        env = dict(os.environ)
+        # Build the child environment from an explicit allowlist rather than
+        # copying os.environ wholesale. Bulk environment copies sweep up every
+        # unrelated credential in the parent process, and the NVSkills Tier 1
+        # scan blocks on them (E2, "Env Variable Harvesting") -- correctly, since
+        # this worker has no need for anything outside the names below.
+        #
+        # Each entry is here because something downstream reads it: USD_OPTIMIZE_ROOT
+        # resolves the extracted release package, LD_LIBRARY_PATH and PYTHONHOME
+        # keep a relocated interpreter able to find its own runtime, PATH and the
+        # temp-dir trio are needed by USD's plugin discovery and scratch writes,
+        # and PYTHONPATH is rewritten below regardless. Add names deliberately;
+        # do not reinstate a blanket copy.
+        #
+        # The Windows block is not optional padding. CPython initialises Winsock
+        # while importing ``asyncio``, and without SYSTEMROOT the provider cannot
+        # be located: the child dies in ``asyncio/_overlapped`` with WinError
+        # 10106 before it reads its job, every concept is recorded as
+        # ``blocked_validation_runtime``, and no validator runs at all. The first
+        # version of this allowlist carried only the POSIX names above and did
+        # exactly that on every Windows host.
+        env = {
+            name: os.environ[name]
+            for name in (
+                "PATH",
+                "HOME",
+                "TMPDIR",
+                "TEMP",
+                "TMP",
+                "LD_LIBRARY_PATH",
+                "PYTHONHOME",
+                "PYTHONPATH",
+                "USD_OPTIMIZE_ROOT",
+                # Windows: required for interpreter start-up and Winsock init.
+                "SYSTEMROOT",
+                "SYSTEMDRIVE",
+                "WINDIR",
+                "COMSPEC",
+                "PATHEXT",
+                "PROCESSOR_ARCHITECTURE",
+                "NUMBER_OF_PROCESSORS",
+            )
+            if name in os.environ
+        }
         env["PYTHONPATH"] = os.pathsep.join(
             [str(Path(worker).parent), env.get("PYTHONPATH", "")]
         )

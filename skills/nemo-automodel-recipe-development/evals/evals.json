@@ -4,14 +4,14 @@
     "question": "I need to add a new NeMo AutoModel finetuning recipe variant. What steps should I follow?",
     "expected_skill": "nemo-automodel-recipe-development",
     "expected_script": null,
-    "ground_truth": "The agent routes to nemo-automodel-recipe-development, tells the user to find the closest recipe under nemo_automodel/recipes, copy and adapt it, update model/dataset/optimizer/loss/scheduler/checkpoint builders, register a CLI route if adding a new command, add an example YAML under examples, add a tiny CPU-compatible unit test, and test locally with automodel finetune llm -c <config.yaml>.",
+    "ground_truth": "The agent routes to nemo-automodel-recipe-development, tells the user to find the closest recipe under nemo_automodel/recipes, copy and adapt it, update model/dataset/optimizer/loss/scheduler/checkpoint builders, register a recipe alias if adding a new recipe class, add an example YAML under examples, add a tiny CPU-compatible unit test, and test locally with automodel <config.yaml>.",
     "expected_behavior": [
       "Routes to nemo-automodel-recipe-development",
       "Starts from the closest existing recipe",
       "Mentions builder functions for model, dataset or dataloader, optimizer, loss, scheduler, and checkpoint config",
-      "Mentions CLI route registration when adding a command or domain alias",
+      "Mentions recipe alias registration when adding a new recipe class",
       "Mentions adding example YAML under examples",
-      "Mentions adding a tiny CPU-compatible unit test and running automodel finetune llm -c <config.yaml>"
+      "Mentions adding a tiny CPU-compatible unit test and running automodel <config.yaml>"
     ]
   },
   {

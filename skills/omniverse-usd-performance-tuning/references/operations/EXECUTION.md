@@ -6,7 +6,7 @@ agent_next:
   - README.md
   - ../usd-optimize-run-operations/README.md
 freshness: 2026-05-20
-version: "0.1.0"
+version: "0.4.1"
 ---
 
 # Usd Optimize Execution Reference
@@ -58,10 +58,11 @@ the final report can cite the run.
 ## Python API Shape
 
 Probe the selected runtime before writing the script. Newer Kit and standalone
-environments may expose `SceneOptimizerCore.getInstance()` with
-`executeOperation` or `executeConfig`; some standalone builds expose the C++
-binding interface from
-`omni.scene.optimizer.core.bindings._omni_scene_optimizer_core`.
+environments expose `UsdOptimizeCore.getInstance()` (from `usd_optimize.core`)
+with `executeOperation` or `executeConfig`. On runtimes that predate the
+rename, the same instance is reachable as `SceneOptimizerCore` from
+`omni.scene.optimizer.core`, which still resolves on 1.0.4 and 1.1.0 but emits
+a `DeprecationWarning`.
 
 Before invoking any planned operation, cross-check the operation key against
 `usdOptimize.operationsAvailable` in `<output_path>/setup-preflight.json`.
@@ -80,7 +81,7 @@ Inside Kit, use:
 from omni.asset_validator.core import ValidationEngine
 ```
 
-In a standalone `omniverse-asset-validator` environment, use:
+In a standalone `usd-validation-nvidia` environment, use:
 
 ```python
 from omni.asset_validator import ValidationEngine

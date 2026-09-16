@@ -91,29 +91,43 @@
     },
     "invocation": {
       "type": "object",
-      "required": ["official_entrypoint", "upstream_root", "command", "exit_code", "model_inventory"],
+      "required": ["official_entrypoint", "upstream_root", "upstream_identity", "command", "exit_code", "model_inventory"],
       "properties": {
         "official_entrypoint": {"type": "string"},
         "upstream_root": {"type": "string"},
         "upstream_commit": {"type": "string"},
+        "upstream_identity": {
+          "type": "object",
+          "required": ["commit", "expected_commit", "commit_match", "tracked_files_clean", "trusted"],
+          "properties": {
+            "commit": {"type": "string"},
+            "expected_commit": {"type": "string"},
+            "commit_match": {"type": "boolean"},
+            "tracked_files_clean": {"type": "boolean"},
+            "trusted": {"type": "boolean"}
+          }
+        },
         "command": {"type": "array", "items": {"type": "string"}},
         "exit_code": {"type": "integer"},
         "subprocess_seconds": {"type": "number"},
         "model_inventory": {
           "type": "object",
-          "required": ["all_present", "files"],
+          "required": ["all_present", "all_sha256_match", "files"],
           "properties": {
             "all_present": {"type": "boolean"},
+            "all_sha256_match": {"type": "boolean"},
             "files": {
               "type": "array",
               "items": {
                 "type": "object",
-                "required": ["path", "present"],
+                "required": ["path", "present", "expected_sha256", "sha256_match"],
                 "properties": {
                   "path": {"type": "string"},
                   "present": {"type": "boolean"},
                   "bytes": {"type": ["integer", "null"]},
-                  "sha256": {"type": "string"}
+                  "sha256": {"type": "string"},
+                  "expected_sha256": {"type": "string"},
+                  "sha256_match": {"type": "boolean"}
                 }
               }
             }

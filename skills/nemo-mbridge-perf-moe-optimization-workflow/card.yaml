@@ -1,10 +1,10 @@
 title: moe_optimization_workflow
-validated_on: "2026-04-01"
+validated_on: "2026-07-31"
 summary: >
-  Systematic 3-phase workflow for optimizing MoE training performance,
-  distilled from the Megatron-Core MoE paper (arXiv:2603.07685). Covers
-  the Three Walls framework, parallel folding, memory optimization stack,
-  FP8 recipe selection, CUDA graphs, and flexible VPP.
+  Evidence-gated workflow for optimizing MoE training performance. It freezes
+  a measurement contract, follows fit -> scale -> profile -> retune -> validate,
+  operationalizes the paper's Three Walls as four diagnostic bottlenecks, and
+  separates training-equivalent acceptance from benchmark-only experiments.
 
 source: "https://arxiv.org/abs/2603.07685"
 source_title: "Scalable Training of Mixture-of-Experts Models with Megatron Core"
@@ -13,6 +13,10 @@ validation_status:
   three_walls_framework:
     - documented
   optimization_workflow:
+    - documented
+  measurement_contract:
+    - documented
+  final_acceptance_gate:
     - documented
   parallel_folding:
     - documented
@@ -23,6 +27,10 @@ validation_status:
   cuda_graphs_moe:
     - documented
   dsv3_case_study:
+    - measured
+  qwen3_30b_h100_case_study:
+    - measured
+  overlap_profile_method:
     - measured
 
 core_concepts:
@@ -40,6 +48,12 @@ core_concepts:
       key_metric: "GPU SM utilization"
       dsv3_example: "GEMMs <50% of execution time vs ~70% in dense models"
 
+  operational_bottlenecks:
+    memory: "peak and reserved memory, OOM point, recompute/offload requirement"
+    communication: "exposed collective intervals and communication/compute overlap"
+    host_launch: "GPU gaps, launch rate, graph replay and CPU-side overhead"
+    compute: "SM utilization and intended kernel/backend activation"
+
   parameter_compute_mismatch:
     description: >
       MoE total params scale with E (expert count) while per-token compute
@@ -55,6 +69,11 @@ core_concepts:
     key_benefit: "EP can exceed DP by folding across TP×CP groups"
 
 optimization_phases:
+  phase_0_contract:
+    goal: "Freeze a comparable experiment and declare its semantic class"
+    key_action: >
+      Hold runtime, hardware, topology, task/data/routing, precision, batch
+      shape, parallelism, graph scopes, and timing window fixed.
   phase_1_memory:
     goal: "Fit training in GPU memory"
     key_action: "Choose parallelism that keeps memory within GPU capacity"
@@ -70,6 +89,14 @@ optimization_phases:
   phase_3_bottleneck:
     goal: "Profile and apply targeted optimizations"
     approach: "Identify which wall dominates, apply targeted fix, re-profile"
+  phase_4_retune:
+    goal: "Screen one profile-driven variable at a time"
+    candidates: "dispatcher, overlap, lower precision, CUDA graphs, recompute"
+  phase_5_validate:
+    goal: "Validate the complete winner"
+    gate: >
+      At least 50 steps, declared post-warmup window, actual backend/kernel/replay
+      evidence, finite loss, skipped/NaN counts, memory, step time, and TFLOPS/GPU.
 
 memory_techniques:
   - name: memory_efficient_permutation
@@ -104,11 +131,11 @@ fp8_recipes:
   - name: blockwise_fp8
     platform: "Hopper"
     granularity: "128×128 blocks"
-    use_for: "Production on Hopper"
+    use_for: "Candidate after a stable BF16 baseline; verify target kernels and step time"
   - name: mxfp8
     platform: "Blackwell"
     granularity: "1×32 elements"
-    use_for: "Default on Blackwell"
+    use_for: "High-priority candidate after a stable BF16 baseline"
   - name: nvfp4
     platform: "Blackwell"
     granularity: "16 elements, 2-level microscaling"
@@ -135,13 +162,44 @@ dsv3_case_study:
     tflops: 368
     dominant_bottleneck: "Communication (cross-node EP all-to-all)"
 
+qwen3_30b_h100_case_study:
+  hardware: "16×H100"
+  precision: BF16
+  parallelism: "TP1/PP1/CP1/EP16"
+  sequence_length: 4096
+  batch: "MBS1/GBS1024"
+  routing: force_balance
+  dispatcher: HybridEP
+  cuda_graph_scopes: "moe_router, moe_preprocess"
+  delayed_wgrad_compute: false
+  final_step_time_ms: 20147.290
+  final_tflops: 299.352
+  hybridep_num_sms: 32
+  combine_chunk_tokens: 64
+  earlier_overlap_ab:
+    baseline_step_time_ms: 24713.800
+    overlap_step_time_ms: 20992.030
+    baseline_tflops: 244.039
+    overlap_tflops: 287.305
+    throughput_gain_percent: 17.729
+    profile_comm_hidden_off_percent: 0.11
+    profile_comm_hidden_on_percent: 36.55
+  dominant_bottleneck: "Exposed HybridEP dispatch/combine communication"
+
 key_lessons:
   - "Platform characteristics drive strategy, not just model architecture"
   - "Parallel Folding unlocks independent attention/MoE optimization"
   - "FP8 shifts bottleneck from memory/compute to CPU overhead"
   - "Optimization is iterative: solving one wall exposes another"
+  - "Use unprofiled steady timing for acceptance and matched profiles for causality"
+  - "Use interval unions and communication/compute intersection; summed concurrent kernel durations are not wall time"
+  - "Hardware determines legal candidates, not the winning dispatcher or precision mode"
+  - "Separate a one-variable causal A/B from the final multi-knob winner"
+  - "Forced routing is benchmark-only and requires separate natural-routing validation"
 
 evidence:
   - "arXiv:2603.07685 — Scalable Training of MoE with Megatron Core"
   - "Megatron-Core v0.16 benchmarks"
   - "DSV3 and Qwen3-235B empirical results"
+  - "examples/model_verification_cards/qwen3-30b-a3b/card.yaml"
+  - "src/megatron/bridge/perf_recipes/qwen/h100/qwen3_moe.py"

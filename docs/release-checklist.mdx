@@ -11,17 +11,32 @@ Use this checklist when preparing a skill for review, publication, or internal d
 - `SKILL.md` describes when the skill should activate.
 - Tool, shell, network, file, environment, and MCP capabilities are declared when used.
 - Scripts and references are necessary for the stated use case.
-- Test fixtures, examples, and generated files are either intentionally included or excluded.
+- Evaluation fixtures belong under `evals/` for Tier 3. Tier 1's SkillSpector scan excludes that tree by design, so do not thin fixtures to clear a broader standalone scan.
 
 ## Scanning and Evaluation
 
 - Ship an evaluation task set at `evals/evals.json` so Tier 3 can run.
-- Run SkillEvaluator against the complete skill directory. Tier 1 includes the SkillSpector scan.
+- Run SkillEvaluator against the complete skill directory. Tier 1 includes the SkillSpector scan on a staged subset of that tree (see scope below).
 - Save a Markdown or SARIF report for review.
-- Resolve critical and high findings before release.
+- Resolve critical and high findings in the Tier 1 scan scope before release.
 - Review medium findings for policy or usability impact.
 - Confirm the skill description matches executable behavior.
 - Review the `BENCHMARK.md` verdict before publishing.
+
+### Tier 1 SkillSpector scope
+
+SkillEvaluator's Tier 1 security validator stages a filtered copy of the skill before invoking SkillSpector. These directories are skipped at any depth:
+
+- `evals/`, `.evals/`
+- `results/`, `.results/`
+- `versions/`, `.versions/`
+- `__pycache__/`, `.git/`, `.venv/`, `node_modules/`
+
+Tier 1 filters individual findings from these generated artifact files:
+
+- `skill.oms.sig`, `skill-card.md`, `benchmark.md`
+
+These files can remain in the staged copy, but their individual findings are not included in Tier 1 results. Only findings inside this scope are release-gate findings. Use SkillEvaluator to reproduce what the gate enforces; a standalone `skillspector scan` on the complete skill directory is broader.
 
 For installation and the commands to run an evaluation, see the [SkillEvaluator documentation](https://docs.nvidia.com/skills/skillevaluator).
 

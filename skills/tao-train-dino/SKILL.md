@@ -17,6 +17,8 @@ tags:
 
 # DINO
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 DINO (DETR with Improved DeNoising Anchor Boxes) for 2D object detection. Transformer-based detector with denoising training, multi-scale features, and optional distillation support.
 
 Uses pretrained backbone weights (e.g. ResNet-50 ImageNet). Set `model.pretrained_backbone_path` for backbone-only or `train.pretrained_model_path` for full model.
@@ -188,3 +190,4 @@ declarations. Skip this when running locally with `docker run`.
 ## Deployment
 
 - [tao-deploy-dino](references/tao-deploy-dino.md)
+

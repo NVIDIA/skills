@@ -1,0 +1,90 @@
+[
+  {
+    "id": "write-dag-augmentation-only-positive",
+    "question": "Create a new Kubernetes DAG that only runs the IAA Cosmos image-edit stage on person crops at s3://bucket/crops — no auto-labeling or person-attribute search afterward.",
+    "expected_skill": "write-dag",
+    "expected_script": null,
+    "ground_truth": "This is a structural subset of image_attribute_augmentation_dag_k8s's chain (drops event_and_person_attribute_search and generate_augmented_dataset), so it is a genuine write-dag case. Compose CosmosTaskGroup (+ conditional CosmosPostProcessingTaskGroup) with no ImageAttributeAugmentationTaskGroup, using the IAA manifest as the base.",
+    "expected_behavior": [
+      "Runs the Step 0 existing-DAG check and confirms this does not match image_attribute_augmentation_dag_k8s's full chain.",
+      "Selects CosmosTaskGroup and does not include ImageAttributeAugmentationTaskGroup.",
+      "Invokes the augmentation component skill (or falls back to its frozen excerpt) before writing manifest/config content, rather than inventing model defaults or prompts.",
+      "Copies the IAA k8s manifest as the base and trims components.tasks/components.endpoints to only what's needed.",
+      "Writes new callables adapted from the closest existing DAG rather than reusing image_attribute_augmentation_dag's callables unmodified."
+    ]
+  },
+  {
+    "id": "write-dag-existing-dag-negative",
+    "question": "Write me a custom DAG for image attribute augmentation with 5 variants per person and my own VLM/LLM/image-edit URLs.",
+    "expected_skill": "write-dag",
+    "expected_script": null,
+    "ground_truth": "num_augmentation and service URLs are payload differences already covered by image_attribute_augmentation_dag_k8s's existing payload schema — the task-group chain is identical, so this is not a write-dag case.",
+    "expected_behavior": [
+      "Runs the Step 0 check and recognizes the requested chain matches image_attribute_augmentation_dag_k8s exactly.",
+      "Does not write any new DAG files.",
+      "Tells the user to use image-attribute-augmentation-workflow instead, with num_augmentation=5 and their endpoint URLs as payload values."
+    ]
+  },
+  {
+    "id": "write-dag-labeling-only-positive",
+    "question": "I need a K8s DAG that runs person-attribute captioning and query generation over crops that are already augmented — no image-edit step.",
+    "expected_skill": "write-dag",
+    "expected_script": null,
+    "ground_truth": "ImageAttributeAugmentationTaskGroup only, with input_preparation listing pre-augmented crops directly instead of combining raw person-ID panes; no CosmosTaskGroup.",
+    "expected_behavior": [
+      "Confirms via Step 0 that dropping CosmosTaskGroup is a structural difference from image_attribute_augmentation_dag_k8s, not just a payload difference.",
+      "Selects ImageAttributeAugmentationTaskGroup only.",
+      "Adjusts input_preparation's callable for pre-augmented crops rather than reusing IAA's raw-crop combining logic unmodified.",
+      "Reads the ImageAttributeAugmentationTaskGroup's __init__ before wiring kwargs rather than guessing them."
+    ]
+  },
+  {
+    "id": "write-dag-nvcf-scope-negative",
+    "question": "Build the custom labeling-only DAG for NVCF, we don't have Kubernetes here.",
+    "expected_skill": "write-dag",
+    "expected_script": null,
+    "ground_truth": "This repository's checked-in branches only support Kubernetes manifests; NVCF is out of scope unless the user's environment is confirmed to support it, and even then it's new scope requiring its own investigation.",
+    "expected_behavior": [
+      "States that only Kubernetes is supported today rather than generating an NVCF manifest.",
+      "Does not invent an NVCF registration path.",
+      "Asks the user to confirm their environment actually supports NVCF before treating it as in-scope, and flags it as separate scope rather than folding it into this skill's normal flow."
+    ]
+  },
+  {
+    "id": "write-dag-parity-check-positive",
+    "question": "Generate the DAG described in physical-ai-image-attribute-augmentation/launchable.md's augmentation-only mode, and confirm it matches the doc.",
+    "expected_skill": "write-dag",
+    "expected_script": null,
+    "ground_truth": "After writing the manifest and DAG, explicitly diff served model names, required serving flags (e.g. --omni), and endpoint adapter choice against the cited doc, and report any mismatch rather than silently reconciling it.",
+    "expected_behavior": [
+      "Performs the Step 6 Parity Check against the cited launchable.md.",
+      "Checks served model/version, required serving flags, and adapter-vs-API-path agreement.",
+      "Reports mismatches explicitly instead of quietly changing the doc's requirements to fit the generated manifest, or vice versa without flagging it."
+    ]
+  },
+  {
+    "id": "write-dag-deploy-confirmation-positive",
+    "question": "Generate a K8s DAG that runs detection+tracking and captioning only over an existing video dataset, then get it running.",
+    "expected_skill": "write-dag",
+    "expected_script": null,
+    "ground_truth": "After Step 7's summary, the read-only readiness check runs automatically, but make sync-dag deploys DAG files to the shared Airflow cluster and requires explicit user confirmation before it runs — invoking write-dag is not standing authorization for that deploy step.",
+    "expected_behavior": [
+      "Runs the read-only readiness check immediately after printing the Step 7 summary, without asking first.",
+      "Stops and asks for explicit confirmation before running make sync-dag.",
+      "Does not claim that invoking write-dag already authorized the deploy.",
+      "Also confirms separately, later, before triggering an actual run against the shared cluster."
+    ]
+  },
+  {
+    "id": "write-dag-gpu-footprint-positive",
+    "question": "Build a K8s DAG with detection+tracking, captioning, and visual QA over seed images, external services only, then tell me the GPU cost.",
+    "expected_skill": "write-dag",
+    "expected_script": null,
+    "ground_truth": "detection_and_tracking, captioning, and visual_qa all run on the k8s_gpu_task profile and cost 1 GPU each regardless of external_services, so external mode here is 3 GPUs minimum, not 0.",
+    "expected_behavior": [
+      "Computes the GPU footprint from the manifest's deployment profiles rather than assuming external mode is always 0 GPUs.",
+      "Reports both the external-mode and internal-mode GPU totals in the Step 7 summary.",
+      "Does not reuse IAA's 'external = 0 GPU' figure for a pipeline whose task pods are GPU-profiled."
+    ]
+  }
+]

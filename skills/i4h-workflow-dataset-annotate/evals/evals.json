@@ -1,13 +1,14 @@
 [
   {
     "id": "i4h-workflow-dataset-annotate-readme-quick-all-recorded",
-    "question": "Run Annotation on all recorded episodes and summarize.",
+    "question": "Run annotation on all recorded episodes and summarize.",
     "expected_skill": "i4h-workflow-dataset-annotate",
     "ground_truth": "This README Quick Run prompt routes to VLM annotation over the latest recorded HDF5 episodes and returns a summary.",
     "expected_behavior": [
       "routes to i4h-workflow-dataset-annotate",
       "uses the latest recorded HDF5 episodes",
-      "uses the env YAML task description unless overridden",
+      "uses the source scene manifest instruction unless overridden",
+      "uses a configured caller-provided vision endpoint and model instead of starting the local VLM",
       "summarizes success labels after annotation"
     ]
   },
@@ -19,7 +20,7 @@
     "expected_behavior": [
       "routes to i4h-workflow-dataset-annotate",
       "labels episodes against the task criterion",
-      "keeps artifacts under workflows/agentic/runs",
+      "keeps artifacts under ./runs",
       "does not run annotation when only conversion or replay is requested"
     ]
   }

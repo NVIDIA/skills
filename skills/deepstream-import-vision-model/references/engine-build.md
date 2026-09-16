@@ -29,12 +29,15 @@ echo "Engine:   models/$MODEL_NAME/benchmarks/engines/${MODEL_FILENAME}_dynamic_
 # Verify ONNX file exists
 ls -lh "$ONNX_PATH" || { echo "ERROR: ONNX file not found at $ONNX_PATH"; exit 1; }
 
-# Verify trtexec is available and check TRT version
-TRTEXEC=$(which trtexec) || { echo "ERROR: trtexec not found in PATH — install TensorRT or check PATH"; exit 1; }
-$TRTEXEC --help 2>&1 | head -3
-dpkg -l | grep libnvinfer-bin
+# trtexec lives at a fixed path IN the container (not on PATH); read the TRT version from it.
+TRTEXEC=/usr/src/tensorrt/bin/trtexec
+[ -x "$TRTEXEC" ] || { echo "ERROR: trtexec not found at $TRTEXEC — is this the DeepStream/TensorRT image?"; exit 1; }
+# `head -2` closes the pipe early, so trtexec takes SIGPIPE; under `set -o pipefail` that
+# surfaces as exit 141 and aborts the calling script. Engine/log existence is checked
+# explicitly below, so the version banner is advisory only.
+"$TRTEXEC" --version 2>&1 | head -2 || true
 
-# Verify GPU is available
+# Verify GPU is available (in-container)
 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
 ```
 
@@ -44,7 +47,7 @@ If the ONNX file doesn't exist, inform the user to run Steps 1-3 first (see refe
 
 Inspect the ONNX model and auto-parse input name and spatial dimensions:
 ```bash
-INSPECT_OUT=$(python3 skills/deepstream-import-vision-model/scripts/model/inspect-onnx.py "$ONNX_PATH")
+INSPECT_OUT=$(python3 .claude/skills/deepstream-import-vision-model/scripts/model/inspect-onnx.py "$ONNX_PATH")
 echo "$INSPECT_OUT"
 
 INPUT_NAME=$(echo "$INSPECT_OUT" | grep -oP 'input_name:\s*\K\S+')
@@ -68,7 +71,7 @@ the exact batch size used for benchmarking and DeepStream. `min=1` handles singl
 ```bash
 STEP4_START=$(date +%s.%N)
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-# benchmarks/engines/ already exists from nv-model-acquire;
+# benchmarks/engines/ already exists from model-acquire;
 # mkdir -p kept here as a safety net for standalone use
 mkdir -p models/$MODEL_NAME/benchmarks/engines models/$MODEL_NAME/benchmarks/b1 models/$MODEL_NAME/benchmarks/b${MAX_BS}
 
@@ -89,7 +92,7 @@ $TRTEXEC \
   { echo "ERROR: Engine file not created — check build log for errors"; exit 1; }
 
 STEP4_END=$(date +%s.%N)
-STEP4_DURATION=$(echo "$STEP4_END - $STEP4_START" | bc)
+STEP4_DURATION=$(python3 -c "print(round($STEP4_END - $STEP4_START, 2))")   # bc is not in the container; python3 always is
 echo "[Step 4] Engine build completed in ${STEP4_DURATION}s"
 ```
 
@@ -110,7 +113,7 @@ STEP5_START=$(date +%s.%N)
 
 ### Run 5a — Latency baseline (BS=1)
 
-> Log filename is **fixed** — no timestamp, no variation. Always `trtexec_b1.log`. This ensures the nv-import-vision-model-report skill can find it with an exact path, not a wildcard.
+> Log filename is **fixed** — no timestamp, no variation. Always `trtexec_b1.log`. This ensures the report-generation skill can find it with an exact path, not a wildcard.
 
 ```bash
 $TRTEXEC \
@@ -158,7 +161,7 @@ echo "BS=$MAX_BS: QPS=$QPS_BS_MAX  imgs/s=$IMGS_PER_SEC  GPU mean=${GPU_MEAN_BS_
 echo "PEAK_GPU_STREAMS=$PEAK_GPU_STREAMS  (floor($IMGS_PER_SEC / 30))"
 
 STEP5_END=$(date +%s.%N)
-STEP5_DURATION=$(echo "$STEP5_END - $STEP5_START" | bc)
+STEP5_DURATION=$(python3 -c "print(round($STEP5_END - $STEP5_START, 2))")   # bc is not in the container; python3 always is
 echo "[Step 5] Benchmarks completed in ${STEP5_DURATION}s"
 ```
 
@@ -256,11 +259,19 @@ In DeepStream, frames are decoded on GPU (`nvv4l2decoder`) and stay on GPU throu
 
 TensorRT engine files are **not portable** across TensorRT versions.
 
-### Pre-flight Version Check (MANDATORY before building engines)
-Already done at the top of this skill via `$TRTEXEC --help` and `dpkg -l | grep libnvinfer-bin`. Do not repeat.
+### Pre-flight Version Check
+`trtexec` lives in the container at `/usr/src/tensorrt/bin/trtexec` (set `TRTEXEC=/usr/src/tensorrt/bin/trtexec`);
+get its version with `"$TRTEXEC" --version`. No host `dpkg`/`libnvinfer-bin` check is needed.
 
-### Docker vs Host Engine Builds
-Docker-built engines may silently fail at runtime when loaded by host DeepStream (symptom: 0% GPU, pipeline stuck). **Always build engines on the host** using the same `libnvinfer` version as DeepStream (`dpkg -l | grep libnvinfer-bin`). Never mix TRT versions between engine builder and runtime.
+### Build and run in the SAME container image
+The engine is **built and run inside the same image** (`nvcr.io/nvidia/deepstream:9.1-triton-multiarch`),
+so the `libnvinfer` that `trtexec` builds against is byte-for-byte the one DeepStream loads at runtime —
+**there is no build-vs-runtime version skew.** This is the correct fix for TensorRT's engine
+non-portability: it *eliminates* the "Docker-built engine silently fails on a differently-versioned
+host runtime" failure mode (0% GPU / stuck pipeline) that the old "always build on the host" rule tried
+to avoid. **Never build an engine against a different TensorRT than the one that will run it** — using
+one image for both guarantees this by construction. (Do not build engines on the host; the host has no
+required toolchain in the container-run model.)
 
 ## Known Issues and Workarounds
 
@@ -293,7 +304,7 @@ Dynamic-shape engines for transformer models (DETR, RT-DETR) can show **non-mono
 ## Output Summary
 
 ```bash
-TOTAL_DURATION=$(echo "$STEP4_DURATION + $STEP5_DURATION" | bc)
+TOTAL_DURATION=$(python3 -c "print(round($STEP4_DURATION + $STEP5_DURATION, 2))")   # bc is not in the container; python3 always is
 ```
 
 When complete, print:

@@ -1,0 +1,74 @@
+{
+  "skill_name": "kermt-finetune",
+  "evals": [
+    {
+      "id": "kermt-finetune-001",
+      "prompt": "I want to use kermt-finetune with my pretrained cmim checkpoint at /models/cmim_pretrain.pt on my labeled dataset /data/solubility.csv. Use scaffold_balanced split, classification dataset type, and set epochs to 50 with batch size 16.",
+      "expected_output": "The agent invoked the kermt-finetune skill to validate the cmim checkpoint, validate the labeled CSV, prepare the data with scaffold_balanced splitting, and launched the finetune container detached with the specified hyperparameters (classification, 50 epochs, batch size 16).",
+      "assertions": [
+        "The agent read the kermt-finetune SKILL.md to understand the skill's requirements and parameters",
+        "The agent validated that the checkpoint /models/cmim_pretrain.pt is a valid pretrain checkpoint (cmim type)",
+        "The agent validated the labeled CSV and confirmed target columns before proceeding",
+        "The agent launched the finetune process with --dataset-type classification --epochs 50 --batch-size 16 --split-type scaffold_balanced and reported the run directory and container name",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "kermt-finetune",
+      "expected_script": null
+    },
+    {
+      "id": "kermt-finetune-002",
+      "prompt": "I have a pretrained molecular encoder checkpoint (grover_base) and a CSV with SMILES and three regression targets (logP, solubility, melting_point). I need to train the model on this labeled data using the pretrained weights. Can you set it up with a learning rate of 0.0001 and 100 epochs?",
+      "expected_output": "The agent recognized this as a finetuning task for a pretrained KERMT encoder, validated the grover_base checkpoint and multi-target CSV, prepared the data, and launched the detached finetune run with the specified learning rate and epoch count.",
+      "assertions": [
+        "The agent identified this as a kermt-finetune workflow based on the description of finetuning a pretrained molecular encoder on labeled data",
+        "The agent validated the grover_base checkpoint and the CSV structure including the three target columns (logP, solubility, melting_point)",
+        "The agent configured the finetune with --targets logP solubility melting_point --init-lr 0.0001 --epochs 100 and dataset-type regression",
+        "The agent launched the finetune in a detached container and reported the run directory and container name",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "kermt-finetune",
+      "expected_script": null
+    },
+    {
+      "id": "kermt-finetune-003",
+      "prompt": "We just finished pretraining our KERMT model with the hybrid objective and the checkpoint is saved at /workspace/kermt_runs/hybrid_pretrain/model.pt. Our medicinal chemistry team prepared a curated dataset of 5000 compounds with binary activity labels against JAK2 at /projects/jak2/jak2_activity.csv. They also prepared canonical train/val/test splits at /projects/jak2/splits/train.csv, /projects/jak2/splits/val.csv, and /projects/jak2/splits/test.csv. We need to finetune for classification using AUC as the metric with early stopping at epoch 20. Please set this up.",
+      "expected_output": "The agent set up a kermt-finetune run using the hybrid pretrain checkpoint, the JAK2 classification dataset with pre-determined splits, AUC metric, and early stopping at epoch 20, launching the training in a detached container.",
+      "assertions": [
+        "The agent read the kermt-finetune SKILL.md and identified that pre-split CSVs require --split-type index_predetermined with --val-csv and --test-csv flags",
+        "The agent validated the hybrid pretrain checkpoint and the labeled CSV with binary activity labels",
+        "The agent configured the run with --dataset-type classification --metric auc --early-stop-epoch 20 --split-type index_predetermined --val-csv /projects/jak2/splits/val.csv --test-csv /projects/jak2/splits/test.csv",
+        "The agent launched the detached finetune container and reported the run directory and container name to the user",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "kermt-finetune",
+      "expected_script": null
+    },
+    {
+      "id": "kermt-finetune-004",
+      "prompt": "How do I convert a SMILES string to a molecular fingerprint using RDKit? I want to compute Tanimoto similarity between two molecules.",
+      "expected_output": "The agent provided guidance on using RDKit to generate molecular fingerprints and compute Tanimoto similarity, without invoking the kermt-finetune skill since this is a basic cheminformatics question unrelated to model finetuning.",
+      "assertions": [
+        "The agent recognized this as a general RDKit/cheminformatics question unrelated to KERMT model finetuning",
+        "The agent provided code or instructions for generating fingerprints and computing Tanimoto similarity using RDKit",
+        "The agent did not attempt to invoke the kermt-finetune skill or validate any checkpoints or CSVs",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    },
+    {
+      "id": "kermt-finetune-005",
+      "prompt": "I want to finetune the publicly released KERMT model (nvidia/NV-KERMT-70M-v2) on the Biogen multi-task ADME dataset at /data/biogen/train.csv — it has four regression endpoints: HLM, RLM, MDCK, and logS. I don't have a local checkpoint. Please set it up for 3 epochs to start.",
+      "expected_output": "The agent recognized that no --ckpt was provided, obtained explicit consent (or honored --pretrained-release) to download the released hybrid model nvidia/NV-KERMT-70M-v2 via fetch_released_model.py, validated the downloaded pretrain checkpoint for finetune init, validated the Biogen multi-task CSV, and launched a detached finetune run over the four HLM/RLM/MDCK/logS regression targets for 3 epochs.",
+      "assertions": [
+        "The agent read the kermt-finetune SKILL.md and, finding no --ckpt, defaulted to the released model nvidia/NV-KERMT-70M-v2 via the consent gate (or an explicit --pretrained-release flag)",
+        "The agent downloaded the released bundle with fetch_released_model.py (huggingface_hub) into the --model-dir mount before finetuning, reusing an already-complete bundle if present",
+        "The agent validated the downloaded checkpoint using check_checkpoint.py with --mode finetune_init and confirmed the four regression targets (HLM, RLM, MDCK, logS) in the CSV",
+        "The agent launched the detached finetune run with --dataset-type regression and --epochs 3, reporting the run directory and container name",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "kermt-finetune",
+      "expected_script": null
+    }
+  ]
+}

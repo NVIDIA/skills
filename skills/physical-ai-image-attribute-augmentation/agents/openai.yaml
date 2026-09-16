@@ -1,0 +1,6 @@
+interface:
+  display_name: "PAIDF Orchestration — Image Attribute Augmentation"
+  short_description: "Run image attribute augmentation and attribute-search workflows"
+
+policy:
+  allow_implicit_invocation: true

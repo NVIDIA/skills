@@ -6,3 +6,5 @@ description: NeMo Retriever - deploy NeMo Retriever Library locally, extract inf
 skills:
   - path: skills/nemo-retriever/
     catalog_dir: nemo-retriever
+  - path: skills/nemo-retriever-mcp/
+    catalog_dir: nemo-retriever-mcp

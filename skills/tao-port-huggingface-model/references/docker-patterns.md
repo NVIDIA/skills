@@ -74,7 +74,7 @@ The skill runs every test inside a TAO Toolkit container image on `nvcr.io`. Pha
 
 | Repo | Local tag (prepared in Phase 0) | Underlying TAO Toolkit image (user-supplied) |
 |------|---------------------------------|----------------------------------------------|
-| **tao-core** | `tao-pytorch-base:latest` (or `nvcr.io/nvidia/pytorch:24.03-py3`) | public NGC PyTorch image, or reuses the prepared tao-pytorch image |
+| **tao-core** | `tao-pytorch-base:latest` (or `nvcr.io/nvidia/pytorch:24.03-py3`) | public NGC PyTorch image, or reuses the prepared tao-pytorch image | <!-- unpinned: example public NGC base image -->
 | **tao-pytorch** | `tao-pytorch-base:latest` | tao-pytorch image (e.g. `nvcr.io/<org>/tao-toolkit:<version>-pyt`) |
 | **tao-deploy** | `tao-deploy-base:latest` | tao-deploy image (e.g. `nvcr.io/<org>/tao-toolkit:<version>-deploy`) |
 | **tao-dataservices** | `tao-dataservices-base:latest` (optional) | tao-dataservices image (e.g. `nvcr.io/<org>/tao-toolkit:<version>-data-services`) |

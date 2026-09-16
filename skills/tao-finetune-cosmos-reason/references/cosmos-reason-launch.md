@@ -17,12 +17,28 @@ For root mode, explain the automatic mapping: `train_root` maps to
 `custom.train_dataset.media_path=train_root`; `eval_root` maps the same way for
 `custom.val_dataset`.
 
-Before train or AutoML runner generation, resolve the action=train container
-image from `references/skill_info.yaml` and `versions.yaml` (or the packaged
-`scripts/resolve_tao_image.py` helper), show the exact image to the user, and
-ask whether to use it or override with `image=<override>`. Do not silently
-launch on the default image. This skill does not package a
+Before train or AutoML runner generation, read the pinned action=train
+container image from `references/skill_info.yaml` (`container_image`), show the
+exact image to the user, and ask whether to use it or override with
+`image=<override>`. Do not silently launch on the default image. This skill does not package a
 `skills/models/tao-finetune-cosmos-reason/config.json` file.
+
+The same metadata declares model-level GPU host minimums. They override the
+TAO-wide platform defaults for Cosmos-RL. On a self-managed Docker host, run:
+
+```bash
+bash skills/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh \
+  --backend docker --check-only \
+  --min-driver-version 580 \
+  --min-cuda-version 13.0 \
+  --min-container-toolkit-version 1.19.1
+```
+
+Use the same minimums when validating self-managed Kubernetes workers. On
+administrator-managed SLURM or Kubernetes nodes, verify that the node image or
+operator policy satisfies the profile before submission. These are minimum
+bounds: newer compatible versions pass, while a driver below the CUDA 13.x
+compatibility floor must fail.
 
 For launch preflight, pass the concrete annotation and media paths to the
 shared helper:
@@ -33,9 +49,8 @@ scripts/check_tao_launch_preflight.py --platform slurm \
   --path train_media=/lustre/.../train \
   --path val_annotation=/lustre/.../eval/annotations.json \
   --path val_media=/lustre/.../eval \
-  --gpu-min-count 4 \
-  --gpu-min-memory-gb 80 \
-  --gpu-arch-allowlist cosmos_rl=sm_80,sm_90,sm_100,sm_120
+  --gpu-min-total-memory-gb 256 \
+  --gpu-arch-allowlist cosmos_rl=sm_80,sm_90,sm_100,sm_103,sm_103a,sm_120
 ```
 
 For local Docker, pass the resolved Cosmos-RL image so preflight can enforce
@@ -48,7 +63,8 @@ scripts/check_tao_launch_preflight.py --platform local-docker \
   --path train_annotation=/abs/path/train/annotations.json \
   --path train_media=/abs/path/train \
   --path val_annotation=/abs/path/eval/annotations.json \
-  --path val_media=/abs/path/eval
+  --path val_media=/abs/path/eval \
+  --gpu-min-total-memory-gb 256
 ```
 
 For `s3://` paths, if this helper reports that `aws` is missing, ask for
@@ -63,14 +79,27 @@ directory when annotations reference individual files. Keep a
 `<workspace>/evaluations/data_staging.json` record with the original S3 URI, the
 staged path, and the command/log used to verify the copy.
 
-For Cosmos-RL, count and memory are necessary but not sufficient. Treat the run
-as launchable only when the target has at least 4 GPUs with 80GB-class memory or
-higher, the GPU architecture is in the image-supported allowlist above, and the
-normal Docker/platform, S3, and credential preflight checks pass. A remote image
+For Cosmos-RL SFT (`train.train_policy.type="sft"`), require at least 256 GB of
+cumulative visible GPU memory. Do not impose a fixed device count or per-device
+capacity: set `policy.parallelism.dp_shard_size` and the platform GPU request to
+the actual visible GPU count, and set `policy.parallelism.dp_replicate_size=1`
+for a single node. Workflows that allocate separate policy and rollout replicas
+must still satisfy their explicit topology. In every case, each visible GPU
+architecture must be in the image-supported allowlist above and the selected
+image must pass the runtime CUDA-stack smoke test along with normal
+Docker/platform, S3, and credential preflight checks. Architecture-specific
+suffixes such as `a` and `f` are matched to the same base SM family by the
+preflight helper.
+
+The production recommendation remains at least 4 GPUs with 80GB-class memory.
+A single high-memory GB300 is also supported when the selected image passes
+architecture introspection and the spec sets
+`policy.parallelism.dp_shard_size=1`; apply the WTS/GB300 guards in
+`cosmos-reason-wts-gb300.md` when that workflow is selected. A remote image
 manifest that advertises `linux/arm64` only proves CPU architecture support; it
-does not prove CUDA SM support. Spark/GB10 `sm_121` must be blocked for this
-image unless direct image introspection confirms `sm_121` support or the user
-chooses a newer compatible image.
+does not prove CUDA SM support. `sm_121` must be blocked for this image unless
+direct runtime validation confirms support or the user chooses a compatible
+image.
 
 ## Per-Action Dataset Requirements
 
@@ -154,6 +183,13 @@ LoRA settings, `train.epoch`, `train.train_batch_per_replica`,
 validation frequency, and logging. The packaged template keeps
 `custom.vision.nframes=8` for bounded 1-GPU memory; switch to `fps` only after
 checking token budget and GPU memory.
+
+Keep cadence epoch-based by default: use `train.epoch` for training duration,
+`train.ckpt.save_freq_in_epoch=1` for checkpoints, and
+`validation.freq_in_epoch=1` for validation. Do not select step-based
+`train.ckpt.save_freq` or `validation.freq` because of a dataset, GPU SKU,
+topology, or runtime image. Use step cadence only when the user explicitly
+requests it.
 
 Do not require per-record `video_fps` for the packaged `nframes` template. If a
 run switches to `custom.vision.fps` or a selected dataset/image profile

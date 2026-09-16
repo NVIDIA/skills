@@ -60,10 +60,6 @@
             "format": "date-time",
             "description": "Optional provenance: ISO 8601 UTC date the op first appeared in scene-optimizer-core. Documentary only — no tool reads it; demoted from required so it is not mandatory output. When present it must still be a valid ISO 8601 UTC date-time (checked in tests)."
           },
-          "requires_extension": {
-            "type": "string",
-            "description": "Optional provenance: Kit extension that owns the op (e.g. 'omni.scene.optimizer.core'). Documentary only — no tool reads it (the operationsAvailable check lives in prose); demoted from required so it is not mandatory output."
-          },
           "curation": {
             "type": "object",
             "description": "This-repo recommendation posture (was _curation.json). status is now DERIVED by the upstream status-derivation rubric (run during skill development) and materialized here; only status_override + rationale are authored.",

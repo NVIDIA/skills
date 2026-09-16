@@ -29,6 +29,8 @@ tags:
 
 # Video Reasoning Annotation Pipeline
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Generate Chain-of-Thought training datasets from videos by producing multi-level captions, structured descriptions, and QA pairs (MCQ, binary, open-ended) with step-by-step reasoning traces. Domain-agnostic by default — customize prompts for any video domain.
 
 ## Purpose
@@ -177,6 +179,7 @@ Each step 4 file looks like:
 
 ## Prerequisites
 
-- **Container**: `tao_toolkit.pyt` (resolves to `nvcr.io/nvidia/tao/tao-toolkit:6.26.3-pyt` via `versions.yaml`).
+- **Container**: `nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt`. <!-- versions-key: images.tao_toolkit.pyt -->
 - **ffmpeg / ffprobe**: required for chunk captioning (Step 1b) and highlight extraction (Step 1c).
 - **VLM endpoint**: at least one — Gemini API key or OpenAI-compatible endpoint.
+

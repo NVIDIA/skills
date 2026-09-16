@@ -12,6 +12,8 @@ from typing import Any
 
 from script_utils import check_result as _check, emit_json_report
 
+from preflight_manifest import preflight_required, preflight_status_check
+
 
 def _skill_name() -> str:
     return Path(sys.argv[0]).resolve().parents[1].name
@@ -22,6 +24,16 @@ def _write_report(payload: dict[str, Any], report_path: Path | None) -> None:
 
 
 def check_dependencies() -> dict[str, Any]:
+    skill = _skill_name()
+    if preflight_required():
+        preflight_check = preflight_status_check(skill, "openusd_python")
+        if not preflight_check["passed"]:
+            return {
+                "skill": skill,
+                "passed": False,
+                "checks": [preflight_check],
+                "errors": [preflight_check["message"]],
+            }
     checks = [
         _check("python_available", True, f"Python executable: {sys.executable}", "info"),
     ]

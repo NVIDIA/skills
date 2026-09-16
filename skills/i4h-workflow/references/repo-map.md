@@ -1,67 +1,54 @@
-# Agentic Repo Map
+# Workflow Ownership Map
 
-Load this when authoring, forking, or baking agentic environments. Keep env YAMLs as the source of truth and inspect the concrete source files for the selected env before generating code.
+Use this map after reading `./DESIGN.md`. Inspect the concrete implementation before editing; filenames are not API contracts.
 
-## Source of Truth
+## Authoring and runtime ownership
 
-- Env YAML: `workflows/agentic/config/environments/<env>.yaml` defines robot, cameras, policy stack, model source, task text, arena defaults, and dataset mapping.
-- Arena env discovery: `workflows/agentic/arena/arena/environments/__init__.py` imports every `*_environment.py` module and matches each class `name` to a YAML file. A class without YAML, or YAML without class, fails registration.
-- `workflows/agentic/arena/arena/registry.py` is only a compatibility shim over `arena.environments`.
-- Run commands from the repo root and keep the `workflows/agentic/` prefix when writing files.
+| Concern | Owner | Source |
+|---|---|---|
+| World assets, cameras, randomization, adapters, reset hooks | Scene | `./arena/i4h_arena/scenes/`, `./arena/i4h_arena/assets/`, `./arena/i4h_arena/envcfg/` |
+| Scene capabilities and mode overrides | Scene manifest | `./arena/i4h_arena/scenes/manifest/<scene>.yaml` |
+| Cross-process robot labels, calibration, teleop devices | Embodiment manifest | `./arena/i4h_arena/embodiments/manifest/<robot>.yaml` |
+| Reusable behavior, typed ports, requirements | Task | `./tasks/<project>/` |
+| Simulator-compatible exported RSL-RL actors | In-process policy Task | `./tasks/rsl_rl/` |
+| Remote backend/model/observation/training contract | Remote task manifest | `./tasks/<project>/i4h_tasks/<project>/manifest/<task>.yaml` |
+| Scene selection, run modes, graph composition, goal semantics | Workflow | `./workflows/i4h_workflows/<specialty>/<workflow>.py` |
+| Standard run-mode vocabulary and shared builders | Workflows | `./workflows/i4h_workflow_modes/README.md` |
+| Node scheduling, wiring, retries, timeouts | Engine | `./engine/` |
+| Episode attempts, reset/step/render/record loop | Simulation runner | `./arena/i4h_arena/runner.py` |
+| HDF5 contract and cross-process messages | Common | `./common/i4h_common/` |
+| Mimic, annotation, conversion, visualization | Offline tools | `./tools/` |
+| Vectorized online RL stepping, trainer mapping, and hyperparameters | RL training lifecycle | `./rl/` |
 
-## Subproject Roles
+The public authoring surface is `engine/i4h_engine/interface.py` and `engine/i4h_engine/graph.py`. A workflow module exports exactly one `WORKFLOW = Workflow(...)`. The workflow layout and specialty catalog are documented in `./workflows/README.md`.
 
-| Path | Role |
-|---|---|
-| `workflows/agentic/config/environments/` | Env YAML source of truth. |
-| `workflows/agentic/arena/arena/environments/` | Env classes, CLI args, `get_env`, teleop/replay/policy rollout behavior. |
-| `workflows/agentic/arena/arena/assets/` | Scene assets, USD constants, cameras, table/props/destinations. |
-| `workflows/agentic/arena/arena/tasks/` | Observations, events, success/termination logic, task cfgs. |
-| `workflows/agentic/arena/arena/runtimes/` | Runtime policy IO, camera publishing, action/state bridging. |
-| `workflows/agentic/arena/arena/embodiments/` | Robot embodiment configs for SO-ARM, G1, Franka-style arm. |
-| `workflows/agentic/policy/` | Policy stack dispatch, inference daemon, train CLIs, stack registries. |
-| `workflows/agentic/dataset/` | HDF5 to LeRobot conversion and modality metadata. |
-| `workflows/agentic/annotator/` | VLM success annotation and HDF5 filtering. |
-| `workflows/agentic/mimic/` | HDF5 trajectory expansion. |
-| `workflows/agentic/common/` | Shared config, robot constants, messaging utilities. |
+## Dependency rules
 
-## Existing Env Map
+- Keep `common` independent of every other i4h layer.
+- Keep the Engine independent of concrete workflows, tasks, Arena, and Isaac Sim.
+- Keep in-process tasks independent of workflows and Arena.
+- Keep workflows independent of Arena, Isaac Sim, and policy stacks.
+- Keep GR00T/openpi backends and offline tools dependent only on `common` among i4h layers.
+- Let only `SimulationRunner` call `env.step` during normal Workflow execution; an isolated RL trainer owns vectorized stepping during online training.
 
-| Env | YAML | Env class | Assets | Task | Runtime | Policy stack |
-|---|---|---|---|---|---|---|
-| `scissor_pick_and_place` | `config/environments/scissor_pick_and_place.yaml` | `arena/environments/scissor_pick_and_place_environment.py` | `arena/assets/scissor_pick_and_place.py` | `arena/tasks/scissor_pick_and_place.py` | `arena/runtimes/scissor_pick_and_place.py` | `gr00t_n15` default, N1.7 alternative |
-| `locomanip_tray_pick_and_place` | `config/environments/locomanip_tray_pick_and_place.yaml` | `arena/environments/locomanip_tray_pick_and_place_environment.py` | `arena/assets/locomanip.py` | `arena/tasks/tray_pick_and_place.py` | `arena/runtimes/locomanip_tray_pick_and_place.py` | `gr00t_n16` |
-| `locomanip_push_cart` | `config/environments/locomanip_push_cart.yaml` | `arena/environments/locomanip_push_cart_environment.py` | `arena/assets/locomanip.py` | `arena/tasks/push_cart.py` | `arena/runtimes/locomanip_push_cart.py` | `gr00t_n16` |
-| `assemble_trocar` | `config/environments/assemble_trocar.yaml` | `arena/environments/assemble_trocar_environment.py` | `arena/assets/assemble_trocar.py` | `arena/tasks/assemble_trocar.py` | `arena/runtimes/assemble_trocar.py` | `gr00t_n15`, inference-only |
-| `ultrasound_liver_scan` | `config/environments/ultrasound_liver_scan.yaml` | `arena/environments/ultrasound_liver_scan_environment.py` | `arena/assets/ultrasound_liver_scan.py` | `arena/tasks/ultrasound_liver_scan.py` | `arena/runtimes/ultrasound_liver_scan.py` | `openpi_pi0` |
+## Existing pattern families
 
-Paths in the table are under `workflows/agentic/`.
+- SO-ARM scissors: `scissor_pick_and_place` plus `soarm_scissors`; policy, N1.7 alternative, rule-based, teleop, replay, and idle.
+- G1 locomanipulation: `locomanip_tray_pick_and_place` and `locomanip_push_cart`; N1.6 policy with a 23-wide teleop mode override.
+- G1 trocar: `assemble_trocar`; dex-hand scene, N1.5 policy Task, and separate RLinf PPO post-training profile.
+- Ultrasound reach: `ultrasound_probe_reach`; Franka probe Scene, RSL-RL PPO profile, exported TorchScript Task, policy, and idle modes.
+- Ultrasound: `ultrasound_liver_scan`; Panda scene with openpi policy, rule-based, teleop, replay, and idle.
+- Surgical: PSM, dual-PSM, and STAR scenes with rule-based, replay, and idle modes.
 
-## Pattern Families
+Confirm these families with `./run.sh list`; manifests and workflows may evolve.
 
-- Scissor SO-ARM: inline `InteractiveSceneCfg` in `arena/assets/scissor_pick_and_place.py`, wrapped by `ConfigAsset` and returned by `make_scissor_pick_and_place_scene_assets()`. Robot/cameras come from `SoArm101Embodiment`; the robot is not listed in the scene asset names.
-- G1 locomanip: env classes extend `HumanoidEnvironmentBase`, fetch registered assets via `self.asset_registry.get_asset_by_name(...)`, and use G1 WBC/head-camera policy IO from the locomanip stack.
-- Assemble trocar: G1 plus dex hands, inference-only. Do not add training hooks unless the codebase grows supported training for it.
-- Ultrasound: Franka-style arm and `openpi_pi0`; inspect its YAML/task/runtime before changing camera or dataset fields because it does not follow the G1 GR00T modality pattern.
-
-## Load Order for Env Code Work
-
-1. Selected env YAML in `workflows/agentic/config/environments/`.
-2. Selected source env class in `arena/arena/environments/`.
-3. Selected assets file and constants in `arena/arena/assets/`.
-4. Selected task file in `arena/arena/tasks/`.
-5. Selected runtime in `arena/arena/runtimes/`.
-6. Matching policy stack files in `workflows/agentic/policy/<stack>/` and `workflows/agentic/policy/policy_routing.py` when policy dispatch changes.
-
-Do not infer APIs from names alone. Read the closest existing implementation first, then fork and make minimal changes.
-
-## Registration Checks
-
-Use these before claiming a new or modified env is wired correctly:
+## Validation order
 
 ```bash
-workflows/agentic/policy/run.sh --list-envs
-workflows/agentic/arena/run.sh --env <env> --dry-run
-workflows/agentic/policy/run.sh --env <env> --dry-run
-python -m py_compile <changed-python-files>
+cd "$(git rev-parse --show-toplevel)"
+./run.sh show <workflow> --mode <mode>
+./run.sh lint <workflow> --mode <mode>
+./run.sh lint --all
 ```
+
+Run focused tests in each owning component environment. For Scene or adapter changes, finish with a visible simulator run in every affected dynamic mode; use `--idle` only for stationary layout inspection.

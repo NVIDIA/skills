@@ -1,0 +1,16 @@
+{
+  "_comment": "MR-Brain v1 axial whole-brain MRA fixture, approximately 220 x 220 x 158 mm FOV; upstream reports sparse MRA training coverage, so output quality is not guaranteed.",
+  "modality": "mri_mra",
+  "dim": [
+    256,
+    256,
+    128
+  ],
+  "spacing": [
+    0.86,
+    0.86,
+    1.23
+  ],
+  "num_inference_steps": 30,
+  "cfg_guidance_scale": 2
+}

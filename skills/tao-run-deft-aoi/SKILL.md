@@ -22,6 +22,8 @@ tags:
 
 # Skill: tao-run-deft-aoi
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 ## When to Use This Skill
 
 Use this skill when the user wants an agent to run the full DEFT AOI improvement loop for an NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection model: baseline evaluation, RCA, synthetic defect generation, data mining, retraining, and deployment gating until a KPI target is met.
@@ -66,20 +68,13 @@ not apply this policy to other workflows.
 ## Launch Intake
 
 After the user confirms they want to run this workflow, ask which supported
-platform they intend to run on. Generate the platform choices with:
+platform they intend to run on. The supported platforms are the installed
+platform skills — `tao-run-on-local-docker` (default for a local GPU host),
+`tao-run-on-brev`, `tao-run-on-slurm`, and `tao-run-on-kubernetes`. Never
+default silently; if the user has not chosen, ask.
 
-```bash
-${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_tao_platforms.py \
-  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skills-external} --format text
-```
-
-After platform selection, run:
-
-```bash
-${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_tao_platforms.py \
-  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skills-external} \
-  --platform <platform> --format text
-```
+After platform selection, read the chosen platform skill's SKILL.md and run
+its Preflight section for the credential and environment requirements.
 
 Ask only for credentials relevant to that platform, plus model-specific
 credentials required by the selected workflow.
@@ -129,7 +124,7 @@ All pipeline stages run inline in the parent context — the parent invokes the 
 
 ### Using Bundled Scripts
 
-Run bundled scripts from `scripts/` via `run_script()` when the harness provides it (a Claude Code plugin runtime helper, not a function defined in this repo); otherwise fall back to direct `python`. Resolve every path argument to an absolute host path first. Never write `loop_log.jsonl` via `echo` or inline `jq` — the `seq` invariant requires reading the live tail through `next_seq()`. See `references/scripts-and-agents.md` for the full **Available Scripts** table, the `agents/reporter.md` spawn contract, the **Stage Reference Modules** stage→skill mapping, the path-rule invariant, and the workflow-level AutoML-policy pitfall. For per-script invocation examples, see `references/SCRIPT_USAGE.md`.
+Run bundled scripts from `scripts/` via `run_script()` when the harness provides it (a Claude Code plugin runtime helper, not a function defined in this repo); otherwise fall back to direct `python`. Resolve every path argument to an absolute host path first. Never write `loop_log.jsonl` via `echo` or inline `jq` — the `seq` invariant requires reading the live tail through `next_seq()`. See `references/scripts-and-agents.md` for the full **Available Scripts** table, per-script **invocation examples** (`run_script()` / direct-python / in-process), the `agents/reporter.md` spawn contract, the **Stage Reference Modules** stage→skill mapping, the path-rule invariant, and the workflow-level AutoML-policy pitfall.
 
 ## Stage Reference Modules
 
@@ -141,7 +136,7 @@ Each pipeline stage maps to one underlying skill in the bank; the matching `refe
 
 | Topic | Reference | Contents |
 |---|---|---|
-| Bring-your-own-data, data contract, output layout, augmentation pool | `references/data-layout.md` | No public AOI dataset; full `<workspace>` input tree, ChangeNet 14-column CSV schema pointer, `${RESULTS_DIR}/` output tree, and the two-source mining-pool table |
+| Bring-your-own-data, data contract, output layout, augmentation pool | `references/data-layout.md` | No public AOI dataset; full `<workspace>` input tree, ChangeNet four-column required CSV schema, `${RESULTS_DIR}/` output tree, and the two-source mining-pool table |
 | Pre-Flight checks, defaults, Pre-Flight Summary template, runtime estimate | `references/preflight.md` | The 10 ordered Pre-Flight checks, required input `max_iterations`, all defaults, the full Pre-Flight Summary table + populate commands, and the per-iteration runtime estimate |
 | Pipeline steps, state/logging, stage execution, reports, runtime behavior | `references/pipeline-and-state.md` | Baseline pre-seed/skip-train logic, the 7 iteration Pipeline steps, `deft_state.json` + `loop_log.jsonl` schema and `seq` cadence, post-stage check, per-iteration HTML render, and the loop-end sequence |
 | Bundled scripts, reporter agent, stage modules, AutoML pitfall | `references/scripts-and-agents.md` | Available Scripts table, `agents/reporter.md` spawn contract, Stage Reference Modules table, path-rule invariant, AutoML-policy spec trap |
@@ -153,3 +148,5 @@ Each pipeline stage maps to one underlying skill in the bank; the matching `refe
 Run the full Pre-Flight (`references/preflight.md`), print the Pre-Flight Summary, then STOP at the one user gate. After approval, run the baseline (with the pre-seed/skip-train logic) and the 7-step iteration Pipeline, all detailed in `references/pipeline-and-state.md`.
 
 Hard-stop and never auto-retry on: any stage `status=error`; train/validation leakage (the mid-iteration check on `mining_filter/mining_pool.csv` right after mining, and the post-assembly check on the combined CSV); a missing or zero-row mining pool; a failed CSV existence check; silent-drop; and AMP allocation mismatch. The loop stops when the KPI target is met, `max_iterations` is reached, or an unrecoverable gate fires. Each terminal path runs the loop-end sequence: append the final `loop_stop` entry via `scripts/log_stage.py`, backfill token usage with `scripts/align_token_usage.py`, spawn the `reporter` agent one final time (`trigger="loop-end"`), then run `scripts/prepare_inference_spec.py` — skipped only when no valid checkpoint exists. Per-stage state cadence (one `loop_log.jsonl` entry per stage, `seq=last+1` from disk, disk is canonical, HTML render once per iteration and at loop end) is specified in `references/pipeline-and-state.md`.
+
+

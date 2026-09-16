@@ -6,8 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 # CLI Try-Now Reference
 
 Use this reference only for the default coding-agent trial. Keep the first run
-local, project-scoped, read-only, and limited to the built-in Observability
-plugin.
+local, user-scoped, confirmation-gated, and limited to the built-in
+Observability plugin.
 
 ## Contents
 
@@ -36,7 +36,6 @@ directly:
 ```bash
 command -v codex && codex --version
 command -v claude && claude --version
-command -v hermes && hermes --version
 ```
 
 Use Codex CLI 0.129.0 or newer. Confirm that the selected agent is already
@@ -72,19 +71,25 @@ configuration.
 
 ## Inspect Configuration Before Editing
 
-Inspect these sources when they exist:
+Resolve the supported user configuration directory from
+`$XDG_CONFIG_HOME/nemo-relay`, falling back to `$HOME/.config/nemo-relay`.
+Inspect these files when they exist:
 
 ```text
-./.nemo-relay/config.toml
-./.nemo-relay/plugins.toml
-~/.config/nemo-relay/config.toml
-~/.config/nemo-relay/plugins.toml
+${XDG_CONFIG_HOME:-$HOME/.config}/nemo-relay/config.toml
+${XDG_CONFIG_HOME:-$HOME/.config}/nemo-relay/plugins.toml
 ```
 
-Project configuration is the default for this trial. User configuration has
-higher precedence, so identify inherited or overriding plugin settings before
-changing a project file. Show the proposed change and obtain confirmation.
-Merge with an existing plugin document; do not replace unrelated components.
+Repository-local `.nemo-relay/config.toml` and `.nemo-relay/plugins.toml`
+files are unsupported as active Relay configuration. If they exist, identify
+them for the user and explain that this quick start will not create, edit,
+merge, or trust them. Local output directories such as `.nemo-relay/atof` and
+`.nemo-relay/atif` are artifacts, not configuration layers, and may remain
+valid when explicitly configured as output locations.
+
+Account for higher-precedence system policy, show the proposed user-file
+change, and obtain confirmation. Merge with an existing plugin document; do
+not replace unrelated components.
 
 ## Configure The Agent And Observability
 
@@ -93,18 +98,16 @@ When an interactive TTY is available, use the built-in setup path:
 ```bash
 nemo-relay config codex
 nemo-relay config claude
-nemo-relay config hermes
 ```
 
-Run only the command for the selected agent. Choose project scope, continue to
-plugin configuration, enable the built-in `observability` component, and enable
-both ATOF and ATIF local file output. The Hermes path also installs or updates
-the hook configuration that its transparent run requires.
+Run only the command for the selected agent. Setup writes the XDG user
+configuration. Continue to plugin configuration, enable the built-in
+`observability` component, and enable both ATOF and ATIF local file output.
 
 When an interactive plugin editor is unavailable, add or merge the following
-component in `./.nemo-relay/plugins.toml` after confirmation. First determine
-the installed NeMo Relay version: use observability configuration version 2
-with Relay 0.6 and version 3 with Relay 0.7.
+component in the XDG user `plugins.toml` after confirmation. Resolve the user
+configuration directory and replace `<relay-user-config-dir>` below with its
+absolute path.
 
 ```toml
 version = 1
@@ -114,20 +117,20 @@ kind = "observability"
 enabled = true
 
 [components.config]
-version = 2 # Use 3 with NeMo Relay 0.7.
+version = 3
 
 [components.config.atof]
 enabled = true
 
 [[components.config.atof.sinks]]
 type = "file"
-output_directory = ".nemo-relay/atof"
+output_directory = "<relay-user-config-dir>/atof"
 filename = "events.jsonl"
 mode = "append"
 
 [components.config.atif]
 enabled = true
-output_directory = ".nemo-relay/atif"
+output_directory = "<relay-user-config-dir>/atif"
 filename_template = "{session_id}.atif.json"
 ```
 
@@ -146,13 +149,12 @@ or:
 command = "claude"
 ```
 
-Do not hand-write Hermes hook paths. Use `nemo-relay config hermes` in a TTY.
-
-After the confirmed plugin change, create the configured local output
-directories so doctor can verify that they are writable:
+After the confirmed plugin change, create the configured user output directories
+so doctor can verify that they are writable:
 
 ```bash
-mkdir -p .nemo-relay/atof .nemo-relay/atif
+relay_user_dir="${XDG_CONFIG_HOME:-$HOME/.config}/nemo-relay"
+mkdir -p "$relay_user_dir/atof" "$relay_user_dir/atif"
 ```
 
 ## Validate And Preview
@@ -162,7 +164,6 @@ Run doctor for the selected agent:
 ```bash
 nemo-relay doctor codex --json
 nemo-relay doctor claude --json
-nemo-relay doctor hermes --json
 ```
 
 Run only one command. Summarize failed checks and the remediation they report.
@@ -171,12 +172,12 @@ Then inspect the generated wrapper plan without launching the agent:
 ```bash
 nemo-relay run --agent codex --dry-run --print
 nemo-relay run --agent claude --dry-run --print
-nemo-relay run --agent hermes --dry-run --print
 ```
 
 Confirm that the plan uses a loopback gateway, the intended agent command, and
-the expected project plugin configuration. Show this summary and obtain user
-confirmation before the live run.
+supported user or explicit plugin configuration. The plan must not depend on
+repository-local `.nemo-relay/config.toml` or `.nemo-relay/plugins.toml`. Show
+this summary and obtain user confirmation before the live run.
 
 ## Run A Safe Trial
 
@@ -196,23 +197,21 @@ nemo-relay codex -- exec "Use a shell tool to print exactly relay-smoke-test, th
 nemo-relay claude -- "Use a shell tool to print exactly relay-smoke-test, then reply that the tool call completed. Do not inspect files, environment variables, processes, credentials, network resources, or system configuration."
 ```
 
-For Hermes, launch `nemo-relay hermes` and enter the same prompt in the agent
-session. Do not guess a one-shot Hermes invocation when its installed CLI shape
-is unknown.
-
 ## Verify Both Outputs
 
 Check that ATOF output exists and is non-empty:
 
 ```bash
-test -s .nemo-relay/atof/events.jsonl
-wc -l .nemo-relay/atof/events.jsonl
+relay_user_dir="${XDG_CONFIG_HOME:-$HOME/.config}/nemo-relay"
+test -s "$relay_user_dir/atof/events.jsonl"
+wc -l "$relay_user_dir/atof/events.jsonl"
 ```
 
 Find non-empty ATIF trajectories:
 
 ```bash
-find .nemo-relay/atif -type f -name '*.json' -size +0c -print
+relay_user_dir="${XDG_CONFIG_HOME:-$HOME/.config}/nemo-relay"
+find "$relay_user_dir/atif" -type f -name '*.json' -size +0c -print
 ```
 
 Parse only the minimum JSON needed to report:
@@ -224,9 +223,7 @@ Parse only the minimum JSON needed to report:
 
 Do not paste complete event records or trajectories. Codex writes an ATIF
 snapshot after each completed turn. Claude Code normally writes the trajectory
-when the session ends. Hermes writes or updates it on its supported finalize or
-reset lifecycle, so close or finalize the session before declaring ATIF
-missing.
+when the session ends.
 
 ## Choose The Next Plugin
 
@@ -243,15 +240,17 @@ insufficient.
 
 ## Troubleshoot The Smallest Failed Boundary
 
-- **No ATOF or ATIF files**: run `nemo-relay doctor <agent> --json`; check plugin
-  discovery, component activation, config precedence, and output-directory
-  permissions.
+- **No ATOF or ATIF files**: run `nemo-relay doctor <agent> --json`; check
+  supported plugin discovery, component activation, config precedence, and
+  output-directory permissions. Do not treat repository-local
+  `.nemo-relay/config.toml` or `.nemo-relay/plugins.toml` as active
+  configuration.
 - **ATOF exists but ATIF does not**: finish the turn and close or finalize the
   agent session before changing configuration.
 - **Agent and tool events exist but LLM events do not**: confirm the launched
   agent's provider traffic is using the temporary gateway.
 - **No hook events**: confirm the agent loaded or approved the generated hooks.
-  Codex may require manual hook review; Hermes requires its hook setup.
+  Codex may require manual hook review.
 - **The wrapper does not launch**: inspect `--dry-run --print`, the selected
   agent command, authentication readiness, and doctor output.
 

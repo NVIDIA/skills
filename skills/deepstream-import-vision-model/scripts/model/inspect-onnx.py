@@ -74,7 +74,7 @@ try:
 except Exception as e:
     print(f"\n✗ ONNX validation error: {e}")
 
-# --- Machine-parseable summary (consumed by nv-engine-build and ds-run-pipeline) ---
+# --- Machine-parseable summary (consumed by the engine-build and pipeline-run phases) ---
 # grep patterns expect lines: "input_name: <name>", "height: <int>", "width: <int>"
 print("\n=== Machine-Parseable Summary ===")
 if graph and graph.input:

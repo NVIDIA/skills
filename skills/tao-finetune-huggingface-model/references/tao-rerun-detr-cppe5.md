@@ -18,26 +18,26 @@ docker build -t run-detr-resnet50-cppe5:latest .
 
 # prepare
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -v $(pwd):/workspace \
+  -e HF_TOKEN -v $(pwd):/workspace \
   run-detr-resnet50-cppe5:latest \
   -lc "cd /workspace && python prepare_data.py --config config.yaml"
 
 # smoke
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -e WANDB_MODE=disabled -v $(pwd):/workspace \
+  -e HF_TOKEN -e WANDB_MODE=disabled -v $(pwd):/workspace \
   run-detr-resnet50-cppe5:latest \
   -lc "cd /workspace && python train.py --config config.yaml --smoke --max_steps 1"
 
 # baseline
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -v $(pwd):/workspace \
+  -e HF_TOKEN -v $(pwd):/workspace \
   run-detr-resnet50-cppe5:latest \
   -lc "cd /workspace && python run_eval.py --config config.yaml \
        --checkpoint facebook/detr-resnet-50 --output reports/baseline_results.json"
 
 # train
 docker run -d --name repro_train --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -e WANDB_API_KEY=$WANDB_API_KEY -e WANDB_PROJECT=$WANDB_PROJECT \
+  -e HF_TOKEN -e WANDB_API_KEY -e WANDB_PROJECT=$WANDB_PROJECT \
   -v $(pwd):/workspace \
   run-detr-resnet50-cppe5:latest \
   -lc "cd /workspace && python train.py --config config.yaml 2>&1 | tee logs/train.log"
@@ -45,7 +45,7 @@ docker logs -f repro_train
 
 # eval + infer
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -v $(pwd):/workspace \
+  -e HF_TOKEN -v $(pwd):/workspace \
   run-detr-resnet50-cppe5:latest \
   -lc "cd /workspace && \
        python run_eval.py --config config.yaml --checkpoint checkpoints/final --output reports/eval_results.json && \
@@ -69,7 +69,7 @@ the paper's 300-epoch schedule on COCO (118k). For closer-to-SOTA numbers bump
 - Dataset: `cppe-5` (800 train / 200 eval subset, 5 classes)
 - Training: 10 epochs, bs=8, lr=5e-5, warmup_ratio=0.1, weight_decay=1e-4, bf16
 - Augmentations (albumentations): Perspective, HFlip, RandomBrightnessContrast, HueSat
-- NGC image: `nvcr.io/nvidia/pytorch:25.01-py3`
+- NGC image: `nvcr.io/nvidia/pytorch:25.01-py3` <!-- unpinned: historical rerun record -->
 
 ## Troubleshooting
 

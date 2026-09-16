@@ -7,6 +7,20 @@
 
 {{ executive_summary }}
 
+{% if safety_gate %}
+## Correctness Safety Gate
+
+The Phase-2c correctness precondition. A status outside
+`resolved | clear | none | passed | not_required` means the run carries a known
+defect; the run-scoring oracle zeroes it.
+
+| Field | Value |
+|---|---|
+| Status | {{ safety_gate.status }} |
+| Finding | {{ safety_gate.finding }} |
+| Notes | {{ safety_gate.notes }} |
+{% endif %}
+
 ## Reasoning
 
 {{ reasoning }}
@@ -73,6 +87,16 @@ baseline, never the raw input.
 | Optimized | {{ footprint.optimized_bytes }} bytes |
 | Structural win (vs normalized baseline) | {{ footprint.structural_delta_pct }}% |
 | Total raw → optimized | {{ footprint.raw_delta_pct }}% |
+{% endif %}
+
+{% if gate_summary_rows %}
+## Preservation, Coverage, and Fidelity
+
+| Gate | Recorded |
+|---|---|
+{% for row in gate_summary_rows %}
+| {{ row.name }} | {{ row.value }} |
+{% endfor %}
 {% endif %}
 
 ## Operations

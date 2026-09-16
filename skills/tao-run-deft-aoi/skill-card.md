@@ -9,66 +9,73 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to run the complete DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet PCB inspection models, iterating through baseline evaluation, root cause analysis, synthetic defect generation, data mining, and retraining until false-accept-rate and recall KPI targets are met. <br>
+Developers and engineers who need to iteratively improve NVIDIA TAO VisualChangeNet PCB inspection models through automated RCA, synthetic defect generation, data mining, retraining, and KPI-based deployment gating. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Yes] <br>
+**Credential Type(s):** [API key] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Pipeline and State](references/pipeline-and-state.md) <br>
-- [Pre-Flight Checks](references/preflight.md) <br>
-- [Visual ChangeNet](references/visual-changenet.md) <br>
-- [Data Layout](references/data-layout.md) <br>
-- [PAIDF AnomalyGen](references/paidf-anomalygen.md) <br>
-- [Scripts and Agents](references/scripts-and-agents.md) <br>
+- [TAO Skill Bank Repository](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [visual-changenet.md](references/visual-changenet.md) <br>
+- [paidf-anomalygen.md](references/paidf-anomalygen.md) <br>
+- [pipeline-and-state.md](references/pipeline-and-state.md) <br>
+- [data-layout.md](references/data-layout.md) <br>
+- [preflight.md](references/preflight.md) <br>
+- [scripts-and-agents.md](references/scripts-and-agents.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, HTML reports, JSON state files] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
+**Output Format:** [Markdown with inline bash code blocks and HTML report] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Produces DEFT_Loop_Report.html, deft_state.json, and loop_log.jsonl as persistent artifacts] <br>
+**Other Properties Related to Output:** [Produces HTML loop report (DEFT_Loop_Report.html) and JSON state files (deft_state.json, loop_log.jsonl)] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). <br>
+1 evaluation task (1 positive), each attempt run in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
+- Effectiveness: Checks whether the skill helped complete the user's goal (goal completion and expected workflow adherence). <br>
+- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 100% (+100%) | 88% (+88%) |
-| Discoverability | 1 | 83% (+83%) | 62% (+62%) |
-| Effectiveness | 1 | 90% (+76%) | 90% (+76%) |
-| Efficiency | 1 | 66% (+39%) | 61% (+33%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 23% → 100% (+77 points) | 34% → 54% (+20 points) |
+| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
+| Correctness | 0% → 100% (+100 points) | 20% → 100% (+80 points) |
+| Discoverability | 0% → 100% (+100 points) | 0% → 0% (±0 points) |
+| Effectiveness | 17% → 100% (+83 points) | 48% → 70% (+22 points) |
+| Efficiency | 0% → 100% (+100 points) | 0% → 0% (±0 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

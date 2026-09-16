@@ -1,6 +1,10 @@
 # Transform Manipulator
 
-Use this when an Omniverse Realtime Viewer needs interactive translate, rotate, or scale controls for a selected USD prim. Also read `prim-transform-safety` when live `omni:xform` attributes or selection animation are involved, and `viewport-overlays` for the WebRTC headless ovui overlay compositor.
+Use this when an Omniverse Realtime Viewer needs interactive translate, rotate,
+or scale controls for a selected USD prim. Also read `ovstage-data-plane` for
+runtime transform writes and `viewport-overlays` for the WebRTC headless ovui
+overlay compositor. Read `prim-transform-safety` only when maintaining legacy
+direct OVRTX `omni:xform` helpers.
 
 For ovui-owned gizmo, widget, or headless overlay behavior beyond this skill,
 read `references/dependencies` for acquisition guidance and supplemental dependency
@@ -16,8 +20,9 @@ Implement these pieces in the generated app as needed:
   coordinates and give the gizmo pointer priority before camera controls.
 - App tool state: own active tool, keyboard shortcuts, toolbar state, selected
   path synchronization, animation pause/resume, and pending transform updates.
-- Runtime bridge: write live `omni:xform` values for immediate ovrtx feedback,
-  then commit final persistent edits through the selected session-layer path.
+- Runtime bridge: write live `omni:xform` values through OVStage for immediate
+  renderer feedback, then optionally commit final persistent edits through the
+  selected session-layer path.
 - WebRTC headless overlay: draw the same manipulator grammar through ovui
   overlay primitives, then alpha-composite the RGBA overlay over the streamed
   BGRA frame.
@@ -30,7 +35,9 @@ Implement these pieces in the generated app as needed:
 
 ## Architecture
 
-There are two supported manipulator paths. Both share the same state and math: selected path, active tool, projected axis endpoints, hit testing, drag state, and USD transform authoring.
+There are two supported manipulator paths. Both share the same state and math:
+selected path, active tool, projected axis endpoints, hit testing, drag state,
+OVStage runtime transform writes, and optional USD/session-layer authoring.
 
 ```text
 WebRTC path:
@@ -181,20 +188,44 @@ elif drag.tool == "scale":
 
 The viewer matrix convention is row-major with translation in row 3. Keep `world_to_screen()` coordinate conventions consistent: if the projection helper returns bottom-left origin, convert once to top-left origin before hit testing.
 
-## USD Transform Authoring
+## Runtime Transform Handoff And USD Commit
 
-For immediate ovrtx feedback, every manipulator drag path must update the live
-runtime transform. Use `renderer.write_attribute(..., "omni:xform", ...)` with
-`Semantic.XFORM_MAT4x4`, `PrimMode.CREATE_NEW`, and `DataAccess.SYNC`, and
-snapshot the selected prim's current world transform at drag start. A visible
-manipulator without a live transform write is not complete.
+For immediate renderer feedback, every manipulator drag path must update the
+live runtime transform through OVStage. Snapshot the selected prim's current
+world transform at drag start, compute each drag sample from that base, publish
+the `omni:xform` matrix at a monotonic ordinal, then let the attached renderer
+consume that ordinal in its normal loop. A visible manipulator without a runtime
+transform write is not complete.
+
+```python
+import numpy as np
+
+def publish_drag_transform(runtime, path: str, world_transform: np.ndarray) -> int:
+    ordinal = runtime.next_ordinal()
+    runtime.write_attribute(
+        ordinal=ordinal,
+        prim_paths=[path],
+        attribute_name="omni:xform",
+        values=np.asarray([world_transform], dtype=np.float64),
+        semantic="XFORM_MAT4x4",
+        prim_mode="create_new",
+    ).wait()
+    runtime.advance_write_floor(ordinal).wait()
+    return ordinal
+```
+
+Adapter method names are application-owned; map them to the pinned OVStage API.
+Do not implement new OVStage viewers by direct OVRTX transform
+`write_attribute`, `bind_attribute`, or `map_attribute` calls.
 
 Session-layer xformOp authoring is useful for persistent/editor-style edits,
 but it should not be the only path for a realtime viewer drag. If both are
-required, write live `omni:xform` during the drag and commit the final edit
-through the chosen session-layer/undo path on release.
+required, write live `omni:xform` through OVStage during the drag and commit the
+final edit through the chosen session-layer/undo path on release.
 
-Author manipulator edits into the session layer so user USD files remain non-destructive. Convert the desired world matrix into parent-local space before writing xform ops.
+Author optional persistent manipulator edits into the session layer so user USD
+files remain non-destructive. Convert the desired world matrix into parent-local
+space before writing xform ops.
 
 ```python
 from pxr import Gf, Usd, UsdGeom
@@ -241,7 +272,11 @@ def write_xform_ops(xformable, translate, rotate_xyz, scale):
     return True
 ```
 
-For live ovrtx state, coordinate this with `prim-transform-safety`: query real world transforms before binding `omni:xform`, initialize the binding before the next render step, and recreate bindings after scene reload.
+For live runtime state, coordinate with `ovstage-data-plane`: query current
+world transforms before the drag, write only from the render/runtime owner, wait
+for the write floor before rendering the dependent frame, and discard cached
+transform state after scene-generation changes. `prim-transform-safety` covers
+legacy direct OVRTX binding hazards only.
 
 ## Drawing
 
@@ -266,7 +301,7 @@ Selection animation and manipulator drags must not write transforms at the same 
 gizmo = TransformGizmo(
     width,
     height,
-    on_transform_changed=apply_world_transform_to_prim,
+    on_transform_changed=lambda path, world: publish_drag_transform(runtime, path, world),
     on_drag_start=lambda path: animator.freeze(path),
     on_drag_end=lambda path: animator.resume(path),
 )
@@ -282,7 +317,10 @@ world[3, 0:3] += animator.current_offset(path)
 gizmo.set_selection(path, world_transform=world)
 ```
 
-On drag start, freeze the animation first, then use the current visible transform as `start_transform`. On drag end, update the animator base transform before resuming so it does not snap back to the pre-drag position.
+On drag start, freeze the animation first, then use the current visible runtime
+transform as `start_transform`. On drag end, update the animator base transform
+from the final OVStage pose before resuming so it does not snap back to the
+pre-drag position.
 
 ## Tool Selection
 
@@ -316,21 +354,30 @@ the server-side overlay state.
 - `HIT_RADIUS_PX = 18` is too small for WebRTC. Use `35`.
 - Hover consumption is intentional: `contains() == True` can block camera input so the cursor can communicate that the gizmo is interactive. Only start transforms on press hits.
 - Convert viewport coordinates through the same letterbox mapping used for picking and camera input.
-- Do not call `renderer.step()` concurrently with scene reset, transform binding, or stage mutation.
+- Do not call `renderer.step()` concurrently with scene reset, OVStage transform
+  publication, or stage mutation.
 - Keep one shared ovui headless overlay window; multiple windows can break frame export.
 - If an axis projects to a near-zero screen length, use a deterministic fallback direction instead of producing NaNs.
-- If the gizmo is visible but the prim stays stationary, verify input ownership first and then verify that the drag callback reaches the live `omni:xform` write path for the selected prim.
+- If the gizmo is visible but the prim stays stationary, verify input ownership
+  first and then verify that the drag callback reaches the OVStage `omni:xform`
+  publication path for the selected prim.
 
 ## Checklist
 
 - [ ] Read `viewport-overlays` for WebRTC/headless ovui composition or `local-viewer` for inline `ByteImageProvider` drawing.
-- [ ] Read `prim-transform-safety` before writing live `omni:xform` or combining gizmo drags with selection animation.
+- [ ] Read `ovstage-data-plane` before writing live `omni:xform` or combining
+      gizmo drags with selection animation.
 - [ ] Route gizmo input before camera input for press, move, release, and wheel.
 - [ ] Project origin and axes every frame from the current camera view/projection.
 - [ ] Use `start_transform` and `start_mouse` as the base for each drag update.
-- [ ] During drag, write the selected prim's live `omni:xform`; on release, optionally commit to a session-layer USD edit path.
+- [ ] During drag, publish the selected prim's live `omni:xform` through
+      OVStage; on release, optionally commit to a session-layer USD edit path.
 - [ ] Author USD xform ops in the session layer with parent compensation and Vec3f/Vec3d type preservation.
-- [ ] Validate with a measured transform delta, not only a screenshot of a visible manipulator.
+- [ ] Validate with a measured transform delta and OVStage write/render
+      consume ordinal, not only a screenshot of a visible manipulator.
 - [ ] Freeze animation during drag and resume from the new base transform after drag end.
 
-See also: `viewport-overlays`, `prim-transform-safety`, `viewer-input-routing`, `camera-controls`, `object-selection`, `selection-animation`, `local-viewer`, `streaming-messages`.
+See also: `viewport-overlays`, `ovstage-data-plane`,
+`ovstage-ovrtx-integration`, `viewer-input-routing`, `camera-controls`,
+`object-selection`, `selection-animation`, `local-viewer`,
+`streaming-messages`.

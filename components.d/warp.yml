@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: Warp
+repo: NVIDIA/warp
+description: GPU-accelerated simulation, robotics, and machine learning — evaluate Warp candidates, optimize compile times, and debug gradients.
+skills:
+  - path: skills/warp-compile-time-optimizer/
+    catalog_dir: warp-compile-time-optimizer
+  - path: skills/warp-debug-gradients/
+    catalog_dir: warp-debug-gradients
+  - path: skills/warp-eval/
+    catalog_dir: warp-eval

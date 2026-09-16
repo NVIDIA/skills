@@ -1,16 +1,22 @@
 network_arch: cosmos-rl
+huggingface_model_ids:
+- nvidia/Cosmos3-Nano
 aliases:
 - Cosmos Reason 3
 - Cosmos3 Nano Reasoner
 - Cosmos3-Nano
-- nvidia/Cosmos3-Nano
 automl_enabled: true
-container_image: tao_toolkit.cosmos_rl
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.1.0-cosmos-rl  # versions-key: images.tao_toolkit.cosmos_rl
 required_credentials:
 - HF_TOKEN
 data_format: llava
 gpu_spec_key: policy.parallelism.dp_shard_size
 node_spec_key: policy.parallelism.dp_replicate_size
+runtime_requirements:
+  gpu_host:
+    min_driver_version: '580'
+    min_cuda_version: '13.0'
+    min_container_toolkit_version: '1.19.1'
 data_sources:
   train:
     custom.train_dataset.annotation_path:

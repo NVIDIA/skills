@@ -17,27 +17,26 @@ Resolve everything possible before asking the user. In order:
 
    | Variable | Required for | Image prefix it gates |
    |---|---|---|
-   | `NGC_KEY` | All nvcr.io image pulls — TAO toolkit (train/infer/deploy/data services) and the paidf-anomalygen SDG container | `nvcr.io/nvstaging/tao/*`, `nvcr.io/nv-metropolis-dev/*` |
+   | `NGC_KEY` | All nvcr.io image pulls — TAO toolkit (train/infer/deploy/data services) and the paidf-anomalygen SDG container | the registry orgs of the pinned image URIs in step 5 |
    | `HF_TOKEN` | Pre-Flight HuggingFace model downloads (ChangeNet backbone, Cosmos diffusion, T5, C-RADIO-V3, DINOv2, SAM2, Qwen-VL, SigLIP) — cached under `augmentation/anomalygen/base_checkpoints/`. Also gates the PCB reference dataset auto-fetch. | huggingface.co |
 
-   Both variables must be non-empty. The single `NGC_KEY` must have read access to both `nvstaging/tao` (TAO Toolkit images) and `nv-metropolis-dev` (paidf-anomalygen). If either is missing, show the user `.env.example` (next to this skill), ask them to copy it to `<workspace>/.env` and fill in values, and do not proceed until set.
+   Both variables must be non-empty. The single `NGC_KEY` must have read access to every registry org referenced by the pinned image URIs in step 5 (TAO Toolkit and paidf-anomalygen images). If either is missing, show the user `.env.example` (next to this skill), ask them to copy it to `<workspace>/.env` and fill in values, and do not proceed until set.
 4. `docker login nvcr.io` once with `NGC_KEY` (username `$oauthtoken`, password = the key). nvcr.io stores one credential per host. Do not fall back to host-side TAO wrappers.
-5. **Resolve container image refs from `versions.yaml`.** The rest of this skill — including the Pre-Flight Summary's `docker image inspect` line, every stage launch, and the `references/*.md` files — references three env vars. They are **not** defined elsewhere; resolve them here using `scripts/resolve_versions_key.py` (the single owner of `versions.yaml` schema knowledge) and `export` them so all downstream commands see them:
+5. **Export the pinned container image env vars.** The rest of this skill — including the Pre-Flight Summary's `docker image inspect` line, every stage launch, and the `references/*.md` files — references three env vars. They are **not** defined elsewhere; the pinned URIs below are stamped from the release manifest. `export` them so all downstream commands see them:
 
    ```bash
-   SB=${TAO_SKILL_BANK_PATH:-~/tao-skills-external}
-   export TAO_PYT_IMAGE=$($SB/scripts/resolve_versions_key.py images.tao_toolkit.pyt)
-   export TAO_DS_IMAGE=$($SB/scripts/resolve_versions_key.py  images.tao_toolkit.data_services)
-   export AG_IMAGE=$($SB/scripts/resolve_versions_key.py      images.metropolis_sdg.paidf_anomalygen)
+   export TAO_PYT_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
+   export TAO_DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-data-services  # versions-key: images.tao_toolkit.data_services
+   export AG_IMAGE=nvcr.io/nvidia/paidf-anomalygen:1.0.0  # versions-key: images.metropolis_sdg.paidf_anomalygen
    ```
 
-   | Env var | `versions.yaml` key | Used by |
+   | Env var | versions-key | Used by |
    |---|---|---|
    | `TAO_PYT_IMAGE` | `images.tao_toolkit.pyt` | `train`, `evaluate`, `rca` (TAO toolkit pyt container) |
    | `TAO_DS_IMAGE` | `images.tao_toolkit.data_services` | `data_mining` (TAO data services container) |
    | `AG_IMAGE` | `images.metropolis_sdg.paidf_anomalygen` | `anomalygen` (paidf-anomalygen container) |
 
-   The script exits non-zero (with a diagnostic on stderr) if a key is missing or empty. Hard stop here — without the export, bash silently substitutes `""`, the next step's `docker image inspect` reports `0` MISSING for every image, and the failure mode points at the wrong root cause.
+   Hard stop here if any export is missing — without it, bash silently substitutes `""`, the next step's `docker image inspect` reports `0` MISSING for every image, and the failure mode points at the wrong root cause.
 6. Verify every image resolved in step 5 is present locally (`docker image inspect "$TAO_PYT_IMAGE" "$AG_IMAGE" "$TAO_DS_IMAGE"`).
 
    **Architecture compatibility check.** The AnomalyGen (`$AG_IMAGE`) container is published as amd64-only and will fail silently on arm64 hosts (e.g. DGX Spark). This surfaces only after schema generation, credential injection, and a 24 GB download — so check it now:
@@ -85,7 +84,7 @@ Once all checks pass, print this summary and **STOP — wait for explicit user a
 | Field                          | Value                                                                          |
 | ------------------------------ | ------------------------------------------------------------------------------ |
 | KPI Target                     | FAR < X% at Recall=100%                                                        |
-| Max Iterations                 | N                                                                              |
+| Max DEFT Iterations            | N                                                                              |
 | Stop condition                 | KPI met **or** max_iterations reached — reaching the KPI is not guaranteed; FAR may regress between iterations |
 | Training Epochs                | N per iteration                                                                |
 | Num SDG                        | N synthetic samples per iteration                                              |
@@ -119,7 +118,7 @@ Fill the `Image` column with the actual URI resolved in Pre-Flight step 5
 (i.e. the value of the env var), not the literal `${VAR}` placeholder.
 Print one row per env var so the audit trail shows exactly which tag will run.
 
-| Env var          | Image (resolved from `versions.yaml`)                                          | Status     |
+| Env var          | Image (pinned in Pre-Flight step 5)                                            | Status     |
 | ---------------- | ------------------------------------------------------------------------------ | ---------- |
 | `TAO_PYT_IMAGE`  | `<$TAO_PYT_IMAGE>` (key: `images.tao_toolkit.pyt`)                             | OK/MISSING |
 | `AG_IMAGE`       | `<$AG_IMAGE>` (key: `images.metropolis_sdg.paidf_anomalygen`)                 | OK/MISSING |
@@ -134,7 +133,7 @@ cat <workspace>/augmentation/anomalygen/checkpoints/<project>/checkpoints/latest
 cat <workspace>/augmentation/anomalygen/datasets/<project>/defect_spec.jsonl | python3 -c "import sys,json; [print(json.loads(l)['defect_type']) for l in sys.stdin]"
 nvidia-smi --list-gpus | wc -l
 # ${TAO_PYT_IMAGE}, ${AG_IMAGE}, ${TAO_DS_IMAGE} are exported by Pre-Flight step 5
-# from versions.yaml via scripts/resolve_versions_key.py. Loop per-image so the
+# (pinned URIs stamped from the release manifest). Loop per-image so the
 # output maps 1:1 to the Docker Images table rows above (you can't fill a
 # per-row Status column from a single aggregate "grep -c sha256" count).
 for var in TAO_PYT_IMAGE AG_IMAGE TAO_DS_IMAGE; do

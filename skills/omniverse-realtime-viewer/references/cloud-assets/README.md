@@ -35,8 +35,9 @@ MINIO_ROOT_USER=minioadmin MINIO_ROOT_PASSWORD=minioadmin /tmp/minio server /tmp
 
 ## Dependencies
 
+Read `references/dependencies/nvidia-runtime.md` before installing or integrating `ovstorage`.
+
 ```bash
-pip install ovstorage
 pip install "boto3>=1.34"  # optional for generated direct-S3 helpers
 ```
 

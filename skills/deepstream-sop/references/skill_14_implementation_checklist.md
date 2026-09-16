@@ -74,7 +74,7 @@ Use config files as-is from `configs/`: `nvds_preprocess_template.txt`, `nvds_in
 ## Docker build prerequisites
 
 - [ ] Base image pulled: `docker pull nvcr.io/nvidia/blueprint/vss-engine:2.4.1`
-- [ ] DS headers image pulled: `docker pull nvcr.io/nvidia/deepstream:8.0-triton-multiarch`
+- [ ] DS headers image pulled: `docker pull nvcr.io/nvidia/deepstream:9.1-triton-multiarch` *(default; override via `--build-arg DS_IMAGE=<pre-release>` while DS-9.1 is not public — see Dockerfile comment)*
 - [ ] Pylon SDK binary (real file, not symlink): `binaries/pylon-25.10.2_linux-x86_64_setup.tar.gz`
 - [ ] `docker/ddm_pytorch2.patch` present (copy from `references/ddm_pytorch2.patch`)
 - [ ] `docker/package_file_list.txt` updated with ALL source files (missing files → runtime ImportError)

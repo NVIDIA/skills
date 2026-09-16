@@ -1,14 +1,43 @@
 [
   {
     "id": "smoke-test-before-training",
-    "question": "I have an MSD-style CT segmentation dataset at /data/msd_case. Do the shortest smoke-scale NV-Segment-CT finetune check first.",
+    "question": "Prepare the shortest smoke-scale NV-Segment-CT finetune command for my MSD-style CT segmentation dataset at /data/msd_case, with outputs under runs/nvseg_msd_case_smoke. This is a command-shape review only; do not install packages or start training in this environment.",
     "expected_skill": "nv-segment-ct-finetune",
-    "ground_truth": "The agent runs scripts/run_finetune.py with the dataset path, --smoke, a small patch size, and an explicit output directory.",
+    "ground_truth": "The agent provides, but does not execute, scripts/run_finetune.py with the dataset path, --smoke, a small patch size, and the caller-provided output directory, then identifies output.json recommended_ckpt as the checkpoint field to inspect.",
     "expected_behavior": [
       "the command uses skills/nv-segment-ct-finetune/scripts/run_finetune.py",
-      "the command includes the user dataset path as the positional argument",
+      "the command includes /data/msd_case as the positional dataset and runs/nvseg_msd_case_smoke as --output-dir",
       "the command includes --smoke before proposing a long run",
+      "the agent does not install packages or start training during this command-shape review",
       "the final answer says recommended_ckpt, not last epoch, is the checkpoint to inspect"
+    ]
+  },
+  {
+    "id": "fixed-channel-softmax-finetune",
+    "question": "Prepare a reproducible NV-Segment-CT fixed-channel softmax finetune command for my mutually exclusive two-label CT dataset. The dataset root is /data/two_label_ct, the datalist is /data/two_label_ct/dataset.json, dataset label 1 maps to VISTA3D class 3, dataset label 2 maps to class 13 in that order, and outputs should go under runs/nvseg_softmax. This is a command-shape review only; do not install packages, clone repositories, or start training in this environment.",
+    "expected_skill": "nv-segment-ct-finetune",
+    "ground_truth": "The agent provides, but does not execute, the pinned upstream source setup and scripts/run_finetune.py with the exact dataset, datalist, ordered label mapping, --softmax, and caller-provided output directory.",
+    "expected_behavior": [
+      "the command uses skills/nv-segment-ct-finetune/scripts/run_finetune.py",
+      "the command includes --dataset-dir /data/two_label_ct, --datalist /data/two_label_ct/dataset.json, and --output-dir runs/nvseg_softmax",
+      "the command includes --softmax and the ordered --label-mapping [[1,3],[2,13]]",
+      "the agent requires the pinned upstream source checkout through NV_SEGMENT_CT_ROOT or NV_SEGMENT_CTMR_ROOT",
+      "the agent does not install packages, clone repositories, or start training during this command-shape review",
+      "the answer distinguishes model_softmax.pt from the standard model_finetune.pt checkpoint"
+    ]
+  },
+  {
+    "id": "local-mlflow-tracking",
+    "question": "Prepare an NV-Segment-CT finetune command for my CT dataset at /data/lung_ct with datalist /data/lung_ct/dataset.json. Track the run locally in MLflow experiment nvseg-review with run name trial-01, and write outputs under runs/nvseg_mlflow. This is a command-shape review only; do not install packages or start training in this environment.",
+    "expected_skill": "nv-segment-ct-finetune",
+    "ground_truth": "The agent provides, but does not execute, scripts/run_finetune.py with the exact dataset, datalist, output directory, --mlflow-experiment-name, and --mlflow-run-name. It omits a remote tracking URI so MONAI uses the local output-directory MLflow store.",
+    "expected_behavior": [
+      "the command uses skills/nv-segment-ct-finetune/scripts/run_finetune.py",
+      "the command includes --dataset-dir /data/lung_ct, --datalist /data/lung_ct/dataset.json, and --output-dir runs/nvseg_mlflow",
+      "the command includes --mlflow-experiment-name nvseg-review and --mlflow-run-name trial-01",
+      "the command does not set --mlflow-tracking-uri because local tracking was requested",
+      "the answer identifies runs/nvseg_mlflow/mlruns as the local tracking store",
+      "the agent does not install packages or start training during this command-shape review"
     ]
   },
   {

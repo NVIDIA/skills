@@ -20,24 +20,52 @@ Minimum useful fields:
 
 For broad property inspection, use `stage-hierarchy` serialization rules and cap large arrays.
 
+### Summary And Detail Contract
+
+For asset review, show a compact summary immediately, then organize the full
+payload into a detailed read-only table. The summary should contain the name,
+full path, type name, classification or kind when authored, child count, and
+available state flags: active, defined, loaded, abstract, and instance or
+instance-proxy. Treat these fields as optional because a prim type or the active
+runtime may not expose every one.
+
+Group the detailed table so a reviewer can scan rather than parse an arbitrary
+JSON blob:
+
+| Group | Typical fields |
+|---|---|
+| Transform | Authored xform ops and computed world transform. |
+| Material | Direct or inherited binding path. |
+| Visibility | Visibility and purpose. |
+| Variants | Set names, selections, and available choices. |
+| Attributes | Values, schema/type information, and capped array previews. |
+| Relationships | Named targets, including material relationships when applicable. |
+| Metadata | Kind, authored metadata, and other composition details. |
+
+Use a compact placeholder while a newly selected prim's detail request is in
+flight. Do not retain the prior prim's table until the response arrives.
+
 ## Preferred Data Path
 
-Use native ovrtx 0.3 reads for inspector attributes first:
+Use OVStage runtime reads for current inspector attributes first:
 
-1. Use `Renderer.query_prims()` with `AttributeFilterMode.SPECIFIC` or `ALL` to discover available attributes and `AttributeInfo` descriptors.
-2. Use `Renderer.read_attribute()` for scalar values with one value per prim, such as `omni:xform`, radius-like numeric values, or shader inputs.
-3. Use `Renderer.read_array_attribute()` for variable-length array values, such as mesh `points`, `normals`, or `faceVertexCounts`.
-4. Use pxr only for variant sets, relationship targets, and USD metadata until native APIs cover those at the same fidelity.
+1. Use the runtime query adapter with a specific or all-attribute filter to
+   discover available attributes and descriptors.
+2. Use runtime scalar reads for one value per prim, such as `omni:xform`,
+   radius-like numeric values, tokens, or shader inputs.
+3. Use runtime array reads for variable-length values, such as mesh `points`,
+   `normals`, or `faceVertexCounts`.
+4. Use pxr only for variant sets, relationship targets, material binding
+   strings, and USD metadata until runtime APIs cover those at the same fidelity.
 
 ```python
 import numpy as np
-from ovrtx import AttributeFilterMode
 
 COMMON_ATTRS = ["omni:xform", "visibility", "purpose", "inputs:Fader"]
 
-def native_prim_info(renderer, path: str) -> dict:
-    query = renderer.query_prims(
-        attribute_filter_mode=AttributeFilterMode.SPECIFIC,
+def runtime_prim_info(runtime, path: str) -> dict:
+    query = runtime.query_prims(
+        attribute_filter_mode="specific",
         attribute_names=COMMON_ATTRS,
     )
     attrs = query.get(path, {})
@@ -47,15 +75,19 @@ def native_prim_info(renderer, path: str) -> dict:
         "attributes": sorted(attrs.keys()),
     }
     if "omni:xform" in attrs:
-        tensor = renderer.read_attribute("omni:xform", [path])
-        data["world_transform"] = np.from_dlpack(tensor).reshape(1, 4, 4)[0].tolist()
+        values = runtime.read_attribute("omni:xform", [path])
+        data["world_transform"] = np.asarray(values).reshape(1, 4, 4)[0].tolist()
     if "inputs:Fader" in attrs:
-        tensor = renderer.read_attribute("inputs:Fader", [path])
-        data["fader"] = float(np.from_dlpack(tensor).reshape(-1)[0])
+        values = runtime.read_attribute("inputs:Fader", [path])
+        data["fader"] = float(np.asarray(values).reshape(-1)[0])
     return data
 ```
 
-Do not force every inspector field through pxr just because the UI already has a worker. The worker should augment native data with variants, material relationship strings, and authored metadata when those fields are requested.
+Do not force every inspector field through pxr just because the UI already has a
+worker. The worker should augment runtime data with variants, material
+relationship strings, and authored metadata when those fields are requested.
+Direct OVRTX reads are for renderer diagnostics or legacy pre-OVStage viewers,
+not the default inspector path.
 
 ## Delivery-Mode Field Sets
 
@@ -68,25 +100,25 @@ The exact fields shown differ by delivery path:
 | Local ovui overlay | Name, path, type, and position, projected into the local viewport with image-letterbox offsets. |
 | Tauri shared React panel | Selected path plus `PrimProperty[]`; the current backend stub returns only a `path` property until a Rust/USD property query is added. |
 
-## Native Property Query Pattern
+## Runtime Property Query Pattern
 
 For selected-prim panels, keep a small allowlist of high-value attributes and cap payload size before sending over a data channel:
 
 ```python
-def read_selected_attributes(renderer, path: str, attr_names: list[str]) -> dict:
-    info = renderer.query_prims(
-        attribute_filter_mode=AttributeFilterMode.SPECIFIC,
+def read_selected_attributes(runtime, path: str, attr_names: list[str]) -> dict:
+    info = runtime.query_prims(
+        attribute_filter_mode="specific",
         attribute_names=attr_names,
     ).get(path, {})
 
     values = {}
     for name, desc in info.items():
         if desc.is_array:
-            arrays = renderer.read_array_attribute(name, [path])
-            values[name] = np.from_dlpack(arrays[path])[:1000].tolist()
+            arrays = runtime.read_array_attribute(name, [path])
+            values[name] = np.asarray(arrays[path])[:1000].copy().tolist()
         else:
-            tensor = renderer.read_attribute(name, [path])
-            values[name] = np.from_dlpack(tensor).tolist()
+            value = runtime.read_attribute(name, [path])
+            values[name] = np.asarray(value).copy().tolist()
     return values
 ```
 
@@ -167,11 +199,14 @@ Use bbox top-center as the anchor when available; fall back to local-to-world tr
 
 For server-side WebRTC overlays, `viewport-overlays` owns the headless ovui composition path. It uses the same info fields and projection idea but renders to an alpha frame that is blended over the stream.
 
-See also: `stage-attribute-reads`, `stage-hierarchy`, `object-selection`, `viewport-overlays`, `local-viewer`.
+See also: `stage-attribute-reads`, `stage-hierarchy`, `object-selection`,
+`viewport-overlays`, `local-viewer`, `ovstage-data-plane`.
 
 ## Adding This To An Existing Omniverse Realtime Viewer
 
-- Add `server/prim_info.py` or extend `server/stage_queries.py` with selected-prim info queries backed by native `query_prims()` and `read_attribute()` / `read_array_attribute()`.
+- Add `server/prim_info.py` or extend `server/stage_queries.py` with
+  selected-prim info queries backed by OVStage runtime queries and
+  `read_attribute()` / `read_array_attribute()` wrappers.
 - Maintain current selected prim path, latest info payload, and an invalidation flag for scene reloads.
 - Use `stageSelectionChanged` as the trigger to request or push fresh prim info.
 - Reuse `getPropertiesRequest` -> `getPropertiesResponse` for dense property panels.
@@ -184,7 +219,9 @@ See also: `stage-attribute-reads`, `stage-hierarchy`, `object-selection`, `viewp
   otherwise be dropped after selection changes.
 - Local Omniverse Realtime Viewer apps can use a sidebar or viewport overlay tied directly to the local stage query object.
 - Include name, path, type, transform, material, visibility, purpose, metadata, and variants when available.
-- Prefer native attribute reads for transform and numeric/tensor values; use pxr for variant sets, relationships, and USD metadata.
+- Prefer OVStage runtime attribute reads for transform and numeric/tensor
+  values; use pxr for variant sets, relationships, material binding strings,
+  and USD metadata.
 - Cap large arrays and serialize USD values using `stage-hierarchy` rules before
   sending JSON. For inspector panels, send counts plus a small preview for mesh
   buffers such as `points`, `normals`, `faceVertexIndices`, and UV primvars; do

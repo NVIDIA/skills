@@ -18,7 +18,7 @@ Load this file only when the compact `SKILL.md` points here for the current task
 This is a skill-bank **workflow** skill at `skills/applications/tao-run-automl/`. The agent
 discovers it by reading this file directly (or via the `tao-skills` plugin).
 
-Run automated hyperparameter optimization (HPO) for any TAO network. The agent uses `AutoMLRunner` — a single interface that manages the full loop: generate hyperparameter recommendations, launch training jobs, extract metrics, and feed results back to the optimizer.
+Run automated hyperparameter optimization (HPO) for any TAO network/action. The agent uses `AutoMLRunner` — a single interface that manages the full loop: generate hyperparameter recommendations, launch action jobs, extract metrics, and feed results back to the optimizer.
 
 The runner is **platform-agnostic** — it takes any object implementing the standard SDK shape (`create_job`, `get_job_status`, `get_job_logs`, `get_failure_analysis`) and calls those methods. Pick whichever SDK matches where you want jobs to run; the runner doesn't care:
 
@@ -97,7 +97,7 @@ Before running AutoML:
        │   ├── <model_skill>/
        │   │   ├── SKILL.md
        │   │   ├── schemas/
-       │   │   │   └── train.schema.json          # REQUIRED AutoML gate
+       │   │   │   └── <action>.schema.json       # REQUIRED AutoML gate
        │   │   └── references/
        │   │       ├── skill_info.yaml             # actions, data_sources, container image
        │   │       └── spec_template_train.yaml    # default training spec (recommended)
@@ -105,7 +105,7 @@ Before running AutoML:
        ├── data/
        └── platform/
    ```
-   **CRITICAL**: AutoML requires a packaged generated train dataclass schema at `<bank-root>/skills/models/<model_skill>/schemas/train.schema.json`. The schema must exist and parse as JSON — it's the AutoML support gate because it defines `automl_enabled` parameters, defaults, ranges, options, weights, and popular metadata. Schemas are generated during skill-bank maintenance and shipped with the plugin; the runtime must not expect `~/tao-core` to exist. If the packaged train schema is missing, do not run AutoML for that model.
+   **CRITICAL**: AutoML requires a packaged generated dataclass schema at `<bank-root>/skills/models/<model_skill>/schemas/<action>.schema.json`. The schema must exist and parse as JSON — it's the AutoML support gate because it defines `automl_enabled` parameters, defaults, ranges, options, weights, and popular metadata. Schemas are generated during skill-bank maintenance and shipped with the plugin; the runtime must not expect `~/tao-core` to exist. If the packaged action schema is missing, do not run AutoML for that model/action.
 
    `references/spec_template_<action>.yaml` is required for **non-TAO-Core models** (cosmos-rl, clip, etc.) — without it the runner has no defaults and the trial spec will be missing keys. For **TAO Core / Hydra-based models** (DINO, BEVFusion, etc.) the template is optional; Hydra fills container-side defaults at runtime.
 4. **`nvidia-tao-automl` installed** with the platform extra you want. Resolve
@@ -133,22 +133,22 @@ python3 -c "import wandb; print('WandB OK')"
 
 ## Concepts: What is TAO AutoML?
 
-TAO AutoML automates the "try different hyperparameter values → train → compare results → repeat" cycle. Instead of manually tweaking training settings, you tell AutoML:
+TAO AutoML automates the "try different hyperparameter values → run action → compare results → repeat" cycle. Instead of manually tweaking action settings, you tell AutoML:
 
-- **What network** to train (`network_arch`)
+- **What network/action** to optimize (`network_arch`, `action`)
 - **Which hyperparameters** to search over (from the model skill and schema)
 - **What metric** to optimize (from the model skill or user request)
 - **How many trials** (budget)
 
 AutoML then:
 1. Picks hyperparameter values using a search algorithm (Bayesian, Hyperband, LLM, etc.)
-2. Launches a real training job on whichever backend the SDK targets (Brev, SLURM, Kubernetes, or local Docker)
-3. Reads the result metric from training logs
+2. Launches a real action job on whichever backend the SDK targets (Brev, SLURM, Kubernetes, or local Docker)
+3. Reads the result metric from logs or an optional follow-up evaluator
 4. Feeds the result back to the algorithm so it learns what works
 5. Repeats until budget is exhausted
 6. Returns the best configuration found
 
-Each "trial" is called a **recommendation** (rec). One rec = one full training run with a specific set of hyperparameters.
+Each "trial" is called a **recommendation** (rec). One rec = one full action run with a specific set of hyperparameters.
 
 ---
 
@@ -173,9 +173,11 @@ ${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_automl_support.py \
   --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skills-external} --format text
 ```
 
-Return both sections from that output: runnable AutoML models and
-AutoML-enabled models still blocked on schema packaging. The support rule is:
-AutoML is enabled at model level; runnable AutoML also requires
-`skills/models/<network>/schemas/train.schema.json` to be packaged and valid.
+Return both sections from that output: runnable AutoML model/actions and
+AutoML-enabled model/actions still blocked on schema packaging. The support
+rule is: AutoML is enabled at model level; runnable AutoML for an action also
+requires `skills/models/<model_skill>/schemas/<action>.schema.json` to be packaged and
+valid. Use `--action distill`, `--action prune`, or `--action quantize` for a
+focused compression-action query.
 
 ---

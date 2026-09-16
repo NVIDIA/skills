@@ -33,6 +33,13 @@ cannot silently over-share at the mesh level. **Identity defines the grain;
 the hash only confirms reuse** — a candidate with no identity signal is refused
 a shared disposition unless it is the explicit structural-fallback grain.
 
+Emitted vocabulary: a target whose grain came from the structural fallback
+carries ``identity_signal: "structural_fallback"`` (not ``"none"``), and a
+target that used the intent-confirmed exemption carries
+``intent_confirmed: true``. Both are the manifest-schema spellings, so the two
+exemptions this core grants survive the handoff to the report gate instead of
+being re-failed there.
+
 Usage:
     python3 select_frontier.py <candidates.json>           # or - for stdin
 Exit 0 when a valid frontier is produced, 1 on an identity violation.
@@ -124,14 +131,20 @@ def select_frontier(payload: dict) -> dict:
             c["grain_source"] = "structural_fallback"
             diagnostics.append(
                 f"{cid}: identity_signal 'kind' arrived with kind_untrusted=true — "
-                "coerced to identity_signal 'none' / grain_source 'structural_fallback' "
+                "coerced to grain_source 'structural_fallback' and emitted as "
+                "identity_signal 'structural_fallback' "
                 "(stage-wide meshes-per-kind preflight rejected kind as a boundary)"
             )
         copies = _occurrences(c)
         total_units += copies
         distinct_prototypes += 1  # one prototype authored per value-variant candidate
         signal = c.get("identity_signal", "none")
-        grain_source = c.get("grain_source") or ("structural_fallback" if signal == "none" and c.get("structural_fallback") else "identity")
+        grain_source = c.get("grain_source") or (
+            "structural_fallback"
+            if signal == "structural_fallback"
+            or (signal == "none" and c.get("structural_fallback"))
+            else "identity"
+        )
         own_prims = c.get("own_prims") or 0
         own_meshes = c.get("own_meshes") or 0
         scope = _share_scope(c)
@@ -184,13 +197,26 @@ def select_frontier(payload: dict) -> dict:
                 "kind / semantic part must stay addressable by default."
             )
 
+        # The grain the frontier landed on, named in the vocabulary the manifest
+        # schema and the downstream report gate share. A unit with no authored
+        # identity whose grain came from the structural fallback is emitted as
+        # identity_signal 'structural_fallback' — the enum value that names the
+        # §6.0 exemption. Emitting 'none' left the exemption legible only in
+        # grain_source, which the report gate does not read, so every
+        # structural-fallback and kind_untrusted descent failed the final gate.
+        emitted_signal = (
+            "structural_fallback"
+            if grain_source == "structural_fallback" and signal not in STRONG_IDENTITY
+            else signal
+        )
+
         non_dc_savings = own_prims * max(copies - 1, 0)
         target = {
             "path": c.get("path") or c.get("target_path") or f"/_proto/{cid}",
             "target_class": c.get("target_class", "prototype"),
             "mesh_count": int(c.get("mesh_count", own_meshes)),
             "identity_disposition": disposition,
-            "identity_signal": signal if (is_shared or is_destroying) else c.get("identity_signal", signal),
+            "identity_signal": emitted_signal,
             "grain_source": grain_source,
             "reduction_route": route,
             "copy_count": copies,
@@ -208,10 +234,16 @@ def select_frontier(payload: dict) -> dict:
                 "mesh_level": own_meshes * copies,
             },
             "decision_reason": {
-                "identity_signal": signal,
+                "identity_signal": emitted_signal,
                 "stop_condition": "below_floor" if below_minp else "min_meaningful_unit",
             },
         }
+        if c.get("intent_confirmed"):
+            # The second exemption this core grants: an identity-destroying
+            # route on a strong-identity unit is legal only with an explicit
+            # confirmation. Carry it onto the target so the manifest gate can
+            # honour the same exemption instead of re-failing the run.
+            target["intent_confirmed"] = True
         if c.get("value_variant_id") is not None:
             target["value_variant_id"] = c["value_variant_id"]
         if c.get("structure_hash") in variant_counts:

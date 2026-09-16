@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MedtechModelEvidenceExportOutput",
+  "type": "object",
+  "required": [
+    "skill",
+    "status",
+    "mode",
+    "source",
+    "tags",
+    "params",
+    "metrics",
+    "artifact_plan",
+    "note",
+    "warnings",
+    "mlflow",
+    "environment",
+    "intended_use_disclaimer"
+  ],
+  "properties": {
+    "skill": {"const": "medtech_model_evidence_export"},
+    "status": {"enum": ["dry_run", "logged", "failed"]},
+    "mode": {"enum": ["dry-run", "local", "databricks"]},
+    "source": {
+      "type": "object",
+      "required": ["pack_path", "pack_kind", "skill_id", "skill_version"],
+      "properties": {
+        "pack_path": {"type": "string"},
+        "pack_kind": {"type": "string"},
+        "skill_id": {"type": ["string", "null"]},
+        "skill_version": {"type": ["string", "number", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "tags": {"type": "object", "additionalProperties": {"type": "string"}},
+    "params": {"type": "object", "additionalProperties": {"type": "string"}},
+    "metrics": {"type": "object", "additionalProperties": {"type": "number"}},
+    "artifact_plan": {
+      "type": "object",
+      "required": [
+        "policy",
+        "metadata",
+        "metadata_count",
+        "preview_count",
+        "items",
+        "requires_confirmation",
+        "max_artifact_mb"
+      ],
+      "properties": {
+        "policy": {"enum": ["metadata", "preview", "all"]},
+        "metadata": {"type": "array", "items": {"type": "string"}},
+        "metadata_count": {"type": "integer", "minimum": 0},
+        "preview_count": {"type": "integer", "minimum": 0},
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "kind", "bytes", "status"],
+            "properties": {
+              "name": {"type": "string"},
+              "kind": {"enum": ["image", "mask", "visual"]},
+              "bytes": {"type": ["integer", "null"], "minimum": 0},
+              "status": {"enum": ["not_selected", "missing", "over_size_limit", "ready"]}
+            },
+            "additionalProperties": false
+          }
+        },
+        "requires_confirmation": {"type": "boolean"},
+        "max_artifact_mb": {"type": "number", "exclusiveMinimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "note": {"type": "string"},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "mlflow": {
+      "type": "object",
+      "required": ["available", "tracking_uri", "experiment_name", "run_id", "error"],
+      "properties": {
+        "available": {"type": "boolean"},
+        "tracking_uri": {"type": ["string", "null"]},
+        "experiment_name": {"type": ["string", "null"]},
+        "run_id": {"type": ["string", "null"]},
+        "error": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "environment": {
+      "type": "object",
+      "required": ["packages"],
+      "properties": {
+        "packages": {"type": "object", "additionalProperties": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "intended_use_disclaimer": {"type": "string"}
+  },
+  "additionalProperties": false
+}

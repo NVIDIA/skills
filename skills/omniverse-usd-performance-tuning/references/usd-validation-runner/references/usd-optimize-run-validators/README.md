@@ -36,8 +36,7 @@ See `references/_shared/standard-output-format.md`.
 
 Resolve the upstream guide without cloning the source repo:
 
-1. `$USD_OPTIMIZE_ROOT/.agents/skills/run-validators/SKILL.md`
-2. `$USD_OPTIMIZE_ROOT/.agents/skills/run-validators/SKILL.md`
+1. `$USD_OPTIMIZE_ROOT/.agents/skills/run-validators/SKILL.md` — the same path on 1.0.x and 1.1.x
 
 If no package root is available, download and extract the prebuilt Usd Optimize release package (current asset name + download: `references/upstreams/usd-optimize.md`), or use
 the package archive path, direct archive URL, or extracted package root supplied

@@ -6,6 +6,20 @@ Use this skill for requests mentioning orbit camera, pan, zoom, camera controls,
 
 ovrtx does not provide native camera input handling. The camera is a USD prim, and the app updates its `omni:xform` every frame or after input changes.
 
+## Attached OVStage Runtime
+
+When the renderer is attached to OVStage, keep camera state behind the
+application runtime adapter. The controller may calculate an orbit pose locally,
+but the adapter performs the live `omni:xform` and lens writes to OVStage,
+waits, advances the write floor, and supplies the committed ordinal to the
+render loop. Do not call `renderer.write_attribute()`, `bind_attribute()`, or
+open a second USD stage for attached-viewer camera updates.
+
+Direct USD and renderer examples in this reference are standalone compatibility
+or offline tooling only. Before implementing an attached path, read the current
+OVStage runtime/data-plane/integration references and current upstream OVStage
+and OVRTX agent guidance, skills, and examples.
+
 Read `viewer-input-routing` first when the task involves WebRTC/SHM input
 callbacks, ovui button ids, viewport input gating, wheel events, or
 click-vs-drag dispatch. This skill owns camera state and camera math.
@@ -50,6 +64,11 @@ Use left drag for orbit, middle drag for pan, right drag for dolly/zoom, and whe
 
 ## Render Aspect
 
+For an attached viewer, send the desired render dimensions to the runtime
+camera/render-product command adapter. It owns the relevant OVStage mutation and
+publication. The direct USD helper below is for a standalone or offline path
+only.
+
 When creating or explicitly reconfiguring the render product resolution, update camera viewport dimensions and projection aspect in the same operation. For USD cameras, keep horizontal aperture stable and derive vertical aperture from the render size:
 
 ```python
@@ -67,8 +86,8 @@ Browser streaming should keep a fixed server render resolution, display the vide
 
 Input transport rules:
 
-- WebRTC: use the NVST native input channel and handle `InputEvent` structs from ovstream callbacks.
-- SHM: use `ovstream.ShmClient.send_input_event()` from Python, or `ovstream_shm_client_send_input_event()` from C, with `InputEvent` structs; do not send JSON `mouseInput`.
+- WebRTC: use the NVST native input channel and handle `InputEvent` structs from ovstream callbacks. Only after `viewer-input-routing` verifies that native callbacks are absent while the data channel works may a browser use its mutually exclusive JSON fallback.
+- SHM: use `ovstream.Client(ovstream.ClientType.SHM, stream_name="...").send_input_event(event)` from Python, or `ovstream_client_send_input_event(client, event)` from C, with `InputEvent` structs; do not send JSON `mouseInput`.
 - In-process: call camera controller methods directly from the Python/C++ UI event loop.
 
 For browser-streamed React apps, gate native input with an app-level viewport
@@ -99,6 +118,8 @@ click can arrive before the React `setViewportInputActive {active:true}` data
 channel message, and the release will not be recognized as a click. DOM panels
 should still send `active:false` on pointer enter/down to disable camera and
 picking while the user interacts with UI chrome.
+
+Whether input arrives through the native callback or the verified browser JSON fallback, route it to the same `on_mouse_move`, `on_mouse_button_down`, `on_mouse_button_up`, and `on_scroll` camera operations. The fallback server handler must not implement separate camera math or bypass click-vs-drag state.
 
 ## Drag Threshold (Click vs Drag Discrimination)
 
@@ -216,6 +237,27 @@ def sanitize_camera(camera) -> None:
 
 Call this before handling input and before generating matrices.
 
+## Stage Up-Axis Is Camera State
+
+Read the USD stage up-axis through the metadata worker described in
+`stage-loading` after every successful load. Preserve it in server-owned camera
+state; do not rotate the user USD or compensate with mesh transforms.
+
+```python
+def configure_camera_up_axis(camera, up_axis: str) -> None:
+    axis = str(up_axis).upper()
+    camera.up_axis = axis if axis in {"Y", "Z"} else "Y"
+    camera.world_up = np.array(
+        [0.0, 0.0, 1.0] if camera.up_axis == "Z" else [0.0, 1.0, 0.0],
+        dtype=np.float64,
+    )
+```
+
+Call this before fit-to-stage and keep the same `camera.world_up` for orbit
+basis construction, middle-drag pan axes, and optional fly movement. A stage
+that renders but appears sideways almost always has a hard-coded Y-up camera
+path rather than a rendering or source-USD problem.
+
 ## Row-Major ovrtx Camera Matrix
 
 ovrtx consumes USD `GfMatrix4d` row-vector layout:
@@ -228,17 +270,18 @@ M[2, :3] = -forward    # camera local -Z looks forward
 M[3, :3] = eye         # translation
 ```
 
-For Y-up scenes:
+Build the basis from the active stage axis, not a hard-coded default:
 
 ```python
 forward = target - eye
 forward /= np.linalg.norm(forward)
-world_up = np.array([0.0, 1.0, 0.0])
-right = np.cross(forward, world_up); right /= np.linalg.norm(right)
+right = np.cross(forward, camera.world_up); right /= np.linalg.norm(right)
 up = np.cross(right, forward)
 ```
 
-Use `world_up = [0, 0, 1]` for Z-up scenes. The common mistake is putting axes in columns, which puts the camera inside or under geometry.
+`camera.world_up` is `[0, 1, 0]` for Y-up and `[0, 0, 1]` for Z-up. Use the
+same basis for pan: horizontal movement follows `right`, and vertical movement
+follows `up`. The common mistake is putting axes in columns, which puts the camera inside or under geometry.
 
 If your camera helper returns a GL view matrix, convert it:
 
@@ -246,7 +289,26 @@ If your camera helper returns a GL view matrix, convert it:
 world_matrix = np.ascontiguousarray(np.linalg.inv(view_matrix).T, dtype=np.float64)
 ```
 
-## Write To ovrtx
+## Commit Camera State
+
+### Attached OVStage Viewer
+
+```python
+pose = camera.get_camera_xform()
+if pose.shape == (4, 4) and np.isfinite(pose).all():
+    committed = runtime.camera_commands.set_orbit_pose(
+        camera_path="/Session/Cameras/Main",
+        xform=pose,
+        focal_length=camera.focal_length,
+    )
+    renderer.step(render_products, delta_time, ordinal=committed.ordinal)
+```
+
+`set_orbit_pose` is an application adapter operation: it resolves the active
+path through OVStage, writes at a new ordinal, waits, and advances the write
+floor. It is not a direct OVRTX write call.
+
+### Standalone Compatibility Path
 
 ```python
 xform = np.ascontiguousarray(camera.get_camera_xform(), dtype=np.float64)
@@ -269,9 +331,13 @@ stage cameras, copy the selected authored camera's focal length, apertures,
 clipping range, projection, and transform into the viewer camera before falling
 back to bounds fitting.
 
-If no authored camera exists, compute a world bbox via `stage-hierarchy`, then
-set target to the bbox center and distance from max dimension and focal
-length/field of view. Choose the initial view for the kind of stage:
+If no authored camera exists, configure the camera from the loaded stage
+`up_axis`, then compute a world bbox via `stage-hierarchy`. Set target to the
+bbox center and distance from max dimension and focal length/field of view using
+the resulting `camera.world_up` basis. Use that same state for later orbit and
+pan; fitting with one axis and navigating with another makes a correctly fitted
+scene appear to roll or lie sideways. Choose the initial view for the kind of
+stage:
 
 - For general object/prop scenes, a three-quarter orbit view is usually safe.
 - For Z-up exterior or architectural scenes, avoid a steep roof-down first view.
@@ -322,8 +388,10 @@ Toggle the gizmo from a header button. `DragGesture` instances must be created o
 
 ## Gotchas
 
-- Use `omni:xform`, not authored USD `xformOp:*`, for live ovrtx camera updates.
-- Use `Semantic.XFORM_MAT4x4` and `PrimMode.CREATE_NEW`.
+- In an attached viewer, use the OVStage data plane rather than authored USD or
+  renderer attribute APIs for live camera state.
+- The `Semantic.XFORM_MAT4x4` / `PrimMode.CREATE_NEW` example is standalone
+  compatibility guidance only; verify current OVRTX API shape before using it.
 - Skip writes if the 4x4 matrix is non-finite.
 - Clamp local mouse coordinates through the visible rendered image rect so letterboxing does not skew orbit/pick math.
 

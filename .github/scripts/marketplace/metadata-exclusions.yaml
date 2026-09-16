@@ -12,7 +12,7 @@
 # Example:
 #   exclusions:
 #     - name: experimental-skill-foo
-#       reason: Awaiting OSRB review.
+#       reason: Awaiting owner confirmation.
 #       owner: "@example-team"
 #     - name: in-flight-rename
 #       reason: Skill rename in flight; re-include after content stabilizes.

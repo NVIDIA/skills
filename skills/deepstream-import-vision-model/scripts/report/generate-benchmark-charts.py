@@ -20,7 +20,7 @@ Step 8: Generate exactly 5 benchmark charts as PNG images for the report.
 
 Usage: python3 generate-benchmark-charts.py <output_dir> <json_data_file>
 
-Expected JSON format (benchmark_data.json written by nv-import-vision-model-report skill pre-flight):
+Expected JSON format (benchmark_data.json written by report-generation skill pre-flight):
 {
   "model_name": "yolo26_nano",
   "engine": "models/yolo26_nano/benchmarks/engines/yolo26n_dynamic_b256.engine",

@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: BioNeMo KERMT
+repo: NVIDIA-BioNeMo/KERMT
+ref: main
+description: >-
+  KERMT skills for container setup, molecular model pretraining and finetuning,
+  inference, embedding extraction, and run monitoring.
+links:
+  contributing: CONTRIBUTING.md
+  discussions: false
+  security: false
+skills:
+  - path: skills/kermt-add-cmim-pretrain/
+    catalog_dir: bionemo-kermt-add-cmim-pretrain
+  - path: skills/kermt-continue-pretrain/
+    catalog_dir: bionemo-kermt-continue-pretrain
+  - path: skills/kermt-embed/
+    catalog_dir: bionemo-kermt-embed
+  - path: skills/kermt-finetune/
+    catalog_dir: bionemo-kermt-finetune
+  - path: skills/kermt-infer/
+    catalog_dir: bionemo-kermt-infer
+  - path: skills/kermt-monitor/
+    catalog_dir: bionemo-kermt-monitor
+  - path: skills/kermt-pretrain-scratch/
+    catalog_dir: bionemo-kermt-pretrain-scratch
+  - path: skills/kermt-setup/
+    catalog_dir: bionemo-kermt-setup

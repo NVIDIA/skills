@@ -18,10 +18,10 @@ version: 0.1.0
 upstream_refs:
   - kind: pypi_package
     name: pydicom
-    version_constraint: ">=2.4,<4"
+    version_constraint: ">=2.4.5,<4,!=3.0.0,!=3.0.1"
   - kind: pypi_package
     name: nibabel
-    version_constraint: ">=4.0"
+    version_constraint: ">=5.4,<6"
 license: Apache-2.0
 intended_use:
   summary: Engineering-time conversion of a single-series DICOM directory (CT) to a
@@ -57,12 +57,16 @@ runtime:
     - "--output"
     - "${out}/volume.nii.gz"
   dependencies:
-    pydicom: ">=2.4,<4"
-    nibabel: ">=4.0"
-    numpy: ">=1.23"
+    pydicom: ">=2.4.5,<4,!=3.0.0,!=3.0.1"
+    nibabel: ">=5.4,<6"
+    numpy: ">=1.25,<3"
     typer: ">=0.9"
   side_effects:
-    pip_packages: [pydicom>=2.4,<4, nibabel>=4.0, numpy>=1.23, typer>=0.9]
+    pip_packages:
+      - pydicom>=2.4.5,<4,!=3.0.0,!=3.0.1
+      - nibabel>=5.4,<6
+      - numpy>=1.25,<3
+      - typer>=0.9
     local_writes:
       - {path: "${out}/volume.nii.gz", approx_mb_max: 500}
     home_writes: []
@@ -146,6 +150,10 @@ validation:
     rss_mb_peak:         {max: 500}
     gpu_seconds:         {max: 0}
     gpu_memory_mb_peak:  {max: 0}
+  env_pin:
+    pydicom: ">=2.4.5,<4,!=3.0.0,!=3.0.1"
+    nibabel: ">=5.4,<6"
+    numpy: ">=1.25,<3"
   reproducibility:
     mode: repeat
     fixture: fixtures/clean_axial

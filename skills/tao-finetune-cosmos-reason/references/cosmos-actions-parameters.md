@@ -156,7 +156,12 @@ For platform-side multi-node setup (sbatch flags on SLURM, Indexed Job + Service
 - **custom.system_prompt**: Instructions prepended to every prompt.
 
 ### Checkpointing
-- **train.ckpt.save_freq_in_epoch**: Save every N epochs. Default 1.
+- **train.ckpt.save_freq_in_epoch**: Save every N epochs. Default 1. Preserve
+  this epoch-based default unless the user explicitly requests step-based
+  checkpointing; dataset and hardware guidance must not override it.
+- **train.ckpt.save_freq**: Save every N optimizer steps. Use only when the user
+  explicitly requests step-based checkpointing; then omit
+  `save_freq_in_epoch` or set it to `0` so the two cadences do not conflict.
 - **train.ckpt.max_keep**: Keep N most recent checkpoints. Default 2 for
   AutoML/minimal runs so the best LoRA adapter remains available even when the
   container records the best validation step before later epoch cleanup.
@@ -187,7 +192,11 @@ launcher staging files under `inputs/`, or the broken `best` symlink itself as
 fine-tuned checkpoints for handoff.
 
 ### Validation
-- **validation.freq_in_epoch**: Run validation every N epochs. Too frequent slows training.
+- **validation.freq_in_epoch**: Run validation every N epochs. Default 1.
+  Preserve this epoch-based default unless the user explicitly requests a
+  step-based cadence.
+- **validation.freq**: Run a complete validation pass every N optimizer steps.
+  Use only when the user explicitly requests step-based validation.
 
 ### Logging
 - **logging.logger**: Options: `console`, `wandb`.
@@ -195,7 +204,10 @@ fine-tuned checkpoints for handoff.
 
 ## Hardware
 
-Cosmos-RL models are 8B parameters and benefit from multi-GPU training with FSDP sharding. `dp_shard_size` should equal total GPU count. Recommended: 8x A100 or H100 (80GB each).
+Cosmos-RL models are 8B parameters and use FSDP sharding. SFT requires at least 256 GB of cumulative visible GPU memory, with no fixed device count or per-device capacity. Set `dp_shard_size` to the actual visible GPU count and `dp_replicate_size=1` for a single node. Every visible architecture must be supported by the selected image and pass the runtime CUDA-stack smoke test.
+
+Apply `runtime_requirements.gpu_host` from `references/skill_info.yaml` as
+minimum-version overrides to the shared host setup check.
 
 ## Error Patterns
 
@@ -222,14 +234,16 @@ do not lower it to tiny values such as 128 for video calibration.
 
 **You are trying to access a gated repo**: The HuggingFace model `nvidia/Cosmos3-Nano` requires authentication. All ranks will retry in a loop until they time out. Fix: ensure `HF_TOKEN` is set in your environment (e.g., `export HF_TOKEN=...` in your shell) and passed into the container with `-e HF_TOKEN`. The user must also accept the model agreement at <https://huggingface.co/nvidia/Cosmos3-Nano>.
 
-**Cosmos-RL GPU resource and architecture gate**: The actionable launch gate is
-at least 4 GPUs with 80GB-class memory or higher, plus a GPU architecture
-supported by the selected Cosmos-RL image, plus normal platform, container, S3,
-and credential preflight. Run
-`scripts/check_tao_launch_preflight.py --gpu-min-count 4 --gpu-min-memory-gb 80 --gpu-arch-allowlist cosmos_rl=sm_80,sm_90,sm_100,sm_120`
+**Cosmos-RL GPU resource and architecture gate**: For SFT, the actionable
+launch gate is at least 256 GB of cumulative visible GPU memory, a GPU
+architecture supported by the selected Cosmos-RL image, and normal platform,
+container, S3, and credential preflight. Set `dp_shard_size` to the actual GPU
+count and do not require a fixed policy/rollout topology for SFT. Run
+`scripts/check_tao_launch_preflight.py --gpu-min-total-memory-gb 256 --gpu-arch-allowlist cosmos_rl=sm_80,sm_90,sm_100,sm_103,sm_103a,sm_120`
 before launching. If the target architecture is known but cannot be detected
-from the launch host, pass `--gpu-arch sm_XX` explicitly. Spark/GB10 `sm_121`
-is not launchable with this image unless image introspection confirms `sm_121`
+from the launch host, pass `--gpu-arch sm_XX` explicitly. Architecture-specific
+suffixes such as `a` and `f` match the same base SM family. `sm_121` is not
+launchable with this image unless direct runtime validation confirms `sm_121`
 support or a newer compatible image is selected. If a resource-qualified
 platform still fails with a kernel JIT error such as
 `nvrtc: invalid --gpu-architecture`, classify it as an image/toolchain defect to

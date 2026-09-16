@@ -212,6 +212,11 @@ def main() -> int:
     # with AI available must fail. A synthetic skill is injected into discovery
     # so the outcome does not depend on whether the working tree happens to
     # contain an unenriched skill today.
+    #
+    # --check returns 1 for drift as well as for warnings, and a PR that edits
+    # skill content legitimately drifts the checked-in metadata. Asserting on
+    # the bare exit code therefore failed on unrelated PRs. Capture the output
+    # and judge the warning path on its own.
     original_discover = gen.discover_skills
     ghost = gen.Skill(
         path="skills/zzz-unenriched-fixture",
@@ -224,19 +229,32 @@ def main() -> int:
         found, excluded = original_discover(exclusions)
         return list(found) + [ghost], excluded
 
-    def exit_code_for(argv, client):
+    original_diff = gen.diff_text
+
+    def run_for(argv, client):
         gen.discover_skills = discover_with_ghost
         gen.build_ai_client = lambda allow_ai=True: client
+        # Suppress drift reporting for the duration of the run. --check returns
+        # 1 for drift as well as for warnings, and any PR that edits skill
+        # content drifts the checked-in metadata legitimately. Neutralising the
+        # comparison makes the exit code attributable to the warning gate alone,
+        # which is what this case is about. Drift itself is covered by case 4.
+        gen.diff_text = lambda *a, **k: ""
+        out, err = io.StringIO(), io.StringIO()
         try:
-            with contextlib.redirect_stderr(io.StringIO()), \
-                    contextlib.redirect_stdout(io.StringIO()):
-                return gen.main(argv)
+            with contextlib.redirect_stderr(err), contextlib.redirect_stdout(out):
+                rc = gen.main(argv)
         finally:
             gen.discover_skills = original_discover
             gen.build_ai_client = original_client
+            gen.diff_text = original_diff
+        return rc, out.getvalue() + err.getvalue()
 
-    rc_no_ai = exit_code_for(["--check", "--no-ai"], None)
-    rc_with_ai = exit_code_for(["--check"], failing_api)
+    rc_no_ai, log_no_ai = run_for(["--check", "--no-ai"], None)
+    rc_with_ai, _ = run_for(["--check"], failing_api)
+
+    r.check("unenriched new skill under --no-ai -> reported as a warning",
+            "PARTIAL SUCCESS" in log_no_ai)
     r.check("unenriched new skill under --no-ai -> does not fail PR CI", rc_no_ai == 0,
             f"rc={rc_no_ai}")
     r.check("unenrichable new skill with AI available -> fails the run", rc_with_ai == 1,

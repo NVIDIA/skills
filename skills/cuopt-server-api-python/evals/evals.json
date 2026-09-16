@@ -10,5 +10,91 @@
       "Names cost_matrix_data, travel_time_matrix_data, task_data, fleet_data, solver_config as the VRPTW payload fields and flags the travel_time_matrix_data (REST) vs transit_time_matrix_data (Python) naming",
       "Does not produce a full runnable client script"
     ]
+  },
+  {
+    "id": "srv-py-eval-002-rest-lp-payload-fields",
+    "question": "I want to solve a linear program through the cuOpt REST server instead of the Python API. What does the request body look like — which top-level fields do I send, and in what format is the constraint matrix? Name the fields only, no runnable script.",
+    "expected_skill": "cuopt-server-api-python",
+    "expected_script": null,
+    "ground_truth": "The agent explains that the LP payload is posted to the same POST /cuopt/request endpoint and that the constraint matrix is supplied in CSR (compressed sparse row) form. The top-level fields are csr_constraint_matrix (with offsets, indices, values), constraint_bounds (lower_bounds / upper_bounds, where infinite bounds are the strings \"ninf\" and \"inf\"), objective_data (coefficients), variable_bounds (lower_bounds / upper_bounds), maximize (boolean), and solver_config (e.g. time_limit). Does not produce a runnable client script.",
+    "expected_behavior": [
+      "States that LP uses the same POST /cuopt/request → GET /cuopt/solution/{reqId} flow as routing",
+      "Names csr_constraint_matrix (offsets/indices/values), constraint_bounds, objective_data, variable_bounds, maximize, and solver_config",
+      "Notes that the constraint matrix is CSR and that infinite bounds are expressed as the strings \"inf\"/\"ninf\"",
+      "Does not produce a full runnable client script"
+    ]
+  },
+  {
+    "id": "srv-py-eval-003-rest-milp-vs-lp",
+    "question": "I already have an LP working against the cuOpt REST server. What is the minimum change to the request body to make some of the variables integer?",
+    "expected_skill": "cuopt-server-api-python",
+    "expected_script": null,
+    "ground_truth": "The agent explains that MILP over REST uses the identical payload structure as LP, with one addition: a variable_types array, one entry per variable, using the values \"integer\", \"continuous\", or \"binary\". No endpoint change and no other field change is required.",
+    "expected_behavior": [
+      "Identifies variable_types as the only field that must be added",
+      "Gives the per-variable values \"integer\", \"continuous\", \"binary\"",
+      "Confirms the endpoint and remaining payload fields are unchanged from LP"
+    ]
+  },
+  {
+    "id": "srv-py-eval-004-qp-not-supported-over-rest",
+    "question": "Can I solve a quadratic program (quadratic objective, linear constraints) by POSTing to the cuOpt REST server? If not, what should I use instead?",
+    "expected_skill": "cuopt-server-api-python",
+    "expected_script": null,
+    "ground_truth": "The agent states that QP is not exposed over the REST server — the server supports routing, LP, and MILP only — and redirects the user to the cuOpt Python or C API for quadratic objectives. It does not invent a REST payload field for a quadratic objective term.",
+    "expected_behavior": [
+      "States clearly that QP is not available through the REST API",
+      "Redirects to the Python or C API for QP",
+      "Does not fabricate a REST request field for the quadratic objective"
+    ]
+  },
+  {
+    "id": "srv-py-eval-005-debug-422-field-names",
+    "question": "My POST to /cuopt/request keeps coming back 422. My payload has a transit_time_matrix_data key and fleet_data.capacities set to [[50], [50]] for my two vehicles. What is wrong?",
+    "expected_skill": "cuopt-server-api-python",
+    "expected_script": null,
+    "ground_truth": "The agent identifies two distinct errors. First, the REST API expects travel_time_matrix_data; transit_time_matrix_data is the Python-API name and is not a valid REST field. Second, capacities is indexed per capacity dimension, not per vehicle — for two vehicles sharing a single capacity dimension of 50 the correct value is [[50, 50]], whereas [[50], [50]] declares two capacity dimensions. It also suggests checking field names against the OpenAPI spec at /cuopt.yaml.",
+    "expected_behavior": [
+      "Flags transit_time_matrix_data → travel_time_matrix_data",
+      "Explains that capacities is nested per capacity dimension, not per vehicle, and gives [[50, 50]] as the fix",
+      "Points at the OpenAPI spec (/cuopt.yaml) as the authority for field names"
+    ]
+  },
+  {
+    "id": "srv-py-eval-006-docker-deployment",
+    "question": "How do I run the cuOpt server in Docker so I can reach it on port 8000 from my host? Give me the command and tell me how to choose the image tag.",
+    "expected_skill": "cuopt-server-api-python",
+    "expected_script": null,
+    "ground_truth": "The agent gives a docker run command that passes --gpus all (the server requires a GPU) and publishes the port with -p 8000:8000. For the tag it recommends latest-cu12 or latest-cu13 chosen to match the driver's CUDA major version (latest-cu13-ubi10 for a UBI10 base), in preference to CUDA+Python-specific tags such as latest-cuda12.9-py3.13 which track a single Python line and go stale. It notes that for production the tag should be pinned to a full release tag or an immutable @sha256 digest, since latest-* tags are mutable. It also mentions verifying with a request to /cuopt/health.",
+    "expected_behavior": [
+      "Includes --gpus all and -p 8000:8000 in the docker run command",
+      "Recommends latest-cu12 / latest-cu13 selected by CUDA major version over CUDA+Python-specific tags",
+      "Notes that latest-* is mutable and should be pinned to a release tag or digest for production",
+      "Mentions verifying the container with GET /cuopt/health"
+    ]
+  },
+  {
+    "id": "srv-py-eval-007-client-hardening",
+    "question": "I'm writing a Python client that submits a job to the cuOpt server and polls for the result. What should I be careful about in the polling loop?",
+    "expected_skill": "cuopt-server-api-python",
+    "expected_script": null,
+    "ground_truth": "The agent advises setting an explicit timeout on every requests call, calling raise_for_status() on the submit response, and validating the server-supplied reqId (e.g. against a pattern like [A-Za-z0-9_-]{1,64}) before interpolating it into the /cuopt/solution/{reqId} URL, since it is untrusted network input. It also notes that the poll budget and solver_config.time_limit need to be raised together, and that the server offers no built-in auth or TLS so the base URL should point at a trusted endpoint.",
+    "expected_behavior": [
+      "Recommends an explicit timeout on every request",
+      "Recommends validating the server-returned reqId before using it in a URL path",
+      "Notes that the poll loop budget must accommodate solver_config.time_limit"
+    ]
+  },
+  {
+    "id": "srv-py-eval-008-runnable-assets",
+    "question": "Does this skill ship any ready-to-run REST client examples? If so, what do they cover and how do I point one at a server that is not on localhost:8000?",
+    "expected_skill": "cuopt-server-api-python",
+    "expected_script": null,
+    "ground_truth": "The agent lists the bundled assets — vrp_simple (basic VRP), vrp_basic (VRP with time windows), pdp_basic (pickup and delivery), lp_basic (LP via CSR), and milp_basic (MILP) — and explains that each is a client.py using requests that accepts a --server flag defaulting to http://localhost:8000. It notes the scripts exit 0 when the server is unreachable so they are safe to run in CI.",
+    "expected_behavior": [
+      "Names the five asset directories and what each demonstrates",
+      "States that the server URL is set with the --server command-line flag (default http://localhost:8000)",
+      "Mentions that the scripts exit 0 if the server is unreachable"
+    ]
   }
 ]

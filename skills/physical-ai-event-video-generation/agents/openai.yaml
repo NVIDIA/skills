@@ -1,0 +1,6 @@
+interface:
+  display_name: "PAIDF Orchestration — Event Video Generation"
+  short_description: "Run event video generation and anomaly-dataset workflows"
+
+policy:
+  allow_implicit_invocation: true

@@ -5,13 +5,13 @@
 Source of truth:
 
 ```text
-https://github.com/NVIDIA/simready-foundation/blob/main/skills/simready-foundation-conform-fet-005-simulate-grasp-physics/SKILL.md
+https://github.com/NVIDIA/simready-foundation/blob/v2026.04.1/skills/simready-foundation-conform-fet-005-simulate-grasp-physics/SKILL.md
 ```
 
 Use an authenticated local checkout at
 `$SIMREADY_FOUNDATION_ROOT/skills/simready-foundation-conform-fet-005-simulate-grasp-physics/SKILL.md`
 or
-`$PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT/simready-foundation/skills/simready-foundation-conform-fet-005-simulate-grasp-physics/SKILL.md`
+`$OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT/simready-foundation/skills/simready-foundation-conform-fet-005-simulate-grasp-physics/SKILL.md`
 when browser access is unavailable.
 
 Do not copy FET005 requirement summaries, visual policy, or repair policy into
@@ -19,7 +19,7 @@ this repo.
 
 ## Local Helper
 
-This directory only keeps a legacy Skill Hub helper script for deterministic
+This directory only keeps a legacy Omniverse CAD-to-SimReady helper script for deterministic
 grasp-line authoring and JSON reports. Prefer the upstream Foundation script when
 it is available:
 
@@ -33,7 +33,7 @@ uv run --python 3.12 python "$SIMREADY_FOUNDATION_ROOT/skills/simready-foundatio
   --report <output-root>/author-grasp-line.json
 ```
 
-Use the local helper only when the installed Skill Hub workflow needs its
+Use the local helper only when the installed Omniverse CAD-to-SimReady workflow needs its
 existing report contract:
 
 ```bash

@@ -24,7 +24,7 @@
   `OVRTX_SEMANTIC_XFORM_MAT4x4`. Do not rely on USD `xformOp:*` edits for live
   camera movement.
 - **Selection setup:** Native outlines require renderer config plus non-zero
-  per-prim `OVRTX_ATTR_NAME_SELECTION_OUTLINE_GROUP` values.
+  renderer path-ID groups through `ovrtx_set_selection_outline_group()`.
 - **EffectLayer scope:** `inputs:Fader` is a material effect. It is not the
   default selection path and only works for known material shader prims.
 - **First frame cost:** Cold shader/pipeline compilation can make the first

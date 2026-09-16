@@ -1,0 +1,9 @@
+version: 2
+# Reviewed false positives — NVIDIA/nvskills-ci#67. No content removed.
+rules:
+  - id: "PE*"
+    path: "eval.config"
+    reason: "Reviewed FP (#67): standard infra path/flag refs in docs (SSH/kubeconfig/keyring/etc-passwd/docker), not privilege escalation."
+  - id: "LP*"
+    path: "scripts/stage_backbone.py"
+    reason: "Reviewed FP (#67): declared capability matches the skill's documented required function."

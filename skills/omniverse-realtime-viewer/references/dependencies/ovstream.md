@@ -12,6 +12,32 @@ transport-specific examples, or release-specific behavior, read
 `nvidia-runtime.md` for the current ovstream repository pointer and inspect
 that repo's `skills/`, samples, examples, and release notes.
 
+## SHM Input Contract
+
+Use the current ovstream client surface for SHM input. The transport is selected
+when constructing the client; it is not represented by a separate `ShmClient`
+class:
+
+```python
+client = ovstream.Client(
+    ovstream.ClientType.SHM,
+    stream_name="...",
+)
+client.send_input_event(event)
+```
+
+For native C integrations, use the current library symbol:
+
+```c
+ovstream_client_send_input_event(client, event);
+```
+
+The surrounding input contract remains native `InputEvent` structs. Do not send
+JSON `mouseInput` for SHM camera control. For release-specific signatures and
+examples, inspect the current ovstream repository `skills/`, examples, headers,
+and package docstrings before implementing.
+
+
 Do not repeat direct wheel URLs, wheel filenames, or alternate package
 locations in skills or templates. Keep acquisition details in
 `nvidia-runtime.md`.

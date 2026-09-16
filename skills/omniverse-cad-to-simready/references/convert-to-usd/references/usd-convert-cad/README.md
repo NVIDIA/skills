@@ -2,114 +2,101 @@
 
 ## When to Use
 
-Use this reference for NVIDIA-backed source conversion. On supported architectures, conversion delegates to upstream `usd-convert-cad`, a headless Omniverse Kit Python wrapper that installs `omniverse-kit`, fetches converter core extensions from the Kit registry, routes supported source formats through its format metadata, and writes its own JSON conversion report.
+Use this reference for NVIDIA-backed source conversion. Conversion delegates to the standalone `usd-convert-cad` Python wheel, a self-contained converter that bundles its own OpenUSD (`pxr`) runtime. There is no Omniverse Kit app, no extension-registry pull, no `config.env`, and no EULA prompt.
 
-Guardrail: upstream `usd-convert-cad` is the default converter backend for this reference's NVIDIA-backed source conversion. The only local fallback is Linux arm64, where upstream `usd-convert-cad` is not available yet; that path uses a private NVIDIA Kit App Template application with CAD Converter extensions. Do not fall back to `usd-convert-asset`, hand-authored USD, mesh converters, or other substitute CAD converters.
+Guardrail: `usd-convert-cad` is the only allowed converter backend for this reference's NVIDIA-backed source conversion on all supported architectures, including Linux arm64. Do not fall back to `usd-convert-asset`, hand-authored USD, mesh converters, or other substitute CAD converters.
 
 ## Upstream Reference
 
 - NVIDIA Omniverse `usd-convert-cad` repository: `https://github.com/NVIDIA-Omniverse/usd-convert-cad`
-- Upstream CAD conversion skill: `https://github.com/NVIDIA-Omniverse/usd-convert-cad/blob/main/.agents/skills/usd-convert-cad/SKILL.md`
-- Linux arm64 fallback: NVIDIA Kit App Template repository: `https://github.com/NVIDIA-Omniverse/kit-app-template`
-- Linux arm64 fallback docs: `https://docs.omniverse.nvidia.com/kit/docs/kit-app-template/latest/`
-- NVIDIA Omniverse CAD Converter extension docs: `https://docs.omniverse.nvidia.com/kit/docs/omni.kit.converter.cad/latest/`
-- NVIDIA HOOPS CAD core extension docs: `https://docs.omniverse.nvidia.com/kit/docs/omni.kit.converter.hoops_core/latest/Overview.html`
-- NVIDIA DGN CAD core extension docs: `https://docs.omniverse.nvidia.com/kit/docs/omni.kit.converter.dgn_core/latest/Overview.html`
-- NVIDIA JT CAD core extension docs: `https://docs.omniverse.nvidia.com/kit/docs/omni.kit.converter.jt_core/latest/Overview.html`
-- Linux arm64 optional service mode docs: `https://docs.omniverse.nvidia.com/kit/docs/omni.services.convert.cad/latest/Usage.html`
+- Upstream CAD conversion skill (authoritative Supported Formats and converter options for the tested runtime): `https://github.com/NVIDIA-Omniverse/usd-convert-cad/blob/v0.2.0/skills/omniverse-cad-to-usd/SKILL.md`
 
-Browser, raw-file fetches, or unauthenticated GitHub access can fail depending on access level. If that happens, use an authenticated local clone of `https://github.com/NVIDIA-Omniverse/usd-convert-cad` and read the referenced paths from that checkout.
+Preflight clones the ref pinned in `upstream-versions.lock.json` so this SKILL.md is available locally; `run.py --probe` parses that tested Supported Formats table instead of silently adopting changes from a newer upstream release. Browser, raw-file fetches, or unauthenticated GitHub access can fail depending on access level. If that happens, use an authenticated local clone of `https://github.com/NVIDIA-Omniverse/usd-convert-cad` at the pinned ref and read the referenced paths from that checkout.
 
-Use `$HOME/.physical-ai-skill-hub/upstreams/usd-convert-cad` as the default stable upstream checkout path. Set `PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT` to move the shared upstream root, or set `USD_CONVERT_CAD_ROOT` / `--usd-convert-cad-root` for this converter only. An existing legacy `$HOME/.usd-convert-cad` checkout is still accepted when no shared root is configured, but new setup should use the shared upstream root. Do not use `/tmp` as the runtime checkout location for conversions. A `/tmp` clone is acceptable only for short-lived inspection.
-
-On Linux arm64 only, the wrapper does not require `USD_CONVERT_CAD_ROOT`. Instead it locates Kit App Template from `KIT_APP_TEMPLATE_ROOT` or `$HOME/.kit-app-template`, the build directory from `KIT_APP_TEMPLATE_BUILD_DIR` or `_build/<platform>/release`, and the Kit executable from `KIT_APP_TEMPLATE_KIT_EXECUTABLE`, `KIT_EXECUTABLE`, or `<kit-build-dir>/kit/kit`.
+The wheel bundles its own OpenUSD (`pxr`) runtime, so install it into a dedicated Python 3.12 interpreter to avoid clashing with any other `pxr` distribution in a shared environment. Point this reference at that interpreter with `--usd-convert-cad-python` or the `USD_CONVERT_CAD_PYTHON` environment variable. When neither is set, the reference reads the interpreter from the preflight manifest (`usd_convert_cad` runtime), then falls back to the interpreter running the script.
 
 ## Inputs
 
-Collect a source file, output directory, and optional `--usd-convert-cad-root`.
-Supported source suffixes and converter routing belong to upstream
-`SUPPORTED_FORMATS` / format metadata in `src/usd_convert_cad/formats.py` and
-`.agents/skills/usd-convert-cad/SKILL.md`.
-This reference reads the upstream formats table from the configured checkout
-when it is available and keeps only a fallback snapshot for blocked reports when
-the checkout is missing. Examples such as `.stp`, `.step`, `.igs`, `.iges`,
-`.dgn`, `.ifc`, `.ifczip`, `.jt`, and proprietary CAD files route to
-`usd-convert-cad`, never to a substitute converter. Mesh/scene formats also
-route here when upstream `usd-convert-cad` lists them as supported; otherwise
-they are reported unsupported rather than sent to `usd-convert-asset`.
-Do not choose `jt_core`, `dgn_core`, or `hoops_core` in this wrapper; upstream
-`usd-convert-cad` selects the converter from its supported-format metadata.
-Legacy backend-selection arguments are accepted for compatibility, but the value
-is ignored by this wrapper and is never forwarded to upstream `convert.py`.
+Collect a source file, an output directory, and optionally the converter interpreter via `--usd-convert-cad-python` (or `USD_CONVERT_CAD_PYTHON`).
+Supported source suffixes come from the upstream Supported Formats table in the
+`usd-convert-cad` SKILL.md (`skills/omniverse-cad-to-usd/SKILL.md`). Because the
+wheel does not expose a machine-readable format registry, `run.py` reads that
+table directly from a checkout of the repo and resolves the SKILL.md in this
+order:
 
-On Linux arm64, probe support does not use a local source-format allowlist
-because the Kit App Template fallback is the scoped architecture workaround.
-The fallback reports support and lets the installed Kit CAD Converter runtime
-determine whether the input can be converted. The fallback accepts Kit App
-Template options such as `--kit-app-template-root`,
-`--kit-build-dir`, `--kit-executable`, `--execution-mode`, `--config-path`,
-`--fine`, and `--coarse`; these options are ignored by the upstream path on
-other architectures.
+1. `--usd-convert-cad-skill <path-to-SKILL.md>`
+2. `USD_CONVERT_CAD_SKILL` (SKILL.md file or a checkout directory)
+3. `--usd-convert-cad-root <checkout>`
+4. the preflight manifest's `usd_convert_cad` upstream checkout
+5. `USD_CONVERT_CAD_ROOT`
+6. the shared upstream checkout (`OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT/usd-convert-cad`)
+
+When none of these is reachable (for example, a fully offline run), `run.py`
+falls back to a built-in snapshot of the table (`SUPPORTED_CAD_SUFFIXES`), so
+conversion is never blocked purely by a missing checkout. Examples such as
+`.stp`, `.step`, `.igs`, `.iges`, `.dgn`, `.ifc`, `.ifczip`, `.jt`, and
+proprietary CAD files route to `usd-convert-cad`, never to a substitute
+converter. Mesh/scene formats also route here when the table lists them as
+supported; otherwise they are reported unsupported rather than sent to
+`usd-convert-asset`.
+The legacy backend-selection argument (`--backend`) is still accepted for
+compatibility but ignored; the wheel selects its converter internally.
+`--usd-convert-cad-root` now selects the SKILL.md checkout (see above) instead of
+a conversion runtime.
 
 ## Dependency Check
 
 Require:
 
-- `usd-convert-cad` from this repo.
-- A local `NVIDIA-Omniverse/usd-convert-cad` checkout from `https://github.com/NVIDIA-Omniverse/usd-convert-cad`, preferably at `$HOME/.physical-ai-skill-hub/upstreams/usd-convert-cad`.
-- Python 3.12 available for upstream setup.
-- Upstream setup completed with the upstream runtime Python, for example
-  `.venv/bin/python install.py` from the upstream checkout after the venv is
-  created.
-- Upstream environment validated with `python validate.py`.
-- Network access to the Kit extension registry on first run.
-- Accepted Omniverse terms for non-interactive runs. The wrappers set or expect `OMNI_KIT_ACCEPT_EULA=yes`.
+- The manifest-pinned `usd-convert-cad==0.2.0` wheel installed into a Python 3.12 environment
+  (`python -m pip install usd-convert-cad==0.2.0`). If the wheel is hosted on an NVIDIA
+  package index, add it, for example `--extra-index-url https://pypi.nvidia.com`.
+- An isolated interpreter for that wheel (its bundled `pxr` can conflict with
+  another OpenUSD in a shared interpreter), exposed via `--usd-convert-cad-python`,
+  `USD_CONVERT_CAD_PYTHON`, or the preflight manifest.
 
-For Linux arm64 fallback, require:
-
-- Local `NVIDIA-Omniverse/kit-app-template` checkout from `https://github.com/NVIDIA-Omniverse/kit-app-template`, preferably at `$HOME/.kit-app-template`.
-- A built Kit App Template app whose dependencies include `omni.kit.converter.cad` or the specific CAD core extension required by the input: `omni.kit.converter.hoops_core`, `omni.kit.converter.dgn_core`, or `omni.kit.converter.jt_core`.
-- Built Kit executable under `_build/<platform>/release/kit/kit` or an explicit `--kit-executable`.
-- For optional `--execution-mode service`, `omni.services.convert.cad-*` in `_build/<platform>/release/extscache`, including `omni/services/convert/cad/services/process/{hoops,dgn,jt}_main.py`.
-- Accepted Omniverse terms for non-interactive runs. The fallback sets `ACCEPT_EULA=Y` and `OMNI_KIT_ACCEPT_EULA=yes`.
-
-Do not silently install or build missing dependencies. If the checkout, `.venv`, `omniverse-kit`, converter core extension, platform support, Kit App Template build, or CAD Converter license is unavailable, run the wrapper and preserve its blocked conversion report. This reference may invoke upstream `validate.py` to verify readiness on supported architectures. On Linux arm64 it may start the local Kit App Template runtime because that is the scoped fallback path.
+Do not silently install missing dependencies. If the wheel is not importable in
+the resolved interpreter, run the wrapper and preserve its blocked conversion
+report with the install hint. `check_dependencies.py` verifies the wheel imports
+(`import usd_convert_cad; print(usd_convert_cad.get_version())`) and is the CAD
+readiness gate before batching per-asset conversions.
 
 ## Conversion Workflow
 
 1. Confirm the source asset exists.
-2. On Linux arm64, when this CAD reference is selected by the higher-level router, use the Kit App Template CAD Converter fallback and let the installed Kit runtime determine conversion support.
-3. On other architectures, confirm upstream `usd-convert-cad` lists the source suffix as supported.
-4. Locate the upstream checkout from `--usd-convert-cad-root`, `USD_CONVERT_CAD_ROOT`, `$PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT/usd-convert-cad`, or `$HOME/.physical-ai-skill-hub/upstreams/usd-convert-cad`; on Linux arm64, locate Kit App Template from `KIT_APP_TEMPLATE_ROOT`, `KIT_APP_TEMPLATE_BUILD_DIR`, or `KIT_APP_TEMPLATE_KIT_EXECUTABLE`.
-5. If setup state is unknown, follow the selected runtime's install/validate guidance.
-6. Run this installed reference's portable script; before upstream conversion it delegates readiness to upstream `validate.py`, then calls upstream `python "$USD_CONVERT_CAD_ROOT/convert.py" ... --quiet --report ...`. On Linux arm64, it starts the built Kit executable with the selected CAD core extension and a generated runner/config sidecar.
-7. Preserve both reports on the upstream path: this repo's normalized conversion report and the upstream `*_usd_convert_cad_status.json` sidecar. Preserve generated Kit fallback sidecars on the Linux arm64 path.
-8. If USD is generated, hand it to `validate-usd-minimum`.
-9. If blocked, report the exact upstream readiness or fallback runtime failure, such as a missing checkout, stale setup, Python 3.12 issue, `omniverse-kit` issue, missing Kit App Template build, required CAD core extension, platform issue, registry download failure, conversion failure, or CAD license dependency.
+2. Confirm the source suffix appears in the `usd-convert-cad` SKILL.md Supported Formats table (parsed live from the resolved checkout, with the built-in snapshot as fallback).
+   On Linux aarch64, reject `.dwg`, `.dxf`, `.rvt`, and `.rfa` before invoking
+   the wheel because the upstream DWG/Revit readers are unavailable there.
+3. Resolve the converter interpreter from `--usd-convert-cad-python`, `USD_CONVERT_CAD_PYTHON`, or the preflight manifest.
+4. If the wheel is not installed or does not match `upstream-versions.lock.json`, follow the install hint (`python -m pip install usd-convert-cad==0.2.0` into an isolated Python 3.12 environment).
+5. Run this reference's portable script. It invokes `python -m usd_convert_cad -i <source> -o <output_dir>/<stem>.usd` with the resolved interpreter.
+6. Treat the converter exit code as authoritative: exit `0` with the expected USD present is success; non-zero or a missing output is a failure with the converter's stderr recorded in the report.
+7. If USD is generated, hand it to `validate-usd-minimum`.
+8. If blocked, report the exact failure, such as an uninstalled or unimportable wheel, a wrong Python version, an unsupported source format, a conversion error, or a CAD license dependency.
 
 ## CLI Pattern
 
-Default STEP conversion:
+Default STEP conversion (uses `USD_CONVERT_CAD_PYTHON` or the current interpreter):
 
 ```bash
 python3 scripts/run.py asset.step output_dir \
   --report output_dir/conversion.json
 ```
 
-Explicit upstream checkout:
+Explicit converter interpreter:
 
 ```bash
 python3 scripts/run.py asset.jt output_dir \
-  --usd-convert-cad-root /path/to/usd-convert-cad \
+  --usd-convert-cad-python /path/to/.venv/bin/python \
   --report output_dir/conversion.json
 ```
 
-Linux arm64 fallback with explicit Kit App Template build:
+Forward documented converter options straight through to the wheel:
 
 ```bash
-python3 scripts/run.py asset.step output_dir \
-  --kit-build-dir /path/to/kit-app-template/_build/linux-aarch64/release \
-  --report output_dir/conversion.json
+python3 scripts/run.py asset.jt output_dir \
+  --report output_dir/conversion.json \
+  --tess-lod 4 --no-materials
 ```
 
 When running from outside the reference directory, use the installed reference path:
@@ -124,37 +111,32 @@ Check dependencies with:
 python3 scripts/check_dependencies.py --report dependency-check.json
 ```
 
-The dependency check delegates to upstream `validate.py` when the checkout,
-`convert.py`, and `validate.py` are present. It can start the upstream runtime
-and access the extension registry; use it as the CAD readiness gate before
-batching per-asset conversions. On Linux arm64, the dependency check reports
-Kit App Template root, build directory, and Kit executable readiness instead.
-
 ## Output Format
 
-This repo normalizes the upstream status into the shared conversion report contract and includes:
+This repo normalizes the conversion into the shared conversion report contract and includes:
 
 - `source_asset_path`
 - `source_format: cad`
 - `converter_skill: usd-convert-cad`
-- `converter_tool: usd-convert-cad` on the upstream path, or `NVIDIA Kit App Template CAD Converter` on Linux arm64 fallback
-- `converter_command`, the upstream `convert.py` invocation with explicit output USD and report paths, or the Kit executable command that enables the selected CAD core fallback extension
+- `converter_tool: usd-convert-cad`
+- `converter_command`, the `python -m usd_convert_cad -i <input> -o <output>` invocation (plus any forwarded converter options)
 - `output_directory`
 - `output_usd_path`
 - `generated_files`
-- `sidecar_inputs`, including the upstream checkout, upstream JSON report, and upstream log when available, or the Kit App Template checkout/build/config/runner sidecars for Linux arm64 fallback
-- `warnings`, including the selected runtime and converter core
+- `sidecar_inputs`, including the resolved converter interpreter
+- `warnings`, including the resolved interpreter and installed wheel version
 - `errors`
 - `next_step: validate-usd-minimum`
 
-The upstream sidecar report includes the selected converter extension, converter module, converter options, elapsed time, pass/fail status, and upstream warnings/errors.
+The wheel writes only the requested USD output (and any sidecars the chosen USD format implies); it does not emit a separate JSON status report.
 
 ## Known Caveats
 
-- Upstream `usd-convert-cad` is still Omniverse Kit and CAD Converter based; the Linux arm64 fallback uses Kit App Template and CAD Converter directly until upstream supports that architecture.
-- Python 3.12 is required by upstream setup.
-- The first conversion can take longer because Kit downloads converter extensions from the registry.
-- If `validate.py` reports `Result.ERROR_ACCESS_DENIED` while pulling a Kit extension, treat it as an upstream Kit registry/CDN access problem, not a routing problem. The portable scripts report `kind: kit_registry_access_denied` with the extension, URL host, exit code, and a recovery hint. Fix Horde node egress, proxy, or credentials, or pre-populate and reuse the upstream Kit extension cache, then rerun `OMNI_KIT_ACCEPT_EULA=yes python validate.py`.
+- The `usd-convert-cad` wheel bundles its own OpenUSD and CAD conversion runtime; install it into an isolated Python 3.12 environment so its `pxr` cannot conflict with another OpenUSD distribution.
+- Python 3.12 is required by the wheel.
+- On Linux aarch64, AutoCAD `.dwg`/`.dxf` and Revit `.rvt`/`.rfa` inputs are
+  unsupported by the upstream wheel and are reported as a platform limitation.
+- USDZ (`.usdz`) export is not supported yet; use `.usd`, `.usda`, or `.usdc`.
 - Proprietary CAD formats can require CAD Converter licensing.
-- Detailed converter option names must come from the upstream skill, Kit App Template docs, or installed extension docs.
+- Detailed converter option names must come from the upstream skill or `usd-convert-cad --help` for the installed version.
 - A successful CAD conversion does not imply simulation readiness.

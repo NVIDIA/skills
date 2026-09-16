@@ -4,6 +4,8 @@ name: DeepStream
 repo: NVIDIA/DeepStream
 description: Agentic skills for guided DeepStream development.
 skills:
+  - path: skills/amc-run-rtsp-calibration/
+    catalog_dir: amc-run-rtsp-calibration
   - path: skills/amc-run-sample-calibration/
     catalog_dir: amc-run-sample-calibration
   - path: skills/amc-run-video-calibration/
@@ -18,7 +20,15 @@ skills:
     catalog_dir: deepstream-import-vision-model
   - path: skills/deepstream-profile-pipeline/
     catalog_dir: deepstream-profile-pipeline
+  - path: skills/deepstream-run-mv3dt/
+    catalog_dir: deepstream-run-mv3dt
   - path: skills/deepstream-sop/
     catalog_dir: deepstream-sop
+  - path: skills/rtvi-cv-customize-model/
+    catalog_dir: rtvi-cv-customize-model
+  - path: skills/rtvi-cv-scaffold-vss-service/
+    catalog_dir: rtvi-cv-scaffold-vss-service
+  - path: skills/rtvi-vlm-customize-model/
+    catalog_dir: rtvi-vlm-customize-model
 links:
   discussions: false

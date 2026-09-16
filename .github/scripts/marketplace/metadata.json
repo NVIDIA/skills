@@ -37,6 +37,18 @@
       }
     },
     {
+      "path": "skills/amc-run-rtsp-calibration",
+      "name": "amc-run-rtsp-calibration",
+      "description": "Calibrate a new dataset from live RTSP camera streams via the AutoMagicCalib REST API. Use when the user provides RTSP URLs or asks to calibrate live cameras; VIOS records clips, AMC ingests them, then runs calibration.",
+      "metadata": {
+        "product.primary": "DeepStream SDK",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,solutions_architect,developer",
+        "discovery.activity_tags": "configure,integrate,operate,validate"
+      }
+    },
+    {
       "path": "skills/amc-run-sample-calibration",
       "name": "amc-run-sample-calibration",
       "description": "Run end-to-end calibration on the shipped sample dataset (sdg_08_2_sample_data_010926.zip) against a running AMC microservice. Use when user says 'test sample dataset', 'run sample calibration', 'verify AMC install', or 'launch and test'.",
@@ -51,7 +63,7 @@
     {
       "path": "skills/amc-run-video-calibration",
       "name": "amc-run-video-calibration",
-      "description": "Calibrate a new dataset from pre-recorded video files via the AutoMagicCalib REST API. Use when user has local MP4s and says 'calibrate my videos', 'run AMC on these videos', or similar. For RTSP/live streams, use amc-run-rtsp-calibration instead.",
+      "description": "Calibrates pre-recorded `cam_*.mp4` datasets through the AutoMagicCalib REST API. Use for user-supplied local MP4s; route live RTSP streams to `amc-run-rtsp-calibration`.",
       "metadata": {
         "product.primary": "DeepStream SDK",
         "classification.category.primary": "ai_and_machine_learning",
@@ -73,15 +85,123 @@
       }
     },
     {
+      "path": "skills/bionemo-kermt-add-cmim-pretrain",
+      "name": "kermt-add-cmim-pretrain",
+      "description": "Convert a grover_base checkpoint (encoder-only or encoder + vocab heads) into a hybrid checkpoint by adding a randomly-initialized cMIM decoder + latent_dist, then continue pretraining on the user's corpus as hybrid (vocab + contrast). Effectively kermt-continue-pretrain with a one-time ckpt-conversion step prepended.",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "computational_biologist,research_academic,ml_engineer,research_non_academic,ai_engineer",
+        "discovery.activity_tags": "convert,train,extend,configure,integrate"
+      }
+    },
+    {
+      "path": "skills/bionemo-kermt-continue-pretrain",
+      "name": "kermt-continue-pretrain",
+      "description": "Continue KERMT pretraining on a custom SMILES corpus with a grover_base, cmim, or hybrid checkpoint. Use a local checkpoint or optionally download a pinned Hugging Face model bundle using HF_TOKEN if configured. Run containerized training and write model bundles, prepared data, logs, and checkpoints to user-selected host directories.",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "computational_biologist,ml_engineer,research_academic,data_scientist,bioinformatician",
+        "discovery.activity_tags": "train,fine_tune,configure,package,deploy"
+      }
+    },
+    {
+      "path": "skills/bionemo-kermt-embed",
+      "name": "kermt-embed",
+      "description": "Extract per-molecule embeddings from any encoder-bearing KERMT checkpoint. Use a local checkpoint or optionally download a pinned Hugging Face model bundle using HF_TOKEN if configured. Run containerized embedding extraction and write model bundles, per-readout .npy embeddings, canonical SMILES, and validity arrays to user-selected host directories.",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,research_academic,ml_engineer,data_scientist",
+        "discovery.activity_tags": "extract,inference,generate,validate,integrate"
+      }
+    },
+    {
+      "path": "skills/bionemo-kermt-finetune",
+      "name": "kermt-finetune",
+      "description": "Finetune a pretrained KERMT encoder on a labeled CSV. Validate the checkpoint and data, prepare features, and run containerized training. Use a local checkpoint or optionally download a pinned Hugging Face model bundle using HF_TOKEN if configured. Write model bundles, prepared data, logs, and trained models to user-selected host directories.",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "computational_biologist,ml_engineer,bioinformatician,data_scientist,research_academic",
+        "discovery.activity_tags": "fine_tune,train,validate,configure,evaluate"
+      }
+    },
+    {
+      "path": "skills/bionemo-kermt-infer",
+      "name": "kermt-infer",
+      "description": "Run predictions with a finetuned KERMT checkpoint on a SMILES-only CSV. The skill validates that the input ckpt has task FFN heads (refuses pretrain ckpts with a redirect to kermt-finetune), validates the CSV, prepares the data (clean + rdkit_2d features), then launches main.py predict inside the kermt container (blocking, minutes-scale).",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,research_academic,data_scientist,ml_engineer,application_developer",
+        "discovery.activity_tags": "inference,validate,transform,operate"
+      }
+    },
+    {
+      "path": "skills/bionemo-kermt-monitor",
+      "name": "kermt-monitor",
+      "description": "Check progress for a detached KERMT run (pretrain, finetune, or any kermt_run_detached invocation). Reads run.json, queries docker for container state, tails the pretrain/finetune log, and parses progress lines (epoch, step, val loss).",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,computational_biologist,bioinformatician,research_academic,devops_engineer",
+        "discovery.activity_tags": "monitor,train,fine_tune,inspect,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/bionemo-kermt-pretrain-scratch",
+      "name": "kermt-pretrain-scratch",
+      "description": "Pretrain a fresh KERMT model from scratch on a user-provided corpus. Builds a new vocabulary from the corpus, instantiates the model architecture from defaults, and launches pretrain_ddp.py inside the kermt container (detached for long runs). Unlike kermt-continue-pretrain, no starting checkpoint is loaded — the model is randomly initialized.",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,computational_biologist,research_academic,data_scientist,ai_engineer",
+        "discovery.activity_tags": "train,configure,scale,operate"
+      }
+    },
+    {
+      "path": "skills/bionemo-kermt-setup",
+      "name": "kermt-setup",
+      "description": "Bootstrap the KERMT agent environment — verify host docker + nvidia-container-toolkit, build the kermt:latest image from the repo's Dockerfile if it doesn't yet exist, and run a GPU smoke test inside the container. Every other kermt-* skill depends on this; invoke it first.",
+      "metadata": {
+        "product.primary": "BioNeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "application_developer,ml_engineer,computational_biologist,bioinformatician,devops_engineer",
+        "discovery.activity_tags": "get_started,configure,validate,test,deploy"
+      }
+    },
+    {
       "path": "skills/cudaq-guide",
       "name": "cudaq-guide",
-      "description": "CUDA-Q onboarding guide for installation, test programs, GPU simulation, QPU hardware, and quantum applications.",
+      "description": "Use for CUDA-Q setup, simulation targets, QPU access, and @cudaq.kernel authoring guidance.",
       "metadata": {
         "product.primary": "CUDA-Q",
         "classification.category.primary": "accelerated_computing",
         "catalog.subdomain": "quantum-computing",
         "audience": "developer,quantum_researcher,hpc_developer",
         "discovery.activity_tags": "get_started,configure,validate"
+      }
+    },
+    {
+      "path": "skills/cudaq-importing",
+      "name": "cudaq-importing",
+      "description": "Use when porting circuits from another framework (e.g. Qiskit) into CUDA-Q kernels while preserving the source algorithm and validation fidelity.",
+      "metadata": {
+        "product.primary": "CUDA-Q",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "quantum-computing",
+        "audience": "quantum_researcher,application_developer,hpc_developer,research_academic,developer",
+        "discovery.activity_tags": "migrate,convert,integrate,validate,transform"
       }
     },
     {
@@ -267,7 +387,7 @@
     {
       "path": "skills/deepstream-import-vision-model",
       "name": "deepstream-import-vision-model",
-      "description": "Use this skill to bring any vision model from HuggingFace or NVIDIA NGC into an NVIDIA DeepStream pipeline with end-to-end automation: ONNX download, SafeTensors export, TRT engine build, custom nvinfer bbox parser, multi-stream benchmark, and PDF report. Object detection models only.\n",
+      "description": "Use this skill to bring a supported object-detection vision model from HuggingFace or NVIDIA NGC into an NVIDIA DeepStream pipeline with end-to-end automation: ONNX download, SafeTensors export, TRT engine build, custom nvinfer bbox parser, multi-stream benchmark, and PDF report. Object detection models only.\n",
       "metadata": {
         "product.primary": "DeepStream SDK",
         "classification.category.primary": "ai_and_machine_learning",
@@ -286,6 +406,18 @@
         "catalog.subdomain": "vision-ai",
         "audience": "application_developer,developer,solutions_architect,ml_engineer,platform_engineer",
         "discovery.activity_tags": "profile,benchmark,optimize,measure,configure"
+      }
+    },
+    {
+      "path": "skills/deepstream-run-mv3dt",
+      "name": "deepstream-run-mv3dt",
+      "description": "Run and operate the DeepStream Multi-View 3D Tracking reference app, also known as MV3DT. Use when the user asks to set up prerequisites, run shipped MV3DT samples, run Multi-View 3D Tracking on custom synchronized MP4 datasets, import camera calibration, delegate missing calibration to AutoMagicCalib, inspect OSD or BEV visualization, consume MV3DT Kafka metadata, or clean up MV3DT run state in the DeepStream MV3DT app directory.",
+      "metadata": {
+        "product.primary": "DeepStream SDK",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,developer,ai_engineer,solutions_architect",
+        "discovery.activity_tags": "operate,configure,get_started,inspect,debug"
       }
     },
     {
@@ -1237,6 +1369,30 @@
       }
     },
     {
+      "path": "skills/foundationpose-pipeline",
+      "name": "foundationpose-pipeline",
+      "description": "Adapt BOP datasets, run the FoundationPose perception pipeline with TAO depth, and evaluate or re-score pose results. Use for dataset runs and result comparisons; environment installation belongs to foundationpose-setup.",
+      "metadata": {
+        "product.primary": "Isaac Perception",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "robotics",
+        "audience": "robotics_developer,ai_engineer,ml_engineer,developer",
+        "discovery.activity_tags": "inference,evaluate,benchmark,compare,convert"
+      }
+    },
+    {
+      "path": "skills/foundationpose-setup",
+      "name": "foundationpose-setup",
+      "description": "Install or repair the FoundationPose perception pipeline and build its FoundationStereo TensorRT engines. Use for SAM3/TAO dependency conflicts, CUDA library failures, and depth-engine shape or precision decisions.",
+      "metadata": {
+        "product.primary": "Isaac Perception",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "robotics",
+        "audience": "robotics_developer,application_developer,ml_engineer,ai_engineer,devops_engineer",
+        "discovery.activity_tags": "troubleshoot,configure,get_started,debug,deploy"
+      }
+    },
+    {
       "path": "skills/holohub-app-lifecycle",
       "name": "holohub-app-lifecycle",
       "description": "Use for non-failing HoloHub app work with ./holohub: scaffold, build, run, test, visual evidence, lint, and flow benchmarking.",
@@ -1429,93 +1585,9 @@
       }
     },
     {
-      "path": "skills/i4h-catheter-navigation",
-      "name": "i4h-catheter-navigation",
-      "description": "Overview of `workflows/catheter_navigation/` (fluorosim DRR, XPBD physics, vasculature digital twin). Use when the user asks what the catheter navigation workflow is, what's supported, or where to start.",
-      "metadata": {
-        "product.primary": "Isaac for Healthcare",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "simulation-modeling",
-        "audience": "developer,simulation_engineer,application_developer,clinician",
-        "discovery.activity_tags": "get_started,summarize,select,inspect"
-      }
-    },
-    {
-      "path": "skills/i4h-catheter-navigation-digital-twin",
-      "name": "i4h-catheter-navigation-digital-twin",
-      "description": "Build a patient vasculature digital twin from CT (preprocess + segment). Use when asked to preprocess CT, segment vessels, extract centerline, or prepare ct_cache for viewport/DRR.",
-      "metadata": {
-        "product.primary": "Isaac for Healthcare",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "digital-twins",
-        "audience": "application_developer,simulation_engineer,ai_engineer,developer",
-        "discovery.activity_tags": "extract,transform,generate,configure"
-      }
-    },
-    {
-      "path": "skills/i4h-catheter-navigation-e2e",
-      "name": "i4h-catheter-navigation-e2e",
-      "description": "End-to-end smoke for catheter navigation covering setup, digital twin, DRR, and unit tests. Use when asked to run the full catheter workflow smoke or demo the v0.7 pipeline.",
-      "metadata": {
-        "product.primary": "Isaac for Healthcare",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "robotics-simulation",
-        "audience": "application_developer,simulation_engineer,robotics_developer,developer",
-        "discovery.activity_tags": "test,validate,get_started,configure"
-      }
-    },
-    {
-      "path": "skills/i4h-catheter-navigation-render-drr",
-      "name": "i4h-catheter-navigation-render-drr",
-      "description": "Render a single DRR fluoroscopy frame from a CT cache or synthetic phantom. Use when asked to render DRR, generate a fluoro image, or smoke-test the Slang renderer.",
-      "metadata": {
-        "product.primary": "Isaac for Healthcare",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "simulation-modeling",
-        "audience": "application_developer,simulation_engineer,developer",
-        "discovery.activity_tags": "generate,validate,test,debug"
-      }
-    },
-    {
-      "path": "skills/i4h-catheter-navigation-setup",
-      "name": "i4h-catheter-navigation-setup",
-      "description": "Verify host/GPU requirements and PYTHONPATH for the catheter navigation workflow. Use when asked to set up, install, or bootstrap catheter_navigation, or when hitting import/GPU/slangpy errors.",
-      "metadata": {
-        "product.primary": "Isaac for Healthcare",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "physical-ai",
-        "audience": "developer,application_developer,robotics_developer,simulation_engineer,devops_engineer",
-        "discovery.activity_tags": "get_started,configure,troubleshoot,debug,validate"
-      }
-    },
-    {
-      "path": "skills/i4h-catheter-navigation-smoke",
-      "name": "i4h-catheter-navigation-smoke",
-      "description": "Run CPU-only fluorosim smoke tests (imports, preprocessing, CLI parsers). Use when asked to smoke-test catheter navigation in CI or without a GPU.",
-      "metadata": {
-        "product.primary": "Isaac for Healthcare",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "simulation-modeling",
-        "audience": "developer,devops_engineer,application_developer,platform_engineer",
-        "discovery.activity_tags": "test,validate,debug,integrate"
-      }
-    },
-    {
-      "path": "skills/i4h-catheter-navigation-viewport",
-      "name": "i4h-catheter-navigation-viewport",
-      "description": "Launch the interactive Slang fluoroscopy viewport with XPBD catheter physics. Use when asked to open the viewport, teleop a catheter, or demo fluoro navigation.",
-      "metadata": {
-        "product.primary": "Isaac for Healthcare",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "simulation-modeling",
-        "audience": "simulation_engineer,application_developer,developer,robotics_developer",
-        "discovery.activity_tags": "operate,get_started,test,configure"
-      }
-    },
-    {
       "path": "skills/i4h-lerobot-viz",
       "name": "i4h-lerobot-viz",
-      "description": "Serve the LeRobot HTML visualizer for a converted dataset in a browser. Use when asked to visualize, inspect, or open a LeRobot dataset; not for converting HDF5 (use [[i4h-workflow-dataset-convert]]).",
+      "description": "Serve and visually inspect a converted LeRobot dataset in the browser. Use for videos and state/action timelines; do not use for raw workflow HDF5 or incomplete conversion output.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1527,19 +1599,19 @@
     {
       "path": "skills/i4h-workflow",
       "name": "i4h-workflow",
-      "description": "Overview of `workflows/agentic/` (IsaacLab-Arena + GR00T/openpi). Use when the user asks what i4h workflow is, what's supported, or where to start.",
+      "description": "Orient users to the i4h workflow runtime and route them to the correct stage skill. Use for architecture, support, or where-to-start questions; do not execute a known stage.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "robotics",
         "audience": "robotics_developer,simulation_engineer,ml_engineer,ai_engineer,developer",
-        "discovery.activity_tags": "get_started,summarize,select,orchestrate"
+        "discovery.activity_tags": "get_started,select,orchestrate,troubleshoot"
       }
     },
     {
       "path": "skills/i4h-workflow-create",
       "name": "i4h-workflow-create",
-      "description": "Create a new agentic env by forking an existing env. Use for new env/task scaffolding, not scene edits or baking.",
+      "description": "Create a minimal blank Workflow scaffold with a Scene containing ground and light plus an idle run mode. Use for fast new Workflow scaffolding.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1551,31 +1623,31 @@
     {
       "path": "skills/i4h-workflow-dataset-annotate",
       "name": "i4h-workflow-dataset-annotate",
-      "description": "Use a VLM to verify whether each episode satisfies the env's task description. Use when the user asks to annotate, label episodes, filter demos, or gate finetuning on a success classifier.",
+      "description": "Grade or filter workflow HDF5 episodes with an OpenAI-compatible vision model. Use for visual success labels; do not use for replay, policy evaluation, or recordings without frames.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "robotics",
         "audience": "robotics_developer,ml_engineer,ai_engineer,developer",
-        "discovery.activity_tags": "classify,validate,evaluate,fine_tune"
+        "discovery.activity_tags": "classify,validate,evaluate,assess"
       }
     },
     {
       "path": "skills/i4h-workflow-dataset-convert",
       "name": "i4h-workflow-dataset-convert",
-      "description": "Convert an agentic HDF5 recording into a LeRobot dataset (parquet, meta, videos). Use when asked to convert HDF5, prepare for training, or export to LeRobot; not for viewing — use [[i4h-lerobot-viz]].",
+      "description": "Convert workflow HDF5 recordings to LeRobot datasets for training or browser inspection. Use for conversion; do not use for replay, augmentation, or raw-data repair.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "robotics",
         "audience": "robotics_developer,ml_engineer,data_engineer,ai_engineer,developer",
-        "discovery.activity_tags": "convert,transform,fine_tune,train,integrate"
+        "discovery.activity_tags": "convert,transform,inspect,train,integrate"
       }
     },
     {
       "path": "skills/i4h-workflow-dataset-mimic",
       "name": "i4h-workflow-dataset-mimic",
-      "description": "Expand an HDF5 recording by cloning trajectories with action/state noise. Use when asked to mimic, expand, or augment a dataset; not for recording new demos (use [[i4h-workflow-dataset-teleop]]).",
+      "description": "Expand workflow HDF5 demonstrations with action jitter, optionally scoped to node segments. Use for synthetic variants; do not use to collect data, alter state directly, or generate new images.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1587,7 +1659,7 @@
     {
       "path": "skills/i4h-workflow-dataset-replay",
       "name": "i4h-workflow-dataset-replay",
-      "description": "Replay a recorded HDF5 episode inside Isaac Sim for visual verification. Use when the user asks to replay, play back, or step through an HDF5 recording.",
+      "description": "Replay a workflow HDF5 episode through its original Scene. Use for visual trajectory and recording verification; do not use for policy evaluation or LeRobot data.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1599,7 +1671,7 @@
     {
       "path": "skills/i4h-workflow-dataset-teleop",
       "name": "i4h-workflow-dataset-teleop",
-      "description": "Record episodes for an agentic env via teleoperation (keyboard, SO-ARM leader, or VR) into HDF5. Use when the user wants to teleop or record human demos.",
+      "description": "Record demonstrations through a workflow's teleop Task into workflow HDF5. Use for keyboard, leader, VR, or bus input; do not use for policy evaluation or autonomous rule-based Tasks.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1611,7 +1683,7 @@
     {
       "path": "skills/i4h-workflow-e2e",
       "name": "i4h-workflow-e2e",
-      "description": "Run the full end-to-end agentic pipeline (record → mimic → annotate → replay → convert → visualize → finetune → validate). Use when asked to run the whole pipeline or do an e2e, smoke, or demo run.",
+      "description": "Run the maintained workflow data-to-policy pipeline from recording through checkpoint validation. Use for full end-to-end requests; do not use for one individual stage.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1623,7 +1695,7 @@
     {
       "path": "skills/i4h-workflow-finetune",
       "name": "i4h-workflow-finetune",
-      "description": "Fine-tune a GR00T or openpi PI0 policy on a LeRobot dataset. Use when asked to finetune, train, or post-train a policy on demos; not for evaluating a checkpoint (use [[i4h-workflow-validate]]).",
+      "description": "Fine-tune a manifest-backed GR00T or openpi remote Task on compatible LeRobot data. Use for training; do not use for inference-only Tasks or checkpoint rollout.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1635,7 +1707,7 @@
     {
       "path": "skills/i4h-workflow-scene-edit",
       "name": "i4h-workflow-scene-edit",
-      "description": "Edit an env's scene in place — objects, cameras, task, success bounds, randomization. Use when asked to edit a scene or launch/run/open an env in edit mode (`--bridge`), incl. a just-created env.",
+      "description": "Edit an existing workflow Scene or task contract. Use for assets, layout, cameras, randomization, task text, or success rules; do not use to create a new workflow.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -1647,19 +1719,31 @@
     {
       "path": "skills/i4h-workflow-setup",
       "name": "i4h-workflow-setup",
-      "description": "Verify host requirements and run `workflows/agentic/setup.sh`. Use when asked to set up, install, or bootstrap the agentic workflow, or hits missing `.venv`, third-party checkout, or engine errors.",
+      "description": "Preflight and set up the root-level workflow runtime. Use for installation, missing component environments, or third-party failures; do not use for rollout validation.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "agentic-ai",
+        "catalog.subdomain": "infrastructure",
         "audience": "devops_engineer,platform_engineer,developer,ai_engineer,application_developer",
-        "discovery.activity_tags": "get_started,configure,troubleshoot,validate,deploy"
+        "discovery.activity_tags": "get_started,configure,troubleshoot,inspect,assess"
+      }
+    },
+    {
+      "path": "skills/i4h-workflow-train-rl",
+      "name": "i4h-workflow-train-rl",
+      "description": "Use when training, evaluating, or exporting Workflow policies with online RSL-RL or RLinf, including RL checkpoint and Workflow handoff.",
+      "metadata": {
+        "product.primary": "Isaac for Healthcare",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "robotics",
+        "audience": "robotics_developer,ml_engineer,ai_engineer,simulation_engineer,developer",
+        "discovery.activity_tags": "train,evaluate,deploy,configure,validate"
       }
     },
     {
       "path": "skills/i4h-workflow-validate",
       "name": "i4h-workflow-validate",
-      "description": "Validate, evaluate, or run i4h envs. Use for policy/checkpoint rollouts and scripted state-machine smoke runs.",
+      "description": "Run the root-level workflow runtime policy or rule-based rollouts and verify simulator success. Use for evaluation, checkpoints, or local controllers; do not use for replay or dataset annotation.",
       "metadata": {
         "product.primary": "Isaac for Healthcare",
         "classification.category.primary": "physical_ai",
@@ -2065,6 +2149,66 @@
       }
     },
     {
+      "path": "skills/jetson-video-benchmark",
+      "name": "jetson-video-benchmark",
+      "description": "Use when measuring Jetson Video Codec SDK or PyNvVideoCodec encode/decode throughput, comparing presets or surfaces, testing codec-worker capacity with authenticated samples and user media, or producing a documented clock-scaled or clock-and-resolution-scaled planning estimate when representative content is unavailable. Also use for Jetson video requests asking only for PSNR or SSIM results, to apply this performance skill's scope-only response.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "graphics_and_media",
+        "catalog.subdomain": "gpu-development",
+        "audience": "application_developer,platform_engineer,solutions_architect,developer",
+        "discovery.activity_tags": "benchmark,measure,compare,test,profile"
+      }
+    },
+    {
+      "path": "skills/jetson-video-capability",
+      "name": "jetson-video-capability",
+      "description": "Use when Jetson codec, profile, chroma, bit-depth, dimension, engine-count, or operational support must be reconciled using live SDK APIs, authenticated NVIDIA samples, and NVIDIA documentation. Also use for Jetson questions about Netflix, Widevine, or other DRM-protected streaming-service playback to apply the codec-scope boundary.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,application_developer,platform_engineer,solutions_architect,hands_on_builder",
+        "discovery.activity_tags": "validate,inspect,compare,select,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/jetson-video-pipeline",
+      "name": "jetson-video-pipeline",
+      "description": "Use when executing and verifying Jetson Video Codec SDK or PyNvVideoCodec encode/decode, transcode, segmentation, container decode, AV1, or acceptance workflows with exact artifact handoffs.",
+      "metadata": {
+        "product.primary": "Video Codec",
+        "classification.category.primary": "graphics_and_media",
+        "catalog.subdomain": "gpu-development",
+        "audience": "application_developer,developer,platform_engineer",
+        "discovery.activity_tags": "validate,test,convert,debug,package"
+      }
+    },
+    {
+      "path": "skills/jetson-video-recipe",
+      "name": "jetson-video-recipe",
+      "description": "Use when turning a Jetson encoder use case into one validated surface-neutral recipe with native and PyNvVideoCodec projections for codec, preset, rate control, bitrate, latency, format, and profile.",
+      "metadata": {
+        "product.primary": "Jetson",
+        "classification.category.primary": "graphics_and_media",
+        "catalog.subdomain": "gpu-development",
+        "audience": "application_developer,developer,solutions_architect,platform_engineer",
+        "discovery.activity_tags": "convert,configure,validate,generate,optimize"
+      }
+    },
+    {
+      "path": "skills/jetson-video-setup",
+      "name": "jetson-video-setup",
+      "description": "Use when installing, repairing, probing, or verifying native NVIDIA Video Codec SDK or PyNvVideoCodec on Jetson with official encode-to-decode samples, including registered-environment recovery.",
+      "metadata": {
+        "product.primary": "Video Codec",
+        "classification.category.primary": "graphics_and_media",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,application_developer,platform_engineer,hands_on_builder",
+        "discovery.activity_tags": "configure,troubleshoot,validate,recover,inspect"
+      }
+    },
+    {
       "path": "skills/launch-nemo-rl",
       "name": "launch-nemo-rl",
       "description": "Playbook for launching, monitoring, stopping, and debugging NeMo-RL recipes on a Kubernetes cluster via the nrl-k8s CLI. Covers ephemeral vs long-lived RayCluster modes, iterating on runs, and debugging hung or failed training jobs.",
@@ -2137,6 +2281,18 @@
       }
     },
     {
+      "path": "skills/medtech-model-evidence-export",
+      "name": "medtech-model-evidence-export",
+      "description": "Exports sanitized metadata, parameters, reproducibility details, quality metrics, and optional review artifacts from Medical AI inference runs or evidence packs to MLflow. Use after inference, including NV-Generate runs; not for live training tracking, model registration, or clinical use.",
+      "metadata": {
+        "product.primary": "NIM for Healthcare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,data_scientist,developer",
+        "discovery.activity_tags": "extract,integrate,inference,validate,measure"
+      }
+    },
+    {
       "path": "skills/nemo-automodel-distributed-training",
       "name": "nemo-automodel-distributed-training",
       "description": "Guide for selecting and configuring distributed training strategies in NeMo AutoModel, including FSDP2, Megatron FSDP, DDP, and parallelism settings.",
@@ -2185,27 +2341,27 @@
       }
     },
     {
-      "path": "skills/nemo-data-designer-plugin",
-      "name": "nemo-data-designer-plugin",
-      "description": "Use when the user wants to create a dataset, generate synthetic data, or build a data generation pipeline.",
-      "metadata": {
-        "product.primary": "NeMo",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "developer,ai_engineer,ml_engineer,data_engineer",
-        "discovery.activity_tags": "generate,synthesize,configure,validate"
-      }
-    },
-    {
-      "path": "skills/nemo-evaluator-plugin",
-      "name": "nemo-evaluator-plugin",
-      "description": "Evaluate models, datasets, and agents with the NeMo Evaluator plugin. Use for metric selection, SDK checks, platform jobs, and result retrieval.",
+      "path": "skills/nemo-fabric-build-adapter",
+      "name": "nemo-fabric-build-adapter",
+      "description": "Build, migrate, review, and maintain third-party NVIDIA NeMo Fabric adapters against the public adapter contract. Use when creating adapter or target descriptors, mapping AgentConfig into an agent harness or custom-agent runtime, implementing start/invoke/stop, declaring schemas and capabilities, packaging discovery metadata, or assessing adapter conformance. Do not use for consumer applications that only call the NVIDIA NeMo Fabric SDK.",
       "metadata": {
         "product.primary": "NeMo",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
-        "discovery.activity_tags": "evaluate,validate,configure,inspect"
+        "audience": "developer,application_developer,ai_engineer,platform_engineer,solutions_architect",
+        "discovery.activity_tags": "integrate,extend,configure,validate,package"
+      }
+    },
+    {
+      "path": "skills/nemo-fabric-integrate",
+      "name": "nemo-fabric-integrate",
+      "description": "Use this skill when integrating NVIDIA NeMo Fabric into a consumer application, service, evaluation harness, or platform through the typed Python SDK — translating the consumer's own application, job, or deployment config into an in-memory FabricConfig, choosing the single-invocation convenience API or an explicitly started runtime, validating with plan and doctor, and consuming normalized results, artifacts, and telemetry.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "application_developer,platform_engineer,ai_engineer,ml_engineer,devops_engineer",
+        "discovery.activity_tags": "integrate,configure,validate,deploy,evaluate"
       }
     },
     {
@@ -2235,7 +2391,7 @@
     {
       "path": "skills/nemo-mbridge-perf-activation-recompute",
       "name": "nemo-mbridge-perf-activation-recompute",
-      "description": "Validate and use selective and full activation recompute in Megatron Bridge to reduce GPU memory usage at the cost of extra compute.",
+      "description": "Validate and use selective and full activation recompute in Megatron Bridge to reduce GPU memory usage at the cost of extra compute. Use for activation memory OOMs or regressions involving recompute_granularity, recompute_num_layers, recompute_modules, recompute_method, selective recompute, full recompute, or activation checkpointing.",
       "metadata": {
         "product.primary": "NeMo Megatron Bridge",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2343,7 +2499,7 @@
     {
       "path": "skills/nemo-mbridge-perf-moe-hardware-configs",
       "name": "nemo-mbridge-perf-moe-hardware-configs",
-      "description": "Representative MoE training playbooks by hardware platform and model family. Summarizes rounded throughput bands, parallelism patterns, and common tuning stacks.",
+      "description": "Representative, point-in-time MoE training playbooks by hardware and model family. Use them as candidate seeds, then revalidate the exact runtime, semantics, topology, and steady-state throughput.",
       "metadata": {
         "product.primary": "NeMo Megatron Bridge",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2367,7 +2523,7 @@
     {
       "path": "skills/nemo-mbridge-perf-moe-optimization-workflow",
       "name": "nemo-mbridge-perf-moe-optimization-workflow",
-      "description": "Systematic workflow for MoE training optimization in Megatron Bridge, based on the Megatron-Core MoE paper. Covers the Three Walls framework, parallel folding, recompute strategy, dispatcher choice, and CUDA-graph bring-up.",
+      "description": "Evidence-gated workflow for MoE performance optimization in Megatron Bridge. Covers measurement contracts, the Three Walls framework, parallel folding, profiling, matched A/B tuning, and final validation.",
       "metadata": {
         "product.primary": "NeMo Megatron Bridge",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2403,7 +2559,7 @@
     {
       "path": "skills/nemo-mbridge-perf-sequence-packing",
       "name": "nemo-mbridge-perf-sequence-packing",
-      "description": "Validate and use packed sequences and long-context training in Megatron-Bridge, distinguishing offline packed SFT for LLMs from in-batch packing for VLMs, and applying the right CP constraints.",
+      "description": "Validate and use packed sequences and long-context training in Megatron-Bridge, including offline LLM packing, collate-time VLM packing, Energon online packing, and CP constraints.",
       "metadata": {
         "product.primary": "NeMo Megatron Bridge",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2427,13 +2583,13 @@
     {
       "path": "skills/nemo-mbridge-recipe-recommender",
       "name": "nemo-mbridge-recipe-recommender",
-      "description": "Recommend and customize Megatron Bridge recipes for a user's model, GPU count, and training goal. Indexes library recipes (pretrain/SFT/PEFT) and performance recipes.",
+      "description": "Recommend and customize Megatron Bridge library and benchmark recipes for a user's model, GPU count, hardware, sequence length, and pretrain/SFT/PEFT goal. Use when selecting a starting recipe, comparing library and benchmark configs, resizing parallelism for a GPU allocation, or distinguishing convergence changes, semantics-preserving execution tuning, and benchmark-only shortcuts.",
       "metadata": {
         "product.primary": "NeMo Megatron Bridge",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
-        "discovery.activity_tags": "select,configure,train,optimize,validate"
+        "discovery.activity_tags": "select,configure,benchmark,compare,optimize"
       }
     },
     {
@@ -2547,7 +2703,7 @@
     {
       "path": "skills/nemo-relay-plugin-build",
       "name": "nemo-relay-plugin-build",
-      "description": "Use this skill when building or packaging reusable NeMo Relay runtime behavior as a configuration-activated plugin with deterministic validation and rollback-safe registration.",
+      "description": "Use this skill when building or packaging reusable NeMo Relay runtime behavior as an embedded configuration component or a manifest-backed `rust_dynamic` native or `worker` gRPC plugin, with deterministic validation and rollback-safe registration.",
       "metadata": {
         "product.primary": "NeMo",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2571,13 +2727,25 @@
     {
       "path": "skills/nemo-retriever",
       "name": "nemo-retriever",
-      "description": "Use when the user wants to search, query, extract, transcribe, describe, quote, filter, or aggregate across documents — PDFs, scanned forms / images (`.jpg` `.png` `.tiff`), Office (`.docx` `.pptx`), text (`.html` `.txt`), audio (`.mp3` `.wav` `.m4a`), or video (`.mp4` `.mov`). Prefer this over native Read / Grep for multi-file or non-PDF corpora. Not for: editing files, web browsing, single-file plain-text lookups, fine-tuning.",
+      "description": "Use when searching, extracting, ingesting, or querying a document collection with the NeMo Retriever 26.8.1 CLI, including local LanceDB indexes and deployed Retriever services. Use for PDFs, images, Office files, HTML, text, audio, and video; not for editing documents or web search.",
       "metadata": {
         "product.primary": "NeMo Retriever",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "developer,ai_engineer,data_engineer",
-        "discovery.activity_tags": "extract,inspect,summarize,configure"
+        "discovery.activity_tags": "extract,inspect,integrate,configure"
+      }
+    },
+    {
+      "path": "skills/nemo-retriever-mcp",
+      "name": "nemo-retriever-mcp",
+      "description": "Use when a task needs to search or add documents through NeMo Retriever MCP.",
+      "metadata": {
+        "product.primary": "NeMo Retriever",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "ai_engineer,application_developer,developer,ml_engineer,data_engineer",
+        "discovery.activity_tags": "integrate,extract,orchestrate,operate"
       }
     },
     {
@@ -2691,7 +2859,7 @@
     {
       "path": "skills/nemotron-speech",
       "name": "nemotron-speech",
-      "description": "Routes NVIDIA Nemotron Speech (Riva) NIM tasks — deploys, runs, and tests ASR, TTS, and NMT NIMs on build.nvidia.com or self-hosted.",
+      "description": "Routes NVIDIA Nemotron Speech (Formerly Riva) NIM tasks — deploys, runs, and tests ASR, TTS, and NMT NIMs on build.nvidia.com or self-hosted.",
       "metadata": {
         "product.primary": "Riva",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2727,19 +2895,19 @@
     {
       "path": "skills/nv-generate-mr-brain",
       "name": "nv-generate-mr-brain",
-      "description": "Used for generating synthetic brain MRI volumes with NV-Generate-CTMR rflow-mr-brain. Not for production training data.",
+      "description": "Used for generating synthetic T1, T2, FLAIR, SWI, or MRA brain MRI volumes with NV-Generate-CTMR MR-Brain v1. Not for production training data.",
       "metadata": {
         "product.primary": "MONAI",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "vision-ai",
-        "audience": "developer,ai_engineer,ml_engineer",
+        "audience": "developer,research_academic,research_non_academic,ai_engineer,ml_engineer",
         "discovery.activity_tags": "generate,synthesize,validate,inspect"
       }
     },
     {
       "path": "skills/nv-generate-mr-brain-finetune",
       "name": "nv-generate-mr-brain-finetune",
-      "description": "Used for finetuning NV-Generate-CTMR MR-brain diffusion UNet from a NIfTI datalist. Not for clinical or production data approval.",
+      "description": "Used for finetuning NV-Generate-CTMR MR-Brain v1 for T1, T2, FLAIR, SWI, or MRA data from a NIfTI datalist. Not for clinical or production data approval.",
       "metadata": {
         "product.primary": "MONAI",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2787,7 +2955,7 @@
     {
       "path": "skills/nv-segment-ct-finetune",
       "name": "nv-segment-ct-finetune",
-      "description": "Used for smoke or dataset finetuning of NV-Segment-CT VISTA3D on CT NIfTI labels. Not for clinical validation.",
+      "description": "Runs standard or fixed-channel softmax finetuning of NV-Segment-CT VISTA3D on CT NIfTI image/label datasets, with optional MONAI-native MLflow tracking and checkpoint evidence. Uses softmax for predefined, mutually exclusive classes; keeps the standard workflow when point prompts or runtime-variable classes are needed. Not for clinical validation.",
       "metadata": {
         "product.primary": "MONAI",
         "classification.category.primary": "ai_and_machine_learning",
@@ -2806,6 +2974,114 @@
         "catalog.subdomain": "vision-ai",
         "audience": "developer,ai_engineer,ml_engineer",
         "discovery.activity_tags": "inference,validate,inspect"
+      }
+    },
+    {
+      "path": "skills/nvflare-autofl",
+      "name": "nvflare-autofl",
+      "description": "Use for agent-assisted Auto-FL optimization of an existing NVFLARE job in simulation, POC, or production. Do not use for code conversion, diagnosis-only work, or deployment setup.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,platform_engineer,developer",
+        "discovery.activity_tags": "optimize,evaluate,benchmark,compare,train"
+      }
+    },
+    {
+      "path": "skills/nvflare-autofl-report",
+      "name": "nvflare-autofl-report",
+      "description": "Generate a reproducible final report, literature-outcome synthesis, JSON summary, and refreshed progress plot for a stopped or interrupted NVFLARE Auto-FL campaign.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,data_scientist,ai_engineer,developer,platform_engineer",
+        "discovery.activity_tags": "generate,summarize,synthesize,evaluate,recover"
+      }
+    },
+    {
+      "path": "skills/nvflare-convert-huggingface",
+      "name": "nvflare-convert-huggingface",
+      "description": "Convert existing Hugging Face Transformers Trainer or TRL SFTTrainer training code into an NVFLARE federated job using flare.patch(trainer), local validation, and job export; use when the user names Hugging Face or preliminary source inspection identifies one Hugging Face owner, and not for manual PyTorch loops, Lightning, inference-only pipelines, deployment, or experiment workflows.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,data_scientist",
+        "discovery.activity_tags": "convert,train,validate,package,integrate"
+      }
+    },
+    {
+      "path": "skills/nvflare-convert-lightning",
+      "name": "nvflare-convert-lightning",
+      "description": "Convert existing PyTorch Lightning training code into an NVFLARE federated job using the Lightning Client API patch, local validation, and job export; use only when the request names federated/NVFLARE conversion or asks multiple sites to train collaboratively while keeping each site's data local, and either names PyTorch Lightning or preliminary source inspection identifies one Lightning owner; do not use for non-federated Lightning work such as DDP, profiling, inference serving, or training-loop changes, nor for plain PyTorch, TensorFlow/Keras, other frameworks, deployment, POC/production lifecycle, or experiment workflows.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,developer",
+        "discovery.activity_tags": "convert,integrate,train,validate,package"
+      }
+    },
+    {
+      "path": "skills/nvflare-convert-pytorch",
+      "name": "nvflare-convert-pytorch",
+      "description": "Convert existing plain or manual PyTorch training code into an NVFLARE federated job using Client API model exchange, local validation, and job export; use when the user names plain PyTorch or preliminary source inspection identifies one plain-PyTorch owner, and not for Lightning, other frameworks, deployment, POC/production lifecycle, or experiment workflows.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "convert,train,validate,package,integrate"
+      }
+    },
+    {
+      "path": "skills/nvflare-diagnose-job",
+      "name": "nvflare-diagnose-job",
+      "description": "Use when the user asks why a reported NVFLARE job failure signal occurred: the job failed, stalled, timed out, lost clients, ended with EXECUTION_EXCEPTION, or produced suspicious errors. Diagnose in simulation, POC, or production by collecting bounded evidence and mapping failure patterns to recovery actions.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,devops_engineer,platform_engineer,ai_engineer,production_operator",
+        "discovery.activity_tags": "troubleshoot,debug,recover,inspect,operate"
+      }
+    },
+    {
+      "path": "skills/nvflare-fed-stats",
+      "name": "nvflare-fed-stats",
+      "description": "Compute federated statistics over tabular data (count, sum, mean, stddev, var, histogram, quantile, noise-protected min/max) and image data (count, failure_count, pixel-intensity histogram) across NVFLARE sites via FedStatsRecipe — automatic and non-interactive from the dataset, feature names (header or supplied), and optionally a README or notes declaring which statistics to compute; do not use for model training conversion, hierarchical statistics, deployment, POC/production lifecycle, or failed-job diagnosis.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "data-science",
+        "audience": "ml_engineer,data_scientist,developer,data_engineer,ai_engineer",
+        "discovery.activity_tags": "measure,summarize,assess,generate"
+      }
+    },
+    {
+      "path": "skills/nvflare-orient",
+      "name": "nvflare-orient",
+      "description": "Route open-ended NVFLARE advice and only conversion requests whose preliminary source inspection reports unresolved or conflicting ownership; never load this skill merely to inspect a concrete conversion request before selecting its detected framework converter.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer,solutions_architect",
+        "discovery.activity_tags": "select,orchestrate,inspect,convert,configure"
+      }
+    },
+    {
+      "path": "skills/nvflare-shared",
+      "name": "nvflare-shared",
+      "description": "Internal NVFLARE conversion references and templates. Use only when another NVFLARE skill directs you to a shared workflow, policy, or asset.",
+      "metadata": {
+        "product.primary": "NVFLare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "convert,configure,validate,integrate"
       }
     },
     {
@@ -2869,6 +3145,66 @@
       }
     },
     {
+      "path": "skills/paidf-augmentation",
+      "name": "paidf-augmentation",
+      "description": "Use when authoring or validating PAIDF augmentation YAML configs, or running remote Cosmos Transfer/Predict, image-edit, or image-to-video inference.",
+      "metadata": {
+        "product.primary": "Cosmos",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "ai_engineer,ml_engineer,robotics_developer,developer,data_engineer",
+        "discovery.activity_tags": "configure,validate,inference,generate,evaluate"
+      }
+    },
+    {
+      "path": "skills/paidf-auto-labeling",
+      "name": "paidf-auto-labeling",
+      "description": "Use when a user needs to get started with PAIDF Auto-Labeling, plan a scenario, run or debug a shipped cookbook, author prompts or cookbooks, migrate a pipeline, or configure a stage. Confirm critical inputs (data path, output path, endpoints) and ask when any are missing. This is a router: read the matching reference instead of inventing a workflow.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "ml_engineer,ai_engineer,data_engineer,developer,robotics_developer",
+        "discovery.activity_tags": "get_started,debug,configure,migrate,integrate"
+      }
+    },
+    {
+      "path": "skills/paidf-curation-and-retrieval",
+      "name": "paidf-curation-and-retrieval",
+      "description": "Use when operating PAIDF Curation and Retrieval or NVIDIA Cosmos Curator pipelines (split, filter, caption, embed, dedup, shard, image annotate) or PAIDF Data Mining nearest-neighbor matching on Curator embeddings. Activate for Make or CLI pipeline config, GPU run preflight, FFmpeg sidecar, SAM3 keys, or Curator-to-TAO handoff. Do not use for generic ETL, vector-database RAG, model training, orchestration, or embeddings outside Cosmos Curator and PAIDF Data Mining.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "data_engineer,ml_engineer,ai_engineer,robotics_developer,developer",
+        "discovery.activity_tags": "operate,configure,transform,extract,validate"
+      }
+    },
+    {
+      "path": "skills/paidf-orchestration-setup",
+      "name": "paidf-orchestration-setup",
+      "description": "Audit, prepare, and deploy PAIDF Orchestration on a Kubernetes GPU cluster - single-GPU H100/L40S hosts, managed Kubernetes, kubeadm, and similar. Select for requests to set up, install, deploy, configure, or check a PAIDF Orchestration environment; run a workflow on a new or unverified GPU host; connect via kubeconfig; validate GPU compute; deploy the Airflow controller; or choose external versus in-cluster model services. A plain SSH host is not a supported backend.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "devops_engineer,platform_engineer,solutions_architect,ai_engineer,developer",
+        "discovery.activity_tags": "deploy,configure,validate,orchestrate,get_started"
+      }
+    },
+    {
+      "path": "skills/paidf-orchestration-write-dag",
+      "name": "paidf-orchestration-write-dag",
+      "description": "Use when a user describes a custom PAIDF Orchestration pipeline — a specific ordered combination of stages such as augmentation only, auto-labeling only, detection+captioning only, or image attribute augmentation without full auto-labeling — that no existing DAG in airflow/dags/workflows/ covers, and asks for a new Kubernetes DAG. Also use to check that a generated or existing DAG's model/container/prompt choices match an external spec document (e.g. a PAIDF `launchable.md`).",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "application_developer,platform_engineer,devops_engineer,ml_engineer,ai_engineer",
+        "discovery.activity_tags": "orchestrate,generate,configure,deploy,validate"
+      }
+    },
+    {
       "path": "skills/physical-ai-defect-image-generation",
       "name": "physical-ai-defect-image-generation",
       "description": "Use when the user wants to orchestrate defect image generation with NVIDIA Cosmos AnomalyGen (Cosmos-Predict2-derived) on OSMO for PCBA, metal surface, and glass inspection. The Day 0 path handles cold-start with USD-to-ROI, image-edit augmentation, and AnomalyGen to create initial PCBA datasets. The Day 1 path performs inference and labeling on real images. This skill helps with first-time asset setup, creation of finetuning checkpoints, and configuring deployment.\nTrigger keywords: defect image generation, dig workflow, dig pipeline, defect image detection workflow, aoi pipeline, aoi anomalygen, usd2roi anomalygen, day 0 pcba, day 1 pcba, day 1 real-photo alignment, day 1 manual roi, metal surface anomaly, glass defect, anomalygen finetune, setup_pcb, setup_metal, setup_glass, setup_pretrained, dig setup, dig datasets, dig pretrained checkpoint, dig image-edit endpoint, cosmos defect generation, cosmos-predict2 defect, cosmos-anomalygen, cosmos predict2 finetune.",
@@ -2878,6 +3214,30 @@
         "catalog.subdomain": "physical-ai",
         "audience": "developer,ai_engineer,ml_engineer",
         "discovery.activity_tags": "orchestrate,generate,synthesize,fine_tune,configure"
+      }
+    },
+    {
+      "path": "skills/physical-ai-event-video-generation",
+      "name": "physical-ai-event-video-generation",
+      "description": "Run the PAIDF Orchestration Event Video Generation DAG on Kubernetes - image-to-video anomaly generation, auto-labeling, and anomaly dataset generation. Select for requests about event video generation, anomaly video generation, image-to-video synthesis, Cosmos3 image2video, anomaly dataset creation, safety/surveillance SDG, or generating person-falling, person-climbing, person-running, fighting, smoking/vaping, fire/smoke, or shoplifting video clips from a seed image. Runs environment setup first when controller readiness is unknown. Not for person-crop clothing/attribute augmentation (that is image-attribute-augmentation-workflow) and not for video style transfer.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "ai_engineer,ml_engineer,data_engineer,application_developer,devops_engineer",
+        "discovery.activity_tags": "generate,synthesize,orchestrate,deploy,configure"
+      }
+    },
+    {
+      "path": "skills/physical-ai-image-attribute-augmentation",
+      "name": "physical-ai-image-attribute-augmentation",
+      "description": "Run the PAIDF Orchestration Image Attribute Augmentation DAG on Kubernetes - person-crop clothing augmentation, attribute search, and augmented dataset generation. Select for requests about image attribute augmentation, person attribute search, person re-identification data, clothing augmentation, attribute captions, augmentation payloads, run status, or result retrieval. Runs environment setup first when controller readiness is unknown. Not for video or defect-image generation.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "ml_engineer,ai_engineer,data_engineer,developer",
+        "discovery.activity_tags": "generate,configure,orchestrate,monitor,extract"
       }
     },
     {
@@ -2895,25 +3255,13 @@
     {
       "path": "skills/physical-ai-neural-reconstruction",
       "name": "physical-ai-neural-reconstruction",
-      "description": "Router for NVIDIA NuRec/NRE: USDZ rendering, NCore conversion, 3DGS, gRPC sensor sim, PhysicalAI HF datasets. Do NOT use for SimReady or infra setup.",
+      "description": "Router for NVIDIA NuRec/NRE: USDZ rendering, NCore conversion, 3DGS, gRPC sensor sim, carline adaptation, PhysicalAI HF datasets. Do NOT use for SimReady or infra setup.",
       "metadata": {
         "product.primary": "NuRec",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "physical-ai",
         "audience": "developer,simulation_engineer,ai_engineer",
         "discovery.activity_tags": "select,convert,generate,validate"
-      }
-    },
-    {
-      "path": "skills/physical-ai-people-attribute-search",
-      "name": "physical-ai-people-attribute-search",
-      "description": "Use when running people attribute search (PAS) image augmentation and auto-labeling workflows on OSMO: flow selection, preflight, submit-time interpolation, monitoring, and output retrieval. Trigger keywords: people attribute search, PAS, person augmentation, attribute search, person re-identification, clothing augmentation, person crop augmentation.",
-      "metadata": {
-        "product.primary": "Physical AI Dataset",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "physical-ai",
-        "audience": "ai_engineer,ml_engineer,data_engineer,developer,robotics_developer",
-        "discovery.activity_tags": "orchestrate,generate,monitor,validate,select"
       }
     },
     {
@@ -3001,6 +3349,42 @@
       }
     },
     {
+      "path": "skills/rtvi-cv-customize-model",
+      "name": "rtvi-cv-customize-model",
+      "description": "How to swap the DeepStream CV detection model in the VSS Alerts Blueprint verification (2d_cv) mode - covers ONNX export, custom bbox parsers, compose mount gotchas, nvinfer config, runtime TRT engine build, deployment, and a segmentation-capable model addendum handoff.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ml_engineer,ai_engineer,devops_engineer",
+        "discovery.activity_tags": "configure,deploy,debug,integrate,convert"
+      }
+    },
+    {
+      "path": "skills/rtvi-cv-scaffold-vss-service",
+      "name": "rtvi-cv-scaffold-vss-service",
+      "description": "Scaffold a standalone RTVI CV microservice that plugs into VSS Search and Alerts profiles via Kafka mdx-raw. The shipped scaffold script is a YOLO26 reference implementation (ONNX, labels, custom parser required). Use when building a new perception microservice repo, validating the VSS integration contract, extending that scaffold for segmentation frame-mask payloads, or scaffolding with placeholders before customer YOLO26 assets exist. For swapping the detector in the stock vss-rt-cv container, use rtvi-cv-customize-model instead. Live DeepStream integration cannot run until the customer-supplied ONNX, labels file, and parser library exist.\n",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ml_engineer,solutions_architect,devops_engineer",
+        "discovery.activity_tags": "integrate,generate,configure,deploy,validate"
+      }
+    },
+    {
+      "path": "skills/rtvi-vlm-customize-model",
+      "name": "rtvi-vlm-customize-model",
+      "description": "How to swap the VLM in the VSS Alerts Blueprint — covers RTVI-VLM microservice deployment methods, all three VLM consumers (rtvi-vlm, vlm-as-verifier, vss-agent), and health checks.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,devops_engineer,platform_engineer,solutions_architect,ai_engineer",
+        "discovery.activity_tags": "configure,deploy,integrate,validate,troubleshoot"
+      }
+    },
+    {
       "path": "skills/skill-card-generator",
       "name": "skill-card-generator",
       "description": "Use only to generate or update a governance skill card for a specified existing agent skill directory. Do not use for explaining, listing, comparing, or discussing skill capabilities.",
@@ -3027,7 +3411,7 @@
     {
       "path": "skills/tao-analyze-gaps-visual-changenet",
       "name": "tao-analyze-gaps-visual-changenet",
-      "description": "Performs gap analysis on NVIDIA TAO VCN Classify (Visual Component Net) experiments by invoking the data-services container (`tao_toolkit.data_services` from `versions.yaml`) directly via `docker run … gap_analysis vcn_aoi …` — picks the optimal decision threshold, ranks per-sample weakness, and emits a top-K weakest parquet expanded per-lighting for downstream augmentation. Use when analyzing VCN classification failures, picking SDA augmentation targets, or auditing PASS/NO_PASS boundary cases.",
+      "description": "Performs gap analysis on NVIDIA TAO VCN Classify (Visual Component Net) experiments by invoking the pinned TAO data-services container directly via `docker run … gap_analysis vcn_aoi …` — picks the optimal decision threshold, ranks per-sample weakness, and emits a top-K weakest parquet expanded per-lighting for downstream augmentation. Use when analyzing VCN classification failures, picking SDA augmentation targets, or auditing PASS/NO_PASS boundary cases.",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -3087,7 +3471,7 @@
     {
       "path": "skills/tao-finetune-cosmos-reason",
       "name": "tao-finetune-cosmos-reason",
-      "description": "Cosmos3-Nano video QA supervised fine-tuning with FSDP parallelism. Use when training or evaluating video question-answering models, fine-tuning Cosmos3-Nano or compatible Cosmos Reason models with SFT/LoRA, or working with Cosmos-RL. Trigger phrases include \"fine-tune Cosmos\", \"Cosmos3 Nano Reasoner\", \"Cosmos-RL SFT\", \"video QA fine-tune\", \"Cosmos3-Nano training\".",
+      "description": "Cosmos3-Nano video QA supervised fine-tuning with FSDP parallelism across variable-width GPU configurations. Use when training or evaluating video question-answering models, fine-tuning Cosmos3-Nano or compatible Cosmos Reason models with SFT/LoRA, or working with Cosmos-RL. Trigger phrases include \"fine-tune Cosmos\", \"Cosmos3 Nano Reasoner\", \"Cosmos-RL SFT\", \"video QA fine-tune\", \"Cosmos3-Nano training\".",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -3099,7 +3483,7 @@
     {
       "path": "skills/tao-finetune-huggingface-model",
       "name": "tao-finetune-huggingface-model",
-      "description": "Fine-tune any HuggingFace CV / VLM / LLM model on local NVIDIA GPUs inside an NGC PyTorch container. Use when the user wants to fine-tune a HuggingFace model (full or LoRA), train a vision / VLM / LLM model end-to-end, generate a reproducible HF training pipeline, smoke-test a HuggingFace model locally before scale-up, push a fine-tuned model to the HF Hub with a model card, or emit a self-contained rerun skill for an existing HuggingFace finetune. Supports image classification, object detection, semantic / instance / panoptic segmentation, depth estimation, image-text-to-text VLM (SFT / LoRA), and LLM SFT / DPO / GRPO. Six-step workflow: inspect and qualify, hardware and NGC image, research, generate and smoke, train + eval + infer, push and emit rerun skill.\n",
+      "description": "Fine-tune any HuggingFace CV / VLM / LLM model on local NVIDIA GPUs inside an NGC PyTorch container when no dedicated TAO model skill matches. Use when the user wants to fine-tune a HuggingFace model (full or LoRA), train a vision / VLM / LLM model end-to-end, generate a reproducible HF training pipeline, smoke-test a HuggingFace model locally before scale-up, push a fine-tuned model to the HF Hub with a model card, or emit a self-contained rerun skill for an existing HuggingFace finetune. Supports image classification, object detection, semantic / instance / panoptic segmentation, depth estimation, image-text-to-text VLM (SFT / LoRA), and LLM SFT / DPO / GRPO. Six-step workflow: inspect and qualify, hardware and NGC image, research, generate and smoke, train + eval + infer, push and emit rerun skill. Do not use for any Hugging Face model ID claimed by a dedicated `skills/models/*` skill; the model skill and its declared execution environment take precedence.\n",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -3207,7 +3591,7 @@
     {
       "path": "skills/tao-run-automl",
       "name": "tao-run-automl",
-      "description": "Run AutoML / hyperparameter optimization (HPO) for NVIDIA TAO networks using AutoMLRunner. Handles algorithm selection (bayesian, hyperband, asha, bohb, llm, hybrid, autoresearch), WandB experiment tracking, job execution on any TAO SDK platform, result interpretation, and per-rec custom evaluation hooks. Use when the user mentions TAO AutoML, hyperparameter optimization, HPO, automl, automl_settings, AutoMLRunner, tao_automl, bayesian search, hyperband, ASHA, LLM-guided search, autoresearch, or wants to tune training hyperparameters for any TAO network. Platform-agnostic — runs on any SDK (Brev, SLURM, Kubernetes, Docker).",
+      "description": "Run container-backed AutoML / hyperparameter optimization (HPO) for NVIDIA TAO networks using AutoMLRunner. Handles algorithm selection (bayesian, hyperband, asha, bohb, llm, hybrid, autoresearch), WandB experiment tracking, job execution on any TAO SDK platform, result interpretation, and per-rec custom evaluation hooks. Use when the user mentions TAO AutoML, hyperparameter optimization, HPO, automl, automl_settings, AutoMLRunner, tao_automl, bayesian search, hyperband, ASHA, LLM-guided search, autoresearch, or wants to tune train/distill/prune/quantize action parameters for any TAO network. Model actions use the model skill's resolved container image by default; venv training requires an explicit user request. Platform-agnostic — runs on any SDK (Brev, SLURM, Kubernetes, Docker).",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -3327,7 +3711,7 @@
     {
       "path": "skills/tao-setup-nvidia-gpu-host",
       "name": "tao-setup-nvidia-gpu-host",
-      "description": "Host setup for TAO GPU backends. Checks and, after user approval, installs NVIDIA driver branch 580, CUDA Toolkit 13.0, and NVIDIA Container Toolkit 1.19.0 for Docker/local-Docker and Kubernetes GPU worker hosts. The `--check-only` path works on any Linux distribution; `--install` automates debian-family (Ubuntu/Debian/Pop!_OS/Mint/Zorin/Raspbian), rhel-family (Fedora/RHEL/Rocky/AlmaLinux), and suse-family (openSUSE/SLES) hosts, and prints actionable manual-install steps for everything else. Use when the user asks to \"set up an NVIDIA GPU host\", \"check TAO Docker GPU runtime\", or prepare a Kubernetes GPU worker for TAO.",
+      "description": "Host setup for TAO GPU backends. Checks and, after user approval, installs minimum-compatible NVIDIA driver, CUDA Toolkit, and NVIDIA Container Toolkit versions for Docker/local-Docker and Kubernetes GPU worker hosts. TAO-wide defaults can be overridden by the selected model's runtime profile. The `--check-only` path works on any Linux distribution; `--install` automates debian-family (Ubuntu/Debian/Pop!_OS/Mint/Zorin/Raspbian), rhel-family (Fedora/RHEL/Rocky/AlmaLinux), and suse-family (openSUSE/SLES) hosts, and prints actionable manual-install steps for everything else. Use when the user asks to \"set up an NVIDIA GPU host\", \"check TAO Docker GPU runtime\", or prepare a Kubernetes GPU worker for TAO.",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "infrastructure",
@@ -3958,6 +4342,42 @@
         "catalog.subdomain": "vision-ai",
         "audience": "application_developer,ai_engineer,ml_engineer,solutions_architect,developer",
         "discovery.activity_tags": "summarize,inference,integrate,deploy,operate"
+      }
+    },
+    {
+      "path": "skills/warp-compile-time-optimizer",
+      "name": "warp-compile-time-optimizer",
+      "description": "Use when compile time or startup time is the problem in code that uses Warp: a request to improve, optimize, or cut compile times; an app that is slow to start or stalls at the first wp.launch; seconds of compiling before real work begins; JIT modules recompiling on every run or every CI job. Only applies when the code being optimized uses Warp kernels. Not for steady-state kernel runtime, memory, correctness, building Warp itself from source, or nvcc/C++ build times.",
+      "metadata": {
+        "product.primary": "Warp",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,application_developer,hpc_developer,simulation_engineer,robotics_developer",
+        "discovery.activity_tags": "optimize,profile,measure,debug,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/warp-debug-gradients",
+      "name": "warp-debug-gradients",
+      "description": "Use to diagnose and fix incorrect gradients in differentiable Warp programs. Anything trained, optimized, calibrated, or fit through Warp kernels depends on wp.Tape gradients, so treat any misbehavior of such a workflow as a gradient problem until proven otherwise — use this when training diverges or NaNs, won't train at all, stalls or plateaus above the expected loss, converges to a wrong or biased answer, is worse than a reference implementation, works at small scale but fails at production scale, or fails a QA/validation recheck. Also for explicit symptoms — exploding, NaN/inf, zero, or subtly wrong gradients, suspected wp.Tape/backward issues, gradcheck failures — but users usually describe only the surface symptom (\"the sim explodes\", \"the fit gets dragged toward outliers\") without mentioning gradients: make that leap. Not for forward-only Warp work, build/install problems, or autograd issues in other frameworks without Warp.",
+      "metadata": {
+        "product.primary": "Warp",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "simulation_engineer,developer,ml_engineer,ai_engineer,robotics_developer",
+        "discovery.activity_tags": "debug,troubleshoot,validate,test,measure"
+      }
+    },
+    {
+      "path": "skills/warp-eval",
+      "name": "warp-eval",
+      "description": "Evaluate whether an existing hot path is a credible NVIDIA Warp candidate. Use for irregular or spatial queries, particle or geometry simulation, branch-heavy loops, many small launches, host fallbacks, or large intermediates. CPU-only code and absent GPU dependencies are normal unless NVIDIA is prohibited. Exclude required cross-vendor or CPU-only deployment, vendor-lowered dense or NN layers, general Warp API questions, and already-selected Warp kernels. Contribution policy alone is not exclusion.\n",
+      "metadata": {
+        "product.primary": "Warp",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "simulation_engineer,application_developer,hpc_developer,developer,robotics_developer",
+        "discovery.activity_tags": "evaluate,benchmark,profile,optimize,assess"
       }
     }
   ]

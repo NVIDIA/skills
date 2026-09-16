@@ -1,14 +1,28 @@
 ---
 name: deepstream-import-vision-model
 description: >
-  Use this skill to bring any vision model from HuggingFace or NVIDIA NGC into
+  Use this skill to bring a supported object-detection vision model from HuggingFace or NVIDIA NGC into
   an NVIDIA DeepStream pipeline with end-to-end automation: ONNX download,
   SafeTensors export, TRT engine build, custom nvinfer bbox parser, multi-stream
   benchmark, and PDF report. Object detection models only.
 license: CC-BY-4.0 AND Apache-2.0
 metadata:
-  author: NVIDIA CORPORATION
-  version: 1.2.2
+  author: "Tushar Khinvasara <tkhinvasara@nvidia.com>"
+  owner: "Tushar Khinvasara <tkhinvasara@nvidia.com>"
+  service: "deepstream"
+  version: "1.5.2"
+  reviewed: "2026-08-04"
+  team: deepstream-sdk
+  tags:
+    - deepstream
+    - tensorrt
+    - object-detection
+    - import-vision-model
+  languages:
+    - bash
+    - python
+    - cpp
+  domain: computer-vision
 ---
 
 # DeepStream Import Vision Model
@@ -16,6 +30,37 @@ metadata:
 When this skill is active, **read the relevant reference document before starting each phase**. Do not rely on memory — reference documents contain exact script paths, bash variable conventions, log filename contracts, and critical parsing rules.
 
 **Current scope:** Object detection models only. Fail fast on classification, segmentation, or other architectures detected in `config.json`.
+
+## Model choice — always offer two options
+
+Before preflight, browsing, downloads, or file creation, present exactly these two choices. Do not
+start with only an open-ended model-source prompt. If the user's request already clearly selects a
+model, confirm the matching choice instead of asking redundantly.
+
+### 1. Default model (recommended)
+
+Use the validated Hugging Face RT-DETR model:
+
+```yaml
+model_id: PekingU/rtdetr_r50vd
+source: huggingface
+task: object-detection
+precision_preference: fp16
+```
+
+### 2. Custom object-detection model
+
+Ask for one supported source:
+
+- Hugging Face model ID (`organization/model`) or full model URL.
+- NVIDIA NGC catalog model URL including its version.
+
+Explain that the skill currently rejects classification, segmentation, and other non-detection
+architectures after inspecting `config.json`. Do not invent or silently substitute a model when the
+custom source is missing or unsupported.
+
+For a dry run, present the same two choices and simulate discovery, build, benchmark, and report
+stages without browsing, downloading, launching Docker, writing files, or starting processes.
 
 ## Pipeline Overview
 
@@ -28,39 +73,44 @@ When this skill is active, **read the relevant reference document before startin
 
 Run the full pipeline autonomously without pausing for confirmation at each step.
 
-## Pre-flight Checks
+## Runs entirely through Docker (no host packages)
 
-Run before starting:
+**Every step runs INSIDE the DeepStream container.** The host needs only **Docker + the NVIDIA
+driver** — no host python/venv/torch/trtexec/make/wkhtmltopdf. This works identically on Linux and
+**Windows** (Docker Desktop + WSL2 backend, required for `--gpus`). The per-shell bind-mount
+token is the only OS difference — `-v "$PWD":/work` (bash), `-v "${PWD}:/work"` (PowerShell),
+`-v "%cd%:/work"` (cmd); full guide in [references/windows.md](references/windows.md). All venv/ONNX/
+engine/parser/config/report artifacts live under the mounted working root and persist between the
+ephemeral `--rm` containers.
 
+## Pre-flight — bootstrap + verify (through the container)
+
+**1. One-time bootstrap** — builds `build/.venv_optimum` (torch/onnx/onnxruntime/report deps; the
+venv name is historical, optimum is no longer used) +
+installs `wkhtmltopdf`, all in-container. From the working root:
 ```bash
-# 1. GPU and drivers
-nvidia-smi
-
-# 2. TensorRT version match (must match between builder and DS runtime)
-trtexec 2>&1 | head -3
-dpkg -l | grep libnvinfer-bin
-
-# 3. Shared Python venv — create once, reuse across all models
-mkdir -p build
-VENV=build/.venv_optimum
-if [ ! -x "$VENV/bin/python3" ]; then
-  python3 -m venv "$VENV"
-  "$VENV/bin/pip" install --upgrade pip -q
-  "$VENV/bin/pip" install "optimum[exporters]>=1.20,<2.0" "torch<2.12" \
-    transformers onnxruntime matplotlib numpy markdown -q
-fi
-
-# 4. System tools
-which wkhtmltopdf || apt-get install -y wkhtmltopdf
-which mediainfo    || apt-get install -y mediainfo
-which deepstream-app  # required for KITTI dump (Step 6g) and benchmark perf-measurement (Step 7c); shipped with DeepStream SDK
-
-# 5. Sample video — only check default path when user has not provided a custom DS_VIDEO
-if [ -z "$DS_VIDEO" ]; then
-  [ -f /opt/nvidia/deepstream/deepstream/samples/streams/sample_720p.mp4 ] || \
-    echo "WARNING: sample_720p.mp4 not found. Install DeepStream samples or set DS_VIDEO=/path/to/your.mp4"
-fi
+docker run --rm -it --gpus all --shm-size=16g -v "$PWD":/work -w /work \
+  --entrypoint bash nvcr.io/nvidia/deepstream:9.1-triton-multiarch \
+  .claude/skills/deepstream-import-vision-model/setup.sh
 ```
+
+**2. Preflight** — GPU + venv + trtexec, run THROUGH the container (container-mode auto-detects):
+```bash
+docker run --rm --gpus all -v "$PWD":/work -w /work \
+  --entrypoint bash nvcr.io/nvidia/deepstream:9.1-triton-multiarch \
+  .claude/skills/deepstream-import-vision-model/scripts/preflight.sh   # proceed only on PASS
+```
+
+**Every subsequent phase runs the same way** — issue the model's commands via
+`docker run … --entrypoint bash … -lc '<commands>'` (or the
+`.claude/skills/deepstream-import-vision-model/scripts/dsrun.sh` wrapper:
+`bash .claude/skills/deepstream-import-vision-model/scripts/dsrun.sh '<in-container command>'`),
+using `PY=build/.venv_optimum/bin/python` and
+`trtexec` at `/usr/src/tensorrt/bin/trtexec` inside the container. `deepstream-app`,
+`gst-launch-1.0`, and `/opt/nvidia/deepstream/…` sample paths all exist **in** the image.
+TensorRT build+runtime share one image, so there is **no version skew** (the concern the old
+"build on the host" rule tried to avoid — see [references/engine-build.md](references/engine-build.md)).
+`sample_720p.mp4` ships in the image; set `DS_VIDEO` only to override.
 
 ## Mandatory Output Structure
 
@@ -92,14 +142,44 @@ mkdir -p models/$MODEL_NAME/{model,parser,config,scripts,benchmarks/engines,benc
 1. **Engine naming** — always `{model}_dynamic_b{MAX_BS}.engine`. Never bare `model_dynamic.engine`.
 2. **batch_size == num_streams** — in DS runs, `batch-size` and stream count are always equal.
 3. **Log filenames are fixed** — `trtexec_b1.log`, `trtexec_b${MAX_BS}.log`, `ds_s${N}_run1.log`, `ds_s${N}_run2.log`. No timestamps. Report generation reads exact paths.
-4. **Parser zero-init** — always `NvDsInferObjectDetectionInfo obj = {};`. Required for DeepStream OBB support; bare `obj;` leaves `rotation_angle` uninitialized, causing tilted bounding boxes.
+4. **Parser zero-init** — always `NvDsInferObjectDetectionInfo obj = {};`. Required for DS 9.1 OBB support; bare `obj;` leaves `rotation_angle` uninitialized, causing tilted bounding boxes.
 5. **KITTI validation gate** — do NOT proceed to Step 7 if KITTI frame count is zero or detection rate < 90%.
 6. **Shared venv** — `build/.venv_optimum` reused across all models. Never create per-model venvs.
 7. **trtexec `--noDataTransfers`** — GPU-only compute matches DeepStream's GPU-to-GPU data flow.
-8. **Report HTML+PDF** — always use `skills/deepstream-import-vision-model/scripts/report/md-to-html-pdf.py`. Never write a custom HTML generator or call `wkhtmltopdf` directly.
+8. **Report HTML+PDF** — always use `.claude/skills/deepstream-import-vision-model/scripts/report/md-to-html-pdf.py`. Never write a custom HTML generator or call `wkhtmltopdf` directly.
 9. **Object detection only** — reject non-detection architectures from `config.json` before building anything.
 10. **Encoder fallback (MANDATORY)** — `x264enc` and `openh264enc` are **prohibited**. On NVENC-unavailable systems, use `theoraenc + oggmux` (LGPL; ships in gst-plugins-base; output is `.ogv`). If `theoraenc`/`oggmux` are absent, skip video creation (`DS_SINGLE_STREAM_MODE=skipped`). Report which mode was used: `nvv4l2h264enc` / `theoraenc-fallback` / `skipped`.
 11. **Video source (MANDATORY)** — default is always `sample_720p.mp4` (1280×720). Never autonomously substitute `sample_1080p_h264.mp4` or any other file. Only use a different video when the user explicitly provides a path (via `DS_VIDEO` env var or script argument).
+
+## Examples
+
+**Default model, end to end.** Bootstrap once, then run the full pipeline:
+
+```bash
+docker run --rm -it --gpus all --shm-size=16g -v "$PWD":/work -w /work \
+  --entrypoint bash nvcr.io/nvidia/deepstream:9.1-triton-multiarch \
+  .claude/skills/deepstream-import-vision-model/setup.sh
+# then: "Use deepstream-import-vision-model to run PekingU/rtdetr_r50vd"
+```
+
+**SafeTensors model with no published ONNX.** Step 2b exports it first; the wrapper reports which
+backend produced the graph and fails loudly if the batch dimension was baked in:
+
+```bash
+bash .claude/skills/deepstream-import-vision-model/scripts/model/safetensors-to-onnx.sh \
+  models/$MODEL_NAME/hf_model models/$MODEL_NAME/onnx_export/
+#   [export] backend=dynamo
+#   [export] dynamo produced a static batch dimension; trying the next backend
+#   [export] backend=legacy-torchscript
+#   [export] pixel_values shape=['batch', 3, 640, 640]
+```
+
+**Pin a Hub revision** for a reproducible build — any exporter flag passes straight through:
+
+```bash
+bash .claude/skills/deepstream-import-vision-model/scripts/model/safetensors-to-onnx.sh \
+  PekingU/rtdetr_r50vd models/rtdetr/onnx_export --revision <commit-sha> --opset 18
+```
 
 ## Pipeline Timing
 
@@ -109,7 +189,7 @@ Wrap every step:
 STEP_START=$(date +%s.%N)
 # ... step commands ...
 STEP_END=$(date +%s.%N)
-STEP_DURATION=$(echo "$STEP_END - $STEP_START" | bc)
+STEP_DURATION=$(python3 -c "print(round($STEP_END - $STEP_START, 2))")   # bc is not in the container; python3 always is
 echo "[Step N] completed in ${STEP_DURATION}s"
 ```
 
@@ -136,7 +216,7 @@ Run charts and report scripts with the shared venv active: `source build/.venv_o
 
 ## Scripts
 
-Located in `scripts/`.
+Installed into `.claude/skills/deepstream-import-vision-model/scripts/` by `install.sh`.
 
 | Script | Phase | Purpose |
 |--------|-------|---------|
@@ -144,7 +224,8 @@ Located in `scripts/`.
 | `model/hf-download-config.sh` | 1–3 | Download config.json from HF |
 | `model/ngc-list-files.sh` | 1–3 | List NGC model files |
 | `model/ngc-download.sh` | 1–3 | Download NGC model archive |
-| `model/safetensors-to-onnx.sh` | 1–3 | Export SafeTensors → ONNX via optimum-cli |
+| `model/safetensors-to-onnx.sh` | 1–3 | Export SafeTensors → ONNX via `torch.onnx.export` (wrapper) |
+| `model/safetensors_to_onnx.py` | 1–3 | The exporter — dynamo backend, TorchScript fallback, verifies dynamic batch |
 | `model/inspect-onnx.py` | 1–5 | Inspect ONNX input/output shapes |
 | `model/make-static-batch-onnx.py` | 4–5 | Bake batch dim into ONNX |
 | `model/cleanup.sh` | Any | Remove staging dirs, preserve shared venv |
@@ -172,8 +253,7 @@ Located in `scripts/`.
 | Engine rebuilds every DS run | `model-engine-file` path wrong — check relative path from `config/` dir |
 | `setDimensions` negative dims | Add `infer-dims=3;H;W` to nvinfer config for dynamic ONNX models |
 | `--memPoolSize` workspace 0.03 MiB | Use `M` suffix not `MiB` — e.g. `--memPoolSize=workspace:32768M` |
-| ForeignNode build failure (DETR) | Use dynamo export path or run `onnxsim` — see references/engine-build.md |
+| ForeignNode build failure (DETR) | Run `onnxsim` — see references/engine-build.md. Not reproduced on TRT 10.16 with either export backend |
+| ONNX has a static batch dim | Both export backends specialized it — see the gotchas in references/model-acquire.md |
 | Zero detections | Wrong `net-scale-factor` — check model family table in references/pipeline-run.md |
 | `No module named 'pyservicemaker'` | Install into venv: `pip install /opt/nvidia/deepstream/.../pyservicemaker*.whl` |
-
-<!-- Signing refresh marker. -->

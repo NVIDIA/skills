@@ -1,0 +1,60 @@
+{
+  "skill_name": "foundationpose-pipeline",
+  "evals": [
+    {
+      "id": "pipeline-explicit-no-depth",
+      "prompt": "Use foundationpose-pipeline to write run-plan.md for one T-LESS scene. Assume the product checkout and environment are ready, the dataset is adapted, profile and dataset are both tless, scene_gt.json and GT cache exist, but there is no collected sensor depth. The verified engine is /models/depth.engine. Produce a command using a fresh output/run-smoke directory and explain what metrics remain available. Do not execute the pipeline or clone anything.",
+      "expected_output": "run-plan.md uses ./.venv/bin/python script/run_pipeline.py with --config tless --dataset tless --output-dir output/run-smoke --max-scenes 1 --foundation-stereo-model /models/depth.engine --depth-backend commercial --no-depth-metrics. Detection/pose scoring remains available; collected-depth comparisons are unavailable, not zero. No separate depth-generation process is added.",
+      "assertions": [
+        "Creates run-plan.md using the product entry point, dataset, engine, fresh output, and one-scene limit.",
+        "Includes --no-depth-metrics and explains that pose/detection GT scoring remains available.",
+        "Uses --depth-backend commercial as an assertion alongside the engine path, without a separate depth subprocess."
+      ],
+      "expected_skill": "foundationpose-pipeline",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "pipeline-implicit-rescore",
+      "prompt": "For a command-planning exercise, assume a completed FoundationPose perception run is in output/old-run with predictions.jsonl, mask sidecars, and depth outputs. Assume the environment and T-LESS GT cache are ready. Profile and dataset are tless; no collected sensor depth is available. These are hypothetical paths: do not search the sandbox for the run. Write rescore.md with the command to change the rerank cutoff to 4.5, preserve the old report, and write output/score-4p5. Do not execute models, clone, or install anything.",
+      "expected_output": "rescore.md invokes ./.venv/bin/python script/evaluate.py --config tless --dataset tless --run output/old-run --output-dir output/score-4p5 --rerank-cutoff 4.5 --no-depth-metrics. It uses completed inference artifacts and does not rerun SAM3, depth or FoundationPose. It distinguishes cache-backed scoring from possible GT rasterization on a cache miss.",
+      "assertions": [
+        "Creates rescore.md using script/evaluate.py with both --dataset and --config.",
+        "Preserves the old report using a distinct --output-dir and sets cutoff 4.5.",
+        "Skips unavailable depth metrics and avoids inference reruns."
+      ],
+      "expected_skill": "foundationpose-pipeline",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "pipeline-context-compare",
+      "prompt": "Compare the two supplied FoundationPose pose summaries at /workspace/input/baseline.json and /workspace/input/candidate.json. They used the same configured 5 mm threshold. Write comparison.md in the current directory with the measured changes and whether the candidate is clearly better. Use only these fixture files; no models, network, or repository clone is needed.",
+      "expected_output": "comparison.md reports matches 100 to 60 (-40%), within-threshold rate 0.80 to 0.90 (+10 percentage points), median 3 to 2 mm, p99 15 to 35 mm, rotation mean 5 to 12 deg, and ADD/ADD-S mean 4 to 6 mm. It does not declare unconditional improvement: the matched population shrank while tails/means worsened.",
+      "assertions": [
+        "Reads both supplied JSON files and creates comparison.md.",
+        "Compares matched_predictions before making an accuracy claim and identifies the coverage loss.",
+        "Reports the higher within-threshold rate and better median alongside worse p99 and means.",
+        "Does not invent per-object results absent from the input."
+      ],
+      "expected_skill": "foundationpose-pipeline",
+      "expected_script": null,
+      "files": [
+        "files/baseline.json",
+        "files/candidate.json"
+      ]
+    },
+    {
+      "id": "pipeline-negative-installation",
+      "prompt": "I am only diagnosing an installation issue in the FoundationPose perception pipeline: libfoundation_pose_nvidia.so cannot load because GLIBC_2.38 is missing on Ubuntu 22.04 with glibc 2.35. In one paragraph explain whether rerunning my BOP dataset will fix it. Do not run, evaluate, or adapt any dataset.",
+      "expected_output": "Explains that rerunning a dataset cannot fix an unsupported host runtime, and setup must address the OS/library compatibility first. Does not invoke foundationpose-pipeline or launch dataset work.",
+      "assertions": [
+        "Does not read or invoke foundationpose-pipeline.",
+        "Explains the runtime incompatibility without launching dataset adaptation or inference."
+      ],
+      "expected_skill": null,
+      "expected_script": null,
+      "files": []
+    }
+  ]
+}

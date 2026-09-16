@@ -1,0 +1,4 @@
+{
+  "skip_checks": ["schema"],
+  "reason": "RTVI VSS scaffold skill includes repo-local scripts, references, agent metadata, and evals required by the team skill catalog. Security, PII, code-integrity, unicode, and lint checks remain active."
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "tested_integration": {
+    "branch": "byungsook/qa-rerun-20260803",
+    "commit": "6b659812db791354da24de4583cd8cc9339443b7",
+    "validated_at": "2026-08-04"
+  },
+  "git_upstreams": {
+    "content_agents": {
+      "checkout": "content-agents",
+      "commit": "36dbf3f274f8e256637230a05a085853f65cc175",
+      "env": "CONTENT_AGENTS_UPSTREAM_ROOT",
+      "ref": "v0.5.2",
+      "url": "https://github.com/nvidia-omniverse/content-agents"
+    },
+    "simready_foundation": {
+      "checkout": "simready-foundation",
+      "commit": "a1e9dd68ee2d107f74dc6cd6da875b54ad3f8fd3",
+      "env": "SIMREADY_FOUNDATION_ROOT",
+      "ref": "v2026.04.1",
+      "url": "https://github.com/NVIDIA/simready-foundation"
+    },
+    "usd_convert_cad": {
+      "checkout": "usd-convert-cad",
+      "commit": "208fe2c1cd71ae2bb7bd825daf712617000ae028",
+      "env": "USD_CONVERT_CAD_ROOT",
+      "ref": "v0.2.0",
+      "url": "https://github.com/NVIDIA-Omniverse/usd-convert-cad"
+    },
+    "usd_convert_gsplat": {
+      "checkout": "usd-convert-gsplat",
+      "commit": "621017ebf78394488260c70ec4eadd70ff621131",
+      "env": "USD_CONVERT_GSPLAT_ROOT",
+      "ref": "v0.1.15",
+      "url": "https://github.com/NVIDIA-Omniverse/usd-convert-gsplat"
+    }
+  },
+  "python_packages": {
+    "jinja2": "3.1.6",
+    "markdown-it-py": "4.2.0",
+    "markupsafe": "3.0.3",
+    "mdurl": "0.1.2",
+    "numpy": "1.26.4",
+    "omniverse-asset-validator": "1.18.0",
+    "omniverse-usd-profiles": "1.10.22",
+    "simready-validate": "2026.4.8",
+    "usd-convert-cad": "0.2.0",
+    "usd-exchange": "2.3.0"
+  },
+  "python_sources": {
+    "gsplat2usd": {
+      "commit": "c965f84bcbdc9667bb9631c6c922d12b4fea20ce",
+      "subdirectory": "source/python",
+      "url": "https://github.com/NVIDIA-Omniverse/gsplat-converter.git",
+      "version": "0.1.5"
+    }
+  },
+  "runtime_sets": {
+    "simready_validate": {
+      "no_deps": [
+        "simready-validate"
+      ],
+      "packages": [
+        "usd-exchange",
+        "omniverse-asset-validator",
+        "omniverse-usd-profiles",
+        "numpy",
+        "jinja2",
+        "markdown-it-py",
+        "markupsafe",
+        "mdurl"
+      ]
+    },
+    "usd_convert_cad": {
+      "no_deps": [],
+      "packages": [
+        "usd-convert-cad"
+      ]
+    }
+  }
+}

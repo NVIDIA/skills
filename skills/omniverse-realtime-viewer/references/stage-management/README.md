@@ -4,7 +4,7 @@
 
 Use this skill for switch scenes, load another file, change USD, asset browser, scene dropdown, persist across scenes, or reload stage.
 
-Use this skill when the Omniverse Realtime Viewer needs multiple USD files, stage reload, reset, additive composition, or state that survives scene changes.
+Use this skill when the Omniverse Realtime Viewer needs multiple USD files, stage reload, reset, additive composition, or state that survives scene changes. New ovrtx viewers manage those changes as OVStage population/data-plane generations and render committed ordinals.
 
 ## Asset Discovery
 
@@ -12,7 +12,7 @@ Populate scene selectors from one of these sources:
 
 - Local samples directory: scan for `.usd`, `.usda`, and `.usdc`; display basename, store absolute path.
 - Cloud/cache source: resolve through `cloud-assets`, then list cached local files.
-- User-provided path: validate with `Usd.Stage.Open()` for metadata queries before handing it to ovrtx.
+- User-provided path: validate with `Usd.Stage.Open()` for metadata queries before handing it to OVStage population.
 
 Keep UI labels separate from load paths. Relative USD asset references require the stage file to remain in its original directory or in a cache preserving directory structure.
 
@@ -31,16 +31,30 @@ Skipping redundant reloads prevents unnecessary render interruption, CUDA contex
 
 ## Stage Composition Policy
 
-In ovrtx 0.3, stage replacement and additive composition are separate operations:
+In ovrtx attached mode, stage replacement and additive composition are
+OVStage population operations:
 
-- Use `renderer.open_usd(path)` to replace the active root layer with a file/URL-backed stage.
-- Use `renderer.open_usd_from_string(usda)` to replace the active root layer with generated viewer/session USDA, commonly an inline root that sublayers the user scene.
-- Use `renderer.add_usd_reference(path, prefix_path="/SomePrim")` or `renderer.add_usd_reference_from_string(usda, prefix_path="/SomePrim")` only for additive content under a unique prim path. Keep the returned handle and call `renderer.remove_usd(handle)` to remove it.
-- Use `renderer.reset_stage()` only to intentionally clear the renderer to an empty stage. It is not part of normal scene switching because `open_usd*` replaces the current root layer.
+- Use `ovstage.population.open_usd(stage, path, ordinal=N, domains=PopulationDomain.RENDERING)` to replace the active root source with a file/URL-backed composed stage.
+- Use `ovstage.population.open_usd_from_string(stage, usda, ordinal=N, domains=PopulationDomain.RENDERING)` for generated viewer/session USDA, commonly an inline root that sublayers the user scene.
+- Use `ovstage.population.add_usd_reference*()` only for additive content under a unique target path. Keep the returned handle, call `ovstage.population.apply_usd_changes(stage, ordinal=N)`, wait, and advance the write floor.
+- Use `ovstage.population.remove_usd(stage, handle)` to remove additive content, then `apply_usd_changes(stage, ordinal=N)`, wait, and advance the write floor.
+- Use `ovstage.population.reset_usd(stage)` only for an explicit "clear scene" or shutdown flow; follow with `apply_usd_changes(stage, ordinal=N)` and publish the generation.
+
+Direct `renderer.open_usd*`, `add_usd_reference*`, `remove_usd()`, and
+`reset_stage()` are standalone compatibility APIs. Keep them off the production
+path when an OVStage is attached.
+
+Attach the renderer after the first successful population publication. Keep the
+attachment across scene switches that reuse the same `ovstage.Stage`; detach and
+reattach only when replacing or destroying the Stage instance.
 
 ## Hot-Swap Sequence
 
-Run stage switching on the UI/render thread unless you have a dedicated loading worker. Do not call `renderer.step()` while `open_usd*`, `add_usd_reference*`, `remove_usd()`, or `reset_stage()` is active.
+Run stage switching through the one runtime owner unless you have a dedicated
+loading worker. Do not call `renderer.step()` while OVStage population,
+`apply_usd_changes`, write-floor advancement, renderer `attach_ovstage`,
+`detach_ovstage`, `update_from_stage`, or standalone renderer stage mutation is
+active.
 
 ```python
 def switch_scene(path: str):
@@ -49,58 +63,92 @@ def switch_scene(path: str):
     tree.reset()
     animator = None
 
-    stage = Usd.Stage.Open(path)              # hierarchy, bbox, material map
+    usd_stage = Usd.Stage.Open(path)          # hierarchy, bbox, material map
     camera_state = camera.snapshot()          # preserve if requested
     settings_state = settings.to_dict()
+    ordinal = runtime.next_ordinal()
 
-    # Replace-root load. path_or_composite(path) may be the user USD or
-    # a generated wrapper USDA that sublayers the user USD and authors viewer prims.
-    renderer.open_usd(path_or_composite(path))
+    # Replace-root population. path_or_composite(path) may be the user USD or a
+    # generated wrapper USDA that sublayers the user USD and authors viewer prims.
+    population.open_usd(runtime.stage, path_or_composite(path), ordinal=ordinal)
+    runtime.stage.advance_write_floor(ordinal).wait()
+    renderer.update_from_stage(ordinal)       # optional if the next step uses ordinal
 
-    reset_effect_layer_faders(renderer, stage)
-    material_map = build_prim_material_map(stage)
-    picker.rebuild(stage)
-    animator = build_animator(renderer, stage, pickable_paths)
-    tree.attach_stage(stage)
+    effect_ordinal = runtime.next_ordinal()
+    reset_effect_layer_faders(runtime.stage, usd_stage, ordinal=effect_ordinal)
+    runtime.stage.advance_write_floor(effect_ordinal).wait()
 
-    settings.apply(settings_state, renderer, stage)
-    camera.restore_or_fit(camera_state, stage)
+    material_map = build_prim_material_map(usd_stage)
+    picker.rebuild(usd_stage)
+    animator = build_animator(runtime.stage, usd_stage, pickable_paths)
+    tree.attach_ovstage(usd_stage)
+
+    settings.apply(settings_state, runtime.stage, usd_stage)
+    camera.restore_or_fit(camera_state, usd_stage)
 ```
 
 For generated viewer/session USDA that should not be written to disk:
 
 ```python
-renderer.open_usd_from_string(make_viewer_root_usda(path, width, height))
+ordinal = runtime.next_ordinal()
+population.open_usd_from_string(
+    runtime.stage,
+    make_viewer_root_usda(path, width, height),
+    ordinal=ordinal,
+)
+runtime.stage.advance_write_floor(ordinal).wait()
 ```
 
 For additive scene content:
 
 ```python
-handle = renderer.add_usd_reference(asset_path, prefix_path="/Runtime/Assets/Asset_001")
+handle = population.add_usd_reference(
+    runtime.stage,
+    asset_path,
+    "/Runtime/Assets/Asset_001",
+)
+ordinal = runtime.next_ordinal()
+population.apply_usd_changes(runtime.stage, ordinal=ordinal)
+runtime.stage.advance_write_floor(ordinal).wait()
 # Later:
-renderer.remove_usd(handle)
+population.remove_usd(runtime.stage, handle)
+ordinal = runtime.next_ordinal()
+population.apply_usd_changes(runtime.stage, ordinal=ordinal)
+runtime.stage.advance_write_floor(ordinal).wait()
 ```
 
 ## Async Operations
 
-Python `open_usd()` / `open_usd_from_string()` are blocking convenience calls. Use the `_async` variants for non-blocking loads and poll the returned `Operation` from the render/runtime owner:
+Python OVStage population `open_usd()` / `open_usd_from_string()` are blocking
+convenience calls. Use the `_async` variants for non-blocking loads and poll or
+wait for the returned `Operation` from the render/runtime owner:
 
 ```python
-op = renderer.open_usd_async(path_or_composite(path))
+ordinal = runtime.next_ordinal()
+op = population.open_usd_async(runtime.stage, path_or_composite(path), ordinal=ordinal)
 while True:
-    status = op.query_status()
-    if status.done:
+    code, error_op_ids, _ = runtime.stage.wait_op(op.op_id, timeout=0)
+    if code == ovstage.ErrorCode.TIMEOUT:
+        stream_last_good_frame()
+        continue
+    if code == ovstage.ErrorCode.OK and not error_op_ids:
         break
-    if status.failed:
-        raise RuntimeError(status.error)
-    stream_last_good_frame()
+    raise RuntimeError(op.error_message())
 
 op.wait()
+runtime.stage.advance_write_floor(ordinal).wait()
 ```
 
-Apply the same pattern to async reset and reference operations. For two-phase query operations such as `query_prims_async(...)`, wait for the `Operation` first, then call `.fetch()` on the returned pending fetch/result object before reading dictionaries.
+Apply the same pattern to async reset/reference population operations and
+OVStage data-plane query/read/map operations. Wait with the API that enqueued
+the work, then fetch/release the OVStage result handle before reading
+dictionaries.
 
-Do not treat an async enqueue or a C return value as proof that the stage is loaded. Poll/query or wait for completion before rebuilding pick maps, hierarchy, material maps, animation bindings, or before reporting `openStageResult: success`.
+Do not treat an async enqueue or a C return value as proof that the stage is
+loaded. Poll/query or wait for completion, advance the write floor, and update
+or step the attached renderer with the committed ordinal before rebuilding pick
+maps, hierarchy, material maps, animation bindings, or before reporting
+`openStageResult: success`.
 
 ## Dynamic Root Prim
 
@@ -126,7 +174,7 @@ Camera state should be sanitized after restore. If a target or distance is non-f
 
 ## Preserve Settings
 
-Validated render settings and non-live profile defaults belong to app state, not the USD asset unless the user asks to author the file. Save settings JSON and re-apply only settings with a verified apply path after every replace-root `open_usd*` load and after additive composition changes that affect render settings.
+Validated render settings and non-live profile defaults belong to app state, not the USD asset unless the user asks to author the file. Save settings JSON and re-apply only settings with a verified OVStage/session apply path after every replace-root population load and after additive composition changes that affect render settings.
 
 ```python
 settings = RenderSettings.load("viewer_settings.json")
@@ -138,31 +186,47 @@ Use `render-settings` for the schema and lighting controls.
 
 ## Reset, Reload, And Remove
 
-`resetStageRequest` should reload the current scene from its source with `open_usd()` or `open_usd_from_string()` and a scene-manager `force=True` flag, then rebuild all derived state: hierarchy, pick buffers, material map, selection feedback, animator base transforms, and info panel state. It does not need a response in the existing protocol, but local UI should visually clear selection immediately.
+`resetStageRequest` should reload the current scene from its source with
+OVStage `population.open_usd()` or `open_usd_from_string()` and a scene-manager
+`force=True` flag, publish the new ordinal, then rebuild all derived state:
+hierarchy, pick buffers, material map, selection feedback, animator base
+transforms, and info panel state. It does not need a response in the existing
+protocol, but local UI should visually clear selection immediately.
 
-Use `renderer.reset_stage()` only for an explicit "clear scene" or shutdown/cleanup flow where the renderer should have no root layer. A reload of the current scene is not a clear; it is another replace-root load.
+Use OVStage `population.reset_usd()` only for an explicit "clear scene" source
+state. Use `renderer.detach_ovstage()` or standalone `renderer.reset_stage()`
+only for teardown/compatibility flows where the renderer should stop rendering
+the attached stage. A reload of the current scene is not a clear; it is another
+replace-root population load.
 
-For additive references, remove only the handle returned by `add_usd_reference*`. Do not call `reset_stage()` to remove one additive asset unless the intended result is to discard the entire root stage and every reference.
+For additive references, remove only the handle returned by
+`population.add_usd_reference*`, call `apply_usd_changes(stage, ordinal=N)`,
+and publish that ordinal. Do not reset the entire stage to remove one additive
+asset unless the intended result is to discard the entire root source and every
+reference.
 
 ## Stage Switch Side Effects
 
 After each new stage load:
 
-- Write all EffectLayer shader `inputs:Fader` values to `0`.
+- Write all EffectLayer shader `inputs:Fader` values to `0` through the
+  generated session/composite layer or OVStage runtime data plane.
 - Render at least two frames before trusting any display/debug segmentation AOV.
 - Recompute pickable bbox data and descendant mesh expansion maps.
-- Rebuild the stage tree/sidebar under `/World` or the pseudo-root.
+- Rebuild the stage tree/sidebar under the detected `root_prim_path`.
 - Refit or restore camera before the next visible frame.
-- Recreate `PrimAnimator`; do not reuse old bound attributes across replace-root loads or renderer stage resets.
+- Recreate transform/animation runtime state; do not reuse old OVStage queries,
+  maps, direct renderer bindings, or path IDs across replace-root loads or
+  renderer stage resets.
 
 ## Failure Modes
 
 - Scene appears textureless after switching: composite/cache path broke relative asset resolution.
-- Highlight starts glowing before selection: EffectLayer Faders were not reset after reload.
+- Highlight starts glowing before selection: EffectLayer Faders were not reset in the session/composite layer or OVStage runtime state after reload.
 - Picks return old prims: cached pick/path IDs survived a scene reload; clear ID maps and resolve new IDs through the current renderer path dictionary.
 - Camera inside geometry: preserved distance/target does not fit the new scene; use bbox fit.
-- Crash or hang on switch: `renderer.step()` ran concurrently with stage mutation.
-- Success reported too early: async `Operation` was enqueued but not completed; poll `query_status()` or wait before rebuilding derived state.
+- Crash or hang on switch: `renderer.step()` ran concurrently with OVStage population/write-floor work or standalone renderer stage mutation.
+- Success reported too early: async `Operation` was enqueued but not completed; poll or wait, advance the write floor, and step/update the renderer before rebuilding derived state.
 - Wrong stage after reconnect: frontend requested its dropdown default instead of accepting the server's current stage from initial state.
 - Long reload of the same scene: missing normalized-path check before starting a reload.
 - Empty or wrong hierarchy for valid assets: code assumed `/World` even though the loaded stage used another root prim.
@@ -172,12 +236,16 @@ See also: `stage-loading`, `camera-controls`, `render-settings`, `object-selecti
 ## Adding This To An Existing Omniverse Realtime Viewer
 
 - Add `server/scene_manager.py` or equivalent ownership around scene discovery, load, reset, and reload.
-- Keep server state for current URL, loading state, hierarchy root, selection, camera policy, and settings snapshot.
+- Keep server state for current URL, loading state, hierarchy root, selection,
+  camera policy, settings snapshot, active stage generation, and last committed
+  OVStage ordinal.
 - Add messages for `openStageRequest`, `openStageResult`, `resetStageRequest`, `loadingStateQuery`, and `loadingStateResponse`.
-- Route all stage mutations through the render/runtime thread that owns ovrtx.
+- Route all OVStage population, data-plane writes, write-floor advances, renderer
+  updates, and renderer steps through the runtime thread.
 - Modify `scene_loader.py` to rebuild viewer camera, RenderProduct, RenderVars, and optional wrapper files or inline root USDA per scene.
 - Reapply validated render settings and camera policy after each load before the first visible frame.
-- Clear selection, pick maps, info panels, hierarchy caches, highlight faders, and animation bindings on switch.
+- Clear selection, pick maps, info panels, hierarchy caches, highlight faders,
+  OVStage queries/maps, direct renderer bindings, and animation state on switch.
 - Frontend wires a scene picker or asset browser to `openStageRequest` and displays load/error state from responses.
 - Persist cross-scene settings in an app JSON file, not in user USD assets.
 - Push current scene, loading state, settings, selection, and root hierarchy to newly connected clients.

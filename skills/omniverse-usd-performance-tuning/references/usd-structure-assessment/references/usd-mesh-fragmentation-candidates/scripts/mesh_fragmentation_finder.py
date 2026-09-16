@@ -141,13 +141,16 @@ def _identity_signal(s: dict) -> str:
 
 
 def suggest_merges(parent_summaries, *, small_mesh_paths=None, instanced_paths=None,
-                   knobs=None) -> dict:
+                   knobs=None, root="/") -> dict:
     """Pure function: parent summaries -> {suggestions, routed_small_geometry,
     diagnostics}. No stage access, no geometry — unit-testable without Kit.
 
     ``parent_summaries`` — one dict per candidate parent with cheap reads:
         path, parent_kind, parent_name/parent_named, child_count,
         child_mesh_count, anonymous_child_fraction, distinct_materials.
+    ``root`` — the scan root the summaries came from, reported for the audit.
+        ``scan_stage`` walks the composed stage from the pseudo-root, so this
+        is ``"/"`` on the shipped path.
     ``small_mesh_paths`` — ancestor-or-exact paths flagged ``perf_small_mesh`` by
         the validator (the tininess signal / entry point).
     ``instanced_paths`` — paths the instance-candidate finder already claims as
@@ -223,8 +226,14 @@ def suggest_merges(parent_summaries, *, small_mesh_paths=None, instanced_paths=N
             ),
         },
         "diagnostics": {
+            "root": root,
             "parents_examined": len(parent_summaries),
             "fans_surfaced": len(suggestions),
+            # The tininess entry signal: how many perf_small_mesh paths the
+            # validator handed in. 0 means the suggester ran on structure
+            # alone, which the report has to say — the routing between merge
+            # and removeSmallGeometry depends on this input existing.
+            "perf_small_mesh_inputs": len(small),
         },
     }
 
@@ -283,8 +292,13 @@ def scan_stage(stage, knobs=None) -> list:
 
 
 def render_report(result: dict) -> str:
-    L = ["Mesh-fragmentation suggester — %d parent(s) examined, %d fan(s) surfaced."
-         % (result["diagnostics"]["parents_examined"], result["diagnostics"]["fans_surfaced"])]
+    diag = result["diagnostics"]
+    L = ["Mesh-fragmentation suggester — root=%s, %d parent(s) examined, %d fan(s) surfaced."
+         % (diag.get("root", "/"), diag["parents_examined"], diag["fans_surfaced"])]
+    entered = diag.get("perf_small_mesh_inputs", 0)
+    L.append("perf_small_mesh entry signal: %s."
+             % ("%d path(s) from the validator" % entered if entered
+                else "none supplied — surfaced from structure alone"))
     for s in result["suggestions"]:
         L.append("  - %s  [fan=%d, materials=%d, ratio=%.1f%s%s]"
                  % (s["merge_boundary"], s["fan_size"], s["distinct_materials"],
@@ -296,6 +310,13 @@ def render_report(result: dict) -> str:
     if rsg["remove_small_geometry_candidates"]:
         L.append("  removeSmallGeometry (delete) candidates: %d"
                  % len(rsg["remove_small_geometry_candidates"]))
+    L.append("")
+    L.append("Caveats:")
+    L.append("  - Advisory only; this tool does not modify the stage.")
+    L.append("  - Merge is identity-destroying and intent/archetype-gated: nothing here")
+    L.append("    runs until the user (or the archetype default) confirms it.")
+    L.append("  - No vertex-coincidence test is performed; the weld is realized by the op,")
+    L.append("    not measured here to decide.")
     return "\n".join(L)
 
 
@@ -314,7 +335,8 @@ def _main(argv) -> int:
         return 2
     from pxr import Usd
     stage = Usd.Stage.Open(stage_path)
-    result = suggest_merges(scan_stage(stage), small_mesh_paths=small_paths)
+    result = suggest_merges(scan_stage(stage), small_mesh_paths=small_paths,
+                            root=str(stage.GetPseudoRoot().GetPath()))
     print(json.dumps(result, indent=2) if emit else render_report(result))
     return 0
 

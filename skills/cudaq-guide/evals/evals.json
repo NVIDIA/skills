@@ -71,6 +71,53 @@
     ]
   },
   {
+    "id": "cudaq-guide-author-api-001",
+    "question": "I'm writing a @cudaq.kernel and just need aggregate measurement counts, not per-shot data. Which execution API should I use and how should the kernel end?",
+    "expected_skill": "cudaq-guide",
+    "expected_script": null,
+    "ground_truth": "The agent recommends `cudaq.sample`, ends the kernel with `mz(qubits)` and no return type, and notes that `cudaq.run` (which requires a return type) is orders of magnitude (~1000x) slower and should only be used when per-shot data must be captured into Python.",
+    "expected_behavior": [
+      "The agent read skills/cudaq-guide/SKILL.md before answering",
+      "The agent recommended `cudaq.sample` and ending the kernel with `mz(qubits)` with no return type",
+      "The agent noted that `cudaq.run` is much slower and only needed when per-shot data is required"
+    ]
+  },
+  {
+    "id": "cudaq-guide-author-adjoint-001",
+    "question": "My QPE kernel fails at sample time with 'RuntimeError: Could not successfully apply argument synth'. I'm wrapping a kernel in cudaq.control and that kernel calls cudaq.adjoint internally. How do I fix it?",
+    "expected_skill": "cudaq-guide",
+    "expected_script": null,
+    "ground_truth": "The agent identifies that `cudaq.control(K, ...)` does not compose with `cudaq.adjoint(...)` inside K, and advises hand-rolling the inverse: write a separate inverse kernel that walks the gates in reverse (self-inverse gates unchanged, parameterized rotations negate their angle) and call it directly instead of using `cudaq.adjoint`.",
+    "expected_behavior": [
+      "The agent read skills/cudaq-guide/SKILL.md before answering",
+      "The agent identified that cudaq.control does not compose with cudaq.adjoint inside the controlled kernel",
+      "The agent recommended hand-rolling an explicit inverse kernel (reverse gate order, negate rotation angles) instead of cudaq.adjoint"
+    ]
+  },
+  {
+    "id": "cudaq-guide-author-constraint-001",
+    "question": "Inside my @cudaq.kernel I get a CompilerError when I call int(x) to cast a value. Why, and what should I do instead?",
+    "expected_skill": "cudaq-guide",
+    "expected_script": null,
+    "ground_truth": "The agent explains that explicit casts like `int(x)`/`float(x)`/`bool(x)` are not supported inside a kernel because it compiles to Quake MLIR rather than regular Python, and advises using implicit int/float promotion instead (e.g. multiplying by a float literal like `1.0 * x`).",
+    "expected_behavior": [
+      "The agent read skills/cudaq-guide/SKILL.md before answering",
+      "The agent explained that explicit casts are unsupported inside a @cudaq.kernel (restricted Python subset compiled to Quake MLIR)",
+      "The agent suggested implicit promotion instead of an explicit cast"
+    ]
+  },
+  {
+    "id": "cudaq-guide-route-qiskit-001",
+    "question": "I have an existing Qiskit circuit and I want to port it to CUDA-Q. Can you help me translate the gates and handle the bit-ordering differences?",
+    "expected_skill": "cudaq-importing",
+    "expected_script": null,
+    "ground_truth": "The agent recognizes this as a Qiskit-to-CUDA-Q porting task and routes to the cudaq-importing skill (gate-translation table, bit-ordering vs Qiskit, framework-decoupling patterns) rather than answering solely from the cudaq-guide skill.",
+    "expected_behavior": [
+      "The agent routed the request to the cudaq-importing skill rather than handling it only via cudaq-guide",
+      "The agent addressed gate translation and bit-ordering differences between Qiskit and CUDA-Q"
+    ]
+  },
+  {
     "id": "cudaq-guide-neg-001",
     "question": "Write a short poem about the changing seasons.",
     "expected_skill": null,

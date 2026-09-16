@@ -13,6 +13,8 @@ import sys
 import tempfile
 from typing import Any
 
+from preflight_manifest import preflight_required, preflight_status_check
+
 
 USD_LAYER_SUFFIXES = frozenset({".usd", ".usda", ".usdc", ".usdz"})
 
@@ -51,6 +53,33 @@ def tail_text(text: str, limit: int = 4000) -> str:
     if len(text) <= limit:
         return text
     return "..." + text[-limit:]
+
+
+def inspect_png(path: Path) -> dict[str, Any]:
+    try:
+        from PIL import Image, ImageStat
+    except Exception as exc:
+        return {"available": False, "warning": f"Pillow is unavailable: {exc}"}
+
+    try:
+        image = Image.open(path).convert("RGB")
+    except Exception as exc:
+        return {"available": False, "warning": f"Could not inspect PNG pixels: {exc}"}
+    small = image.resize((min(64, image.width), min(64, image.height)))
+    pixels = small.get_flattened_data() if hasattr(small, "get_flattened_data") else small.getdata()
+    unique = len(set(pixels))
+    extrema = image.getextrema()
+    uniform = unique <= 1 or all(low == high for low, high in extrema)
+    all_black = all(high == 0 for _, high in extrema)
+    return {
+        "available": True,
+        "size": [image.width, image.height],
+        "extrema": [[int(low), int(high)] for low, high in extrema],
+        "unique_colors_after_resize": unique,
+        "channel_mean": [float(v) for v in ImageStat.Stat(image).mean],
+        "uniform": bool(uniform),
+        "all_black": bool(all_black),
+    }
 
 
 def check_result(
@@ -236,6 +265,22 @@ def run_asset_validator_category(
 ) -> dict[str, Any]:
     asset_path = asset_path.resolve()
     command = [validator_tool, "--category", category]
+    if preflight_required():
+        preflight_check = preflight_status_check(validator_skill, "asset_validator")
+        if not preflight_check["passed"]:
+            return asset_validation_report(
+                asset_path=asset_path,
+                validator_skill=validator_skill,
+                validator_tool=validator_tool,
+                category=category,
+                command=command,
+                issues=[],
+                warnings=[],
+                errors=[preflight_check["message"]],
+                status="BLOCKED",
+                next_step=next_step,
+                severities=severities,
+            )
     command_base, fallback_warnings = _resolve_validator_command(validator_tool, module_tool)
     if command_base is None:
         return asset_validation_report(

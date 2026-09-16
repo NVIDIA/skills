@@ -18,6 +18,8 @@ tags:
 
 # TAO Execution SDK
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 The SDK is the **optional** Python layer for users who need job handles, S3 I/O wrapping, or platform-specific features (SLURM/Lustre queues, Kubernetes Jobs, local Docker debugging, Brev instance reuse). Most TAO skills run with just `docker run` and don't need it. Reach for the SDK when:
 
 - You want a `Job` handle to poll status and stream logs over time.

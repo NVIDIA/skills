@@ -1,10 +1,11 @@
 title: moe_comm_overlap
-validated_on: "2026-03-15"
+validated_on: "2026-07-25"
 summary: >
   Megatron-Bridge supports MoE expert-parallel communication overlap through
   overlap_moe_expert_parallel_comm, with optional delayed expert wgrad
-  scheduling, but the path depends on dispatcher choice, expert parallelism,
-  precision, and runtime support.
+  scheduling. A controlled Qwen3 30B-A3B HybridEP run on 16 H100 GPUs measured
+  a 15.059% step-time reduction and 17.729% throughput increase from plain EP
+  overlap with delayed wgrad disabled.
 validation_status:
   moe_overlap_validation:
     - code_verified
@@ -13,7 +14,11 @@ validation_status:
   deepep_hybridep_helper_behavior:
     - code_verified
   end_to_end_recipe_smoke:
-    - unclear
+    - measured
+  qwen3_30b_hybridep_h100:
+    - measured
+  matched_nsys_ab:
+    - measured
 feature_meaning:
   moe_overlap: >
     Overlap of expert-parallel token dispatch communication with expert compute.
@@ -23,7 +28,33 @@ feature_meaning:
     Dispatcher mode used for DeepEP or HybridEP style backends.
 recommended_path:
   comm_overlap.overlap_moe_expert_parallel_comm: true_for_moe_tuning
+  comm_overlap.delay_wgrad_compute: false_for_first_isolation
   model.moe_shared_expert_overlap: false_when_overlap_is_enabled
+measured_result:
+  model: Qwen3 30B-A3B
+  hardware: "16×H100"
+  precision: BF16
+  shape: "seq4096 TP1 PP1 CP1 EP16 MBS1 GBS1024"
+  dispatcher: HybridEP
+  routing: force_balance
+  cuda_graph_scopes: "moe_router, moe_preprocess"
+  baseline_step_time_ms: 24713.800
+  baseline_model_tflops_per_gpu: 244.039
+  overlap_step_time_ms: 20992.030
+  overlap_model_tflops_per_gpu: 287.305
+  step_time_reduction_percent: 15.059
+  throughput_gain_percent: 17.729
+  rank0_peak_allocated_gib: 62.166
+  skipped_iterations: 0
+  nan_iterations: 0
+profile_result:
+  captured_kernels_per_case: 463348
+  comm_compute_overlap_off_ms: 9.079
+  comm_compute_overlap_on_ms: 3958.997
+  comm_hidden_off_percent: 0.11
+  comm_hidden_on_percent: 36.55
+  gpu_active_union_off_ms: 22820.667
+  gpu_active_union_on_ms: 21221.363
 known_constraints:
   - expert_model_parallel_size must be greater than 1.
   - num_moe_experts must be greater than 1.
@@ -33,9 +64,12 @@ known_constraints:
 known_limitations:
   - Setting moe_flex_dispatcher_backend alone does not activate flex dispatch.
   - Public recipes are often conservative and leave MoE overlap disabled by default.
-  - Repo evidence is stronger for validation logic than for end-to-end throughput gains.
+  - The measured gain is workload-specific and should not be generalized across model, dispatcher, topology, or batch changes.
+  - Summed per-stream kernel time is not a wall-time metric when kernels overlap.
 evidence:
   - docs/training/communication-overlap.md
+  - examples/model_verification_cards/qwen3-30b-a3b/card.yaml
+  - src/megatron/bridge/perf_recipes/qwen/h100/qwen3_moe.py
   - docs/parallelisms.md
   - src/megatron/bridge/training/comm_overlap.py
   - src/megatron/bridge/training/flex_dispatcher_backend.py
@@ -44,4 +78,4 @@ evidence:
   - tests/unit_tests/training/test_deepep.py
 follow_up_validation:
   - Add a positive Bridge functional smoke for overlap_moe_expert_parallel_comm.
-  - Add benchmark-backed guidance for at least one representative MoE family.
+  - Repeat the matched profile method on another model family and topology.

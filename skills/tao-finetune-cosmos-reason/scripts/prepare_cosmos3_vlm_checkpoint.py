@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0
 """Prepare Cosmos3-Nano weights for Cosmos-RL Qwen3-VL loaders.
+
 The upstream Cosmos3-Nano checkpoint is a Cosmos3 Omni checkpoint. Cosmos-RL
 images that load Qwen3-VL models need the documented VLM safetensors conversion
 from NVIDIA/cosmos-framework.
@@ -19,7 +18,7 @@ from pathlib import Path
 
 
 DEFAULT_COSMOS_FRAMEWORK_REPO = "https://github.com/NVIDIA/cosmos-framework.git"
-DEFAULT_CONVERSION_IMAGE = "nvcr.io/nvidia/pytorch:25.09-py3"
+DEFAULT_CONVERSION_IMAGE = "nvcr.io/nvidia/pytorch:25.09-py3"  # unpinned: upstream converter compatibility
 DEFAULT_VLM_MODEL_NAME = "Qwen/Qwen3-VL-8B-Instruct"
 
 
@@ -71,7 +70,7 @@ def converted_checkpoint_status(path: Path) -> tuple[bool, str]:
         suffix = "..." if len(missing) > 5 else ""
         return False, f"missing referenced shard(s): {preview}{suffix}"
 
-    tokenizer_files = ["tokenizer_config.json", "tokenizer.json"]
+    tokenizer_files = ["tokenizer_config.json", "tokenizer.json", "chat_template.json"]
     missing_tokenizer = [name for name in tokenizer_files if not (path / name).is_file()]
     if missing_tokenizer:
         return False, f"missing tokenizer file(s): {', '.join(missing_tokenizer)}"
@@ -91,10 +90,47 @@ def ensure_cosmos_framework(path: Path, repo: str, no_clone: bool) -> None:
     run(["git", "clone", repo, str(path)])
 
 
+def ensure_chat_template(output_path: Path, checkpoint_path: str) -> None:
+    """Materialize the JSON chat template required by Cosmos-RL evaluation."""
+    target = output_path / "chat_template.json"
+    if not output_path.is_dir():
+        return
+
+    if not target.is_file():
+        source_path = expand_path(checkpoint_path)
+        source_template = source_path / "chat_template.json"
+        if source_path.is_dir() and source_template.is_file():
+            shutil.copy2(source_template, target)
+        else:
+            # The converter currently emits chat_template.jinja but the
+            # evaluator's local-tokenizer guard requires the JSON wrapper.
+            jinja_template = output_path / "chat_template.jinja"
+            if jinja_template.is_file():
+                target.write_text(json.dumps({"chat_template": jinja_template.read_text()}, indent=2) + "\n")
+
+    tokenizer_config_path = output_path / "tokenizer_config.json"
+    if tokenizer_config_path.is_file():
+        tokenizer_config = json.loads(tokenizer_config_path.read_text())
+        if tokenizer_config.get("fix_mistral_regex") is not True:
+            tokenizer_config["fix_mistral_regex"] = True
+            tokenizer_config_path.write_text(json.dumps(tokenizer_config, indent=2) + "\n")
+
+
 def docker_checkpoint_mount(checkpoint_path: str) -> tuple[list[str], str]:
     host_path = expand_path(checkpoint_path)
     if not host_path.exists():
         return [], checkpoint_path
+
+    # Hugging Face cache snapshots contain relative links such as
+    # ../../blobs/<digest>. Mounting only the snapshot makes those links point
+    # outside the bind mount, so preserve the repository cache root when the
+    # caller supplies a standard .../snapshots/<revision> path.
+    if host_path.parent.name == "snapshots" and (host_path.parent.parent / "blobs").is_dir():
+        repo_root = host_path.parent.parent
+        container_root = "/checkpoint/repository"
+        container_path = f"{container_root}/snapshots/{host_path.name}"
+        return ["-v", f"{repo_root}:{container_root}:ro"], container_path
+
     container_path = f"/checkpoint/{host_path.name}"
     return ["-v", f"{host_path}:{container_path}:ro"], container_path
 
@@ -225,11 +261,14 @@ def validate_with_image(output_path: Path, image: str) -> None:
         "-lc",
         (
             "python - <<'PY'\n"
-            "from transformers import AutoConfig\n"
+            "from transformers import AutoConfig, AutoProcessor\n"
             "cfg = AutoConfig.from_pretrained('/converted')\n"
+            "processor = AutoProcessor.from_pretrained('/converted')\n"
             "print(type(cfg).__name__, cfg.model_type)\n"
             "if cfg.model_type != 'qwen3_vl':\n"
             "    raise SystemExit(1)\n"
+            "if not processor.tokenizer.chat_template:\n"
+            "    raise SystemExit('converted tokenizer has no chat template')\n"
             "PY"
         ),
     ]
@@ -292,6 +331,7 @@ def main() -> int:
     args = parse_args()
     output_path = expand_path(args.output_path)
 
+    ensure_chat_template(output_path, args.checkpoint_path)
     complete, reason = converted_checkpoint_status(output_path)
     if complete and not args.force:
         print(f"converted_checkpoint={output_path}", flush=True)
@@ -307,6 +347,7 @@ def main() -> int:
         shutil.rmtree(output_path)
 
     run_conversion(args)
+    ensure_chat_template(output_path, args.checkpoint_path)
 
     complete, reason = converted_checkpoint_status(output_path)
     if not complete:

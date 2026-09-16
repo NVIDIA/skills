@@ -13,7 +13,8 @@ targeting a specific backend.
   placement error. Discover via `brev orgs --json` (cloud cred) and
   `brev ls --json` (workspace group). See `skills/platform/tao-run-on-brev/SKILL.md` →
   *Creating an instance — placement info* for the full lookup recipe.
-- The handler waits for both `status=RUNNING` and `brev exec ... -- true`
+- The handler waits for both `status=RUNNING` and a successful trivial exec
+  (`brev exec <instance> "true"`)
   before returning, so a `create_job` → `get_job_logs` sequence won't race
   sshd bring-up. The first remote exec uses a 600s timeout to absorb the
   container-pull window; reused instances use 30s.

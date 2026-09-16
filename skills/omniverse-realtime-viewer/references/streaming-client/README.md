@@ -8,10 +8,7 @@ remote-video, StreamingContext, VITE_SERVER_HOST, frontend no video, or
 object-fit contain.
 
 Use this for the browser side of a WebRTC Omniverse Realtime Viewer backed by
-standalone `ovstream`. The viewer service may run under OKAS, Kubernetes, or
-another session orchestrator, but the browser WebRTC client profile remains
-standalone `ovstream` Direct mode, not a Kit, OVC, NVCF, or GFN connection
-profile.
+standalone `ovstream`. For Brev, OKAS, or another session orchestrator, the browser WebRTC client profile remains standalone `ovstream` Direct mode. For NVCF self-hosted deployment, first read `cloud-deployment/nvcf-self-hosted.md` and follow the upstream workflow for the exposed media and browser connection model; do not guess a client profile.
 
 ## AppStreamer Direct API
 
@@ -23,11 +20,48 @@ current `ovstream` WebRTC browser client example as the reference:
 ```typescript
 import { AppStreamer, StreamType, type DirectConfig } from '@nvidia/ov-web-rtc';
 
+async function preflightEmbeddedH264(video: HTMLVideoElement) {
+  const embedded = (() => { try { return window.top !== window.self; } catch { return true; } })();
+  const mediaCapabilities = navigator.mediaCapabilities;
+  let decodingInfo: MediaCapabilitiesDecodingInfo | undefined;
+  try {
+    if (mediaCapabilities?.decodingInfo) {
+      decodingInfo = await mediaCapabilities.decodingInfo({
+        type: "webrtc",
+        video: { contentType: "video/H264; codecs=avc1.42E01E", width: 1920, height: 1080, bitrate: 8_000_000, framerate: 60 },
+      });
+    }
+  } catch (error) {
+    console.warn("H264 media-capability probe failed", error);
+  }
+  const result = { embedded, mediaCapabilities: Boolean(mediaCapabilities?.decodingInfo), decodingInfo, canPlay: video.canPlayType("video/mp4; codecs=avc1.42E01E") };
+  console.info("WebRTC H264 preflight", result);
+  return result;
+}
+
+async function waitForDecodedFrame(video: HTMLVideoElement, timeoutMs = 15_000) {
+  const initial = video.getVideoPlaybackQuality?.().totalVideoFrames ?? 0;
+  const deadline = performance.now() + timeoutMs;
+  while (performance.now() < deadline) {
+    const decoded = video.getVideoPlaybackQuality?.().totalVideoFrames ?? 0;
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && (decoded > initial || video.currentTime > 0)) return;
+    await new Promise(resolve => window.setTimeout(resolve, 100));
+  }
+  throw new Error("WebRTC connected but no decoded H264 frame arrived");
+}
+
+const video = document.getElementById("remote-video") as HTMLVideoElement;
+await preflightEmbeddedH264(video);
+
 const config: DirectConfig = {
   videoElementId: 'remote-video',
   audioElementId: 'remote-audio',
   server: 'localhost',
   signalingPort: 49100,
+  width: 1920,
+  height: 1080,
+  codec: 'H264',
+  codecList: ['H264'],
   nativeTouchEvents: true,
   fps: 60,
   maxReconnects: 5,
@@ -40,22 +74,33 @@ const config: DirectConfig = {
 };
 
 await AppStreamer.connect({ streamSource: StreamType.DIRECT, streamConfig: config });
+await waitForDecodedFrame(video);
 ```
 
-`onCustomEvent` receives parsed app JSON. Mouse, keyboard, wheel, and touch events are forwarded by the streaming library automatically; do not send them manually as JSON messages.
+Treat the resolved `AppStreamer.connect(...)` Promise as the app-command/data
+channel readiness signal. `onStart` means video has begun decoding, not that it
+is safe to send the first app message. Do not gate `openStageRequest`,
+`setViewportInputActive`, or other app commands on `onStart`; doing so can
+deadlock idle servers that wait for the client command before rendering a real
+stage frame.
+
+`onCustomEvent` receives parsed app JSON. Mouse, keyboard, wheel, and touch events are forwarded by the streaming library automatically in native mode. Use the documented `mouseInput` fallback only after the explicit native-callback failure diagnostic.
 
 ## DirectConfig Gotchas
 
 - Use `streamSource: StreamType.DIRECT` with `server` and `signalingPort` for
   the standalone `ovstream` server.
-- Do not use Kit, OVC, NVCF, or GFN client connection profiles in the browser
-  WebRTC config. If an orchestrator launches the session, map its exposed
-  endpoint to `server` and `signalingPort`.
+- Set an explicit fixed `width`, `height`, `codec: 'H264'`, and
+  `codecList: ['H264']` unless a verified deployment profile selects another
+  codec. Do not rely on a default codec value for first-frame validation.
+- For standalone `ovstream` Direct deployments, do not use connection profiles or fields intended for a different streaming product. If an orchestrator launches the session, map its exposed endpoint to `server` and `signalingPort`. For NVCF self-hosted deployment, follow `cloud-deployment/nvcf-self-hosted.md` instead.
 - Do not set `mediaServer` or `mediaPort`; SDP discovers the UDP media endpoint. Setting `mediaPort: 49100` sends media to the TCP signaling port and causes connected-with-no-video failures.
 - Do not construct a sign-in URL, append a custom signaling path, or add
   auth/session fields to `DirectConfig`. Portal auth and session lifecycle
   belong outside the browser WebRTC client config.
 - The `<video id="remote-video">` element must exist in the DOM before `connect()`.
+- Before `connect()`, run an embedded-host H264 preflight: record whether the viewer is framed, whether `navigator.mediaCapabilities.decodingInfo` is exposed, and the advisory H264 result. Missing or failed capability APIs are diagnostics, not proof that H264/WebRTC is unsupported; keep the explicit H264 DirectConfig and continue to decoded-frame validation.
+- After `connect()` resolves, prove video separately: the video element reaches `HAVE_CURRENT_DATA` and decoded-frame count (or `currentTime` where frame counters are unavailable) advances.
 - Tune reconnects to avoid log storms: `maxReconnects: 5`, `reconnectDelay: 3000`.
 - Keep the React effect that calls `AppStreamer.connect()` stable. It should depend only on immutable connection config, not on stateful message routers that change when app messages arrive.
 - Avoid `React.StrictMode` for the first direct-streaming scaffold unless the connect effect explicitly guards double mount/connect. StrictMode can intentionally mount, cleanup, and remount effects in development.
@@ -86,12 +131,12 @@ The hook should expose:
 
 | Field | Purpose |
 |---|---|
-| `status` | `'connecting' | 'connected' | 'failed'` |
+| `status` | `'connecting' | 'connected' | 'failed'`; `connected` means `AppStreamer.connect()` resolved and app commands may be sent. |
 | `sendMessage` | send `{event_type, payload}`; no-op if disconnected |
 | `onCustomEvent` | subscribe to server messages; returns cleanup |
 | `errorMessage` | failure detail |
 
-On connect, prefer the server's `push_initial_state` when a stage is already loaded; it should send `openStageResult`, root `getChildrenResult`, AOV state, and any overlay state after the data channel opens. If the server starts idle and the app has bundled samples, auto-open the first sample once after `status === 'connected'`. Send later `openStageRequest` messages only when the user switches scenes, opens a file, or resets/reloads.
+On connect, prefer the server's `push_initial_state` when a stage is already loaded; it should send `openStageResult`, root `getChildrenResult`, AOV state, and any overlay state after the data channel opens. If the server starts idle and the app has bundled samples, auto-open the first sample once after `status === 'connected'`, not after `onStart`. Send later `openStageRequest` messages only when the user switches scenes, opens a file, or resets/reloads.
 
 ```tsx
 const openedInitial = useRef(false);
@@ -131,7 +176,7 @@ Browser-streamed Omniverse Realtime Viewer apps use a fixed server render resolu
 }
 ```
 
-Do not send viewport-size messages when CSS layout changes. NVST handles letterbox coordinate mapping for stream input when the video is contained inside a differently shaped DOM box. Do not synthesize JSON `mouseInput`; AppStreamer/NVST forwards browser input through the native input channel.
+Do not send viewport-size messages when CSS layout changes. NVST handles letterbox coordinate mapping for native stream input when the video is contained inside a differently shaped DOM box. Native input is the default. Use JSON `mouseInput` only when `viewer-input-routing`'s explicit diagnostic proves that the data channel works but native `on_input` callbacks do not; it is a mutually-exclusive fallback, not a second input path.
 
 For React shells with sidebars, top bars, or inspectors, keep the stream surface
 layout-stable while UI state changes:
@@ -205,6 +250,12 @@ This prevents sidebar clicks, tree expansion, inspector scrolling, and top-bar
 selection changes from being interpreted as camera orbit, pan, zoom, or pick
 gestures.
 
+## Verified JSON Mouse Fallback
+
+Do not add these handlers to a normal browser viewer. Enable them only when the server/app configuration has selected `json-fallback` after the native-input diagnostic. Keep native mode as the default and make mode changes cancel any active gesture on both sides.
+
+Map the CSS pointer position to the visible, letterbox-corrected video rectangle before sending it. Ignore events in black bars. In fallback mode call `stopPropagation()` so AppStreamer/NVST cannot also receive the gesture. Send `mouseInput` with render-product `x` and `y`: use `kind: "mouse_move"` or `"mouse_button"` with DOM `button` and `down`, and `kind: "mouse_wheel"` with `delta_y`. Register move/up/cancel listeners for an active fallback drag and remove them when it ends. Do not send fallback events outside the viewport or while native mode is active.
+
 ## Config Resolution
 
 Use this priority:
@@ -260,6 +311,9 @@ export interface ViewerBackend {
 Adapter implementation rules:
 
 - Keep resolver buckets keyed by URL or prim path for `openStageResult`, `getChildrenResult`, `getPropertiesResponse`, and `getVariantsResponse`.
+- Discover optional feature support from backend capability messages or
+  app-specific config before showing controls for runtime transforms, pick
+  effects, physics impulses, or other non-baseline commands.
 - Add timeouts to promises so dropped data-channel responses do not hang UI components permanently.
 - Cache latest children per `prim_path` and return cached rows if a request times out.
 - Subscribe to `stageSelectionChanged` and call every selection subscriber with the canonical server path list.
@@ -271,6 +325,8 @@ Adapter implementation rules:
   fast server responses can otherwise be dropped after a valid
   `stageSelectionChanged` event.
 - Route AppStreamer lifecycle through `EventAction` and `EventStatus`: `EventAction.START` plus `EventStatus.SUCCESS` means connected; `EventStatus.ERROR`, `onStop`, and `onTerminate` update failed/connecting state and reject relevant pending work.
+- Keep optional feature commands behind the shared `ViewerBackend` capability
+  extension instead of sending library-specific calls from React components.
 
 Resolver pattern:
 

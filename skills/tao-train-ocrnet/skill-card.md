@@ -1,5 +1,5 @@
 ## Description: <br>
-OCRNet for scene text recognition. Recognizes text content from cropped text-region images and supports CTC and attention-based decoders. <br>
+Recognizes text content from cropped text-region images and supports CTC and attention-based decoders for training, evaluating, exporting, pruning, quantizing, retraining, and running inference for TAO OCRNet models. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,19 +9,32 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, pruning, quantizing, retraining, or running inference on NVIDIA TAO OCRNet models for scene text recognition tasks. <br>
+Developers and engineers training, evaluating, pruning, quantizing, exporting, and running inference on OCRNet scene text recognition models using NVIDIA TAO Toolkit. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [skill_info.yaml](references/skill_info.yaml) <br>
 - [TAO Deploy OCRNet](references/tao-deploy-ocrnet.md) <br>
-- [Skill Info](references/skill_info.yaml) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
+- [Deploy skill_info.yaml](references/tao-deploy-ocrnet.skill_info.yaml) <br>
+- [Spec Template: Train](references/spec_template_train.yaml) <br>
+- [Spec Template: Evaluate](references/spec_template_evaluate.yaml) <br>
+- [Spec Template: Export](references/spec_template_export.yaml) <br>
+- [Spec Template: Inference](references/spec_template_inference.yaml) <br>
+- [Spec Template: Prune](references/spec_template_prune.yaml) <br>
+- [Spec Template: Quantize](references/spec_template_quantize.yaml) <br>
+- [Spec Template: Retrain](references/spec_template_retrain.yaml) <br>
 
 
 ## Skill Output: <br>
@@ -31,41 +44,41 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task in NVSkills-Eval external profile (astra-sandbox environment). 1 positive activation task, 0 negative tasks. <br>
+1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot/1. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was found and executed. <br>
+- Effectiveness: Checks whether the user's goal was achieved and expected workflow behavior was followed. <br>
+- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 50% (+50%) | 20% (+0%) |
-| Discoverability | 1 | 0% (+0%) | 0% (+0%) |
-| Effectiveness | 1 | 88% (+78%) | 44% (+0%) |
-| Efficiency | 1 | 27% (-0%) | 28% (-0%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 46% → 93% (+47 points) | 55% → 95% (+40 points) |
+| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
+| Correctness | 20% → 100% (+80 points) | 100% → 100% (±0 points) |
+| Discoverability | 50% → 100% (+50 points) | 0% → 94% (+94 points) |
+| Effectiveness | 17% → 83% (+67 points) | 75% → 83% (+8 points) |
+| Efficiency | 45% → 83% (+38 points) | 0% → 100% (+100 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

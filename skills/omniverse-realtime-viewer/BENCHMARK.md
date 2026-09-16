@@ -1,87 +1,110 @@
-# Evaluation Report
+# Skill Benchmark: omniverse-realtime-viewer
 
-Evaluation of the `omniverse-realtime-viewer` skill before publication through NVSkills-Eval.
-
-This benchmark summarizes 3-Tier Evaluation from NVSkills-Eval results for the skill. The goal is to document whether the skill is safe, discoverable, effective, and useful for agents before it is published for broader workflow use.
-
-## Evaluation Summary
-
-- Skill: `omniverse-realtime-viewer`
-- Evaluation date: 2026-05-28
-- NVSkills-Eval profile: `external`
-- Overall verdict: FAIL
-- Tier 3 live agent evaluation: not available in this report
-
-## Agents Used
-
-- Tier 3 agent details were not available in this report.
-
-## Metrics Used
-
-Reported benchmark dimensions:
-
-- Security: checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access.
-- Correctness: checks whether the agent follows the expected workflow and produces the correct final output.
-- Discoverability: checks whether the agent loads the skill when relevant and avoids using it when irrelevant.
-- Effectiveness: checks whether the agent performs measurably better with the skill than without it.
-- Efficiency: checks whether the agent uses fewer tokens and avoids redundant work.
-
-Underlying evaluation signals used in this run:
-
-- No Tier 3 evaluation signal details were available in this report.
-
-## Test Tasks
-
-Tier 3 evaluation task details were not available in this report.
-
-## Results
-
-Tier 3 dimension rollup was not available in this report.
-
-## Tier 1: Static Validation Summary
-
-Tier 1 validation passed with observations. NVSkills-Eval ran 9 checks and found 32 total findings.
-
-Top findings:
-
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/stage-hierarchy/fallback-worker-protocol.md:55`)
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/stage-hierarchy/fallback-worker-protocol.md:56`)
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/headless-shm-cli/README.md:156`)
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/headless-shm-cli/README.md:169`)
-- MEDIUM PII/gps_coordinates: GPS coordinates (location information) (`references/cpp-native-viewer/interaction-features.md:20`)
-
-## Tier 2: Deduplication Summary
-
-Tier 2 validation reported findings. NVSkills-Eval ran 2 checks and found 21 total findings.
-
-Top findings:
-
-- HIGH DUPLICATE/duplicate: Duplicate content found across references/stage-hierarchy/README.md and references/stage-queries/README.md:
-  "### `prim_list_handle` Use" in references/stage-hierarchy/README.md (lines 91-102)
-  vs "## `prim_list_handle`" in references/stage-queries/README.md (lines 124-129) (`references/stage-hierarchy/README.md:91`)
-- HIGH DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/conventions.md and references/routing.md and references/stage-hierarchy/fallback-worker-protocol.md and references/streaming-messages/server-handler-map.md and references/streaming-server/frame-loop-and-continuity.md and references/troubleshooting/scenario-playbooks.md and references/validation.md:
-  "(preamble)" in SKILL.md (lines 1-3)
-  vs "(preamble)" in references/conventions.md (lines 1-3)
-  vs "(preamble)" in references/routing.md (lines 1-3)
-  vs "(preamble)" in references/stage-hierarchy/fallback-worker-protocol.md (lines 1-3)
-  vs "(preamble)" in references/streaming-messages/server-handler-map.md (lines 1-3)
-  vs "(preamble)" in references/streaming-server/frame-loop-and-continuity.md (lines 1-3)
-  vs "(preamble)" in references/troubleshooting/scenario-playbooks.md (lines 1-3)
-  vs "(preamble)" in references/validation.md (lines 1-3) (`SKILL.md:1`)
-- HIGH DUPLICATE/duplicate: Duplicate content found across references/ovrtx-rendering/README.md and references/stage-loading/README.md and references/stage-management/README.md:
-  "## Stage Composition APIs" in references/ovrtx-rendering/README.md (lines 36-48)
-  vs "## ovrtx 0.3 Stage Composition APIs" in references/stage-loading/README.md (lines 13-25)
-  vs "## Stage Composition Policy" in references/stage-management/README.md (lines 32-40) (`references/ovrtx-rendering/README.md:36`)
-- HIGH DUPLICATE/duplicate: Duplicate content found across references/conventions.md and references/electron-shm-viewer/protocol-interaction-lifecycle.md and references/ovui-local-viewer-recipe/setup-shell-renderer.md and references/stage-management/README.md and references/streaming-viewer-recipe/server-runtime.md:
-  "## Scene Loading" in references/conventions.md (lines 83-94)
-  vs "## Scene Loading, Queries, And Settings" in references/electron-shm-viewer/protocol-interaction-lifecycle.md (lines 88-116)
-  vs "## 5. Implement Scene Loading" in references/ovui-local-viewer-recipe/setup-shell-renderer.md (lines 125-159)
-  vs "## Adding This To An Existing Omniverse Realtime Viewer" in references/stage-management/README.md (lines 172-183)
-  vs "## 5. Implement Scene Loading" in references/streaming-viewer-recipe/server-runtime.md (lines 164-198) (`references/conventions.md:83`)
-- HIGH DUPLICATE/duplicate: Duplicate content found across references/stage-hierarchy/README.md and references/stage-queries/README.md:
-  "### AND / OR / NOT Filters" in references/stage-hierarchy/README.md (lines 43-71)
-  vs "## Filter Construction" in references/stage-queries/README.md (lines 35-70) (`references/stage-hierarchy/README.md:43`)
+> ✅ **Overall verdict: PASS — Recommended for publication**
 
 ## Publication Recommendation
 
-The skill should be reviewed before NVSkills-Eval publication. Skill owners should address the findings above and rerun NVSkills-Eval to refresh this benchmark.
+Recommended for publication based on the completed evaluation evidence in this report.
+
+## Evaluation Metadata
+
+- Skill: `omniverse-realtime-viewer`
+- Evaluation date: 2026-08-20
+- Evaluator version: `1.3.2`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Tasks: 7 evaluation tasks (7 positive)
+- Dataset digest: `sha256:22c636e11cd01854316a62aa9e61948dd62ec9d8efda268d6b78487da6c55e82` (skill-evaluator-dataset-snapshot/1)
+- Attempts per task: 1
+- Environment: `local`
+- Tier 3 evidence: required for publication
+
+Tasks ran on the trusted local host; local mode is not sandboxed.
+
+## Execution and Provenance
+
+- Validation status: `passed`
+- Report generation: `complete`
+- Evaluator version: `1.3.2`
+- Git commit: `0117bc2e3e54da4244a656466526c5b1b5a559ea`
+- Content type: requested `auto`, detected `skill`
+- Container image: `gitlab-master.nvidia.com:5005/nvcarps/ci-group/nvcarps-ci/skillevaluator-ci:sha-0117bc2e3e54da4244a656466526c5b1b5a559ea`
+- Container image digest: `not recorded`
+- Tier 3: requested `true`, executed `true`, status `succeeded`
+
+## What This Report Answers
+
+The three-tier evaluation checks whether the skill:
+
+- is safe to use;
+- produces correct answers;
+- is discovered and activated when needed;
+- helps the agent complete the user's goal and expected workflow; and
+- avoids wasted skill and tool usage.
+
+## Results at a Glance
+
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 68% → 88% (+20 points) | 60% → 72% (+12 points) |
+| Security | 93% → 86% (-7 points) | 50% → 7% (-43 points) |
+| Correctness | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
+| Discoverability | 42% → 92% (+50 points) | 45% → 79% (+34 points) |
+| Effectiveness | 82% → 92% (+10 points) | 73% → 95% (+22 points) |
+| Efficiency | 21% → 69% (+48 points) | 33% → 82% (+49 points) |
+
+**How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.
+
+Example: `47% → 92% (+45 points)` means the skill-assisted run scored 92%, 45 percentage points above its 47% no-skill baseline.
+
+## Tier Status
+
+| Tier | Purpose | Status | Evidence |
+|---|---|---|---|
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 2 finding(s) |
+| Tier 2 | Semantic deduplication | **NOT RUN** | No result was recorded |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 7 task(s) |
+
+## Findings and Observations
+
+<details>
+<summary>Show detailed findings and successful checks</summary>
+
+- **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'version' is ignored; use 'metadata.version' (`skills/omniverse-realtime-viewer/SKILL.md`)
+- **LOW** SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/omniverse-realtime-viewer/SKILL.md`)
+
+</details>
+
+## Scoring Methodology
+
+<details>
+<summary>Show dimension definitions, source signals, and thresholds</summary>
+
+| Dimension | Question | Scored signals |
+|---|---|---|
+| Security | Is it safe to use? | `security` (100%) |
+| Correctness | Is the answer correct? | `accuracy` (100%) |
+| Discoverability | Was the right skill loaded when needed? | `skill_execution` (100%) |
+| Effectiveness | Did the skill help complete the task? | `goal_accuracy` (50%) + `behavior_check` (50%) |
+| Efficiency | Did it avoid wasted tool or skill usage? | `skill_efficiency` (100%) |
+
+- Dimension bands: PASS at 50% or above; NEUTRAL from 40% to below 50%; FAIL below 40%.
+- Overall Tier 3 lift: PASS at +5 points or more; FAIL at -10 points or less; values between those bands are NEUTRAL.
+- Overall verdict: PASS only when every configured dimension passes for at least one supported agent. Lift is reported as diagnostic evidence and does not override this gate.
+- The 50% attempt pass threshold is a separate per-task gate; it is not the dimension pass threshold.
+- Effectiveness is the equal-weight mean of goal completion (`goal_accuracy`) and expected workflow adherence (`behavior_check`).
+- Token efficiency is a separate report-only signal. It does not change a dimension score or the overall verdict.
+
+Signals present in this run:
+
+- `security` (Security): unsafe operations, secret leakage, and unauthorized access.
+- `skill_execution` (Skill Execution): whether the expected skill was found and executed.
+- `skill_efficiency` (Efficiency): routing quality, workspace-aware skill reads, and productive tool use.
+- `accuracy` (Accuracy): final-answer correctness against the reference answer.
+- `goal_accuracy` (Goal Accuracy): whether the user's goal was achieved.
+- `behavior_check` (Behavior Check): whether the expected workflow behavior was followed.
+
+</details>
+
+## Freshness
+
+Regenerate this benchmark when the skill, evaluation dataset, target agent/model, evaluator version, environment, or scoring policy changes.

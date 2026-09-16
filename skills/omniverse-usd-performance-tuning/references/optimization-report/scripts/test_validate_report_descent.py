@@ -4,7 +4,8 @@
 """Dependency-free tests for the descent-convergence gate (validate_descent_convergence).
 
 Run: python3 test_validate_report_descent.py   (exit 0 = all pass, 1 = a failure)
-No pytest / third-party deps, matching validate_report.py's standalone ethos.
+No test-framework or third-party deps, matching validate_report.py's standalone
+ethos.
 """
 import sys
 from pathlib import Path

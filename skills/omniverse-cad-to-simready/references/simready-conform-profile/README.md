@@ -6,13 +6,13 @@ Use this router reference after USD conversion and property assignment, before
 `simready-validate`. It chooses the SimReady feature-level conformance skill
 that should repair a failing profile requirement.
 
-This reference ships a narrow `scripts/run.py` router for deterministic Skill
-Hub handoff and report generation. It should not be treated as the source of
+This reference ships a narrow `scripts/run.py` router for deterministic
+workflow handoff and report generation. It should not be treated as the source of
 truth for canonical FET instructions. The source of truth is the SimReady
 Foundation repository:
 
 ```text
-https://github.com/NVIDIA/simready-foundation/tree/main
+https://github.com/NVIDIA/simready-foundation/tree/v2026.04.1
 ```
 
 Do not copy upstream FET skill instructions, requirement summaries, validators,
@@ -27,13 +27,13 @@ use a local checkout and read the upstream `SKILL.md` file directly.
 - OpenUSD Python APIs (`pxr.Usd`, `pxr.UsdGeom`) for local helper scripts when
   they are used.
 - A SimReady Foundation checkout at
-  `${SIMREADY_FOUNDATION_ROOT:-$PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT/simready-foundation}`
-  or `$HOME/.physical-ai-skill-hub/upstreams/simready-foundation`,
-  checked out to branch `main`.
+  `${SIMREADY_FOUNDATION_ROOT:-$OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT/simready-foundation}`
+  or `$HOME/.omniverse-cad-to-simready/upstreams/simready-foundation`,
+  checked out to the exact ref in `upstream-versions.lock.json` (currently `v2026.04.1`).
 
 ## Scope
 
-This reference owns only Skill Hub routing, report handoff, and local helper
+This reference owns only Omniverse CAD-to-SimReady routing, report handoff, and local helper
 selection. Upstream SimReady Foundation owns feature-level conformance behavior.
 
 ## Upstream Skills
@@ -62,22 +62,22 @@ Use this mapping when routing validation failures:
 The matching branch URLs are:
 
 ```text
-https://github.com/NVIDIA/simready-foundation/blob/main/skills/simready-foundation-conform-fet-000-core/SKILL.md
-https://github.com/NVIDIA/simready-foundation/blob/main/skills/simready-foundation-conform-fet-001-minimal/SKILL.md
-https://github.com/NVIDIA/simready-foundation/blob/main/skills/simready-foundation-conform-fet-003-rigid-body-physics/SKILL.md
-https://github.com/NVIDIA/simready-foundation/blob/main/skills/simready-foundation-conform-fet-004-simulate-multi-body-physics/SKILL.md
-https://github.com/NVIDIA/simready-foundation/blob/main/skills/simready-foundation-conform-fet-005-simulate-grasp-physics/SKILL.md
-https://github.com/NVIDIA/simready-foundation/blob/main/skills/simready-foundation-conform-fet-006-materials/SKILL.md
-https://github.com/NVIDIA/simready-foundation/blob/main/skills/simready-foundation-conform-fet-007-nonvisual-materials/SKILL.md
-https://github.com/NVIDIA/simready-foundation/blob/main/skills/simready-foundation-conform-fet-021-robot-core/SKILL.md
-https://github.com/NVIDIA/simready-foundation/blob/main/skills/simready-foundation-conform-fet-023-robot-materials/SKILL.md
-https://github.com/NVIDIA/simready-foundation/blob/main/skills/simready-foundation-conform-fet-024-base-articulation/SKILL.md
+https://github.com/NVIDIA/simready-foundation/blob/v2026.04.1/skills/simready-foundation-conform-fet-000-core/SKILL.md
+https://github.com/NVIDIA/simready-foundation/blob/v2026.04.1/skills/simready-foundation-conform-fet-001-minimal/SKILL.md
+https://github.com/NVIDIA/simready-foundation/blob/v2026.04.1/skills/simready-foundation-conform-fet-003-rigid-body-physics/SKILL.md
+https://github.com/NVIDIA/simready-foundation/blob/v2026.04.1/skills/simready-foundation-conform-fet-004-simulate-multi-body-physics/SKILL.md
+https://github.com/NVIDIA/simready-foundation/blob/v2026.04.1/skills/simready-foundation-conform-fet-005-simulate-grasp-physics/SKILL.md
+https://github.com/NVIDIA/simready-foundation/blob/v2026.04.1/skills/simready-foundation-conform-fet-006-materials/SKILL.md
+https://github.com/NVIDIA/simready-foundation/blob/v2026.04.1/skills/simready-foundation-conform-fet-007-nonvisual-materials/SKILL.md
+https://github.com/NVIDIA/simready-foundation/blob/v2026.04.1/skills/simready-foundation-conform-fet-021-robot-core/SKILL.md
+https://github.com/NVIDIA/simready-foundation/blob/v2026.04.1/skills/simready-foundation-conform-fet-023-robot-materials/SKILL.md
+https://github.com/NVIDIA/simready-foundation/blob/v2026.04.1/skills/simready-foundation-conform-fet-024-base-articulation/SKILL.md
 ```
 
 ## Local Helper Policy
 
 Some legacy reference-local scripts remain only as narrow report-producing
-helpers for the Skill Hub workflow. They are not the FET skill source of truth.
+helpers for the Omniverse CAD-to-SimReady workflow. They are not the FET skill source of truth.
 Before running one, read the matching upstream Foundation skill and make sure the
 helper still matches the selected profile requirement.
 
@@ -148,8 +148,8 @@ overwrite source files.
 Resolve the Foundation checkout before following any FET skill:
 
 ```bash
-export PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT="${PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT:-$HOME/.physical-ai-skill-hub/upstreams}"
-export SIMREADY_FOUNDATION_ROOT="${SIMREADY_FOUNDATION_ROOT:-$PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT/simready-foundation}"
+export OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT="${OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT:-$HOME/.omniverse-cad-to-simready/upstreams}"
+export SIMREADY_FOUNDATION_ROOT="${SIMREADY_FOUNDATION_ROOT:-$OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT/simready-foundation}"
 git -C "$SIMREADY_FOUNDATION_ROOT" checkout main
 ```
 
@@ -234,7 +234,7 @@ The workflow summary should include:
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| Foundation skill file is missing | `SIMREADY_FOUNDATION_ROOT` points to the wrong checkout or branch | Check out `https://github.com/NVIDIA/simready-foundation` at `main`. |
+| Foundation skill file is missing | `SIMREADY_FOUNDATION_ROOT` points to the wrong checkout or revision | Check out `https://github.com/NVIDIA/simready-foundation` at the exact ref in `upstream-versions.lock.json`. |
 | Sealed `.usdz` cannot be repaired in place | Feature repairs that author USD prims cannot rewrite a sealed package | Produce or request an unpacked USD-family asset before running prim-level repair. Core metadata repair may still proceed sidecar-only. |
 | `GSP.001` failure reported as final without classification | Vision-capable inspection or explicit grasp points were not available | Route to upstream `simready-foundation-conform-fet-005-simulate-grasp-physics`. If neither vision nor explicit points are available, report the FET005 step as `blocked`. |
 | `RB.MB.001` failure reported after Physics Agent | The USD has fewer than two `UsdPhysics.RigidBodyAPI` prims, even if it has many visual or collider prims | Route to upstream `simready-foundation-conform-fet-004-simulate-multi-body-physics` when there are at least two existing component colliders or part roots that represent source parts. If the asset has only one mesh component or one `GeomSubset` component, `simready-validate` treats `RB.MB.001` as non-blocking and preserves it under `ignored_issues`; do not invent geometry. |

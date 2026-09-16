@@ -39,7 +39,10 @@ the live render settings panel, not shown as hopeful sliders or toggles.
 Persisted JSON is only saved preference state. It is not proof that a setting was
 applied to the active render. A successful setting change must either change the
 active viewer state immediately or be part of an explicit non-live workflow such
-as "Apply and reload stage" or "Use for newly opened scenes."
+as "Apply and reload stage" or "Use for newly opened scenes." Do not send
+`renderSettingsChanged.result = "success"` for a client form update unless the
+payload also reports whether the active render changed through `applied`,
+`applies_at`, and `requires_reload`.
 
 Keep effective render settings outside the USD asset. The viewer can restore
 validated settings across scene changes without modifying user files.
@@ -48,7 +51,7 @@ validated settings across scene changes without modifying user files.
 
 | `applies_at` | Use when | User-facing behavior |
 |---|---|---|
-| `immediate` | The render thread can apply the setting through a verified renderer API, `renderer.write_attribute(...)`, or frame-conversion path. | Live control is enabled and `renderSettingsChanged.applied` is true after success. |
+| `immediate` | The render thread can apply the setting through a verified renderer API, OVStage/runtime data-plane write, standalone compatibility `renderer.write_attribute(...)` path, or frame-conversion path. | Live control is enabled and `renderSettingsChanged.applied` is true after success. |
 | `reload_required` | The setting only works by rebuilding viewer-owned session/composite data. | Do not hide the reload behind a live control; expose an explicit apply/reload command. |
 | `next_scene_load` | The setting is only a default for future stage loads. | Put it in a profile/defaults workflow, not the live render panel. |
 | `unsupported` | No verified backend path exists for the active runtime. | Omit from active controls and reject direct requests. |
@@ -105,7 +108,10 @@ def RenderProduct "ViewportTexture0" {
 }
 ```
 
-In `fout.render_vars`, names match `sourceName`, not the RenderVar prim name. Extra render vars increase VRAM use, around 8 MB per 1080p uint32 buffer. Picking uses native pick queries in ovrtx 0.3, so do not request segmentation render vars just for object selection.
+In `fout.render_vars`, names match `sourceName`, not the RenderVar prim name.
+Extra render vars increase VRAM use, around 8 MB per 1080p uint32 buffer.
+Picking uses native OVRTX pick queries and the renderer path dictionary, so do
+not request segmentation render vars just for object selection.
 
 Use the multi-line `RenderVar` form above. Some ovrtx parser builds reject inline one-line `RenderVar` definitions.
 
@@ -135,9 +141,10 @@ backend and echo the effective value if the backend adjusts it.
 Default rule: do not add session fallback lights. Stages own their lighting, and injected lights make local and streaming samples diverge.
 
 If the user asks for viewer-controlled lighting, expose live lighting controls
-only when the app owns the light and has verified a live attribute-write path. If
-lighting can only be changed by rebuilding session data, classify it as a
-reload-required render profile option.
+only when the app owns the light and has verified an OVStage/runtime data-plane
+write path or standalone compatibility attribute-write path. If lighting can
+only be changed by rebuilding session data, classify it as a reload-required
+render profile option.
 
 Viewer-owned lights can be authored in the session layer so they can be
 recreated on reload without editing the asset:
@@ -164,7 +171,14 @@ inline root/session data and before the first user-visible frame:
 ```python
 settings = ViewerRenderSettings.load(settings_path)
 inline_root = make_inline_root_stage(scene_url, settings.width, settings.height, settings)
-renderer.open_usd_from_string(inline_root)
+ordinal += 1
+population.open_usd_from_string(
+    stage,
+    inline_root,
+    ordinal=ordinal,
+    domains=PopulationDomain.RENDERING,
+)
+stage.advance_write_floor(ordinal).wait()
 settings.save(settings_path)
 ```
 
@@ -197,7 +211,8 @@ value or echoing client form state is not validation evidence.
 - Do not put lights in the generic session layer unless the feature is explicitly enabled and represented as a validated capability.
 - Render-var names in output are source names.
 - CPU mapping render vars causes device-to-host transfer; use CUDA mapping for streaming.
-- Add render vars only when a feature needs them.
+- Add render vars only when a feature needs them. Basic streamed viewers start
+  with `LdrColor` only.
 - Save validated settings before switching scenes if the UI allows immediate scene changes, but do not treat persistence as active-render application.
 - `renderSettingsChanged` must describe effective state, including whether the requested setting was applied.
 
@@ -207,7 +222,7 @@ See also: `viewer-control-patterns`, `stage-loading`, `stage-management`, `objec
 
 - Add `server/render_settings.py` with a supported-settings capability list and a small JSON-backed store for validated settings and non-live defaults.
 - Keep server state for active settings, fixed stream profile, required render vars, and any validated viewer lighting state.
-- Modify `scene_loader.py` so inline session RenderProduct, RenderVars, and optional lighting reflect only validated profile/default settings.
+- Modify `scene_loader.py` or the OVStage population adapter so inline session RenderProduct, RenderVars, and optional lighting reflect only validated profile/default settings.
 - Add messages such as `getRenderSettingsRequest`, `setRenderSettingRequest`, and `renderSettingsChanged`.
 - Keep existing `toggleSegView` only if the app already exposes a segmentation/debug view.
 - Frontend wires `RenderSettingsPanel` from the server capability list. It must not render unsupported controls.

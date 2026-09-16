@@ -19,6 +19,8 @@ tags:
 
 # TAO ChangeNet Classification RCA Skill
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 You are an expert investigator for NVIDIA TAO Visual ChangeNet classification experiments. Your job is to find **why** the model fails, backed by **visual evidence from actual images**.
 
 When the user provides an experiment result directory and training code directory, perform a deep Root Cause Analysis. The investigation must be **image-evidence-driven** — every major conclusion should trace back to specific images you viewed.

@@ -1,13 +1,14 @@
 ---
 name: "amc-run-video-calibration"
-description: "Calibrate a new dataset from pre-recorded video files via the AutoMagicCalib REST API. Use when user has local MP4s and says 'calibrate my videos', 'run AMC on these videos', or similar. For RTSP/live streams, use amc-run-rtsp-calibration instead."
+description: "Calibrates pre-recorded `cam_*.mp4` datasets through the AutoMagicCalib REST API. Use for user-supplied local MP4s; route live RTSP streams to `amc-run-rtsp-calibration`."
 owner: "NVIDIA CORPORATION"
 service: "auto-magic-calib"
-version: "1.0.0"
 reviewed: "2026-04-28"
 license: "Apache-2.0"
+permissions: [env, file_read, network]
 metadata:
-  author: "NVIDIA CORPORATION"
+  version: "1.0.0"
+  author: "Shubham Agrawal <shuagrawal@nvidia.com>"
   tags: [amc, calibration, rest-api, camera, python]
 ---
 
@@ -24,16 +25,35 @@ Drives calibration through the REST API on user-supplied **pre-recorded MP4 file
 
 Do not use this skill for live RTSP streams or `rtsp://...` URLs; route those requests to `skills/amc-run-rtsp-calibration/SKILL.md`.
 
+## Purpose
+
+Guide the agent through project creation, sorted MP4 upload, local asset resolution, UI fallback only when necessary, project verification, calibration, polling, evaluation, and optional VGGT refinement for a user-provided multi-camera dataset.
+
 ## Prerequisites
 
 - [ ] AMC microservice **and** UI running (follow `skills/amc-setup-calibration-stack/SKILL.md`)
-- [ ] You know the microservice URL (e.g. `http://<HOST_IP>:<MS_PORT>`) and UI URL
-- [ ] Video files locally as `cam_00.mp4`, `cam_01.mp4`, … time-synchronized, ~1920×1080
+- [ ] You know the microservice URL (use `https://<HOST_IP>:<MS_PORT>` for remote AMC, or `http://localhost:<MS_PORT>` on loopback) and UI URL
+- [ ] Video files locally as contiguous `cam_00.mp4`, `cam_01.mp4`, … time-synchronized, ~1920×1080
 - [ ] Python 3 with `requests`
+- [ ] If AMC stores project outputs outside the default `projects/` directory, you know the host `PROJECTS_DIR`
+
+## Interaction Model
+
+- The "host's question mechanism" means the runtime's built-in prompt API for short user decisions, such as terminal stdin, an IDE ask tool, or an equivalent interactive dialog.
+- If that mechanism is unavailable, ask in chat and wait before any guarded step that requires user confirmation or a missing-file decision.
+- For unattended runs, the bundled script requires all non-UI inputs up front and exits before `/calibrate` unless `CONFIRM_CALIBRATION=true` is set. `RUN_VGGT=true` remains a separate opt-in for the optional VGGT step.
 
 ## Data Privacy
 
 Video files uploaded via this skill are transmitted to the AutoMagicCalib backend (REST endpoint). Only use this skill when the backend is deployed on a trusted platform / network.
+
+## Inputs
+
+- Required inputs: `VIDEO_DIR`, `BASE_URL`, and `PROJECT_NAME`.
+- Optional local inputs: `CONFIG_FILE`, `ALIGNMENT_JSON`, `LAYOUT_PNG`, `GT_ZIP`, `FOCAL_LENGTHS`, and `DETECTOR_TYPE`.
+- Optional control inputs: `CONFIRM_CALIBRATION`, `RUN_VGGT`, `PROJECTS_DIR`, `CALIBRATION_TIMEOUT_SECONDS`, and `VGGT_TIMEOUT_SECONDS`.
+- `BASE_URL` should use HTTPS for non-loopback hosts. Set `ALLOW_INSECURE_HTTP=true` only for trusted development setups that intentionally use remote plain HTTP.
+- Resolution precedence for settings, alignment, and layout: explicit path, single local auto-detected match, then UI fallback.
 
 ## What to Ask the User
 
@@ -65,6 +85,12 @@ See root `README.md` "Custom Dataset" section for input-video guidelines and gro
 
 ---
 
+## Available Scripts
+
+| Script | Purpose | Key inputs |
+|---|---|---|
+| [run_video_calibration.py](scripts/run_video_calibration.py) | Executes create-project, upload, verify, calibrate, poll, evaluate, and optional VGGT refinement for a local MP4 dataset. | Required: `BASE_URL`, `PROJECT_NAME`, `VIDEO_DIR`. Optional: `CONFIG_FILE`, `ALIGNMENT_JSON`, `LAYOUT_PNG`, `GT_ZIP`, `FOCAL_LENGTHS`, `DETECTOR_TYPE`, `CONFIRM_CALIBRATION`, `RUN_VGGT`, `PROJECTS_DIR`, `CALIBRATION_TIMEOUT_SECONDS`, `VGGT_TIMEOUT_SECONDS`, `ALLOW_INSECURE_HTTP`. |
+
 ## Instructions
 
 All endpoints below are implemented end-to-end in the [Complete Python Script](#complete-python-script) — the prose is the workflow plus the decisions the agent must make; the script is the authoritative runnable.
@@ -75,16 +101,18 @@ All endpoints below are implemented end-to-end in the [Complete Python Script](#
 
 ### Step 2 — Upload Videos (required)
 
-`POST /v1/upload_video_files/<project_id>` (multipart `files`). **Upload sorted alphabetically** — the server assigns camera indices by upload order.
+`POST /v1/upload_video_files/<project_id>` (multipart `files`). **Upload sorted alphabetically** — the server assigns camera indices by upload order. The bundled script rejects non-contiguous or non-zero-based camera sequences up front; the directory must contain `cam_00.mp4`, `cam_01.mp4`, ... with no gaps.
 
 ### Step 3 — Resolve Local Files (Auto-Scan, Ask, or UI)
 
 For each of calibration-settings, alignment, and layout, run this resolution:
 
+**Auto-use rule:** if exactly one match is found, the script uses it automatically and prints the resolved path. No extra prompt occurs for that file.
+
 1. **Auto-scan** `VIDEO_DIR`, one level of subdirectories under `VIDEO_DIR`, and `VIDEO_DIR.parent` for the candidate filenames (table above).
 2. If **exactly one match**, use it and print what was found.
 3. If **zero or multiple matches**, print the searched locations, then ask the user for an explicit path using the host's question mechanism; if none is available, ask in chat and wait. If they don't have the file, mark it for UI fallback.
-4. **UI fallback**: tell the user to complete the corresponding UI step; wait for confirmation; for alignment/layout also verify files landed in `projects/project_<id>/manual_adjustment/`.
+4. **UI fallback**: tell the user to complete the corresponding UI step; wait for confirmation; then continue to Step 6 and treat `verify_project` as the source of truth for whether the UI-supplied alignment/layout data is complete.
 
 ### Step 4 — Upload Resolved Files
 
@@ -98,6 +126,8 @@ Upload each file resolved locally:
 | Ground truth (optional) | `POST /v1/upload_gt_file/<project_id>` (`GT.zip`) | Enables evaluation metrics |
 | Focal lengths (optional) | `POST /v1/upload_focal_length/<project_id>` (repeated `focal_length=`) | Overrides GeoCalib estimates |
 
+Upload all resolved local files first, in any order. After the local uploads are complete, continue to Step 5 only for unresolved files, then run Step 6 exactly once to verify the assembled project.
+
 After a successful settings POST, parse the file for `"detector"` / `"detector_type"` — if it's `"resnet"` or `"transformer"`, use that value for the `/calibrate` call in Step 7 (detector is a separate API parameter, not consumed by `/config`).
 
 ### Step 5 — UI Fallback (only for files the user doesn't have locally)
@@ -107,20 +137,7 @@ If any of settings / alignment / layout was not resolved in Step 3, direct the u
 - **Settings missing** → "Open UI project `<project_id>`, go to **Step 3: Parameters**, tune via the settings dialog (or accept defaults), click Save." **Also**: before the `/calibrate` call, ask the user which detector to use (`resnet` or `transformer`) using the host's question mechanism; if none is available, ask in chat and wait. UI Step 3 does not cover detector choice.
 - **Alignment or layout missing** → "Open UI project `<project_id>`, go to **Step 4: Alignment**, upload layout, mark correspondence points, click Save."
 
-Wait for user confirmation. For non-interactive script runs, provide the needed files up front; the script exits with a clear message rather than waiting on input. For alignment/layout, verify on disk before continuing:
-
-```bash
-: "${REPO_ROOT:?set REPO_ROOT to the auto-magic-calib checkout. Run amc-setup-calibration-stack Step 0b first.}"
-grep -q "AutoMagicCalib" "$REPO_ROOT/README.md" 2>/dev/null && grep -q "auto-magic-calib-ms" "$REPO_ROOT/compose/ms/compose.yml" 2>/dev/null || { echo "ERROR: REPO_ROOT is not an auto-magic-calib checkout: $REPO_ROOT" >&2; exit 1; }
-# Resolve PROJECT_DIR from the Compose environment file (default: projects/ at repo root).
-COMPOSE_ENV_BASENAME="env"
-COMPOSE_ENV_FILE="$REPO_ROOT/compose/.${COMPOSE_ENV_BASENAME}"
-PROJECT_DIR_REL=$(grep ^PROJECT_DIR "$COMPOSE_ENV_FILE" 2>/dev/null | cut -d= -f2 | tr -d '[:space:]')
-HOST_PROJECTS=$(cd "$REPO_ROOT/compose" && realpath "${PROJECT_DIR_REL:-../../projects}")
-
-ls "$HOST_PROJECTS/project_<project_id>/manual_adjustment/"
-# Expected: alignment_data.json, layout.png
-```
+Wait for user confirmation. For non-interactive script runs, provide the needed files up front; the script exits with a clear message rather than waiting on input. Do not require local access to AMC's `projects/` storage for the UI fallback; Step 6 is the canonical server-side verification step.
 
 ### Step 6 — Verify Project
 
@@ -128,7 +145,7 @@ ls "$HOST_PROJECTS/project_<project_id>/manual_adjustment/"
 
 ### Step 7 — Start Calibration
 
-**Confirm the plan before calibrating.** Whether the settings file and detector were auto-detected or asked, present a short summary and get explicit user confirmation before `POST /calibrate` using the host's question mechanism; if none is available, ask in chat and wait. The resolved values are the defaults, so confirming is one click, but the user can switch the detector or skip an auto-detected settings file. The standalone Python script prints the same plan and prompts only when stdin is interactive. Summarize:
+**Confirm the plan before calibrating.** Whether the settings file and detector were auto-detected or asked, present a short summary and get explicit user confirmation before `POST /calibrate` using the host's question mechanism; if none is available, ask in chat and wait. The resolved values are the defaults, so confirming is one click, but the user can switch the detector or skip an auto-detected settings file. The standalone Python script prompts when stdin is interactive; in non-interactive runs it exits before `/calibrate` unless `CONFIRM_CALIBRATION=true` is set. Summarize:
 
 - **Detector** — `resnet` or `transformer` (the value to be sent).
 - **Calibration settings** — the file being applied (path), or "defaults" if none.
@@ -143,11 +160,11 @@ Content-Type: application/json
 
 ### Step 8 — Poll for Completion
 
-`GET /v1/get_project_info/<project_id>` every 10 s — `project_info.project_state` goes `RUNNING` → `COMPLETED` (or `ERROR`, pull the log). Typical time: **10–60 min** depending on video length and detector.
+`GET /v1/get_project_info/<project_id>` every 10 s — `project_info.project_state` goes `RUNNING` → `COMPLETED` (or `ERROR`, pull the log). Typical time: **10–60 min** depending on video length and detector. The bundled script defaults to a `90` minute cap through `CALIBRATION_TIMEOUT_SECONDS=5400`; raise that env var for longer runs instead of silently killing the process.
 
 ### Step 9 — Get Results
 
-`GET /v1/result/<project_id>/evaluation_statistics` (only if GT was uploaded; includes `Average L2 distance(m)` and `Average reprojection error 0(px)`), and `GET /v1/amc/calibrate/<project_id>/log` for the calibration log.
+`GET /v1/result/<project_id>/evaluation_statistics` (only if GT was uploaded; includes `Average L2 distance(m)` and `Average reprojection error 0(px)`), and `GET /v1/amc/calibrate/<project_id>/log` for the calibration log. If GT was uploaded and `evaluation_statistics` returns non-200, surface that HTTP error instead of treating it as a missing-GT case.
 
 ### Status Fields from `get_project_info`
 
@@ -171,7 +188,7 @@ The standalone Python script prompts only when stdin is interactive. In non-inte
 
 ## Complete Python Script
 
-Use the bundled script from the `amc-run-video-calibration` skill package, not from the `auto-magic-calib` repo root. If the user points the agent at this skill folder directly instead of installing it, set `AMC_VIDEO_SKILL_DIR` to the directory containing this `SKILL.md`, or run the command from that directory. Set `BASE_URL`, `PROJECT_NAME`, and `VIDEO_DIR`; optional env vars are `CONFIG_FILE`, `ALIGNMENT_JSON`, `LAYOUT_PNG`, `GT_ZIP`, `FOCAL_LENGTHS`, `DETECTOR_TYPE`, `RUN_VGGT`, `REPO_ROOT`, and `PROJECTS_DIR`. The script implements UI fallback, plan confirmation, VGGT prompt/opt-in behavior, polling, and refined statistics retrieval.
+Use the bundled script from the `amc-run-video-calibration` skill package, not from the `auto-magic-calib` repo root. If the user points the agent at this skill folder directly instead of installing it, set `AMC_VIDEO_SKILL_DIR` to the directory containing this `SKILL.md`, or run the command from that directory. Set `BASE_URL`, `PROJECT_NAME`, and `VIDEO_DIR`; optional env vars are `CONFIG_FILE`, `ALIGNMENT_JSON`, `LAYOUT_PNG`, `GT_ZIP`, `FOCAL_LENGTHS`, `DETECTOR_TYPE`, `RUN_VGGT`, `REPO_ROOT`, `PROJECTS_DIR`, `CONFIRM_CALIBRATION`, `CALIBRATION_TIMEOUT_SECONDS`, `VGGT_TIMEOUT_SECONDS`, and `ALLOW_INSECURE_HTTP`. The script implements AMC readiness checks, UI fallback, explicit confirmation gating, bounded polling, and refined statistics retrieval.
 
 ```bash
 # Optional but recommended: REPO_ROOT points to the auto-magic-calib checkout.
@@ -204,10 +221,35 @@ done
 python3 "$SCRIPT_PATH"
 ```
 
+## Examples
+
+Interactive run with auto-detection for local settings/alignment/layout:
+
+```bash
+BASE_URL="http://localhost:8000/v1" \
+PROJECT_NAME="warehouse-calibration" \
+VIDEO_DIR="/data/warehouse_session" \
+python3 "$SCRIPT_PATH"
+```
+
+Non-interactive run with all required local files supplied up front:
+
+```bash
+BASE_URL="http://localhost:8000/v1" \
+PROJECT_NAME="warehouse-batch" \
+VIDEO_DIR="/data/warehouse_session" \
+CONFIG_FILE="/data/warehouse_session/settings.json" \
+ALIGNMENT_JSON="/data/warehouse_session/alignment_data.json" \
+LAYOUT_PNG="/data/warehouse_session/layout.png" \
+CONFIRM_CALIBRATION=true \
+RUN_VGGT=true \
+python3 "$SCRIPT_PATH"
+```
+
 ## Success Criteria
 
 - `project_state == "COMPLETED"` after polling.
-- If manual alignment was used: `projects/project_<id>/manual_adjustment/` contains `alignment_data.json` + `layout.png`.
+- `verify_project` returned `READY` before calibration (including manual alignment/UI fallback paths).
 - If GT was uploaded: evaluation returns typical thresholds:
   - `Average L2 distance(m)` < 1.5
   - `Average reprojection error 0(px)` < 5
@@ -230,12 +272,18 @@ projects/project_<project_id>/
 └── calibration.log
 ```
 
+## Limitations
+
+- This skill only applies to local pre-recorded `cam_*.mp4` datasets. Live RTSP streams and the bundled sample dataset are out of scope.
+- Unattended runs cannot rely on UI fallback; provide the required local files up front and set `CONFIRM_CALIBRATION=true`.
+- Reported server-side output paths depend on the correct host `PROJECTS_DIR` when AMC writes project outputs outside the default `projects/` directory.
+
 ## Troubleshooting
 
 | Issue | Fix |
 |---|---|
 | `verify_project` state not `READY` | Confirm videos uploaded and alignment + layout are present (either via API or via UI manual alignment) |
-| Manual alignment files missing after UI step | User didn't click Save; also verify `projects/project_<id>/manual_adjustment/` exists |
+| Manual alignment still not accepted after UI step | User likely did not click Save or the UI data is incomplete; rerun `verify_project` and repeat UI Step 4 |
 | Calibration stuck `RUNNING` > 90 min | `GET /v1/amc/calibrate/<id>/log` — usually insufficient tracklets (scene too static). See "Custom Dataset" guidelines in root README. |
 | Immediate `ERROR` state | Check video naming: must be `cam_00.mp4`, `cam_01.mp4`, … contiguous |
 | Low L2 but high reprojection | Provide explicit `focal_length` override via Step 3 |

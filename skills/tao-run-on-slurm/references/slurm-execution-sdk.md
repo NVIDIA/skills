@@ -117,7 +117,7 @@ SLURM is the platform of choice for large multi-node runs — pass `num_nodes > 
 
 ```python
 job = sdk.create_job(
-    image='nvcr.io/nvidia/tao/tao-toolkit:6.26.3-pyt',
+    image='nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt',  # versions-key: images.tao_toolkit.pyt
     command='torchrun --nnodes=$WORLD_SIZE --nproc-per-node=$NUM_GPU_PER_NODE '
             '--node-rank=$NODE_RANK --master-addr=$MASTER_ADDR --master-port=$MASTER_PORT '
             'train.py',
@@ -216,7 +216,7 @@ ep = build_entrypoint(
 
 sdk = SlurmSDK()  # reads SLURM_USER, SLURM_HOSTNAME, SLURM_BASE_RESULTS_DIR from env
 job = sdk.create_job(
-    image='nvcr.io/nvidia/tao/tao-toolkit:6.26.3-pyt',
+    image='nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt',  # versions-key: images.tao_toolkit.pyt
     command=ep['command'],
     gpu_count=8,
     num_nodes=2,                                           # multi-node supported
@@ -277,8 +277,10 @@ confirm the fix before resubmitting.
 **Local dataset path rejected**: Convert the data path to `lustre:///...` or
 copy the dataset onto the cluster's shared filesystem.
 
-**SQSH conversion timeout**: Increase `sqsh_conversion_timeout_minutes`, use a
-smaller image, or pre-stage the SQSH image in the cache directory.
+**SQSH conversion timeout**: The `cpu` partition on CS-OCI-ORD has a ~30 min
+wall-time limit — shorter than the conversion time for large TAO images. Always set `SLURM_CONVERSION_PARTITION=cpu_long` and
+`SLURM_CONVERSION_TIMEOUT_MINUTES=120` before constructing `SlurmSDK`. The SDK validates the SQSH via SquashFS magic bytes before reusing it, so
+partial files from failed conversions are automatically rejected and reconverted.
 
 **Pyxis or Enroot unavailable**: The generated sbatch script depends on
 `srun --container-image`. Ask the cluster admin to enable Pyxis/Enroot or use a

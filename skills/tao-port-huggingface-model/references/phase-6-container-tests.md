@@ -56,7 +56,7 @@ Phase 0 prepared these local image tags from the TAO Toolkit container reference
 
 | Repo | Local tag (prepared in Phase 0) | Underlying TAO Toolkit image (user-supplied) | Packages removed during prep |
 |------|---------------------------------|----------------------------------------------|------------------------------|
-| **tao-core** | `tao-pytorch-base:latest` (or `nvcr.io/nvidia/pytorch:24.03-py3`) | n/a — uses public NGC PyTorch image directly, or piggybacks on the prepared tao-pytorch image | n/a |
+| **tao-core** | `tao-pytorch-base:latest` (or `nvcr.io/nvidia/pytorch:24.03-py3`) | n/a — uses public NGC PyTorch image directly, or piggybacks on the prepared tao-pytorch image | n/a | <!-- unpinned: example public NGC base image -->
 | **tao-pytorch** | `tao-pytorch-base:latest` | tao-pytorch image (e.g. `nvcr.io/<org>/tao-toolkit:<version>-pyt`) | `nvidia_tao_pytorch`, `nvidia_tao_core` |
 | **tao-deploy** | `tao-deploy-base:latest` | tao-deploy image (e.g. `nvcr.io/<org>/tao-toolkit:<version>-deploy`) | `nvidia_tao_deploy`, `nvidia_tao_core` |
 | **tao-dataservices** | `tao-dataservices-base:latest` (optional) | tao-dataservices image (e.g. `nvcr.io/<org>/tao-toolkit:<version>-data-services`) | `nvidia_tao_ds`, `nvidia_tao_pytorch`, `nvidia_tao_core` |

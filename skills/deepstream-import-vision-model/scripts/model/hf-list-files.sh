@@ -60,8 +60,8 @@ if [[ -n "${HF_TOKEN:-}" ]]; then
 fi
 
 # Separate exit-code capture from body so we can diagnose failures precisely.
-RESPONSE="$(curl "${CURL_OPTS[@]}" "$URL")"
-CURL_RC=$?
+CURL_RC=0
+RESPONSE="$(curl "${CURL_OPTS[@]}" "$URL")" || CURL_RC=$?
 
 if [[ $CURL_RC -ne 0 ]]; then
     echo "ERROR: curl failed (exit $CURL_RC) while fetching $URL" >&2

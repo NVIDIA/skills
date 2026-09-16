@@ -53,7 +53,9 @@
           },
           "additionalProperties": true
         },
-        "smoke": {"type": "boolean"}
+        "smoke": {"type": "boolean"},
+        "softmax": {"type": "boolean"},
+        "workflow": {"enum": ["standard", "softmax"]}
       }
     },
     "environment": {
@@ -78,6 +80,7 @@
         "learning_rate": {"type": "number"},
         "nproc_per_node": {"type": "integer", "minimum": 1},
         "multi_gpu": {"type": "boolean"},
+        "workflow": {"enum": ["standard", "softmax"]},
         "rationale": {"type": "array", "items": {"type": "string"}}
       }
     },
@@ -90,6 +93,8 @@
         "config_stack": {"type": "array", "items": {"type": "string"}, "minItems": 3},
         "multi_gpu": {"type": "boolean"},
         "cwd": {"type": "string"},
+        "bundle_root": {"type": "string"},
+        "upstream_commit": {"type": ["string", "null"]},
         "override_file": {"type": "string"}
       }
     },
@@ -101,6 +106,9 @@
         "finetuned_ckpt_exists": {"type": "boolean"},
         "pretrained_ckpt": {"type": "string"},
         "recommended_ckpt": {"type": ["string", "null"]},
+        "checkpoint_architecture": {
+          "enum": ["vista3d_promptable", "fixed_channel_softmax"]
+        },
         "checkpoint_comparisons_to_pretrained": {"type": "object"},
         "finetuned_ckpt_matches_pretrained_weights": {"type": ["boolean", "null"]},
         "baseline_val_dice": {"type": ["number", "null"]},

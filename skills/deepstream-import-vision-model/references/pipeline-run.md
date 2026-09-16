@@ -17,10 +17,8 @@ ONNX_FILE=$(ls models/$MODEL_NAME/model/*.onnx 2>/dev/null | grep -v '_dynamic' 
 [ -z "$ONNX_FILE" ] && { echo "ERROR: No ONNX file found in models/$MODEL_NAME/model/ — run Steps 1-3 first (references/model-acquire.md)"; exit 1; }
 MODEL_FILENAME=$(basename "$ONNX_FILE" .onnx)
 
-# Find TRT engine from nv-engine-build
-ENGINE=$(ls models/$MODEL_NAME/benchmarks/engines/*_dynamic_b*.engine 2>/dev/null | head -1)
-[ -z "$ENGINE" ] && { echo "ERROR: No engine found in models/$MODEL_NAME/benchmarks/engines/ — run Steps 4-5 first (references/engine-build.md)"; exit 1; }
-MAX_BS=$(echo "$ENGINE" | grep -oP '_b\K[0-9]+(?=\.engine)')
+# Engine + MAX_BS from the shared resolver (see scripts/model/resolve-engine.sh).
+eval "$(bash .claude/skills/deepstream-import-vision-model/scripts/model/resolve-engine.sh "$MODEL_NAME")" || exit 1
 
 # Read PEAK_GPU_STREAMS from trtexec Step 5b log — fixed filename, no timestamp, no wildcard
 TRTEXEC_LOG="models/$MODEL_NAME/benchmarks/b${MAX_BS}/trtexec_b${MAX_BS}.log"
@@ -33,7 +31,7 @@ print(round(imgs, 2), int(math.floor(imgs / 30)))
 ")
 
 # Read spatial dimensions from ONNX inspection
-INSPECT_OUT=$(python3 skills/deepstream-import-vision-model/scripts/model/inspect-onnx.py "$ONNX_FILE")
+INSPECT_OUT=$(python3 .claude/skills/deepstream-import-vision-model/scripts/model/inspect-onnx.py "$ONNX_FILE")
 INPUT_NAME=$(echo "$INSPECT_OUT" | grep -oP 'input_name:\s*\K\S+')
 H=$(echo "$INSPECT_OUT"          | grep -oP 'height:\s*\K[0-9]+')
 W=$(echo "$INSPECT_OUT"          | grep -oP 'width:\s*\K[0-9]+')
@@ -43,7 +41,7 @@ W=$(echo "$INSPECT_OUT"          | grep -oP 'width:\s*\K[0-9]+')
 
 # Detect installed CUDA version for parser compilation
 CUDA_VER=$(ls /usr/local/ 2>/dev/null | grep -oP '^cuda-\K[0-9]+\.[0-9]+$' | sort -V | tail -1)
-[ -z "$CUDA_VER" ] && CUDA_VER=12.8
+[ -z "$CUDA_VER" ] && CUDA_VER=13.2
 echo "CUDA_VER=$CUDA_VER"
 
 # Count labels
@@ -59,7 +57,9 @@ print(''.join(p.capitalize() for p in parts))
 ")
 # Sanitize MODEL_NAME for use in C++ source/library filenames — mirrors PARSER_FUNC_SUFFIX logic.
 # e.g. rtdetr-l → rtdetr_l  grounding-dino-base → grounding_dino_base
-MODEL_NAME_SAFE=$(echo "$MODEL_NAME" | tr -c 'A-Za-z0-9' '_')
+# printf, NOT echo: echo appends a newline that `tr -c` turns into a trailing '_', yielding
+# e.g. `rtdetr_r50vd_` and a custom-lib-path that never matches the Makefile's TARGET_LIB.
+MODEL_NAME_SAFE=$(printf '%s' "$MODEL_NAME" | tr -c 'A-Za-z0-9' '_')
 
 # Video source — default is sample_720p.mp4 (MANDATORY). Never autonomously substitute
 # sample_1080p_h264.mp4 or any other file. DS_VIDEO may only be set when the user explicitly
@@ -68,7 +68,7 @@ VIDEO="${DS_VIDEO:-/opt/nvidia/deepstream/deepstream/samples/streams/sample_720p
 [ -f "$VIDEO" ] || {
   echo "ERROR: Video file not found: $VIDEO"
   echo "  Fix 1: Set DS_VIDEO=/path/to/sample_720p.mp4 before running"
-  echo "  Fix 2: Install DeepStream samples"
+  echo "  Fix 2: Install DeepStream samples (DeepStream 9.1 samples): apt-get install deepstream-9.1-samples"
   exit 1
 }
 
@@ -248,7 +248,7 @@ echo "labels.txt: $NUM_LABELS classes -> num-detected-classes=$NUM_LABELS"
 > Primary encoder is `nvv4l2h264enc` (NVENC via V4L2) → `.mp4`. `x264enc` and `openh264enc` are **prohibited**.
 > On systems where `/dev/v4l2-nvenc` is unavailable, the approved fallback is `theoraenc + oggmux`
 > (LGPL; both ship in gst-plugins-base) → `.ogv`. If `theoraenc`/`oggmux` are absent, video creation is skipped.
-> Use `skills/deepstream-import-vision-model/scripts/deepstream/ds-single-stream.sh` which handles this automatically
+> Use `.claude/skills/deepstream-import-vision-model/scripts/deepstream/ds-single-stream.sh` which handles this automatically
 > and emits a `DS_SINGLE_STREAM_MODE=` marker the report parser reads.
 
 **Primary (NVENC available):**
@@ -320,7 +320,7 @@ Run a KITTI dump to confirm detections exist before multi-stream benchmarks.
 ```bash
 mkdir -p models/$MODEL_NAME/samples/kitti_output
 
-bash skills/deepstream-import-vision-model/scripts/deepstream/ds-kitti-dump.sh \
+bash .claude/skills/deepstream-import-vision-model/scripts/deepstream/ds-kitti-dump.sh \
   models/$MODEL_NAME/config/config_infer_primary_${MODEL_NAME}.txt \
   models/$MODEL_NAME/samples/kitti_output \
   100 \
@@ -357,7 +357,7 @@ fi
 
 ```bash
 STEP6_END=$(date +%s.%N)
-STEP6_DURATION=$(echo "$STEP6_END - $STEP6_START" | bc)
+STEP6_DURATION=$(python3 -c "print(round($STEP6_END - $STEP6_START, 2))")   # bc is not in the container; python3 always is
 echo "[Step 6] completed in ${STEP6_DURATION}s"
 ```
 
@@ -376,39 +376,34 @@ echo "[Step 6] completed in ${STEP6_DURATION}s"
 
 ### 7b: Create DS Benchmark Config
 
-Create one nvinfer config for all DS benchmark runs. `batch-size` is overridden at runtime via the nvinfer GStreamer element property:
+Create one nvinfer config for all DS benchmark runs. `batch-size` is overridden at runtime via the nvinfer GStreamer element property.
+
+This config is **derived from the Step 6e config** rather than re-authored — every `[property]` and
+`[class-attrs-all]` value is identical. Only the relative paths and `batch-size` differ, because this
+copy lives one directory deeper (`benchmarks/ds/` instead of `config/`). Deriving it keeps the two
+from drifting apart:
 
 ```bash
 mkdir -p models/$MODEL_NAME/benchmarks/ds
 
-cat > models/$MODEL_NAME/benchmarks/ds/config_infer_ds_${MODEL_NAME}.txt << EOF
-[property]
-gpu-id=0
-net-scale-factor=0.00392156862745098
-model-color-format=0
-onnx-file=../../model/${MODEL_FILENAME}.onnx
-model-engine-file=../engines/${MODEL_FILENAME}_dynamic_b${MAX_BS}.engine
-labelfile-path=../../config/labels.txt
-batch-size=${MAX_BS}
-network-mode=2
-num-detected-classes=${NUM_LABELS}
-process-mode=1
-interval=0
-gie-unique-id=1
-network-type=0
-custom-lib-path=../../parser/libnvdsinfer_${MODEL_NAME_SAFE}_parser.so
-parse-bbox-func-name=NvDsInferParseCustom${PARSER_FUNC_SUFFIX}
-# 2=DeepStream NMS (dense heads: YOLO, SSD). Use 4 if engine has fused NMS output
-cluster-mode=2
-infer-dims=3;${H};${W}
-maintain-aspect-ratio=1
-
-[class-attrs-all]
-topk=200
-nms-iou-threshold=0.45
-pre-cluster-threshold=0.25
-EOF
+sed -e 's#^onnx-file=\.\./#onnx-file=../../#' \
+    -e 's#^model-engine-file=\.\./benchmarks/engines/#model-engine-file=../engines/#' \
+    -e 's#^labelfile-path=labels\.txt#labelfile-path=../../config/labels.txt#' \
+    -e "s#^batch-size=1\$#batch-size=${MAX_BS}#" \
+    -e 's#^custom-lib-path=\.\./#custom-lib-path=../../#' \
+    models/$MODEL_NAME/config/config_infer_primary_${MODEL_NAME}.txt \
+  > models/$MODEL_NAME/benchmarks/ds/config_infer_ds_${MODEL_NAME}.txt
 ```
+
+The five derived keys, for reference:
+
+| Key | Step 6e (`config/`) | Step 7b (`benchmarks/ds/`) |
+|---|---|---|
+| `onnx-file` | `../model/…` | `../../model/…` |
+| `model-engine-file` | `../benchmarks/engines/…` | `../engines/…` |
+| `labelfile-path` | `labels.txt` | `../../config/labels.txt` |
+| `batch-size` | `1` | `${MAX_BS}` |
+| `custom-lib-path` | `../parser/…` | `../../parser/…` |
 
 > **Path note**: Paths are relative to `benchmarks/ds/` where this config lives.
 
@@ -420,7 +415,7 @@ Every pipeline stage must be separated by `queue` elements. Use `leaky=downstrea
 
 Only **2 DS pipeline runs** characterise DS overhead vs trtexec.
 
-Both runs go through `deepstream-app` with `[application] enable-perf-measurement=1` (wrapped by `skills/deepstream-import-vision-model/scripts/deepstream/ds-perf-run.sh`). FPS is parsed from the canonical `**PERF:` lines DeepStream emits at the configured measurement interval. This replaces the older `gst-launch-1.0 ... ! fpsdisplaysink` path so the runtime no longer depends on `gstreamer1.0-plugins-bad`.
+Both runs go through `deepstream-app` with `[application] enable-perf-measurement=1` (wrapped by `.claude/skills/deepstream-import-vision-model/scripts/deepstream/ds-perf-run.sh`). FPS is parsed from the canonical `**PERF:` lines DeepStream emits at the configured measurement interval. This replaces the older `gst-launch-1.0 ... ! fpsdisplaysink` path so the runtime no longer depends on `gstreamer1.0-plugins-bad`.
 
 > **PERF line format**: `**PERF: <fps_run> (<fps_avg>)` — one float per active source. The helper script averages the per-stream instantaneous FPS across the last few measurement windows; the parser below mirrors that contract.
 
@@ -428,7 +423,7 @@ Both runs go through `deepstream-app` with `[application] enable-perf-measuremen
 
 > **CRITICAL**: Use `$PEAK_GPU_STREAMS` directly. Do NOT pre-apply any efficiency discount (no ×0.6, ×0.7, etc.). Run 1 *measures* the real overhead — do not guess it.
 
-> Log filenames are **fixed** — no timestamp variation. Always `ds_s${N}_run1.log` and `ds_s${N}_run2.log` in `benchmarks/ds/`. The nv-import-vision-model-report skill reads these exact paths.
+> Log filenames are **fixed** — no timestamp variation. Always `ds_s${N}_run1.log` and `ds_s${N}_run2.log` in `benchmarks/ds/`. The report-generation skill reads these exact paths.
 
 ```bash
 # Hard constraint: num_streams <= engine max batch size — always
@@ -436,7 +431,7 @@ N=$(python3 -c "print(min($PEAK_GPU_STREAMS, $MAX_BS))")
 LOG_RUN1="models/$MODEL_NAME/benchmarks/ds/ds_s${N}_run1.log"
 
 STEP7_RUN1_START=$(date +%s.%N)
-bash skills/deepstream-import-vision-model/scripts/deepstream/ds-perf-run.sh \
+bash .claude/skills/deepstream-import-vision-model/scripts/deepstream/ds-perf-run.sh \
   models/$MODEL_NAME/benchmarks/ds/config_infer_ds_${MODEL_NAME}.txt \
   "$N" \
   "$LOG_RUN1" \
@@ -451,7 +446,7 @@ TOTAL_FPS_RUN1=$(python3 -c "print(round(float('$FPS_RUN1') * $N, 2))")
 RT_STREAMS=$(python3 -c "import math; print(min(int(math.floor(float('$TOTAL_FPS_RUN1') / 30)), $MAX_BS))")
 echo "DS Run 1: $N streams | FPS/stream=$FPS_RUN1 | total=$TOTAL_FPS_RUN1 img/s | RT_STREAMS=$RT_STREAMS"
 STEP7_RUN1_END=$(date +%s.%N)
-STEP7_RUN1_DURATION=$(echo "$STEP7_RUN1_END - $STEP7_RUN1_START" | bc)
+STEP7_RUN1_DURATION=$(python3 -c "print(round($STEP7_RUN1_END - $STEP7_RUN1_START, 2))")   # bc is not in the container; python3 always is
 echo "[Step 7 Run 1] completed in ${STEP7_RUN1_DURATION}s"
 ```
 
@@ -461,7 +456,7 @@ N=$RT_STREAMS
 LOG_RUN2="models/$MODEL_NAME/benchmarks/ds/ds_s${N}_run2.log"
 
 STEP7_RUN2_START=$(date +%s.%N)
-bash skills/deepstream-import-vision-model/scripts/deepstream/ds-perf-run.sh \
+bash .claude/skills/deepstream-import-vision-model/scripts/deepstream/ds-perf-run.sh \
   models/$MODEL_NAME/benchmarks/ds/config_infer_ds_${MODEL_NAME}.txt \
   "$N" \
   "$LOG_RUN2" \
@@ -476,20 +471,33 @@ TOTAL_FPS_RUN2=$(python3 -c "print(round(float('$FPS_RUN2') * $N, 2))")
 RT_CONFIRMED=$(python3 -c "print('YES' if float('$FPS_RUN2') >= 30 else 'NO')")
 echo "DS Run 2: $N streams | FPS/stream=$FPS_RUN2 | total=$TOTAL_FPS_RUN2 img/s | Real-time: $RT_CONFIRMED"
 STEP7_RUN2_END=$(date +%s.%N)
-STEP7_RUN2_DURATION=$(echo "$STEP7_RUN2_END - $STEP7_RUN2_START" | bc)
+STEP7_RUN2_DURATION=$(python3 -c "print(round($STEP7_RUN2_END - $STEP7_RUN2_START, 2))")   # bc is not in the container; python3 always is
 echo "[Step 7 Run 2] completed in ${STEP7_RUN2_DURATION}s"
 ```
 
 > **NVDEC saturation on fast nano models**: very fast models (YOLO-nano family, etc.) can saturate NVDEC before GPU. Symptom: DS aggregate FPS plateaus at the same value regardless of stream count (e.g., 6,976 at 128 streams, 7,060 at 200 streams). In this case, `PEAK_GPU_STREAMS` from trtexec is an overestimate — Run 1 at that count will show fps/stream well below 30. The `RT_STREAMS = floor(TOTAL_FPS_RUN1 / 30)` formula above produces the correct NVDEC-limited ceiling. Do not pre-apply an efficiency factor to `PEAK_GPU_STREAMS` to compensate — the 2-run method measures overhead, it does not guess it.
 
-**If Run 2 is still not real-time** (FPS/stream < 30): halve RT_STREAMS and retry once:
+**If Run 2 is still not real-time** (FPS/stream < 30): **converge to the true ceiling — do NOT halve.**
+
+> **Why not halve:** halving overshoots badly. If Run 2 at 38 streams measures 29.6 fps/stream
+> (total 1124.8 img/s — only 1.3% under real-time), the real ceiling is ~37 streams, not 19.
+> Halving to 19 discards ~half the GPU's real capacity and reports a misleadingly low number.
+> Instead, recompute the target from Run 2's *measured* total throughput
+> (`floor(TOTAL_FPS_RUN2 / 30)`), which is strictly below the count that just failed, then
+> step down by 1 until real-time. This lands on the true ceiling in 1–2 short retries.
+
 ```bash
-if [ "$RT_CONFIRMED" = "NO" ]; then
-  RT_STREAMS=$(python3 -c "import math; print(max(1, int(math.floor($RT_STREAMS / 2))))")
-  echo "Run 2 not real-time — retrying at $RT_STREAMS streams"
+# Bounded convergence: recompute from measured throughput, then decrement by 1.
+RETRIES=0
+while [ "$RT_CONFIRMED" = "NO" ] && [ "$RETRIES" -lt 5 ]; do
+  # First correction: jump to floor(measured_total/30); afterwards step down by 1.
+  NEXT=$(python3 -c "import math; print(int(math.floor(float('$TOTAL_FPS_RUN2') / 30)))")
+  [ "$NEXT" -ge "$N" ] && NEXT=$((N - 1))   # guarantee strict progress below the failing count
+  RT_STREAMS=$(python3 -c "print(max(1, $NEXT))")
   N=$RT_STREAMS
+  echo "Run 2 not real-time (fps/stream=$FPS_RUN2) — converging to $N streams"
   LOG_RUN2="models/$MODEL_NAME/benchmarks/ds/ds_s${N}_run2.log"
-  bash skills/deepstream-import-vision-model/scripts/deepstream/ds-perf-run.sh \
+  bash .claude/skills/deepstream-import-vision-model/scripts/deepstream/ds-perf-run.sh \
     models/$MODEL_NAME/benchmarks/ds/config_infer_ds_${MODEL_NAME}.txt \
     "$N" \
     "$LOG_RUN2" \
@@ -498,8 +506,10 @@ if [ "$RT_CONFIRMED" = "NO" ]; then
 import sys; vals=[float(l) for l in sys.stdin if l.strip()]; print(round(sum(vals)/len(vals),2) if vals else 0)")
   TOTAL_FPS_RUN2=$(python3 -c "print(round(float('$FPS_RUN2') * $N, 2))")
   RT_CONFIRMED=$(python3 -c "print('YES' if float('$FPS_RUN2') >= 30 else 'NO')")
-  echo "Retry: $N streams | FPS/stream=$FPS_RUN2 | Real-time: $RT_CONFIRMED"
-fi
+  RETRIES=$((RETRIES + 1))
+  echo "Retry $RETRIES: $N streams | FPS/stream=$FPS_RUN2 | Real-time: $RT_CONFIRMED"
+  [ "$N" -le 1 ] && break
+done
 ```
 
 **CONSTRAINT**: `num_streams <= engine_max_bs` always. Already enforced above via `min(RT_STREAMS, MAX_BS)`.
@@ -514,7 +524,7 @@ DS_EFF_RUN2=$(python3 -c "print(round(float('$TOTAL_FPS_RUN2') / float('$TRTEXEC
 ## Timing and Output Summary
 
 ```bash
-TOTAL_67_DURATION=$(echo "$STEP6_DURATION + $STEP7_RUN1_DURATION + $STEP7_RUN2_DURATION" | bc)
+TOTAL_67_DURATION=$(python3 -c "print(round($STEP6_DURATION + $STEP7_RUN1_DURATION + $STEP7_RUN2_DURATION, 2))")   # bc is not in the container; python3 always is
 ```
 
 When complete, print:

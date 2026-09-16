@@ -1,16 +1,12 @@
 # Local Docker Invocation
 
-When running without the TAO SDK (local docker), resolve the TAO pyt image from `versions.yaml` and invoke directly:
+When running without the TAO SDK (local docker), use the pinned TAO pyt image and invoke directly:
 
 ```bash
 set -a; source <workspace>/.env; set +a
 
-# Resolve the TAO pyt container URI from versions.yaml. The awk fallback keeps
-# local Docker usable on hosts where the helper's PyYAML dependency is missing.
-TAO_PYT_IMAGE=$(
-    "${TAO_SKILL_BANK_PATH:?}/scripts/resolve_versions_key.py" images.tao_toolkit.pyt 2>/dev/null ||
-    awk '/^[[:space:]]*pyt:/{print $2; exit}' "${TAO_SKILL_BANK_PATH:?}/versions.yaml"
-)
+# Pinned TAO pyt container URI (stamped from the release manifest).
+TAO_PYT_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
 
 docker run --rm --gpus all --shm-size=8g \
     -e NGC_API_KEY="${NGC_API_KEY}" \

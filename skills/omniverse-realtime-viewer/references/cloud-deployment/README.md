@@ -2,7 +2,18 @@
 
 ## Triggers
 
-Use this skill for requests mentioning deploy, OKAS 1, cloud deployment, session APIs, Docker, health checks, Brev, launchables, or remote deployment.
+Use this skill for requests mentioning deploy, NVCF self-hosted, OKAS 1, cloud deployment, session APIs, Docker, health checks, Brev, launchables, or remote deployment.
+
+## Choose A Deployment Path
+
+- **Brev**: a fast demo deployment; use the Brev recipe below.
+- **OKAS or another portable session orchestrator**: use the generic session contract below.
+- **NVCF self-hosted on AWS or Azure**: read `nvcf-self-hosted.md` first, then follow the current upstream `streaming-self-hosted` orchestration and component skills. Do not duplicate that workflow here.
+
+For NVCF image preparation and viewer-side failures, use
+`nvcf-viewer-container-contract.md`, `gpu-container-runtime.md`,
+`container-image-build.md`, and `webrtc-network-diagnostics.md` after selecting
+the upstream deployment path.
 
 ## Brev Launchable Deployment (Recommended for Demo)
 
@@ -23,7 +34,7 @@ Two access modes are supported:
 
 #### Option A: HTTPS via Brev domain (port 80 + Caddy WSS proxy)
 
-Brev exposes port 80 as `https://frontend-<id>.brevlab.com` with TLS termination at their edge. Browsers enforce secure WebSocket (`wss://`) — plain `ws://` is blocked as mixed-content. Caddy on port 80 serves both the frontend AND proxies the internal `@nvidia/ov-web-rtc` Direct signaling endpoint used by standalone `ovstream`:
+Brev exposes port 80 as `https://frontend-<id>.brevlab.com` with TLS termination at their edge. Browsers enforce secure WebSocket (`wss://`) — plain `ws://` is blocked as mixed-content. Caddy on port 80 serves both the frontend AND proxies the backend `@nvidia/ov-web-rtc` Direct signaling endpoint used by standalone `ovstream`:
 
 ```text
 Browser → https://frontend-<id>.brevlab.com (Brev TLS edge)
@@ -41,12 +52,11 @@ Brev routes this → port 80 → Caddy → localhost:49100.
 This is the exposed route for standalone `ovstream` Direct signaling. The
 deployment layer may provide auth, launch, routing, and lifecycle management,
 but the browser WebRTC config still uses `@nvidia/ov-web-rtc` Direct mode with
-the exposed signaling endpoint. Do not replace it with a Kit, OVC, NVCF, or GFN
-client connection profile.
+the exposed signaling endpoint. Do not replace it with a connection profile intended for a different streaming product.
 
 #### Option B: Direct IP access (port 1024 + nginx)
 
-For internal testing where TLS isn't needed, access the viewer directly via `http://<PUBLIC_IP>:1024`. nginx on port 1024 proxies both the frontend and signaling:
+For development or controlled-network testing where TLS isn't needed, access the viewer directly via `http://<PUBLIC_IP>:1024`. nginx on port 1024 proxies both the frontend and signaling:
 
 ```text
 Browser → http://<PUBLIC_IP>:1024/
@@ -176,7 +186,8 @@ With Option B, nginx proxies it on the same port.
        libxcb1 libbsd0 libmd0 libegl1 libglib2.0-0
 
    # Deploy directory
-   sudo mkdir -p /opt/ov-viewer && sudo chown $(whoami) /opt/ov-viewer
+   sudo mkdir -p /opt/ov-viewer
+   sudo chown $(whoami) /opt/ov-viewer
    cp -r /tmp/ov-deploy/server /opt/ov-viewer/
    cp -r /tmp/ov-deploy/samples_data /opt/ov-viewer/
    mkdir -p /opt/ov-viewer/clients/webrtc-browser
@@ -188,13 +199,14 @@ With Option B, nginx proxies it on the same port.
    source .venv/bin/activate
    pip install --upgrade pip -q
    pip install /tmp/ov-deploy/*.whl -q
-   pip install numpy warp-lang "usd-core==24.11" -q
+   pip install numpy warp-lang "usd-core" -q
    python3 -c "import ovstream, ovrtx; print('OK')"
    deactivate
 
    # Install Caddy (Option A only)
    curl -o /tmp/caddy.tar.gz -sL "https://github.com/caddyserver/caddy/releases/download/v2.8.4/caddy_2.8.4_linux_amd64.tar.gz"
-   tar -xzf /tmp/caddy.tar.gz -C /tmp caddy && sudo mv /tmp/caddy /usr/local/bin/caddy
+   tar -xzf /tmp/caddy.tar.gz -C /tmp caddy
+   sudo mv /tmp/caddy /usr/local/bin/caddy
    ```
 
 4. **Start server:**
@@ -237,7 +249,7 @@ With Option B, nginx proxies it on the same port.
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | Mixed Content: `ws://` blocked | Page loaded over HTTPS, SDK uses plain WS | Use Option A (Caddy + `VITE_SIGNALING_PORT=443`) or Option B (direct IP, no TLS) |
-| "connection attempts failed, retrying" | Proxy not forwarding the internal Direct signaling endpoint | Verify Caddy/nginx config proxies `/sign_in` to 49100 |
+| "connection attempts failed, retrying" | Proxy not forwarding the backend Direct signaling endpoint | Verify Caddy/nginx config proxies `/sign_in` to 49100 |
 | WebSocket to `wss://` fails on direct IP | SDK tries WSS on HTTPS page | Use Option B with `http://` access (no TLS = no mixed-content) |
 | Black screen, input works | NVENC encoder state corruption | Kill and restart server clean |
 | `NattHolePunch: Address ... is not valid` | Signaling through Cloudflare hides client IP | Use Option B (direct IP) or Option A (Caddy, doesn't affect UDP) |
@@ -252,7 +264,7 @@ With Option B, nginx proxies it on the same port.
 
 **Option A (Caddy + HTTPS)** is required for demos and external access. Brev's HTTPS proxy terminates TLS at the edge and forwards to port 80. Browsers enforce `wss://` from HTTPS pages — Caddy solves this by serving both frontend and signaling on the same origin.
 
-**Option B (nginx + direct IP)** is simpler for internal dev/testing. No TLS means no mixed-content issues. Access via `http://<PUBLIC_IP>:1024` bypasses Brev's Cloudflare tunnel entirely. However, NVST cannot determine the client IP through Cloudflare, so never use the Brev `https://` URL with Option B.
+**Option B (nginx + direct IP)** is simpler for development/testing. No TLS means no mixed-content issues. Access via `http://<PUBLIC_IP>:1024` bypasses Brev's Cloudflare tunnel entirely. However, NVST cannot determine the client IP through Cloudflare, so never use the Brev `https://` URL with Option B.
 
 Port 1024 and 80 are opened via Brev's "TCP/UDP Port Rules" (actual AWS security group entries), NOT via "Secure Links" (which only proxy TCP through Cloudflare).
 
@@ -454,7 +466,7 @@ Register the Omniverse Realtime Viewer with portable metadata:
 {
   "id": "ovrtx-viewer",
   "name": "Omniverse Realtime Viewer",
-  "image": "ovrtx-viewer:0.2.0",
+  "image": "ovrtx-viewer:latest",
   "description": "Omniverse Realtime Viewer using ovrtx rendering with ovstream WebRTC delivery",
   "gpuRequired": true,
   "ports": {
@@ -494,7 +506,7 @@ python3 server/ov_web_viewer_server.py \
 
 ```bash
 cd deploy
-docker build -t ovrtx-viewer:0.2.0 .
+docker build -t ovrtx-viewer:latest .
 ```
 
 `deploy/entrypoint.sh` launches the server with `$PORT` and `$STAGE_PATH`.
@@ -513,7 +525,7 @@ POST /sessions {application:"ovrtx-viewer"}
   → spawn one GPU process/container
   → poll GET :8081/healthz
   → mark ready
-  → browser connects to frontend and internal Direct signaling
+  → browser connects to frontend and backend Direct signaling
   → WebRTC media flows
   → DELETE /sessions/{id}
   → SIGTERM
@@ -525,4 +537,8 @@ POST /sessions {application:"ovrtx-viewer"}
 - `streaming-client` for frontend WebRTC SDK usage.
 - `streaming-lifecycle` for connection/reconnection behavior.
 - `cloud-assets` when deployed sessions load stages from S3/MinIO.
+- `nvcf-viewer-container-contract.md` for the application/platform boundary.
+- `gpu-container-runtime.md` for GPU image and native-runtime preflight.
+- `container-image-build.md` for registry image preparation.
+- `webrtc-network-diagnostics.md` for signaling/media failure isolation.
 - OKAS 1 or your orchestrator documentation for portal/session APIs.

@@ -139,12 +139,12 @@ Structure:
       "version": "110.0.4"
     },
     "assetValidator": {
-      "package": "omniverse-asset-validator",
+      "package": "usd-validation-nvidia",
       "version": "1.x.y",
       "source": "pip"
     }
   },
-  "optimization_score": 7.8,
+  "optimization_score": 8.8,
   "score_scope": "stage_optimization",
   "score_label": "strong",
   "reasoning": "The agent prioritized composition cleanup because the baseline profile showed high layer count, expensive stage open, and repeated structure. The chosen operations reduce composition and traversal cost without changing visual intent.\n\nMore aggressive mesh repair or decimation was left out because validator findings indicate bounded-loss decisions that need user approval. Runtime profiling is separated into an Omniperf handoff.",
@@ -160,6 +160,17 @@ Structure:
     "artifact_path": null,
     "summary": "Runtime profiling was not run for this report.",
     "caveat": "Use Omniperf for RAM, VRAM, FPS, frame time, shader, renderer, and GPU metrics."
+  },
+  "safety_gate": {
+    "status": "resolved",
+    "finding": "material_dangling_binding: 12 bindings targeted a Looks scope that no longer exists",
+    "notes": "Repaired in Phase 2c before any structural work; re-validated clean at Phase 6b."
+  },
+  "preservation": {
+    "rendered_mesh_count": 4820,
+    "distinct_geometry_bytes_preserved": true,
+    "bounds_preserved": true,
+    "dangling": 0
   },
   "artifacts": {
     "json": "/path/to/SnowdonTowers_SampleHVAC_optimization_report.json",
@@ -373,9 +384,18 @@ Markdown layout is maintained.
 The renderer emits the following sections in order (rendered-output preview —
 illustrative only, **not** a hand-fill target): the title with the asset name;
 a Stage Optimization Score / verdict / generated-timestamp / output line; the
-executive summary; Reasoning; a Runtime Context table; Stage Impact Areas; a
+executive summary; a Correctness Safety Gate table when the report carries a
+`safety_gate` block; Reasoning; a Runtime Context table; Stage Impact Areas; a
 Runtime Profiling note (plus a Runtime Profiling table when handoff fields are
-present); Metric Evidence; Operations; and Validators.
+present); Metric Evidence; Storage Footprint when a `footprint` block is present;
+a Preservation, Coverage, and Fidelity table summarising the `preservation`,
+`target_coverage`, `structural_summary`, and `fidelity` blocks the report
+carries; Operations; and Validators.
+
+The gate blocks render from the machine-readable JSON. Do not rely on restating
+a correctness finding in `executive_summary` or `reasoning` to make it visible:
+fill `safety_gate` and the renderer surfaces it, and a reader who re-renders the
+same JSON gets the same finding.
 
 ## Rules
 

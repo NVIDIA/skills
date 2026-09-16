@@ -133,8 +133,8 @@ Report:
   ~every `kind=component` subtree holds <= 1 mesh (common on monolithic CAD
   imports — exporters tag every mesh a component), the SA report must surface
   "kind present but ~1 mesh/component — unreliable boundary" so downstream
-  frontier selection demotes it instead of trusting it (see the
-  `usd-hierarchy-dedupe-candidates` finder spec §6.0.1 kind-trust preflight).
+  frontier selection demotes it instead of trusting it (see the kind-trust
+  preflight in `usd-hierarchy-dedupe-candidates/references/instance-candidate-finder-spec.md` §6.0.1).
 
 ## SA Stage 2: Structural Heuristics (metadata only, narrows validation scope)
 
@@ -292,7 +292,8 @@ and only then confirm reuse:
    meshes-per-kind sample shows kind does not bound multi-mesh parts (~1
    mesh/component, the CAD-exporter artifact), DEMOTE authored kind and fall
    through this ladder as if it were absent — the structural fallback below may
-   then propose the grain, flagged `kind_untrusted` (finder spec §6.0.1).
+   then propose the grain, flagged `kind_untrusted`
+   (`instance-candidate-finder-spec.md` §6.0.1).
 2. **Namespace / naming.** A meaningful authored name (`assetInfo`, display name,
    variant set) marks a "thing"; `Mesh_017` or a transform-only `Xform` is
    plumbing. The transition from named typed scopes down to anonymous `Mesh`/`Gprim`

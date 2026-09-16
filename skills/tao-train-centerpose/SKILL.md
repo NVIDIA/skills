@@ -16,6 +16,8 @@ tags:
 
 # CenterPose
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 CenterPose for keypoint / pose estimation. Detects object centers and regresses keypoint locations. Used for 6-DoF object pose estimation.
 
 Set model.backbone.pretrained_backbone_path.
@@ -24,7 +26,7 @@ For TAO Deploy TensorRT actions (`gen_trt_engine`, TensorRT `evaluate`, and Tens
 
 ## Dataclass Schemas
 
-Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
+Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML for an action requires `schemas/<action>.schema.json` and `references/spec_template_<action>.yaml` to exist and parse. Use the packaged selected-action schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
 
 ## Train Action Policy
 
@@ -152,7 +154,7 @@ evaluate, inference, export, and resume. Use the symlink only when the user
 explicitly asks for latest.
 
 **TAO Deploy postprocessor compatibility**: Use the deploy image resolved from
-`versions.yaml` or the selected platform. A successful `gen_trt_engine` run does
+the skill's pinned deploy image or the selected platform. A successful `gen_trt_engine` run does
 not prove deploy `evaluate` or `inference` works; inspect those action exit codes
 and logs separately, especially for CenterPose postprocessor errors such as
 `TypeError: only 0-dimensional arrays can be converted to Python scalars`.
@@ -192,3 +194,4 @@ For `parent_model` or `parent_model_folder`, pass the upstream train/export/Auto
 ## Deployment
 
 - [tao-deploy-centerpose](references/tao-deploy-centerpose.md)
+

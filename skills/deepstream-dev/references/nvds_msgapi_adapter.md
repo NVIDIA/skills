@@ -93,7 +93,7 @@ NvDsMsgApiErrorType nvds_msgapi_send(NvDsMsgApiHandle h_ptr,
 | Parameter | Type | Description |
 |---|---|---|
 | `h_ptr` | `NvDsMsgApiHandle` | Connection handle. |
-| `topic` | `char *` | Topic to send the message to. May be `NULL`. |
+| `topic` | `char *` | Destination topic for the payload. May be `NULL`. |
 | `payload` | `const uint8_t *` | Pointer to the message bytes. The message may but need not be a NULL-terminated string. |
 | `nbuf` | `size_t` | Number of bytes to send, including the terminating NULL if the message is a string. |
 

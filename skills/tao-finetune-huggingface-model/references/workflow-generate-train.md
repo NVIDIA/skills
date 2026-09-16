@@ -102,6 +102,7 @@ If `emit_unit_tests: true`, also generate `tests/` per `references/testing.md`.
 **Dockerfile template:**
 
 ```dockerfile
+# unpinned: default HF-finetune base image; Phase 2 selects the live NGC tag
 ARG NGC_IMAGE=nvcr.io/nvidia/pytorch:24.09-py3
 FROM ${NGC_IMAGE}
 

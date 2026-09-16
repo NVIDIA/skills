@@ -1,10 +1,10 @@
 ---
 name: i4h-workflow-dataset-replay
-version: "0.6.0"
-description: Replay a recorded HDF5 episode inside Isaac Sim for visual verification. Use when the user asks to replay, play back, or step through an HDF5 recording.
+description: Replay a workflow HDF5 episode through its original Scene. Use for visual trajectory and recording verification; do not use for policy evaluation or LeRobot data.
 license: Apache-2.0
 metadata:
   author: "Isaac for Healthcare Team <isaac-for-healthcare-support@nvidia.com>"
+  version: "0.8.0"
   tags:
     - isaac-for-healthcare
     - i4h
@@ -13,97 +13,81 @@ metadata:
     - hdf5
 ---
 
-# i4h Workflow — Replay Dataset
+# Replay a Workflow Recording
 
 ## Purpose
 
-Replay a recorded HDF5 episode inside Isaac Sim for visual verification. Use when the user asks to replay, play back, or step through an HDF5 recording.
+Replay the exact recorded action sequence through the matching workflow and inspect it visibly.
 
-## Base Code
+## Instructions
 
-These steps drive the i4h-workflows base code (the `workflows/agentic/` tree). To reuse an existing checkout, set `I4H_WORKFLOWS` to its path (no clone happens). Otherwise this resolves the current repo, or clones to `~/i4h-workflows` — pick that default without prompting. Run every command below from the resolved root:
+1. Run the checkout resolver and select the exact HDF5.
+2. Read the original workflow and requested episode.
+3. Inspect action-contract compatibility.
+4. Run the replay visibly in the foreground through completion.
+
+## Resolve the recording
 
 ```bash
-# Resolve the i4h-workflows base code (provides workflows/agentic/).
+export I4H_WORKFLOWS_REPO_URL="${I4H_WORKFLOWS_REPO_URL:-https://github.com/isaac-for-healthcare/i4h-workflows}"
+I4H_REPO_DIR_NAME="${I4H_WORKFLOWS_REPO_URL%/}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME##*/}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME##*:}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME%.git}"
+[ -n "$I4H_REPO_DIR_NAME" ] || { echo "Cannot derive a checkout name from I4H_WORKFLOWS_REPO_URL" >&2; exit 2; }
 ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"
-if [ ! -d "$ROOT/workflows/agentic" ]; then
-  ROOT="${I4H_WORKFLOWS:-$HOME/i4h-workflows}"
-  [ -d "$ROOT/workflows/agentic" ] || git clone https://github.com/isaac-for-healthcare/i4h-workflows "$ROOT"
+if [ ! -d "$ROOT/workflows/i4h_workflows" ]; then
+  ROOT="${I4H_WORKFLOWS:-$HOME/$I4H_REPO_DIR_NAME}"
+  [ -d "$ROOT/workflows/i4h_workflows" ] || git clone "$I4H_WORKFLOWS_REPO_URL" "$ROOT"
 fi
-export I4H_WORKFLOWS="$ROOT"; cd "$ROOT"
+export I4H_WORKFLOWS="$ROOT"
+cd "$ROOT"
+find runs -name '*.hdf5' -type f -printf '%T@ %p\n' | sort -nr | head
 ```
 
-## Basics
+Treat the resolver above as part of the skill contract: a hosted copy may run outside the base repository, so never assume the current checkout contains `workflows/i4h_workflows`. `I4H_WORKFLOWS_REPO_URL` selects the clone source. When `I4H_WORKFLOWS` is unset, derive the fallback directory from that URL; set `I4H_WORKFLOWS` only to reuse or choose a specific destination. Never replace an existing checkout.
 
-- **Env config (source of truth):** `workflows/agentic/config/environments/<env>.yaml` — the `<env>` scene, robot, and cameras Arena replays against.
-- Replay runs `arena/run.sh --replay` against the env that produced the HDF5.
-- Use it to verify visual correctness before conversion or training.
-- Interpret ordinal wording as zero-based episode indices: "first episode" -> `0`, "second episode" -> `1`, etc.
+Use an explicit or current-chain recording first. Otherwise select the newest plausible HDF5 and state that choice. Never substitute an older file after a failed recording.
 
-## Run
+Interpret natural ordinals as zero-based indices: first is `0`, second is `1`.
 
-Run the steps below in order. Each step is a separate bash call; variables persist in the local agent's tmux session.
-
-### Step 1 — setup and resolve HDF5
+## Inspect before launch
 
 ```bash
-REPO_ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"; [ -d "$REPO_ROOT/workflows/agentic" ] || REPO_ROOT="$HOME/i4h-workflows"
-ENV_ID=scissor_pick_and_place
-RUNS_ROOT="${REPO_ROOT}/workflows/agentic/runs"
-EPISODE_INDEX="${EPISODE_INDEX:-0}"  # For "Replay second episode", set EPISODE_INDEX=1.
-
-# Point HDF5_PATH at a real recording (absolute path). Recordings come from teleop, mimic, or
-# validate (which writes data/verify.hdf5 under each runs/eval_* dir). List candidates newest-first:
-#   find "${RUNS_ROOT}" -name '*.hdf5' -printf '%TY-%Tm-%Td %TH:%TM  %p\n' | sort -r | head
-HDF5_PATH="${HDF5_PATH:-}"
-if [ ! -f "${HDF5_PATH}" ]; then
-  echo "replay: set HDF5_PATH to an existing .hdf5 (got '${HDF5_PATH:-<unset>}'). Candidates:" >&2
-  find "${RUNS_ROOT}" -name '*.hdf5' -printf '%TY-%Tm-%Td %TH:%TM  %p\n' 2>/dev/null | sort -r | head
-  exit 1
-fi
-
-RUN_DIR="${RUNS_ROOT}/replay_${ENV_ID}_$(date +%Y%m%d_%H%M%S)"
-mkdir -p "${RUN_DIR}/logs"
-ln -sfn "${RUN_DIR}" "${RUNS_ROOT}/.latest"
+HDF5_PATH=/absolute/path/to/recording.hdf5
+uv run --project tools/dataset i4h-dataset inspect "$HDF5_PATH" --segments
 ```
 
-### Step 2 — replay
+Resolve the original workflow from recording metadata and conversation context. Confirm the requested episode exists and its action width matches the workflow's replay Scene contract.
+
+## Replay
 
 ```bash
-"${REPO_ROOT}/workflows/agentic/arena/run.sh" \
-  --env "${ENV_ID}" \
-  --replay "${HDF5_PATH}" \
-  --episode-index "${EPISODE_INDEX}" \
-  2>&1 | tee "${RUN_DIR}/logs/replay.log"
+./run.sh <workflow> --replay "$HDF5_PATH" --episode <zero-based-index>
 ```
 
-## Notes
+Keep the visible simulator and command in the foreground. Poll yielded execution until `run.sh` exits; do not detach or return while replay is still running.
 
-- `HDF5_PATH` must be an absolute path to an existing recording — `--replay` resolves a relative path against `runs/<env>/`, not your cwd, so a bare/relative path silently fails to load. The block lists real candidates if it's unset or wrong.
-- Recordings come from [[i4h-workflow-dataset-teleop]], [[i4h-workflow-dataset-mimic]], or [[i4h-workflow-validate]] (validate writes `data/verify.hdf5` under each `runs/eval_*` dir). There is no default `demo.hdf5`.
-- `--episode-index` selects the episode within the HDF5 (zero-based).
-- For "Replay second episode", use `--episode-index 1`.
-- Use the same env id as the env that produced the recording.
+## Verify
 
-## Prerequisites
-
-- Workflow set up via [[i4h-workflow-setup]] (the `.venv` must exist).
-- An existing HDF5 recording to replay.
-- The env id that produced the recording.
-
-## Limitations
-
-- Visual verification only; replay does not modify or expand the recording.
-- Replays one episode per invocation, selected by `--episode-index`.
-- Runs inside Isaac Sim; the env id must match the one that produced the HDF5.
+Observe the complete trajectory, relevant objects, camera views, segment boundaries, and final status. If motion diverges, report the first mismatching segment or action-contract error. Do not change workflow, episode, or recording silently.
 
 ## Troubleshooting
 
-- **Error:** `.venv` not found / replay fails to launch - Cause: workflow not set up. Fix: run [[i4h-workflow-setup]] first.
-- **Error:** `replay: set HDF5_PATH to an existing .hdf5` (or recording fails to load) - Cause: `HDF5_PATH` unset or not a real file. Fix: pick an absolute path from the printed candidates (e.g. a `verify.hdf5` under `runs/eval_*/data/`).
-- **Error:** episode index out of range - Cause: `--episode-index` exceeds the episodes in the HDF5. Fix: use a valid zero-based index.
-- **Error:** mismatched/garbled playback - Cause: `--env` differs from the env that produced the recording. Fix: use the same env id.
+On launch failure, verify workflow metadata, episode existence, and action width. On divergence, report the first mismatching segment.
 
-## Final Response
+## Prerequisites
 
-Report env, HDF5 path, episode index, launch outcome, visible mismatches.
+Require the original workflow assets and a readable episode whose action width matches replay mode.
+
+## Limitations
+
+Replay verifies stored actions in one Scene; it does not evaluate a learned policy or guarantee transfer to another Scene.
+
+## Examples
+
+- `Replay the second episode.` → select the current recording, map “second” to index `1`, and observe the visible replay.
+
+## Completion gate
+
+Report workflow, HDF5 path, episode index, frame/segment count, action width, exit/final status, and visible agreement or first mismatch.

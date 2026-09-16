@@ -18,6 +18,8 @@ tags:
 
 # Brev
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 NVIDIA Brev provides on-demand GPU instances across multiple cloud providers. Instances come pre-loaded with NVIDIA drivers, CUDA, Docker, and NVIDIA Container Toolkit.
 
 Brev is instance-based (not job-based). You create an instance, run commands on it via `brev exec`, and delete it when done. The TAO SDK's BrevHandler wraps this into the standard job interface.
@@ -62,7 +64,7 @@ brev ls >/dev/null 2>&1 || {
 }
 ```
 
-If any non-pip step fails, the agent prompts the user to authorize the fix via Bash, then re-runs the preflight before continuing. The TAO SDK is **not** required for Brev — `brev exec docker run …` is sufficient. Reach for the SDK only if you want Job handles, S3 I/O wrapping via `script_runner`, or state persistence; `nvidia-tao-sdk` is on public PyPI, install missing SDK requirements automatically from the pinned Brev extra in `versions.yaml`: `python -m pip install "$("${TAO_SKILL_BANK_PATH:?}/scripts/resolve_versions_key.py" wheels.tao_sdk_brev)"`. **When going the SDK route, read `tao-skill-bank:tao-run-platform` for the `BrevSDK` kwarg reference, `build_entrypoint`, and `ActionWorkflow` patterns.**
+If any non-pip step fails, the agent prompts the user to authorize the fix via Bash, then re-runs the preflight before continuing. The TAO SDK is **not** required for Brev — `brev exec <instance> "docker run …"` is sufficient. Reach for the SDK only if you want Job handles, S3 I/O wrapping via `script_runner`, or state persistence; `nvidia-tao-sdk` is on public PyPI; install missing SDK requirements automatically from the pinned Brev extra: `python -m pip install "nvidia-tao-sdk[brev]==7.1.0rc42"` <!-- versions-key: wheels.tao_sdk_brev -->. **When going the SDK route, read `tao-skill-bank:tao-run-platform` for the `BrevSDK` kwarg reference, `build_entrypoint`, and `ActionWorkflow` patterns.**
 
 ## Authentication
 
@@ -153,17 +155,41 @@ No shared NFS/Lustre. All data flows through S3 via the script_runner's fsspec i
 
 ## Docker on Brev
 
-VM Mode instances have Docker pre-installed. For TAO container images:
+VM Mode instances have Docker pre-installed.
+
+### `brev exec` syntax — the remote command is ONE quoted string
+
+The CLI signature is `brev exec [instance...] <command>`: every positional
+except the last is treated as an instance name, and `--` only terminates flag
+parsing — it does **not** bundle the words after it into a single command.
+The multi-token form `brev exec <instance> -- docker run --gpus all …` <!-- lint-ok: brev-exec-form -->
+therefore makes the CLI treat `docker`, `run`, … as instance names and fails
+with `could not look up instance "docker"` / `illegal option -- -` (exit 255)
+— an error that reads like an SSH/instance fault but is a syntax fault. A
+single-token probe (`brev exec <instance> -- true`) <!-- lint-ok: brev-exec-form -->
+"works" only because the lone token is parsed as the command; never take it as
+proof that exec is healthy. Always pass the whole remote command as one quoted
+string:
 
 ```bash
-# NGC auth (one-time per instance)
-brev exec <instance> -- docker login nvcr.io -u '$oauthtoken' -p <NGC_KEY>
+brev exec <instance> "docker --version"
+```
 
-# Run a TAO training job
-brev exec <instance> -- docker run --gpus all --rm \
-  -v ~/data:/data \
-  nvcr.io/nvidia/tao/tao-toolkit:6.26.3-pyt \
-  visual_changenet train -e /data/spec.yaml
+### NGC auth + running TAO containers
+
+```bash
+# NGC auth (one-time per instance). The key travels over stdin — never put it
+# in argv, where it lands in the instance process table, the SSH command
+# string brev forwards, and session transcripts.
+printf '%s' "$NGC_KEY" | brev exec <instance> "docker login nvcr.io -u '\$oauthtoken' --password-stdin"
+
+# Verify the login without reading credential files: manifest inspect succeeds
+# only when the login worked AND the key's org has entitlement for the image.
+TAO_PYT_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
+brev exec <instance> "docker manifest inspect $TAO_PYT_IMAGE >/dev/null && echo AUTH_OK || echo AUTH_FAIL"
+
+# Run a TAO training job — the whole docker run is one quoted string.
+brev exec <instance> "docker run --gpus all --rm -v ~/data:/data $TAO_PYT_IMAGE visual_changenet train -e /data/spec.yaml"
 ```
 
 ### Wait for instance readiness before the first `brev exec`
@@ -172,15 +198,18 @@ A freshly created instance reports `RUNNING` long before sshd, hostname
 resolution, and the user shell are ready. The first `brev exec` against an
 unsettled instance fails with `hostname not resolvable`,
 `Connection refused`, or a silent timeout. Always poll until a trivial exec
-succeeds before issuing real work:
+succeeds before issuing real work. The probe must be a **multi-word quoted
+command**: it proves both SSH readiness and the single-string exec form that
+every real command depends on (a bare `true` probe passes even when every
+multi-token command would fail):
 
 ```bash
 # Wait up to 5 minutes for shell readiness — covers the SSH bring-up window.
 for i in $(seq 1 60); do
-  brev exec <instance> -- true >/dev/null 2>&1 && break
+  [ "$(brev exec <instance> "echo ok" 2>/dev/null)" = "ok" ] && break
   sleep 5
 done
-brev exec <instance> -- true >/dev/null 2>&1 || {
+[ "$(brev exec <instance> "echo ok" 2>/dev/null)" = "ok" ] || {
   echo "instance <instance> never became exec-ready"; exit 1;
 }
 ```
@@ -226,6 +255,14 @@ right after create**: Instance reports `RUNNING` before sshd is up. Use the
 readiness-wait loop in *Wait for instance readiness before the first `brev
 exec`* before issuing the real command.
 
+**`could not look up instance "<word>"` / `ssh: illegal option -- -` / exit
+255 on a multi-word `brev exec`**: The remote command was passed as separate
+tokens (`brev exec <instance> -- docker run …`). <!-- lint-ok: brev-exec-form -->
+The CLI parses every positional except the last as an instance name, so
+`docker`, `run`, … are looked up as instances and stray `--flags` leak to ssh.
+Pass the whole remote command as ONE quoted string:
+`brev exec <instance> "docker run …"`. See *`brev exec` syntax* above.
+
 **SDK exec timeout / `exec failed` on a fresh instance**: The SDK's
 `brev exec` wrapper timed out before remote startup finished. Raise the
 timeout to ≥ 600 s for cold-start runs (see *`brev exec` timeout for
@@ -236,4 +273,14 @@ flag. Use plain `brev delete <instance>`.
 
 **Instance stuck in provisioning**: Some GPU types have limited availability. Try a different `--gpu-name` or provider.
 
-**Docker pull fails on nvcr.io**: NGC_KEY not set or expired. Run `docker login nvcr.io` on the instance.
+**Docker pull / `docker manifest inspect` fails on nvcr.io**: Two distinct
+causes — distinguish them by login state:
+
+- **No prior `Login Succeeded` on the instance**: not authenticated —
+  `NGC_KEY` unset, expired, or the login never ran. Re-run the stdin login
+  from *NGC auth + running TAO containers* with a valid key.
+- **Login succeeded but pull/inspect still returns `Access Denied` /
+  `unauthorized`**: the key authenticates but its NGC org lacks entitlement
+  for the image's org (e.g. a pre-release staging org). Request org access or select an
+  image from an org the key can read — re-running login will not help.
+

@@ -7,4 +7,4 @@ Submit an LP to the cuOpt server (CSR format) and poll for the solution.
 **Run:** `python client.py`
 If the server is not reachable, the script exits 0 (skip).
 
-**Env:** `CUOPT_SERVER_URL` (default `http://localhost:8000`).
+**Server URL:** `--server` (default `http://localhost:8000`).

@@ -7,12 +7,18 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to perform root cause analysis on NVIDIA TAO Visual ChangeNet classification experiments, investigating model failures, poor recall/FAR/PASS metrics, and auditing visual inspection pipeline quality. <br>
+Developers and engineers analyzing NVIDIA TAO Visual ChangeNet classification experiments to diagnose model failures, investigate poor recall/FAR/PASS-NO_PASS metrics, audit visual inspection pipeline quality, or produce RCA reports for AOI defect-detection models. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
@@ -22,50 +28,51 @@ Mitigation: Review and scan skill before deployment. <br>
 - [Investigation Phases](references/investigation-phases.md) <br>
 - [Output Structure](references/output-structure.md) <br>
 - [Parallelization Strategy](references/parallelization.md) <br>
+- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Files] <br>
-**Output Format:** [Markdown report with embedded images and analysis tables] <br>
+**Output Format:** [Markdown report with embedded thumbnail images] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Timestamped output folder with RCA_Report.md, rca_images/, and rca_config/] <br>
+**Other Properties Related to Output:** [Timestamped output directory containing RCA_Report.md, rca_images/, rca_config/, and session log] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task in the `astra-sandbox` environment using the NVSkills-Eval `external` profile. <br>
+1 evaluation task (1 positive), each attempt in an isolated sandbox pod. Dataset digest: sha256:0f59e0d0e9480172b2f30333f8d1e5c4879d9904763edbe80d78be71db557687. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
+- Effectiveness: Checks whether the skill helped complete the user's goal (goal completion 50% + expected workflow adherence 50%). <br>
+- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 100% (+100%) | 97% (+97%) |
-| Discoverability | 1 | 89% (+89%) | 97% (+97%) |
-| Effectiveness | 1 | 100% (+86%) | 90% (+66%) |
-| Efficiency | 1 | 73% (+46%) | 96% (+68%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 23% → 100% (+77 points) | 34% → 95% (+62 points) |
+| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
+| Correctness | 0% → 100% (+100 points) | 20% → 100% (+80 points) |
+| Discoverability | 0% → 100% (+100 points) | 0% → 94% (+94 points) |
+| Effectiveness | 17% → 100% (+83 points) | 48% → 83% (+35 points) |
+| Efficiency | 0% → 100% (+100 points) | 0% → 100% (+100 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

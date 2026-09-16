@@ -19,8 +19,11 @@ docker images | grep vss-engine
 # Pull if missing (requires NGC credentials for nvcr.io)
 docker pull nvcr.io/nvidia/blueprint/vss-engine:2.4.1
 
-# Also needed: DeepStream image for header extraction (Stage 1 of Dockerfile)
-docker pull nvcr.io/nvidia/deepstream:8.0-triton-multiarch
+# Also needed: DeepStream image for header extraction (Stage 1 of Dockerfile).
+# Default matches Dockerfile's DS_IMAGE ARG default (DS-9.1 public). Until DS-9.1
+# is public, use a pre-release image and pass it via --build-arg DS_IMAGE=... at
+# `docker build` time (see Dockerfile comment).
+docker pull nvcr.io/nvidia/deepstream:9.1-triton-multiarch
 ```
 
 ---

@@ -1,0 +1,38 @@
+{
+  "schema_version": "nvflare.autofl.campaign_state.v1",
+  "updated_at": "2026-07-02T09:41:52Z",
+  "results": "results.tsv",
+  "decision": "continue",
+  "reason": "family_repeat_limit",
+  "next_action": "diversify_candidates",
+  "final_response_allowed": false,
+  "candidate_cap": null,
+  "candidate_cap_source": "uncapped",
+  "candidate_attempts": 9,
+  "pending_candidates": 0,
+  "scored_attempts": 9,
+  "best_score": 0.839,
+  "stop_files": [],
+  "plateau": {
+    "available": true,
+    "recommendation": "continue",
+    "best_name": "fedadam-server-faithful",
+    "best_score": 0.839,
+    "best_scored_index": 1,
+    "last_literature_event_index": 1,
+    "last_batch_completion_index": 4,
+    "min_delta": 0.0005,
+    "reset_row_index": 4,
+    "scored_since_reset": 6,
+    "threshold": 8
+  },
+  "exploration_batch": {
+    "literature_event_id": "lit-0001",
+    "event_index": 1,
+    "required": 3,
+    "completed": 3,
+    "completion_index": 4
+  },
+  "required_exploration": null,
+  "agent_instruction": "Do not produce a final answer. Recent scored attempts are argument-only tuning of a single algorithm family; prepare a source-backed candidate or switch to a different family next."
+}

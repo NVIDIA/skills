@@ -10,6 +10,12 @@ For ovrtx C API behavior, native viewer behavior, renderer lifecycle guidance,
 or release-specific behavior not covered here, read `references/dependencies` for
 acquisition guidance and supplemental dependency documentation.
 
+Before copying any C API declaration, config entry, struct field, result status,
+or render-var mapping sequence from this reference, inspect the current upstream
+ovrtx `AGENTS.md`, relevant `skills/`, matching C examples, and installed public
+headers. Treat detailed snippets as validation targets; the installed headers and
+examples are authoritative when they differ.
+
 ## Read Order
 
 | Need | Read |

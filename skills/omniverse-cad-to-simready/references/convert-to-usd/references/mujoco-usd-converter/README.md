@@ -63,7 +63,7 @@ Prefer the installed reference-local script after confirming dependencies:
 python3 scripts/run.py /path/to/robot.xml /path/to/usd_robot --report /path/to/conversion_report.json
 ```
 
-The wrapper preserves the normalized skill-hub report and forwards supported
+The wrapper preserves the normalized omniverse-cad-to-simready report and forwards supported
 upstream `mujoco_usd_converter` options verbatim. Use the upstream flag names
 for single-file output, physics-scene omission, verbose conversion, or authored
 comments:

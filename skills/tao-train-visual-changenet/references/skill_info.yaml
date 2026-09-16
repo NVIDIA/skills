@@ -1,6 +1,6 @@
 network_arch: visual-changenet
 automl_enabled: true
-container_image: tao_toolkit.pyt
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
 gpu_spec_key: train.num_gpus
 actions:
   train:
@@ -274,7 +274,13 @@ pretrained_models:
     # HF source for staging; the spec field accepts only LOCAL paths. Download
     # `nvidia/C-RADIOv2-B`/`model.safetensors` and mount it before training.
     backbone: hf://nvidia/C-RADIOv2-B/model.safetensors
-    full_model: ngc://nvidia/tao/visual_changenet_classification:visual_changenet_nvpcb_trainable_v1.0
+    # No 7.1-compatible pretrained classify checkpoint is published. The 7.0-era
+    # ngc://nvidia/tao/visual_changenet_classification:visual_changenet_nvpcb_trainable_v1.0
+    # is INCOMPATIBLE with the 7.1 backbone_v2 architecture (KeyError on radio.*);
+    # do not download it. Train from `backbone` above and use that 7.1 checkpoint
+    # for evaluate/inference. If a genuine NGC pull is ever needed, resolve the org
+    # from `ngc config current` — never hardcode or assume a registry org.
+    full_model: ""
   segment:
     full_model: ngc://nvidia/tao/visual_changenet_segmentation_levircd:visual_changenet_levircd_trainable_v1.0
 key_defaults: {}

@@ -9,17 +9,17 @@ Exchange README first:
 For agent-facing authoring guidance, use the upstream USD Exchange skills:
 `https://github.com/NVIDIA-Omniverse/usd-exchange/tree/main/.agents/skills`.
 
-Do not infer a local explanation of USD Exchange from this Skill Hub reference.
+Do not infer a local explanation of USD Exchange from this Omniverse CAD-to-SimReady reference.
 This repository only records how the upstream USD Exchange SDK / usdex
-authoring rules attach to Physical AI Skill Hub code.
+authoring rules attach to Omniverse CAD-to-SimReady code.
 
 ## When to Use
 
-Use this reference when changing repo code that authors or rewrites USD opinions. It is a Skill-Hub-side binding layer for OpenUSD Exchange SDK 2.3. Keep the upstream SDK skills as the source of authoring rules; this reference only records how those rules attach to this repository.
+Use this reference when changing repo code that authors or rewrites USD opinions. It is an Omniverse CAD-to-SimReady binding layer for OpenUSD Exchange SDK 2.3. Keep the upstream SDK skills as the source of authoring rules; this reference only records how those rules attach to this repository.
 
 This is a repository-maintenance skill, not a public installed asset-processing runtime. It is documentation-driven and does not ship `scripts/run.py`.
 
-Do not copy the upstream `usd-authoring` reference set into this repo. Use the tagged upstream `v2.3.0` agent skill and the final public package floor `usd-exchange>=2.3.0`.
+Do not copy the upstream `usd-authoring` reference set into this repo. Use the tagged upstream `v2.3.0` agent skill and the `usd-exchange==2.3.0` runtime pinned by `upstream-versions.lock.json`.
 
 ## When To Apply
 
@@ -41,12 +41,12 @@ Stop when the task is limited to read-only USD validation, packaging manifests, 
 
 If those URLs are not available, do not substitute stale copied rules. Use an authenticated local checkout of `https://github.com/NVIDIA-Omniverse/usd-exchange` at tag `v2.3.0` and read the same paths from that checkout.
 
-## Skill Hub Bindings
+## Omniverse CAD-to-SimReady Bindings
 
 Use a module-level `AUTHORING_METADATA` constant in this form:
 
 ```text
-physical-ai-skill-hub <entrypoint-or-skill-name> v<repo-version>
+omniverse-cad-to-simready <entrypoint-or-skill-name> v<repo-version>
 ```
 
 Pass that constant to every `usdex.core.createStage`, `configureStage`, `saveStage`, `saveLayer`, or `exportLayer` call introduced by this repo.
@@ -68,7 +68,7 @@ After authoring or conversion, route validation in this order:
 3. `omni-asset-validate-geometry` and `omni-asset-validate-physics` as applicable
 4. `simready-validate` for SimReady assets
 
-Use the installed `omniverse-cad-to-simready/references/omni-asset-validate/scripts/run.py` wrapper for hub-level validation. Reserve `usdex.test.TestCase.assertIsValidUsd` for unit tests that directly exercise SDK authoring behavior.
+Use the installed `omniverse-cad-to-simready/references/omni-asset-validate/scripts/run.py` wrapper for workflow-level validation. Reserve `usdex.test.TestCase.assertIsValidUsd` for unit tests that directly exercise SDK authoring behavior.
 
 ## Anti-Pattern Catalog
 

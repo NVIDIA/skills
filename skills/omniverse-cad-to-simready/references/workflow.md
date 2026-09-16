@@ -23,6 +23,13 @@ Collect these inputs before running:
 If a required sidecar path is missing, stop and report the blocked dependency.
 Do not move or rewrite source assets unless the user explicitly asks.
 
+## Minimum Viable Scope
+
+Conversion-only is a valid workflow request. When the user asks only to convert
+or smoke-test source asset conversion, set `property_assignment_intent=skip`,
+do not deploy Content Agents, run `convert-to-usd`, then run
+`validate-usd-minimum` on the generated USD if conversion succeeds.
+
 ## Source Routing
 
 | Input | Conversion route |
@@ -34,11 +41,14 @@ Do not move or rewrite source assets unless the user explicitly asks.
 | Existing `.usd`, `.usda`, `.usdc`, or `.usdz` | Skip conversion and validate directly |
 
 NVIDIA-backed source formats route through the `usd-convert-cad` reference and
-must delegate to upstream `usd-convert-cad` only, including the suffixes listed
-by upstream `src/usd_convert_cad/formats.py`. If the upstream checkout, setup,
-Python 3.12 runtime, `omniverse-kit`, required converter extension, platform
-support, licensing, or conversion support is unavailable, mark conversion
-blocked rather than substituting another converter.
+must delegate to the standalone `usd-convert-cad` wheel only, including the
+suffixes listed in the upstream Supported Formats table in the `usd-convert-cad`
+SKILL.md (`skills/omniverse-cad-to-usd/SKILL.md`). The `usd-convert-cad`
+reference probe parses that table live from a checkout of the repo (with a
+built-in snapshot as an offline fallback), so upstream format changes are picked
+up automatically. If the wheel is not installed or importable in the resolved
+Python 3.12 interpreter, or conversion or licensing support is unavailable, mark
+conversion blocked rather than substituting another converter.
 
 ## Workflow
 
@@ -213,6 +223,24 @@ The JSON report should include:
 | `needs_rerun` | Whether the asset completed the workflow but has validation findings, transient service failures, or other remediation items. |
 | `rerun_reasons` | Validation findings, transient service errors, or blocked diagnostics that require later retry/remediation. |
 | `steps` | Ordered conversion, assignment, conformance, validation, and packaging step results. |
+
+## Consolidated Report Contract
+
+Emit a consolidated workflow report in Markdown, and include JSON when the
+workflow writes structured artifacts. The report must include:
+
+- Overall status: `passed`, `blocked`, `failed`, or `needs_rerun`.
+- Request summary: source asset path, detected source format, output root,
+  selected SimReady profile/version, and property assignment intent.
+- Ordered stage results: stage reference, input artifact, output USD or USDZ
+  path, report path, status, blocker reason, and rerun reason when applicable.
+- Content Agents readiness and property assignment results with service URLs,
+  tokens, and credentials redacted.
+- Conformance and validation findings grouped by gate, requirement ID, selected
+  FET repair reference, repair-loop attempt, and final disposition.
+- Final artifacts: final reported USD path, render preview path when requested,
+  package root and package validation report when packaging ran, Markdown report
+  path, JSON report path when present, and recommended next work.
 
 ## Human Approval Points
 

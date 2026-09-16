@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers enabling expert-parallel communication overlap to hide dispatch/combine latency in MoE training workloads, or diagnosing throughput regressions related to EP overlap configuration changes. <br>
+Developers and engineers enabling expert-parallel communication overlap to hide dispatch/combine latency in MoE training on NVIDIA GPUs, or diagnosing throughput regressions related to EP overlap configuration. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -37,41 +37,41 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (positive skill-activation case) in the NVSkills-Eval external profile on the astra-sandbox environment. <br>
+Evaluated against 1 positive evaluation task in isolated sandbox pods (dataset digest: sha256:473eeb29e4297235c32a27b47541793b4f7eddba5f4fc3e053f65a5b344292f1). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Whether the skill is safe to use (no unsafe operations, secret leakage, or unauthorized access). <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded and activated when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (goal_accuracy 50% + behavior_check 50%). <br>
+- Efficiency: Whether the skill avoided wasted tool or skill usage (routing quality and productive tool use). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 100% (+75%) | 97% (+22%) |
-| Discoverability | 1 | 100% (+75%) | 97% (+72%) |
-| Effectiveness | 1 | 98% (+98%) | 80% (+13%) |
-| Efficiency | 1 | 94% (+69%) | 96% (+69%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 40% → 98% (+58 points) | 60% → 96% (+36 points) |
+| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
+| Correctness | 0% → 100% (+100 points) | 100% → 100% (±0 points) |
+| Discoverability | 50% → 100% (+50 points) | 50% → 94% (+44 points) |
+| Effectiveness | 0% → 92% (+92 points) | 48% → 84% (+37 points) |
+| Efficiency | 50% → 100% (+50 points) | 0% → 100% (+100 points) |
 
 ## Testing Completed: <br>
 **[x] Agent Red-Teaming** <br>

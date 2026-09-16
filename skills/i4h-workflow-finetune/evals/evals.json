@@ -1,7 +1,7 @@
 [
   {
     "id": "i4h-workflow-finetune-readme-quick-steps-batch",
-    "question": "Finetune for 200 steps with batch size of 32.  Turn off vision tuning.",
+    "question": "Fine-tune for 200 steps with a batch size of 32. Turn off vision tuning.",
     "expected_skill": "i4h-workflow-finetune",
     "ground_truth": "This README Quick Run prompt routes to finetuning for the active/new env, using 200 training steps, batch size 32, and vision tuning disabled.",
     "expected_behavior": [
@@ -9,8 +9,12 @@
       "uses the current or recently converted LeRobot dataset",
       "sets training steps to 200",
       "sets batch size to 32",
-      "turns off vision tuning",
-      "reports checkpoint output"
+      "resolves trainability and defaults from the selected remote-task manifest",
+      "maps vision tuning off to --no-tune-visual only for a GR00T training CLI that supports it",
+      "dry-runs the resolved training configuration before the long run",
+      "runs a bounded inference-backend preload-only smoke on the exact checkpoint",
+      "reports output and checkpoint disk sizes without deleting duplicated artifacts",
+      "reports the exact checkpoint path for i4h-workflow-validate"
     ]
   },
   {

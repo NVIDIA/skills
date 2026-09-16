@@ -31,6 +31,10 @@ Required top-level fields:
 | `runtime_profiling` | object | Phase 6d | Optional Omniperf/runtime-profiler handoff for RAM, VRAM, FPS, frame time, shader, renderer, and GPU metrics. |
 | `footprint` | object | Phases 1a + 6 | Optional repack-normalized disk-footprint attribution. When any footprint claim is made, report `raw_input_bytes`, `repack_normalized_baseline_bytes`, `optimized_bytes` and attribute `repack_delta_pct` / `structural_delta_pct`; `scored_against: "repack_normalized"`. The storage score measures `structural_delta_pct`, not the raw headline. |
 | `preservation` | object | Phases 1 + 6 | Preservation (silent-loss) gate. Required on any run that makes a structural/dedupe/instancing claim (omit only for a pure no_op with no preservation assertion). Emit `rendered_mesh_count` (must equal the asset's known pre-optimization rendered-mesh count — not authored prims), `distinct_geometry_bytes_preserved: true`, `bounds_preserved: true`, `dangling: 0`. Report scoring marks the run 0 if this block is missing or any gate changed: a "lossless" dedupe that drops rendered meshes, geometry bytes, bounds, or leaves dangling bindings is silent loss, caught here rather than by the disk number. |
+| `safety_gate` | object | Phase 2c | Correctness precondition state. Required whenever a Phase-2c safety-gate validator reports issues — `validate_report.py` rejects a report that fires a gate and then omits the block, and the run-scoring oracle treats an omitted or status-less block as unresolved. Record `status` (`resolved \| clear \| none \| passed \| not_required` when cleared; `unresolved \| blocked \| failed` when not), plus `finding` and `notes`. Recording an uncleared gate is the honest outcome; omitting it is a report error. |
+| `structural_summary` | object | Phases 4 + 6 | Scene-graph (axis-B) outcome. `reuse_measured` is what the oracle's axis-B credit keys on — without it a consolidation claim scores 0 structural credit. Also carries the descent-convergence mirrors (`frontier_descent_converged`, `frontier_final_rescan_new_groups_above_floor`) for manifest-less runs, and `merge_identity_class` when a within-prototype merge ran. |
+| `fidelity` | object | Phase 4 | Lossy-tier evidence. Emit on any run that decimates, fits primitives, or otherwise trades geometry for size: `max_deviation_within_band` false fails the oracle (a run that "beat" the ceiling by over-decimating). |
+| `target_coverage` | object | Phase 4 | **Schema-required.** The Phase-4 completion ledger: one `entries[]` row per planned Phase-4 target with its `disposition`, plus `complete` and `source_manifests[]`. `validate_report.py` reconciles it against the apply-restructure manifest(s), so it is not self-attested; a report without it fails on a required field. |
 | `metric_groups[]` | array | Phase 6d | Stage headline areas such as composition load, structure, instancing, storage footprint, and validation. |
 | `artifacts` | object | Phase 6d | Paths to generated JSON, Markdown, and static HTML reports. |
 | `metrics[]` | array | Phases 1a + 6a | Each metric: `name`, `before`, `after`, `change_pct`, `verdict`. |
@@ -47,8 +51,8 @@ Populate immediately after the runtime is chosen:
 
 - [ ] `asset_name` (basename of input)
 - [ ] `input_path`
-- [ ] Record runtime choice (Kit or standalone) and install path in `notes` for traceability (not a schema field).
-- [ ] Start `measurement_context` with runtime choice, cache state, sample count, stage-open method, and warmup policy when known.
+- [ ] Record the resolved runtime and its install path in `notes` for traceability (not a schema field). Take both from `setup-preflight.json`: the standalone Usd Optimize and usd-validation-nvidia versions that will act on the asset, plus the Kit application and version when the opt-in Kit→omniperf profiling adjunct is in play.
+- [ ] Start `measurement_context` with the resolved runtime, cache state, sample count, stage-open method, and warmup policy when known.
 
 ### Phase 1 - Open and characterize
 
@@ -72,6 +76,12 @@ in `runtime_profiling`, ideally via Omniperf dashboard/artifacts.
 ### Phase 2 - Composition / discovery / restructure decision
 
 - [ ] `validators[]` - first entries (validator name + issue count from Phase 2c Tier 1 whole-stage probes). One row per validator that ran.
+- [ ] `safety_gate` - required as soon as any of those rows is a safety-gate
+  concept (`role: safety_gate` in `validator-concepts.json`) with `issues > 0`.
+  Record the `status`, the `finding`, and what was done about it. If the gate was
+  waived to continue, say so in `notes` and leave `status: unresolved` — the run
+  scores 0 either way, and omitting the block now fails `validate_report.py`
+  instead of quietly passing.
 - [ ] The Phase 2e gate never exits the pipeline; it only chooses how to optimize. The only `output_path: null` / empty `operations[]` report comes from a `no_op` run (already-optimized) or the runtime-forced `structural_only` degraded path (Usd Optimize unavailable + install declined), not a user-chosen exit.
 
 ### Phase 3 - Stage-level instancing
@@ -86,6 +96,19 @@ in `runtime_profiling`, ideally via Omniperf dashboard/artifacts.
 
 - [ ] `validators[]` - per-target Tier 2/3 entries from the Phase 4 validate→re-verify loop (4c/4d). Name the target in each entry and record its findings (before) and re-verify result (after).
 - [ ] `operations[]` - one entry per op per target. The `result` field is concise per-target outcome (e.g. `meshCleanup on prototype/A: 124 prims processed, 12% triangle reduction`).
+- [ ] `target_coverage` - the completion ledger, and a schema-required field. One
+  `entries[]` row per planned Phase-4 target (path, role, `mesh_count`,
+  `disposition`), `source_manifests[]` pointing at the apply-restructure
+  manifest(s) so the gate can reconcile instead of taking the report's word, and
+  `complete` set once every entry resolves. Collect it as targets finish; a
+  report that reaches Phase 6 without it fails on a required field.
+- [ ] `structural_summary` - `reuse_measured` (true only if the run MEASURED
+  distinct vs total units), the prototype/instance counts, and the
+  `frontier_descent_converged` /
+  `frontier_final_rescan_new_groups_above_floor` mirrors when there is no
+  manifest. `merge_identity_class` when a within-prototype merge ran.
+- [ ] `fidelity` - on any lossy step (decimation, primitive fit), record
+  `max_deviation_within_band` and the `band` it was measured against.
 - [ ] Record the Phase 4 scheduler `status.json` path in `notes` or the Markdown summary. It should include target weights, chosen concurrency per batch, resource observations, output/log paths, failures, timeouts, and any adjustment or resume decision.
 - [ ] If the scheduler-backed batch paused, record the `status.json` path to resume from under `notes` with the remaining (non-terminal) target count.
 
@@ -101,7 +124,13 @@ in `runtime_profiling`, ideally via Omniperf dashboard/artifacts.
 - [ ] `validators[]` - second pass entries from Phase 6b Tier 1 whole-stage re-validation. Compare against Phase 2c (Tier 1) and Phase 4 (per-target) entries to surface dropped/persistent issues in the Markdown summary.
 - [ ] `verdict` - top-level verdict from `compare-profiles` (Phase 6c).
 - [ ] `timestamp` - written by `optimization-report`.
-- [ ] `optimization_score`, `score_scope`, `score_label`, and `metric_groups[]` - computed from stage/composition metrics only.
+- [ ] `target_coverage.complete` - the Phase-4 completion gate. Confirm every
+  entry resolved (`optimized` / `skipped_zero_meshes` / `skipped_user_declined`)
+  and that `source_manifests[]` still points at the manifests the run used.
+- [ ] `optimization_score`, `score_scope`, `score_label`, and `metric_groups[]` -
+  computed from stage/composition metrics only. `validate_report.py` recomputes
+  `round(sum(score * weight) / sum(weight), 1)` and derives the band, so a
+  hand-edited score or a label that contradicts it now fails.
 - [ ] `reasoning` - one to two concise paragraphs explaining the chosen optimization strategy and tradeoffs.
 - [ ] `runtime_profiling` - point to Omniperf/runtime-profiler artifacts if available, or mark as `not_run` with a recommendation.
 - [ ] `artifacts` - include the JSON, Markdown, and HTML report paths.

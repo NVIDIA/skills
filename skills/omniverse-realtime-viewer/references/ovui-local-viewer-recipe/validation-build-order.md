@@ -2,6 +2,9 @@
 
 ## 13. Validate The Omniverse Realtime Viewer
 
+Use this as a routine smoke checklist. Add focused proof only for features the
+viewer actually exposes or for demo-critical claims.
+
 Validate in this order:
 
 1. Compile or import-check the local app package.
@@ -21,11 +24,18 @@ Validate in this order:
 12. Confirm selected prim state appears in the tree and info panel.
 13. Confirm hierarchy expansion, properties, and variants display the current selected prim only.
 14. Confirm scene switching clears stale selection, refreshes hierarchy, preserves render settings, and avoids concurrent render/reset.
-15. Confirm every visible render setting has validation evidence: before/after pixels, backend state proof, ovrtx docs/sample-backed API proof, wrapper diff plus explicit reload, or unsupported-key rejection.
+15. For visible render settings, confirm either an immediate before/after effect,
+    backend effective-state echo, explicit reload/profile behavior, or
+    unsupported-key rejection. Do not require broad artifact capture for hidden
+    or unimplemented settings.
 16. Confirm render settings persist after scene switch and app restart only for settings that were validated or accepted as non-live defaults.
 17. Confirm selection outline groups are cleared on every stage load when selection feedback is enabled.
 18. If a selected-prim transform gizmo is present, confirm dragging it changes a known prim's live `omni:xform` by a measured delta and the highlight/info panel follow the moved prim.
-19. Confirm the app shuts down without leaving a stale Python GPU process.
+19. If physics is requested, confirm either a verified
+    `PhysX.attach_ovstage(stage, read_ordinal=...)` compatibility probe or the bounded OVPhysX worker
+    path. Focus proof on one selected prim, parent/child process model, OVStage
+    write/consume ordinals, and nonzero motion when motion was requested.
+20. Confirm the app shuts down without leaving a stale Python GPU process.
 
 Use these failure checks:
 

@@ -1,0 +1,5 @@
+version: 1
+interface:
+  display_name: RTVI VSS CV Service
+  short_description: Scaffold a standalone DeepStream CV microservice that publishes detection metadata (and optional segmentation/frame-mask payloads) to Kafka mdx-raw for VSS Search and Alerts profiles.
+  default_prompt: Scaffold a standalone RTVI CV microservice that plugs into VSS via Kafka mdx-raw so search, alerts, and behavior analytics consume it. Use the shipped scaffold script (YOLO26 reference by default; customer ONNX, labels, and custom parser required). Keep the VSS broker contract fixed, and implement segmentation/frame-mask payloads via the documented msgconv wrapper pattern when needed. For swapping the detector in the stock vss-rt-cv container, use rtvi-cv-customize-model instead.

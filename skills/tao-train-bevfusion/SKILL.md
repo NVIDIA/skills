@@ -19,19 +19,21 @@ tags:
 
 # BEVFusion
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 BEVFusion for multi-sensor 3D object detection. Fuses LiDAR point clouds and camera images in bird's-eye-view (BEV) space. Used in autonomous driving for robust 3D perception.
 
 Set pretrained backbone paths for Swin image backbone.
 
 BEVFusion requires the BEVFusion-specific TAO container
-`nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt`. The shared TAO PyTorch 7.0 RC image
+`nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt`. <!-- unpinned: BEVFusion-only container --> The shared TAO PyTorch 7.0 RC image
 does not package `mmdet3d` and fails before any BEVFusion action can parse its
 spec. The model-skill action is named `dataset_convert`, but the 5.5 container
 CLI subtask is `bevfusion convert -e <spec>`.
 
 ## Dataclass Schemas
 
-Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
+Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML for an action requires `schemas/<action>.schema.json` and `references/spec_template_<action>.yaml` to exist and parse. Use the packaged selected-action schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
 
 ## Train Action Policy
 
@@ -180,7 +182,7 @@ empty string, for `train.pretrained_checkpoint` and
 
 **`ModuleNotFoundError: No module named 'mmdet3d'`**: The shared TAO PyTorch
 7.0 RC image does not include the BEVFusion `mmdet3d` dependency. Use
-`nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt`; it contains `mmdet3d` and exposes
+`nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt`; <!-- unpinned: BEVFusion-only container --> it contains `mmdet3d` and exposes
 the BEVFusion `convert`, `train`, `evaluate`, and `inference` subtasks.
 
 **Post-evaluation SIGSEGV in BEVFusion 5.5**: Some local-docker runs can write
@@ -224,3 +226,4 @@ Inference mappings from TAO Core `bevfusion.config.json`:
 | train | `train.resume_training_checkpoint_path` | `resume_model` | model file inferred from the current job results folder |
 
 For `parent_model` or `parent_model_folder`, pass the upstream train/export/AutoML child job id as `parent_job_id`. The SDK lists the parent result folder, filters checkpoint artifacts, and returns the selected model file or folder. Do not add these mappings back to `config.json` and do not patch generated runner scripts to guess checkpoint paths.
+

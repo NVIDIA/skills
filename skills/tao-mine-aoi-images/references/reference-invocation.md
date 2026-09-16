@@ -14,7 +14,7 @@ MODEL_PATH=google/siglip-base-patch16-224  # or a local checkpoint path
 TOPN=5
 METRIC=cosine
 FILTER_BY_LABEL=false
-IMG=$(python3 -c "import yaml,os; print(yaml.safe_load(open(os.environ['TAO_SKILL_BANK_PATH']+'/versions.yaml'))['images']['tao_toolkit']['data_services'])")
+IMG=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-data-services  # versions-key: images.tao_toolkit.data_services
 
 mkdir -p "$OUT"
 

@@ -1,6 +1,6 @@
 ---
 name: cuopt-numerical-optimization-api
-version: "26.08.00"
+version: "26.10.00"
 description: LP, MILP, and QP (beta) with cuOpt — Python, C, and CLI. Use when the user is solving LP, MILP, or QP with any cuOpt interface.
 license: Apache-2.0
 metadata:
@@ -14,6 +14,7 @@ metadata:
     - c-api
     - cli
 ---
+
 
 
 # cuOpt Numerical Optimization API

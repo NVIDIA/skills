@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Any
 
 from run import _check, _decode_png, _endpoint_kind, _endpoint_requires_token, _post_json, _resolve_endpoint, _resolve_token
-from script_utils import emit_json_report
-from stage_prep import inspect_png, prepare_render_stage
+from script_utils import emit_json_report, inspect_png
+from stage_prep import prepare_render_stage
 
 
 SKILL = "ovrtx-render-service"

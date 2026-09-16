@@ -31,15 +31,21 @@ GitHub search ranks repositories on metadata and engagement, not just content. B
 
 These apply to the *source* repo; the catalog repo's own metadata is maintained by the catalog team.
 
-## IP Review and License (External Skills)
+## License
 
-For skills published to `github.com/nvidia/skills`, NVIDIA contributors confirm three things per onboarding PR:
+Skills published to `github.com/nvidia/skills` are licensed under one of:
 
-1. The skills have been cleared for open source release per NVIDIA's internal IP review process (six-question check).
+- Apache 2.0
+- CC-BY 4.0
+- Dual (Apache 2.0 + CC-BY 4.0)
+
+Contributors confirm three things per onboarding PR:
+
+1. The skills have been cleared for open source release by the owning team.
 2. The skill is licensed under Apache 2.0, CC-BY 4.0, or dual-license (Apache 2.0 + CC-BY 4.0).
 3. No new license or new third-party component has been introduced beyond what the source repo already carries.
 
-NVIDIA contributors: see the internal onboarding guide for the IP review process details and license selection. The [pull request template](.github/PULL_REQUEST_TEMPLATE.md) prompts for these affirmations on every onboarding PR.
+The [pull request template](.github/PULL_REQUEST_TEMPLATE.md) prompts for these affirmations on every onboarding PR.
 
 ## Signing Your Work
 

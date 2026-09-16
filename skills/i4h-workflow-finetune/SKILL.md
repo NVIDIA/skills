@@ -1,145 +1,130 @@
 ---
 name: i4h-workflow-finetune
-version: "0.6.0"
-description: Fine-tune a GR00T or openpi PI0 policy on a LeRobot dataset. Use when asked to finetune, train, or post-train a policy on demos; not for evaluating a checkpoint (use [[i4h-workflow-validate]]).
+description: Fine-tune a manifest-backed GR00T or openpi remote Task on compatible LeRobot data. Use for training; do not use for inference-only Tasks or checkpoint rollout.
 license: Apache-2.0
 metadata:
   author: "Isaac for Healthcare Team <isaac-for-healthcare-support@nvidia.com>"
+  version: "0.8.0"
   tags:
     - isaac-for-healthcare
     - i4h
-    - agentic-workflow
-    - finetune
-    - training
+    - lerobot
+    - gr00t
+    - openpi
 ---
 
-# i4h Workflow — Finetune
+# Fine-tune a Workflow Policy Task
 
 ## Purpose
 
-Fine-tune a GR00T or openpi PI0 policy on an existing LeRobot dataset. Use when asked to finetune, train, or post-train a policy on recorded demos.
+Resolve and run training from the selected workflow run mode and owning remote-task manifest.
 
-## Base Code
+## Instructions
 
-These steps drive the i4h-workflows base code (the `workflows/agentic/` tree). To reuse an existing checkout, set `I4H_WORKFLOWS` to its path (no clone happens). Otherwise this resolves the current repo, or clones to `~/i4h-workflows` — pick that default without prompting. Run every command below from the resolved root:
+1. Resolve the base checkout, policy mode, and remote task.
+2. Verify dataset compatibility and a `train` block.
+3. Dry-run the exact configuration.
+4. Train in the foreground and verify checkpoint artifacts.
+
+## Resolve the workflow, task, and data
 
 ```bash
-# Resolve the i4h-workflows base code (provides workflows/agentic/).
+export I4H_WORKFLOWS_REPO_URL="${I4H_WORKFLOWS_REPO_URL:-https://github.com/isaac-for-healthcare/i4h-workflows}"
+I4H_REPO_DIR_NAME="${I4H_WORKFLOWS_REPO_URL%/}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME##*/}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME##*:}"
+I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME%.git}"
+[ -n "$I4H_REPO_DIR_NAME" ] || { echo "Cannot derive a checkout name from I4H_WORKFLOWS_REPO_URL" >&2; exit 2; }
 ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"
-if [ ! -d "$ROOT/workflows/agentic" ]; then
-  ROOT="${I4H_WORKFLOWS:-$HOME/i4h-workflows}"
-  [ -d "$ROOT/workflows/agentic" ] || git clone https://github.com/isaac-for-healthcare/i4h-workflows "$ROOT"
+if [ ! -d "$ROOT/workflows/i4h_workflows" ]; then
+  ROOT="${I4H_WORKFLOWS:-$HOME/$I4H_REPO_DIR_NAME}"
+  [ -d "$ROOT/workflows/i4h_workflows" ] || git clone "$I4H_WORKFLOWS_REPO_URL" "$ROOT"
 fi
-export I4H_WORKFLOWS="$ROOT"; cd "$ROOT"
+export I4H_WORKFLOWS="$ROOT"
+cd "$ROOT"
+./run.sh list
+./run.sh show <workflow> --mode <policy-mode>
+test -f /absolute/path/to/dataset/meta/info.json
+nvidia-smi
 ```
 
-## Basics
+Treat the resolver above as part of the skill contract: a hosted copy may run outside the base repository, so never assume the current checkout contains `workflows/i4h_workflows`. `I4H_WORKFLOWS_REPO_URL` selects the clone source. When `I4H_WORKFLOWS` is unset, derive the fallback directory from that URL; set `I4H_WORKFLOWS` only to reuse or choose a specific destination. Never replace an existing checkout.
 
-- The dataset path must be an existing LeRobot directory with `meta/info.json`.
-- Train support is determined by `policy.train_module` in `workflows/agentic/config/environments/<env>.yaml`. A null value means inference-only.
-- `assemble_trocar` is inference-only.
+Read the selected workflow run mode to identify its remote task id. Open `tasks/<project>/i4h_tasks/<project>/manifest/<task>.yaml` and require `train:`. Resolve the project, entry point, base model/config, output defaults, and modality contract from that manifest and the project's `train.py`.
 
-## Stack Map
+Use the current-chain LeRobot dataset when the prompt omits a path. Verify its embodiment, cameras, task text, feature widths, and episode count are compatible with the remote task.
 
-| Env | Stack | CLI |
-|---|---|---|
-| `scissor_pick_and_place` | `gr00t_n15` | `i4h-agentic-gr00t-n15-train` |
-| `locomanip_tray_pick_and_place` | `gr00t_n16` | `i4h-agentic-gr00t-n16-train` |
-| `locomanip_push_cart` | `gr00t_n16` | `i4h-agentic-gr00t-n16-train` |
-| `ultrasound_liver_scan` | `openpi_pi0` | `i4h-agentic-openpi-pi0-train` |
+## Resolve configuration before a long run
 
-N1.6 locomanip envs share `policy.locomanip.train`.
-
-## Preflight
+All policy train entry points support `--dry-run`:
 
 ```bash
-test -f "${DATASET_PATH}/meta/info.json"
-nvidia-smi --query-gpu=name --format=csv,noheader | wc -l
-workflows/agentic/policy/<stack>/run.sh --list-envs
+uv run --project "tasks/<project>" "i4h-tasks-<project-with-hyphens>-train" \
+  --task <project>/<task> \
+  --dataset /absolute/path/to/dataset \
+  --output-dir /absolute/path/to/checkpoints \
+  --max-steps <N> \
+  --batch-size <N> \
+  --dry-run
 ```
 
-## Run
+Inspect the resolved config. Keep user-requested steps, batch size, model/config, and GPU count exact.
 
-Run the steps below in order. Each step is a separate bash call; variables persist in the local agent's tmux session.
+For GR00T, “turn off vision tuning” maps to `--no-tune-visual`. Do not pass that flag to openpi, whose CLI does not expose it. Use only flags present in the selected project's current `train.py`.
 
-### Step 1 — setup and resolve dataset
+## Train
+
+Remove `--dry-run` and keep the command in the foreground:
 
 ```bash
-REPO_ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"; [ -d "$REPO_ROOT/workflows/agentic" ] || REPO_ROOT="$HOME/i4h-workflows"
-ENV_ID=scissor_pick_and_place
-STACK_DIR=gr00t_n15
-TRAIN_CLI=i4h-agentic-gr00t-n15-train
-RUNS_ROOT="${REPO_ROOT}/workflows/agentic/runs"
-
-# Point DATASET_PATH at a converted LeRobot dataset dir (absolute; must contain meta/info.json),
-# produced by [[i4h-workflow-dataset-convert]]. List candidates:
-#   find "${RUNS_ROOT}" "${HF_LEROBOT_HOME:-$HOME/.cache/huggingface/lerobot}" -name info.json -path '*/meta/*' -printf '%h\n' | sed 's#/meta$##' | sort -u
-DATASET_PATH="${DATASET_PATH:-}"
-if [ ! -f "${DATASET_PATH%/}/meta/info.json" ]; then
-  echo "finetune: set DATASET_PATH to a LeRobot dataset dir with meta/info.json (got '${DATASET_PATH:-<unset>}'). Candidates:" >&2
-  find "${RUNS_ROOT}" "${HF_LEROBOT_HOME:-$HOME/.cache/huggingface/lerobot}" -name info.json -path '*/meta/*' -printf '%h\n' 2>/dev/null | sed 's#/meta$##' | sort -u | head
-  exit 1
-fi
-
-RUN_DIR="${RUNS_ROOT}/finetune_${ENV_ID}_$(date +%Y%m%d_%H%M%S)"
-OUT="${RUN_DIR}/checkpoint"
-export TMPDIR=/tmp   # short path: torch DataLoader FD-sharing socket must fit AF_UNIX's 108-byte limit
-mkdir -p "${OUT}" "${RUN_DIR}/logs"
-ln -sfn "${RUN_DIR}" "${RUNS_ROOT}/.latest"
+uv run --project "tasks/<project>" "i4h-tasks-<project-with-hyphens>-train" \
+  --task <project>/<task> \
+  --dataset /absolute/path/to/dataset \
+  --output-dir /absolute/path/to/checkpoints \
+  --max-steps <N> \
+  --save-steps <N> \
+  --batch-size <N> \
+  --num-gpus <N>
 ```
 
-### Step 2 — train
-
-```bash
-uv --directory "${REPO_ROOT}/workflows/agentic/policy/${STACK_DIR}" run "${TRAIN_CLI}" \
-  --env "${ENV_ID}" \
-  --dataset-path "${DATASET_PATH}" \
-  --output-dir "${OUT}" \
-  --max-steps 1000 \
-  --save-steps 1000 \
-  --num-gpus 1 \
-  2>&1 | tee "${RUN_DIR}/logs/finetune.log"
-```
-
-Tyro flags use kebab case (`--max-steps`, not `--max_steps`).
-
-## Common Flags
-
-- `--dataset-path PATH` (required)
-- `--output-dir PATH`
-- `--base-model-path PATH_OR_REPO` overrides YAML `policy.model_repo`
-- `--max-steps N`, `--save-steps N`
-- `--batch-size N`, `--learning-rate FLOAT`
-- `--no-tune-visual` — freeze the vision backbone (trains the action head + projector only): ~2× faster, ~half the memory, less overfitting. Good default for small datasets; unfreeze only with lots of data + a real visual domain gap.
-- `--num-gpus N` — must not exceed visible GPUs
-- `--report-to tensorboard|wandb`
+Add backend-specific flags only after resolving them. Do not silently lower requested steps or batch size to make training fit.
 
 ## Verify
 
-- Checkpoint directory `${OUT}/checkpoint-<N>` contains `model-0000*-of-*.safetensors`, `experiment_cfg/`, `processor/`.
-- Log contains `train_loss` lines and a final `'train_runtime': ...` summary.
+Require exit status 0, completed requested steps, saved training logs, and at least one loadable checkpoint artifact. Resolve the exact checkpoint path rather than calling an incomplete output directory a checkpoint.
 
-## Prerequisites
+Run a bounded backend load smoke before reporting the checkpoint usable:
 
-- Workflow set up via [[i4h-workflow-setup]] (the stack's `.venv` must exist).
-- An existing LeRobot dataset directory with `meta/info.json`.
-- A train-capable env: `policy.train_module` non-null in `workflows/agentic/config/environments/<env>.yaml` (`assemble_trocar` is inference-only).
-- At least one visible GPU (`--num-gpus` must not exceed visible GPUs).
+```bash
+uv run --project "tasks/<project>" python -m "<project>.server" \
+  --namespace "checkpoint-smoke-$$" \
+  --preload <project>/<task> \
+  --checkpoint /absolute/path/to/checkpoint \
+  --preload-only
+```
 
-## Limitations
+Use the selected project's actual module path. `--preload-only` loads the manifest and checkpoint through the inference backend, then exits without starting a rollout. A training exit alone proves that files were written, not that inference can load them.
 
-- Inference-only envs (null `policy.train_module`, e.g. `assemble_trocar`) cannot be fine-tuned.
-- Requires GPU(s); `--num-gpus` must not exceed the count from `nvidia-smi`.
-- N1.6 locomanip envs share `policy.locomanip.train`.
-- Each env maps to one stack/CLI (see Stack Map); the dataset must match that env.
+Report `du -sh` for the task output and the selected checkpoint. Some trainers save both a final model at the output root and numbered checkpoints; identify that duplication, but do not delete either copy unless the user explicitly asks for cleanup.
+
+Hand the exact load-smoked checkpoint path to `i4h-workflow-validate`; do not evaluate unless the user requested it.
 
 ## Troubleshooting
 
-- **Error:** train CLI / module import fails - Cause: workflow not set up, stack `.venv` missing. Fix: run [[i4h-workflow-setup]] first.
-- **Error:** dataset path rejected / missing `meta/info.json` - Cause: `--dataset-path` is not a valid LeRobot directory. Fix: point to a converted LeRobot dataset (see Preflight `test -f`).
-- **Error:** env is inference-only / no train support - Cause: `policy.train_module` is null for that env. Fix: choose a train-capable env from the Stack Map.
-- **Error:** unrecognized flag like `--max_steps` - Cause: Tyro flags use kebab case. Fix: use `--max-steps` form.
+Report the first dataset, manifest, model-access, GPU-memory, or backend error. Preserve logs and never silently change requested hyperparameters.
 
-## Final Response
+## Prerequisites
 
-Report env, stack, dataset path, output checkpoint path, train_loss summary, and blockers.
+Require a compatible LeRobot dataset, synced policy environment, model access, GPU capacity, and a remote-task manifest with `train:`.
+
+## Limitations
+
+Inference-only Tasks cannot be fine-tuned, and this skill does not claim rollout success from training alone.
+
+## Examples
+
+- `Fine-tune for 200 steps with a batch size of 32. Turn off vision tuning.` → preserve exact values, apply GR00T's supported vision flag, dry-run, train, and report the checkpoint.
+
+## Completion gate
+
+Report workflow/mode, task id and manifest, dataset compatibility, resolved config, requested/completed steps, batch/GPU/vision settings, checkpoint path, bounded load-smoke result, output/checkpoint disk sizes, exact validation handoff, exit summary, and any inference-only or resource blocker.

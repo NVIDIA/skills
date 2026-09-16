@@ -42,28 +42,56 @@ import typer
 SKILL_NAME = "nv_generate_mr_brain"
 MODEL_REPO = "https://github.com/NVIDIA-Medtech/NV-Generate-CTMR"
 MODEL_WEIGHTS_REPO = "https://huggingface.co/nvidia/NV-Generate-MR-Brain"
+UPSTREAM_COMMIT = "da438fec6484cdb6f421f8c7051d954ebefff730"
 VERSION = "rflow-mr-brain"
 NETWORK = "rflow"
 REPO_ROOT = Path(__file__).resolve().parents[int("3")]
+
+_CHILD_ENV_KEYS = (
+    "CUDA_DEVICE_ORDER",
+    "CUDA_HOME",
+    "CUDA_PATH",
+    "CUDA_VISIBLE_DEVICES",
+    "CUBLAS_WORKSPACE_CONFIG",
+    "CURL_CA_BUNDLE",
+    "HOME",
+    "LANG",
+    "LC_ALL",
+    "LD_LIBRARY_PATH",
+    "NVIDIA_DRIVER_CAPABILITIES",
+    "NVIDIA_VISIBLE_DEVICES",
+    "OMP_NUM_THREADS",
+    "PATH",
+    "PYTHONNOUSERSITE",
+    "REQUESTS_CA_BUNDLE",
+    "SSL_CERT_FILE",
+    "TMPDIR",
+    "TORCH_EXTENSIONS_DIR",
+    "TORCH_HOME",
+)
 
 UPSTREAM_NETWORK_CONFIG = "configs/config_network_rflow.json"
 UPSTREAM_MODEL_CONFIG = "configs/config_maisi_diff_model_rflow-mr-brain.json"
 UPSTREAM_ENV_CONFIG = "configs/environment_maisi_diff_model_rflow-mr-brain.json"
 UPSTREAM_MODALITY_MAPPING = "configs/modality_mapping.json"
-UPSTREAM_MODEL_FILES = (
-    "models/autoencoder_v1.pt",
-    "models/diff_unet_3d_rflow-mr-brain_v0.pt",
-)
+UPSTREAM_MODEL_FILES = {
+    "models/autoencoder_v1.pt": "1f8a7a056d0ebc00486edc43c26768bf1c12eaa6df9dd172e34598003be95eb3",
+    "models/diff_unet_3d_rflow-mr-brain_v1.pt": (
+        "90c4a015879d4f2caa3f398ea85a7e14af208ad5404bd62d54b4b59327c73b36"
+    ),
+}
 
 SUPPORTED_MODALITIES = (
     "mri",
     "mri_t1",
     "mri_t2",
     "mri_flair",
+    "mri_mra",
     "mri_swi",
     "mri_t1_skull_stripped",
     "mri_t2_skull_stripped",
     "mri_flair_skull_stripped",
+    "mri_mra_skull_stripped",
     "mri_swi_skull_stripped",
 )
 OVERRIDE_KEYS = (
@@ -114,11 +142,25 @@ def file_sha256_safe(path: Path) -> str:
         return ""
 
 
+def _child_process_env(overrides: dict[str, str] | None = None) -> dict[str, str]:
+    """Build the minimal environment needed by the pinned upstream process."""
+    env: dict[str, str] = {}
+    for name in _CHILD_ENV_KEYS:
+        value = os.environ.get(name)
+        if value is not None:
+            env[name] = value
+    env.setdefault("PATH", os.defpath)
+    if overrides:
+        env.update(overrides)
+    return env
+
+
 def git_commit(root: Path) -> str:
     try:
         proc = subprocess.run(
             ["git", "rev-parse", "HEAD"],
             cwd=str(root),
+            env=_child_process_env(),
             check=False,
             capture_output=True,
             text=True,
@@ -129,6 +171,34 @@ def git_commit(root: Path) -> str:
     if proc.returncode == 0:
         return proc.stdout.strip()
     return ""
+
+
+def _git_tracked_files_clean(root: Path) -> bool:
+    try:
+        proc = subprocess.run(
+            ["git", "status", "--porcelain", "--untracked-files=no"],
+            cwd=str(root),
+            env=_child_process_env(),
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=int("10"),
+        )
+    except Exception:
+        return False
+    return proc.returncode == 0 and not proc.stdout.strip()
+
+
+def _upstream_identity(root: Path) -> dict[str, Any]:
+    commit = git_commit(root)
+    tracked_files_clean = _git_tracked_files_clean(root)
+    return {
+        "commit": commit,
+        "expected_commit": UPSTREAM_COMMIT,
+        "commit_match": commit == UPSTREAM_COMMIT,
+        "tracked_files_clean": tracked_files_clean,
+        "trusted": commit == UPSTREAM_COMMIT and tracked_files_clean,
+    }
 
 
 def _round(values: Any, ndigits: int = int("6")) -> Any:
@@ -368,19 +438,29 @@ def _preflight(rendered_inference: dict[str, Any]) -> tuple[list[str], list[str]
 def _model_inventory(upstream_root: Path) -> dict[str, Any]:
     files: list[dict[str, Any]] = []
     all_present = True
-    for rel in UPSTREAM_MODEL_FILES:
+    all_sha256_match = True
+    for rel, expected_sha256 in UPSTREAM_MODEL_FILES.items():
         path = upstream_root / rel
         present = path.is_file()
+        actual_sha256 = file_sha256_safe(path) if present else ""
+        sha256_match = bool(present and actual_sha256 == expected_sha256)
         files.append(
             {
                 "path": rel,
                 "present": present,
                 "bytes": path.stat().st_size if present else None,
-                "sha256": file_sha256_safe(path) if present else "",
+                "sha256": actual_sha256,
+                "expected_sha256": expected_sha256,
+                "sha256_match": sha256_match,
             }
         )
         all_present = all_present and present
-    return {"all_present": all_present, "files": files}
+        all_sha256_match = all_sha256_match and sha256_match
+    return {
+        "all_present": all_present,
+        "all_sha256_match": all_sha256_match,
+        "files": files,
+    }
 
 
 def _build_command(staged_model_path: Path, staged_env_path: Path, num_gpus: int) -> list[str]:
@@ -523,6 +603,20 @@ def main(
             }
         )
         raise typer.Exit(2)
+    upstream_identity = _upstream_identity(upstream_root)
+    if not upstream_identity["trusted"]:
+        emit(
+            {
+                "skill": SKILL_NAME,
+                "error": "NV_GENERATE_ROOT identity invalid",
+                "detail": (
+                    "Use the exact clean checkout documented in SKILL.md; tracked source "
+                    "edits and other commits are rejected before upstream code execution."
+                ),
+                "upstream_identity": upstream_identity,
+            }
+        )
+        raise typer.Exit(2)
     if output_dir is None:
         output_dir = upstream_root / "output"
     output_dir = output_dir.expanduser().resolve()
@@ -550,8 +644,13 @@ def main(
     inventory = _model_inventory(upstream_root)
     if not inventory["all_present"]:
         errors.append(
-            "missing rflow-mr-brain model weights. Run `python -m scripts.download_model_data "
-            "--version rflow-mr-brain --root_dir ./ --model_only` from $NV_GENERATE_ROOT."
+            "missing rflow-mr-brain v1 model weights. Run the immutable Hugging Face "
+            "download commands documented in SKILL.md."
+        )
+    elif not inventory["all_sha256_match"]:
+        errors.append(
+            "rflow-mr-brain model weights do not match the pinned v1 snapshots. "
+            "Re-download the immutable revisions documented in SKILL.md."
         )
 
     cost = context["estimated_cost"]
@@ -595,6 +694,7 @@ def main(
                 "estimated_cost": cost,
                 "cuda": cuda,
                 "model_inventory": inventory,
+                "upstream_identity": upstream_identity,
                 "rendered_model_config": rendered_model,
                 "rendered_env_config": rendered_env,
             }
@@ -616,9 +716,17 @@ def main(
         raise typer.Exit(2)
 
     cmd = _build_command(staged_model_path, staged_env_path, num_gpus)
-    run_env = os.environ.copy()
-    run_env.setdefault("MONAI_DATA_DIRECTORY", str(upstream_root / "temp_work_dir"))
-    run_env.setdefault("PYTORCH_CUDA_ALLOC_CONF", "max_split_size_mb:128,expandable_segments:True")
+    runtime_cache = output_dir / "_runtime_cache"
+    run_env = _child_process_env(
+        {
+            "CUDA_CACHE_PATH": str(runtime_cache / "cuda"),
+            "HF_HOME": str(runtime_cache / "huggingface"),
+            "MPLCONFIGDIR": str(runtime_cache / "matplotlib"),
+            "MONAI_DATA_DIRECTORY": str(upstream_root / "temp_work_dir"),
+            "PYTORCH_CUDA_ALLOC_CONF": "max_split_size_mb:128,expandable_segments:True",
+            "XDG_CACHE_HOME": str(runtime_cache / "xdg"),
+        }
+    )
 
     run_started = time.time()
     t0 = time.monotonic()
@@ -674,7 +782,8 @@ def main(
         "invocation": {
             "official_entrypoint": "python -m scripts.diff_model_infer",
             "upstream_root": str(upstream_root),
-            "upstream_commit": git_commit(upstream_root),
+            "upstream_commit": upstream_identity["commit"],
+            "upstream_identity": upstream_identity,
             "command": cmd,
             "exit_code": rc,
             "subprocess_seconds": round(elapsed, int("3")),

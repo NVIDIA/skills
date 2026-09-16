@@ -17,26 +17,26 @@ docker build -t run-smolvlm-256m-vqav2:latest .
 
 # prepare
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -v $(pwd):/workspace \
+  -e HF_TOKEN -v $(pwd):/workspace \
   run-smolvlm-256m-vqav2:latest \
   -lc "cd /workspace && python prepare_data.py --config config.yaml"
 
 # smoke
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -e WANDB_MODE=disabled -v $(pwd):/workspace \
+  -e HF_TOKEN -e WANDB_MODE=disabled -v $(pwd):/workspace \
   run-smolvlm-256m-vqav2:latest \
   -lc "cd /workspace && python train.py --config config.yaml --smoke --max_steps 1"
 
 # baseline
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -v $(pwd):/workspace \
+  -e HF_TOKEN -v $(pwd):/workspace \
   run-smolvlm-256m-vqav2:latest \
   -lc "cd /workspace && python run_eval.py --config config.yaml \
        --checkpoint HuggingFaceTB/SmolVLM-256M-Instruct --output reports/baseline_results.json"
 
 # train LoRA
 docker run -d --name repro_train --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -e WANDB_API_KEY=$WANDB_API_KEY -e WANDB_PROJECT=$WANDB_PROJECT \
+  -e HF_TOKEN -e WANDB_API_KEY -e WANDB_PROJECT=$WANDB_PROJECT \
   -v $(pwd):/workspace \
   run-smolvlm-256m-vqav2:latest \
   -lc "cd /workspace && python train.py --config config.yaml 2>&1 | tee logs/train.log"
@@ -44,7 +44,7 @@ docker logs -f repro_train
 
 # merge LoRA adapter, then eval + infer on merged checkpoint
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -v $(pwd):/workspace \
+  -e HF_TOKEN -v $(pwd):/workspace \
   run-smolvlm-256m-vqav2:latest \
   -lc "cd /workspace && \
        python merge_lora.py --base_model HuggingFaceTB/SmolVLM-256M-Instruct \
@@ -77,7 +77,7 @@ already substring-matched the short ground truths.
 - Training: 1 epoch, bs=4×grad_accum=4 (eff 16), lr=1e-4, warmup_steps=50, bf16, gradient_checkpointing
 - LoRA: r=8, α=8, dropout=0.1, targets = {down,o,k,q,gate,up,v}_proj
 - Attention: `eager` (Idefics3VisionTransformer lacks SDPA in transformers 4.49)
-- NGC image: `nvcr.io/nvidia/pytorch:25.01-py3`
+- NGC image: `nvcr.io/nvidia/pytorch:25.01-py3` <!-- unpinned: historical rerun record -->
 
 ## Troubleshooting
 

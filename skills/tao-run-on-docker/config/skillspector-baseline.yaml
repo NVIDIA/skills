@@ -1,0 +1,11 @@
+version: 2
+# Reviewed false positives for the TAO "run on Docker" skill. These are
+# documentation references to standard container infrastructure, not exploitable
+# privilege escalation. Tracked in NVIDIA/nvskills-ci#67.
+rules:
+  - id: "PE*"
+    path: "SKILL.md"
+    reason: "Reviewed: documents standard NGC docker-login credential location and the secure rootless --user UID:GID mapping (getpwuid troubleshooting). Path/flag references in docs, not privilege escalation."
+  - id: "PE*"
+    path: "references/*"
+    reason: "Reviewed: docker.sock / infra references in the skill's config-schema reference doc. Documentation, not an exploit."

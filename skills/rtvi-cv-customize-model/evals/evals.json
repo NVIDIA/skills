@@ -1,0 +1,132 @@
+{
+  "skill_name": "rtvi-cv-customize-model",
+  "evals": [
+    {
+      "id": "rtvi-cv-customize-model-001",
+      "name": "happy-path-byom-stage-build-deploy-yolo11",
+      "prompt": "Replace the VSS Alerts Blueprint verification-mode detector with a YOLO11 ONNX model and redeploy perception-alerts.",
+      "expected_output": "Skill keeps the scope to 2d_cv, requires the user to supply and stage an ONNX model under VSS_DATA_DIR/models/yolo, updates the custom parser plus nvinfer config (including NMS clustering), honors DS_CONFIG_FILE in ds-start.sh, then rebuilds and recreates perception-alerts so TensorRT can generate the engine at runtime.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Response requires user to supply and stage an ONNX model rather than installing Ultralytics",
+          "type": "not_contains_pattern",
+          "pattern": "pip install ultralytics"
+        },
+        {
+          "text": "Response stages the model under VSS_DATA_DIR (not MDX_DATA_DIR)",
+          "type": "contains_pattern",
+          "pattern": "VSS_DATA_DIR"
+        },
+        {
+          "text": "Response covers parser / nvinfer wiring",
+          "type": "contains_pattern",
+          "pattern": "parse-bbox-func-name"
+        },
+        {
+          "text": "Response configures NMS as a property and keeps its IOU threshold in class attributes",
+          "type": "contains_pattern",
+          "pattern": "\\[property\\][\\s\\S]*cluster-mode=2[\\s\\S]*\\[class-attrs-all\\][\\s\\S]*nms-iou-threshold=0\\.45"
+        },
+        {
+          "text": "Response does not place cluster-mode in the class attributes section",
+          "type": "not_contains_pattern",
+          "pattern": "\\[class-attrs-all\\][^\\[]*cluster-mode=2"
+        },
+        {
+          "text": "Response resolves DS_CONFIG_FILE into CONFIG_FILE for the profile entrypoint",
+          "type": "contains_pattern",
+          "pattern": "DS_CONFIG_FILE"
+        },
+        {
+          "text": "Response redeploys perception-alerts (not perception-sdr-alerts)",
+          "type": "contains_pattern",
+          "pattern": "perception-alerts"
+        },
+        {
+          "text": "Response mentions runtime TensorRT engine build",
+          "type": "contains_pattern",
+          "pattern": "(trtexec|yolo11s_fp16\\.engine)"
+        },
+        {
+          "text": "Response does not use the obsolete MDX_DATA_DIR name",
+          "type": "not_contains_pattern",
+          "pattern": "MDX_DATA_DIR"
+        },
+        {
+          "text": "Response does not leak tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|glpat-|nvapi-)[A-Za-z0-9+/=_-]{10,}"
+        }
+      ]
+    },
+    {
+      "id": "rtvi-cv-customize-model-002",
+      "name": "integration-troubleshoot-dlsym-parser-mismatch",
+      "prompt": "DeepStream starts, but the custom parser library loads and then reports dlsym failed for the bbox parser. What should I check?",
+      "expected_output": "Skill explains that the nvinfer parse-bbox-func-name, the extern C parser symbol, and CHECK_CUSTOM_PARSE_FUNC_PROTOTYPE must all match exactly. It also points at rebuilding the .so in perception.Dockerfile with the DeepStream and CUDA include paths present.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Response identifies the parse-bbox-func-name mismatch",
+          "type": "contains_pattern",
+          "pattern": "parse-bbox-func-name"
+        },
+        {
+          "text": "Response includes the exact symbol and macro alignment requirement",
+          "type": "contains_pattern",
+          "pattern": "CHECK_CUSTOM_PARSE_FUNC_PROTOTYPE"
+        },
+        {
+          "text": "Response mentions rebuilding with CUDA include paths",
+          "type": "contains_pattern",
+          "pattern": "(CUDA include|cuda.*/include|sources/includes)"
+        },
+        {
+          "text": "Response does not leak tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|glpat-|nvapi-)[A-Za-z0-9+/=_-]{10,}"
+        }
+      ]
+    },
+    {
+      "id": "rtvi-cv-customize-model-003",
+      "name": "negative-file-mount-creates-ghost-directory",
+      "prompt": "I mounted the ONNX file path directly in compose even though the host file does not exist yet. That is fine, right?",
+      "expected_output": "Skill says no: Docker can create a ghost directory at that file path. It tells the user to mount the parent directory instead, ensure the ONNX exists under VSS_DATA_DIR/models/yolo, and rerun the export after any dev-profile.sh up that wipes the models directory.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Response rejects the direct file-mount assumption",
+          "type": "contains_pattern",
+          "pattern": "(ghost directory|parent directory)"
+        },
+        {
+          "text": "Response calls out the VSS_DATA_DIR ONNX staging path",
+          "type": "contains_pattern",
+          "pattern": "VSS_DATA_DIR\\}?/models/yolo"
+        },
+        {
+          "text": "Response mentions the wipe/redeploy cycle",
+          "type": "contains_pattern",
+          "pattern": "(dev-profile\\.sh up|re-stage|models/yolo)"
+        },
+        {
+          "text": "Response does not falsely say the broken mount is acceptable",
+          "type": "not_contains_pattern",
+          "pattern": "(yes[, ]+that is fine|no other changes needed)"
+        },
+        {
+          "text": "Response does not use the obsolete MDX_DATA_DIR name",
+          "type": "not_contains_pattern",
+          "pattern": "MDX_DATA_DIR"
+        },
+        {
+          "text": "Response does not leak tokens or credentials",
+          "type": "not_contains_pattern",
+          "pattern": "(Bearer |sk-|glpat-|nvapi-)[A-Za-z0-9+/=_-]{10,}"
+        }
+      ]
+    }
+  ]
+}

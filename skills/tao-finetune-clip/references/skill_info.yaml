@@ -1,6 +1,6 @@
 network_arch: clip
 automl_enabled: true
-container_image: tao_toolkit.pyt
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
 data_format: default
 gpu_spec_key: train.num_gpus
 actions:
@@ -103,7 +103,7 @@ actions:
     upload_excludes:
     - inputs/
   gen_trt_engine:
-    container_image: tao_toolkit.deploy
+    container_image: nvcr.io/nvidia/tao/tao-toolkit:7.1.0-deploy  # versions-key: images.tao_toolkit.deploy
     command: clip gen_trt_engine -e {config_path}
     config_format: yaml
     mode: config

@@ -20,6 +20,8 @@ tags:
 
 # Depth Net Fast Stereo
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Real-time stereo depth estimation using **FastFoundationStereo (FFS)** — the bp2 commercial distilled variant of FoundationStereo. Predicts disparity maps from rectified stereo image pairs with per-layer pruned widths for real-time inference.
 
 The mono / stereo / fast-stereo skills share the unified TAO `depth_net` CLI; FFS is selected via `model.model_type: FastFoundationStereo`. FFS differs from `FoundationStereo` only in pruned per-layer widths and a serialized forward path; everything else (entrypoint, action verbs, dataset classes, deploy chain) is identical to `depth-net-stereo`.

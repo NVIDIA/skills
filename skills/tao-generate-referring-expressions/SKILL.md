@@ -24,6 +24,8 @@ allowed-tools: Read Bash Write
 
 # Image Referring Expression Pipeline
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Generate referring-expression and grounding annotations from images with KITTI-format bounding box labels. A single VLM (Gemini or any OpenAI-compatible endpoint) runs four steps: per-object region descriptions, holistic image captions, grouped grounding expressions tied to bboxes, and an optional double-check verification pass.
 
 ## Purpose
@@ -137,6 +139,7 @@ All outputs go to `results_dir/`:
 
 ## Prerequisites
 
-- **Container**: `nvcr.io/nvidia/tao/tao-toolkit:6.26.3-pyt`
+- **Container**: `nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt` <!-- versions-key: images.tao_toolkit.pyt -->
 - **API access**: At least one VLM endpoint (Gemini API key or OpenAI-compatible endpoint capable of image input)
 - **PIL / Pillow**: Required to read image dimensions during seeding (already present in the TAO container)
+

@@ -6,7 +6,9 @@ Do this in `frontend/src/streaming/` and `frontend/src/App.tsx`:
 
 - Create a streaming provider that resolves host and signaling port from URL parameters first, environment variables second, a `stream.config.json` file third, and browser hostname plus default port last.
 - Render the video element with the exact id expected by AppStreamer before attempting to connect.
-- Connect with the Direct stream mode and the resolved signaling host/port from a stable React effect.
+- Connect with the Direct stream mode, resolved signaling host/port, fixed
+  width/height, and explicit H264 codec policy from a stable React effect.
+- Before connection, record an embedded-host H264 preflight; after connection, verify an actual decoded frame rather than treating signaling or `onStart` as video proof.
 - Style the video with `object-fit: contain` so the fixed-resolution stream scales to the available page area without distortion.
 - Expose status, error message, connection lifecycle events, a guarded send helper, and custom-event subscription to the rest of the app.
 - Mount the viewport video first, then overlay DOM controls such as toolbar, scene picker, tree, property panel, status, and settings.
@@ -21,17 +23,22 @@ Critical contracts:
   route the session, but the frontend should receive a standalone `ovstream`
   Direct host and signaling port.
 - The video element must exist before connect starts.
-- Gate initial data-channel sends on connected status.
+- Embedded hosts: before connecting, record iframe status and the availability/result of `navigator.mediaCapabilities.decodingInfo` for H264 when present. This is advisory: an unavailable capability API in Tableau or another host frame must not cause an automatic codec rejection. Continue with the explicit H264 DirectConfig, then require decoded-frame proof.
+- Gate initial data-channel sends on connected status. Connected status means
+  `AppStreamer.connect()` resolved; `onStart` only means video has begun
+  decoding.
 - Keep the `AppStreamer.connect()` effect dependent only on immutable connection config. Do not let stateful message routers recreate the effect after `openStageResult`, `getChildrenResult`, or status events arrive.
 - Catch rejected `AppStreamer.sendMessage()` Promises during connect/disconnect windows.
 - Give DOM overlays explicit `z-index` above the video layer.
 - Use modest reconnect settings to avoid repeated `previous session already running` churn.
-- Let the streaming library forward mouse, keyboard, wheel, and touch input through NVST's native input channel. Do not duplicate these as app JSON.
+- Let the streaming library forward mouse, keyboard, wheel, and touch input through NVST's native input channel. Only use `mouseInput` after the explicit native-callback failure diagnostic in `viewer-input-routing`; fallback and native input must never run together.
 - Do not send viewport-size messages when CSS layout changes. Keep the stream fixed and rely on NVST letterbox coordinate mapping.
 
 Decision points:
 
-- If the app should auto-load a default scene, send `openStageRequest` only after connected status is reached.
+- If the app should auto-load a default scene, send `openStageRequest` only
+  after `AppStreamer.connect()` resolves. Do not wait for `onStart`; an idle
+  server may need the request before it can produce the first decoded frame.
 - If the server loads an initial scene before the browser connects, rely on server initial-state push rather than requiring the frontend to guess.
 - If the user wants a dense tool UI, keep it as DOM overlay around the video. Use server-side overlays only when they must be part of the streamed pixels.
 - If the client runs from a different machine, expose host and signaling port through URL parameters.
@@ -61,9 +68,14 @@ The frontend should fetch `stream.config.json` at startup and use its values as 
 
 Common failure modes:
 
+- An embedded host can hide `MediaCapabilities` even when the Direct H264 path is viable. Log that absence and validate the same viewer standalone and in the host frame; do not silently substitute a codec or browser renderer.
+- A resolved `connect()` Promise or `onStart` without an advancing decoded-frame count is not a working video stream.
+
 - Connecting before the video element exists produces a connection that cannot display video.
 - Setting media port to the signaling port produces connected-with-no-video failures.
 - Sending requests before data channel readiness drops initial scene loads.
+- Waiting for `onStart` before sending `openStageRequest` can deadlock idle
+  servers because no stage frame is decoded until the request arrives.
 - One rendered frame then black can be caused by React effect cleanup calling `AppStreamer.terminate()` after normal app state updates.
 - A frontend waiting for `getChildrenResponse` while the server sends `getChildrenResult` leaves the tree empty.
 
@@ -144,7 +156,7 @@ Critical contracts:
 - The video element id must match AppStreamer config exactly.
 - Keep data-channel sends behind the streaming provider's connected-state guard.
 - Treat server events as authoritative for loaded scene, selection, settings, and errors.
-- Do not duplicate pointer input handling in DOM unless it is for UI widgets outside the video viewport.
+- Do not duplicate pointer input handling in DOM unless it is for UI widgets outside the video viewport or the verified, mutually exclusive `mouseInput` fallback.
 - Clean up event subscriptions when components unmount.
 
 Decision points:

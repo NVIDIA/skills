@@ -61,10 +61,13 @@ the source repo just to read SO guidance.
    changes first. Add decimation only after the user confirms the reduction
    goal.
 8. **Build the JSON config.** Read each operation's upstream per-op guide
-   (`usd-optimize/docs/operations/<key>.rst` on 1.1.x packages, or
-   `.agents/operations/<key>.md` on 1.0.x; resolution in
+   (`usd-optimize/docs/operations/<operation-key>.rst` on 1.1.x packages, or
+   `.agents/operations/<operation-key>.md` on 1.0.x; resolution in
    `references/upstreams/usd-optimize.md`) for parameter names, defaults, and
-   risky fields before emitting the final chain.
+   risky fields before emitting the final chain. These live inside the Usd
+   Optimize package, not in this skill tree; local routing metadata and the
+   `parameter_prerequisites` contract live in
+   `references/operations/operations.json`.
 9. **Prepare the user-facing rationale.** Name the evidence each step
    addresses, why the order matters, which steps are destructive or
    bounded-loss, and which before/after metrics will prove the recipe worked.

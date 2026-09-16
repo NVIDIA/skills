@@ -22,6 +22,8 @@ tags:
 
 # TAO Inference Microservice
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 ## Instructions
 
 **To start an inference service:**
@@ -240,3 +242,4 @@ Send a `POST` to `{BASE_URL}/v1/chat/completions` with `Content-Type: applicatio
 | **500** | Unhandled exception during inference | Check container logs |
 
 For 202 and 503, the body contains `{"error": {"type": "<error_type>", "message": "<reason>"}}`. See `container_response_shapes` in `references/request.yaml` for error type strings.
+

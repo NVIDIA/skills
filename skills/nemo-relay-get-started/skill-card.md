@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers new to NeMo Relay who want to try the framework, select the least-complex quick-start path for their environment, and verify initial observable value before production setup. <br>
+Developers and engineers adopting NeMo Relay for the first time use this skill to select the simplest applicable quick-start path and verify observable Relay value before production deployment. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -28,15 +28,14 @@ Mitigation: Review and scan skill before deployment. <br>
 - [CLI Try-Now Reference](references/cli-try-now.md) <br>
 - [Built-In Integrations Try-Now Reference](references/built-in-integrations-try-now.md) <br>
 - [Manual Language Try-Now Reference](references/manual-language-try-now.md) <br>
-- [NeMo Relay CLI Overview](https://docs.nvidia.com/nemo/relay/dev/nemo-relay-cli/about) <br>
-- [Supported Integrations](https://docs.nvidia.com/nemo/relay/dev/supported-integrations/about) <br>
-- [Language Quick Starts](https://docs.nvidia.com/nemo/relay/dev/getting-started/quick-start) <br>
-- [Plugin Configuration](https://docs.nvidia.com/nemo/relay/dev/configure-plugins/about) <br>
+- [NeMo Relay Getting Started Quick Start](https://docs.nvidia.com/nemo/relay/dev/getting-started/quick-start) <br>
+- [NeMo Relay Supported Integrations](https://docs.nvidia.com/nemo/relay/dev/supported-integrations/about) <br>
+- [NeMo Relay Plugin Configuration](https://docs.nvidia.com/nemo/relay/dev/configure-plugins/about) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Code] <br>
+**Output Format:** [Markdown with inline bash and language-specific code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -47,43 +46,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 15 tasks (14 positive, 1 negative) in isolated k8s-sandbox pods with 1 attempt per task. <br>
+Evaluated against 15 tasks (14 positive, 1 negative) from the skill-evaluator dataset. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use, checking for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the answer produced is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was found and activated when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
+- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
+- Discoverability: Whether the expected skill was found and executed when needed. <br>
+- Effectiveness: Whether the skill helps complete the user's goal and follows expected workflow behavior. <br>
+- Efficiency: Whether the skill avoids wasted tool or skill usage through good routing and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `security`: Verifies absence of unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies that the expected skill was found and executed. <br>
+- `skill_efficiency`: Verifies routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
+- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 47% → 85% (+37 points) | 49% → 78% (+29 points) |
-| Security | 93% → 93% (±0 points) | 63% → 73% (+10 points) |
-| Correctness | 19% → 91% (+72 points) | 57% → 85% (+28 points) |
-| Discoverability | 50% → 93% (+43 points) | 48% → 86% (+38 points) |
-| Effectiveness | 30% → 70% (+40 points) | 43% → 66% (+23 points) |
-| Efficiency | 45% → 77% (+32 points) | 31% → 77% (+46 points) |
-
-## Testing Completed: <br>
-**[x] Agent Red-Teaming** <br>
-**[ ] Network Security** <br>
-**[ ] Product Security** <br>
+| Overall | 49% → 88% (+39 points) | 51% → 83% (+32 points) |
+| Security | 100% → 100% (±0 points) | 73% → 90% (+17 points) |
+| Correctness | 23% → 92% (+69 points) | 68% → 89% (+21 points) |
+| Discoverability | 51% → 95% (+44 points) | 44% → 90% (+45 points) |
+| Effectiveness | 27% → 68% (+40 points) | 42% → 70% (+27 points) |
+| Efficiency | 44% → 84% (+40 points) | 27% → 76% (+49 points) |
 
 ## Skill Version(s): <br>
-f23d697 (source: git SHA, committed 2026-07-30) <br>
+7eb33b6 (source: git SHA, committed 2026-08-21) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

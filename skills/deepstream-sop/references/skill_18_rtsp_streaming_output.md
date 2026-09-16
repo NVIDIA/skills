@@ -1,6 +1,6 @@
 # § 18 — RTSP Streaming Output
 
-> **⚠️ OPTIONAL — OPT-IN FEATURE. Do NOT generate by default.**
+> **⚠ OPTIONAL — OPT-IN FEATURE. Do NOT generate by default.**
 > This section is generated **only when the user explicitly requests RTSP streaming output**
 > (e.g. *"…generate a SOP microservice **with rtsp streaming output feature**…"*). When the
 > user runs the plain generation prompt (`example_sop_prompt.md` without asking for RTSP),

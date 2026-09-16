@@ -13,7 +13,7 @@ SkillEvaluator runs three tiers over a skill: deterministic validation, semantic
 
 | Tier | What it does | Can it block publication? |
 |---|---|---|
-| **Tier 1 — Validation** | Schema, license, PII, Unicode safety, and the full SkillSpector security scan | Yes, on high-severity findings |
+| **Tier 1 — Validation** | Schema, license, PII, Unicode safety, and the SkillSpector security scan over a staged subset (artifact and evaluation trees excluded) | Yes, on high-severity findings in that scope |
 | **Tier 2 — Deduplication** | Semantic overlap against skills already in the catalog | Advisory |
 | **Tier 3 — Live evaluation** | Real agents run the task set in a sandbox, with and without the skill | Yes, via the verdict |
 

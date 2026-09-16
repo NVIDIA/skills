@@ -3,6 +3,18 @@
 
 Acquire an ONNX model from Hugging Face, creating the mandatory model folder structure.
 
+## Intake — choose the model
+
+Before Step 1, present two explicit choices:
+
+1. **Default model (recommended):** `PekingU/rtdetr_r50vd` from Hugging Face.
+2. **Custom object-detection model:** collect a Hugging Face ID/URL or a versioned NVIDIA NGC
+   catalog URL.
+
+Do not replace this with only an open-ended source prompt. If Default is selected, set
+`INPUT="PekingU/rtdetr_r50vd"`. If Custom is selected, require the source before continuing.
+Dry runs show the choices but perform no browsing, downloads, Docker launches, or file writes.
+
 ## MANDATORY: Model Folder Structure
 
 Create this layout at the start of Step 2 (once `$MODEL_NAME` is set by Step 1):
@@ -66,7 +78,7 @@ fi
 - Browse the HF repository and classify available model files using the vetted helper script
   (validates inputs, uses HTTPS+TLSv1.2 only, honors `$HF_TOKEN`):
   ```bash
-  FILES="$(bash skills/deepstream-import-vision-model/scripts/model/hf-list-files.sh "$HF_ORG" "$MODEL_NAME")"
+  FILES="$(bash .claude/skills/deepstream-import-vision-model/scripts/model/hf-list-files.sh "$HF_ORG" "$MODEL_NAME")"
   ONNX_FILES=$(echo "$FILES" | grep -E '\.onnx$' || true)
   ST_FILES=$(echo "$FILES" | grep -E '\.(safetensors|bin)$' || true)
   echo "ONNX files:      ${ONNX_FILES:-none}"
@@ -75,7 +87,7 @@ fi
 
   # If ONNX list is empty in root, also check /onnx subdirectory
   if [ -z "$ONNX_FILES" ]; then
-      ONNX_SUB="$(bash skills/deepstream-import-vision-model/scripts/model/hf-list-files.sh "$HF_ORG" "$MODEL_NAME" onnx | grep -E '\.onnx$' || true)"
+      ONNX_SUB="$(bash .claude/skills/deepstream-import-vision-model/scripts/model/hf-list-files.sh "$HF_ORG" "$MODEL_NAME" onnx | grep -E '\.onnx$' || true)"
       echo "ONNX in /onnx subdir: ${ONNX_SUB:-none}"
   fi
   ```
@@ -91,7 +103,7 @@ fi
   ```bash
   # HF: download from API via vetted helper. NGC: extracted from archive in Step 2d.
   if [ "$MODEL_SOURCE" = "hf" ]; then
-    bash skills/deepstream-import-vision-model/scripts/model/hf-download-config.sh \
+    bash .claude/skills/deepstream-import-vision-model/scripts/model/hf-download-config.sh \
         "$HF_ORG" "$MODEL_NAME" "models/$MODEL_NAME/config/config.json"
   else
     echo "NGC model — config.json will be extracted from the downloaded archive in Step 2d"
@@ -105,34 +117,18 @@ fi
 
 - **Reject non-detection architectures (fail fast)**: Check the `architectures` field in `config.json` before continuing. If the architecture class ends in a non-detection suffix such as `ForImageClassification`, `ForSemanticSegmentation`, `ForInstanceSegmentation`, `ForPanopticSegmentation`, `ForDepthEstimation`, `ForMaskedLM`, `ForTokenClassification`, or `ForCausalLM`, **abort the pipeline with a clear error and exit non-zero**: `"deepstream-import-vision-model currently supports object detection models only. Detected architecture: {arch_class}. Classification, segmentation, and other vision tasks are not yet supported."` Do not prompt the user. Detection architectures end in `ForObjectDetection` (or, for some DETR-family variants, `ForConditionalDetection` / `ForZeroShotObjectDetection`).
 
-- **Extract `labels.txt` from `config.json`** — run this immediately after `config.json` is in place (for HF models that is now; for NGC models this runs at the end of Step 2d):
+- **Validate the architecture and extract `labels.txt`** — one shared helper does both, so the
+  HF and NGC routes cannot drift apart. Run it as soon as `config.json` is in place (for HF that
+  is now; for NGC it runs at the end of Step 2d):
   ```bash
-  python3 - <<EOF
-  import json, sys
-  with open("models/$MODEL_NAME/config/config.json") as f:
-      cfg = json.load(f)
-
-  # Primary: id2label (standard HF detection/classification format)
-  if "id2label" in cfg:
-      labels = [cfg["id2label"][str(i)] for i in range(len(cfg["id2label"]))]
-  # Fallback 1: label2id reversed
-  elif "label2id" in cfg:
-      labels = [k for k, v in sorted(cfg["label2id"].items(), key=lambda x: x[1])]
-  # Fallback 2: names dict/list (some YOLO HF repos)
-  elif "names" in cfg:
-      names = cfg["names"]
-      labels = [names[str(i)] for i in range(len(names))] if isinstance(names, dict) else list(names)
-  else:
-      print("ERROR: No label map found in config.json -- cannot create labels.txt", file=sys.stderr)
-      sys.exit(1)
-
-  with open("models/$MODEL_NAME/config/labels.txt", "w") as f:
-      f.write("\n".join(labels) + "\n")
-  print(f"labels.txt: {len(labels)} classes")
-  print("  " + ", ".join(labels[:5]) + (" ..." if len(labels) > 5 else ""))
-  EOF
+  build/.venv_optimum/bin/python \
+    .claude/skills/deepstream-import-vision-model/scripts/model/config-to-labels.py \
+    --config models/$MODEL_NAME/config/config.json \
+    --labels models/$MODEL_NAME/config/labels.txt
   ```
-  If the script exits with error (no label map found), **fail the pipeline with a clear error and exit** — do not prompt the user, and never fall back to hardcoded COCO, ImageNet, or any other default list. This same script runs for HF and NGC — the only requirement is that `config.json` exists at `models/$MODEL_NAME/config/config.json`.
+  It exits non-zero on a non-detection architecture (the fail-fast gate above) and on a missing
+  label map. **Treat either as fatal** — do not prompt the user, and never fall back to hardcoded
+  COCO, ImageNet, or any other default list.
 
 ### Step 2a: Select ONNX Variant (Category A)
 - Identify available quantization variants (fp32, fp16, int8, int4, quantized, etc.)
@@ -155,29 +151,24 @@ fi
 
 When the repo only has `.safetensors` (or `.bin`) files and no ONNX export, convert to ONNX using an **isolated virtual environment** to avoid polluting the host system.
 
-#### 2b-i: Setup Isolated Virtual Environment
-- **ALWAYS** use a dedicated venv for export tools. Never install optimum/transformers/torch system-wide.
-- Use a **single shared venv** at `build/.venv_optimum` across all models — `optimum`, `transformers`, `torch`, and `safetensors` are heavy (~2-5 GB) and identical from one model to the next, so creating one per model wastes ~minutes of install time and GBs of disk every run. The `skills/deepstream-import-vision-model/scripts/model/safetensors-to-onnx.sh` helper is built around this shared venv; align the skill-driven path with it.
+#### 2b-i: Virtual Environment (already built by `setup.sh`, in-container)
+- The shared venv at **`build/.venv_optimum`** is created **inside the DeepStream container** by the
+  skill's `setup.sh` (one-time bootstrap) — do **not** create it on the host. Every export command runs
+  in-container against it; use `PY=build/.venv_optimum/bin/python` and `build/.venv_optimum/bin/optimum-cli`.
+- It's a single shared venv across all models (`torch`/`transformers`/`onnxruntime` are heavy
+  and identical model-to-model). If it's missing, run the bootstrap (from SKILL.md Pre-flight):
   ```bash
-  mkdir -p build
-  VENV=build/.venv_optimum
-  if [ ! -x "$VENV/bin/optimum-cli" ]; then
-    python3 -m venv "$VENV"
-    source "$VENV/bin/activate"
-    pip install --upgrade pip
-    pip install optimum[exporters] torch transformers safetensors onnxruntime matplotlib numpy markdown
-  else
-    source "$VENV/bin/activate"
-  fi
+  # in-container (via docker run … --entrypoint bash … setup.sh); NOT on the host
+  .claude/skills/deepstream-import-vision-model/setup.sh    # builds build/.venv_optimum + wkhtmltopdf
   ```
-- For a new model that needs **extra packages** (e.g. `timm` for DETR-family backbones, `onnxsim`, or a different `optimum` pin), `pip install` them **into the existing shared venv** rather than creating a new one:
+- For a new model that needs **extra packages** (e.g. `timm` for DETR-family backbones or `onnxsim`), `pip install` them **into the existing shared venv** rather than creating a new one:
   ```bash
   source build/.venv_optimum/bin/activate
-  pip install timm   # or: pip install 'optimum[exporters]<2.1'
+  pip install timm   # or: pip install onnxsim
   ```
 - The venv lives under `build/.venv_optimum` at the repo root, keeping `models/` clean and excluded from git via the root `.gitignore`
 - All subsequent Python/pip commands in Step 2b must run inside this venv
-- Legacy per-model venvs at `build/.venv_$MODEL_NAME` from older runs are still cleaned up by `skills/deepstream-import-vision-model/scripts/model/cleanup.sh "$MODEL_NAME"` for backward compatibility
+- Legacy per-model venvs at `build/.venv_$MODEL_NAME` from older runs are still cleaned up by `.claude/skills/deepstream-import-vision-model/scripts/model/cleanup.sh "$MODEL_NAME"` for backward compatibility
 
 #### 2b-ii: Download Required Files
 - Download from the HF repo into `models/$MODEL_NAME/hf_model/` using `-P` to avoid changing the working directory:
@@ -196,70 +187,110 @@ When the repo only has `.safetensors` (or `.bin`) files and no ONNX export, conv
   ```
 - For sharded models (multiple `.safetensors` files), also download `model.safetensors.index.json` and all shards
 
-#### 2b-iii: Try optimum-cli Export (Preferred) -- Max 3 Retries
+#### 2b-iii: SafeTensors -> ONNX Export -- Max 3 Retries
 
-> **optimum 2.1.0 removed the `onnx` subcommand.** If `optimum-cli export onnx` exits with "unknown command", pin an older version (`pip install 'optimum[exporters]<2.1'`) or skip straight to **Step 2b-iv** (manual `torch.onnx.export`). The `optimum.exporters.onnx` Python module is also gone in 2.1+.
+> **optimum was removed from this skill.** It pinned `transformers` below 4.54.0, which blocked the
+> releases fixing its RCE advisories (GHSA-29pf-2h5f-8g72, fixed in 5.3.0; GHSA-fgcw-684q-jj6r, fixed
+> in 5.5.0), and optimum 2.1.0 dropped the `onnx` subcommand entirely. Export now goes through
+> `torch.onnx.export` directly.
 
-- Attempt export using optimum-cli:
+- Run the export wrapper (it resolves the shared venv and calls `safetensors_to_onnx.py`):
   ```bash
-  source build/.venv_optimum/bin/activate
-  optimum-cli export onnx \
-    --model models/$MODEL_NAME/hf_model \
-    --task object-detection \
-    --opset 17 \
+  bash .claude/skills/deepstream-import-vision-model/scripts/model/safetensors-to-onnx.sh \
+    models/$MODEL_NAME/hf_model \
     models/$MODEL_NAME/onnx_export/
   ```
-- Common `--task` values for detection/vision models:
-  - `object-detection` -- DETR, YOLOS, Conditional DETR
-  - `image-classification` -- ResNet, ViT, Swin, ConvNeXt
-  - `image-segmentation` -- Mask2Former, SAM
-  - `semantic-segmentation` -- SegFormer, UperNet
-  - `zero-shot-object-detection` -- OWL-ViT, Grounding DINO (if supported)
+- It writes `models/$MODEL_NAME/onnx_export/model.onnx` and:
+  - reads the export resolution from `preprocessor_config.json` (falling back to 640x640);
+  - rejects non-detection architectures before doing any work;
+  - **tries the dynamo backend, then falls back to TorchScript** if dynamo specialized the batch
+    dimension — it prints `[export] backend=...` so you can see which one produced the graph;
+  - consolidates any sidecar `model.onnx.data` back into the `.onnx`;
+  - **verifies** the graph has the `pixel_values` input plus `logits` / `pred_boxes` outputs, and
+    that the batch dimension really is dynamic. It exits non-zero rather than emitting a
+    static-batch graph, because DeepStream needs `batch_size == num_streams` up to `MAX_BS`.
+- Expected output for the default model — note the automatic fallback:
+  ```
+  [export] backend=dynamo
+  [export] pixel_values shape=[2, 3, 640, 640]
+  [export] dynamo produced a static batch dimension; trying the next backend
+  [export] backend=legacy-torchscript
+  [export] pixel_values shape=['batch', 3, 640, 640]
+  ```
+- Useful flags (passed straight through): `--opset N` · `--image-size N` · `--max-batch N` ·
+  `--static-batch` · `--legacy-torchscript`
 - If export succeeds, copy the ONNX file to the `model/` subdirectory:
   ```bash
   cp models/$MODEL_NAME/onnx_export/model.onnx models/$MODEL_NAME/model/$MODEL_NAME.onnx
   ```
-- **Retry policy**: If the export fails, retry up to **3 times total** with adjustments between attempts:
-  - **Retry 1**: Try a different `--task` value if the error suggests wrong task type
-  - **Retry 2**: Try a different `--opset` version (e.g., 14 or 16 instead of 17)
-  - **Retry 3**: Try with `--no-post-process` or other flags relevant to the error
-  - After 3 failed attempts with optimum-cli, fall back to **Step 2b-iv** (manual torch.onnx.export)
+- **Retry policy**: the two-backend fallback is automatic, so a failure here means both backends
+  failed. Retry up to **3 times total** with adjustments between attempts:
+  - **Retry 1**: Set `--image-size` explicitly if the error mentions a shape or resize mismatch
+  - **Retry 2**: Try a different `--opset` (18 is the default; 17 and below fail on `Resize`)
+  - **Retry 3**: Try `--static-batch` if both backends baked in the batch dimension. The engine
+    must then be built at a fixed batch size — see `references/engine-build.md`.
+  - After 3 failed attempts, fall back to **Step 2b-iv** (hand-written export for an unusual architecture)
 
-#### 2b-iv: Fallback -- Manual torch.onnx.export (If optimum fails) -- Max 3 Retries
-- If optimum-cli fails after 3 retries (unsupported architecture), use manual export:
+#### 2b-iv: Fallback -- Hand-written torch.onnx.export (unusual architectures) -- Max 3 Retries
+- If the wrapper fails after 3 retries because the model does not follow the standard
+  `logits` / `pred_boxes` detection contract, write the export inline and adjust the wrapper outputs:
   ```bash
-  source build/.venv_optimum/bin/activate
-  python3 -c "
-  from transformers import AutoModelForObjectDetection, AutoConfig
+  build/.venv_optimum/bin/python -c "
   import torch
+  from transformers import AutoModelForObjectDetection
 
-  model = AutoModelForObjectDetection.from_pretrained('models/$MODEL_NAME/hf_model')
-  model.eval()
+  model = AutoModelForObjectDetection.from_pretrained('models/$MODEL_NAME/hf_model').eval()
 
-  # Create dummy input matching preprocessor_config.json dimensions
+  class Wrap(torch.nn.Module):
+      def __init__(s, m): super().__init__(); s.m = m
+      def forward(s, x):
+          o = s.m(pixel_values=x)
+          return o.logits, o.pred_boxes   # <- adjust for the architecture
+
+  # Dummy input matching preprocessor_config.json dimensions
   dummy = torch.randn(1, 3, 800, 800)
 
-  torch.onnx.export(model, dummy, 'models/$MODEL_NAME/model/$MODEL_NAME.onnx',
-    export_params=True, opset_version=17, do_constant_folding=True,
+  # TorchScript backend — the more reliable one for a dynamic batch dimension on
+  # DETR-family detectors. Swap to the dynamo block below if this backend fails.
+  torch.onnx.export(Wrap(model), dummy, 'models/$MODEL_NAME/model/$MODEL_NAME.onnx',
+    opset_version=18, do_constant_folding=True, dynamo=False,
     input_names=['pixel_values'],
     output_names=['logits', 'pred_boxes'],
     dynamic_axes={'pixel_values': {0: 'batch'},
                   'logits': {0: 'batch'},
                   'pred_boxes': {0: 'batch'}})
+
+  # dynamo backend (use for text-conditioned models the tracer cannot handle):
+  #   batch = torch.export.Dim('batch', min=1, max=16)
+  #   torch.onnx.export(Wrap(model), (torch.randn(2, 3, 800, 800),), '<out>.onnx',
+  #     opset_version=18, dynamo=True,
+  #     input_names=['pixel_values'], output_names=['logits', 'pred_boxes'],
+  #     dynamic_shapes={'pixel_values': {0: batch}})
   "
   ```
-- Adjust input/output names and shapes based on the model architecture
+- Adjust the wrapper's returned tensors, input/output names, and shapes for the architecture
+- Always confirm the batch dimension survived:
+  ```bash
+  build/.venv_optimum/bin/python -c "
+  import onnx; d = onnx.load('models/$MODEL_NAME/model/$MODEL_NAME.onnx').graph.input[0].type.tensor_type.shape.dim
+  print([x.dim_param or x.dim_value for x in d])"   # expect ['batch', 3, H, W]
+  ```
 - **Retry policy**: If manual export fails, retry up to **3 times total** with adjustments:
-  - **Retry 1**: Try a different `AutoModel` class (e.g., `AutoModel`, `AutoModelForImageClassification`)
-  - **Retry 2**: Try a different opset version or simplify dynamic_axes
-  - **Retry 3**: Try with `torch.onnx.export(..., operator_export_type=torch.onnx.OperatorExportTypes.ONNX_ATEN_FALLBACK)`
+  - **Retry 1**: Try a different `AutoModel` class, or return different tensors from the wrapper
+  - **Retry 2**: Switch backend (TorchScript <-> dynamo), remembering `dynamic_axes` vs `dynamic_shapes`
+  - **Retry 3**: Drop the dynamic batch entirely and build a fixed-batch engine
   - After 3 failed attempts, **stop and generate a failure report**
 
-> **Gotchas for recent PyTorch/transformers**:
-> - PyTorch 2.11+ with onnxscript installed auto-upgrades opset to 18 even when `opset_version=17` is requested. The resulting opset-18 ONNX is compatible with TRT 10.16 — accept it.
-> - The dynamo backend (`dynamo=True`) may silently ignore `dynamic_axes` for transformer models where attention reshape patterns bake the batch dimension into the graph. Verify exported input shapes with `onnx.load()`. For DETR-family models on TRT 10.16, prefer the dynamo path with `torch.export.Dim("batch", min=1, max=N)` — it avoids the backbone-mask ForeignNode failure described in `nv-engine-build`.
-> - The legacy TorchScript path (`dynamo=False`) crashes with transformers 5.5+ due to `create_bidirectional_mask` incompatibility.
-> - **External data files**: `torch.onnx.export` may produce `model.onnx.data` alongside the `.onnx`. Consolidate before TRT conversion: `m = onnx.load(path, load_external_data=True); onnx.save(m, consolidated_path)`.
+> **Gotchas for recent PyTorch/transformers** (verified on torch 2.13.0 + transformers 5.14.1
+> inside `nvcr.io/nvidia/deepstream:9.1-triton-multiarch`):
+> - **Neither backend works for every architecture — try `dynamo=True` first, fall back to `dynamo=False`.** `safetensors_to_onnx.py` does this automatically and reports which backend won.
+> - **`dynamo=True` can silently produce a STATIC batch dimension.** The model's own code may specialize `shape[0]`; `torch.export` then reports *"you marked batch as dynamic but your code specialized it to a constant"*. **RT-DETR (`PekingU/rtdetr_r50vd`, the default model) does exactly this** — dynamo yields `[2, 3, 640, 640]`, the TorchScript path yields `['batch', 3, 640, 640]`. Always verify with `onnx.load()`; the exporter asserts it.
+> - **`dynamo=False` does NOT crash on transformers 5.5+ for vision detectors.** An earlier revision of this document claimed it did, via `create_bidirectional_mask`. That applies to **text-conditioned** models (Grounding DINO and friends, which run a BERT text encoder) — not to pure-vision detectors. RT-DETR and YOLOS both export cleanly through TorchScript on transformers 5.14.1.
+> - Under `dynamo=True` the parameter is `dynamic_shapes` (with `torch.export.Dim`), **not** `dynamic_axes`; under `dynamo=False` it is `dynamic_axes`. Passing the wrong one is silently ineffective.
+> - **Use opset 18, not 17.** The dynamo exporter implements >= 18 and auto-upgrades, then its downgrade pass fails outright with `No Adapter To Version 17 for Resize`. Opset 18 is fine on TRT 10.16.
+> - **Call `.eval()` on the wrapper module too**, not just the loaded model — a fresh `nn.Module` defaults to training mode, which changes dropout/batchnorm behaviour during export.
+> - **External data files**: `torch.onnx.export` may produce `model.onnx.data` alongside the `.onnx`. Consolidate before TRT conversion: `m = onnx.load(path, load_external_data=True); onnx.save(m, consolidated_path)`. The exporter does this automatically.
+> - No `ForeignNode` failure was observed for RT-DETR on TRT 10.16 with either backend — see `references/engine-build.md` for the historical issue.
 
 #### 2b-v: Handle Multi-Modal Models (e.g., Grounding DINO)
 - Models that take **both image AND text** inputs need special handling for DeepStream (nvinfer only supports image input)
@@ -318,9 +349,9 @@ Only run `onnxsim` if TRT build fails with `ForeignNode` warnings — it is not 
 - `cleanup.sh` removes per-model artifacts (`models/$MODEL_NAME/hf_model`, `models/$MODEL_NAME/onnx_export`, and any legacy `build/.venv_$MODEL_NAME` left over from older runs):
   ```bash
   # Validated script; will refuse unsafe paths. Shared .venv_optimum is preserved.
-  bash skills/deepstream-import-vision-model/scripts/model/cleanup.sh "$MODEL_NAME"
+  bash .claude/skills/deepstream-import-vision-model/scripts/model/cleanup.sh "$MODEL_NAME"
   # Preview without removing:
-  # bash skills/deepstream-import-vision-model/scripts/model/cleanup.sh "$MODEL_NAME" --dry-run
+  # bash .claude/skills/deepstream-import-vision-model/scripts/model/cleanup.sh "$MODEL_NAME" --dry-run
   ```
 - The ONNX file is now at `models/$MODEL_NAME/model/$MODEL_NAME.onnx` -- proceed to engine building
 
@@ -331,8 +362,8 @@ When the model comes from NVIDIA NGC (not HuggingFace), download using the `ngc`
 ```bash
 # Vetted helper: prefers ngc CLI if installed, else falls back to authenticated
 # HTTPS+TLS via curl against the public NGC catalog API. All inputs validated
-# against ^[A-Za-z0-9._-]+$. See skills/deepstream-import-vision-model/scripts/model/ngc-download.sh for details.
-bash skills/deepstream-import-vision-model/scripts/model/ngc-download.sh \
+# against ^[A-Za-z0-9._-]+$. See .claude/skills/deepstream-import-vision-model/scripts/model/ngc-download.sh for details.
+bash .claude/skills/deepstream-import-vision-model/scripts/model/ngc-download.sh \
     "$NGC_ORG" "$NGC_TEAM" "$MODEL_NAME" "$NGC_VERSION" \
     "models/$MODEL_NAME/ngc_download"
 
@@ -359,26 +390,14 @@ ls -lhR models/$MODEL_NAME/ngc_download/
   else
     cp "$NGC_CONFIG" models/$MODEL_NAME/config/config.json
     echo "config.json extracted from: $NGC_CONFIG"
-    # Now run the same labels.txt extraction as the HF path
-    python3 - <<EOF
-import json, sys
-with open("models/$MODEL_NAME/config/config.json") as f:
-    cfg = json.load(f)
-if "id2label" in cfg:
-    labels = [cfg["id2label"][str(i)] for i in range(len(cfg["id2label"]))]
-elif "label2id" in cfg:
-    labels = [k for k, v in sorted(cfg["label2id"].items(), key=lambda x: x[1])]
-elif "names" in cfg:
-    names = cfg["names"]
-    labels = [names[str(i)] for i in range(len(names))] if isinstance(names, dict) else list(names)
-else:
-    print("ERROR: No label map found in config.json -- cannot create labels.txt", file=sys.stderr)
-    sys.exit(1)
-with open("models/$MODEL_NAME/config/labels.txt", "w") as f:
-    f.write("\n".join(labels) + "\n")
-print(f"labels.txt: {len(labels)} classes")
-print("  " + ", ".join(labels[:5]) + (" ..." if len(labels) > 5 else ""))
-EOF
+
+    # Same helper the HF route uses: gates the architecture, then writes labels.txt.
+    # The NGC route reaches config.json later than the HF route, so without this a
+    # classification model would build an engine and a parser before anything noticed.
+    build/.venv_optimum/bin/python \
+      .claude/skills/deepstream-import-vision-model/scripts/model/config-to-labels.py \
+      --config models/$MODEL_NAME/config/config.json \
+      --labels models/$MODEL_NAME/config/labels.txt || exit 1
   fi
   ```
 
@@ -401,7 +420,7 @@ Record wall-clock time at the start and end of this skill:
 STEP_START=$(date +%s.%N)
 # ... all steps ...
 STEP_END=$(date +%s.%N)
-STEP_DURATION=$(echo "$STEP_END - $STEP_START" | bc)
+STEP_DURATION=$(python3 -c "print(round($STEP_END - $STEP_START, 2))")   # bc is not in the container; python3 always is
 ```
 
 ## Output Summary

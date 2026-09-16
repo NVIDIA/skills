@@ -22,6 +22,8 @@ tags:
 
 # PAIDF AnomalyGen
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Multi-phase pipeline (0–7); the `mode` flag selects which phases run.
 
 | Phase | What runs | Mode(s) |

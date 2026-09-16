@@ -25,10 +25,18 @@ Load only the reference files needed for the current phase:
 - Do not use WebGL, Three.js, Babylon.js, or any browser-side 3D renderer. The browser displays an `ovstream` WebRTC video stream from server-side `ovrtx` rendering.
 - Keep the streaming app split into a Python server process and a React browser client.
 - Stream rendered pixels through `ovstream`; use JSON data-channel messages only for app state and commands.
-- Use NVST native input forwarding for mouse, keyboard, wheel, and touch input. Do not invent JSON mouse input for browser streaming; normalize it with `viewer-input-routing`.
+- Use NVST native input forwarding for mouse, keyboard, wheel, and touch input. A browser JSON mouse fallback is permitted only after `viewer-input-routing` records a working data channel and a failed native callback test; it replaces, never duplicates, native input.
 - Make one render thread the sole owner of `renderer.step()`, stage mutation, native picking, selection outline writes, and live `write_attribute()` calls.
+- In OVStage-backed apps, the same runtime owner also owns stage lifetime,
+  ordinals, write floors, and renderer publication. Do not pass live OVStage
+  handles, mapped buffers, or DLPack objects to the browser, USD workers, or
+  physics workers.
 - Register ovstream callbacks before starting the server.
 - Set `OVRTX_SKIP_USD_CHECK=1` before ovrtx work.
+- Keep `pxr`/OpenUSD queries and OVPhysX USD population behind process
+  boundaries unless the exact ABI/import path is verified. A failed
+  `PhysX.attach_ovstage(stage, read_ordinal=...)` bridge must not fall back to parent-process
+  OVPhysX population.
 - Keep stream resolution fixed for a session and display video with `object-fit: contain`.
 - Treat `/healthz` readiness as server-render proof: return ready after the first valid ovrtx frame has been converted and copied into the app-owned stream buffer, not when a browser connects. Lack of a connected client is a guarded-send condition, not a readiness failure.
 - Never modify user USD files when adding viewer camera, render products, render vars, settings, selection metadata, or inline session data.
@@ -42,10 +50,15 @@ repository-level helper scripts.
 The generated setup flow must:
 
 - create a project-local Python virtual environment;
-- install `ovrtx`, `ovstream`, `warp-lang`, and `numpy` using `references/dependencies`;
-- install `usd-core==24.11` only when the generated server includes a `pxr` query worker;
+- install `ovrtx`, `ovstage` when the runtime uses OVStage, `ovstream`,
+  `warp-lang`, and `numpy` using `references/dependencies`;
+- install `ovphysx` only in the selected physics worker or verified
+  attached-stage test environment;
+- install `usd-core` only when the generated server includes a `pxr` query worker, resolving a release compatible with the selected runtime package set;
 - run import and lifecycle checks for `ovrtx`, `ovstream`, `warp`, and the selected `pxr` subprocess path;
-- construct an `ovrtx.Renderer` once on the target GPU;
+- construct an `ovrtx.Renderer` once on the target GPU and attach/use the
+  selected OVStage path only after the current dependency guidance has been
+  verified;
 - record the commands and results in the validation output.
 
 The generated run wrapper must set the required runtime environment, start the
@@ -65,3 +78,5 @@ older recipes.
 8. Capture validation and review evidence.
 
 See also: `usd-viewer-app`, `streaming-server`, `streaming-client`, `streaming-messages`, `streaming-lifecycle`, `ovrtx-rendering`, `stage-loading`, `viewer-input-routing`, `camera-controls`, `object-selection`, `selection-feedback`, `stage-hierarchy`, `stage-management`, `render-settings`, and `viewer-ux-workflow`.
+
+For live data/scene editing driven from browser controls — a React control → data-channel message → server op mapping to either a cheap data-plane array/attribute write or a structural rebuild — see `cae-cfd-visualization/driving-cae-viz-via-ovstage.md` (the generalized "control → correct write" pattern) and `cae-cfd-visualization/streaming-cae-viewer.md` (the CAE-specific server runtime, message set, and control → server-op flow that compose over this recipe). To layer CAE/CFD visualization on a browser stream, start at `cae-cfd-visualization/README.md`.

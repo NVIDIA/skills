@@ -1,0 +1,41 @@
+{
+  "skill_name": "jetson-video-recipe",
+  "evals": [
+    {
+      "id": "recipe-live-streaming-both",
+      "prompt": "Give me one H.264 1080p60, 6 Mbps CBR low-latency live-streaming recipe for native Video Codec SDK and PyNvVideoCodec. Do not run it.",
+      "expected_output": "One validated live-streaming recipe projected to both SDKs with explicit defaults.",
+      "assertions": [
+        "Preserves H.264, 1920x1080, 60 fps, CBR, and 6000000 bps in one canonical intent",
+        "Resolves to P4, low-latency tuning, GOP 60, one B-frame, zero lookahead, full-resolution multipass, and a 3000000-bit VBV buffer",
+        "Projects the same intent to native and PyNvVideoCodec without claiming execution, measured quality, or performance"
+      ],
+      "expected_skill": "jetson-video-recipe",
+      "expected_workflow": "recipes"
+    },
+    {
+      "id": "recipe-high-profile-projection-loss",
+      "prompt": "Prepare an H.264 1080p archival recipe for native Video Codec SDK and PyNvVideoCodec. High profile is required. Do not run it.",
+      "expected_output": "One archival recipe that preserves High profile natively and exposes the PyNvVideoCodec projection loss.",
+      "assertions": [
+        "Preserves H.264 High profile as an explicit canonical control and expresses it in the native projection",
+        "Reports the released PyNvVideoCodec sample projection as unrepresentable because it cannot express a named profile",
+        "Does not drop or downgrade High profile, claim both projections are exact, or claim execution or performance"
+      ],
+      "expected_skill": "jetson-video-recipe",
+      "expected_workflow": "recipes"
+    },
+    {
+      "id": "recipe-cq-bitrate-conflict",
+      "prompt": "Plan an H.264 encoder recipe with CQ 22 and a 6 Mbps bitrate. Do not run it.",
+      "expected_output": "A clear conflict result with no fabricated or silently modified recipe.",
+      "assertions": [
+        "Explains that CQ is a target-quality VBR control and conflicts with an average bitrate in the shared recipe contract",
+        "Does not silently discard CQ, reinterpret the bitrate as a cap, or produce a validated native or PyNvVideoCodec projection",
+        "Launches no media, codec, or benchmark operation and asks only for information needed after the conflict is resolved"
+      ],
+      "expected_skill": "jetson-video-recipe",
+      "expected_workflow": "recipes"
+    }
+  ]
+}

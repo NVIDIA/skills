@@ -20,7 +20,7 @@ from script_utils import check_result, emit_json_report, resolve_output_path, us
 
 SKILL = "FET_001_MINIMAL"
 TOOL = "pxr.Usd/UsdGeom unit normalization"
-AUTHORING_METADATA = "physical-ai-skill-hub FET_001_MINIMAL/scripts/run.py v0.1.0"
+AUTHORING_METADATA = "omniverse-cad-to-simready FET_001_MINIMAL/scripts/run.py v0.1.0"
 SUPPORTED_USD_EXTENSIONS = {".usd", ".usda", ".usdc"}
 DEFAULT_PROFILE = "Prop-Robotics-Neutral"
 DEFAULT_PROFILE_VERSION = "1.0.0"

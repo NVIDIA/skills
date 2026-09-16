@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# Verify the source-repo skills an onboarding PR declares, before it merges.
+#
+# An onboarding PR adds components.d/<slug>.yml pointing at skill directories
+# in a product repo. The other checks on such a PR inspect this repository's
+# tree, which is sound — the content being onboarded lives elsewhere and goes
+# unexamined. The PR therefore goes green on evidence unrelated to what is
+# being merged.
+#
+# The sync applies the real check an hour later, and refuses any skill whose
+# files no longer match skill.oms.sig: an existing skill reverts, a new skill
+# is dropped outright. By then the PR is closed, so the failure surfaces
+# nowhere — the catalog looks correct and the skill is simply absent. That is
+# how paidf-augmentation (#501) merged green and vanished on 2026-08-31, and
+# how paidf-orchestration (#507) carried the same defect in all four skills.
+#
+# This job follows the pointer and reports the offending filename while the
+# author is still looking at the PR. See .github/scripts/verify_source_onboarding.py.
+
+name: Verify Source Onboarding
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "components.d/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-source-onboarding-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  source-onboarding:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Full history so base...head and `git show <base>:<file>` resolve.
+          # The check needs the component file's *previous* contents to tell
+          # which declared paths this PR actually adds.
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Verify declared source skills
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 .github/scripts/verify_source_onboarding.py

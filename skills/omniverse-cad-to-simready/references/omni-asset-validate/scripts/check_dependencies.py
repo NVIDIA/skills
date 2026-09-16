@@ -16,6 +16,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "shared"))
 
 from script_utils import check_result as _check, emit_json_report
 
+from preflight_manifest import preflight_required, preflight_status_check
+
 
 SKILL = "omni-asset-validate"
 TOOL = "nvidia_usd_validate"
@@ -29,6 +31,15 @@ def _write_report(payload: dict[str, Any], report_path: Path | None) -> None:
 
 
 def check_dependencies() -> dict[str, Any]:
+    if preflight_required():
+        preflight_check = preflight_status_check(SKILL, "asset_validator")
+        if not preflight_check["passed"]:
+            return {
+                "skill": SKILL,
+                "passed": False,
+                "checks": [preflight_check],
+                "errors": [preflight_check["message"]],
+            }
     executable = shutil.which(TOOL)
     legacy_executable = shutil.which(LEGACY_TOOL)
     module_tool = next((name for name in (MODULE_TOOL, LEGACY_MODULE_TOOL) if importlib.util.find_spec(name) is not None), None)

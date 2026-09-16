@@ -181,12 +181,16 @@ Five steps (2a-2d) feeding the gate at 2e, plus optional 2f if the user chooses 
        `material_duplicates` falsely return 0), so an
        unresolved safety-gate finding BLOCKS Phase-2e interpretation of the
        structural/material evidence until it is waived or repaired. Repair (when
-       chosen) is one whole-stage bespoke USD-authoring rebind via the
-       open-reasoning mode (Sdf/pxr, owned by `apply-restructure` — not an SO
-       op), authored BEFORE structuring so the defect is never replicated into
-       prototypes/instances; it is intent-gated (surfaced with trigger +
-       hypothesis, applied on confirmation, written to a new file, source
-       untouched — detection != mandatory repair). Re-verify the same concepts
+       chosen) is one whole-stage bespoke Sdf/pxr authoring pass that the agent
+       performs directly: there is no SO op for it, and no shipped
+       `apply-restructure` mode owns it yet — a `correctness_repair` mode and
+       its spec are proposed in issue #200 but not written, so until that lands
+       the recipe is the agent's to compose under the constraints this phase
+       states. Author it BEFORE structuring so the defect is never replicated
+       into prototypes/instances, in one whole-stage pass, written to a new
+       output file with the source never opened for write; it is intent-gated
+       (surfaced with trigger + hypothesis, applied on confirmation —
+       detection != mandatory repair). Re-verify the same concepts
        after structuring on each externalized node (restructure can introduce
        new dangling bindings). This detection sweep is mandatory-early but still
        cost-bounded: it does NOT inherit Tier-1's no-timeout exemption — run it
@@ -281,18 +285,36 @@ Five steps (2a-2d) feeding the gate at 2e, plus optional 2f if the user chooses 
       2. Author that level's shared prototypes (`instanceable=true`
          references — see SHARE, DON'T SCATTER below). Tag each target in the
          manifest `phase4_targets[]` with its level (assembly / component /
-         subcomponent = USD `kind`) and its asset type (architecture / product
-         / piping / generic — this picks which geometry ops apply later).
-      3. Re-scan one level down (the quick structure-only pass) and SHOW the
-         user the new repeated groups it finds that are worth sharing (roughly
-         20+ prims, appearing 2+ times), with the cost (more layers, parts
-         less directly selectable). ASK: go deeper, or stop? Always ask before
-         crossing a named-part boundary or doing anything that destroys
-         identity (point-instancing / merging). A plain lossless-sharing tail
-         can be auto-finished if the user opts in.
-      4. STOP when the user says stop, or when that re-scan finds nothing new
+         subcomponent = USD `kind`) and its `archetype` — one of
+         `large-spatial`, `encapsulated-product`, `piping`, `generic`, which is
+         what the manifest schema accepts and what picks the geometry ops later.
+      3. MEASURE, then re-scan, then ask.
+         a. Capture a cold stage open on this level's output, in a fresh
+            process, with the `profile-stage` quick recipe Phase 1a already
+            required. One number, a few seconds of work, and it is the only
+            evidence that the descent is still paying for itself.
+         b. Re-scan one level down (the quick structure-only pass).
+         c. SHOW the user, together: the new repeated groups worth sharing
+            (roughly 20+ prims, appearing 2+ times), the cold open at this
+            level against the previous level and against the Phase 1a
+            baseline, the running prototype count, and the cost (more
+            prototypes, more layers on the `external_prototype` branch, parts
+            less directly selectable). ASK: go deeper, or stop?
+         Always ask before crossing a named-part boundary or doing anything
+         that destroys identity (point-instancing / merging). A plain
+         lossless-sharing tail can be auto-finished if the user opts in — but
+         it still measures per level and still stops on a rising cold open.
+      4. STOP when the user says stop, when that re-scan finds nothing new
          worth sharing (only leftovers remain: tiny parts left in place for a
-         later merge, already-split variants, or one-offs).
+         later merge, already-split variants, or one-offs), or when cold open
+         has risen materially against the Phase 1a baseline. A rising cold open
+         means the descent has started costing more than the sharing saves;
+         stop, record the level that was best, and say so.
+
+    Record every level's cold open and prototype count in the manifest
+    `frontier` block. Phase 6c compares against the Phase 1a baseline anyway;
+    capturing per level is what lets the report name the level where it turned,
+    instead of discovering the regression after Phase 4's geometry ops are done.
 
     DONE = the loop above finished. Record it in the manifest's `frontier`
     block: `descent_converged: true` and `final_rescan_new_groups_above_floor: 0`.
@@ -302,9 +324,13 @@ Five steps (2a-2d) feeding the gate at 2e, plus optional 2f if the user chooses 
     are reserved fuses geometry that was about to be shared, so triangles and
     disk GROW instead of shrink and the Phase 6 gate rejects the result.
 
-    Don't over-split: each pass adds layers, so how deep you go caps the layer
-    COUNT. Exploding a factory asset into five-figure layer counts is a
-    failure, even with packaging deferred.
+    Don't over-split. Each pass adds prototypes, and on the
+    `external_prototype` branch it adds layers too, so how deep you go caps
+    both. Exploding a factory asset into five-figure layer counts is a failure,
+    even with packaging deferred. Five-figure prototype counts earn the same
+    suspicion — and on the `internal_reference` branch, where the stage stays a
+    single file and the layer count cannot grow at all, prototype count and the
+    per-level cold open are the only ceilings that can fire.
 
     SHARE, DON'T SCATTER (hard rule): externalizing MUST use shared prototypes
     with `instanceable=true` references — NOT N separate per-node payloads
@@ -313,7 +339,13 @@ Five steps (2a-2d) feeding the gate at 2e, plus optional 2f if the user chooses 
     the load-time / layer-count tradeoff instead of presenting the split as the
     optimization. A USDC repack or an unshared split is NOT a win — the Phase 6
     gate fails closed on it (see footprint contract + optimization-report).
-    Depth caps layer count; sharing caps load time and memory.
+
+    What sharing buys, and what it does not. Sharing reliably cuts scene-graph
+    weight: composed prim count, and the composition and traversal work that
+    scales with it. Its effect on stage-open time is asset-dependent and has to
+    be measured. The one full run of this loop followed §2g exactly, converged,
+    took prototypes 0 -> 5,225 and authored prims -89.4 %, and still regressed
+    cold open +173 % and warm open +251 %. Measure per level; do not assume.
 ```
 
 #### The structure model the descent is serving (read before deciding a frontier)
@@ -530,13 +562,26 @@ see the "Post-Restructure / Post-Decompose Validation Strategy" in
        byte-dedups). Apply the merge-eligibility guard (weak/none identity only;
        bounds-coherence ceiling) and the full op-chain from
        `usd-structure-assessment/references/apply-restructure/references/mesh-merge-rewrite-spec.md`
-       §9 before fusing. **Group the fan by the `(scope × material) key`:** within
-       the merge boundary (the nearest named/`kind` ancestor, preserved), fuse the
+       §9 before fusing. **Run ONE scoped `merge` call per boundary — NEVER a
+       single global call.** Scope first, material second: a global call buckets
+       by material across the whole stage and `mergePoint` then resolves to the
+       stage root, so you get anonymous blobs spanning the entire asset. Measured
+       on an 85,871-mesh CAD station, a single global call produced 298 meshes of
+       which 39.6% each spanned more than half the asset and 0 of 617 named units
+       survived — every count looked correct and the tree was unusable. One call
+       per named unit on the same asset gave a median mesh spanning 0.029 of the
+       stage with all 617 units intact.
+
+       Within each boundary (the nearest named/`kind` ancestor, preserved), fuse the
        same-material meshes into one `Mesh` per material; when materials must
        coexist in one prim, fuse into one `Mesh` with a per-material
        `UsdGeomSubset` (familyName `materialBind`) so every binding survives — and
        stop merging when the per-subset overhead approaches the per-mesh overhead it
-       replaced. The detailed grouping/execution mechanic and the archetype-gated
+       replaced. That ceiling is real and cheap to cross: a run that took the subset
+       route on every boundary reached 6,674 subsets and ~6,755 draw calls against
+       298 for one-mesh-per-material, and measured 12 FPS against 50 in a
+       rasterizing viewport. Under RTX both were 66 FPS, so the cost is
+       draw-call submission, not geometry — weigh it by target renderer. The detailed grouping/execution mechanic and the archetype-gated
        merge depth live in
        `usd-structure-assessment/references/apply-restructure/references/mesh-merge-rewrite-spec.md`;
        the cheap suggester that surfaces these fans is
@@ -612,6 +657,75 @@ dedup-orphaned arrays and silently grows the file even as content shrinks.
 
 Do **not** use `stage.Export()` here unless the user explicitly wants a
 flattened deliverable. This cleanup step re-emits individual layers.
+
+#### Required: verify the layer still composes after every structural op
+
+Counts and bounding boxes are not evidence that the output survived. After any op
+that moves or deletes prims — `merge`, `flattenHierarchy`, `pruneLeaves`,
+`deduplicate*`, or a direct namespace edit — open a throwaway stage that
+**references** the written layer and confirm it composes the mesh count you
+expect:
+
+```python
+c = Usd.Stage.CreateInMemory()
+c.DefinePrim("/Consumer", "Xform").GetReferences().AddReference(out_path)
+assert sum(1 for p in c.Traverse() if p.IsA(UsdGeom.Mesh)) == expected
+```
+
+Three lines, and it is the only check that catches these first four observed failures,
+each of which reported success and left every count and bounding box correct:
+
+- `merge` with `rootPath` unset parks merged meshes at the pseudo-root, outside the
+  stage `defaultPrim` — a consumer referencing the layer composes **zero** geometry.
+- `merge` with `rootPath` set has been seen mis-parsing the path as relative,
+  turning 899 meshes into 823 mangled prims.
+- `merge` on a masked stage **with `rootPath` unset** deletes every source mesh
+  and authors nothing, returning ok=True. Both conditions are required, and
+  `meshPrimPaths` is not involved. It is the same root cause as the entry above:
+  with no `rootPath` the output goes to `/merged` at the stage root, which lies
+  outside the population mask, so it cannot be authored while the sources are
+  removed regardless.
+
+  Measured on one masked unit of a CAD station, 334 meshes / 292,058 triangles:
+
+  | stage | `rootPath` | result |
+  |---|---|---|
+  | masked | set | 334 -> 1 mesh, every triangle preserved |
+  | masked | unset | 334 -> 0 meshes, **all 292,058 triangles gone** |
+  | unmasked | unset | triangles survive in the layer, but they are parked at `/merged` outside the `defaultPrim`, so a consumer referencing it composes nothing |
+  | unmasked | set | triangles preserved, output in place |
+
+  Passing an absolute `rootPath` under the target is therefore sufficient, and
+  merging on a masked stage is safe with it. Listing `meshPrimPaths` changes
+  nothing either way.
+
+- `flattenHierarchy` at its upstream default `identity: false`, run whole-stage,
+  has deleted the `defaultPrim` outright while leaving the layer metadata pointing
+  at the missing prim — 0 of 38,917 meshes reachable through a reference.
+- `merge` leaves the source Xforms behind. It removes the Mesh prims it fused
+  but not the grouping prims that held them, each still carrying a transform and
+  a material binding that now bind nothing. **Finish the merge PASS with one
+  stage-level `pruneLeaves`**, after every per-unit merge call has run — not
+  once per call. `pruneLeaves` is stage-level cleanup and is not part of the
+  per-prototype op chain; see `apply-restructure/references/mesh-merge-rewrite-spec.md`,
+  which owns that placement. Running it inside the per-prototype chain would
+  cascade into ancestors while sibling merges are still pending. Measured after merging beneath 220 named units of a CAD
+  station: 79,630 Xforms remained for 468 meshes, 65,244 of them childless
+  leaves. `pruneLeaves` took the stage from 83,286 prims to 5,421 (-93.5%) and
+  the Xforms to 1,765 (-97.8%) in 0.8 s, with the triangle count unchanged.
+  It does remove named units that hold nothing: on that stage 601 of 604 survived,
+  the three lost being one chain that was already empty in the source. Check the
+  units you promised the user rather than assuming. Without it the scene graph stays as deep
+  and as wide as the unoptimized stage while holding almost nothing, which is
+  most of what a stage-open cost measures.
+  **The composition check above does not catch this one.** That check asserts the
+  mesh count, which is correct after a merge that leaves Xforms standing, so it
+  passes on a stage the prune has not run over. Verify the prim count as well.
+
+These are `usd-optimize` runtime behaviours rather than skill behaviour, and all
+five sit in ops classed `apply_authority: auto` / `loss_class: lossless`. Until they are fixed upstream,
+`auto` means "no user decision needed", never "cannot break the layer" — so
+verify rather than assume.
 
 The disk-size deltas reported in Phase 6 are only meaningful after this
 cleanup pass, and must be attributed against a **repack-normalized baseline**
@@ -706,7 +820,7 @@ exactly `profile-stage:after`.
     **Default mild bounded-loss pass:** by default at least one Phase-7 iteration
     applies the **`auto-within-tolerance`** ops — every `bounded-loss` op with a
     deviation parameter at the *conservative* per-target scale band — for
-    **visually-toleranced** targets (`large-spatial` / `encapsulated` /
+    **visually-toleranced** targets (`large-spatial` / `encapsulated-product` /
     `generic`), with a one-line notice (not a prompt). This guards against
     under-optimization (the over-tessellated mesh a pure opt-in menu lets sail
     through). It does NOT apply to targets carrying a functional-precision signal
@@ -785,7 +899,23 @@ checkout through `references/upstreams/usd-optimize.md`.
 - Structure and hierarchy rewrites complete before mesh-level optimization; use
   `usd-hierarchy-dedupe-candidates` + `apply-restructure` before mesh-level
   `deduplicateGeometry`.
-- `meshCleanup` BEFORE `decimateMeshes`.
+- **`meshCleanup` BEFORE `decimateMeshes` — a precondition, not hygiene.** When the
+  `vertex_weld` concept fires, welding is upstream of any geometry reduction and
+  decimation should not run until it has. Two reasons, both measured:
+  - **Decimation barely moves on unwelded input.** CAD exporters emit each face with
+    its own vertices, so before a weld nearly every edge is a boundary edge, and
+    `pinBoundaries: true` (which the anti-pattern rules require when meshes share
+    boundaries) then pins almost the entire mesh. Measured on a CAD station, the
+    weld alone cut points by 57.8% before decimation did anything.
+  - **`reductionFactor` is only predictable on welded input.** It is keep-percent of
+    the *welded* vertex count, so on a stage carrying ~2.4x redundant vertices
+    `reductionFactor: 90.0` retained 35.5%, not 90%. Weld first and the nominal value
+    means what the parameter glossary says it means. See
+    `usd-optimize-run-operations/references/units-and-tolerances.md`.
+
+  So the sequence is: validate weld state (`vertex_weld`) → weld with `meshCleanup`
+  if it fires → then reduce. A decimation planned on an unwelded stage is planned
+  against a vertex count that is an artifact of the exporter.
 - `deduplicateGeometry` BEFORE `decimateMeshes` — **with the instancing caveat**:
   `deduplicateGeometry`'s default `duplicateMethod` (Instanceable Reference, 2)
   replaces duplicates with instances, and `decimateMeshes` skips instanced prims

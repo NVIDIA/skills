@@ -6,7 +6,7 @@ agent_next:
   - workflow.md
   - output-workspace.md
 freshness: 2026-05-20
-version: "0.1.0"
+version: "0.4.1"
 ---
 
 # USD Performance Tuning Skill Map

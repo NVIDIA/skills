@@ -8,8 +8,8 @@
       "skills": [
         "aiq-deploy",
         "aiq-research",
-        "i4h-workflow-setup",
-        "nemo-evaluator-plugin",
+        "nemo-fabric-build-adapter",
+        "nemo-fabric-integrate",
         "nemo-relay-debug-runtime-integration",
         "nemo-relay-get-started",
         "nemo-relay-install",
@@ -21,6 +21,7 @@
         "nemo-relay-plugin-build",
         "nemo-relay-plugin-observability",
         "nemo-retriever",
+        "nemo-retriever-mcp",
         "nemoclaw-user-guide",
         "nemotron-policy-generator",
         "nvidia-skill-finder",
@@ -42,7 +43,6 @@
         "hsb-ip-packetizer",
         "hsb-setup",
         "hsb-test",
-        "i4h-catheter-navigation-setup",
         "jetson-build-source",
         "jetson-customize-camera",
         "jetson-customize-fan",
@@ -63,13 +63,20 @@
         "jetson-print-device-info",
         "jetson-quick-start",
         "jetson-set-target",
+        "jetson-video-capability",
         "omniverse-cad-to-simready",
         "omniverse-realtime-viewer",
         "omniverse-usd-performance-tuning",
+        "paidf-augmentation",
+        "paidf-auto-labeling",
+        "paidf-curation-and-retrieval",
+        "paidf-orchestration-setup",
+        "paidf-orchestration-write-dag",
         "physical-ai-defect-image-generation",
+        "physical-ai-event-video-generation",
+        "physical-ai-image-attribute-augmentation",
         "physical-ai-infrastructure-setup-and-resilient-scaling",
         "physical-ai-neural-reconstruction",
-        "physical-ai-people-attribute-search",
         "physical-ai-video-data-augmentation"
       ]
     },
@@ -77,6 +84,8 @@
       "title": "Robotics",
       "description": "Build, deploy, test, and operate robotic systems, robot policies, robot applications, and robot development workflows.",
       "skills": [
+        "foundationpose-pipeline",
+        "foundationpose-setup",
         "i4h-lerobot-viz",
         "i4h-workflow",
         "i4h-workflow-dataset-annotate",
@@ -85,6 +94,7 @@
         "i4h-workflow-dataset-teleop",
         "i4h-workflow-e2e",
         "i4h-workflow-finetune",
+        "i4h-workflow-train-rl",
         "jetson-customize-pcie",
         "jetson-customize-pinmux",
         "jetson-validate-image"
@@ -94,7 +104,6 @@
       "title": "Robotics Simulation",
       "description": "Build and run robotics simulation workflows for training, testing, validation, synthetic data generation, and scenario coverage.",
       "skills": [
-        "i4h-catheter-navigation-e2e",
         "i4h-workflow-create",
         "i4h-workflow-dataset-replay",
         "i4h-workflow-scene-edit",
@@ -105,6 +114,7 @@
       "title": "Vision AI",
       "description": "Build vision and video AI workflows for analytics, search, summarization, alerts, real-time understanding, and model integration.",
       "skills": [
+        "amc-run-rtsp-calibration",
         "amc-run-sample-calibration",
         "amc-run-video-calibration",
         "amc-setup-calibration-stack",
@@ -112,6 +122,7 @@
         "deepstream-generate-pipeline",
         "deepstream-import-vision-model",
         "deepstream-profile-pipeline",
+        "deepstream-run-mv3dt",
         "deepstream-sop",
         "dicom-metadata-extract",
         "dicom-series-preflight",
@@ -126,6 +137,9 @@
         "nv-segment-ct-finetune",
         "nv-segment-ctmr",
         "paidf-anomalygen",
+        "rtvi-cv-customize-model",
+        "rtvi-cv-scaffold-vss-service",
+        "rtvi-vlm-customize-model",
         "tao-analyze-changenet-rca",
         "tao-analyze-gaps-visual-changenet",
         "tao-analyze-gaps-vlm-bcq",
@@ -202,19 +216,8 @@
         "earth2studio-deterministic-forecast",
         "earth2studio-discover",
         "earth2studio-install",
-        "i4h-catheter-navigation",
-        "i4h-catheter-navigation-render-drr",
-        "i4h-catheter-navigation-smoke",
-        "i4h-catheter-navigation-viewport",
         "physicsnemo-discover",
         "physicsnemo-shard-tensor"
-      ]
-    },
-    {
-      "title": "Digital Twins",
-      "description": "Build, simulate, connect, and operate digital representations of physical systems, environments, factories, and assets.",
-      "skills": [
-        "i4h-catheter-navigation-digital-twin"
       ]
     },
     {
@@ -225,7 +228,8 @@
         "cupynumeric-hdf5",
         "cupynumeric-install",
         "cupynumeric-migration-readiness",
-        "cupynumeric-parallel-data-load"
+        "cupynumeric-parallel-data-load",
+        "nvflare-fed-stats"
       ]
     },
     {
@@ -234,6 +238,12 @@
       "skills": [
         "dali-dynamic-mode",
         "data-designer",
+        "kermt-add-cmim-pretrain",
+        "kermt-continue-pretrain",
+        "kermt-finetune",
+        "kermt-monitor",
+        "kermt-pretrain-scratch",
+        "kermt-setup",
         "launch-nemo-rl",
         "mcore-create-issue",
         "mcore-linting-and-formatting",
@@ -244,7 +254,6 @@
         "nemo-automodel-launcher-config",
         "nemo-automodel-model-onboarding",
         "nemo-automodel-recipe-development",
-        "nemo-data-designer-plugin",
         "nemo-mbridge-mlm-bridge-training",
         "nemo-mbridge-multi-node-slurm",
         "nemo-mbridge-perf-activation-recompute",
@@ -271,6 +280,14 @@
         "nemo-rl-session-memory",
         "nemotron-customize",
         "nemotron-retrieval-recipes",
+        "nvflare-autofl",
+        "nvflare-autofl-report",
+        "nvflare-convert-huggingface",
+        "nvflare-convert-lightning",
+        "nvflare-convert-pytorch",
+        "nvflare-diagnose-job",
+        "nvflare-orient",
+        "nvflare-shared",
         "tao-convert-dataset-format",
         "tao-finetune-cosmos-reason",
         "tao-finetune-huggingface-model",
@@ -300,6 +317,9 @@
         "jetson-llm-benchmark",
         "jetson-llm-serve",
         "jetson-speculative-decoding",
+        "kermt-embed",
+        "kermt-infer",
+        "medtech-model-evidence-export",
         "tao-run-inference-service"
       ]
     },
@@ -323,6 +343,10 @@
       "skills": [
         "holohub-module-lifecycle",
         "hsb-ip-create-top",
+        "jetson-video-benchmark",
+        "jetson-video-pipeline",
+        "jetson-video-recipe",
+        "jetson-video-setup",
         "tao-run-on-docker",
         "tilegym-adding-cutile-kernel",
         "tilegym-converting-cutile-to-julia",
@@ -330,14 +354,18 @@
         "tilegym-cutile-autotuning",
         "tilegym-cutile-python",
         "tilegym-improve-cutile-kernel-perf",
-        "tilegym-monkey-patch-kernels-to-transformers"
+        "tilegym-monkey-patch-kernels-to-transformers",
+        "warp-compile-time-optimizer",
+        "warp-debug-gradients",
+        "warp-eval"
       ]
     },
     {
       "title": "Quantum Computing",
       "description": "Build, run, and validate quantum and hybrid quantum-classical applications, including CUDA-Q development workflows.",
       "skills": [
-        "cudaq-guide"
+        "cudaq-guide",
+        "cudaq-importing"
       ]
     },
     {
@@ -350,6 +378,7 @@
         "holoscan-install-source",
         "holoscan-install-wheel",
         "holoscan-setup",
+        "i4h-workflow-setup",
         "jetson-customize-clocks",
         "jetson-generate-kb",
         "jetson-headless-mode",

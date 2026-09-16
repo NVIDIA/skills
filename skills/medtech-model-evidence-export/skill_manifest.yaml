@@ -1,0 +1,117 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+id: medagent.medtech_model_evidence_export
+version: 0.2.0
+upstream_refs:
+  - kind: pypi_package
+    name: mlflow
+    version_constraint: ">=2.10,<4"
+license: Apache-2.0
+intended_use:
+  summary: >
+    Post-hoc export of sanitized Medical AI inference-run metadata, evaluation
+    evidence, reproducibility parameters, quality metrics, and explicitly
+    approved review artifacts through the documented MLflow Python API.
+  scope: development
+  not_for:
+    - live training-curve tracking
+    - unapproved medical-image upload
+    - model registration
+    - clinical interpretation
+    - regulatory submission
+inputs:
+  - name: evidence_source
+    type: path
+    description: Evidence pack, trusted-run root containing skill_run/, or direct result JSON.
+  - name: mode
+    type: string
+    description: dry-run, local, or databricks.
+    optional: true
+    default: dry-run
+  - name: artifact_policy
+    type: string
+    description: metadata, preview, or all; live preview/all requires explicit confirmation.
+    optional: true
+    default: metadata
+outputs:
+  - name: export_result
+    type: json
+    schema: validators/output_schema.json
+runtime:
+  language: python
+  python: ">=3.10"
+  entrypoint: scripts/export_evidence_pack.py
+  args:
+    - "${python}"
+    - "${script}"
+    - "${fixture}"
+    - "--mode"
+    - "dry-run"
+    - "--artifact-policy"
+    - "metadata"
+  dependencies:
+    mlflow: ">=2.10,<4"
+    nibabel: ">=4,<6"
+    numpy: ">=1.24,<3"
+  test_dependencies:
+    jsonschema: ">=4"
+    pytest: ">=7"
+  env_optional:
+    - DATABRICKS_HOST
+    - DATABRICKS_TOKEN
+    - MLFLOW_TRACKING_URI
+  side_effects:
+    pip_packages:
+      - "mlflow>=2.10,<4"
+      - "nibabel>=4,<6"
+      - "numpy>=1.24,<3"
+    local_writes:
+      - {path: "<current-working-directory>/mlruns", approx_mb_max: 1024, optional: true}
+    home_writes: []
+    network_endpoints:
+      - "https://<caller-provided-mlflow-or-databricks-workspace>"
+    requires_docker: false
+    requires_gpu: none
+    environment:
+      clean_environment_required: false
+      clean_environment_recommended: false
+      modifies_active_python_environment: false
+      user_environment_modification_ok: false
+      recommended_isolation: caller-selected Python environment
+limitations:
+  - The exporter mirrors existing inference evidence; it does not evaluate model quality.
+  - Preview and raw medical artifacts require an explicit policy and live-upload confirmation.
+  - NIfTI statistics are sampled for bounded memory use and are engineering heuristics only.
+  - Databricks authentication, retention, and experiment permissions belong to the caller.
+  - The committed dry-run fixture does not validate a live MLflow or Databricks service.
+validation:
+  expected_runtime_seconds:
+    min: 0.0
+    max: 15.0
+  sanity_checks:
+    - {path: skill, eq: medtech_model_evidence_export}
+    - {path: status, eq: dry_run}
+    - {path: mode, eq: dry-run}
+    - {path: source.pack_kind, eq: skill_run}
+    - {path: source.skill_id, eq: medagent.nv_generate_ct_rflow}
+    - {path: params, length_gte: 5}
+    - {path: metrics, length_gte: 5}
+    - {path: artifact_plan.policy, eq: metadata}
+    - {path: artifact_plan.metadata_count, gte: 5}
+    - {path: note, matches: "Post-hoc MLflow evidence export"}
+    - {path: mlflow.available, exists: true}
+  expected_cost:
+    wall_seconds: {max: 15}
+    cpu_seconds: {max: 15}
+    rss_mb_peak: {max: 500}
+    gpu_seconds: {max: 0}
+    gpu_memory_mb_peak: {max: 0}
+  env_pin:
+    nibabel: ">=4,<6"
+    numpy: ">=1.24,<3"
+  reproducibility:
+    mode: repeat
+    fixture: fixtures/sample_pack
+    runs: 2
+    reason: Dry-run metadata extraction and export planning are deterministic for a fixed pack.

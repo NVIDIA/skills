@@ -1,0 +1,39 @@
+[
+  {
+    "id": "1",
+    "question": "I just cloned the repo and have my own warehouse-safety videos. I'm new to this - how do I get started producing auto-labels for my domain?",
+    "expected_skill": "paidf-auto-labeling",
+    "ground_truth": "Response uses the auto-labeling skill to give a guided end-to-end path: first confirm the critical inputs with the user (input data path, output path, VLM/LLM endpoints and model names, model cache, GPU ids) and ask for anything missing; verify the environment; run a shipped example cookbook with --container-dry-run to prove the stack before customizing; then plan the scenario (scenario-planning), adapt the closest shipped cookbook (cookbook-authoring), author prompts/question banks (prompt-authoring), configure stages starting with detection-and-tracking, and dry-run then execute and validate (workflow-runner-debugging). It routes to the matching references instead of duplicating their detail and does not claim it executed anything.",
+    "expected_behavior": [
+      "Response triggers the auto-labeling skill for a new user/new domain onboarding request.",
+      "Response confirms critical inputs and asks the user for any that are missing or ambiguous before running.",
+      "Response tells the user to run a shipped example first (dry-run) before customizing.",
+      "Response sequences plan -> adapt cookbook -> author prompts -> configure stages -> dry-run/execute/validate and routes to the specialized skills.",
+      "Response provides a container dry-run command and does not claim execution."
+    ]
+  },
+  {
+    "id": "2",
+    "question": "Kick off the auto-labeling pipeline for my new use case and just run it.",
+    "expected_skill": "paidf-auto-labeling",
+    "ground_truth": "Response uses the auto-labeling skill and refuses to guess. Because the input data path, output path, and VLM/LLM endpoints/model names are not provided, it asks the user to supply and confirm those critical inputs (plus model cache, GPU ids, and reasoning max_tokens if a reasoning model is used) before executing. It restates the confirmed values, requires a dry-run before any real run, and does not invent paths, endpoints, or credentials.",
+    "expected_behavior": [
+      "Response triggers the auto-labeling skill.",
+      "Response asks the user for the missing critical inputs (data path, output path, endpoints/model names) rather than guessing or inventing defaults.",
+      "Response states it will restate/confirm inputs and dry-run before any real run.",
+      "Response does not fabricate paths, endpoint URLs, model IDs, or credentials."
+    ]
+  },
+  {
+    "id": "3",
+    "question": "What's the fastest way to confirm the stack works end to end before I customize anything for my own domain?",
+    "expected_skill": "paidf-auto-labeling",
+    "ground_truth": "Response uses the auto-labeling skill to recommend running a shipped example pipeline (the closest operator cookbook - video data augmentation, event-and-person-attribute-search, or event-verification-reasoning) via workflow-runner with --container-dry-run first, then a real run, before adapting anything for the custom domain. It confirms environment prerequisites (model cache, reachable endpoints, GPU) and notes that customizing before a clean example run makes domain debugging ambiguous.",
+    "expected_behavior": [
+      "Response triggers the auto-labeling skill.",
+      "Response recommends running a shipped example cookbook first (dry-run then real run) to validate the stack.",
+      "Response confirms environment prerequisites before running.",
+      "Response advises against customizing a cookbook before the shipped example runs clean."
+    ]
+  }
+]

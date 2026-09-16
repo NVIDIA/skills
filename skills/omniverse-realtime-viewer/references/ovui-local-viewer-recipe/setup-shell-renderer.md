@@ -2,18 +2,29 @@
 
 ## 2. Install Dependencies And Configure The Environment
 
-*Read `references/dependencies` FIRST.* Its `references/nvidia-runtime.md` file is
+*Read `references/dependencies` FIRST.* Its `nvidia-runtime.md` file is
 the source of truth for NVIDIA runtime locations. Do not guess or repeat `ovui`
 package URLs, wheel names, artifact locations, or fallback install commands in
 this recipe.
 
 Do this:
 
+- Resolve the Python environment from the current `NVIDIA-Omniverse/ovui`
+  `README.md`, `AGENTS.md`, relevant `skills/omniverse-ui-*` references, and
+  package metadata before creating the venv. Do not hard-code a Python version
+  in generated local `ovui` setup notes.
 - Install `ovrtx` using the package guidance in `references/dependencies`.
+- Install `ovstage` using the package guidance in `references/dependencies`
+  when the local runtime uses OVStage as the live stage substrate.
 - Install `ovui` using the current PyPI package guidance in `references/dependencies`.
 - Install any selected local UI companion packages from the same `ovui`
   package set as the base UI package.
-- Install `usd-core==24.11` when the local app needs `pxr` queries. Pin to 24.11 — newer versions cause TfType schema conflicts with ovrtx.
+- Install `usd-core` only when the app creates a USD query worker. Resolve a release compatible with the selected runtime package set after reviewing the current upstream runtime documentation and release notes. Keep
+  routine `pxr` imports out of the local process that owns OVRTX and live
+  OVStage unless the exact wheel set and import path are verified.
+- Install `ovphysx` only in a bounded physics worker or isolated
+  attached-stage compatibility probe unless the selected local app has verified
+  `PhysX.attach_ovstage(stage, read_ordinal=...)` for the exact OVStage/OVPhysX ABI.
 - Install `numpy` for matrices, camera math, and CPU frame handling (`pip install numpy`).
 - Install `warp-lang` only when the local app needs CUDA-side display or image-processing utilities (`pip install warp-lang`).
 - Do not install `ovstream` or frontend streaming packages for a local-only viewer.
@@ -28,17 +39,26 @@ Set these environment contracts before starting the app:
 
 Decision points:
 
-- If the local app imports `pxr` in the main process, follow the local import discipline documented in `references/local-viewer`.
-- If USD registry or DLL conflicts appear, isolate `pxr` queries into a subprocess and keep the main app focused on ovui plus ovrtx.
+- Prefer a subprocess for USD queries and keep the main app focused on ovui,
+  OVRTX, and live OVStage/session state.
+- If USD registry or DLL conflicts appear, treat that as confirmation that `pxr`
+  queries belong in a subprocess.
+- If OVPhysX attach fails with missing OVStage bridge symbols, run physics in a
+  bounded child process and hand pose samples back to the parent; do not call
+  OVPhysX in the local viewer process.
 - If the user only needs rendering and camera navigation, defer `usd-core` until hierarchy or bounds queries are required.
-- If running on Windows, read `references/windows-native-setup` before changing import order or subprocess strategy.
+- If running on Windows, read `references/windows-native-setup`, especially
+  `Local ovui On Windows`, before changing import order or subprocess strategy.
+  Skip its streaming-only frontend/WebRTC sections for local-only apps.
 - If local UI imports report missing package metadata or missing
   `VIEWPORT_CAMERA_POSE_SOURCE`, read `references/dependencies` and use one
   compatible local UI package set.
 
 Common failure modes:
 
-- `usd-core detected`, duplicate USD debug symbols, `_tf` import failures, or MDL resolver crashes usually mean import order or library path is wrong.
+- `usd-core detected`, duplicate USD debug symbols, `_tf` import failures, or
+  MDL resolver crashes usually mean import order or library path is wrong, or a
+  second USD-populating runtime entered the viewer process.
 - Magenta materials usually mean `OVRTX_BIN_PATH` or plugin library path is missing.
 - ovui import failure usually means the selected package was not installed or
   its required import path is not on `PYTHONPATH`.
@@ -96,6 +116,8 @@ Do this in `local_app/renderer_runtime.py`:
 - Store the active render product path, render width, render height, current frame index, and whether a valid stage is loaded.
 - Expose render-loop-only operations for loading a scene, resetting the stage, stepping a frame, mapping render vars, enqueueing and decoding native pick queries, writing native selection outline groups, and writing live attributes.
 - Keep renderer mutations serialized with scene loading, scene reset, settings changes, and camera writes.
+- For OVStage-backed runtimes, publish runtime mutations through OVStage/session
+  state at monotonic ordinals and render only committed publications.
 
 Critical contracts:
 
@@ -103,7 +125,10 @@ Critical contracts:
 - Pass the exact viewer RenderProduct path to every step call.
 - Extract `LdrColor` for local image display. It is RGBA8 from ovrtx.
 - For local UI display, copy CPU-mapped pixel data inside the map context before returning it to the widget.
-- Use `write_attribute` for live camera transforms and other live state. Write `omni:xform`, not authored `xformOp:*`, for interactive updates.
+- Use `write_attribute` for live camera transforms and other live state when
+  using direct OVRTX writes. Write `omni:xform`, not authored `xformOp:*`, for
+  interactive updates. For OVStage-backed paths, use the current OVStage/OVRTX
+  integration guidance for published live writes.
 - Use the correct transform semantic and create-new prim mode for attributes that may not already exist in Fabric.
 
 Decision points:
@@ -117,7 +142,9 @@ Common failure modes:
 
 - `Unable to find RenderProduct prim` means scene setup did not create the path used by `renderer.step()`.
 - Black frame usually means camera relation, render product resolution, render var source, or camera transform is invalid.
-- Live camera changes doing nothing usually means the app wrote `xformOp:transform` instead of `omni:xform`, or used existing-only prim mode.
+- Live camera changes doing nothing usually means the app wrote
+  `xformOp:transform` instead of `omni:xform`, used existing-only prim mode, or
+  published above the OVStage write floor.
 - Crashes during scene switches usually mean `renderer.step()` overlapped a reset, load, or layer mutation.
 
 Read for depth: see `references/ovrtx-rendering` for the full renderer construction, frame extraction, and live attribute contract.

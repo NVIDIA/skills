@@ -170,6 +170,20 @@
       </div>
     </header>
 
+    {% if safety_gate %}
+    <h2>Correctness Safety Gate</h2>
+    <div class="note">
+      The Phase-2c correctness precondition. A status outside <code>resolved | clear | none | passed | not_required</code> means the run carries a known defect; the run-scoring oracle zeroes it.
+    </div>
+    <table>
+      <tbody>
+        <tr><th>Status</th><td>{{ safety_gate.status }}</td></tr>
+        <tr><th>Finding</th><td>{{ safety_gate.finding }}</td></tr>
+        <tr><th>Notes</th><td>{{ safety_gate.notes }}</td></tr>
+      </tbody>
+    </table>
+    {% endif %}
+
     <h2>Reasoning</h2>
     <section class="reasoning">
       {% for paragraph in reasoning_paragraphs %}
@@ -261,6 +275,18 @@
         <tr><th>Optimized</th><td>{{ footprint.optimized_bytes }} bytes</td></tr>
         <tr><th>Structural win (vs normalized baseline)</th><td>{{ footprint.structural_delta_pct }}%</td></tr>
         <tr><th>Total raw &rarr; optimized</th><td>{{ footprint.raw_delta_pct }}%</td></tr>
+      </tbody>
+    </table>
+    {% endif %}
+
+    {% if gate_summary_rows %}
+    <h2>Preservation, Coverage, and Fidelity</h2>
+    <table>
+      <thead><tr><th>Gate</th><th>Recorded</th></tr></thead>
+      <tbody>
+        {% for row in gate_summary_rows %}
+        <tr><td>{{ row.name }}</td><td>{{ row.value }}</td></tr>
+        {% endfor %}
       </tbody>
     </table>
     {% endif %}

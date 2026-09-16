@@ -6,6 +6,13 @@ Supported actions: `gen_trt_engine`, `evaluate`, `inference`.
 
 ## Quick Start
 
+Set the deploy container once at the top of the session — every command below
+uses it:
+
+```bash
+TAO_DEPLOY_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-deploy  # versions-key: images.tao_toolkit.deploy
+```
+
 ### Generate TensorRT Engine
 
 ```bash
@@ -13,7 +20,7 @@ docker run --gpus all --rm --shm-size=16g \
   -v /path/to/specs:/specs \
   -v /path/to/export:/models \
   -v /path/to/results:/results \
-  nvcr.io/nvidia/tao/tao-toolkit:6.26.3-deploy \
+  "$TAO_DEPLOY_IMAGE" \
   pointpillars gen_trt_engine -e /specs/pointpillars_deploy_gen_trt_engine.yaml
 ```
 
@@ -24,7 +31,7 @@ docker run --gpus all --rm --shm-size=16g \
   -v /path/to/specs:/specs \
   -v /path/to/eval:/data \
   -v /path/to/results:/results \
-  nvcr.io/nvidia/tao/tao-toolkit:6.26.3-deploy \
+  "$TAO_DEPLOY_IMAGE" \
   pointpillars evaluate -e /specs/pointpillars_deploy_evaluate.yaml
 ```
 
@@ -35,7 +42,7 @@ docker run --gpus all --rm --shm-size=16g \
   -v /path/to/specs:/specs \
   -v /path/to/inference:/data \
   -v /path/to/results:/results \
-  nvcr.io/nvidia/tao/tao-toolkit:6.26.3-deploy \
+  "$TAO_DEPLOY_IMAGE" \
   pointpillars inference -e /specs/pointpillars_deploy_inference.yaml
 ```
 

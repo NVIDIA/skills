@@ -20,6 +20,8 @@ tags:
 
 # VLM Binary Classification Gap Analysis
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Reads a VLM predictions JSON, compares each model response against ground truth, and writes FP/FN failure cases to a JSONL file with a summary report.
 
 ## Purpose
@@ -87,3 +89,4 @@ If no gaps are found, no files are written and a message is logged.
 | `ValueError: must be a JSON array` | Predictions file is not a list | Wrap predictions in `[...]` |
 | `ValueError: missing 'gt'/'response'/'video_id'` | A prediction item is missing a required field | Inspect and fix the predictions JSON |
 | Samples silently skipped | `response` or `gt` contains both or neither 'yes'/'no' | Check logs for warnings; inspect those samples |
+

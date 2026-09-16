@@ -50,8 +50,9 @@ by this workflow. Invoke its `--check-only` mode; on failure, ask the user to
 authorize the install, then re-run.
 
 ```bash
-TAO_SKILL_BANK_ROOT="${TAO_SKILL_BANK_PATH:-${TAO_SKILL_BANK_ROOT:-$PWD}}"
-SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT}/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
+# Resolve the skill bank root and use the GPU-host skill's bundled installer.
+SB="${TAO_SKILL_BANK_PATH:-${TAO_SKILL_BANK_ROOT:-$PWD}}"
+SETUP_SCRIPT="${SB}/skills/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
 
 bash "$SETUP_SCRIPT" --backend docker --check-only || {
   echo "MISSING: TAO GPU host runtime not ready."
@@ -100,7 +101,7 @@ Prompt the user with:
 > 2. **tao-deploy image** (required) — typically `nvcr.io/<org>/tao-toolkit:<version>-deploy` or `nvcr.io/<org>/tao-toolkit-deploy:<rc-tag>-multiarch`.
 > 3. **tao-dataservices image** (optional — only required if Phase 2.4 finds annotation-converter work) — typically `nvcr.io/<org>/tao-toolkit:<version>-data-services` or `nvcr.io/<org>/tao-toolkit-ds:<rc-tag>-multiarch`.
 >
-> tao-core does not require its own image — the public `nvcr.io/nvidia/pytorch:24.03-py3` image is used directly for tao-core smoke tests, or the prepared tao-pytorch image is reused.
+> tao-core does not require its own image — the public `nvcr.io/nvidia/pytorch:24.03-py3` image is used directly for tao-core smoke tests, or the prepared tao-pytorch image is reused. <!-- unpinned: example public NGC base image -->
 
 Capture the answers into shell variables for the rest of Phase 0:
 

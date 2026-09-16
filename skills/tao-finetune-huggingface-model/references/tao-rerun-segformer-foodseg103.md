@@ -16,30 +16,30 @@ source .env
 docker build -t run-segformer-b0-foodseg103:latest .
 
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -v $(pwd):/workspace \
+  -e HF_TOKEN -v $(pwd):/workspace \
   run-segformer-b0-foodseg103:latest \
   -lc "cd /workspace && python prepare_data.py --config config.yaml"
 
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -e WANDB_MODE=disabled -v $(pwd):/workspace \
+  -e HF_TOKEN -e WANDB_MODE=disabled -v $(pwd):/workspace \
   run-segformer-b0-foodseg103:latest \
   -lc "cd /workspace && python train.py --config config.yaml --smoke --max_steps 1"
 
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -v $(pwd):/workspace \
+  -e HF_TOKEN -v $(pwd):/workspace \
   run-segformer-b0-foodseg103:latest \
   -lc "cd /workspace && python run_eval.py --config config.yaml \
        --checkpoint nvidia/mit-b0 --output reports/baseline_results.json"
 
 docker run -d --name repro_train --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -e WANDB_API_KEY=$WANDB_API_KEY -e WANDB_PROJECT=$WANDB_PROJECT \
+  -e HF_TOKEN -e WANDB_API_KEY -e WANDB_PROJECT=$WANDB_PROJECT \
   -v $(pwd):/workspace \
   run-segformer-b0-foodseg103:latest \
   -lc "cd /workspace && python train.py --config config.yaml 2>&1 | tee logs/train.log"
 docker logs -f repro_train
 
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
-  -e HF_TOKEN=$HF_TOKEN -v $(pwd):/workspace \
+  -e HF_TOKEN -v $(pwd):/workspace \
   run-segformer-b0-foodseg103:latest \
   -lc "cd /workspace && \
        python run_eval.py --config config.yaml --checkpoint checkpoints/final --output reports/eval_results.json && \
@@ -64,7 +64,7 @@ FoodSeg103 you'd need the full train split and ~50+ epochs.
 - Dataset: `EduardoPacheco/FoodSeg103` (1000 train / 200 eval subset, 104 classes)
 - Training: 5 epochs, bs=8×grad_accum=2 (effective 16), lr=6e-5, warmup_ratio=0.1, bf16
 - Image size: 512×512, HFlip augmentation only
-- NGC image: `nvcr.io/nvidia/pytorch:25.01-py3`
+- NGC image: `nvcr.io/nvidia/pytorch:25.01-py3` <!-- unpinned: historical rerun record -->
 
 ## Troubleshooting
 

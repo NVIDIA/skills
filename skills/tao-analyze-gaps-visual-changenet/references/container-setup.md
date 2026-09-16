@@ -1,10 +1,10 @@
 # Container Setup and Path Mounting
 
-The threshold sweep, weakness ranking, and per-lighting expansion all run inside the `tao_toolkit.data_services` image declared in `versions.yaml`. Resolve the concrete URI once at the top of the run, then confirm Docker, the NVIDIA container toolkit, and a GPU are present and ensure the image is cached:
+The threshold sweep, weakness ranking, and per-lighting expansion all run inside the pinned TAO data-services image below. Confirm Docker, the NVIDIA container toolkit, and a GPU are present and ensure the image is cached:
 
 ```bash
-# Resolve tao_toolkit.data_services → concrete nvcr.io/... URI from versions.yaml
-DS_IMAGE=$(python3 -c "import yaml,os; print(yaml.safe_load(open(os.environ['TAO_SKILL_BANK_PATH']+'/versions.yaml'))['images']['tao_toolkit']['data_services'])")
+# Pinned TAO data-services container URI (stamped from the release manifest)
+DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-data-services  # versions-key: images.tao_toolkit.data_services
 echo "DS_IMAGE=$DS_IMAGE"
 
 docker info > /dev/null && echo "OK: docker"
@@ -12,8 +12,6 @@ nvidia-smi > /dev/null && echo "OK: GPU"
 docker image inspect "$DS_IMAGE" > /dev/null \
   || docker pull "$DS_IMAGE"
 ```
-
-`TAO_SKILL_BANK_PATH` is usually exported by the installed skill bank. If it is unset, point it at the skill-bank repo root before resolving.
 
 A GPU is required (the same image is used across the AOI loop and other actions assume CUDA is present). Aborting early on a GPU-less host saves a confusing late error.
 

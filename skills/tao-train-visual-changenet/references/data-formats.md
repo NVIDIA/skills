@@ -88,3 +88,14 @@ num_input: 3
 ```
 
 Set `dataset.classify.num_input` to match the number of lighting conditions. The `grid_map` controls how multi-input images are tiled (default 2x2).
+
+## Pre-Flight validation (`scripts/validate_vcn_dataset.py`)
+
+The classify Pre-Flight (see SKILL.md) enforces the contract the TAO siamese loader assumes. Each check and why it exists:
+
+- **Relative paths only.** `input_path` / `golden_path` resolve under `images_dir` (mounted at `/data`); an absolute host path does not exist inside the container and every row fails file-not-found.
+- **A directory per sample.** The loader builds `<images_dir>/<input_path>/<object_name>_<light><ext>`, so `input_path` must name a directory (e.g. `sample_001/`), not a flat image filename (`input_001.jpg`).
+- **Two label classes for `--mode train`.** An all-`PASS` (or all-defect) training set makes the classify loader divide by zero (`pf_ratio = num_pass / len(fail_indices)`) at epoch 1.
+- **Batch size fits the dataset.** With `--batch-size` (and `--num-gpus`), a batch larger than the per-replica row count (`rows / num_gpus`) is rejected; otherwise the loader crashes with `Dataset size (N) is smaller than the total batch size` ~60s in, after the checkpoint loads.
+
+Pass `--light` / `--image-ext` for a non-default lighting suffix or extension (defaults: `SolderLight`, `.jpg`). Omit `--images-dir` to run schema/path/label checks without the on-disk image-existence check. Resolve every path argument to an absolute host path first.

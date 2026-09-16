@@ -1,0 +1,14 @@
+name: Physical AI Orchestration
+repo: NVIDIA/paidf-orchestration
+description: Build, run and monitor physical AI data factory pipelines for image and video generation and transformation.
+skills:
+  - path: skills/paidf-orchestration-write-dag/
+    catalog_dir: paidf-orchestration-write-dag
+  - path: skills/paidf-orchestration-setup/
+    catalog_dir: paidf-orchestration-setup
+  - path: skills/physical-ai-event-video-generation/
+    catalog_dir: physical-ai-event-video-generation
+  - path: skills/physical-ai-image-attribute-augmentation/
+    catalog_dir: physical-ai-image-attribute-augmentation
+links:
+  discussions: false

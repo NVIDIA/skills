@@ -1,60 +1,112 @@
-{
-  "version": "0.1.0",
-  "skill": "omniverse-cad-to-simready",
-  "cases": [
-    {
-      "id": "cad-to-simready-end-to-end-positive",
-      "question": "Take this STEP assembly from source CAD to a SimReady prop, including conversion, conformance, validation, and package metadata if possible.",
-      "expected_skill": "omniverse-cad-to-simready",
-      "expected_script": null,
-      "ground_truth": "The agent should select the CAD-to-SimReady workflow, treat it as an end-to-end source-asset to SimReady request, run or verify preflight first, and coordinate conversion, validation, conformance, optional property assignment, and packaging through nested references.",
-      "expected_behavior": [
-        "Reads skills/omniverse-cad-to-simready/SKILL.md.",
-        "Classifies the request as an end-to-end CAD/source-asset to SimReady workflow.",
-        "Runs the preflight reference or verifies an existing PHYSICAL_AI_PREFLIGHT_MANIFEST before downstream stages.",
-        "Routes source conversion through references/convert-to-usd instead of inventing a monolithic runner.",
-        "Runs validation and conformance stages in workflow order and reports the first blocking gate."
-      ]
-    },
-    {
-      "id": "cad-to-simready-conversion-only-positive",
-      "question": "Use the repo-local omniverse-cad-to-simready workflow on skills/omniverse-cad-to-simready/evals/files/minimal_mesh.stl. Skip property prediction and assignment. Convert it to USD and run minimum validation only.",
-      "expected_skill": "omniverse-cad-to-simready",
-      "expected_script": null,
-      "ground_truth": "The agent should keep this as a conversion-only CAD-to-SimReady workflow slice, skip Content Agents deployment, route the STL mesh source through convert-to-usd, and hand the generated USD to minimum validation.",
-      "expected_behavior": [
-        "Reads skills/omniverse-cad-to-simready/SKILL.md.",
-        "Sets property_assignment_intent to skip because the prompt disables property prediction and assignment.",
-        "Uses preflight with Content Agents skipped or verifies an existing ready preflight manifest.",
-        "Runs or plans references/convert-to-usd/scripts/run.py for the STL input.",
-        "Runs or plans validate-usd-minimum on the converted USD and does not continue into full SimReady packaging."
-      ]
-    },
-    {
-      "id": "cad-to-simready-viewer-distractor-negative",
-      "question": "Build a browser-based RTX USD viewer with camera controls, object picking, a stage tree, and render settings.",
-      "expected_skill": null,
-      "expected_script": null,
-      "ground_truth": "This is a realtime USD viewer application request, not a CAD/source-asset to SimReady conversion workflow.",
-      "expected_behavior": [
-        "Does not select omniverse-cad-to-simready.",
-        "Does not run CAD conversion, SimReady conformance, or SimReady package creation steps.",
-        "Routes to a viewer-oriented skill if one is available."
-      ]
-    },
-    {
-      "id": "cad-to-simready-content-agents-blocked",
-      "question": "Convert this source asset to a SimReady USD and use Content Agents to assign material and physics properties, but no Content Agents endpoints or NVIDIA_API_KEY are configured.",
-      "expected_skill": "omniverse-cad-to-simready",
-      "expected_script": null,
-      "ground_truth": "The agent should select the CAD-to-SimReady workflow, recognize that property assignment requires Content Agents readiness, and report the missing deployment/authentication blocker instead of claiming property assignment succeeded.",
-      "expected_behavior": [
-        "Reads skills/omniverse-cad-to-simready/SKILL.md.",
-        "Sets property_assignment_intent to run because material and physics property assignment is requested.",
-        "Checks for healthy Content Agents endpoints or deployment credentials before conversion and downstream validation.",
-        "Reports missing Content Agents endpoints or NVIDIA_API_KEY as a blocker.",
-        "Does not claim material or physics assignment succeeded."
-      ]
-    }
-  ]
-}
+[
+  {
+    "id": "cad-to-simready-end-to-end-positive",
+    "question": "Take this STEP assembly from source CAD to a SimReady prop, including conversion, conformance, validation, and package metadata if possible.",
+    "expected_skill": "omniverse-cad-to-simready",
+    "expected_script": null,
+    "ground_truth": "The agent should select the CAD-to-SimReady workflow, treat it as an end-to-end source-asset to SimReady request, run or verify preflight first, and coordinate conversion, validation, conformance, optional property assignment, and packaging through nested references.",
+    "expected_behavior": [
+      "Reads skills/omniverse-cad-to-simready/SKILL.md.",
+      "Classifies the request as an end-to-end CAD/source-asset to SimReady workflow.",
+      "Runs the preflight reference or verifies an existing PHYSICAL_AI_PREFLIGHT_MANIFEST before downstream stages.",
+      "Routes source conversion through references/convert-to-usd instead of inventing a monolithic runner.",
+      "Runs validation and conformance stages in workflow order and reports the first blocking gate."
+    ]
+  },
+  {
+    "id": "cad-to-simready-conversion-only-positive",
+    "question": "Use the repo-local omniverse-cad-to-simready workflow on skills/omniverse-cad-to-simready/evals/files/minimal_mesh.stl. Skip property prediction and assignment. Convert it to USD and run minimum validation only.",
+    "expected_skill": "omniverse-cad-to-simready",
+    "expected_script": null,
+    "ground_truth": "The agent should keep this as a conversion-only CAD-to-SimReady workflow slice, skip Content Agents deployment, route the STL mesh source through convert-to-usd, and hand the generated USD to minimum validation.",
+    "expected_behavior": [
+      "Reads skills/omniverse-cad-to-simready/SKILL.md.",
+      "Sets property_assignment_intent to skip because the prompt disables property prediction and assignment.",
+      "Uses preflight with Content Agents skipped or verifies an existing ready preflight manifest.",
+      "Runs or plans references/convert-to-usd/scripts/run.py for the STL input.",
+      "Runs or plans validate-usd-minimum on the converted USD and does not continue into full SimReady packaging."
+    ]
+  },
+  {
+    "id": "cad-to-simready-viewer-distractor-negative",
+    "question": "Build a browser-based RTX USD viewer with camera controls, object picking, a stage tree, and render settings.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "This is a realtime USD viewer application request, not a CAD/source-asset to SimReady conversion workflow.",
+    "expected_behavior": [
+      "Does not select omniverse-cad-to-simready.",
+      "Does not run CAD conversion, SimReady conformance, or SimReady package creation steps.",
+      "Routes to a viewer-oriented skill if one is available."
+    ]
+  },
+  {
+    "id": "cad-to-simready-content-agents-blocked",
+    "question": "Convert this source asset to a SimReady USD and use Content Agents to assign material and physics properties, but no Content Agents endpoints or NVIDIA_API_KEY are configured.",
+    "expected_skill": "omniverse-cad-to-simready",
+    "expected_script": null,
+    "ground_truth": "The agent should select the CAD-to-SimReady workflow, recognize that property assignment requires Content Agents readiness, and report the missing deployment/authentication blocker instead of claiming property assignment succeeded.",
+    "expected_behavior": [
+      "Reads skills/omniverse-cad-to-simready/SKILL.md.",
+      "Sets property_assignment_intent to run because material and physics property assignment is requested.",
+      "Checks for healthy Content Agents endpoints or deployment credentials before conversion and downstream validation.",
+      "Reports missing Content Agents endpoints or NVIDIA_API_KEY as a blocker.",
+      "Does not claim material or physics assignment succeeded."
+    ]
+  },
+  {
+    "id": "cad-to-simready-content-agents-openai-gpt55",
+    "question": "Deploy Content Agents for the CAD-to-SimReady workflow using the private dotenv at ~/Codes/.env. Use OpenAI gpt-5.5 for both the VLM and LLM, deploy the required local services, and then run material and physics assignment.",
+    "expected_skill": "omniverse-cad-to-simready",
+    "expected_script": null,
+    "ground_truth": "The agent should select the CAD-to-SimReady workflow, run preflight with Content Agents enabled, load the OpenAI key from the private dotenv without printing it, configure both VLM and LLM backends as openai with model gpt-5.5, deploy or verify OVRTX before Material and Physics services, and only continue after healthy Content Agents endpoints are exported.",
+    "expected_behavior": [
+      "Reads skills/omniverse-cad-to-simready/SKILL.md and the preflight or deploy-content-agents reference.",
+      "Uses --content-agents-secret-env-file with the provided private dotenv rather than asking the user to paste the key.",
+      "Sets both --content-agents-vlm-backend openai and --content-agents-llm-backend openai with model gpt-5.5.",
+      "Treats OpenAI as the selected hosted provider and does not route the request through NIM, NVCF, or build.nvidia.com defaults.",
+      "Deploys or verifies the shared standalone OVRTX renderer before deploying Material and Physics services one at a time."
+    ]
+  },
+  {
+    "id": "cad-to-simready-content-agents-custom-openai-vlm",
+    "question": "For this SimReady conversion, deploy Content Agents with a custom OpenAI-compatible VLM endpoint at https://vlm.example.test/v1, model vision-router-prod, and API key environment variable ACME_VLM_KEY. Use Anthropic Claude for the LLM.",
+    "expected_skill": "omniverse-cad-to-simready",
+    "expected_script": null,
+    "ground_truth": "The agent should keep the custom OpenAI-compatible VLM endpoint on the openai backend, pass the custom endpoint and API-key environment variable through preflight, use the Anthropic backend and key for the LLM, deploy missing local services in deterministic order, and avoid treating a generic OpenAI-compatible endpoint as a NIM backend.",
+    "expected_behavior": [
+      "Reads the Content Agents deployment guidance before configuring services.",
+      "Sets --content-agents-vlm-backend openai together with --content-agents-vlm-endpoint and --content-agents-vlm-api-key-env ACME_VLM_KEY.",
+      "Loads or asks for the custom ACME_VLM_KEY secret without printing it.",
+      "Sets the LLM backend to anthropic and uses the Anthropic provider key path for the LLM.",
+      "Does not infer nim for a custom OpenAI-compatible endpoint and does not require NVIDIA NIM credentials for that VLM."
+    ]
+  },
+  {
+    "id": "cad-to-simready-content-agents-explicit-endpoints",
+    "question": "I already have healthy Content Agents endpoints: Material at http://material.local:8100, Physics at http://physics.local:8200, and OVRTX at http://render.local:8001. Use those for CAD-to-SimReady property assignment instead of deploying containers.",
+    "expected_skill": "omniverse-cad-to-simready",
+    "expected_script": null,
+    "ground_truth": "The agent should treat explicitly provided Material, Physics, and OVRTX endpoints as user-owned, probe them for readiness, export the corresponding Content Agents and renderer environment variables when healthy, and not replace them with managed local containers.",
+    "expected_behavior": [
+      "Reads the preflight or deploy-content-agents reference before acting on the endpoints.",
+      "Treats provided CONTENT_AGENTS_*_BASE_URL and render endpoints as user-owned services.",
+      "Probes the provided endpoints and blocks if they are unhealthy instead of silently deploying replacements.",
+      "Exports healthy CONTENT_AGENTS_MATERIAL_AGENT_BASE_URL, CONTENT_AGENTS_PHYSICS_AGENT_BASE_URL, and RENDER_ENDPOINT values.",
+      "Continues to material and physics assignment only after endpoint readiness is verified."
+    ]
+  },
+  {
+    "id": "cad-to-simready-content-agents-internal-backend-negative",
+    "question": "Deploy the CAD-to-SimReady Content Agents stack with the perflab or nvidia_inference backend for the VLM.",
+    "expected_skill": "omniverse-cad-to-simready",
+    "expected_script": null,
+    "ground_truth": "The agent should select the CAD-to-SimReady deployment path but reject internal-only Content Agents backend names in this public skill. It should ask for a public hosted backend such as openai, anthropic, gemini, nim for actual NIM endpoints, or a custom OpenAI-compatible endpoint configured through the openai backend.",
+    "expected_behavior": [
+      "Reads the Content Agents deployment guidance before accepting backend names.",
+      "Does not use perflab, perflab_azure_openai, nvidia_inference, or other internal-only backend defaults.",
+      "Offers public provider choices such as openai, anthropic, gemini, or nim for actual NIM endpoints.",
+      "Explains that custom OpenAI-compatible endpoints should use the openai backend plus explicit endpoint and API-key-env settings.",
+      "Does not deploy services until a supported public backend or explicit healthy endpoint is selected."
+    ]
+  }
+]

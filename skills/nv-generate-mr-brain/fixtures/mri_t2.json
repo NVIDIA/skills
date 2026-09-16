@@ -1,16 +1,16 @@
 {
-  "_comment": "Whole-brain T2w MRI generation fixture.",
+  "_comment": "MR-Brain v1 axial whole-brain T2w fixture, approximately 240 x 240 x 158 mm FOV.",
   "modality": "mri_t2",
   "dim": [
     256,
     256,
-    256
+    128
   ],
   "spacing": [
-    1.0,
-    1.0,
-    1.0
+    0.94,
+    0.94,
+    1.23
   ],
   "num_inference_steps": 30,
-  "cfg_guidance_scale": 10
+  "cfg_guidance_scale": 2
 }

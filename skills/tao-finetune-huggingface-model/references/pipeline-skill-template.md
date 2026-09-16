@@ -141,7 +141,7 @@ docker build -t run-<model_short_name>:latest .
 # 2. Prepare data
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
-  -e HF_TOKEN=$HF_TOKEN \
+  -e HF_TOKEN \
   -e HF_HOME=/workspace/.cache/huggingface \
   -v $(pwd):/workspace \
   run-<model_short_name>:latest \
@@ -150,7 +150,7 @@ docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
 # 3. Smoke test (1 step on real data)
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
-  -e HF_TOKEN=$HF_TOKEN -e WANDB_MODE=disabled \
+  -e HF_TOKEN -e WANDB_MODE=disabled \
   -e HF_HOME=/workspace/.cache/huggingface \
   -v $(pwd):/workspace \
   run-<model_short_name>:latest \
@@ -159,7 +159,7 @@ docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
 # 4. Baseline (zero-shot) eval
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
-  -e HF_TOKEN=$HF_TOKEN \
+  -e HF_TOKEN \
   -e HF_HOME=/workspace/.cache/huggingface \
   -v $(pwd):/workspace \
   run-<model_short_name>:latest \
@@ -169,8 +169,8 @@ docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
 # 5. Full training
 docker run -d --name run_train --gpus all --shm-size=16g --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
-  -e HF_TOKEN=$HF_TOKEN \
-  -e WANDB_API_KEY=$WANDB_API_KEY -e WANDB_PROJECT=$WANDB_PROJECT \
+  -e HF_TOKEN \
+  -e WANDB_API_KEY -e WANDB_PROJECT=$WANDB_PROJECT \
   -e HF_HOME=/workspace/.cache/huggingface \
   -v $(pwd):/workspace \
   run-<model_short_name>:latest \
@@ -180,7 +180,7 @@ docker logs -f run_train
 # 6. Post-train eval + 5 inference samples
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
-  -e HF_TOKEN=$HF_TOKEN \
+  -e HF_TOKEN \
   -e HF_HOME=/workspace/.cache/huggingface \
   -v $(pwd):/workspace \
   run-<model_short_name>:latest \
@@ -196,7 +196,7 @@ docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
 ```bash
 docker run --rm --gpus all --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
-  -e HF_TOKEN=$HF_TOKEN \
+  -e HF_TOKEN \
   -e HF_HOME=/workspace/.cache/huggingface \
   -v $(pwd):/workspace \
   run-<model_short_name>:latest \

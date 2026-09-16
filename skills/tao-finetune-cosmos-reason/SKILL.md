@@ -1,14 +1,14 @@
 ---
 name: tao-finetune-cosmos-reason
-description: Cosmos3-Nano video QA supervised fine-tuning with FSDP parallelism. Use when training or evaluating video
+description: Cosmos3-Nano video QA supervised fine-tuning with FSDP parallelism across variable-width GPU configurations. Use when training or evaluating video
   question-answering models, fine-tuning Cosmos3-Nano or compatible Cosmos Reason models with SFT/LoRA, or working with
   Cosmos-RL. Trigger phrases include "fine-tune Cosmos", "Cosmos3 Nano Reasoner", "Cosmos-RL SFT",
   "video QA fine-tune", "Cosmos3-Nano training".
 license: Apache-2.0
-compatibility: Requires docker + nvidia-container-toolkit.
+compatibility: Requires Docker, NVIDIA driver 580 or newer, CUDA Toolkit 13.0 or newer, and NVIDIA Container Toolkit 1.19.1 or newer. The selected image must pass its native CUDA-stack smoke test on every visible GPU architecture.
 metadata:
   author: NVIDIA Corporation
-  version: "0.1.0"
+  version: "0.1.2"
 allowed-tools: Read Bash
 tags:
 - video
@@ -20,6 +20,8 @@ tags:
 ---
 
 # Cosmos-RL
+
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
 
 Supervised fine-tuning (SFT) of Cosmos Reason video QA models. The packaged
 default base model is **hf_model://nvidia/Cosmos3-Nano**. Pretrained weights
@@ -36,12 +38,73 @@ Requests for "Cosmos Reason 3", "Cosmos3 Nano Reasoner", or
 model directory in the skill bank; route those requests here. Override the base
 HuggingFace model only when the user explicitly asks for a different model.
 
+## Execution Environment — Hard Gate
+
+`references/skill_info.yaml:container_image` is the default runtime for every
+Cosmos-RL action, including AutoML child jobs. Resolve and preflight that image
+before creating training files, installing training dependencies, downloading
+the checkpoint, or launching a smoke test. A user-supplied `image=<override>`
+replaces the resolved default for that run.
+
+Do **not** create or use a host `venv`, `uv` environment, generic NGC PyTorch
+image, or custom Transformers training project merely because the base model is
+on Hugging Face. Venv-based **training** is allowed only when the user explicitly
+selects venv execution. A host Python environment used to run TAO SDK or the
+AutoML controller is control-plane-only and does not change the child-job
+runtime: training and evaluation still run in the resolved Cosmos-RL image.
+
+If this skill and `tao-finetune-huggingface-model` both appear to match, this
+dedicated model skill wins.
+
 Deep detail lives in references; load the smallest one that matches the task:
 
 - `references/cosmos-reason-launch.md` — launch intake, preflight, per-action dataset requirements, spec construction, typical overrides.
 - `references/cosmos-reason-evaluate.md` — evaluate (flat TOML, task types, LoRA eval, selective download, results) and datasets.
 - `references/cosmos-reason-automl.md` — AutoML/HPO policy and search-space guidance.
 - `references/cosmos-reason-parameters.md` — important parameters, hardware, error patterns, DEFT/gap analysis, parent-model inference mappings.
+- `references/cosmos-reason-wts-gb300.md` — deterministic WTS dataset/runtime helpers and single-GB300 launch guards.
+
+## Quick Start (docker run)
+
+Docker-native launch in the resolved Cosmos-RL image — no TAO SDK and no host
+Python. This satisfies the Execution Environment hard gate above: the container
+*is* the runtime. Use the local Docker/platform skill instead when it gives a
+stricter environment-specific command.
+
+```bash
+COSMOS_RL_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-cosmos-rl  # versions-key: images.tao_toolkit.cosmos_rl
+COSMOS_RL_IMAGE="${COSMOS_RL_IMAGE:-$COSMOS_RL_IMAGE_DEFAULT}"
+RUN_ROOT="${RUN_ROOT:-$PWD}"
+DOCKER_COMMON=(
+  --rm --gpus all --ipc=host
+  --shm-size=64g
+  --ulimit memlock=-1
+  --ulimit stack=67108864
+  -e HF_TOKEN
+  -v "$RUN_ROOT/data:/data:ro"
+  -v "$RUN_ROOT/specs:/specs:ro"
+  -v "$RUN_ROOT/results:/results"
+)
+```
+
+Train:
+
+```bash
+docker run "${DOCKER_COMMON[@]}" "$COSMOS_RL_IMAGE" \
+  cosmos-rl --config /specs/train.toml /opt/cosmos_rl/tao_sft_example.py
+```
+
+Evaluate:
+
+```bash
+docker run "${DOCKER_COMMON[@]}" "$COSMOS_RL_IMAGE" \
+  cosmos-rl-evaluate --config /specs/evaluate.toml
+```
+
+Specs are TOML for this skill, not YAML. `inference` and `quantize` are driven
+by spec-reading wrappers rather than a single flag-for-flag command; run them
+through the same image and see `references/cosmos-reason-launch.md` for the
+exact form. Pass `HF_TOKEN` as an environment variable — never in a spec or log.
 
 ## Dataclass Schemas
 
@@ -96,6 +159,12 @@ again.
 
 ## Training Requirements
 
+The model-level GPU host requirements in `references/skill_info.yaml` override
+the TAO-wide platform defaults for this workflow. Apply that profile through
+the shared host setup check before launch, as shown in
+`references/cosmos-reason-launch.md`. Treat the versions as lower bounds, not
+exact pins, and retain the selected-image native GPU smoke test.
+
 - **Dataset type:** vlm
 - **Formats:** llava, daft
 - **Accepted dataset intents:** training, evaluation, testing
@@ -143,6 +212,22 @@ The packaged template keeps `custom.vision.nframes=8` for bounded 1-GPU memory;
 switch to `fps` only after checking token budget and GPU memory, and delete
 `custom.vision.nframes` from the spec when you do.
 
+### Epoch-based cadence policy
+
+Training duration, checkpointing, and validation are epoch-based by default:
+
+- Set training duration with `train.epoch`.
+- Keep `train.ckpt.save_freq_in_epoch=1` and do not disable it or replace it
+  with `train.ckpt.save_freq` unless the user explicitly requests step-based
+  checkpointing.
+- Keep `validation.freq_in_epoch=1` and do not replace it with
+  `validation.freq` unless the user explicitly requests step-based validation.
+
+Dataset, GPU, topology, memory, and runtime-image guidance must not change
+these cadence defaults. A hardware- or dataset-specific reference may explain
+how to implement an explicitly requested step cadence, but must never infer or
+select step cadence on the user's behalf.
+
 See `references/cosmos-reason-launch.md` for launch intake, the full
 `check_tao_launch_preflight.py` slurm/local-Docker examples, the
 `video_fps` preflight example, S3 staging, the GPU resource/architecture gate,
@@ -188,8 +273,11 @@ For parallelism, set `policy.parallelism.dp_shard_size` = GPUs per node and
 Cosmos-RL handles distributed init internally via FSDP and does not rely on
 platform-level `MASTER_ADDR`/`WORLD_SIZE`; submit with
 `gpu_count=<gpus_per_node>` and `num_nodes=<N>` and the spec keys drive
-sharding. Cosmos-RL models are 8B parameters; recommended 8x A100 or H100
-(80GB each).
+sharding. SFT requires at least 256 GB of cumulative visible GPU memory rather
+than a fixed device count or per-device capacity. Set `dp_shard_size` and the
+platform GPU request to the actual visible GPU count, and use
+`dp_replicate_size=1` for a single node. The selected image must support every
+visible GPU architecture and pass its runtime CUDA-stack smoke test.
 
 See `references/cosmos-reason-parameters.md` for important parameters (training
 loop, model/policy, parallelism incl. multi-node FSDP, optimization, vision

@@ -2,7 +2,7 @@
 name: tao-mine-aoi-images
 description: Runs the DEFT embed-then-mine workflow for VCN AOI iterations — embeds the gap-analysis target parquet, embeds a source pool, and mines nearest-neighbour source images for downstream augmentation. Use as the immediate next step after `tao-route-visual-changenet-samples` when expanding a real-image augmentation queue from the mining subset.
 license: Apache-2.0
-compatibility: Requires docker + nvidia-container-toolkit and a CUDA GPU. Pulls the `tao_toolkit.data_services` image declared in `versions.yaml` at the skill bank root.
+compatibility: Requires docker + nvidia-container-toolkit and a CUDA GPU. Pulls the TAO data-services container pinned in this skill.yaml` at the skill bank root.
 metadata:
   author: NVIDIA Corporation
   version: "0.1.0"
@@ -18,11 +18,13 @@ tags:
 
 # DEFT Mining and Embedding Skill
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 You are the operator of the DEFT embed-then-mine workflow for VCN AOI. Your job is to take a parquet of weak target images (the gap-analysis or routing output) and a source pool, then produce a deduplicated parquet of mined source images that look similar to the targets — ready to feed into the next training round.
 
 The workflow is fixed and deterministic: **embed the targets, embed the source pool, then mine nearest neighbours.** Each step's output parquet is the next step's input. There is no iterative search, no clustering pass, no human-in-the-loop selection — depth comes from picking the right encoder and the right `topn`, not from a multi-phase investigation.
 
-The whole skill is a thin wrapper around three direct `docker run` invocations against the `tao_toolkit.data_services` image declared in `versions.yaml` (resolved at runtime — see Setup). The container's entrypoint takes `<category> <action> -e <spec.yaml> [hydra overrides...]` — pass `embedding image_embeddings -e <embedding_spec.yaml> …` for embedding and `tmm nearest_neighbors -e <mining_spec.yaml> …` for mining. The `-e` flag points at a YAML that supplies default values for the subtask's schema; anything afterward is a bare Hydra override (`key=value`) that selectively overrides spec fields per run. (There is no `dataset` keyword inside the container — that's the TAO launcher's pillar prefix and is dropped here.) Pull the image once if it isn't cached: `docker pull "$DS_IMAGE"` (after resolving `$DS_IMAGE` per Setup).
+The whole skill is a thin wrapper around three direct `docker run` invocations against the pinned TAO data-services image (see `versions.yaml` (resolved at runtime — see Setup). The container's entrypoint takes `<category> <action> -e <spec.yaml> [hydra overrides...]` — pass `embedding image_embeddings -e <embedding_spec.yaml> …` for embedding and `tmm nearest_neighbors -e <mining_spec.yaml> …` for mining. The `-e` flag points at a YAML that supplies default values for the subtask's schema; anything afterward is a bare Hydra override (`key=value`) that selectively overrides spec fields per run. (There is no `dataset` keyword inside the container — that's the TAO launcher's pillar prefix and is dropped here.) Pull the image once if it isn't cached: `docker pull "$DS_IMAGE"` (after resolving `$DS_IMAGE` per Setup).
 
 Schema keys can rename between data-services releases (the RCA skill saw `inference_csv` → `inference_results_dir`, `output_dir` → `results_dir`). When in doubt, introspect the actual schema once per image: `docker run --rm "$DS_IMAGE" embedding image_embeddings --cfg=job` and `... tmm nearest_neighbors --cfg=job`.
 
@@ -39,11 +41,11 @@ Schema keys can rename between data-services releases (the RCA skill saw `infere
 
 ## Setup
 
-Resolve the concrete `tao_toolkit.data_services` URI from `versions.yaml` once at the top of the run, then confirm Docker, the NVIDIA container toolkit, and a GPU are present before doing anything else. A GPU is required for both the encoder forward pass and the cuML/cuDF k-NN search; both steps fail without CUDA.
+Use the pinned TAO data-services URI below, then confirm Docker, the NVIDIA container toolkit, and a GPU are present before doing anything else. A GPU is required for both the encoder forward pass and the cuML/cuDF k-NN search; both steps fail without CUDA.
 
 ```bash
-# Resolve tao_toolkit.data_services → concrete nvcr.io/... URI from versions.yaml
-DS_IMAGE=$(python3 -c "import yaml,os; print(yaml.safe_load(open(os.environ['TAO_SKILL_BANK_PATH']+'/versions.yaml'))['images']['tao_toolkit']['data_services'])")
+# Pinned TAO data-services container URI (stamped from the release manifest)
+DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-data-services  # versions-key: images.tao_toolkit.data_services
 echo "DS_IMAGE=$DS_IMAGE"
 
 docker info > /dev/null && echo "OK: docker"
@@ -133,7 +135,7 @@ See `references/troubleshooting.md` for the full pitfall list with the exact err
 
 ## Execution Order
 
-1. Resolve `DS_IMAGE` from `versions.yaml` (`images.tao_toolkit.data_services`), then run `docker info`, `nvidia-smi`, and `docker image inspect "$DS_IMAGE"` (pulling if missing) once to confirm the environment. Abort with a clear message if any fail.
+1. Set `DS_IMAGE` to the pinned data-services URI (see Setup), then run `docker info`, `nvidia-smi`, and `docker image inspect "$DS_IMAGE"` (pulling if missing) once to confirm the environment. Abort with a clear message if any fail.
 2. Run `date +%Y-%m-%d_%H%M%S` to get the timestamp; create `<output_dir>/mining_results/<timestamp>/`.
 3. Write `embedding_spec.yaml` and `mining_spec.yaml` into the timestamped dir, filling in the encoder choice and mining knobs. Keep these under `$WORKSPACE` so the `-e` path resolves inside the container.
 4. If the source pool is a CSV, convert to parquet first (preserve `filepath` and `label`).

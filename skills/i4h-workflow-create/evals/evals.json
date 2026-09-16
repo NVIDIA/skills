@@ -1,39 +1,73 @@
 [
   {
-    "id": "i4h-workflow-create-readme-quick-g1-sort",
-    "question": "Create a new i4h environment for surgical tool sorting using G1 based on scissor_pick_and_place.",
+    "id": "i4h-workflow-create-readme-blank",
+    "question": "Create a blank hospital-automation-robotics workflow named my_workflow.",
     "expected_skill": "i4h-workflow-create",
-    "ground_truth": "This README Quick Run prompt routes to environment creation, forking scissor_pick_and_place into a G1 surgical tool sorting env.",
+    "ground_truth": "This authoring prompt routes to fast blank Workflow creation and produces a complete idle-only scaffold without selecting a robot, task, source Workflow, or policy.",
     "expected_behavior": [
       "routes to i4h-workflow-create",
-      "uses scissor_pick_and_place as the source env",
-      "switches the robot/policy plan to Unitree G1 and GR00T N1.6",
-      "treats the env YAML as the source of truth",
-      "runs the create validation gate after source changes"
+      "runs ./scripts/create_blank_environment.py for my_workflow with --specialty hospital-automation-robotics",
+      "creates the Scene assets, Scene class, scene manifest, idle workflow, and contract test",
+      "generates a contract test for durable workflow and manifest invariants that remains valid after later assets, robots, cameras, tasks, or modes are added",
+      "creates only a ground plane and dome light",
+      "does not inspect or fork an existing workflow",
+      "does not add or declare a robot, policy, task manifest, object, or camera",
+      "does not boot Isaac Sim",
+      "runs show and lint for idle, lint --all, the generated contract test, and the shared zero-DOF blank-scene runtime test",
+      "leaves later world and behavior authoring to scene-edit and task-specific work"
     ]
   },
   {
-    "id": "i4h-workflow-create-table-soarm-sort",
-    "question": "Create a new i4h environment by forking the scissor pick-and-place task for surgical tool sorting.",
+    "id": "i4h-workflow-create-generic-fast",
+    "question": "Make me a new laparoscopic-robotics workflow called training_sandbox as fast as possible. Start blank.",
     "expected_skill": "i4h-workflow-create",
-    "ground_truth": "This README skill-table prompt routes to environment creation by forking the scissor pick-and-place task for surgical tool sorting.",
+    "ground_truth": "The request creates a complete blank training_sandbox workflow and Scene through the fast idle-only generator.",
     "expected_behavior": [
       "routes to i4h-workflow-create",
-      "forks from scissor_pick_and_place",
-      "preserves existing source patterns unless a robot or policy change is requested",
-      "creates or updates env YAML, assets, task, and registration files"
+      "uses training_sandbox as the workflow and Scene id under laparoscopic-robotics",
+      "uses the shared executable Python utility to create the five overwrite-safe blank Workflow files in one command",
+      "exposes exactly idle mode",
+      "does not make the generated contract test permanently assert that the workflow remains blank",
+      "performs only fast static validation"
     ]
   },
   {
-    "id": "i4h-workflow-create-table-g1-sort",
-    "question": "Create a new i4h environment by forking the scissor pick-and-place task for surgical tool sorting using G1 robot.",
+    "id": "i4h-workflow-create-readme-robotic-instrument-reach",
+    "question": "Create a blank ultrasound-robotics workflow named robotic_instrument_reach.",
     "expected_skill": "i4h-workflow-create",
-    "ground_truth": "This README skill-table prompt routes to environment creation with G1 as the robot variant.",
+    "ground_truth": "This README RL-authoring prompt creates the blank robotic_instrument_reach Scene and idle Workflow before any robot, objective, or policy is added.",
     "expected_behavior": [
       "routes to i4h-workflow-create",
-      "forks from scissor_pick_and_place",
-      "uses G1 robot conventions and matching policy stack",
-      "validates the new env with the source-instantiation gate"
+      "uses robotic_instrument_reach as the workflow and Scene id under ultrasound-robotics",
+      "creates the blank Scene assets, Scene class, scene manifest, idle Workflow, and extensible contract test",
+      "does not add the Franka-style arm, training pad, target, camera, RL objective, or policy yet",
+      "runs the generator's static validation"
+    ]
+  },
+  {
+    "id": "i4h-workflow-create-missing-specialty",
+    "question": "Create a blank i4h workflow named recovery_room.",
+    "expected_skill": "i4h-workflow-create",
+    "ground_truth": "The workflow cannot be created until the user chooses one approved product specialty.",
+    "expected_behavior": [
+      "routes to i4h-workflow-create",
+      "asks the user to choose laparoscopic-robotics, ultrasound-robotics, endoluminal-robotics, or hospital-automation-robotics",
+      "does not infer a specialty from recovery_room",
+      "does not run the generator or create files before the user chooses"
+    ]
+  },
+  {
+    "id": "i4h-workflow-create-existing-global-id",
+    "question": "Create a blank workflow named ultrasound_liver_scan under hospital-automation-robotics.",
+    "expected_skill": "i4h-workflow-create",
+    "ground_truth": "The public workflow id ultrasound_liver_scan already exists under ultrasound-robotics, so creation must stop before any files are written.",
+    "expected_behavior": [
+      "routes to i4h-workflow-create",
+      "runs the blank Workflow generator with ultrasound_liver_scan and hospital-automation-robotics",
+      "lets the generator detect the existing public id across all specialty directories before writing files",
+      "reports workflows/i4h_workflows/ultrasound-robotics/ultrasound_liver_scan.py from the generator error",
+      "does not overwrite or relocate the existing Workflow or create a duplicate under hospital-automation-robotics",
+      "asks whether the user wants to edit the existing Workflow or choose a different id"
     ]
   }
 ]

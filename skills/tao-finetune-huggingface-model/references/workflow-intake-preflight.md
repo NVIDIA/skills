@@ -93,13 +93,13 @@ here.
 
 **Default platform:** `local-docker`. This workflow builds a one-off image
 (`run-<short>:latest`) and runs it on the local Docker daemon — the same
-pattern documented in `skills/platform/tao-run-on-local-docker/SKILL.md`. Ask the user only when
+pattern documented in the `tao-run-on-local-docker` skill. Ask the user only when
 they explicitly need a different backend (Brev for a remote GPU instance,
-SLURM/Kubernetes for managed scheduling); in that case run the chosen
-platform's Preflight section first, generate the choices via
-`${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_tao_platforms.py
---format text`, then route the `docker run` commands in Steps 4–5 through that
-platform's execution pattern.
+SLURM/Kubernetes for managed scheduling); in that case read the chosen
+platform's skill (`tao-run-on-brev`, `tao-run-on-slurm`, `tao-run-on-kubernetes`,
+or `tao-run-on-local-docker`) and run its Preflight section first, then route
+the `docker run` commands in Steps 4–5 through that platform's execution
+pattern.
 
 **GPU runtime preflight:** Step 2a runs the `tao-setup-nvidia-gpu-host` skill's
 `--check-only` mode. Do not duplicate the NCT / driver / `--gpus all` smoke
@@ -216,8 +216,9 @@ just covers the Docker-daemon prereq earlier so the probe's `docker run`
 doesn't fail with a bare `docker: command not found`:
 
 ```bash
-TAO_SKILL_BANK_ROOT="${TAO_SKILL_BANK_PATH:-${TAO_SKILL_BANK_ROOT:-$PWD}}"
-SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT}/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
+# Resolve the skill bank root and use the GPU-host skill's bundled installer.
+SB="${TAO_SKILL_BANK_PATH:-${TAO_SKILL_BANK_ROOT:-$PWD}}"
+SETUP_SCRIPT="${SB}/skills/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "MISSING: docker is required for Step 1's containerized probe."
@@ -421,8 +422,9 @@ run actually needs.
 
 ```bash
 # 1) GPU host runtime — delegated to tao-setup-nvidia-gpu-host
-TAO_SKILL_BANK_ROOT="${TAO_SKILL_BANK_PATH:-${TAO_SKILL_BANK_ROOT:-$PWD}}"
-SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT}/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
+# Resolve the skill bank root and use the GPU-host skill's bundled installer.
+SB="${TAO_SKILL_BANK_PATH:-${TAO_SKILL_BANK_ROOT:-$PWD}}"
+SETUP_SCRIPT="${SB}/skills/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
 
 bash "$SETUP_SCRIPT" --backend docker --check-only || {
   echo "MISSING: TAO GPU host runtime not ready."
@@ -473,7 +475,7 @@ the newest CUDA-aligned image and let real compat workarounds
 (`compat-workarounds.md`) handle any per-version issue.
 
 If the live fetch fails: fallback rules in `references/hardware-container.md`. Default
-fallback: `nvcr.io/nvidia/pytorch:24.09-py3` (driver ≥ 545; SDPA+GQA bug — if
+fallback: `nvcr.io/nvidia/pytorch:24.09-py3` <!-- unpinned: documented fallback; live selection in hardware-container.md --> (driver ≥ 545; SDPA+GQA bug — if
 the model has `num_key_value_heads < num_attention_heads`, set
 `attn_implementation: "eager"` in config).
 

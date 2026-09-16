@@ -12,6 +12,15 @@ train:
   num_nodes: 1
   validation_interval: 50
   checkpoint_interval: 200
+  checkpointer:
+    enable_topk: false
+    replace_periodic: false
+    monitor: val_loss
+    mode: min
+    save_top_k: 1
+    filename: model_best_{epoch:03d}
+    dirpath: ''
+    auto_insert_metric_name: false
   optim:
     lr: 1.0e-05
     optim: adamw

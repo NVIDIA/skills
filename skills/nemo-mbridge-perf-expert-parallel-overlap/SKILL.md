@@ -89,6 +89,42 @@ shape. It does not show a meaningful independent win from delayed wgrad, and it
 does not validate fused MoE permutation because that path was disabled for the
 runtime stack.
 
+## HybridEP Production-Shape Benchmark
+
+A 2026-07-25 controlled Qwen3 30B-A3B pretraining comparison validated plain
+EP overlap with the production HybridEP path:
+
+```text
+Hardware: 16×H100
+Precision: BF16
+Sequence: 4096
+Parallelism: TP1 / PP1 / CP1 / EP16
+Batch: MBS1 / GBS1024
+Routing: force balance
+Dispatcher: flex + HybridEP
+CUDA graph: Transformer Engine scopes moe_router + moe_preprocess
+Delayed wgrad: disabled
+```
+
+| Case | Steady window | Step time | Model TFLOPS/GPU |
+|---|---:|---:|---:|
+| overlap off | iterations 5-20 | 24.7138s | 244.039 |
+| overlap on, search run | iterations 5-20 | 21.0725s | 286.208 |
+| overlap on, independent validation | iterations 41-50 | 20.9920s | 287.305 |
+
+The independent run reduced step time by 15.059% and raised throughput by
+17.729% over the reproduced baseline. Loss was finite, skipped and NaN
+iterations remained zero, and rank-0 peak allocated memory was 62.166 GiB.
+
+A matched Nsight Systems comparison captured the same 463,348 rank-0 kernels
+per case. Enabling overlap increased communication concurrent with GEMM and
+attention from 9.079ms (0.11% of communication time) to 3,958.997ms (36.55%).
+GPU-active interval union fell from 22.821s to 21.221s.
+
+Use this as evidence for the mechanism, not as a universal speedup promise.
+The dispatcher, graph scopes, routing, parallelism, batch shape, and runtime
+were held fixed while only plain EP overlap changed.
+
 ## Enablement
 
 ### alltoall dispatcher
@@ -114,12 +150,16 @@ work and its extra compatibility constraints have been checked.
 from megatron.bridge.training.flex_dispatcher_backend import apply_flex_dispatcher_backend
 
 cfg.comm_overlap.overlap_moe_expert_parallel_comm = True
-cfg.comm_overlap.delay_wgrad_compute = True
+cfg.comm_overlap.delay_wgrad_compute = False
 cfg.model.moe_shared_expert_overlap = False
 
 apply_flex_dispatcher_backend(cfg.model, moe_flex_dispatcher_backend="deepep")
 # or: apply_flex_dispatcher_backend(cfg.model, moe_flex_dispatcher_backend="hybridep")
 ```
+
+Benchmark plain EP overlap first. Enable `delay_wgrad_compute=True` only as a
+separate follow-up A/B after its CUDA-graph and TE compatibility constraints
+are satisfied.
 
 ## Compatibility And Constraints
 
@@ -222,6 +262,22 @@ After a successful run with EP overlap:
 - Throughput improves or at least does not regress for the target workload
 - Loss trajectory matches baseline (overlap should not affect convergence)
 
+### Profile interpretation
+
+Use an unprofiled steady window for the throughput acceptance result. Use a
+matched profile to explain the mechanism:
+
+1. Keep the dispatcher, routing, graph scopes, batch shape, parallel layout,
+   and runtime fixed.
+2. Capture the same rank and steady iteration while toggling only plain EP
+   overlap.
+3. Build interval unions for communication and compute kernels, then measure
+   their intersection.
+4. Do not use summed kernel duration as wall time. Concurrent kernels can run
+   longer under SM or bandwidth contention even when exposed time decreases.
+5. Corroborate interval results with dispatch/combine NVTX ranges, final step
+   time, loss finiteness, skipped/NaN counts, and peak memory.
+
 ## Code Anchors
 
 ### Bridge overlap validation
@@ -287,6 +343,7 @@ def _set_moe_a2a_overlap_overrides(recipe, moe_a2a_overlap=False):
 | assert on attention bias | CUDA graph attn + delayed wgrad + bias | Check `add_bias_linear` / `add_qkv_bias` | Disable attention bias |
 | no throughput gain from flex dispatcher | `apply_flex_dispatcher_backend` not called | Check `moe_token_dispatcher_type` in logs | Call `apply_flex_dispatcher_backend(...)` |
 | DeepEP/HybridEP silently skipped | Unsupported GPU | Check warning logs | Run on Ampere/Hopper/Blackwell |
+| summed kernel time increases after overlap | Expected concurrency contention or a regression | Compare interval unions, comm/compute intersection, and unprofiled step time | Judge overlap from exposed wall time, not summed per-stream duration |
 
 ## Known Limitations
 
@@ -294,9 +351,11 @@ def _set_moe_a2a_overlap_overrides(recipe, moe_a2a_overlap=False):
   you must call `apply_flex_dispatcher_backend(...)`.
 - Public recipes are often conservative and leave MoE overlap disabled by
   default.
-- End-to-end throughput gains have not yet been measured in a controlled Bridge
-  experiment for every model family. Code validation is stronger than a single
-  universal performance claim.
+- Controlled end-to-end and profile evidence exists for one Qwen3 30B-A3B
+  HybridEP H100 shape; repeat the matched A/B before generalizing it to another
+  model, dispatcher, topology, precision, or batch shape.
 - MoE overlap and shared-expert overlap are mutually exclusive.
 - CUDA graph plus delayed wgrad is a multi-constraint path that requires
   careful TE version and scope validation.
+
+_Last signature refresh: 2026-08-03._

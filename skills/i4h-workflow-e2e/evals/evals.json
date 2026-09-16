@@ -8,6 +8,9 @@
       "routes to i4h-workflow-e2e",
       "maps scissor pick-and-place to scissor_pick_and_place",
       "uses the e2e script rather than manually running only one stage",
+      "requires a successful dry-run before execution",
+      "uses the default full setup path",
+      "keeps the pipeline in the foreground until its stage summary",
       "covers record, mimic, annotate/filter, replay, convert, visualize, finetune, and validate unless skipped"
     ]
   },
@@ -18,7 +21,7 @@
     "ground_truth": "This README skill-table prompt routes to the full e2e smoke pipeline for scissor_pick_and_place.",
     "expected_behavior": [
       "routes to i4h-workflow-e2e",
-      "uses workflows/agentic/scripts/e2e/run.sh",
+      "uses ./scripts/e2e/run.sh",
       "reports the run directory and per-stage status",
       "does not replace the full pipeline with a single validation rollout"
     ]
