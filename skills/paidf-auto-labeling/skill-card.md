@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to plan, run, and debug PAIDF auto-labeling workflows that turn raw video and image datasets into annotation artifacts and training-ready outputs. <br>
+Developers and engineers use this skill to plan, configure, run, and debug PAIDF Auto-Labeling cookbooks that turn raw image and video datasets into annotation artifacts and training-ready outputs. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Yes] <br>
-**Credential Type(s):** [API key] <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -50,38 +50,39 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 3 internal evaluation tasks (3 positive). Each task attempt ran in its own isolated sandbox pod. <br>
+Evaluated against 3 tasks (3 positive) in isolated k8s-sandbox pods, 3 attempts per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks whether the user's goal was achieved and expected workflow behavior was followed. <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded when needed and decoys were avoided. <br>
+- Effectiveness: Whether the skill helped complete the user's goal (50% goal completion + 50% expected workflow adherence). <br>
+- Efficiency: Whether wasted tool calls and token usage were avoided (50% tool-call productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Verifies absence of unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
-- `skill_execution`: Verifies whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Verifies routing quality, workspace-aware skill reads, and productive tool use. <br>
-- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
-- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected and the workflow executed. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 52% → 95% (+43 points) | 53% → 96% (+43 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 33% → 100% (+67 points) | 40% → 100% (+60 points) |
-| Discoverability | 50% → 99% (+49 points) | 46% → 90% (+44 points) |
-| Effectiveness | 32% → 87% (+54 points) | 29% → 92% (+63 points) |
-| Efficiency | 44% → 90% (+46 points) | 50% → 100% (+50 points) |
+| Overall | 94.7% | 93.7% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 14.3% → 100.0% (+85.7 points) | 36.0% → 100.0% (+64.0 points) |
+| Discoverability | 95.0% | 88.3% |
+| Effectiveness | 18.6% → 90.8% (+72.2 points) | 23.5% → 87.5% (+64.0 points) |
+| Efficiency | 87.8% | 92.8% |
 
 ## Skill Version(s): <br>
-1.1.0 (source: frontmatter, pyproject.toml, CHANGELOG) <br>
+1.1.0 (source: frontmatter, pyproject.toml, changelog) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
