@@ -1,13 +1,15 @@
 # Skill Benchmark: nemotron-asr-finetune
 
-> ⚠️ **Overall verdict: INCOMPLETE — Required evidence is missing**
+> ✅ **Overall verdict: PASS — Recommended for publication**
 
-One or more required evaluation tiers did not complete, so this benchmark is not publication-complete.
+## Publication Recommendation
+
+Recommended for publication based on the completed evaluation evidence in this report.
 
 ## Evaluation Metadata
 
 - Skill: `nemotron-asr-finetune`
-- Evaluation date: 2026-09-11
+- Evaluation date: 2026-09-15
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 17 evaluation tasks (14 positive, 3 negative)
@@ -33,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | Not available | 79.1% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | Not available | 77.8% → 80.0% (+2.2 points) |
-| Correctness | Not available | 62.2% → 82.0% (+19.8 points) |
-| Discoverability | Not available | 92.1% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | Not available | 34.5% → 64.7% (+30.2 points) |
-| Efficiency | Not available | 76.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 90.7% — baseline ran, but no comparable score was available; uplift unavailable | 80.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 94.1% (-5.9 points) | 85.2% → 80.0% (-5.2 points) |
+| Correctness | 61.0% → 94.1% (+33.1 points) | 58.5% → 83.0% (+24.5 points) |
+| Discoverability | 98.2% — baseline ran, but no comparable score was available; uplift unavailable | 91.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 37.1% → 83.3% (+46.2 points) | 38.1% → 66.7% (+28.6 points) |
+| Efficiency | 83.7% — baseline ran, but no comparable score was available; uplift unavailable | 80.3% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -52,43 +54,43 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 2,801,908 | 7,728,320 | N/A | N/A | skill 17/17; base 26/51 |
-| claude-code | nemotron-asr-orchestrate-envcheck-001 | 151,907 | 124,619 | +27,288 | +21.90% | skill 1/1; base 1/1 |
-| claude-code | nemotron-asr-orchestrate-envcheck-insist-001 | 242,146 | 29,816 | +212,330 | +712.13% | skill 1/1; base 1/1 |
-| claude-code | nemotron-asr-orchestrate-escalate-001 | 173,379 | 32,067 | +141,312 | +440.68% | skill 1/1; base 1/1 |
-| claude-code | nemotron-asr-orchestrate-eval-001 | 151,844 | 92,622 | +59,222 | +63.94% | skill 1/1; base 1/1 |
-| claude-code | nemotron-asr-orchestrate-lowdata-001 | 107,864 | 31,546 | +76,318 | +241.93% | skill 1/1; base 1/1 |
-| claude-code | nemotron-asr-orchestrate-negative-deploy-001 | 219,011 | 67,735 | +151,276 | +223.34% | skill 1/1; base 1/1 |
-| claude-code | nemotron-asr-orchestrate-negative-llm-001 | 163,980 | 4,932,483 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | nemotron-asr-orchestrate-negative-openai-001 | 62,917 | 246,940 | -184,023 | -74.52% | skill 1/1; base 1/1 |
-| claude-code | nemotron-asr-orchestrate-ngram-rnnt-deploy-001 | 105,780 | 32,364 | +73,416 | +226.84% | skill 1/1; base 1/1 |
-| claude-code | nemotron-asr-orchestrate-path-001 | 169,035 | 31,099 | +137,936 | +443.54% | skill 1/1; base 1/1 |
-| claude-code | nemotron-asr-orchestrate-planning-001 | 139,740 | 127,588 | +12,152 | +9.52% | skill 1/1; base 1/1 |
-| claude-code | nemotron-asr-orchestrate-preflight-001 | 309,367 | 256,208 | +53,159 | +20.75% | skill 1/1; base 1/1 |
-| claude-code | nemotron-asr-orchestrate-preflight-8khz-001 | 159,408 | 93,737 | N/A | N/A | skill 1/1; base 2/2 |
-| claude-code | nemotron-asr-orchestrate-scope-001 | 168,024 | 93,796 | +74,228 | +79.14% | skill 1/1; base 1/1 |
-| claude-code | nemotron-asr-orchestrate-subskill-reachability-001 | 204,431 | 765,894 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | nemotron-asr-orchestrate-subskills-001 | 111,748 | 275,114 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | nemotron-asr-orchestrate-wordboost-nemo-pilot-001 | 161,327 | 494,692 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 2,703,038 | 3,644,445 | N/A | N/A | skill 20/20; base 27/27 |
-| codex | nemotron-asr-orchestrate-envcheck-001 | 72,176 | 159,768 | N/A | N/A | skill 1/1; base 2/2 |
-| codex | nemotron-asr-orchestrate-envcheck-insist-001 | 30,363 | 13,306 | +17,057 | +128.19% | skill 1/1; base 1/1 |
-| codex | nemotron-asr-orchestrate-escalate-001 | 35,133 | 13,843 | +21,290 | +153.80% | skill 1/1; base 1/1 |
-| codex | nemotron-asr-orchestrate-eval-001 | 83,957 | 55,446 | +28,511 | +51.42% | skill 1/1; base 1/1 |
-| codex | nemotron-asr-orchestrate-lowdata-001 | 34,837 | 18,259 | +16,578 | +90.79% | skill 1/1; base 1/1 |
-| codex | nemotron-asr-orchestrate-negative-deploy-001 | 629,384 | 834,753 | N/A | N/A | skill 2/2; base 3/3 |
-| codex | nemotron-asr-orchestrate-negative-llm-001 | 1,038,433 | 1,559,963 | -521,530 | -33.43% | skill 3/3; base 3/3 |
-| codex | nemotron-asr-orchestrate-negative-openai-001 | 129,101 | 119,963 | +9,138 | +7.62% | skill 1/1; base 1/1 |
-| codex | nemotron-asr-orchestrate-ngram-rnnt-deploy-001 | 35,012 | 87,731 | N/A | N/A | skill 1/1; base 2/2 |
-| codex | nemotron-asr-orchestrate-path-001 | 34,750 | 18,571 | +16,179 | +87.12% | skill 1/1; base 1/1 |
-| codex | nemotron-asr-orchestrate-planning-001 | 61,039 | 47,019 | +14,020 | +29.82% | skill 1/1; base 1/1 |
-| codex | nemotron-asr-orchestrate-preflight-001 | 154,898 | 70,548 | +84,350 | +119.56% | skill 1/1; base 1/1 |
-| codex | nemotron-asr-orchestrate-preflight-8khz-001 | 42,379 | 239,324 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | nemotron-asr-orchestrate-scope-001 | 34,914 | 18,932 | +15,982 | +84.42% | skill 1/1; base 1/1 |
-| codex | nemotron-asr-orchestrate-subskill-reachability-001 | 116,906 | 153,805 | -36,899 | -23.99% | skill 1/1; base 1/1 |
-| codex | nemotron-asr-orchestrate-subskills-001 | 49,869 | 195,286 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | nemotron-asr-orchestrate-wordboost-nemo-pilot-001 | 119,887 | 37,928 | +81,959 | +216.09% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 5,504,946 | 11,372,765 | N/A | N/A | skill 37/37; base 53/78 |
+| claude-code | All cases | 3,696,703 | 2,131,523 | N/A | N/A | skill 17/17; base 21/21 |
+| claude-code | nemotron-asr-orchestrate-envcheck-001 | 195,423 | 412,637 | N/A | N/A | skill 1/1; base 2/2 |
+| claude-code | nemotron-asr-orchestrate-envcheck-insist-001 | 198,794 | 29,519 | +169,275 | +573.44% | skill 1/1; base 1/1 |
+| claude-code | nemotron-asr-orchestrate-escalate-001 | 174,424 | 32,270 | +142,154 | +440.51% | skill 1/1; base 1/1 |
+| claude-code | nemotron-asr-orchestrate-eval-001 | 157,832 | 92,250 | +65,582 | +71.09% | skill 1/1; base 1/1 |
+| claude-code | nemotron-asr-orchestrate-lowdata-001 | 103,542 | 31,654 | +71,888 | +227.11% | skill 1/1; base 1/1 |
+| claude-code | nemotron-asr-orchestrate-negative-deploy-001 | 356,276 | 126,930 | +229,346 | +180.69% | skill 1/1; base 1/1 |
+| claude-code | nemotron-asr-orchestrate-negative-llm-001 | 836,221 | 157,238 | +678,983 | +431.82% | skill 1/1; base 1/1 |
+| claude-code | nemotron-asr-orchestrate-negative-openai-001 | 62,476 | 62,600 | -124 | -0.20% | skill 1/1; base 1/1 |
+| claude-code | nemotron-asr-orchestrate-ngram-rnnt-deploy-001 | 106,297 | 64,965 | N/A | N/A | skill 1/1; base 2/2 |
+| claude-code | nemotron-asr-orchestrate-path-001 | 169,680 | 30,781 | +138,899 | +451.25% | skill 1/1; base 1/1 |
+| claude-code | nemotron-asr-orchestrate-planning-001 | 174,715 | 97,090 | +77,625 | +79.95% | skill 1/1; base 1/1 |
+| claude-code | nemotron-asr-orchestrate-preflight-001 | 308,210 | 214,595 | +93,615 | +43.62% | skill 1/1; base 1/1 |
+| claude-code | nemotron-asr-orchestrate-preflight-8khz-001 | 156,654 | 31,400 | +125,254 | +398.90% | skill 1/1; base 1/1 |
+| claude-code | nemotron-asr-orchestrate-scope-001 | 170,261 | 94,315 | +75,946 | +80.52% | skill 1/1; base 1/1 |
+| claude-code | nemotron-asr-orchestrate-subskill-reachability-001 | 248,758 | 219,466 | +29,292 | +13.35% | skill 1/1; base 1/1 |
+| claude-code | nemotron-asr-orchestrate-subskills-001 | 112,186 | 366,568 | N/A | N/A | skill 1/1; base 3/3 |
+| claude-code | nemotron-asr-orchestrate-wordboost-nemo-pilot-001 | 164,954 | 67,245 | +97,709 | +145.30% | skill 1/1; base 1/1 |
+| codex | All cases | 2,563,746 | 3,277,730 | N/A | N/A | skill 20/20; base 27/27 |
+| codex | nemotron-asr-orchestrate-envcheck-001 | 65,836 | 229,187 | N/A | N/A | skill 1/1; base 3/3 |
+| codex | nemotron-asr-orchestrate-envcheck-insist-001 | 47,508 | 13,301 | +34,207 | +257.18% | skill 1/1; base 1/1 |
+| codex | nemotron-asr-orchestrate-escalate-001 | 30,616 | 13,774 | +16,842 | +122.27% | skill 1/1; base 1/1 |
+| codex | nemotron-asr-orchestrate-eval-001 | 50,060 | 55,432 | -5,372 | -9.69% | skill 1/1; base 1/1 |
+| codex | nemotron-asr-orchestrate-lowdata-001 | 30,379 | 20,243 | +10,136 | +50.07% | skill 1/1; base 1/1 |
+| codex | nemotron-asr-orchestrate-negative-deploy-001 | 439,456 | 709,131 | -269,675 | -38.03% | skill 2/2; base 2/2 |
+| codex | nemotron-asr-orchestrate-negative-llm-001 | 1,093,941 | 1,264,495 | -170,554 | -13.49% | skill 3/3; base 3/3 |
+| codex | nemotron-asr-orchestrate-negative-openai-001 | 39,625 | 110,770 | -71,145 | -64.23% | skill 1/1; base 1/1 |
+| codex | nemotron-asr-orchestrate-ngram-rnnt-deploy-001 | 74,378 | 50,802 | +23,576 | +46.41% | skill 1/1; base 1/1 |
+| codex | nemotron-asr-orchestrate-path-001 | 54,704 | 18,269 | +36,435 | +199.44% | skill 1/1; base 1/1 |
+| codex | nemotron-asr-orchestrate-planning-001 | 73,787 | 18,913 | +54,874 | +290.14% | skill 1/1; base 1/1 |
+| codex | nemotron-asr-orchestrate-preflight-001 | 186,530 | 85,429 | +101,101 | +118.35% | skill 1/1; base 1/1 |
+| codex | nemotron-asr-orchestrate-preflight-8khz-001 | 35,326 | 236,698 | N/A | N/A | skill 1/1; base 3/3 |
+| codex | nemotron-asr-orchestrate-scope-001 | 34,659 | 25,257 | +9,402 | +37.23% | skill 1/1; base 1/1 |
+| codex | nemotron-asr-orchestrate-subskill-reachability-001 | 169,468 | 198,340 | N/A | N/A | skill 1/1; base 2/2 |
+| codex | nemotron-asr-orchestrate-subskills-001 | 49,903 | 194,982 | N/A | N/A | skill 1/1; base 3/3 |
+| codex | nemotron-asr-orchestrate-wordboost-nemo-pilot-001 | 87,570 | 32,707 | +54,863 | +167.74% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 6,260,449 | 5,409,253 | N/A | N/A | skill 37/37; base 48/48 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -96,8 +98,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 4 finding(s) |
-| Tier 2 | Semantic deduplication | **NOT RUN** | No result was recorded |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 26 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 17 task(s) |
 
 ## Findings and Observations
@@ -105,10 +107,12 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **MEDIUM** QUALITY/quality_correctness: No documented scripts in table format (`skills/nemotron-asr-finetune/SKILL.md`)
+- **MEDIUM** QUALITY/quality_correctness: Instructions don't mention 'run_script' (`skills/nemotron-asr-finetune/SKILL.md`)
+- **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/nemotron-asr-finetune/SKILL.md`)
+- **MEDIUM** QUALITY/quality_efficiency: Deeply nested references in path-selection.md (`skills/nemotron-asr-finetune/SKILL.md`)
 - **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'version' is ignored; use 'metadata.version' (`skills/nemotron-asr-finetune/SKILL.md`)
-- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/nemotron-asr-finetune/SKILL.md`)
-- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nemotron-asr-finetune/SKILL.md`)
-- **LOW** SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/nemotron-asr-finetune/SKILL.md`)
+- 21 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

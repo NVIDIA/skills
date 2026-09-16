@@ -56,7 +56,7 @@ It owns the plan and the routing; the sub-skills own the execution. When a neede
 
 ## When to Use
 
-Use for any request to make a Nemotron Speech / Riva ASR model work better on a specific domain or language — improving accuracy, reducing WER, adding a language, or planning a fine-tune. Start here even when the user names a specific technique, so the cheapest sufficient path is chosen and the right sub-skills are sequenced.
+Use for any request to make a Nemotron Speech / Riva ASR model work better on a specific domain or language — improving accuracy, reducing WER, adding a language, or planning a fine-tune. Start here even when the user names a specific technique: treat it as a candidate until the orchestration step confirms it is the cheapest sufficient path, then sequence the right sub-skills.
 
 ## Orchestration Workflow
 
