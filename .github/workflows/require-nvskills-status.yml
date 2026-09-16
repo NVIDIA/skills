@@ -72,16 +72,6 @@ jobs:
             printf '%s' "${value}"
           }
 
-          case "${HEAD_REF}" in
-            automated/sync-skills|bot/regenerate-skill-metadata)
-              append_summary \
-                "## NVSkills CI required status" \
-                "" \
-                "Skipped: bot-managed branch \`${HEAD_REF}\` is exempt from this check."
-              exit 0
-              ;;
-          esac
-
           github_get() {
             curl --fail --silent --show-error --location \
               --retry 3 \
@@ -225,6 +215,18 @@ jobs:
               "" \
               "Skipped: this workflow run is for stale head \`${head_sha}\`; PR #${pr_number} is now at \`${current_head_sha}\`."
             exit 0
+          fi
+
+          if [ "${head_repo_full_name}" = "${REPO,,}" ]; then
+            case "${HEAD_REF}" in
+              automated/sync-skills|bot/regenerate-skill-metadata)
+                append_summary \
+                  "## NVSkills CI required status" \
+                  "" \
+                  "Skipped: upstream bot-managed branch \`${HEAD_REF}\` is exempt from this check."
+                exit 0
+                ;;
+            esac
           fi
 
           has_watched_change=false
