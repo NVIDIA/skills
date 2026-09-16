@@ -1,0 +1,5 @@
+2026-06-02 07:36:10 - client_api_launcher - INFO - Round 0 received 5000 model tensors through streaming
+2026-06-02 07:39:45 - CellPipe - ERROR - failed to send task train: peer_read_timeout=300.0
+2026-06-02 07:39:46 - DownloadService - INFO - stream progress active ref=model-abc bytes_done=3221225472 total_bytes=5368709120
+2026-06-02 07:41:02 - DownloadService - INFO - stream progress active ref=model-abc bytes_done=4831838208 total_bytes=5368709120
+2026-06-02 07:43:11 - client_api_launcher - INFO - model transfer completed after timeout warning

@@ -1,7 +1,8 @@
 # Reference data for the TAO Inference Microservice skill (SKILL.md).
 # This file contains only data: image mappings, schema definitions, valid values,
 # env var names, and secrets classification. All behavioural instructions live in SKILL.md.
-# Update this file when deployment defaults change; update SKILL.md when behaviour changes.
+# Update this file when routing changes; backend-specific model image pins stay
+# in the owning model skill's references/skill_info.yaml.
 
 skill:
   name: inference_microservice
@@ -11,12 +12,18 @@ docker_image_defaults:
     COSMOS_RL: IMAGE_COSMOS_RL
     COSMOS_PREDICT2_5: IMAGE_COSMOS_PREDICT2_5
     TAO_DATASERVICES: IMAGE_TAO_DATASERVICES
-  # Values are versions.yaml dotted keys (preferred) — resolved at runtime via
-  # tao_sdk.versions.resolve_container_image. Absolute image URIs also work for
-  # one-off / experimental overrides without a manifest bump.
+  # Backend-specific Cosmos image knowledge remains in the Cosmos model
+  # skill's skill_info.yaml and is resolved through resolve_tao_image.py.
+  model_skill_defaults:
+    COSMOS_RL:
+      model: nvidia/Cosmos3-Nano
+      action: inference_microservice
+      backend: cosmos-rl
+  # Other values are versions.yaml dotted keys resolved at runtime by
+  # scripts/resolve_versions_key.py. Absolute image URIs also work for one-off
+  # environment overrides without a manifest bump.
   mapping:
-    COSMOS_RL: tao_toolkit.cosmos_rl
-    COSMOS_PREDICT2_5: tao_toolkit.cosmos_predict_2_5
+    COSMOS_PREDICT2_5: tao_toolkit.cosmos_predict
     TAO_DATASERVICES: tao_toolkit.data_services
 
 network_config_files:

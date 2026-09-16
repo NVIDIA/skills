@@ -19,6 +19,8 @@ tags:
 
 # Sparse4D
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Sparse4D for multi-camera temporal 3D object detection and tracking. Uses sparse queries with deformable attention across camera views and time for end-to-end 3D perception. Includes instance bank for temporal tracking.
 
 Use a pretrained ResNet-101 backbone when one is available by setting
@@ -28,7 +30,7 @@ still use a compatible PTM.
 
 ## Dataclass Schemas
 
-Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
+Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML for an action requires `schemas/<action>.schema.json` and `references/spec_template_<action>.yaml` to exist and parse. Use the packaged selected-action schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
 
 ## Train Action Policy
 
@@ -220,7 +222,7 @@ depth paths.
 **H5 depth tuple mismatch**: If training fails with an H5 path error where the
 trainer tries to open a camera directory such as
 `/data/aicity_root/train/<scene>/Camera`, run
-`models/sparse4d/scripts/normalize_depth_paths.py --data-root <host-aicity-root>/train <converted-ann-dir>`
+`models/tao-train-sparse4d/scripts/normalize_depth_paths.py --data-root <host-aicity-root>/train <converted-ann-dir>`
 after `dataset_convert` and before train/evaluate/inference. The helper rewrites
 converted `depth_map_path` tuples to point at
 `<scene>/depth_maps/<camera>.h5` with the H5 dataset key basename.

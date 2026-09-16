@@ -21,6 +21,7 @@
     },
     "targets": {
       "type": "array",
+      "$comment": "The sole execution contract: run_scope_note iterates this list and nothing else. Every name in concepts[] must appear here or run_scope_note raises ScopeNoteContractError. A whole_stage concept needs only {\"concept\": \"<name>\"}; a scoped concept must supply paths or pairs.",
       "items": {
         "type": "object",
         "additionalProperties": false,

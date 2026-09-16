@@ -45,7 +45,13 @@ Use one server render and stream size for the session, typically 1920x1080. The 
 
 Do not implement live viewport-size changes. ovrtx does not expose a `renderer.resize()` API, ovstream encoders cannot be assumed to resize on the fly, and changing camera aspect after connection has caused failures. If an application exposes a different fixed stream size, apply it through startup configuration or an explicit reconnect/restart path.
 
-## Frame Continuity During Stage Loads
+## Frame Continuity During Idle And Stage Loads
+
+A connected WebRTC session needs continuous valid video frames even when no USD
+stage is loaded yet. Allocate a persistent fallback BGRA frame, such as a dark
+loading frame, before accepting browser connections. While the server is idle,
+loading, or blocked on renderer mutation, submit the fallback or last-good frame
+every render tick instead of waiting for the first real stage frame.
 
 Stage loads must not block the message callback thread or stop video output. Large USD files can take much longer than the WebRTC/encoder liveness window, and connections may be killed after roughly 7 seconds without frames.
 
@@ -64,7 +70,8 @@ while running:
     else:
         frame = loading_frame
 
-    server.stream_video(frame)
+    if server.is_client_connected:
+        server.stream_video(frame)
 ```
 
 This preserves WebRTC heartbeats and avoids stepping ovrtx while `reset_stage()`, `open_usd()`, `open_usd_from_string()`, reference updates, or selection state rebuilds are mutating the renderer.

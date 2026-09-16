@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: FoundationPose Perception Pipeline
+repo: nvidia-isaac/foundationpose_perception_pipeline
+description: Set up the FoundationPose perception stack, adapt BOP datasets, and run or evaluate pose inference with TAO Deploy depth.
+links:
+  discussions: false
+skills:
+  - path: skills/foundationpose-setup/
+    catalog_dir: foundationpose-setup
+  - path: skills/foundationpose-pipeline/
+    catalog_dir: foundationpose-pipeline

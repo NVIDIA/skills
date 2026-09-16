@@ -32,7 +32,7 @@ DeepStream Service Maker provides two complementary APIs for custom data injecti
 ### Pattern 1: Pipeline-to-Pipeline Transfer
 Transfer frames between two DeepStream pipelines.
 
-```
+```text
 Pipeline A -> BufferRetriever -> Queue -> BufferProvider -> Pipeline B
 ```
 
@@ -43,7 +43,7 @@ Pipeline A -> BufferRetriever -> Queue -> BufferProvider -> Pipeline B
 ### Pattern 2: Custom Video Source
 Read from custom camera or video source.
 
-```
+```text
 Custom Source -> BufferProvider -> appsrc -> DeepStream Pipeline
 ```
 
@@ -54,7 +54,7 @@ Custom Source -> BufferProvider -> appsrc -> DeepStream Pipeline
 ### Pattern 3: Frame Extraction
 Extract frames from pipeline for archival or analysis.
 
-```
+```text
 DeepStream Pipeline -> appsink -> BufferRetriever -> Save/Process
 ```
 
@@ -65,7 +65,7 @@ DeepStream Pipeline -> appsink -> BufferRetriever -> Save/Process
 ### Pattern 4: Synthetic Data Generation
 Generate test data for pipeline validation.
 
-```
+```text
 Synthetic Generator -> BufferProvider -> appsrc -> DeepStream Pipeline
 ```
 
@@ -76,7 +76,7 @@ Synthetic Generator -> BufferProvider -> appsrc -> DeepStream Pipeline
 ### Pattern 5: Selective Frame Capture
 Capture frames based on inference results.
 
-```
+```text
 Pipeline -> Inference -> Metadata Probe -> Trigger -> BufferRetriever -> Save
 ```
 
@@ -263,7 +263,7 @@ A `BufferProvider` is a user-implemented class that generates buffers on-demand.
 A `Feeder` is a wrapper that connects a `BufferProvider` to an `appsrc` element. It manages the signal handling for "need-data" and "enough-data" events.
 
 ### Data Flow
-```
+```text
 BufferProvider.generate() -> Feeder -> appsrc -> Pipeline
 ```
 
@@ -581,7 +581,7 @@ def pipeline_with_queue_injection(frame_queue):
     pipeline.add("nveglglessink", "sink", {"sync": False})
 
     pipeline.link("src", "convert", "caps")
-    pipeline.link(("convert", "mux"), ("", "sink_%u"))
+    pipeline.link(("caps", "mux"), ("", "sink_%u"))
     pipeline.link("mux", "sink")
 
     pipeline.attach("src", Feeder("feeder", provider), tips="need-data/enough-data")
@@ -819,7 +819,7 @@ A `BufferRetriever` is a user-implemented class that consumes buffers from the p
 A `Receiver` is a wrapper that connects a `BufferRetriever` to an `appsink` element. It manages the signal handling for "new-sample" events.
 
 ### Data Flow
-```
+```text
 Pipeline -> appsink -> Receiver -> BufferRetriever.consume()
 ```
 

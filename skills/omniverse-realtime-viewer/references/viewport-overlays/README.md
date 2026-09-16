@@ -6,7 +6,10 @@ Use this skill for viewport overlay, camera gizmo overlay, ovui overlay, headles
 
 Use this for server-side ovui overlays rendered in headless Vulkan mode, alpha-composited over the ovrtx frame, and streamed through ovstream. For local inline overlays, also read `local-viewer`, `viewer-input-routing`, `camera-controls`, and `prim-info-display`.
 
-For interactive translate/rotate/scale gizmos or object manipulators, read `transform-manipulator`. That skill owns gizmo math, hit testing, input priority before camera controls, USD xform authoring, and the local numpy-frame drawing path.
+For interactive translate/rotate/scale gizmos or object manipulators, read
+`transform-manipulator`. That skill owns gizmo math, hit testing, input priority
+before camera controls, OVStage runtime transform handoff, optional USD/session
+commit, and the local numpy-frame drawing path.
 
 ## Frame Path
 
@@ -38,7 +41,9 @@ ovrtx renderer.step() -> LdrColor CUDA RGBA8
 ## Current Overlays
 
 - Camera orbit gizmo: 120x120 bottom-right trackball ring, hover highlight, DragGesture to `orbit_delta`.
-- Prim info panel: dark translucent panel, appears on single-select, tracks prim world center, hides on click-off or behind-camera depth, shows name/path/type/translate/rotate/scale/material.
+- Prim info panel: dark translucent panel, appears on single-select, tracks the
+  current OVStage runtime world center, hides on click-off or behind-camera
+  depth, shows name/path/type/translate/rotate/scale/material.
 - Transform manipulator: use `transform-manipulator` for selected-prim translate/rotate/scale gizmos; this overlay skill only covers the shared headless ovui frame/composite plumbing.
 
 ## Add A Widget
@@ -49,6 +54,8 @@ ovrtx renderer.step() -> LdrColor CUDA RGBA8
 4. Add `contains(x, y)` for input hit testing.
 5. Wire `show/hide/update` from `message_handler.py` or the server.
 6. For world anchors, call `world_to_screen()` every frame before ticking ovui.
+7. If the anchor follows an animated, transformed, or physics-driven prim, read
+   the current OVStage runtime transform rather than pxr authored transforms.
 
 ```python
 sx, sy, depth = world_to_screen(point_3d, view_matrix, proj_matrix, viewport_w, viewport_h)
@@ -97,4 +104,6 @@ overlay.
 - `PrimInfoPanel.contains()` returns False when hidden.
 - Feature should remain behind `--ovui-camera-gizmo`; server runs normally without it.
 
-See also: `transform-manipulator`, `prim-info-display`, `viewer-input-routing`, `camera-controls`, `streaming-server`, `local-viewer`.
+See also: `transform-manipulator`, `prim-info-display`,
+`stage-attribute-reads`, `viewer-input-routing`, `camera-controls`,
+`streaming-server`, `local-viewer`.

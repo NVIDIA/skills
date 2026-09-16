@@ -48,7 +48,7 @@ line.
 **Required:**
 - `model_id` — HuggingFace model ID, e.g. `google/vit-base-patch16-224`
 
-**Conditional credentials (read from the session environment, exported before launching when present):**
+**Conditional credentials (read from the session environment — exported before launching, or sourced from a user-approved env file with `set -a; source /path/to/.env; set +a`):**
 - `HF_TOKEN` — required only when the model or dataset is **gated** (read access) or `push_to_hub` is on (write access). Public model + public dataset + `push_to_hub: false` runs do not need it. The agent never reads the value — only checks presence with `[ -n "$HF_TOKEN" ]`.
 - `WANDB_API_KEY`, `WANDB_PROJECT` — required only when WandB monitoring is enabled. Set `WANDB_MODE=disabled` to opt out.
 
@@ -87,35 +87,33 @@ here.
 
 | Concern | Authoritative skill |
 |---|---|
-| GPU host runtime — NVIDIA driver 580, CUDA Toolkit 13.0, NVIDIA Container Toolkit 1.19.0 | [`tao-skill-bank:tao-setup-nvidia-gpu-host`](../../platform/tao-setup-nvidia-gpu-host/SKILL.md) |
-| `docker run` flags, NGC auth, `--gpus`, mounts, env passthrough, `--ipc=host`/`--shm-size`, common error modes | [`tao-skill-bank:tao-run-on-docker`](../../platform/tao-run-on-docker/SKILL.md) |
-| Local Docker job preflight (daemon reachable, GPU smoke) | [`tao-skill-bank:tao-run-on-local-docker`](../../platform/tao-run-on-local-docker/SKILL.md) |
+| GPU host runtime — NVIDIA driver 580, CUDA Toolkit 13.0, NVIDIA Container Toolkit 1.19.0 | [`tao-skill-bank:tao-setup-nvidia-gpu-host`](../../../platform/tao-setup-nvidia-gpu-host/SKILL.md) |
+| `docker run` flags, NGC auth, `--gpus`, mounts, env passthrough, `--shm-size=8g`/`--shm-size`, common error modes, local/remote Docker job preflight (daemon reachable, GPU smoke) | [`tao-skill-bank:tao-run-on-docker`](../../../platform/tao-run-on-docker/SKILL.md) |
 
-**Default platform:** `local-docker`. This workflow builds a one-off image
-(`run-<short>:latest`) and runs it on the local Docker daemon — the same
-pattern documented in `skills/platform/tao-run-on-local-docker/SKILL.md`. Ask the user only when
+**Default platform:** `docker`. This workflow builds a one-off image
+(`run-<short>:latest`) and runs it on the local Docker daemon — following the
+`docker run` conventions in `skills/platform/tao-run-on-docker/SKILL.md`. Ask the user only when
 they explicitly need a different backend (Brev for a remote GPU instance,
 SLURM/Kubernetes for managed scheduling); in that case run the chosen
-platform's Preflight section first, generate the choices via
-`${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_tao_platforms.py
---format text`, then route the `docker run` commands in Steps 4–5 through that
-platform's execution pattern.
+platform's Preflight section first, discover the execution platforms from the
+installed platform skills (tao-run-on-docker / -slurm / -kubernetes / -brev,
+plus any external one) by reading each platform skill's `## Credentials`
+section and `references/skill_info.yaml` — then route the
+`docker run` commands in Steps 4–5 through that platform's execution pattern.
 
 **GPU runtime preflight:** Step 2a runs the `tao-setup-nvidia-gpu-host` skill's
 `--check-only` mode. Do not duplicate the NCT / driver / `--gpus all` smoke
 logic here — if it needs to change, change it in `tao-setup-nvidia-gpu-host`.
 
-**Credentials preflight:** credentials are read from the session
-environment (exported in your shell before launching); the SessionStart hook
-(`hooks/session_start.sh`) lists the variable names (never values) in the session banner.
-Step 2a only confirms presence of credentials that the current run
-*actually* needs — `HF_TOKEN` for gated downloads or `push_to_hub`,
-`WANDB_API_KEY`/`WANDB_PROJECT` if WandB is enabled — instead of hard-
-requiring them up front.
+**Credentials preflight:** the SessionStart hook (`hooks/session_start.sh`)
+lists the variable names (never values) in the session banner. Step 2a only
+confirms presence of credentials that the current run *actually* needs —
+`HF_TOKEN` for gated downloads or `push_to_hub`, `WANDB_API_KEY`/
+`WANDB_PROJECT` if WandB is enabled — instead of hard-requiring them up front.
 
 **Docker run conventions:** every `docker run` invocation in
 `references/docker-runs.md` follows the canonical flag set from
-`skills/platform/tao-run-on-docker/SKILL.md` (`--gpus all`, `--ipc=host` or `--shm-size=…`,
+`skills/platform/tao-run-on-docker/SKILL.md` (`--gpus all`, `--shm-size=8g` or `--shm-size=…`,
 `-e VAR` passthrough, bind mounts, `--rm` for one-shots). Treat that skill as
 the spec; this one only adds workflow-specific flags
 (`--entrypoint /bin/bash -lc`, `PYTORCH_CUDA_ALLOC_CONF`, `--name hft_train`).
@@ -216,8 +214,9 @@ just covers the Docker-daemon prereq earlier so the probe's `docker run`
 doesn't fail with a bare `docker: command not found`:
 
 ```bash
-TAO_SKILL_BANK_ROOT="${TAO_SKILL_BANK_PATH:-${TAO_SKILL_BANK_ROOT:-$PWD}}"
-SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT}/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
+# Resolve the skill bank root and use the GPU-host skill's bundled installer.
+SB="${TAO_SKILL_BANK_PATH:-${TAO_SKILL_BANK_ROOT:-$PWD}}"
+SETUP_SCRIPT="${SB}/skills/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "MISSING: docker is required for Step 1's containerized probe."
@@ -247,6 +246,7 @@ relative `./output/<short>` and an explicit absolute override resolve
 correctly:
 
 ```bash
+set -a; source /path/to/.env; set +a   # omit if already exported
 case "$OUTPUT_DIR" in
   /*) ;;
   *) OUTPUT_DIR="$(pwd)/$OUTPUT_DIR" ;;
@@ -258,10 +258,11 @@ from transformers import AutoConfig
 from huggingface_hub import model_info
 mid = os.environ["MODEL_ID"]; tok = os.environ.get("HF_TOKEN") or None  # optional — public models work without it
 try:
+    # WARNING: trust_remote_code=True executes model-repo Python. Only probe repos you trust.
     cfg = AutoConfig.from_pretrained(mid, token=tok, trust_remote_code=True)
 except Exception as e:
     # If this is a gated model, the error message will name 401/access-denied;
-    # tell the user to export HF_TOKEN and retry.
+    # tell the user to export HF_TOKEN (or source their env file) and retry.
     print(f"REJECT: AutoConfig failed — {e}"); sys.exit(1)
 info = model_info(mid, token=tok)
 print("model_type:", cfg.model_type)
@@ -315,6 +316,7 @@ Step 1b is a separate bash invocation, so it repeats the `$OUTPUT_DIR`
 normalization (the variable doesn't survive across `bash -c` calls):
 
 ```bash
+set -a; source /path/to/.env; set +a   # omit if already exported
 case "$OUTPUT_DIR" in
   /*) ;;
   *) OUTPUT_DIR="$(pwd)/$OUTPUT_DIR" ;;
@@ -416,13 +418,14 @@ hardware-dependent compat rules.
 `tao-setup-nvidia-gpu-host` skill (driver branch 580, CUDA Toolkit 13.0, NVIDIA
 Container Toolkit 1.19.0). Invoke it in `--check-only` mode; on failure, ask
 the user to authorize the install, then re-run. Credentials are read from the
-session environment (exported before launching) — only check the ones the current
-run actually needs.
+session environment (exported before launching or sourced from a user-approved
+env file) — only check the ones the current run actually needs.
 
 ```bash
 # 1) GPU host runtime — delegated to tao-setup-nvidia-gpu-host
-TAO_SKILL_BANK_ROOT="${TAO_SKILL_BANK_PATH:-${TAO_SKILL_BANK_ROOT:-$PWD}}"
-SETUP_SCRIPT="${TAO_SKILL_BANK_ROOT}/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
+# Resolve the skill bank root and use the GPU-host skill's bundled installer.
+SB="${TAO_SKILL_BANK_PATH:-${TAO_SKILL_BANK_ROOT:-$PWD}}"
+SETUP_SCRIPT="${SB}/skills/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
 
 bash "$SETUP_SCRIPT" --backend docker --check-only || {
   echo "MISSING: TAO GPU host runtime not ready."
@@ -473,7 +476,7 @@ the newest CUDA-aligned image and let real compat workarounds
 (`compat-workarounds.md`) handle any per-version issue.
 
 If the live fetch fails: fallback rules in `references/hardware-container.md`. Default
-fallback: `nvcr.io/nvidia/pytorch:24.09-py3` (driver ≥ 545; SDPA+GQA bug — if
+fallback: `nvcr.io/nvidia/pytorch:24.09-py3` <!-- unpinned: documented fallback; live selection in hardware-container.md --> (driver ≥ 545; SDPA+GQA bug — if
 the model has `num_key_value_heads < num_attention_heads`, set
 `attn_implementation: "eager"` in config).
 

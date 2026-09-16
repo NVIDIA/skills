@@ -1,0 +1,14 @@
+[
+  {
+    "id": "tao-finetune-nv-tesseract-forecasting-basic",
+    "question": "A user request: \"Run NV-Tesseract forecasting on my multivariate time-series CSV using DARR context-enhanced kNN retrieval with the moment_head_512_6hr weights, and then fine-tune on my domain data.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
+    "expected_skill": "tao-finetune-nv-tesseract-forecasting",
+    "expected_script": null,
+    "ground_truth": "Identify tao-finetune-nv-tesseract-forecasting as the applicable skill and summarize its documented DARR-mode inference and fine-tuning workflow from SKILL.md (uv sync, perform_forecasting with the moment_head_512_6hr weights in DARR mode, then the fine-tune step on user data) without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-finetune-nv-tesseract-forecasting as the relevant skill",
+      "Outlines the documented DARR-mode inference and fine-tune workflow steps from SKILL.md (uv sync, perform_forecasting / DARR mode, fine-tune on user CSV)",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]

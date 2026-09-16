@@ -13,6 +13,10 @@ Electron main should:
 - forward JSON app messages between preload and the native client
 - cancel pending waits before closing native handles
 - terminate the Python sidecar on quit when Electron started it
+On Windows, the sidecar launcher must use the project-local
+`.venv\Scripts\python.exe` chosen during setup. Run the App-Local Desktop
+Preflight in `windows-native-setup` before diagnosing SHM or renderer behavior.
+
 
 Do not call a blocking frame wait directly on Electron main.
 

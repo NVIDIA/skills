@@ -2,13 +2,14 @@
   "automl_default_parameters": [],
   "automl_disabled_parameters": [],
   "default": {
-    "base_model_path": "hf_model://nvidia/Cosmos3-Nano",
+    "base_model_path": "",
     "device_map": "auto",
     "enable_lora": false,
     "fps": 1,
     "max_new_tokens": 32,
     "media": "",
-    "model_path": "hf_model://nvidia/Cosmos3-Nano",
+    "model_path": "",
+    "num_frames": null,
     "num_gpus": 1,
     "prompt": "Describe this video briefly.",
     "results_dir": "",
@@ -18,7 +19,7 @@
   },
   "properties": {
     "base_model_path": {
-      "default": "hf_model://nvidia/Cosmos3-Nano",
+      "default": "",
       "type": "string"
     },
     "device_map": {
@@ -42,11 +43,16 @@
       "type": "string"
     },
     "model_path": {
-      "default": "hf_model://nvidia/Cosmos3-Nano",
+      "default": "",
       "type": "string"
     },
     "num_gpus": {
       "default": 1,
+      "type": "integer"
+    },
+    "num_frames": {
+      "default": null,
+      "minimum": 1,
       "type": "integer"
     },
     "prompt": {

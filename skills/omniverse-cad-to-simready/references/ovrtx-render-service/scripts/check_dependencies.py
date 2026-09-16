@@ -53,6 +53,19 @@ def check_dependencies() -> dict[str, Any]:
     else:
         checks.append(_check("openusd_python_available", True, "OpenUSD Python modules are available", "info"))
 
+    try:
+        from PIL import Image, ImageStat  # noqa: F401
+    except Exception as exc:
+        checks.append(
+            _check(
+                "pillow_available",
+                False,
+                f"Pillow is unavailable: {exc}. Pixel inspection cannot run, so scripts/run.py will fail the render stage closed.",
+            )
+        )
+    else:
+        checks.append(_check("pillow_available", True, "Pillow is available for pixel inspection", "info"))
+
     manifest, _, _ = load_preflight_manifest()
     endpoint = _env_first(
         (

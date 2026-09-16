@@ -1,0 +1,59 @@
+{
+  "skill": "nv_generate_ct_rflow",
+  "version": "0.1.0",
+  "run_id": "fixture-direct-run",
+  "validation_overall": "passed",
+  "model": "NVIDIA-Medtech/NV-Generate-CTMR (rflow-ct)",
+  "model_repo": "https://github.com/NVIDIA-Medtech/NV-Generate-CTMR",
+  "model_weights_repo": "https://huggingface.co/nvidia/NV-Generate-CT",
+  "input": {
+    "body_region_requested": ["chest"],
+    "anatomy_list_requested": ["lung tumor"],
+    "controllable_anatomy_size": [[0.5]],
+    "num_output_samples_requested": 1,
+    "output_size_requested": [256, 256, 256],
+    "spacing_requested": [1.0, 1.0, 1.0],
+    "random_seed": 17,
+    "version": "rflow-ct"
+  },
+  "output": {
+    "samples": [
+      {
+        "image_path": "<output-dir>/sample_0001_image.nii.gz",
+        "label_path": "<output-dir>/sample_0001_label.nii.gz",
+        "image_hu_min": -1024.0,
+        "image_hu_max": 1421.0,
+        "image_hu_mean": -512.6,
+        "image_hu_std": 327.4,
+        "label_foreground_voxels": 4200,
+        "label_background_voxels": 95800
+      }
+    ],
+    "output_label_mapping": [
+      {"anatomy": "lung tumor", "maisi_label_id": 23, "output_label_id": 1}
+    ],
+    "summary_html": "<output-dir>/summary.html"
+  },
+  "metrics": {
+    "generation_time_s": 118.4,
+    "peak_gpu_mb": 21344.0,
+    "tumor_volume_pct": 4.2
+  },
+  "invocation": {
+    "upstream_commit": "61c4ec709b84cad468852243c48e250bec732074",
+    "rendered_infer_config": {
+      "num_inference_steps": 1000,
+      "output_size": [256, 256, 256],
+      "spacing": [1.0, 1.0, 1.0]
+    },
+    "model_inventory": {
+      "files": [
+        {
+          "path": "/models/diff_unet_3d_rflow-ct.pt",
+          "sha256": "93f065ef4ab3a969821a39050e8b58c0541d2332e44f5a1c05fb2e038eb64c7e"
+        }
+      ]
+    }
+  },
+  "runtime": {"subprocess_seconds": 118.4}
+}

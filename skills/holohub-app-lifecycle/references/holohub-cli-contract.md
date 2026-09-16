@@ -1,13 +1,19 @@
 # `./holohub` contract
 
-**Evidence release:** verified 2026-07-31 at the official HoloHub tag
+**Evidence releases:** verified 2026-07-31 at the official HoloHub tag
 `holoscan-sdk-4.5.0`, resolving to
-`0a2f81ef978ccd83a676b1c3189cf5b201315a2b`.
+`0a2f81ef978ccd83a676b1c3189cf5b201315a2b`. Rechecked 2026-09-02 with
+the wrapper configuration proposed by HoloHub pull request 1699 at commit
+`4cc1a85cedeec005e290e319ebdc330001d34234`: both repository wrappers pin
+`holoscan-cli==4.6.0`, retain `--pre --extra-index-url
+https://pypi.nvidia.com` as the default pip options, and default the SDK base to
+4.6.0.
 
-Requires `holoscan-cli>=4.5.0`, matching HoloHub's current wrapper and base
-SDK pins. The final-release behavior below was verified with the published
-4.5.0 wheel and tag commit
-`33a8a112bdb44aef47b34e8f9a47484fb54e9e31`.
+Requires `holoscan-cli>=4.5.0`. The earlier baseline was verified with the
+published 4.5.0 wheel and tag commit
+`33a8a112bdb44aef47b34e8f9a47484fb54e9e31`; the current behavior was
+verified with the published 4.6.0 wheel and release/tag commit
+`1e5e051bd5241c3159208cc55191887c951896c4`.
 
 This byte-identical contract is the version-evidence source shared by the
 HoloHub lifecycle skills. Do not duplicate exact verification tags or SHAs in
@@ -58,12 +64,13 @@ Resolve disagreements in this order:
 
 Use `./holohub` as the public HoloHub command surface. Current `package` creates
 Holoscan Module DEB/WHEEL artifacts, not application packages. HoloHub no
-longer accepts new `workflows/` contributions, and holoscan-cli 4.5.0 removes
-the `workflow` project type.
+longer accepts new `workflows/` contributions, and the verified holoscan-cli
+4.5.0 and 4.6.0 releases do not expose the `workflow` project type.
 
 Use `--json` with `version`, `list`, `modes`, `env-info`, `env-check`, and
-`status`. Each 4.5.0 payload begins with `"schema_version": 1`; tolerate
-additive fields. Parse stdout separately from diagnostics on stderr.
+`status`. Each verified 4.5.0 and 4.6.0 payload begins with
+`"schema_version": 1`; tolerate additive fields. Parse stdout separately from
+diagnostics on stderr.
 `env-check --json` still exits nonzero when a check fails, so preserve and
 parse its JSON before triage. Treat that result as task-blocking only when a
 failed capability is required by the selected project's documented needs or
@@ -85,10 +92,14 @@ verify    focused test + observable result/artifact + final status
   support only `--dryrun`; read-only diagnostics need neither.
 - Keep project, mode, language, image, inputs, privileges, and task arguments
   identical between preview and action.
-- In 4.5.0, build, package, and sccache-enabled container dry runs do not
-  create CLI-owned state. Wrapper environment bootstrap, prompts, and other
-  previewed commands can still have side effects; dry run is not an offline
-  guarantee.
+- In the verified 4.5.0 and 4.6.0 releases, build, package, and
+  sccache-enabled container dry runs do not create CLI-owned state. Wrapper
+  environment bootstrap, prompts, and other previewed commands can still have
+  side effects; dry run is not an offline guarantee.
+- In 4.6.0, `test` uses `xvfb-run` when it is available and otherwise warns and
+  runs `ctest` directly; `--no-xvfb` skips that detection. It also passes the
+  active project root as `-DCTEST_SOURCE_DIRECTORY="$PWD"`, and the packaged
+  CTest script preserves that value instead of redirecting to site-packages.
 - The first wrapper invocation can select, create, or repair its command
   environment before parsing the verb. Use `version --json` and
   `env-info --json` instead of guessing which environment is active.

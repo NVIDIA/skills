@@ -110,17 +110,30 @@ TEXT_FILENAMES = {
     "justfile",
 }
 
+LEGACY_PROJECT_CONFIG_FILENAMES = {"config.toml", "plugins.toml"}
+
 
 @dataclass(frozen=True)
 class FileChange:
+    """A text file that would receive or received identifier replacements."""
+
     path: Path
     count: int
 
 
 @dataclass(frozen=True)
 class PathChange:
+    """A file or directory path that would be or was renamed."""
+
     old: Path
     new: Path
+
+
+@dataclass(frozen=True)
+class LegacyProjectConfig:
+    """Project-local NeMo Flow configuration that must not be renamed blindly."""
+
+    path: Path
 
 
 class MutationError(RuntimeError):
@@ -128,6 +141,7 @@ class MutationError(RuntimeError):
 
 
 def apply_replacements(text: str) -> tuple[str, int]:
+    """Apply explicit NeMo Flow to NeMo Relay replacements in text."""
     count = 0
     updated = text
     for old, new in REPLACEMENTS:
@@ -139,12 +153,14 @@ def apply_replacements(text: str) -> tuple[str, int]:
 
 
 def should_skip_dir(name: str, include_generated: bool) -> bool:
+    """Return whether a directory name should be skipped during traversal."""
     if include_generated and name == "_generated":
         return False
     return name in SKIP_DIRS
 
 
 def is_safe_entry(path: Path, root: Path) -> bool:
+    """Return whether path is a non-symlink entry contained by root."""
     if path.is_symlink():
         return False
     try:
@@ -154,9 +170,15 @@ def is_safe_entry(path: Path, root: Path) -> bool:
 
 
 def should_scan_file(path: Path, include_lockfiles: bool) -> bool:
+    """Return whether a file is a supported text candidate for scanning."""
     if path.name in LOCKFILE_NAMES and not include_lockfiles:
         return False
     return path.name in TEXT_FILENAMES or path.suffix in TEXT_SUFFIXES
+
+
+def is_legacy_project_config(path: Path) -> bool:
+    """Return whether path is a legacy project-local configuration file."""
+    return path.parent.name == ".nemo-flow" and path.name in LEGACY_PROJECT_CONFIG_FILENAMES
 
 
 def supports_secure_mutation() -> bool:
@@ -174,6 +196,7 @@ def supports_secure_mutation() -> bool:
 
 
 def supports_atomic_no_replace_rename() -> bool:
+    """Return whether the platform exposes an atomic no-replace rename API."""
     libc = ctypes.CDLL(None)
     return (sys.platform.startswith("linux") and hasattr(libc, "renameat2")) or (
         sys.platform == "darwin" and hasattr(libc, "renameatx_np")
@@ -211,6 +234,7 @@ def rename_no_replace_at(parent_fd: int, old_name: str, new_name: str) -> None:
 
 
 def directory_open_flags() -> int:
+    """Return flags used to open directories without following symlinks."""
     return os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
 
 
@@ -248,6 +272,7 @@ def open_relative_directory(root_fd: int, relative_path: Path) -> Iterator[int]:
 
 
 def same_file_version(left: os.stat_result, right: os.stat_result) -> bool:
+    """Return whether two stat results describe the same unchanged file."""
     return (
         left.st_dev == right.st_dev
         and left.st_ino == right.st_ino
@@ -294,6 +319,7 @@ def replace_file_at(parent_fd: int, name: str, data: bytes, source_stat: os.stat
 
 
 def iter_files(root: Path, include_lockfiles: bool, include_generated: bool):
+    """Yield safe text file candidates below root."""
     for current_root, dirs, files in os.walk(root):
         current = Path(current_root)
         dirs[:] = [
@@ -307,7 +333,25 @@ def iter_files(root: Path, include_lockfiles: bool, include_generated: bool):
                 yield path
 
 
+def collect_legacy_project_configs(root: Path, include_generated: bool) -> list[LegacyProjectConfig]:
+    """Find project-local NeMo Flow config files that need manual migration."""
+    configs: list[LegacyProjectConfig] = []
+    for path in iter_files(root, include_lockfiles=True, include_generated=include_generated):
+        if is_legacy_project_config(path):
+            configs.append(LegacyProjectConfig(path=path))
+    return sorted(configs, key=lambda config: str(config.path))
+
+
+def legacy_configs_changed(left: list[LegacyProjectConfig], right: list[LegacyProjectConfig]) -> bool:
+    """Return whether the protected legacy config set changed during scanning."""
+    return {config.path for config in left} != {config.path for config in right}
+
+
 def rewrite_file_secure(path: Path, root: Path, root_fd: int) -> FileChange | None:
+    """Apply replacements to one file through directory handles."""
+    if is_legacy_project_config(path):
+        raise MutationError(f"legacy project configuration changed during scan: {path}")
+
     try:
         relative_path = path.relative_to(root)
         with open_relative_directory(root_fd, relative_path.parent) as parent_fd:
@@ -342,6 +386,7 @@ def rewrite_file_secure(path: Path, root: Path, root_fd: int) -> FileChange | No
 
 
 def rewrite_file(path: Path, root: Path, write: bool, root_fd: int | None = None) -> FileChange | None:
+    """Report or apply replacements for one file."""
     if write:
         if root_fd is None:
             raise MutationError("write mode requires a confirmed root directory handle")
@@ -373,11 +418,41 @@ def rewrite_file(path: Path, root: Path, write: bool, root_fd: int | None = None
 
 
 def updated_name(name: str) -> str:
+    """Return a path component with explicit NeMo Flow names replaced."""
     updated, _ = apply_replacements(name)
     return updated
 
 
-def collect_path_changes(root: Path, include_generated: bool) -> list[PathChange]:
+def is_blocked_legacy_config_path(path: Path, legacy_configs: list[LegacyProjectConfig]) -> bool:
+    """Return whether renaming path would move legacy project configuration."""
+    return any(path == config.path or path in config.path.parents for config in legacy_configs)
+
+
+def directory_contains_legacy_config_at(parent_fd: int, name: str) -> bool:
+    """Return whether a child directory currently contains legacy config files."""
+    try:
+        directory_fd = os.open(name, directory_open_flags(), dir_fd=parent_fd)
+    except OSError as error:
+        raise MutationError(f"cannot inspect directory for legacy project configuration: {name}: {error}") from error
+    try:
+        for filename in LEGACY_PROJECT_CONFIG_FILENAMES:
+            try:
+                config_stat = os.stat(filename, dir_fd=directory_fd, follow_symlinks=False)
+            except FileNotFoundError:
+                continue
+            if stat.S_ISREG(config_stat.st_mode):
+                return True
+        return False
+    finally:
+        os.close(directory_fd)
+
+
+def collect_path_changes(
+    root: Path,
+    include_generated: bool,
+    legacy_configs: list[LegacyProjectConfig],
+) -> list[PathChange]:
+    """Collect safe path renames without moving legacy project configuration."""
     changes: list[PathChange] = []
     paths: list[Path] = []
     for current_root, dirs, files in os.walk(root):
@@ -396,6 +471,8 @@ def collect_path_changes(root: Path, include_generated: bool) -> list[PathChange
             paths.append(path)
 
     for old in sorted(paths, key=lambda path: len(path.parts), reverse=True):
+        if is_blocked_legacy_config_path(old, legacy_configs):
+            continue
         new_name = updated_name(old.name)
         if new_name != old.name:
             changes.append(PathChange(old=old, new=old.with_name(new_name)))
@@ -408,6 +485,7 @@ def apply_path_changes(
     write: bool,
     root_fd: int | None = None,
 ) -> list[PathChange]:
+    """Report or apply safe path renames."""
     applied: list[PathChange] = []
     for change in changes:
         if write:
@@ -422,6 +500,9 @@ def apply_path_changes(
                     source_stat = os.stat(old_relative.name, dir_fd=parent_fd, follow_symlinks=False)
                     if not (stat.S_ISREG(source_stat.st_mode) or stat.S_ISDIR(source_stat.st_mode)):
                         raise ValueError("rename source is not a regular file or directory")
+                    if old_relative.name == ".nemo-flow" and stat.S_ISDIR(source_stat.st_mode):
+                        if directory_contains_legacy_config_at(parent_fd, old_relative.name):
+                            raise MutationError(f"legacy project configuration changed during scan: {change.old}")
                     rename_no_replace_at(parent_fd, old_relative.name, new_relative.name)
             except (OSError, RuntimeError, ValueError) as error:
                 raise MutationError(f"unsafe rename: {change.old} -> {change.new}: {error}") from error
@@ -448,9 +529,11 @@ def apply_path_changes(
 def print_report(
     file_changes: list[FileChange],
     path_changes: list[PathChange],
+    legacy_configs: list[LegacyProjectConfig],
     write: bool,
     max_report: int,
 ) -> None:
+    """Print a dry-run or write-mode migration summary."""
     mode = "updated" if write else "would update"
     rename_mode = "renamed" if write else "would rename"
 
@@ -464,10 +547,22 @@ def print_report(
     if len(path_changes) > max_report:
         print(f"... {len(path_changes) - max_report} more path changes omitted")
 
+    for config in legacy_configs[:max_report]:
+        print(
+            "manual migration required: "
+            f"{config.path} is project-local NeMo Flow configuration; "
+            "move reviewed settings to a supported user or explicit Relay configuration path"
+        )
+    if len(legacy_configs) > max_report:
+        print(f"... {len(legacy_configs) - max_report} more legacy project config warnings omitted")
+
     print(f"summary: {len(file_changes)} files {mode}; {len(path_changes)} paths {rename_mode}")
+    if legacy_configs:
+        print(f"summary: {len(legacy_configs)} legacy project config files require manual migration")
 
 
 def main() -> int:
+    """Run the command-line migration helper."""
     parser = argparse.ArgumentParser(
         description="Rewrite explicit NeMo Flow names to NeMo Relay names.",
     )
@@ -506,9 +601,11 @@ def main() -> int:
         "--max-report",
         type=int,
         default=200,
-        help="Maximum file changes and path changes to print.",
+        help="Maximum file changes, path changes, and legacy configuration warnings to print.",
     )
     args = parser.parse_args()
+    if args.max_report < 0:
+        parser.error("--max-report must be non-negative")
 
     root = Path(args.root).resolve()
     if not root.exists():
@@ -540,16 +637,31 @@ def main() -> int:
             except OSError as error:
                 parser.error(f"confirmed root cannot be opened safely: {error}")
 
+        legacy_configs = collect_legacy_project_configs(root, args.include_generated)
+
         file_changes = [
             change
             for path in iter_files(root, args.include_lockfiles, args.include_generated)
-            if (change := rewrite_file(path, root, args.write, root_fd)) is not None
+            if not is_legacy_project_config(path)
+            if (change := rewrite_file(path, root, write=False)) is not None
         ]
+
+        current_legacy_configs = collect_legacy_project_configs(root, args.include_generated)
+        if args.write and legacy_configs_changed(legacy_configs, current_legacy_configs):
+            raise MutationError("legacy project configuration changed during scan")
+        legacy_configs = current_legacy_configs
+        if args.write:
+            applied_file_changes: list[FileChange] = []
+            for change in file_changes:
+                applied_change = rewrite_file(change.path, root, write=True, root_fd=root_fd)
+                if applied_change is not None:
+                    applied_file_changes.append(applied_change)
+            file_changes = applied_file_changes
 
         path_changes: list[PathChange] = []
         if args.rename_paths:
             path_changes = apply_path_changes(
-                collect_path_changes(root, args.include_generated),
+                collect_path_changes(root, args.include_generated, legacy_configs),
                 root,
                 args.write,
                 root_fd,
@@ -561,7 +673,7 @@ def main() -> int:
         if root_fd is not None:
             os.close(root_fd)
 
-    print_report(file_changes, path_changes, args.write, args.max_report)
+    print_report(file_changes, path_changes, legacy_configs, args.write, args.max_report)
     if not args.write:
         print("dry run only; pass --write to apply changes")
     return 0

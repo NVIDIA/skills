@@ -1,0 +1,27 @@
+results_dir: null
+model:
+  backbone: swin_large_patch4_window7_224
+  num_queries: 900
+  num_feature_levels: 4
+  return_interm_indices: [1, 2, 3, 4]
+  two_stage_type: standard
+  num_co_heads: 1
+dataset:
+  dataset_type: default
+  num_classes: null          # must match the classmap line count and the checkpoint head
+  batch_size: 1
+  augmentation:
+    fixed_random_crop: null
+    input_mean: [0.485, 0.456, 0.406]
+    input_std: [0.229, 0.224, 0.225]
+  infer_data_sources:
+    image_dir: null          # directory of images to pseudo-label
+    classmap: null           # newline-separated class list, one per line
+  eval_class_ids: null
+train:
+  activation_checkpoint: false
+  freeze: []
+inference:
+  checkpoint: null
+  conf_threshold: 0.3        # TAO default is 0.5; the reference pipeline used 0.3
+  num_gpus: 1

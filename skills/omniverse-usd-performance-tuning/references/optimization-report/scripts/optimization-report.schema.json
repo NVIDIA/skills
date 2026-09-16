@@ -104,7 +104,7 @@
           "properties": {
             "package": {
               "type": "string",
-              "description": "Package or extension name, e.g. 'omniverse-asset-validator' or 'omni.asset_validator.core'."
+              "description": "Package or extension name, e.g. 'usd-validation-nvidia' (pip distribution) or 'omni.asset_validator' (module)."
             },
             "version": {
               "type": "string",
@@ -123,7 +123,7 @@
       "type": "number",
       "minimum": 0,
       "maximum": 10,
-      "description": "Stage Optimization Score from 0-10, computed deterministically as round(sum(metric_groups[].score * metric_groups[].weight) / sum(metric_groups[].weight), 1) across scored stage/composition groups only. Exclude groups with score=null or weight=0. Runtime metrics such as RAM, VRAM, FPS, and frame time are excluded unless supplied by a separate runtime profiling report and explicitly treated outside this score."
+      "description": "Stage Optimization Score from 0-10, computed deterministically as round(sum(metric_groups[].score * metric_groups[].weight) / sum(metric_groups[].weight), 1) across scored stage/composition groups only. Exclude groups with score=null or weight=0. Runtime metrics such as RAM, VRAM, FPS, and frame time are excluded unless supplied by a separate runtime profiling report and explicitly treated outside this score. validate_report.py recomputes this weighted mean and rejects a declared score more than 0.05 away from it, so a hand-edited headline fails."
     },
     "score_scope": {
       "type": "string",
@@ -133,7 +133,7 @@
     "score_label": {
       "type": "string",
       "enum": ["excellent", "strong", "moderate", "neutral", "mixed", "regressed"],
-      "description": "Human-readable score band derived from optimization_score: excellent >= 9.0; strong >= 7.5 and < 9.0; moderate >= 5.5 and < 7.5; neutral >= 4.5 and < 5.5; mixed >= 2.5 and < 4.5; regressed < 2.5."
+      "description": "Human-readable score band derived from optimization_score: excellent >= 9.0; strong >= 7.5 and < 9.0; moderate >= 5.5 and < 7.5; neutral >= 4.5 and < 5.5; mixed >= 2.5 and < 4.5; regressed < 2.5. validate_report.py derives the band from the declared score and rejects a label that contradicts it."
     },
     "executive_summary": {
       "type": "string",
@@ -221,8 +221,8 @@
         },
         "merge_identity_class": {
           "type": "string",
-          "enum": ["weak", "none"],
-          "description": "Identity class of the units fused by the merge. A merge destroys per-part identity, so only 'weak' (anonymous, identity-not-wanted) or 'none' (identity-free fragments) units may be merged. A strong-identity (addressable component/subcomponent) unit must NOT be merged — the scorer's preservation gate fails any other value."
+          "enum": ["weak", "none", "strong"],
+          "description": "Identity class of the units fused by the merge. A merge destroys per-part identity, so only 'weak' (anonymous, identity-not-wanted) or 'none' (identity-free fragments) units may be merged. 'strong' (an addressable component/subcomponent) is a legal VALUE so a run that did fuse a strong-identity unit can say so; the scorer's preservation gate then fails the run. Without 'strong' in the enum the honest report was schema-invalid, which left omitting the field — and omission clears the guard — as the only way to stay valid."
         },
         "merge_bounds_coherence": {
           "type": "number",
@@ -251,10 +251,15 @@
     },
     "safety_gate": {
       "type": "object",
-      "description": "Correctness-precondition state (e.g. dangling material bindings repaired BEFORE structuring). The run-scoring oracle fails closed on a status that is not resolved/clear/none/passed/not_required.",
+      "description": "Correctness-precondition state (e.g. dangling material bindings repaired BEFORE structuring). Emit this block whenever a Phase-2c safety-gate validator reported issues: validate_report.py's safety-gate check requires it in that case, and the run-scoring oracle treats an omitted block as unresolved, so leaving it out is a reporting error rather than a clean run. The oracle also fails closed on a status that is not resolved/clear/none/passed/not_required, and on a block that records no status.",
       "additionalProperties": true,
+      "required": ["status"],
       "properties": {
-        "status": { "type": "string", "description": "resolved | clear | none | passed | not_required (cleared) vs. unresolved | blocked | failed (the scorer zeroes the run)." },
+        "status": {
+          "type": "string",
+          "enum": ["resolved", "clear", "none", "passed", "not_required", "unresolved", "blocked", "failed"],
+          "description": "resolved | clear | none | passed | not_required (cleared) vs. unresolved | blocked | failed (the scorer zeroes the run). Enumerated so a typo or an empty string is a schema error instead of a silently cleared gate."
+        },
         "finding": { "type": "string" },
         "notes": { "type": "string" }
       }

@@ -1,0 +1,22 @@
+[
+  {"query": "Predict protein structure using OpenFold3 NIM from this FASTA sequence", "should_trigger": true},
+  {"query": "I want to run OpenFold3 to co-fold a protein-DNA complex", "should_trigger": true},
+  {"query": "Use the OpenFold3 NIM microservice to predict a protein-ligand complex structure", "should_trigger": true},
+  {"query": "Run OpenFold3 via the hosted NVIDIA API and save the mmCIF structure output", "should_trigger": true},
+  {"query": "Predict protein-RNA complex structure using the OpenFold3 BioNeMo NIM", "should_trigger": true},
+  {"query": "How do I run OpenFold3 with an MSA input and get pLDDT and pTM scores?", "should_trigger": true},
+  {"query": "Run the OpenFold3 Docker container locally and predict a multi-chain protein assembly", "should_trigger": true},
+  {"query": "I need biomolecular co-folding with a CCD ligand code (like ATP) using OpenFold3", "should_trigger": true},
+  {"query": "Use OpenFold3 NIM to predict 5 diffusion samples for my protein complex", "should_trigger": true},
+  {"query": "Run structure prediction with OpenFold3 using a template CIF file", "should_trigger": true},
+  {"query": "Fold a protein with SMILES ligand using the OpenFold3 NIM and get confidence scores", "should_trigger": true},
+  {"query": "I want to co-fold a protein with a small molecule using the OpenFold3 API from NVIDIA", "should_trigger": true},
+  {"query": "Run MSA search to generate multiple sequence alignments for my protein", "should_trigger": false},
+  {"query": "Generate novel molecules from a scaffold using the GenMol NIM", "should_trigger": false},
+  {"query": "Dock a ligand to a receptor using DiffDock and return binding poses", "should_trigger": false},
+  {"query": "Design protein sequences for a target backbone using ProteinMPNN", "should_trigger": false},
+  {"query": "Run RFDiffusion to de novo design a protein backbone of 80 residues", "should_trigger": false},
+  {"query": "Calculate RMSD between two protein structures and identify flexible loops", "should_trigger": false},
+  {"query": "Predict binding affinity using Boltz2 NIM for a kinase-inhibitor complex", "should_trigger": false},
+  {"query": "Visualize the pLDDT score per residue from an AlphaFold2 output", "should_trigger": false}
+]

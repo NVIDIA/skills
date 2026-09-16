@@ -15,21 +15,27 @@
         .replace('{{ GENERATED_DATE }}',        generated_date)
         .replace('{{ KPI_TARGET }}',            kpi_target)
         ...
-        .replace('{{ FAR_DATA_JSON }}',         json.dumps(far_data))
+        .replace('{{ METRIC_DATA_JSON }}',      json.dumps(metric_data))
         ...)
     open(f'{RESULTS_DIR}/DEFT_Loop_Report.html', 'w').write(html)
 
   ── SIMPLE TOKEN REFERENCE ────────────────────────────────────────────────────
   {{ GENERATED_DATE }}          ISO-8601 datetime, e.g. "2026-04-28 19:13 UTC"
-  {{ KPI_TARGET }}              e.g. "FAR < 10% @ Recall = 100%"
+  {{ KPI_TARGET }}              e.g. "Weighted escape cost <= 0.02 cost/board"
+  {{ PRIMARY_METRIC_LABEL }}    customer-facing primary metric name
+  {{ PRIMARY_METRIC_UNIT }}     display suffix such as "%" or " cost/board"
+  {{ PRIMARY_METRIC_UNIT_JSON }} JSON string for that suffix in JavaScript
+  {{ METRIC_DIRECTION_LABEL }}  "Lower is better" or "Higher is better"
   {{ ITERATIONS_RUN }}          integer, e.g. 3
   {{ MAX_ITERATIONS }}          integer, e.g. 3
   {{ BEST_ITER_LABEL }}         e.g. "Iter 1"
-  {{ BEST_FAR }}                float string, e.g. "49.29"
-  {{ BEST_THRESHOLD }}          float string, e.g. "0.109226"
+  {{ BEST_METRIC_VALUE }}       best primary-metric value
+  {{ BEST_THRESHOLD }}          float string or "n/a"
   {{ BEST_CHECKPOINT }}         absolute path string
-  {{ KPI_TARGET_PCT }}          numeric KPI line on FAR chart, e.g. 10
-  {{ FAR_Y_MAX }}               chart Y max, e.g. 100
+  {{ METRIC_TARGET_VALUE }}     numeric primary-metric target
+  {{ METRIC_Y_MIN }}            primary-metric chart Y minimum
+  {{ METRIC_Y_MAX }}            primary-metric chart Y maximum
+  {{ METRIC_MINIMIZES_JSON }}   JSON boolean; true for < / <=, false for > / >=
   {{ FINAL_ITER_COUNT_LABEL }}  e.g. "3 / 3 complete"
   {{ FINAL_KPI_STATUS }}        Neutral status string. Examples:
                                 "MET"                           — target reached
@@ -39,56 +45,41 @@
 
   ── PRE-RENDERED HTML BLOCK REFERENCE ─────────────────────────────────────────
   {{ KPI_BANNER_HTML }}
-      Conditional banner. Use neutral phrasing when the target is not yet reached
-      (we are the product team — describe the gap, never say "NOT MET"). Example
-      for a run still short of target:
-        <div class="kpi-banner" style="background:rgba(255,188,1,0.10);border-color:rgba(255,188,1,0.35);">
-          <div class="icon" style="background:var(--nvidia-yellow);color:#000">i</div>
-          <div class="content">
-            <div class="title" style="color:var(--nvidia-yellow)">Best result so far</div>
-            <div class="body">After N iterations, best is
-              <strong>Iter X — FAR = Y% @ 100% Recall</strong>
-              (<strong>Zpp from the Wpp target</strong>).
-              <strong>Next lever:</strong> one-liner.
-            </div>
-          </div>
-        </div>
-      KPI MET example (green):
+      Conditional banner. Emit only for KPI MET or a committed hard stop. Use
+      an empty string while the loop is running or when the iteration budget
+      ends short of target; never emit an informational `i` / gap banner. KPI
+      MET example (green):
         <div class="kpi-banner" style="background:rgba(118,185,0,0.12);border-color:rgba(118,185,0,0.4);">
           <div class="icon" style="background:var(--nvidia-green);color:#000">✓</div>
           <div class="content">
             <div class="title" style="color:var(--nvidia-green)">KPI MET</div>
-            <div class="body">Iter X achieved <strong>FAR = Y% @ 100% Recall</strong>.</div>
+            <div class="body">Iter X achieved <strong>the customer metric target</strong>.</div>
           </div>
         </div>
 
   {{ PROBLEM_STATEMENT_HTML }}
       Pre-rendered HTML for the "Problem Statement" card — mirrors § 1 of the
-      gap-analysis report style. Covers (1) the task and target model, (2) how
-      the KPI is measured (FAR @ 100% Recall math one-liner), and (3) the
-      failure modes the loop targets. Bake the concrete KPI target into the
+      gap-analysis report style. Covers (1) the task and target model, (2) the
+      customer metric predicate, evaluator, and constraints, and (3) the
+      failure modes the loop targets. Bake the concrete metric target into the
       copy — do not leave it as a `{{ KPI_TARGET }}` token inside this block,
       because the .replace() pass treats this string as already final. Example:
         <p class="info-text">
           We are given a pre-trained <strong>Visual ChangeNet</strong> binary
           classifier for PCB AOI inspection (PASS vs NO_PASS) and tasked with
-          reducing its False Alarm Rate (FAR) on the customer's KPI evaluation
-          set <em>without missing a single real defect</em>. Target:
-          <strong>FAR &lt; 10% @ 100% Recall</strong>.
+          improving the customer's deployment objective. Target:
+          <strong>weighted escape cost &le; 0.02 cost/board</strong>, subject to
+          <strong>recall &ge; 99.5%</strong>.
         </p>
         <div class="insight">
-          <strong>How FAR @ 100% Recall is measured:</strong> we sweep the
-          decision threshold on the model's NO_PASS probability and pick the
-          lowest threshold for which every NO_PASS sample in the validation
-          set is still caught. FAR is then the percentage of <code>PASS</code>
-          components the same threshold misclassifies as <code>NO_PASS</code>.
-          Lower FAR = fewer good boards flagged for human re-review.
+          <strong>How the metric is measured:</strong> the approved customer
+          evaluator consumes the inference CSV and policy weights, emits one
+          auditable result JSON, and reports every configured constraint.
         </div>
         <p class="info-text" style="margin-top:16px">
-          <strong>What needs to improve.</strong> Closing the FAR gap at 100%
-          recall means shrinking the score-overlap region where rare hard-PASS
-          samples score above the cleanest NO_PASS samples. We target this gap
-          by:
+          <strong>What needs to improve.</strong> RCA diagnostics identify the
+          error populations that contribute most to the customer metric. We
+          target those populations by:
         </p>
         <ul class="context-list">
           <li><strong>Real-image mining</strong> — k-NN search from an unlabeled
@@ -98,8 +89,8 @@
             paired defective / golden component crops for rare defect modes
             the mining pool cannot cover.</li>
           <li><strong>Iterative fine-tune</strong> — retrain ChangeNet on the
-            augmented set and re-pick the 100%-recall threshold each round
-            until FAR meets the KPI ceiling.</li>
+            augmented set and re-run the same approved evaluator each round
+            until its predicate and constraints pass.</li>
         </ul>
 
   {{ KPI_DATASET_HTML }}
@@ -115,7 +106,8 @@
           variants</strong>, split <strong>11,920 PASS / 560 NO_PASS</strong>
           (4.5% NO_PASS). NO_PASS is dominated by <code>solder_bridge</code>
           and <code>missing_component</code>; <code>misalignment</code> is
-          rare (&lt; 5% of NO_PASS) and drives most of the residual FAR.
+          rare (&lt; 5% of NO_PASS) and drives most of the residual deployment
+          cost under the configured customer metric.
         </p>
         <table class="data-table">
           <thead><tr>
@@ -144,14 +136,14 @@
       chose for this run. Example:
         <p class="info-text">
           Each iteration runs five stages: <strong>evaluate</strong> the
-          current ChangeNet checkpoint on the KPI val set and pick the
-          100%-recall threshold; <strong>RCA</strong> ranks PASS samples by
-          NO_PASS score to surface the worst false-alarm candidates;
+          current ChangeNet checkpoint on the evaluation set with the approved
+          customer metric; <strong>RCA</strong> ranks the errors that most
+          influence the observed metric;
           <strong>route</strong> those candidates to k-NN mining (real PASS
           lookalikes from an unlabeled pool, cosine similarity &ge; 0.9) and
           AnomalyGen (synthetic NG/OK pairs on defect modes mining cannot
           cover); <strong>fine-tune</strong> on the augmented training set;
-          <strong>re-evaluate</strong> and stop when FAR meets the KPI ceiling
+          <strong>re-evaluate</strong> and stop when the metric contract passes
           or after <strong>3 iterations</strong>.
         </p>
         <div class="insight">
@@ -166,8 +158,8 @@
       One <tr> per iteration. Row template:
         <tr class="best|regress|''">
           <td><strong>Label</strong> [<span class="badge best|warn|bad">★ BEST|⚠|BAD</span>]</td>
-          <td class="num pos|neg">FAR%</td>
-          <td class="num pos|neg">Δ pp or "—"</td>
+          <td class="num pos|neg">primary metric + unit</td>
+          <td class="num pos|neg">direction-aware Δ or "—"</td>
           <td class="num">threshold</td>
           <td class="num">training_rows</td>
           <td class="num">synthetic_rows</td>
@@ -175,15 +167,15 @@
           <td>note text</td>
         </tr>
       CSS guidance:
-        best row  → class="best", FAR in <td class="num pos">
-        regression → class="regress", FAR in <td class="num neg">
+        best row  → class="best", primary metric in <td class="num pos">
+        regression → class="regress", primary metric in <td class="num neg">
         baseline  → no class, delta = "—"
         syn_ratio > 50% → wrap in <span class="badge warn">X% ⚠</span>
 
   {{ RCA_INSIGHT_HTML }}
       The blue insight box explaining the root cause. Example:
         <div class="insight">
-          <strong>Why FAR is X%:</strong> explanation with
+          <strong>What drives the current customer metric:</strong> explanation with
           <code>component</code> references and <strong>bold</strong> counts.
         </div>
 
@@ -196,15 +188,17 @@
           <td>notes — use <span class="cross">←</span> for worst sample</td>
         </tr>
 
-  {{ RECALL_FAR_ROWS_HTML }}
-      One <tr> per recall/FAR tradeoff point. Row template:
+  {{ EVALUATOR_DIAGNOSTIC_ROWS_HTML }}
+      Optional evaluator-specific diagnostics. Keep these separate from the
+      primary metric and render one four-column row per diagnostic point.
+      Row template:
         <tr [style="background:rgba(118,185,0,0.06)"] >
-          <td class="num">recall% [<span style="color:var(--text-muted)">(−N FN)</span>]</td>
-          <td class="num pos|neg">far%</td>
+          <td>measure</td>
+          <td class="num pos|neg">value + unit</td>
           <td class="num">threshold</td>
           <td><span class="check|cross">✓|✗</span></td>
         </tr>
-      Highlight the row that meets KPI (or the best achievable row).
+      Highlight the row selected by the evaluator, if applicable.
 
   {{ DEFECT_TYPE_ROWS_HTML }}
       One <tr> per defect class. Row template:
@@ -262,7 +256,7 @@
         <div class="iter-card best|regress|''">
           <span class="iter-tag">★ Best | Regression | label</span>
           <div class="iter-title">Iter N</div>
-          <div class="iter-far">XX.XX%</div>
+          <div class="iter-metric">metric value + unit</div>
           <ul>
             <li>bullet 1</li>
             <li class="warn">warning bullet</li>
@@ -284,8 +278,8 @@
         <div class="reco" style="grid-column: 1 / -1">...</div>
 
   ── JSON CHART DATA REFERENCE ─────────────────────────────────────────────────
-  {{ FAR_DATA_JSON }}
-      JSON array for the FAR trend chart. Each element:
+  {{ METRIC_DATA_JSON }}
+      Primary-metric trend. Each element:
         {"label": "Baseline|Iter N", "value": 73.93, "color": "#3498db|#76b900|#c2262d"}
       Color guide: first point = #3498db (blue), improvement = #76b900 (green),
                    regression = #c2262d (red)
@@ -299,11 +293,11 @@
           <td class="num pos">total (sdg + mined)</td>
         </tr>
       sdg_count   = rows in mining_pool.csv where source == sdg_pool (all AnomalyGen output)
-      mined_count = rows in mining_pool.csv where source == mined (cosine similarity ≥ 0.9)
+      mined_count = novel rows in mining_pool.csv where source == mined after cosine + cross-iteration history filtering
       total       = sdg_count + mined_count
 
-  {{ FAR_Y_STEPS_JSON }}
-      JSON array of Y-axis tick values for FAR chart, e.g. [0, 25, 50, 75, 100]
+  {{ METRIC_Y_STEPS_JSON }}
+      Y-axis tick values for the primary-metric chart.
 ================================================================================
 -->
 <html lang="en">
@@ -312,8 +306,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DEFT Loop Final Report — PCB AOI ChangeNet</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
   :root {
     --nvidia-green: #76b900;
     --nvidia-green-light: #8ed100;
@@ -335,7 +327,7 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Inter', 'NVIDIA Sans', Arial, sans-serif;
+    font-family: 'NVIDIA Sans', Inter, Arial, sans-serif;
     background: var(--bg-dark);
     color: var(--text-primary);
     display: flex;
@@ -731,15 +723,15 @@
     color: var(--text-primary);
     margin-bottom: 6px;
   }
-  .iter-card .iter-far {
+  .iter-card .iter-metric {
     font-size: 34px;
     font-weight: 800;
     letter-spacing: -0.5px;
     margin-bottom: 18px;
     font-family: 'SF Mono', 'Fira Code', monospace;
   }
-  .iter-card.best .iter-far { color: var(--nvidia-green); }
-  .iter-card.regress .iter-far { color: var(--nvidia-red); }
+  .iter-card.best .iter-metric { color: var(--nvidia-green); }
+  .iter-card.regress .iter-metric { color: var(--nvidia-red); }
   .iter-card ul {
     list-style: none;
     padding: 0;
@@ -933,6 +925,36 @@
   {{ KPI_BANNER_HTML }}
 </div>
 
+<!-- ════════════ RUN CONFIGURATION & OUTCOME ════════════ -->
+<div class="card">
+  <div class="header">
+    <div>
+      <div class="chart-title">Run Configuration &amp; Outcome</div>
+      <div class="chart-subtitle">Approved configuration, measured wall time, and the current canonical outcome</div>
+    </div>
+  </div>
+  <table class="data-table">
+    <thead><tr><th>Item</th><th>Details</th></tr></thead>
+    <tbody>{{ RUN_SUMMARY_ROWS_HTML }}</tbody>
+  </table>
+
+  <h3 class="sub-title" style="margin-top:28px">Training Set Growth</h3>
+  <div class="chart-subtitle">Raw k-NN candidates and generated SDG rows compared with net unique rows retained after the committed deduplicating merge</div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Iteration</th>
+        <th>KNN Raw Mined</th>
+        <th>SDG Generated</th>
+        <th>New Unique Images (After Dedup)</th>
+        <th>Training Set Total</th>
+        <th>Δ</th>
+      </tr>
+    </thead>
+    <tbody>{{ GROWTH_ROWS_HTML }}</tbody>
+  </table>
+</div>
+
 <!-- ════════════ PROBLEM STATEMENT ════════════ -->
 <div class="card">
   <div class="header">
@@ -960,7 +982,7 @@
   <div class="header">
     <div>
       <div class="chart-title">Approach</div>
-      <div class="chart-subtitle">How the DEFT loop systematically closes the FAR gap at 100% recall</div>
+      <div class="chart-subtitle">How the DEFT loop improves {{ PRIMARY_METRIC_LABEL }} against the customer target</div>
     </div>
   </div>
   {{ APPROACH_HTML }}
@@ -971,16 +993,16 @@
   <div class="header">
     <div>
       <div class="chart-title">Progress Overview</div>
-      <div class="chart-subtitle">FAR trend (@ 100% Recall) across iterations</div>
+      <div class="chart-subtitle">{{ PRIMARY_METRIC_LABEL }} trend across completed evaluations</div>
     </div>
   </div>
 
   <div class="chart-wrapper">
-    <div class="y-label">FAR (%)</div>
-    <div class="y-axis-labels" id="farYLabels"></div>
-    <div class="chart-area" id="farChart"></div>
+    <div class="y-label">{{ PRIMARY_METRIC_LABEL }}{{ PRIMARY_METRIC_UNIT }}</div>
+    <div class="y-axis-labels" id="metricYLabels"></div>
+    <div class="chart-area" id="metricChart"></div>
   </div>
-  <div class="footnote">Lower is better &mdash; KPI target line at {{ KPI_TARGET_PCT }}%</div>
+  <div class="footnote">{{ METRIC_DIRECTION_LABEL }} &mdash; customer target at {{ METRIC_TARGET_VALUE }}{{ PRIMARY_METRIC_UNIT }}</div>
 </div>
 
 <!-- ════════════ PER-ITERATION RESULTS ════════════ -->
@@ -988,7 +1010,7 @@
   <div class="header">
     <div>
       <div class="chart-title">Per-Iteration Results</div>
-      <div class="chart-subtitle">Threshold selected to maintain <span>100% recall</span> on validation NO_PASS set</div>
+      <div class="chart-subtitle">Each completed row uses the approved customer metric evaluator; operating threshold may be n/a</div>
     </div>
   </div>
 
@@ -996,7 +1018,7 @@
     <thead>
       <tr>
         <th>Phase</th>
-        <th>FAR @ 100% Recall</th>
+        <th>{{ PRIMARY_METRIC_LABEL }}{{ PRIMARY_METRIC_UNIT }}</th>
         <th>Δ vs Baseline</th>
         <th>Threshold</th>
         <th>Training Rows</th>
@@ -1040,7 +1062,7 @@
   <div class="header">
     <div>
       <div class="chart-title">Root Cause Analysis</div>
-      <div class="chart-subtitle">Why FAR collapses at 100% recall — score distribution at {{ BEST_ITER_LABEL }}</div>
+      <div class="chart-subtitle">Score-distribution diagnostic at {{ BEST_ITER_LABEL }} (independent of the primary metric)</div>
     </div>
   </div>
 
@@ -1067,18 +1089,18 @@
     </div>
 
     <div class="chart-col">
-      <h3 class="sub-title">Recall vs FAR Trade-off ({{ BEST_ITER_LABEL }})</h3>
+      <h3 class="sub-title">Evaluator Diagnostics ({{ BEST_ITER_LABEL }})</h3>
       <table class="data-table">
         <thead>
           <tr>
-            <th>Min Recall</th>
-            <th>FAR</th>
+            <th>Measure</th>
+            <th>Value</th>
             <th>Threshold</th>
-            <th>KPI</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
-          {{ RECALL_FAR_ROWS_HTML }}
+          {{ EVALUATOR_DIAGNOSTIC_ROWS_HTML }}
         </tbody>
       </table>
     </div>
@@ -1164,8 +1186,8 @@
       <div class="status-value">{{ FINAL_ITER_COUNT_LABEL }}</div>
     </div>
     <div class="status-block">
-      <div class="status-label">Best FAR @ 100% Recall</div>
-      <div class="status-value green">{{ BEST_FAR }}%</div>
+      <div class="status-label">Best {{ PRIMARY_METRIC_LABEL }}</div>
+      <div class="status-value green">{{ BEST_METRIC_VALUE }}{{ PRIMARY_METRIC_UNIT }}</div>
     </div>
     <div class="status-block">
       <div class="status-label">Threshold</div>
@@ -1186,55 +1208,59 @@
 <script>
 (function () {
   // ── Chart data injected by the agent's Python rendering code ──
-  const farData  = {{ FAR_DATA_JSON }};
-  const farYSteps = {{ FAR_Y_STEPS_JSON }};
-  const farMax    = {{ FAR_Y_MAX }};
-  const kpiTarget = {{ KPI_TARGET_PCT }};
+  const metricData = {{ METRIC_DATA_JSON }};
+  const metricYSteps = {{ METRIC_Y_STEPS_JSON }};
+  const metricMin = {{ METRIC_Y_MIN }};
+  const metricMax = {{ METRIC_Y_MAX }};
+  const metricTarget = {{ METRIC_TARGET_VALUE }};
+  const metricMinimizes = {{ METRIC_MINIMIZES_JSON }};
+  const metricRange = Math.max(metricMax - metricMin, Number.EPSILON);
+  const metricUnit = {{ PRIMARY_METRIC_UNIT_JSON }};
+  const toYPct = value => (1 - (value - metricMin) / metricRange) * 100;
 
-  // ── FAR Trend Line Chart ──
-  const farYLabels = document.getElementById("farYLabels");
-  const farChart   = document.getElementById("farChart");
+  // ── Primary Metric Trend Line Chart ──
+  const metricYLabels = document.getElementById("metricYLabels");
+  const metricChart = document.getElementById("metricChart");
 
-  farYSteps.slice().reverse().forEach(v => {
+  metricYSteps.slice().reverse().forEach(v => {
     const tick = document.createElement("div");
     tick.className = "y-tick";
-    tick.textContent = v + "%";
-    farYLabels.appendChild(tick);
+    tick.textContent = v + metricUnit;
+    metricYLabels.appendChild(tick);
   });
 
-  const farChartH = farChart.offsetHeight || 320;
-  const farChartW = farChart.offsetWidth  || 600;
+  const metricChartH = metricChart.offsetHeight || 320;
+  const metricChartW = metricChart.offsetWidth || 600;
 
-  farYSteps.forEach(v => {
-    if (v === 0) return;
-    const pct = (1 - v / farMax) * 100;
+  metricYSteps.forEach(v => {
+    const pct = toYPct(v);
     const gl = document.createElement("div");
     gl.className = "grid-line";
     gl.style.top = pct + "%";
-    farChart.appendChild(gl);
+    metricChart.appendChild(gl);
   });
 
   // KPI target line
   const kpiLine = document.createElement("div");
-  kpiLine.style.cssText = `position:absolute; left:0; right:0; top:${(1 - kpiTarget / farMax) * 100}%; border-top:1.5px dashed var(--nvidia-red); pointer-events:none`;
-  farChart.appendChild(kpiLine);
+  kpiLine.style.cssText = `position:absolute; left:0; right:0; top:${toYPct(metricTarget)}%; border-top:1.5px dashed var(--nvidia-red); pointer-events:none`;
+  metricChart.appendChild(kpiLine);
   const kpiLabel = document.createElement("div");
-  kpiLabel.style.cssText = `position:absolute; right:8px; top:calc(${(1 - kpiTarget / farMax) * 100}% - 22px); font-size:13px; font-weight:700; color:var(--nvidia-red); background:var(--bg-card); padding:3px 8px; border-radius:3px;`;
-  kpiLabel.textContent = "KPI " + kpiTarget + "%";
-  farChart.appendChild(kpiLabel);
+  kpiLabel.style.cssText = `position:absolute; right:8px; top:calc(${toYPct(metricTarget)}% - 22px); font-size:13px; font-weight:700; color:var(--nvidia-red); background:var(--bg-card); padding:3px 8px; border-radius:3px;`;
+  kpiLabel.textContent = "Target " + metricTarget + metricUnit;
+  metricChart.appendChild(kpiLabel);
 
   // Plot points + line
   const pad    = 30;
-  const innerW = farChartW - pad * 2;
-  const positions = farData.map((d, i) => ({
-    x: pad + (innerW * i / (farData.length - 1)),
-    y: (1 - d.value / farMax) * farChartH,
+  const innerW = metricChartW - pad * 2;
+  const positions = metricData.map((d, i) => ({
+    x: pad + (innerW * i / Math.max(metricData.length - 1, 1)),
+    y: toYPct(d.value) / 100 * metricChartH,
     d
   }));
 
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.style.cssText = "position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:visible";
-  svg.setAttribute("viewBox", `0 0 ${farChartW} ${farChartH}`);
+  svg.setAttribute("viewBox", `0 0 ${metricChartW} ${metricChartH}`);
   svg.setAttribute("preserveAspectRatio", "none");
 
   for (let i = 0; i < positions.length - 1; i++) {
@@ -1243,27 +1269,29 @@
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
     line.setAttribute("x1", p1.x); line.setAttribute("y1", p1.y);
     line.setAttribute("x2", p2.x); line.setAttribute("y2", p2.y);
-    const isImprovement = p2.d.value < p1.d.value;
+    const isImprovement = metricMinimizes
+      ? p2.d.value < p1.d.value
+      : p2.d.value > p1.d.value;
     line.setAttribute("stroke", isImprovement ? "#76b900" : "#c2262d");
     line.setAttribute("stroke-width", "2.5");
     svg.appendChild(line);
   }
-  farChart.appendChild(svg);
+  metricChart.appendChild(svg);
 
   positions.forEach(p => {
     const dot = document.createElement("div");
     dot.style.cssText = `position:absolute; left:${p.x - 6}px; top:${p.y - 6}px; width:12px; height:12px; border-radius:50%; background:${p.d.color}; box-shadow:0 0 0 3px var(--bg-card), 0 0 12px ${p.d.color}66; z-index:2;`;
-    farChart.appendChild(dot);
+    metricChart.appendChild(dot);
 
     const lbl = document.createElement("div");
     lbl.style.cssText = `position:absolute; left:${p.x}px; top:${p.y - 32}px; transform:translateX(-50%); font-size:15px; font-weight:700; color:${p.d.color}; white-space:nowrap; z-index:2;`;
-    lbl.textContent = p.d.value.toFixed(2) + "%";
-    farChart.appendChild(lbl);
+    lbl.textContent = p.d.value.toFixed(2) + metricUnit;
+    metricChart.appendChild(lbl);
 
     const xLbl = document.createElement("div");
     xLbl.style.cssText = `position:absolute; left:${p.x}px; bottom:-26px; transform:translateX(-50%); font-size:14px; font-weight:600; color:var(--text-secondary); white-space:nowrap;`;
     xLbl.textContent = p.d.label;
-    farChart.appendChild(xLbl);
+    metricChart.appendChild(xLbl);
   });
 
 })();

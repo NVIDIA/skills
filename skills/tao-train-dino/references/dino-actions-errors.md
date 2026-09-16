@@ -83,7 +83,7 @@ Transformer-based detection is memory-intensive. batch_size=4 fits on 24GB GPUs.
 
 **`CUDA device-side assert`**: `num_classes` too low. Set `num_classes >= max(category_id) + 1`.
 
-**S3 inputs not downloaded inside container**: When the agent invokes DINO via SDK orchestration, `references/skill_info.yaml` must declare `actions.train.inputs` with `[0]`-indexed spec keys (see "Optional: SDK orchestration internals"). Use `s3://...` for S3-compatible datasets; do not generate `aws://...` URIs.
+**S3 inputs not downloaded inside container**: `references/skill_info.yaml` must declare `actions.train.inputs` with `[0]`-indexed spec keys so the launcher stages the datasets before the container runs. Use `s3://...` for S3-compatible datasets; do not generate `aws://...` URIs.
 
 **Evaluate checkpoint not found at result root**: DINO train jobs upload
 checkpoints under `results_dir/train/`. If eval fails with `FileNotFoundError`

@@ -14,6 +14,12 @@ For ovrtx renderer behavior, Python/C API behavior, or release-specific notes
 beyond this viewer skill package, read `references/dependencies` for acquisition
 guidance and supplemental dependency documentation.
 
+For current OVStage-backed viewer architectures, the application runtime owns the
+live OVStage stage, ordinals, write floor, and renderer publication. Read
+`ovstage-runtime`, `ovstage-population`, `ovstage-data-plane`, and
+`ovstage-ovrtx-integration` before implementing runtime scene population,
+transform writes, path dictionaries, or attached rendering.
+
 ## Streaming Recipe
 
 Use this recipe when the user asks for browser access, remote GPUs, WebRTC, service deployment, or co-viewing. Read:
@@ -24,14 +30,19 @@ Use this recipe when the user asks for browser access, remote GPUs, WebRTC, serv
 4. `streaming-messages` for JSON data-channel messages and shared protocol contracts.
 5. `streaming-lifecycle` for connection timing, envelope unwrapping, initial-state push, and exact event names.
 6. `ovrtx-rendering` for renderer construction, stepping, frame extraction, environment setup, and `write_attribute`.
-7. `stage-loading` for camera/render-product/session USDA setup and user-stage wrapping.
-8. `viewer-input-routing` for WebRTC/native input normalization, viewport ownership, and click-vs-drag dispatch.
-9. `camera-controls` for orbit, pan, zoom, camera fitting, row-major camera matrices, and camera gizmo controls.
-10. `native-picking-selection`, `object-selection`, and `selection-feedback` for picking and visual selection state.
-11. `transform-manipulator` and `prim-transform-safety` if the user asks to move selected prims or use translate/rotate/scale gizmos.
-12. `prim-info-display`, `stage-attribute-reads`, `stage-hierarchy`, and `stage-queries` for properties, hierarchy data, native prim discovery, variants, and bounds.
-13. `stage-management` and `render-settings` for scene switching, quality controls, lighting, and persisted settings.
-14. `viewport-overlays` if overlays are rendered server-side with headless ovui and composited into the WebRTC frame.
+7. `ovstage-runtime`, `ovstage-population`, `ovstage-data-plane`, and
+   `ovstage-ovrtx-integration` when the app uses OVStage as the runtime scene
+   substrate.
+8. `stage-loading` for camera/render-product/session USDA setup and user-stage wrapping.
+9. `viewer-input-routing` for WebRTC/native input normalization, viewport ownership, and click-vs-drag dispatch.
+10. `camera-controls` for orbit, pan, zoom, camera fitting, row-major camera matrices, and camera gizmo controls.
+11. `native-picking-selection`, `object-selection`, and `selection-feedback` for picking and visual selection state.
+12. `transform-manipulator` and `prim-transform-safety` if the user asks to move selected prims or use translate/rotate/scale gizmos.
+13. `physics-simulation` plus OVPhysX package/repo skills if the user asks for
+    physics impulses, drop tests, grabs, or simulation-driven transforms.
+14. `prim-info-display`, `stage-attribute-reads`, `stage-hierarchy`, and `stage-queries` for properties, hierarchy data, native prim discovery, variants, and bounds.
+15. `stage-management` and `render-settings` for scene switching, quality controls, lighting, and persisted settings.
+16. `viewport-overlays` if overlays are rendered server-side with headless ovui and composited into the WebRTC frame.
 
 ## Local Recipe
 
@@ -40,17 +51,22 @@ Use this recipe when the user asks for a desktop viewer running on the GPU works
 1. `ovui-local-viewer-recipe` as the end-to-end local desktop entry point.
 2. `local-viewer` for the standalone ovui shell, image display, resize handling, and mouse capture surface.
 3. `ovrtx-rendering` for renderer construction, stepping, frame extraction, environment setup, and `write_attribute`.
-4. `stage-loading` for camera/render-product/session USDA setup and user-stage wrapping.
-5. `viewer-input-routing` for ovui/native input normalization, viewport ownership, and click-vs-drag dispatch.
-6. `camera-controls` for orbit, pan, zoom, camera fitting, row-major camera matrices, and camera gizmo controls.
-7. `native-picking-selection`, `object-selection`, and `selection-feedback` for picking and visual selection state.
-8. `transform-manipulator` and `prim-transform-safety` if the user asks to move selected prims or use translate/rotate/scale gizmos.
-9. `prim-info-display`, `stage-attribute-reads`, `stage-hierarchy`, and `stage-queries` for properties, hierarchy data, native prim discovery, variants, and bounds.
-10. `stage-management` and `render-settings` for scene switching, quality controls, lighting, and persisted settings.
+4. `ovstage-runtime`, `ovstage-population`, `ovstage-data-plane`, and
+   `ovstage-ovrtx-integration` when the app uses OVStage as the runtime scene
+   substrate.
+5. `stage-loading` for camera/render-product/session USDA setup and user-stage wrapping.
+6. `viewer-input-routing` for ovui/native input normalization, viewport ownership, and click-vs-drag dispatch.
+7. `camera-controls` for orbit, pan, zoom, camera fitting, row-major camera matrices, and camera gizmo controls.
+8. `native-picking-selection`, `object-selection`, and `selection-feedback` for picking and visual selection state.
+9. `transform-manipulator` and `prim-transform-safety` if the user asks to move selected prims or use translate/rotate/scale gizmos.
+10. `physics-simulation` plus OVPhysX package/repo skills if the user asks for
+   physics impulses, drop tests, grabs, or simulation-driven transforms.
+11. `prim-info-display`, `stage-attribute-reads`, `stage-hierarchy`, and `stage-queries` for properties, hierarchy data, native prim discovery, variants, and bounds.
+12. `stage-management` and `render-settings` for scene switching, quality controls, lighting, and persisted settings.
 
 ## Intent Routing
 
-For full user-intent routing, read `AGENTS.md` § Intent-Based Routing. This
+For full user-intent routing, read `references/routing.md` § Intent-Based Routing. This
 skill only chooses the first delivery recipe for broad viewer requests:
 
 - Browser or remote viewing: start with `streaming-viewer-recipe`.
@@ -81,17 +97,24 @@ Delivery method?
 
 - Set `OVRTX_SKIP_USD_CHECK=1` before importing or constructing ovrtx components.
 - `ovrtx` owns the render loop: the app calls `renderer.step()` explicitly.
+- In OVStage-backed apps, the parent viewer runtime owns stage lifetime,
+  ordinals, write floors, renderer attachment, and publication. Workers and UI
+  layers exchange DTOs, not live runtime handles.
 - The camera is a USD prim. Orbit/pan/zoom writes `omni:xform`, not raw view matrices.
 - Selected-prim transform gizmos must write the selected prim's live `omni:xform`; a visible handle without prim movement is not done.
 - Session/render wrapper USDA should not inject fallback lights unless the user explicitly wants lighting overrides; stages usually own their lighting.
 - Normalize native input through `viewer-input-routing`: WebRTC `ovstream.MouseButton` values are `LEFT=1`, `MIDDLE=2`, and `RIGHT=3`, and browser-streamed apps should default the viewport input gate to active when the stream surface is the native input source.
 - Load-time EffectLayer `inputs:Fader = 0` is mandatory because ovrtx does not run the OmniGraph network that normally drives glow.
 - Never call `renderer.step()` concurrently with `open_usd()`, `open_usd_from_string()`, reference add/remove APIs, or `reset_stage()`.
+- Keep `pxr`/OpenUSD queries and OVPhysX USD population behind process
+  boundaries unless the exact ABI/import path is verified. If
+  `PhysX.attach_ovstage(stage, read_ordinal=...)` fails with missing OVStage bridge symbols, do not
+  populate OVPhysX in the parent viewer process.
 - Browser-streamed Omniverse Realtime Viewer apps use a fixed server render resolution and display the stream with `object-fit: contain`; NVST handles letterbox coordinate mapping.
 - If renderer validation hangs after a crash, inspect `nvidia-smi` and kill only stale Python Omniverse Realtime Viewer processes.
 
 ## Validation
 
-For the target prompt in `REFACTOR_TASK.md`, routing should select: `usd-viewer-app`, `ovui-local-viewer-recipe`, `local-viewer`, `ovrtx-rendering`, `stage-loading`, `viewer-input-routing`, `camera-controls`, `native-picking-selection`, `object-selection`, `selection-feedback`, `prim-info-display`, `stage-attribute-reads`, `stage-management`, `render-settings`, `stage-hierarchy`, and `stage-queries`.
+For the target broad-viewer prompt, routing should select: `usd-viewer-app`, `ovui-local-viewer-recipe`, `local-viewer`, `ovrtx-rendering`, `stage-loading`, `viewer-input-routing`, `camera-controls`, `native-picking-selection`, `object-selection`, `selection-feedback`, `prim-info-display`, `stage-attribute-reads`, `stage-management`, `render-settings`, `stage-hierarchy`, and `stage-queries`.
 
 See also: `streaming-vs-local`, `viewer-input-routing`, `windows-native-setup`, `cloud-assets`, `cloud-deployment`.

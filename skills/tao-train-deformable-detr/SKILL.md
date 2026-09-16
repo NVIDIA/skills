@@ -17,6 +17,8 @@ tags:
 
 # Deformable DETR
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Deformable DETR for 2D object detection. Uses deformable attention for efficient multi-scale feature processing. Lighter than DINO with competitive accuracy.
 
 Uses pretrained weights. Set `model.pretrained_backbone_path` for backbone-only
@@ -26,7 +28,7 @@ Supported parent model actions are `train`, `evaluate`, `inference`, `export`, a
 
 ## Dataclass Schemas
 
-Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
+Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML for an action requires `schemas/<action>.schema.json` and `references/spec_template_<action>.yaml` to exist and parse. Use the packaged selected-action schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
 
 ## Train Action Policy
 
@@ -38,7 +40,9 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 
 - **Dataset type:** object_detection
 - **Formats:** coco, coco_raw
-- **Monitoring metric:** val_mAP50 for AP50; `val_mAP` for COCO/paper-style benchmark comparisons.
+- **AutoML metric contract:** for evaluation-backed selection, use `test_mAP50` with maximize direction. Use `val_mAP50` only for training-log-only AutoML workflows.
+- **Training monitoring metrics:** `val_mAP50` for AP50; `val_mAP` for COCO/paper-style benchmark comparisons.
+- **Evaluate action metrics:** `test_mAP50` for AP50; `test_mAP` for COCO/paper-style benchmark comparisons. AutoML trials compared through the evaluate action must use the corresponding `test_*` KPI rather than looking for a `val_*` KPI in evaluator output.
 
 ### Per-Action Dataset Requirements
 
@@ -209,7 +213,7 @@ Minimum 1 GPU(s), recommended 4 GPU(s). 16GB+ (V100 or A100) VRAM per GPU. Sligh
 
 **Dataset size smaller than total batch size**: Reduce batch_size or num_gpus.
 
-**AutoML metric extraction**: Deformable DETR emits detection metrics in structured training status and logs. For COCO/paper-style benchmark comparisons, optimize `val_mAP` with `direction: maximize`; for explicit AP50 workflows, optimize `val_mAP50`. Prefer `results_dir/train/status.json` or AutoML result state before parsing raw logs. Do not optimize `val_loss` for default detection model invocations.
+**AutoML metric extraction**: Deformable DETR emits `val_mAP` and `val_mAP50` in structured training status, while the standalone evaluate action emits `test_mAP` and `test_mAP50`. For COCO/paper-style training-only comparisons, optimize `val_mAP`; for explicit AP50 training-only workflows, optimize `val_mAP50`. When AutoML scores each recommendation with the evaluate action, use the corresponding `test_mAP` or `test_mAP50` KPI. Prefer `results_dir/train/status.json` or AutoML result state before parsing raw logs. Do not optimize `val_loss` for default detection model invocations.
 
 ## Spec Param / Parent Model Inference
 

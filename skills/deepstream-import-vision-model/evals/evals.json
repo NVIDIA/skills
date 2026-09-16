@@ -1,71 +1,502 @@
-[
-  {
-    "id": "deepstream-import-vision-model-001",
-    "question": "I want to import a HuggingFace object detection model into DeepStream. Describe the end-to-end workflow this skill should follow, including model acquisition, engine build, DeepStream validation, benchmarking, and report generation.",
-    "expected_skill": "deepstream-import-vision-model",
-    "expected_script": null,
-    "ground_truth": "The response should use the import-model workflow: inspect or download model assets, reject unsupported non-detection architectures, export or use ONNX, build TensorRT engines, create parser and nvinfer config, validate with a single-stream DeepStream run and KITTI output, run multi-stream benchmarks, and generate markdown, HTML, and PDF benchmark reports.",
-    "expected_behavior": [
-      "Read the relevant reference document before each phase rather than relying on memory.",
-      "Use the mandatory models/{model_name}/ directory structure.",
-      "Handle HuggingFace or NGC model acquisition and detect unsupported non-detection architectures early.",
-      "Build TensorRT engines with the prescribed naming pattern.",
-      "Run DeepStream validation before benchmarking.",
-      "Generate benchmark_report.md, benchmark_report.html, and benchmark_report_{model_name}.pdf."
-    ]
-  },
-  {
-    "id": "deepstream-import-vision-model-002",
-    "question": "A YOLO object detection model exported from HuggingFace has dynamic ONNX dimensions. Explain how to build and configure it for DeepStream so the engine and nvinfer config are stable.",
-    "expected_skill": "deepstream-import-vision-model",
-    "expected_script": null,
-    "ground_truth": "The answer should inspect the ONNX model, create a static batch variant if needed, build TensorRT engines with batch-specific names, set infer-dims in the nvinfer config, use DeepStream NMS for pre-NMS YOLO outputs, and keep batch-size equal to the number of streams during DeepStream runs.",
-    "expected_behavior": [
-      "Inspect ONNX input and output shapes before engine build.",
-      "Create or use a static batch ONNX when dynamic dimensions would break TensorRT or DeepStream.",
-      "Name engines as {model}_dynamic_b{MAX_BS}.engine.",
-      "Set infer-dims to the explicit C;H;W input dimensions.",
-      "Use cluster-mode 2 for dense pre-NMS YOLO-style outputs.",
-      "Keep DeepStream batch-size equal to the number of input streams."
-    ]
-  },
-  {
-    "id": "deepstream-import-vision-model-003",
-    "question": "During DeepStream validation for an imported detector, KITTI output has zero frames and NVENC is unavailable on the system. What should the skill do before producing a benchmark report?",
-    "expected_skill": "deepstream-import-vision-model",
-    "expected_script": null,
-    "ground_truth": "The skill should fail or stop before Step 7 when KITTI validation has zero frames or detection rate is below the threshold. For video output, it should use nvv4l2h264enc when available, fall back to theoraenc plus oggmux when NVENC is unavailable, or skip video creation if neither path is available, then report which mode was used.",
-    "expected_behavior": [
-      "Do not proceed to multi-stream benchmarking when KITTI frame count is zero.",
-      "Treat detection rate below 90 percent as a validation gate failure.",
-      "Do not use x264enc or openh264enc.",
-      "Use theoraenc plus oggmux as the fallback when NVENC is unavailable.",
-      "Skip video creation if neither NVENC nor theora fallback is available.",
-      "Report the selected video mode in the benchmark output."
-    ]
-  },
-  {
-    "id": "deepstream-import-vision-model-004-negative",
-    "question": "Optimize SQL queries for a PostgreSQL reporting dashboard and add Redis caching. No model import or DeepStream runtime changes are needed.",
-    "expected_skill": null,
-    "expected_script": null,
-    "ground_truth": "The deepstream-import-vision-model skill should not be selected because the request is unrelated to model acquisition, TensorRT build, or DeepStream pipeline validation.",
-    "expected_behavior": [
-      "Do not activate deepstream-import-vision-model for this request.",
-      "Avoid model import, TensorRT, and DeepStream benchmarking instructions.",
-      "Respond with a generic fallback or suggest a relevant database-focused workflow."
-    ]
-  },
-  {
-    "id": "deepstream-import-vision-model-005-negative",
-    "question": "How can I fine-tune a BERT model for sentiment analysis on my own dataset?",
-    "expected_skill": null,
-    "expected_script": null,
-    "ground_truth": "The deepstream-import-vision-model skill should not be selected because this request is unrelated to DeepStream object-detection model import or TensorRT/benchmark workflow.",
-    "expected_behavior": [
-      "Do not activate deepstream-import-vision-model for this request.",
-      "State that this is outside the DeepStream import-vision-model scope.",
-      "Suggest a relevant NLP model fine-tuning path instead."
-    ]
-  }
-]
+{
+  "skill_name": "deepstream-import-vision-model",
+  "evals": [
+    {
+      "id": "1",
+      "name": "hf-onnx-to-trt-deepstream-full-pipeline",
+      "prompt": "Use deepstream-import-vision-model to run this model: https://huggingface.co/onnx-community/yolov8n",
+      "expected_output": "Skill detects ONNX files in the HuggingFace repo, downloads the fp16 ONNX variant, builds a dynamic TensorRT engine with trtexec, runs DeepStream single-stream validation, enforces the KITTI detection-rate gate, executes multi-stream benchmarks, and generates the HTML/PDF report.",
+      "files": [],
+      "should_trigger": true,
+      "expected_behavior": [
+        "Reads SKILL.md before acting",
+        "Lists the HuggingFace repo files and selects the fp16 ONNX variant without prompting the user",
+        "Builds a dynamic-batch TensorRT engine with trtexec",
+        "Runs single-stream DeepStream validation and enforces the KITTI detection-rate gate before benchmarking",
+        "Runs the multi-stream benchmark and generates the report in all three formats"
+      ],
+      "assertions": [
+        {
+          "text": "Skill acknowledges the HuggingFace URL",
+          "type": "contains_pattern",
+          "pattern": "(huggingface|yolov8n|onnx-community)"
+        },
+        {
+          "text": "Skill selects the fp16 ONNX variant by filename",
+          "type": "contains_pattern",
+          "pattern": "(model_fp16\\.onnx|_fp16\\.onnx)"
+        },
+        {
+          "text": "Skill builds a dynamic-shape TensorRT engine with trtexec",
+          "type": "contains_pattern",
+          "pattern": "trtexec[\\s\\S]{0,400}(minShapes|optShapes|maxShapes|dynamic)"
+        },
+        {
+          "text": "Skill enforces the KITTI detection-rate validation gate before benchmarking",
+          "type": "contains_pattern",
+          "pattern": "KITTI[\\s\\S]{0,200}(90|detection rate)"
+        },
+        {
+          "text": "Skill runs the DeepStream pipeline",
+          "type": "contains_pattern",
+          "pattern": "(deepstream-app|gst-launch|nvinfer)"
+        },
+        {
+          "text": "Skill generates the benchmark report",
+          "type": "contains_pattern",
+          "pattern": "(md-to-html-pdf|\\.pdf|PDF|benchmark report)"
+        },
+        {
+          "text": "Skill does not leak credentials or secrets",
+          "type": "not_contains_pattern",
+          "pattern": "((Bearer|Authorization:)\\s+\\S{12,}|sk-[A-Za-z0-9]{16,}|(hf_|nvapi-|ghp_|glpat-)[A-Za-z0-9_-]{16,}|(api[_.-]?key|password|secret|token)\\s*[:=]\\s*['\"]?[A-Za-z0-9_+/=-]{12,})"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "safetensors-torch-onnx-auto-export",
+      "prompt": "Use deepstream-import-vision-model to run this model: https://huggingface.co/IDEA-Research/grounding-dino-base",
+      "expected_output": "Skill finds only SafeTensors files in the HuggingFace repo, automatically exports to ONNX using torch.onnx.export via safetensors-to-onnx.sh in the shared build/.venv_optimum environment (dynamo backend with TorchScript fallback), then proceeds with TensorRT engine build and DeepStream integration.",
+      "files": [],
+      "should_trigger": true,
+      "expected_behavior": [
+        "Reads SKILL.md and the model-acquire reference before acting",
+        "Determines the repo has no ONNX files and only SafeTensors weights",
+        "Exports to ONNX with torch.onnx.export inside the shared build/.venv_optimum environment",
+        "Falls back from the dynamo backend to TorchScript if the export specializes the batch dimension",
+        "Proceeds to the TensorRT engine build and DeepStream pipeline after a successful export"
+      ],
+      "assertions": [
+        {
+          "text": "Skill detects no ONNX files and finds SafeTensors",
+          "type": "contains_pattern",
+          "pattern": "(SafeTensors|safetensors|no ONNX|only SafeTensors)"
+        },
+        {
+          "text": "Skill exports to ONNX via torch.onnx.export",
+          "type": "contains_pattern",
+          "pattern": "(torch\\.onnx\\.export|safetensors[-_]to[-_]onnx)"
+        },
+        {
+          "text": "Skill uses the shared build/.venv_optimum export environment",
+          "type": "contains_pattern",
+          "pattern": "build/\\.venv_optimum"
+        },
+        {
+          "text": "Skill preserves a dynamic batch dimension in the exported ONNX",
+          "type": "contains_pattern",
+          "pattern": "(dynamic[\\s_-]?(batch|axes)|dynamo|TorchScript)"
+        },
+        {
+          "text": "Skill proceeds to TensorRT after export",
+          "type": "contains_pattern",
+          "pattern": "(trtexec|TensorRT engine)"
+        },
+        {
+          "text": "Skill runs DeepStream pipeline after engine build",
+          "type": "contains_pattern",
+          "pattern": "(deepstream-app|gst-launch|nvinfer)"
+        },
+        {
+          "text": "Skill does not leak credentials or secrets",
+          "type": "not_contains_pattern",
+          "pattern": "((Bearer|Authorization:)\\s+\\S{12,}|sk-[A-Za-z0-9]{16,}|(hf_|nvapi-|ghp_|glpat-)[A-Za-z0-9_-]{16,}|(api[_.-]?key|password|secret|token)\\s*[:=]\\s*['\"]?[A-Za-z0-9_+/=-]{12,})"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "bring-your-own-vision-model-routing",
+      "prompt": "Bring my own vision model and benchmark this model on DeepStream: https://huggingface.co/onnx-community/yolov8n",
+      "expected_output": "Skill recognises the bring-your-own-model request and runs the full deepstream-import-vision-model pipeline — same behaviour as invoking deepstream-import-vision-model directly.",
+      "files": [],
+      "should_trigger": true,
+      "expected_behavior": [
+        "Discovers and activates deepstream-import-vision-model without the user naming it",
+        "Proceeds directly into the import pipeline instead of asking which skill or agent to use",
+        "Runs the ONNX download, TensorRT engine build, DeepStream pipeline, and benchmark report"
+      ],
+      "assertions": [
+        {
+          "text": "Skill activates and acknowledges the canonical workflow",
+          "type": "contains_pattern",
+          "pattern": "(deepstream-import-vision-model|bring.*vision.*model|BYOVM)"
+        },
+        {
+          "text": "Skill processes the HuggingFace URL",
+          "type": "contains_pattern",
+          "pattern": "(huggingface|yolov8n)"
+        },
+        {
+          "text": "Skill runs the full pipeline",
+          "type": "contains_pattern",
+          "pattern": "(trtexec|TensorRT|DeepStream|benchmark)"
+        },
+        {
+          "text": "Skill does not ask the user which agent or skill to use",
+          "type": "not_contains_pattern",
+          "pattern": "\\b(which|what)\\s+(agent|skill)\\b[^.?\\n]{0,80}\\?"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "ngc-tao-model-builtin-parser",
+      "prompt": "Use deepstream-import-vision-model to run the trafficcamnet model from NVIDIA NGC",
+      "expected_output": "Skill downloads the NGC TAO model using the NGC CLI or authenticated HTTPS fallback, uses the built-in DeepStream TAO parser (libnvds_infercustomparser.so with parse-bbox-func-name) instead of compiling a custom parser, reads preprocessing params from nvdsinfer_config.yaml, and runs the full benchmark pipeline.",
+      "files": [],
+      "should_trigger": true,
+      "expected_behavior": [
+        "Reads SKILL.md and the pipeline-run reference before acting",
+        "Downloads the versioned NGC model with the NGC CLI or the authenticated HTTPS fallback",
+        "Routes to the built-in TAO parser library rather than generating and compiling parser source",
+        "Reads preprocessing parameters from the model's nvdsinfer config instead of guessing them",
+        "Runs the DeepStream benchmark pipeline and generates the report"
+      ],
+      "assertions": [
+        {
+          "text": "Skill downloads from NGC using a supported client",
+          "type": "contains_pattern",
+          "pattern": "(ngc|NGC|trafficcamnet|api\\.ngc\\.nvidia\\.com)"
+        },
+        {
+          "text": "Skill names the built-in TAO parser library",
+          "type": "contains_pattern",
+          "pattern": "libnvds_infercustomparser\\.so"
+        },
+        {
+          "text": "Skill wires the parser via parse-bbox-func-name",
+          "type": "contains_pattern",
+          "pattern": "parse-bbox-func-name"
+        },
+        {
+          "text": "Skill does not invoke a compiler to build a custom parser",
+          "type": "not_contains_pattern",
+          "pattern": "(^|\\n)\\s*(sudo\\s+)?(g\\+\\+|gcc|cmake|make)\\s+[^\\n]*\\.(cpp|c|o)\\b"
+        },
+        {
+          "text": "Skill runs DeepStream pipeline",
+          "type": "contains_pattern",
+          "pattern": "(deepstream-app|gst-launch|nvinfer)"
+        },
+        {
+          "text": "Skill does not leak credentials or secrets",
+          "type": "not_contains_pattern",
+          "pattern": "((Bearer|Authorization:)\\s+\\S{12,}|sk-[A-Za-z0-9]{16,}|(hf_|nvapi-|ghp_|glpat-)[A-Za-z0-9_-]{16,}|(api[_.-]?key|password|secret|token)\\s*[:=]\\s*['\"]?[A-Za-z0-9_+/=-]{12,})"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "name": "custom-local-onnx-model",
+      "prompt": "Use deepstream-import-vision-model to run my local ONNX model at /workspace/models/my_detector.onnx",
+      "expected_output": "Skill skips the HuggingFace download steps entirely, inspects the local ONNX file directly with inspect-onnx.py, builds a TensorRT engine, and proceeds with DeepStream integration and benchmarking.",
+      "files": [],
+      "should_trigger": true,
+      "expected_behavior": [
+        "Recognises the input as an on-disk ONNX path and skips every download step",
+        "Inspects the local ONNX inputs, outputs, and opset before building",
+        "Builds the TensorRT engine directly from the local file",
+        "Runs the DeepStream pipeline and benchmark against the resulting engine"
+      ],
+      "assertions": [
+        {
+          "text": "Skill acknowledges the local ONNX path",
+          "type": "contains_pattern",
+          "pattern": "(my_detector|/workspace/models|local.*ONNX|ONNX.*local)"
+        },
+        {
+          "text": "Skill does not execute a HuggingFace download",
+          "type": "not_contains_pattern",
+          "pattern": "(^|\\n)\\s*(hf_hub_download\\(|huggingface-cli\\s+download|hf\\s+download\\b)"
+        },
+        {
+          "text": "Skill inspects the ONNX model",
+          "type": "contains_pattern",
+          "pattern": "(inspect-onnx|inspect|input.*shape|output.*shape|opset)"
+        },
+        {
+          "text": "Skill builds TensorRT engine from local model",
+          "type": "contains_pattern",
+          "pattern": "(trtexec|TensorRT engine)"
+        },
+        {
+          "text": "Skill runs DeepStream pipeline",
+          "type": "contains_pattern",
+          "pattern": "(deepstream-app|gst-launch|nvinfer)"
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "name": "multi-variant-onnx-fp16-auto-select",
+      "prompt": "Use deepstream-import-vision-model to run this model: https://huggingface.co/onnx-community/owlvit-base-patch32",
+      "expected_output": "Skill finds multiple ONNX variants (fp16, fp32, quantized) in the HuggingFace repo, automatically selects the fp16 variant without prompting the user, and applies OWL-ViT's exact preprocessing constants (net-scale-factor=0.01459, cluster-mode=2) in the nvinfer config.",
+      "files": [],
+      "should_trigger": true,
+      "expected_behavior": [
+        "Lists the repo and identifies more than one ONNX variant",
+        "Applies the deterministic fp16-first selection rule silently, without asking the user to choose",
+        "Supplies OWL-ViT's exact nvinfer preprocessing constants rather than generic defaults",
+        "Proceeds to the TensorRT engine build with the selected variant"
+      ],
+      "assertions": [
+        {
+          "text": "Skill detects multiple ONNX variants",
+          "type": "contains_pattern",
+          "pattern": "(multiple|variant|fp32|quantized)"
+        },
+        {
+          "text": "Skill selects the fp16 variant by filename",
+          "type": "contains_pattern",
+          "pattern": "(model_fp16\\.onnx|_fp16\\.onnx)"
+        },
+        {
+          "text": "Skill supplies the OWL-ViT net-scale-factor constant",
+          "type": "contains_pattern",
+          "pattern": "net-scale-factor\\s*=\\s*0\\.01459"
+        },
+        {
+          "text": "Skill supplies the OWL-ViT clustering mode",
+          "type": "contains_pattern",
+          "pattern": "cluster-mode\\s*=\\s*2"
+        },
+        {
+          "text": "Skill does not ask the user which variant or precision to use",
+          "type": "not_contains_pattern",
+          "pattern": "\\b(which|what)\\s+(ONNX\\s+)?(variant|precision|model file)\\b[^.?\\n]{0,80}\\?"
+        },
+        {
+          "text": "Skill proceeds with TensorRT engine build",
+          "type": "contains_pattern",
+          "pattern": "(trtexec|TensorRT engine)"
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "name": "reject-unsupported-non-vision-model",
+      "prompt": "Use deepstream-import-vision-model to run this model: https://huggingface.co/openai-community/gpt2",
+      "expected_output": "Skill identifies that gpt2 is a language model, not an object-detection vision model, cites the config.json architecture gate (ForCausalLM), and rejects the request. Skill does not download weights, build a TensorRT engine, or start a DeepStream pipeline.",
+      "files": [],
+      "should_trigger": false,
+      "expected_behavior": [
+        "Inspects or reasons about the model's config.json architecture before doing any work",
+        "Identifies the architecture as a causal language model and therefore out of scope",
+        "Explains that the skill supports object-detection vision models only",
+        "Does not execute any skill script, download weights, build an engine, or start a pipeline"
+      ],
+      "assertions": [
+        {
+          "text": "Skill identifies the model is not an object-detection vision model",
+          "type": "contains_pattern",
+          "pattern": "(language model|NLP|not a vision|unsupported|not compatible|text model|object detection only)"
+        },
+        {
+          "text": "Skill cites the config.json architecture gate",
+          "type": "contains_pattern",
+          "pattern": "(ForCausalLM|architecture|config\\.json)"
+        },
+        {
+          "text": "Skill does not execute an engine build or DeepStream run",
+          "type": "not_contains_pattern",
+          "pattern": "(^|\\n)\\s*(bash\\s+)?(\\./)?((scripts/)?(engine/benchmark-trtexec\\.sh|deepstream/[a-z-]+\\.sh)|trtexec\\s+--|deepstream-app\\s+-c|gst-launch-1\\.0\\s)"
+        },
+        {
+          "text": "Skill does not leak credentials",
+          "type": "not_contains_pattern",
+          "pattern": "((Bearer|Authorization:)\\s+\\S{12,}|sk-[A-Za-z0-9]{16,}|(hf_|nvapi-|ghp_|glpat-)[A-Za-z0-9_-]{16,}|(api[_.-]?key|password|secret|token)\\s*[:=]\\s*['\"]?[A-Za-z0-9_+/=-]{12,})"
+        }
+      ]
+    },
+    {
+      "id": "disco-hf-onnx-no-skill-name",
+      "name": "disco-hf-onnx-no-skill-name",
+      "prompt": "I have a YOLOv8 ONNX detector on HuggingFace — get it running on DeepStream and give me a throughput benchmark.",
+      "expected_output": "Without being told which skill to use, the agent discovers deepstream-import-vision-model from the intent, then runs the full ONNX download → TensorRT engine → DeepStream pipeline → benchmark report path.",
+      "files": [],
+      "should_trigger": true,
+      "expected_behavior": [
+        "Discovers deepstream-import-vision-model from the intent without the user naming it",
+        "Reads SKILL.md before acting",
+        "Runs the ONNX acquisition, TensorRT engine build, and DeepStream benchmark end to end",
+        "Produces the benchmark report"
+      ],
+      "assertions": [
+        {
+          "text": "Agent routes to the DeepStream vision-model import workflow",
+          "type": "contains_pattern",
+          "pattern": "(deepstream-import-vision-model|import.*vision.*model)"
+        },
+        {
+          "text": "Agent builds a TensorRT engine with trtexec",
+          "type": "contains_pattern",
+          "pattern": "(trtexec|TensorRT engine)"
+        },
+        {
+          "text": "Agent runs the DeepStream pipeline and benchmark",
+          "type": "contains_pattern",
+          "pattern": "(deepstream-app|gst-launch|nvinfer)"
+        },
+        {
+          "text": "Agent does not leak credentials or secrets",
+          "type": "not_contains_pattern",
+          "pattern": "((Bearer|Authorization:)\\s+\\S{12,}|sk-[A-Za-z0-9]{16,}|(hf_|nvapi-|ghp_|glpat-)[A-Za-z0-9_-]{16,}|(api[_.-]?key|password|secret|token)\\s*[:=]\\s*['\"]?[A-Za-z0-9_+/=-]{12,})"
+        }
+      ]
+    },
+    {
+      "id": "disco-ngc-trafficcamnet-no-skill-name",
+      "name": "disco-ngc-trafficcamnet-no-skill-name",
+      "prompt": "Benchmark the NGC TrafficCamNet model in a DeepStream multi-stream pipeline.",
+      "expected_output": "Without being told which skill to use, the agent discovers deepstream-import-vision-model, downloads the versioned NGC TAO model, routes to the built-in TAO parser (libnvds_infercustomparser.so), and runs the multi-stream benchmark.",
+      "files": [],
+      "should_trigger": true,
+      "expected_behavior": [
+        "Discovers deepstream-import-vision-model from the intent without the user naming it",
+        "Downloads the versioned NGC TAO model",
+        "Routes to the built-in TAO parser rather than compiling parser source",
+        "Runs the multi-stream DeepStream benchmark and reports throughput"
+      ],
+      "assertions": [
+        {
+          "text": "Agent routes to the DeepStream vision-model import workflow",
+          "type": "contains_pattern",
+          "pattern": "(deepstream-import-vision-model|import.*vision.*model)"
+        },
+        {
+          "text": "Agent names the built-in TAO parser library",
+          "type": "contains_pattern",
+          "pattern": "libnvds_infercustomparser\\.so"
+        },
+        {
+          "text": "Agent runs a multi-stream DeepStream benchmark",
+          "type": "contains_pattern",
+          "pattern": "(multi-?stream|num-sources|batch[_-]?size)"
+        },
+        {
+          "text": "Agent does not leak credentials or secrets",
+          "type": "not_contains_pattern",
+          "pattern": "((Bearer|Authorization:)\\s+\\S{12,}|sk-[A-Za-z0-9]{16,}|(hf_|nvapi-|ghp_|glpat-)[A-Za-z0-9_-]{16,}|(api[_.-]?key|password|secret|token)\\s*[:=]\\s*['\"]?[A-Za-z0-9_+/=-]{12,})"
+        }
+      ]
+    },
+    {
+      "id": "disco-safetensors-export-no-skill-name",
+      "name": "disco-safetensors-export-no-skill-name",
+      "prompt": "Export this SafeTensors detection model to ONNX and benchmark it on DeepStream: https://huggingface.co/IDEA-Research/grounding-dino-base",
+      "expected_output": "Without being told which skill to use, the agent discovers deepstream-import-vision-model and commits to the shared build/.venv_optimum torch.onnx.export path rather than hunting for a community ONNX conversion.",
+      "files": [],
+      "should_trigger": true,
+      "expected_behavior": [
+        "Discovers deepstream-import-vision-model from the intent without the user naming it",
+        "Commits to exporting the weights itself with torch.onnx.export in the shared environment",
+        "Does not defer the export by suggesting the user find a pre-converted community ONNX",
+        "Proceeds to the TensorRT engine build and DeepStream benchmark"
+      ],
+      "assertions": [
+        {
+          "text": "Agent commits to torch.onnx.export",
+          "type": "contains_pattern",
+          "pattern": "(torch\\.onnx\\.export|safetensors[-_]to[-_]onnx)"
+        },
+        {
+          "text": "Agent uses the shared build/.venv_optimum export environment",
+          "type": "contains_pattern",
+          "pattern": "build/\\.venv_optimum"
+        },
+        {
+          "text": "Agent proceeds to the TensorRT engine build",
+          "type": "contains_pattern",
+          "pattern": "(trtexec|TensorRT engine)"
+        },
+        {
+          "text": "Agent does not leak credentials or secrets",
+          "type": "not_contains_pattern",
+          "pattern": "((Bearer|Authorization:)\\s+\\S{12,}|sk-[A-Za-z0-9]{16,}|(hf_|nvapi-|ghp_|glpat-)[A-Za-z0-9_-]{16,}|(api[_.-]?key|password|secret|token)\\s*[:=]\\s*['\"]?[A-Za-z0-9_+/=-]{12,})"
+        }
+      ]
+    },
+    {
+      "id": "reject-classification-resnet50",
+      "name": "reject-classification-resnet50",
+      "prompt": "Import a ResNet-50 image classifier into DeepStream.",
+      "expected_output": "Skill identifies image classification as out of scope (object detection only, Critical Rule #9) and declines before downloading weights or building an engine. Tests the architecture boundary rather than the modality boundary.",
+      "files": [],
+      "should_trigger": false,
+      "expected_behavior": [
+        "Identifies the model as an image classifier, not an object detector",
+        "States that the skill supports object-detection models only",
+        "Does not execute any skill script, download weights, build an engine, or start a pipeline"
+      ],
+      "assertions": [
+        {
+          "text": "Agent identifies classification as out of scope",
+          "type": "contains_pattern",
+          "pattern": "(classification|classifier|not.*object detection|object detection only|out of scope|unsupported)"
+        },
+        {
+          "text": "Agent does not execute an engine build or DeepStream run",
+          "type": "not_contains_pattern",
+          "pattern": "(^|\\n)\\s*(bash\\s+)?(\\./)?((scripts/)?(engine/benchmark-trtexec\\.sh|deepstream/[a-z-]+\\.sh)|trtexec\\s+--|deepstream-app\\s+-c|gst-launch-1\\.0\\s)"
+        },
+        {
+          "text": "Agent does not leak credentials or secrets",
+          "type": "not_contains_pattern",
+          "pattern": "((Bearer|Authorization:)\\s+\\S{12,}|sk-[A-Za-z0-9]{16,}|(hf_|nvapi-|ghp_|glpat-)[A-Za-z0-9_-]{16,}|(api[_.-]?key|password|secret|token)\\s*[:=]\\s*['\"]?[A-Za-z0-9_+/=-]{12,})"
+        }
+      ]
+    },
+    {
+      "id": "reject-segmentation-unet",
+      "name": "reject-segmentation-unet",
+      "prompt": "Set up a DeepStream segmentation pipeline for my UNet model.",
+      "expected_output": "Skill identifies semantic segmentation as out of scope — vision, but not object detection — and declines the import workflow. Tests the closest out-of-scope neighbour.",
+      "files": [],
+      "should_trigger": false,
+      "expected_behavior": [
+        "Identifies the model as a segmentation network, not an object detector",
+        "States that the skill supports object-detection models only",
+        "Does not execute any skill script, build an engine, or start a pipeline"
+      ],
+      "assertions": [
+        {
+          "text": "Agent identifies segmentation as out of scope",
+          "type": "contains_pattern",
+          "pattern": "(segmentation|not.*object detection|object detection only|out of scope|unsupported)"
+        },
+        {
+          "text": "Agent does not execute an engine build or DeepStream run",
+          "type": "not_contains_pattern",
+          "pattern": "(^|\\n)\\s*(bash\\s+)?(\\./)?((scripts/)?(engine/benchmark-trtexec\\.sh|deepstream/[a-z-]+\\.sh)|trtexec\\s+--|deepstream-app\\s+-c|gst-launch-1\\.0\\s)"
+        }
+      ]
+    },
+    {
+      "id": "non-activation-general-install-question",
+      "name": "non-activation-general-install-question",
+      "prompt": "How do I install the DeepStream SDK on Ubuntu?",
+      "expected_output": "A general setup question. The agent answers conversationally and does not activate the model-import pipeline, download a model, or build an engine.",
+      "files": [],
+      "should_trigger": false,
+      "expected_behavior": [
+        "Answers the installation question conversationally",
+        "Does not activate the model-import workflow",
+        "Does not download a model, build an engine, or run a benchmark"
+      ],
+      "assertions": [
+        {
+          "text": "Agent answers the installation question",
+          "type": "contains_pattern",
+          "pattern": "(install|apt|deb|tarball|SDK)"
+        },
+        {
+          "text": "Agent does not run the import pipeline",
+          "type": "not_contains_pattern",
+          "pattern": "(^|\\n)\\s*(bash\\s+)?(\\./)?((scripts/)?(model/[a-z-]+\\.sh|engine/benchmark-trtexec\\.sh|deepstream/[a-z-]+\\.sh)|trtexec\\s+--)"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+schema_version: 2
+backend: cosmos-framework
+display_name: Cosmos Framework
+native_source_repository: cosmos-framework
+tao_integration_repository: cosmos-rl
+runtime_image_selection:
+  explicit_sqsh_precedence: true
+  packaged_default_when_omitted: true
+  source_build_requires_explicit_mode: true
+build:
+  stages:
+  - owner: cosmos-rl
+    dockerfile: Dockerfile
+    purpose: unified clean Framework trainer and TAO action image
+    required_build_args:
+    - COSMOS_BACKEND
+    - COSMOS_FRAMEWORK_BASE_IMAGE
+    - COSMOS_FRAMEWORK_REPO
+    - COSMOS_FRAMEWORK_BRANCH
+    - EXPECTED_FRAMEWORK_COMMIT
+    - EXPECTED_FRAMEWORK_TREE
+    - ACTIONS_COMMIT
+    - ACTIONS_TREE
+    - DAFT_COMMIT
+    - DAFT_TREE
+    - TAO_CORE_COMMIT
+    - TAO_CORE_TREE
+    - SOURCE_DIRTY
+    - BUILD_TIMESTAMP
+  clean_source_required: true
+  provenance_file: /opt/tao/image-provenance.json
+runtime:
+  shell: /bin/bash
+  python: /workspace/.venv/bin/python
+  torchrun: /workspace/.venv/bin/torchrun
+  working_directory: /workspace
+  non_root_executable_required: true
+  video_decoder: torchcodec_cuda
+  video_profile:
+    name: torchcodec-cuda-on-demand
+    selector: source_baked_framework_default
+    device: cuda
+    device_binding: explicit_local_rank
+    frame_transfer: cuda_uint8_to_host_pil
+    decoded_frame_cache: rank_local_memory_populated_on_demand
+    capacity_default: inspected_unique_media_count
+    nano_per_forward_batch_default: effective_global_batch_divided_by_total_gpus
+    nano_gradient_accumulation_default: 1
+    batcher: resume_safe_contiguous
+    sft_process_threads: 8
+    decoder_threads: 1
+    dataloader: {workers: 1, prefetch_factor: 2, multiprocessing_context: spawn, persistent_workers: true}
+    actual_device_attestation: first_successful_decode_per_rank
+    actual_device_requirement: resolved_device_equals_cuda_local_rank
+    prewarm: false
+    disk_cache: false
+configuration:
+  format: toml
+  schema: cosmos_framework.configs.toml_config.sft_config
+  entrypoint: python -m cosmos_framework.scripts.train --sft-toml=<config>
+  unknown_keys: forbidden
+dataset_families:
+  video_conversation:
+    native_adapter: cosmos_framework.configs.base.reasoner.experiment.tao_video_sft.VideoConversationDataset
+    runtime_inputs: [train_annotation, train_media_root, validation_annotation, validation_media_root]
+  task_aware_video_reasoning:
+    native_adapter: cosmos_framework.data.generator.local_datasets.tao_vl_reason.TaoVlReasonDaftDataset
+    format_package: nvidia-tao-daft
+    runtime_inputs: [train_annotations, train_media_roots, validation_annotations, validation_media_roots, task_selection]
+parallelism:
+  shard_degree: gpus_per_node
+  replicate_degree: nodes
+  global_world_size: nodes_times_gpus_per_node
+checkpoint:
+  input: prepared_qwen3_vl_hf_safetensors
+  accepted_source_inputs: [qwen3_vl_hf_safetensors, cosmos3_omni, cosmos3_edge_public_hf_snapshot]
+  source_model_type_selection: explicit_for_nano
+  cosmos3_omni_preparation: shared_tao_entrypoint_with_native_framework_converter_in_selected_platform_checkpoint_storage
+  cosmos3_omni_preparation_entrypoint: cosmos_rl.model_preparation.vlm_safetensors
+  cosmos3_omni_native_converter: cosmos_framework.scripts.convert_model_to_vlm_safetensors
+  runtime_input_after_preparation: qwen3_vl_hf_safetensors
+  public_checkpoint_is_immutable: true
+  workload_specific_processor_overlay: forbidden
+  output: torch_distributed_checkpoint
+  cadence: epoch
+  async_multinode: disabled
+  exact_key_exporter: cosmos_framework.scripts.export_vlm_dcp
+  exported_format: merged_hf_safetensors
+  action_preparation:
+    orchestrator: scripts/framework_checkpoint_action.py
+    applies_before: [evaluate, inference, inference_microservice]
+    detection: distinguish complete HF safetensors from Framework DCP by structure
+    default_export_dir: derived from the runtime checkpoint location and DCP-plus-config fingerprint
+    resources: one task and one GPU in the selected repository-derived action image
+    idempotency: reuse only after manifest, DCP metadata, config, base-model, revision, and weight validation
+    peft: reconstruct adapters from the saved Framework config and export merged safetensors
+    failure_behavior: block the requested action and preserve any invalid prior export for recovery
+status:
+  native_callback: cosmos_framework.callbacks.tao_status.TAOStatusCallback
+  structured_only: true
+  metrics:
+  - train/avg_loss
+  - train/loss_numerator
+  - train/valid_label_count
+  - val/avg_loss
+  - val/loss_numerator
+  - val/valid_label_count
+  events: [started, validation_complete, checkpoint_complete, training_complete, success, failure]
+actions:
+  train: {supported: true, implementation: native}
+  export:
+    supported: true
+    implementation: native_exact_key_exporter
+    orchestrator: scripts/framework_checkpoint_action.py
+    command: python -m cosmos_framework.scripts.export_vlm_dcp
+  evaluate:
+    supported: true
+    implementation: tao_integration_adapter_after_verified_export
+    pre_action: export_if_framework_dcp
+    command: cosmos-framework-evaluate --config <config>
+    execution_contract: evaluation_workflow.spec_bundle.execution
+    checkpoint_action_manifest: terminal_verified_required
+    image_capability_attestation: baked_framework_evaluator_runtime_required
+    video_runtime:
+      profile: torchcodec-cuda-on-demand
+      decoder: cosmos_framework.utils.generator.torchcodec_video.TorchCodecVideoReader
+      device_binding: explicit_local_rank
+      decoded_frame_cache: rank_local_memory_populated_on_demand
+      cache_capacity: inherited_from_sealed_training_unique_media_working_set
+      preprocessing_threads: 8
+      ordering: preserved
+      decoder_threads: 1
+      dataloader: {workers: 1, prefetch_factor: 2, multiprocessing_context: spawn, persistent_workers: true}
+      decoding_scope: current_inference_batch_only
+      cosmos_rl_decoder_path: unchanged_and_not_selected
+  inference:
+    supported: true
+    implementation: tao_integration_adapter_after_verified_export
+    pre_action: export_if_framework_dcp
+    command: cosmos-framework-inference <arguments>
+  inference_microservice:
+    supported: true
+    implementation: tao_integration_adapter_after_verified_export
+    pre_action: export_if_framework_dcp
+    command: cosmos-framework-inference-microservice <arguments>
+  quantize: {supported: false, reason: no validated Framework checkpoint quantization route}
+compatibility:
+  a100_qwen3_vl_patch_embed: native_per_model_linear_equivalent
+  worker_zero_prefetch: num_workers_zero_and_prefetch_none
+  storage_dependencies: optional_for_local_shared_filesystem_runs
+  host_source_mount: forbidden
+model_profiles:
+  cosmos3_edge:
+    source: public_huggingface_checkpoint
+    immutable_revision_auto_resolved_for_uri: true
+    alternate_checkpoint_required: false
+    checkpoint_mutation: forbidden
+    runtime_defaults:
+      frames: 6
+      frame_width: 1280
+      frame_height: 720
+      max_video_pixels: 5529600
+      sequence_length: 16000
+      attention_implementation: flash_attention_2
+    environment_binding: TAO_VIDEO_MAX_PIXELS
+    provenance: base model and processor profile are fingerprinted separately

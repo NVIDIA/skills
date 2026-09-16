@@ -1,0 +1,1852 @@
+{
+  "automl_default_parameters": [
+    "dataset.workers",
+    "dataset.batch_size"
+  ],
+  "automl_disabled_parameters": [
+    "dataset.train_dataset",
+    "wandb.tags",
+    "inference",
+    "train.cudnn",
+    "train.gpu_ids",
+    "train.schedulers",
+    "model",
+    "model.head",
+    "model.backbone",
+    "dataset",
+    "train.checkpointer",
+    "train.optim",
+    "model.gram",
+    "gen_trt_engine",
+    "model.preservation",
+    "train.schedulers.weight_decay",
+    "model.lora.target_modules",
+    "train.schedulers.last_layer_learning_rate",
+    "dataset.transform.global_crops_scale",
+    "train.schedulers.learning_rate",
+    "wandb",
+    "model.distill",
+    "train",
+    "train.schedulers.teacher_temperature",
+    "inference.gpu_ids",
+    "dataset.transform",
+    "train.schedulers.momentum",
+    "gen_trt_engine.tensorrt.layers_precision",
+    "dataset.transform.local_crops_scale",
+    "gen_trt_engine.tensorrt",
+    "convert",
+    "dataset.test_dataset",
+    "model.lora",
+    "export"
+  ],
+  "default": {
+    "convert": {
+      "checkpoint": "",
+      "output_path": "",
+      "results_dir": "",
+      "source": "teacher",
+      "validate": true
+    },
+    "dataset": {
+      "batch_size": 4,
+      "pin_memory": true,
+      "test_dataset": {
+        "images_dir": ""
+      },
+      "train_dataset": {
+        "images_dir": ""
+      },
+      "transform": {
+        "global_crops_scale": [
+          0.32,
+          1.0
+        ],
+        "global_crops_size": 256,
+        "local_crops_scale": [
+          0.05,
+          0.32
+        ],
+        "local_crops_size": 112,
+        "n_global_crops": 2,
+        "n_local_crops": 8
+      },
+      "workers": 8
+    },
+    "encryption_key": "",
+    "model": {
+      "backbone": {
+        "drop_path_rate": 0.4,
+        "img_size": 256,
+        "num_register_tokens": 4,
+        "patch_size": 16,
+        "rope_theta": 100.0,
+        "student_type": "vit_b",
+        "teacher_type": "vit_b"
+      },
+      "centering_method": "sinkhorn",
+      "distill": {
+        "disable_masking": false,
+        "enable": false,
+        "pretrained_non_distill_pl_model_path": ""
+      },
+      "gram": {
+        "enable": false,
+        "refresh_interval": 0,
+        "start_step": 0,
+        "teacher_scale": 1.0,
+        "teacher_source": "pretrained",
+        "w_gram": 0.0
+      },
+      "head": {
+        "bottleneck_dim": 384,
+        "hidden_dim": 2048,
+        "num_layers": 3
+      },
+      "lora": {
+        "alpha": 16.0,
+        "dropout": 0.05,
+        "enable": false,
+        "num_last_blocks": 0,
+        "rank": 8,
+        "target_modules": [
+          "qkv",
+          "proj"
+        ]
+      },
+      "preservation": {
+        "cls_cosine_weight": 0.05,
+        "cls_mse_weight": 0.05,
+        "enable": false
+      }
+    },
+    "model_name": "",
+    "results_dir": "",
+    "train": {
+      "checkpoint_interval": 1,
+      "checkpoint_interval_unit": "epoch",
+      "checkpointer": {
+        "auto_insert_metric_name": false,
+        "enable_topk": false,
+        "filename": "model_best_{epoch:03d}",
+        "replace_periodic": false,
+        "save_top_k": 1
+      },
+      "clip_grad_norm": 3.0,
+      "cudnn": {
+        "benchmark": true,
+        "deterministic": false
+      },
+      "distributed_strategy": "auto",
+      "gpu_ids": [
+        0
+      ],
+      "layerwise_decay": 1.0,
+      "log_every_n_steps": 1,
+      "num_epochs": 10,
+      "num_gpus": 1,
+      "num_nodes": 1,
+      "num_prototypes": 131072,
+      "optim": {
+        "optim": "adamw"
+      },
+      "precision": "16-mixed",
+      "results_dir": "",
+      "resume_training_checkpoint_path": "",
+      "schedulers": {
+        "last_layer_learning_rate": {
+          "freeze_steps": 1250,
+          "max_decay_steps": 2500000,
+          "val_base": 7.07e-06,
+          "val_final": 1e-06,
+          "val_start": 0.0,
+          "warm_up_steps": 100000
+        },
+        "learning_rate": {
+          "max_decay_steps": 2500000,
+          "val_base": 7.07e-06,
+          "val_final": 1e-06,
+          "val_start": 0.0,
+          "warm_up_steps": 100000
+        },
+        "momentum": {
+          "max_decay_steps": 2500000,
+          "val_base": 0.994,
+          "val_final": 1.0,
+          "val_start": 0.0,
+          "warm_up_steps": 0
+        },
+        "teacher_temperature": {
+          "max_decay_steps": 37500,
+          "val_base": 0.07,
+          "val_final": 0.07,
+          "val_start": 0.04,
+          "warm_up_steps": 37500
+        },
+        "weight_decay": {
+          "max_decay_steps": 2500000,
+          "val_base": 0.04,
+          "val_final": 0.2,
+          "val_start": 0.0,
+          "warm_up_steps": 0
+        }
+      },
+      "seed": 1234,
+      "use_custom_attention": true,
+      "validation_interval": 1
+    },
+    "wandb": {
+      "enable": true,
+      "entity": "",
+      "group": "",
+      "name": "TAO Toolkit Training",
+      "project": "TAO Toolkit",
+      "reinit": false,
+      "run_id": "",
+      "save_code": false,
+      "sync_tensorboard": false,
+      "tags": [
+        "tao-toolkit"
+      ]
+    }
+  },
+  "popular": {
+    "convert": {
+      "checkpoint": "",
+      "output_path": "",
+      "source": "teacher"
+    },
+    "dataset": {
+      "batch_size": 4,
+      "pin_memory": true,
+      "transform": {
+        "global_crops_scale": [
+          0.32,
+          1.0
+        ],
+        "global_crops_size": 256,
+        "local_crops_scale": [
+          0.05,
+          0.32
+        ],
+        "local_crops_size": 112,
+        "n_global_crops": 2,
+        "n_local_crops": 8
+      },
+      "workers": 8
+    },
+    "gen_trt_engine": {
+      "batch_size": -1,
+      "gpu_id": 0,
+      "tensorrt": {
+        "max_batch_size": 1,
+        "min_batch_size": 1,
+        "opt_batch_size": 1
+      }
+    },
+    "inference": {
+      "gpu_ids": [
+        0
+      ],
+      "num_gpus": 1,
+      "num_nodes": 1
+    },
+    "model": {
+      "backbone": {
+        "drop_path_rate": 0.4,
+        "img_size": 256,
+        "num_register_tokens": 4,
+        "patch_size": 16,
+        "rope_theta": 100.0
+      },
+      "centering_method": "sinkhorn",
+      "distill": {
+        "disable_masking": false,
+        "enable": false
+      },
+      "gram": {
+        "enable": false,
+        "start_step": 0,
+        "w_gram": 0.0
+      },
+      "head": {
+        "bottleneck_dim": 384,
+        "hidden_dim": 2048,
+        "num_layers": 3
+      },
+      "lora": {
+        "alpha": 16.0,
+        "enable": false,
+        "num_last_blocks": 0,
+        "rank": 8,
+        "target_modules": [
+          "qkv",
+          "proj"
+        ]
+      },
+      "preservation": {
+        "cls_cosine_weight": 0.05,
+        "cls_mse_weight": 0.05,
+        "enable": false
+      }
+    },
+    "train": {
+      "checkpoint_interval": 1,
+      "clip_grad_norm": 3.0,
+      "distributed_strategy": "auto",
+      "gpu_ids": [
+        0
+      ],
+      "layerwise_decay": 1.0,
+      "num_epochs": 10,
+      "num_gpus": 1,
+      "num_nodes": 1,
+      "num_prototypes": 131072,
+      "optim": {
+        "optim": "adamw"
+      },
+      "precision": "16-mixed",
+      "schedulers": {
+        "last_layer_learning_rate": {
+          "freeze_steps": 1250,
+          "max_decay_steps": 2500000,
+          "val_base": 7.07e-06,
+          "val_final": 1e-06,
+          "val_start": 0.0,
+          "warm_up_steps": 100000
+        },
+        "learning_rate": {
+          "max_decay_steps": 2500000,
+          "val_base": 7.07e-06,
+          "val_final": 1e-06,
+          "val_start": 0.0,
+          "warm_up_steps": 100000
+        },
+        "momentum": {
+          "max_decay_steps": 2500000,
+          "val_base": 0.994,
+          "val_final": 1.0,
+          "val_start": 0.0,
+          "warm_up_steps": 0
+        },
+        "teacher_temperature": {
+          "max_decay_steps": 37500,
+          "val_base": 0.07,
+          "val_final": 0.07,
+          "val_start": 0.04,
+          "warm_up_steps": 37500
+        },
+        "weight_decay": {
+          "max_decay_steps": 2500000,
+          "val_base": 0.04,
+          "val_final": 0.2,
+          "val_start": 0.0,
+          "warm_up_steps": 0
+        }
+      },
+      "use_custom_attention": true,
+      "validation_interval": 1
+    }
+  },
+  "properties": {
+    "automl_disabled_parameters": [
+      "wandb",
+      "model",
+      "dataset",
+      "train",
+      "inference",
+      "export",
+      "gen_trt_engine",
+      "convert"
+    ],
+    "convert": {
+      "automl_enabled": false,
+      "default": {
+        "checkpoint": "",
+        "output_path": "",
+        "results_dir": "",
+        "source": "teacher",
+        "validate": true
+      },
+      "description": "Configurable parameters to convert an SSL backbone to the backbone_v2 (timm) layout.",
+      "popular": [
+        "output_path",
+        "source",
+        "checkpoint"
+      ],
+      "properties": {
+        "checkpoint": {
+          "default": "",
+          "description": "SSL DINOv3 checkpoint to convert: a stripped backbone file (student_*.pth / teacher_*.pth) or a full Lightning .pth/.ckpt.",
+          "popular": true,
+          "title": "checkpoint",
+          "type": "string"
+        },
+        "output_path": {
+          "default": "",
+          "description": "Output path for the timm-format backbone (.safetensors or .pth). Defaults to <results_dir>/dinov3_<arch>_backbone.safetensors.",
+          "popular": true,
+          "title": "output path",
+          "type": "string"
+        },
+        "results_dir": {
+          "default": "",
+          "description": "Directory for convert results/logs",
+          "title": "results dir",
+          "type": "string"
+        },
+        "source": {
+          "default": "teacher",
+          "description": "Which SSL sub-model's backbone to export (EMA teacher recommended).",
+          "enum": [
+            "student",
+            "teacher",
+            "student_ema"
+          ],
+          "popular": true,
+          "title": "source",
+          "type": "categorical"
+        },
+        "validate": {
+          "default": true,
+          "description": "Validate the converted state dict against a fresh timm DINOv3 model.",
+          "title": "validate",
+          "type": "bool"
+        }
+      },
+      "type": "collection"
+    },
+    "dataset": {
+      "automl_default_parameters": [
+        "dataset.batch_size",
+        "dataset.workers"
+      ],
+      "automl_disabled_parameters": [
+        "dataset.train_dataset",
+        "dataset.test_dataset",
+        "dataset.transform"
+      ],
+      "automl_enabled": false,
+      "default": {
+        "batch_size": 4,
+        "pin_memory": true,
+        "test_dataset": {
+          "images_dir": ""
+        },
+        "train_dataset": {
+          "images_dir": ""
+        },
+        "transform": {
+          "global_crops_scale": [
+            0.32,
+            1.0
+          ],
+          "global_crops_size": 256,
+          "local_crops_scale": [
+            0.05,
+            0.32
+          ],
+          "local_crops_size": 112,
+          "n_global_crops": 2,
+          "n_local_crops": 8
+        },
+        "workers": 8
+      },
+      "description": "Configurable parameters to construct the dataset for a DINOv3 experiment.",
+      "popular": [
+        "transform",
+        "workers",
+        "batch_size",
+        "pin_memory"
+      ],
+      "properties": {
+        "batch_size": {
+          "automl_enabled": true,
+          "default": 4,
+          "description": "The batch size for training",
+          "maximum": Infinity,
+          "minimum": 1,
+          "popular": true,
+          "title": "batch size",
+          "type": "int"
+        },
+        "pin_memory": {
+          "default": true,
+          "description": "Flag to enable the dataloader to allocated pagelocked memory for faster of data between the CPU and GPU.",
+          "popular": true,
+          "title": "pin_memory",
+          "type": "bool"
+        },
+        "test_dataset": {
+          "automl_enabled": false,
+          "default": {
+            "images_dir": ""
+          },
+          "description": "Configuration for the testing dataset path",
+          "properties": {
+            "images_dir": {
+              "default": "",
+              "description": "Path to the extracted images directory for the dataset (not an archive such as .tar.gz)",
+              "title": "image directory",
+              "type": "string"
+            }
+          },
+          "title": "Testing Dataset",
+          "type": "collection"
+        },
+        "train_dataset": {
+          "automl_enabled": false,
+          "default": {
+            "images_dir": ""
+          },
+          "description": "Configuration for the training dataset path",
+          "properties": {
+            "images_dir": {
+              "default": "",
+              "description": "Path to the extracted images directory for the dataset (not an archive such as .tar.gz)",
+              "title": "image directory",
+              "type": "string"
+            }
+          },
+          "title": "Training Dataset",
+          "type": "collection"
+        },
+        "transform": {
+          "automl_disabled_parameters": [
+            "dataset.transform.global_crops_scale",
+            "dataset.transform.local_crops_scale"
+          ],
+          "automl_enabled": false,
+          "default": {
+            "global_crops_scale": [
+              0.32,
+              1.0
+            ],
+            "global_crops_size": 256,
+            "local_crops_scale": [
+              0.05,
+              0.32
+            ],
+            "local_crops_size": 112,
+            "n_global_crops": 2,
+            "n_local_crops": 8
+          },
+          "description": "Configuration parameters for data transformation",
+          "popular": [
+            "n_global_crops",
+            "global_crops_size",
+            "local_crops_scale",
+            "global_crops_scale",
+            "local_crops_size",
+            "n_local_crops"
+          ],
+          "properties": {
+            "global_crops_scale": {
+              "automl_enabled": false,
+              "default": [
+                0.32,
+                1.0
+              ],
+              "description": "Scale range for global crops",
+              "popular": true,
+              "title": "Global Crops Scale",
+              "type": "list"
+            },
+            "global_crops_size": {
+              "default": 256,
+              "description": "Size of global crops for DINOv3 training.",
+              "maximum": Infinity,
+              "minimum": 1,
+              "popular": true,
+              "title": "Global Crops Size",
+              "type": "int"
+            },
+            "local_crops_scale": {
+              "automl_enabled": false,
+              "default": [
+                0.05,
+                0.32
+              ],
+              "description": "Scale range for local crops",
+              "popular": true,
+              "title": "Local Crops Scale",
+              "type": "list"
+            },
+            "local_crops_size": {
+              "default": 112,
+              "description": "Size of local crops (multiple of patch 16)",
+              "maximum": Infinity,
+              "minimum": 1,
+              "popular": true,
+              "title": "Local Crops Size",
+              "type": "int"
+            },
+            "n_global_crops": {
+              "default": 2,
+              "description": "Number of global crops to generate",
+              "maximum": Infinity,
+              "minimum": 1,
+              "popular": true,
+              "title": "Number of Global Crops",
+              "type": "int"
+            },
+            "n_local_crops": {
+              "default": 8,
+              "description": "Number of local crops to generate",
+              "maximum": Infinity,
+              "minimum": 1,
+              "popular": true,
+              "title": "Number of Local Crops",
+              "type": "int"
+            }
+          },
+          "title": "transform",
+          "type": "collection"
+        },
+        "workers": {
+          "automl_enabled": true,
+          "default": 8,
+          "description": "The number of parallel workers processing data",
+          "maximum": Infinity,
+          "minimum": 1,
+          "popular": true,
+          "title": "batch size",
+          "type": "int"
+        }
+      },
+      "type": "collection"
+    },
+    "encryption_key": {
+      "default": "",
+      "description": "Key for encrypting model checkpoints",
+      "title": "Encryption key",
+      "type": "string"
+    },
+    "model": {
+      "automl_disabled_parameters": [
+        "model.distill",
+        "model.backbone",
+        "model.head",
+        "model.gram",
+        "model.lora",
+        "model.preservation"
+      ],
+      "automl_enabled": false,
+      "default": {
+        "backbone": {
+          "drop_path_rate": 0.4,
+          "img_size": 256,
+          "num_register_tokens": 4,
+          "patch_size": 16,
+          "rope_theta": 100.0,
+          "student_type": "vit_b",
+          "teacher_type": "vit_b"
+        },
+        "centering_method": "sinkhorn",
+        "distill": {
+          "disable_masking": false,
+          "enable": false,
+          "pretrained_non_distill_pl_model_path": ""
+        },
+        "gram": {
+          "enable": false,
+          "refresh_interval": 0,
+          "start_step": 0,
+          "teacher_scale": 1.0,
+          "teacher_source": "pretrained",
+          "w_gram": 0.0
+        },
+        "head": {
+          "bottleneck_dim": 384,
+          "hidden_dim": 2048,
+          "num_layers": 3
+        },
+        "lora": {
+          "alpha": 16.0,
+          "dropout": 0.05,
+          "enable": false,
+          "num_last_blocks": 0,
+          "rank": 8,
+          "target_modules": [
+            "qkv",
+            "proj"
+          ]
+        },
+        "preservation": {
+          "cls_cosine_weight": 0.05,
+          "cls_mse_weight": 0.05,
+          "enable": false
+        }
+      },
+      "description": "Configurable parameters to construct the model for a DINOv3 experiment.",
+      "popular": [
+        "backbone",
+        "lora",
+        "distill",
+        "head",
+        "preservation",
+        "centering_method",
+        "gram"
+      ],
+      "properties": {
+        "backbone": {
+          "automl_enabled": false,
+          "default": {
+            "drop_path_rate": 0.4,
+            "img_size": 256,
+            "num_register_tokens": 4,
+            "patch_size": 16,
+            "rope_theta": 100.0,
+            "student_type": "vit_b",
+            "teacher_type": "vit_b"
+          },
+          "description": "Configuration for the DINOv3 backbone",
+          "popular": [
+            "patch_size",
+            "rope_theta",
+            "img_size",
+            "num_register_tokens",
+            "drop_path_rate"
+          ],
+          "properties": {
+            "drop_path_rate": {
+              "default": 0.4,
+              "description": "Drop path rate for stochastic depth regularization",
+              "popular": true,
+              "title": "drop path rate",
+              "type": "float"
+            },
+            "img_size": {
+              "default": 256,
+              "description": "Backbone image size. Supported values are 256, 512, and 768.",
+              "enum": [
+                256,
+                512,
+                768
+              ],
+              "popular": true,
+              "title": "image size",
+              "type": "ordered_int"
+            },
+            "num_register_tokens": {
+              "default": 4,
+              "description": "Number of register tokens (DINOv3 ViT-B uses 4)",
+              "maximum": Infinity,
+              "minimum": 0,
+              "popular": true,
+              "title": "num register tokens",
+              "type": "int"
+            },
+            "patch_size": {
+              "default": 16,
+              "description": "Size of patches (DINOv3 uses patch 16)",
+              "enum": [
+                16
+              ],
+              "popular": true,
+              "title": "patch size",
+              "type": "ordered_int"
+            },
+            "rope_theta": {
+              "default": 100.0,
+              "description": "Frequency base for 2D axial RoPE. Must match the timm DINOv3 reference; verified by the step-4 feature-parity smoke test.",
+              "popular": true,
+              "title": "RoPE theta",
+              "type": "float"
+            },
+            "student_type": {
+              "default": "vit_b",
+              "description": "Student backbone name. TAO's DINOv3 supports vit_s, vit_s_plus, vit_b, vit_l, vit_h_plus and vit_7b.",
+              "enum": [
+                "vit_s",
+                "vit_s_plus",
+                "vit_b",
+                "vit_l",
+                "vit_h_plus",
+                "vit_7b"
+              ],
+              "title": "student backbone",
+              "type": "categorical"
+            },
+            "teacher_type": {
+              "default": "vit_b",
+              "description": "Teacher backbone name. TAO's DINOv3 supports vit_s, vit_s_plus, vit_b, vit_l, vit_h_plus and vit_7b.",
+              "enum": [
+                "vit_s",
+                "vit_s_plus",
+                "vit_b",
+                "vit_l",
+                "vit_h_plus",
+                "vit_7b"
+              ],
+              "title": "teacher backbone",
+              "type": "categorical"
+            }
+          },
+          "type": "collection"
+        },
+        "centering_method": {
+          "default": "sinkhorn",
+          "description": "Teacher-output centering for the DINO/iBOT heads. DINOv3 uses Sinkhorn-Knopp (SwAV); 'softmax' is the DINOv2 fallback. If training shows instability/collapse, try 'softmax'.",
+          "enum": [
+            "sinkhorn",
+            "softmax"
+          ],
+          "popular": true,
+          "title": "centering method",
+          "type": "categorical"
+        },
+        "distill": {
+          "automl_enabled": false,
+          "default": {
+            "disable_masking": false,
+            "enable": false,
+            "pretrained_non_distill_pl_model_path": ""
+          },
+          "description": "Configuration for distillation (reused from nvdinov2)",
+          "popular": [
+            "enable",
+            "disable_masking"
+          ],
+          "properties": {
+            "disable_masking": {
+              "default": false,
+              "description": "Whether to disable masking when distillation",
+              "popular": true,
+              "title": "disable_masking",
+              "type": "bool"
+            },
+            "enable": {
+              "default": false,
+              "description": "Whether to run distillation",
+              "popular": true,
+              "title": "distillation",
+              "type": "bool"
+            },
+            "pretrained_non_distill_pl_model_path": {
+              "default": "",
+              "description": "Path to a pre-trained pl model from non-distillation DINOv2 SSL pipe for initializing teacher in distillation.",
+              "type": "string"
+            }
+          },
+          "type": "collection"
+        },
+        "gram": {
+          "automl_enabled": false,
+          "default": {
+            "enable": false,
+            "refresh_interval": 0,
+            "start_step": 0,
+            "teacher_scale": 1.0,
+            "teacher_source": "pretrained",
+            "w_gram": 0.0
+          },
+          "description": "Configuration for DINOv3 Gram anchoring",
+          "popular": [
+            "start_step",
+            "enable",
+            "w_gram"
+          ],
+          "properties": {
+            "enable": {
+              "default": false,
+              "description": "Whether to add the Gram-anchoring loss term",
+              "popular": true,
+              "title": "enable gram",
+              "type": "bool"
+            },
+            "refresh_interval": {
+              "default": 0,
+              "description": "Steps between refreshing the Gram teacher from the EMA teacher (only when teacher_source='ema'). 0 = never refresh (frozen snapshot, Phase 0 behavior).",
+              "maximum": Infinity,
+              "minimum": 0,
+              "title": "gram refresh interval",
+              "type": "int"
+            },
+            "start_step": {
+              "default": 0,
+              "description": "Global step at which the Gram term activates",
+              "maximum": Infinity,
+              "minimum": 0,
+              "popular": true,
+              "title": "gram start step",
+              "type": "int"
+            },
+            "teacher_scale": {
+              "default": 1.0,
+              "description": "Resolution multiple at which the Gram teacher runs relative to the student. DINOv3 computes Gram on higher-res teacher features; the teacher grid is average-pooled back to the student grid before the loss. 1.0 = same resolution (default, memory-safe). The paper uses 2.0, but at 768 the teacher then runs at 1536 (96x96=9216 tokens) -> heavy; raise to 1.5/2.0 only if memory allows.",
+              "title": "gram teacher scale",
+              "type": "float"
+            },
+            "teacher_source": {
+              "default": "pretrained",
+              "description": "Source of the frozen Gram teacher weights: 'pretrained' anchors to the loaded DINOv3 weights (Phase 0 default); 'ema' uses an early-EMA snapshot of the current run's teacher, refreshed every 'refresh_interval' steps (Phase 1 / high-res).",
+              "enum": [
+                "pretrained",
+                "ema"
+              ],
+              "title": "gram teacher source",
+              "type": "categorical"
+            },
+            "w_gram": {
+              "default": 0.0,
+              "description": "Weight of the Gram-anchoring loss term",
+              "popular": true,
+              "title": "gram weight",
+              "type": "float"
+            }
+          },
+          "type": "collection"
+        },
+        "head": {
+          "automl_enabled": false,
+          "default": {
+            "bottleneck_dim": 384,
+            "hidden_dim": 2048,
+            "num_layers": 3
+          },
+          "description": "Configuration for the DINOv3 head (reused from nvdinov2)",
+          "popular": [
+            "bottleneck_dim",
+            "num_layers",
+            "hidden_dim"
+          ],
+          "properties": {
+            "bottleneck_dim": {
+              "default": 384,
+              "description": "Dimension of the bottleneck layer in the NVDINOv2 head",
+              "maximum": Infinity,
+              "minimum": 1,
+              "popular": true,
+              "title": "bottleneck dimension",
+              "type": "int"
+            },
+            "hidden_dim": {
+              "default": 2048,
+              "description": "Dimension of the hidden layers in the NVDINOv2 head",
+              "maximum": Infinity,
+              "minimum": 1,
+              "popular": true,
+              "title": "hidden dimension",
+              "type": "int"
+            },
+            "num_layers": {
+              "default": 3,
+              "description": "Number of layers in the NVDINOv2 head",
+              "maximum": Infinity,
+              "minimum": 1,
+              "popular": true,
+              "title": "number of Layers",
+              "type": "int"
+            }
+          },
+          "type": "collection"
+        },
+        "lora": {
+          "automl_disabled_parameters": [
+            "model.lora.target_modules"
+          ],
+          "automl_enabled": false,
+          "default": {
+            "alpha": 16.0,
+            "dropout": 0.05,
+            "enable": false,
+            "num_last_blocks": 0,
+            "rank": 8,
+            "target_modules": [
+              "qkv",
+              "proj"
+            ]
+          },
+          "description": "Configuration for LoRA parameter-efficient continual pre-training",
+          "popular": [
+            "rank",
+            "num_last_blocks",
+            "alpha",
+            "target_modules",
+            "enable"
+          ],
+          "properties": {
+            "alpha": {
+              "default": 16.0,
+              "description": "LoRA scaling alpha; the applied scale is alpha / rank.",
+              "popular": true,
+              "title": "lora alpha",
+              "type": "float"
+            },
+            "dropout": {
+              "default": 0.05,
+              "description": "Dropout applied to the LoRA branch input only (the frozen base path is untouched).",
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "title": "lora dropout",
+              "type": "float"
+            },
+            "enable": {
+              "default": false,
+              "description": "Whether to apply LoRA adapters to the backbone (parameter-efficient SSL)",
+              "popular": true,
+              "title": "enable lora",
+              "type": "bool"
+            },
+            "num_last_blocks": {
+              "default": 0,
+              "description": "Adapt only the last N transformer blocks. 0 = all blocks.",
+              "maximum": Infinity,
+              "minimum": 0,
+              "popular": true,
+              "title": "lora num last blocks",
+              "type": "int"
+            },
+            "rank": {
+              "default": 8,
+              "description": "LoRA rank (r). The low-rank update is dW = (alpha/r) * B @ A.",
+              "maximum": Infinity,
+              "minimum": 1,
+              "popular": true,
+              "title": "lora rank",
+              "type": "int"
+            },
+            "target_modules": {
+              "automl_enabled": false,
+              "default": [
+                "qkv",
+                "proj"
+              ],
+              "description": "Projections to adapt inside each targeted ViT block. 'qkv' and 'proj' are the attention projections (the v1 default); 'fc1'/'fc2' additionally adapt the FFN. SwiGLU backbones (ViT-S+/H+/7B) expose a fused fc1 and are deferred in v1.",
+              "popular": true,
+              "title": "lora target modules",
+              "type": "list"
+            }
+          },
+          "type": "collection"
+        },
+        "preservation": {
+          "automl_enabled": false,
+          "default": {
+            "cls_cosine_weight": 0.05,
+            "cls_mse_weight": 0.05,
+            "enable": false
+          },
+          "description": "Configuration for CLS-token preservation against the frozen anchor teacher",
+          "popular": [
+            "cls_mse_weight",
+            "cls_cosine_weight",
+            "enable"
+          ],
+          "properties": {
+            "cls_cosine_weight": {
+              "default": 0.05,
+              "description": "Weight of the CLS-token cosine preservation term (0 disables just this term).",
+              "maximum": Infinity,
+              "minimum": 0.0,
+              "popular": true,
+              "title": "cls cosine weight",
+              "type": "float"
+            },
+            "cls_mse_weight": {
+              "default": 0.05,
+              "description": "Weight of the CLS-token MSE preservation term (0 disables just this term).",
+              "maximum": Infinity,
+              "minimum": 0.0,
+              "popular": true,
+              "title": "cls mse weight",
+              "type": "float"
+            },
+            "enable": {
+              "default": false,
+              "description": "Whether to add CLS-token preservation losses against the frozen anchor teacher. Recommended alongside LoRA for continual pre-training.",
+              "popular": true,
+              "title": "enable preservation",
+              "type": "bool"
+            }
+          },
+          "type": "collection"
+        }
+      },
+      "type": "collection"
+    },
+    "model_name": {
+      "default": "",
+      "description": "Name of model if invoking task via :code:`model_agnostic`",
+      "title": "Model name",
+      "type": "string"
+    },
+    "results_dir": {
+      "default": "",
+      "description": "\n        Path to where all the assets generated from a task are stored.\n        ",
+      "title": "Results directory",
+      "type": "string"
+    },
+    "train": {
+      "automl_disabled_parameters": [
+        "train.gpu_ids",
+        "train.cudnn",
+        "train.checkpointer",
+        "train.schedulers",
+        "train.optim"
+      ],
+      "automl_enabled": false,
+      "default": {
+        "checkpoint_interval": 1,
+        "checkpoint_interval_unit": "epoch",
+        "checkpointer": {
+          "auto_insert_metric_name": false,
+          "enable_topk": false,
+          "filename": "model_best_{epoch:03d}",
+          "replace_periodic": false,
+          "save_top_k": 1
+        },
+        "clip_grad_norm": 3.0,
+        "cudnn": {
+          "benchmark": true,
+          "deterministic": false
+        },
+        "distributed_strategy": "auto",
+        "gpu_ids": [
+          0
+        ],
+        "layerwise_decay": 1.0,
+        "log_every_n_steps": 1,
+        "num_epochs": 10,
+        "num_gpus": 1,
+        "num_nodes": 1,
+        "num_prototypes": 131072,
+        "optim": {
+          "optim": "adamw"
+        },
+        "precision": "16-mixed",
+        "results_dir": "",
+        "resume_training_checkpoint_path": "",
+        "schedulers": {
+          "last_layer_learning_rate": {
+            "freeze_steps": 1250,
+            "max_decay_steps": 2500000,
+            "val_base": 7.07e-06,
+            "val_final": 1e-06,
+            "val_start": 0.0,
+            "warm_up_steps": 100000
+          },
+          "learning_rate": {
+            "max_decay_steps": 2500000,
+            "val_base": 7.07e-06,
+            "val_final": 1e-06,
+            "val_start": 0.0,
+            "warm_up_steps": 100000
+          },
+          "momentum": {
+            "max_decay_steps": 2500000,
+            "val_base": 0.994,
+            "val_final": 1.0,
+            "val_start": 0.0,
+            "warm_up_steps": 0
+          },
+          "teacher_temperature": {
+            "max_decay_steps": 37500,
+            "val_base": 0.07,
+            "val_final": 0.07,
+            "val_start": 0.04,
+            "warm_up_steps": 37500
+          },
+          "weight_decay": {
+            "max_decay_steps": 2500000,
+            "val_base": 0.04,
+            "val_final": 0.2,
+            "val_start": 0.0,
+            "warm_up_steps": 0
+          }
+        },
+        "seed": 1234,
+        "use_custom_attention": true,
+        "validation_interval": 1
+      },
+      "description": "Configurable parameters to construct the trainer for a DINOv3 experiment.",
+      "popular": [
+        "layerwise_decay",
+        "checkpoint_interval",
+        "optim",
+        "gpu_ids",
+        "validation_interval",
+        "num_gpus",
+        "precision",
+        "num_prototypes",
+        "schedulers",
+        "distributed_strategy",
+        "num_nodes",
+        "clip_grad_norm",
+        "num_epochs",
+        "use_custom_attention"
+      ],
+      "properties": {
+        "checkpoint_interval": {
+          "default": 1,
+          "description": "The interval (in epochs) at which a checkpoint will be saved. Helps resume training.",
+          "minimum": 1,
+          "popular": true,
+          "title": "Checkpoint interval",
+          "type": "int"
+        },
+        "checkpoint_interval_unit": {
+          "default": "epoch",
+          "description": "The unit of the checkpoint interval.",
+          "enum": [
+            "epoch",
+            "step"
+          ],
+          "title": "Checkpoint interval unit",
+          "type": "categorical"
+        },
+        "checkpointer": {
+          "automl_enabled": false,
+          "default": {
+            "auto_insert_metric_name": false,
+            "enable_topk": false,
+            "filename": "model_best_{epoch:03d}",
+            "replace_periodic": false,
+            "save_top_k": 1
+          },
+          "properties": {
+            "auto_insert_metric_name": {
+              "default": false,
+              "type": "bool"
+            },
+            "dirpath": {
+              "description": "Directory for best checkpoints. Defaults to results_dir.",
+              "type": "string"
+            },
+            "enable_topk": {
+              "default": false,
+              "description": "Save checkpoint(s) ranked by a monitored metric. This is additive to periodic checkpoints unless replace_periodic is enabled.",
+              "title": "Enable best-checkpoint saving",
+              "type": "bool"
+            },
+            "filename": {
+              "default": "model_best_{epoch:03d}",
+              "title": "Best-checkpoint filename pattern",
+              "type": "string"
+            },
+            "mode": {
+              "description": "Leave unset to use the network's default direction.",
+              "enum": [
+                "min",
+                "max"
+              ],
+              "title": "Monitor mode",
+              "type": "categorical"
+            },
+            "monitor": {
+              "description": "Leave unset to use the network's default metric.",
+              "title": "Monitored metric",
+              "type": "string"
+            },
+            "replace_periodic": {
+              "default": false,
+              "description": "When best-checkpoint saving is enabled, replace periodic history with one metric-best checkpoint and its latest symlink.",
+              "title": "Replace periodic checkpoints",
+              "type": "bool"
+            },
+            "save_top_k": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Number of best checkpoints",
+              "type": "int"
+            }
+          },
+          "type": "collection"
+        },
+        "clip_grad_norm": {
+          "default": 3.0,
+          "description": "Value to clip gradients norm",
+          "popular": true,
+          "title": "clip gradient norm",
+          "type": "float"
+        },
+        "cudnn": {
+          "automl_enabled": false,
+          "default": {
+            "benchmark": true,
+            "deterministic": false
+          },
+          "description": "CuDNN settings compatible with DINOv3 custom attention.",
+          "properties": {
+            "benchmark": {
+              "default": true,
+              "description": "Enable CuDNN benchmarking for DINOv3 training.",
+              "title": "CuDNN benchmark",
+              "type": "bool"
+            },
+            "deterministic": {
+              "default": false,
+              "description": "Enable deterministic CuDNN behavior. Keep disabled when using DINOv3 custom attention, which has no deterministic backward implementation.",
+              "title": "CuDNN deterministic",
+              "type": "bool"
+            }
+          },
+          "type": "collection"
+        },
+        "distributed_strategy": {
+          "default": "auto",
+          "description": "Lightning distributed strategy. 'auto' keeps the nvdinov2 behaviour (single-device or DDP). 'fsdp' shards params/grads/optimizer (FULL_SHARD) for high-resolution and large-backbone multi-GPU training.",
+          "enum": [
+            "auto",
+            "ddp",
+            "fsdp"
+          ],
+          "popular": true,
+          "title": "distributed strategy",
+          "type": "categorical"
+        },
+        "gpu_ids": {
+          "automl_enabled": false,
+          "default": [
+            0
+          ],
+          "description": "\n        List of GPU IDs to run the training on. The length of this list\n        must be equal to the number of gpus in train.num_gpus.",
+          "popular": true,
+          "title": "GPU IDs",
+          "type": "list"
+        },
+        "layerwise_decay": {
+          "default": 1.0,
+          "description": "Layerwise decay factor",
+          "popular": true,
+          "title": "layerwise decay factor",
+          "type": "float"
+        },
+        "log_every_n_steps": {
+          "default": 1,
+          "description": "Number of training steps between logger updates.",
+          "minimum": 1,
+          "title": "logging interval",
+          "type": "int"
+        },
+        "num_epochs": {
+          "default": 10,
+          "description": "Number of epochs to run the training.",
+          "maximum": Infinity,
+          "minimum": 1,
+          "popular": true,
+          "title": "Number of epochs",
+          "type": "int"
+        },
+        "num_gpus": {
+          "default": 1,
+          "description": "The number of GPUs to run the train job.",
+          "minimum": 1,
+          "popular": true,
+          "title": "Number of GPUs",
+          "type": "int"
+        },
+        "num_nodes": {
+          "default": 1,
+          "description": "Number of nodes to run the training on. If > 1, then multi-node is enabled.",
+          "minimum": 1,
+          "popular": true,
+          "title": "Number of nodes",
+          "type": "int"
+        },
+        "num_prototypes": {
+          "default": 131072,
+          "description": "Number of prototypes",
+          "popular": true,
+          "title": "number of prototypes",
+          "type": "int"
+        },
+        "optim": {
+          "automl_enabled": false,
+          "default": {
+            "optim": "adamw"
+          },
+          "description": "Optimizer configuration for NVDINOv2",
+          "popular": [
+            "optim"
+          ],
+          "properties": {
+            "optim": {
+              "default": "adamw",
+              "description": "Optimizer type",
+              "enum": [
+                "adamw",
+                ""
+              ],
+              "popular": true,
+              "title": "optimizer",
+              "type": "categorical"
+            }
+          },
+          "type": "collection"
+        },
+        "precision": {
+          "default": "16-mixed",
+          "description": "Precision",
+          "popular": true,
+          "title": "precision",
+          "type": "string"
+        },
+        "pretrained_model_path": {
+          "description": "Path to DINOv3 pretrained weights matching the configured backbone. Accepts a timm-format directory or file, or a stripped TAO DINOv3 backbone checkpoint. DINOv2/NVDINOv2 checkpoints are not supported.",
+          "type": "string"
+        },
+        "results_dir": {
+          "default": "",
+          "description": "\n        Path to where all the assets generated from a task are stored.\n        ",
+          "title": "Results directory",
+          "type": "string"
+        },
+        "resume_training_checkpoint_path": {
+          "default": "",
+          "description": "Path to the checkpoint to resume training from.",
+          "title": "Resume checkpoint path",
+          "type": "string"
+        },
+        "schedulers": {
+          "automl_disabled_parameters": [
+            "train.schedulers.learning_rate",
+            "train.schedulers.last_layer_learning_rate",
+            "train.schedulers.weight_decay",
+            "train.schedulers.momentum",
+            "train.schedulers.teacher_temperature"
+          ],
+          "automl_enabled": false,
+          "default": {
+            "last_layer_learning_rate": {
+              "freeze_steps": 1250,
+              "max_decay_steps": 2500000,
+              "val_base": 7.07e-06,
+              "val_final": 1e-06,
+              "val_start": 0.0,
+              "warm_up_steps": 100000
+            },
+            "learning_rate": {
+              "max_decay_steps": 2500000,
+              "val_base": 7.07e-06,
+              "val_final": 1e-06,
+              "val_start": 0.0,
+              "warm_up_steps": 100000
+            },
+            "momentum": {
+              "max_decay_steps": 2500000,
+              "val_base": 0.994,
+              "val_final": 1.0,
+              "val_start": 0.0,
+              "warm_up_steps": 0
+            },
+            "teacher_temperature": {
+              "max_decay_steps": 37500,
+              "val_base": 0.07,
+              "val_final": 0.07,
+              "val_start": 0.04,
+              "warm_up_steps": 37500
+            },
+            "weight_decay": {
+              "max_decay_steps": 2500000,
+              "val_base": 0.04,
+              "val_final": 0.2,
+              "val_start": 0.0,
+              "warm_up_steps": 0
+            }
+          },
+          "description": "Schedulers configuration for NVDINOv2 training",
+          "popular": [
+            "learning_rate",
+            "weight_decay",
+            "teacher_temperature",
+            "momentum",
+            "last_layer_learning_rate"
+          ],
+          "properties": {
+            "last_layer_learning_rate": {
+              "automl_enabled": false,
+              "default": {
+                "freeze_steps": 1250,
+                "max_decay_steps": 2500000,
+                "val_base": 7.07e-06,
+                "val_final": 1e-06,
+                "val_start": 0.0,
+                "warm_up_steps": 100000
+              },
+              "description": "Last layer learning rate scheduler configuration",
+              "popular": [
+                "val_base",
+                "val_final",
+                "val_start",
+                "warm_up_steps",
+                "freeze_steps",
+                "max_decay_steps"
+              ],
+              "properties": {
+                "freeze_steps": {
+                  "default": 1250,
+                  "description": "Number of freeze steps",
+                  "popular": true,
+                  "title": "freeze steps",
+                  "type": "int"
+                },
+                "max_decay_steps": {
+                  "default": 2500000,
+                  "description": "Maximum decay steps",
+                  "popular": true,
+                  "title": "max decay steps",
+                  "type": "int"
+                },
+                "val_base": {
+                  "default": 7.07e-06,
+                  "description": "The value after warm-up for scheduler.",
+                  "popular": true,
+                  "title": "base value",
+                  "type": "float"
+                },
+                "val_final": {
+                  "default": 1e-06,
+                  "description": "Final value for scheduler",
+                  "popular": true,
+                  "title": "final value",
+                  "type": "float"
+                },
+                "val_start": {
+                  "default": 0.0,
+                  "description": "Starting value for scheduler",
+                  "popular": true,
+                  "title": "starting value",
+                  "type": "float"
+                },
+                "warm_up_steps": {
+                  "default": 100000,
+                  "description": "Number of warm-up steps",
+                  "popular": true,
+                  "title": "warm-up steps",
+                  "type": "int"
+                }
+              },
+              "type": "collection"
+            },
+            "learning_rate": {
+              "automl_enabled": false,
+              "default": {
+                "max_decay_steps": 2500000,
+                "val_base": 7.07e-06,
+                "val_final": 1e-06,
+                "val_start": 0.0,
+                "warm_up_steps": 100000
+              },
+              "description": "Learning rate scheduler configuration",
+              "popular": [
+                "val_base",
+                "val_final",
+                "val_start",
+                "warm_up_steps",
+                "max_decay_steps"
+              ],
+              "properties": {
+                "max_decay_steps": {
+                  "default": 2500000,
+                  "description": "Maximum decay steps",
+                  "popular": true,
+                  "title": "max decay steps",
+                  "type": "int"
+                },
+                "val_base": {
+                  "default": 7.07e-06,
+                  "description": "The value after warm-up for scheduler",
+                  "popular": true,
+                  "title": "base value",
+                  "type": "float"
+                },
+                "val_final": {
+                  "default": 1e-06,
+                  "description": "Final value for scheduler",
+                  "popular": true,
+                  "title": "final value",
+                  "type": "float"
+                },
+                "val_start": {
+                  "default": 0.0,
+                  "description": "Starting value for scheduler",
+                  "popular": true,
+                  "title": "starting value",
+                  "type": "float"
+                },
+                "warm_up_steps": {
+                  "default": 100000,
+                  "description": "Number of warm-up steps",
+                  "popular": true,
+                  "title": "warm-up steps",
+                  "type": "int"
+                }
+              },
+              "type": "collection"
+            },
+            "momentum": {
+              "automl_enabled": false,
+              "default": {
+                "max_decay_steps": 2500000,
+                "val_base": 0.994,
+                "val_final": 1.0,
+                "val_start": 0.0,
+                "warm_up_steps": 0
+              },
+              "description": "Momentum scheduler configuration",
+              "popular": [
+                "val_base",
+                "val_final",
+                "val_start",
+                "warm_up_steps",
+                "max_decay_steps"
+              ],
+              "properties": {
+                "max_decay_steps": {
+                  "default": 2500000,
+                  "description": "Maximum decay steps",
+                  "popular": true,
+                  "title": "max decay steps",
+                  "type": "int"
+                },
+                "val_base": {
+                  "default": 0.994,
+                  "description": "The value after warm-up for scheduler",
+                  "popular": true,
+                  "title": "base value",
+                  "type": "float"
+                },
+                "val_final": {
+                  "default": 1.0,
+                  "description": "Final value for scheduler",
+                  "popular": true,
+                  "title": "final value",
+                  "type": "float"
+                },
+                "val_start": {
+                  "default": 0.0,
+                  "description": "Starting value for scheduler",
+                  "popular": true,
+                  "title": "starting value",
+                  "type": "float"
+                },
+                "warm_up_steps": {
+                  "default": 0,
+                  "description": "Number of warm-up steps",
+                  "popular": true,
+                  "title": "warm-up steps",
+                  "type": "int"
+                }
+              },
+              "type": "collection"
+            },
+            "teacher_temperature": {
+              "automl_enabled": false,
+              "default": {
+                "max_decay_steps": 37500,
+                "val_base": 0.07,
+                "val_final": 0.07,
+                "val_start": 0.04,
+                "warm_up_steps": 37500
+              },
+              "description": "Teacher temperature scheduler configuration",
+              "popular": [
+                "val_base",
+                "val_final",
+                "val_start",
+                "warm_up_steps",
+                "max_decay_steps"
+              ],
+              "properties": {
+                "max_decay_steps": {
+                  "default": 37500,
+                  "description": "Maximum decay steps",
+                  "popular": true,
+                  "title": "max decay steps",
+                  "type": "int"
+                },
+                "val_base": {
+                  "default": 0.07,
+                  "description": "The value after warm-up for scheduler",
+                  "popular": true,
+                  "title": "base value",
+                  "type": "float"
+                },
+                "val_final": {
+                  "default": 0.07,
+                  "description": "Final value for scheduler",
+                  "popular": true,
+                  "title": "final value",
+                  "type": "float"
+                },
+                "val_start": {
+                  "default": 0.04,
+                  "description": "Starting value for scheduler",
+                  "popular": true,
+                  "title": "starting value",
+                  "type": "float"
+                },
+                "warm_up_steps": {
+                  "default": 37500,
+                  "description": "Number of warm-up steps",
+                  "popular": true,
+                  "title": "warm-up steps",
+                  "type": "int"
+                }
+              },
+              "type": "collection"
+            },
+            "weight_decay": {
+              "automl_enabled": false,
+              "default": {
+                "max_decay_steps": 2500000,
+                "val_base": 0.04,
+                "val_final": 0.2,
+                "val_start": 0.0,
+                "warm_up_steps": 0
+              },
+              "description": "Weight decay scheduler configuration",
+              "popular": [
+                "val_base",
+                "val_final",
+                "val_start",
+                "warm_up_steps",
+                "max_decay_steps"
+              ],
+              "properties": {
+                "max_decay_steps": {
+                  "default": 2500000,
+                  "description": "Maximum decay steps",
+                  "popular": true,
+                  "title": "max decay steps",
+                  "type": "int"
+                },
+                "val_base": {
+                  "default": 0.04,
+                  "description": "The value after warm-up for scheduler",
+                  "popular": true,
+                  "title": "base value",
+                  "type": "float"
+                },
+                "val_final": {
+                  "default": 0.2,
+                  "description": "Final value for scheduler",
+                  "popular": true,
+                  "title": "final value",
+                  "type": "float"
+                },
+                "val_start": {
+                  "default": 0.0,
+                  "description": "Starting value for scheduler",
+                  "popular": true,
+                  "title": "starting value",
+                  "type": "float"
+                },
+                "warm_up_steps": {
+                  "default": 0,
+                  "description": "Number of warm-up steps",
+                  "popular": true,
+                  "title": "warm-up steps",
+                  "type": "int"
+                }
+              },
+              "type": "collection"
+            }
+          },
+          "type": "collection"
+        },
+        "seed": {
+          "default": 1234,
+          "description": "The seed for the initializer in PyTorch. If < 0, disable fixed seed.",
+          "maximum": Infinity,
+          "minimum": -1,
+          "title": "Seed for randomization",
+          "type": "int"
+        },
+        "use_custom_attention": {
+          "default": true,
+          "description": "Whether to use memory_efficient_attention",
+          "popular": true,
+          "title": "custom_attention",
+          "type": "bool"
+        },
+        "validation_interval": {
+          "default": 1,
+          "description": "\n        The interval (in epochs) at which a evaluation\n        will be triggered on the validation dataset.",
+          "minimum": 1,
+          "popular": true,
+          "title": "Validation interval",
+          "type": "int"
+        }
+      },
+      "type": "collection"
+    },
+    "wandb": {
+      "automl_disabled_parameters": [
+        "wandb.tags"
+      ],
+      "automl_enabled": false,
+      "default": {
+        "enable": true,
+        "entity": "",
+        "group": "",
+        "name": "TAO Toolkit Training",
+        "project": "TAO Toolkit",
+        "reinit": false,
+        "run_id": "",
+        "save_code": false,
+        "sync_tensorboard": false,
+        "tags": [
+          "tao-toolkit"
+        ]
+      },
+      "properties": {
+        "enable": {
+          "default": true,
+          "type": "bool"
+        },
+        "entity": {
+          "default": "",
+          "type": "string"
+        },
+        "group": {
+          "default": "",
+          "type": "string"
+        },
+        "name": {
+          "default": "TAO Toolkit Training",
+          "type": "string"
+        },
+        "project": {
+          "default": "TAO Toolkit",
+          "type": "string"
+        },
+        "reinit": {
+          "default": false,
+          "type": "bool"
+        },
+        "run_id": {
+          "default": "",
+          "type": "string"
+        },
+        "save_code": {
+          "default": false,
+          "type": "bool"
+        },
+        "sync_tensorboard": {
+          "default": false,
+          "type": "bool"
+        },
+        "tags": {
+          "automl_enabled": false,
+          "default": [
+            "tao-toolkit"
+          ],
+          "type": "list"
+        }
+      },
+      "type": "collection"
+    }
+  },
+  "type": "object",
+  "x_tao_schema": {
+    "action": "convert",
+    "core_module": "dinov3",
+    "model": "tao-train-dinov3",
+    "network_arch": "dinov3",
+    "schema_action": "convert",
+    "schema_version": 1,
+    "source": "tao-core dataclass config"
+  }
+}

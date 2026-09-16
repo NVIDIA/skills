@@ -19,6 +19,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "shared"))
 
 from script_utils import subprocess_output, tail_text
 
+from preflight_manifest import preflight_required, preflight_status_check
+
 
 SKILL = "omni-asset-validate"
 TOOL = "nvidia_usd_validate"
@@ -226,6 +228,24 @@ def validate_with_asset_validator(
     asset_path = asset_path.resolve()
     categories = list(categories or [])
     rules = list(rules or [])
+    if preflight_required():
+        preflight_check = preflight_status_check(SKILL, "asset_validator")
+        if not preflight_check["passed"]:
+            return AssetValidatorReport(
+                asset_path=str(asset_path),
+                validator_skill=SKILL,
+                validator_tool=TOOL,
+                passed=False,
+                status="BLOCKED",
+                command=[TOOL],
+                categories=categories,
+                rules=rules,
+                issue_counts={severity: 0 for severity in SEVERITIES},
+                issues=[],
+                warnings=[],
+                errors=[preflight_check["message"]],
+                next_step=next_step,
+            )
     command = [TOOL]
     for category in categories:
         command.extend(["--category", category])

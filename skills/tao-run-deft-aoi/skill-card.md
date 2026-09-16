@@ -1,5 +1,5 @@
 ## Description: <br>
-Run the full DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection models: baseline evaluate, RCA, Cosmos AnomalyGen / AMP synthetic defects, k-NN mining, retraining, and deployment gating until FAR / recall KPI targets are met. <br>
+Run the full DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection models: baseline evaluate, RCA, Cosmos AnomalyGen / AMP synthetic defects, k-NN mining, retraining, and deployment gating against a customer-defined primary metric and optional constraints. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,66 +9,75 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to run the complete DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet PCB inspection models, iterating through baseline evaluation, root cause analysis, synthetic defect generation, data mining, and retraining until false-accept-rate and recall KPI targets are met. <br>
+Developers and engineers use this skill to run the full DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection models, iterating through baseline evaluation, root-cause analysis, synthetic defect generation, data mining, and retraining until a customer-defined quality metric meets its deployment target. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Yes] <br>
+**Credential Type(s):** [API key] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Pipeline and State](references/pipeline-and-state.md) <br>
-- [Pre-Flight Checks](references/preflight.md) <br>
-- [Visual ChangeNet](references/visual-changenet.md) <br>
-- [Data Layout](references/data-layout.md) <br>
-- [PAIDF AnomalyGen](references/paidf-anomalygen.md) <br>
-- [Scripts and Agents](references/scripts-and-agents.md) <br>
+- [TAO Skill Bank Repository](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [visual-changenet.md](references/visual-changenet.md) <br>
+- [pipeline-and-state.md](references/pipeline-and-state.md) <br>
+- [metric-contract.md](references/metric-contract.md) <br>
+- [preflight.md](references/preflight.md) <br>
+- [data-layout.md](references/data-layout.md) <br>
+- [scripts-and-agents.md](references/scripts-and-agents.md) <br>
+- [air-gap.md](references/air-gap.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, HTML reports, JSON state files] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis, Files] <br>
+**Output Format:** [Markdown with inline bash code blocks and HTML report] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Produces DEFT_Loop_Report.html, deft_state.json, and loop_log.jsonl as persistent artifacts] <br>
+**Other Properties Related to Output:** [Produces DEFT_Loop_Report.html and deployment-gating artifacts under the results directory] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task in the NVSkills-Eval external profile (astra-sandbox environment). <br>
+3 evaluation tasks (3 positive), each with 3 attempts per task in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Whether the skill is safe to use: checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded when needed: skill selection, decoy avoidance, and workflow execution. <br>
+- Effectiveness: Whether the skill helped complete the user's goal: equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage: 50% tool-call productivity and 50% token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity scored under Efficiency. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 100% (+100%) | 88% (+88%) |
-| Discoverability | 1 | 83% (+83%) | 62% (+62%) |
-| Effectiveness | 1 | 90% (+76%) | 90% (+76%) |
-| Efficiency | 1 | 66% (+39%) | 61% (+33%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 96.2% | 83.8% |
+| Security | 71.4% → 100.0% (+28.6 points) | 83.3% → 100.0% (+16.7 points) |
+| Correctness | 8.6% → 100.0% (+91.4 points) | 26.7% → 93.3% (+66.6 points) |
+| Discoverability | 93.3% | 58.3% |
+| Effectiveness | 23.7% → 92.8% (+69.1 points) | 41.3% → 69.5% (+28.2 points) |
+| Efficiency | 94.9% | 97.7% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

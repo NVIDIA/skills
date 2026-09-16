@@ -1,0 +1,188 @@
+{
+  "skill_name": "nvmolkit-usage",
+  "evals": [
+    {
+      "id": "nvmolkit-usage-001",
+      "prompt": "Set up nvMolKit from scratch in a fresh conda-managed environment on a CUDA-capable Linux workstation. Include install commands and a small Python smoke test that verifies the installed package can process a batch of RDKit molecules on GPU.",
+      "expected_output": "The agent creates and activates a conda environment, installs nvMolKit and GPU-enabled PyTorch from conda-forge with a CUDA version compatible with the host driver, and supplies a smoke test that checks CUDA and computes batched Morgan fingerprints.",
+      "assertions": [
+        "The agent read or referenced the nvmolkit-usage SKILL.md for installation and runtime requirements",
+        "The agent creates and activates a conda, mamba, or micromamba environment with a supported Python version",
+        "The agent installs nvmolkit from conda-forge and ensures that PyTorch is GPU-enabled rather than silently accepting a CPU-only solve",
+        "The agent explains how to choose a cuda-version compatible with the driver reported by nvidia-smi",
+        "The smoke test imports nvMolKit, torch, and RDKit and checks torch.cuda.is_available()",
+        "The smoke test calls MorganFingerprintGenerator.GetFingerprints once on a list of RDKit molecules and safely inspects the AsyncGpuResult with .numpy() or synchronization before a host read through .torch()",
+        "The agent does not recommend building nvMolKit from source for this package-install task"
+      ],
+      "expected_skill": "nvmolkit-usage",
+      "expected_script": null
+    },
+    {
+      "id": "nvmolkit-usage-002",
+      "prompt": "Set up nvMolKit from scratch in a uv-managed Python environment. Include commands to create the environment, install nvMolKit from its Python package distribution, and run a small Python smoke test that verifies the installed package can process a batch of RDKit molecules on GPU.",
+      "expected_output": "The agent creates a uv environment with a supported Python version, selects a compatible CUDA 12 PyTorch backend while installing nvmolkit, and supplies a CUDA-aware batched Morgan fingerprint smoke test.",
+      "assertions": [
+        "The agent read or referenced the nvmolkit-usage SKILL.md for uv installation and runtime requirements",
+        "The agent uses uv venv or uv init with a supported Python version",
+        "The agent installs nvmolkit through uv and explicitly selects or preinstalls a PyTorch CUDA backend compatible with the host driver",
+        "The agent states that nvMolKit requires a supported CUDA-capable NVIDIA GPU and GPU-enabled torch",
+        "The smoke test imports nvMolKit, torch, and RDKit and checks CUDA availability",
+        "The smoke test calls MorganFingerprintGenerator.GetFingerprints once on a molecule list and safely inspects the result",
+        "The agent does not switch the requested uv workflow to conda or a source build"
+      ],
+      "expected_skill": "nvmolkit-usage",
+      "expected_script": null
+    },
+    {
+      "id": "nvmolkit-usage-003",
+      "prompt": "Port the following RDKit code to nvMolKit. Preserve the behavior.\n\n```python\nfrom rdkit import Chem, DataStructs\nfrom rdkit.Chem import rdFingerprintGenerator\nfrom rdkit.ML.Cluster import Butina\nimport numpy as np\n\nsmiles = [\n    \"CCO\", \"CCN\", \"CC(=O)O\", \"CCCCCC\", \"C1CCCCC1\",\n    \"c1ccccc1\", \"Cc1ccccc1\", \"Oc1ccccc1\",\n    \"CC(=O)Oc1ccccc1C(=O)O\", \"c1ccncc1\",\n]\nmols = [Chem.MolFromSmiles(s) for s in smiles]\nfpgen = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=2048)\nfps = [fpgen.GetFingerprint(m) for m in mols]\nsim = np.array([DataStructs.BulkTanimotoSimilarity(fp, fps) for fp in fps])\ndist = 1.0 - sim\nclusters = Butina.ClusterData(\n    dist[np.tril_indices(len(mols), -1)], len(mols), 0.35, isDistData=True\n)\n```",
+      "expected_output": "The agent provides a complete batched nvMolKit port that parses RDKit molecules, computes packed Morgan fingerprints once for the collection, keeps fingerprint-to-similarity processing on GPU, and clusters with the nvMolKit Butina API using its required input type and shape.",
+      "assertions": [
+        "The agent uses nvmolkit.fingerprints.MorganFingerprintGenerator(radius=2, fpSize=2048) and calls GetFingerprints once on the molecule collection rather than once per molecule",
+        "The agent feeds the GPU-resident fingerprint result directly to crossTanimotoSimilarity without an intervening NumPy conversion",
+        "The agent uses nvmolkit.clustering.butina with a full square GPU distance matrix or fused_butina with a CUDA torch tensor of packed fingerprints",
+        "The agent does not pass an RDKit-style condensed lower triangle or a CPU NumPy matrix to nvmolkit.clustering.butina",
+        "The agent handles the 0.35 distance cutoff consistently, converting similarity to distance when using butina",
+        "Any host read uses blocking .numpy() or synchronizes before reading values through .torch()",
+        "The resulting code reports cluster assignments aligned with the input molecules"
+      ],
+      "expected_skill": "nvmolkit-usage",
+      "expected_script": null
+    },
+    {
+      "id": "nvmolkit-usage-004",
+      "prompt": "Port the following RDKit code to nvMolKit. Preserve the behavior.\n\n```python\nfrom rdkit import Chem\nfrom rdkit.Chem import AllChem\nfrom rdkit.Chem.rdDistGeom import ETKDGv3\n\nsmiles = [\n    \"CCO\", \"CCN\", \"CC(=O)O\", \"CCCCCC\", \"C1CCCCC1\",\n    \"c1ccccc1\", \"Cc1ccccc1\", \"Oc1ccccc1\",\n    \"CC(=O)Oc1ccccc1C(=O)O\", \"c1ccncc1\",\n]\nmols = [Chem.AddHs(Chem.MolFromSmiles(s)) for s in smiles]\nparams = ETKDGv3()\nparams.randomSeed = 7\nfor mol in mols:\n    AllChem.EmbedMultipleConfs(mol, numConfs=20, params=params)\n    AllChem.MMFFOptimizeMoleculeConfs(mol, maxIters=500)\n    rms = AllChem.GetConformerRMSMatrix(Chem.RemoveHs(mol))\n```",
+      "expected_output": "The agent provides a complete nvMolKit port using batched embedding, batched MMFF optimization, and the batch conformer RMSD API, with nvMolKit-compatible ETKDG parameters and safe result handling.",
+      "assertions": [
+        "The agent creates explicit-hydrogen RDKit molecules with Chem.AddHs before embedding",
+        "The agent creates ETKDGv3 parameters without setting useRandomCoords",
+        "The agent calls nvmolkit.embedMolecules.EmbedMolecules once on the molecule collection with confsPerMolecule=20",
+        "The agent calls MMFFOptimizeMoleculesConfs once on the molecule collection with maxIters=500 instead of retaining the RDKit per-molecule optimization loop",
+        "The agent calls GetConformerRMSMatrixBatch on the heavy-atom molecule collection",
+        "The agent treats GetConformerRMSMatrixBatch output as one AsyncGpuResult per input molecule rather than calling .numpy() or .torch() on the returned list",
+        "The agent safely converts or synchronizes each asynchronous RMSD result before host inspection"
+      ],
+      "expected_skill": "nvmolkit-usage",
+      "expected_script": null
+    },
+    {
+      "id": "nvmolkit-usage-005",
+      "prompt": "Port the following RDKit code to nvMolKit. Preserve the behavior, including the all-match counting convention used by the RDKit code.\n\n```python\nfrom rdkit import Chem\n\nsmiles = [\n    \"CCO\", \"CCN\", \"CC(=O)O\", \"CCCCCC\", \"C1CCCCC1\",\n    \"c1ccccc1\", \"Cc1ccccc1\", \"Oc1ccccc1\",\n    \"CC(=O)Oc1ccccc1C(=O)O\", \"c1ccncc1\",\n]\nquery = Chem.MolFromSmarts(\"c1ccccc1\")\nrows = []\nfor smi in smiles:\n    mol = Chem.MolFromSmiles(smi)\n    matches = mol.GetSubstructMatches(query, uniquify=False)\n    rows.append((smi, bool(matches), len(matches)))\n```",
+      "expected_output": "The agent provides a batched nvMolKit substructure workflow using a target collection and a one-element SMARTS query collection, with uniquify disabled and both boolean and count results reported in input order.",
+      "assertions": [
+        "The agent parses target molecules with Chem.MolFromSmiles and constructs the query with Chem.MolFromSmarts('c1ccccc1')",
+        "The agent uses nvMolKit hasSubstructMatch plus countSubstructMatches, or getSubstructMatches and derives both values from the returned matches",
+        "The agent passes target and query collections to the nvMolKit API, using [query] for the one-query batch",
+        "The agent preserves the all-match convention by leaving SubstructSearchConfig.uniquify false",
+        "The agent does not duplicate the query once per target and incorrectly interpret a target-by-target diagonal as the result",
+        "The agent emits one boolean/count row per input target in input order, including false/zero rows"
+      ],
+      "expected_skill": "nvmolkit-usage",
+      "expected_script": null
+    },
+    {
+      "id": "nvmolkit-usage-006",
+      "prompt": "Write a from-scratch nvMolKit workflow that computes Morgan fingerprints with radius 2 and fpSize 2048, computes an all-pairs Tanimoto similarity matrix, clusters molecules with Butina at distance cutoff 0.35, and reports cluster assignments. Fill in the `<your code here>` section; keep the loading header and printing footer intact.\n\n```python\nimport argparse\nimport json\nfrom pathlib import Path\nfrom rdkit import Chem\n\nparser = argparse.ArgumentParser()\nparser.add_argument(\"--input\", default=\"input.smi\")\nargs, _ = parser.parse_known_args()\n\nsmiles = [\n    line.split()[0]\n    for line in Path(args.input).read_text().splitlines()\n    if line.strip() and not line.startswith(\"#\")\n]\nmols = [Chem.MolFromSmiles(smi) for smi in smiles]\n\n# <your code here>\n\nprint(json.dumps({\n    \"similarity\": similarity_matrix.tolist(),\n    \"clusters\": cluster_assignments,\n}, sort_keys=True))\n```",
+      "expected_output": "The agent writes a complete batch-oriented nvMolKit fingerprint, similarity, and clustering workflow with correct GPU dataflow, cutoff semantics, and JSON reporting.",
+      "assertions": [
+        "The code reads SMILES, parses them into RDKit molecules, and validates or handles failed parses",
+        "The code computes all fingerprints with one MorganFingerprintGenerator.GetFingerprints call over the collection or suitably large chunks",
+        "The code computes all-pairs similarity with crossTanimotoSimilarity on GPU-resident packed fingerprints",
+        "The code clusters with nvMolKit butina using a square GPU distance matrix, or with fused_butina using a CUDA torch tensor of packed fingerprints",
+        "The code handles the distinction between a 0.35 distance cutoff and Tanimoto similarity correctly",
+        "The code delays host conversion until after nvMolKit GPU operations and handles AsyncGpuResult host reads safely",
+        "The code prints valid JSON containing a serializable square similarity matrix and cluster assignments"
+      ],
+      "expected_skill": "nvmolkit-usage",
+      "expected_script": null
+    },
+    {
+      "id": "nvmolkit-usage-007",
+      "prompt": "Write a from-scratch nvMolKit workflow for conformer analysis. Add explicit hydrogens, generate ETKDGv3 conformers, MMFF-optimize the conformers, compute conformer RMSD matrices for each molecule, and report per-molecule energy and RMSD summaries. Fill in the `<your code here>` section; keep the loading header and printing footer intact.\n\n```python\nimport argparse\nimport json\nfrom pathlib import Path\nfrom rdkit import Chem\n\nparser = argparse.ArgumentParser()\nparser.add_argument(\"--input\", default=\"input.smi\")\nargs, _ = parser.parse_known_args()\n\nsmiles = [\n    line.split()[0]\n    for line in Path(args.input).read_text().splitlines()\n    if line.strip() and not line.startswith(\"#\")\n]\nmols = [Chem.MolFromSmiles(smi) for smi in smiles]\n\n# <your code here>\n\nprint(json.dumps({\n    \"summaries\": conformer_summaries,\n}, sort_keys=True))\n```",
+      "expected_output": "The agent writes a complete batch-oriented nvMolKit conformer workflow using compatible ETKDG parameters, batched MMFF and RMSD calls, invalid-molecule handling, and structured summaries.",
+      "assertions": [
+        "The code parses the SMILES and adds explicit hydrogens before ETKDG and MMFF",
+        "The code uses ETKDGv3; eigenvalue-based and random-coordinate initialization are both valid",
+        "The code calls EmbedMolecules once on the valid molecule collection with an explicit positive confsPerMolecule value",
+        "The code calls MMFFOptimizeMoleculesConfs once on the collection and handles molecules lacking MMFF parameters or reports the indexed ValueError cleanly",
+        "The code calls GetConformerRMSMatrixBatch on heavy-atom molecules rather than using the single-molecule API as its primary loop",
+        "The code iterates over the list of RMSD AsyncGpuResult objects and safely converts each result",
+        "The code reports conformer counts, finite energy summaries, and RMSD summaries for every retained input molecule as valid JSON"
+      ],
+      "expected_skill": "nvmolkit-usage",
+      "expected_script": null
+    },
+    {
+      "id": "nvmolkit-usage-008",
+      "prompt": "Write a from-scratch nvMolKit substructure-search workflow that reports whether each input molecule contains an aromatic benzene ring and how many SMARTS matches each molecule has, counting all atom-mapping matches for the benzene SMARTS pattern. Produce one substructure_rows entry for every input SMILES in input order, including nonmatches as false/0 rows. Fill in the `<your code here>` section; keep the loading header and printing footer intact.\n\n```python\nimport argparse\nimport json\nfrom pathlib import Path\nfrom rdkit import Chem\n\nparser = argparse.ArgumentParser()\nparser.add_argument(\"--input\", default=\"input.smi\")\nargs, _ = parser.parse_known_args()\n\nsmiles = [\n    line.split()[0]\n    for line in Path(args.input).read_text().splitlines()\n    if line.strip() and not line.startswith(\"#\")\n]\nmols = [Chem.MolFromSmiles(smi) for smi in smiles]\n\n# <your code here>\n\nprint(json.dumps({\n    \"rows\": substructure_rows,\n}, sort_keys=True))\n```",
+      "expected_output": "The agent writes a complete batched nvMolKit substructure workflow with a one-element query batch, all-match counting, and complete ordered JSON output.",
+      "assertions": [
+        "The code parses every target SMILES and constructs the benzene query with Chem.MolFromSmarts('c1ccccc1')",
+        "The code uses nvMolKit substructure APIs over the target collection and [query], not an RDKit per-molecule matching loop",
+        "The code uses SubstructSearchConfig and preserves uniquify=False for all atom-mapping matches",
+        "The code obtains counts through countSubstructMatches or by counting getSubstructMatches results",
+        "The code reports a boolean and integer count for every target in input order, including false and zero for nonmatches",
+        "The code prints valid JSON with one substructure row per input molecule"
+      ],
+      "expected_skill": "nvmolkit-usage",
+      "expected_script": null
+    },
+    {
+      "id": "nvmolkit-usage-009",
+      "prompt": "Diagnose why this nvMolKit fingerprinting code performs poorly, then rewrite it with the right API usage. Do not run or benchmark the code; diagnose from the code only. Explain the performance bugs briefly and provide corrected code.\n\n```python\nfrom rdkit import Chem\nfrom nvmolkit.fingerprints import MorganFingerprintGenerator\n\n# smiles contains about 10,000 SMILES strings loaded from a file.\ngen = MorganFingerprintGenerator(radius=2, fpSize=2048)\nfingerprints = []\nfor smi in smiles:\n    mol = Chem.MolFromSmiles(smi)\n    fp = gen.GetFingerprints([mol]).numpy()\n    fingerprints.append(fp)\n```",
+      "expected_output": "The agent identifies the repeated tiny GPU batches and per-iteration host transfers, then rewrites the code to parse a collection and call GetFingerprints once or in large chunks before any required host conversion.",
+      "assertions": [
+        "The agent recognizes from static inspection that GetFingerprints([mol]) in a 10,000-iteration loop creates tiny GPU workloads whose launch and setup overhead cannot be amortized",
+        "The agent explains that .numpy() in the hot loop synchronizes and transfers each result to the host",
+        "The corrected code parses a molecule collection and calls one GetFingerprints over the collection or a small number of large chunks",
+        "The corrected code delays any required host conversion until after batched GPU work",
+        "The agent does not run a benchmark or suggest changing to another per-molecule loop"
+      ],
+      "expected_skill": "nvmolkit-usage",
+      "expected_script": null
+    },
+    {
+      "id": "nvmolkit-usage-010",
+      "prompt": "Here is an existing good nvMolKit ETKDG embedding script. Modify it to use nvMolKit autotuning for the HardwareOptions used by EmbedMolecules. Do not run or benchmark it; provide the updated script only.\n\n```python\nfrom pathlib import Path\nimport json\nimport time\n\nimport torch\nfrom rdkit import Chem\nfrom rdkit.Chem import AddHs\nfrom rdkit.Chem.rdDistGeom import ETKDGv3\n\nfrom nvmolkit.embedMolecules import EmbedMolecules\n\nsmiles_path = Path(\"molecules.smi\")\nsmiles = [\n    line.split()[0]\n    for line in smiles_path.read_text().splitlines()\n    if line.strip() and not line.startswith(\"#\")\n]\nmols = [AddHs(Chem.MolFromSmiles(smi)) for smi in smiles]\n\nparams = ETKDGv3()\nparams.randomSeed = 0xC0FFEE\n\nstart = time.perf_counter()\nEmbedMolecules(mols, params, confsPerMolecule=10, maxIterations=-1)\ntorch.cuda.synchronize()\nelapsed = time.perf_counter() - start\n\nsummary = {\n    \"molecules\": len(mols),\n    \"conformers\": sum(mol.GetNumConformers() for mol in mols),\n    \"elapsed_seconds\": elapsed,\n}\nPath(\"embedding_summary.json\").write_text(\n    json.dumps(summary, indent=2, sort_keys=True)\n)\n```",
+      "expected_output": "The agent preserves the existing workflow, calls the supported tune_embed_molecules API on a representative workload, applies TuneResult.best_config through hardwareOptions= to the full EmbedMolecules call, and retains summary output.",
+      "assertions": [
+        "The updated script preserves SMILES loading, AddHs, ETKDGv3, full-workload embedding, and embedding_summary.json output",
+        "The script imports and calls nvmolkit.autotune.tune_embed_molecules or an equivalent supported import of that function",
+        "The script may tune on a representative subset while keeping the full collection for the production EmbedMolecules call",
+        "The script reads TuneResult.best_config and passes it to the full EmbedMolecules call via hardwareOptions=",
+        "The script does not invent an Autotuner class, merely hand-pick HardwareOptions, or run the requested code"
+      ],
+      "expected_skill": "nvmolkit-usage",
+      "expected_script": null
+    },
+    {
+      "id": "nvmolkit-usage-011",
+      "prompt": "A user says this nvMolKit fingerprinting code uses the recommended batched API but is not faster than their RDKit version. Do not run or benchmark the code; explain what is happening and what to tell the user.\n\n```python\nfrom rdkit import Chem\nfrom nvmolkit.fingerprints import MorganFingerprintGenerator\n\nsmiles = [\"CCO\", \"c1ccccc1\", \"CC(=O)O\"]\nmols = [Chem.MolFromSmiles(s) for s in smiles]\ngen = MorganFingerprintGenerator(radius=2, fpSize=2048)\nfps = gen.GetFingerprints(mols)\narr = fps.numpy()\n```",
+      "expected_output": "The agent explains that the API usage is already correctly batched but three molecules cannot amortize GPU launch, setup, synchronization, and transfer overhead, and recommends benchmarking representative high-throughput batches.",
+      "assertions": [
+        "The agent recognizes that GetFingerprints(mols) is already the correct batched nvMolKit API pattern",
+        "The agent explains that a three-molecule workload is too small to amortize GPU launch, setup, synchronization, and host-transfer overhead",
+        "The agent states that speedup should not be expected for this tiny workload",
+        "The agent recommends measuring throughput with many molecules or representative large batches",
+        "The agent does not recommend a per-molecule nvMolKit loop or claim the code demonstrates an nvMolKit performance regression"
+      ],
+      "expected_skill": "nvmolkit-usage",
+      "expected_script": null
+    },
+    {
+      "id": "nvmolkit-usage-012",
+      "prompt": "Write nvMolKit code that finds maximum common substructures for the explicit molecule pairs [(0, 1), (2, 3), (0, 2)]. Preserve that pair order, allow any atom and any bond to match, set a 5-second timeout for each pair, and report atom/bond counts plus whether each search timed out.",
+      "expected_output": "The agent constructs RDKit molecules, calls nvmolkit.mcs.findMCS once in explicit-pairs mode, and reads the ordered MCSBatchResult correctly, including each MCSResult's counts and canceled flag.",
+      "assertions": [
+        "The code imports findMCS from nvmolkit.mcs and calls it once for the batch",
+        "The code passes mode='pairs' and the explicit pairs [(0, 1), (2, 3), (0, 2)] without reordering or deduplicating them",
+        "The code uses atom_compare='any', bond_compare='any', and timeout_seconds=5",
+        "The code iterates in result.pairs order and materializes each item with result[pair_idx] or result.get_result(pair_idx)",
+        "The code reports num_atoms, num_bonds, and canceled for every requested pair",
+        "The agent explains that timeout_seconds is a per-pair budget and that a canceled result may contain the best partial MCS found"
+      ],
+      "expected_skill": "nvmolkit-usage",
+      "expected_script": null
+    }
+  ]
+}

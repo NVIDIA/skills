@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers using the HoloHub CLI to scaffold, test, package, and prove reusable Holoscan Modules through the full producer-consumer lifecycle. <br>
+Developers and engineers building reusable Holoscan Modules use this skill to scaffold, test, package (DEB/WHEEL), and prove clean-consumer installs through the HoloHub CLI. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,15 +25,16 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [HoloHub CLI Contract](references/holohub-cli-contract.md) <br>
-- [Module Development](references/module-development.md) <br>
-- [Module Consumer and Packaging](references/module-consumer-packaging.md) <br>
-- [HoloHub Create-a-Module Tutorial](https://github.com/nvidia-holoscan/holohub/tree/main/tutorials/holoscan-modules/create-a-module) <br>
-- [HoloHub Use-a-Module Tutorial](https://github.com/nvidia-holoscan/holohub/tree/main/tutorials/holoscan-modules/use-a-module) <br>
+- [./holohub CLI contract](references/holohub-cli-contract.md) <br>
+- [Module development through ./holohub](references/module-development.md) <br>
+- [Module consumer iteration and packaging](references/module-consumer-packaging.md) <br>
+- [HoloHub repository](https://github.com/nvidia-holoscan/holohub) <br>
+- [Create a module tutorial](https://github.com/nvidia-holoscan/holohub/tree/main/tutorials/holoscan-modules/create-a-module) <br>
+- [Use a module tutorial](https://github.com/nvidia-holoscan/holohub/tree/main/tutorials/holoscan-modules/use-a-module) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Code, Configuration instructions, Analysis] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Code, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -45,15 +46,15 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-3 evaluation tasks (2 positive, 1 negative) in isolated k8s-sandbox pods. <br>
+4 evaluation tasks (3 positive, 1 negative), each run in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
+- Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the skill produces correct answers against the reference. <br>
+- Discoverability: Whether the right skill was loaded and executed when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (equal-weight mean of goal completion and behavior adherence). <br>
+- Efficiency: Whether the skill avoided wasted tool or skill usage — routing quality and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
@@ -68,15 +69,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 53% → 88% (+35 points) | 51% → 49% (-2 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 20% → 80% (+60 points) | 40% → 40% (±0 points) |
-| Discoverability | 67% → 100% (+33 points) | 50% → 50% (±0 points) |
-| Effectiveness | 14% → 62% (+48 points) | 31% → 20% (-11 points) |
-| Efficiency | 63% → 96% (+33 points) | 33% → 33% (±0 points) |
+| Overall | 52% → 93% (+41 points) | 56% → 76% (+20 points) |
+| Security | 75% → 100% (+25 points) | 100% → 75% (-25 points) |
+| Correctness | 35% → 100% (+65 points) | 55% → 95% (+40 points) |
+| Discoverability | 61% → 100% (+39 points) | 48% → 83% (+34 points) |
+| Effectiveness | 34% → 66% (+33 points) | 45% → 52% (+7 points) |
+| Efficiency | 55% → 97% (+42 points) | 34% → 75% (+41 points) |
 
 ## Skill Version(s): <br>
-bd405993 (source: git SHA, committed 2026-08-05) <br>
+0504f91f (source: git SHA, committed 2026-09-02) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

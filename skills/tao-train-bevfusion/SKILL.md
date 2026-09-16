@@ -19,19 +19,21 @@ tags:
 
 # BEVFusion
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 BEVFusion for multi-sensor 3D object detection. Fuses LiDAR point clouds and camera images in bird's-eye-view (BEV) space. Used in autonomous driving for robust 3D perception.
 
 Set pretrained backbone paths for Swin image backbone.
 
 BEVFusion requires the BEVFusion-specific TAO container
-`nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt`. The shared TAO PyTorch 7.0 RC image
-does not package `mmdet3d` and fails before any BEVFusion action can parse its
+`nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt`. <!-- unpinned: BEVFusion-only container --> Shared TAO PyTorch 7.x images do
+not package `mmdet3d` and fail before any BEVFusion action can parse its
 spec. The model-skill action is named `dataset_convert`, but the 5.5 container
 CLI subtask is `bevfusion convert -e <spec>`.
 
 ## Dataclass Schemas
 
-Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
+Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML for an action requires `schemas/<action>.schema.json` and `references/spec_template_<action>.yaml` to exist and parse. Use the packaged selected-action schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
 
 ## Train Action Policy
 
@@ -149,7 +151,10 @@ Optional. Val dataset split is configured via ann_file in dataset config.
 
 ## Hardware
 
-Minimum 2 GPU(s), recommended 4 GPU(s). 24GB+ (A100 recommended) VRAM per GPU. BEVFusion is memory-intensive due to multi-sensor fusion. A100 GPUs strongly recommended. Multi-GPU training expected.
+One GPU is supported for minimal smoke/AutoML validation with a small dataset
+and batch size. Use 2+ GPUs for ordinary training and 4 GPUs when practical.
+24GB+ (A100 recommended) VRAM per GPU. BEVFusion is memory-intensive due to
+multi-sensor fusion.
 
 ## Error Patterns
 
@@ -178,16 +183,20 @@ experiment config before running the selected action. Use YAML null, not an
 empty string, for `train.pretrained_checkpoint` and
 `train.resume_training_checkpoint_path` when no checkpoint is intended.
 
-**`ModuleNotFoundError: No module named 'mmdet3d'`**: The shared TAO PyTorch
-7.0 RC image does not include the BEVFusion `mmdet3d` dependency. Use
-`nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt`; it contains `mmdet3d` and exposes
+**`ModuleNotFoundError: No module named 'mmdet3d'`**: Shared TAO PyTorch 7.x
+images do not include the BEVFusion `mmdet3d` dependency. Use
+`nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt`; <!-- unpinned: BEVFusion-only container --> it contains `mmdet3d` and exposes
 the BEVFusion `convert`, `train`, `evaluate`, and `inference` subtasks.
 
 **Post-evaluation SIGSEGV in BEVFusion 5.5**: Some local-docker runs can write
 checkpoints or prediction files and still finish with TAO `Execution status:
 FAIL` after `Signal 11 (SIGSEGV)` in `cuMemRetainAllocationHandle`. Do not mark
 the action successful from the Docker exit code alone; inspect the TAO log or
-`status.json`. If a checkpoint was produced before this failure, use only the
+`status.json`. On CUDA 12+ hosts, retain the TAO 5.5 dependency stack and apply
+the BEVFusion rotated-IoU CPU fallback and runner cleanup from `tao-pytorch`;
+do not switch the action to a shared 7.x image. The fallback is the default;
+`BEVFUSION_ROTATE_IOU_BACKEND=gpu` is an explicit opt-in to the legacy Numba
+CUDA evaluator. If a checkpoint was produced before this failure, use only the
 exact intended checkpoint such as `epoch_1.pth` for downstream diagnostics and
 do not treat `last_checkpoint` as a best checkpoint unless the action explicitly
 requests the latest checkpoint.

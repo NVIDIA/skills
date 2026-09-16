@@ -1,0 +1,145 @@
+{
+  "version": 5,
+  "workflow": "tao-run-deft-aoi-cosmos3",
+  "started_at": "2026-07-28T00:00:00+00:00",
+  "status": "in_progress",
+  "kpi_target": "NG recall >= 1",
+  "metric_contract": {
+    "name": "recall_ng",
+    "display_name": "NG recall",
+    "operator": ">=",
+    "target": 1.0,
+    "unit": "",
+    "evaluator": {
+      "type": "artifact",
+      "producer": "scripts/analyze_gaps.py",
+      "path_template": "/abs/results/{iter_label}/benchmark_metrics/metric_result.json"
+    },
+    "constraints": [
+      {
+        "name": "unknown_predictions",
+        "display_name": "Unknown predictions",
+        "operator": "<=",
+        "target": 0.0,
+        "unit": ""
+      }
+    ]
+  },
+  "results_dir": "/abs/results",
+  "max_iterations": 3,
+  "current_iteration": 0,
+  "execution_policy": {
+    "network_mode": "airgap",
+    "activation_source": "harness restriction",
+    "allow_package_install": false,
+    "allow_remote_fetch": false,
+    "allow_container_pull": false,
+    "allow_registry_login": false,
+    "python_launcher": "scripts/deft_python.sh",
+    "python_executable": "/usr/bin/python3",
+    "hf_offline": true
+  },
+  "config": {
+    "workspace": "/abs/workspace",
+    "platform": "selected-platform",
+    "model_skill": "tao-finetune-cosmos-reason",
+    "base_model": "nvidia/Cosmos3-Nano",
+    "automl_policy": "off",
+    "annotation_mode": "bare_okng",
+    "media_root": "/abs/workspace",
+    "annotations": {
+      "proxy": "/abs/workspace/annotations/proxy_kpi.json",
+      "benchmark": "/abs/workspace/annotations/benchmark_kpi.json",
+      "mining": "/abs/workspace/annotations/mining_pool.json"
+    },
+    "evaluation": {
+      "proxy": {
+        "annotations": "/abs/workspace/annotations/proxy_kpi.json",
+        "drives_rcca": true,
+        "drives_loop_stop": false
+      },
+      "benchmark": {
+        "annotations": "/abs/workspace/annotations/benchmark_kpi.json",
+        "sha256": "<sha256>",
+        "drives_rcca": false,
+        "drives_loop_stop": true
+      }
+    },
+    "specs": {
+      "train": "/abs/workspace/specs/train_spec.toml",
+      "proxy": "/abs/workspace/specs/evaluate_spec.toml",
+      "benchmark": "/abs/workspace/specs/evaluate_spec.toml"
+    },
+    "containers": {
+      "cosmos_rl": "resolved-from-versions.yaml",
+      "data_services": "resolved-from-versions.yaml"
+    },
+    "training": {
+      "annotation_source": "generated_from_mining_and_anomalygen",
+      "num_gpus": 1,
+      "num_nodes": 1,
+      "gpu_model": "NVIDIA H100 80GB HBM3",
+      "num_epochs": 10,
+      "batch_size": 4,
+      "learning_rate": 0.0001,
+      "lora": {
+        "r": 16,
+        "alpha": 32,
+        "target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj",
+          "gate_proj",
+          "up_proj",
+          "down_proj"
+        ]
+      }
+    },
+    "mining": {
+      "top_k_per_target": 5,
+      "metric": "cosine",
+      "min_similarity": 0.9,
+      "history_aware": {
+        "enabled": true,
+        "identity": "filepath",
+        "history_file": "/abs/results/mining_history.json"
+      }
+    },
+    "anomalygen": {
+      "sub_skill": "tao-generate-anomalies",
+      "mode": "inference_only",
+      "num_search_run": 0,
+      "nn_threshold": 0,
+      "project": "nvpcb",
+      "num_SDG": 20,
+      "container": "resolved-from-versions.yaml",
+      "checkpoint_dir": "/abs/workspace/augmentation/anomalygen/checkpoints/nvpcb",
+      "dataset_dir": "/abs/workspace/augmentation/anomalygen/datasets/nvpcb",
+      "defect_spec": "/abs/workspace/augmentation/anomalygen/datasets/nvpcb/defect_spec.jsonl",
+      "cosmos_models_dir": "/abs/workspace/augmentation/anomalygen/base_checkpoints",
+      "label": "NG"
+    }
+  },
+  "iterations": {},
+  "events": [],
+  "_completed_step_values": [
+    "train",
+    "evaluate_benchmark",
+    "benchmark_metrics",
+    "evaluate_proxy",
+    "proxy_rcca",
+    "routing",
+    "anomalygen",
+    "data_mining",
+    "assemble_data",
+    "validate_data",
+    "loop_stop"
+  ],
+  "_status_values": [
+    "pending",
+    "in_progress",
+    "complete",
+    "failed"
+  ]
+}

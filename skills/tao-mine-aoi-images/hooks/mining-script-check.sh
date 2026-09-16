@@ -45,7 +45,7 @@ if re.search(r'\bdocker\s+run\b', command) and ('docker: command not found' in c
 
 # 1b. tao-toolkit-ds image missing or unreachable
 if re.search(r'(unable to find image|pull access denied|manifest unknown|repository does not exist).*tao-toolkit-ds', combined, re.IGNORECASE):
-    warnings.append("The `tao_toolkit.data_services` container image (resolved from `versions.yaml`) is missing or unreachable. Resolve `DS_IMAGE` from `versions.yaml` (`images.tao_toolkit.data_services`), pre-pull with `docker pull \"$DS_IMAGE\"`, and confirm registry credentials. The data-services tag declared in versions.yaml is required — the generic `:latest` does not contain the embedding/mining entrypoints.")
+    warnings.append("The TAO data-services container image (pinned in this skill; was `versions.yaml`) is missing or unreachable. Resolve `DS_IMAGE` from `versions.yaml` (`images.tao_toolkit.data_services`), pre-pull with `docker pull \"$DS_IMAGE\"`, and confirm registry credentials. The data-services tag declared in versions.yaml is required — the generic `:latest` does not contain the embedding/mining entrypoints.")
 
 # 1c. Path-mount mismatch — entrypoint reports a parquet path it cannot find that exists on the host
 if re.search(r'(FileNotFoundError|No such file or directory).*\.parquet', combined):
@@ -80,7 +80,7 @@ if re.search(r"filter_by_label\s*=\s*true", command):
 
 # 5. Empty mined parquet hint
 if re.search(r'mined.*0\s+(unique|rows?|images?)', combined, re.IGNORECASE):
-    warnings.append("Mining produced 0 rows. Likely causes: empty source pool, encoder mismatch (Steps 1/2 disagreed), or label filter dropped every pair.")
+    warnings.append("Mining produced 0 rows. Likely causes: empty source pool, encoder mismatch (Steps 1/2 disagreed), label/similarity filtering dropped every pair, or history-aware selection found only samples used by earlier iterations. Inspect the history summary and consider a wider topn.")
 
 # 6. Missing GPU / CUDA
 if re.search(r'(CUDA.*not available|no CUDA-capable device|nvidia-smi.*not found|could not select device driver.*gpu)', combined, re.IGNORECASE):

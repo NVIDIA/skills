@@ -364,7 +364,7 @@
           "properties": {
             "images_dir": {
               "default": "",
-              "description": "Path to images directory for dataset",
+              "description": "Path to an extracted images directory for the dataset. Archive files such as .tar, .tar.gz, .tgz, and .zip are not supported.",
               "title": "image directory",
               "type": "string"
             }
@@ -381,7 +381,7 @@
           "properties": {
             "images_dir": {
               "default": "",
-              "description": "Path to images directory for dataset",
+              "description": "Path to an extracted images directory for the dataset. Archive files such as .tar, .tar.gz, .tgz, and .zip are not supported.",
               "title": "image directory",
               "type": "string"
             }

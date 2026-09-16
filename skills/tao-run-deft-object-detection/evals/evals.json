@@ -1,0 +1,66 @@
+[
+  {
+    "id": "tao-run-deft-object-detection-basic",
+    "question": "A user request: \"Use the tao-run-deft-object-detection skill to improve my Grounding DINO model.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
+    "expected_skill": "tao-run-deft-object-detection",
+    "expected_script": null,
+    "ground_truth": "Identify tao-run-deft-object-detection as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-run-deft-object-detection as the relevant skill",
+      "States that the baseline runs inference then kpi_analyze against a zero-shot checkpoint and does NOT train",
+      "Lists the seven iteration stages in order: gap_analysis, embed, mine, stage, train, inference, kpi_analyze",
+      "Mentions the single user gate at the Pre-Flight Summary before the loop becomes autonomous",
+      "Notes that mAP is reported rather than gated, so the loop runs to max_iterations",
+      "Does not run commands, scripts, or web searches"
+    ]
+  },
+  {
+    "id": "tao-run-deft-object-detection-stage-skills",
+    "question": "Reading only the tao-run-deft-object-detection skill documentation, which underlying TAO skills does each of its iteration stages invoke, and which stages are bundled glue rather than a skill? Do NOT run any commands, scripts, or web searches.",
+    "expected_skill": "tao-run-deft-object-detection",
+    "expected_script": null,
+    "ground_truth": "gap_analysis uses tao-analyze-gaps-od-map; embed uses tao-generate-image-embeddings; mine uses tao-mine-od-images; train and inference use tao-train-grounding-dino; kpi_analyze uses tao-analyze-detection-kpi. The stage step is bundled glue with no leaf skill.",
+    "expected_behavior": [
+      "Maps gap_analysis to tao-analyze-gaps-od-map",
+      "Maps embed to tao-generate-image-embeddings",
+      "Maps mine to tao-mine-od-images",
+      "Maps train and inference to tao-train-grounding-dino",
+      "Maps kpi_analyze to tao-analyze-detection-kpi",
+      "Identifies the stage step as bundled glue with no underlying skill",
+      "Does not run commands, scripts, or web searches"
+    ]
+  },
+  {
+    "id": "tao-run-deft-object-detection-run-loop",
+    "question": "Run the DEFT object-detection loop.\nPool images:      $POOL/images\nTarget classes:   bicycle, car, person\nworkspace         $WORKSPACE\nresults dir       $WORKSPACE/run_full\nKPI images        $KPI/images\nKPI ground truth  $KPI/labels\nKPI class mapping $MAPPING.yaml\nepochs 1 \u00b7 2 GPUs \u00b7 multiplier 1 \u00b7 allocation class-balanced\n\nOutline the steps the skill prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
+    "expected_skill": "tao-run-deft-object-detection",
+    "expected_script": null,
+    "ground_truth": "Identify tao-run-deft-object-detection, initialise run state from the supplied parameters, prepare the source pool once, score a zero-shot baseline, then iterate gap_analysis -> embed -> mine -> stage -> train -> inference -> kpi_analyze, committing each stage. Everything not supplied \u2014 the container images, the zero-shot checkpoint, every spec, the mining budget and the weak-image thresholds \u2014 comes from the skill, not from the user.",
+    "expected_behavior": [
+      "Identifies tao-run-deft-object-detection as the relevant skill",
+      "Runs Pre-Flight and stops at the Pre-Flight Summary for the single user gate before launching GPU work",
+      "States that prep runs once: Co-DETR pseudo-labels the pool, annotations convert produces COCO and ODVG, embedding image_embeddings produces the mining corpus",
+      "States that the baseline runs inference then kpi_analyze against a zero-shot checkpoint and does NOT train",
+      "Lists the seven iteration stages in order: gap_analysis, embed, mine, stage, train, inference, kpi_analyze",
+      "Does not ask the user for the container images, the zero-shot checkpoint, or any spec contents \u2014 the skill resolves these",
+      "Commits each stage so the run is resumable, rather than treating stage output alone as completion",
+      "Does not run commands, scripts, or web searches"
+    ]
+  },
+  {
+    "id": "tao-run-deft-object-detection-resume-state",
+    "question": "Resume the existing DEFT object-detection run at $RESULTS_DIR. Determine its canonical status and the single safe next action before launching any GPU work.",
+    "expected_skill": "tao-run-deft-object-detection",
+    "expected_script": "scripts/audit_deft_run.py",
+    "ground_truth": "Load tao-run-deft-object-detection and run its read-only audit against $RESULTS_DIR. The audit reads deft_state.json and loop_log.jsonl from disk and reports DEFT_RUN_STATUS, last_committed, next_action and read_before_action. Trust that over any prior assistant message or transcript, stop on INVALID, and read only the reference the audit names before acting.",
+    "expected_behavior": [
+      "Runs scripts/audit_deft_run.py against $RESULTS_DIR before any stage command",
+      "Treats deft_state.json plus loop_log.jsonl as the sole source of truth for what completed",
+      "Uses the audit's next_action rather than inferring the next stage from artifacts on disk",
+      "Reads only the reference named by read_before_action before acting",
+      "Stops when DEFT_RUN_STATUS is INVALID instead of continuing",
+      "Does not launch containers, pulls, or file mutations during the status check",
+      "Does not infer completion from a checkpoint, a kpi_calc.csv, or a prior assistant message alone"
+    ]
+  }
+]

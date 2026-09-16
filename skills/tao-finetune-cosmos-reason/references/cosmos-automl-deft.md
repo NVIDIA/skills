@@ -13,7 +13,7 @@ Load this file only when the compact `SKILL.md` points here for the current task
 
 Requests for "Cosmos Reason 3", "Cosmos3 Nano Reasoner", or
 `nvidia/Cosmos3-Nano` are handled by this skill. The packaged default base
-model is `hf_model://nvidia/Cosmos3-Nano`; override it only when the user
+model is supplied at runtime; URI refs are resolved automatically to immutable Hub commits. Use it only when the user
 explicitly provides a different HuggingFace model id, `hf_model://...` URI, or
 cluster-local snapshot. Apply the same base model consistently to train
 (`policy.model_name_or_path`) and post-training evaluation

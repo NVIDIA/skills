@@ -39,7 +39,10 @@ Before executing the op chain, re-read and confirm:
    confirmation prompt format, destructive-op approval policy.
 - [ ] Every op key cross-checked against `setup-preflight.json`
    `usdOptimize.operationsAvailable`.
-- [ ] Per-op `parameter_prerequisites` frontmatter read for each destructive op.
+- [ ] Each destructive op looked up in `references/operations/operations.json`
+   and its `parameter_prerequisites` read where the entry has one. Where it does
+   not, the fallback in `operation-safety.md` §"Fallback: confirm-required ops
+   with no `parameter_prerequisites` block" used to compose the confirmation.
 - [ ] `references/units-and-tolerances.md` — conversion formula for any
    tolerance-based op.
 - [ ] `references/invocation.md` for local invocation mechanics and upstream

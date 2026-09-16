@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
 """Aggregate per-skill BENCHMARK.md evaluation reports into benchmarks.json.
 
 Walks skills/*/BENCHMARK.md, extracts the evaluation summary, agents, and
@@ -26,8 +28,17 @@ from pathlib import Path
 SUMMARY_FIELDS = {
     "skill": [re.compile(r"^- Skill: `?([^`\n]+)`?\s*$")],
     "evaluation_date": [re.compile(r"^- Evaluation date: (.+)$")],
-    "profile": [re.compile(r"^- NVSkills-Eval profile: `?([^`\n]+)`?\s*$")],
+    # RETIRED. v1/v2 emitted "- NVSkills-Eval profile: external". v3 dropped
+    # the line along with the NVSkills-Eval name, which is internal and does
+    # not belong in a published report. The field is retired rather than
+    # carried as a permanently-null column named after an internal tool.
     "environment": [re.compile(r"^- Environment: `?([^`\n]+)`?\s*$")],
+    # v3 provenance. Absent from v1/v2, which leave these None.
+    "evaluator_version": [re.compile(r"^- Evaluator version: `?([^`\n]+?)`?\s*$")],
+    # The digest line carries a trailing snapshot name in parentheses, so this
+    # cannot use the trailing-anchored form the other fields use.
+    "dataset_digest": [re.compile(r"^- Dataset digest: `?([^`\s]+)`?")],
+    "validation_status": [re.compile(r"^- Validation status: `?([^`\n]+?)`?\s*$")],
     "tasks": [
         re.compile(r"^- Dataset: (\d+) evaluation tasks?"),          # v1
         re.compile(r"^- Tasks: (\d+) evaluation tasks?"),            # v2
@@ -62,6 +73,52 @@ RESULTS_SECTIONS = {"results", "results at a glance"}
 SUMMARY_ROWS = {"overall"}
 INT_FIELDS = {"tasks", "attempts_per_task"}
 FLOAT_FIELDS = {"pass_threshold_pct"}
+
+# NO_FABRICATION: v3 mentions "50%" once, in a static glossary bullet
+# ("- The 50% attempt pass threshold is a separate per-task gate; ..."). That
+# sentence is byte-identical across skills with 4, 5 and 18 tasks, so it is
+# template prose, not a per-skill measurement. Scraping it would stamp 50.0 on
+# every v3 skill regardless of what it was evaluated against — a fabricated
+# provenance claim in the file whose purpose is recording provenance. Leave
+# pass_threshold_pct None on v3 until SkillEvaluator emits it as a real field.
+
+# Fields mid-retirement: known to be losing values as cards migrate, so a
+# rising null count is the expected transition rather than a parser break.
+#
+# pass_threshold_pct is read from the "- Pass threshold: N%" line that v1/v2
+# cards carry and v3 cards dropped (see NO_FABRICATION above). Every skill that
+# re-runs CI and lands a v3 card therefore adds exactly one null. Without this
+# exemption the guard blocks every sync that migrates any skill — it fired on
+# cuopt-server-api-python on 2026-08-28 and would fire again on each of the
+# ~100 skills still carrying a v1/v2 value.
+#
+# The drift is still reported, just not treated as blocking: the point of the
+# guard is catching a parser that broke without anyone noticing, and this is
+# the opposite — a change we understand and chose. Every other field stays
+# guarded.
+#
+# Remove this once SkillEvaluator emits the threshold as a real per-run field
+# and the parser reads it again.
+#
+# ---
+#
+# validation_status is read from the "- Validation status: `passed`" line that
+# v1/v2 cards carry and SkillEvaluator 1.5.x dropped. It is the same shape of
+# change as pass_threshold_pct above, and it fired on 2026-09-15: the sync that
+# landed 10 BioNeMo KERMT/FoundationPose skills plus a re-signed nemotron-speech
+# took validation_status from 248 to 259 nulls and blocked the regeneration on
+# every hourly run until this exemption.
+#
+# Worth recording why this is not worth deriving from another field: the line
+# carries exactly one value. All 96 cards that still emit it say `passed`, and
+# none has ever said anything else, so it distinguishes nothing. Those 96 are
+# also precisely the 96 cards still carrying the internal CI image path, i.e.
+# the set last signed before 1.5.4 — so the field reaches zero on its own as
+# those teams re-sign, and inferring it from the verdict or the Tier 1 row
+# would assert something the original line never claimed.
+#
+# Remove this once no card emits the line and the field is dropped outright.
+MIGRATING_FIELDS = {"pass_threshold_pct", "validation_status"}
 
 
 def parse_uplift(raw):
@@ -173,6 +230,120 @@ def parse_benchmark(path: Path) -> dict:
     return entry
 
 
+def null_rate_regressions(old: dict, new: dict, exclude=frozenset()) -> dict:
+    """Fields that lost values between two benchmarks.json generations.
+
+    Returns {field: (old_null_count, new_null_count)} for every field whose
+    null count rose, counted only over skills present in BOTH files so that
+    newly added skills cannot register as a regression.
+
+    This is the generic guard against silent degradation: a regeneration can
+    succeed, keep a valid schema, pass --check, and still quietly empty a
+    column when an upstream report format changes. Both the v3
+    pass_threshold drift and the 2026-08-03 disappearance of
+    cuopt-multi-objective-exploration are that shape.
+
+    ``exclude`` drops catalog dirs from the comparison entirely. Callers use
+    it for dirs no longer registered in components.d: those are orphans
+    awaiting prune-orphans, and their component field going null is the
+    deregistration working, not a parser losing data. Counting them made a
+    routine catalog_dir rename unlandable — see main().
+
+    Skills are keyed by catalog_dir, not by the skill name in the report. A
+    rename leaves the old and new dirs carrying the *same* skill name, so a
+    name key collides: the two entries overwrite each other here, and an
+    exclusion aimed at the orphan would take the live skill with it. Dir
+    names are unique by construction.
+    """
+    def by_dir(doc):
+        return {s.get("catalog_dir") or s.get("skill"): s
+                for s in doc.get("skills", [])}
+
+    old_by_skill, new_by_skill = by_dir(old), by_dir(new)
+    common = (old_by_skill.keys() & new_by_skill.keys()) - set(exclude)
+
+    fields = {
+        k
+        for skill in common
+        for k in (*old_by_skill[skill], *new_by_skill[skill])
+        if k not in ("skill", "catalog_dir")
+    }
+
+    regressions = {}
+    for field in sorted(fields):
+        was = sum(1 for s in common if old_by_skill[s].get(field) is None)
+        now = sum(1 for s in common if new_by_skill[s].get(field) is None)
+        if now > was:
+            regressions[field] = (was, now)
+    return regressions
+
+
+def registered_catalog_dirs(repo_root: Path) -> set:
+    """Catalog dirs the sync will keep, by prune-orphans' own rule.
+
+    A dir survives the sync if it is declared in components.d, staged in
+    manual-components.yml, or listed in catalog-exceptions.yml. Anything else
+    under skills/ is deleted in the next sync commit.
+
+    Deliberately not derived from load_component_map(): that maps dir ->
+    component name and so only sees entries that declare one. An exception
+    listed without a component would drop out of the map and be read here as
+    an orphan, quietly losing it the null guard's protection. Membership, not
+    the component value, is what decides whether a dir has a future.
+    """
+    dirs = set()
+    for yml in sorted((repo_root / "components.d").glob("*.yml")):
+        for line in yml.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"^-?\s*catalog_dir:\s*(.+)$", line.strip())
+            if m:
+                dirs.add(m.group(1).strip())
+
+    manual = repo_root / ".github" / "scripts" / "manual-components.yml"
+    if manual.exists():
+        for line in manual.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"^-\s*(\S+)\s*$", line.strip())
+            if m:
+                dirs.add(m.group(1))
+
+    exceptions = repo_root / "catalog-exceptions.yml"
+    if exceptions.exists():
+        for line in exceptions.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"^-?\s*dir:\s*(.+)$", line.strip())
+            if m:
+                dirs.add(m.group(1).strip())
+    return dirs
+
+
+def component_only_difference(existing, payload: str) -> bool:
+    """True when two benchmarks.json bodies agree except on `component`.
+
+    Used to tell a stale product assignment — which a components.d edit
+    creates immediately and the next sync resolves — apart from real drift in
+    the measurements. Everything except the component values must match
+    exactly, including which skills are present, so this cannot mask a skill
+    appearing, vanishing, or changing its numbers.
+
+    A malformed existing file is not a component-only difference; it is a
+    genuine mismatch and the caller should report it as one.
+    """
+    if existing is None:
+        return False
+    try:
+        a, b = json.loads(existing), json.loads(payload)
+    except json.JSONDecodeError:
+        return False
+
+    def strip(doc):
+        doc = json.loads(json.dumps(doc))  # copy; leave the caller's alone
+        for entry in doc.get("skills", []):
+            entry.pop("component", None)
+        for row in doc.get("results", []):
+            row.pop("component", None)
+        return doc
+
+    return strip(a) == strip(b)
+
+
 def average_uplift(results: list):
     uplifts = [
         s["uplift_pct"]
@@ -279,6 +450,13 @@ def main() -> int:
         help="Fail (exit 1) if the checked-in benchmarks.json does not match "
         "what the BENCHMARK.md sources would generate.",
     )
+    ap.add_argument(
+        "--allow-null-regressions",
+        action="store_true",
+        help="Write even when a field lost values against the existing "
+        "benchmarks.json. Use when an upstream report format change has "
+        "genuinely retired a field, so the new state can be landed.",
+    )
     args = ap.parse_args()
     root = args.repo_root.resolve()
     target = root / "benchmarks.json"
@@ -289,6 +467,21 @@ def main() -> int:
     if args.check:
         existing = target.read_text(encoding="utf-8") if target.exists() else None
         if existing != payload:
+            # `component` is the one field not parsed from a BENCHMARK.md. It
+            # is joined in from components.d, so it moves the moment a PR
+            # edits a registration — while benchmarks.json cannot be brought
+            # up to date until the sync has renamed the dirs on disk. A
+            # components.d-only PR is therefore *expected* to differ here, and
+            # failing on it demanded a regeneration the null guard below then
+            # refused to perform. Validate the measurements; let the
+            # post-sync regeneration settle the join.
+            if component_only_difference(existing, payload):
+                print(
+                    "benchmarks.json differs only in component assignments, "
+                    "which components.d has changed and the next sync will "
+                    "re-derive. Measurements are up to date."
+                )
+                return 0
             print(
                 "benchmarks.json is out of date with skills/*/BENCHMARK.md.\n"
                 "Regenerate it with: python3 .github/scripts/aggregate_benchmarks.py",
@@ -297,6 +490,62 @@ def main() -> int:
             return 1
         print(f"benchmarks.json is up to date ({count} skills)")
         return 0
+
+    if target.exists() and not args.allow_null_regressions:
+        previous = json.loads(target.read_text(encoding="utf-8"))
+        generated = json.loads(payload)
+
+        # Catalog dirs still on disk but no longer registered are orphans:
+        # the sync's prune-orphans step deletes them in the same commit that
+        # writes the renamed dirs. Their component is null because the
+        # deregistration worked, so counting it as lost data blocks the very
+        # change that deregistered them. #519 could not be landed at all
+        # until this exclusion existed.
+        registered = registered_catalog_dirs(root)
+        # prune-orphans refuses to delete anything when the declared set comes
+        # back empty, because a parse error makes every dir look unregistered.
+        # The same reasoning applies here: an empty set would exempt the whole
+        # catalog and silently disable the guard.
+        orphans = {
+            s.get("catalog_dir")
+            for s in generated.get("skills", [])
+            if registered and s.get("catalog_dir") not in registered
+        }
+        if orphans:
+            print(
+                f"note: {len(orphans)} deregistered dir(s) awaiting prune "
+                "excluded from the null guard.",
+                file=sys.stderr,
+            )
+
+        lost = null_rate_regressions(previous, generated, exclude=orphans)
+
+        # Report every regression; block only on the ones we did not expect.
+        for field, (was, now) in sorted(lost.items()):
+            if field in MIGRATING_FIELDS:
+                print(
+                    f"note: {field} {was} -> {now} nulls — expected while cards "
+                    "migrate; see MIGRATING_FIELDS.",
+                    file=sys.stderr,
+                )
+        lost = {f: v for f, v in lost.items() if f not in MIGRATING_FIELDS}
+
+        if lost:
+            print(
+                "Refusing to write benchmarks.json: fields lost values.\n"
+                "Skills carried these before and would not after:",
+                file=sys.stderr,
+            )
+            for field, (was, now) in lost.items():
+                print(f"  {field}: {was} -> {now} nulls", file=sys.stderr)
+            print(
+                "\nThis usually means an upstream BENCHMARK.md format change "
+                "stopped emitting a field the parser reads.\n"
+                "Either teach the parser the new format, or re-run with "
+                "--allow-null-regressions if the field is genuinely retired.",
+                file=sys.stderr,
+            )
+            return 1
 
     target.write_text(payload, encoding="utf-8")
     print(f"Wrote benchmarks.json: {count} skills")

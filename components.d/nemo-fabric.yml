@@ -1,0 +1,10 @@
+name: NeMo Fabric
+repo: NVIDIA/NeMo-Fabric
+description: Portable skills for integrating applications with NeMo Fabric through its public SDK and building compatible third-party adapters.
+links:
+  discussions: false
+skills:
+  - path: skills/nemo-fabric-integrate/
+    catalog_dir: nemo-fabric-integrate
+  - path: skills/nemo-fabric-build-adapter/
+    catalog_dir: nemo-fabric-build-adapter

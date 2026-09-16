@@ -3,12 +3,12 @@
 ## Error Patterns
 
 **Checkpoint not found**: The evaluate, inference, export, and quantize actions
-require a valid checkpoint path. Current TAO 6.25.10 Visual ChangeNet training
-emits epoch/step checkpoint files such as `model_epoch_000_step_00012.pth`;
-it does not necessarily write `changenet_model_classify_latest.pth` or
-`changenet_model_segment_latest.pth`. Use the model-skill `parent_model`
-resolver for downstream actions and `resume_model` for resume, or pass the exact
-epoch/step checkpoint when running local Docker directly.
+require a concrete checkpoint path. Training emits files such as
+`model_epoch_000_step_00012.pth` and the task-specific latest symlink. Use the
+model-skill `parent_model` resolver for downstream actions and `resume_model`
+for resume, or pass the exact container path when running local Docker. Do not
+build a cross-action path from `${results_dir}`; TAO rebases it to the current
+action's output directory.
 
 **CSV format mismatch**: The classify CSV must have exactly four columns:
 `input_path`, `golden_path`, `label`, and `object_name`. Missing columns or
@@ -21,8 +21,6 @@ characters and uses comma delimiters (not semicolons or tabs).
 
 **Low evaluation accuracy with correct training loss**: The `eval_margin` threshold may be miscalibrated for your data. After training, run inference on a validation set and inspect the embedding distance distribution to pick an appropriate threshold. The default 0.3 is tuned for the reference dataset and may not generalize.
 
-**`AssertionError: Contrastive loss only supports Euclidean distance module`** at evaluate/inference: the spec dropped the `train` subtree. Model `__init__` reads `train.classify.loss` regardless of action; omitting it falls back to contrastive loss, which then conflicts with non-default `model.classify.difference_module` (e.g. `learnable`) saved in the checkpoint. Keep `train.classify.loss` (and `train.classify.cls_weight`) in the spec for evaluate and inference too.
-
 **Checkpoint load key mismatch at evaluate/inference**: Keep the classify model
 architecture fields aligned with the train spec. C-RADIO classify checkpoints
 require `model.backbone.type: c_radio_v2_vit_base_patch16_224`,
@@ -30,6 +28,17 @@ require `model.backbone.type: c_radio_v2_vit_base_patch16_224`,
 `model.classify.eval_margin: 0.3`, `dataset.classify.num_input: 1`, and
 `dataset.classify.input_map: {SolderLight: 0}` unless the training run used a
 different override set.
+
+**`KeyError: radio.*` loading an NGC classify checkpoint on 7.1**: The 7.0.x-era
+NGC model `nvidia/tao/visual_changenet_classification:visual_changenet_nvpcb_trainable_v1.0`
+is INCOMPATIBLE with the 7.1 `backbone_v2` architecture — loading it raises a
+`KeyError` on `radio.radio.radio.*` keys. There is no 7.1-compatible pretrained
+classify checkpoint published on NGC, so do not try to download a `full_model`
+classify checkpoint for evaluate/inference. Stage the public C-RADIOv2-B backbone
+(see SKILL.md) and TRAIN first, then run evaluate/inference against a checkpoint
+from that 7.1 train under `results_dir`. The backbone is a public HuggingFace
+download needing no NGC org — do not hardcode or assume any registry org;
+resolve any genuine NGC pull's org from `ngc config current`.
 
 **Training does not converge**: Check that `train.classify.cls_weight` is appropriate for your class distribution. If defects are very rare (<1% of samples), increase the defective class weight. Also verify that `fpratio_sampling` is not too low, which would under-sample the majority class.
 

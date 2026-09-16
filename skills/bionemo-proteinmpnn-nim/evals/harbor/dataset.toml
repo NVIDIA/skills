@@ -1,0 +1,6 @@
+[dataset]
+name = "proteinmpnn-local-eval"
+description = "Local ProteinMPNN NIM sequence-design evaluation"
+
+[[tasks]]
+name = "nvidia/proteinmpnn-local-design"

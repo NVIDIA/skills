@@ -5,20 +5,20 @@
 Source of truth:
 
 ```text
-https://github.com/NVIDIA/simready-foundation/blob/main/skills/simready-foundation-conform-fet-000-core/SKILL.md
+https://github.com/NVIDIA/simready-foundation/blob/v2026.04.1/skills/simready-foundation-conform-fet-000-core/SKILL.md
 ```
 
 Use an authenticated local checkout at
 `$SIMREADY_FOUNDATION_ROOT/skills/simready-foundation-conform-fet-000-core/SKILL.md`
 or
-`$PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT/simready-foundation/skills/simready-foundation-conform-fet-000-core/SKILL.md`
+`$OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT/simready-foundation/skills/simready-foundation-conform-fet-000-core/SKILL.md`
 when browser access is unavailable.
 
 Do not copy FET000 requirement summaries or repair policy into this repo.
 
 ## Local Helper
 
-This directory only keeps a legacy Skill Hub helper script for deterministic
+This directory only keeps a legacy Omniverse CAD-to-SimReady helper script for deterministic
 metadata updates and JSON reports:
 
 ```bash

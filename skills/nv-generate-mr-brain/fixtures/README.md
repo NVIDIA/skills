@@ -15,11 +15,13 @@ patient data, or model weights.
 
 | File | Modality | Notes |
 |---|---|---|
-| `default_mri_t1.json` | `mri_t1` | Whole-brain T1w, 256^3, 1 mm spacing |
-| `mri_t2.json` | `mri_t2` | Whole-brain T2w, 256^3, 1 mm spacing |
-| `mri_flair_skull_stripped.json` | `mri_flair_skull_stripped` | Skull-stripped FLAIR, 256^3, 1 mm spacing |
+| `default_mri_t1.json` | `mri_t1` | v1 axial T1w default, `[256,256,128]` at `[0.94,0.94,1.36]` mm |
+| `mri_t2.json` | `mri_t2` | v1 axial T2w starting point near the upstream median FOV |
+| `mri_flair_skull_stripped.json` | `mri_flair_skull_stripped` | v1 skull-stripped axial FLAIR starting point |
+| `mri_mra.json` | `mri_mra` | v1 axial MRA starting point; sparse upstream training coverage |
 
 Valid modality names follow upstream `configs/modality_mapping.json`: `mri`,
-`mri_t1`, `mri_t2`, `mri_flair`, `mri_swi`,
+`mri_t1`, `mri_t2`, `mri_flair`, `mri_mra`, `mri_swi`,
 `mri_t1_skull_stripped`, `mri_t2_skull_stripped`,
-`mri_flair_skull_stripped`, and `mri_swi_skull_stripped`.
+`mri_flair_skull_stripped`, `mri_mra_skull_stripped`, and
+`mri_swi_skull_stripped`.

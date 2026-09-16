@@ -45,7 +45,7 @@ Concrete patterns extracted from the TAO repos for running tests in containers, 
 
 > **Note:** For testing, we run directly inside the prepared TAO Toolkit containers (image tags built in Phase 0) — no Docker build is involved in the test loop. Release Docker images are optional and only for distribution validation. All work must be **local only** (`--load`, not `--push`). Do NOT push images to any registry.
 
-> **Authority for generic flags:** the `--gpus`, `--ipc=host` / `--shm-size`,
+> **Authority for generic flags:** the `--gpus`, `--shm-size=8g` / `--shm-size`,
 > `-v host:container`, `-e VAR` passthrough, container-name reuse, and
 > `docker inspect` / `docker logs` patterns are owned by
 > [`tao-skill-bank:tao-run-on-docker`](../../../platform/tao-run-on-docker/SKILL.md). The host GPU
@@ -74,7 +74,7 @@ The skill runs every test inside a TAO Toolkit container image on `nvcr.io`. Pha
 
 | Repo | Local tag (prepared in Phase 0) | Underlying TAO Toolkit image (user-supplied) |
 |------|---------------------------------|----------------------------------------------|
-| **tao-core** | `tao-pytorch-base:latest` (or `nvcr.io/nvidia/pytorch:24.03-py3`) | public NGC PyTorch image, or reuses the prepared tao-pytorch image |
+| **tao-core** | `tao-pytorch-base:latest` (or `nvcr.io/nvidia/pytorch:24.03-py3`) | public NGC PyTorch image, or reuses the prepared tao-pytorch image | <!-- unpinned: example public NGC base image -->
 | **tao-pytorch** | `tao-pytorch-base:latest` | tao-pytorch image (e.g. `nvcr.io/<org>/tao-toolkit:<version>-pyt`) |
 | **tao-deploy** | `tao-deploy-base:latest` | tao-deploy image (e.g. `nvcr.io/<org>/tao-toolkit:<version>-deploy`) |
 | **tao-dataservices** | `tao-dataservices-base:latest` (optional) | tao-dataservices image (e.g. `nvcr.io/<org>/tao-toolkit:<version>-data-services`) |

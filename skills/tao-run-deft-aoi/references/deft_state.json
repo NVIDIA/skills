@@ -1,41 +1,87 @@
 {
-  "_comment": "Reference schema for ${RESULTS_DIR}/deft_state.json. Written with Python/jq (never echo) after every step. Together with results/loop_log.jsonl this is the single source of truth: re-read on startup and before every stage; never trust in-memory state across turns. Example values are aligned to ~/workspace.",
-  "version": 2,
+  "_comment": "Reference schema for ${RESULTS_DIR}/deft_state.json. Initialize it once and update it through commit_stage.py after every step. It is the single source of truth: re-read on startup and before every stage; never trust in-memory state across turns. Every recorded path must be absolute; /home/user/workspace is the resolved example form of ~/workspace.",
+  "version": 4,
   "started_at": "2026-05-04T06:46:53+00:00",
-  "kpi_target": "FAR < 10% at recall=100%",
-  "results_dir": "~/workspace/results",
+  "status": "in_progress",
+  "kpi_target": "Quality score >= 0.9",
+  "metric_contract": {
+    "name": "quality_score",
+    "display_name": "Quality score",
+    "operator": ">=",
+    "target": 0.9,
+    "unit": "",
+    "evaluator": {
+      "type": "command",
+      "path": "/home/user/workspace/metrics/evaluate_quality.py",
+      "args": []
+    },
+    "constraints": []
+  },
+  "results_dir": "/home/user/workspace/results/run_<TS>",
   "max_iterations": 2,
   "current_iteration": 0,
+  "execution_policy": {
+    "network_mode": "airgap",
+    "activation_source": "harness restriction",
+    "allow_package_install": false,
+    "allow_remote_fetch": false,
+    "allow_container_pull": false,
+    "allow_registry_login": false,
+    "python_launcher": "scripts/deft_python.sh",
+    "python_executable": "/usr/bin/python3",
+    "hf_offline": true
+  },
   "config": {
-    "specs_file": "~/workspace/specs/baseline_spec.yaml",
-    "training_csv": "~/workspace/train/base/training_set.csv",
-    "validation_csv": "~/workspace/train/base/validation_set.csv",
-    "kpi_test_csv": "~/workspace/kpi/testing_set.csv",
-    "images_dir": "~/workspace/kpi/images",
-    "backbone_weight_dir": "~/workspace/augmentation/backbone",
+    "specs_file": "/home/user/workspace/specs/baseline_spec.yaml",
+    "training_csv": "/home/user/workspace/train/base/training_set.csv",
+    "validation_csv": "/home/user/workspace/train/base/validation_set.csv",
+    "kpi_test_csv": "/home/user/workspace/kpi/testing_set.csv",
+    "images_dir": "/home/user/workspace/images",
+    "mining_pool_csv": "/home/user/workspace/augmentation/mining_pool/mining_pool.csv",
+    "mining_images_root": "/home/user/workspace/images",
+    "resolved_mining_pool_csv": "/home/user/workspace/results/run_<TS>/inputs/mining_pool.resolved.csv",
+    "backbone_weight_dir": "/home/user/workspace/augmentation/backbone",
     "train_container": "<resolved from versions.yaml::images.tao_toolkit.pyt at init time>",
     "num_gpus": 4,
+    "gpu_model": "NVIDIA RTX PRO 6000 Blackwell (96 GB)",
     "batch_size": 16,
-    "num_epochs": 20,
+    "num_epochs": 10,
     "anomalygen": {
-      "sub_skill": "paidf-anomalygen",
+      "sub_skill": "tao-generate-anomalies",
       "mode": "inference_only",
       "project": "nvpcb",
-      "defect_spec": "~/workspace/augmentation/anomalygen/datasets/nvpcb/defect_spec.jsonl",
-      "checkpoint_dir": "~/workspace/augmentation/anomalygen/checkpoints/nvpcb",
-      "dataset_dir_source": "~/workspace/augmentation/anomalygen/datasets/nvpcb",
+      "defect_spec": "/home/user/workspace/augmentation/anomalygen/datasets/nvpcb/defect_spec.jsonl",
+      "checkpoint_dir": "/home/user/workspace/augmentation/anomalygen/checkpoints/nvpcb",
+      "dataset_dir_source": "/home/user/workspace/augmentation/anomalygen/datasets/nvpcb",
       "step": 14000,
       "num_SDG": 20,
-      "container": "nvcr.io/nv-metropolis-dev/metropolis-sdg/paidf-anomalygen:1.0.0-26487d2d.main"
+      "container": "<resolved from AG_IMAGE or versions.yaml at init time>"
     },
     "mining_filter": {
       "sub_skill": "tao-mine-aoi-images",
       "top_k_per_target": 5,
       "metric": "cosine",
-      "min_similarity": null
+      "min_similarity": 0.9,
+      "history_aware": {
+        "enabled": true,
+        "identity": "filepath",
+        "history_file": "/home/user/workspace/results/run_<TS>/mining_history.json"
+      }
     }
   },
   "iterations": {},
+  "events": [
+    {
+      "seq": 1,
+      "ts": "2026-05-04T06:55:00+00:00",
+      "iter": "baseline",
+      "stage": "train",
+      "status": "ok",
+      "summary": "baseline training complete",
+      "duration_sec": 487,
+      "context_tokens": 0
+    }
+  ],
   "_completed_step_values": [
     "evaluate",
     "rca",
@@ -43,6 +89,7 @@
     "anomalygen",
     "routing",
     "data_mining",
+    "data_merge",
     "train",
     "loop_stop"
   ],

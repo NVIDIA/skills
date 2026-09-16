@@ -47,6 +47,26 @@ integer ``rendered_mesh_count`` / ``dangling`` and boolean
 values actually pass (count unchanged, bounds/bytes preserved, dangling 0) is
 scored against the asset's oracle, not here.
 
+Safety-gate gate (Phase-2c correctness precondition)
+----------------------------------------------------
+The ``safety_gate`` block records whether a correctness precondition — dangling
+material bindings, a broken reference — was cleared before structuring. It was
+optional and unchecked, so deleting it turned a run the scorer zeroes into one it
+passed at 1.0: the gradient rewarded hiding the finding. This gate requires the
+block whenever a ``validators[]`` row reports issues for a concept the registry
+(``usd-validation-runner/references/validator-concepts.json``) tags
+``role: safety_gate``, and requires a present block to state a non-empty status.
+The status vocabulary is a schema enum, and the run-scoring oracle reads the same
+``safety_gate_status`` helper, so an unstated gate is unresolved on both paths.
+
+Score-arithmetic gate
+---------------------
+``optimization_score`` is defined as the weighted mean over ``metric_groups[]``
+and ``score_label`` as a band derived from it. Both rules lived only in prose and
+schema descriptions, so a report declaring 2.0 with the label ``strong`` — or a
+weighted mean of 1.0 against a declared 8.0 — validated clean. Both are now
+recomputed from data already in the report.
+
 Descent-convergence gate (premature-merge / premature-decimate)
 ---------------------------------------------------------------
 A run that did hierarchy dedup / instancing must not run a Phase-4 geometry op
@@ -64,7 +84,8 @@ rejects the ``descent_converged == true`` with residue-remaining contradiction.
 
 Usage:
     python3 validate_report.py <report.json> [--schema <schema.json>] \\
-        [--manifest <apply-restructure-manifest.json> ...]
+        [--manifest <apply-restructure-manifest.json> ...] \\
+        [--validator-concepts <validator-concepts.json>]
 Exit code 0 when the report conforms and the coverage gate passes, 1 otherwise.
 """
 from __future__ import annotations
@@ -83,6 +104,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import descent_convergence_common as dcc  # noqa: E402
 
 DEFAULT_SCHEMA = Path(__file__).resolve().parent / "optimization-report.schema.json"
+#: The validator-concept registry is the single source of truth for which concepts
+#: are safety gates (``role: safety_gate``). It ships in the sibling
+#: usd-validation-runner reference; this validator reads it and never restates it.
+DEFAULT_VALIDATOR_CONCEPTS = (
+    Path(__file__).resolve().parents[2]
+    / "usd-validation-runner"
+    / "references"
+    / "validator-concepts.json"
+)
 
 #: A Phase-4 target is "resolved" only with one of these dispositions. ``blocked``
 #: (or a target with no entry at all) keeps ``target_coverage.complete`` false and
@@ -101,11 +131,47 @@ SHARED_IDENTITY_DISPOSITIONS = frozenset({"externalize_shared", "internal_share"
 IDENTITY_DESTROYING_ROUTES = frozenset({"point_instance", "merge"})
 #: Identity signals that mark a unit as a real, addressable part (strong identity).
 STRONG_IDENTITY_SIGNALS = frozenset({"kind", "naming", "semantic"})
+#: The structural-fallback grain: identity is absent, so the coarsest repeating
+#: subtree proposed the boundary. Weak identity, but a LEGAL shared-frontier basis —
+#: this is the escape hatch ``select_frontier.py`` grants and the value it emits.
+STRUCTURAL_FALLBACK_SIGNAL = "structural_fallback"
+#: Every identity_signal the apply-restructure manifest schema admits. Anything
+#: else (a typo, an invented spelling) is rejected rather than waved through: the
+#: shared/destroying checks below key on exact values, so an unknown signal would
+#: otherwise slip past both of them.
+LEGAL_IDENTITY_SIGNALS = STRONG_IDENTITY_SIGNALS | {STRUCTURAL_FALLBACK_SIGNAL, "none"}
+#: ``safety_gate.status`` values that mean the correctness precondition IS cleared.
+SAFETY_GATE_CLEARED_STATUSES = frozenset(
+    {"resolved", "clear", "none", "passed", "not_required"}
+)
+#: ...and the values that say it is not. Together these are the schema enum, so a
+#: typo cannot land in the gap between "cleared" and "uncleared" and read as clean.
+SAFETY_GATE_UNCLEARED_STATUSES = frozenset({"unresolved", "blocked", "failed"})
+SAFETY_GATE_STATUSES = SAFETY_GATE_CLEARED_STATUSES | SAFETY_GATE_UNCLEARED_STATUSES
+#: Score bands, high to low, as ``(label, inclusive_lower_bound)``. Mirrors the
+#: schema's score_label description and the README's derivation rule.
+SCORE_BANDS: tuple[tuple[str, float], ...] = (
+    ("excellent", 9.0),
+    ("strong", 7.5),
+    ("moderate", 5.5),
+    ("neutral", 4.5),
+    ("mixed", 2.5),
+    ("regressed", float("-inf")),
+)
+#: How far the declared ``optimization_score`` may sit from the recomputed weighted
+#: mean. The contract rounds the mean to one decimal, so 0.05 admits every correct
+#: rounding and nothing else.
+_SCORE_TOLERANCE = 0.05
 #: Coverage-entry roles that mean "a restructure happened", so a manifest is
 #: mandatory and reconciliation is not optional. The ``monolith`` role (an
 #: optimize-as-is N=1 target) and an empty ledger stay manifest-free. Shared with
 #: the descent-convergence gate (dcc.RESTRUCTURE_ROLES) so the two stay in lockstep.
 RESTRUCTURE_ROLES = dcc.RESTRUCTURE_ROLES
+
+
+def _is_number(value: Any) -> bool:
+    """True for a real JSON number. ``bool`` is an ``int`` in Python and is not one."""
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
 
 
 def _type_ok(instance: Any, type_name: str) -> bool:
@@ -180,18 +246,27 @@ def _validate_frontier_entry(target: dict, label: str) -> list[str]:
 
     * a shared (externalize_shared / internal_share) or identity-destroying
       (point_instance / merge) entry must carry an ``identity_signal`` (the
-      queryable boundary basis);
-    * a shared entry whose frontier landed on anonymous meshes
-      (``identity_signal == "none"``) fails — the descent crossed from parts into
-      triangles;
+      queryable boundary basis), and that signal must be one the manifest schema
+      admits;
+    * a shared entry must land on a strong (kind / naming / semantic) unit or on
+      the ``structural_fallback`` grain — landing on anonymous meshes
+      (``identity_signal == "none"``) fails, because the descent crossed from
+      parts into triangles;
     * an identity-destroying ``reduction_route`` on a STRONG-identity unit
       (kind / naming / semantic) fails — point_instance / merge are the matrix's
-      two weak-identity-only rows.
+      two weak-identity-only rows — UNLESS the entry carries
+      ``intent_confirmed: true``.
+
+    The two exemptions (the ``structural_fallback`` grain and ``intent_confirmed``)
+    are the ones ``select_frontier.py`` already grants on the producer side. They
+    are honoured here so a descent the producer deliberately allows does not fail
+    its own report gate at the end of the run.
     """
     errors: list[str] = []
     disposition = target.get("identity_disposition")
     route = target.get("reduction_route")
     signal = target.get("identity_signal")
+    intent_confirmed = bool(target.get("intent_confirmed"))
 
     is_shared = disposition in SHARED_IDENTITY_DISPOSITIONS
     is_destroying = route in IDENTITY_DESTROYING_ROUTES
@@ -202,21 +277,28 @@ def _validate_frontier_entry(target: dict, label: str) -> list[str]:
             f"({disposition}) or identity-destroying ({route}) entry "
             "(the boundary basis must be queryable)"
         )
+    elif signal is not None and signal not in LEGAL_IDENTITY_SIGNALS:
+        errors.append(
+            f"{label}: identity_signal {signal!r} is not one of "
+            f"{sorted(LEGAL_IDENTITY_SIGNALS)} (the apply-restructure manifest enum) "
+            "— an unrecognised signal would slip past both identity guards"
+        )
 
     if is_shared and signal == "none":
         errors.append(
             f"{label}: identity_disposition {disposition!r} landed on anonymous "
             "meshes (identity_signal 'none') — a shared frontier must land on a "
             "named/kind/semantic unit or, at worst, the coarsest repeating subtree "
-            "(structural_fallback), never anonymous geometry"
+            "(identity_signal 'structural_fallback'), never anonymous geometry"
         )
 
-    if is_destroying and signal in STRONG_IDENTITY_SIGNALS:
+    if is_destroying and signal in STRONG_IDENTITY_SIGNALS and not intent_confirmed:
         errors.append(
             f"{label}: identity-destroying reduction_route {route!r} on a "
             f"strong-identity unit (identity_signal {signal!r}) — point_instance / "
             "merge are reserved for weak-identity (anonymous / structural_fallback) "
-            "units; a named/kind/semantic part must stay addressable"
+            "units; a named/kind/semantic part must stay addressable unless the "
+            "entry records an explicit intent_confirmed: true"
         )
 
     return errors
@@ -501,6 +583,220 @@ def validate_preservation(report: Any) -> list[str]:
     return errors
 
 
+class ValidatorConceptsUnavailable(RuntimeError):
+    """The validator-concept registry could not be read.
+
+    Raised rather than swallowed: the rule the safety-gate check exists to enforce
+    is that silence must not read as a clean gate, so a check that cannot run has
+    to say so instead of passing.
+    """
+
+
+_SAFETY_GATE_CONCEPTS_CACHE: dict[str, frozenset[str]] = {}
+
+
+def load_safety_gate_concepts(concepts_path: Path | None = None) -> frozenset[str]:
+    """Canonical names of every registry concept tagged ``role: safety_gate``.
+
+    The registry (``usd-validation-runner/references/validator-concepts.json``) is
+    the single source of truth for that tag; this validator reads it rather than
+    keeping a second copy of the list that could drift.
+    """
+    path = Path(concepts_path) if concepts_path is not None else DEFAULT_VALIDATOR_CONCEPTS
+    key = str(path)
+    cached = _SAFETY_GATE_CONCEPTS_CACHE.get(key)
+    if cached is not None:
+        return cached
+    try:
+        registry = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValidatorConceptsUnavailable(
+            f"validator-concept registry {path} could not be read ({exc}), so the "
+            "safety-gate check cannot tell which validators are safety gates"
+        ) from exc
+    concepts = registry.get("concepts") if isinstance(registry, dict) else None
+    if not isinstance(concepts, list):
+        raise ValidatorConceptsUnavailable(
+            f"validator-concept registry {path} has no concepts[] array"
+        )
+    names = frozenset(
+        concept["canonical_name"]
+        for concept in concepts
+        if isinstance(concept, dict)
+        and concept.get("role") == "safety_gate"
+        and isinstance(concept.get("canonical_name"), str)
+    )
+    if not names:
+        raise ValidatorConceptsUnavailable(
+            f"validator-concept registry {path} declares no role 'safety_gate' concepts"
+        )
+    _SAFETY_GATE_CONCEPTS_CACHE[key] = names
+    return names
+
+
+def fired_safety_gate_validators(
+    report: Any, concepts_path: Path | None = None
+) -> list[str]:
+    """``validators[]`` row names that report issues for a registry safety gate.
+
+    The registry is read only when at least one row reports issues, so a report
+    with no validator findings never depends on it.
+    """
+    rows = report.get("validators") if isinstance(report, dict) else None
+    if not isinstance(rows, list):
+        return []
+    reporting: list[str] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        name = row.get("name")
+        issues = row.get("issues")
+        if isinstance(name, str) and _is_number(issues) and issues > 0:
+            reporting.append(name)
+    if not reporting:
+        return []
+    gates = load_safety_gate_concepts(concepts_path)
+    return sorted({name for name in reporting if name in gates})
+
+
+def safety_gate_status(report: Any) -> str | None:
+    """Normalized ``safety_gate.status``.
+
+    ``None`` when the block is absent; ``""`` when the block is there but records
+    no usable status (key missing, empty, or not a string). Both callers — this
+    validator and the run-scoring oracle — read the state through this one
+    function so they cannot disagree about what "unstated" means.
+    """
+    block = report.get("safety_gate") if isinstance(report, dict) else None
+    if not isinstance(block, dict):
+        return None
+    raw = block.get("status")
+    return raw.strip().lower() if isinstance(raw, str) else ""
+
+
+def validate_safety_gate(report: Any, concepts_path: Path | None = None) -> list[str]:
+    """Gate the Phase-2c ``safety_gate`` block: presence and a stated status.
+
+    Two rules, both fail-closed:
+
+    * the block is REQUIRED whenever a ``validators[]`` row reports issues for a
+      concept the registry tags ``role: safety_gate``. Without this, deleting the
+      block turned a run the scorer zeroes into a run it passes at 1.0 — the
+      scoring gradient pointed at omission, which on an eval loop trains an agent
+      to hide correctness findings;
+    * a block that is present must record a non-empty ``status``. The set of legal
+      status strings is the schema enum (see ``SAFETY_GATE_STATUSES``); this
+      function checks only that something was stated.
+    """
+    errors: list[str] = []
+    if not isinstance(report, dict):
+        return errors
+    try:
+        fired = fired_safety_gate_validators(report, concepts_path)
+    except ValidatorConceptsUnavailable as exc:
+        return [f"safety_gate: {exc}"]
+
+    status = safety_gate_status(report)
+    if status is None:
+        if fired:
+            errors.append(
+                "safety_gate block is missing but safety-gate validator(s) "
+                f"{fired} report issues — a fired correctness gate must be recorded "
+                "with its status (resolved/clear/none/passed/not_required when it was "
+                "cleared, unresolved/blocked/failed when it was not). Omitting the "
+                "block hides the finding from the scorer instead of clearing the gate."
+            )
+    elif not status:
+        errors.append(
+            "safety_gate is present but records no status — an unstated gate is "
+            "treated as unresolved, never as cleared. Set safety_gate.status to one "
+            f"of {sorted(SAFETY_GATE_STATUSES)}."
+        )
+    return errors
+
+
+def score_band(score: float) -> str:
+    """The documented ``score_label`` band for a numeric ``optimization_score``."""
+    for label, lower_bound in SCORE_BANDS:
+        if score >= lower_bound:
+            return label
+    return SCORE_BANDS[-1][0]
+
+
+def validate_score_arithmetic(report: Any) -> list[str]:
+    """Gate the headline ``optimization_score`` and its ``score_label``.
+
+    Both rules are stated in the schema descriptions and the report README, and
+    until now neither was checked: a report could declare 2.0 with the label
+    ``strong``, or a weighted mean of 1.0 against a declared 8.0, and validate
+    clean. The score is the number every reader anchors on, and both inputs are
+    already in the report, so recompute it:
+
+    * the weighted mean over ``metric_groups[]`` with a non-null score and a
+      non-zero weight must be within 0.05 of ``optimization_score`` (the contract
+      rounds to one decimal, so that tolerance admits every correct rounding);
+    * ``score_label`` must be the band the declared score falls in.
+    """
+    errors: list[str] = []
+    if not isinstance(report, dict):
+        return errors
+    declared = report.get("optimization_score")
+    groups = report.get("metric_groups")
+
+    if _is_number(declared) and isinstance(groups, list):
+        weighted_total = 0.0
+        weight_total = 0.0
+        negative_weights: list[Any] = []
+        for group in groups:
+            if not isinstance(group, dict):
+                continue
+            group_score = group.get("score")
+            weight = group.get("weight")
+            if not _is_number(weight):
+                continue
+            if weight < 0:
+                negative_weights.append(group.get("id", "<unknown>"))
+                continue
+            if group_score is None or not _is_number(group_score) or weight == 0:
+                continue
+            weighted_total += group_score * weight
+            weight_total += weight
+        if negative_weights:
+            errors.append(
+                f"metric_groups {negative_weights} declare a negative weight; weights "
+                "are a non-negative relative scale, and a negative one corrupts the "
+                "weighted mean the top-level score is computed from"
+            )
+        if weight_total:
+            computed = weighted_total / weight_total
+            if abs(declared - computed) > _SCORE_TOLERANCE:
+                errors.append(
+                    f"optimization_score {declared} does not match the weighted mean of "
+                    f"metric_groups[] ({computed:.4f}, rounds to {round(computed, 1)}) "
+                    f"within {_SCORE_TOLERANCE}. The score is computed as "
+                    "round(sum(score * weight) / sum(weight), 1) over groups with a "
+                    "non-null score and a non-zero weight; do not hand-edit it afterwards."
+                )
+        elif not negative_weights:
+            errors.append(
+                f"optimization_score {declared} is declared but metric_groups[] has no "
+                "scored group (non-null score with a non-zero weight) to compute it "
+                "from; the headline score is derived from the groups, so at least one "
+                "must carry a score"
+            )
+
+    label = report.get("score_label")
+    if _is_number(declared) and isinstance(label, str):
+        expected = score_band(declared)
+        if label != expected:
+            errors.append(
+                f"score_label {label!r} contradicts optimization_score {declared}, "
+                f"which falls in the {expected!r} band (excellent >= 9.0; strong >= 7.5; "
+                "moderate >= 5.5; neutral >= 4.5; mixed >= 2.5; regressed < 2.5)"
+            )
+    return errors
+
+
 def reconcile_target_coverage(report: Any, manifests: list[Any] | None = None) -> list[str]:
     """Gate the report's Phase-4 target_coverage; reconcile against manifest(s).
 
@@ -727,6 +1023,14 @@ def main() -> int:
         "the report's target_coverage.source_manifests[] are loaded automatically "
         "and merged with these.",
     )
+    parser.add_argument(
+        "--validator-concepts",
+        type=Path,
+        default=None,
+        help="Path to validator-concepts.json. Defaults to the sibling "
+        "usd-validation-runner reference; the safety-gate check reads it to learn "
+        "which concepts carry role 'safety_gate'.",
+    )
     args = parser.parse_args()
 
     report = json.loads(args.report.read_text(encoding="utf-8"))
@@ -747,6 +1051,8 @@ def main() -> int:
     errors.extend(reconcile_target_coverage(report, manifests))
     errors.extend(validate_footprint(report))
     errors.extend(validate_preservation(report))
+    errors.extend(validate_safety_gate(report, args.validator_concepts))
+    errors.extend(validate_score_arithmetic(report))
     errors.extend(validate_descent_convergence(report, manifests))
 
     if errors:

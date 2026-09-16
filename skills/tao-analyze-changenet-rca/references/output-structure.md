@@ -25,7 +25,7 @@ to 128×128 px (or original size if smaller). Use these thumbnails in the Markdo
 - 3.1 Golden Image Audit
      | Golden Path | Thumbnail | Mean Intensity | Visual Verdict |
      |-------------|-----------|----------------|----------------|
-     (one row per audited golden image, thumbnail = `![golden](rca_images/<name>.jpg)`)
+     (one row per audited golden image, thumbnail = `![golden] (rca_images/<filename>.jpg)`)
 
 - 3.2 Failure Mode Clustering
      | Sample | Score | Defect Type | Test Image | Golden Image | Failure Mode | Description |

@@ -37,11 +37,12 @@ resource_defaults:
   timeout_hours: 3.8
   max_time_hours: 4
   partition: polar,polar3,polar4,grizzly
-  container_mounts: /lustre
+  container_mounts: runtime-supplied
   use_sqsh: true
-  sqsh_conversion_partition: cpu
-  sqsh_conversion_timeout_minutes: 30
-  sqsh_conversion_memory_gb: 32
+  sqsh_conversion_partition: cpu_long
+  sqsh_conversion_timeout_minutes: 120
+  sqsh_conversion_cpus_per_task: 4
+  sqsh_conversion_memory_mb: 7200
 cloud_storage:
   protocol: lustre
   uri_format: lustre:///{absolute_path}

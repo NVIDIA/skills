@@ -488,8 +488,9 @@ def test_trainer_one_step(cfg, processor, tmp_path_factory):
 ## Running Tests — Phase 4.5 Command
 
 ```bash
+set -a; source /path/to/.env; set +a   # omit if already exported
 docker run --rm --gpus all --shm-size=16g \
-  -e HF_TOKEN=$HF_TOKEN \
+  -e HF_TOKEN \
   -e PYTHONUNBUFFERED=1 \
   -v $(pwd)/output_dir:/workspace \
   <ngc_image> \

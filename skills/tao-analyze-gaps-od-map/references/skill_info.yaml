@@ -1,0 +1,22 @@
+network_arch: tao-analyze-gaps-od-map
+type: data
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+gpu_spec_key: null
+required_credentials: []
+actions:
+  object_detection:
+    command: gap_analysis object_detection -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      ground_truth_ann_path:
+        type: path   # KITTI: a directory; COCO: a json file
+      inference_ann_path:
+        type: path   # KITTI: a directory; COCO: a json file
+      images_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: directory
+    upload_excludes:
+    - inputs/

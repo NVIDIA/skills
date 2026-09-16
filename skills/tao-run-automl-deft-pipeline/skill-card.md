@@ -9,65 +9,71 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers who need to run an end-to-end three-phase training pipeline (AutoML baseline, DEFT iterative data-improvement loop, AutoML refinement) on NVIDIA TAO models for AOI inspection and other DEFT applications. <br>
+Developers and engineers use this skill to run the full three-phase AOI training pipeline — AutoML hyperparameter optimization, DEFT data-improvement loop, and post-DEFT AutoML refinement — to fine-tune NVIDIA TAO ChangeNet models end-to-end. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Consolidated Pre-Flight](references/consolidated-preflight.md) <br>
-- [Phase Handoffs](references/phase-handoffs.md) <br>
-- [Pitfalls and Quality Checks](references/pitfalls-and-quality-checks.md) <br>
-- [Quick Start Example](references/quick-start-example.md) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
+- [consolidated-preflight.md](references/consolidated-preflight.md) <br>
+- [phase-handoffs.md](references/phase-handoffs.md) <br>
+- [pitfalls-and-quality-checks.md](references/pitfalls-and-quality-checks.md) <br>
+- [quick-start-example.md](references/quick-start-example.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Files] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`claude-code`) <br>
-- Codex (`codex`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task in the NVSkills-Eval `external` profile (`astra-sandbox` environment). <br>
+Evaluated against 1 task (1 positive) from skill-evaluator-dataset-snapshot/1, with 3 attempts per task in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks whether the final answer is correct against the reference answer. <br>
+- Discoverability: Checks whether the right skill was loaded and activated when needed. <br>
+- Effectiveness: Checks whether the skill helped the agent complete the user's goal and follow the expected workflow. <br>
+- Efficiency: Checks whether the skill avoided wasted tool calls and excessive token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Verifies absence of unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
+- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Verifies tool-call productivity. <br>
+- `token_efficiency`: Verifies actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 100% (+100%) | 97% (+97%) |
-| Discoverability | 1 | 88% (+88%) | 59% (+59%) |
-| Effectiveness | 1 | 90% (+76%) | 90% (+66%) |
-| Efficiency | 1 | 75% (+48%) | 42% (+14%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 99.4% — baseline ran, but no comparable score was available; uplift unavailable | 79.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 6.7% → 100.0% (+93.3 points) | 20.0% → 100.0% (+80.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 16.7% → 100.0% (+83.3 points) | 48.3% → 100.0% (+51.7 points) |
+| Efficiency | 97.2% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.5% (-1.2 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

@@ -21,7 +21,8 @@
       "routes to i4h-workflow-dataset-mimic",
       "uses an existing HDF5 recording as input",
       "expands to the requested episode count",
-      "applies small action and state noise"
+      "applies small action noise",
+      "does not claim to add independent state noise or synthesize new camera frames"
     ]
   }
 ]

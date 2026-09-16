@@ -1,0 +1,190 @@
+schema_version: 2
+backend: cosmos-rl
+display_name: Cosmos-RL
+native_source_repository: cosmos-reason-gitlab
+tao_integration_repository: cosmos-rl
+runtime_image_selection:
+  explicit_sqsh_precedence: true
+  packaged_default_when_omitted: true
+  source_build_requires_explicit_mode: true
+build:
+  owner: cosmos-rl
+  dockerfile: Dockerfile
+  required_build_args:
+  - COSMOS_BACKEND
+  - COSMOS_RL_BUILD_MODE
+  - VLLM_BASE_IMAGE
+  - COSMOS_RL_GITHUB_REPO
+  - COSMOS_RL_GITHUB_BRANCH
+  - ACTIONS_COMMIT
+  - ACTIONS_TREE
+  - DAFT_COMMIT
+  - DAFT_TREE
+  - TAO_CORE_COMMIT
+  - TAO_CORE_TREE
+  - SOURCE_DIRTY
+  - BUILD_TIMESTAMP
+  - PYAV_WHEEL_SHA256
+  clean_source_required: true
+  provenance_file: /opt/tao/image-provenance.json
+runtime:
+  shell: /bin/bash
+  python: /opt/venv/cosmos_rl/bin/python
+  working_directory: /workspace/cosmos_rl
+  non_root_executable_required: true
+  video_decoder_selection: explicit_profile
+  default_video_profiles:
+    video_conversation: pynv-device-rgbp
+    task_aware_video_reasoning: system-pyav
+  video_profiles:
+    pynv-device-rgbp:
+      decoder: pynvvideocodec
+      frame_transfer: device_rgbp_dlpack
+      processed_video_cache: rank_local_memory_on_demand
+      decoder_session_cache: rank_local_native_on_demand
+      dataloader_workers: 1
+      dataloader_prefetch_factor: 2
+      dataloader_persistent_workers: true
+      worker_decoder_cache_forwarding: TAO_PYNV_DECODER_CACHE_SIZE_required
+      sft_batch_threads: 4
+      processed_video_cache_capacity_default: inspected_unique_media_capacity
+      decoder_session_cache_capacity_default: inspected_unique_media_capacity
+      disk_cache: false
+      prewarm: false
+      compatibility_artifact: optional_and_never_a_direct_launch_gate
+      capability_fallback: tao_system_pyav_sparse
+      capability_fallback_scope: nvdec_incompatible_stream_only
+    system-pyav:
+      decoder: torchvision
+      implementation: sparse_software_system_PyAV
+      dataloader_workers: 0
+      dataloader_prefetch_factor: omitted
+      sft_batch_threads: 1
+      disk_cache: false
+      prewarm: false
+  pyav_contract:
+    version: 17.1.0
+    wheel_sha256: f9a65d1f48b818323fb411e80358f89d77dec340b01d27c6b2dfbb9cbf4b779f
+    codec_resolution: {h264: h264, hevc: hevc}
+    forbidden_resolution: [h264_cuvid, hevc_cuvid]
+  driver_capabilities: [compute, utility, video]
+configuration:
+  format: toml
+  schema: cosmos_rl.policy.config.Config
+  entrypoint: cosmos-rl --config <config> <dataset_hook>
+  vision_schema:
+    type: cosmos_rl.tools.custom_hooks.tao_vl_reason_daft_sft_example.VisionConfig
+    fields:
+    - resized_height
+    - resized_width
+    - min_pixels
+    - max_pixels
+    - total_pixels
+    - video_start
+    - video_end
+    - nframes
+    - fps
+    - min_frames
+    - max_frames
+    mutually_exclusive: [nframes, fps]
+    fps_only: [min_frames, max_frames]
+    paired: [resized_height, resized_width]
+  peft_schema:
+    type: cosmos_rl.policy.config.LoraConfig
+    fields: [r, lora_alpha, lora_dropout, target_modules, bias, use_rslora, modules_to_save, adapter_dtype]
+    forbidden_legacy_fields: [dim, alpha, dropout]
+training_integrity:
+  attention_mask:
+    producer: cosmos_rl.dispatcher.data.packer.hf_vlm_data_packer.HFVLMDataPacker._collate_fn
+    construction: unpadded sequence length after truncation; never infer from pad-token values or multimodal position ids
+    consumer: Hugging Face VLM forward attention_mask
+  first_update_gradient_gate:
+    execution: after the first backward pass and before clipping or optimizer update
+    components: [vision_encoder, vision_projector, language_model, lm_head]
+    required_visual_result: every trainable visual component has at least one gradient tensor and a finite nonzero global norm
+    explicitly_frozen_result: not_applicable_frozen
+    structured_status_prefix: model/components
+    separate_smoke_job: false
+dataset_families:
+  video_conversation:
+    hook: package://cosmos_rl/tools/custom_hooks/tao_sft_example.py
+    runtime_inputs: [train_annotation, train_media_root, validation_annotation, validation_media_root]
+  task_aware_video_reasoning:
+    hook: package://cosmos_rl/tools/custom_hooks/tao_vl_reason_daft_sft_example.py
+    format_package: nvidia-tao-daft
+    runtime_inputs: [train_annotations, train_media_roots, validation_annotations, validation_media_roots, task_selection]
+parallelism:
+  controller: one_on_node_zero
+  policy_worker: one_replica_command_per_node
+  dp_shard_size: total_gpus
+  dp_replicate_size: 1
+  pipeline_parallelism_for_parity: 1
+checkpoint:
+  input: prepared_qwen3_vl_hf_safetensors
+  accepted_source_inputs: [qwen3_vl_hf_safetensors, cosmos3_omni]
+  source_model_type_selection: explicit_for_nano
+  cosmos3_omni_preparation: shared_tao_entrypoint_with_pinned_isolated_framework_converter_in_selected_platform_checkpoint_storage
+  cosmos3_omni_preparation_entrypoint: cosmos_rl.model_preparation.vlm_safetensors
+  cosmos3_omni_native_converter: cosmos_framework.scripts.convert_model_to_vlm_safetensors
+  runtime_input_after_preparation: qwen3_vl_hf_safetensors
+  output: cosmos_rl_epoch_policy_and_hf_safetensors
+  cadence: epoch
+  async_multinode: disabled
+status:
+  native_logger: TAOStatusLogger
+  structured_only: true
+  metrics:
+  - train/avg_loss
+  - train/loss_numerator
+  - train/valid_label_count
+  - val/avg_loss
+  - val/loss_numerator
+  - val/valid_label_count
+  events: [started, validation_complete, checkpoint_complete, training_complete, success, failure]
+actions:
+  train: {supported: true, implementation: native}
+  export: {supported: true, implementation: native_checkpoint_export}
+  evaluate:
+    supported: true
+    implementation: tao_integration
+    execution_contract: evaluation_workflow.spec_bundle.execution
+  inference: {supported: true, implementation: tao_integration}
+  inference_microservice: {supported: true, implementation: tao_integration}
+  quantize: {supported: true, implementation: tao_integration}
+cache:
+  default_mode: direct
+  direct_training_starts_without_prewarm: true
+  prewarm_required_for_video_conversation_runs: false
+  prewarm_mode: explicit_opt_in
+  task_aware_policy: direct_sparse_software_decode_on_a100
+  video_conversation_policy: direct_pynv_device_rgbp_with_rank_local_memory
+  fast_memory_cache_payload: processed_fetch_video_output_not_video_files
+  fast_memory_cache_population: on_demand_during_training
+  deterministic_key: dataset_plus_model_plus_processor
+  train_validation_keys_separate: true
+  completeness_manifest_required: true
+decoder_artifact:
+  schema_version: 2
+  builder: cosmos_rl.utils.video_override_artifacts
+  validator: cosmos_rl.utils.validate_video_override_artifacts
+  selection_basis: resolved_rl_decoder_capability
+  scan_all_referenced_media: true
+  convert_only_incompatible_media_for_fast_profile: true
+  force_all_validation_annotations: framework_task_aware_only
+  diagnosed_train_sources_are_explicit: true
+  gpu_random_access_validation_required: true
+  required_for_resolved_rl_hardware_decoder: false
+compatibility:
+  a100_qwen3_vl_patch_embed: native_per_model_linear_equivalent
+  vllm_qwen3_vl_patch_embed: equal_or_newer_pytorch_linear_guard_verified
+  deepep_extension: python_binding_and_required_internode_symbols_verified
+  software_video_workers: spawn_context_registered_reader_and_no_cuda_context
+  pynv_device_rgbp: dlpack_transfer_exact_batch_gate_and_scanned_retry
+  pynv_capability_fallback: permanent_nvdec_capability_exception_only
+  pynv_capability_fallback_attestation: first_use_per_rank
+  pynv_decoder_sessions: explicit_capacity_with_inspected_unique_media_default
+  pynv_spawned_worker_decoder_capacity: environment_forwarded_and_preflight_verified
+  pynv_processed_cache_binding: dynamic_vision_process_fetch_preflight_verified
+  sft_batch_threads: validated_four_thread_fast_path_with_explicit_override
+  worker_zero_prefetch: num_workers_zero_and_prefetch_omitted
+  host_source_mount: forbidden

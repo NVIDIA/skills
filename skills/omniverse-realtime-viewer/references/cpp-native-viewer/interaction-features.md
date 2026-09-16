@@ -331,69 +331,30 @@ click is a `1x1` rectangle: `{x, y, x + 1, y + 1}`.
 
 ## Selection Outline
 
-Enable outlines in renderer config, then write
-`omni:selectionOutlineGroup`/`OVRTX_ATTR_NAME_SELECTION_OUTLINE_GROUP` on selected
-prims. Group `0` clears the outline; group `1` is primary selection.
+Enable outlines in renderer config, then call
+`ovrtx_set_selection_outline_group()` with renderer path IDs. Group `0` clears
+the outline; group `1` is primary selection.
 
 ```cpp
-static bool writeU8Attribute(
-    ovrtx_renderer_t* renderer,
-    const std::string& primPath,
-    const char* attributeName,
-    std::uint8_t value)
-{
-    int64_t shape[] = {1};
-    int64_t strides[] = {1};
-
-    DLTensor tensor = {};
-    tensor.data = &value;
-    tensor.device = {kDLCPU, 0};
-    tensor.ndim = 1;
-    tensor.dtype = {static_cast<std::uint8_t>(kDLUInt), 8, 1};
-    tensor.shape = shape;
-    tensor.strides = strides;
-
-    ovrtx_input_buffer_t input = {};
-    input.tensors = &tensor;
-    input.tensor_count = 1;
-
-    const ovx_string_t path = toOvxString(primPath);
-    const ovx_string_t paths[] = {path};
-
-    ovrtx_binding_desc_or_handle_t binding = {};
-    binding.binding_desc.prim_list = {paths, 1};
-    binding.binding_desc.attribute_name = {0, literal_to_ovx_string(attributeName)};
-    binding.binding_desc.attribute_type = {
-        {static_cast<std::uint8_t>(kDLUInt), 8, 1},
-        false,
-        OVRTX_SEMANTIC_NONE,
-    };
-    binding.binding_desc.prim_mode = OVRTX_BINDING_PRIM_MODE_CREATE_NEW;
-
-    const ovrtx_enqueue_result_t write =
-        ovrtx_write_attribute(renderer, &binding, &input, OVRTX_DATA_ACCESS_SYNC);
-    return ok(write);
-}
-
 static void setSelectionOutline(
     ovrtx_renderer_t* renderer,
-    const std::string& previousPath,
-    const std::string& nextPath)
+    uint64_t previousPathId,
+    uint64_t nextPathId)
 {
-    if (!previousPath.empty()) {
-        writeU8Attribute(renderer, previousPath,
-            OVRTX_ATTR_NAME_SELECTION_OUTLINE_GROUP, 0);
+    if (previousPathId) {
+        const uint8_t group = 0;
+        ovrtx_set_selection_outline_group(renderer, &previousPathId, 1, &group);
     }
-    if (!nextPath.empty()) {
-        writeU8Attribute(renderer, nextPath,
-            OVRTX_ATTR_NAME_SELECTION_OUTLINE_GROUP, 1);
+    if (nextPathId) {
+        const uint8_t group = 1;
+        ovrtx_set_selection_outline_group(renderer, &nextPathId, 1, &group);
     }
 }
 ```
 
-If the installed SDK provides `ovrtx_set_selection_outline_group()`, prefer that
-helper for bulk updates. The attribute write above is the explicit fallback and
-is useful when combining outline state with other per-prim writes.
+For bulk updates, pass parallel path-ID and group arrays to the same helper.
+Do not replace this renderer-owned selection state with a generic attribute
+write.
 
 ## EffectLayer Prim-Pick Effects
 

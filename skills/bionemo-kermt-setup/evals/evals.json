@@ -1,0 +1,60 @@
+{
+  "skill_name": "kermt-setup",
+  "evals": [
+    {
+      "id": "kermt-setup-001",
+      "prompt": "Run /kermt-setup to bootstrap my environment. The repo is at /home/user/kermt.",
+      "expected_output": "The agent invoked the kermt-setup skill, verified docker and nvidia-container-toolkit on the host, built or confirmed the kermt:latest image exists, and ran a GPU smoke test inside the container, reporting success or actionable errors for each step.",
+      "assertions": [
+        "The agent executed or described running $SKILL_DIR/scripts/kermt_container.sh check_docker to verify docker availability",
+        "The agent executed or described running $SKILL_DIR/scripts/kermt_container.sh check_gpu to verify GPU passthrough",
+        "The agent executed or described running $SKILL_DIR/scripts/kermt_container.sh ensure_image to build or verify the kermt:latest image",
+        "The agent reported the outcome of the GPU smoke test to the user",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "kermt-setup",
+      "expected_script": null
+    },
+    {
+      "id": "kermt-setup-002",
+      "prompt": "I just got a fresh Ubuntu machine with an NVIDIA A100. I need to prepare it so I can run kermt training workflows later. Can you check that docker and GPU passthrough are working and build the container image from my repo at ~/projects/kermt?",
+      "expected_output": "The agent recognized this as a kermt environment bootstrap task, walked through verifying docker, GPU passthrough via nvidia-container-toolkit, and building the kermt:latest image from the Dockerfile, informing the user of results at each stage.",
+      "assertions": [
+        "The agent identified the task as requiring the kermt-setup skill without the user naming it explicitly",
+        "The agent warned the user that the first image build may take significant time and disk space (~50 GB)",
+        "The agent ran or instructed running the check_docker and check_gpu subcommands before attempting the image build",
+        "The agent confirmed the kermt:latest image was built or already present and that the GPU smoke test passed",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "kermt-setup",
+      "expected_script": null
+    },
+    {
+      "id": "kermt-setup-003",
+      "prompt": "I tried to run kermt-finetune but got an error saying the kermt:latest image doesn't exist. How do I fix this?",
+      "expected_output": "The agent recognized that the missing kermt:latest image requires running kermt-setup first, guided the user through the full bootstrap process including docker verification, GPU check, and image build, resolving the dependency so kermt-finetune can subsequently run.",
+      "assertions": [
+        "The agent explained that kermt-setup must be run before other kermt-* skills",
+        "The agent asked for or confirmed the KERMT_REPO path since the image was missing",
+        "The agent executed or guided the user through the kermt_container.sh ensure_image step to build the missing image",
+        "The agent confirmed the image was successfully built and advised retrying kermt-finetune",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "kermt-setup",
+      "expected_script": null
+    },
+    {
+      "id": "kermt-setup-004",
+      "prompt": "Can you help me write a Python script that reads a CSV file and plots a bar chart using matplotlib?",
+      "expected_output": "The agent provided Python code for reading a CSV and creating a matplotlib bar chart without invoking or referencing the kermt-setup skill, as the request is entirely unrelated to container bootstrapping or GPU environment setup.",
+      "assertions": [
+        "The agent provided a Python code snippet using pandas or csv module to read the CSV",
+        "The agent included matplotlib plotting code for a bar chart",
+        "The agent did not reference kermt-setup, docker, GPU passthrough, or container building",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

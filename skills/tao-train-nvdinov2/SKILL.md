@@ -18,6 +18,8 @@ tags:
 
 # NVDINOv2
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 NVDINOv2 for self-supervised visual representation learning. Trains vision transformers via self-distillation (teacher-student) without labels. Produces general-purpose visual features.
 
 Set train.pretrained_model_path for pretrained ViT weights.
@@ -26,7 +28,7 @@ For TAO Deploy TensorRT actions (`gen_trt_engine`), read `references/tao-deploy-
 
 ## Dataclass Schemas
 
-Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
+Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML for an action requires `schemas/<action>.schema.json` and `references/spec_template_<action>.yaml` to exist and parse. Use the packaged selected-action schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
 
 ## Train Action Policy
 
@@ -39,21 +41,31 @@ Non-train actions such as `inference`, `export`, and deploy flows stay in this m
 - **Dataset type:** image_classification
 - **Formats:** ssl
 - **Monitoring metric:** train_loss
+- **AutoML metric contract:** Use `train_loss` emitted by the train action and
+  minimize it. This model has no packaged evaluate action, so do not invent an
+  evaluation KPI; validate the selected `student_epoch_*` checkpoint through
+  inference.
 
 ### Per-Action Dataset Requirements
 
-| Action | Spec Key | Source | Files | List? |
+| Action | Spec Key | Source | Source artifact → runtime value | List? |
 |---|---|---|---|---|
-| inference | dataset.test_dataset.images_dir | inference_dataset | images_test.tar.gz | No |
-| train | dataset.train_dataset.images_dir | train_datasets | images_train.tar.gz | No |
+| inference | dataset.test_dataset.images_dir | inference_dataset | `images_test.tar.gz` → extracted image folder | No |
+| train | dataset.train_dataset.images_dir | train_datasets | `images_train.tar.gz` → extracted image folder | No |
+
+The managed runner may source these datasets as archives because
+`references/skill_info.yaml` declares `runtime: extracted_folder`. It must
+unpack the archive and place the resulting directory in `images_dir`. For
+direct Docker or TAO CLI runs, extract archives before launch; never set an
+`images_dir` field to `.tar`, `.tar.gz`, `.tgz`, or `.zip`.
 
 ### Typical Spec Overrides
 
 Data source overrides are **mandatory for train and inference** — the agent MUST construct data source paths from the Per-Action Dataset Requirements table above and include them in `spec_overrides`.
 
 ```python
-S3_TRAIN = "s3://bucket/data/train"
-S3_EVAL = "s3://bucket/data/eval"
+TRAIN_IMAGES_DIR = "/workspace/data/extracted/train/images_train"
+TEST_IMAGES_DIR = "/workspace/data/extracted/test/images_test"
 ```
 
 **train (mandatory data sources):**
@@ -62,7 +74,7 @@ S3_EVAL = "s3://bucket/data/eval"
     "train.num_gpus": 1,
     "train.num_epochs": 10,
     "train.checkpoint_interval": 10,
-    "dataset.train_dataset.images_dir": f"{S3_TRAIN}/images_train.tar.gz",
+    "dataset.train_dataset.images_dir": TRAIN_IMAGES_DIR,
 }
 ```
 
@@ -85,7 +97,7 @@ run representative while avoiding the much slower ViT-Large default.
     "train.precision": "32-true",
     "train.use_custom_attention": False,
     "train.num_gpus": 1,
-    "dataset.train_dataset.images_dir": f"{S3_TRAIN}/images_train.tar.gz",
+    "dataset.train_dataset.images_dir": TRAIN_IMAGES_DIR,
 }
 ```
 
@@ -105,7 +117,10 @@ run representative while avoiding the much slower ViT-Large default.
     "model.backbone.student_type": "<same value used for train>",
     "model.backbone.img_size": "<same value used for train>",
     "train.use_custom_attention": "<same value used for train>",
-    "dataset.test_dataset.images_dir": f"{S3_EVAL}/images_test.tar.gz",
+    # NVDINOv2 enables persistent_workers in its prediction DataLoader.
+    # Keep this positive; dataset.workers=0 makes inference fail before loading data.
+    "dataset.workers": 2,
+    "dataset.test_dataset.images_dir": TEST_IMAGES_DIR,
 }
 ```
 ## Eval Dataset
@@ -144,6 +159,11 @@ Minimum 4 GPU(s), recommended 8 GPU(s). 40GB+ (A100 recommended) VRAM per GPU. S
 
 ## Error Patterns
 
+**No images found / archive path rejected**: `dataset.*.images_dir` must be an
+extracted directory containing images, not an archive. Extract `.tar`,
+`.tar.gz`, `.tgz`, or `.zip` inputs first. Managed archive-backed sources must
+use the directory produced by `runtime: extracted_folder`.
+
 **CUDA out of memory**: ViT-Large teacher+student with img_size=518 requires 40GB+ GPU memory. Reduce batch_size, img_size, or use smaller ViT variant.
 
 **Inference checkpoint has unexpected Lightning keys**: For downstream
@@ -151,6 +171,11 @@ Minimum 4 GPU(s), recommended 8 GPU(s). 40GB+ (A100 recommended) VRAM per GPU. S
 not `nvdinov2_model_latest.pth`. The latest file is a training checkpoint and
 the inference loader reports unexpected keys such as `state_dict`, optimizer
 state, and scheduler state.
+
+**Inference fails with `persistent_workers option needs num_workers > 0`**:
+Set `dataset.workers` to a positive value (use `2` for a minimal local run).
+The NVDINOv2 prediction DataLoader enables persistent workers and cannot run
+with the generic zero-worker smoke-test override.
 
 **Export checkpoint has unexpected Lightning keys**: Export also consumes the
 selected `student_epoch_*.pth` checkpoint. Use the full `model_epoch_*.pth`

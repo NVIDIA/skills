@@ -1,23 +1,26 @@
 [
   {
     "id": "finetune-mr-brain-from-datalist",
-    "question": "Fine-tune the NV-Generate MR brain diffusion model using images listed in /data/mrbrain/datalist.json.",
+    "question": "Prepare a reproducible NV-Generate MR-Brain v1 finetune command for /data/mrbrain/datalist.json, with relative training images rooted at /data/mrbrain and outputs under runs/nv_generate_mr_brain_finetune. This is a command-shape review only; do not install packages, download weights, or start GPU training in this environment.",
     "expected_skill": "nv-generate-mr-brain-finetune",
-    "ground_truth": "The agent uses scripts/run_mr_brain_finetune.py with --data-base-dir, --output-dir, and the datalist path.",
+    "ground_truth": "The agent uses scripts/run_mr_brain_finetune.py with /data/mrbrain/datalist.json, --data-base-dir /data/mrbrain, --output-dir runs/nv_generate_mr_brain_finetune, and no --preflight flag.",
     "expected_behavior": [
       "the command uses skills/nv-generate-mr-brain-finetune/scripts/run_mr_brain_finetune.py",
       "the command includes --data-base-dir",
       "the command includes an explicit --output-dir",
+      "the command does not include --preflight for the requested training launch",
       "the agent states the output checkpoint is experimental and not clinically validated"
     ]
   },
   {
     "id": "preflight-before-gpu-run",
-    "question": "Check whether my MR-brain finetune datalist is runnable before launching the GPU job.",
+    "question": "Prepare the MR-Brain v1 preflight command for /data/mrbrain/datalist.json, with relative training images rooted at /data/mrbrain and outputs under runs/nv_generate_mr_brain_finetune_preflight. This is a command-shape review only; do not install packages or start GPU training in this environment.",
     "expected_skill": "nv-generate-mr-brain-finetune",
-    "ground_truth": "The agent runs the wrapper with --preflight and does not start training.",
+    "ground_truth": "The agent uses the wrapper with the supplied datalist, --data-base-dir /data/mrbrain, an explicit output directory, and --preflight; it does not start training.",
     "expected_behavior": [
       "the command includes --preflight",
+      "the command includes --data-base-dir",
+      "the command includes an explicit --output-dir",
       "the command does not call scripts.diff_model_train.py directly",
       "the agent explains that real training still requires NIfTI images and model weights"
     ]

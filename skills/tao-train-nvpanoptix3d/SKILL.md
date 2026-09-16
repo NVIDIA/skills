@@ -18,41 +18,95 @@ tags:
 
 # NVPanoptix3D
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 NVPanoptix3D for panoptic 3D scene reconstruction from posed RGB images. Produces 3D panoptic segmentation (semantic, instance, and panoptic masks) with occupancy completion. Built on VGGT backbone with Mask2Former-style head and 3D frustum reconstruction.
 
 Uses 2D and 3D stage checkpoints. Set train.checkpoint_2d and train.checkpoint_3d for staged initialization.
 
+## Quick Start (docker run)
+
+Docker-native launch — no TAO SDK and no Python on the host. Use the local
+Docker/platform skill instead when it gives a stricter environment-specific
+command (non-root UID mapping, cache redirects, remote daemons).
+
+```bash
+TAO_PYT_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt  # versions-key: images.tao_toolkit.pyt
+TAO_PYT_IMAGE="${TAO_PYT_IMAGE:-$TAO_PYT_IMAGE_DEFAULT}"
+RUN_ROOT="${RUN_ROOT:-$PWD}"
+DOCKER_COMMON=(
+  --rm --gpus all --shm-size=8g
+  --shm-size=8g
+  --ulimit memlock=-1
+  --ulimit stack=67108864
+  -v "$RUN_ROOT/data:/data:ro"
+  -v "$RUN_ROOT/specs:/specs:ro"
+  -v "$RUN_ROOT/results:/results"
+)
+```
+
+Train:
+
+```bash
+docker run "${DOCKER_COMMON[@]}" "$TAO_PYT_IMAGE" \
+  python -m nvidia_tao_pytorch.cv.nvpanoptix3d.entrypoint.nvpanoptix3d train -e /specs/train.yaml
+```
+
+Evaluate:
+
+```bash
+docker run "${DOCKER_COMMON[@]}" "$TAO_PYT_IMAGE" \
+  python -m nvidia_tao_pytorch.cv.nvpanoptix3d.entrypoint.nvpanoptix3d evaluate -e /specs/evaluate.yaml
+```
+
+Inference:
+
+```bash
+docker run "${DOCKER_COMMON[@]}" "$TAO_PYT_IMAGE" \
+  python -m nvidia_tao_pytorch.cv.nvpanoptix3d.entrypoint.nvpanoptix3d inference -e /specs/inference.yaml
+```
+
+Export:
+
+```bash
+docker run "${DOCKER_COMMON[@]}" "$TAO_PYT_IMAGE" \
+  python -m nvidia_tao_pytorch.cv.nvpanoptix3d.entrypoint.nvpanoptix3d export -e /specs/export.yaml
+```
+
+Every action takes its spec with `-e`; `results_dir` is set in the spec or
+overridden on the command line. Mount any pretrained-weights directory the spec
+references, and keep every in-container path consistent across actions.
+
 ## Dataclass Schemas
 
-Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
+Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML for an action requires `schemas/<action>.schema.json` and `references/spec_template_<action>.yaml` to exist and parse. Use the packaged selected-action schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
 
 ## Train Action Policy
 
 This model is AutoML-enabled at the model layer. Before handling any train-stage request, read `references/skill_info.yaml` and resolve the run override from either an explicit `automl_policy` value or the user's workflow request. Use `automl_policy: on` by default and only expose `on` / `off` in new launch prompts. Treat phrases like "turn off AutoML", "disable AutoML", "no HPO", or "plain training" as `automl_policy: off` for this run only. When `automl_policy: on`, `automl_enabled: true`, and both `schemas/train.schema.json` and `references/spec_template_train.yaml` are packaged, route the train action through `tao-skill-bank:tao-run-automl` by default with this model's `skill_dir`. Preserve workflow/application overrides for datasets, specs, output directories, GPU/platform settings, parent checkpoints, and `automl_policy`. Use direct model training only when `automl_policy: off` or the packaged train schema/template is missing; in the missing-schema case, report that AutoML is enabled but not runnable for this model until schemas are generated.
 
-For AutoML, use `train_loss` as the optimization metric with
-`direction=minimize`, and set `train.optim.monitor_name: train_loss` in
-`spec_overrides`. NVPanoptix3D train jobs emit `PRQ`, `RSQ`, and `RRQ` in
-`status.json`, and the training progress log emits `train_loss`; short or
-minimal jobs may not emit `val_loss`, including full-trial smoke runs.
-Multi-fidelity AutoML algorithms such as Hyperband, ASHA, and BOHB may promote
-a checkpoint to a resume job that completes without emitting a fresh
-`train_loss` line. In that case, the AutoML metric is the carried-forward
-metric from the source rung job that emitted `train_loss`; still verify the
-promoted job resumed from the explicit epoch/step checkpoint, produced a real
-checkpoint, and is usable for evaluate/inference.
+For AutoML, use `PRQ` as the optimization metric with `direction=maximize`.
+NVPanoptix3D train validation and evaluate jobs both emit `PRQ`, `RSQ`, and
+`RRQ` in `status.json`, so use `PRQ` consistently for the baseline, every
+recommendation, and final best-checkpoint evaluation. The model may use
+`train.optim.monitor_name: train_loss` internally for checkpointing, but
+minimal jobs do not reliably export a numeric `train_loss` to the TAO status
+channel; do not use it as the AutoML selection metric. Multi-fidelity
+promotions must obtain a fresh `PRQ` after the resumed epoch and must still
+resume from the explicit epoch/step checkpoint, produce a real checkpoint,
+and pass evaluate/inference.
 Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows stay in this model skill. The per-run `automl_policy` override does not change model metadata.
 
 ## Training Requirements
 
 - **Dataset type:** nvpanoptix3d
 - **Formats:** front3d, matterport
-- **Monitoring metric:** train_loss
-- **AutoML direction:** minimize
-- For AutoML train jobs, use `train_loss`. For multi-fidelity resume jobs that do not emit a fresh `train_loss`,
-  compare AutoML's carried metric to the source rung job that emitted it.
-  Validation status KPIs are `PRQ`, `RSQ`, and `RRQ`; do not use `val_loss`
-  unless a specific run is known to emit it.
+- **Monitoring metric:** `PRQ`
+- **AutoML direction:** maximize
+- Validation and evaluate status KPIs are `PRQ`, `RSQ`, and `RRQ`. Use `PRQ`
+  for AutoML selection; do not use `train_loss` or `val_loss` unless a
+  different workflow proves that exact scalar is externally emitted for every
+  trial and obtains explicit approval to use a proxy objective.
 
 ### Per-Action Dataset Requirements
 

@@ -1,0 +1,208 @@
+[
+  {
+    "id": "tao-run-deft-pas-attached-loop-liveness",
+    "question": "While planning an approved PAS DEFT run, explain what happens after a long pool_embed stage is backgrounded and you post a progress update. May you end the turn and rely on a future poll to resume the loop? This is planning only: do not run commands or tools.",
+    "expected_skill": "tao-run-deft-pas",
+    "expected_script": null,
+    "ground_truth": "Attached monitoring is the default. A progress update is not a final response. The driving agent must keep the same turn alive, poll the stage's durable status with an explicit terminal condition, finalize and commit it, re-audit, and immediately execute the single next action until the whole bounded loop reaches COMPLETE, terminal FAILED, or INVALID. A final response ends monitoring and no future poll can wake an ended turn. Detach is allowed only on explicit user request or a genuine runtime limitation, in which case provide the exact durable audit/resume command and do not promise unattended continuation.",
+    "expected_behavior": [
+      "States that attached monitoring is enabled by default and keeps the driving turn alive while the run is nonterminal",
+      "Treats progress updates as in-progress commentary rather than final responses",
+      "Uses terminal-condition polling, then finalize, commit, audit, and immediate continuation to the audit-selected next action",
+      "Does not claim that a timer or future poll can resume an ended chat turn",
+      "Allows detach only when explicitly requested or forced by a runtime limitation, with an exact durable audit/resume command and no unattended-monitoring claim",
+      "Does not run commands or tools"
+    ]
+  },
+  {
+    "id": "tao-run-deft-pas-plain-language-routing",
+    "question": "Improve my SigLIP2 image retrieval model on my attribute-labelled dataset until it stops getting better. Do not run anything; in one line name which skill applies, or say NONE.",
+    "expected_skill": "tao-run-deft-pas",
+    "expected_script": null,
+    "ground_truth": "Select tao-run-deft-pas because the request describes its iterative attribute-focused retrieval improvement loop in customer language. It is not a one-off tao-finetune-clip run, generic AutoML search, or the AOI/ChangeNet workflow. Do not execute anything.",
+    "expected_behavior": [
+      "Names tao-run-deft-pas as the applicable skill",
+      "Recognizes attribute-labelled SigLIP2 retrieval plus repeated improvement as the PAS DEFT loop",
+      "Does not select one-shot tao-finetune-clip, tao-run-automl, or tao-run-deft-aoi",
+      "Does not run commands, scripts, containers, installs, web searches, audits, or other tools"
+    ]
+  },
+  {
+    "id": "tao-run-deft-pas-plain-language-routing-no-model-name",
+    "question": "Keep improving my image-retrieval model on attribute-labelled images until it stops getting better. Do not run anything; in one line name which skill applies, or say NONE.",
+    "expected_skill": "tao-run-deft-pas",
+    "expected_script": null,
+    "ground_truth": "Select tao-run-deft-pas because attribute-labelled image retrieval plus iterative improvement is the PAS DEFT workflow even when the customer does not know the PAS or SigLIP2 names. Do not select AOI, which is restricted to PCB/VisualChangeNet inspection.",
+    "expected_behavior": [
+      "Names tao-run-deft-pas as the applicable skill",
+      "Uses attribute-labelled image retrieval and repeated improvement as the routing signals",
+      "Does not select tao-run-deft-aoi without AOI, PCB, VisualChangeNet, or ChangeNet context",
+      "Does not run commands, scripts, containers, installs, web searches, audits, or other tools"
+    ]
+  },
+  {
+    "id": "tao-run-deft-pas-plain-language-routing-stage-paraphrase",
+    "question": "I have product photos paired with textual attributes. Repeatedly identify the weakest retrieval attributes, mine additional image-caption pairs, retrain, and re-evaluate until validation plateaus. Do not run anything; in one line name which skill applies, or say NONE.",
+    "expected_skill": "tao-run-deft-pas",
+    "expected_script": null,
+    "ground_truth": "Select tao-run-deft-pas because the requested evaluate, attribute-gap, pair-mining, retrain, and re-evaluate cycle is the PAS DEFT workflow even though no internal workflow or model name appears.",
+    "expected_behavior": [
+      "Names tao-run-deft-pas as the applicable skill",
+      "Uses the repeated retrieval evaluation, weak-attribute analysis, pair mining, and retraining cycle as the routing structure",
+      "Does not require the user to know CLIP, SigLIP, DEFT, or PAS terminology",
+      "Does not select one-shot tao-finetune-clip, tao-run-automl, or tao-run-deft-aoi",
+      "Does not run commands, scripts, containers, installs, web searches, audits, or other tools"
+    ]
+  },
+  {
+    "id": "tao-run-deft-pas-plain-language-routing-kpi-paraphrase",
+    "question": "For this attribute-captioned person-search dataset, cycle through retrieval evaluation, hard-pair mining, and model updates until medium-query Rank-1 reaches 0.65 or four rounds finish. Do not run anything; in one line name which skill applies, or say NONE.",
+    "expected_skill": "tao-run-deft-pas",
+    "expected_script": null,
+    "ground_truth": "Select tao-run-deft-pas because attribute-captioned retrieval with repeated mining/training/evaluation and a retrieval-KPI or iteration stop is the PAS DEFT application contract.",
+    "expected_behavior": [
+      "Names tao-run-deft-pas as the applicable skill",
+      "Recognizes the retrieval KPI and bounded repeated mining/training/evaluation loop",
+      "Does not treat the numeric target as generic HPO and does not infer AOI or PCB inspection",
+      "Does not run commands, scripts, containers, installs, web searches, audits, or other tools"
+    ]
+  },
+  {
+    "id": "tao-run-deft-pas-basic",
+    "question": "A user says: \"Use the tao-run-deft-pas skill to plan a PAS DEFT run.\" Identify the applicable skill and outline its documented workflow. This is a planning evaluation: do not run commands, scripts, containers, installs, web searches, audits, or any other tools.",
+    "expected_skill": "tao-run-deft-pas",
+    "expected_script": null,
+    "ground_truth": "Identify tao-run-deft-pas and describe its self-contained, disk-backed workflow on Docker, SLURM, Kubernetes, Brev, or virtualenv: select one platform when none was supplied; perform read-only preflight and one approval boundary; deterministic config/state initialization; dataset setup and one-time pool embedding; zero-shot evaluation; a bounded gap, mining, history-selection, optional-visualization, train, and evaluate loop; platform four-verb job records; validated commits; final audit and deterministic report. The customer supplies data archives, not an implementation checkout. Do not execute anything.",
+    "expected_behavior": [
+      "Identifies tao-run-deft-pas as the relevant self-contained skill and does not request an implementation checkout",
+      "Names all five supported TAO platforms and asks once for a platform because none was supplied, without defaulting to Docker",
+      "Outlines read-only preflight, one approval boundary, deterministic initialization, dataset_setup, pool_embed, zero-shot evaluate, and the bounded per-iteration loop",
+      "Explains that each stage is artifact-validated before a canonical state commit and that completion requires a successful require-complete audit",
+      "Does not run commands, scripts, containers, installs, web searches, audits, or other tools"
+    ]
+  },
+  {
+    "id": "tao-run-deft-pas-clean-intake",
+    "question": "Plan the initial intake after installing the TAO skill bank and asking to run tao-deft-pas. Do not run commands, scripts, containers, installs, web searches, audits, or any other tools.",
+    "expected_skill": "tao-run-deft-pas",
+    "expected_script": null,
+    "ground_truth": "Resolve tao-deft-pas as shorthand for canonical tao-run-deft-pas and describe its initial intake without executing it. State that PAS supports Docker, SLURM, Kubernetes, Brev, and virtualenv and requires one selection when no platform was supplied. If no archive input was supplied, explain the documented bounded search: candidate depth 0..2 beneath ~/pas and workspace pas/input/inputs roots, and depth 0 at the workspace root. Never search home broadly or add repositories, tutorial/notebook trees, or workspace data outputs as implicit roots. Do not follow symlinks. Explain that execution will report each absolute search root, reason, depth bound and status, then each archive candidate's containing directory, depth, classification, exact archive file paths and sizes, and PAS-only resume candidates. Ask one consolidated question for platform, max_iterations or a time budget, plus any genuinely ambiguous archive/run choice. Apply and state all other documented defaults rather than asking about optional KPI, Hugging Face authentication, or overrides. Explain that full archive/platform/GPU/environment-presence discovery and one complete approval summary follow, and do not install, create files, inspect credential files, log in, acquire images, or submit work yet.",
+    "expected_behavior": [
+      "Routes tao-deft-pas to the canonical tao-run-deft-pas skill",
+      "Names Docker, SLURM, Kubernetes, Brev, and virtualenv and asks once for a platform because none was supplied",
+      "Asks only for platform, max_iterations or a time budget, and any genuinely ambiguous input selection",
+      "Explains that execution will report each bounded archive search root, reason, depth cap and status, identify one required archive pair rather than present directory names as multiple required datasets, and avoid broad home or repository/tutorial searches",
+      "Presents only state whose workflow is exactly tao-run-deft-pas as a resume candidate",
+      "States the metric, epoch, GPU, mining, history, continual, visualization, and token-forwarding defaults without asking the user to customize them",
+      "Defers full archive, selected-platform, image/runtime, GPU, and credential-presence checks until required intake is resolved",
+      "Promises a complete preflight summary and explicit approval before installs, writes, logins, pulls, downloads, extraction, or container execution",
+      "Uses only process-environment credential presence, never opens or sources a credential file, and never exposes credential values"
+    ]
+  },
+  {
+    "id": "tao-run-deft-pas-discovery-provenance",
+    "question": "Plan the first read-only intake for tao-deft-pas with no archive path and no iteration bound. Assume ~/pas directly contains images_raw.tar and meta.tar.gz; a tao-tutorials checkout elsewhere under the home directory contains copies plus extracted images/captions/pair files; and ~/workspace/results/run_old/deft_state.json identifies workflow tao-run-deft-aoi. Do not run commands, scripts, containers, installs, web searches, audits, or any other tools.",
+    "expected_skill": "tao-run-deft-pas",
+    "expected_script": null,
+    "ground_truth": "Use canonical tao-run-deft-pas. Describe checking only the documented conventional archive roots, not recursively scanning home or the tao-tutorials checkout. Report ~/pas as the sole archive-only candidate, show its two exact archive file paths as one required pair, and explain that it came from current-filesystem discovery of the conventional ~/pas root. Exclude the AOI state from PAS resume choices and label it ignored as non-PAS. Then ask once for platform and max_iterations or a time budget while stating the documented defaults and deferring full preflight and all mutations.",
+    "expected_behavior": [
+      "Names tao-run-deft-pas as canonical and asks for one of its five platforms without defaulting",
+      "States that ~/pas was checked because it is the documented conventional PAS archive root and that recursive home/repository searches were not performed",
+      "Describes ~/pas as one archive-only root containing the required images_raw.tar and meta.tar.gz pair, not as one of two required dataset folders",
+      "Does not surface the tao-tutorials extracted development directory as an automatically discovered candidate",
+      "Excludes run_old because its workflow is tao-run-deft-aoi and does not offer it for PAS resume",
+      "Asks for platform and max_iterations or a time budget, states defaults, and performs no writes, installs, archive validation, credential inspection, or workload execution"
+    ]
+  },
+  {
+    "id": "tao-run-deft-pas-bounded-nested-discovery",
+    "question": "Plan the first read-only intake for tao-deft-pas with no archive path. Assume ~/pas/drop/pas_v31_tao_ft contains the required images_raw.tar and meta.tar.gz; ~/pas/too/deep/export/pas_v32 contains another pair; a tao-tutorials checkout elsewhere under the home directory also contains a pair; and ~/workspace/input/latest is a symlink to that tutorial directory. Do not run commands, scripts, containers, installs, web searches, audits, or any other tools.",
+    "expected_skill": "tao-run-deft-pas",
+    "expected_script": null,
+    "ground_truth": "Use canonical tao-run-deft-pas. Explain the bounded AOI-style subtree lookup: inspect candidate directories only at depth 0..2 under ~/pas and the workspace pas/input/inputs roots, inspect the workspace root only at depth 0, and do not follow symlinks. Therefore select ~/pas/drop/pas_v31_tao_ft as the sole in-scope archive candidate, with provenance showing it was found at depth 2 under the conventional ~/pas root. Do not discover the depth-3 PAS pair, the unrelated tutorial checkout, or the target of the workspace/input/latest symlink. Report the exact two files as one pair, then ask for platform and the missing iteration/time bound while stating defaults and deferring full preflight and all mutations.",
+    "expected_behavior": [
+      "Names tao-run-deft-pas as canonical and asks for one of its five platforms without defaulting",
+      "Uses only the documented semantic search roots and caps candidate-directory recursion at depth 2, while checking the workspace root at depth 0 only",
+      "Finds ~/pas/drop/pas_v31_tao_ft at candidate depth 2 and reports the conventional ~/pas search-root reason and exact archive pair",
+      "Does not include the depth-3 pair, scan the unrelated tao-tutorials checkout, or follow the workspace/input/latest symlink",
+      "Auto-selects the sole in-scope archive-only candidate and does not describe the two archive files as two dataset folders",
+      "Asks for platform and max_iterations or a time budget, states defaults, and performs no writes, installs, full archive validation, credential inspection, or workload execution"
+    ]
+  },
+  {
+    "id": "tao-run-deft-pas-explicit-root-ambiguity",
+    "question": "Plan PAS DEFT intake when I explicitly give /mnt/pas-drop as the archive directory. It contains valid pairs under release/v31 and release/v32, while ~/pas also contains a valid pair. I have not supplied an iteration bound. Do not run commands, scripts, containers, installs, web searches, audits, or any other tools.",
+    "expected_skill": "tao-run-deft-pas",
+    "expected_script": null,
+    "ground_truth": "Treat /mnt/pas-drop as the sole user-approved search root, search candidate directories only at depth 0..2 beneath it, and suppress all conventional-root searching. Report release/v31 and release/v32 as alternative archive roots with exact pair paths, candidate depth and user-supplied-root provenance. Do not inspect or mention ~/pas as a discovered candidate and do not choose by order, name, timestamp, or size. Ask one consolidated question for platform, the archive-root choice, and max_iterations or a time budget; state all other defaults and defer full validation and mutations.",
+    "expected_behavior": [
+      "Uses canonical tao-run-deft-pas and asks for one of its five platforms without defaulting",
+      "Searches only the explicit /mnt/pas-drop subtree to candidate depth 2 and does not fall back to conventional roots",
+      "Reports both nested pairs as alternatives with exact paths, depths, and user-supplied-root provenance",
+      "Does not guess between candidates using search order, name, modification time, or archive size",
+      "Combines platform, archive choice, and missing iteration/time bound into one question while applying documented optional defaults",
+      "Performs no filesystem inspection in this plan-only evaluation and defers full validation and every mutation"
+    ]
+  },
+  {
+    "id": "tao-run-deft-pas-resume-plan",
+    "question": "Describe how you would safely resume an existing PAS DEFT run at $RESULTS_DIR and determine its single next action before GPU work. Do not run commands, scripts, containers, installs, web searches, audits, or any other tools.",
+    "expected_skill": "tao-run-deft-pas",
+    "expected_script": "scripts/audit_deft_run.py",
+    "ground_truth": "Explain that execution would begin with deft_python.sh invoking the read-only audit_deft_run.py against $RESULTS_DIR. Canonical deft_state.json and loop_log.jsonl override prose or reports; INVALID is a hard stop; the audit's read_before_action and next_action identify the only permitted stage. No work is executed in this evaluation.",
+    "expected_behavior": [
+      "Names scripts/audit_deft_run.py as the first command that would be used, through scripts/deft_python.sh",
+      "Treats deft_state.json plus loop_log.jsonl as canonical rather than inferring status from checkpoints, reports, metrics, or prior prose",
+      "States that DEFT_RUN_STATUS=INVALID is a hard stop requiring repair of the reported inconsistency",
+      "Uses the audit's read_before_action and next_action as the only permitted continuation",
+      "Does not inspect the run, launch containers or GPU work, mutate files, or execute any command"
+    ]
+  },
+  {
+    "id": "tao-run-deft-pas-metric-contract",
+    "question": "Plan a Docker-based PAS DEFT run whose gate is Rank-1 >= 0.25 on medium queries, for at most 3 iterations. Explain deterministic configuration, state, evaluation evidence, checkpoint selection, stopping, audit, and reporting. Do not run commands, scripts, containers, installs, web searches, audits, or any other tools.",
+    "expected_skill": "tao-run-deft-pas",
+    "expected_script": "scripts/prepare_deft_config.py",
+    "ground_truth": "Render and approve the immutable metric contract {Rank-1, medium, >=, 0.25} with max_iterations=3, then initialize state from the rendered config. At execution time, bind every baseline/iteration result to its exact nvidia_pas_metrics_aggregate.csv and iteration label, recompute the value with bundled metric tooling, stop when the gate passes or the budget is exhausted, select the highest Rank-1 result because the approved operator is >=, verify completion with audit_deft_run.py --require-complete, and render the HTML report deterministically. This evaluation executes nothing.",
+    "expected_behavior": [
+      "Preserves the metric contract as metric_name Rank-1, query_type medium, operator >=, target 0.25 and max_iterations=3",
+      "Uses prepare_deft_config.py before one-time state initialization so approved values and config hashes are recorded",
+      "Requires each result to be bound to the exact iteration label and aggregate metrics CSV, with the metric value recomputed rather than trusted from prose",
+      "Requires training evidence to bind the exact approved clip train command, TAO success status, and a current-iteration raw checkpoint behind the canonical best path before evaluation",
+      "Runs the zero-shot evaluation before training, stops early on a passing gate, and otherwise stops after three iterations",
+      "Selects the highest Rank-1 result under the >= operator and claims completion only after a successful require-complete audit and deterministic report render",
+      "Does not run scripts, containers, training, inference, audits, web searches, or other tools"
+    ]
+  },
+  {
+    "id": "tao-run-deft-pas-history-recovery-plan",
+    "question": "While planning recovery for iteration 2, you learn that mining_selection_history.json already contains iter2 but canonical state does not show history_select committed. Explain the likely interruption and the sanctioned recovery. Do not run commands, scripts, containers, installs, web searches, audits, or any other tools.",
+    "expected_skill": "tao-run-deft-pas",
+    "expected_script": "scripts/run_pas_stage.py",
+    "ground_truth": "The prior attempt likely stopped after pas_deft atomically wrote the iteration-2 history ledger entry but before commit_stage.py committed canonical stage state. After an audit confirms this exact recoverable condition, rerun the deterministic history-select adapter once with --resume so it validates and reuses the matching ledger/artifacts, then commit and re-audit. Never hand-edit the ledger, deft_state.json, or loop_log.jsonl, and never delete earlier iteration history. This evaluation executes nothing.",
+    "expected_behavior": [
+      "Diagnoses an interruption between the pas_deft history ledger write and the canonical history_select commit",
+      "Uses scripts/run_pas_stage.py history-select --resume only after the audit identifies the matching recoverable state",
+      "Requires the adapter to validate the existing iteration entry and artifacts before reuse",
+      "Never proposes hand-editing mining_selection_history.json, deft_state.json, or loop_log.jsonl, or deleting earlier history",
+      "Bounds recovery to one rerun followed immediately by commit validation and a read-only re-audit",
+      "Does not inspect files, mutate the run, or execute any command"
+    ]
+  },
+  {
+    "id": "tao-run-deft-pas-virtualenv-contract",
+    "question": "Plan, but do not execute, the virtualenv runtime preparation and verification for a one-iteration PAS DEFT run. Explain how TAO execution environments differ from the workspace control environment and what must pass before state initialization. Do not run commands, scripts, installs, downloads, web searches, audits, or any other tools.",
+    "expected_skill": "tao-run-deft-pas",
+    "expected_script": "scripts/manage_pas_virtualenv.py",
+    "ground_truth": "Use separate immutable CPython 3.12 execution profiles: pyt for clip train/evaluate and ds for embedding/tmm. The workspace control .venv remains separate and may use CPU PyTorch. Bind both absolute profile paths into approval/state. A shared execution directory is valid only if it independently passes both profile contracts. Plan first; installation must fail closed unless the checked-in manifest names a complete reviewed transitive hash lock. Verification of a supplied prebuilt profile remains available without that acquisition lock because it installs nothing, but it must verify ABI/machine/glibc, exact pinned TAO/PyTorch distributions, console-script metadata owner and target, profile imports, pip check, PyTorch CUDA build, and real tensor allocation/synchronization on every approved GPU before state. Executable filenames alone are not proof. Do not execute anything.",
+    "expected_behavior": [
+      "Distinguishes the host control .venv from the two TAO execution profiles",
+      "Maps pyt actions to clip and ds actions to embedding/tmm and records both absolute profile paths",
+      "Allows one shared execution environment only if it passes both complete contracts",
+      "Requires CPython 3.12 ABI/platform checks, exact distribution versions, console-script ownership/targets, imports, pip check, CUDA build, and real per-GPU tensor probes",
+      "Rejects executable-name-only tests and source checkouts as runtime proof",
+      "Requires a reviewed complete transitive hash lock before approved installation and never invents missing hashes",
+      "Does not run commands, install, download, inspect credentials, or mutate files"
+    ]
+  }
+]

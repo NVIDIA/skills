@@ -2,7 +2,8 @@
 
 Shared reference for any operation that converts user-specified mm tolerances
 to Usd Optimize stage-unit parameters. Referenced by `operation-safety.md`
-and consumed by any `parameter_prerequisites` block with a `conversion` field.
+and consumed by any `parameter_prerequisites` block with a `conversion` field
+in `references/operations/operations.json`.
 
 ## Source of Truth
 
@@ -64,7 +65,12 @@ routing.
 
 ## Elicitation Template
 
-When asking the user for a physical tolerance, follow this structure:
+Use this structure when the operation has a `parameter_prerequisites` block in
+`references/operations/operations.json` with an `elicit_from_user` entry. For an
+operation with no block, `operation-safety.md` §"Fallback: confirm-required ops
+with no `parameter_prerequisites` block" owns the prompt, and the numbers come
+from the scale bands above rather than from a defaults array.
+
 1. **State the asset's physical scale:**
    > "This stage uses {scale_hint} (metersPerUnit = {metersPerUnit})."
 
@@ -82,12 +88,48 @@ When asking the user for a physical tolerance, follow this structure:
 | SO Parameter | Unit | Range | Meaning |
 |-------------|------|-------|---------|
 | `maxMeanError` | stage units | 0.0 = disabled | QEM error budget per vertex. Primary quality knob. |
-| `reductionFactor` | integer 0–100 | 100 = keep all | Percentage of triangles to **KEEP**, not remove. Secondary stop condition. |
-| `maxTriangles` | integer | 0 = disabled | Absolute triangle cap per mesh. |
-| `pinBoundaries` | boolean | — | Preserve mesh boundary edges. Always `true` for sub-mesh decimation. |
+| `reductionFactor` | float 0.0–100.0 | 100.0 = keep all, 0.0 = disabled | Percentage of the original **vertex** count to KEEP. Secondary stop condition; upstream default is `50.0`. |
+| `pinBoundaries` | boolean | default `false` | Preserve mesh boundary edges. Pass `true` explicitly for sub-mesh decimation. |
 
-**Critical:** `reductionFactor` is "keep percent", NOT "reduce percent".
-`reductionFactor: 90` means keep 90% of triangles (remove 10%).
+**Critical:** `reductionFactor` is "keep percent" of the vertex count **after the
+operation's internal weld**, not of the authored count. On welded input the two
+are the same and the nominal value holds: measured on 1.0.4 and 1.1.0, a
+3,721-vertex mesh at `reductionFactor: 90.0` came back with 3,348, exactly 90.0%.
+
+CAD input is never welded, so the nominal value badly overstates what you keep.
+Measured on a 1,761-mesh CAD slice (2,827,779 authored vertices, roughly 2.4x
+redundant), `maxMeanError` disabled so nothing else could bind first:
+
+| `reductionFactor` | vertices kept | faces kept |
+|---|---|---|
+| 90.0 | 35.5% | 79.9% |
+| 80.0 | 31.5% | 71.0% |
+| 50.0 | 19.7% | 44.3% |
+| 45.0 | 17.7% | 39.8% |
+| 20.0 | 7.9% | 17.6% |
+
+Faces track the nominal value at a consistent ~0.88x; vertices do not track it
+at all. An independent run on a different asset reproduced this (45.0 retaining
+17.8%, 80.0 retaining 31.9%).
+
+Three consequences. **Compare on faces, not vertices** — a CAD stage's authored
+vertex count is an artifact of the exporter, not a measure of its geometry. And
+**you cannot predict the output of a stated triangle target through
+`reductionFactor`** without first knowing the asset's weld ratio, which is one
+more reason a triangle target must drive `maxMeanError` iteratively rather than
+switching the op to rate mode. See `operation-safety.md § A stated triangle
+target is a CEILING, not a mode switch`.
+
+Third, and the actionable one: **weld first and the parameter becomes meaningful
+again.** The unpredictability above is entirely the redundant vertices. Validate
+the weld state with the `vertex_weld` concept, run `meshCleanup` if it fires, and
+only then reduce — at which point `reductionFactor: 90.0` keeps 90% because the
+authored and welded counts finally agree. The workflow states this as a
+precondition rather than an ordering preference; see `workflow.md § Operation
+ordering invariants`.
+
+`decimateMeshes` has no absolute triangle cap; `reductionFactor` is its only
+count-based stop condition, and it is not a reliable one.
 
 ## Anti-Patterns
 
@@ -117,7 +159,6 @@ Any operation with tolerance knobs benefits from this formula:
 - `findCoincidingGeometry` — `tolerance`
 - `mergeVertices` — `tolerance`
 - `removeSmallGeometry` — `threshold` (min extent in stage units)
-- `findSmallGeometry` — `threshold`
 
 ## deduplicateGeometry parameter gotchas (field-validated)
 
@@ -133,8 +174,10 @@ record locally:
   direction: when in doubt, tune DOWN first.
 - **`considerDeepTransforms` defaults to `true` and can corrupt placement** —
   the standalone run observed instances landing with wrong transforms under the
-  default. Set `considerDeepTransforms: false` unless placement has been
-  verified on a sample after a trial run.
+  default. Pass `considerDeepTransforms: 0` unless placement has been verified
+  on a sample after a trial run. Use `0`, not `false`: the CLI parses this
+  argument as an integer and rejects the boolean literal with `failed to set
+  argument: stoi`, which aborts the run before any work is done.
 - **`duplicateMethod` default (Instanceable Reference, 2) makes later
   decimation a no-op** — dedupe output is instances, and `decimateMeshes`
   skips instanced prims. Decimate before dedupe, or use a non-instancing
@@ -171,6 +214,10 @@ what gets fitted, and is justified only by an explicit preservation intent. This
 corrects a historic inverted-doc reading that told agents to set `false`
 everywhere.
 
-Each operation's `parameter_prerequisites` frontmatter specifies which fields
-it needs and what conversion applies. This file owns the shared formula;
-individual ops own their specific parameter semantics.
+Where an operation's entry in `references/operations/operations.json` carries a
+`parameter_prerequisites` block, that block specifies which fields the operation
+needs and what conversion applies. `fitPrimitives` has no such block: its number
+comes from the `fitPrimitives` column of the scale-band table above, and its
+data-preservation decision from the two boolean parameters described in this
+section. This file owns the shared formula and the per-target bands; individual
+ops own their specific parameter semantics.

@@ -1,0 +1,131 @@
+find_available_appointments:
+  type: function
+  function:
+    name: find_available_appointments
+    description: >-
+      Look up open healthcare appointment slots in the demo SQLite schedule.
+      Call this only after appointment_type, a date or date range explicitly
+      provided by the user, and the user's explicit morning-or-afternoon
+      preference are known. Never invent or default a date range or use the
+      current datetime as the user's scheduling preference. Use the current
+      datetime only to resolve a relative date phrase the user actually said.
+      When all required inputs are known, call this function immediately in
+      the current turn without first responding that availability will be checked.
+    parameters:
+      type: object
+      properties:
+        appointment_type:
+          type: string
+          enum:
+            - Adult physicals
+            - Pediatric physicals
+            - Follow-up appointments
+            - Sick visits
+            - Flu shots
+            - Other vaccinations
+            - Allergy shots
+            - B12 injections
+            - Diabetes management
+            - Hypertension management
+            - Asthma management
+            - Chronic pain management
+            - Initial mental health consultations
+            - Follow-up mental health appointments
+            - Therapy sessions
+            - Blood draws
+            - Urine tests
+            - EKGs
+            - Biopsies
+            - Medication management
+            - Wart removals
+            - Skin tag removals
+            - Ear wax removals
+          description: Appointment type to search for.
+        start_date:
+          type: string
+          description: >-
+            Earliest appointment date in year-month-date order. Resolve relative
+            dates such as tomorrow, next week, or next Monday using the current
+            datetime context. If the user names a weekday, verify this ISO date
+            falls on that weekday before calling. Calendar example: when today
+            is Monday 2026-08-17, next Monday is 2026-08-24, not 2026-08-25.
+        end_date:
+          type: string
+          description: >-
+            Latest appointment date in year-month-date order. If the user named one
+            exact day, use the same value as start_date. It must satisfy the same
+            named-weekday constraint as start_date.
+        time_window:
+          type: string
+          enum:
+            - morning
+            - afternoon
+          description: >-
+            The user's explicitly stated preference: morning or afternoon.
+            Do not infer or default this value. Ask the user if it is missing.
+      required:
+        - appointment_type
+        - start_date
+        - end_date
+        - time_window
+
+book_appointment:
+  type: function
+  function:
+    name: book_appointment
+    description: >-
+      Write the patient's intended appointment booking to the demo SQLite
+      schedule. Call this only after the user has chosen one available slot and
+      appointment_type, appointment_datetime, patient_name, date_of_birth,
+      and visit_reason are known.
+    parameters:
+      type: object
+      properties:
+        slot_id:
+          type: string
+          description: Optional slot ID returned by find_available_appointments.
+        appointment_type:
+          type: string
+          enum:
+            - Adult physicals
+            - Pediatric physicals
+            - Follow-up appointments
+            - Sick visits
+            - Flu shots
+            - Other vaccinations
+            - Allergy shots
+            - B12 injections
+            - Diabetes management
+            - Hypertension management
+            - Asthma management
+            - Chronic pain management
+            - Initial mental health consultations
+            - Follow-up mental health appointments
+            - Therapy sessions
+            - Blood draws
+            - Urine tests
+            - EKGs
+            - Biopsies
+            - Medication management
+            - Wart removals
+            - Skin tag removals
+            - Ear wax removals
+          description: Appointment type for the chosen slot.
+        appointment_datetime:
+          type: string
+          description: Chosen appointment date and time, such as 2026-08-24 09:00:00.
+        patient_name:
+          type: string
+          description: Patient full name.
+        date_of_birth:
+          type: string
+          description: Patient date of birth, preferably in year-month-date order.
+        visit_reason:
+          type: string
+          description: Reason for the visit.
+      required:
+        - appointment_type
+        - appointment_datetime
+        - patient_name
+        - date_of_birth
+        - visit_reason

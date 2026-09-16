@@ -10,5 +10,42 @@
       "Outlines the documented workflow steps from SKILL.md",
       "Does not run commands, scripts, or web searches"
     ]
+  },
+  {
+    "id": "tao-finetune-huggingface-model-dedicated-routing",
+    "question": "A user asks to LoRA fine-tune the Hugging Face model nvidia/Cosmos3-Nano. Decide whether to use this generic Hugging Face workflow or a dedicated TAO model skill. Do not execute anything.",
+    "expected_skill": "tao-finetune-cosmos-reason",
+    "expected_script": null,
+    "ground_truth": "Silently perform the ownership lookup, route nvidia/Cosmos3-Nano to tao-finetune-cosmos-reason, and use its associated container image, action template, and checkpoint preparation. The original user request is sufficient; do not ask the user to name internal skills or conversion formats.",
+    "expected_behavior": [
+      "Recognizes that Hugging Face hosting does not override dedicated-model routing",
+      "Routes nvidia/Cosmos3-Nano to tao-finetune-cosmos-reason",
+      "Does not create a generic Hugging Face trainer, venv, or one-off image",
+      "Does not ask the user to resubmit the prompt with a TAO skill name, container family, or checkpoint-conversion instructions"
+    ]
+  },
+  {
+    "id": "tao-finetune-huggingface-model-dedicated-routing-non-cosmos",
+    "question": "A user asks to fine-tune the Hugging Face model nvidia/nv-tesseract-forecasting. Decide whether to use this generic Hugging Face workflow or a dedicated TAO model skill. Do not execute anything.",
+    "expected_skill": "tao-finetune-nv-tesseract-forecasting",
+    "expected_script": null,
+    "ground_truth": "Do not use the generic Hugging Face workflow. The packaged ownership registry maps nvidia/nv-tesseract-forecasting to tao-finetune-nv-tesseract-forecasting, whose documented uv execution environment remains authoritative.",
+    "expected_behavior": [
+      "Applies the ownership gate generically rather than special-casing Cosmos",
+      "Routes nvidia/nv-tesseract-forecasting to tao-finetune-nv-tesseract-forecasting",
+      "Uses the dedicated model skill's declared execution environment instead of creating the generic NGC workflow"
+    ]
+  },
+  {
+    "id": "tao-finetune-huggingface-model-unclaimed-routing",
+    "question": "A user asks to fine-tune google/vit-base-patch16-224, and the TAO model ownership resolver reports UNMATCHED with exit code 3. Decide which workflow applies. Do not execute anything.",
+    "expected_skill": "tao-finetune-huggingface-model",
+    "expected_script": null,
+    "ground_truth": "Because the deterministic ownership lookup returned the explicit unmatched result, continue with tao-finetune-huggingface-model and its default NGC-container workflow.",
+    "expected_behavior": [
+      "Uses the generic Hugging Face skill only after the explicit unmatched result",
+      "Keeps the generic skill's NGC-container default",
+      "Does not create a host training venv unless the user explicitly requests venv execution"
+    ]
   }
 ]

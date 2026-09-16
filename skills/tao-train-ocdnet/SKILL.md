@@ -17,6 +17,8 @@ tags:
 
 # OCDNet
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 OCDNet for scene text detection. Detects arbitrary-oriented text regions in natural images using a differentiable binarization approach.
 
 Set `model.pretrained_model_path` for pretrained weights.
@@ -27,7 +29,7 @@ The PyT OCDNet CLI supports `train`, `evaluate`, `export`, `inference`, `prune`,
 
 ## Dataclass Schemas
 
-Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
+Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML for an action requires `schemas/<action>.schema.json` and `references/spec_template_<action>.yaml` to exist and parse. Use the packaged selected-action schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
 
 ## Train Action Policy
 
@@ -45,7 +47,12 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 
 - **Dataset type:** ocdnet
 - **Formats:** default
-- **Monitoring metric:** hmean
+- **AutoML training metric:** `train_loss` (the status logger's final
+  `train_loss_epoch` value), with `direction=minimize`
+- **AutoML metric contract:** Use `train_loss` emitted during training and
+  minimize it. Treat `train_loss_epoch` as a log fallback alias only; use
+  standalone `hmean` solely to validate the selected checkpoint.
+- **Standalone evaluation metric:** `hmean`, with `direction=maximize`
 
 ### Per-Action Dataset Requirements
 

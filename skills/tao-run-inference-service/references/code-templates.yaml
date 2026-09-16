@@ -49,10 +49,20 @@ job_payload_builder:
           f"--job {shlex.quote(job_json)} --docker_env_vars {shlex.quote(env_json)}"
       )
 
-      # Resolve image per Section 2: read network config → docker_image_defaults.mapping
-      # value (a versions.yaml dotted key) → tao_sdk.versions.resolve_container_image.
-      from tao_sdk.versions import resolve_container_image
-      image = resolve_container_image("tao_toolkit.cosmos_rl")  # or IMAGE_COSMOS_RL env-var override
+      # Resolve Cosmos-RL through the model skill's backend metadata. No TAO SDK.
+      import os, subprocess
+      image = os.environ.get("IMAGE_COSMOS_RL")
+      if not image:
+          resolved = subprocess.check_output(
+              [f"{os.environ['TAO_SKILL_BANK_PATH']}/scripts/resolve_tao_image.py",
+               "--skill-bank", os.environ["TAO_SKILL_BANK_PATH"],
+               "--model", "nvidia/Cosmos3-Nano",
+               "--action", "inference_microservice",
+               "--backend", "cosmos-rl",
+               "--format", "json"],
+              text=True,
+          )
+          image = json.loads(resolved)["image"]
 
   cosmos-predict2.5:
     description: >
@@ -102,9 +112,12 @@ job_payload_builder:
       if model_path.startswith("hf_model://"):
           env_payload["HF_TOKEN"] = "<HF_TOKEN env var>"   # export HF_TOKEN=...
 
-      # Resolve image per Section 2 (versions.yaml dotted key → concrete URI).
-      from tao_sdk.versions import resolve_container_image
-      image = resolve_container_image("tao_toolkit.cosmos_predict_2_5")  # or IMAGE_COSMOS_PREDICT2_5 env-var override
+      # Resolve image per Section 2 (versions.yaml dotted key → concrete URI). No TAO SDK.
+      import os, subprocess
+      image = os.environ.get("IMAGE_COSMOS_PREDICT2_5") or subprocess.check_output(
+          [f"{os.environ['TAO_SKILL_BANK_PATH']}/scripts/resolve_versions_key.py",
+           "images.tao_toolkit.cosmos_predict"], text=True
+      ).strip()
 
   tao-dataservices:
     description: >
@@ -148,9 +161,12 @@ job_payload_builder:
           f"--job {shlex.quote(job_json)} --docker_env_vars {shlex.quote(env_json)}"
       )
 
-      # Resolve image per Section 2 (versions.yaml dotted key → concrete URI).
-      from tao_sdk.versions import resolve_container_image
-      image = resolve_container_image("tao_toolkit.data_services")  # or IMAGE_TAO_DATASERVICES env-var override
+      # Resolve image per Section 2 (versions.yaml dotted key → concrete URI). No TAO SDK.
+      import os, subprocess
+      image = os.environ.get("IMAGE_TAO_DATASERVICES") or subprocess.check_output(
+          [f"{os.environ['TAO_SKILL_BANK_PATH']}/scripts/resolve_versions_key.py",
+           "images.tao_toolkit.data_services"], text=True
+      ).strip()
 
 registry_write:
   description: >
@@ -213,25 +229,30 @@ registry_write:
     python: |
       import subprocess, time, os
 
-      slurm_job_id = job.backend_details["slurm_metadata"]["slurm_job_id"]
+      # slurm_job_id is the scheduler id the tao-run-on-slurm platform skill
+      # returned when it submitted the container (via ssh + sbatch). No TAO SDK.
+      slurm_job_id = "<slurm_job_id from tao-run-on-slurm start step>"
+      login = f"{os.environ['SLURM_USER']}@{os.environ['SLURM_HOSTNAME']}"
 
+      # Poll scheduler state over SSH (sacct/squeue), the same SDK-free mechanism
+      # tao-run-on-slurm uses. Treat RUNNING/COMPLETING as ready to port-forward.
       while True:
-          status = sdk.get_job_status(job.id)
-          if status.status == "Running":
+          status = subprocess.check_output(
+              ["ssh", login, f"sacct -j {slurm_job_id} -X -n -o State"], text=True
+          ).strip().split()[0] if slurm_job_id else ""
+          if status in ("RUNNING", "COMPLETING"):
               break
-          if status.status in ("Error", "Canceled"):
-              raise RuntimeError(f"SLURM job failed: {status.status}")
+          if status in ("FAILED", "CANCELLED", "TIMEOUT", "NODE_FAIL"):
+              raise RuntimeError(f"SLURM job failed: {status}")
           time.sleep(15)
 
       node = subprocess.check_output(
-          ["ssh", f"{os.environ['SLURM_USER']}@{os.environ['SLURM_HOSTNAME']}",
-           f"squeue -j {slurm_job_id} -h -o '%N'"],
+          ["ssh", login, f"squeue -j {slurm_job_id} -h -o '%N'"],
           text=True
       ).strip()
 
       subprocess.Popen([
-          "ssh", "-N", "-L", f"{host_port}:{node}:8080",
-          f"{os.environ['SLURM_USER']}@{os.environ['SLURM_HOSTNAME']}"
+          "ssh", "-N", "-L", f"{host_port}:{node}:8080", login
       ])
       print(f"Port-forward: localhost:{host_port} -> {node}:8080 via SLURM login node")
 

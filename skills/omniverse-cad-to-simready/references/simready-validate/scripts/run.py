@@ -7,7 +7,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import platform
 from pathlib import Path
 import re
 import shutil
@@ -20,6 +19,15 @@ from urllib.parse import urlparse
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "shared"))
 
 from script_utils import emit_json_report
+from upstream_versions import (
+    UPSTREAM_VERSION_MANIFEST_PATH,
+    expected_versions,
+    git_upstreams,
+    runtime_package_names,
+    runtime_requirements,
+    version_mismatches,
+    version_probe_code,
+)
 
 from preflight_manifest import (
     load_preflight_manifest,
@@ -37,19 +45,16 @@ SKILL = "simready-validate"
 TOOL = "simready-validate"
 DEFAULT_PROFILE = "Prop-Robotics-Neutral"
 DEFAULT_PROFILE_VERSION = "1.0.0"
-DEFAULT_UPSTREAM_ROOT = Path.home() / ".physical-ai-skill-hub" / "upstreams"
+DEFAULT_UPSTREAM_ROOT = Path.home() / ".omniverse-cad-to-simready" / "upstreams"
 DEFAULT_FOUNDATION_REPO_URL = "https://github.com/NVIDIA/simready-foundation"
-DEFAULT_FOUNDATION_BRANCH = "main"
-DEFAULT_SIMREADY_VALIDATE_REQUIREMENT = "simready-validate>=2026.4.8"
+DEFAULT_FOUNDATION_BRANCH = git_upstreams()["simready_foundation"]["ref"]
 NONBLOCKING_SINGLE_COMPONENT_REQUIREMENT = "RB.MB.001"
-SIMREADY_RUNTIME_EXTRA_REQUIREMENTS = [
-    "numpy>=1.24,<3",
-]
-USD_EXCHANGE_SDK_FALLBACK_REQUIREMENTS = [
-    "usd-exchange>=2.3.0",
-    "omniverse-asset-validator",
-    "omniverse-usd-profiles>=1.10.22",
-]
+SIMREADY_RUNTIME_REQUIREMENTS = runtime_requirements("simready_validate")
+SIMREADY_NO_DEPS_REQUIREMENTS = runtime_requirements("simready_validate", no_deps=True)
+SIMREADY_RUNTIME_PACKAGE_NAMES = (
+    *runtime_package_names("simready_validate"),
+    *runtime_package_names("simready_validate", no_deps=True),
+)
 
 
 def _checkout_name_from_repo_url(repo_url: str) -> str:
@@ -320,7 +325,7 @@ def _runtime_venv_dir() -> Path:
     if venv_dir is not None:
         return venv_dir
     cache_home = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")).expanduser()
-    return (cache_home / "physical-ai-skill-hub" / "simready-validate-venv").resolve()
+    return (cache_home / "omniverse-cad-to-simready" / "simready-validate-venv").resolve()
 
 
 def _venv_bin_dir(venv_dir: Path) -> Path:
@@ -337,40 +342,29 @@ def _venv_executable(venv_dir: Path) -> Path:
 
 
 def _runtime_dependencies_ready(python: Path) -> bool:
+    return _runtime_version_error(python) is None
+
+
+def _runtime_version_error(python: Path) -> str | None:
+    code = (
+        "import numpy; import omni.asset_validator; from pxr import Usd; "
+        + version_probe_code(SIMREADY_RUNTIME_PACKAGE_NAMES)
+    )
     completed = subprocess.run(
-        [str(python), "-c", "import numpy"],
+        [str(python), "-c", code],
         capture_output=True,
         text=True,
-        timeout=60,
+        timeout=120,
         check=False,
     )
-    return completed.returncode == 0
-
-
-def _dedupe_requirements(requirements: list[str]) -> list[str]:
-    seen: set[str] = set()
-    deduped: list[str] = []
-    for requirement in requirements:
-        key = requirement.strip().lower()
-        if not key or key in seen:
-            continue
-        seen.add(key)
-        deduped.append(requirement)
-    return deduped
-
-
-def _foundation_requirements(requirements_path: Path) -> tuple[list[str], list[str]]:
-    simready_requirements: list[str] = []
-    other_requirements: list[str] = []
-    for raw_line in requirements_path.read_text(encoding="utf-8").splitlines():
-        line = raw_line.split("#", 1)[0].strip()
-        if not line:
-            continue
-        if line.lower().startswith("simready-validate"):
-            simready_requirements.append(line)
-        elif not line.lower().startswith("usd-core"):
-            other_requirements.append(line)
-    return simready_requirements or [DEFAULT_SIMREADY_VALIDATE_REQUIREMENT], other_requirements
+    if completed.returncode != 0:
+        return completed.stderr.strip() or completed.stdout.strip() or f"version probe exited {completed.returncode}"
+    try:
+        installed = json.loads(completed.stdout.strip().splitlines()[-1])
+    except (IndexError, json.JSONDecodeError) as exc:
+        return f"version probe did not return JSON: {exc}"
+    mismatches = version_mismatches(expected_versions(SIMREADY_RUNTIME_PACKAGE_NAMES), installed)
+    return "; ".join(mismatches) if mismatches else None
 
 
 def _foundation_requirements_path(root: Path) -> Path:
@@ -379,17 +373,6 @@ def _foundation_requirements_path(root: Path) -> Path:
         root / "nv_core" / "validator_sample" / "requirements.txt",
     ]
     return next((path for path in candidates if path.is_file()), candidates[0])
-
-
-def _is_aarch64() -> bool:
-    return platform.machine().lower() in {"aarch64", "arm64"}
-
-
-def _should_try_usd_exchange_fallback(install_detail: str) -> bool:
-    if not _is_aarch64():
-        return False
-    lowered = install_detail.lower()
-    return "usd-core" in lowered or "no matching distribution" in lowered or "resolutionimpossible" in lowered
 
 
 def _run_pip_install(python: Path, args: list[str], *, timeout: int = 900) -> subprocess.CompletedProcess[str]:
@@ -402,24 +385,21 @@ def _run_pip_install(python: Path, args: list[str], *, timeout: int = 900) -> su
     )
 
 
-def _install_cli_with_usd_exchange_sdk_runtime(
-    python: Path,
-    executable: Path,
-    requirements_path: Path,
-) -> str | None:
-    simready_requirements, other_requirements = _foundation_requirements(requirements_path)
-    runtime_requirements = _dedupe_requirements([*USD_EXCHANGE_SDK_FALLBACK_REQUIREMENTS, *other_requirements, *SIMREADY_RUNTIME_EXTRA_REQUIREMENTS])
-    runtime_install = _run_pip_install(python, runtime_requirements)
+def _install_cli_with_locked_runtime(python: Path, executable: Path) -> str | None:
+    runtime_install = _run_pip_install(python, list(SIMREADY_RUNTIME_REQUIREMENTS))
     if runtime_install.returncode != 0:
         detail = runtime_install.stderr.strip() or runtime_install.stdout.strip()
-        return f"Failed to install USD Exchange SDK fallback runtime: {detail}"
+        return f"Failed to install pinned SimReady runtime from {UPSTREAM_VERSION_MANIFEST_PATH}: {detail}"
 
-    simready_install = _run_pip_install(python, ["--no-deps", *simready_requirements])
+    simready_install = _run_pip_install(python, ["--no-deps", *SIMREADY_NO_DEPS_REQUIREMENTS])
     if simready_install.returncode != 0:
         detail = simready_install.stderr.strip() or simready_install.stdout.strip()
-        return f"Failed to install {TOOL} with USD Exchange SDK fallback runtime: {detail}"
+        return f"Failed to install pinned {TOOL} runtime: {detail}"
     if not executable.is_file():
-        return f"Installed USD Exchange SDK fallback runtime, but {executable} was not created"
+        return f"Installed pinned SimReady runtime, but {executable} was not created"
+    version_error = _runtime_version_error(python)
+    if version_error:
+        return f"Pinned SimReady runtime verification failed: {version_error}"
     return None
 
 
@@ -428,8 +408,8 @@ def _install_cli_from_foundation_repo(foundation_root: Path | None) -> tuple[str
     if root is None:
         return None, (
             f"{TOOL} CLI was not found on PATH, and no SimReady Foundation checkout was found at "
-            f"$SIMREADY_FOUNDATION_ROOT, $PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT/{DEFAULT_FOUNDATION_CHECKOUT}, "
-            f"or $HOME/.physical-ai-skill-hub/upstreams/{DEFAULT_FOUNDATION_CHECKOUT} "
+            f"$SIMREADY_FOUNDATION_ROOT, $OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT/{DEFAULT_FOUNDATION_CHECKOUT}, "
+            f"or $HOME/.omniverse-cad-to-simready/upstreams/{DEFAULT_FOUNDATION_CHECKOUT} "
             f"checked out to {DEFAULT_FOUNDATION_BRANCH}"
         )
     requirements_path = _foundation_requirements_path(root)
@@ -454,17 +434,9 @@ def _install_cli_from_foundation_repo(foundation_root: Path | None) -> tuple[str
         return None, f"Failed to create {TOOL} runtime venv at {venv_dir}: {detail}"
 
     python = _venv_python(venv_dir)
-    install = _run_pip_install(python, ["-r", str(requirements_path), *SIMREADY_RUNTIME_EXTRA_REQUIREMENTS])
-    if install.returncode != 0:
-        detail = install.stderr.strip() or install.stdout.strip()
-        if _should_try_usd_exchange_fallback(detail):
-            fallback_error = _install_cli_with_usd_exchange_sdk_runtime(python, executable, requirements_path)
-            if fallback_error is None:
-                return str(executable), None
-            return None, f"Failed to install {TOOL} from {requirements_path}: {detail}\n{fallback_error}"
-        return None, f"Failed to install {TOOL} from {requirements_path}: {detail}"
-    if not executable.is_file():
-        return None, f"Installed {requirements_path}, but {executable} was not created"
+    install_error = _install_cli_with_locked_runtime(python, executable)
+    if install_error:
+        return None, install_error
     return str(executable), None
 
 
@@ -598,7 +570,7 @@ def _resolve_foundation_root(explicit: Path | None) -> Path | None:
     env_value = os.getenv("SIMREADY_FOUNDATION_ROOT")
     if env_value:
         return Path(env_value)
-    upstream_root = Path(os.getenv("PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT", str(DEFAULT_UPSTREAM_ROOT)))
+    upstream_root = Path(os.getenv("OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT", str(DEFAULT_UPSTREAM_ROOT)))
     candidate = upstream_root / DEFAULT_FOUNDATION_CHECKOUT
     return candidate if candidate.exists() else None
 

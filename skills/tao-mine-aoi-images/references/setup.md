@@ -1,10 +1,10 @@
 # Setup and Environment
 
-The mining and embedding tasks live inside the `tao_toolkit.data_services` image declared in `versions.yaml`. Resolve the concrete URI once at the top of the run, then confirm Docker, the NVIDIA container toolkit, and a GPU are present before doing anything else:
+The mining and embedding tasks live inside the pinned TAO data-services image below. Confirm Docker, the NVIDIA container toolkit, and a GPU are present before doing anything else:
 
 ```bash
-# Resolve tao_toolkit.data_services → concrete nvcr.io/... URI from versions.yaml
-DS_IMAGE=$(python3 -c "import yaml,os; print(yaml.safe_load(open(os.environ['TAO_SKILL_BANK_PATH']+'/versions.yaml'))['images']['tao_toolkit']['data_services'])")
+# Pinned TAO data-services container URI (stamped from the release manifest)
+DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
 echo "DS_IMAGE=$DS_IMAGE"
 
 docker info > /dev/null && echo "OK: docker"
@@ -13,15 +13,13 @@ docker image inspect "$DS_IMAGE" > /dev/null \
   || docker pull "$DS_IMAGE"
 ```
 
-`TAO_SKILL_BANK_PATH` is exported by the plugin's `session_start` hook. If it is unset (e.g. running outside the Claude Code plugin), point it at the skill-bank repo root before resolving.
-
 A GPU is required for both the encoder forward pass and the cuML/cuDF k-NN search; both steps will fail without CUDA.
 
 **Path mounting.** Every host path the container reads or writes — input parquets, output dirs, and the source-pool image root — must be bind-mounted. The simplest and most predictable approach is to mount the workspace root with **identical paths** inside and outside the container so the absolute paths in the parquet args resolve the same way on both sides:
 
 ```bash
 WORKSPACE=<absolute path that contains all parquets, outputs, and the source-pool images>
-DOCKER="docker run --gpus all --rm --ipc=host -v $WORKSPACE:$WORKSPACE -w $WORKSPACE $DS_IMAGE"
+DOCKER="docker run --gpus all --rm --shm-size=8g -v $WORKSPACE:$WORKSPACE -w $WORKSPACE $DS_IMAGE"
 ```
 
 Do **not** pass `--user $(id -u):$(id -g)`. The `data_services` image imports `transformers` at startup, which calls `getpass.getuser()` → `pwd.getpwuid(os.getuid())`. With a non-root host UID and no matching `/etc/passwd` entry inside the container, this raises `KeyError: 'getpwuid(): uid not found: <uid>'` before any embedding or mining work starts. The container runs as root; chown outputs back to the host UID afterward if needed:

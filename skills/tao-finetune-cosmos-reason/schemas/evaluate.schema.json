@@ -1,31 +1,37 @@
 {
   "automl_default_parameters": [
-    "vision.fps"
+    "dataset.system_prompt",
+    "vision.num_frames",
+    "generation.max_tokens",
+    "generation.temperature",
+    "generation.repetition_penalty",
+    "generation.presence_penalty",
+    "generation.frequency_penalty"
   ],
   "automl_disabled_parameters": [
-    "metrics",
-    "evaluation",
-    "model",
-    "vision",
-    "evaluation.soft_accuracy",
-    "task",
-    "metrics.names",
-    "results",
     "dataset",
-    "generation"
+    "evaluation",
+    "generation",
+    "metrics",
+    "model",
+    "results",
+    "task",
+    "vision"
   ],
   "default": {
     "dataset": {
       "annotation_path": "",
       "media_dir": "",
-      "system_prompt": "You are a helpful assistant that can answer questions about a street-view CCTV footage. The vehicles that need attention are marked with bounding boxes and IDs."
+      "system_prompt": ""
     },
     "evaluation": {
-      "answer_type": "freeform",
-      "batch_size": 50,
+      "answer_type": "",
+      "barrier_timeout_seconds": 14400,
+      "batch_size": 0,
       "limit": -1,
-      "num_processes": 40,
-      "seed": 1,
+      "num_processes": 1,
+      "seed": 0,
+      "shard_strategy": "stride",
       "shard_id": 0,
       "skip_saved": false,
       "soft_accuracy": {
@@ -36,89 +42,89 @@
     "generation": {
       "frequency_penalty": 0.0,
       "max_retries": 10,
-      "max_tokens": 1024,
+      "max_tokens": 0,
       "presence_penalty": 0.0,
       "repetition_penalty": 1.0,
       "temperature": 0.0
     },
     "metrics": {
-      "bertscore_batch_size": 1,
-      "bertscore_device": "cpu",
-      "bertscore_lang": "en",
-      "bertscore_model": "microsoft/deberta-xlarge-mnli",
-      "names": [
-        "bleu",
-        "rouge",
-        "bertscore"
-      ]
+      "names": []
     },
     "model": {
-      "base_model_path": "hf_model://nvidia/Cosmos3-Nano",
-      "dtype": "bfloat16",
+      "base_model_path": "",
+      "config_file": "",
+      "dtype": "",
+      "max_length": 0,
+      "tp_size": 1,
       "enable_lora": false,
-      "max_length": 128000,
-      "model_name": "hf_model://nvidia/Cosmos3-Nano",
-      "save_folder": "cr1_1_zero_shot",
-      "tokenizer_model_name": "qwen2.5-vl-7b",
-      "tp_size": 1
+      "export_dir": "",
+      "model_name": "",
+      "vit_checkpoint_path": ""
     },
-    "num_gpus": 1,
+    "num_gpus": 0,
     "results": {
       "save_confusion_matrix": true,
       "save_individual_results": true,
       "save_metrics_summary": true
     },
+    "results_dir": "",
     "task": {
       "type": ""
     },
     "vision": {
-      "nframes": 8
-    },
-    "results_dir": ""
+      "max_pixels": 0,
+      "min_pixels": 0,
+      "num_frames": 0,
+      "decoder_device": "cuda",
+      "decoder_cache_size": 4,
+      "decoder_threads": 1,
+      "dataloader_multiprocessing_context": "spawn",
+      "dataloader_num_workers": 1,
+      "dataloader_persistent_workers": true,
+      "dataloader_prefetch_factor": 2,
+      "frame_transfer": "host_rgb",
+      "process_threads": 8,
+      "video_cache_size": 0,
+      "video_decoder": "pynvvideocodec"
+    }
   },
+  "evaluate_automl_disabled_parameters": [
+    "evaluate.dataset",
+    "evaluate.evaluation",
+    "evaluate.generation",
+    "evaluate.metrics",
+    "evaluate.model",
+    "evaluate.results",
+    "evaluate.task",
+    "evaluate.vision"
+  ],
+  "evaluate_automl_enabled": false,
   "properties": {
-    "automl_disabled_parameters": [
-      "metrics",
-      "evaluation",
-      "model",
-      "vision",
-      "evaluation.soft_accuracy",
-      "task",
-      "metrics.names",
-      "results",
-      "dataset",
-      "generation"
-    ],
-    "results_dir": {
-      "default": "",
-      "description": "Directory to save evaluation results",
-      "title": "Results directory",
-      "type": "string"
-    },
     "dataset": {
       "automl_enabled": false,
       "default": {
         "annotation_path": "",
         "media_dir": "",
-        "system_prompt": "You are a helpful assistant that can answer questions about a street-view CCTV footage. The vehicles that need attention are marked with bounding boxes and IDs."
+        "system_prompt": ""
       },
-      "description": "Dataset configuration for evaluation",
+      "description": "Exact evaluation dataset inputs. Resolve from the selected training validation split or explicit current-run intake.",
       "properties": {
         "annotation_path": {
           "default": "",
-          "description": "Path to the annotation JSON file containing evaluation samples",
+          "description": "Exact annotation manifest; never inferred from directory history.",
           "title": "Annotation path",
           "type": "string"
         },
         "media_dir": {
           "default": "",
-          "description": "Optional path to media files directory (if different from annotation paths)",
+          "description": "Exact media root paired with the annotation manifest.",
           "title": "Media directory",
           "type": "string"
         },
         "system_prompt": {
-          "default": "You are a helpful assistant that can answer questions about a street-view CCTV footage. The vehicles that need attention are marked with bounding boxes and IDs.",
-          "description": "System prompt for the evaluation tasks",
+          "automl_enabled": true,
+          "default": "",
+          "description": "Inherit the exact fine-tuning prompt when evaluating its validation split; otherwise require explicit intake. Empty is a valid explicit value.",
           "title": "System prompt",
           "type": "string"
         }
@@ -126,16 +132,15 @@
       "type": "collection"
     },
     "evaluation": {
-      "automl_disabled_parameters": [
-        "evaluate.evaluation.soft_accuracy"
-      ],
       "automl_enabled": false,
       "default": {
-        "answer_type": "freeform",
-        "batch_size": 50,
+        "answer_type": "",
+        "barrier_timeout_seconds": 14400,
+        "batch_size": 0,
         "limit": -1,
-        "num_processes": 40,
-        "seed": 1,
+        "num_processes": 1,
+        "seed": 0,
+        "shard_strategy": "stride",
         "shard_id": 0,
         "skip_saved": false,
         "soft_accuracy": {
@@ -143,58 +148,59 @@
           "f1_threshold": 0.8
         }
       },
-      "description": "Evaluation parameters",
+      "description": "Evaluation execution and answer parsing.",
       "properties": {
         "answer_type": {
-          "default": "freeform",
-          "description": "Expected answer format (letter, reasoning, freeform)",
+          "default": "",
+          "enum": ["letter", "reasoning", "freeform", "naive"],
           "title": "Answer type",
-          "type": "string"
+          "type": "categorical"
+        },
+        "barrier_timeout_seconds": {
+          "default": 14400,
+          "minimum": 1,
+          "title": "Rank barrier timeout",
+          "type": "int"
         },
         "batch_size": {
-          "default": 50,
-          "description": "Number of requests to process in each batch during inference",
-          "maximum": 500,
+          "default": 0,
           "minimum": 1,
-          "title": "Batch size",
+          "title": "Inference batch size",
           "type": "int"
         },
         "limit": {
           "default": -1,
-          "description": "Limit the number of tasks to evaluate (-1 for no limit, useful for debugging)",
-          "maximum": 999999,
           "minimum": -1,
-          "title": "Task limit",
+          "title": "Evaluation limit",
           "type": "int"
         },
         "num_processes": {
-          "default": 40,
-          "description": "Number of parallel workers for evaluation",
-          "maximum": 128,
+          "default": 1,
           "minimum": 1,
-          "title": "Number of processes",
+          "title": "Input preparation processes",
           "type": "int"
         },
         "seed": {
-          "default": 1,
-          "description": "Random seed for reproducibility",
-          "maximum": 999999,
+          "default": 0,
           "minimum": 0,
-          "title": "Random seed",
+          "title": "Seed",
           "type": "int"
+        },
+        "shard_strategy": {
+          "default": "stride",
+          "enum": ["stride", "media_balanced"],
+          "title": "Data-parallel shard strategy",
+          "type": "categorical"
         },
         "shard_id": {
           "default": 0,
-          "description": "Current shard ID (0-based)",
-          "maximum": 63,
           "minimum": 0,
           "title": "Shard ID",
           "type": "int"
         },
         "skip_saved": {
           "default": false,
-          "description": "Skip tasks for which results are already saved",
-          "title": "Skip saved results",
+          "title": "Skip saved outputs",
           "type": "bool"
         },
         "soft_accuracy": {
@@ -203,22 +209,9 @@
             "enabled": true,
             "f1_threshold": 0.8
           },
-          "description": "Soft accuracy configuration for general evaluation",
           "properties": {
-            "enabled": {
-              "default": true,
-              "description": "Enable soft accuracy computation based on token overlap F1",
-              "title": "Enable soft accuracy",
-              "type": "bool"
-            },
-            "f1_threshold": {
-              "default": 0.8,
-              "description": "F1 threshold for soft accuracy (predictions with F1 >= threshold are considered correct)",
-              "maximum": 1.0,
-              "minimum": 0.0,
-              "title": "F1 threshold",
-              "type": "float"
-            }
+            "enabled": {"default": true, "type": "bool"},
+            "f1_threshold": {"default": 0.8, "maximum": 1.0, "minimum": 0.0, "type": "float"}
           },
           "type": "collection"
         }
@@ -230,201 +223,60 @@
       "default": {
         "frequency_penalty": 0.0,
         "max_retries": 10,
-        "max_tokens": 1024,
+        "max_tokens": 0,
         "presence_penalty": 0.0,
         "repetition_penalty": 1.0,
         "temperature": 0.0
       },
-      "description": "Generation parameters",
       "properties": {
-        "frequency_penalty": {
-          "default": 0.0,
-          "description": "Frequency penalty for generation",
-          "maximum": 2.0,
-          "minimum": -2.0,
-          "title": "Frequency penalty",
-          "type": "float"
-        },
-        "max_retries": {
-          "default": 10,
-          "description": "Maximum number of retries for failed generations",
-          "maximum": 50,
-          "minimum": 0,
-          "title": "Maximum retries",
-          "type": "int"
-        },
-        "max_tokens": {
-          "default": 1024,
-          "description": "Maximum number of tokens in the generated response",
-          "maximum": 8192,
-          "minimum": 1,
-          "title": "Maximum tokens",
-          "type": "int"
-        },
-        "presence_penalty": {
-          "default": 0.0,
-          "description": "Presence penalty for generation",
-          "maximum": 2.0,
-          "minimum": -2.0,
-          "title": "Presence penalty",
-          "type": "float"
-        },
-        "repetition_penalty": {
-          "default": 1.0,
-          "description": "Repetition penalty for generation",
-          "maximum": 2.0,
-          "minimum": 0.1,
-          "title": "Repetition penalty",
-          "type": "float"
-        },
-        "temperature": {
-          "default": 0.0,
-          "description": "Temperature for sampling (0.0 for greedy decoding)",
-          "maximum": 2.0,
-          "minimum": 0.0,
-          "title": "Temperature",
-          "type": "float"
-        }
+        "frequency_penalty": {"automl_enabled": true, "default": 0.0, "type": "float"},
+        "max_retries": {"default": 10, "minimum": 0, "type": "int"},
+        "max_tokens": {"automl_enabled": true, "default": 0, "minimum": 1, "type": "int"},
+        "presence_penalty": {"automl_enabled": true, "default": 0.0, "type": "float"},
+        "repetition_penalty": {"automl_enabled": true, "default": 1.0, "type": "float"},
+        "temperature": {"automl_enabled": true, "default": 0.0, "minimum": 0.0, "type": "float"}
       },
       "type": "collection"
     },
     "metrics": {
-      "automl_disabled_parameters": [
-        "evaluate.metrics.names"
-      ],
       "automl_enabled": false,
-      "default": {
-        "bertscore_batch_size": 1,
-        "bertscore_device": "cpu",
-        "bertscore_lang": "en",
-        "bertscore_model": "microsoft/deberta-xlarge-mnli",
-        "names": [
-          "bleu",
-          "rouge",
-          "bertscore"
-        ]
-      },
-      "description": "Metrics configuration for general evaluation",
+      "default": {"names": []},
+      "description": "Task-declared metrics. Accuracy tasks use the shared task-aware scorer and need no text metric download.",
       "properties": {
-        "bertscore_lang": {
-          "default": "en",
-          "description": "Language for BERTScore computation",
-          "title": "BERTScore language",
-          "type": "string"
-        },
-        "bertscore_model": {
-          "default": "microsoft/deberta-xlarge-mnli",
-          "description": "Model to use for BERTScore computation (e.g., microsoft/deberta-xlarge-mnli)",
-          "title": "BERTScore model",
-          "type": "string"
-        },
-        "bertscore_device": {
-          "default": "cpu",
-          "description": "Device for BERTScore computation (use cpu to avoid competing with the eval model for GPU memory)",
-          "title": "BERTScore device",
-          "type": "string"
-        },
-        "bertscore_batch_size": {
-          "default": 1,
-          "description": "Optional BERTScore batch size; lower values reduce peak memory",
-          "minimum": 1,
-          "title": "BERTScore batch size",
-          "type": "int"
-        },
-        "names": {
-          "automl_enabled": false,
-          "default": [
-            "bleu",
-            "rouge",
-            "bertscore"
-          ],
-          "description": "List of metrics to compute (bleu, rouge, bertscore)",
-          "enum": [
-            "bleu",
-            "rouge",
-            "bertscore"
-          ],
-          "title": "Metric names",
-          "type": "list"
-        }
+        "names": {"automl_enabled": false, "default": [], "type": "list"}
       },
       "type": "collection"
     },
     "model": {
       "automl_enabled": false,
       "default": {
-        "base_model_path": "hf_model://nvidia/Cosmos3-Nano",
-        "dtype": "bfloat16",
+        "base_model_path": "",
+        "config_file": "",
+        "dtype": "",
+        "max_length": 0,
+        "tp_size": 1,
         "enable_lora": false,
-        "max_length": 128000,
-        "model_name": "hf_model://nvidia/Cosmos3-Nano",
-        "save_folder": "cr1_1_zero_shot",
-        "tokenizer_model_name": "qwen2.5-vl-7b",
-        "tp_size": 1
+        "export_dir": "",
+        "model_name": "",
+        "vit_checkpoint_path": ""
       },
-      "description": "Model configuration",
       "properties": {
-        "base_model_path": {
-          "default": "hf_model://nvidia/Cosmos3-Nano",
-          "description": "Path to base model for LoRA merging (used when enable_lora is True)",
-          "title": "Base model path",
-          "type": "string"
-        },
-        "dtype": {
-          "default": "bfloat16",
-          "description": "Data type for model weights (bfloat16, float16)",
-          "title": "Data type",
-          "type": "string"
-        },
-        "enable_lora": {
-          "default": false,
-          "description": "Enable LoRA model merging (merge LoRA weights with base model before evaluation)",
-          "title": "Enable LoRA merging",
-          "type": "bool"
-        },
-        "max_length": {
-          "default": 128000,
-          "description": "Maximum sequence length for the model",
-          "maximum": 1000000,
-          "minimum": 1024,
-          "title": "Maximum sequence length",
-          "type": "int"
-        },
-        "model_name": {
-          "default": "hf_model://nvidia/Cosmos3-Nano",
-          "description": "Model name or path to safetensors directory",
-          "title": "Model name",
-          "type": "string"
-        },
-        "save_folder": {
-          "default": "cr1_1_zero_shot",
-          "description": "Folder name to save the output results",
-          "title": "Save folder",
-          "type": "string"
-        },
-        "tokenizer_model_name": {
-          "default": "qwen2.5-vl-7b",
-          "description": "Tokenizer model name (qwen2.5-vl-7b, qwen2-vl-2b, qwen2.5-vl-32b, qwen2.5-vl-72b)",
-          "title": "Tokenizer model name",
-          "type": "string"
-        },
-        "tp_size": {
-          "default": 1,
-          "description": "Tensor parallel size for vLLM model loading (num_gpus = total_shard x tp_size)",
-          "maximum": 8,
-          "minimum": 1,
-          "title": "Tensor parallel size",
-          "type": "int"
-        }
+        "base_model_path": {"default": "", "type": "string"},
+        "config_file": {"default": "", "type": "string"},
+        "dtype": {"default": "", "type": "string"},
+        "max_length": {"default": 0, "minimum": 1, "type": "int"},
+        "tp_size": {"default": 1, "minimum": 1, "type": "int"},
+        "enable_lora": {"default": false, "type": "bool"},
+        "export_dir": {"default": "", "type": "string"},
+        "model_name": {"default": "", "type": "string"},
+        "vit_checkpoint_path": {"default": "", "type": "string"}
       },
       "type": "collection"
     },
     "num_gpus": {
-      "default": 1,
-      "description": "Total number of GPUs to use. Automatically calculates total_shard = num_gpus / tp_size. Default: data parallelism (tp_size=1).",
+      "default": 0,
       "maximum": 8,
       "minimum": 1,
-      "title": "Number of GPUs",
       "type": "int"
     },
     "results": {
@@ -434,105 +286,130 @@
         "save_individual_results": true,
         "save_metrics_summary": true
       },
-      "description": "Results and output configuration",
       "properties": {
-        "save_confusion_matrix": {
-          "default": true,
-          "description": "Generate and save confusion matrix visualization",
-          "title": "Save confusion matrix",
-          "type": "bool"
-        },
-        "save_individual_results": {
-          "default": true,
-          "description": "Save individual result JSON files for each sample",
-          "title": "Save individual results",
-          "type": "bool"
-        },
-        "save_metrics_summary": {
-          "default": true,
-          "description": "Save overall metrics summary JSON file",
-          "title": "Save metrics summary",
-          "type": "bool"
-        }
+        "save_confusion_matrix": {"default": true, "type": "bool"},
+        "save_individual_results": {"default": true, "type": "bool"},
+        "save_metrics_summary": {"default": true, "type": "bool"}
       },
       "type": "collection"
     },
+    "results_dir": {
+      "default": "",
+      "description": "New user-owned evaluation results directory.",
+      "type": "string"
+    },
     "task": {
       "automl_enabled": false,
-      "default": {
-        "type": ""
-      },
-      "description": "Task configuration for evaluation",
+      "default": {"type": ""},
       "properties": {
         "type": {
           "default": "",
-          "description": "Type of evaluation task (general, its_directionality)",
-          "enum": [
-            "its_directionality",
-            "general"
-          ],
-          "title": "Task type",
+          "enum": ["", "binary", "mcq", "text", "its_directionality", "metropolis_sgd"],
           "type": "categorical"
         }
       },
       "type": "collection"
     },
     "vision": {
-      "automl_default_parameters": [
-        "evaluate.vision.fps"
-      ],
       "automl_enabled": false,
       "default": {
-        "nframes": 8
+        "max_pixels": 0,
+        "min_pixels": 0,
+        "num_frames": 0,
+        "decoder_device": "cuda",
+        "decoder_cache_size": 4,
+        "decoder_threads": 1,
+        "dataloader_multiprocessing_context": "spawn",
+        "dataloader_num_workers": 1,
+        "dataloader_persistent_workers": true,
+        "dataloader_prefetch_factor": 2,
+        "process_threads": 8,
+        "frame_transfer": "host_rgb",
+        "video_cache_size": 0,
+        "video_decoder": "pynvvideocodec"
       },
-      "description": "Vision processing configuration",
       "properties": {
-        "fps": {
-          "automl_enabled": true,
-          "description": "Frames per second for vision processing.",
-          "maximum": 3,
-          "minimum": 1,
-          "title": "FPS",
-          "type": "int"
-        },
-        "nframes": {
-          "default": 8,
-          "description": "Number of frames for vision processing.",
-          "maximum": 8,
-          "minimum": 1,
-          "title": "Number of frames",
-          "type": "int"
-        },
-        "total_pixels": {
-          "description": "Total number of pixels for vision processing.",
-          "maximum": Infinity,
-          "minimum": 1,
-          "title": "Total pixels",
-          "type": "int"
-        }
+        "decoder_device": {"default": "cuda", "enum": ["cuda"], "type": "categorical"},
+        "decoder_cache_size": {"default": 4, "minimum": 1, "type": "int"},
+        "decoder_threads": {"default": 1, "minimum": 1, "type": "int"},
+        "dataloader_multiprocessing_context": {"default": "spawn", "enum": ["spawn"], "type": "categorical"},
+        "dataloader_num_workers": {"default": 1, "minimum": 1, "type": "int"},
+        "dataloader_persistent_workers": {"default": true, "type": "bool"},
+        "dataloader_prefetch_factor": {"default": 2, "minimum": 1, "type": "int"},
+        "fps": {"automl_enabled": false, "exclusiveMinimum": 0, "type": "float"},
+        "max_frames": {"automl_enabled": false, "minimum": 1, "type": "int"},
+        "max_pixels": {"default": 0, "minimum": 1, "type": "int"},
+        "min_frames": {"automl_enabled": false, "minimum": 1, "type": "int"},
+        "min_pixels": {"default": 0, "minimum": 1, "type": "int"},
+        "num_frames": {"automl_enabled": true, "default": 0, "minimum": 1, "type": "int"},
+        "process_threads": {"default": 8, "minimum": 1, "type": "int"},
+        "frame_transfer": {"default": "host_rgb", "enum": ["host_rgb", "device_rgbp"], "type": "categorical"},
+        "resized_height": {"automl_enabled": false, "minimum": 1, "type": "int"},
+        "resized_width": {"automl_enabled": false, "minimum": 1, "type": "int"},
+        "total_pixels": {"automl_enabled": false, "minimum": 1, "type": "int"},
+        "video_cache_size": {"default": 0, "minimum": 0, "type": "int"},
+        "video_decoder": {"default": "pynvvideocodec", "enum": ["pynvvideocodec", "torchcodec-cuda-on-demand"], "type": "categorical"},
+        "video_end": {"automl_enabled": false, "exclusiveMinimum": 0, "type": "float"},
+        "video_override_map": {"type": "string"},
+        "video_start": {"automl_enabled": false, "minimum": 0, "type": "float"}
       },
       "type": "collection"
     }
   },
   "type": "object",
+  "x_tao_resolution": {
+    "infer_from_training_plan": [
+      "dataset.annotation_path",
+      "dataset.media_dir",
+      "dataset.system_prompt",
+      "evaluation.answer_type",
+      "evaluation.batch_size",
+      "evaluation.seed",
+      "metrics.names",
+      "model.base_model_path",
+      "model.dtype",
+      "model.enable_lora",
+      "num_gpus",
+      "task.type",
+      "vision.max_pixels",
+      "vision.num_frames",
+      "vision.fps",
+      "vision.min_frames",
+      "vision.max_frames",
+      "vision.video_start",
+      "vision.video_end",
+      "vision.resized_height",
+      "vision.resized_width",
+      "vision.min_pixels",
+      "vision.total_pixels"
+    ],
+    "materializer": "scripts/evaluation_workflow.py",
+    "never_infer_from_history": [
+      "checkpoint_selection",
+      "dataset.annotation_path",
+      "dataset.media_dir",
+      "results_dir"
+    ],
+    "required_current_run_intake_when_not_recorded": [
+      "checkpoint_selection",
+      "dataset.annotation_path",
+      "dataset.media_dir",
+      "dataset.system_prompt",
+      "evaluation.answer_type",
+      "generation.max_tokens",
+      "metrics.names",
+      "results_dir",
+      "task.type"
+    ],
+    "template_launchable": false
+  },
   "x_tao_schema": {
     "action": "evaluate",
     "core_module": "cosmos-rl",
-    "model": "cosmos-rl",
-    "network_arch": "cosmos-rl",
+    "model": "cosmos-reason",
+    "network_arch": "cosmos-reason",
     "schema_action": "evaluate",
-    "schema_version": 1,
-    "source": "tao-core dataclass config"
-  },
-  "evaluate_automl_disabled_parameters": [
-    "evaluate.task",
-    "evaluate.dataset",
-    "evaluate.model",
-    "evaluate.evaluation",
-    "evaluate.vision",
-    "evaluate.generation",
-    "evaluate.metrics",
-    "evaluate.results"
-  ],
-  "evaluate_automl_enabled": false
+    "schema_version": 2,
+    "source": "dataset-neutral skill contract over repository evaluator"
+  }
 }

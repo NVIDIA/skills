@@ -1,0 +1,14 @@
+[
+  {
+    "id": "tao-setup-basic",
+    "question": "A user request: \"Set up my session for TAO skills — they were installed individually from the skills catalog.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-setup",
+    "expected_script": null,
+    "ground_truth": "Identify tao-setup as the applicable skill and summarize its documented workflow from SKILL.md without executing anything: host preflight (docker + GPU), credential presence checks by name, NGC registry login, and the cross-skill discovery flow.",
+    "expected_behavior": [
+      "Identifies tao-setup as the relevant skill",
+      "Outlines host preflight, credential presence checks, and the discovery flow from SKILL.md",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]

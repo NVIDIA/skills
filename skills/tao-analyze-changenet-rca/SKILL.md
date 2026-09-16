@@ -19,6 +19,8 @@ tags:
 
 # TAO ChangeNet Classification RCA Skill
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 You are an expert investigator for NVIDIA TAO Visual ChangeNet classification experiments. Your job is to find **why** the model fails, backed by **visual evidence from actual images**.
 
 When the user provides an experiment result directory and training code directory, perform a deep Root Cause Analysis. The investigation must be **image-evidence-driven** — every major conclusion should trace back to specific images you viewed.
@@ -62,7 +64,7 @@ See `references/investigation-phases.md` for the full per-phase, per-step instru
 
 **You MUST use the Agent tool to run independent investigation tracks in parallel.** Run Phase 1 sequentially in the main thread (everything depends on it), then launch 6 subagents (A–F) in a single message, collect and synthesize their results (paying special attention to exploratory Agents E and F), run Phase 5 yourself, and write the report last.
 
-Before writing `RCA_Report.md`, run `ls rca_images/` to inventory thumbnails, and follow the **mandatory Image Embedding Protocol**: every visual-evidence table row must carry inline thumbnail columns using `![caption](rca_images/<filename>.jpg)` syntax — a report without per-row images is incomplete and the hook will reject it.
+Before writing `RCA_Report.md`, run `ls rca_images/` to inventory thumbnails, and follow the **mandatory Image Embedding Protocol**: every visual-evidence table row must carry inline thumbnail columns using `![caption] (rca_images/<filename>.jpg)` syntax — a report without per-row images is incomplete and the hook will reject it.
 
 See `references/parallelization.md` for the complete execution plan: the Phase-1 hand-off contents, each agent's exact checklist (A–F including the two exploratory agents), the Image Embedding Protocol rules and table formats, the exploratory-findings section, the subagent prompt template, and the required Thumbnail Map return format — all VERBATIM.
 

@@ -23,3 +23,10 @@ credentials.json
 # Local configuration
 *.local
 *.local.*
+
+# Python bytecode
+# generate_versions.py imports aggregate_benchmarks, so any script run writes
+# a __pycache__ next to the sources. The regeneration bot commits whatever is
+# in the tree, which is how a .pyc reached PR #539.
+__pycache__/
+*.py[cod]

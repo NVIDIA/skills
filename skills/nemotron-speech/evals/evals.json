@@ -126,6 +126,89 @@
     ]
   },
   {
+    "id": "nemotron-speech-tts-custom-001",
+    "question": "I fine-tuned a Magpie TTS model in NeMo and have a .nemo checkpoint. How do I convert it to a Riva NIM using riva-build and riva-deploy?",
+    "expected_skill": "nemotron-speech",
+    "expected_script": null,
+    "ground_truth": "The agent should activate nemotron-speech, route to references/tts-custom.md, and follow the 4-phase pipeline: obtain the .nemo checkpoint, build an RMIR with riva-build inside the NIM container, deploy with riva-deploy, and launch the custom NIM with NIM_DISABLE_MODEL_DOWNLOAD=true.",
+    "expected_behavior": [
+      "Route to references/tts-custom.md before giving riva-build commands.",
+      "Distinguish .nemo, .riva, RMIR, and deployed model repository artifacts for TTS.",
+      "Fetch the TTS support matrix and custom-deployment page, then confirm the riva-build config-name against the matching image's --help output.",
+      "Use riva-build and riva-deploy terminology; do not rename commands to Nemotron.",
+      "Include the readiness probe and --list-voices verification step after launching the custom TTS NIM."
+    ]
+  },
+  {
+    "id": "nemotron-speech-tts-pipelines-zeroshot-guardrail-001",
+    "question": "I want to use zero-shot voice cloning on my self-hosted Riva TTS NIM. Just show me the code to pass an audio prompt.",
+    "expected_skill": "nemotron-speech",
+    "expected_script": null,
+    "ground_truth": "The agent should activate nemotron-speech, route to references/tts-pipelines.md, and run the zero-shot pre-flight check before providing any synthesis code. It must not hand over ZeroShotData synthesis code without first confirming the deployed model supports zero-shot. If the pre-flight check returns BLOCKED or UNIMPLEMENTED, the agent must stop and instruct the user to redeploy with a zero-shot-capable model.",
+    "expected_behavior": [
+      "Route to references/tts-pipelines.md.",
+      "Present the zero-shot pre-flight check script and instruct the user to run it before proceeding — do not skip this step even if the user asks to skip straight to the synthesis code.",
+      "If the pre-flight check exits with code 1 (BLOCKED/UNIMPLEMENTED), stop and direct the user to fetch the TTS support matrix, identify a zero-shot-capable model, and redeploy — do not provide ZeroShotData synthesis code in this case.",
+      "Only provide the ZeroShotData gRPC synthesis snippet after the pre-flight check has confirmed OK.",
+      "Do not hardcode a model name as zero-shot capable — always direct the user to verify on the current TTS support matrix."
+    ]
+  },
+  {
+    "id": "nemotron-speech-tts-pipelines-001",
+    "question": "I want to use zero-shot voice cloning with my Riva Magpie TTS NIM. Show me how to pass an audio prompt and set the quality parameter in gRPC Python. Also, my HTTP streaming output isn't a valid WAV — how do I fix that?",
+    "expected_skill": "nemotron-speech",
+    "expected_script": null,
+    "ground_truth": "The agent should activate nemotron-speech, route to references/tts-pipelines.md, show how to populate ZeroShotData in SynthesizeSpeechRequest with audio_prompt, sample_rate_hz, encoding, quality, and transcript fields, and explain that HTTP streaming returns raw LPCM (not WAV) which must be wrapped with sox.",
+    "expected_behavior": [
+      "Route to references/tts-pipelines.md.",
+      "Verify that the deployed model supports zero-shot voice cloning by directing the user to the TTS customization page before providing code.",
+      "Provide a gRPC Python snippet populating ZeroShotData with audio_prompt bytes, sample_rate_hz, encoding, quality, and transcript.",
+      "Explain that HTTP streaming (/v1/audio/synthesize_online) returns raw LPCM without a WAV header and show the sox conversion command.",
+      "Note that quality is an integer 1-40 with higher values improving voice similarity at the cost of latency."
+    ]
+  },
+  {
+    "id": "nemotron-speech-tts-pronunciation-001",
+    "question": "The word NVIDIA is being mispronounced by my Magpie TTS NIM. Suggest a few IPA pronunciations to test, synthesize audio variants so I can pick the best one, then give me the final pronunciation in all formats I can use.",
+    "expected_skill": "nemotron-speech",
+    "expected_script": null,
+    "ground_truth": "The agent should activate nemotron-speech, route to references/tts-pronunciation.md, generate 2-3 distinct IPA candidates for 'NVIDIA', produce an inline Python script that synthesizes variant_a.wav, variant_b.wav, variant_c.wav using the custom_dictionary field with double-space delimiter, ask the user which variant sounds correct, and then output the pronunciation in all three formats: custom_dictionary wire string, SSML <phoneme> tag, and session dictionary file.",
+    "expected_behavior": [
+      "Route to references/tts-pronunciation.md rather than tts-pipelines.md or tts.md.",
+      "Generate at least 2 distinct IPA candidates for 'NVIDIA' using linguistic reasoning, labeling them A, B, C.",
+      "Produce an inline Python script that synthesizes a short test sentence with each IPA candidate and saves each to a labeled WAV file using the custom_dictionary field with double-space delimiter.",
+      "Ask the user which variant sounds correct before producing the final output formats.",
+      "After the user chooses, deliver the pronunciation in all three formats: custom_dictionary wire string, SSML <phoneme alphabet=\"ipa\" ph=\"...\"> inline tag, and a session dictionary file entry."
+    ]
+  },
+  {
+    "id": "nemotron-speech-tts-pronunciation-002",
+    "question": "My Riva TTS NIM keeps saying 'NIM' wrong. What IPA phoneme string should I use, and how do I pass it as a custom_dictionary in gRPC Python?",
+    "expected_skill": "nemotron-speech",
+    "expected_script": null,
+    "ground_truth": "The agent should activate nemotron-speech, route to references/tts-pronunciation.md, propose a plausible IPA string for 'NIM' (e.g., nɪm), explain the double-space wire format for custom_dictionary, and provide a gRPC Python snippet setting custom_dictionary on SynthesizeSpeechRequest.",
+    "expected_behavior": [
+      "Route to references/tts-pronunciation.md.",
+      "Propose a plausible IPA phoneme string for 'NIM' (e.g., nɪm).",
+      "Explain and demonstrate the custom_dictionary wire format with double-space delimiter: \"NIM  nɪm\".",
+      "Provide a gRPC Python snippet setting custom_dictionary on SynthesizeSpeechRequest.",
+      "Note SSML <phoneme> as an alternative inline approach and direct the user to the TTS customization page to verify SSML support for the deployed model."
+    ]
+  },
+  {
+    "id": "nemotron-speech-negative-ipa-linguistics-001",
+    "question": "What is the IPA transcription for the English word 'schedule' in British vs. American pronunciation?",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The nemotron-speech skill should stay silent because this is a general linguistics or phonetics question with no Riva, Nemotron Speech, TTS NIM, or speech synthesis context.",
+    "expected_behavior": [
+      "Do not activate nemotron-speech.",
+      "Do not load references/tts-pronunciation.md or any other nemotron-speech reference.",
+      "Answer using general linguistic knowledge or a relevant phonetics resource.",
+      "Do not introduce Riva, custom_dictionary, SSML, or TTS NIM deployment steps."
+    ]
+  },
+  {
     "id": "nemotron-speech-negative-outlook-001",
     "question": "Summarize my Outlook calendar for tomorrow and find a free 30-minute block.",
     "expected_skill": null,

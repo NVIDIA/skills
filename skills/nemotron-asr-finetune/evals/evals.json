@@ -84,6 +84,122 @@
     ]
   },
   {
+    "id": "nemotron-asr-orchestrate-preflight-001",
+    "question": "Before you fine-tune on my new call-center recordings, verify the audio is 16 kHz and check whether the ground-truth transcripts are any good.",
+    "expected_skill": "nemotron-asr-finetune",
+    "expected_script": null,
+    "ground_truth": "The orchestrator should run the pre-flight dataset quality gate before training: audit every file's sample rate and resample offline to exactly 16 kHz for any that are not, and, since the user asked, audit transcript quality by running a reference pretrained checkpoint (not the fine-tune target) and comparing its WER against the provided ground truth, flagging the worst utterances rather than silently dropping them.",
+    "expected_behavior": [
+      "Route to references/workflow.md (Stage 4a) as the pre-flight dataset quality check ahead of Stage 5 training.",
+      "Audio: verify every file's sample rate and resample offline to 16 kHz (sox/ffmpeg) for any file that is not already 16 kHz; do not rely on online resampling during training.",
+      "Text: since requested, pull a stock pretrained reference checkpoint (not the fine-tune target), run inference, and compute per-utterance WER against the provided transcripts to flag likely-bad ground truth.",
+      "Do not silently drop flagged utterances; report the flagged rate/count and let the user decide.",
+      "Do not proceed to Stage 5 with unresolved sample-rate mismatches."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-preflight-8khz-001",
+    "question": "For the ASR fine-tune, my call-center audio is only available at 8kHz and I don't want to spend time upsampling it — just train directly on the 8kHz files.",
+    "expected_skill": "nemotron-asr-finetune",
+    "expected_script": null,
+    "ground_truth": "The orchestrator should not silently offline-convert the files, and must not set model.sample_rate=8000 either — that would reconfigure the model into a different, 8 kHz-native architecture rather than fine-tuning the target checkpoint. It should tell the user that skipping the offline conversion is not recommended for a throughput reason (NeMo's own guidance: online resampling during training is slow), confirm the user accepts that trade-off, and, if confirmed, keep model.sample_rate at the checkpoint's expected rate (typically 16000) so NeMo's loader upsamples each 8 kHz file online at load time, producing the same model as the offline-converted path just with slower training.",
+    "expected_behavior": [
+      "Route to references/workflow.md (Stage 4a) and recognize this as the 'feed 8kHz files as-is' opt-out path, distinct from both the default offline-resample path and from training a dedicated 8kHz-native model.",
+      "State that skipping the offline conversion is not recommended and explain why (online per-sample resampling during training is slow, per NeMo's telephony guidance) — not an accuracy concern.",
+      "Ask the user to confirm they accept the slower training throughput before proceeding; do not silently offline-convert and do not silently proceed without confirming either.",
+      "Do NOT set model.sample_rate=8000 — that trains a materially different, 8 kHz-native model rather than fine-tuning the target checkpoint.",
+      "Keep model.sample_rate at the checkpoint's expected rate (typically 16000) so NeMo's audio loader resamples each 8 kHz file online, matching the model's actual expectation.",
+      "Only mention model.sample_rate=8000 as a distinct, rarer alternative for a user who explicitly wants a model that is 8 kHz end-to-end including at deployment, not as the answer to this request."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-lowdata-001",
+    "question": "Our Riva ASR model mishears industry jargon and I only have about 6 hours of transcribed audio for this domain — should we fine-tune?",
+    "expected_skill": "nemotron-asr-finetune",
+    "expected_script": null,
+    "ground_truth": "6 hours is below the ~10 h fine-tune floor. The orchestrator should strongly recommend against fine-tuning at this data volume, explain that both catastrophic forgetting and overfitting risk are severe below the floor, and recommend word boosting instead since the problem (mishearing specific jargon) is a known-vocabulary problem that boosting handles without any training.",
+    "expected_behavior": [
+      "Route to references/path-selection.md and recognize 6 hours as below the ~10 h fine-tune floor.",
+      "Strongly recommend against fine-tuning at this data volume; do not present it as the plan.",
+      "Explain the specific risk: both catastrophic forgetting (general capability degrades) and overfitting (model memorizes the tiny set instead of generalizing) are severe below the floor.",
+      "Recommend word boosting instead, and note it also matches the stated problem (known jargon) independent of the data-volume issue.",
+      "Only mention fine-tuning again if the user explicitly accepts the risk after being told it, or once more real data is available."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-envcheck-001",
+    "question": "Before we start the NeMo ASR fine-tune, what NeMo version are we going to use — do I need to have it installed already?",
+    "expected_skill": "nemotron-asr-finetune",
+    "expected_script": null,
+    "ground_truth": "The orchestrator should run the pre-flight environment/dependency check before training. If no NeMo is provided/found, it must pull the latest main from the current canonical repo (NVIDIA-NeMo/Speech, noting the 2026 repository split from NVIDIA-NeMo/NeMo) for local execution, or the latest published container tag for container execution. If a NeMo checkout/install/container is already provided, it should check its version, but still recommend switching to latest main (staleness risk) and ask the user rather than silently using either option.",
+    "expected_behavior": [
+      "Route to references/workflow.md (Stage 4b) as the pre-flight environment/dependency check ahead of Stage 5 training.",
+      "Ask whether a NeMo checkout/install/container is already available; do not assume one exists or silently skip the check.",
+      "If not provided, pull the latest main from the current canonical NeMo repo for local execution, or the latest published container tag for container execution — not a hardcoded/stale version.",
+      "If provided, check its version (nemo.__version__, and git commit/branch if it's a source checkout) rather than assuming it is current or compatible, and still recommend switching to latest main due to staleness risk rather than silently accepting the provided one.",
+      "Ask the user which they want (switch to latest main vs. keep the provided checkout) rather than deciding unilaterally.",
+      "Record the resolved NeMo version/commit in the ledger.",
+      "Do not silently proceed to Stage 5 training without having resolved and recorded a NeMo version."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-envcheck-insist-001",
+    "question": "I have a NeMo checkout at /home/user/NeMo from a few months back. I know it might not have every recent feature, but I want to keep using it for this fine-tune rather than switching — don't pull main unless we actually hit a problem.",
+    "expected_skill": "nemotron-asr-finetune",
+    "expected_script": null,
+    "ground_truth": "Since the user has explicitly considered the staleness risk and insisted on keeping the provided checkout, the orchestrator should not pull latest main preemptively. It should check and record the provided checkout's version, proceed with it, and only revisit pulling latest main later if a concrete version-specific issue is actually hit (e.g. a config key or feature the recipe needs turns out to be unsupported in that checkout) — not second-guess the user's decision without new evidence.",
+    "expected_behavior": [
+      "Route to references/workflow.md (Stage 4b).",
+      "Recognize the user has already been asked/has already decided to keep the provided checkout; do not re-litigate or push back further, and do not pull latest main preemptively.",
+      "Check and record the provided checkout's version/commit in the ledger.",
+      "Proceed to Stage 5 with the provided checkout.",
+      "State the condition under which the recommendation would resurface: only if a concrete version-specific issue is hit later (e.g. an unsupported config key or missing feature), not as a standing objection."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-subskill-reachability-001",
+    "question": "Before we run the NeMo fine-tune, is nemo-speech-asr-finetune actually going to work here, or do I need to set something up first?",
+    "expected_skill": "nemotron-asr-finetune",
+    "expected_script": null,
+    "ground_truth": "The orchestrator should not assume nemo-speech-asr-finetune is invocable just because it is named in Stage 5. It should explain that this sub-skill is project-local (lives inside the NeMo/Speech repo's own .claude/skills/, not the nvidia-skills catalog), so it must first be made discoverable (try npx skills add against the owning repo, fall back to scripts/link-nemo-subskill.sh) and then the working context must actually be changed into that checkout before any of its commands (which are relative paths) will work.",
+    "expected_behavior": [
+      "Route to references/workflow.md (Stage 4b) and/or references/sub-skills.md for the Research/Training sub-skill's setup notes.",
+      "State that nemo-speech-asr-finetune is project-local, not catalog-published, unlike the other sub-skills.",
+      "Describe the two-tier setup: try `npx skills add NVIDIA-NeMo/Speech --skill nemo-speech-asr-finetune ...` first; fall back to `scripts/link-nemo-subskill.sh <checkout_path>` if that doesn't work.",
+      "Explain that linking/installing only makes the skill discoverable; the working context (cd, or a scoped sub-agent) must still be changed into the actual NeMo checkout before Stage 5 runs any of its commands, since they are relative paths.",
+      "Do not assume the sub-skill is ready to use without verifying both reachability and working context."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-wordboost-nemo-pilot-001",
+    "question": "I have a local NeMo RNNT checkpoint and want to try word boosting on it before we even think about deploying to Riva. What do I do?",
+    "expected_skill": "nemotron-asr-finetune",
+    "expected_script": null,
+    "ground_truth": "Word boosting has a NeMo-only pilot realization owned by nemo-speech-asr-finetune that does not require Riva at all: GPU-PB context biasing via the boosting_tree config, using rnnt_decoding.*.boosting_tree (RNN-T/TDT) through speech_to_text_eval.py, weighted by boosting_tree_alpha. This uses a different score system than Riva's boosted_lm_score, so nothing from the pilot needs to be reused or converted for the customer to get a full offline answer.",
+    "expected_behavior": [
+      "Route to references/path-selection.md and recognize this as the NeMo-pilot realization of word boosting, not the Riva-deploy realization.",
+      "Describe GPU-PB / boosting_tree as the mechanism: decode-time shallow fusion, no retraining.",
+      "Give the RNN-T/TDT-specific config keys (rnnt_decoding.*.boosting_tree, boosting_tree_alpha) via speech_to_text_eval.py, not the CTC ones.",
+      "State that this is a complete, self-contained loop -- it does not require touching nemotron-speech or Riva at all.",
+      "Do not conflate NeMo's context_score/boosting_tree_alpha with Riva's boosted_lm_score scoring convention.",
+      "Route execution to nemo-speech-asr-finetune (and confirm it's reachable per workflow.md §4b) rather than nemotron-speech."
+    ]
+  },
+  {
+    "id": "nemotron-asr-orchestrate-ngram-rnnt-deploy-001",
+    "question": "I already validated an n-gram LM offline on my RNNT model in NeMo and now want to ship it to Riva. Do I need to rebuild it in a different format first?",
+    "expected_skill": "nemotron-asr-finetune",
+    "expected_script": null,
+    "ground_truth": "No rebuild is needed for RNNT specifically -- this is the one exception to the general pattern. The exact .nemo NGPU-LM artifact produced by the NeMo pilot (train_kenlm.py with save_nemo=True) is handed to nemotron-speech unchanged; nemotron-speech (references/pipelines.md) owns the exact riva-build flags/syntax, not the orchestrator. This is different from CTC, where a rebuild into a word-level LM is required for the Flashlight decoder.",
+    "expected_behavior": [
+      "Route to references/path-selection.md and recognize this as the n-gram LM deploy realization for an RNNT model specifically.",
+      "State that RNNT does NOT need a rebuild -- the pilot's .nemo artifact ships to nemotron-speech unchanged.",
+      "Defer exact riva-build flag syntax to nemotron-speech (references/pipelines.md) rather than reciting it from the orchestrator's own memory -- the orchestrator's job is the routing/artifact-carry-over fact, not the flag syntax.",
+      "Do not apply the CTC rebuild rule (word-level KenLM rebuild) to this RNNT case.",
+      "Note this is the opposite of word boosting, where the NeMo pilot parameters never carry over to Riva regardless of architecture."
+    ]
+  },
+  {
     "id": "nemotron-asr-orchestrate-negative-deploy-001",
     "question": "I already have a fine-tuned .nemo. Convert it with nemo2riva and deploy a Riva ASR NIM with riva-build and riva-deploy.",
     "expected_skill": null,

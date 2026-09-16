@@ -93,48 +93,35 @@ warm_open_spread_pct = (
 
 stage = Usd.Stage.Open(stage_path)
 
-# Traversal — measure only the default-prim hierarchy (authored scene graph),
-# excluding prototype prims (/__Prototype_*). Prototypes are internal to USD
-# instancing and their traversal cost is a composition-setup cost, not a
-# scene-graph complexity cost. Comparing before/after traversal is only
-# meaningful when both measurements cover the same logical scope.
+# Traversal. `Usd.Stage.Traverse()` walks the pseudo-root's namespace, which
+# contains the authored scene graph and nothing else. Prototype prims
+# (/__Prototype_*) are not in that namespace — reach them through
+# `stage.GetPrototypes()`, and reach the geometry they stand in for through
+# `Usd.TraverseInstanceProxies()`.
+#
+# Keep the timed loop free of per-prim Python work. Anything you put inside it
+# is charged to the metric and scales with prim count, so it costs the larger
+# capture more than the smaller one and invents an improvement.
 all_prims = list(stage.Traverse())
-
-# Filter out prototype prims for the traversal measurement.
-# stage.Traverse() DOES visit /__Prototype_* prims when prototype_count > 0,
-# so we must exclude them to measure authored scene-graph complexity only.
-def is_prototype_prim(prim):
-    """Return True if prim lives under a /__Prototype_* root."""
-    path_str = str(prim.GetPath())
-    return path_str.startswith("/__Prototype_")
-
-authored_prims = [p for p in all_prims if not is_prototype_prim(p)]
 
 t0 = time.perf_counter()
 for _ in range(10):
-    # Re-traverse but measure only authored scope traversal time
-    prims = [p for p in stage.Traverse() if not is_prototype_prim(p)]
-traverse_ms = (time.perf_counter() - t0) * 1000 / 10
-
-# Full traversal including prototypes (for reference / completeness)
-traverse_full_ms_t0 = time.perf_counter()
-for _ in range(10):
     list(stage.Traverse())
-traverse_full_ms = (time.perf_counter() - traverse_full_ms_t0) * 1000 / 10
+traverse_ms = (time.perf_counter() - t0) * 1000 / 10
 
 # Instance-proxy traversal (only meaningful when instance_count > 0).
 all_prims_with_proxies = list(stage.Traverse(Usd.TraverseInstanceProxies()))
 
 # Attribute resolution
 t0 = time.perf_counter()
-for prim in authored_prims:
+for prim in all_prims:
     for attr in prim.GetAttributes():
         attr.Get()
 resolve_ms = (time.perf_counter() - t0) * 1000
 
 # Transform computation
 xf_cache = UsdGeom.XformCache()
-xformable = [p for p in authored_prims if p.IsA(UsdGeom.Xformable)]
+xformable = [p for p in all_prims if p.IsA(UsdGeom.Xformable)]
 t0 = time.perf_counter()
 for prim in xformable:
     xf_cache.GetLocalToWorldTransform(prim)
@@ -146,41 +133,60 @@ stats = UsdUtils.ComputeUsdStageStats(stage)
 
 ### Quick mode output
 
+Real capture from an instanced 23.7k-prim stage (USD 0.26.5):
+
 ```json
 {
   "mode": "quick",
-  "stage_path": "/path/to/stage.usd",
-  "cold_open_ms": 485.2,
-  "warm_open_ms": 104.1,
-  "warm_open_samples_ms": [106.2, 101.9, 104.1, 103.8, 105.0],
+  "stage_path": "/path/to/stage.usdc",
+  "cold_open_ms": 1013.2,
+  "warm_open_ms": 854.1,
+  "warm_open_samples_ms": [853.7, 854.6, 845.9, 854.1, 865.2],
   "warm_open_sample_count": 5,
-  "warm_open_spread_pct": 4.1,
+  "warm_open_spread_pct": 2.3,
   "open_timing_context": "fresh_process",
-  "traverse_ms": 0.84,
-  "traverse_full_ms": 1.02,
-  "attribute_resolution_ms": 169.9,
-  "transform_ms": 10.2,
-  "prim_count": 2742,
-  "prim_count_authored": 2742,
-  "prim_count_with_instance_proxies": 2742,
-  "layer_count": 230,
-  "instance_count": 0,
-  "prototype_count": 0,
-  "total_attributes": 62076
+  "traverse_ms": 42.52,
+  "attribute_resolution_ms": 867.0,
+  "transform_ms": 106.6,
+  "prim_count": 23704,
+  "prim_count_with_instance_proxies": 385703,
+  "layer_count": 1,
+  "instance_count": 104023,
+  "prototype_count": 5225,
+  "total_attributes": 149949
 }
 ```
 
-`traverse_ms` measures only authored prims (excludes `/__Prototype_*` subtrees);
-`traverse_full_ms` measures the full `stage.Traverse()` including prototypes.
-Use `traverse_ms` for before/after comparisons — it represents the user-visible
-scene graph complexity. `traverse_full_ms` is diagnostic-only (composition setup
-cost).
+`traverse_ms` is the mean of ten `list(stage.Traverse())` passes and is the one
+traversal metric. Use it for before/after comparison.
 
-`prim_count` is the total from `stage.Traverse()` (includes prototype prims);
-`prim_count_authored` excludes `/__Prototype_*` subtrees (the authored scene graph);
-`prim_count_with_instance_proxies` is the rendered-geometry footprint (what
-Hydra walks). When `instance_count > 0` these three diverge — report all so
-the optimization-report can attribute regressions to the right axis.
+There is no separate "authored" traversal metric because there is nothing to
+separate. `stage.Traverse()` returns authored prims only; it never yields a
+`/__Prototype_*` path, whatever `prototype_count` says.
+
+`prim_count` is how many prims `stage.Traverse()` yields — the authored scene
+graph. `prim_count_with_instance_proxies` counts instance proxies as well and
+is the rendered-geometry footprint (what Hydra walks); it is much larger once
+`instance_count > 0`, as in the capture above. `prototype_count`, from
+`UsdUtils.ComputeUsdStageStats`, covers the prototype side. Report all three so
+the optimization-report can attribute a regression to the right axis.
+
+### Retired metrics
+
+An earlier version of this recipe reported `traverse_ms` from a loop that
+filtered `/__Prototype_*` paths out of `stage.Traverse()`, plus an unfiltered
+`traverse_full_ms`, plus a `prim_count_authored` alongside `prim_count`. The
+filter was dead code: it never matched a prim, so `prim_count_authored` always
+equalled `prim_count` and the only difference between the two timings was the
+per-prim `str()` and `startswith()` the filter ran inside the timed loop. That
+cost grows with prim count, so it inflated a large baseline far more than a
+small optimized stage and reported improvement that was the filter getting
+cheaper.
+
+`traverse_full_ms` and `prim_count_authored` are gone. Profiles captured with
+the old recipe cannot be compared against profiles captured with this one —
+recapture the baseline. If you are re-reading an old profile, its
+`traverse_full_ms` is the honest number and its `traverse_ms` is not.
 
 ### Stage-open Timing Protocol
 
@@ -357,7 +363,11 @@ unavailable)" and §"Quick-mode-only caveat" for the report wording.
 
 ## Troubleshooting
 
-- If `pxr` imports fail, run setup to choose a Kit or standalone USD Python runtime.
+- If `pxr` imports fail, run `setup-usd-performance-tuning` to resolve the
+  standalone USD Python runtime; it owns the probe and writes
+  `setup-preflight.json`. Nothing is being chosen here — standalone is the
+  runtime for all optimization and validation work, and the Kit adjunct is only
+  relevant to full mode below.
 - If full mode cannot load Tracy, verify `omni.kit.profiler.tracy` is enabled in the selected Kit runtime.
 - If warm-open samples vary widely, rerun the protocol in fresh processes; if
   variance persists, treat warm-load evidence as inconclusive (verdict row

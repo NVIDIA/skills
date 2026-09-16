@@ -1,0 +1,15 @@
+[
+  {
+    "id": "tao-mine-nearest-neighbors-basic",
+    "question": "A user request: \"Use the tao-mine-nearest-neighbors skill.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-mine-nearest-neighbors",
+    "expected_script": null,
+    "ground_truth": "Identify tao-mine-nearest-neighbors as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-mine-nearest-neighbors as the relevant skill",
+      "Explains that it runs TAO Data Services TMM nearest_neighbors from a YAML spec",
+      "Mentions the output parquet and mining_summary.txt artifacts",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]

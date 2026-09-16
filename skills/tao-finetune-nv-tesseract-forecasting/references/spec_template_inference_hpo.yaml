@@ -1,0 +1,18 @@
+dataset:
+  csv: ""             # eval CSV with ground truth (needs >= seq_len + forecast_horizon rows)
+  context_csv: ""     # DARR context library (separate normal-behavior history)
+  timestamp_col: timestamp
+  target_cols: ""
+  label_horizon: 72   # how many future rows to hold back as ground truth
+hpo:
+  alpha: 0.01
+  k: 64
+  temperature: 0.05
+  context_stride: 72
+  forecast_horizon: 72
+  seq_len: 512
+  ckpt: ""
+  standardizer_pkl: ""
+  use_cross_channel: false
+train:
+  output_dir: artifacts/inference_hpo

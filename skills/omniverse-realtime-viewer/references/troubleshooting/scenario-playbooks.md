@@ -11,6 +11,10 @@ Check first:
 - `OVRTX_BIN_PATH` points at the ovrtx `bin` directory when renderer plugins or MDL materials fail.
 - `OVSTREAM_LIB_PATH` points at the native ovstream library directory when `ovstream` cannot import.
 - The process uses one USD import strategy: ovrtx-first for streaming, documented local-viewer ordering for lightweight local paths, or a separate `pxr` worker on Windows.
+- OVStage-backed viewers have one parent runtime owner for stage lifetime,
+  ordinals, write floors, renderer attachment, and publication.
+- `pxr`/OpenUSD queries and OVPhysX USD population run in workers unless the
+  exact ABI/import path is verified.
 - A GPU is visible and the selected CUDA device is not already held by a stale Omniverse Realtime Viewer process.
 - Signaling and media ports are available.
 
@@ -20,6 +24,7 @@ Logs to inspect:
 - Any app log file configured by the generated viewer, commonly under `logs/` or the current working directory.
 - `pxr_worker.py` stderr if hierarchy/properties run in a subprocess.
 - Native crash output from the terminal that launched the server.
+- OVPhysX worker stderr/stdout files if physics was requested.
 
 Usual fixes:
 
@@ -27,6 +32,8 @@ Usual fixes:
 - Move ovrtx bundled plugin libraries first in the dynamic library path if another USD build is loaded.
 - Kill stale GPU Omniverse Realtime Viewer processes after a renderer crash or hang.
 - Change the signaling port if another process owns it.
+- If `PhysX.attach_ovstage(stage, read_ordinal=...)` reports missing OVStage bridge symbols, use the
+  bounded worker path rather than parent-process OVPhysX population.
 
 ## Server-Side Diagnostics
 
@@ -52,6 +59,9 @@ Interpretation:
 Check first:
 
 - The server was started before the frontend connects.
+- DirectConfig sets explicit fixed `width`, `height`, `codec: 'H264'`, and
+  `codecList: ['H264']` unless a verified deployment profile selected another
+  codec.
 - The frontend uses `server` and `signalingPort`, not `signalingServer`.
 - The frontend uses standalone ovstream Direct config: `server` and
   `signalingPort`.
@@ -60,29 +70,36 @@ Check first:
   container, map its exposed endpoint to `server` and `signalingPort`.
 - Local development uses `webrtc_public_ip=127.0.0.1` or an explicitly reachable LAN IP.
 - Only one WebRTC client is connected unless the server intentionally replaces the old session.
+- For Tableau or another embedded host, run the H264 preflight before connect and record whether the page is framed and whether `navigator.mediaCapabilities.decodingInfo` is exposed. Its absence is an embed-host diagnostic, not an automatic codec failure.
 
 Logs to inspect:
 
 - Browser console for WebSocket/signaling errors.
 - Browser Network tab for the signaling request and WebSocket upgrade. If
   `POST /sign_in` returns HTTP 501, verify the frontend did not follow a
-  Kit/OVC/NVCF/GFN client profile or inject auth/session fields before changing
+  standalone-Direct connection profile intended for a different streaming product or inject auth/session fields before changing
   the ovrtx or ovstream server.
 - Server logs for connection callbacks.
 - `chrome://webrtc-internals` or `edge://webrtc-internals` for ICE, DTLS, and media state.
+- The preflight log: explicit H264 DirectConfig, iframe status, MediaCapabilities availability/result, video `readyState`, and decoded-frame counter or `currentTime`.
 
 Usual fixes:
 
 - Match frontend host/port to the server's WebRTC signaling config.
+- Add explicit H264 codec fields when logs mention `Could not get encoded frame`
+  or the browser connects with black video and no decoded frames.
 - Remove `mediaPort` from frontend config.
 - Reduce aggressive reconnect settings when logs show repeated previous-session messages.
 - Close the old browser tab or restart the ovstream server if the previous session is stuck.
+- If MediaCapabilities is absent only in the embed, validate the same build standalone and in-frame. Escalate the host-frame media-policy limitation with that evidence; do not claim H264 is unsupported solely from the missing API.
 
 ## Video Does Not Stream
 
 Check first:
 
 - `server.on_connection`, `server.on_message`, and `server.on_input` are registered before `server.start()`.
+- The render loop streams a fallback or last-good BGRA frame while a client is
+  connected, even before a USD stage is loaded.
 - The render loop is calling `renderer.step()` with the exact active RenderProduct path.
 - `LdrColor` exists in the returned render vars.
 - The app submits BGRA8 frames to ovstream, not ovrtx RGBA8.
@@ -90,6 +107,7 @@ Check first:
 - Render var data is copied while the owning `RenderProductSetOutputs` is still alive; frame views are not held across later `renderer.step()` calls.
 - Stream width, height, and pitch match the frame buffer.
 - The `<video>` element exists before `AppStreamer.connect()`.
+- In an embedded host, the H264 preflight was recorded before connect; after connect, the video reaches `HAVE_CURRENT_DATA` and decoded-frame count or `currentTime` advances.
 - On cold start, the first `renderer.step()` may spend 2-5 minutes compiling RTX shaders or pipelines before producing a frame.
 
 Logs to inspect:
@@ -99,10 +117,13 @@ Logs to inspect:
 - ovstream warnings from the log callback.
 - Browser media element errors in the console.
 - WebRTC internals inbound video stats: frames decoded, frames dropped, resolution, bitrate.
+- Embedded-host preflight output: iframe status, MediaCapabilities availability/result, and the explicit H264 config.
 
 Usual fixes:
 
 - Fix RenderProduct/session layer setup before changing WebRTC code.
+- If the session disconnects in roughly 1-2 seconds before app messages arrive,
+  add idle/fallback frame submission before changing scene loading.
 - Add or repair RGBA-to-BGRA conversion when red and blue are swapped.
 - Keep browser streaming at the configured fixed resolution. If that startup configuration changes, restart/reconnect instead of resizing the live stream.
 - Copy frame data inside the same render-loop step when passing it to an encoder, stream, UI bridge, or worker queue.
@@ -183,6 +204,8 @@ Usual fixes:
 Check first:
 
 - Frontend sends only after streaming status is connected.
+- Streaming status `connected` is set after `AppStreamer.connect()` resolves;
+  `onStart` is only the video-decoding/live signal.
 - Server send helper checks that a client is connected before `send_message`.
 - The server unwraps browser library messages that contain `messageType`, `messageRecipient`, and nested `data`.
 - Exact event names match on both sides: `openStageResult`, `getChildrenResult`, `stageSelectionChanged`, `getPropertiesResponse`.
@@ -199,6 +222,8 @@ Logs to inspect:
 Usual fixes:
 
 - Unwrap the AppStreamer envelope before reading `event_type`.
+- Move initial `openStageRequest` and viewport app commands behind the resolved
+  `AppStreamer.connect()` Promise, not behind `onStart`.
 - Add one shared message-name reference and update both frontend and server routers.
 - Push current stage, hierarchy root, selection, loading state, and render settings after a reconnect.
 - Queue slow work for the render/runtime thread.
@@ -254,12 +279,56 @@ Usual fixes:
 - Rebuild session render prims after every reset.
 - Write wrapper files near the source asset or preserve directory structure in the cache.
 
+## OVStage And OVPhysX Boundary
+
+Use this when runtime transforms, physics impulses, drop tests, or OVStage-backed
+render updates crash, no-op, or desynchronize.
+
+Check first:
+
+- The parent viewer process owns OVRTX, live OVStage/session state, ordinals,
+  write floors, renderer attachment, and publication.
+- UI/data-channel callbacks enqueue runtime commands; they do not mutate OVRTX
+  or OVStage directly.
+- OpenUSD/pxr queries run in a worker unless direct imports were verified for the
+  exact OVRTX/OVStage/USD wheel set.
+- `PhysX.attach_ovstage(stage, read_ordinal=...)` was probed against the exact installed
+  OVStage/OVPhysX ABI before using in-process attach.
+- If `attach_ovstage` failed or was not probed, the OVPhysX worker path runs only in a
+  bounded child worker, never in the already-running parent viewer process.
+- Physics worker results include selected path, matrices or translations,
+  nonzero displacement/rotation when requested, child return code, and
+  diagnostics.
+- Parent writes accepted pose samples through OVStage/session state at monotonic
+  ordinals and renders only committed publications.
+
+Known failure signatures:
+
+- Missing `ovstage_register_consumer`, `ovstage_register_output_buffer`,
+  `ovstage_publish`, `ovstage_query_changes`, `ovstage_read_attribute`, or
+  `ovstage_write_attribute` during `PhysX.attach_ovstage(stage, read_ordinal=...)` means the installed
+  OVStage wheel does not export the bridge symbols OVPhysX expects.
+- A native crash after parent-process OVPhysX population usually means
+  competing USD population entered the process that owns OVRTX/OVStage.
+- Duplicate USD registries, `_tf` failures, `TfType::AddAlias`, or repeated USD
+  plugin/type aliases point to mixed USD runtimes in one process.
+
+Usual fixes:
+
+- Move physics simulation to a child process and return structured JSON pose
+  samples.
+- Keep worker stdout JSON-only and put native logs on stderr or in log files.
+- Recreate the parent runtime after ABI/import-order changes instead of trying
+  to recover native state in place.
+- Include the parent/worker process model and OVStage write/consume ordinals in
+  focused validation proof for physics demos.
+
 ## Camera Does Not Move
 
 Check first:
 
-- In WebRTC streaming, camera input is handled from NVST/ovstream `InputEvent` callbacks, not JSON.
-- In SHM streaming, camera input must use `ovstream.ShmClient.send_input_event()` from Python, or `ovstream_shm_client_send_input_event()` from C, not JSON `mouseInput`.
+- In WebRTC streaming, camera input normally arrives through NVST/ovstream `InputEvent` callbacks. If the data channel is proven live but an explicit pointer/button/wheel test produces no server `on_input` events, enable the browser-only JSON fallback from `viewer-input-routing`; do not enable it alongside native input.
+- In SHM streaming, camera input must use `ovstream.Client(ovstream.ClientType.SHM, stream_name="...").send_input_event(event)` from Python, or `ovstream_client_send_input_event(client, event)` from C, not JSON `mouseInput`.
 - In in-process apps, camera input should call the Python/C++ camera APIs directly.
 - Mouse coordinates are converted through the rendered image rect, including letterboxing.
 - The camera path used by controls is the same path referenced by the RenderProduct.
@@ -276,6 +345,7 @@ Logs to inspect:
 Usual fixes:
 
 - Route input events to a render-thread command queue.
+- If the browser data channel works but native events are absent, first confirm viewport ownership and callback registration. Then select the mutually exclusive `mouseInput` fallback, log that decision, map DOM coordinates to render pixels, and dispatch through the same camera/pick queue.
 - Write `omni:xform` with create-new prim mode for viewer camera updates.
 - Refit the camera to stage bounds after invalid restore state.
 - Keep drag threshold logic from turning every click into a camera move or every drag into a selection.

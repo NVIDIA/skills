@@ -14,6 +14,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "shared"))
 
 from script_utils import check_result as _check, emit_json_report
 
+from preflight_manifest import preflight_required, preflight_status_check
+
 
 SKILL = "simready-conform-profile"
 HELPER_SCRIPTS = [
@@ -28,6 +30,13 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Check simready-conform-profile helper dependencies.")
     parser.add_argument("--report", type=Path)
     args = parser.parse_args(argv)
+
+    if preflight_required():
+        preflight_check = preflight_status_check(SKILL, "openusd_python")
+        if not preflight_check["passed"]:
+            payload = {"skill": SKILL, "passed": False, "checks": [preflight_check], "errors": [preflight_check["message"]]}
+            emit_json_report(payload, args.report)
+            return 1
 
     skill_root = Path(__file__).resolve().parents[1]
     checks = [_check("python_available", True, f"Python executable: {sys.executable}")]

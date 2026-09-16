@@ -1,31 +1,33 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """Run AMC calibration against the bundled synthetic sample dataset."""
 
 import os
-import subprocess
 import sys
 import time
+from contextlib import ExitStack
 from pathlib import Path
 
 try:
     import requests
-except ModuleNotFoundError:
-    venv = Path(os.environ.get("TMPDIR", "/tmp")) / "amc-sample-test-venv"
-    python = venv / "bin" / "python3"
-    pip = venv / "bin" / "pip"
-    if not python.exists():
-        subprocess.check_call([sys.executable, "-m", "venv", str(venv)])
-    subprocess.check_call([str(pip), "install", "--quiet", "requests"])
-    os.execv(str(python), [str(python), __file__, *sys.argv[1:]])
-
-def _read_env_key(path: Path, key: str):
-    try:
-        for line in path.read_text().splitlines():
-            if line.startswith(f"{key}="):
-                return line.split("=", 1)[1].strip()
-    except FileNotFoundError:
-        return None
-    return None
+except ModuleNotFoundError as exc:
+    raise SystemExit(
+        "This script requires Python 3 with the 'requests' package installed. "
+        "Install it first, for example: python3 -m pip install requests"
+    ) from exc
 
 
 def _env_bool(name: str, default: bool) -> bool:
@@ -35,14 +37,35 @@ def _env_bool(name: str, default: bool) -> bool:
     return value.strip().lower() in ("1", "true", "yes", "y")
 
 
+def _normalize_base_url(value: str) -> str:
+    base = value.rstrip("/")
+    return base if base.endswith("/v1") else f"{base}/v1"
+
+
+def _detect_ms_port() -> str:
+    for port in range(8000, 8010):
+        try:
+            response = requests.get(f"http://localhost:{port}/v1/ready", timeout=(3, 5))
+            response.raise_for_status()
+            payload = response.json()
+        except (requests.RequestException, ValueError):
+            continue
+        if payload.get("code") in (0, "0"):
+            return str(port)
+    raise SystemExit(
+        "No running AMC backend detected on localhost ports 8000-8009. "
+        "Start the stack first or set BASE_URL / MS_PORT explicitly."
+    )
+
+
 # Run from the auto-magic-calib repo root, or set REPO_ROOT explicitly.
 REPO_ROOT = Path(os.environ.get("REPO_ROOT") or Path.cwd())
-MS_PORT = (
-    os.environ.get("MS_PORT")
-    or _read_env_key(REPO_ROOT / "compose" / ".env", "AUTO_MAGIC_CALIB_MS_PORT")
-    or "8000"
-)
-BASE_URL = os.environ.get("BASE_URL", f"http://localhost:{MS_PORT}/v1")
+BASE_URL = os.environ.get("BASE_URL")
+if BASE_URL:
+    BASE_URL = _normalize_base_url(BASE_URL)
+else:
+    MS_PORT = os.environ.get("MS_PORT") or _detect_ms_port()
+    BASE_URL = f"http://localhost:{MS_PORT}/v1"
 RUN_VGGT = _env_bool("RUN_VGGT", True)
 
 # Sample zip lives in assets/.
@@ -107,12 +130,12 @@ project_id = r.json()["project_id"]
 print(f"[1] Created project {project_name} -> {project_id}")
 
 # Step 2 -- Upload videos (sorted alphabetically; upload order defines camera indices)
-files, handles = [], []
-for v in videos:
-    f = open(v, "rb"); handles.append(f)
-    files.append(("files", (v.name, f, "video/mp4")))
-r = s.post(f"{BASE_URL}/upload_video_files/{project_id}", files=files, timeout=300)
-for f in handles: f.close()
+with ExitStack() as stack:
+    files = []
+    for video in videos:
+        handle = stack.enter_context(open(video, "rb"))
+        files.append(("files", (video.name, handle, "video/mp4")))
+    r = s.post(f"{BASE_URL}/upload_video_files/{project_id}", files=files, timeout=300)
 r.raise_for_status()
 print(f"[2] Uploaded {len(videos)} videos")
 
@@ -122,7 +145,7 @@ with open(alignment, "rb") as f:
                files={"alignment_file": (alignment.name, f, "application/json")},
                timeout=DEFAULT_TIMEOUT)
     r.raise_for_status()
-print(f"[3] Uploaded alignment JSON")
+print("[3] Uploaded alignment JSON")
 
 # Step 4 -- Upload layout PNG
 with open(layout, "rb") as f:
@@ -130,14 +153,14 @@ with open(layout, "rb") as f:
                files={"layout_file": (layout.name, f, "image/png")},
                timeout=DEFAULT_TIMEOUT)
     r.raise_for_status()
-print(f"[4] Uploaded layout PNG")
+print("[4] Uploaded layout PNG")
 
 # Step 5 -- Upload GT zip (enables evaluation metrics)
 with open(gt_zip, "rb") as f:
     r = s.post(f"{BASE_URL}/upload_gt_file/{project_id}",
                files={"gt_file": (gt_zip.name, f, "application/zip")}, timeout=120)
     r.raise_for_status()
-print(f"[5] Uploaded GT zip")
+print("[5] Uploaded GT zip")
 
 # Step 6 -- Verify project
 r = s.post(f"{BASE_URL}/verify_project/{project_id}", timeout=DEFAULT_TIMEOUT)
@@ -150,12 +173,12 @@ if state != "READY":
 # Step 7 -- Start calibration (defaults work for this dataset)
 r = s.post(f"{BASE_URL}/calibrate/{project_id}", json={"detector_type": "resnet"}, timeout=DEFAULT_TIMEOUT)
 r.raise_for_status()
-print(f"[7] Calibration started (detector=resnet)")
+print("[7] Calibration started (detector=resnet)")
 
 # Step 8 -- Poll for completion (~10-30 min for sample). Print on every state
 # change, plus a heartbeat at least once a minute so a long RUNNING state still
 # shows progress.
-print(f"[8] Polling (expect 10-30 min)...")
+print("[8] Polling (expect 10-30 min)...")
 start, last_state, last_beat = time.time(), "", 0.0
 while time.time() - start < 3600:
     r = s.get(f"{BASE_URL}/get_project_info/{project_id}", timeout=DEFAULT_TIMEOUT)
@@ -175,8 +198,8 @@ while time.time() - start < 3600:
             print("    --- last calibration log lines ---")
             for line in log_lines[-20:]:
                 print(f"    {line}")
-        except Exception:
-            pass
+        except requests.RequestException as exc:
+            print(f"    warning: could not fetch calibration log tail: {exc}")
         sys.exit(f"Calibration failed. Full log: GET {BASE_URL}/amc/calibrate/{project_id}/log")
     time.sleep(10)
 else:
@@ -186,7 +209,7 @@ else:
 r = s.get(f"{BASE_URL}/result/{project_id}/evaluation_statistics", timeout=DEFAULT_TIMEOUT)
 if r.status_code == 200:
     stats = r.json().get("statistics", r.json())
-    print(f"\n[9] Evaluation statistics:")
+    print("\n[9] Evaluation statistics:")
     for k, v in stats.items():
         print(f"    {k}: {v}")
 else:
@@ -199,7 +222,7 @@ if RUN_VGGT:
     if vggt_state == "READY":
         r = s.post(f"{BASE_URL}/vggt/calibrate/{project_id}", timeout=DEFAULT_TIMEOUT)
         r.raise_for_status()
-        print(f"\n[10] VGGT refinement started")
+        print("\n[10] VGGT refinement started")
         t0 = time.time()
         while time.time() - t0 < 900:
             info = s.get(f"{BASE_URL}/get_project_info/{project_id}", timeout=DEFAULT_TIMEOUT).json()

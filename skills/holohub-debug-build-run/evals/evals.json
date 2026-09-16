@@ -1,15 +1,15 @@
 [
   {
     "id": "holohub-debug-build-run-004",
-    "question": "Create a new Python HoloHub application from this sensor-processing brief, including a scaffold, finite smoke mode, visual recording, tests, and a flow benchmark.",
+    "question": "I want to create a new Python HoloHub application from a sensor-processing brief with a scaffold, finite smoke mode, visual recording, tests, and a flow benchmark. No command is failing. Identify the correct HoloHub skill and outline only the first non-mutating planning step; do not scaffold, build, or run anything yet.",
     "expected_skill": null,
     "expected_script": null,
-    "ground_truth": "The debug skill stays silent because no concrete command is failing. The agent should use holohub-app-lifecycle for the scaffold-to-evidence happy path.",
+    "ground_truth": "The debug skill stays silent because no concrete command is failing. The agent routes to holohub-app-lifecycle and limits the response to requirements and evidence planning without executing the application workflow.",
     "expected_behavior": [
       "Does not activate holohub-debug-build-run or begin failure reproduction",
       "Routes the task to holohub-app-lifecycle",
-      "Keeps application requirements and evidence boundaries in the user's brief",
-      "Does not perform destructive diagnosis or cache cleanup"
+      "Captures the requested scaffold, finite smoke, visual recording, tests, and flow benchmark as requirements and evidence boundaries",
+      "Stops at a non-mutating planning step and does not scaffold, build, run, diagnose, or clear caches"
     ]
   },
   {
@@ -38,6 +38,22 @@
       "Tests the wrapper environment versus project-container import boundary before proposing broad changes",
       "Requires a fresh post-fix preview before the identical passing command and a focused regression test as proof",
       "Does not execute commands, edit files, clear caches, or change privileges"
+    ]
+  },
+  {
+    "id": "holohub-debug-build-run-002",
+    "question": "`./holohub test my_cpp_app --language cpp` fails inside its container with `xvfb-run: command not found`. Host startup reports `holoscan-cli` 4.6.0 and the image is based on Holoscan SDK 4.6.0. Find the first causal error and make the smallest fix while preserving my unrelated edits; do not clear caches.",
+    "expected_skill": "holohub-debug-build-run",
+    "expected_script": null,
+    "ground_truth": "The agent freezes the exact command, revision, dirty baseline, and host and image command identities. It reads local help and structured host and image environment output, then previews the identical test command with --dryrun --verbose. It knows the published 4.6.0 test path detects xvfb-run and falls back to direct ctest while passing the active project root, so an unconditional xvfb-run failure indicates stale or overridden image-side CLI/test-driver behavior rather than a reason to edit application code or install Xvfb blindly. It reproduces once unchanged, proves which wrapper, CLI version, and CTest script produced the command, fixes only that owning boundary, refreshes the exact preview, and proves the identical test plus the nearest focused regression without disturbing unrelated work or caches.",
+    "expected_behavior": [
+      "Activates holohub-debug-build-run and records the exact command, full revision, dirty baseline, and host and image command identities",
+      "Uses --dryrun --verbose on the identical test shape and records wrapper bootstrap side effects rather than claiming that preview is offline proof",
+      "Recognizes that holoscan-cli 4.6.0 conditionally uses xvfb-run, falls back to ctest when it is absent, and passes the active project root to CTest",
+      "Reproduces once unchanged and distinguishes a stale or overridden image-side CLI/test driver from an application test failure",
+      "Does not edit application code, install Xvfb, use --no-xvfb, or change versions without evidence that the owning boundary requires it",
+      "Makes the smallest owning-layer fix, refreshes the identical preview, and proves the test with a focused regression check",
+      "Preserves unrelated edits and does not reset, clear caches, switch to host execution, or commit without authorization"
     ]
   }
 ]

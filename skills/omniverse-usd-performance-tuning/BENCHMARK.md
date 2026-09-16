@@ -9,16 +9,27 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `omniverse-usd-performance-tuning`
-- Evaluation date: 2026-07-30
-- Evaluator version: `0.9.0`
+- Evaluation date: 2026-08-24
+- Evaluator version: `1.3.2`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
-- Tasks: 9 evaluation tasks (8 positive, 1 negative)
-- Dataset digest: `sha256:137b9ca69a3516a7fffcdfff70f950f2851e5c425ccd4d9be11fb4ee4161ff8c` (skill-evaluator-dataset-snapshot/1)
+- Tasks: 10 evaluation tasks (9 positive, 1 negative)
+- Dataset digest: `sha256:e8ce4980d3c355c912e64a23c53712932a49478f0c0839b4d48ca0559aa4083c` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
-- Environment: `k8s-sandbox`
+- Environment: `local`
 - Tier 3 evidence: required for publication
 
-Each task attempt ran in its own isolated sandbox pod.
+Tasks ran on the trusted local host; local mode is not sandboxed.
+
+## Execution and Provenance
+
+- Validation status: `passed`
+- Report generation: `complete`
+- Evaluator version: `1.3.2`
+- Git commit: `0117bc2e3e54da4244a656466526c5b1b5a559ea`
+- Content type: requested `auto`, detected `skill`
+- Container image: `gitlab-master.nvidia.com:5005/nvcarps/ci-group/nvcarps-ci/skillevaluator-ci:sha-0117bc2e3e54da4244a656466526c5b1b5a559ea`
+- Container image digest: `not recorded`
+- Tier 3: requested `true`, executed `true`, status `succeeded`
 
 ## What This Report Answers
 
@@ -34,12 +45,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | Not available | 46% → 84% (+38 points) |
-| Security | Not available | 89% → 100% (+11 points) |
-| Correctness | Not available | 20% → 76% (+56 points) |
-| Discoverability | Not available | 47% → 91% (+44 points) |
-| Effectiveness | Not available | 37% → 63% (+26 points) |
-| Efficiency | Not available | 35% → 91% (+56 points) |
+| Overall | 52% → 89% (+37 points) | 56% → 85% (+29 points) |
+| Security | 95% → 100% (+5 points) | 90% → 95% (+5 points) |
+| Correctness | 36% → 92% (+56 points) | 54% → 82% (+28 points) |
+| Discoverability | 46% → 94% (+48 points) | 49% → 84% (+34 points) |
+| Effectiveness | 42% → 71% (+29 points) | 41% → 66% (+25 points) |
+| Efficiency | 43% → 90% (+47 points) | 47% → 98% (+51 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.
 
@@ -49,9 +60,9 @@ Example: `47% → 92% (+45 points)` means the skill-assisted run scored 92%, 45 
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 4 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 1 validator(s); 5 finding(s) |
 | Tier 2 | Semantic deduplication | **NOT RUN** | No result was recorded |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 9 task(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 10 task(s) |
 
 ## Findings and Observations
 
@@ -61,6 +72,7 @@ Example: `47% → 92% (+45 points)` means the skill-assisted run scored 92%, 45 
 - **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'version' is ignored; use 'metadata.version' (`skills/omniverse-usd-performance-tuning/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/omniverse-usd-performance-tuning/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/omniverse-usd-performance-tuning/SKILL.md`)
+- **LOW** SCHEMA/unexpected_file: Unexpected 'CHANGELOG.md' in skill root (`skills/omniverse-usd-performance-tuning/CHANGELOG.md`)
 - **LOW** SCHEMA/author_format: Author must be of the form 'Name <email@host>' (`skills/omniverse-usd-performance-tuning/SKILL.md`)
 
 </details>

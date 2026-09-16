@@ -10,5 +10,34 @@
       "Outlines the documented workflow steps from SKILL.md",
       "Does not run commands, scripts, or web searches"
     ]
+  },
+  {
+    "id": "tao-run-deft-aoi-resume-state",
+    "question": "Resume the existing DEFT AOI run at $RESULTS_DIR. Determine its canonical status and the single safe next action before launching any GPU work.",
+    "expected_skill": "tao-run-deft-aoi",
+    "expected_script": null,
+    "ground_truth": "Load tao-run-deft-aoi, read $RESULTS_DIR/deft_state.json as the single source of truth, use its current iteration, iteration status, completed stage, and latest event to identify the next stage, then read only that stage reference before later work.",
+    "expected_behavior": [
+      "Reads $RESULTS_DIR/deft_state.json before any stage command",
+      "Uses state status, current_iteration, stage_completed, and the latest event to identify progress",
+      "Reads only the next stage's reference before later work",
+      "Does not launch containers, jobs, installs, or file mutations during the status check",
+      "Does not infer completion from a checkpoint, inference CSV, report, or prior assistant message alone"
+    ]
+  },
+  {
+    "id": "tao-run-deft-aoi-customer-metric",
+    "question": "Plan a DEFT AOI run whose deployment gate is weighted escape cost <= 0.02 cost/board, evaluated by /workspace/metrics/evaluate_cost.py, with recall >= 99.5% as a secondary constraint. Explain how state, checkpoint selection, stopping, and reporting handle this KPI. Do not run the workload.",
+    "expected_skill": "tao-run-deft-aoi",
+    "expected_script": "scripts/record_metric_result.py",
+    "ground_truth": "Represent the request as a customer metric contract, preserve the explicit <= direction and evaluator, select the lowest weighted escape cost, require both the primary comparison and recall constraint for success, record standard metric_result evidence in deft_state.json, and report the configured metric rather than replacing it with FAR.",
+    "expected_behavior": [
+      "Creates a metric contract for weighted_escape_cost with operator <=, target 0.02, unit cost/board, and the exact command evaluator",
+      "Represents recall >= 99.5% as a secondary constraint and requires it for completion",
+      "Selects among checkpoints satisfying recall first, then chooses the lowest primary metric value without inferring direction from the metric name",
+      "Uses metric_result plus scripts/record_metric_result.py and deft_state.json as evidence and validation",
+      "Uses the customer metric in stopping and reporting and does not silently substitute FAR",
+      "Does not launch training, inference, containers, or GPU work"
+    ]
   }
 ]

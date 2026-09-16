@@ -16,6 +16,8 @@ tags:
 
 # Mask Grounding DINO
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Mask Grounding DINO for grounded instance segmentation. Extends Grounding DINO with mask prediction head for open-set segmentation guided by text prompts.
 
 Set train.pretrained_model_path for full model weights.
@@ -24,7 +26,7 @@ For TAO Deploy TensorRT actions (`gen_trt_engine`, TensorRT `evaluate`, and Tens
 
 ## Dataclass Schemas
 
-Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
+Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML for an action requires `schemas/<action>.schema.json` and `references/spec_template_<action>.yaml` to exist and parse. Use the packaged selected-action schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
 
 ## Train Action Policy
 
@@ -37,6 +39,14 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 - **Dataset type:** segmentation
 - **Formats:** odvg, coco, coco_raw
 - **Monitoring metric:** val_loss
+- **AutoML metric contract:** Use `val_loss` emitted during training and
+  minimize it. Standalone evaluation metrics are checkpoint-validation KPIs,
+  not the recommendation-selection objective.
+- **Evaluation checkpoint metrics:** `[segm] test_mAP50` and
+  `[bbox] test_mAP50` when the checkpoint produces class predictions. A very
+  short smoke-trained checkpoint can complete evaluation successfully with an
+  empty KPI dictionary; verify the evaluation action and result artifact in
+  that case. Train-stage AutoML selection remains based on `val_loss`.
 
 ### Per-Action Dataset Requirements
 
@@ -119,7 +129,10 @@ Optional. Validation uses COCO-format annotations even when training uses ODVG.
 - **AutoML metric note**: Use `metric="val_loss"` with
   `direction="minimize"` for train-stage AutoML. The packaged train loop logs
   validation loss scalars; it does not emit `[bbox] val_mAP@50` during the
-  train job.
+  train job. Standalone evaluation emits `[segm] test_mAP50` and
+  `[bbox] test_mAP50` only when predictions survive its thresholds; do not
+  substitute either conditional test metric for the training loss used to
+  rank AutoML recommendations.
 - **model.has_mask**: Enables mask prediction head. Default True. Adds mask/dice/rela loss coefficients.
 - **model.num_region_queries**: Number of region queries for mask prediction. Default 100.
 - **model.loss_types**: Loss components. Default [labels, boxes, masks]. Includes mask_loss_coef, dice_loss_coef, rela_loss_coef.

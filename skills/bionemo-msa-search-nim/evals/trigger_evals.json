@@ -1,0 +1,22 @@
+[
+  {"query": "Generate an MSA for this protein sequence to use as AlphaFold input", "should_trigger": true},
+  {"query": "Search UniRef30 for homologs of my protein using the MSA-Search NIM", "should_trigger": true},
+  {"query": "Run ColabFold MSA search via the NVIDIA NIM to get an a3m alignment file", "should_trigger": true},
+  {"query": "I need a multiple sequence alignment for structure prediction — use the MSA-Search microservice", "should_trigger": true},
+  {"query": "Do a paired MSA search for a protein complex using the ColabFold NIM", "should_trigger": true},
+  {"query": "Search for structural templates against PDB70 using the MSA-Search NIM", "should_trigger": true},
+  {"query": "Run MMSeqs2 database search through the NVIDIA hosted API for my protein sequence", "should_trigger": true},
+  {"query": "Generate an MSA and save it as a3m format for OpenFold3 input", "should_trigger": true},
+  {"query": "Use msa-search NIM to find evolutionary homologs in colabfold_envdb", "should_trigger": true},
+  {"query": "I want to run the MSA-Search Docker container locally and search UniRef30", "should_trigger": true},
+  {"query": "Generate a paired MSA for a two-chain protein complex for co-folding", "should_trigger": true},
+  {"query": "Run MSA search on this FASTA sequence and save the alignment for downstream folding", "should_trigger": true},
+  {"query": "Design protein sequences for this backbone structure using inverse folding", "should_trigger": false},
+  {"query": "Generate novel drug-like molecules with scaffold decoration using GenMol", "should_trigger": false},
+  {"query": "Predict protein structure from sequence using OpenFold3 NIM", "should_trigger": false},
+  {"query": "Dock a small molecule to a protein receptor and rank binding poses", "should_trigger": false},
+  {"query": "How do I read a FASTA file in Python using BioPython?", "should_trigger": false},
+  {"query": "Align two protein sequences manually using Needleman-Wunsch", "should_trigger": false},
+  {"query": "Run Boltz2 to predict binding affinity for a kinase-inhibitor pair", "should_trigger": false},
+  {"query": "Design a protein binder for a target using RFDiffusion", "should_trigger": false}
+]

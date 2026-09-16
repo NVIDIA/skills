@@ -1,41 +1,40 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-"""Align Claude Code transcript token usage to loop_log stages (post-processing).
+"""Align Claude Code transcript token usage to DEFT state events.
 
-Why this exists: `log_stage.py` is a passive writer. The bash orchestrator that
-calls it has no way to measure LLM context size, so `context_tokens` ends up as
-a hard-coded placeholder. The real per-call usage *is* recorded by Claude Code
+The stage writer cannot measure LLM context size, so `context_tokens` starts as
+a placeholder. The real per-call usage *is* recorded by Claude Code
 in its transcript JSONLs (`~/.claude/projects/<slug>/<session-id>.jsonl`); each
 assistant message has a `timestamp` and `message.usage` with `input_tokens`,
 `output_tokens`, `cache_read_input_tokens`, and `cache_creation_input_tokens`
 (plus the 5m/1h breakdown).
 
 This script runs after a loop (or any time you want updated numbers). For each
-stage entry in `loop_log.jsonl`, it sums the usage of every assistant message
+stage event in `deft_state.json`, it sums the usage of every assistant message
 whose timestamp falls in `(prev_entry.ts, this_entry.ts]` (the first entry
 covers `[transcript_start, entry_1.ts]`), then writes a per-stage `tokens`
 field and updates `context_tokens` to the real context size at stage end.
 
-The original `loop_log.jsonl` is rewritten atomically (tmp + rename). Existing
-fields are preserved; `seq` is untouched.
+The original `deft_state.json` is rewritten atomically. Existing fields are
+preserved; only the `events` array receives token data.
 
 CLI:
 
     python scripts/align_token_usage.py \
-        --log-path /abs/path/results/loop_log.jsonl \
-        --project-dir ~/.claude/projects/-home-user-tao-skills-external
+        --state-path /abs/path/results/deft_state.json \
+        --project-dir ~/.claude/projects/-home-user-tao-skill-bank
 
     # or pass individual transcript files (repeatable):
     python scripts/align_token_usage.py \
-        --log-path /abs/path/results/loop_log.jsonl \
+        --state-path /abs/path/results/deft_state.json \
         --transcript /path/to/session-a.jsonl \
         --transcript /path/to/session-b.jsonl
 
     # or auto-resolve the project dir from cwd (default: current cwd):
     python scripts/align_token_usage.py \
-        --log-path /abs/path/results/loop_log.jsonl \
-        --cwd ~/tao-skills-external
+        --state-path /abs/path/results/deft_state.json \
+        --cwd ~/tao-skill-bank
 
 The per-entry `tokens` field shape:
 
@@ -171,21 +170,20 @@ def _accumulate(acc: dict, msg: dict) -> None:
 
 
 def align(
-    log_path: pathlib.Path,
+    state_path: pathlib.Path,
     transcript_paths: list[pathlib.Path],
-) -> tuple[list[dict], list[dict]]:
-    """Return (new_entries, messages). Does not write to disk."""
-    if not log_path.is_file():
-        raise FileNotFoundError(f"log not found: {log_path}")
-
-    entries: list[dict] = []
-    with log_path.open() as f:
-        for line in f:
-            if not line.strip():
-                continue
-            entries.append(json.loads(line))
+) -> tuple[dict, list[dict], list[dict]]:
+    """Return (updated_state, updated_events, messages) without writing."""
+    if not state_path.is_file():
+        raise FileNotFoundError(f"state not found: {state_path}")
+    state = json.loads(state_path.read_text())
+    if not isinstance(state, dict):
+        raise ValueError("deft_state.json root must be an object")
+    entries = state.get("events", [])
+    if not isinstance(entries, list):
+        raise ValueError("state.events must be an array")
     if not entries:
-        return [], []
+        return state, [], []
 
     parsed_ts: list[datetime.datetime] = []
     for i, e in enumerate(entries):
@@ -213,20 +211,21 @@ def align(
         merged["context_tokens"] = acc["context_size_end"]
         new_entries.append(merged)
 
-    return new_entries, messages
+    state["events"] = new_entries
+    return state, new_entries, messages
 
 
-def write_atomic(log_path: pathlib.Path, entries: list[dict]) -> None:
-    """Rewrite log_path atomically (write to a sibling tmp, then rename)."""
-    log_path.parent.mkdir(parents=True, exist_ok=True)
+def write_atomic(state_path: pathlib.Path, state: dict) -> None:
+    """Rewrite deft_state.json atomically."""
+    state_path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp_name = tempfile.mkstemp(
-        prefix=log_path.name + ".", suffix=".tmp", dir=str(log_path.parent)
+        prefix=state_path.name + ".", suffix=".tmp", dir=str(state_path.parent)
     )
     try:
         with os.fdopen(fd, "w") as f:
-            for e in entries:
-                f.write(json.dumps(e) + "\n")
-        os.replace(tmp_name, log_path)
+            json.dump(state, f, indent=2)
+            f.write("\n")
+        os.replace(tmp_name, state_path)
     except Exception:
         try:
             os.unlink(tmp_name)
@@ -238,16 +237,16 @@ def write_atomic(log_path: pathlib.Path, entries: list[dict]) -> None:
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Align Claude Code transcript token usage to loop_log.jsonl stages. "
-            "Rewrites the log in place, adding per-stage `tokens` fields and "
+            "Align Claude Code transcript token usage to deft_state.json events. "
+            "Rewrites the state in place, adding per-stage `tokens` fields and "
             "updating `context_tokens` to the real value."
         ),
     )
     parser.add_argument(
-        "--log-path",
+        "--state-path",
         required=True,
         type=pathlib.Path,
-        help="Absolute path to results/loop_log.jsonl",
+        help="Absolute path to results/deft_state.json",
     )
     parser.add_argument(
         "--transcript",
@@ -280,7 +279,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Print the new entries to stdout; do not modify the log file.",
+        help="Print the new events to stdout; do not modify the state file.",
     )
     return parser
 
@@ -293,7 +292,7 @@ def _resolve_transcripts(args: argparse.Namespace) -> list[pathlib.Path]:
         cwd = args.cwd or pathlib.Path.cwd()
         project_dir = discover_project_dir(cwd)
     if not project_dir.is_dir():
-        raise FileNotFoundError(f"project dir not found: {project_dir}")
+        return []
     return sorted(project_dir.glob("*.jsonl"))
 
 
@@ -302,22 +301,25 @@ def main(argv: list[str] | None = None) -> int:
     try:
         transcripts = _resolve_transcripts(args)
         if not transcripts:
-            print("align_token_usage: no transcripts found", file=sys.stderr)
-            return 2
-        new_entries, messages = align(args.log_path, transcripts)
+            print(
+                "align_token_usage: no transcripts found; leaving existing context_tokens unchanged",
+                file=sys.stderr,
+            )
+            return 0
+        state, new_entries, messages = align(args.state_path, transcripts)
     except (FileNotFoundError, ValueError, json.JSONDecodeError) as exc:
         print(f"align_token_usage: {exc}", file=sys.stderr)
         return 2
 
     if not new_entries:
-        print("align_token_usage: log is empty, nothing to do", file=sys.stderr)
+        print("align_token_usage: state has no events, nothing to do", file=sys.stderr)
         return 0
 
     if args.dry_run:
         for e in new_entries:
             print(json.dumps(e))
     else:
-        write_atomic(args.log_path, new_entries)
+        write_atomic(args.state_path, state)
 
     total_msgs = sum(e["tokens"]["n_messages"] for e in new_entries)
     print(

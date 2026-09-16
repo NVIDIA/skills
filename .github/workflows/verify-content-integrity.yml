@@ -110,7 +110,7 @@ jobs:
             fi
             echo '```'
             echo ""
-            echo "**Recovery (skill owners):** the mismatch exists at your source repo — content was modified after the signing run. Open a PR that touches the skill directory (a trivial SKILL.md version bump works if your changes are already merged), comment \`/nvskills-ci\`, and merge with the generated signature commit. Do not modify skill files afterward. Steps: https://nvidia.atlassian.net/wiki/spaces/GAIT/pages/3483240468"
+            echo "**Recovery (skill owners):** the mismatch exists at your source repo — content was modified after the signing run. Open a PR that touches the skill directory (a trivial SKILL.md version bump works if your changes are already merged), comment \`/nvskills-ci\`, and merge with the generated signature commit. Do not modify skill files afterward. If you need help, contact a CODEOWNER."
             echo ""
             echo "This issue auto-updates on every failing sweep and closes automatically when a sweep passes."
           } > "$body"

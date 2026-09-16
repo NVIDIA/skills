@@ -5,11 +5,11 @@
 Use this skill for highlight selected, selection outline, selection group, SelectionGroupStyle, SelectionFillMode, selection glow, selected object feedback, or outline selected prim.
 
 Use this for renderer-visible feedback after selection. Picking and selected-path
-state live in `object-selection`. The combined ovrtx 0.3 API reference is
+state live in `object-selection`. The combined ovrtx API reference is
 `native-picking-selection`.
 
 The default selection visual path is native ovrtx selection outlines and styles.
-Do not create segmentation/Warp outline systems for new ovrtx 0.3 apps.
+Do not create segmentation/Warp outline systems for new ovrtx apps.
 
 For ovrtx selection outline, fill, or C API behavior beyond this reference,
 read `references/dependencies` for acquisition guidance and supplemental dependency
@@ -23,6 +23,9 @@ documentation.
 - Configure outline width and fill mode at renderer creation.
 - Configure per-group outline/fill colors at runtime.
 - Use transparent fill color when the app wants outlines only.
+- Treat outline groups as renderer-visible feedback state. OVStage may receive
+  selected-path metadata or downstream feature writes, but native OVRTX remains
+  the correct surface for selection outlines.
 
 Python names:
 
@@ -31,7 +34,7 @@ Python names:
 - `ovrtx.RendererConfig(selection_fill_mode=ovrtx.SelectionFillMode.GROUP_FILL_COLOR)`
 - `ovrtx.SelectionGroupStyle`
 - `Renderer.set_selection_group_styles(...)`
-- `ovrtx.OVRTX_ATTR_NAME_SELECTION_OUTLINE_GROUP`
+- `Renderer.set_selection_outline_group_strings(...)`
 
 C/C++ names:
 
@@ -92,7 +95,6 @@ frames.
 Python:
 
 ```python
-import numpy as np
 import ovrtx
 
 
@@ -101,11 +103,9 @@ def set_selection_groups(renderer, group_by_path: dict[str, int]) -> None:
         return
 
     paths = list(group_by_path)
-    groups = np.asarray([group_by_path[path] for path in paths], dtype=np.uint8)
-    renderer.write_attribute(
-        prim_paths=paths,
-        attribute_name=ovrtx.OVRTX_ATTR_NAME_SELECTION_OUTLINE_GROUP,
-        tensor=groups,
+    renderer.set_selection_outline_group_strings(
+        paths,
+        [group_by_path[path] for path in paths],
     )
 ```
 
@@ -113,15 +113,18 @@ C/C++:
 
 ```c
 // Set selected prims to group 1.
-ovrtx_set_selection_outline_group(renderer, selected_paths, selected_count, 1);
+uint8_t selected_groups[selected_count];  /* fill with 1 */
+ovrtx_set_selection_outline_group(renderer, selected_path_ids, selected_count, selected_groups);
 
 // Clear previously selected prims.
-ovrtx_set_selection_outline_group(renderer, previous_paths, previous_count, 0);
+uint8_t previous_groups[previous_count];  /* fill with 0 */
+ovrtx_set_selection_outline_group(renderer, previous_path_ids, previous_count, previous_groups);
 ```
 
 Always clear previous groups that are no longer selected before assigning the
 new selection. The renderer displays whatever group value is currently authored
-for each prim.
+for each prim. Do not replace this path with material fader writes; material
+effects belong in `prim-pick-effects` and should be driven through OVStage.
 
 ## Update Pattern
 
@@ -181,6 +184,8 @@ On scene switch, reload, or renderer reset:
 - Group `0` means no native selection outline.
 - Per-group style writes are runtime state; keep them in app setup, not in the
   per-frame hot path.
+- Direct OVRTX group writes are acceptable for selection outlines. Direct OVRTX
+  transform, visibility, or material/effect writes are not part of this module.
 - Fill color does nothing unless the renderer fill mode enables it.
 - Outline dashing/stippling is not supported by the native RTX outline pass.
 - Do not use `seg-outline-highlight` unless the user explicitly needs a custom

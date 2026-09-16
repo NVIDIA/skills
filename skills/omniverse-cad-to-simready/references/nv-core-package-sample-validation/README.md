@@ -11,10 +11,10 @@ This reference does not convert source assets, repair USD layers, or publish pac
 The team reference workflow is NVIDIA's SimReady Foundation create-package skill:
 
 ```text
-https://github.com/NVIDIA/simready-foundation/blob/main/skills/simready-foundation-create-package/SKILL.md
+https://github.com/NVIDIA/simready-foundation/blob/v2026.04.1/skills/simready-foundation-create-package/SKILL.md
 ```
 
-Access note: Browser or raw-file fetches of the upstream skill URL can fail in restricted environments. If that happens, use a local clone of `https://github.com/NVIDIA/simready-foundation` on branch `main` and read `skills/simready-foundation-create-package/SKILL.md` from that checkout. Prefer `$PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT/simready-foundation` or `$HOME/.physical-ai-skill-hub/upstreams/simready-foundation`.
+Access note: Browser or raw-file fetches of the upstream skill URL can fail in restricted environments. If that happens, use a local clone of `https://github.com/NVIDIA/simready-foundation` checked out to the exact ref in `upstream-versions.lock.json` (currently `v2026.04.1`) and read `skills/simready-foundation-create-package/SKILL.md` from that checkout. Prefer `$OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT/simready-foundation` or `$HOME/.omniverse-cad-to-simready/upstreams/simready-foundation`.
 
 For formal package post-validation with the registered SimReady Foundation package profiles, use the upstream `create_simready_package.py --only-post-validation` flow from that sample when `simready-validate` and WRAPP dependencies are installed. Do not duplicate or reinterpret the upstream package validation workflow inside this reference; point to the upstream skill and run the upstream sample when formal validation is required. This installed reference's `scripts/run.py` provides deterministic package checks for local package artifacts.
 

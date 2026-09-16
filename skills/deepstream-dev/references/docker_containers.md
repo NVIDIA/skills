@@ -77,6 +77,19 @@ RUN pip install --break-system-packages \
 
 > **Note**: The `--break-system-packages` flag is needed on Ubuntu 24.04 (Python 3.12) to install into the system Python environment. Alternatively, use a virtual environment.
 
+### Installing pyservicemaker in a Python Virtual Environment
+
+If pyservicemaker code runs from a venv, install the bundled wheel into that
+venv first:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install /opt/nvidia/deepstream/deepstream/service-maker/python/pyservicemaker*.whl \
+    pyyaml
+pip install -r requirements.txt
+```
+
 ---
 
 ## Running Containers
@@ -91,10 +104,9 @@ RUN pip install --break-system-packages \
 
 ```bash
 export DISPLAY=:0
-xhost +
+xhost +si:localuser:root
 
 docker run -it --rm \
-    --network=host \
     --gpus all \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix/:/tmp/.X11-unix \

@@ -238,8 +238,8 @@ Both filters are optional. Extract if present:
 
 | Filter | Description | Example message |
 |---|---|---|
-| **sensor_name** | Show rules for a specific sensor only | *"List active rules on warehouse-dock-1"* |
-| **alert_type** | Show rules matching a specific tag | *"Show me PPE-related realtime rules"* |
+| **sensor_name** | List rules for a specific sensor only | *"List active rules on warehouse-dock-1"* |
+| **alert_type** | List rules matching a specific tag | *"Which realtime rules are PPE-related?"* |
 
 If neither filter is present, return all active rules.
 

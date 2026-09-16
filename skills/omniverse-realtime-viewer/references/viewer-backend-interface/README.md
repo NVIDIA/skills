@@ -15,7 +15,11 @@ interface contract. The contract lets UI components depend on one
 `ViewerBackend` object instead of transport-specific APIs such as AppStreamer
 messages, Electron preload calls, Tauri commands, or future IPC layers.
 
-The shared UI does not render USD or 3D content. All USD rendering still uses `ovrtx` in the appropriate server or native process. The UI displays a video, canvas, or pixel surface owned by the transport and overlays reusable React controls that call `ViewerBackend`.
+The shared UI does not render USD or 3D content. All USD rendering still uses
+`ovrtx` in the appropriate server or native process. In OVStage-backed apps, the
+backend runtime also owns stage lifetime, ordinals, write floors, and renderer
+publication. The UI displays a video, canvas, or pixel surface owned by the
+transport and overlays reusable React controls that call `ViewerBackend`.
 
 ## Read These Skills
 
@@ -90,6 +94,8 @@ export interface ViewerBackend {
   onLoadProgress?(callback: (progress: LoadProgressEvent) => void): () => void;
   onAOVStateChanged?(callback: (active: string, available: string[]) => void): () => void;
   changeAOV?(aov: string): Promise<void>;
+  getCapabilities?(): Promise<ViewerCapabilities>;
+  invokeFeature?<T = unknown>(feature: string, payload: Record<string, unknown>): Promise<T>;
   onSelectionChanged(callback: (paths: string[]) => void): () => void;
   pick(x: number, y: number): Promise<string | null>;
   getStageTree(rootPath?: string): Promise<PrimNode[]>;
@@ -116,6 +122,8 @@ Method contract:
 | `onLoadProgress?(callback)` | Subscribe to stage-load progress phases. Use this for progress bars and disabled UI states during load. |
 | `onAOVStateChanged?(callback)` | Subscribe to active AOV and available AOV list changes. Call immediately with cached state when available so controls populate after reconnect. |
 | `changeAOV?(aov)` | Request an AOV/render-var switch. Reject unsupported AOV names or no-op only when the backend intentionally has no AOV support. |
+| `getCapabilities?()` | Return transport-neutral feature flags and effective runtime capabilities, such as supported AOVs, transform modes, pick effects, physics impulse support, and settings keys. |
+| `invokeFeature?(feature,payload)` | Optional extension command for app-specific capabilities. Reject unsupported features instead of falling through to transport internals. |
 | `onSelectionChanged(callback)` | Subscribe to canonical selected prim paths. Return an unsubscribe function and fan out both local UI selections and server/native selection events. |
 | `pick(x, y)` | Return the prim path under a viewport-element-local CSS pixel coordinate, or `null`. Never require callers to pass window coordinates. |
 | `getStageTree(rootPath?)` | Return normalized `PrimNode[]` for the root or requested prim path. It may use cached tree data, lazy queries, or a full hierarchy snapshot. |
@@ -242,9 +250,46 @@ export interface PointerInput {
   button: number;
   pressed: boolean;
 }
+
+export interface ViewerCapabilities {
+  aovs?: string[];
+  renderSettings?: string[];
+  runtimeTransforms?: boolean;
+  pickEffects?: string[];
+  physicsImpulse?: boolean;
+  transport?: 'webrtc' | 'electron-shm' | 'tauri' | 'ovui' | 'native' | string;
+}
 ```
 
 Normalize transport payloads to these types before data reaches shared components. In particular, convert server fields such as `has_children` or boolean `children` into `hasChildren`, and convert property dictionaries into `PrimProperty[]`.
+
+## Capability Extensions
+
+Keep optional features out of the required interface so the same UI can run on
+WebRTC, Electron SHM, Tauri, ovui, or future transports. Use
+`getCapabilities()` to decide whether to show controls, and use
+`invokeFeature()` or a typed adapter method in the transport adapter for the
+actual command.
+
+Useful feature names:
+
+- `runtimeTransform`: move, rotate, or scale selected prims through the runtime
+  owner.
+- `pickEffect`: apply a verified selection-driven material, visibility, or
+  effect change.
+- `physicsImpulse`: run a bounded physics worker and apply returned pose samples
+  through parent runtime state.
+
+Rules:
+
+- Shared components should never receive live OVStage handles, OVRTX handles,
+  DLPack buffers, SHM pointers, or process-local tokens.
+- The backend adapter translates feature commands into data-channel messages,
+  Tauri invokes, Electron IPC, or local API calls.
+- Physics controls should be disabled unless the backend reports either a
+  verified `PhysX.attach_ovstage(stage, read_ordinal=...)` path or a bounded OVPhysX worker path.
+- A missing capability is a normal unsupported state, not a reason to add a
+  browser-side renderer or mutate user USD files.
 
 ## Shared Components
 

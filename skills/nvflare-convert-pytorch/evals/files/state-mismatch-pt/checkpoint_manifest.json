@@ -1,0 +1,11 @@
+{
+  "source_model_state": {
+    "classifier.weight": [2, 4],
+    "classifier.bias": [2]
+  },
+  "generated_server_model_state": {
+    "classifier.weight": [3, 8],
+    "classifier.bias": [3]
+  },
+  "note": "Synthetic post-conversion validation metadata only; it models generated server construction diverging from the unchanged source model. No serialized checkpoint is included or loaded."
+}

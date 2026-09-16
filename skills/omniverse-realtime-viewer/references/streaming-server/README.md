@@ -22,6 +22,12 @@ For ovrtx Python/C API behavior or release-specific server integration details
 not covered here, read `references/dependencies` for acquisition guidance and
 supplemental dependency documentation.
 
+For OVStage-backed apps, the Python server runtime owns the live OVStage stage,
+ordinal clock, write floor, and OVRTX renderer attachment. USD query workers,
+physics workers, and the browser client must exchange structured data such as
+paths, matrices, settings, and diagnostics; do not pass live stage handles,
+mapped buffers, or DLPack objects across process or transport boundaries.
+
 If the installed runtime cannot locate native libraries automatically, set:
 
 ```bash
@@ -53,10 +59,22 @@ Without a display, ovrtx initialization will fail with EGL/GLX errors.
 The reference WebRTC server starts in this order. Keep the ordering when generating `server/ov_web_viewer_server.py` or equivalent runtime shells:
 
 1. Set `OVRTX_SKIP_USD_CHECK=1` before importing `ovrtx` or any module that can import `pxr`.
-2. Import `ovrtx`, construct `Renderer(RendererConfig(sync_mode=True, selection_outline_enabled=True))`, then import sibling helpers. Use ovrtx stage queries for basic prim discovery; keep a `pxr_worker.py` subprocess only for USD features that still require OpenUSD.
+2. Import `ovrtx`, construct the renderer from current OVRTX guidance, and
+   attach it to the viewer-owned OVStage path when the selected architecture uses
+   OVStage. Use native stage queries for basic prim discovery; keep a
+   `pxr_worker.py` subprocess for USD features that still require OpenUSD unless
+   the exact in-process import path is verified.
 3. Import and initialize CUDA helpers such as `warp` for frame conversion.
-4. Load the initial stage if one is configured: build one inline root USDA string that sublayers the user file and authors viewer camera/render-product/render-var data, call `renderer.open_usd_from_string(...)`, bind or write the camera `omni:xform`, initialize native selection outline styles, and cache `current_stage_root_path`.
-5. Warm up the renderer before starting ovstream: step several frames against the canonical render product, update camera transforms, probe render vars, allocate the persistent BGRA stream buffer, and discover the currently available display AOVs.
+4. Load the initial stage if one is configured: populate the runtime stage or
+   build one inline root USDA string that sublayers the user file and authors
+   viewer camera/render-product/render-var data, call the current OVRTX open or
+   attach API, write the camera `omni:xform`, initialize native selection
+   outline styles, and cache `current_stage_root_path`.
+5. Warm up the renderer before starting ovstream: commit the initial stage
+   publication when OVStage is present, step several frames against the
+   canonical render product, update camera transforms, probe render vars,
+   allocate the persistent BGRA stream buffer, and discover the currently
+   available display AOVs.
 6. Initialize ovstream, create `ovstream.Server(ovstream.ServerType.WEBRTC)`, register `on_connection`, `on_message`, `on_input`, and `on_unicode` callbacks where needed, then call `server.start(ServerConfig(...))`.
 7. Start the `/healthz` endpoint before or alongside server startup. It must return `503 not ready` until the renderer has produced and copied one valid display frame into the app-owned stream buffer, then `200 ok` after that.
 8. Start exactly one render loop thread. That thread owns `renderer.step()`, frame conversion, native pick-query enqueue/result decoding, selection-outline state writes, animation updates, and `stream_video()`.
@@ -132,10 +150,18 @@ try:
 finally:
     server.stop()
     server.close()
-    ovstream.shutdown()
+# In a one-shot process, call ovstream.shutdown() from the top-level process
+# exit path after the final server is closed. Do not call it from a same-process
+# stop/restart path.
 ```
 
-`initialize()` is ref-counted; every call needs a matching `shutdown()`. Register callbacks before `start()` so initial connection/input/message events cannot race past handlers.
+`initialize()` is ref-counted; every process-lifetime initialization needs a matching top-level `shutdown()`. Register callbacks before `start()` so initial connection/input/message events cannot race past handlers.
+
+Generated servers that support same-process restart should call `server.stop()`
+and `server.close()` for each server instance, but should not call
+`ovstream.shutdown()` between `Server.start()` attempts in the same Python
+process. Treat `ovstream.shutdown()` as a process-exit cleanup or isolate
+restart validation in a fresh subprocess.
 
 Guard server sends and frame submission against disconnect races. A client can disconnect between `is_client_connected` and `send_message()`, or during `stream_video()`. Those transient failures should not crash the render loop:
 
@@ -229,7 +255,12 @@ No CPU round trip is needed.
 
 Every displayed render var must be converted into a persistent CUDA `uint8 [H,W,4]` BGRA buffer before creating `ovstream.VideoFrame`. Keep `LdrColor` as the fallback if the active AOV cannot be copied.
 
-ovrtx 0.3 render vars can be single-tensor or multi-tensor outputs. For a single-tensor render var, consume the mapped object directly with DLPack. For a multi-tensor render var, choose the named tensor that represents the image payload and read params separately. Image tensors are channel-last: `H x W`, `H x W x 1`, `H x W x 3`, or `H x W x 4`. Do not assume `C x H x W`, and do not use old `.tensor` access in new generated code.
+Current ovrtx render vars can be single-tensor or multi-tensor outputs. For a
+single-tensor render var, consume the mapped object directly with DLPack. For a
+multi-tensor render var, choose the named tensor that represents the image
+payload and read params separately. Image tensors are channel-last: `H x W`,
+`H x W x 1`, `H x W x 3`, or `H x W x 4`. Do not assume `C x H x W`, and do not
+use old `.tensor` access in new generated code.
 
 | AOV | Expected input | Conversion rule |
 |---|---|---|
@@ -250,22 +281,50 @@ if copied:
     stream_server.stream_video(video_frame)
 ```
 
-Pick queries are independent of the displayed AOV. Do not update a segmentation-derived pick buffer in generated ovrtx 0.3 apps.
+Pick queries are independent of the displayed AOV. Do not update a
+segmentation-derived pick buffer in new generated apps.
 
 ## Native Picking And Selection Outlines
 
 Use ovrtx native pick queries and native selection outline state:
 
 1. Convert the ovstream input coordinate to render-product pixel space.
-2. Enqueue `renderer.enqueue_pick_query_async(...)` with a 1x1 rectangle for click picking or a larger rectangle for marquee selection.
+2. Enqueue `renderer.enqueue_pick_query(...)` with normalized top-left bounds
+   for a one-pixel click or a larger marquee rectangle.
 3. Step the same RenderProduct. The pick result appears as the synthetic render var `ovrtx_pick_hit`.
 4. Map the pick-hit output, validate its params such as `magic` and `version`, read the named `primPath` tensor, and resolve each non-zero path id with `renderer.resolve_prim_path_id(...)`.
 5. Deduplicate resolved paths and publish `stageSelectionChanged`.
-6. Clear previous outlines by writing selection group `0`, then write group `1` or another styled group to selected prims through `omni:selectionOutlineGroup` / `OVRTX_ATTR_NAME_SELECTION_OUTLINE_GROUP`.
+6. Clear previous outlines with group `0`, then assign group `1` or another
+   styled group through `Renderer.set_selection_outline_group_strings()`.
 
 Configure selection outlines at renderer creation with `RendererConfig(selection_outline_enabled=True, selection_outline_width=...)`. Configure per-group colors at runtime with `Renderer.set_selection_group_styles(...)`. Changing global width or fill mode requires recreating the renderer; changing per-group colors does not.
 
-Do not create legacy segmentation picker modules, CPU ray fallback picker modules, segmentation ID maps, isolation ID discovery, or Warp outline compositors for ovrtx 0.3 generated apps.
+Do not create legacy segmentation picker modules, CPU ray fallback picker modules, segmentation ID maps, isolation ID discovery, or Warp outline compositors for new generated apps.
+
+## Optional Runtime Feature Commands
+
+Keep the WebRTC protocol extensible instead of baking one app shape into the
+streaming server. Camera, selection, hierarchy, AOVs, and settings are the common
+baseline. Runtime transforms, pick effects, physics impulses, and similar
+features should be advertised through backend capabilities and handled as
+bounded commands on the same render/runtime queue.
+
+Examples:
+
+- `runtimeTransformRequest {request_id?, paths, matrix|translation|rotation|scale, mode?}` writes live transforms through OVStage/session state or the current OVRTX live-write path.
+- `pickEffectRequest {request_id?, paths, effect, value?}` applies a verified visibility/material/effect change after selection.
+- `physicsImpulseRequest {request_id?, path, impulse, angular_impulse?, steps?, dt?}` queues a bounded OVPhysX worker and applies returned pose samples through the parent OVStage/session path.
+
+Rules:
+
+- Reject unsupported feature names or payload fields with a normal error/result
+  message; do not silently mutate renderer state.
+- Do not populate OVPhysX in the already-running viewer process as a
+  fallback for a failed or unverified `PhysX.attach_ovstage(stage, read_ordinal=...)`.
+- Preserve the single render/runtime owner: callbacks enqueue commands, and the
+  render loop applies accepted state changes.
+- Keep long-running physics or USD work outside ovstream callback threads and
+  outside the parent renderer mutation path.
 
 ## Operation Status And Errors
 
@@ -279,7 +338,7 @@ Treat stage loads, render steps, and pick queries as operations whose status mus
 
 ## Input Callback
 
-Input is separate from JSON messages. For WebRTC, NVST forwards mouse/keyboard/gamepad input as binary `InputEvent` structs that arrive through `server.on_input`. For SHM Python clients, send the same native input struct path through `ovstream.ShmClient.send_input_event()`; C clients use `ovstream_shm_client_send_input_event()`. Do not send JSON `mouseInput`. Read `viewer-input-routing` before implementing this callback.
+Input is separate from JSON messages in the normal WebRTC path: NVST forwards mouse/keyboard/gamepad input as binary `InputEvent` structs that arrive through `server.on_input`. A browser-only JSON `mouseInput` fallback is permitted only after `viewer-input-routing` verifies that the data channel works while native callbacks are absent, and it replaces native input. For SHM Python clients, send the native input struct path through `ovstream.Client(ovstream.ClientType.SHM, stream_name="...").send_input_event(event)`; C clients use `ovstream_client_send_input_event(client, event)`. Read `viewer-input-routing` before implementing either browser input mode.
 
 ```python
 def on_input(event):
@@ -353,6 +412,10 @@ default media port. Do not conflate these in frontend config.
 - [ ] Render loop is the only owner of `renderer.step()`.
 - [ ] Render loop enqueues/decodes native pick queries and updates native selection outline groups.
 - [ ] AOV conversion writes a persistent CUDA BGRA8 buffer before `stream_video()`.
+- [ ] The render loop streams a fallback or last-good frame while connected,
+      even when idle or loading.
 - [ ] Disconnect races around `send_message()` and `stream_video()` are caught and debug-logged.
+- [ ] Same-process server restarts stop and close the server without calling
+      `ovstream.shutdown()` until process exit.
 
 See also: `streaming-client`, `streaming-messages`, `streaming-lifecycle`, `ovrtx-rendering`, `stage-loading`, `viewer-input-routing`, `camera-controls`, `object-selection`.

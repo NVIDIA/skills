@@ -1,7 +1,7 @@
 ## Description: <br>
-Use for VSS alert workflows — real-time monitoring, Alert-Bridge subscriptions, Slack notifications, incident queries, camera onboarding. <br>
+Use for VSS alert workflows — real-time monitoring, Alert-Bridge subscriptions, Slack notifications, incident queries, camera onboarding. Not for non-alert analytics. <br>
 
-This skill is ready for commercial/non-commercial use. <br>
+This skill is for demonstration purposes and not for production usage. <br>
 
 ## Owner
 NVIDIA <br>
@@ -9,65 +9,71 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 OR MIT <br>
 ## Use Case: <br>
-Developers and operations engineers managing video surveillance alert pipelines use this skill to configure real-time monitoring, create alert subscriptions, set up Slack notifications, query incidents, and onboard cameras within an NVIDIA VSS deployment. <br>
+Developers and engineers operating the NVIDIA Video Search and Summarization AI Blueprint alert pipeline — managing real-time monitoring, alert subscriptions, Slack notifications, incident queries, and camera onboarding. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
+
+## Requirements / Dependencies: <br>
+**Requires API Key or External Credential:** [Yes] <br>
+**Credential Type(s):** [API key] <br>
+
+Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
 ## Known Risks and Mitigations: <br>
 Risk: Review before execution as proposals could introduce incorrect or misleading guidance into skills. <br>
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Alert Subscriptions Reference](references/alert-subscriptions.md) <br>
 - [Alert Notify Reference](references/alert-notify.md) <br>
+- [Alert Subscriptions Reference](references/alert-subscriptions.md) <br>
 - [CV Verifier Prompts Reference](references/cv-verifier-prompts.md) <br>
+- [NVIDIA Video Search and Summarization GitHub](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
 - [VSS Documentation](https://docs.nvidia.com/vss/latest/index.html) <br>
-- [GitHub Repository](https://github.com/NVIDIA-AI-Blueprints/video-search-and-summarization) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, API Calls, Configuration instructions] <br>
+**Output Type(s):** [Shell commands, API Calls, Configuration instructions, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- `claude-code` <br>
-- `codex` <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 7 internal evaluation tasks (6 positive skill-activation, 1 negative). NVSkills-Eval profile: external. Pass threshold: 50%. Overall verdict: PASS. <br>
+7 evaluation tasks (6 positive, 1 negative) against skill-evaluator-dataset-snapshot/1. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Final-answer correctness against the reference answer. <br>
+- Discoverability: Whether the expected skill was found and executed when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal (50% goal completion + 50% expected workflow adherence). <br>
+- Efficiency: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 7 | 100% (+0%) | 93% (-7%) |
-| Correctness | 7 | 89% (+55%) | 78% (+33%) |
-| Discoverability | 7 | 99% (+55%) | 89% (+26%) |
-| Effectiveness | 7 | 62% (+44%) | 51% (+27%) |
-| Efficiency | 7 | 89% (+51%) | 80% (+22%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 51% → 90% (+39 points) | 50% → 80% (+30 points) |
+| Security | 100% → 86% (-14 points) | 86% → 64% (-21 points) |
+| Correctness | 20% → 100% (+80 points) | 26% → 91% (+66 points) |
+| Discoverability | 56% → 100% (+43 points) | 51% → 87% (+36 points) |
+| Effectiveness | 27% → 70% (+43 points) | 37% → 65% (+27 points) |
+| Efficiency | 51% → 93% (+43 points) | 53% → 94% (+42 points) |
 
 ## Skill Version(s): <br>
 3.2.0 (source: frontmatter) <br>

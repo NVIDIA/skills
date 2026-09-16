@@ -2,7 +2,7 @@
 name: tao-finetune-huggingface-model
 description: >
   Fine-tune any HuggingFace CV / VLM / LLM model on local NVIDIA GPUs inside an
-  NGC PyTorch container. Use when the user wants to fine-tune a HuggingFace
+  NGC PyTorch container when no dedicated TAO model skill matches. Use when the user wants to fine-tune a HuggingFace
   model (full or LoRA), train a vision / VLM / LLM model end-to-end, generate a
   reproducible HF training pipeline, smoke-test a HuggingFace model locally
   before scale-up, push a fine-tuned model to the HF Hub with a model card, or
@@ -11,7 +11,9 @@ description: >
   panoptic segmentation, depth estimation, image-text-to-text VLM (SFT / LoRA),
   and LLM SFT / DPO / GRPO. Six-step workflow: inspect and qualify, hardware
   and NGC image, research, generate and smoke, train + eval + infer, push and
-  emit rerun skill.
+  emit rerun skill. Do not use for any Hugging Face model ID claimed by a
+  dedicated `skills/models/*` skill; the model skill and its declared execution
+  environment take precedence.
 license: Apache-2.0
 tags:
   - finetuning
@@ -19,7 +21,7 @@ tags:
   - nvidia-tao
   - computer-vision
   - training
-compatibility: Requires docker + nvidia-container-toolkit, NVIDIA GPU (driver ≥ 545, ≥ 24 GB VRAM for ≤3B models), ~40 GB free disk. Optional credentials (read from the session environment, exported before launching) — HF_TOKEN is read only when the model/dataset is gated or `push_to_hub` is on; WANDB_API_KEY and WANDB_PROJECT only when WandB logging is enabled.
+compatibility: Requires docker + nvidia-container-toolkit, NVIDIA GPU (driver ≥ 545, ≥ 24 GB VRAM for ≤3B models), ~40 GB free disk. Optional credentials (read from the session environment) — HF_TOKEN is read only when the model/dataset is gated or `push_to_hub` is on; WANDB_API_KEY and WANDB_PROJECT only when WandB logging is enabled.
 metadata:
   author: NVIDIA Corporation
   version: "0.1.0"
@@ -29,10 +31,46 @@ allowed-tools: Read Bash Write
 
 # tao-finetune-huggingface-model
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 Local NVIDIA GPU fine-tuning for HuggingFace models, grounded in live-fetched
 documentation with curated references as a fallback safety net. One NGC container,
 a few focused scripts, one push to HF Hub. Follow the rules in this file; don't
 improvise.
+
+## Dedicated-model routing gate
+
+Before Step 1 or any probe, image selection, package install, venv creation, or
+training-code generation, resolve `model_id` against the packaged model-owner
+registry. Use the absolute skill-bank root from which this file was loaded:
+
+```bash
+python <bank-root>/scripts/resolve_tao_model.py \
+  --skill-bank <bank-root> \
+  --model "$MODEL_ID" \
+  --format json
+```
+
+The resolver matches model metadata, including `huggingface_model_ids`,
+`network_arch`, skill names, and legacy aliases. Routing is internal: a model ID
+and task are enough. Never require prompt boilerplate about skills, containers,
+or checkpoint formats.
+
+- Exit `0`: stop this workflow and follow the owning model skill's environment,
+  action metadata, preflight, and checkpoint preparation.
+- Exit `3`: no packaged model skill owns the ID. This is the only result that
+  permits Step 1 of the generic workflow.
+- Any other nonzero exit: ownership discovery is broken or ambiguous. Stop and
+  resolve that error; do not silently fall back to generic Hugging Face
+  training.
+
+Hugging Face hosting never overrides ownership. Do not use this workflow to
+bypass a matched skill or ask the user to prescribe its internal preparation.
+For example, `nvidia/Cosmos3-Nano` routes to `tao-finetune-cosmos-reason`.
+
+Do not create a host training venv in this workflow. Its default execution path
+is the NGC container documented below; any venv-based training path requires an
+explicit user request.
 
 **Order of authority (highest first):**
 
@@ -51,7 +89,7 @@ in `references/research-priorities.md`.
 **Required:**
 - `model_id` — HuggingFace model ID, e.g. `google/vit-base-patch16-224`
 
-**Conditional credentials (read from the session environment, exported before launching when present):**
+**Conditional credentials (read from the session environment — exported before launching or sourced from a user-approved env file):**
 - `HF_TOKEN` — only when the model/dataset is **gated** (read) or `push_to_hub` is on (write); public + public + `push_to_hub: false` needs none. Value never read — presence-only via `[ -n "$HF_TOKEN" ]`.
 - `WANDB_API_KEY`, `WANDB_PROJECT` — only when WandB is enabled; `WANDB_MODE=disabled` opts out.
 
@@ -90,15 +128,17 @@ a GPU host — read them first.
 | Concern | Authoritative skill |
 |---|---|
 | GPU host runtime (driver 580, CUDA Toolkit 13.0, NVIDIA Container Toolkit 1.19.0) | [`tao-skill-bank:tao-setup-nvidia-gpu-host`](../../platform/tao-setup-nvidia-gpu-host/SKILL.md) |
-| `docker run` flags, NGC auth, mounts, env passthrough | [`tao-skill-bank:tao-run-on-docker`](../../platform/tao-run-on-docker/SKILL.md) |
-| Local Docker job preflight (daemon, GPU smoke) | [`tao-skill-bank:tao-run-on-local-docker`](../../platform/tao-run-on-local-docker/SKILL.md) |
+| `docker run` flags, NGC auth, mounts, env passthrough, local/remote Docker job preflight (daemon, GPU smoke) | [`tao-skill-bank:tao-run-on-docker`](../../platform/tao-run-on-docker/SKILL.md) |
 
 **Default platform:** `local-docker` — build a one-off image (`run-<short>:latest`)
 and run it on the local Docker daemon. Ask only when the user explicitly needs a
 different backend (Brev remote GPU, SLURM/Kubernetes); then run that platform's
 Preflight first and route the Steps 4–5 `docker run` commands through it. The
 GPU-runtime and presence-only credential preflights (values never read), the
-canonical `docker run` flag set, the `list_tao_platforms.py` selection command, and
+canonical `docker run` flag set, discovery of the execution platforms from the
+installed platform skills (tao-run-on-docker / -slurm / -kubernetes / -brev, plus
+any external one; on a runtime that surfaces only the core router skills, read
+skills/platform/tao-run-on-*/SKILL.md frontmatter), and
 the workflow-specific flags (`--entrypoint /bin/bash -lc`, `PYTORCH_CUDA_ALLOC_CONF`,
 `--name hft_train`) are in `references/workflow-intake-preflight.md`.
 
@@ -203,9 +243,8 @@ hardware-dependent compat rules.
    then re-run with `--install --yes`.
 2. Free-disk soft-warn — override via `MIN_DISK_GB` (default 100 GB); recommend
    ≥ 100 GB for NGC base (~20 GB) + HF cache + checkpoints + data.
-3. Conditional credential presence (from the session environment, values never
-   read) — `HF_TOKEN` only when gated or `push_to_hub` is on; `WANDB_*` only when
-   WandB is on.
+3. Conditional credential presence (values never read) — `HF_TOKEN` only when
+   gated or `push_to_hub` is on; `WANDB_*` only when WandB is on.
 
 **Do not proceed to Step 4 on a hard-fail** — Step 4's `docker build` pulls a
 20+ GB NGC base, and a missing `nvidia-container-toolkit` only surfaces later as
@@ -220,7 +259,7 @@ PyTorch NGC container section, pick the highest-versioned image where
 `aN`/`bN`/`rcN` PyTorch tag — NGC validates the full image; pick the newest
 CUDA-aligned one and let `compat-workarounds.md` handle per-version issues. If the
 matrix is unreachable, use the fallbacks in `references/hardware-container.md`;
-default `nvcr.io/nvidia/pytorch:24.09-py3` (driver ≥ 545; SDPA+GQA bug — if
+default `nvcr.io/nvidia/pytorch:24.09-py3` <!-- unpinned: documented fallback --> (driver ≥ 545; SDPA+GQA bug — if
 `num_key_value_heads < num_attention_heads`, set `attn_implementation: "eager"`).
 Record `ngc_image` in `config.yaml`.
 
@@ -363,10 +402,3 @@ fires twice across runs, lift it into `compat-workarounds.md` with a `detect` ru
 - Always include direct Hub and wandb URLs when referencing artifacts.
 - On error: state what went wrong, why, what you changed — no menus.
 - Never present "Option A/B/C" for a request with a clear answer. Act.
-
-## Example pipelines
-
-- [tao-rerun-convnext-cifar10](references/tao-rerun-convnext-cifar10.md)
-- [tao-rerun-detr-cppe5](references/tao-rerun-detr-cppe5.md)
-- [tao-rerun-segformer-foodseg103](references/tao-rerun-segformer-foodseg103.md)
-- [tao-rerun-smolvlm-vqav2](references/tao-rerun-smolvlm-vqav2.md)

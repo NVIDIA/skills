@@ -69,15 +69,25 @@ For **runtime feature questions** (word boosting, force_eou, ITN, diarization, e
 **Function ID lookup (JSON, scriptable, no hardcoding):**
 
 ```bash
+NVCF_FUNCTIONS_JSON=$(mktemp)
+trap 'rm -f "$NVCF_FUNCTIONS_JSON"' EXIT
+
 curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
-  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized" \
-  | python3 -c "
-import sys, json, re
+  --output "$NVCF_FUNCTIONS_JSON" \
+  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized"
+
+python3 - "$NVCF_FUNCTIONS_JSON" <<'PY'
+import json
+import re
+import sys
+
 pat = re.compile(r'parakeet|canary|whisper|nemotron-asr', re.I)
-for f in json.load(sys.stdin).get('functions', []):
+with open(sys.argv[1], encoding="utf-8") as response:
+    functions = json.load(response).get('functions', [])
+for f in functions:
     if f.get('status') == 'ACTIVE' and pat.search(f.get('name','')):
         print(f['id'], f['name'])
-"
+PY
 ```
 
 Pick the `id` of the function whose `name` matches your model.
@@ -124,7 +134,8 @@ export NIM_TAGS_SELECTOR="<selector-from-support-matrix>"
 
 ```bash
 export LOCAL_NIM_CACHE=~/.cache/nim
-mkdir -p $LOCAL_NIM_CACHE && sudo chown 1000:1000 $LOCAL_NIM_CACHE
+mkdir -p $LOCAL_NIM_CACHE
+sudo chown 1000:1000 $LOCAL_NIM_CACHE
 
 docker run -it --rm --name=$CONTAINER_ID \
   --runtime=nvidia \
@@ -148,7 +159,8 @@ Omit `-v $LOCAL_NIM_CACHE:/opt/nim/.cache` to skip caching (re-downloads model o
 
 ```bash
 export NIM_EXPORT_PATH=~/nim_export
-mkdir -p $NIM_EXPORT_PATH && sudo chown 1000:1000 $NIM_EXPORT_PATH
+mkdir -p $NIM_EXPORT_PATH
+sudo chown 1000:1000 $NIM_EXPORT_PATH
 export NIM_TAGS_SELECTOR="name=<model-name>,mode=<str|offline>,model_type=rmir"
 
 ```
@@ -218,14 +230,26 @@ This recipe uses only the `nvidia-riva-client` pip package — no `python-client
 **Cloud — discover function-id, then transcribe (streaming; works for Parakeet and most cloud ASR):**
 
 ```bash
-FID=$(curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
-  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized" \
-  | python3 -c "
-import sys, json
-for f in json.load(sys.stdin).get('functions', []):
+NVCF_FUNCTIONS_JSON=$(mktemp)
+trap 'rm -f "$NVCF_FUNCTIONS_JSON"' EXIT
+
+curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
+  --output "$NVCF_FUNCTIONS_JSON" \
+  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized"
+
+FID=$(python3 - "$NVCF_FUNCTIONS_JSON" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as response:
+    functions = json.load(response).get('functions', [])
+for f in functions:
     if f.get('status') == 'ACTIVE' and f.get('name','').removeprefix('ai-') == 'parakeet-ctc-1_1b-asr':
         print(f['id']); break
-")
+PY
+)
+
+test -n "$FID" || { echo "No matching active NVCF function found" >&2; exit 1; }
 
 AUDIO=audio.wav SERVER=grpc.nvcf.nvidia.com:443 FID=$FID python3 - <<'PY'
 import os, sys, wave, riva.client

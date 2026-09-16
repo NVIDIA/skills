@@ -1,0 +1,8 @@
+name: Physical AI Curation and Retrieval
+repo: NVIDIA/paidf-curation-and-retrieval
+description: Author, validate, and run Physical AI Data Factory curation and retrieval pipelines.
+skills:
+  - path: skills/paidf-curation-and-retrieval
+    catalog_dir: paidf-curation-and-retrieval
+links:
+  discussions: false

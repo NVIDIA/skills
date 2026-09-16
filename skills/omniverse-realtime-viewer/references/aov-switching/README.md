@@ -14,6 +14,12 @@ For ovrtx AOV, RenderVar tensor, mapping, or release-specific behavior not
 covered here, read `references/dependencies` for acquisition guidance and
 supplemental dependency documentation.
 
+Before copying a RenderVar name, frame-output field, map call, DLPack layout, or
+conversion assumption from this reference, inspect the current upstream ovrtx
+`AGENTS.md`, relevant `skills/`, matching examples, and public API documentation
+or headers. Treat the detailed values below as validation targets and expose only
+outputs verified with the installed runtime.
+
 ## Architecture
 
 ```text
@@ -116,7 +122,9 @@ def RenderVar "InstanceSeg"
 
 The keys in `frame_output.render_vars` are source names such as `NormalSD`, not necessarily the `RenderVar` prim names such as `Normal`.
 
-`InstanceSegmentationSD` is a display/debug AOV in this skill. Do not use it as the required picking path for 0.3 viewers; use ovrtx pick queries and resolve pick-hit path IDs through the renderer path dictionary.
+`InstanceSegmentationSD` is a display/debug AOV in this skill. Do not use it as
+the required picking path for current viewers; use native OVRTX pick queries and
+resolve pick-hit path IDs through the renderer path dictionary.
 
 ## Message Protocol
 
@@ -354,6 +362,6 @@ The lighting decomposition AOVs may need more PT convergence samples or a differ
 - `HdrColor` is half-float data exposed as `uint16`; the current conversion is for display only.
 - `NormalSD` is float bit-pattern data exposed as `uint32`; exact decoding needs a real bit-cast path.
 - ovstream expects BGRA8. Every displayable AOV must end in a `uint8 [H,W,4]` buffer.
-- Scalar render outputs are channel-last `[H,W,1]`. Keep old `[H,W]` kernel paths only as compatibility fallbacks if supporting pre-0.3 builds.
+- Scalar render outputs are channel-last `[H,W,1]`. Keep old `[H,W]` kernel paths only as compatibility fallbacks for legacy builds with older scalar tensor shapes.
 
 See also: `ovrtx-rendering`, `streaming-server`, `streaming-messages`, `render-settings`, `object-selection`.

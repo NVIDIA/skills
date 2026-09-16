@@ -1,0 +1,65 @@
+{
+  "skill_name": "openfold2-nim",
+  "evals": [
+    {
+      "id": "1",
+      "prompt": "I want to predict a monomer protein structure with OpenFold2 using the hosted NVIDIA API. The sequence is MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPT. Use selected model 1, skip relaxation for a quick smoke test, and save any returned structure artifacts. Create and execute the request now using NGC_API_KEY from the environment, save the requested artifacts, and report values from the actual response; do not stop after writing the script.",
+      "expected_output": "A successfully executed hosted OpenFold2 request using Bearer auth from NGC_API_KEY, with sequence/input_id/selected_models/relax_prediction and a minimal A3M alignment, plus the actual response summary, full JSON response, and any returned PDB or mmCIF structure artifacts.",
+      "files": [],
+      "assertions": [
+        "[hosted-request-executed] Executes the hosted request instead of only writing code: Trajectory shows successful execution of the hosted request, and the final response reports actual response-derived values and saved artifact paths",
+        "[hosted-endpoint-url] Uses the correct hosted OpenFold2 endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/openfold/openfold2/predict-structure-from-msa-and-template'",
+        "[bearer-auth-header] Sets Authorization header with Bearer token from NGC_API_KEY: Script contains 'Authorization' and 'Bearer' and 'NGC_API_KEY'",
+        "[required-sequence-field] Payload contains the required sequence field with the requested sequence: Script contains 'sequence' and 'MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPT'",
+        "[selected-models-and-relax] Payload uses selected_models and relax_prediction for smoke-test control: Script contains 'selected_models' and '1' and 'relax_prediction' and 'False'",
+        "[a3m-alignment-shape] Provides an A3M alignment under alignments with alignment and format fields: Script contains 'alignments' and 'a3m' and 'alignment' and 'format'",
+        "[saves-json-and-structure] Saves the full JSON response and structure-like PDB/mmCIF output: Script writes JSON response and saves structure text containing 'ATOM' or 'data_' to '.pdb' or '.cif' files"
+      ]
+    }
+  ],
+  "deferred_evals": [
+    {
+      "id": "2",
+      "prompt": "Use OpenFold2 hosted API for a monomer with my own MSA and an explicit template. Sequence: ACDEFGHIKLMNPQRSTVWY. I have A3M text and an mmCIF template string in Python variables. Please show the correct payload shape, note any template-format gotchas, and mention that MSA Search is the handoff if I need to generate a deeper A3M alignment.",
+      "expected_output": "A Python payload showing alignments as database -> a3m -> alignment/format, explicit_templates with mmCIF content, use_templates true, and relax_prediction/selected_models fields. The answer should explain that current OpenFold2 docs use explicit mmCIF templates and mention MSA Search as the handoff for deeper A3M generation.",
+      "files": [],
+      "assertions": [
+        "[hosted-endpoint-url] Uses the correct hosted OpenFold2 endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/openfold/openfold2/predict-structure-from-msa-and-template'",
+        "[alignment-database-shape] Uses nested alignments database -> a3m -> alignment/format: Script contains 'alignments' and 'a3m' and 'alignment' and 'format'",
+        "[explicit-template-field] Uses explicit_templates for mmCIF template input: Script contains 'explicit_templates' and 'mmcif' or 'cif'",
+        "[use-templates-field] Enables templates explicitly: Script contains 'use_templates' and 'True'",
+        "[no-hhr-template-example] Documents explicit mmCIF template format for current OpenFold2: Output contains 'mmCIF' or 'explicit_templates'",
+        "[msa-search-handoff] Mentions MSA Search as the handoff source for deeper A3M alignments: Output contains 'MSA Search' or 'msa-search'"
+      ]
+    },
+    {
+      "todo": "Waiting on local Docker setup in Harbor before enabling this eval.",
+      "id": "3",
+      "prompt": "Help me launch the OpenFold2 NIM locally with Docker and then run a no-auth localhost inference. My NGC_API_KEY is set, or NVIDIA_API_KEY may be set instead, and I want to use LOCAL_NIM_CACHE.",
+      "expected_output": "Docker setup commands that source optional repo-root .env, support NVIDIA_API_KEY fallback to NGC_API_KEY, require LOCAL_NIM_CACHE, docker login to nvcr.io, run nvcr.io/nim/openfold/openfold2:latest with --gpus device=0 and cache mount /opt/nim/.cache, poll /v1/health/ready, and call localhost:8000/biology/openfold/openfold2/predict-structure-from-msa-and-template with no Authorization.",
+      "files": [],
+      "assertions": [
+        "[docker-login-nvcr] Includes docker login command for nvcr.io with oauthtoken: Output contains 'docker login nvcr.io' and 'oauthtoken'",
+        "[docker-image-tag] References the correct OpenFold2 container image: Output contains 'nvcr.io/nim/openfold/openfold2:latest'",
+        "[env-contract-and-cache] Local setup uses repo env contract and LOCAL_NIM_CACHE: Output sources repo-root .env only if present, supports NVIDIA_API_KEY fallback to NGC_API_KEY, requires LOCAL_NIM_CACHE, and mounts LOCAL_NIM_CACHE to /opt/nim/.cache",
+        "[single-gpu-device] Uses a single selected GPU for local OpenFold2: Output contains '--gpus' and 'device=0' or 'NIM_TEST_GPU'",
+        "[health-check-loop] Polls local readiness before inference: Output contains 'localhost:8000/v1/health/ready'",
+        "[local-no-auth-endpoint] Local inference targets localhost without /v1 and with no Authorization: Script contains 'localhost:8000/biology/openfold/openfold2/predict-structure-from-msa-and-template' and does not send 'Authorization'"
+      ]
+    },
+    {
+      "id": "4",
+      "prompt": "I am comparing OpenFold2 parameter choices for a 600-residue monomer. Show a hosted API Python script that uses all available model parameter sets, turns relaxation on for a production run, saves the JSON plus any returned PDB or CIF structures, documents the hosted/local sequence-length caveat, and explains when to use templates versus MSA-only input.",
+      "expected_output": "A hosted OpenFold2 Python script using selected_models [1,2,3,4,5], relax_prediction true, optional alignments and explicit_templates, full JSON saving plus PDB/CIF structure extraction, guidance that OpenFold2 is monomer-only, hosted docs list 1-1000 residues while local docs support up to 2048 on supported hardware, and complexes should use OpenFold3 or Boltz2.",
+      "files": [],
+      "assertions": [
+        "[all-selected-models] Uses all five OpenFold2/AlphaFold2 parameter sets: Script contains 'selected_models' and '1' and '2' and '3' and '4' and '5'",
+        "[relax-production] Enables relaxation for production-quality output: Script contains 'relax_prediction' and 'True' or 'true'",
+        "[template-vs-msa-guidance] Explains using templates only when biologically relevant and otherwise using MSA-only input: Output contains 'templates' and 'MSA' and 'explicit_templates'",
+        "[monomer-only-caveat] States that OpenFold2 NIM is monomer-only: Output contains 'monomer'",
+        "[sequence-length-caveat] Documents hosted/local sequence length caveat: Output contains '1000' and '2048'",
+        "[saves-ranked-results] Saves every returned structure and keeps confidence ordering auditable: Script contains 'pdb' and 'cif' and 'json'"
+      ]
+    }
+  ]
+}

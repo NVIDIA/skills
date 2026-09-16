@@ -2,7 +2,7 @@
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: Digital Health
 repo: NVIDIA/digital-health-examples
-description: Agent skills for the clinical ASR evaluation flywheel — term curation, synthetic clinical-speech benchmark generation, KER (Keyword Error Rate) scoring, and fine-tune guidance.
+description: Agent skills for (1) the clinical ASR evaluation flywheel — term curation, synthetic clinical-speech benchmark generation, KER (Keyword Error Rate) scoring, and fine-tune guidance; (2) the ambient healthcare agent creation with Nemotron Voice Agent.
 skills:
   - path: skills/digital-health-clinical-asr-setup/
     catalog_dir: digital-health-clinical-asr-setup
@@ -12,5 +12,7 @@ skills:
     catalog_dir: digital-health-clinical-asr-eval
   - path: skills/digital-health-clinical-asr-finetune/
     catalog_dir: digital-health-clinical-asr-finetune
+  - path: skills/ambient-healthcare-agent-with-nemotron-voice-agent
+    catalog_dir: ambient-healthcare-agent-with-nemotron-voice-agent
 links:
   discussions: false

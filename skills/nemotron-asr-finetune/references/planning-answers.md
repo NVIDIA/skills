@@ -10,7 +10,8 @@ Anchor to the customization ladder ([`path-selection.md`](path-selection.md)):
 
 - **Word boosting / custom vocab / n-gram LM:** little or no transcribed audio; an LM needs domain **text**, not audio.
 - **Fine-tune:** NIM guide recommends **100+ hours**; **~10 hours** is the floor and only works when **mixed with a
-  larger dataset** to avoid catastrophic forgetting.
+  larger dataset** to avoid catastrophic forgetting. **Below ~10 hours, do not recommend fine-tuning at all** — both
+  catastrophic forgetting and overfitting risk are severe at that volume; recommend **word boosting** instead.
 - **New language:** cross-language transfer from ~16 h; from scratch needs thousands of hours.
 
 Always ask what fraction is **real vs synthetic** and whether the real target-domain audio is representative.

@@ -10,8 +10,8 @@ spot-check policy, and large-stage thresholds live in
 
 ## Prerequisites
 
-- `setup-usd-performance-tuning` has selected a Kit or standalone validation
-  runtime.
+- `setup-usd-performance-tuning` has resolved the standalone validation runtime
+  and written `setup-preflight.json`.
 - Minimum USD openability has passed, or the runner explicitly asked this
   reference to perform only that runtime check.
 - The Phase 2c scope note names selected rules, target paths or masks,
@@ -34,15 +34,18 @@ spot-check policy, and large-stage thresholds live in
 
 | Runtime | Use | Notes |
 |---|---|---|
-| Kit | Setup selected Kit, USD Composer, or a Kit venv; remote `omniverse://` validation; or same-runtime Usd Optimize validation. | Import `omni.asset_validator.core` inside the selected Kit process. Do not require `uv` or `omni_asset_validate` on `PATH`. |
-| Standalone | Setup selected a project-managed `omniverse-asset-validator` environment. | Use the selected Python/CLI. Do not use the Usd Optimize package's bundled `validator-venv` as the preferred runtime. |
+| Kit | Setup selected Kit, USD Composer, or a Kit venv; remote `omniverse://` validation; or same-runtime Usd Optimize validation. | Import `omni.asset_validator.core` inside the selected Kit process. Do not require `uv` or the standalone `nvidia_usd_validate` console script on `PATH`. |
+| Standalone | Setup selected a project-managed `usd-validation-nvidia` environment. | Use the selected Python/CLI. Do not use the Usd Optimize package's bundled `validator-venv` as the preferred runtime. |
 
 Report `blocked_missing_dependency` only when setup cannot provide either
 runtime and the user did not approve installation or selection.
 
 ## Runtime detection (not rule selection)
 
-`omni_asset_validate --help` may be used to confirm a runtime exists. Do **not**
+`nvidia_usd_validate --help` may be used to confirm a standalone runtime exists.
+That console script comes from the `usd-validation-nvidia` distribution; read the
+version with `importlib.metadata.version("usd-validation-nvidia")`, since the
+distribution name and the script name differ. Do **not**
 use the CLI to select which validators run: CLI `--rule` flags take bare names,
 which cannot disambiguate the Usd Optimize and usd-validation-nvidia rules that
 share a class name. Concept selection and execution always go through the

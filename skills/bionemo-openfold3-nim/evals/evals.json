@@ -1,0 +1,63 @@
+{
+  "skill_name": "openfold3-nim",
+  "evals": [
+    {
+      "id": "1",
+      "prompt": "I want to predict the structure of a short peptide using OpenFold3. The sequence is MKTVRQERLKSIVRGPKRAKELMSI. Use the hosted NVIDIA API with my NGC_API_KEY already set in environment.",
+      "expected_output": "A Python script that calls the hosted OpenFold3 endpoint with Bearer auth, constructs an inputs payload with the peptide sequence as a protein molecule type including a minimal MSA, saves the returned structure to a PDB or CIF file, and prints the confidence scores.",
+      "files": [],
+      "assertions": [
+        "[hosted-endpoint-url] Uses the correct hosted OpenFold3 endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/openfold/openfold3/predict'",
+        "[bearer-auth-header] Sets Authorization header with Bearer token from NGC_API_KEY: Script contains 'Authorization' and 'Bearer' and 'NGC_API_KEY'",
+        "[inputs-array-structure] Payload uses 'inputs' array containing molecule objects: Script payload contains 'inputs' key with an array/list containing 'molecules'",
+        "[molecule-type-protein] Molecule object sets type to 'protein': Script contains 'type' and 'protein' in the molecule specification",
+        "[msa-structure] MSA field is provided with nested alignment structure: Script contains 'msa' with an alignment string starting with '>query'",
+        "[saves-structure-output] Saves the returned structure to a file and prints confidence scores: Script writes structure content to a file and references 'confidence_score' or 'structures_with_scores' from the response"
+      ]
+    },
+    {
+      "id": "2",
+      "prompt": "I want to predict a protein-ligand complex structure using OpenFold3. My protein sequence is MTEYKLVVVGACGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVID and I want to co-fold it with ATP (CCD code: ATP). Use the hosted API.",
+      "expected_output": "A Python script with two molecules in the payload — a protein with sequence and MSA, and a ligand using ccd_codes set to ATP — calling the hosted endpoint, saving structure output, and printing pLDDT and confidence scores.",
+      "files": [],
+      "assertions": [
+        "[hosted-endpoint-url] Uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/openfold/openfold3/predict'",
+        "[two-molecules] Payload includes both a protein molecule and a ligand molecule: Script payload contains both 'type' set to 'protein' and 'type' set to 'ligand' in two separate molecule objects",
+        "[ccd-codes-field] Ligand uses ccd_codes field set to ATP: Script contains 'ccd_codes' and 'ATP'",
+        "[protein-sequence-present] The provided protein sequence appears in the payload: Script contains 'MTEYKLVVVGACGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVID'",
+        "[confidence-scores-reported] Prints or displays confidence score and pLDDT from response: Script references 'confidence_score' and 'complex_plddt_score' or 'plddt' from the response",
+        "[saves-output-file] Saves the predicted structure to a PDB or CIF file: Script writes structure content to a file with .pdb or .cif extension"
+      ]
+    },
+    {
+      "id": "3",
+      "prompt": "Help me set up the OpenFold3 NIM locally with Docker. I have an A100 80GB GPU and NGC_API_KEY is set. After setup, predict the structure of this protein: ACDEFGHIKLMNPQRSTVWY.",
+      "expected_output": "Docker setup commands using supplied environment variables without loading credential files, requiring NGC_API_KEY or NVIDIA_API_KEY fallback plus LOCAL_NIM_CACHE, authenticating to nvcr.io using --password-stdin, and starting the container only after successful login. The container uses --gpus 'device=0', --shm-size=16g, the correct cache mount path, and port 8000 bound to 127.0.0.1, followed by a health check loop and no-auth prediction script targeting localhost:8000.",
+      "files": [],
+      "assertions": [
+        "[docker-login-nvcr] Authenticates image pulls before container startup: Commands use docker login nvcr.io with the literal username '$oauthtoken' and --password-stdin, passing NGC_API_KEY via stdin without exposing its value in logs or command-line arguments",
+        "[login-failure-stops-startup] Prevents startup after failed registry authentication: Commands use an explicit success condition or shell error handling so a failed login prevents container startup",
+        "[loopback-port-binding] Keeps the unauthenticated local API on loopback: The startup command publishes port 8000 with '-p 127.0.0.1:8000:8000' or equivalent --publish syntax",
+        "[docker-image-tag] References the correct OpenFold3 container image: Output contains 'nvcr.io/nim/openfold/openfold3'",
+        "[single-gpu-flag] Uses single GPU device specification: Output contains '--gpus' and 'device=0'",
+        "[shm-size-flag] Includes --shm-size flag (required for this NIM): Output contains '--shm-size' and '16'",
+        "[env-contract-and-cache] Local setup uses supplied environment variables and LOCAL_NIM_CACHE: Commands use credentials from the environment without loading credential files, support NVIDIA_API_KEY fallback to NGC_API_KEY, export NGC_API_KEY for the container, require LOCAL_NIM_CACHE, and mount LOCAL_NIM_CACHE to /opt/nim/.cache",
+        "[local-endpoint-url] Prediction script targets localhost:8000 without /v1/ prefix: Script contains 'localhost:8000/biology/openfold/openfold3/predict'"
+      ]
+    },
+    {
+      "id": "4",
+      "prompt": "I have a protein-DNA complex I want to predict with OpenFold3 via the hosted API. Protein chain A: MTEYKLVVVGACGVGKSALTIQLIQNHFVDE. DNA chain B: ATCGATCGATCG (sense strand), DNA chain C: CGATCGATCGAT (antisense strand). I want 2 diffusion samples and output in CIF format.",
+      "expected_output": "A Python script with three molecules in the payload (protein + two DNA chains), diffusion_samples set to 2, output_format set to 'cif', using the hosted endpoint. Saves and names the returned CIF files and prints per-sample confidence scores.",
+      "files": [],
+      "assertions": [
+        "[hosted-endpoint-url] Uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/openfold/openfold3/predict'",
+        "[protein-and-dna-molecules] Payload contains one protein molecule and two DNA molecules: Script contains 'type' set to 'protein' and 'type' set to 'dna' in the molecules list",
+        "[dna-sequences-present] Both DNA sequences appear in the payload: Script contains 'ATCGATCGATCG' and 'CGATCGATCGAT'",
+        "[diffusion-samples] diffusion_samples is set to 2: Script contains 'diffusion_samples' and '2'",
+        "[cif-output-format] output_format is set to 'cif': Script contains 'output_format' and 'cif'",
+        "[multiple-structures-saved] Script iterates over structures_with_scores to save each sample: Script iterates over the response structures and saves each to a separate .cif file"
+      ]
+    }
+  ]
+}

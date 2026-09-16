@@ -1,0 +1,18 @@
+results_dir: /results/evaluate
+model:
+  type: internvideo2-clip-l14
+  image_size: 224
+  canonicalize_text: false
+dataset:
+  val:
+    gt_queries: /data/domain_test.json
+    metadata: /data/val.json
+    video_root: null
+    path_prefix_mapping: {}
+    batch_size: 8
+    num_workers: 8
+evaluate:
+  trt_engine: /models/video_clip.engine
+  batch_size: 8
+  num_gpus: 1
+  gpu_ids: [0]

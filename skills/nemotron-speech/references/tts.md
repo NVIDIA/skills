@@ -20,7 +20,8 @@ This skill is **orientation, not catalog**. When a question depends on data that
 |---|---|
 | Current models, container IDs, `NIM_TAGS_SELECTOR` profiles, available voices, supported languages, VRAM minimums | https://docs.nvidia.com/nim/speech/latest/reference/support-matrix/tts.html |
 | Function IDs for cloud (build.nvidia.com) inference | `https://api.nvcf.nvidia.com/v2/nvcf/functions` (auth with `NVIDIA_API_KEY`; filter by `name` and `status=="ACTIVE"`). For human browsing only: `https://build.nvidia.com/<org>/<model>/api` (JS-rendered, not suitable for non-browser fetch tools). |
-| **Runtime feature support per model** — streaming synthesis, SSML, custom dictionaries, sample-rate control, emotional styles | https://docs.nvidia.com/nim/speech/latest/tts/customization/customization.html |
+| **Request-time feature support per model** — SSML, custom dictionaries, `custom_configuration` keys | https://docs.nvidia.com/nim/speech/latest/tts/customization.html |
+| **Voices and emotional styles** | https://docs.nvidia.com/nim/speech/latest/tts/voices.html |
 | **gRPC proto contract** — `SynthesizeSpeechRequest`, `SynthesizeSpeechResponse`, voice metadata fields | https://docs.nvidia.com/nim/speech/latest/reference/api-references/tts/protos.html |
 | **Realtime WebSocket API** — OpenAI-realtime-compatible TTS sessions | https://docs.nvidia.com/nim/speech/latest/reference/api-references/tts/realtime-tts.html |
 | GPU / VRAM / driver minimums, OS prerequisites | https://docs.nvidia.com/nim/speech/latest/get-started/prerequisites.html |
@@ -61,15 +62,25 @@ For **runtime feature questions** (voice list, SSML, streaming format): fetch or
 **Function ID lookup (JSON, scriptable, no hardcoding):**
 
 ```bash
+NVCF_FUNCTIONS_JSON=$(mktemp)
+trap 'rm -f "$NVCF_FUNCTIONS_JSON"' EXIT
+
 curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
-  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized" \
-  | python3 -c "
-import sys, json, re
+  --output "$NVCF_FUNCTIONS_JSON" \
+  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized"
+
+python3 - "$NVCF_FUNCTIONS_JSON" <<'PY'
+import json
+import re
+import sys
+
 pat = re.compile(r'magpie|tts', re.I)
-for f in json.load(sys.stdin).get('functions', []):
+with open(sys.argv[1], encoding="utf-8") as response:
+    functions = json.load(response).get('functions', [])
+for f in functions:
     if f.get('status') == 'ACTIVE' and pat.search(f.get('name','')):
         print(f['id'], f['name'])
-"
+PY
 ```
 
 Pick the `id` of the function whose `name` matches your model.
@@ -109,7 +120,8 @@ Fetch the current `CONTAINER_ID` and `NIM_TAGS_SELECTOR` for your chosen model f
 export CONTAINER_ID=<container-id-from-support-matrix>
 export NIM_TAGS_SELECTOR="<selector-from-support-matrix>"
 export LOCAL_NIM_CACHE=~/.cache/nim
-mkdir -p $LOCAL_NIM_CACHE && sudo chown 1000:1000 $LOCAL_NIM_CACHE
+mkdir -p $LOCAL_NIM_CACHE
+sudo chown 1000:1000 $LOCAL_NIM_CACHE
 
 docker run -it --rm --name=$CONTAINER_ID \
   --runtime=nvidia \
@@ -190,14 +202,26 @@ This recipe uses only the `nvidia-riva-client` pip package — no `python-client
 **Cloud — discover function-id, then synthesize:**
 
 ```bash
-FID=$(curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
-  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized" \
-  | python3 -c "
-import sys, json
-for f in json.load(sys.stdin).get('functions', []):
+NVCF_FUNCTIONS_JSON=$(mktemp)
+trap 'rm -f "$NVCF_FUNCTIONS_JSON"' EXIT
+
+curl -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
+  --output "$NVCF_FUNCTIONS_JSON" \
+  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized"
+
+FID=$(python3 - "$NVCF_FUNCTIONS_JSON" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as response:
+    functions = json.load(response).get('functions', [])
+for f in functions:
     if f.get('status') == 'ACTIVE' and f.get('name','').removeprefix('ai-') == 'magpie-tts-multilingual':
         print(f['id']); break
-")
+PY
+)
+
+test -n "$FID" || { echo "No matching active NVCF function found" >&2; exit 1; }
 
 # Replace VOICE with a value returned by --list-voices.
 TEXT="Hello from NVIDIA TTS." OUT=out.wav SERVER=grpc.nvcf.nvidia.com:443 \

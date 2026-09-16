@@ -14,7 +14,7 @@
 # limitations under the License.
 
 id: medagent.nv_segment_ct_finetune
-version: 0.4.1
+version: 0.6.0
 upstream_refs:
   - kind: huggingface_repo
     name: nvidia/NV-Segment-CT
@@ -23,19 +23,22 @@ upstream_refs:
   - kind: github_repo
     name: NVIDIA-Medtech/NV-Segment-CTMR
     repo_url: https://github.com/NVIDIA-Medtech/NV-Segment-CTMR
-    git_commit: f9f5f51b589e5dc9c23c453cf5138398e4084056
-    notes: Recommended compatibility source for missing staged training configs; an explicit local checkout is accepted.
+    git_commit: cb921f5c58837c0f42a713855d68b32af88e1cdd
+    notes: >
+      Compatibility source for the standard training configs and the official
+      fixed-channel softmax training implementation.
 license: Apache-2.0
 intended_use:
   summary: >
     Auto-configuring wrapper around NVIDIA-Medtech NV-Segment-CT's
-    continual-learning finetune entry. For the MSD Task06 sanity recipe it
-    follows the DFW single-GPU setting: one GPU, fold-0 validation, label
-    mapping `[[1, 23]]`, automatic class-prompt segmentation, patch
-    `[128,128,128]`, 5 epochs, and original-spacing evaluate.json scoring
-    before and after fine-tuning. Anatomy name -> label_mappings is resolved
-    against `bundle/label_dict.json` so the caller never hand-codes the
-    vista3d global index.
+    continual-learning finetune entries, with optional MONAI-native MLflow
+    tracking and the optional official fixed-channel softmax workflow. For
+    the MSD Task06 sanity recipe it follows the DFW single-GPU setting: one
+    GPU, fold-0 validation, label mapping `[[1, 23]]`, automatic class-prompt
+    segmentation, patch `[128,128,128]`, 5 epochs, and original-spacing
+    evaluate.json scoring before and after fine-tuning. Anatomy name ->
+    label_mappings is resolved against `bundle/label_dict.json` so the caller
+    never hand-codes the vista3d global index.
   scope: development
   not_for:
     - clinical deployment
@@ -95,19 +98,40 @@ inputs:
       automatically by --sanity; optional for caller-provided datasets.
     optional: true
     default: false
+  - name: softmax
+    type: bool
+    description: >
+      Use the upstream fixed-channel softmax workflow for mutually exclusive
+      semantic-segmentation labels. The mapping order defines output channels;
+      interactive point prompts and dynamic label prompts are unavailable.
+    optional: true
+    default: false
   - name: skip_formal_eval
     type: bool
     description: Skip the pre/post original-spacing evaluate.json passes.
     optional: true
     default: false
+  - name: mlflow_tracking_uri
+    type: string
+    description: Optional MLflow tracking URI; defaults to a local store under the output directory.
+    optional: true
+  - name: mlflow_experiment_name
+    type: string
+    description: MLflow experiment name; setting it enables MONAI-native live tracking.
+    optional: true
+  - name: mlflow_run_name
+    type: string
+    description: Optional MLflow run name.
+    optional: true
 outputs:
   - name: finetuned_ckpt
     type: file_path
     formats: [pytorch]
     description: >
-      Best-val-dice checkpoint produced by the bundle's `validate#handlers`
-      (model_finetune.pt). With val_at_start=True this can be a reserialized
-      copy of the pretrained weights; inspect
+      Best-val-dice checkpoint produced by the bundle's `validate#handlers`:
+      model_finetune.pt for the standard workflow or model_softmax.pt for
+      --softmax. With val_at_start=True the standard checkpoint can be a
+      reserialized copy of the pretrained weights; inspect
       output.finetuned_ckpt_matches_pretrained_weights.
     optional_when: smoke == true
   - name: result_json
@@ -133,7 +157,7 @@ runtime:
     scipy: ">=1.10"
     huggingface_hub: "*"
     safetensors: ">=0.4"
-    mlflow: ">=2.10"
+    mlflow: ">=2.10,<4"
     typer: ">=0.9"
   side_effects:
     pip_packages:
@@ -141,7 +165,7 @@ runtime:
       - torch>=2.0
       - "transformers>=4.40,<5"
       - huggingface_hub
-      - mlflow>=2.10
+      - "mlflow>=2.10,<4"
       - nibabel>=4.0
       - numpy>=1.23
       - safetensors>=0.4
@@ -153,11 +177,14 @@ runtime:
       - {path: "skills/nv-segment-ct-finetune/bundle/configs/train_continual_task06_lung.json", approx_mb_max: 1}
       - {path: "skills/nv-segment-ct-finetune/bundle/configs/dfw_no_logging.json", approx_mb_max: 1}
       - {path: "<caller-provided --output-dir>", approx_mb_max: 20000}
+      - {path: "<caller-provided --output-dir>/mlruns", approx_mb_max: 100, optional: true}
     home_writes:
       - {path: "~/.cache/huggingface/", approx_mb_max: 1500}
+      - {path: "~/.cache/nvidia-skills/venvs/nv-segment-ct-finetune-monai14/", approx_mb_max: 500}
     network_endpoints:
       - https://huggingface.co
       - https://raw.githubusercontent.com
+      - "https://<caller-provided-mlflow-or-databricks-workspace>"
     requires_docker: false
     requires_gpu: cuda
     gpu_fallback: cpu
@@ -176,6 +203,18 @@ runtime:
     env_optional:
       - NPROC_PER_NODE   # overrides auto-detected GPU count (>=2 selects multi-GPU)
       - CUDA_VISIBLE_DEVICES
+      - NV_SEGMENT_CT_ROOT
+      - NV_SEGMENT_CTMR_ROOT
+      - NVSEG_FINETUNE_AUTO_VENV
+      - DATABRICKS_CONFIG_PROFILE
+      - DATABRICKS_HOST
+      - DATABRICKS_TOKEN
+      - MLFLOW_TRACKING_CLIENT_CERT_PATH
+      - MLFLOW_TRACKING_INSECURE_TLS
+      - MLFLOW_TRACKING_PASSWORD
+      - MLFLOW_TRACKING_SERVER_CERT_PATH
+      - MLFLOW_TRACKING_TOKEN
+      - MLFLOW_TRACKING_USERNAME
   external_assets:
     - kind: huggingface_repo
       repo_id: nvidia/NV-Segment-CT
@@ -190,6 +229,17 @@ runtime:
         - configs/metadata.json
         - label_dict.json
         - vista3d_pretrained_model/model.safetensors
+    - kind: upstream_repo
+      repo_url: https://github.com/NVIDIA-Medtech/NV-Segment-CTMR
+      install_path: ~/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-cb921f5/NV-Segment-CT
+      install_command: >
+        git clone https://github.com/NVIDIA-Medtech/NV-Segment-CTMR.git $HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-cb921f5 &&
+        git -C $HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-cb921f5 checkout --detach cb921f5c58837c0f42a713855d68b32af88e1cdd &&
+        export NV_SEGMENT_CT_ROOT=$HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-cb921f5/NV-Segment-CT
+      contains:
+        - configs/train_continual_softmax.json
+        - configs/inference_softmax.json
+        - scripts/vista3d_softmax.py
 cost:
   # Per-invocation agent-overhead token cost measured by NeMo Agent Toolkit
   # (NAT) profiler - the cost an LLM-driven agent pays to call this skill
@@ -239,6 +289,13 @@ limitations:
     the host to be able to launch `torchrun` with
     the chosen `--nproc_per_node`. The wrapper does not allocate or
     fence GPUs.
+  - The fixed-channel softmax workflow is additive and opt-in. It disables
+    point prompts and dynamic label prompts, requires mapping order to remain
+    stable between training and inference, cannot be combined with `--auto-seg`
+    or `--sanity`, and does not use the standard Task06 pre/post evaluation
+    baseline.
+  - Optional MLflow support uses MONAI's built-in rank-zero tracking handlers.
+    Tracking failures can fail the upstream MONAI run.
   - Smoke mode is an executable oracle for "pipeline plumbs end to end",
     not a quality bar - it cannot prove the full-dataset finetune will
     converge.

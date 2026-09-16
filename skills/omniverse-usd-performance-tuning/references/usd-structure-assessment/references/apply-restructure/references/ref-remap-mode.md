@@ -44,11 +44,11 @@ After references are stable, run lossless cleanup on the new assembly root via
 `usd-optimize-run-operations`:
 
 - `computeExtents`
-- `pruneLeaves` — **guard against unloaded payloads.** A prim whose payload is not
-  loaded composes no children, so it presents as an empty leaf and `pruneLeaves`
-  silently removes it. Load payloads first, or scope the op away from prims with
-  unloaded payloads. See `operation-safety.md` § Caveat: `pruneLeaves` on unloaded
-  payloads.
+- `pruneLeaves` — unloaded payloads are preserved by default. A prim whose payload
+  is authored but not loaded composes no children and looks like an empty leaf,
+  but `preserveUnloadedPayloads` (default `true`) keeps it. Do not set it `false`
+  unless you intend to drop such prims; there is no need to load payloads across
+  the subtree first. See `operation-safety.md`.
 - `removePrims`
 
 Do not include bounded-loss operations such as `decimateMeshes` or

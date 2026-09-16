@@ -1,0 +1,137 @@
+{
+  "automl_default_parameters": [
+    "hpo.nsample"
+  ],
+  "automl_disabled_parameters": [
+    "dataset.csv",
+    "dataset.label_col",
+    "dataset.eval_rows",
+    "hpo.threshold_strategy",
+    "hpo.model_path",
+    "hpo.config_path",
+    "train.output_dir"
+  ],
+  "default": {
+    "dataset": {
+      "csv": "",
+      "label_col": "label",
+      "eval_rows": 2000
+    },
+    "hpo": {
+      "nsample": 15,
+      "threshold_strategy": "scs",
+      "model_path": "",
+      "config_path": ""
+    },
+    "train": {
+      "output_dir": "artifacts/inference_hpo"
+    }
+  },
+  "properties": {
+    "dataset": {
+      "automl_enabled": false,
+      "description": "Labeled evaluation dataset.",
+      "title": "dataset configuration",
+      "type": "collection",
+      "automl_disabled_parameters": [
+        "dataset.csv",
+        "dataset.label_col",
+        "dataset.eval_rows"
+      ],
+      "properties": {
+        "csv": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Path to labeled CSV. Must contain a ground-truth anomaly column (0/1).",
+          "title": "labeled CSV",
+          "type": "string"
+        },
+        "label_col": {
+          "automl_enabled": false,
+          "default": "label",
+          "description": "Name of the ground-truth anomaly column (0 = normal, 1 = anomaly).",
+          "title": "label column",
+          "type": "string"
+        },
+        "eval_rows": {
+          "automl_enabled": false,
+          "default": 2000,
+          "description": "Number of rows from the top of csv to use for evaluation.",
+          "maximum": 100000,
+          "minimum": 100,
+          "title": "evaluation rows",
+          "type": "int"
+        }
+      }
+    },
+    "hpo": {
+      "automl_default_parameters": ["hpo.nsample"],
+      "automl_disabled_parameters": [
+        "hpo.threshold_strategy",
+        "hpo.model_path",
+        "hpo.config_path"
+      ],
+      "automl_enabled": false,
+      "description": "Inference hyperparameters to tune.",
+      "title": "inference configuration",
+      "type": "collection",
+      "properties": {
+        "nsample": {
+          "automl_enabled": true,
+          "default": 15,
+          "description": "Number of diffusion samples per window. Higher values improve the MAE estimate at the cost of latency.",
+          "maximum": 30,
+          "minimum": 5,
+          "title": "diffusion samples",
+          "type": "int"
+        },
+        "threshold_strategy": {
+          "automl_enabled": false,
+          "default": "scs",
+          "description": "Anomaly threshold algorithm. Run AutoML separately for 'scs' and 'macs' then compare F1.",
+          "title": "threshold strategy",
+          "type": "string"
+        },
+        "model_path": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Path to model checkpoint. Empty = auto-download pretrained weights from HuggingFace.",
+          "title": "model path",
+          "type": "string"
+        },
+        "config_path": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Path to model config YAML. Empty = auto-download curriculum_medium.yaml from HuggingFace.",
+          "title": "model config path",
+          "type": "string"
+        }
+      }
+    },
+    "train": {
+      "automl_disabled_parameters": ["train.output_dir"],
+      "automl_enabled": false,
+      "description": "Output configuration.",
+      "title": "output configuration",
+      "type": "collection",
+      "properties": {
+        "output_dir": {
+          "automl_enabled": false,
+          "default": "artifacts/inference_hpo",
+          "description": "Directory where metrics.json is written per trial.",
+          "title": "output directory",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "x_tao_schema": {
+    "action": "inference_hpo",
+    "model": "tao-finetune-nv-tesseract-ad-diffusion",
+    "network_arch": "nv_tesseract_ad_diffusion",
+    "schema_action": "inference_hpo",
+    "schema_version": 1,
+    "source": "hand-authored for NV-Tesseract AD Diffusion inference HPO"
+  }
+}

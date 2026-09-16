@@ -1,0 +1,22 @@
+network_arch: tao-analyze-detection-kpi
+type: data
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+gpu_spec_key: null
+required_credentials: []
+actions:
+  kpi_analyze:
+    command: analytics kpi_analyze -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      ground_truth_ann_path:
+        type: file
+      inference_ann_path:
+        type: file
+      mapping:
+        type: file
+    outputs:
+      results_dir:
+        type: directory
+    upload_excludes:
+    - inputs/

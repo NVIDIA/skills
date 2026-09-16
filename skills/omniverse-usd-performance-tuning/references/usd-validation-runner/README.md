@@ -244,6 +244,18 @@ flagged target is unresolved, and the report `summary.status` is `BLOCKED`
 until it is. **Do not advance to the optimization report or declare the
 iteration done while the ledger is incomplete.**
 
+**Every concept in `concepts[]` needs its own `targets[]` entry.** `concepts[]`
+records what Deterministic Selection produced; `targets[]` is the only list the
+executor runs. `run_scope_note` rejects a note where the two disagree, before it
+executes anything, and the error names each unexecuted concept. Without that
+check the Always row was easy to under-execute: a note listing all 15 whole-stage
+safety gates under `concepts[]` with one `targets[]` entry ran one gate and
+reported `coverage_ledger.complete: true` and `summary.status: PASS`, because the
+ledger counts only what was planned as a target. A whole-stage concept needs
+nothing but its name — `{"concept": "utf8_paths"}` — so full coverage of the
+Always row is 15 one-key objects. Extra targets beyond the selection are fine;
+that is the user's explicit-target route.
+
 ## Tier Decision Inputs
 
 No schema contains a single `tier` field. Tier selection is policy applied to
@@ -262,7 +274,7 @@ the structure-assessment and validator reports:
 Selected validators are named by **canonical concept name** (e.g.
 `primvar_indexability`, `geom_duplicates`), defined in
 `references/validator-concepts.json`. The canonical executor resolves each
-concept to a unique `(module, class_name)` identity at run time. Do not put
+concept to a unique rule-class identity at run time. Do not put
 runtime class names (`IndexedPrimvarChecker`), operation names, display labels,
 or category names (`Geometry`, `Usd:Performance`) in the plan — class names are
 not unique across providers and categories are lookup buckets, not approval
@@ -273,7 +285,7 @@ Validator; performance tuning prefers the Usd Optimize implementation.
 
 | `phase_recommendation` | Default scope |
 |---|---|
-| `structuring` | Minimum-openability + targeted structural blockers only. Do not validate geometry about to be restructured. |
+| `structuring` | Minimum-openability + targeted structural blockers only. Do not validate geometry about to be restructured. **The whole-stage safety gate is not geometry validation and still runs** — it checks composition, metadata, and binding correctness, all of which a restructure carries forward, so it has to be clean before the restructure, not after. See the "Always" row below. |
 | `optimization` | **2c:** Minimum-openability + Tier 1 cheap whole-stage stats/probes. **Phase 4 (per target):** Tier 2 per `phase4_targets[]` entry; Tier 3 scoped probe mandatory per flagged cross-component pair. No full-stage Tier 2/3 default; whole-stage Tier 3 only on explicit user request. |
 | `already_optimized` | Minimum-openability + Tier 1 cheap whole-stage stats/probes only; ask before expanding. |
 | missing | Run structure assessment first. Do not begin with validators. |
@@ -297,7 +309,7 @@ only the artifact it runs against differs.
 
 | SA signal (condition) | Concepts selected | Target |
 |---|---|---|
-| Always (any `optimization`/`already_optimized` run) | `composition_missing_ref`, `material_path`, `material_dangling_binding`, `texture_bind`, `texture_normalmap` | whole-stage safety gate |
+| Always — every run, at every `phase_recommendation` value, `structuring` included (correctness precondition, `workflow.md` 2c) | Every registry concept whose role is safety_gate and whose scope policy is whole_stage. Today: `composition_missing_ref`, `kind_metadata`, `type_metadata`, `stage_metadata`, `prim_encapsulation`, `layout_default_prim`, `layout_dangling_over`, `material_path`, `material_dangling_binding`, `texture_bind`, `texture_normalmap`, `layer_spec_health`, `utf8_paths`, `subdivision_scheme`, `physics_rigid_body` | whole-stage safety gate |
 | `phase_recommendation = optimization` | `material_duplicates`, `structure_empty_leaf`, `structure_invisible`, `structure_flat_hierarchy`, `extents_zero`, `perf_small_mesh`, `perf_sparse_mesh`, `perf_rtx_mesh_count`, `perf_redundant_timesamples`, `perf_high_vertex_count` | whole stage |
 | Asset posture is CAD / BIM / MEP / converted (e.g. Revit/HOOPS) | `primitive_fit` | per flagged target — **mandatory**, never dropped |
 | Any `optimization` run — cheap, lossless/self-gating primvar cleanup (no flag required) | `primvar_indexability`, `primvar_unused` | per target or sample |
@@ -305,7 +317,7 @@ only the artifact it runs against differs.
 | `hierarchy_dedupe.recommended` or duplicate-geometry signal | `geom_duplicates` (+ `geom_duplicates_fuzzy` if near-duplicates) | flagged subtree |
 | `validation_scope.cross_component_pairs[*]` not explicitly transparent (`enclosure_opaque` true or unset) | `spatial_occluded` | flagged pair — **mandatory** scoped probe |
 | `validation_scope.cross_component_pairs[*]` (routing/overlap) | `spatial_overlapping`, `spatial_coinciding` | flagged pair — **mandatory** scoped probe |
-| Target is simulation-ready (physics/Boolean/3D-print), not visualization | `topology_manifold`, `normals_validity` | flagged target |
+| Target is simulation-ready (physics/Boolean/3D-print), not visualization | `topology_manifold`, `normals_validity`, `topology_general` | flagged target |
 
 If `validation_scope.skip` lists a target, it is excluded from all rows. With
 **zero** flagged assets, the "Always" + whole-stage rows, the flag-independent
@@ -313,6 +325,28 @@ per-target rows (cheap primvar cleanup, mesh hygiene), and the CAD/converted
 `primitive_fit` row all still fire; only the evidence-gated rows (Tier-3 spatial
 pairs, duplicate-geometry, sim-ready) stay empty when their signal is absent. Ask
 before adding concepts no row selects.
+
+**How to evaluate the "Always" row.** Derive it from the registry, do not copy the
+list. The row selects every concept in `validator-concepts.json` with
+`"role": "safety_gate"` **and** `"scope_policy": "whole_stage"`; the names above are
+that query's current answer, and `tests/operations/test_validator_concepts.py`
+fails if the two ever diverge. The earlier hand-copied list of five is how
+`kind_metadata` went missing from selection for a whole release even though the
+registry tagged it and `workflow.md` 2c named it. The row carries no phase
+condition: it fires on `structuring`, `optimization`, and `already_optimized`
+alike. These concepts are all `tier: 1` / `cost_class: cheap` / whole-stage, so
+running them on every asset is a few seconds. Family gates that do not apply to a
+stage (`physics_rigid_body` on a visualization-only asset, for instance) return
+zero findings rather than costing anything, which is why the row is unconditional
+rather than posture-filtered.
+
+**The one safety gate the Always row cannot carry.** `topology_general` is
+`role: safety_gate` but `scope_policy: per_target_or_sample`, so the whole-stage
+query does not reach it and it would otherwise be selectable by no row at all. It
+stays a gate — invalid face-vertex indices are a correctness defect and no
+operation repairs them — and it rides the sim-ready per-target row instead, where
+it runs on the flagged targets whose geometry is about to be operated on. That is
+the only per-target safety gate; every other one is whole-stage tier 1.
 
 **Why the primvar/mesh-hygiene rows are not flag-gated.**
 `primvar_unused`/`primvar_indexability` (lossless, self-gating UV/primvar cleanup)
@@ -381,7 +415,7 @@ silently disagree with an earlier one by re-expanding scope.
 Do not use `ValidationEngine()` or
 `ValidationEngine(init_rules=True)` unless the user explicitly approved
 exhaustive validation. That pattern runs every registered OAV rule plus every SO
-validator that auto-registered.
+validator that `register_all()` put in the registry.
 
 Execution model:
 
@@ -407,13 +441,24 @@ sweep before any copyable pattern that enables default/all rules.
 
 The runner ships a canonical executor at `scripts/usd_validation_executor.py`.
 **Call it directly — do not reimplement rule resolution and do not write your
-own script.** It resolves each canonical concept to a unique `(module,
-class_name)` via `references/validator-concepts.json`, enables exactly those
-rule classes (never `init_rules=True`), and opens the stage scoped. It is
-fail-closed by contract: unknown concept, ambiguous identity, unregistered rule,
-or missing runtime all raise — there is no bare-name lookup and no CLI fallback.
-This is what disambiguates the Usd Optimize `IndexedPrimvarChecker` (fast
-triage) from the usd-validation-nvidia one (full audit) that share a class name.
+own script.** It resolves each canonical concept to a unique rule class via
+`references/validator-concepts.json`, enables exactly those rule classes (never
+`init_rules=True`), and opens the stage scoped. It is fail-closed by contract:
+unknown concept, ambiguous identity, unregistered rule, or missing runtime all
+raise — there is no bare-name lookup and no CLI fallback. This is what
+disambiguates the Usd Optimize `IndexedPrimvarChecker` (fast triage) from the
+usd-validation-nvidia one (full audit) that share a class name.
+
+The resolution key is `(provider family of module, class_name)`. A family is a
+provider's set of package roots across renames: `usd_validation_nvidia` and
+`omni.asset_validator` are one, `usd_optimize` and `omni.scene.optimizer` the
+other. Matching on the family rather than the exact module means an upstream
+module rename inside a provider still resolves, while a cross-provider class-name
+collision still never does. Each registry entry carries the current path in
+`module` and the pre-rename paths in `module_aliases`; both are accepted. The
+executor also calls `usd_optimize.validators.register_all()` on every rule
+enumeration, because importing that package registers nothing on its own — see
+`setup-usd-performance-tuning/references/so-validator-auto-registration.md`.
 
 ```python
 from usd_validation_executor import (
@@ -467,6 +512,13 @@ usd_validation_executor.py`, JSON job on stdin) — an internal worker protocol,
 not a CLI. The default in-process runner is for Tier 1 only, where a hang is not
 a risk. If a concept times out, `run_scope_note` records `timeout_recorded`;
 retry that target with `mask_paths` from the spot-check policy below.
+
+The two entry points differ in what they execute, so do not read one as a
+shorthand for the other. `validate_concepts(stage, [c1, c2, c3])` runs exactly
+the concept list you hand it. `run_scope_note(stage, note)` runs `note["targets"]`
+and uses `note["concepts"]` only to check that every selected concept has a
+target — it raises `ScopeNoteContractError` naming the unexecuted concepts when
+one does not (see **Completion Gate**).
 
 ## Masked-Stage Spot Checks
 
@@ -583,9 +635,11 @@ Post-processing:
 ## Output
 
 Emit `validation-report.json` matching `scripts/validation-report.schema.json`
-when that report is produced. The report must point to provider artifacts such
-as `issues.csv`, `provider-summary.json`, and `run.log`, and include the chosen
-phase scoping so Phase 6 and Phase 7 can reproduce or narrow it.
+when that report is produced, and include the chosen phase scoping so Phase 6 and
+Phase 7 can reproduce or narrow it. `run_scope_note` writes the report itself; it
+produces no CSV, so populate `artifacts` only with files that exist on this run —
+typically the report path and the driver's own log. A provider CSV or
+`provider-summary.json` appears only when something outside this path wrote one.
 
 ## Hard Rules
 
@@ -609,8 +663,11 @@ phase scoping so Phase 6 and Phase 7 can reproduce or narrow it.
 
 ## Troubleshooting
 
-- If `omni_asset_validate` is unavailable, record it as missing rather than
-  fabricating a pass.
+- Before recording the validator as missing, confirm it: the standalone console
+  script is `nvidia_usd_validate` and the import is `omni.asset_validator`.
+  Record `missing` only when both fail. Never fabricate a pass — and never
+  record a gap on a name the runtime does not use, which reports a healthy
+  install as broken.
 - If Usd Optimize validator imports fail, do not report SO-specific results.
 - If the bundled `validator-venv` is slow or lacks dependencies, prefer a Kit or
   project-managed usd-validation-nvidia environment.

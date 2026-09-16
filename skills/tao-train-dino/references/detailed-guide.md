@@ -8,4 +8,4 @@ If a split reference conflicts with `SKILL.md`, `skill_info.yaml`, schemas, or p
 
 - `dino-data-specs.md` — dataset contracts, data-source arrays, or spec override construction
 - `dino-actions-errors.md` — action defaults, hardware notes, or error patterns
-- `dino-automl-sdk.md` — AutoML/HPO behavior, SDK orchestration internals, or checkpoint inference
+- `dino-tuning-multigpu.md` — AutoML/HPO behavior, multi-GPU spec consistency, or checkpoint inference

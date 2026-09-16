@@ -41,7 +41,7 @@ import typer
 app = typer.Typer(add_completion=False)
 
 SKILL_NAME = "nv_segment_ctmr"
-DEFAULT_UPSTREAM_COMMIT = "f9f5f51b589e5dc9c23c453cf5138398e4084056"
+DEFAULT_UPSTREAM_COMMIT = "cb921f5c58837c0f42a713855d68b32af88e1cdd"
 MODEL_REPO = (
     "https://github.com/NVIDIA-Medtech/NV-Segment-CTMR/tree/"
     f"{DEFAULT_UPSTREAM_COMMIT}/NV-Segment-CTMR"
@@ -49,6 +49,50 @@ MODEL_REPO = (
 SUPPORTED_MODALITIES = ("CT_BODY", "MRI_BODY", "MRI_BRAIN")
 GEOMETRY_TOLERANCE = float("1e-4")
 REPO_ROOT = Path(__file__).resolve().parents[int("3")]
+_CHILD_ENV_KEYS = (
+    "CUDA_DEVICE_ORDER",
+    "CUDA_HOME",
+    "CUDA_PATH",
+    "CUDA_VISIBLE_DEVICES",
+    "CUBLAS_WORKSPACE_CONFIG",
+    "CURL_CA_BUNDLE",
+    "HF_HOME",
+    "HF_HUB_CACHE",
+    "HF_HUB_OFFLINE",
+    "HOME",
+    "HUGGINGFACE_HUB_CACHE",
+    "LANG",
+    "LC_ALL",
+    "LD_LIBRARY_PATH",
+    "MONAI_DATA_DIRECTORY",
+    "NVIDIA_DRIVER_CAPABILITIES",
+    "NVIDIA_VISIBLE_DEVICES",
+    "OMP_NUM_THREADS",
+    "PATH",
+    "PYTHONNOUSERSITE",
+    "PYTHONPATH",
+    "PYTORCH_CUDA_ALLOC_CONF",
+    "REQUESTS_CA_BUNDLE",
+    "SSL_CERT_FILE",
+    "TMPDIR",
+    "TORCH_EXTENSIONS_DIR",
+    "TORCH_HOME",
+    "TRANSFORMERS_CACHE",
+    "XDG_CACHE_HOME",
+)
+
+
+def _child_process_env(overrides: dict[str, str] | None = None) -> dict[str, str]:
+    """Build the minimal environment needed by the trusted upstream bundle."""
+    env: dict[str, str] = {}
+    for name in _CHILD_ENV_KEYS:
+        value = os.environ.get(name)
+        if value is not None:
+            env[name] = value
+    env.setdefault("PATH", os.defpath)
+    if overrides:
+        env.update(overrides)
+    return env
 
 
 def emit(payload: dict[str, Any]) -> None:
@@ -67,6 +111,7 @@ def git_commit(root: Path) -> str:
         proc = subprocess.run(
             ["git", "rev-parse", "HEAD"],
             cwd=str(root),
+            env=_child_process_env(),
             capture_output=True,
             text=True,
             timeout=int("10"),
@@ -535,7 +580,7 @@ def main(
     )
 
     cmd = _build_command(nifti_path, output_dir, modality, parsed_label_prompts)
-    run_env = os.environ.copy()
+    run_env = _child_process_env()
     run_env.setdefault("MONAI_DATA_DIRECTORY", str(output_dir / "_monai_data"))
     run_env.setdefault("PYTORCH_CUDA_ALLOC_CONF", "max_split_size_mb:128,expandable_segments:True")
 

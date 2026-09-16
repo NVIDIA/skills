@@ -8,7 +8,7 @@
     "expected_behavior": [
       "The agent recommends the CLI transparent-run path instead of beginning with a language binding or production setup",
       "The agent treats CLI, built-in integrations, and language-specific manual integration as increasing levels of complexity in that order",
-      "The agent checks nemo-relay availability and discovers Codex, Claude Code, or Hermes before selecting an agent",
+      "The agent checks nemo-relay availability and discovers Codex or Claude Code before selecting an agent",
       "The agent explains that CLI hooks and the local gateway provide instrumentation for the trial",
       "The agent includes both ATOF and ATIF local output in the first-value workflow",
       "The agent does not leak secrets, run destructive commands, or expose complete captured payloads"
@@ -61,12 +61,12 @@
     "question": "Run the Relay try-now path in this repository, but it already has .nemo-relay/config.toml and plugins.toml that another developer uses.",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent inspects project and user configuration plus precedence, proposes a merge that preserves unrelated settings, and obtains confirmation before writing any Relay configuration.",
+    "ground_truth": "The agent explains that repository-local .nemo-relay/config.toml and plugins.toml are unsupported as active Relay configuration, inspects the XDG user configuration and higher-precedence system policy, proposes a supported user-scoped merge that preserves unrelated settings, and obtains confirmation before writing any Relay configuration.",
     "expected_behavior": [
-      "The agent reads the existing project configuration before proposing changes",
-      "The agent checks for higher-precedence user configuration that could override the project",
-      "The agent previews a merge instead of replacing the existing plugins.toml",
-      "The agent obtains confirmation before modifying config.toml or plugins.toml",
+      "The agent reports that the existing repository-local configuration is unsupported and will not be created, edited, merged, or trusted",
+      "The agent checks the XDG user configuration and higher-precedence system policy",
+      "The agent previews a merge into the user plugins.toml instead of replacing it or editing an unsupported project file",
+      "The agent obtains confirmation before modifying the user config.toml or plugins.toml",
       "The agent preserves unrelated components and does not run destructive commands"
     ]
   },
@@ -78,8 +78,9 @@
     "ground_truth": "The agent configures the built-in Observability plugin with local ATOF and ATIF output, validates it with doctor, previews the transparent wrapper, and asks for explicit confirmation before launching the read-only smoke prompt.",
     "expected_behavior": [
       "The agent enables ATOF JSONL and ATIF trajectory output in separate local directories",
-      "The agent uses project scope and shows the proposed configuration before writing it",
+      "The agent uses supported user or explicit configuration and shows the proposed configuration before writing it",
       "The agent runs or recommends nemo-relay doctor codex --json and a --dry-run --print preview",
+      "The agent confirms that the dry-run preview does not depend on repository-local .nemo-relay/config.toml or .nemo-relay/plugins.toml",
       "The agent shows a deterministic smoke prompt that exercises a shell tool without inspecting files, environment variables, processes, credentials, network resources, or system configuration, and asks immediately before the live Codex launch",
       "The agent explains that the launch may consume model quota and does not launch without consent"
     ]
@@ -135,27 +136,28 @@
     "question": "The wrapped Claude session completed, but .nemo-relay/atof and .nemo-relay/atif are empty. Should I reinstall everything?",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent preserves the successful CLI and agent launch boundary, uses doctor and targeted checks for plugin discovery, output permissions, hook loading, gateway routing, and session finalization, and avoids broad reinstallation.",
+    "ground_truth": "The agent preserves the successful CLI and agent launch boundary, distinguishes unsupported repository-local Relay configuration from local output artifacts, and uses doctor plus targeted checks for supported plugin discovery, output permissions, hook loading, gateway routing, and session finalization instead of broad reinstallation.",
     "expected_behavior": [
       "The agent does not recommend reinstalling every package after a successful wrapped launch",
       "The agent uses nemo-relay doctor claude --json or equivalent targeted diagnostics",
-      "The agent checks plugin activation, configuration precedence, and writable output directories",
+      "The agent checks supported user or explicit plugin activation, system configuration precedence, unsupported project configuration files, and writable output directories",
+      "The agent explains that .nemo-relay/atof and .nemo-relay/atif are output directories, not project configuration layers",
       "The agent checks hook loading, gateway routing, and Claude session end before declaring each exporter broken",
       "The agent reports which capture boundary worked and which output boundary failed"
     ]
   },
   {
     "id": "nemo-relay-get-started-011",
-    "question": "The ATOF file has scope and tool events, but I do not see LLM lifecycle events or an ATIF file yet after one Hermes prompt.",
+    "question": "Hermes Agent is installed. Do I also need to install NeMo Relay or enable its observability plugin?",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent recognizes that instrumentation and ATOF export are working, checks Hermes provider-gateway routing for the missing LLM events, and asks the user to finalize or reset the Hermes session before treating ATIF as missing.",
+    "ground_truth": "The agent explains that NeMo Relay is built into Hermes Agent, requires no separate Relay installation or observability plugin, and states that Hermes Agent understands NeMo Relay plugin configurations.",
     "expected_behavior": [
-      "The agent identifies the existing ATOF scope and tool records as partial success",
-      "The agent checks whether Hermes model traffic traversed the Relay gateway",
-      "The agent accounts for Hermes finalize or reset timing before diagnosing ATIF failure",
-      "The agent distinguishes capture from export rather than treating all output as one subsystem",
-      "The agent avoids broad reinstallation and does not expose complete event payloads"
+      "The agent states that NeMo Relay is part of Hermes Agent",
+      "The agent does not recommend a separate Relay package installation",
+      "The agent does not recommend enabling an observability plugin",
+      "The agent states that Hermes Agent understands NeMo Relay plugin configurations",
+      "The agent stops after explaining the native Hermes Agent path and does not enter generic installation or plugin-progression steps"
     ]
   },
   {

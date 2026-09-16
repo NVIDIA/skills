@@ -1,0 +1,66 @@
+name: tao-finetune-nv-tesseract-ad-diffusion
+network_arch: nv_tesseract_ad_diffusion
+automl_enabled: true
+container_image: null
+actions:
+  train:
+    command: python examples/finetune_example.py --run-config {config_path}
+    config_format: yaml
+    mode: config
+    # python_script execution via VirtualEnvSDK — no container required.
+    # The script lives in the NV-Tesseract repo, not in this skill directory,
+    # so paths must be supplied at runtime via execution= in runner.run().
+    # See SKILL.md § "Running AutoML locally" for the full example.
+    #
+    # execution:
+    #   type: python_script
+    #   script: /absolute/path/to/NV-Tesseract/ad_diffusion/examples/finetune_example.py
+    #   args: ["--run-config", "{config_path}"]
+    #   cwd: /absolute/path/to/NV-Tesseract/ad_diffusion
+    #   config_format: yaml
+    inputs:
+      dataset.csv:
+        type: file
+      dataset.val_csv:
+        type: file
+        optional: true
+    outputs:
+      train.output_dir:
+        type: folder
+    upload_excludes: []
+    metric: val_loss
+    metric_direction: minimize
+    metric_file: metrics.json
+  inference_hpo:
+    command: python inference_hpo_trial.py --run-config {config_path}
+    config_format: yaml
+    mode: config
+    # Tunes nsample against F1 on labeled data.
+    # Run separately for each threshold_strategy (scs, macs) and compare.
+    # See SKILL.md § "Inference HPO with AutoML" for the trial script and runner.
+    #
+    # execution:
+    #   type: python_script
+    #   script: /absolute/path/to/NV-Tesseract/ad_diffusion/examples/inference_hpo_trial.py
+    #   args: ["--run-config", "{config_path}"]
+    #   cwd: /absolute/path/to/NV-Tesseract/ad_diffusion
+    #   config_format: yaml
+    inputs:
+      dataset.csv:
+        type: file
+    outputs:
+      train.output_dir:
+        type: folder
+    upload_excludes: []
+    metric: f1_score
+    metric_direction: maximize
+    metric_file: metrics.json
+spec_templates:
+  train: references/spec_template_train.yaml
+  inference_hpo: references/spec_template_inference_hpo.yaml
+description: >-
+  NV-Tesseract AD Diffusion fine-tuning and inference HPO via VirtualEnvSDK.
+  No container required. Fine-tuning AutoML minimizes val_loss over lr,
+  weight_decay, batch_size, grad_clip, mask_ratio, and window_length.
+  Inference HPO maximizes F1 over nsample (run once per threshold strategy).
+  Supply execution= to AutoMLRunner.run() with absolute paths to your clone.

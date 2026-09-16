@@ -1,6 +1,6 @@
 # Spec Param / Parent Model Inference
 
-Model-specific parent-model mappings are declared in `references/skill_info.yaml` under `spec_params`. Keep this section aligned with that metadata so generated runners and agents resolve checkpoints before `create_job()` instead of guessing file names.
+Model-specific parent-model mappings are declared in `references/skill_info.yaml` under `spec_params`. Keep this section aligned with that metadata so agents resolve checkpoints before launching a job instead of guessing file names.
 
 Inference mappings from this model skill:
 

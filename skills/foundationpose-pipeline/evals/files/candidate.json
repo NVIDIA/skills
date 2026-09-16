@@ -1,0 +1,11 @@
+{
+  "overall": {
+    "matched_predictions": 60,
+    "max_vertex_error_within_threshold_rate": 0.9,
+    "max_vertex_error_mm_median": 2,
+    "max_vertex_error_mm_p90": 12,
+    "max_vertex_error_mm_p99": 35,
+    "add_or_adds_mm_mean": 6,
+    "rotation_error_deg_mean": 12
+  }
+}

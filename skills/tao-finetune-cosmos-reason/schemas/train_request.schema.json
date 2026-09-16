@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nvidia.com/tao/schemas/cosmos3-train-request-v3.json",
+  "title": "Cosmos3 TAO training request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "backend",
+    "base_model_path_or_uri",
+    "base_model_format",
+    "dataset",
+    "training",
+    "paths",
+    "slurm"
+  ],
+  "properties": {
+    "backend": {"enum": ["cosmos-framework", "cosmos-rl"]},
+    "base_model_path_or_uri": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Local checkpoint, Hugging Face model ID/URL, or hf_model:// model URI. Cosmos3 Omni preparation details are resolved internally."
+    },
+    "base_model_revision": {
+      "type": "string",
+      "description": "Optional Hugging Face branch, tag, or commit. Omitted values resolve from main to an immutable commit automatically."
+    },
+    "base_model_format": {
+      "enum": ["qwen3_vl", "cosmos3_omni", "cosmos3_edge"],
+      "description": "Explicit user-selected input checkpoint config.json.model_type; never inferred for Cosmos3-Nano."
+    },
+    "prepared_checkpoint_path": {
+      "type": "string",
+      "description": "Optional advanced reuse override. Do not request this from users for normal Cosmos-RL Omni training."
+    },
+    "dataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "train_annotations", "train_media_roots", "validation_annotations", "validation_media_roots"],
+      "properties": {
+        "type": {"enum": ["auto", "video_conversation", "task_aware_video_reasoning"]},
+        "train_annotations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "train_media_roots": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "validation_annotations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "validation_media_roots": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "tasks": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+      }
+    },
+    "training": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "epochs", "effective_global_batch", "learning_rate", "seed"],
+      "properties": {
+        "mode": {"enum": ["dense", "peft"]},
+        "epochs": {"type": "integer", "minimum": 1},
+        "effective_global_batch": {"type": "integer", "minimum": 1},
+        "learning_rate": {"type": "number", "exclusiveMinimum": 0},
+        "seed": {"type": "integer"},
+        "video_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "frames": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Uniform frame count forwarded as custom.vision.nframes. Mutually exclusive with fps."
+            },
+            "fps": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Frames sampled per second. Mutually exclusive with frames; enables min_frames and max_frames."
+            },
+            "min_frames": {"type": "integer", "minimum": 1},
+            "max_frames": {"type": "integer", "minimum": 1},
+            "video_start": {"type": "number", "minimum": 0},
+            "video_end": {"type": "number", "exclusiveMinimum": 0},
+            "resized_height": {"type": "integer", "minimum": 1},
+            "resized_width": {"type": "integer", "minimum": 1},
+            "min_pixels": {"type": "integer", "minimum": 1},
+            "frame_width": {"type": "integer", "minimum": 1},
+            "frame_height": {"type": "integer", "minimum": 1},
+            "max_video_pixels": {"type": "integer", "minimum": 1},
+            "total_pixels": {"type": "integer", "minimum": 1},
+            "sequence_length": {"type": "integer", "minimum": 1},
+            "attention_implementation": {"type": "string", "minLength": 1},
+            "rl_video_profile": {"enum": ["auto", "system-pyav", "pynv-device-rgbp"]},
+            "rl_video_cache_size": {"type": "integer", "minimum": 0},
+            "rl_video_decoder_cache_size": {"type": "integer", "minimum": 1},
+            "rl_sft_batch_threads": {"type": "integer", "minimum": 0},
+            "rl_dataloader_num_workers": {"type": "integer", "minimum": 0},
+            "rl_dataloader_prefetch_factor": {"type": "integer", "minimum": 1},
+            "framework_per_forward_batch": {"type": "integer", "minimum": 0},
+            "framework_video_cache_size": {"type": "integer", "minimum": 0},
+            "framework_sft_process_threads": {"type": "integer", "minimum": 0},
+            "framework_video_decoder_threads": {"type": "integer", "minimum": 0}
+          },
+          "allOf": [
+            {"not": {"required": ["frames", "fps"]}},
+            {
+              "if": {"anyOf": [{"required": ["min_frames"]}, {"required": ["max_frames"]}]},
+              "then": {"required": ["fps"]}
+            },
+            {"if": {"required": ["resized_height"]}, "then": {"required": ["resized_width"]}},
+            {"if": {"required": ["resized_width"]}, "then": {"required": ["resized_height"]}}
+          ],
+          "x_tao_native_mapping": {
+            "frames": "custom.vision.nframes",
+            "fps": "custom.vision.fps",
+            "min_frames": "custom.vision.min_frames",
+            "max_frames": "custom.vision.max_frames",
+            "video_start": "custom.vision.video_start",
+            "video_end": "custom.vision.video_end",
+            "resized_height": "custom.vision.resized_height",
+            "resized_width": "custom.vision.resized_width",
+            "min_pixels": "custom.vision.min_pixels",
+            "max_video_pixels": "custom.vision.max_pixels",
+            "total_pixels": "custom.vision.total_pixels"
+          }
+        },
+        "lora": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rank", "alpha", "dropout", "target_modules", "bias", "use_rslora", "modules_to_save", "precision"],
+          "properties": {
+            "rank": {"type": "integer", "minimum": 1},
+            "alpha": {"type": "number", "exclusiveMinimum": 0},
+            "dropout": {"type": "number", "minimum": 0, "maximum": 1},
+            "target_modules": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+            "bias": {"enum": ["none", "all", "lora_only"]},
+            "use_rslora": {"type": "boolean"},
+            "modules_to_save": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+            "precision": {"enum": ["float32", "float16", "bfloat16"]}
+          }
+        }
+      },
+      "allOf": [
+        {"if": {"properties": {"mode": {"const": "peft"}}}, "then": {"required": ["lora"]}},
+        {"if": {"properties": {"mode": {"const": "dense"}}}, "then": {"not": {"required": ["lora"]}}}
+      ]
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["results_dir", "checkpoint_dir", "cache_dir", "sqsh_cache_dir", "ssh_key_path", "container_mounts"],
+      "properties": {
+        "results_dir": {"type": "string", "minLength": 1},
+        "checkpoint_dir": {"type": "string", "minLength": 1},
+        "cache_dir": {"type": "string", "minLength": 1},
+        "sqsh_cache_dir": {"type": "string", "minLength": 1},
+        "ssh_key_path": {"type": "string", "minLength": 1},
+        "container_mounts": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^[^:]+:[^:]+"}}
+      }
+    },
+    "source": {
+      "type": "object",
+      "description": "Advanced source-build inputs. Omit for an existing SQSH or packaged backend image.",
+      "additionalProperties": false,
+      "required": ["native_repository", "tao_integration_repository", "daft_repository", "tao_core_repository"],
+      "properties": {
+        "native_repository": {"type": "string", "minLength": 1},
+        "tao_integration_repository": {"type": "string", "minLength": 1},
+        "daft_repository": {"type": "string", "minLength": 1},
+        "tao_core_repository": {"type": "string", "minLength": 1}
+      }
+    },
+    "image": {
+      "type": "object",
+      "description": "Optional runtime override. Omit to use the packaged backend image; sqsh_path selects an existing SLURM artifact directly.",
+      "additionalProperties": false,
+      "properties": {
+        "runtime_mode": {"enum": ["auto", "existing-sqsh", "packaged-image", "source-build"]},
+        "tag": {"type": "string", "minLength": 1},
+        "build_context": {"type": "string", "minLength": 1},
+        "sqsh_path": {"type": "string", "pattern": "\\.sqsh$"}
+      }
+    },
+    "slurm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["user", "hosts", "partition", "account", "nodes", "gpus_per_node", "cpus_per_task", "time_limit"],
+      "properties": {
+        "user": {"type": "string", "minLength": 1},
+        "hosts": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "partition": {"type": "string", "minLength": 1},
+        "account": {"type": "string", "minLength": 1},
+        "qos": {"type": "string"},
+        "reservation": {"type": "string"},
+        "nodes": {"type": "integer", "minimum": 1},
+        "gpus_per_node": {"type": "integer", "minimum": 1},
+        "cpus_per_task": {"type": "integer", "minimum": 1},
+        "time_limit": {"type": "string"},
+        "timeout": {"type": "string"},
+        "exclusive": {"type": "boolean"},
+        "use_requeue": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "image": {
+            "properties": {"runtime_mode": {"const": "source-build"}},
+            "required": ["runtime_mode"]
+          }
+        },
+        "required": ["image"]
+      },
+      "then": {
+        "required": ["source"],
+        "properties": {
+          "image": {"required": ["tag", "build_context"]}
+        }
+      }
+    }
+  ]
+}

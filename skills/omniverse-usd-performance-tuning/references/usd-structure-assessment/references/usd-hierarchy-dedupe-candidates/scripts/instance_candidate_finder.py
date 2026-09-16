@@ -809,6 +809,8 @@ def analyze(stage, *, root=ROOT, hash_level=HASH_LEVEL,
             [g for g in reported if g["verdict"] != "RED"], walker)
         blocked_savings = total_savings - clean_savings
 
+    depth = _depth_stats(root_path, walker, reported)
+
     return {
         "root": root_path, "hash_level": hash_level, "prims_hashed": prims_hashed,
         "min_subtree_prims": min_subtree_prims, "min_duplicate_count": min_duplicate_count,
@@ -816,7 +818,33 @@ def analyze(stage, *, root=ROOT, hash_level=HASH_LEVEL,
         "total_savings": total_savings, "clean_savings": clean_savings,
         "blocked_savings": blocked_savings, "check_instanceability": check_instanceability,
         "top_n": top_n, "show_paths_per_group": show_paths_per_group,
-        "kind_trust": kind_trust,
+        "kind_trust": kind_trust, "depth": depth,
+    }
+
+
+def _relative_depth(root_path, path):
+    """Namespace depth of ``path`` below ``root_path`` (``root_path`` itself is 0)."""
+    base = 0 if root_path == "/" else root_path.count("/")
+    return max(path.count("/") - base, 0)
+
+
+def _depth_stats(root_path, walker, groups):
+    """Hierarchy depth of the scan and of where the groups were found.
+
+    SA README's hard rule — do not call hierarchy dedupe unnecessary from a
+    root-child or depth-2 name scan on a CAD/BIM export — needs the evidence
+    that the scan actually went deeper than depth 2 and where the repeats
+    live. Without these the rule has nothing to check.
+    """
+    scanned = max((_relative_depth(root_path, p) for p in walker.size), default=0)
+    group_depths = sorted({_relative_depth(root_path, g["paths"][0]) for g in groups})
+    return {
+        "max_scanned": scanned,
+        "group_depths": group_depths,
+        "min_group_depth": group_depths[0] if group_depths else None,
+        "max_group_depth": group_depths[-1] if group_depths else None,
+        "groups_below_depth_2": any(d > 2 for d in group_depths),
+        "groups_only_at_depth_3_plus": bool(group_depths) and group_depths[0] >= 3,
     }
 
 
@@ -842,7 +870,14 @@ def _eliminated_union_size(groups, walker):
 
 
 def validate_knobs(root, hash_level, min_subtree_prims, min_duplicate_count, top_n,
-                   show_paths_per_group, max_findings_per_group):
+                   show_paths_per_group, max_findings_per_group,
+                   kind_trust_max_single_mesh_fraction=KIND_TRUST_MAX_SINGLE_MESH_FRACTION):
+    """Spec §3.3: one error line naming the offending knob, or None.
+
+    Every knob the KNOBS block exposes is checked here, so a mistyped value in a
+    paste-and-run edit fails at the top with a readable line rather than as a
+    traceback from inside the analysis.
+    """
     if not isinstance(hash_level, int) or not (1 <= hash_level <= 4):
         return "HASH_LEVEL out of range (must be int 1..4): %r" % (hash_level,)
     if not isinstance(min_subtree_prims, int) or min_subtree_prims < 1:
@@ -855,6 +890,10 @@ def validate_knobs(root, hash_level, min_subtree_prims, min_duplicate_count, top
         return "SHOW_PATHS_PER_GROUP out of range (must be int >= 1): %r" % (show_paths_per_group,)
     if not isinstance(max_findings_per_group, int) or max_findings_per_group < 1:
         return "MAX_FINDINGS_PER_GROUP out of range (must be int >= 1): %r" % (max_findings_per_group,)
+    ktf = kind_trust_max_single_mesh_fraction
+    if isinstance(ktf, bool) or not isinstance(ktf, (int, float)) or not (0 < ktf <= 1):
+        return ("KIND_TRUST_MAX_SINGLE_MESH_FRACTION out of range "
+                "(must be a number 0 < x <= 1): %r" % (ktf,))
     if not isinstance(root, str) or not root:
         return "ROOT must be a non-empty USD path string"
     return None
@@ -866,6 +905,16 @@ def render_report(report) -> str:
     L = []
     L.append("Instance-candidate finder — root=%s HASH_LEVEL=%d" % (report["root"], report["hash_level"]))
     L.append("Hashed %d prims; grouping by candidate hash." % report["prims_hashed"])
+    d = report.get("depth") or {}
+    if d:
+        if d.get("group_depths"):
+            where = ("groups found at depth %s%s"
+                     % (", ".join(str(x) for x in d["group_depths"]),
+                        "" if d.get("groups_below_depth_2")
+                        else " (none below depth 2)"))
+        else:
+            where = "no groups found"
+        L.append("Maximum hierarchy depth scanned: %d; %s." % (d.get("max_scanned", 0), where))
     L.append("Duplicate groups: %d (MIN_SUBTREE_PRIMS=%d, MIN_DUPLICATE_COUNT=%d, HASH_LEVEL=%d)"
              % (report["total_groups"], report["min_subtree_prims"],
                 report["min_duplicate_count"], report["hash_level"]))
@@ -924,8 +973,13 @@ def to_frontier_candidates(report) -> dict:
     everything it needs (``subtree_meshes``, authored ``kind``, occurrence paths)
     was attached by ``analyze()`` while it had the stage.
 
-    One finder group becomes one candidate. At the default ``HASH_LEVEL == 2`` the
-    hash is STRUCTURAL only (no values), so a group may pool genuine value-variants
+    One finder group becomes one candidate, and one occurrence set becomes at
+    most one candidate: groups that resolve to the same paths (a re-derived
+    boundary landing on an already-reported group) collapse to a single entry,
+    so ``phase4_targets[]`` never lists the same target twice.
+
+    At the default ``HASH_LEVEL == 2`` the hash is STRUCTURAL only (no values),
+    so a group may pool genuine value-variants
     under one structural family — the cheap broad-sweep view. Escalate to
     ``HASH_LEVEL >= 3`` to CONFIRM: the candidate hash then includes attribute
     values, so value-variants split into SEPARATE groups (one prototype per
@@ -964,7 +1018,15 @@ def to_frontier_candidates(report) -> dict:
                   "sampled_kind_prims")
     } if kind_trust else {}
     candidates = []
-    seen_rederived = set()
+    # One candidate per distinct occurrence set, across BOTH emit paths. A
+    # re-derived boundary and an already-reported group can name the same paths
+    # (the nesting-doll shape: 1-mesh kind=component blades walking up to racks
+    # that are themselves a reported group). Emitting both put the same target
+    # in phase4_targets[] twice, so Phase 4 ran its mesh chain twice on it and
+    # the "non-double-counted" savings double-counted — on a 156-prim stage,
+    # 248. Keyed on tuple(paths); on a collision the entry carrying the
+    # kind-trust provenance wins, so the audit trail is never the one dropped.
+    emitted_by_paths: dict = {}
     for g in report.get("groups", []):
         paths = list(g.get("paths", []))
         if not paths:
@@ -979,10 +1041,6 @@ def to_frontier_candidates(report) -> dict:
                            "subtree_prims": g["subtree_prims"],
                            "subtree_meshes": g.get("subtree_meshes", 0),
                            "group_by": "self"}]):
-                key = tuple(part["paths"])
-                if key in seen_rederived:
-                    continue
-                seen_rederived.add(key)
                 boundary_moved = list(part["paths"]) != paths
                 cand = _base_candidate(
                     part["paths"], part["hash"], part["copies"],
@@ -1002,7 +1060,7 @@ def to_frontier_candidates(report) -> dict:
                     cand["rederived_from"] = paths
                 if g.get("walkup_stopped_by"):
                     cand["walkup_stopped_by"] = g["walkup_stopped_by"]
-                candidates.append(cand)
+                _record_candidate(candidates, emitted_by_paths, part["paths"], cand)
             continue
         if kind:
             signal, grain = "kind", "identity"
@@ -1014,11 +1072,40 @@ def to_frontier_candidates(report) -> dict:
         cand["grain_source"] = grain
         if signal == "none":
             cand["structural_fallback"] = True
-        candidates.append(cand)
+        _record_candidate(candidates, emitted_by_paths, paths, cand)
     out = {"candidates": candidates}
     if kind_trust:
         out["kind_trust"] = kind_trust
     return out
+
+
+def _record_candidate(candidates, emitted_by_paths, paths, cand):
+    """Append ``cand`` unless its occurrence set was already emitted.
+
+    The occurrence set — ``tuple(paths)`` — is the identity of a frontier
+    target, so two groups that resolve to the same set are the same target and
+    must produce ONE candidate. Without this the kind-trust re-derivation and
+    the plain reported group both emitted the racks in a blades-under-racks
+    stage: duplicate ``phase4_targets[]``, Phase 4 running its mesh chain twice
+    on the same file, and ``non_double_counted_savings`` summing past the
+    stage's own prim count.
+
+    Collision rule: the entry carrying kind-trust provenance
+    (``kind_untrusted`` plus ``kind_untrusted_source_kind`` / ``rederived_from``
+    / ``rederive_group_by``) wins, whichever order the two arrive in. The bare
+    entry says nothing the provenance-carrying one does not.
+    """
+    key = tuple(paths)
+    index = emitted_by_paths.get(key)
+    if index is None:
+        emitted_by_paths[key] = len(candidates)
+        candidates.append(cand)
+        return cand
+    existing = candidates[index]
+    if cand.get("kind_untrusted") and not existing.get("kind_untrusted"):
+        candidates[index] = cand
+        return cand
+    return existing
 
 
 def _base_candidate(paths, group_hash, copies, own_prims, own_meshes, verdict):
@@ -1077,7 +1164,8 @@ def _resolve_stage():
 
 def main():
     err = validate_knobs(ROOT, HASH_LEVEL, MIN_SUBTREE_PRIMS, MIN_DUPLICATE_COUNT,
-                         TOP_N, SHOW_PATHS_PER_GROUP, MAX_FINDINGS_PER_GROUP)
+                         TOP_N, SHOW_PATHS_PER_GROUP, MAX_FINDINGS_PER_GROUP,
+                         KIND_TRUST_MAX_SINGLE_MESH_FRACTION)
     if err:
         print(err)
         return

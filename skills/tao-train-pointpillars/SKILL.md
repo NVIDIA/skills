@@ -19,6 +19,8 @@ tags:
 
 # PointPillars
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 PointPillars for 3D object detection from LiDAR point clouds. Encodes point clouds into a pseudo-image via pillar-based representation, then applies 2D detection. Used in autonomous driving / robotics.
 
 Typically trained from scratch. Provide train.resume_training_checkpoint_path to resume.
@@ -29,7 +31,7 @@ The packaged PyTorch PointPillars CLI supports `dataset_convert`, `train`, `eval
 
 ## Dataclass Schemas
 
-Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
+Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML for an action requires `schemas/<action>.schema.json` and `references/spec_template_<action>.yaml` to exist and parse. Use the packaged selected-action schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
 
 ## Train Action Policy
 
@@ -41,7 +43,8 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 
 - **Dataset type:** pointpillars
 - **Formats:** default
-- **Monitoring metric:** loss
+- **AutoML training metric:** `loss` (minimize). This is the per-epoch KPI emitted by the train action and is the metric AutoML must extract for trial ranking.
+- **Standalone evaluation metrics:** the evaluate action emits recall KPIs plus dataset-specific detection metrics. For the general point-cloud dataset, verify `bev mAP` and `3d mAP`; do not substitute an evaluation mAP for AutoML's emitted training `loss`.
 
 ### Per-Action Dataset Requirements
 

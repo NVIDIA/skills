@@ -1,9 +1,9 @@
 # Version-sensitive diagnostic priors
 
 Verified 2026-07-31 at the official HoloHub tag `holoscan-sdk-4.5.0`
-(`0a2f81ef978ccd83a676b1c3189cf5b201315a2b`) and against the published
-`holoscan-cli==4.5.0` command surface. Treat these as hypotheses and recheck
-local help, metadata, source, and exact reproduction.
+(`0a2f81ef978ccd83a676b1c3189cf5b201315a2b`) and rechecked 2026-09-02
+against the published `holoscan-cli==4.6.0` command surface. Treat these as
+hypotheses and recheck local help, metadata, source, and exact reproduction.
 
 ## Launcher and command identity
 
@@ -50,6 +50,11 @@ local help, metadata, source, and exact reproduction.
   image-side test script is distinct from an application test failure.
 - In 4.5.0 or newer, an in-container test honors
   `HOLOSCAN_CLI_CTEST_SCRIPT` before importing an installed CLI package.
+- In 4.6.0, the generated test command detects `xvfb-run`, warns and falls
+  back to direct `ctest` when it is absent, and passes the active project root
+  as `CTEST_SOURCE_DIRECTORY`. An unconditional `xvfb-run` call or a source
+  directory under site-packages indicates stale or overridden image-side
+  command behavior; `--no-xvfb` is an explicit bypass, not the first fix.
 - The tested CTest driver recognizes APP/OP/PKG/EXT but not MODULE, so
   `test <module>` falls through to broader testing. Test declared operators and
   demos directly.

@@ -29,14 +29,15 @@ resource_defaults:
   ttl_seconds_after_finished: 3600  # auto-clean Jobs 1h after terminal state
   backoff_limit: 0  # no auto-retry; surface failure to the user
   restart_policy: Never
-  num_nodes: 1  # single-pod only in v1
+  num_nodes: 1  # default only — multi-node runs via the Indexed Job template
 cloud_storage:
   protocol: aws
   uri_format: s3://{bucket_name}/{path}
   metadata_key: aws
-sdk_module: tao_sdk.platforms.kubernetes.sdk
 features:
 - gpu-scheduling
 - failure-analysis
 - log-streaming
 - pod-diagnostics
+- multi-node
+- producer-action-mount-aliases

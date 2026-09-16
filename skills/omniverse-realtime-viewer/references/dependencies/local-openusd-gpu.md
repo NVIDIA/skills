@@ -23,6 +23,7 @@ python3 -c "import omni.ui as ui; print('ovui OK')"
 Common local-only failures:
 
 - `ModuleNotFoundError: omni.ui`: local desktop UI packages are not installed in the active environment.
+- `ImportError: libcudart.so.12`: ovui is installed, but the CUDA 12 runtime is not on the native library path; discover it beneath `$OVRTX_BIN_PATH/plugins` and retry the verification command with that directory prepended.
 - Window does not open in CI or remote shells: no real display is available; use a configured X display or desktop session.
 - UI frame does not resize with the OS window: app code did not configure the local window shell correctly; read `references/local-viewer`.
 
@@ -32,26 +33,37 @@ Purpose: direct USD queries for hierarchy, properties, variants, bounds, authore
 
 Package: PyPI package `usd-core`.
 
-Install exactly version `24.11`:
+Install `usd-core` only in the selected USD query worker or a short-lived validation environment. Resolve a release compatible with the selected runtime package set by checking the current upstream runtime documentation, release notes, and package metadata:
 
 ```bash
-python3 -m pip install usd-core==24.11
+python3 -m pip install --upgrade usd-core
 ```
 
-Why this pin is required:
+Why process isolation is required:
 
-- Newer `usd-core` versions can cause `TfType::AddAlias` schema conflicts in the viewer stack.
 - `ovrtx` bundles its own USD C++ libraries.
 - `usd-core` ships a separate USD runtime.
 - Loading both USD runtimes in one process can produce linker-level conflicts, duplicate registry state, duplicate debug symbols, and plugin/type alias errors.
 
-Required process contract:
+Default process contract:
 
 1. In the main renderer process, set `OVRTX_SKIP_USD_CHECK=1` before imports.
-2. Import `ovrtx` and construct `ovrtx.Renderer` first.
-3. Do not import `pxr` in that renderer process.
-4. Run all `pxr` work in a subprocess, such as `server/pxr_worker.py`.
+2. Construct the viewer runtime that owns `ovrtx.Renderer` and any live OVStage
+   state.
+3. Do not import `pxr` in that renderer/runtime process unless the exact wheel
+   set and import order have been verified for the target platform.
+4. Run normal `pxr` work in a subprocess, such as `server/pxr_worker.py`.
 5. Communicate with the subprocess through JSON, files, pipes, or another explicit IPC boundary.
+
+Risk boundary:
+
+- Treat `pxr`/`usd-core` as a second USD runtime until proven otherwise.
+- Treat OVPhysX USD population similarly: bounded OVPhysX worker path belongs in a
+  bounded physics worker unless `PhysX.attach_ovstage(stage, read_ordinal=...)` is verified against
+  the exact installed OVStage/OVPhysX ABI.
+- The parent viewer should own OVRTX, OVStage stage lifetime, ordinals, and
+  renderer publication; workers should return DTOs such as hierarchy rows,
+  properties, pose matrices, and diagnostics.
 
 Verify `pxr` only in the intended query process or subprocess:
 
@@ -68,8 +80,10 @@ python3 -m pip show usd-core
 Common failure modes:
 
 - `_tf` import failure: Python version, wheel tag, platform, or shared library resolution mismatch.
-- `TfType::AddAlias` schema conflict: `usd-core` is not pinned to `24.11`, or conflicting USD runtimes are loaded.
-- Duplicate USD registry or debug symbol errors with ovrtx: `pxr` was imported in the renderer process; move queries to a subprocess.
+- `TfType::AddAlias` schema conflict: the installed `usd-core` release is not compatible with the selected runtime packages, or conflicting USD runtimes are loaded.
+- Duplicate USD registry or debug symbol errors with ovrtx: `pxr` was imported
+  in the renderer process, or another USD-populating runtime entered the same
+  process; move queries or physics population to a subprocess.
 - Slow hierarchy queries: app logic is traversing too much USD on the UI/render path; read `references/stage-hierarchy`.
 
 ## warp-lang

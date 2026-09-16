@@ -17,7 +17,11 @@ Before presenting the restructure gate, re-read and confirm:
 - [ ] `setup-preflight.json` runtime header — know what runtime is available.
 - [ ] Present the restructure choices plus optimize-as-is — do not pre-select on
    the user's behalf. The gate chooses *how* to optimize, never *whether*; there
-   is no diagnose-and-exit option.
+   is no diagnose-and-exit option. A preference stated in the brief may pre-fill
+   the recommendation, but does not replace the confirmation.
+- [ ] Whether a user is reachable at all. If none will become available, the gate
+   resolves from measured reuse rather than halting — the run must still produce
+   an optimized asset. See § Rules.
 ## Output Format
 
 See `references/_shared/standard-output-format.md`.
@@ -96,7 +100,7 @@ The agent assembles a decision packet from prior phases:
 
 ## Decision branches
 
-Compute the recommended branch from the inputs, then **always present the choice to the user** - do not auto-proceed.
+Compute the recommended branch from the inputs, then **present the choice to the user** - do not auto-proceed. In a non-interactive context, where no user will become available, resolve from measured reuse instead of halting; see § Rules.
 
 | SA classification | hierarchy_dedupe.recommended | Recommended | Branches offered |
 |---|---|---|---|
@@ -221,7 +225,7 @@ descent decisions are identical. Skipping the frontier here is what leaves
 high-count tiny repeats un-instanced and drops the merge frontier: with no
 `kept_inline_for_merge` reservation, a later within-prototype merge runs *after*
 the dedup/instancing passes already shared the geometry, has to un-instance it to
-fuse, and inflates triangles/disk (the `mesh-merge-rewrite-spec.md` §9
+fuse, and inflates triangles/disk (the `mesh-merge-rewrite-spec.md` §6
 failure). The `kept_inline_for_merge` tagging reserves sub-MINP merge-candidate
 leaves from the dedup/instancing passes so the merge runs **before** the
 geometry-dedup tail.
@@ -320,29 +324,77 @@ Record the user's choice in the optimization plan and emit it for downstream pha
   "recommended": "deduplicate-internally",
   "reasoning": "monolithic with 4 repeated patterns; restructure recommended",
   "boundary_plan_ref": "<path to plan packet for apply-restructure>",
-  "user_confirmed_at": "<ISO 8601 timestamp>"
+  "chosen_by": "user | brief | evidence_unattended",
+  "decision_basis": {
+    "frontier_depth": 4,
+    "points_recoverable_pct": 83.0,
+    "prims_recoverable": 193387,
+    "threshold_applied": ">=30% -> deduplicate-internally"
+  },
+  "user_confirmed_at": "<ISO 8601 timestamp, or null when chosen_by is not 'user'>"
 }
 ```
 
+`chosen_by` and `decision_basis` are required whenever `user_confirmed_at` is null.
+A choice made without a user must carry the measurement that produced it, so a
+reviewer can check the reasoning rather than take the outcome on trust.
+
 ## Rules
 
-- Always present the choice; do not auto-proceed even when SA's recommendation is high-confidence.
-- **Headless / batch / non-interactive contexts:** If the agent cannot ask the
-  user (e.g. running in a scripted pipeline or with no interactive session),
-  **STOP and write the decision as a blocker** in the preflight or report
-  artifact. Do NOT substitute a default choice like "optimize-as-is" on the
-  user's behalf. The gate exists because restructure-vs-optimize-as-is has
-  irreversible consequences that only the user can weigh. Write a
-  `restructure_decision_pending` artifact and halt Phase 2e until a human
-  confirms.
+- **Interactive sessions: always present the choice**; do not auto-proceed even when
+  SA's recommendation is high-confidence.
+- **A brief that states intent pre-fills the choice; it does not remove the gate.**
+  If the request says something about sharing, addressability or delivery shape —
+  "instancing is not what I want here", "nobody selects individual parts", "I need it
+  as one file" — carry it into the presented choice as the recommendation and quote
+  the sentence in `reasoning`. In an interactive session you still present and confirm:
+  a stated preference is evidence about what the user wants, not a substitute for the
+  confirmation this gate exists to obtain. Only in a non-interactive context (below)
+  does a brief that answers the gate let the run proceed on it, recorded as
+  `chosen_by: "brief"`.
+- **Headless / batch / non-interactive contexts: resolve from evidence, do not halt.**
+  Where no user will become available — a scheduled run, CI, a customer running the
+  skill unattended — halting produces no optimized asset at all, which is a worse
+  outcome than a recorded, measured choice. Phase 0's setup skill already ships a
+  batch/CI branch for exactly this; this gate takes the same approach.
+
+  Resolve from the reuse the dedupe scan has *already measured*, at the frontier the
+  descent would target:
+
+  | Measured reuse at the candidate frontier | Unattended resolution |
+  |---|---|
+  | >= 30% of points recoverable | `deduplicate-internally` |
+  | < 15% of points recoverable | `optimize-as-is` |
+  | 15-30%, or SA signals conflict | halt, `restructure_decision_pending` |
+
+  **Never substitute a fixed default.** The reason is measured: on a CAD production
+  line, 10.3% of points are recoverable at the named-unit frontier, so
+  optimize-as-is is right; on a data-centre rack, 83% are recoverable at the same
+  depth, saving 193,387 of 222,513 prims losslessly, so defaulting to optimize-as-is
+  would forfeit most of the available win. One fixed answer is badly wrong for one of
+  those two assets whichever way it points.
+
+  Those thresholds are calibrated on two assets and are provisional. Always record
+  the measurement alongside the choice so they can be re-tuned against evidence
+  rather than re-argued.
+
+  Halting remains correct when the measurement is unavailable, when SA's signals
+  conflict, or when the reuse sits in the ambiguous band. Note that the gate protects
+  the *shape of the deliverable*, not the source asset — the skill never writes to the
+  input, so a resolution recorded with its evidence is reversible by re-running.
 - Do not recommend restructure when SA's `phase_recommendation = already_optimized`.
 - Always present the selective-loading choice when SA reports `payload_count: 0`
   and clear asset-boundary candidates, even if hierarchy dedupe is not
   recommended and the asset is otherwise ready for mesh optimization.
 - If the user picks `deduplicate-internally`, run Phase 2f: `apply-restructure`
-  with `mode: internal_reference` — the same structured descent authored into an
+  with `mode: restructure` and `dedupe.mode: internal_reference` — the same
+  structured descent authored into an
   internal namespace, producing the restructure-role manifest (`internal_share`,
-  `kept_inline_for_merge`). The native `deduplicateHierarchies` op is the
+  `kept_inline_for_merge`). `mode` has exactly two legal values
+  (`restructure`, `ref_remap`); `internal_reference` is a `dedupe.mode`, and
+  writing it as the manifest `mode` both fails the schema and slips the
+  non-empty `phase4_targets[]` requirement that only fires on
+  `mode: restructure`. The native `deduplicateHierarchies` op is the
   per-region authoring primitive the descent drives — the per-level driver in
   `apply-restructure` calls it per region and emits the manifest; invoking it with
   `paths` + `maxDepth` directly, with no manifest, is for standalone

@@ -21,12 +21,16 @@ Keep compatibility exceptions explicit before applying broad renames.
    `TARGET_PATH` to the source repository or target project. Run the bundled
    helper in dry-run mode before editing:
    `python3 "$SKILL_DIR/scripts/migrate_from_nemo_flow.py" "$TARGET_PATH" --rename-paths`
-3. Review the reported text edits and path renames with the user. Obtain explicit
-   confirmation for the resolved target root, then rerun with `--write`,
-   `--rename-paths`, and `--confirm-root "$TARGET_PATH"`.
-4. Apply language-specific cleanup for package manager lockfiles, generated
+3. Review the reported text edits, path renames, and legacy project
+   configuration warnings with the user. Do not migrate project-local
+   `.nemo-flow/config.toml` or `.nemo-flow/plugins.toml` into `.nemo-relay`.
+   Move those settings manually to a supported user or explicit configuration
+   path after review.
+4. Obtain explicit confirmation for the resolved target root, then rerun with
+   `--write`, `--rename-paths`, and `--confirm-root "$TARGET_PATH"`.
+5. Apply language-specific cleanup for package manager lockfiles, generated
    artifacts, and public API examples.
-5. Search for remaining Flow names and verify the affected language surfaces.
+6. Search for remaining Flow names and verify the affected language surfaces.
 
 ## Mechanical Rename Map
 
@@ -45,9 +49,12 @@ Keep compatibility exceptions explicit before applying broad renames.
 - C FFI: `nemo_flow.h` -> `nemo_relay.h`, `nemo_flow_*` ->
   `nemo_relay_*`, `NemoFlow*` -> `NemoRelay*`, and `NEMO_FLOW_*` ->
   `NEMO_RELAY_*`
-- CLI/config: `nemo-flow` -> `nemo-relay`, `.nemo-flow` -> `.nemo-relay`,
+- CLI/config: `nemo-flow` -> `nemo-relay`,
   `~/.config/nemo-flow` -> `~/.config/nemo-relay`, `NEMO_FLOW_*` ->
-  `NEMO_RELAY_*`, and `x-nemo-flow-*` -> `x-nemo-relay-*`
+  `NEMO_RELAY_*`, and `x-nemo-flow-*` -> `x-nemo-relay-*`. Do not blindly
+  rename project-local `.nemo-flow/config.toml` or `.nemo-flow/plugins.toml`
+  into `.nemo-relay`; those files require manual migration to a supported user
+  or explicit configuration path.
 
 Do not replace bare `flow`, `Flow`, or `FlowError`. Those can be domain words
 or intentional compatibility names.
@@ -79,6 +86,9 @@ helper:
 - skips common vendor, build, cache, and generated directories
 - skips lockfiles unless `--include-lockfiles` is passed
 - skips symbolic links and credential-bearing dotenv files
+- detects project-local `.nemo-flow/config.toml` and `.nemo-flow/plugins.toml`,
+  leaves them unchanged, and reports that they require manual migration to a
+  supported user or explicit configuration path
 - requires the reviewed target root to be repeated with `--confirm-root` before
   writing, and refuses filesystem-root or home-directory writes
 - anchors writes and renames to verified directory handles without following

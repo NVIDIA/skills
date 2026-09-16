@@ -1,0 +1,9 @@
+# NOTE: This occupancy map was generated with the Occupancy Map Generator:
+# https://docs.omniverse.nvidia.com/isaacsim/latest/features/ext_omni_isaac_occupancy_map.html#occupancy-map-generator
+# Set "Rotate Image" to 180 degree to meet the ROS conventions.
+image: carter_warehouse_navigation.png
+resolution: 0.05
+origin: [-11.975, -17.975, 0.0000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196

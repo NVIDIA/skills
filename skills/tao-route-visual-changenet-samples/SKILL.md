@@ -19,6 +19,8 @@ tags:
 
 # TAO VCN Sample Routing Skill
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 You are the dispatcher between gap analysis and the augmentation modules in a VCN AOI SDA pipeline. Each augmentation module can only act on labels it knows how to handle:
 
 - **k-NN Mining** can only mine real-image neighbors for labels that already exist in the **source pool CSV**. There is no point looking for `SHIFT` neighbors if the pool has no `SHIFT` rows.
@@ -32,7 +34,7 @@ The work is intentionally trivial: read a parquet, do two `.isin(...)` filters, 
 
 ## Inputs
 
-1. **`gaps_parquet`** — the gap-analysis output (typically `<exp_dir>/rca_results/<timestamp>/gaps.parquet` from `tao-analyze-gaps-visual-changenet`). Required columns: `filepath`, `label`. Other columns (`siamese_score`, `weakness`) are preserved verbatim.
+1. **`gaps_parquet`** — the gap-analysis output (typically `<exp_dir>/rca_results/<timestamp>/kpi_gaps.parquet` from `tao-analyze-gaps-visual-changenet`). Required columns: `filepath`, `label`. Other columns (`siamese_score`, `weakness`) are preserved verbatim.
 2. **`source_pool_csv`** — VCN-format mining source pool CSV with a `label` column. Empty string or non-existent path is allowed; the mining subset will simply be empty in that case.
 3. **Output directory** — where the two routed parquets, the summary, and the report are written. Default: a timestamped folder under the gap-analysis result directory: `<rca_result_dir>/routing_results/<timestamp>/`.
 4. **`anomalygen_supported_labels`** *(optional)* — override the default AnomalyGen-eligible label set. Default: `{"PASS", "EXCESS_SOLDER", "MISSING", "BRIDGE"}`. **Warning:** This must stay in sync with `ANOMALYGEN_SUPPORTED_LABELS` in `mdo-kratos-workflows/pipelines/sda/routing.py` and the AnomalyGen integration's actual generator coverage. Adding a new defect class to AnomalyGen means adding it here too.

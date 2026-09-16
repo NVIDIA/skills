@@ -1,10 +1,12 @@
 title: expert_parallel_overlap
-validated_on: "2026-03-23"
+validated_on: "2026-07-25"
 summary: >
   Megatron-Bridge supports MoE expert-parallel communication overlap through
   overlap_moe_expert_parallel_comm, with optional delayed expert wgrad
   scheduling. The path depends on dispatcher choice (alltoall or flex),
-  expert parallelism degree, precision (BF16/FP16), and runtime support.
+  expert parallelism degree, precision (BF16/FP16), and runtime support. A
+  controlled Qwen3 30B-A3B HybridEP run on 16 H100 GPUs measured a 15.059%
+  step-time reduction from plain EP overlap.
 
 validation_status:
   moe_overlap_validation:
@@ -18,19 +20,23 @@ validation_status:
   cuda_graph_wgrad_interaction:
     - code_verified
   end_to_end_recipe_smoke:
-    - not_yet_tested
+    - measured
+  qwen3_30b_hybridep_h100:
+    - measured
+  matched_nsys_ab:
+    - measured
 
 training_dimensions:
   speed:
-    effect: "~10-20% faster step time (not yet measured in a controlled Bridge experiment)"
-    confidence: medium
+    effect: "15.059% faster step time and 17.729% higher throughput on the measured Qwen3 30B-A3B HybridEP H100 shape"
+    confidence: high_for_measured_shape
     rationale: >
       Hides expert dispatch/combine all-to-all under expert FFN compute.
       Benefit depends on EP degree and collective-to-compute ratio.
   memory:
-    effect: "neutral to slightly higher (not yet measured)"
+    effect: "62.166 GiB rank-0 peak allocated on the measured winner; baseline delta not isolated"
     confidence: medium
-    rationale: Overlap buffers may add minor memory pressure.
+    rationale: The winner stayed below the 65 GiB allocated-memory gate, but the profile A/B did not isolate a peak-memory delta.
   scale:
     effect: "positive at higher EP degrees (not yet measured)"
     confidence: medium
@@ -92,15 +98,20 @@ config_keys:
 
 recommended_path:
   comm_overlap.overlap_moe_expert_parallel_comm: true_for_moe_tuning
-  comm_overlap.delay_wgrad_compute: true_with_overlap
+  comm_overlap.delay_wgrad_compute: false_for_first_isolation
   model.moe_shared_expert_overlap: false_when_overlap_is_enabled
 
 expected_metric_change:
   - metric: step_time
     direction: down
-    magnitude: "~10-20% (not yet measured in Bridge)"
-    conditions: "MoE with alltoall or flex dispatcher, EP >= 4"
-    evidence: not_yet_measured
+    magnitude: "15.059% on measured Qwen3 30B-A3B shape"
+    conditions: "16×H100 BF16 seq4096 TP1 PP1 CP1 EP16 MBS1 GBS1024 force balance HybridEP"
+    evidence: measured
+  - metric: model_tflops_per_gpu
+    direction: up
+    magnitude: "17.729% (244.039 to 287.305)"
+    conditions: "same controlled Qwen3 30B-A3B shape"
+    evidence: measured
   - metric: peak_memory
     direction: up
     magnitude: "slight (not yet measured)"
@@ -110,7 +121,7 @@ expected_metric_change:
 minimal_example:
   config: |
     cfg.comm_overlap.overlap_moe_expert_parallel_comm = True
-    cfg.comm_overlap.delay_wgrad_compute = True
+    cfg.comm_overlap.delay_wgrad_compute = False
     cfg.model.moe_shared_expert_overlap = False
   command: |
     python scripts/performance/setup_experiment.py \
@@ -169,10 +180,13 @@ known_constraints:
 known_limitations:
   - Setting moe_flex_dispatcher_backend alone does not activate flex dispatch.
   - Public recipes are often conservative and leave MoE overlap disabled by default.
-  - End-to-end throughput gains not yet measured in a controlled Bridge experiment.
+  - The measured gain is specific to one Qwen3 30B-A3B HybridEP H100 shape.
+  - Summed per-stream kernel duration is not exposed wall time when kernels overlap.
 
 evidence:
   - docs/training/communication-overlap.md
+  - examples/model_verification_cards/qwen3-30b-a3b/card.yaml
+  - src/megatron/bridge/perf_recipes/qwen/h100/qwen3_moe.py
   - src/megatron/bridge/training/comm_overlap.py
   - src/megatron/bridge/training/flex_dispatcher_backend.py
   - src/megatron/bridge/training/config.py
@@ -181,6 +195,5 @@ evidence:
   - tests/unit_tests/training/test_deepep.py
 
 follow_up_validation:
-  - Measure end-to-end throughput gain for EP overlap on a representative MoE model.
   - Add a positive Bridge functional smoke test for overlap_moe_expert_parallel_comm.
-  - Validate flex dispatcher (DeepEP/HybridEP) throughput vs alltoall baseline.
+  - Repeat the matched A/B on another model family, dispatcher, and topology.

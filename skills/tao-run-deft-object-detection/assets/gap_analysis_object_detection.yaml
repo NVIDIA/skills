@@ -1,0 +1,40 @@
+# gap_analysis object_detection — starting spec.
+#
+# TAO emits no default for this module: `gap_analysis` is absent from the
+# `default_specs` supported list (analytics, annotations, augmentation,
+# auto_label, image). This asset is therefore hand-maintained, which is why the
+# values that matter carry their reasoning inline.
+
+ground_truth_ann_path: ???      # KPI ground-truth KITTI label dir
+inference_ann_path: ???         # the previous phase's inference/labels
+images_dir: ???                 # KPI image root — establishes the full image universe
+results_dir: ???
+kpi: ???                        # phase label, e.g. iter1
+
+# LOWERCASE here (kitti/coco). `analytics kpi_analyze` in the same container
+# requires uppercase. Both spellings are correct for their own stage.
+input_format: kitti
+
+iou_threshold: 0.5
+# Inference already dropped detections below its own conf_threshold at write
+# time. A second gate here composes with that one rather than replacing it.
+conf_threshold: 0.0
+min_area: 0
+
+# Per-class AP50 gates. An image is weak if ANY listed class falls below its gate.
+# Reference ITS defaults: `car` is abundant and already well learned so it is held
+# to a strict gate; the loop exists to lift the rare classes, which get looser ones.
+weak_thresholds:
+  car: {ap50: 0.99}
+  bicycle: {ap50: 0.7}
+  person: {ap50: 0.7}
+
+# Gates every class NOT listed in weak_thresholds above. TAO defaults this to 0.5,
+# which marks images weak on classes the run never targeted and inflates both the
+# gap set and the mining budget derived from it. TAO guards the gate with
+# `a_thresh > 0`, so 0.0 turns it off.
+default_ap50_threshold: 0.0
+default_recall_threshold: 0.0
+default_precision_threshold: 0.0
+
+class_mapping: {}

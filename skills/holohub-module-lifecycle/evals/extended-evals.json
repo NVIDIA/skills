@@ -16,21 +16,6 @@
     ]
   },
   {
-    "id": "holohub-module-lifecycle-005",
-    "question": "My module builds and tests pass. Package it as a Debian package and wheel through ./holohub and confirm both are usable by a clean consumer.",
-    "expected_skill": "holohub-module-lifecycle",
-    "expected_script": null,
-    "ground_truth": "The agent validates module metadata, previews and runs module DEB/WHEEL packaging container-first, inspects artifact identity and contents, installs each format in a disposable artifact-only consumer, and proves import/link plus a finite smoke result without publishing.",
-    "expected_behavior": [
-      "Activates holohub-module-lifecycle",
-      "Confirms module metadata, namespace, version, dependencies, testing, and binary package declarations",
-      "Previews explicit ./holohub package <module> with --dryrun --verbose without treating the preview as artifact output, then records actual action artifact paths",
-      "Inspects wheel metadata and deb control/payload rather than trusting exit zero",
-      "Proves each requested format from a clean consumer that cannot import from the checkout, build tree, user site, or local override",
-      "Does not commit, push, upload, publish, or remove unrelated files without authorization"
-    ]
-  },
-  {
     "id": "holohub-module-lifecycle-007",
     "question": "Create an ordinary HoloHub video application with finite replay and recording modes; it does not expose a reusable module API.",
     "expected_skill": null,

@@ -1,0 +1,22 @@
+[
+  {"query": "Predict a monomer protein structure using OpenFold2 NIM from this FASTA sequence", "should_trigger": true},
+  {"query": "Use OpenFold2 hosted API to fold this single protein chain", "should_trigger": true},
+  {"query": "Run OpenFold2 with an A3M alignment and save the returned PDB", "should_trigger": true},
+  {"query": "I need the OpenFold2 Docker command and local inference endpoint", "should_trigger": true},
+  {"query": "Fold a protein monomer with OpenFold2 and selected_models [1, 2, 3]", "should_trigger": true},
+  {"query": "Use explicit mmCIF templates with the OpenFold2 NIM", "should_trigger": true},
+  {"query": "How do I set relax_prediction for OpenFold2?", "should_trigger": true},
+  {"query": "Call /biology/openfold/openfold2/predict-structure-from-msa-and-template on localhost", "should_trigger": true},
+  {"query": "Use MSA Search output as A3M input for OpenFold2", "should_trigger": true},
+  {"query": "Compare OpenFold2 model parameter sets for a protein monomer", "should_trigger": true},
+  {"query": "Use OpenFold2 through build.nvidia.com and NGC_API_KEY", "should_trigger": true},
+  {"query": "Why should I use OpenFold3 instead of OpenFold2 for a protein-ligand complex?", "should_trigger": true},
+  {"query": "Predict a protein-DNA complex structure with OpenFold3", "should_trigger": false},
+  {"query": "Generate novel molecules using the MolMIM latent space", "should_trigger": false},
+  {"query": "Create a multiple sequence alignment with ColabFold MSA Search", "should_trigger": false},
+  {"query": "Dock aspirin into a protein receptor with DiffDock", "should_trigger": false},
+  {"query": "Design protein sequences for a backbone using ProteinMPNN", "should_trigger": false},
+  {"query": "Generate a de novo backbone with RFDiffusion", "should_trigger": false},
+  {"query": "Predict a protein-ligand complex with Boltz2 affinity scores", "should_trigger": false},
+  {"query": "Generate DNA sequence with Evo2", "should_trigger": false}
+]

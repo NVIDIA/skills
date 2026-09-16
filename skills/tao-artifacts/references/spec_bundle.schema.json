@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tao://artifacts/spec_bundle.schema.json",
+  "title": "TAO spec-bundle",
+  "description": "The typed package a model/data (producer) skill hands to a platform (consumer) skill: everything needed to run one action, nothing platform-specific. Mode-discriminated union: config | args.",
+  "type": "object",
+  "required": ["network_arch", "action", "image", "mode", "command", "declared_inputs", "declared_outputs", "compute_shape"],
+  "additionalProperties": false,
+  "properties": {
+    "network_arch": { "type": "string", "minLength": 1 },
+    "action": { "type": "string", "minLength": 1 },
+    "image": {
+      "type": "string",
+      "pattern": "^\\S+/\\S+$",
+      "description": "Resolved container URI (registry/path:tag), carried as data. Never a versions.yaml key — resolve first via scripts/resolve_tao_image.py."
+    },
+    "mode": { "enum": ["config", "args"] },
+    "command": { "type": "string", "minLength": 1 },
+    "config_format": { "enum": ["yaml", "toml", "json"] },
+    "spec": {
+      "$ref": "#/$defs/nestedDict",
+      "description": "The NESTED config dict mirroring the container's spec shape (mode=config only). Dotted keys are the #1 mistake and are rejected at every level."
+    },
+    "args": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Argument list (mode=args only)."
+    },
+    "declared_inputs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/declaredInput" }
+    },
+    "declared_outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/declaredOutput" }
+    },
+    "upload_excludes": { "type": "array", "items": { "type": "string" } },
+    "compute_shape": {
+      "type": "object",
+      "required": ["gpus", "nodes"],
+      "additionalProperties": false,
+      "properties": {
+        "gpus": { "type": "integer", "minimum": 0, "description": "GPUs per node" },
+        "nodes": { "type": "integer", "minimum": 1, "description": "nodes > 1 engages the multi-node contract (templates + probes)" }
+      }
+    },
+    "gpu_spec_key": {
+      "type": "string",
+      "description": "Dotted pointer to where the GPU count is written in the spec (config mode), e.g. train.num_gpus."
+    },
+    "execution": {
+      "$ref": "#/$defs/executionContract",
+      "description": "Optional model-owned lifecycle around the primary command. Platforms consume this declarative contract instead of model-specific launch renderers."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "mode": { "const": "config" } }, "required": ["mode"] },
+      "then": {
+        "required": ["spec", "config_format"],
+        "properties": {
+          "args": false,
+          "command": { "pattern": "\\{config_path\\}" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "mode": { "const": "args" } }, "required": ["mode"] },
+      "then": {
+        "required": ["args"],
+        "properties": {
+          "spec": false,
+          "config_format": false
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "nestedDict": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[^.]+$" },
+      "additionalProperties": { "$ref": "#/$defs/nestedValue" }
+    },
+    "nestedValue": {
+      "anyOf": [
+        { "type": ["string", "number", "boolean", "null"] },
+        { "type": "array", "items": { "$ref": "#/$defs/nestedValue" } },
+        { "$ref": "#/$defs/nestedDict" }
+      ]
+    },
+    "declaredInput": {
+      "type": "object",
+      "required": ["spec_key", "type", "uri"],
+      "additionalProperties": false,
+      "properties": {
+        "spec_key": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Dotted/indexed POINTER into the spec (e.g. dataset.train_data_sources[0].image_dir). Dots are allowed here — this is a pointer, not a spec key."
+        },
+        "type": { "enum": ["file", "folder"] },
+        "optional": { "type": "boolean", "default": false },
+        "uri": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Source location: s3://, hf://, ngc://, lustre:///, or an absolute compute-frame path (strategy A). NO storage_tier here — the tier is chosen by tao-data-io at stage time and stamped into the job-record."
+        }
+      }
+    },
+    "declaredOutput": {
+      "type": "object",
+      "required": ["spec_key", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "spec_key": { "type": "string", "minLength": 1 },
+        "type": { "enum": ["file", "folder"] }
+      }
+    },
+    "executionContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "environment": {
+          "type": "object",
+          "propertyNames": { "pattern": "^[A-Z_][A-Z0-9_]*$" },
+          "additionalProperties": { "type": "string" },
+          "description": "Non-secret container environment. Values may use the documented {job_id}, {results_dir}, and {config_path} placeholders, which the platform binds after opening the job record."
+        },
+        "pre_commands": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Model-owned runtime attestations or preparation commands, executed in order before the primary command in the same allocation/container."
+        },
+        "post_commands": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Model-owned result validation or aggregation commands, executed in order only after the primary command succeeds."
+        },
+        "post_scope": {
+          "enum": ["all", "leader"],
+          "default": "leader",
+          "description": "Whether post_commands run in every platform task or only task/rank zero."
+        },
+        "distributed": {
+          "type": "object",
+          "required": ["launcher", "processes_per_node"],
+          "additionalProperties": false,
+          "properties": {
+            "launcher": { "enum": ["direct", "torchrun"] },
+            "processes_per_node": { "type": "integer", "minimum": 1 },
+            "tasks_per_node": { "const": 1, "default": 1 }
+          }
+        },
+        "supporting_files": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/supportingFile" },
+          "description": "Checked-in orchestration helpers to stage as immutable auxiliary inputs. These are not source overlays and must not replace code in the image."
+        },
+        "completion": {
+          "type": "object",
+          "required": ["child_exit_code_path"],
+          "additionalProperties": false,
+          "properties": {
+            "child_exit_code_path": { "type": "string", "minLength": 1 },
+            "structured_status_path": { "type": "string", "minLength": 1 },
+            "success_states": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "supportingFile": {
+      "type": "object",
+      "required": ["source", "destination", "sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))\\S+$",
+          "description": "Path relative to the producing skill root; absolute paths and parent traversal are forbidden."
+        },
+        "destination": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))\\S+$",
+          "description": "Relative path below the platform-owned staged helper directory."
+        },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

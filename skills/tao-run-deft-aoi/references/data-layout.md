@@ -2,44 +2,104 @@
 
 ## Bringing Your Own Data
 
-This loop trains on **your** AOI inspection data — there is **no public AOI
-dataset to download**. If the user arrives without a workspace, do not hard-stop
-silently: read `references/data-onboarding.md` and walk them through what to
-supply. That doc is the source of truth for the user-provided / auto-fetched /
-loop-created split, the full 14-column CSV schema, and the `baseline_spec.yaml`
-template pointer. The `## Data Contract` below summarizes the resulting layout.
+This loop trains on **your** AOI inspection data. There is **no public AOI
+dataset to download** — the `NV_PCB_Siamese` paths throughout the skill are a
+naming convention for the mount layout, not a fetchable dataset. If the user
+arrives without a workspace, do not hard-stop silently: explain what they must
+supply (the three categories below are the whole story), point them at the spec
+template (`references/baseline_spec.yaml`), and offer to scaffold the tree.
+
+**You must provide (required — the loop cannot fabricate or download these):**
+
+| Path | What it is |
+|---|---|
+| `specs/baseline_spec.yaml` | ChangeNet train/eval spec. Copy `references/baseline_spec.yaml` (bundled template) and adjust. Source of truth for architecture, lighting, image size. |
+| `train/base/training_set.csv` | Seed training rows using the four mandatory ChangeNet columns below. ~200 rows is a normal first-run size. |
+| `train/base/validation_set.csv` | Held-out rows, same schema. Must not overlap training (the loop hard-stops on leakage). |
+| `kpi/testing_set.csv` | KPI test rows, same schema. This is what FAR / recall is measured on. |
+| `images/` | The canonical image root referenced by every CSV above (real inspection captures + their golden references). |
+| Process environment | `NGC_KEY` + `HF_TOKEN` for approved network-enabled actions only. Exported in the shell before launch, or sourced from a user-approved env file (`set -a; source /path/to/.env; set +a`) — the loop never creates that file, writes a value into it, or prints one. |
+
+**Auto-fetched on first use (do not pre-stage unless air-gapped):** the
+ChangeNet backbone (`nvidia/C-RADIOv2-B`), the AnomalyGen fine-tuned checkpoint
+(`nvidia/Cosmos-AnomalyGen-PCB-2B`), the Cosmos/AnomalyGen base checkpoints,
+and the AnomalyGen PCB reference dataset
+(`nvidia/Cosmos-AnomalyGen-PCB-Dataset`) — all gated by `HF_TOKEN` and cached
+in their documented locations below. **Note:** the AnomalyGen PCB
+reference dataset is a *generator* fine-tuning set (clean image + mask + defect
+spec) — it is **not** your AOI training data and cannot substitute for it.
+
+**Created by the loop (never hand-author):** everything under
+`results/run_<TS>/`, the per-iter `synthetic_iter*` staged images, and the
+combined training CSVs.
+
+The `augmentation/mining_pool/` real-image pool is **optional** — provide it if
+you have a production-line image stream to mine from; the loop runs without it
+(synthetic-only augmentation).
 
 ## Data Contract
 
-Inputs (all paths under `<workspace>` unless absolute):
+The required inputs above, laid out as a tree — plus the optional
+`augmentation/` AnomalyGen override slots and the `results/` root the loop
+creates (paths under `<workspace>` unless absolute):
 
 ```text
 <workspace>/
-├── .env                                     # NGC_KEY (nvcr.io/* image pulls — both nvstaging/tao and nv-metropolis-dev), HF_TOKEN (HuggingFace pre-flight pulls)
+├── images/                                  # canonical real-image root shared by train, validation, KPI, and mining CSVs
+│   └── golden/images/                       # golden/reference component crops
 ├── specs/baseline_spec.yaml                 # ChangeNet train/eval spec
 ├── train/base/
-│   ├── training_set.csv                     # seed training rows; ChangeNet 14-column siamese schema
+│   ├── training_set.csv                     # seed training rows; four mandatory ChangeNet columns
 │   └── validation_set.csv                   # held-out rows; checked for leakage against every train CSV
 ├── kpi/
-│   ├── images/                              # KPI test images (real data only — no generated images here)
-│   └── testing_set.csv                      # labels live in the CSV
+│   └── testing_set.csv                      # labels live in the CSV; paths resolve against <workspace>/images
 ├── augmentation/
 │   ├── mining_pool/
-│   │   ├── mining_pool.csv                  # append-only production-line samples; paths relative to this dir
-│   │   └── images/                          # source images referenced by mining_pool.csv (e.g. *_SolderLight.jpg)
+│   │   └── mining_pool.csv                  # append-only production-line samples; VCN paths resolve against <workspace>/images
 │   └── anomalygen/                          # [Optional] User override slots for AnomalyGen assets.
 │       │                                    # If pre-staged, the loop uses these host paths verbatim.
-│       │                                    # If absent, the paidf-anomalygen skill handles asset acquisition
-│       │                                    # internally — exact storage location is its concern, not the loop's.
+│       │                                    # If absent, the tao-generate-anomalies skill auto-downloads
+│       │                                    # the fine-tuned checkpoint and other assets after approval.
 │       │                                    # `<project>` is the project label (e.g. UC1).
-│       │                                    # See references/paidf-anomalygen.md for details.
-│       ├── checkpoints/<project>/           # Fine-tuned PCB AnomalyGen model override (ag_config.yaml + checkpoints/{latest_checkpoint.txt, model/iter_<step>.pt}).
-│       ├── base_checkpoints/                # Cosmos base models cache override (~22 GB for 2B-only, ~140 GB with 14B + T5-11b).
+│       │                                    # See references/tao-generate-anomalies.md for details.
+│       ├── checkpoints/<project>/           # Optional BYO override; HF checkpoint auto-downloads by default.
+│       ├── base_checkpoints/                # Manifest-pinned Cosmos base models cache (~22 GB; Predict2 Text2Image 2B).
 │       └── datasets/<project>/              # PCB reference data override — defect_spec.jsonl + per-texture image/mask subdirs.
 └── results/run_<YYYYMMDD_HHMMSS>/           # created/resumed by this workflow (= ${RESULTS_DIR})
 ```
 
-**ChangeNet CSV schema (VCN).** Mandatory columns: `input_path`, `golden_path`, `label`, `object_name` (siamese change-detector — a row without `golden_path` is unusable). Preserve `boardname`, scores, and provenance fields when present. TAO builds the full image path as `{images_dir}/{input_path}/{object_name}_{light}{image_ext}` — `input_path` is a directory, not a file. Full 14-column enumeration + example row: `references/data-onboarding.md`.
+**ChangeNet CSV schema (VCN).** All three CSVs (`training_set.csv`,
+`validation_set.csv`, `testing_set.csv`) share the same schema with four mandatory columns:
+
+| # | Column | Required? | Meaning |
+|---|---|---|---|
+| 1 | `input_path` | **yes** | Directory (not a file) holding the component crop, relative to `images_dir`. |
+| 2 | `golden_path` | **yes** | Directory of the golden/reference image for the same component. A row without it is unusable (this is a siamese change-detector). |
+| 3 | `label` | **yes** | `PASS` (exact case — the dataloader's class-0 sentinel) or a defect string (`Missing`, `Shift`, …). |
+| 4 | `object_name` | **yes** | Component id / filename stem, e.g. `C1018@1`; do not include the lighting suffix or file extension. |
+
+Additional production metadata columns are optional and may be preserved when
+present; they are not part of the required ChangeNet CSV contract. `label` case
+matters — keep `PASS` exactly, lowercase + strip everything else (see
+`references/visual-changenet.md`). TAO constructs each image path as
+`{images_dir}/{input_path}/{object_name}_{light}{image_ext}`. The
+`_{light}{image_ext}` filename suffix is defined in the run's `spec.yaml`, not
+in the CSV: `{light}` is a key in `dataset.classify.input_map` (for example,
+`SolderLight`), and `{image_ext}` is `dataset.classify.image_ext` (for example,
+`.jpg`).
+
+The canonical host image directory is `<workspace>/images`. A legacy
+`<workspace>/kpi/images` directory or symlink is accepted only as a fallback;
+Pre-Flight resolves the real path once, records it as `config.images_dir`, and
+every Docker launch mounts that recorded directory. Do not require the legacy
+symlink and do not infer that images are present from a stale workspace
+snapshot.
+
+Example row:
+```
+input_path,golden_path,label,object_name
+690-5G190-0510-001P1/AOI_B/FXLH_..._AOI_B_20230317130332/PerComponent,golden/images/690-5G190-0510-001P1BOT/,PASS,C1018@1
+```
 
 ## Output Layout
 
@@ -47,9 +107,8 @@ Relative to `<workspace>`:
 
 ```text
 results/run_<YYYYMMDD_HHMMSS>/               # = ${RESULTS_DIR}
-├── deft_state.json                          # current resume snapshot (schema: references/deft_state.json)
-├── loop_log.jsonl                           # append-only stage log; single source of truth
-├── DEFT_Loop_Report.html                    # re-rendered after every stage by agents/reporter.md
+├── deft_state.json                          # resume snapshot + ordered events; single source of truth
+├── DEFT_Loop_Report.html                    # atomically refreshed by the commit_stage.py report hook
 ├── best_model.json                          # inference handoff metadata (see references/prepare-for-inference.md)
 ├── best_model_inference_spec.yaml           # ready-to-run TAO inference spec built from training config
 ├── iter${ITER}_summary.md                   # ≤300-word per-iteration summary
@@ -62,7 +121,7 @@ results/run_<YYYYMMDD_HHMMSS>/               # = ${RESULTS_DIR}
     ├── anomalygen/
     │   ├── amp/                             # AMP testcase intermediates (one subdir per sample row in testcase.jsonl)
     │   ├── testcase.jsonl                   # built by prep_testcase.sh; consumed by run_sdg.sh
-    │   └── sdg/                             # `synthetic_dataset_generation.py` output (= paidf-anomalygen `output_dir`)
+    │   └── sdg/                             # `synthetic_dataset_generation.py` output (= tao-generate-anomalies `output_dir`)
     │       ├── SDG_result.csv               # one row per generated sample with params + PSNR
     │       ├── reconstructed_image/         # NG outputs (used as ChangeNet input_path)
     │       ├── original_image/              # OK inputs paired 1-to-1 (used as ChangeNet golden_path)

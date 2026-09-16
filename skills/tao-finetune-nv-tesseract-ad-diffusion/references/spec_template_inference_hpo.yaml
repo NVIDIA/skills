@@ -1,0 +1,11 @@
+dataset:
+  csv: ""
+  label_col: label
+  eval_rows: 2000
+hpo:
+  nsample: 15
+  threshold_strategy: scs
+  model_path: ""
+  config_path: ""
+train:
+  output_dir: artifacts/inference_hpo

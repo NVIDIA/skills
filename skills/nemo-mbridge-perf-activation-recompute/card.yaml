@@ -1,87 +1,112 @@
 title: activation_recompute
-validated_on: "2026-04-02"
+validated_on: "2026-08-12"
 summary: >
-  Selective activation recompute trades GPU compute for memory by recomputing
-  specific module outputs during backward instead of storing them. Megatron
-  Bridge exposes recompute_modules (core_attn, mlp, layernorm, moe, moe_act,
-  shared_experts, mla_up_proj) for fine-grained control. Measured on Llama3
-  70B SFT (32x H100, FP8 CS): mlp recompute saves ~3 GB peak memory but
-  costs ~16% GPU utilization; layernorm recompute is nearly free (~0% cost)
-  but saves negligible memory; core_attn recompute is the default and is
-  cheap when Flash Attention is active. Full-layer recompute
-  (recompute_granularity=full) gives the strongest memory reduction but the
-  highest compute overhead.
+  Selective activation recompute trades replayed forward work for lower retained
+  activation memory. The correct checkpoint boundary is architecture- and
+  backend-specific: core_attn is common for standard attention, mla_up_proj is
+  often more relevant for MLA, and moe_act or layernorm plus moe_act are common
+  narrow choices for grouped MoE. The pinned Megatron Core also accepts mlp,
+  moe, shared_experts, and gdn_norm_out. Full-layer recompute has the broadest
+  memory effect and replay cost. Development branches may expose additional
+  model-specific labels, so the exact target revision is authoritative.
 validation_status:
   selective_recompute_config:
-    - code_verified  # transformer_config.py, transformer_block.py
+    - code_verified  # transformer_config.py and module-local checkpoint sites
   full_layer_recompute_config:
-    - code_verified  # transformer_config.py
+    - code_verified  # transformer_config.py and transformer_block.py
   recompute_modules_enum:
-    - code_verified  # transformer_block.py
+    - code_verified  # transformer_config.py
   llama3_70b_sft_fp8_cs_experiment:
-    - measured  # PR #3107, 32x H100, TP4 PP4 VPP5 DP2
+    - measured  # historical PR #3107; contextual, not a cross-module ranking
+  moonlight_16b_bf16_experiment:
+    - measured  # matched 8-H100 module sweep with an empty-list control
+  nemotron_3_nano_bf16_experiment:
+    - measured  # matched 16-H100 capacity sweep through complete training steps
 training_dimensions:
   speed:
-    effect: "~0% (core_attn/layernorm) to ~16% slower (mlp)"
-    confidence: high
-    rationale: >
-      Measured on Llama3 70B SFT 32x H100: core_attn recompute costs ~0.8%
-      (704 vs 710 TFLOP/s/GPU); layernorm recompute adds ~0.3% on top;
-      mlp recompute costs ~16% (594 TFLOP/s/GPU) because the FFN
-      (hidden=28672) is expensive to recompute.
-  memory:
-    effect: "~0 GB (layernorm) to ~3 GB (mlp) peak memory reduction"
-    confidence: high
-    rationale: >
-      Measured on Llama3 70B SFT 32x H100: mlp recompute reduced peak from
-      58.8 to 55.6 GB. Layernorm recompute did not measurably reduce peak.
-      core_attn+layernorm together still OOMed at 59.6 GB.
-  scale:
-    effect: "neutral"
+    effect: workload-dependent replay overhead
     confidence: medium
     rationale: >
-      Recompute is per-GPU and does not change communication patterns.
+      Narrow output-discard boundaries such as moe_act can replay much less work
+      than whole mlp or moe boundaries. Attention cost also depends on the
+      backend and context-parallel communication. The historical Llama 3 70B
+      run measured mlp only relative to a core_attn baseline, not to a matched
+      no-recompute control. The matched Moonlight run found 1.99% overhead for
+      moe_act, 5.19% for mla_up_proj, and no useful core_attn memory reduction
+      in that exact fused-attention recipe. In the matched Nemotron run,
+      whole-moe recompute was the smallest tested passing boundary; adding
+      layernorm cost 3.07% more step time for 1.014 GB more rank-0 headroom.
+  memory:
+    effect: workload-dependent reduction in retained activations
+    confidence: medium
+    rationale: >
+      Savings depend on which tensors drive the per-rank peak. Standard
+      attention, MLA expansions, dense FFNs, grouped expert activations, and
+      norm outputs require different boundaries; nested boundaries are not
+      additive. The matched Moonlight sweep directly confirmed comparable
+      savings from moe_act and mla_up_proj, no material core_attn reduction,
+      and no incremental peak benefit from the tested nested additions. The
+      Nemotron sweep showed that a narrow boundary can materially reduce an
+      intermediate peak yet remain insufficient for the complete step.
+  scale:
+    effect: can replay communication at some boundaries
+    confidence: high
+    rationale: >
+      core_attn under context parallelism, whole moe, and gdn_norm_out can
+      replay communication during backward. Scale and topology therefore form
+      part of the measurement contract.
   convergence:
-    effect: "no change expected (numerically identical forward)"
-    confidence: high
+    effect: no semantic change expected when RNG replay is correct; verify
+    confidence: medium
     rationale: >
-      Recompute replays the same forward computation — no numerical change.
+      Recomputation should reproduce the forward region during backward, but
+      dropout, graph capture, precision, and branch-specific behavior warrant a
+      numerical or short convergence check.
   stability:
-    effect: "neutral"
+    effect: conditional on feature compatibility
     confidence: high
     rationale: >
-      No additional failure modes beyond the existing config constraints.
+      Megatron Core validates restrictions involving CUDA graphs, FP8 modes,
+      overlap features, and the selected module labels.
 enable_when:
-  - training OOMs or is close to the GPU memory limit
-  - memory savings from lighter modules (core_attn, layernorm) are enough
-  - throughput loss from mlp recompute is acceptable for the use case
-  - full-layer recompute is needed as a last resort for very tight memory
+  - allocated activation memory, rather than allocator fragmentation, drives OOM or inadequate headroom
+  - a matched architecture-specific checkpoint boundary reduces the hot rank's peak at acceptable throughput
+  - full-layer recompute is needed after narrower selective boundaries are exhausted
 avoid_when:
-  - the model already fits with acceptable headroom
-  - mlp recompute cost (~16%) is too high and VPP or parallelism tuning can fix OOM instead
-  - TE-scoped CUDA graphs are enabled with recompute_granularity=full (incompatible)
-  - CPU offloading is available and cheaper (PP=1 only)
+  - the model fits with acceptable headroom and recompute does not improve another measured objective
+  - max reserved memory is high but max allocated memory does not support an activation-capacity diagnosis
+  - the selected module is absent or inactive for the model's measured layers
+  - a required CUDA-graph, FP8, or overlap feature is incompatible with the boundary
 interactions:
   required: []
   conditional:
-    - recompute_granularity=full is incompatible with TE-scoped CUDA graphs
-    - recompute_granularity=full with uniform method requires recompute_num_layers
-    - recompute_granularity=selective requires recompute_modules list
-    - mlp recompute combined with core_attn is slightly worse than mlp alone due to double recompute overhead
+    - selective granularity accepts an empty recompute_modules list as a matched no-recompute control
+    - full granularity requires recompute_method and recompute_num_layers
+    - full recompute with CUDA graphs requires cuda_graph_impl=full_iteration
+    - selective graph capture requires each checkpoint boundary to lie wholly inside or wholly outside the graph scope
+    - core_attn can replay context-parallel communication and may add little with fused or Flash Attention
+    - moe_act and layernorm have FP8 delayed-scaling restrictions
+    - whole moe recompute is incompatible with expert-parallel overlap
+    - shared_experts recompute is incompatible with shared-expert overlap
   incompatible:
-    - recompute_granularity=full with cuda_graph_impl=transformer_engine
+    - full recompute with scoped or local non-full-iteration CUDA graphs
+    - whole moe recompute with expert-parallel overlap
+    - shared_experts recompute with shared-expert overlap
 feature_meaning:
   recompute_granularity: >
-    Controls scope: null (no recompute), selective (per-module), full
-    (entire transformer layer).
+    Controls scope: null (no recompute), selective (per-module), or full
+    (complete transformer-layer regions).
   recompute_modules: >
-    List of modules to selectively recompute: core_attn, mlp, layernorm,
-    moe, moe_act, shared_experts, mla_up_proj.
+    Pinned-revision labels are core_attn, mla_up_proj, layernorm, moe_act, mlp,
+    moe, shared_experts, and gdn_norm_out. Development revisions can add labels;
+    for example, DeepSeek V4's mhc label requires its development MCore branch.
   recompute_method: >
-    For full granularity: uniform (divide layers evenly into blocks) or
-    block (recompute a fixed number of layers per PP stage).
+    For full granularity: uniform groups fixed-size layer blocks; block selects
+    a fixed number of layers per pipeline stage with virtual-pipeline-aware
+    distribution.
   recompute_num_layers: >
-    For full granularity: number of layers per recomputation block.
+    For full granularity: the layer group size or number of selected layers,
+    depending on recompute_method.
 config_keys:
   - model.recompute_granularity
   - model.recompute_modules
@@ -89,22 +114,140 @@ config_keys:
   - model.recompute_num_layers
   - model.distribute_saved_activations
 recommended_path:
-  first_try: "recompute_granularity=selective, recompute_modules=[core_attn]"
-  if_still_oom: "add layernorm (cheap) or mlp (expensive but saves ~3 GB)"
-  last_resort: "recompute_granularity=full, recompute_method=uniform"
-  alternative: "see skills/nemo-mbridge-perf-memory-tuning/ for VPP tuning and other memory strategies"
+  first_step: compare per-rank allocated and reserved peaks and keep a matched no-recompute control
+  standard_attention: test core_attn, but compare it with an empty list under fused or Flash Attention
+  mla: test mla_up_proj first when expanded Q/K/V tensors dominate; add core_attn only with evidence
+  grouped_moe: test moe_act and then layernorm when their outputs drive the peak
+  dense_ffn: test mlp only when its broader replay cost is acceptable
+  broader_moe: reserve whole moe for cases where narrower MoE boundaries do not fit
+  last_resort: use full recompute with recompute_method and recompute_num_layers
+  alternative: see skills/nemo-mbridge-perf-memory-tuning for allocator, parallelism, and offloading options
 expected_metric_change:
   - metric: peak_memory
     direction: down
-    magnitude: "~0 GB (layernorm) to ~3 GB (mlp) on Llama3 70B SFT"
-    conditions: Llama3 70B, TP4 PP4 VPP5 DP2, 32x H100 80GB, FP8 CS
-    evidence: measured_pr_3107
-  - metric: gpu_utilization
-    direction: down
-    magnitude: "~0% (core_attn/layernorm) to ~16% (mlp)"
-    conditions: same as peak_memory
-    evidence: measured_pr_3107
+    magnitude: must be measured for the exact boundary and hot rank
+    conditions: matched model, backend, parallelism, precision, batch, and sequence configuration
+    evidence: module checkpoint implementations, matched Moonlight and Nemotron studies, and historical measured_pr_3107
+  - metric: steady_state_step_time
+    direction: up
+    magnitude: depends on replayed compute and communication
+    conditions: same matched configuration and warmup
+    evidence: module checkpoint implementations, matched Moonlight and Nemotron studies, and historical measured_pr_3107
 measured_results:
+  - model: Moonlight 16B
+    task: pretrain_short_run
+    revisions:
+      bridge: 600d069b824dd5ce50367a311a5a3244478faf22
+      megatron_core: 24bad8e677d22625d86ef2a54c9506b6e4992c93
+    parallelism: TP2_PP1_CP1_EP8_DP4
+    gpus: 8
+    gpu: H100_80GB
+    precision: BF16
+    seq_length: 4096
+    mbs: 1
+    gbs: 4
+    steps: 20
+    measurement: peak allocated after iteration 2; mean time and throughput over iterations 11-20
+    numerical_sanity: all losses finite; zero skipped and NaN iterations
+    experiments:
+      - name: empty_control
+        recompute_modules: []
+        peak_mem_gb: 36.618
+        step_time_ms: 457.18
+        tflops_per_gpu: 77.50
+      - name: core_attn
+        recompute_modules: ["core_attn"]
+        peak_mem_gb: 36.614
+        peak_mem_vs_control_pct: -0.01
+        step_time_ms: 474.80
+        step_time_vs_control_pct: 3.85
+      - name: mla_up_proj
+        recompute_modules: ["mla_up_proj"]
+        peak_mem_gb: 35.902
+        peak_mem_vs_control_pct: -1.96
+        step_time_ms: 480.89
+        step_time_vs_control_pct: 5.19
+      - name: mla_up_proj_plus_mlp
+        recompute_modules: ["mla_up_proj", "mlp"]
+        peak_mem_gb: 35.917
+        peak_mem_vs_control_pct: -1.91
+        step_time_ms: 496.73
+        step_time_vs_control_pct: 8.65
+      - name: moe_act
+        recompute_modules: ["moe_act"]
+        peak_mem_gb: 35.941
+        peak_mem_vs_control_pct: -1.85
+        step_time_ms: 466.26
+        step_time_vs_control_pct: 1.99
+      - name: layernorm_plus_moe_act
+        recompute_modules: ["layernorm", "moe_act"]
+        peak_mem_gb: 35.949
+        peak_mem_vs_control_pct: -1.83
+        step_time_ms: 506.53
+        step_time_vs_control_pct: 10.79
+    conclusion: >
+      For this exact mixed dense/MLA/MoE recipe, moe_act is the efficient first
+      boundary and mla_up_proj is the next candidate when its roughly 39 MB
+      additional saving matters. Adding mlp or layernorm did not reduce the
+      observed peak, and core_attn added cost without material memory benefit.
+  - model: Nemotron 3 Nano
+    task: pretrain_capacity_short_run
+    revisions:
+      bridge: 600d069b824dd5ce50367a311a5a3244478faf22
+      megatron_core: 24bad8e677d22625d86ef2a54c9506b6e4992c93
+    architecture: 52-layer hybrid Mamba/fused-attention MoE
+    parallelism: TP1_PP1_CP1_EP8_DP16
+    expert_data_parallel_size: 2
+    gpus: 16
+    gpu: H100_80GB
+    precision: BF16
+    seq_length: 8192
+    mbs: 1
+    gbs: 16
+    steps: 12
+    execution: HybridEP, grouped GEMM, TE CUDA graphs for attention and Mamba
+    measurement: rank-0 reported peak; mean time and throughput over iterations 7-12 for passing rows
+    experiments:
+      - name: empty_control
+        recompute_modules: []
+        peak_mem_gb_after_iteration_1: 66.297
+        status: OOM_iteration_2_moe_router
+      - name: core_attn
+        recompute_modules: ["core_attn"]
+        status: OOM_iteration_1_grouped_expert_linear
+      - name: moe_act
+        recompute_modules: ["moe_act"]
+        peak_mem_gb_after_iteration_1: 62.103
+        peak_mem_vs_control_pct_at_iteration_1: -6.33
+        status: OOM_iteration_2_output_projection
+      - name: layernorm_plus_moe_act
+        recompute_modules: ["layernorm", "moe_act"]
+        status: OOM_iteration_1_output_projection
+      - name: moe
+        recompute_modules: ["moe"]
+        peak_mem_gb: 64.653
+        step_time_ms: 657.42
+        tflops_per_gpu: 277.72
+        status: completed_12_steps
+      - name: moe_plus_layernorm
+        recompute_modules: ["moe", "layernorm"]
+        peak_mem_gb: 63.639
+        peak_mem_vs_moe_pct: -1.57
+        step_time_ms: 677.62
+        step_time_vs_moe_pct: 3.07
+        tflops_per_gpu: 270.62
+        status: completed_12_steps
+    numerical_sanity: both passing rows had finite losses and zero skipped or NaN iterations
+    comparison_limitations: >
+      Failed rows do not provide steady-state timing, and peaks from different
+      failure phases are not directly rankable. A native 8-H100 exploration
+      hit FP32 optimizer-state capacity and is excluded from throughput claims.
+    conclusion: >
+      Whole-moe recompute was the smallest tested boundary that completed the
+      exact capacity-limited workload. Adding layernorm bought 1.014 GB more
+      rank-0 headroom at 3.07% higher step time. Moe-act provided real relief
+      but did not make the complete step viable; core-attn did not make the
+      workload fit and yielded no positive memory evidence.
   - model: Llama3 70B
     task: sft
     parallelism: TP4_PP4_VPP5_DP2
@@ -115,8 +258,11 @@ measured_results:
     mbs: 1
     gbs: 32
     golden_tflops: 709.93
+    comparison_limitations: >
+      No matched no-recompute row was recorded; golden throughput was not a
+      paired module-only comparison; results do not cover MLA or MoE.
     experiments:
-      - name: baseline
+      - name: core_attn_baseline
         recompute_modules: ["core_attn"]
         tflops: 704
         vs_golden_pct: -0.8
@@ -141,34 +287,51 @@ measured_results:
         peak_mem_gb: 59.6
         status: OOM_on_rank0
 failure_modes:
-  - name: mlp_recompute_too_expensive
-    symptom: ">15% GPU utilization drop"
-    likely_cause: FFN hidden dimension is large (e.g. 28672 for Llama3 70B)
-    fix: use VPP tuning or parallelism changes instead
-  - name: layernorm_insufficient_savings
-    symptom: still OOM after adding layernorm recompute
-    likely_cause: layernorm activations are small relative to total peak
-    fix: add mlp recompute or switch to VPP tuning
-  - name: full_recompute_with_te_cuda_graphs
+  - name: core_attn_has_little_incremental_effect
+    symptom: no material peak reduction against the empty-list control
+    likely_cause: fused attention already rematerializes the expensive internals or another architecture region sets the peak
+    fix: attribute the peak and test mla_up_proj, moe_act, layernorm, or another applicable boundary
+  - name: module_is_inactive
+    symptom: selected recompute label causes no measurable change
+    likely_cause: the module is absent on the measured layers, such as mlp on pure-MoE layers, or graph capture bypasses the wrapper
+    fix: inspect the provider and final graph scope before choosing another boundary
+  - name: overlap_validation_failure
+    symptom: Megatron Core rejects whole-moe or shared-expert recompute
+    likely_cause: expert-parallel or shared-expert overlap conflicts with backward replay
+    fix: retain overlap and use a compatible inner boundary, or disable overlap and remeasure the complete configuration
+  - name: later_failure_is_misclassified_as_success
+    symptom: recompute advances beyond the control's failure point but still OOMs
+    likely_cause: the boundary moved the peak into a later forward region, gradient synchronization, or optimizer initialization
+    fix: record the changed failure stage, but require optimizer initialization and multiple steady-state steps before calling it a pass
+  - name: full_recompute_with_scoped_cuda_graphs
     symptom: "AssertionError: full recompute is only supported with full iteration CUDA graph"
-    likely_cause: recompute_granularity=full with any TE-scoped CUDA graph (attn, mlp, moe_router, etc.). Common on FP8 CS configs that default to cuda_graph_impl=transformer_engine + scope=mlp (e.g. LLAMA3_70B_SFT_CONFIG_H100_FP8_CS_V1). Enforced in MCore transformer_config.py:2001-2005.
-    fix: use recompute_granularity=selective with recompute_modules, or set cuda_graph_impl=none, or switch to cuda_graph_impl=local + cuda_graph_scope=full_iteration
+    likely_cause: full granularity is combined with a non-full-iteration graph implementation
+    fix: use selective recompute, set cuda_graph_impl=none, or use cuda_graph_impl=full_iteration
 known_constraints:
-  - recompute_granularity=selective requires a non-empty recompute_modules list
+  - recompute_granularity=selective accepts an empty recompute_modules list
   - recompute_granularity=full requires recompute_method and recompute_num_layers
   - distribute_saved_activations cannot be used with sequence_parallel=True
-  - combining mlp+core_attn is slightly worse than mlp alone due to double overhead
+  - valid module labels are revision-specific; use the exact target Megatron Core validator
+  - module boundaries can overlap or nest, so memory and replay costs are not additive
 known_limitations:
-  - per-module memory savings vary significantly by model architecture
-  - no automatic selection of optimal recompute_modules
-  - memory savings from layernorm are negligible on most architectures
+  - no automatic selection of the optimal recompute_modules list
+  - no single module ordering applies across standard attention, MLA, MoE, and GDN models
+  - matched Moonlight evidence covers one short BF16 MLA+MoE configuration and is not a universal ranking
+  - matched Nemotron evidence covers one short BF16 hybrid MoE capacity configuration and is not a universal ranking
+  - historical Llama evidence lacks a matched empty-list control
 evidence:
   - docs/training/activation-recomputation.md
-  - "PR #3107 (Llama3 70B SFT OOM fix experiment)"
-  - src/megatron/bridge/recipes/llama/llama3.py
+  - "2026-08-12 matched H100 Moonlight 16B activation-recompute study"
+  - "2026-08-12 matched H100 Nemotron 3 Nano activation-recompute study"
+  - "PR #3107 (historical Llama3 70B SFT experiment)"
   - 3rdparty/Megatron-LM/megatron/core/transformer/transformer_config.py
-  - 3rdparty/Megatron-LM/megatron/core/transformer/transformer_block.py
+  - 3rdparty/Megatron-LM/megatron/core/transformer/attention.py
+  - 3rdparty/Megatron-LM/megatron/core/transformer/multi_latent_attention.py
+  - 3rdparty/Megatron-LM/megatron/core/transformer/transformer_layer.py
+  - 3rdparty/Megatron-LM/megatron/core/transformer/moe/experts.py
+  - 3rdparty/Megatron-LM/megatron/core/transformer/moe/moe_layer.py
+  - 3rdparty/Megatron-LM/megatron/core/ssm/gated_delta_net/gdn.py
 follow_up_validation:
-  - Measure selective recompute impact on MoE models (moe, moe_act modules).
-  - Measure mla_up_proj recompute impact on DeepSeek-style MLA models.
-  - Test selective recompute + TE-scoped CUDA graphs combined perf impact.
+  - Add matched GDN measurements.
+  - Measure context-parallel communication replay for attention and GDN boundaries.
+  - Validate representative selective boundaries under the supported CUDA-graph scopes and FP8 recipes.

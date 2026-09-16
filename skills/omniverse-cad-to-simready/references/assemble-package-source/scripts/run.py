@@ -15,7 +15,9 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "shared"))
 
-from script_utils import check_result_with_code as _check
+from script_utils import check_result_with_code as _check, inspect_png
+
+from preflight_manifest import preflight_required, preflight_status_check
 
 
 USD_SUFFIXES = {".usd", ".usda", ".usdc"}
@@ -312,6 +314,21 @@ def _self_containment_checks(deliverable_root: Path, simready_root: Path) -> lis
     return checks
 
 
+def _thumbnail_pixel_checks(thumbnail: Path, inspection: dict[str, Any]) -> list[dict[str, Any]]:
+    # Same fail-closed rule as the ovrtx-render-service render gate: pixel
+    # inspection is what proves the thumbnail is not blank, so an unavailable
+    # inspection (missing Pillow, unreadable PNG, ...) is a blocker rather than
+    # a skip. There is deliberately no --no-fail-on-uniform opt-out here: that
+    # flag exists on the render stage for diagnostic-only runs, while every
+    # thumbnail assembled here ships inside the deliverable.
+    if inspection.get("available") is False:
+        message = inspection.get("warning", "Could not inspect thumbnail pixels")
+        return [_check("thumbnail_pixel_inspected", False, str(message), code="SR.002")]
+    if inspection.get("uniform"):
+        return [_check("thumbnail_non_uniform", False, f"Thumbnail is blank/uniform by pixel inspection: {thumbnail}", code="SR.002")]
+    return [_check("thumbnail_non_uniform", True, f"Thumbnail has visible pixel variation: {thumbnail}", "info", code="SR.002")]
+
+
 def _errors_from_checks(checks: list[dict[str, Any]]) -> list[str]:
     return [check["message"] for check in checks if check["severity"] == "error" and not check["passed"]]
 
@@ -358,8 +375,18 @@ def assemble(args: argparse.Namespace) -> dict[str, Any]:
         "next_step": "fix-assembly-inputs",
     }
     checks = report["checks"]
+    if preflight_required():
+        preflight_check = preflight_status_check("assemble-package-source", "openusd_python")
+        if not preflight_check["passed"]:
+            report["errors"] = [preflight_check["message"]]
+            _write_report(report_path, report)
+            return report
     checks.append(_check("final_usd_exists", final_usd.is_file(), f"Final USD exists: {final_usd}" if final_usd.is_file() else f"Final USD does not exist: {final_usd}"))
     checks.append(_check("thumbnail_exists", args.thumbnail.is_file(), f"Thumbnail exists: {args.thumbnail}" if args.thumbnail.is_file() else f"Thumbnail does not exist: {args.thumbnail}", code="SR.002"))
+    if args.thumbnail.is_file():
+        thumbnail_inspection = inspect_png(args.thumbnail)
+        report["thumbnail_inspection"] = thumbnail_inspection
+        checks.extend(_thumbnail_pixel_checks(args.thumbnail, thumbnail_inspection))
     if _errors_from_checks(checks):
         report["errors"] = _errors_from_checks(checks)
         _write_report(report_path, report)

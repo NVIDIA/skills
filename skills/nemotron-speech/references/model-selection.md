@@ -12,8 +12,9 @@
 | **Current TTS models, voice lists, supported languages, VRAM** | https://docs.nvidia.com/nim/speech/latest/reference/support-matrix/tts.html |
 | **Current NMT models, language pairs, VRAM** | https://docs.nvidia.com/nim/speech/latest/reference/support-matrix/nmt.html |
 | **ASR per-model feature support** (word boosting, ITN, force_eou, diarization, etc.) | https://docs.nvidia.com/nim/speech/latest/asr/customization/customization.html |
-| **TTS per-model feature support** (SSML, voice list, sample-rate, emotional styles) | https://docs.nvidia.com/nim/speech/latest/tts/customization/customization.html |
-| **NMT per-model feature support** (DNT tags, custom dictionaries, max-length variation, language pairs) | https://docs.nvidia.com/nim/speech/latest/nmt/customization/customization.html |
+| **TTS per-model feature support** (SSML, custom dictionaries, `custom_configuration` keys) | https://docs.nvidia.com/nim/speech/latest/tts/customization.html |
+| **TTS voices and emotional styles** | https://docs.nvidia.com/nim/speech/latest/tts/voices.html |
+| **NMT per-model feature support** (`<dnt>` tags, custom dictionaries, batch translation) | https://docs.nvidia.com/nim/speech/latest/nmt/custom-dictionaries.html |
 | **ASR performance benchmarks** (latency, throughput, RTFX per GPU) | https://docs.nvidia.com/nim/speech/latest/reference/performances/asr/performance.html |
 | **TTS performance benchmarks** | https://docs.nvidia.com/nim/speech/latest/reference/performances/tts/performance.html |
 | **NMT performance benchmarks** | https://docs.nvidia.com/nim/speech/latest/reference/performances/nmt/performance.html |
@@ -108,7 +109,7 @@ If the input *looks* sensitive (PII, health records, internal-confidential conte
 ### Routing values handoff (any path)
 
 Once a path is committed:
-- **Cloud:** the modality reference shows how to discover the NVCF function-id via the curl one-liner in its Quick path; you don't need to pre-resolve it.
+- **Cloud:** the modality reference shows how to discover the NVCF function-id via its file-based curl recipe in the Quick path; you don't need to pre-resolve it.
 - **Local (running NIM):** pass `SERVER=0.0.0.0:50051` when opening the relevant modality reference.
 - **Local (fresh deploy):** follow the modality reference's Step 1 deploy with `CONTAINER_ID` + `NIM_TAGS_SELECTOR` from the support matrix.
 
@@ -221,9 +222,20 @@ docker run --rm --runtime=nvidia --gpus all ubuntu nvidia-smi -L 2>/dev/null | h
 **NVCF reachable + key valid (one shot — fails fast on bad key or air-gapped box):**
 
 ```bash
+NVCF_FUNCTIONS_JSON=$(mktemp)
+trap 'rm -f "$NVCF_FUNCTIONS_JSON"' EXIT
+
 curl --max-time 3 -fsS -H "Authorization: Bearer $NVIDIA_API_KEY" \
-  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized" \
-  | python3 -c "import sys,json; print(len(json.load(sys.stdin).get('functions',[])), 'functions visible')"
+  --output "$NVCF_FUNCTIONS_JSON" \
+  "https://api.nvcf.nvidia.com/v2/nvcf/functions?visibility=public,authorized"
+
+python3 - "$NVCF_FUNCTIONS_JSON" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as response:
+    print(len(json.load(response).get('functions', [])), 'functions visible')
+PY
 # → "N functions visible" on success; "401 Unauthorized" / curl exit non-zero otherwise
 ```
 

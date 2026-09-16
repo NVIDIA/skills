@@ -39,13 +39,25 @@ hierarchy-level analyzer, not a per-mesh dedup or a prototype-organizer.
 - Operates on the currently-open USD stage retrieved from the Kit USD context.
 - Uses only `pxr` and the Python standard library.
 - Output is plain text written to stdout / the script editor console.
-- No file I/O, no UI, no asynchronous work.
+- No UI, no asynchronous work. File I/O only via the explicit `--output
+  <path>` flag (§8.3), which the runtime-artifact token-budget policy needs
+  so a large report stays on disk instead of passing through an agent's
+  context. Nothing is written unless that flag is given.
 
 ## 3. Inputs
 
 A single configuration block at the top of the script. All values must be
 trivially editable by a user before they paste-and-run, as literal Python
 assignments (not nested dicts).
+
+Two command-line flags exist for the standalone (non-Kit) path and take no
+configuration block entry:
+
+- **`--emit-candidates`** — print the `candidates[]` packet (§6.0) as JSON
+  instead of the plain-text report, so the finder pipes into
+  `select_frontier.py`.
+- **`--output <path>`** — additionally write the full structured report
+  (analysis groups plus the candidate packet) to `<path>` as JSON (§8.3).
 
 ### 3.1 Knobs
 
@@ -74,6 +86,10 @@ assignments (not nested dicts).
 - **`INCLUDE_ATTRIBUTE_CONNECTIONS`** *(bool)* — when true, attribute
   `.GetConnections()` are checked alongside relationships in §7. When
   false, only relationships are checked.
+- **`KIND_TRUST_MAX_SINGLE_MESH_FRACTION`** *(float, `0 < x <= 1`)* — the
+  kind-trust preflight threshold. Authored `kind` is untrusted stage-wide
+  when the fraction of sampled kind prims whose subtree holds ≤ 1 mesh
+  reaches this value. See §6.0.1 for the sampling rule.
 
 ### 3.2 Defaults
 
@@ -93,6 +109,7 @@ mandatory defaults are:
 | `CHECK_INSTANCEABILITY`       | `True`        | Verdicts are usually wanted; cheap to compute. |
 | `MAX_FINDINGS_PER_GROUP`      | `6`           | Enough to diagnose; not enough to drown the report. |
 | `INCLUDE_ATTRIBUTE_CONNECTIONS` | `False`     | Shade-graph traffic is noisy; opt-in keeps the default report focused. |
+| `KIND_TRUST_MAX_SINGLE_MESH_FRACTION` | `0.80` | Measured on monolithic CAD imports, where ~every mesh is tagged `kind=component`; below this, kind still partitions geometry. |
 
 ### 3.3 Validation
 
@@ -298,7 +315,8 @@ structurally**:
   holds > 1 mesh (the multi-mesh parent). Re-derived boundaries that genuinely
   repeat are re-grouped by candidate hash; hash-singletons are grouped by
   normalized sibling name-base, reusing the one sibling-name suffix-stripping
-  normalization (usd-structure-assessment §2.4) — never a second normalizer.
+  normalization (`usd-structure-assessment/README.md` §2.4) — never a second
+  normalizer.
 - **No-collateral rule.** The walk terminates immediately at any node with
   > 1 subtree mesh, so a component that is ITSELF multi-mesh re-derives to
   itself: it keeps its boundary and only loses the `kind` label as the
@@ -537,6 +555,12 @@ Otherwise, the report **must** present, in this order:
 1. A startup line indicating the root being scanned and the active
    `HASH_LEVEL`.
 2. A line indicating how many prims were hashed and that grouping has begun.
+   Followed by a line giving the **maximum hierarchy depth scanned** (relative
+   to `ROOT`) and the depths at which groups were found, including whether any
+   sits below depth 2. The structure-assessment rule "do not call hierarchy
+   dedupe unnecessary from a root-child or depth-2 name scan on a CAD/BIM
+   export" is checked against this line, so a report without it leaves that
+   rule with no evidence.
 3. A header line stating the total number of duplicate groups reported,
    with the active filter values (`MIN_SUBTREE_PRIMS`,
    `MIN_DUPLICATE_COUNT`, `HASH_LEVEL`).
@@ -550,14 +574,22 @@ Otherwise, the report **must** present, in this order:
      I1 determinism).
    - If more copies exist than were shown, an "... and K more" trailer line.
 5. A summary block at the end containing:
-   - **`Total potential prim savings (all groups, after collapse)`** —
-     sum of `subtree_prims * (copies - 1)` across every reported group.
+   - **`Total potential prim savings (unique prims; nested-group overlap
+     excluded)`** — the **eliminated union** across every reported group
+     (§9), not a sum of per-group savings. A smaller repeated subtree can
+     live inside a larger repeated subtree, so both groups count the same
+     prims; summing them double-counts, and on a nesting-doll stage the sum
+     exceeds the stage's own prim count. Per-group `subtree_prims *
+     (copies - 1)` stays a **per-group** figure (the group header line in
+     item 4) and is never totalled.
    - When `CHECK_INSTANCEABILITY` is true, additionally:
-     - **`Clean savings (GREEN+YELLOW)`** — sum of savings of
-       non-`RED` groups.
-     - **`Blocked savings (RED)`** — sum of savings of `RED` groups, with
-       a note recommending the user re-run at `HASH_LEVEL=4` to split
-       those groups.
+     - **`Clean savings (GREEN+YELLOW, unique prims)`** — the eliminated
+       union computed over the non-`RED` groups alone.
+     - **`Blocked savings (RED-only remainder)`** — total minus clean. This
+       is the remainder the `RED` groups still hold, which is not the same
+       number as a union over the `RED` groups (a `RED` group nested inside
+       a clean one contributes nothing). Report it with a note recommending
+       a re-run at `HASH_LEVEL=4` to split those groups.
 6. A footer with caveats. The footer must explicitly state:
    - The tool is advisory only and does not modify the stage.
    - Outgoing references that point outside a candidate subtree may
@@ -572,7 +604,14 @@ Otherwise, the report **must** present, in this order:
      RED means the group as-formed is not actually one prototype and should
      either be split (raise `HASH_LEVEL` to 4) or not be instanced.
 
-### 8.3 Whitespace
+### 8.3 JSON paths
+`--emit-candidates` replaces the plain-text report on stdout with the
+`candidates[]` packet described in §6.0. `--output <path>` writes the
+`analyze()` report merged with that packet to `<path>` as JSON; the
+plain-text report still goes to stdout unless `--emit-candidates` was also
+given. A missing `<path>` argument takes the §8.1 error path.
+
+### 8.4 Whitespace
 The exact wording of headers and delimiters is not prescribed. Blank
 lines between sections (and between groups) are permitted and recommended
 for readability, but are not required. I1 determinism (§10) only
@@ -599,7 +638,15 @@ it does not require parity across different implementations.
   This represents the count of prims that would no longer need to be
   composed if all copies in the group shared a single prototype. This is a
   useful proxy for stage-load and memory savings; it is not a guaranteed
-  performance number.
+  performance number. It is a **per-group** figure only; see the eliminated
+  union below for any total.
+- **Eliminated union** — the number of DISTINCT prims that disappear when
+  every reported group collapses to one representative. Take every path in
+  every reported group except each group's representative (`paths[0]`),
+  drop any path nested under another path already in the set, and sum the
+  subtree sizes of what remains. Nested groups therefore contribute their
+  prims once, so the union can never exceed the traversed prim count (I9,
+  §10). This is the only figure the summary block totals.
 
 ## 10. Invariants
 
@@ -637,6 +684,11 @@ exercise them.
   ≥ 2, the hash must depend only on the *set* of authored attribute
   schemas (and at level ≥ 3, their values), not on the order in which
   they were authored.
+- **I9 — Total savings are bounded by the stage.** The reported total
+  savings (the eliminated union, §9) must never exceed the number of prims
+  traversed under `ROOT`, and clean savings must never exceed the total.
+  A total larger than the stage means per-group savings were summed
+  instead of unioned.
 
 ## 11. Edge cases
 
@@ -780,9 +832,13 @@ any framework.
     in single-digit seconds; at level 4, in tens of seconds. (Numbers
     are guidance, not strict gates — but an implementation that is
     asymptotically worse than O(N) for the hashing pass is non-conforming.)
-20. **Out-of-range config rejection.** Setting `HASH_LEVEL = 5` or
-    `MIN_DUPLICATE_COUNT = 1` causes the tool to print one error line
-    and produce no other output.
+20. **Out-of-range config rejection.** Setting `HASH_LEVEL = 5`,
+    `MIN_DUPLICATE_COUNT = 1`, or
+    `KIND_TRUST_MAX_SINGLE_MESH_FRACTION = "banana"` (or `0`, or `1.5`)
+    causes the tool to print one error line naming that knob and produce
+    no other output. Every knob in §3.1 gets this treatment; a knob the
+    validator does not know about surfaces as a traceback from inside the
+    analysis instead.
 21. **Kind-trust preflight (§6.0.1).** A stage where >= 80% of
     `kind=component` prims contain <= 1 mesh emits candidates with
     `grain_source = structural_fallback` re-derived at the multi-mesh parent
@@ -793,6 +849,20 @@ any framework.
     to itself (no collateral); and a 1-mesh link under a prim with
     `UsdPhysics.ArticulationRootAPI` (or joint children) stays below that
     prim, recording `walkup_stopped_by = articulation`.
+22. **One occurrence set, one candidate (nesting doll).** A stage of 5
+    identical racks each holding 10 identical 1-mesh `kind=component`
+    blades reports two groups (the blades and the racks). The blades are
+    demoted and re-derive to the racks, which are already a reported group,
+    so the emitted candidates contain the racks **once** — the entry
+    carrying the kind-trust provenance (`kind_untrusted`,
+    `kind_untrusted_source_kind`, `rederived_from`, `rederive_group_by`),
+    not the bare one. Emitting both puts the same file in
+    `phase4_targets[]` twice and makes `non_double_counted_savings` sum
+    past the stage's own prim count.
+23. **Total savings never exceed the stage (I9).** On the nesting-doll
+    stage above, the reported total savings is at most the number of prims
+    traversed under `ROOT`. A per-group sum would report 271 against a
+    156-prim stage; the eliminated union reports 151.
 
 ## 14. Non-goals
 

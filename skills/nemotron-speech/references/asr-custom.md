@@ -13,7 +13,7 @@ Deploy a custom or modified ASR pipeline as a Riva NIM when pre-built NIMs do no
 | Question type | Fetch this page |
 |---|---|
 | **Per-model `riva-build` syntax, inline `nemo2riva` source_path config (in the Notes sections under each model), supported NeMo architectures, decoder / VAD / diarizer flags** | https://docs.nvidia.com/nim/speech/latest/asr/customization/pipeline-configuration.html |
-| Current NGC `_finetune` artifacts (`deployable` `.riva` and `trainable` `.nemo` versions) | https://catalog.ngc.nvidia.com/orgs/nim/teams/nvidia/models |
+| Current NGC `_finetune` artifacts (`deployable` `.riva` and `trainable` `.nemo` versions) | https://catalog.ngc.nvidia.com/models |
 | Which base NIM container image to use for a given model family | https://docs.nvidia.com/nim/speech/latest/reference/support-matrix/asr.html |
 | GPU / VRAM / driver minimums | https://docs.nvidia.com/nim/speech/latest/get-started/prerequisites.html |
 | Live, version-accurate parameter list (run inside the container) | `riva-build --config-path=pkg://servicemaker.configs.asr --config-name=<streaming\|offline> -h` |
@@ -79,7 +79,8 @@ export CONTAINER_ID=<base-NIM-image-matching-your-model-family>
 export NIM_EXPORT_PATH=~/nim_export
 export ARTIFACT_DIR=/path/to/artifacts         # directory containing your .riva file
 
-mkdir -p $NIM_EXPORT_PATH && sudo chown 1000:1000 $NIM_EXPORT_PATH
+mkdir -p $NIM_EXPORT_PATH
+sudo chown 1000:1000 $NIM_EXPORT_PATH
 
 ```
 

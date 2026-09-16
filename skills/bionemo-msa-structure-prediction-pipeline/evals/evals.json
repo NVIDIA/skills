@@ -1,0 +1,60 @@
+{
+  "skill_name": "msa-structure-prediction-pipeline",
+  "evals": [
+    {
+      "id": "eval-1-basic-structure-prediction",
+      "prompt": "I have a protein sequence and I want the most accurate structure prediction possible. Here's the sequence: MTEYKLVVVGACGVGKSALTIQLIQNHFVDEYDPTIEDSY. Can you run the full MSA-Search then OpenFold3 pipeline using the hosted NVIDIA API? My NGC_API_KEY is in my environment.",
+      "expected_output": "A Python script that calls the hosted MSA-Search endpoint with the sequence and the case-correct database name 'Uniref30_2302', extracts the A3M alignment from the response using the matching case key, then submits it to the hosted OpenFold3 endpoint in the correct 3-level nested msa structure, and prints the confidence scores from the result.",
+      "files": [],
+      "assertions": [
+        "[msa-search-hosted-endpoint] Uses the correct hosted MSA-Search endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/colabfold/msa-search/predict'",
+        "[case-sensitive-database-name] Database name in MSA-Search payload is 'Uniref30_2302' (capital U, not 'uniref30_2302'): Script contains the string 'Uniref30_2302' (with capital U) in the databases list, not the lowercase form 'uniref30_2302'",
+        "[alignment-extracted-with-matching-key] A3M alignment is extracted from the response using the same case key 'Uniref30_2302': Script accesses the MSA-Search response alignments dict using the key 'Uniref30_2302' (capital U), matching the case-sensitive key that was sent",
+        "[openfold3-hosted-endpoint] Uses the correct hosted OpenFold3 endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/openfold/openfold3/predict'",
+        "[bearer-auth-header] Both requests use Bearer token from NGC_API_KEY environment variable: Script contains 'Authorization' and 'Bearer' and 'NGC_API_KEY' for authenticating requests",
+        "[confidence-score-output] Prints confidence scores from the OpenFold3 response: Script accesses 'confidence_score' or 'complex_plddt_score' or 'ptm_score' from the OpenFold3 response"
+      ]
+    },
+    {
+      "id": "eval-2-high-depth-msa-retrieval",
+      "prompt": "I'm trying to improve my OpenFold3 structure prediction by feeding in a deep MSA. Please run MSA-Search against Uniref30 and then pass the alignment into OpenFold3's msa field correctly. The protein is ACDEFGHIKLMNPQRSTVWYACDEFGHIKLMNPQRSTVWY. Use the hosted API.",
+      "expected_output": "A Python script that retrieves the A3M alignment from MSA-Search using 'Uniref30_2302', then threads that alignment text into OpenFold3's payload under the correct 3-level nested msa structure (msa.uniref30.a3m.alignment and msa.uniref30.a3m.format), not as a flat string.",
+      "files": [],
+      "assertions": [
+        "[msa-search-uniref30-correct-case] MSA-Search databases list uses 'Uniref30_2302' with capital U and full versioned name: Script contains 'Uniref30_2302' in the MSA-Search payload databases list",
+        "[openfold3-nested-msa-structure] OpenFold3 msa field uses 3-level nesting: msa[db_key][format_key][fields], not a flat alignment string: Script constructs the OpenFold3 msa payload with nested dict levels — an outer key (like 'uniref30'), an inner key (like 'a3m'), and fields inside including 'alignment' and 'format' — rather than passing the alignment text directly as a string to a flat 'msa' field",
+        "[a3m-format-field-present] The innermost a3m dict includes the 'format' field set to 'a3m': Script includes 'format': 'a3m' inside the nested msa structure passed to OpenFold3",
+        "[alignment-text-threaded-from-step1] The alignment text from MSA-Search is used as the value of 'alignment' in the OpenFold3 payload: Script uses the A3M alignment text retrieved from the MSA-Search response as the value of the 'alignment' field in the OpenFold3 msa payload",
+        "[output-format-pdb] OpenFold3 payload sets output_format to 'pdb': Script contains 'output_format' and 'pdb' in the OpenFold3 payload",
+        "[structure-saved-to-file] The predicted structure is saved to a file: Script writes the structure content from the OpenFold3 response to a local file"
+      ]
+    },
+    {
+      "id": "eval-3-multi-database-msa",
+      "prompt": "I want to run structure prediction with the best possible MSA coverage. Please search both Uniref30 and the ColabFold environmental database, then use both alignments when calling OpenFold3. Sequence: MTEYKLVVVGACGVGKSALTIQLIQNHFVDE. Hosted API please.",
+      "expected_output": "A Python script that queries MSA-Search with both 'Uniref30_2302' and 'colabfold_envdb_202108' (full versioned names), extracts both A3M alignments from the response, and integrates both into the OpenFold3 msa payload as separate nested entries.",
+      "files": [],
+      "assertions": [
+        "[colabfold-envdb-full-versioned-name] MSA-Search payload uses 'colabfold_envdb_202108' — the full versioned name, not the bare 'colabfold_envdb': Script contains 'colabfold_envdb_202108' (with the full version suffix _202108) in the databases list, not the shortened form 'colabfold_envdb'",
+        "[uniref30-correct-case-in-list] MSA-Search payload also contains 'Uniref30_2302' with correct case: Script contains 'Uniref30_2302' in the databases list alongside the colabfold_envdb_202108 entry",
+        "[both-alignments-extracted] Both alignments are extracted from the MSA-Search response using their exact database name keys: Script accesses the MSA-Search response alignments dict for both 'Uniref30_2302' and 'colabfold_envdb_202108' keys to retrieve each alignment",
+        "[both-alignments-in-openfold3-payload] Both alignments are passed into the OpenFold3 msa field as separate nested entries: Script includes two separate entries in the OpenFold3 msa dict — one for each alignment source — each with its own nested a3m alignment and format fields",
+        "[openfold3-correct-hosted-endpoint] OpenFold3 call uses the correct hosted endpoint: Script contains 'health.api.nvidia.com/v1/biology/openfold/openfold3/predict'"
+      ]
+    },
+    {
+      "id": "eval-4-full-hosted-pipeline-with-scores",
+      "prompt": "Can you run a complete structure prediction pipeline for my protein using both NIMs in sequence? First MSA-Search to get homologous alignments, then OpenFold3 to predict the structure. I want all the confidence metrics printed at the end. Sequence: MALWMRLLPLLALLALWGPDPAAAFVNQHLCGSHLVEAL. Use the hosted API endpoints.",
+      "expected_output": "A Python script that runs the full two-step pipeline against the hosted endpoints, extracts all three score fields (confidence_score, complex_plddt_score, ptm_score) from outputs[0]['structures_with_scores'][0], and prints them.",
+      "files": [],
+      "assertions": [
+        "[msa-search-hosted-endpoint-url] MSA-Search call uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/colabfold/msa-search/predict'",
+        "[openfold3-hosted-endpoint-url] OpenFold3 call uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/openfold/openfold3/predict'",
+        "[confidence-score-field] Script reads 'confidence_score' from structures_with_scores: Script accesses 'confidence_score' from the OpenFold3 response structures_with_scores entry",
+        "[complex-plddt-score-field] Script reads 'complex_plddt_score' from structures_with_scores: Script accesses 'complex_plddt_score' from the OpenFold3 response structures_with_scores entry",
+        "[ptm-score-field] Script reads 'ptm_score' from structures_with_scores: Script accesses 'ptm_score' from the OpenFold3 response structures_with_scores entry",
+        "[correct-response-path] Scores are read from the correct nested path outputs[0]['structures_with_scores'][0]: Script navigates the OpenFold3 response through 'outputs' (index 0), then 'structures_with_scores' (index 0) to read the score fields, not from a flat top-level key"
+      ]
+    }
+  ]
+}

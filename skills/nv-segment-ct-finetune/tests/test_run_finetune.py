@@ -14,7 +14,9 @@
 # limitations under the License.
 
 import importlib.util
+import io
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -23,6 +25,82 @@ spec = importlib.util.spec_from_file_location("run_finetune", SCRIPT)
 mod = importlib.util.module_from_spec(spec)
 assert spec.loader is not None
 spec.loader.exec_module(mod)
+
+
+def test_download_label_dict_uses_reviewed_https_origin(tmp_path, monkeypatch):
+    calls = []
+
+    def open_source(url, *, timeout):
+        calls.append((url, timeout))
+        return io.BytesIO(b'{"lung tumor": 23}\n')
+
+    def build_opener(handler):
+        assert isinstance(handler, mod._NoLabelDictRedirects)
+        return SimpleNamespace(open=open_source)
+
+    monkeypatch.setattr(mod.urllib.request, "build_opener", build_opener)
+    dst = tmp_path / "bundle" / "label_dict.json"
+
+    assert mod._download_label_dict(dst) is True
+    assert calls == [(mod.LABEL_DICT_URL, 30)]
+    assert mod.json.loads(dst.read_text()) == {"lung tumor": 23}
+    # A cache hit must not issue a second request or overwrite the saved file.
+    assert mod._download_label_dict(dst) is False
+    assert len(calls) == 1
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://raw.githubusercontent.com/labels.json",
+        "file:///tmp/labels.json",
+        "ftp://raw.githubusercontent.com/labels.json",
+        "custom://raw.githubusercontent.com/labels.json",
+        "https://example.invalid/labels.json",
+        "https://raw.githubusercontent.com.example.invalid/labels.json",
+        "https://example-user@raw.githubusercontent.com/labels.json",
+        "https://raw.githubusercontent.com:80/labels.json",
+        "https://raw.githubusercontent.com:invalid/labels.json",
+        "https://raw.githubusercontent.com/labels.json#fragment",
+    ],
+)
+def test_download_label_dict_rejects_other_origins_before_io(tmp_path, monkeypatch, url):
+    def unexpected_opener(*args, **kwargs):
+        pytest.fail("invalid download source must be rejected before opening a connection")
+
+    monkeypatch.setattr(mod, "LABEL_DICT_URL", url)
+    monkeypatch.setattr(mod.urllib.request, "build_opener", unexpected_opener)
+    dst = tmp_path / "not-created" / "label_dict.json"
+
+    assert mod._download_label_dict(dst) is False
+    assert not dst.parent.exists()
+
+
+@pytest.mark.parametrize(
+    "newurl",
+    [
+        "http://raw.githubusercontent.com/labels.json",
+        "https://example.invalid/labels.json",
+        "file:///tmp/labels.json",
+        "https://raw.githubusercontent.com/other.json",
+    ],
+)
+def test_label_dict_redirect_handler_rejects_all_redirects(newurl):
+    handler = mod._NoLabelDictRedirects()
+    request = mod.urllib.request.Request(mod.LABEL_DICT_URL)
+    assert handler.redirect_request(request, None, 302, "Found", {}, newurl) is None
+
+
+def test_download_label_dict_handles_rejected_redirect(tmp_path, monkeypatch):
+    def open_source(url, *, timeout):
+        raise mod.urllib.error.HTTPError(url, 302, "redirect rejected", {}, None)
+
+    monkeypatch.setattr(
+        mod.urllib.request, "build_opener", lambda _: SimpleNamespace(open=open_source)
+    )
+    dst = tmp_path / "bundle" / "label_dict.json"
+    assert mod._download_label_dict(dst) is False
+    assert not dst.exists()
 
 
 def test_prepare_bundle_files_stages_train_configs_from_local_upstream(tmp_path, monkeypatch):
@@ -108,6 +186,20 @@ def test_upstream_config_dirs_accept_explicit_local_checkout(tmp_path, monkeypat
     assert config_dir in mod._upstream_config_dirs()
 
 
+def test_resolve_softmax_bundle_root_accepts_pinned_layout(tmp_path, monkeypatch):
+    bundle_root = tmp_path / "NV-Segment-CT"
+    (bundle_root / "configs").mkdir(parents=True)
+    (bundle_root / "scripts").mkdir()
+    for name in ("train_continual_softmax.json", "inference_softmax.json"):
+        (bundle_root / "configs" / name).write_text("{}\n")
+    (bundle_root / "scripts" / "vista3d_softmax.py").write_text("class Vista3dSoftmax: pass\n")
+
+    monkeypatch.setenv("NV_SEGMENT_CT_ROOT", str(bundle_root))
+    monkeypatch.delenv("NV_SEGMENT_CTMR_ROOT", raising=False)
+
+    assert mod.resolve_softmax_bundle_root() == bundle_root
+
+
 def test_build_override_defines_bundle_image_and_label_keys(tmp_path):
     override = mod.build_override(
         tmp_path / "dataset",
@@ -143,6 +235,67 @@ def test_build_override_auto_seg_matches_task06_prompt_settings(tmp_path):
     assert override["drop_point_prob"] == 1.0
     expected_spacing = tuple(float("1.5") for _ in range(3))
     assert override["resample_to_spacing"] == expected_spacing
+
+
+def test_build_softmax_override_uses_fixed_channel_contract(tmp_path, monkeypatch):
+    bundle = tmp_path / "bundle"
+    monkeypatch.setattr(mod, "BUNDLE_DIR", bundle)
+
+    override = mod.build_softmax_override(
+        tmp_path / "dataset",
+        tmp_path / "datalist.json",
+        {"default": [[1, 3], [2, 13]]},
+        [128, 128, 128],
+        0.5,
+        10,
+        1e-4,
+        tmp_path / "checkpoints",
+        tmp_path / "validation",
+    )
+
+    assert override["label_mappings"] == {"default": [[1, 3], [2, 13]]}
+    assert override["finetune_model_path"] == str(bundle / "models" / "model.pt")
+    assert override["ckpt_dir"] == str(tmp_path / "checkpoints")
+    assert override["patch_size"] == [128, 128, 128]
+    assert "drop_label_prob" not in override
+    assert "drop_point_prob" not in override
+
+
+def test_validate_softmax_mapping_accepts_unique_positive_pairs():
+    mod.validate_softmax_mapping({"default": [[1, 3], [2, 13]]})
+
+
+def test_child_process_env_keeps_runtime_values_and_drops_credentials(monkeypatch):
+    monkeypatch.setenv("PATH", "/trusted/bin")
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "2")
+    monkeypatch.setenv("OPENAI_API_KEY", "not-forwarded")
+    monkeypatch.setenv("DATABRICKS_TOKEN", "tracking-only")
+
+    env = mod._child_process_env({"NVSEG_FINETUNE_IN_AUTO_VENV": "1"})
+
+    assert env["PATH"] == "/trusted/bin"
+    assert env["CUDA_VISIBLE_DEVICES"] == "2"
+    assert env["NVSEG_FINETUNE_IN_AUTO_VENV"] == "1"
+    assert "OPENAI_API_KEY" not in env
+    assert "DATABRICKS_TOKEN" not in env
+
+    tracking_env = mod._child_process_env(extra_keys=mod._MLFLOW_CHILD_ENV_KEYS)
+    assert tracking_env["DATABRICKS_TOKEN"] == "tracking-only"
+    assert "OPENAI_API_KEY" not in tracking_env
+
+
+@pytest.mark.parametrize(
+    "mapping",
+    [
+        {"default": []},
+        {"default": [[0, 3]]},
+        {"default": [[1, 3], [1, 13]]},
+        {"default": [[1, 3], [2, 3]]},
+    ],
+)
+def test_validate_softmax_mapping_rejects_invalid_channels(mapping):
+    with pytest.raises(mod.typer.BadParameter, match="softmax"):
+        mod.validate_softmax_mapping(mapping)
 
 
 def test_task06_fixture_selects_sanity_preset() -> None:
@@ -270,3 +423,94 @@ def test_compare_checkpoint_weights_detects_changed_tensor(tmp_path):
     assert comparison["weights_identical"] is False
     assert comparison["differing_tensors"] == 1
     assert comparison["max_abs_diff"] == 1.0
+
+
+@pytest.mark.parametrize("state_key", ["state_dict", "model", "network"])
+def test_compare_checkpoint_weights_loads_nested_state_safely(tmp_path, monkeypatch, state_key):
+    torch = pytest.importorskip("torch")
+    reference = tmp_path / "reference.pt"
+    candidate = tmp_path / "candidate.pt"
+    state = {"layer.weight": torch.ones(2, 2)}
+    torch.save(state, reference)
+    torch.save({state_key: state, "epoch": 1, "metrics": {"dice": 0.5}}, candidate)
+    original_load = torch.load
+    calls = []
+
+    def restricted_load(path, *, map_location, weights_only):
+        calls.append(path)
+        assert map_location == "cpu"
+        assert weights_only is True
+        return original_load(path, map_location=map_location, weights_only=weights_only)
+
+    monkeypatch.setattr(torch, "load", restricted_load)
+    comparison = mod.compare_checkpoint_weights(reference, candidate)
+
+    assert calls == [reference, candidate]
+    assert comparison["compared"] is True
+    assert comparison["weights_identical"] is True
+
+
+@pytest.mark.parametrize("unsupported_checkpoint", ["reference", "candidate"])
+def test_compare_checkpoint_weights_rejects_objects_without_unsafe_retry(
+    tmp_path, monkeypatch, unsupported_checkpoint
+):
+    torch = pytest.importorskip("torch")
+    reference = tmp_path / "reference.pt"
+    candidate = tmp_path / "candidate.pt"
+    state = {"layer.weight": torch.ones(2, 2)}
+    torch.save(state, reference)
+    torch.save(state, candidate)
+    rejected = reference if unsupported_checkpoint == "reference" else candidate
+    # Harmless custom metadata exercises the restricted unpickler's rejection;
+    # no executable payload or unrestricted load is needed for this regression.
+    torch.save({"state_dict": state, "metadata": SimpleNamespace(epoch=1)}, rejected)
+    original_load = torch.load
+    calls = []
+
+    def restricted_load(path, *, map_location, weights_only):
+        calls.append(path)
+        assert map_location == "cpu"
+        assert weights_only is True
+        return original_load(path, map_location=map_location, weights_only=weights_only)
+
+    monkeypatch.setattr(torch, "load", restricted_load)
+    comparison = mod.compare_checkpoint_weights(reference, candidate)
+
+    assert comparison["compared"] is False
+    assert comparison["weights_identical"] is None
+    assert "error" in comparison
+    assert calls == ([reference] if rejected == reference else [reference, candidate])
+
+
+def test_mlflow_tracking_uses_monai_builtin_without_training_overrides(tmp_path):
+    args, metadata = mod.build_mlflow_tracking_args(
+        tmp_path,
+        tracking_uri=None,
+        experiment_name="task06-demo",
+        requested_run_name="sanity",
+    )
+
+    assert args[:2] == ["--tracking", "mlflow"]
+    assert "--tracking_uri" in args
+    assert "--experiment_name" in args
+    assert "--run_name" in args
+    assert args[args.index("--save_execute_config") + 1] == "False"
+    assert not any("dataloader" in value or "patch_size" in value for value in args)
+    assert metadata["tracking_uri"] == (tmp_path / "mlruns").resolve().as_uri()
+    assert metadata["experiment_name"] == "task06-demo"
+    assert metadata["run_name"] == "sanity"
+    assert args[args.index("--run_name") + 1] == "sanity"
+
+
+def test_mlflow_tracking_preserves_explicit_remote_uri(tmp_path):
+    args, metadata = mod.build_mlflow_tracking_args(
+        tmp_path,
+        tracking_uri="databricks",
+        experiment_name="/Shared/nvseg",
+        requested_run_name=None,
+    )
+
+    assert args[args.index("--tracking_uri") + 1] == "databricks"
+    assert metadata["tracking_uri"] == "databricks"
+    assert "--run_name" not in args
+    assert "run_name" not in metadata

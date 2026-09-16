@@ -81,6 +81,7 @@ same image used in Phases 3/4/6, so there is no need to maintain a separate
 host venv or to apt-install `python3-venv` / `python3-pip` on the host.
 
 ```bash
+set -a; source /path/to/.env; set +a   # omit if already exported
 # Scratch dir on the host, bind-mounted into the container as /workspace.
 # The directory is owned by the host user that created it, and we run the
 # container as that same UID/GID via --user below, so no further chmod is
@@ -114,6 +115,7 @@ adds that user-site to `sys.path` automatically for subsequent `docker
 exec` probes:
 
 ```bash
+set -a; source /path/to/.env; set +a   # omit if already exported
 docker run -d --name tao-hf-inspect \
   --user $(id -u):$(id -g) \
   -v "$(pwd)/.phase1":/workspace \

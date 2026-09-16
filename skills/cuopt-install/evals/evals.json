@@ -9,5 +9,79 @@
       "Uses the nvidia/cuopt Docker image tagged for CUDA 12 (e.g. nvidia/cuopt:latest-cuda12.9-py3.13), not a fabricated nvcr.io/* path",
       "docker run command includes --gpus all and -p 8000:8000"
     ]
+  },
+  {
+    "id": "inst-eval-002-cuda-suffix-must-match",
+    "question": "nvidia-smi on my box reports CUDA 13. Which cuOpt Python package do I pip install, and does it matter which one I pick?",
+    "expected_skill": "cuopt-install",
+    "expected_script": null,
+    "ground_truth": "The agent installs the cu13-suffixed package (cuopt-cu13) and explains that the package CUDA suffix must match the runtime CUDA — installing the cu12 package on a CUDA 13 runtime is a mismatch. It includes the NVIDIA package index in the command (pip install --extra-index-url=https://pypi.nvidia.com cuopt-cu13), since cuOpt wheels are not on public PyPI without it.",
+    "expected_behavior": [
+      "Selects the cu13-suffixed package to match the reported CUDA major version",
+      "Includes --extra-index-url=https://pypi.nvidia.com in the pip command",
+      "Explains that the package CUDA suffix must match the installed CUDA runtime"
+    ]
+  },
+  {
+    "id": "inst-eval-003-python-implies-c-not-reverse",
+    "question": "I already pip installed the cuOpt Python package. Do I need to install anything else to get the C headers and shared library? And if I later only want the C API without Python, what changes?",
+    "expected_skill": "cuopt-install",
+    "expected_script": null,
+    "ground_truth": "The agent explains the one-way dependency: cuopt-cuXX depends on libcuopt-cuXX, so installing the Python package already brings in the C library and headers — nothing further is needed. The reverse does not hold: installing libcuopt-cuXX on its own provides the C API but does not install the Python bindings. For a C-only setup, install libcuopt-cuXX standalone.",
+    "expected_behavior": [
+      "States that the Python package already pulls in the C library and headers as a dependency, so no extra install is needed",
+      "States that the reverse is not true — libcuopt-cuXX alone does not provide the Python API",
+      "Names libcuopt-cuXX as the standalone C-API package"
+    ]
+  },
+  {
+    "id": "inst-eval-004-unsupported-gpu",
+    "question": "I have a GTX 1080 in this machine. Can I run cuOpt on it?",
+    "expected_skill": "cuopt-install",
+    "expected_script": null,
+    "ground_truth": "The agent answers no. cuOpt requires an NVIDIA GPU with Compute Capability 7.0 or higher (Volta or newer); the GTX 10xx series is Pascal and falls below that threshold. It names examples of supported hardware (V100, A100, H100, RTX 20xx/30xx/40xx) and does not offer a workaround or installation command that would appear to make the unsupported GPU work.",
+    "expected_behavior": [
+      "States that the GPU is not supported because cuOpt requires Compute Capability >= 7.0 (Volta or newer)",
+      "Identifies the GTX 10xx series as Pascal and therefore below the requirement",
+      "Names supported alternatives rather than suggesting a workaround for the unsupported GPU"
+    ]
+  },
+  {
+    "id": "inst-eval-005-underspecified-install-request",
+    "question": "Install cuOpt for me.",
+    "expected_skill": "cuopt-install",
+    "expected_script": null,
+    "ground_truth": "The request is underspecified, so the agent asks the required questions before giving a command: which interface (Python, C, or REST server), which CUDA version is installed (checked with nvcc --version or nvidia-smi), which package manager is preferred (pip, conda, or Docker), and what the target environment is (local GPU machine, cloud instance, container/Kubernetes, or a remote host without a local GPU). It does not guess a default and emit an install command, and it does not run the install itself.",
+    "expected_behavior": [
+      "Asks which interface is wanted — Python, C, or REST server",
+      "Asks which CUDA version is installed, referencing nvcc --version or nvidia-smi",
+      "Asks whether pip, conda, or Docker is preferred",
+      "Does not silently assume defaults and emit a single install command"
+    ]
+  },
+  {
+    "id": "inst-eval-006-no-pip-and-conda-together",
+    "question": "I installed cuOpt with conda a while back. Should I also pip install it so I definitely have the latest?",
+    "expected_skill": "cuopt-install",
+    "expected_script": null,
+    "ground_truth": "The agent advises against it: pip and conda installs of cuOpt are alternatives, not complements. Running the second one overrides the first and can leave a mismatched CUDA or package state. The agent tells the user to pick a single package manager and, if they want a newer build, to upgrade within the manager they already use rather than layering pip on top of conda.",
+    "expected_behavior": [
+      "Says not to install via both pip and conda",
+      "Explains that the second install overrides the first and risks a CUDA/package mismatch",
+      "Recommends upgrading within the already-chosen package manager instead"
+    ]
+  },
+  {
+    "id": "inst-eval-007-module-not-found-triage",
+    "question": "I installed cuOpt but `import cuopt` fails with ModuleNotFoundError: No module named 'cuopt'. How do I work out what went wrong?",
+    "expected_skill": "cuopt-install",
+    "expected_script": null,
+    "ground_truth": "The agent gives a triage sequence rather than a single guess: check that the package is actually present with pip list | grep cuopt, confirm which interpreter is being used with which python (a common cause is installing into a different environment than the one running the import), and reinstall with the correct --extra-index-url=https://pypi.nvidia.com if the package is missing. It also notes that installing only libcuopt-cuXX gives the C library without the Python bindings, which produces this same error.",
+    "expected_behavior": [
+      "Suggests checking pip list | grep cuopt to confirm the package is installed",
+      "Suggests checking which python to catch a wrong-environment mismatch",
+      "Mentions reinstalling with the NVIDIA extra index URL",
+      "Notes that a libcuopt-only install does not provide the Python module"
+    ]
   }
 ]

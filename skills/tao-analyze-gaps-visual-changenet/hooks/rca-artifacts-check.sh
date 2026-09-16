@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Hook: Verify the VCN gap analysis docker run produced all required artifacts alongside the report.
-# The container writes: gaps.parquet, threshold.txt, metrics.json, weak_samples_breakdown.txt
-# (and unreachable_kpi.txt iff the recall target was not reachable). The skill itself writes rca_images/.
+# The container writes: kpi_gaps.parquet, threshold.txt, weak_samples_breakdown.txt
+# (and unreachable_kpi.txt iff the recall target was not reachable). The agent writes rca_images/.
 # Toggle: export RCA_HOOKS=0 to disable
 
 [[ "${RCA_HOOKS:-1}" == "0" ]] && exit 0
@@ -27,7 +27,7 @@ if [[ "$CLAUDE_FILE_PATH" == *RCA_Report.md ]]; then
     exit 0
   fi
 
-  for required in gaps.parquet threshold.txt metrics.json weak_samples_breakdown.txt; do
+  for required in kpi_gaps.parquet threshold.txt weak_samples_breakdown.txt; do
     if [ ! -f "$report_dir/$required" ]; then
       warnings="${warnings}\n- MISSING ARTIFACT: $required not found next to RCA_Report.md. The container run (docker run ... \$DS_IMAGE gap_analysis vcn_aoi ..., where DS_IMAGE = tao_toolkit.data_services from versions.yaml) must write it before the report is produced."
     fi
@@ -42,39 +42,6 @@ if [[ "$CLAUDE_FILE_PATH" == *RCA_Report.md ]]; then
     fi
   fi
 
-  # metrics.json should contain confusion-matrix + per-label distribution stats
-  if [ -f "$report_dir/metrics.json" ]; then
-    metrics_check=$(python3 - "$report_dir/metrics.json" 2>/dev/null << 'PYEOF'
-import json, sys
-try:
-    with open(sys.argv[1]) as f:
-        m = json.load(f)
-    top = {"precision", "recall", "f1", "confusion_matrix", "per_label"}
-    missing = top - set(m)
-    if missing:
-        print(f"KEYS_MISSING:{','.join(sorted(missing))}")
-    elif not isinstance(m.get("per_label"), dict) or not m["per_label"]:
-        print("EMPTY_PER_LABEL")
-    else:
-        print("OK")
-except Exception as e:
-    print(f"ERROR:{e}")
-PYEOF
-)
-    case "$metrics_check" in
-      KEYS_MISSING:*)
-        keys=${metrics_check#KEYS_MISSING:}
-        warnings="${warnings}\n- BAD METRICS: metrics.json missing top-level keys: $keys. Expected: precision, recall, f1, confusion_matrix, per_label."
-        ;;
-      EMPTY_PER_LABEL)
-        warnings="${warnings}\n- BAD METRICS: metrics.json has an empty per_label block; the Weakness Distribution table will be empty."
-        ;;
-      ERROR:*)
-        warnings="${warnings}\n- UNREADABLE METRICS: metrics.json failed to load (${metrics_check#ERROR:})."
-        ;;
-    esac
-  fi
-
   # threshold.txt should contain a single float
   if [ -f "$report_dir/threshold.txt" ]; then
     thr_content=$(tr -d '[:space:]' < "$report_dir/threshold.txt")
@@ -83,9 +50,9 @@ PYEOF
     fi
   fi
 
-  # gaps.parquet should have rows
-  if [ -f "$report_dir/gaps.parquet" ]; then
-    rows=$(python3 - "$report_dir/gaps.parquet" 2>/dev/null << 'PYEOF'
+  # kpi_gaps.parquet should have rows
+  if [ -f "$report_dir/kpi_gaps.parquet" ]; then
+    rows=$(python3 - "$report_dir/kpi_gaps.parquet" 2>/dev/null << 'PYEOF'
 import sys
 try:
     import pandas as pd
@@ -102,14 +69,14 @@ PYEOF
 )
     case "$rows" in
       ROWS:0)
-        warnings="${warnings}\n- EMPTY PARQUET: gaps.parquet has 0 rows. Either every sample is correctly classified (suspicious — verify) or the threshold sweep produced no candidates."
+        warnings="${warnings}\n- EMPTY PARQUET: kpi_gaps.parquet has 0 rows. Either every sample is correctly classified (suspicious — verify) or the threshold sweep produced no candidates."
         ;;
       COLUMNS_MISSING:*)
         cols=${rows#COLUMNS_MISSING:}
-        warnings="${warnings}\n- BAD PARQUET SCHEMA: gaps.parquet missing columns: $cols. Required schema: filepath, label, siamese_score, weakness."
+        warnings="${warnings}\n- BAD PARQUET SCHEMA: kpi_gaps.parquet missing columns: $cols. Required schema: filepath, label, siamese_score, weakness."
         ;;
       ERROR:*)
-        warnings="${warnings}\n- UNREADABLE PARQUET: gaps.parquet failed to load (${rows#ERROR:})."
+        warnings="${warnings}\n- UNREADABLE PARQUET: kpi_gaps.parquet failed to load (${rows#ERROR:})."
         ;;
     esac
   fi

@@ -1,0 +1,20 @@
+version: 2
+
+rules:
+  - id: "PE3"
+    path: "SKILL.md"
+    message: "*[.]env*"
+    reason: >-
+      Temporary suppression until SkillSpector 2.10.0 is deployed in NV-CARPS.
+      Reviewed false positive: the command reads only the non-secret MODE flag
+      from a deploy-tool-generated runtime state file.
+
+  - id: "SC6"
+    path: "scripts/alert-notify/requirements.txt"
+    message: "*uvicorn*"
+    reason: >-
+      Reviewed false positive: uvicorn is the standard ASGI server used by
+      FastAPI, not a typosquat of gunicorn. The dependency is unchanged from
+      develop; the SC6 finding appeared with a newer scanner deployment.
+
+fingerprints: []

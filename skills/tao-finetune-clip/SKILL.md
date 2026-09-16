@@ -2,7 +2,8 @@
 name: tao-finetune-clip
 description: CLIP vision-language model for image-text retrieval, zero-shot classification, embedding extraction, ONNX
   export, and TensorRT deployment. Use when fine-tuning or training CLIP, running zero-shot classification, computing image
-  embeddings, or deploying CLIP to ONNX/TensorRT.
+  embeddings, or deploying CLIP to ONNX/TensorRT. This is a single-action model skill; do not use it for an iterative
+  weak-attribute improvement loop that keeps retraining and evaluating until progress stops, which belongs to tao-run-deft-pas.
 license: Apache-2.0
 compatibility: Requires docker + nvidia-container-toolkit.
 metadata:
@@ -18,6 +19,8 @@ tags:
 ---
 
 # CLIP
+
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
 
 Contrastive Language-Image Pre-training model for zero-shot and fine-tuned image classification, image-text retrieval, and embedding extraction. Fine-tuning adapts CLIP's shared image-text embedding space to domain-specific image-caption data.
 
@@ -46,6 +49,12 @@ For TAO Deploy TensorRT actions (`gen_trt_engine`, TensorRT `evaluate`, and Tens
 - **Dataset type:** image_text
 - **Formats:** custom image/caption folders or WebDataset shards
 - **Monitoring metric:** val/t2i_mAP
+
+The train action emits `val/t2i_mAP`, which is the AutoML selection objective.
+The standalone evaluate action reports the corresponding held-out metric as
+`test/t2i_mAP`; use that name for checkpoint evaluation and compare its value
+with the selected training validation metric rather than expecting a `val/`
+key from the evaluate action.
 
 ### Supported Models
 

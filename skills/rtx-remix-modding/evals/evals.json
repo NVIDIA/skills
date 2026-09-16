@@ -1,0 +1,98 @@
+{
+  "skill_name": "rtx-remix-modding",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "In my Remix project, swap the model on this door for the new one I ingested.",
+      "expected_skill": "rtx-remix-modding",
+      "expected_output": "Edits apply per captured asset, not per instance, so every instance sharing that mesh changes too. This is expected and fine, but it must be disclosed in the closing sentence whenever the subject has siblings.",
+      "assertions": [
+        "The answer states that every instance sharing that captured asset changes, not only the one door",
+        "The answer treats that as expected behaviour rather than an error, and discloses it to the user"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I just recolored that crate in my Remix mod and I don't like it. Put it back.",
+      "expected_skill": "rtx-remix-modding",
+      "expected_output": "There is no undo tool in this release. Say the change cannot be reverted and let the user do it in the Toolkit. Never simulate an undo by hand: authoring references = None or emptying a replacement prim composes to nothing and deletes the asset from the game with no error anywhere.",
+      "assertions": [
+        "The answer states there is no undo tool and the revert must happen in the Remix Toolkit",
+        "The answer does not offer to reverse the change by blocking the reference, emptying the prim, or stripping its own edits back out of the layer"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Add a wooden crate next to the barrel in my Remix scene.",
+      "expected_skill": "rtx-remix-modding",
+      "expected_output": "Remix cannot create geometry — layers only, no meshes, no cubes, no new objects. Creating a prim does not create game geometry by any route, CreatePrim included: it renders nothing while the call reports success. Say so and offer the nearest thing that is possible.",
+      "assertions": [
+        "The answer states that creating geometry is not something Remix can do",
+        "The answer does not propose CreatePrim or any other route to author a new prim",
+        "The answer offers an alternative that stays within what the tools can do"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Find the prim called lamp_03 in my Remix project and make it brighter. Assume a search of the stage for that name comes back empty.",
+      "expected_skill": "rtx-remix-modding",
+      "expected_output": "An empty result is the answer, not the first of two opinions. Report what was searched for and what was found instead, then ask the user to name the object another way. Never re-run a query that nothing has invalidated.",
+      "assertions": [
+        "The answer treats the empty result as final rather than retrying the same search",
+        "The answer ends by asking the user to identify the object a different way"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Make the sky darker in my Remix mod.",
+      "expected_skill": "rtx-remix-modding",
+      "expected_output": "Plenty of what a game renders is not in a capture at all: sky, fog, water, shadows, the HUD. Say what was found and that it cannot be reached, rather than dropping to raw pxr traversal to check again.",
+      "assertions": [
+        "The answer states that the sky is not part of the capture and cannot be reached with these tools",
+        "The answer does not propose raw pxr traversal or hunting through prim children to find it"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "I asked you to apply a texture and the Remix tool returned: \"Asset is not ingested. Re-run with auto_ingest=true to ingest it first.\" What do you tell me?",
+      "expected_skill": "rtx-remix-modding",
+      "expected_output": "Relay what the tool reported. These refusals are written for the user: they name the specific blocker and, where one exists, the remedy. Pass on both — dropping the remedy makes the user hear \"impossible\" when the tool said \"do X and this works\" — and do not explain a cause the tool did not give.",
+      "assertions": [
+        "The answer relays the remedy of re-running with auto_ingest=true, not only the failure",
+        "The answer does not speculate about why the asset was not ingested"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "I don't see any remix_ tools in your tool list. Can you just edit the .usda file directly to change that texture?",
+      "expected_skill": "rtx-remix-modding",
+      "expected_output": "No. Name the gap plainly — the MCP server is only there while the Remix Toolkit runs with it enabled. Editing .usda by hand or searching the filesystem for textures goes around the command layer, and the result usually lands in a layer the runtime ignores, which looks like success and renders nothing.",
+      "assertions": [
+        "The answer declines to edit the .usda file by hand",
+        "The answer explains that such an edit lands in a layer the runtime ignores and renders nothing",
+        "The answer names the unavailable Remix MCP server as the thing to fix"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Deploy an LLM on my B200 with the best throughput settings.",
+      "expected_skill": null,
+      "expected_output": "This skill should not activate; the request is unrelated to RTX Remix.",
+      "assertions": ["The rtx-remix-modding skill does not activate"]
+    },
+    {
+      "id": 9,
+      "prompt": "My CUDA kernel is memory-bound. How should I restructure the shared memory tiling?",
+      "expected_skill": null,
+      "expected_output": "This skill should not activate; the request is unrelated to RTX Remix.",
+      "assertions": ["The rtx-remix-modding skill does not activate"]
+    },
+    {
+      "id": 10,
+      "prompt": "What is the difference between a USD sublayer and a reference?",
+      "expected_skill": null,
+      "expected_output": "This skill should not activate. The question is about USD in general with no RTX Remix context, and answering it needs no Remix-specific knowledge.",
+      "assertions": ["The rtx-remix-modding skill does not activate"]
+    }
+  ]
+}

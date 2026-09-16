@@ -5,29 +5,44 @@
 REST client: LP request (maximize 40x + 30y s.t. 2x+3y<=240, 4x+2y<=200). Requires cuOpt server running.
 
 Usage: python client.py
-  Set CUOPT_SERVER_URL (default http://localhost:8000). Exits 0 if server unreachable (e.g. in CI without server).
+  Pass --server (default http://localhost:8000). Exits 0 if server unreachable (e.g. in CI without server).
 """
 
-import os
+import argparse
+import re
 import sys
 import time
 
 import requests
 
-SERVER = os.environ.get("CUOPT_SERVER_URL", "http://localhost:8000")
+DEFAULT_SERVER = "http://localhost:8000"
 HEADERS = {"Content-Type": "application/json", "CLIENT-VERSION": "custom"}
+REQUEST_TIMEOUT = 30
+REQ_ID_PATTERN = re.compile(r"[A-Za-z0-9_-]{1,64}")
 
 
-def server_ok():
+def parse_args():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--server",
+        default=DEFAULT_SERVER,
+        help=f"cuOpt server base URL (default: {DEFAULT_SERVER})",
+    )
+    return parser.parse_args()
+
+
+def server_ok(server):
     try:
-        r = requests.get(f"{SERVER}/cuopt/health", timeout=2)
+        r = requests.get(f"{server}/cuopt/health", timeout=2)
         return r.status_code == 200
     except Exception:
         return False
 
 
 def main():
-    if not server_ok():
+    server = parse_args().server
+
+    if not server_ok(server):
         print(
             "Server not running, skipping. Start with: python -m cuopt_server.cuopt_service --ip 0.0.0.0 --port 8000"
         )
@@ -57,15 +72,23 @@ def main():
     }
 
     response = requests.post(
-        f"{SERVER}/cuopt/request", json=payload, headers=HEADERS
+        f"{server}/cuopt/request",
+        json=payload,
+        headers=HEADERS,
+        timeout=REQUEST_TIMEOUT,
     )
     response.raise_for_status()
     req_id = response.json()["reqId"]
+    if not REQ_ID_PATTERN.fullmatch(req_id):
+        print(f"Unexpected reqId from server: {req_id!r}")
+        sys.exit(1)
     print(f"Submitted: {req_id}")
 
     for _ in range(30):
         response = requests.get(
-            f"{SERVER}/cuopt/solution/{req_id}", headers=HEADERS
+            f"{server}/cuopt/solution/{req_id}",
+            headers=HEADERS,
+            timeout=REQUEST_TIMEOUT,
         )
         result = response.json()
 

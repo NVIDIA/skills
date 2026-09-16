@@ -1,6 +1,6 @@
 ---
 name: nemo-mbridge-perf-moe-hardware-configs
-description: Representative MoE training playbooks by hardware platform and model family. Summarizes rounded throughput bands, parallelism patterns, and common tuning stacks.
+description: Representative, point-in-time MoE training playbooks by hardware and model family. Use them as candidate seeds, then revalidate the exact runtime, semantics, topology, and steady-state throughput.
 license: Apache-2.0
 when_to_use: Hardware-specific MoE playbooks or throughput estimates; 'MoE on H100', 'GB200 config', 'expected throughput', 'MoE hardware playbook', 'parallelism for B200'.
 ---
@@ -12,12 +12,14 @@ Card: @skills/nemo-mbridge-perf-moe-hardware-configs/card.yaml
 
 ## Quick Platform Playbook
 
-| Platform | Typical MoE strategy | What usually matters most |
+These rows are search seeds, not hardware defaults or throughput promises.
+
+| Platform | Candidates to screen after `alltoall` bring-up | What usually matters most |
 |---|---|---|
-| H100 | DeepEP + stronger PP + moderate TP | communication overlap and PP efficiency |
-| B200 | DeepEP + MXFP8 + careful PP layout | container quality and tuned comm settings |
-| GB200 | HybridEP + partial CUDA graphs + CPU cleanup | host overhead, topology-aware dispatch, memory headroom |
-| GB300 | HybridEP + newer FP8 and kernel stack | same GB200 playbook, usually with a higher ceiling |
+| H100 | DeepEP or HybridEP, explicit overlap, supported FP8 modes | communication overlap, dispatcher/runtime compatibility, and PP efficiency |
+| B200 | DeepEP or HybridEP, supported FP8 modes, careful PP layout | container quality and tuned communication settings |
+| GB200 | HybridEP, then profile-driven graphs and CPU cleanup | host overhead, topology-aware dispatch, memory headroom |
+| GB300 | HybridEP and the target container's lower-precision/kernel stack | the same system interactions as GB200, with remeasurement required |
 
 ## First Answer Checklist
 
@@ -28,12 +30,14 @@ throughput caveats:
 |---|---|---|---|
 | DSV3 | H100 | DeepEP | TP=2, EP=64, PP=8, VPP=4 |
 | DSV3 | GB200/GB300 | HybridEP | TP=1, EP=64, PP=4, VPP=4 |
-| Qwen3 235B | H100 | DeepEP | TP=2, EP=32, PP=8, VPP=4 |
+| Qwen3 235B | H100 | `alltoall` + overlap in the current canonical recipe | TP=2, EP=32, PP=8, VPP=4 |
 | Qwen3 235B | GB200 | HybridEP | TP=1 or 2, EP=32-64, PP=4, VPP=unspecified |
+| Qwen3 30B | 16×H100 | HybridEP | TP=1, EP=16, PP=1, plain EP overlap |
 
 For Qwen3 235B on GB200, explicitly say `VPP=unspecified`; do not invent or
-extrapolate `VPP=12` unless a measured row provides it. Include TE-scoped CUDA
-graph scopes (`attn`, `moe_router`, `moe_preprocess`),
+extrapolate `VPP=12` unless a measured row provides it. Treat TE-scoped CUDA
+graph scopes (`attn`, `moe_router`, `moe_preprocess`) as profile-driven
+candidates,
 `CUDA_DEVICE_MAX_CONNECTIONS` selection,
 `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`, `NCCL_GRAPH_REGISTER=0`,
 GB200/GB300 CPU-side tuning, and the warning not to cargo-cult tracker rows.
@@ -49,9 +53,9 @@ moves. Treat them as planning ranges, not exact promises.
 | DSV3, large-scale | B200 | high-hundreds TFLOPS/GPU, mid-teens MFU | TP1, EP32, PP8, DeepEP |
 | DSV3, large-scale | GB200 | around 1K TFLOPS/GPU, low-20s MFU | TP1, EP64, PP4, HybridEP |
 | DSV3, large-scale | GB300 | above the GB200 band, often mid-20s MFU | TP1, EP64, PP4, HybridEP |
-| Qwen3 235B | H100 | low-300s TFLOPS/GPU, around 30% MFU | TP2, EP32, PP8, DeepEP |
+| Qwen3 235B | H100 | historical low-300s snapshots; remeasure the current recipe | TP2, EP32, PP8; current recipe uses `alltoall` + overlap |
 | Qwen3 235B | GB200 | high-hundreds TFLOPS/GPU in tuned runs | TP1 or TP2, EP32-64, PP4, HybridEP |
-| Qwen3 30B | H100 | low-200s TFLOPS/GPU | TP1, EP8, PP1, DeepEP |
+| Qwen3 30B | H100 | about 300 TFLOPS/GPU on the validated 16-GPU shape | TP1, EP16, PP1, HybridEP + EP overlap |
 | Qwen3-Next 80B | GB200 | low-300s TFLOPS/GPU in BF16-class runs | TP1, EP32, PP2, HybridEP |
 
 ## Representative Config Families
@@ -89,9 +93,9 @@ Priority: HybridEP, CPU optimization, and graph-friendly static shapes
 ### Qwen3 235B on H100
 
 ```text
-Dispatcher: DeepEP
+Dispatcher: alltoall in the current canonical recipe; re-screen flex backends on the target stack
 TP=2  EP=32  PP=8  VPP=4
-Recompute: norm and activation-side selective recompute
+Recompute: none in the current canonical recipe
 Priority: communication overlap and router-path cleanup
 ```
 
@@ -104,6 +108,28 @@ CUDA Graph: attn + moe_router + moe_preprocess
 Recompute: moe_act, mlp, or norm depending on memory pressure
 Priority: balance throughput against memory headroom
 ```
+
+### Qwen3 30B-A3B on 16 H100
+
+```text
+Dispatcher: HybridEP
+TP=1  EP=16  PP=1  CP=1
+Precision: BF16
+Sequence: 4096
+Batch: MBS1 GBS1024
+Routing: force balance
+EP overlap: enabled
+Delayed wgrad: disabled
+CUDA Graph: moe_router + moe_preprocess
+HybridEP: permute fusion, 32 SMs, 64-token combine chunks
+Measured: 20.14729s/step, 299.352 model TFLOPS/GPU over iterations 41-50
+Rank-0 peak allocated memory: 62.166 GiB
+```
+
+The current number is the final multi-knob canonical recipe result. An earlier
+matched A/B isolated plain EP overlap: 244.039 to 287.305 TFLOPS/GPU, with
+communication hidden by GEMM/attention increasing from 0.11% to 36.55%. Do not
+attribute the later 299.352 result entirely to overlap.
 
 ### Qwen3-Next 80B on GB200
 
@@ -165,5 +191,17 @@ work, not as afterthoughts.
 4. **Compare absolute throughput, not only MFU**: MFU can mislead when switching
    between BF16, FP8, and other precision modes.
 
-5. **Force-balance routing is the safer benchmark default**: keep routing mode
-   fixed when comparing hardware or dispatcher stacks.
+5. **Force-balance routing is benchmark-only**: it can control routing variance,
+   but it changes semantics. Keep routing fixed within an A/B and validate
+   natural routing separately for training acceptance.
+
+6. **Do not treat the dispatcher table as a hard platform rule**: HybridEP is
+   the validated winner for the canonical 16×H100 Qwen3 30B shape, while the
+   current 256×H100 Qwen3 235B recipe uses `alltoall`. Benchmark backend
+   compatibility and throughput in the production container.
+
+7. **Separate screening, causality, and acceptance**: short runs reject weak
+   candidates, matched one-variable A/Bs explain a mechanism, and a 50-step
+   final run validates the complete winner.
+
+_Last signature refresh: 2026-08-03._

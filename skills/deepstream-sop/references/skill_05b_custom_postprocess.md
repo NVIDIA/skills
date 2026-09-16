@@ -29,8 +29,11 @@ deduction failure at compile time.
 ## Dockerfile Requirements (both stages needed)
 
 ```dockerfile
-# Stage 1: Extract DeepStream headers (needed by Makefile -I flags)
-FROM nvcr.io/nvidia/deepstream:8.0-triton-multiarch AS ds_dev
+# Stage 1: Extract DeepStream headers (needed by Makefile -I flags).
+# Same ARG-based override as Dockerfile_reference — override via
+# --build-arg DS_IMAGE=<your DS 9.1 image> while DS-9.1 is not yet public.
+ARG DS_IMAGE="nvcr.io/nvidia/deepstream:9.1-triton-multiarch"
+FROM ${DS_IMAGE} AS ds_dev
 
 # Stage 2: main build
 FROM ${BASE_IMAGE} AS base

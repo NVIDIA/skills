@@ -52,12 +52,12 @@ def _default_foundation_root() -> Path | None:
     env_root = os.environ.get("SIMREADY_FOUNDATION_ROOT")
     if env_root:
         return Path(env_root).expanduser().resolve()
-    upstream_root = os.environ.get("PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT")
+    upstream_root = os.environ.get("OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT")
     if upstream_root:
         candidate = Path(upstream_root).expanduser() / DEFAULT_FOUNDATION_CHECKOUT
         if candidate.exists():
             return candidate.resolve()
-    candidate = Path.home() / ".physical-ai-skill-hub" / "upstreams" / DEFAULT_FOUNDATION_CHECKOUT
+    candidate = Path.home() / ".omniverse-cad-to-simready" / "upstreams" / DEFAULT_FOUNDATION_CHECKOUT
     if candidate.exists():
         return candidate.resolve()
     return None

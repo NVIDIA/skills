@@ -1,44 +1,59 @@
 [
   {
     "id": "i4h-workflow-validate-readme-quick-scissor-two",
-    "question": "Evaluate scissor pick and place for 2 episodes.",
+    "question": "Evaluate scissor pick and place in policy mode and record 2 successful episodes.",
     "expected_skill": "i4h-workflow-validate",
-    "ground_truth": "This README Quick Run prompt routes to validation for env scissor_pick_and_place with two policy rollout episodes.",
+    "ground_truth": "This README Quick Run prompt routes to validation for scissor_pick_and_place and keeps policy mode while recording two successful rollout episodes.",
     "expected_behavior": [
       "routes to i4h-workflow-validate",
       "maps the natural env name to scissor_pick_and_place",
       "sets EPISODES to 2",
-      "uses the env YAML policy model unless a checkpoint is provided",
+      "uses policy mode and does not switch to rule-based because the prompt says successful",
+      "uses the workflow's remote-task manifest unless a checkpoint is provided",
+      "keeps the unified launcher in the foreground until the final episode summary",
       "records verification episodes to HDF5"
     ]
   },
   {
     "id": "i4h-workflow-validate-readme-quick-ultrasound",
-    "question": "Evaluate ultrasound for 1 episode.",
+    "question": "Evaluate ultrasound_liver_scan in policy mode for 1 episode.",
     "expected_skill": "i4h-workflow-validate",
     "ground_truth": "This README Quick Run prompt routes to validation for env ultrasound_liver_scan with one episode.",
     "expected_behavior": [
       "routes to i4h-workflow-validate",
-      "maps ultrasound to ultrasound_liver_scan",
+      "uses the explicit ultrasound_liver_scan workflow ID",
       "sets EPISODES to 1",
-      "uses the openpi policy stack from the env YAML"
+      "uses the openpi policy task declared by the workflow"
     ]
   },
   {
     "id": "i4h-workflow-validate-readme-quick-trocar",
-    "question": "Evaluate trocar assembly for 1 episode.",
+    "question": "Evaluate trocar assembly in policy mode for 1 episode.",
     "expected_skill": "i4h-workflow-validate",
-    "ground_truth": "This README Quick Run prompt routes to validation for env assemble_trocar with one inference-only episode.",
+    "ground_truth": "This README Quick Run prompt routes to validation for env assemble_trocar with one remote GR00T policy episode, using either its configured checkpoint or an explicitly exported RLinf checkpoint.",
     "expected_behavior": [
       "routes to i4h-workflow-validate",
       "maps trocar assembly to assemble_trocar",
       "sets EPISODES to 1",
-      "treats assemble_trocar as inference-only"
+      "uses the remote GR00T N1.5 Task and accepts a compatible exported RLinf checkpoint when supplied"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-ultrasound-probe-reach",
+    "question": "Validate ultrasound_probe_reach in policy mode and report its simulator success rate.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This README RL-authoring prompt validates the exported TorchScript actor through the rsl_rl/ultrasound_probe_reach in-process Task and normal Workflow SimulationRunner.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "resolves the ultrasound_probe_reach policy mode and rsl_rl/ultrasound_probe_reach Task",
+      "requires the exact exported policy.pt checkpoint",
+      "runs the requested episodes through the normal SimulationRunner",
+      "reports episode attempts, visible torso-target behavior, and simulator success rate"
     ]
   },
   {
     "id": "i4h-workflow-validate-readme-quick-locomanip-tray",
-    "question": "Evaluate locomanip tray pick and place for 1 episode.",
+    "question": "Evaluate locomanip tray pick and place in policy mode for 1 episode.",
     "expected_skill": "i4h-workflow-validate",
     "ground_truth": "This README Quick Run prompt routes to validation for env locomanip_tray_pick_and_place with one episode.",
     "expected_behavior": [
@@ -50,7 +65,7 @@
   },
   {
     "id": "i4h-workflow-validate-readme-quick-locomanip-cart",
-    "question": "Evaluate locomanip push cart for 1 episode.",
+    "question": "Evaluate locomanip push cart in policy mode for 1 episode.",
     "expected_skill": "i4h-workflow-validate",
     "ground_truth": "This README Quick Run prompt routes to validation for env locomanip_push_cart with one episode.",
     "expected_behavior": [
@@ -61,41 +76,71 @@
     ]
   },
   {
-    "id": "i4h-workflow-validate-readme-quick-surgical-reach-state-machine",
-    "question": "Run surgical_reach_psm with the state machine for 1 episode.",
+    "id": "i4h-workflow-validate-readme-quick-surgical-reach-rule-based",
+    "question": "Run surgical_reach_psm in rule-based mode for 1 episode.",
     "expected_skill": "i4h-workflow-validate",
-    "ground_truth": "This README Quick Run prompt routes to validation/smoke-run handling for env surgical_reach_psm with Arena --state-machine and one episode, without starting a policy daemon.",
+    "ground_truth": "This README Quick Run prompt routes to the surgical_reach_psm rule-based mode for one episode.",
     "expected_behavior": [
       "routes to i4h-workflow-validate",
-      "sets ENV_ID to surgical_reach_psm",
-      "sets STATE_MACHINE to true and EPISODES to 1",
-      "runs Arena with --state-machine",
-      "does not start the policy daemon"
+      "maps the workflow to surgical_reach_psm",
+      "sets the requested episodes to 1",
+      "runs the unified launcher with --rule-based",
+      "does not request an unavailable surgical policy"
     ]
   },
   {
-    "id": "i4h-workflow-validate-readme-quick-surgical-lift-needle-state-machine",
-    "question": "Run surgical_lift_needle with the state machine for 1 episode.",
+    "id": "i4h-workflow-validate-readme-quick-surgical-reach-newton",
+    "question": "Run surgical_reach_psm in rule-based mode for 1 episode with Newton physics.",
     "expected_skill": "i4h-workflow-validate",
-    "ground_truth": "This README Quick Run prompt routes to validation/smoke-run handling for env surgical_lift_needle with Arena --state-machine and one episode, without starting a policy daemon.",
+    "ground_truth": "This README prompt runs one surgical_reach_psm rule-based rollout with the explicitly requested Newton physics preset.",
     "expected_behavior": [
       "routes to i4h-workflow-validate",
-      "sets ENV_ID to surgical_lift_needle",
-      "sets STATE_MACHINE to true and EPISODES to 1",
-      "runs Arena with --state-machine",
-      "does not start the policy daemon"
+      "maps the workflow to surgical_reach_psm",
+      "sets the requested episodes to 1",
+      "runs the unified launcher with --rule-based and --presets newton",
+      "does not silently use the default PhysX backend",
+      "requires the final episode success summary"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-readme-quick-surgical-lift-needle-rule-based",
+    "question": "Run surgical_lift_needle in rule-based mode for 1 episode.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This README Quick Run prompt routes to the surgical_lift_needle rule-based mode for one episode.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "maps the workflow to surgical_lift_needle",
+      "sets the requested episodes to 1",
+      "runs the unified launcher with --rule-based",
+      "does not request an unavailable surgical policy"
     ]
   },
   {
     "id": "i4h-workflow-validate-readme-quick-new-checkpoint",
-    "question": "Run eval using new checkpoint for 300 timesteps.",
+    "question": "Evaluate the new checkpoint.",
     "expected_skill": "i4h-workflow-validate",
-    "ground_truth": "This README Quick Run prompt routes to checkpoint validation, using the newly produced checkpoint and max timesteps of 300.",
+    "ground_truth": "This README continuation validates the newly produced my_workflow checkpoint with the workflow's normal episode cap.",
     "expected_behavior": [
       "routes to i4h-workflow-validate",
-      "uses the latest/new checkpoint as MODEL_PATH",
-      "sets MAX_TIMESTEPS to 300",
+      "resolves the latest/new checkpoint and passes --checkpoint explicitly",
+      "uses the my_workflow policy mode and does not invent a timestep override",
       "records rollout verification output"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-readme-new-env-rule-based-record",
+    "question": "Run and record 5 successful rule-based episodes for my_workflow.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This README authoring prompt records five successful demonstrations from the newly created workflow's rule-based G1 reach-table mode.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "resolves my_workflow and requires its declared rule-based mode",
+      "runs the unified launcher in rule-based mode for five successful episodes",
+      "keeps the rollout in the foreground and visibly verifies G1 reaches the table",
+      "does not silently switch the rollout to headless mode",
+      "records the episodes to HDF5 and inspects segments, actions, cameras, and success flags",
+      "distinguishes structural validity, launchability, and rollout validation in the report",
+      "reports the recording path for conversion and training"
     ]
   },
   {
@@ -108,6 +153,106 @@
       "maps the prompt to scissor_pick_and_place",
       "sets EPISODES to 3",
       "does not run annotation unless separately requested"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-readme-robotic-instrument-reach",
+    "question": "Validate robotic_instrument_reach in policy mode and report its simulator success rate.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This README RL-authoring prompt validates the exported RoboticInstrumentReach TorchScript policy through its reusable in-process Task and the normal Workflow runner.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "resolves robotic_instrument_reach policy mode and the rsl_rl/robotic_instrument_reach Task",
+      "passes the exact exported policy.pt checkpoint",
+      "runs requested episodes visibly through the unified launcher in the foreground",
+      "records and inspects HDF5 actions, camera frames, node segments, and success flags",
+      "reports requested successes, attempts, completion steps, checkpoint source, and simulator success rate"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-specialty-surgical-dual-psm",
+    "question": "Run surgical_reach_dual_psm in rule-based mode for 1 episode.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This laparoscopic specialty prompt validates one surgical_reach_dual_psm episode with its declared rule-based controller.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "uses surgical_reach_dual_psm in rule-based mode",
+      "requests one successful episode",
+      "records and inspects the rollout artifacts"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-specialty-surgical-star",
+    "question": "Run surgical_reach_star in rule-based mode for 1 episode.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This laparoscopic specialty prompt validates one surgical_reach_star episode with its declared rule-based controller.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "uses surgical_reach_star in rule-based mode",
+      "requests one successful episode",
+      "records and inspects the rollout artifacts"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-specialty-surgical-lift-block",
+    "question": "Run surgical_lift_block in rule-based mode for 1 episode.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This laparoscopic specialty prompt validates one surgical_lift_block episode with its declared rule-based controller.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "uses surgical_lift_block in rule-based mode",
+      "requests one successful episode",
+      "records and inspects the rollout artifacts"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-specialty-surgical-lift-needle-organs",
+    "question": "Run surgical_lift_needle_organs in rule-based mode for 1 episode.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This laparoscopic specialty prompt validates one surgical_lift_needle_organs episode with its declared rule-based controller.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "uses surgical_lift_needle_organs in rule-based mode",
+      "requests one successful episode",
+      "records and inspects the rollout artifacts"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-specialty-endoluminal-demo",
+    "question": "Run endoluminal_navigation in demo mode for 1 episode without patient CT data.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This endoluminal specialty prompt validates one procedural endoluminal_navigation demo episode without a patient-twin manifest.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "uses the declared endoluminal_navigation demo mode",
+      "does not require or invent a patient CT path",
+      "requests one successful episode and inspects its artifacts"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-specialty-scissor-policy",
+    "question": "Evaluate scissor pick and place for 1 episode.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This hospital-automation specialty prompt validates one scissor_pick_and_place episode using its ordinary policy mode.",
+    "expected_behavior": [
+      "routes to i4h-workflow-validate",
+      "maps the natural workflow name to scissor_pick_and_place",
+      "uses ordinary policy mode for one successful episode",
+      "records and inspects the rollout artifacts"
+    ]
+  },
+  {
+    "id": "i4h-workflow-validate-specialty-endoluminal-total-segmentator",
+    "question": "Download TotalSegmentator sample s0011 and prepare it as a patient twin.\nRun endoluminal_navigation in demo mode with it and verify fluoroscopy.",
+    "expected_skill": "i4h-workflow-validate",
+    "ground_truth": "This endoluminal specialty prompt downloads the public TotalSegmentator small sample, converts subject s0011 with the patient-twin tool, and validates endoluminal_navigation demo mode using the generated manifest.",
+    "expected_behavior": [
+      "routes the final rollout to i4h-workflow-validate",
+      "downloads the documented public TotalSegmentator small dataset only when it is not already available",
+      "prepares subject s0011 with tools/patient_twin/run.sh",
+      "passes the generated patient_twin.yaml to endoluminal_navigation demo mode",
+      "runs the unified launcher in the foreground",
+      "verifies the completed episode and visible fluoroscopy result"
     ]
   }
 ]

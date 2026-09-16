@@ -83,7 +83,7 @@ PYEOF
         warnings="${warnings}\n- BAD MINED SCHEMA: mined.parquet missing 'filepath' column (got: $cols)."
         ;;
       EMPTY)
-        warnings="${warnings}\n- EMPTY MINED PARQUET: mined.parquet has 0 rows. Either the source pool was empty, the encoders disagreed, or the label filter dropped every pair. Check mining_summary.txt and re-read the launcher log."
+        warnings="${warnings}\n- EMPTY MINED PARQUET: mined.parquet has 0 rows. Either the source pool was empty, the encoders disagreed, a retention filter dropped every pair, or history-aware selection found only prior samples. Check mining_summary.txt and mining_history_summary.json; consider increasing topn."
         ;;
       ERROR:*)
         warnings="${warnings}\n- UNREADABLE PARQUET: mined.parquet failed to load (${result#ERROR:})."

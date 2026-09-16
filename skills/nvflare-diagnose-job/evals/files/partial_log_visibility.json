@@ -1,0 +1,8 @@
+{
+  "job_id": "abc123",
+  "logs": {
+    "server": {"status": "ok", "truncated": true, "lines": ["Round 2 timed out waiting for clients"]},
+    "site-1": {"status": "permission_denied"},
+    "site-2": {"status": "missing"}
+  }
+}

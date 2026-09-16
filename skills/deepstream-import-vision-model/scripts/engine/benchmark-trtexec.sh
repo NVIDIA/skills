@@ -64,7 +64,7 @@ for ENGINE_INFO in "${ENGINE_PAIRS[@]}"; do
     GPU_MEAN=$(echo "$OUTPUT" | grep "GPU Compute Time:" | grep -oP 'mean = \K[0-9.]+')
     GPU_MIN=$(echo "$OUTPUT" | grep "GPU Compute Time:" | grep -oP 'min = \K[0-9.]+')
     GPU_MAX=$(echo "$OUTPUT" | grep "GPU Compute Time:" | grep -oP 'max = \K[0-9.]+')
-    IMGS_PER_SEC=$(echo "scale=0; $THROUGHPUT * $BATCH" | bc 2>/dev/null)
+    IMGS_PER_SEC=$(awk "BEGIN{printf \"%d\", ${THROUGHPUT:-0} * $BATCH}" 2>/dev/null)  # awk: bc absent in container
 
     echo "  GPU Compute: ${GPU_MEAN} ms (min=${GPU_MIN}, max=${GPU_MAX})"
     echo "  Throughput:  ${THROUGHPUT} qps"

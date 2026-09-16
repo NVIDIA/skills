@@ -17,6 +17,8 @@ tags:
 
 # RT-DETR
 
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+
 RT-DETR (Real-Time DEtection TRansformer) for 2D object detection. Designed for real-time inference with competitive accuracy. Supports distillation and quantization for deployment optimization.
 
 Set model.pretrained_backbone_path for backbone weights or train.pretrained_model_path for full model.
@@ -25,7 +27,7 @@ For TAO Deploy TensorRT actions (`gen_trt_engine`, TensorRT `evaluate`, and Tens
 
 ## Dataclass Schemas
 
-Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML still requires `schemas/train.schema.json` and `references/spec_template_train.yaml` to exist and parse. Use the packaged train schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
+Generated TAO Core schemas are packaged in `schemas/<action>.schema.json`, with `schemas/manifest.json` listing available actions. Each generated schema also emits `references/spec_template_<action>.yaml` from the schema top-level `default` field. AutoML enablement is declared at the model layer in `references/skill_info.yaml` via `automl_enabled`. Runnable AutoML for an action requires `schemas/<action>.schema.json` and `references/spec_template_<action>.yaml` to exist and parse. Use the packaged selected-action schema for `automl_default_parameters`, `automl_disabled_parameters`, defaults, min/max bounds, enums, option weights, math conditions, dependencies, and popular parameters. Do not expect `~/tao-core` at runtime; maintainers regenerate schemas/templates before packaging the skill bank.
 
 ## Train Action Policy
 
@@ -43,7 +45,8 @@ The parent PyT CLI does not expose `gen_trt_engine`. Use `models/rtdetr/deploy` 
 
 - **Dataset type:** object_detection
 - **Formats:** coco, coco_raw
-- **Monitoring metric:** mAP50 for quick operational checks; `val_mAP` for COCO/paper-style benchmark comparisons.
+- **AutoML training metrics:** `val_mAP50` for quick operational checks or `val_mAP` for COCO/paper-style benchmark comparisons; both are maximized. These are the exact structured train-status KPI names.
+- **Standalone evaluation metrics:** `test_mAP50` and `test_mAP`. Do not use the evaluator's `test_*` names for AutoML trial ranking.
 
 ### Per-Action Dataset Requirements
 
@@ -246,7 +249,7 @@ for a different shape. The older packaged `960x544` template shape can fail
 during ONNX tracing with `The size of tensor a (...) must match the size of
 tensor b (...)` in `hybrid_encoder.py` positional embedding addition.
 
-**AutoML metric extraction**: RT-DETR emits detection metrics in structured training status and logs. For COCO/paper-style benchmark comparisons, optimize `val_mAP` with `direction: maximize`; for explicit AP50 workflows, optimize `mAP50`. Prefer `results_dir/train/status.json` or AutoML result state before parsing raw logs. Do not optimize `val_loss` for default detection model invocations.
+**AutoML metric extraction**: RT-DETR emits detection metrics in structured training status and logs. For COCO/paper-style benchmark comparisons, optimize `val_mAP` with `direction: maximize`; for explicit AP50 workflows, optimize `val_mAP50`. Standalone evaluation emits the corresponding `test_mAP` and `test_mAP50` keys. Prefer `results_dir/train/status.json` or AutoML result state before parsing raw logs. Do not optimize `val_loss` for default detection model invocations.
 
 **Checkpoint handoff**: For evaluate/export/inference/quantize/distill/resume, use the checkpoint resolver on the best AutoML child job's `results_dir/train/` folder and select the action-appropriate `model_epoch_*.pth` checkpoint. RT-DETR may also write a latest symlink, but that should only be used when a caller explicitly requests latest. Keep `dataset.num_classes`, `dataset.eval_class_ids`, `model.num_queries`, and `model.num_select` consistent with training.
 

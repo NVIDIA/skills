@@ -13,15 +13,18 @@ This document provides comprehensive best practices, design patterns, and optimi
 **Best Practice**: Build pipelines in modular, reusable functions.
 
 ```python
+import os
+
 def create_source_pipeline(video_path, num_streams=1):
     """Create reusable source pipeline"""
     sources = []
     for i in range(num_streams):
-        sources.extend([
-            {"element": "filesrc", "name": f"src{i}", "props": {"location": video_path}},
-            {"element": "h264parse", "name": f"parser{i}"},
-            {"element": "nvv4l2decoder", "name": f"decoder{i}"}
-        ])
+        uri = "file://" + os.path.abspath(video_path)
+        sources.append({
+            "element": "nvurisrcbin",
+            "name": f"src{i}",
+            "props": {"uri": uri}
+        })
     return sources
 
 def create_inference_pipeline(config_files):
@@ -619,7 +622,8 @@ class PerformanceTest:
         
         def frame_callback(batch_meta):
             nonlocal frame_count
-            frame_count += len(batch_meta.frame_items)
+            for _ in batch_meta.frame_items:
+                frame_count += 1
         
         pipeline.attach("infer", Probe("fps", frame_callback))
         pipeline.start()
@@ -644,11 +648,11 @@ class PerformanceTest:
 import os
 from pathlib import Path
 
-class EnvironmentConfig:
-    """Load configuration based on environment"""
+class DeploymentConfig:
+    """Load configuration for the active deployment profile"""
     def __init__(self):
-        self.env = os.getenv("DEEPSTREAM_ENV", "development")
-        self.config_dir = Path("/etc/deepstream") / self.env
+        self.profile = os.environ.get("DEEPSTREAM_PROFILE", "development")
+        self.config_dir = Path("/etc/deepstream") / self.profile
     
     def get_config_path(self, config_name):
         """Get configuration file path"""
@@ -656,7 +660,7 @@ class EnvironmentConfig:
     
     def get_model_path(self, model_name):
         """Get model file path"""
-        return Path("/opt/models") / self.env / model_name
+        return Path("/opt/models") / self.profile / model_name
 ```
 
 ### Logging Best Practices
@@ -1166,4 +1170,3 @@ Following these best practices and patterns will help you build robust, performa
    - **KNOW** that `nvv4l2decoder` outputs NVMM format (no converter needed before nvstreammux)
 
 These practices ensure your DeepStream applications are production-ready and scalable.
-

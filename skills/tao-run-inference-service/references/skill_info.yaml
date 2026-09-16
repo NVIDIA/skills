@@ -1,10 +1,11 @@
 name: tao-run-inference-service
 type: application
 
-required_credentials:
-  - TAO_CLOUD_ACCESS_KEY   # cloud storage access key — never prompt; set as env var
-  - TAO_CLOUD_SECRET_KEY   # cloud storage secret key — never prompt; set as env var
-  # TAO_CLOUD_ENDPOINT_URL is optional — set when using a non-AWS S3-compatible endpoint
+required_credentials: []
+  # The inference service has NO cloud-storage dependency. Model weights come
+  # from the HuggingFace Hub or a local container path — no TAO_CLOUD_* keys.
+  # HF_TOKEN is the only credential that ever applies (gated HuggingFace models);
+  # it is read from the env var at runtime per the SKILL.md Secrets rule.
 
 prerequisites:
   required:
@@ -15,15 +16,11 @@ prerequisites:
       references/service.yaml.
   - name: model_path
     description: >-
-      Cloud URI to the trained model checkpoint (e.g. s3://bucket/path/to/checkpoint).
-      The container fetches this at startup using cloud_metadata credentials — a local
-      filesystem path will not work.
-  - name: cloud_type
-    description: Cloud storage provider (e.g. "aws", "azure", "gcs").
-  - name: bucket
-    description: Cloud storage bucket or container name.
-  - name: region
-    description: Cloud storage region (e.g. "us-east-1").
+      Trained model checkpoint. Valid forms: hf_model://<org>/<model>
+      (HuggingFace Hub — set HF_TOKEN for gated models) or a local container
+      filesystem path. Cloud URIs (s3://, gs://, az://) are NOT supported —
+      the inference service has no cloud-storage dependency. See
+      model_path_protocols in references/service.yaml.
   - name: platform
     description: >-
       Compute backend where the container will run. One of: local-docker, brev,
@@ -36,5 +33,3 @@ prerequisites:
   - name: host_port
     description: Host-side port to bind for local-docker and brev platforms.
     default: 8080
-  - name: results_dir
-    description: Cloud URI for container output. Defaults to s3://{bucket}/results/{job_id}.

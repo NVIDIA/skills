@@ -1,0 +1,123 @@
+name: tao-train-dinov3
+network_arch: dinov3
+huggingface_model_ids:
+- timm/vit_base_patch16_dinov3.lvd1689m
+- timm/vit_small_patch16_dinov3.lvd1689m
+automl_enabled: true
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt  # versions-key: images.tao_toolkit.pyt
+data_format: ssl
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: dinov3 train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.train_dataset.images_dir:
+        type: folder
+      train.pretrained_model_path:
+        type: file
+        optional: true
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: dinov3 export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  inference:
+    command: dinov3 inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.checkpoint:
+        type: file
+      dataset.test_dataset.images_dir:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  convert:
+    command: dinov3 convert -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      convert.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      convert.output_path:
+        type: file
+    upload_excludes:
+    - inputs/
+data_sources:
+  # `path` names the managed source artifact. `runtime: extracted_folder`
+  # requires the runner to pass the unpacked directory to the images_dir spec.
+  train:
+    dataset.train_dataset.images_dir:
+      source: train_datasets
+      path: images_train.tar.gz
+      runtime: extracted_folder
+  inference:
+    dataset.test_dataset.images_dir:
+      source: inference_dataset
+      path: images_test.tar.gz
+      runtime: extracted_folder
+spec_params:
+  train:
+    encryption_key: key
+    results_dir: output_dir
+    train.pretrained_model_path: ptm_if_no_resume_model
+    train.resume_training_checkpoint_path: resume_model
+  # Select the teacher checkpoint explicitly for export, inference, and conversion.
+  export:
+    encryption_key: key
+    export.onnx_file: create_onnx_file
+    results_dir: output_dir
+  inference:
+    encryption_key: key
+    results_dir: output_dir
+  convert:
+    encryption_key: key
+    results_dir: output_dir
+key_defaults: {}
+spec_shorthand_keys:
+  num_epochs: train.num_epochs
+  batch_size: dataset.batch_size
+  workers: dataset.workers
+  image_size: model.backbone.img_size
+  teacher_type: model.backbone.teacher_type
+  student_type: model.backbone.student_type
+  num_prototypes: train.num_prototypes
+  precision: train.precision
+  centering_method: model.centering_method
+  gram_enable: model.gram.enable
+  resume_checkpoint: train.resume_training_checkpoint_path
+  export_input_width: export.input_width
+  export_input_height: export.input_height
+spec_templates:
+  train: ../references/spec_template_train.yaml
+  export: ../references/spec_template_export.yaml
+  inference: ../references/spec_template_inference.yaml
+  convert: ../references/spec_template_convert.yaml
+description: DINOv3 continual self-supervised pre-training. Domain-adapts public DINOv3 ViT backbones
+  on unlabeled images via DINO + iBOT + KoLeo (+ optional Gram anchoring) and converts the EMA teacher
+  into a timm-format backbone for downstream TAO tasks.

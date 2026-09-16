@@ -12,8 +12,9 @@ TAO container only fails per-batch and surfaces the root cause minutes in.
 This script:
 
 1. Reads the assembled training CSV, resolves every `input_path` and
-   `golden_path` against a workspace root (or treats absolute paths as-is),
-   and hard-stops on any missing file or schema error.
+   `golden_path` against a workspace root, with a CSV-directory fallback for
+   flat source pools (or treats absolute paths as-is), and hard-stops on any
+   missing file or schema error.
 2. Enforces the PASS-preserving label rule: `label == "PASS"` must stay
    uppercase; every other label must be lowercase + stripped. Non-compliant
    rows hard-stop because TAO's ChangeNet classify dataloader does
@@ -40,6 +41,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import pathlib
 import sys
 
@@ -138,11 +140,13 @@ def validate(
 
     Uses stdlib csv so the script runs on bare hosts without pandas.
 
-    Path resolution follows TAO ChangeNet's siamese dataloader convention
-    when `object_name` is present in the CSV:
+    A path that already resolves to a file under the workspace root or beside
+    the CSV is accepted as a flat-file source-pool row. Otherwise, path
+    resolution follows TAO ChangeNet's siamese dataloader convention when
+    `object_name` is present in the CSV:
         <workspace_root>/<input_path>/<object_name>_<light><image_ext>
-    Falls back to flat-file resolution (<workspace_root>/<input_path>) when
-    `object_name` is absent.
+    This lets the raw smoke-test mining pool use `images/<file>.jpg` while
+    assembled training rows continue to use directory-style paths.
     """
     errors: list[str] = []
 
@@ -174,15 +178,31 @@ def validate(
             if not raw:
                 missing.append((i, f"<empty {col}>"))
                 continue
-            if siamese_mode:
+            raw_path = pathlib.Path(raw)
+            direct_candidates = [_resolve(raw, workspace_root)]
+            if not raw_path.is_absolute():
+                direct_candidates.append(csv_path.parent / raw_path)
+            direct_file = next(
+                (candidate for candidate in direct_candidates if candidate.is_file()),
+                None,
+            )
+
+            if direct_file is not None:
+                resolved = direct_file
+            elif siamese_mode:
                 obj = (row.get("object_name") or "").strip()
                 if not obj:
                     missing.append((i, f"<empty object_name for siamese {col}>"))
                     continue
                 # TAO siamese resolution: images_dir/input_path/object_name_light.ext
-                resolved = _resolve(raw, workspace_root) / f"{obj}_{light}{image_ext}"
+                filename = f"{obj}_{light}{image_ext}"
+                reconstructed = [base / filename for base in direct_candidates]
+                resolved = next(
+                    (candidate for candidate in reconstructed if candidate.is_file()),
+                    reconstructed[0],
+                )
             else:
-                resolved = _resolve(raw, workspace_root)
+                resolved = direct_candidates[0]
             if not resolved.is_file():
                 missing.append((i, f"{raw} -> {resolved}"))
         if missing:
@@ -191,6 +211,25 @@ def validate(
                 f"{len(missing)} row(s) reference a missing {col} on disk "
                 f"(workspace_root={workspace_root}, siamese={siamese_mode}); first: {sample}"
             )
+            image_prefix = next(
+                (
+                    prefix
+                    for prefix in (pathlib.Path("images"), pathlib.Path("kpi/images"))
+                    if any(
+                        not pathlib.Path((row.get(col) or "").strip()).is_absolute()
+                        and (workspace_root / prefix / (row.get(col) or "").strip()).exists()
+                        for row in rows
+                        if (row.get(col) or "").strip()
+                    )
+                ),
+                None,
+            )
+            if image_prefix is not None:
+                errors.append(
+                    f"{col} appears to use base-CSV coordinates; prepend "
+                    f"'{image_prefix.as_posix()}/' exactly once before assembling "
+                    "an iteration CSV"
+                )
 
     if "label" in columns:
         errors.extend(_check_label_case(rows))
@@ -222,7 +261,8 @@ def _build_parser() -> argparse.ArgumentParser:
         type=pathlib.Path,
         help=(
             "Absolute workspace root. Relative input_path / golden_path values "
-            "are resolved against this directory; absolute values are used as-is."
+            "are resolved against this directory, with a CSV-directory fallback "
+            "for flat source-pool files; absolute values are used as-is."
         ),
     )
     parser.add_argument(
@@ -250,7 +290,40 @@ def _build_parser() -> argparse.ArgumentParser:
         default=".jpg",
         help="Image extension for siamese path resolution. Default: .jpg.",
     )
+    parser.add_argument(
+        "--report-json",
+        type=pathlib.Path,
+        help=(
+            "Write a machine-verifiable success report containing rows_checked, "
+            "missing_file_count, and train_val_leakage_overlap_count."
+        ),
+    )
     return parser
+
+
+def _write_success_report(args: argparse.Namespace) -> None:
+    if args.report_json is None:
+        return
+    with args.csv.open(newline="") as f:
+        rows_checked = sum(1 for _ in csv.DictReader(f))
+    report = {
+        "status": "ok",
+        "training_csv": str(args.csv.resolve()),
+        "validation_csv": (
+            str(args.validation_csv.resolve())
+            if args.validation_csv is not None
+            else None
+        ),
+        "rows_checked": rows_checked,
+        "missing_file_count": 0,
+        "train_val_leakage_overlap_count": (
+            0 if args.validation_csv is not None else None
+        ),
+    }
+    args.report_json.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = args.report_json.with_name(f".{args.report_json.name}.tmp")
+    tmp_path.write_text(json.dumps(report, indent=2) + "\n")
+    tmp_path.replace(args.report_json)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -270,6 +343,7 @@ def main(argv: list[str] | None = None) -> int:
         for e in errors:
             print(f"  - {e}", file=sys.stderr)
         return 2
+    _write_success_report(args)
     print(f"validate_training_csv: ok ({args.csv})", file=sys.stderr)
     return 0
 

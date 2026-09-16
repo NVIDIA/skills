@@ -3,7 +3,7 @@
 For local-docker runs, keep Sparse4D conversion rooted at `/data/aicity_root` and train/eval data roots at the converted split folder, for example `/data/aicity_root/train`. Mount the same host directory at `/data/aicity_root` for dataset_convert, train, evaluate, and inference; the converter extracts RGB frames there and writes those absolute frame paths into the pickle files. The annotations converter writes absolute RGB paths under the conversion root and relative depth paths under the split, so both mounts must stay stable across conversion and training. When `aicity.depth_format: h5`, normalize the converted pickle depth tuples before training if the H5 files live under `depth_maps/`:
 
 ```bash
-models/sparse4d/scripts/normalize_depth_paths.py \
+models/tao-train-sparse4d/scripts/normalize_depth_paths.py \
   --data-root /path/to/aicity_root/train \
   /path/to/results/<dataset_convert_job_id>/results_dir/train
 ```

@@ -97,33 +97,55 @@ jobs:
             local page=1
             local response
             local first_response=""
-            local page_files
-            local all_files='[]'
             local page_count
+            # Accumulate through files, never shell variables passed as argv.
+            # Linux caps a single argument at 128 KiB (MAX_ARG_STRLEN); the
+            # commit payload exceeds that long before the page-30 guard below
+            # can fire, so --argjson died with "Argument list too long" instead
+            # of returning a verdict. See PR #471 (96 files, 865 KiB).
+            local scratch_dir all_files_file page_files_file
+            if ! scratch_dir="$(mktemp -d)" || [ -z "${scratch_dir}" ]; then
+              echo "Unable to create a scratch directory for commit ${commit_sha}." >&2
+              return 1
+            fi
+            all_files_file="${scratch_dir}/all.json"
+            page_files_file="${scratch_dir}/page.json"
+            printf '[]' > "${all_files_file}"
 
             while true; do
               response="$(github_get "https://api.github.com/repos/${owner}/${repo}/commits/${commit_sha}?per_page=100&page=${page}")"
               if [ "${page}" -eq 1 ]; then
                 first_response="${response}"
               fi
-              page_files="$(printf '%s' "${response}" | jq -c '.files // []')"
-              page_count="$(printf '%s' "${page_files}" | jq 'length')"
-              all_files="$(jq -cn \
-                --argjson existing "${all_files}" \
-                --argjson current "${page_files}" \
-                '$existing + $current')"
+              # Keep only what the classifiers below read: .filename and
+              # .previous_filename. The API returns each file's full patch,
+              # which is ~98% of the payload and never inspected. Dropping
+              # .previous_filename here would let a rename INTO a signature
+              # artifact name pass is_generated_signature_artifact_commit,
+              # so both fields are required.
+              printf '%s' "${response}" \
+                | jq -c '[.files[]? | {filename, previous_filename}]' > "${page_files_file}"
+              page_count="$(jq 'length' < "${page_files_file}")"
+              jq -cn \
+                --slurpfile existing "${all_files_file}" \
+                --slurpfile current "${page_files_file}" \
+                '$existing[0] + $current[0]' > "${all_files_file}.new"
+              mv "${all_files_file}.new" "${all_files_file}"
 
               if [ "${page_count}" -lt 100 ]; then
                 break
               fi
               if [ "${page}" -ge 30 ]; then
                 echo "Commit ${commit_sha} has too many files to classify safely." >&2
+                rm -rf "${scratch_dir}"
                 return 1
               fi
               page=$((page + 1))
             done
 
-            printf '%s' "${first_response}" | jq -c --argjson files "${all_files}" '.files = $files'
+            printf '%s' "${first_response}" \
+              | jq -c --slurpfile files "${all_files_file}" '.files = $files[0]'
+            rm -rf "${scratch_dir}"
           }
 
           first_watched_path() {
@@ -131,9 +153,7 @@ jobs:
               def watched:
                 (. // "") |
                 startswith("skills/") or
-                startswith("team-skills/") or
-                startswith("rules/team-rules/") or
-                startswith("plugins/");
+                startswith("team-skills/");
               [
                 .files[]? |
                 select((.filename | watched) or (.previous_filename? | watched)) |
@@ -146,7 +166,7 @@ jobs:
             local commit_json="$1"
             local commit_title
 
-            commit_title="$(printf '%s' "${commit_json}" | jq -r '.commit.message | split("\n")[0]')"
+            commit_title="$(printf '%s' "${commit_json}" | jq -r '(.commit.message // "") | split("\n")[0]')"
             [ "${commit_title}" = "${SIGNATURE_COMMIT_TITLE}" ] || return 1
 
             printf '%s' "${commit_json}" | jq -e '
@@ -183,6 +203,7 @@ jobs:
                 )
               ' >/dev/null
           }
+
           if [ -z "${pr_number}" ] || [ -z "${head_sha}" ]; then
             echo "Pull request metadata is incomplete."
             exit 1
@@ -190,6 +211,14 @@ jobs:
 
           pr_json="$(github_get "https://api.github.com/repos/${owner}/${repo}/pulls/${pr_number}")"
           current_head_sha="$(printf '%s' "${pr_json}" | jq -r '.head.sha | ascii_downcase')"
+          head_repo_full_name="$(printf '%s' "${pr_json}" | jq -r '(.head.repo.full_name // "") | ascii_downcase')"
+          base_repo_full_name="$(printf '%s' "${pr_json}" | jq -r '(.base.repo.full_name // "") | ascii_downcase')"
+          is_fork_pull_request=false
+          if [ -n "${head_repo_full_name}" ] &&
+            [ -n "${base_repo_full_name}" ] &&
+            [ "${head_repo_full_name}" != "${base_repo_full_name}" ]; then
+            is_fork_pull_request=true
+          fi
           if [ "${current_head_sha}" != "${head_sha}" ]; then
             append_summary \
               "## NVSkills CI required status" \
@@ -206,9 +235,7 @@ jobs:
               def watched:
                 (. // "") |
                 startswith("skills/") or
-                startswith("team-skills/") or
-                startswith("rules/team-rules/") or
-                startswith("plugins/");
+                startswith("team-skills/");
               any(.[]; (.filename | watched) or (.previous_filename? | watched))
             ' >/dev/null; then
               has_watched_change=true
@@ -365,7 +392,7 @@ jobs:
             if [ "${status_sha}" != "${head_sha}" ]; then
               append_summary \
                 "" \
-                "PR head \`${head_sha}\` contains only trailing changes outside watched NVSkills paths after the validated tree."
+                "PR head \`${head_sha}\` contains no unvalidated watched-path content after the validation evidence commit."
             fi
             exit 0
           fi
@@ -378,9 +405,12 @@ jobs:
             "Latest watched-path change: \`${latest_watched_path}\`." \
             "" \
             "Comment \`/nvskills-ci\` on this PR after every commit that changes" \
-            "\`skills/\`, \`team-skills/\`, \`rules/team-rules/\`, or \`plugins/\`." \
-            "" \
-            "For a fork pull request, add \`${SIGNATURE_SERVICE_ACCOUNT_LOGIN}\`, the configured NVSkills signing service account, as a collaborator with write access to the fork repository, then ask a maintainer of the base repository to comment \`/nvskills-ci\`."
+            "\`skills/\` or \`team-skills/\`."
+          if [ "${is_fork_pull_request}" = "true" ]; then
+            append_summary \
+              "" \
+              "For a fork pull request, add \`${SIGNATURE_SERVICE_ACCOUNT_LOGIN}\`, the configured NVSkills signing service account, as a collaborator with write access to the fork repository, then ask a maintainer of the base repository to comment \`/nvskills-ci\`."
+          fi
           if [ -n "${status_sha}" ]; then
             append_summary "" "Latest NVSkills CI status checked: \`${status_state}\` on \`${status_sha}\`."
           fi

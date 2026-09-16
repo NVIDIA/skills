@@ -1,0 +1,42 @@
+# tmm unique_neighbor_matching — starting spec.
+#
+# TAO emits no default: `tmm` is absent from the `default_specs` supported list.
+
+source_path: ???                # the pool embeddings parquet — the search corpus
+target_path: ???                # the weak-image embeddings parquet — the queries
+output_dir: ???                 # a DIRECTORY, not a file
+desired_unique_count: ???       # from prepare_budget_for_mining.py
+
+# `global` splits one budget across all targets. `class_stratified` apportions it
+# by target-class ratio with largest-remainder and a non-rare fallback pool; the
+# reference pipeline's `class_balanced` maps to it.
+allocation_policy: global
+
+distance_metric: euclidean
+# Seeds the miner's internal candidate-pool growth (widens each internal retry,
+# capped at 8 passes). Unrelated to the loop's max_iterations.
+candidate_expansion_factor: 5
+
+# TAO DS image_embeddings writes `embedding`; these defaults match it.
+source_embedding_column: embedding
+target_embedding_column: embedding
+source_filepath_column: filepath
+target_filepath_column: filepath
+
+# null on iteration 1 ONLY. Later iterations pass the prior cumulative parquet so
+# each iteration mines a disjoint batch. NOTE: when this empties the source pool,
+# the miner crashes rather than reporting an empty result — check the pool against
+# the exclude set before invoking.
+exclude_path: null
+
+# Both required for class_stratified, as COCO JSON. TAO DS will not infer the
+# format, hence detection_format being explicit.
+source_detection_file: null
+target_detection_file: null
+detection_format: null
+
+# Comma-separated STRING, not a list, e.g. "bicycle,person".
+rare_class_list: ""
+
+save_embeddings: false
+visualize: false

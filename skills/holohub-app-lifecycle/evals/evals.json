@@ -53,5 +53,19 @@
       "Names module-only ./holohub package behavior and clean-consumer verification",
       "Does not package, run commands, publish artifacts, or reintroduce a removed application packager during this routing step"
     ]
+  },
+  {
+    "id": "holohub-app-lifecycle-013",
+    "question": "I only need a read-only inventory and scaffold plan for a CPU-only application. `./holohub version --json` reports `holoscan-cli` 4.6.0 and the selected base image is Holoscan SDK 4.6.0, while `./holohub env-check --json` reports failed GPU and Docker checks on this planning host. Decide whether either result blocks the plan. Do not run mutating commands.",
+    "expected_skill": "holohub-app-lifecycle",
+    "expected_script": null,
+    "ground_truth": "The agent parses the structured version and environment diagnostics. It recognizes the holoscan-cli 4.6.0 wrapper and Holoscan SDK 4.6.0 base as the supported HoloHub defaults, so it does not change either version or treat the version report as a failure. Because the requested evidence is read-only planning and neither GPU nor Docker is required, it continues with bounded checkout discovery, local help and metadata inspection, and the scaffold plan. It records the unavailable capabilities and defers build, run, and visual proof that require them.",
+    "expected_behavior": [
+      "Activates holohub-app-lifecycle and parses the structured version and env-check results",
+      "Recognizes the 4.6.0 CLI wrapper and 4.6.0 SDK base as supported defaults without forcing either version to change",
+      "Maps each failed capability to the evidence actually requested and continues read-only planning when GPU and Docker are irrelevant",
+      "Uses bounded checkout discovery plus local help and metadata for the plan rather than forcing the contract's evidence snapshot",
+      "Does not claim build, runtime, or visual proof that requires an unavailable capability and does not run mutating commands"
+    ]
   }
 ]

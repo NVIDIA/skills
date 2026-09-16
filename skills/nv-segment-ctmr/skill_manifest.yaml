@@ -14,12 +14,12 @@
 # limitations under the License.
 
 id: medagent.nv_segment_ctmr
-version: 0.1.0
+version: 0.1.1
 upstream_refs:
   - kind: github_repo
     name: NVIDIA-Medtech/NV-Segment-CTMR
     repo_url: https://github.com/NVIDIA-Medtech/NV-Segment-CTMR
-    git_commit: f9f5f51b589e5dc9c23c453cf5138398e4084056
+    git_commit: cb921f5c58837c0f42a713855d68b32af88e1cdd
     notes: Recommended default for a new checkout; an explicit caller-provided NV_SEGMENT_CTMR_ROOT is accepted.
   - kind: huggingface_repo
     name: nvidia/NV-Segment-CTMR
@@ -102,14 +102,17 @@ runtime:
     env_required: []
     env_optional:
       - NV_SEGMENT_CTMR_ROOT
+      - CUDA_VISIBLE_DEVICES
+      - MONAI_DATA_DIRECTORY
+      - PYTORCH_CUDA_ALLOC_CONF
   external_assets:
     - kind: upstream_repo
       repo_url: https://github.com/NVIDIA-Medtech/NV-Segment-CTMR
-      install_path: ~/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-f9f5f51/NV-Segment-CTMR
+      install_path: ~/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-cb921f5/NV-Segment-CTMR
       install_command: >
-        git clone https://github.com/NVIDIA-Medtech/NV-Segment-CTMR.git $HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-f9f5f51 &&
-        git -C $HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-f9f5f51 checkout --detach f9f5f51b589e5dc9c23c453cf5138398e4084056 &&
-        export NV_SEGMENT_CTMR_ROOT=$HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-f9f5f51/NV-Segment-CTMR &&
+        git clone https://github.com/NVIDIA-Medtech/NV-Segment-CTMR.git $HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-cb921f5 &&
+        git -C $HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-cb921f5 checkout --detach cb921f5c58837c0f42a713855d68b32af88e1cdd &&
+        export NV_SEGMENT_CTMR_ROOT=$HOME/.cache/nvidia-skills/upstreams/NV-Segment-CTMR-cb921f5/NV-Segment-CTMR &&
         pip install -r $NV_SEGMENT_CTMR_ROOT/requirements.txt
       contains:
         - configs/inference.json

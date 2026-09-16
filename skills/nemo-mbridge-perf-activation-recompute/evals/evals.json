@@ -1,16 +1,47 @@
 [
   {
-    "id": "activation-recompute-positive-memory-smoke",
-    "question": "Use the nemo-mbridge-perf-activation-recompute skill. My Megatron Bridge model is close to OOM and an FP8 config already uses TE-scoped CUDA graphs. Give a concise checklist with the first environment fix, the exact selective-to-full recompute order, the required full-recompute config fields, and the CUDA-graph assertion workaround.",
+    "id": "activation-recompute-architecture-aware-memory-smoke",
+    "question": "Use the nemo-mbridge-perf-activation-recompute skill. I have three Megatron Bridge jobs near OOM: one uses standard attention with Transformer Engine fused attention, one uses MLA, and one uses grouped MoE. Give a concise first-candidate recompute choice for each, explain why core_attn is not universal, state the required full-recompute fields, and cover the CUDA-graph workaround.",
     "expected_skill": "nemo-mbridge-perf-activation-recompute",
     "expected_script": null,
-    "ground_truth": "The answer should use the activation recompute skill. It should say to try PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True first, then start with recompute_granularity=\"selective\" and recompute_modules=[\"core_attn\"], optionally add layernorm, and use full recompute only if selective still does not fit. It should state full recompute requires recompute_method and recompute_num_layers, and that full/layer-level recompute is incompatible with TE-scoped CUDA graph scopes such as attn, mlp, or moe_router. It should give valid workarounds: use selective recompute, disable CUDA graphs with cuda_graph_impl=\"none\", or switch to cuda_graph_impl=\"local\" with cuda_graph_scope=\"full_iteration\".",
+    "ground_truth": "The answer should first distinguish allocated activation pressure from reserved-memory fragmentation and keep a matched no-recompute control. For standard attention, core_attn is a common candidate, but with TE fused or Flash Attention it must be compared with an empty selective module list because the backend already rematerializes attention internals. For MLA, mla_up_proj is the first candidate when expanded Q/K/V tensors dominate; core_attn can be additive when the attention core remains material. For grouped MoE, moe_act is the narrow first candidate and layernorm can be added when norm outputs matter; whole moe is broader and replays routing, experts, and communication. Full recompute requires recompute_method and recompute_num_layers. Full recompute with CUDA graphs requires cuda_graph_impl=full_iteration; otherwise use selective recompute or cuda_graph_impl=none.",
     "expected_behavior": [
       "Read the nemo-mbridge-perf-activation-recompute skill before answering.",
-      "Recommend PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True before recompute changes.",
-      "Prefer selective recompute with core_attn and optionally layernorm before full recompute.",
+      "Use a matched no-recompute control and distinguish allocated memory from allocator fragmentation.",
+      "Describe core_attn as common for standard attention but not a universal first choice.",
+      "Recommend mla_up_proj for MLA and moe_act, optionally layernorm, for grouped MoE based on peak attribution.",
       "State that full recompute requires recompute_method and recompute_num_layers.",
-      "Explain the TE-scoped CUDA graph incompatibility and list a valid workaround."
+      "Explain that full recompute with CUDA graphs requires full_iteration, with selective recompute or disabled graphs as alternatives."
+    ]
+  },
+  {
+    "id": "activation-recompute-moonlight-evidence",
+    "question": "Use the nemo-mbridge-perf-activation-recompute skill. For the exact Moonlight 16B H100 configuration measured by the skill, which selective boundary should I try first? Explain the tradeoff versus mla_up_proj, core_attn, and adding layernorm or mlp, and state whether the conclusion is portable to other recipes.",
+    "expected_skill": "nemo-mbridge-perf-activation-recompute",
+    "expected_script": null,
+    "ground_truth": "For the exact measured Moonlight workload, recommend moe_act first: it lowered peak allocated memory 1.85% with 1.99% step-time overhead. mla_up_proj saved 1.96%, only about 39 MB more, with 5.19% overhead, so it is the next choice only if the small additional saving matters. core_attn provided no material allocated-memory reduction and cost 3.85% under fused attention. Adding mlp to mla_up_proj or layernorm to moe_act did not improve the observed peak and increased step time. The answer must limit this conclusion to the exact measured architecture, backend, topology, precision, and shape rather than claim a universal label ranking.",
+    "expected_behavior": [
+      "Read the nemo-mbridge-perf-activation-recompute skill before answering.",
+      "Recommend moe_act first for the exact measured Moonlight workload.",
+      "Compare allocated-memory and step-time deltas against the matched empty-list control.",
+      "Explain that mla_up_proj provides only a small additional saving at higher cost in this run.",
+      "Reject core_attn and the broader tested additions as first choices for this exact run.",
+      "Do not extrapolate the measured ordering into a universal recommendation."
+    ]
+  },
+  {
+    "id": "activation-recompute-nemotron-capacity-evidence",
+    "question": "Use the nemo-mbridge-perf-activation-recompute skill. In the measured Nemotron 3 Nano 16-H100 workload, moe_act lowered an iteration-1 peak but the job still OOMed. What is the smallest tested passing choice, what does layernorm add, and how should I classify the moe_act result?",
+    "expected_skill": "nemo-mbridge-perf-activation-recompute",
+    "expected_script": null,
+    "ground_truth": "Whole moe recompute was the smallest tested choice that completed all 12 steps. Adding layernorm lowered the rank-0 post-iteration-2 peak from 64.653 GB to 63.639 GB, another 1.014 GB or 1.57%, but raised steady-state step time from 657.42 ms to 677.62 ms, or 3.07%. Moe_act lowered the matched iteration-1 rank-0 peak by 4.194 GB or 6.33% relative to the empty control, but then OOMed in the iteration-2 output projection. It is diagnostic evidence of real activation relief, not a pass. A pass requires optimizer initialization and multiple steady-state steps.",
+    "expected_behavior": [
+      "Read the nemo-mbridge-perf-activation-recompute skill before answering.",
+      "Identify whole moe as the smallest tested passing boundary for the exact Nemotron workload.",
+      "Quantify the extra memory headroom and step-time cost from adding layernorm.",
+      "Classify moe_act as useful failure-stage evidence rather than a successful configuration.",
+      "Require optimizer initialization and multiple steady-state steps for a pass.",
+      "Limit the conclusion to the measured Nemotron configuration."
     ]
   }
 ]

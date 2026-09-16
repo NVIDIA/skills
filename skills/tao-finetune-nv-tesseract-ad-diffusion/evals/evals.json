@@ -1,0 +1,14 @@
+[
+  {
+    "id": "tao-finetune-nv-tesseract-ad-diffusion-basic",
+    "question": "A user request: \"Fine-tune NV-Tesseract AD Diffusion on my multivariate time-series CSV of normal-behavior data, then run diffusion-based anomaly detection with curriculum_medium.yaml and final_model.pth.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
+    "expected_skill": "tao-finetune-nv-tesseract-ad-diffusion",
+    "expected_script": null,
+    "ground_truth": "Identify tao-finetune-nv-tesseract-ad-diffusion as the applicable skill and summarize its documented fine-tune + inference workflow from SKILL.md (uv sync, finetune_example.py on the user CSV, then quick_example.py with --model-path final_model.pth and --config-path curriculum_medium.yaml) without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-finetune-nv-tesseract-ad-diffusion as the relevant skill",
+      "Outlines the documented fine-tune and inference workflow steps from SKILL.md (uv sync, finetune_example.py, quick_example.py with --model-path/--config-path/--dataset-path)",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]

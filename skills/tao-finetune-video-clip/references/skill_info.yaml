@@ -1,0 +1,111 @@
+network_arch: video-clip
+automl_enabled: false
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt  # versions-key: images.tao_toolkit.pyt
+required_credentials:
+- HF_TOKEN
+- NGC_KEY
+data_format: vadr1_chunks
+gpu_spec_key: train.num_gpus
+actions:
+  train:
+    command: video_clip train -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      model.text_encoder:
+        type: file
+      dataset.train.video_text.metadata:
+        type: file
+      dataset.val.video_text.metadata:
+        type: file
+      train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: video_clip evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.checkpoint:
+        type: file
+      dataset.val.video_text.metadata:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: video_clip inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.checkpoint:
+        type: file
+      inference.query.text_file:
+        type: file
+        optional: true
+      dataset.inference.video_text.metadata:
+        type: file
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  export:
+    command: video_clip export -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      export.checkpoint:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      export.onnx_file:
+        type: file
+    upload_excludes:
+    - inputs/
+  gen_trt_engine:
+    container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-deploy  # versions-key: images.tao_toolkit.deploy
+    command: video_clip gen_trt_engine -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      gen_trt_engine.onnx_file:
+        type: file
+      gen_trt_engine.trt_engine:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      gen_trt_engine.trt_engine:
+        type: file
+    upload_excludes:
+    - inputs/
+data_sources:
+  train:
+    dataset.train.video_text.metadata:
+      source: train_datasets
+      multiple_sources: false
+      path: train.json
+    dataset.val.video_text.metadata:
+      source: eval_dataset
+      multiple_sources: false
+      path: val.json
+  evaluate:
+    dataset.val.video_text.metadata:
+      source: eval_dataset
+      multiple_sources: false
+      path: val.json
+  inference:
+    inference.query.text_file:
+      source: inference_dataset
+      multiple_sources: false
+      path: prompts.txt

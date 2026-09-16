@@ -26,7 +26,7 @@ python3 /path/to/skills/omniverse-cad-to-simready/references/content-agents/scri
   --call material \
   --call physics \
   --prompt "$ASSET_CONTEXT_PROMPT" \
-  --convert-output-to-usd \
+  --convert-physics-output-to-usd \
   --report /path/to/output_dir/assignment/content-agents.json
 
 python3 /path/to/skills/omniverse-cad-to-simready/references/simready-conform-profile/scripts/run.py \

@@ -1,0 +1,9 @@
+source_parquet: null
+target_parquet: null
+output_parquet: null
+topn: 5
+knn_metric: cosine
+source_embed_column_name: embedding
+target_embed_column_name: embedding
+filter_by_label: "false"
+distance_threshold: -1.0

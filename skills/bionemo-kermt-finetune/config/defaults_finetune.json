@@ -1,0 +1,41 @@
+{
+  "_about": "Default hyperparameters applied by kermt-finetune. Values target a scaffold-balanced single-task regression finetune (the common ADMET case). Epochs are set to 30 for a faster default; raise via --epochs for a real training run. The skill echoes the applied set back to the user on every invocation; override any value with the corresponding CLI flag.",
+
+  "training": {
+    "_about": "Optimizer, training schedule, and data-side regularization.",
+    "epochs": 30,
+    "batch_size": 32,
+    "init_lr": 1e-4,
+    "max_lr": 1e-4,
+    "final_lr": 2e-5,
+    "dropout": 0.0,
+    "bond_drop_rate": 0.1,
+    "dist_coff": 0.15,
+    "seed": 0,
+    "tensorboard": true
+  },
+
+  "task": {
+    "_about": "Task semantics. For classification tasks override dataset_type ('classification'), metric (e.g. 'auc'), and any optimizer settings that need to differ.",
+    "dataset_type": "regression",
+    "metric": "mae",
+    "split_type": "scaffold_balanced",
+    "ensemble_size": 1,
+    "num_folds": 1,
+    "no_features_scaling": true
+  },
+
+  "ffn_head": {
+    "_about": "Dimensions of the FFN head attached on top of the encoder for the downstream task. These size new modules and do not need to match the encoder hidden_size. Per-target MTL FFN heads are off by default (ffn_num_task_specific_layers=0 == shared FFN trunk only); set ffn_num_task_specific_layers>0 plus a matching ffn_task_specific_hidden_size to give each target its own small head on top of the shared trunk.",
+    "ffn_hidden_size": 700,
+    "ffn_num_layers": 3,
+    "ffn_num_task_specific_layers": 0,
+    "ffn_task_specific_hidden_size": null
+  },
+
+  "_about_arch": "Encoder architecture and arch-coupled flags (including self_attention) are intentionally not in this file. The runner reads them from the loaded checkpoint via check_checkpoint.py and uses the ckpt-derived values; user-supplied flags that mismatch the ckpt are rejected with a clear error.",
+
+  "_about_mtl": "Per-target task-specific FFN heads are exposed via ffn_num_task_specific_layers (default 0 == off) and ffn_task_specific_hidden_size (default null; required when ffn_num_task_specific_layers > 0). When >0, each target column gets its own N-layer FFN stacked on the shared trunk; useful for heterogeneous multi-target finetunes (e.g. solubility + permeability + metabolic stability together). Override via --ffn-num-task-specific-layers N --ffn-task-specific-hidden-size H.",
+
+  "_about_gpu_selection": "GPU selection is auto-detected at runtime, not a default here. Finetune defaults to GPU 0. Use --gpus <id> to pick a single device for single-GPU finetune; use --num-gpus N for multi-GPU data-parallel (DDP)."
+}

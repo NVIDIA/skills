@@ -233,7 +233,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--profile", default="Prop-Robotics-Neutral")
     parser.add_argument("--profile-version", default="1.0.0")
     parser.add_argument("--source-asset")
-    parser.add_argument("--generated-by", default="physical-ai-skill-hub")
+    parser.add_argument("--generated-by", default="omniverse-cad-to-simready")
     parser.add_argument("--author")
     parser.add_argument("--tag", dest="tags", action="append", default=[])
     parser.add_argument("--pipeline-step", dest="pipeline_steps", action="append", default=[])

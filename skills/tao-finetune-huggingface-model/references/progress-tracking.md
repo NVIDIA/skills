@@ -92,7 +92,7 @@ will see the debugging trail, not just the final scripts.
 - {{TIMESTAMP}} ✅ 635 GB disk free (≥ 40 GB required)
 - {{TIMESTAMP}} ✅ HF_TOKEN valid for {{MODEL_ID}}
 - {{TIMESTAMP}} ✅ GPU: A100-SXM4-80GB, driver 560.35.05, 1 GPU, 80 GB VRAM
-- {{TIMESTAMP}} ✅ NGC image selected: `nvcr.io/nvidia/pytorch:24.09-py3` (CUDA 12.6, PyTorch 2.5.0)
+- {{TIMESTAMP}} ✅ NGC image selected: `nvcr.io/nvidia/pytorch:24.09-py3` (CUDA 12.6, PyTorch 2.5.0) <!-- unpinned: example log entry -->
 - {{TIMESTAMP}} ✅ Wrote `meta/phase1_hardware.yaml`
 
 ## Phase 2 — Container Setup

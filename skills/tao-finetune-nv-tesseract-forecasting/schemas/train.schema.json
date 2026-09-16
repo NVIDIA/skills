@@ -1,0 +1,341 @@
+{
+  "automl_default_parameters": [
+    "train.lr",
+    "train.batch_size",
+    "train.head_dropout",
+    "train.weight_decay",
+    "train.max_norm"
+  ],
+  "automl_disabled_parameters": [
+    "dataset.csv",
+    "dataset.train_csv",
+    "dataset.val_csv",
+    "dataset.timestamp_col",
+    "dataset.target_cols",
+    "dataset.val_ratio",
+    "dataset.test_ratio",
+    "dataset.stride",
+    "model.seq_len",
+    "model.forecast_horizon",
+    "model.ckpt_init",
+    "model.use_cross_channel",
+    "model.cross_channel_heads",
+    "model.cross_channel_dropout",
+    "model.unfreeze_encoder",
+    "model.unfreeze_embedder",
+    "train.epochs",
+    "train.num_epochs",
+    "train.checkpoint_interval",
+    "train.checkpoint_interval_unit",
+    "train.seed",
+    "train.output_dir"
+  ],
+  "default": {
+    "dataset": {
+      "csv": "",
+      "train_csv": "",
+      "val_csv": "",
+      "timestamp_col": "timestamp",
+      "target_cols": "",
+      "val_ratio": 0.1,
+      "test_ratio": 0.0,
+      "stride": 1
+    },
+    "model": {
+      "seq_len": 512,
+      "forecast_horizon": 72,
+      "ckpt_init": "auto",
+      "use_cross_channel": false,
+      "cross_channel_heads": 8,
+      "cross_channel_dropout": 0.1,
+      "unfreeze_encoder": false,
+      "unfreeze_embedder": false
+    },
+    "train": {
+      "epochs": 5,
+      "num_epochs": 5,
+      "checkpoint_interval": 5,
+      "checkpoint_interval_unit": "epoch",
+      "batch_size": 8,
+      "lr": 1e-4,
+      "weight_decay": 0.0,
+      "head_dropout": 0.1,
+      "max_norm": 5.0,
+      "seed": 13,
+      "output_dir": "artifacts/finetune"
+    }
+  },
+  "properties": {
+    "dataset": {
+      "automl_enabled": false,
+      "description": "Dataset configuration for fine-tuning.",
+      "title": "dataset configuration",
+      "type": "collection",
+      "properties": {
+        "csv": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Single CSV split temporally into train/val/test.",
+          "title": "training CSV",
+          "type": "string"
+        },
+        "train_csv": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Training CSV when using separate train/val files.",
+          "title": "train CSV",
+          "type": "string"
+        },
+        "val_csv": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Validation CSV (used with train_csv).",
+          "title": "validation CSV",
+          "type": "string"
+        },
+        "timestamp_col": {
+          "automl_enabled": false,
+          "default": "timestamp",
+          "description": "Name of the datetime column to exclude from features.",
+          "title": "timestamp column",
+          "type": "string"
+        },
+        "target_cols": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Comma-separated target columns. Empty = all numeric columns.",
+          "title": "target columns",
+          "type": "string"
+        },
+        "val_ratio": {
+          "automl_enabled": false,
+          "default": 0.1,
+          "description": "Fraction of csv reserved for validation (temporal split).",
+          "maximum": 0.5,
+          "minimum": 0.05,
+          "title": "validation ratio",
+          "type": "float"
+        },
+        "test_ratio": {
+          "automl_enabled": false,
+          "default": 0.0,
+          "description": "Fraction of csv held out for test.",
+          "maximum": 0.3,
+          "minimum": 0.0,
+          "title": "test ratio",
+          "type": "float"
+        },
+        "stride": {
+          "automl_enabled": false,
+          "default": 1,
+          "description": "Sliding window stride. Use 1 for dense windows.",
+          "minimum": 1,
+          "title": "stride",
+          "type": "int"
+        }
+      }
+    },
+    "model": {
+      "automl_enabled": false,
+      "description": "Model architecture configuration (fixed before HPO).",
+      "title": "model configuration",
+      "type": "collection",
+      "properties": {
+        "seq_len": {
+          "automl_enabled": false,
+          "default": 512,
+          "description": "Input context window length in timesteps.",
+          "maximum": 512,
+          "minimum": 64,
+          "title": "sequence length",
+          "type": "int"
+        },
+        "forecast_horizon": {
+          "automl_enabled": false,
+          "default": 72,
+          "description": "Steps ahead to predict. Max 512.",
+          "maximum": 512,
+          "minimum": 1,
+          "title": "forecast horizon",
+          "type": "int"
+        },
+        "ckpt_init": {
+          "automl_enabled": false,
+          "default": "auto",
+          "description": "Checkpoint to warm-start from. 'auto' = HuggingFace weights; 'none' = fresh head; or path to .pt file.",
+          "title": "checkpoint init",
+          "type": "string"
+        },
+        "use_cross_channel": {
+          "automl_enabled": false,
+          "default": false,
+          "description": "Add cross-channel attention layer (uses run8_best_model_cr.pt as default checkpoint). Architecture choice — fix before HPO.",
+          "title": "use cross channel",
+          "type": "bool"
+        },
+        "cross_channel_heads": {
+          "automl_enabled": false,
+          "default": 8,
+          "description": "Attention heads in the cross-channel layer.",
+          "maximum": 16,
+          "minimum": 1,
+          "title": "cross channel heads",
+          "type": "int"
+        },
+        "cross_channel_dropout": {
+          "automl_enabled": false,
+          "default": 0.1,
+          "description": "Dropout in the cross-channel attention layer.",
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "title": "cross channel dropout",
+          "type": "float"
+        },
+        "unfreeze_encoder": {
+          "automl_enabled": false,
+          "default": false,
+          "description": "Train the transformer encoder (expensive; use only with large datasets).",
+          "title": "unfreeze encoder",
+          "type": "bool"
+        },
+        "unfreeze_embedder": {
+          "automl_enabled": false,
+          "default": false,
+          "description": "Train the patch embedder.",
+          "title": "unfreeze embedder",
+          "type": "bool"
+        }
+      }
+    },
+    "train": {
+      "automl_default_parameters": [
+        "train.lr",
+        "train.batch_size",
+        "train.head_dropout",
+        "train.weight_decay",
+        "train.max_norm"
+      ],
+      "automl_disabled_parameters": [
+        "train.epochs",
+        "train.num_epochs",
+        "train.checkpoint_interval",
+        "train.checkpoint_interval_unit",
+        "train.seed",
+        "train.output_dir"
+      ],
+      "automl_enabled": false,
+      "description": "Training hyperparameters.",
+      "title": "training configuration",
+      "type": "collection",
+      "properties": {
+        "epochs": {
+          "automl_enabled": false,
+          "default": 5,
+          "description": "Training epochs. Fixed per experiment — not searched by AutoML.",
+          "maximum": 200,
+          "minimum": 1,
+          "title": "epochs",
+          "type": "int"
+        },
+        "num_epochs": {
+          "automl_enabled": false,
+          "default": 5,
+          "description": "Compatibility epoch count consumed by AutoMLRunner checkpoint retention. Keep equal to train.epochs for NV-Tesseract scripts.",
+          "maximum": 200,
+          "minimum": 1,
+          "title": "AutoML runner epoch count",
+          "type": "int"
+        },
+        "checkpoint_interval": {
+          "automl_enabled": false,
+          "default": 5,
+          "description": "Compatibility checkpoint interval consumed by AutoMLRunner checkpoint retention.",
+          "minimum": 1,
+          "title": "checkpoint interval",
+          "type": "int"
+        },
+        "checkpoint_interval_unit": {
+          "automl_enabled": false,
+          "default": "epoch",
+          "description": "Compatibility checkpoint interval unit consumed by AutoMLRunner checkpoint retention.",
+          "enum": [
+            "epoch",
+            "step"
+          ],
+          "title": "checkpoint interval unit",
+          "type": "categorical"
+        },
+        "batch_size": {
+          "automl_enabled": true,
+          "default": 8,
+          "description": "Per-GPU batch size.",
+          "maximum": 64,
+          "minimum": 4,
+          "title": "batch size",
+          "type": "int"
+        },
+        "lr": {
+          "automl_enabled": true,
+          "default": 1e-4,
+          "description": "AdamW peak learning rate (OneCycleLR scheduler).",
+          "maximum": 1e-3,
+          "minimum": 1e-6,
+          "title": "learning rate",
+          "type": "float"
+        },
+        "weight_decay": {
+          "automl_enabled": true,
+          "default": 0.0,
+          "description": "AdamW weight decay (L2 regularization).",
+          "maximum": 0.01,
+          "minimum": 0.0,
+          "title": "weight decay",
+          "type": "float"
+        },
+        "head_dropout": {
+          "automl_enabled": true,
+          "default": 0.1,
+          "description": "Dropout in the forecasting head.",
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "title": "head dropout",
+          "type": "float"
+        },
+        "max_norm": {
+          "automl_enabled": true,
+          "default": 5.0,
+          "description": "Gradient norm clipping threshold.",
+          "maximum": 10.0,
+          "minimum": 1.0,
+          "title": "gradient clip",
+          "type": "float"
+        },
+        "seed": {
+          "automl_enabled": false,
+          "default": 13,
+          "description": "Random seed for reproducibility.",
+          "maximum": 99999,
+          "minimum": 0,
+          "title": "random seed",
+          "type": "int"
+        },
+        "output_dir": {
+          "automl_enabled": false,
+          "default": "artifacts/finetune",
+          "description": "Output directory for checkpoints and metrics.",
+          "title": "output directory",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "x_tao_schema": {
+    "action": "train",
+    "model": "tao-finetune-nv-tesseract-forecasting",
+    "network_arch": "nv_tesseract_forecasting",
+    "schema_action": "train",
+    "schema_version": 1,
+    "source": "hand-authored for NV-Tesseract Forecasting finetune_example.py CLI"
+  }
+}

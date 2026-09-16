@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: Nemotron Voice Agent
+repo: NVIDIA-AI-Blueprints/nemotron-voice-agent
+description: >-
+  Create or refine NVIDIA voice agents (Cascaded or Omni) with Pipecat or
+  LiveKit — speech customization, model selection, cloud or local deployment,
+  and iteration.
+links:
+  discussions: false
+skills:
+  - path: skills/nemotron-voice-agent-builder/
+    catalog_dir: nemotron-voice-agent-builder

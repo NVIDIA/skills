@@ -1,0 +1,327 @@
+{
+  "skill_name": "nvflare-autofl",
+  "evals": [
+    {
+      "id": "autofl-optimize-existing-job",
+      "prompt": "Use NVFLARE Auto-FL to optimize ./job.py for validation accuracy in simulation with an 8-candidate budget.",
+      "expected_output": "The agent invokes the NVFLARE Auto-FL skill, imports job.py into autofl.yaml, summarizes editable/unresolved/allowed campaign settings, then prepares and evaluates agent-authored source or tunable candidates through candidate manifests and existing FLARE execution surfaces.",
+      "files": [],
+      "assertions": [
+        "The agent generates autofl.yaml before editing files.",
+        "The agent summarizes editable settings, unresolved fields, fixed-budget constraints, and allowed edit paths.",
+        "The agent forms hypotheses and edits isolated candidate source rather than limiting the campaign to built-in tunable sweeps.",
+        "The agent records changed files, patch hash, base candidate, and artifacts in candidate_manifest.json.",
+        "The agent runs candidates using the existing job.py rather than replacing it with autofl.yaml.",
+        "The agent records candidate results and reports the best reproducible candidate."
+      ],
+      "nvflare": {
+        "expected_skill": "nvflare-autofl",
+        "mandatory_behavior": [
+          {
+            "id": "deterministic-import-first",
+            "description": "runs deterministic job import before candidate edits"
+          },
+          {
+            "id": "campaign-summary-before-runs",
+            "description": "shows editable, unresolved, allowed, and fixed-budget campaign fields before running candidates"
+          },
+          {
+            "id": "bounded-edit-surface",
+            "description": "edits only files allowed by autofl.yaml"
+          },
+          {
+            "id": "agent-authored-code-candidates",
+            "description": "lets the coding agent implement source and algorithm candidates in an isolated draft"
+          },
+          {
+            "id": "candidate-manifest-provenance",
+            "description": "computes a manifest with base source, changed files, patch hash, budget hash, artifacts, and result"
+          },
+          {
+            "id": "existing-flare-execution",
+            "description": "uses job.py and standard FLARE execution surfaces for candidate runs"
+          }
+        ],
+        "prohibited_behavior": [
+          {
+            "id": "no-autofl-yaml-as-exported-job",
+            "description": "does not treat autofl.yaml as a replacement for job.py or an exported FLARE job"
+          },
+          {
+            "id": "no-policy-bypass",
+            "description": "does not bypass startup-kit authentication, site policy, or normal job submission for production runs"
+          },
+          {
+            "id": "no-out-of-scope-edits",
+            "description": "does not edit outside the allowed edit paths"
+          },
+          {
+            "id": "no-default-generated-search-policy",
+            "description": "does not let built-in tunable suggestions replace agent candidate planning"
+          }
+        ],
+        "process_metrics": [
+          {
+            "id": "import_before_edit",
+            "description": "whether deterministic import occurs before candidate code edits"
+          },
+          {
+            "id": "fixed_budget_violation_count",
+            "description": "number of candidate runs that changed fixed-budget fields without user approval"
+          },
+          {
+            "id": "metric_extraction_success",
+            "description": "whether the requested metric is extracted from NVFLARE artifacts or logs"
+          },
+          {
+            "id": "candidate_manifest_completeness",
+            "description": "whether code candidates include deterministic source, budget, patch, and artifact provenance"
+          },
+          {
+            "id": "unwanted_production_action_count",
+            "description": "number of production submissions or policy-sensitive actions performed without explicit user context"
+          },
+          {
+            "id": "report_reproducibility",
+            "description": "whether the final report includes commands, artifacts, changed files, and the best candidate"
+          }
+        ]
+      }
+    },
+    {
+      "id": "autofl-natural-phrasing-low-accuracy",
+      "prompt": "My NVFLARE job in ./job.py is not getting very good accuracy. Please do a small local optimization pass - keep the data and evaluation setup as they are, and try two approaches you think are likely to help.",
+      "expected_output": "The agent recognizes the plain-language improvement request, invokes the NVFLARE Auto-FL skill, imports job.py into autofl.yaml, and runs a bounded two-candidate campaign through the official campaign runner while keeping the data and evaluation setup unchanged.",
+      "files": [],
+      "assertions": [
+        "The selected skill is nvflare-autofl even though the prompt never mentions Auto-FL, campaigns, or candidates.",
+        "The agent runs all optimization through run_job_campaign.py rather than optimizing the project directly.",
+        "The agent treats candidate training and metric-based screening as counted attempts even if described as smoke, dry, replica, screen, or sweep runs.",
+        "The agent limits the campaign to two evaluated candidates beyond the baseline, matching the requested number of approaches.",
+        "The agent keeps the data and evaluation setup unchanged while exploring candidates.",
+        "The agent reports the evaluated candidates and the best reproducible result when the campaign finishes."
+      ],
+      "nvflare": {
+        "expected_skill": "nvflare-autofl",
+        "mandatory_behavior": [
+          {
+            "id": "natural-phrasing-trigger",
+            "description": "routes a plain-language low-accuracy or try-N-approaches request to the Auto-FL campaign without requiring Auto-FL terminology"
+          },
+          {
+            "id": "deterministic-import-first",
+            "description": "runs deterministic job import before candidate edits"
+          },
+          {
+            "id": "campaign-runner-only",
+            "description": "performs every optimization step through run_job_campaign.py"
+          },
+          {
+            "id": "training-equivalent-accounting",
+            "description": "counts every candidate training, parameter update, and metric-based screening or ranking execution regardless of its label"
+          },
+          {
+            "id": "candidate-cap-respected",
+            "description": "initializes the campaign with --max-candidates 2 and stops when the candidate cap is exhausted"
+          }
+        ],
+        "prohibited_behavior": [
+          {
+            "id": "no-direct-project-optimization",
+            "description": "does not optimize or edit the user's project outside a prepared candidate"
+          },
+          {
+            "id": "no-off-runner-screening",
+            "description": "does not run smoke, dry, replica, sweep, screening, or manual candidate training outside the campaign runner"
+          },
+          {
+            "id": "no-data-or-evaluation-changes",
+            "description": "does not alter the data pipeline or evaluation setup while exploring candidates"
+          }
+        ]
+      }
+    },
+    {
+      "id": "autofl-literature-batch-before-tuning",
+      "prompt": "Continue my uncapped NVFLARE Auto-FL campaign on ./job.py. I just ran the literature pass you suggested and recorded the review with record --literature. The current .nvflare/autofl/campaign_state.json and results.tsv are attached. What do you run next?",
+      "expected_output": "The agent reads the code-owned campaign state, sees next_action=develop_literature_batch with required_exploration=source_backed_exploration for literature event lit-0001, and completes the remaining exploration batch — the ledger already holds the scored faithful implementation, so the agent prepares the tuned variant and the ablation with --family and --literature-event lit-0001 until 3 linked candidates have scored — before resuming argument-only tuning, treating the plateau clock as reset only when the batch completes.",
+      "files": [
+        "files/develop_literature_batch_state.json",
+        "files/develop_literature_batch_results.tsv"
+      ],
+      "assertions": [
+        "The agent executes the state's next_action develop_literature_batch instead of choosing its own next step or resuming argument-only tuning.",
+        "The agent prepares each remaining batch candidate with prepare --family <slug> --literature-event lit-0001 so the linkage persists in the manifest and ledger.",
+        "The agent gives every literature-linked candidate source edits, because the runner rejects argument-only literature-linked candidates at evaluate time.",
+        "The agent brings the lit-0001 exploration batch to its required exploration_batch_size (3) scored source-backed candidates before normal candidate flow resumes; the faithful implementation is already scored in the ledger, so the tuned variant and the ablation remain.",
+        "The agent treats the plateau clock as reset when the final linked candidate scores, not when the literature review row was recorded.",
+        "The agent does not produce a final campaign answer while final_response_allowed is false."
+      ],
+      "nvflare": {
+        "expected_skill": "nvflare-autofl",
+        "mandatory_behavior": [
+          {
+            "id": "execute-develop-literature-batch",
+            "description": "executes the code-owned next_action develop_literature_batch when the latest review's exploration batch is incomplete"
+          },
+          {
+            "id": "literature-event-linkage",
+            "description": "prepares batch candidates with --family and --literature-event so they link to the recorded review in the manifest and ledger"
+          },
+          {
+            "id": "source-backed-batch-completion",
+            "description": "completes exploration_batch_size scored source-backed candidates (faithful implementation, tuned variant, ablation) linked to the review before resuming normal candidate flow"
+          },
+          {
+            "id": "plateau-reset-on-batch-completion",
+            "description": "treats the plateau clock as reset when the exploration batch completes, not when the review row is recorded"
+          }
+        ],
+        "prohibited_behavior": [
+          {
+            "id": "no-argument-only-literature-candidates",
+            "description": "does not link argument-only candidates to a literature event; the runner rejects them at evaluate time"
+          },
+          {
+            "id": "no-tuning-before-batch-complete",
+            "description": "does not resume argument-only tuning while state reports required_exploration=source_backed_exploration"
+          },
+          {
+            "id": "no-plateau-relief-from-review-row",
+            "description": "does not claim the recorded review row alone relieved plateau pressure"
+          },
+          {
+            "id": "no-final-answer-during-batch",
+            "description": "does not produce a final campaign answer while final_response_allowed is false"
+          }
+        ],
+        "process_metrics": [
+          {
+            "id": "literature_batch_completed_before_tuning",
+            "description": "whether exploration_batch_size scored source-backed candidates linked to lit-0001 complete before any argument-only tuning candidate runs"
+          },
+          {
+            "id": "literature_linkage_completeness",
+            "description": "whether every batch candidate is prepared with --family and --literature-event and lands in the ledger with literature_event_id lit-0001"
+          },
+          {
+            "id": "argument_only_literature_candidate_count",
+            "description": "number of literature-linked candidates evaluated without source edits and rejected by the runner"
+          },
+          {
+            "id": "premature_plateau_reset_count",
+            "description": "number of times the agent claims plateau relief before the exploration batch completes"
+          },
+          {
+            "id": "premature_final_answer_count",
+            "description": "number of final campaign answers attempted while final_response_allowed is false"
+          }
+        ]
+      }
+    },
+    {
+      "id": "autofl-diversify-after-family-repeat",
+      "prompt": "Keep optimizing ./job.py with NVFLARE Auto-FL. My last six scored candidates were all argument-only FedAvg learning-rate, batch-size, and weight-decay tweaks, and the attached campaign state now reports diversify_candidates. What is the next candidate?",
+      "expected_output": "The agent honors next_action=diversify_candidates from the code-owned campaign state: instead of a seventh same-family argument-only attempt, it switches to a different algorithm family or prepares a source-backed candidate with a workload-appropriate idea, keeping the same campaign inputs, comparison budget, and ledger.",
+      "files": [
+        "files/diversify_candidates_state.json",
+        "files/diversify_candidates_results.tsv"
+      ],
+      "assertions": [
+        "The agent recognizes the family_repeat_limit condition from the campaign state and the ledger's six consecutive argument-only fedavg attempts.",
+        "The agent's next candidate switches algorithm family or contains source edits rather than being another same-family argument-only tweak.",
+        "The agent selects workload-appropriate exploration such as client optimizer, loss, schedule, architecture, or server aggregation, not Byzantine-robust aggregation for a benign campaign.",
+        "The agent keeps the same job.py, autofl.yaml, metric, comparison budget, and ledger while diversifying.",
+        "The agent does not produce a final campaign answer while final_response_allowed is false."
+      ],
+      "nvflare": {
+        "expected_skill": "nvflare-autofl",
+        "mandatory_behavior": [
+          {
+            "id": "execute-diversify-candidates",
+            "description": "switches algorithm family or prepares a source-backed candidate when state reports diversify_candidates"
+          },
+          {
+            "id": "honor-family-repeat-limit",
+            "description": "treats family_repeat_limit consecutive same-family argument-only scored attempts as requiring a family switch or source-backed candidate"
+          },
+          {
+            "id": "workload-appropriate-exploration",
+            "description": "chooses exploration compatible with the workload's threat model and fixed comparison budget"
+          },
+          {
+            "id": "keep-campaign-identity-while-diversifying",
+            "description": "keeps the same campaign inputs, metric, comparison budget, and ledger when diversifying"
+          }
+        ],
+        "prohibited_behavior": [
+          {
+            "id": "no-same-family-argument-only-repeat",
+            "description": "does not respond to diversify_candidates with another argument-only candidate from the same algorithm family"
+          },
+          {
+            "id": "no-byzantine-robust-for-benign",
+            "description": "does not select Byzantine-robust aggregation for a benign-client campaign"
+          },
+          {
+            "id": "no-new-campaign-to-escape-diversification",
+            "description": "does not restart or replace the campaign to escape the diversification requirement"
+          }
+        ],
+        "process_metrics": [
+          {
+            "id": "same_family_argument_only_after_diversify_count",
+            "description": "number of same-family argument-only candidates evaluated after state reported diversify_candidates"
+          },
+          {
+            "id": "diversification_first_pass",
+            "description": "whether the first candidate after diversify_candidates switches family or contains source edits"
+          },
+          {
+            "id": "workload_mismatch_candidate_count",
+            "description": "number of candidates that conflict with the workload's threat model, such as Byzantine-robust aggregation in a benign campaign"
+          }
+        ]
+      }
+    },
+    {
+      "id": "autofl-negative-pytorch-conversion",
+      "prompt": "Convert this standalone PyTorch training script into an NVFLARE federated job.",
+      "expected_output": "The Auto-FL skill should not be the lead; a conversion skill should handle the request before Auto-FL is applicable.",
+      "files": [],
+      "assertions": [
+        "The selected skill is nvflare-convert-pytorch, not nvflare-autofl."
+      ],
+      "nvflare": {
+        "expected_skill": "nvflare-convert-pytorch",
+        "negative_for": "nvflare-autofl"
+      }
+    },
+    {
+      "id": "autofl-negative-diagnose-job",
+      "prompt": "My NVFLARE job failed with EXECUTION_EXCEPTION. Diagnose the client logs and tell me what went wrong.",
+      "expected_output": "The Auto-FL skill should not be the lead; failed-job diagnosis should route to nvflare-diagnose-job.",
+      "files": [],
+      "assertions": [
+        "The selected skill is nvflare-diagnose-job, not nvflare-autofl."
+      ],
+      "nvflare": {
+        "expected_skill": "nvflare-diagnose-job",
+        "negative_for": "nvflare-autofl"
+      }
+    },
+    {
+      "id": "autofl-global-negative-web-app",
+      "prompt": "Build a React landing page for a bakery.",
+      "expected_output": "No FLARE skill should trigger.",
+      "files": [],
+      "assertions": [
+        "The selected skill is none."
+      ],
+      "nvflare": {
+        "expected_skill": null,
+        "negative_for": "*"
+      }
+    }
+  ]
+}

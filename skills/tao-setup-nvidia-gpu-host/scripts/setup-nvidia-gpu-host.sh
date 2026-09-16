@@ -4,15 +4,9 @@
 
 set -euo pipefail
 
-DRIVER_BRANCH="${NVIDIA_DRIVER_BRANCH:-580}"
-DRIVER_PACKAGE_DEBIAN="${NVIDIA_DRIVER_PACKAGE_DEBIAN:-nvidia-open-${DRIVER_BRANCH}}"
-DRIVER_PACKAGE_RHEL="${NVIDIA_DRIVER_PACKAGE_RHEL:-nvidia-driver-cuda}"
-DRIVER_KMOD_RHEL="${NVIDIA_DRIVER_KMOD_RHEL:-kmod-nvidia-open-dkms}"
-DRIVER_PACKAGE_SUSE="${NVIDIA_DRIVER_PACKAGE_SUSE:-nvidia-open-driver-G06-signed-kmp-default}"
-CUDA_PACKAGE="${NVIDIA_CUDA_PACKAGE:-cuda-toolkit-13-0}"
-CUDA_PATH="${NVIDIA_CUDA_PATH:-/usr/local/cuda-13.0}"
-CONTAINER_TOOLKIT_VERSION="${NVIDIA_CONTAINER_TOOLKIT_VERSION:-1.19.0-1}"
-CONTAINER_TOOLKIT_VERSION_BARE="${CONTAINER_TOOLKIT_VERSION%-*}"  # "1.19.0-1" -> "1.19.0"
+MIN_DRIVER_VERSION="${TAO_MIN_DRIVER_VERSION:-580}"
+MIN_CUDA_VERSION="${TAO_MIN_CUDA_VERSION:-13.0}"
+MIN_CONTAINER_TOOLKIT_VERSION="${TAO_MIN_CONTAINER_TOOLKIT_VERSION:-1.19.0}"
 DOCKER_PACKAGE_DEBIAN="${DOCKER_PACKAGE_DEBIAN:-${DOCKER_PACKAGE:-docker.io}}"
 BACKEND="docker"
 INSTALL=0
@@ -32,13 +26,20 @@ CUDA_REPO_ARCH=""    # x86_64 | sbsa
 usage() {
   cat <<'USAGE'
 Usage: setup-nvidia-gpu-host.sh [--backend docker|kubernetes] [--check-only|--install] [--yes]
+                                [--min-driver-version VERSION]
+                                [--min-cuda-version VERSION]
+                                [--min-container-toolkit-version VERSION]
                                 [--skip-docker-install] [--skip-docker-config] [--skip-docker-group]
 
 Checks and (with --install) installs the TAO GPU host runtime:
-  - NVIDIA driver branch 580 (open kernel module preferred)
-  - CUDA Toolkit 13.0
-  - NVIDIA Container Toolkit 1.19.0-1
+  - NVIDIA driver >= 580 (open kernel module preferred)
+  - CUDA Toolkit >= 13.0
+  - NVIDIA Container Toolkit >= 1.19.0
   - Docker engine (installed on demand for the docker / local-docker backend)
+
+Those are the TAO-wide defaults. A selected model skill may override any
+minimum with the three --min-*-version flags. Newer compatible versions pass;
+the flags are minimum bounds, not exact release pins.
 
 By default this script only checks. The --check-only path runs on any Linux
 distribution because it only queries `nvidia-smi`, the CUDA toolkit path, the
@@ -83,6 +84,18 @@ while [[ $# -gt 0 ]]; do
       YES=1
       shift
       ;;
+    --min-driver-version)
+      MIN_DRIVER_VERSION="${2:-}"
+      shift 2
+      ;;
+    --min-cuda-version)
+      MIN_CUDA_VERSION="${2:-}"
+      shift 2
+      ;;
+    --min-container-toolkit-version)
+      MIN_CONTAINER_TOOLKIT_VERSION="${2:-}"
+      shift 2
+      ;;
     --skip-docker-config)
       CONFIGURE_DOCKER=0
       shift
@@ -106,6 +119,23 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+for requirement in \
+  "$MIN_DRIVER_VERSION" \
+  "$MIN_CUDA_VERSION" \
+  "$MIN_CONTAINER_TOOLKIT_VERSION"; do
+  if [[ ! "$requirement" =~ ^[0-9]+([.][0-9]+)*$ ]]; then
+    echo "Version requirements must contain only numeric dot-separated components: '$requirement'" >&2
+    exit 2
+  fi
+done
+
+DRIVER_PACKAGE_DEBIAN="${NVIDIA_DRIVER_PACKAGE_DEBIAN:-nvidia-open}"
+DRIVER_PACKAGE_RHEL="${NVIDIA_DRIVER_PACKAGE_RHEL:-nvidia-driver-cuda}"
+DRIVER_KMOD_RHEL="${NVIDIA_DRIVER_KMOD_RHEL:-kmod-nvidia-open-dkms}"
+DRIVER_PACKAGE_SUSE="${NVIDIA_DRIVER_PACKAGE_SUSE:-nvidia-open-driver-G06-signed-kmp-default}"
+CUDA_PACKAGE="${NVIDIA_CUDA_PACKAGE:-cuda-toolkit-${MIN_CUDA_VERSION//./-}}"
+CUDA_PATH="${NVIDIA_CUDA_PATH:-/usr/local/cuda-${MIN_CUDA_VERSION}}"
 
 case "$BACKEND" in
   docker|local-docker|kubernetes|k8s) ;;
@@ -226,48 +256,80 @@ detect_distro() {
   esac
 }
 
-driver_ok() {
+version_ge() {
+  local actual="$1" required="$2" index actual_part required_part
+  local -a actual_parts required_parts
+  IFS=. read -r -a actual_parts <<< "$actual"
+  IFS=. read -r -a required_parts <<< "$required"
+  for ((index = 0; index < ${#actual_parts[@]} || index < ${#required_parts[@]}; index++)); do
+    actual_part="${actual_parts[index]:-0}"
+    required_part="${required_parts[index]:-0}"
+    ((10#$actual_part > 10#$required_part)) && return 0
+    ((10#$actual_part < 10#$required_part)) && return 1
+  done
+  return 0
+}
+
+extract_numeric_version() {
+  grep -Eo '[0-9]+([.][0-9]+)+' | head -n 1
+}
+
+driver_version() {
   have nvidia-smi || return 1
+  nvidia-smi --query-gpu=driver_version --format=csv,noheader 2>/dev/null \
+    | head -n 1 | tr -d '[:space:]'
+}
+
+driver_ok() {
   local version
-  version="$(nvidia-smi --query-gpu=driver_version --format=csv,noheader 2>/dev/null | head -n 1 | tr -d '[:space:]')"
-  [[ "$version" == "${DRIVER_BRANCH}".* ]]
+  have nvidia-smi || return 1
+  nvidia-smi -L >/dev/null 2>&1 || return 1
+  version="$(driver_version)"
+  [[ -n "$version" ]] && version_ge "$version" "$MIN_DRIVER_VERSION"
+}
+
+cuda_version() {
+  local nvcc=""
+  if [[ -x "${CUDA_PATH}/bin/nvcc" ]]; then
+    nvcc="${CUDA_PATH}/bin/nvcc"
+  elif [[ -x /usr/local/cuda/bin/nvcc ]]; then
+    nvcc=/usr/local/cuda/bin/nvcc
+  elif have nvcc; then
+    nvcc="$(command -v nvcc)"
+  else
+    return 1
+  fi
+  "$nvcc" --version 2>/dev/null \
+    | sed -n 's/.*release \([0-9][0-9.]*\).*/\1/p' | head -n 1
 }
 
 cuda_ok() {
-  [[ -x "${CUDA_PATH}/bin/nvcc" ]] || return 1
-  "${CUDA_PATH}/bin/nvcc" --version 2>/dev/null | grep -q 'release 13\.0'
+  local version
+  version="$(cuda_version)"
+  [[ -n "$version" ]] && version_ge "$version" "$MIN_CUDA_VERSION"
 }
 
-container_toolkit_ok() {
-  # Probe in order of specificity: dpkg (debian), rpm (rhel/suse), nvidia-ctk
-  # binary version (universal fallback for distros where the package metadata
-  # is not in a standard tool).
+container_toolkit_version() {
   local installed=""
   if have dpkg-query; then
     installed="$(dpkg-query -W -f='${Version}' nvidia-container-toolkit 2>/dev/null || true)"
-    if [[ -n "$installed" ]]; then
-      [[ "$installed" == "$CONTAINER_TOOLKIT_VERSION" \
-        || "$installed" == "${CONTAINER_TOOLKIT_VERSION_BARE}"* ]]
-      return $?
-    fi
   fi
-  if have rpm; then
+  if [[ -z "$installed" ]] && have rpm; then
     installed="$(rpm -q --queryformat '%{VERSION}' nvidia-container-toolkit 2>/dev/null \
-                 | grep -v '^package ' || true)"
-    if [[ -n "$installed" ]]; then
-      [[ "$installed" == "$CONTAINER_TOOLKIT_VERSION_BARE" ]]
-      return $?
-    fi
+      | grep -v '^package ' || true)"
   fi
-  if have nvidia-ctk; then
-    installed="$(nvidia-ctk --version 2>/dev/null | head -n1 \
-                 | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)"
-    if [[ -n "$installed" ]]; then
-      [[ "$installed" == "$CONTAINER_TOOLKIT_VERSION_BARE" ]]
-      return $?
-    fi
+  if [[ -z "$installed" ]] && have nvidia-ctk; then
+    installed="$(nvidia-ctk --version 2>/dev/null | head -n 1)"
   fi
-  return 1
+  [[ -n "$installed" ]] || return 1
+  printf '%s\n' "$installed" | extract_numeric_version
+}
+
+container_toolkit_ok() {
+  local version
+  version="$(container_toolkit_version)"
+  [[ -n "$version" ]] \
+    && version_ge "$version" "$MIN_CONTAINER_TOOLKIT_VERSION"
 }
 
 docker_installed_ok() {
@@ -296,22 +358,27 @@ kubernetes_gpu_ok() {
 }
 
 print_status() {
+  local detected_driver detected_cuda detected_toolkit
+  detected_driver="$(driver_version || true)"
+  detected_cuda="$(cuda_version || true)"
+  detected_toolkit="$(container_toolkit_version || true)"
+
   if driver_ok; then
-    echo "OK: NVIDIA driver branch ${DRIVER_BRANCH}"
+    echo "OK: NVIDIA driver ${detected_driver} >= ${MIN_DRIVER_VERSION}"
   else
-    echo "MISSING: NVIDIA driver branch ${DRIVER_BRANCH}"
+    echo "MISSING: visible GPU with NVIDIA driver >= ${MIN_DRIVER_VERSION} (detected: ${detected_driver:-none})"
   fi
 
   if cuda_ok; then
-    echo "OK: CUDA Toolkit 13.0 at ${CUDA_PATH}"
+    echo "OK: CUDA Toolkit ${detected_cuda} >= ${MIN_CUDA_VERSION}"
   else
-    echo "MISSING: CUDA Toolkit 13.0 at ${CUDA_PATH}"
+    echo "MISSING: CUDA Toolkit >= ${MIN_CUDA_VERSION} (detected: ${detected_cuda:-none})"
   fi
 
   if container_toolkit_ok; then
-    echo "OK: NVIDIA Container Toolkit ${CONTAINER_TOOLKIT_VERSION_BARE}"
+    echo "OK: NVIDIA Container Toolkit ${detected_toolkit} >= ${MIN_CONTAINER_TOOLKIT_VERSION}"
   else
-    echo "MISSING: NVIDIA Container Toolkit ${CONTAINER_TOOLKIT_VERSION_BARE}"
+    echo "MISSING: NVIDIA Container Toolkit >= ${MIN_CONTAINER_TOOLKIT_VERSION} (detected: ${detected_toolkit:-none})"
   fi
 
   if [[ "$BACKEND" == "docker" || "$BACKEND" == "local-docker" ]]; then
@@ -377,7 +444,6 @@ runtime_ok() {
 }
 
 unsupported_install_family() {
-  local nct_ver="${CONTAINER_TOOLKIT_VERSION_BARE}"
   cat >&2 <<EOF
 ERROR: --install does not yet automate this distribution.
        Detected: ${DISTRO_PRETTY:-unknown} (family=${PKG_FAMILY:-unknown})
@@ -385,9 +451,9 @@ ERROR: --install does not yet automate this distribution.
 Install these manually using your distribution's package manager, then rerun
 this script with --check-only to verify:
 
-  - NVIDIA driver branch ${DRIVER_BRANCH} (open kernel module preferred)
-  - CUDA Toolkit 13.0 (NVIDIA package: ${CUDA_PACKAGE})
-  - NVIDIA Container Toolkit ${nct_ver}
+  - NVIDIA driver >= ${MIN_DRIVER_VERSION} (open kernel module preferred)
+  - CUDA Toolkit >= ${MIN_CUDA_VERSION} (NVIDIA package: ${CUDA_PACKAGE})
+  - NVIDIA Container Toolkit >= ${MIN_CONTAINER_TOOLKIT_VERSION}
   - Docker engine (any flavor)
 
 NVIDIA documentation:
@@ -398,10 +464,8 @@ NVIDIA documentation:
   - Docker engine install guide (per distro):
       https://docs.docker.com/engine/install/
 
-Tip: this skill bank's containerized workflows themselves are distribution-
-agnostic — the only host-side requirement is a working Docker daemon plus
-the NVIDIA Container Toolkit. Once those are in place, no further host
-Python / apt / dnf prerequisites are needed.
+The selected model's runtime requirements take precedence over the TAO-wide
+defaults. Rerun with the same --min-*-version flags after manual installation.
 EOF
   exit 1
 }
@@ -414,9 +478,9 @@ confirm_install() {
   local driver_line cuda_line nct_line docker_line=""
   case "$PKG_FAMILY" in
     debian)
-      driver_line="${DRIVER_PACKAGE_DEBIAN} (driver branch ${DRIVER_BRANCH})"
+      driver_line="${DRIVER_PACKAGE_DEBIAN} (must provide driver >= ${MIN_DRIVER_VERSION})"
       cuda_line="${CUDA_PACKAGE}"
-      nct_line="nvidia-container-toolkit=${CONTAINER_TOOLKIT_VERSION}"
+      nct_line="current nvidia-container-toolkit packages (must be >= ${MIN_CONTAINER_TOOLKIT_VERSION})"
       if [[ ( "$BACKEND" == "docker" || "$BACKEND" == "local-docker" ) \
             && "$INSTALL_DOCKER" -eq 1 ]] && ! have docker; then
         docker_line="
@@ -424,9 +488,9 @@ confirm_install() {
       fi
       ;;
     rhel)
-      driver_line="${DRIVER_PACKAGE_RHEL} + ${DRIVER_KMOD_RHEL} (driver branch ${DRIVER_BRANCH}, from NVIDIA CUDA repo)"
+      driver_line="${DRIVER_PACKAGE_RHEL} + ${DRIVER_KMOD_RHEL} (must provide driver >= ${MIN_DRIVER_VERSION})"
       cuda_line="${CUDA_PACKAGE}"
-      nct_line="nvidia-container-toolkit-${CONTAINER_TOOLKIT_VERSION_BARE}"
+      nct_line="current nvidia-container-toolkit packages (must be >= ${MIN_CONTAINER_TOOLKIT_VERSION})"
       if [[ ( "$BACKEND" == "docker" || "$BACKEND" == "local-docker" ) \
             && "$INSTALL_DOCKER" -eq 1 ]] && ! have docker; then
         case "$DISTRO_ID" in
@@ -438,9 +502,9 @@ confirm_install() {
       fi
       ;;
     suse)
-      driver_line="${DRIVER_PACKAGE_SUSE} (driver branch ${DRIVER_BRANCH}, from NVIDIA CUDA repo)"
+      driver_line="${DRIVER_PACKAGE_SUSE} (must provide driver >= ${MIN_DRIVER_VERSION})"
       cuda_line="${CUDA_PACKAGE}"
-      nct_line="nvidia-container-toolkit-${CONTAINER_TOOLKIT_VERSION_BARE}"
+      nct_line="current nvidia-container-toolkit packages (must be >= ${MIN_CONTAINER_TOOLKIT_VERSION})"
       if [[ ( "$BACKEND" == "docker" || "$BACKEND" == "local-docker" ) \
             && "$INSTALL_DOCKER" -eq 1 ]] && ! have docker; then
         docker_line="
@@ -590,16 +654,14 @@ install_runtime_packages() {
       "${SUDO[@]}" apt-get update
       "${SUDO[@]}" apt-get install -y --allow-downgrades \
         "$kernel_headers" \
-        "nvidia-driver-pinning-${DRIVER_BRANCH}" \
         "$DRIVER_PACKAGE_DEBIAN" \
         "$CUDA_PACKAGE" \
-        "nvidia-container-toolkit=${CONTAINER_TOOLKIT_VERSION}" \
-        "nvidia-container-toolkit-base=${CONTAINER_TOOLKIT_VERSION}" \
-        "libnvidia-container-tools=${CONTAINER_TOOLKIT_VERSION}" \
-        "libnvidia-container1=${CONTAINER_TOOLKIT_VERSION}"
+        nvidia-container-toolkit \
+        nvidia-container-toolkit-base \
+        libnvidia-container-tools \
+        libnvidia-container1
       ;;
     rhel)
-      local ver="${CONTAINER_TOOLKIT_VERSION_BARE}"
       # Kernel headers/devel package names match the running kernel.
       "${SUDO[@]}" "$PKG_MANAGER" -y install \
         "kernel-devel-$(uname -r)" \
@@ -608,21 +670,20 @@ install_runtime_packages() {
         "$DRIVER_PACKAGE_RHEL" \
         "$DRIVER_KMOD_RHEL" \
         "$CUDA_PACKAGE" \
-        "nvidia-container-toolkit-${ver}" \
-        "nvidia-container-toolkit-base-${ver}" \
-        "libnvidia-container-tools-${ver}" \
-        "libnvidia-container1-${ver}"
+        nvidia-container-toolkit \
+        nvidia-container-toolkit-base \
+        libnvidia-container-tools \
+        libnvidia-container1
       ;;
     suse)
-      local ver="${CONTAINER_TOOLKIT_VERSION_BARE}"
       "${SUDO[@]}" zypper --non-interactive install --allow-downgrade \
         "kernel-default-devel" \
         "$DRIVER_PACKAGE_SUSE" \
         "$CUDA_PACKAGE" \
-        "nvidia-container-toolkit-${ver}" \
-        "nvidia-container-toolkit-base-${ver}" \
-        "libnvidia-container-tools-${ver}" \
-        "libnvidia-container1-${ver}"
+        nvidia-container-toolkit \
+        nvidia-container-toolkit-base \
+        libnvidia-container-tools \
+        libnvidia-container1
       ;;
     *)
       unsupported_install_family
@@ -738,7 +799,7 @@ if [[ "$INSTALL" -eq 0 ]]; then
   echo
   case "$PKG_FAMILY" in
     debian|rhel|suse)
-      echo "Run with --install --yes after user approval to install the pinned runtime."
+      echo "Run with --install --yes after user approval to install or update the runtime."
       ;;
     *)
       echo "Automatic install is not available for this distribution. See the"

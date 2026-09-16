@@ -1,7 +1,7 @@
 [
   {
     "id": "tao-run-on-docker-basic",
-    "question": "A user request: \"Use the tao-run-on-docker skill.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
+    "question": "A user request: \"Use the tao-run-on-docker skill.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
     "expected_skill": "tao-run-on-docker",
     "expected_script": null,
     "ground_truth": "Identify tao-run-on-docker as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",
@@ -9,6 +9,22 @@
       "Identifies tao-run-on-docker as the relevant skill",
       "Outlines the documented workflow steps from SKILL.md",
       "Does not run commands, scripts, or web searches"
+    ]
+  },
+  {
+    "id": "tao-run-on-docker-four-verb-lifecycle",
+    "question": "Using local Docker, run a short-lived container job end to end and report its final state: submit it, poll status, fetch the last lines of its logs, then cancel and tear it down. Use a tiny public image (e.g. busybox) — this checks the execution contract, not model training, so no GPU is required.",
+    "expected_skill": "tao-run-on-docker",
+    "expected_script": "scripts/tao_job_record.py",
+    "ground_truth": "Load tao-run-on-docker and implement its four verbs against the local daemon: lint the command with redact_secrets.py, open a job record to mint JOB_ID BEFORE launching, name the container after JOB_ID so the later verbs can find it, mark RUNNING with the container id as backend-ref, map docker's native state to the fixed vocabulary, fetch logs by JOB_ID, then remove the container and mark the record CANCELED. Verified end to end against a live daemon.",
+    "expected_behavior": [
+      "Opens the job record with tao_job_record.py BEFORE `docker run`, not after — the minted id is the only handle the launch can use",
+      "Names/labels the container after $JOB_ID so status, logs, and cancel can locate it",
+      "Marks RUNNING with --backend-ref set to the container id returned by `docker run -d`",
+      "Maps docker's native state to the fixed vocabulary (PENDING RUNNING COMPLETE ERROR CANCELED UNKNOWN) rather than reporting the raw string",
+      "Fetches logs by $JOB_ID rather than by a container id it kept in a shell variable",
+      "Removes the container and marks the record CANCELED — leaving a record in PENDING after a failed or finished run is a leak",
+      "Does not require a GPU, and does not pull a TAO image for a lifecycle check"
     ]
   }
 ]

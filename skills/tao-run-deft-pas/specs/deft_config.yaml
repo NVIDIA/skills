@@ -1,0 +1,64 @@
+experiment:
+  name: "pas_deft"
+  results_path: "results"
+  train_config: "specs/tao_spec.yaml"
+  eval_config: "specs/tao_spec.yaml"
+  visualize: true
+  visualize_embeddings: true
+
+iteration:
+  start: 1
+  end: 2
+
+training:
+  init_checkpoint: ""
+  continual_model: false
+  continual_dataset: true
+  num_nodes: 1
+
+mining:
+  knn_batch_size: 32
+  history_aware:
+    enabled: true
+    replay_fraction: 0.20
+  recovery:
+    caption_expansion:
+      enabled: false
+      mode: "nearest"
+      max_pairs_per_image_path: 2
+      max_expanded_pair_fraction: 0.25
+      dedupe_normalized_caption: true
+      count_expanded_pairs_toward_target: "auto"
+
+gap_analysis:
+  metric_name: "Rank-1"
+  weak_attribute_topk: 4
+  target_query_count: 10000
+  queries_per_slice: 256
+  query_types: "easy,medium"
+  caption_diversity:
+    enabled: true
+    history_file: "caption_selection_history.json"
+    history_policy: "prefer_unseen"
+    coverage_target: 1.0
+    min_unique_texts_per_attribute: 8
+    max_rows_per_unique_text: 1
+    max_rows_per_image_path: 1
+
+pas:
+  # train_pairs_source_file: "data/pas_v31_tao_ft/train_pairs.json"
+  pool_pairs_source_file: "data/pas_v31_tao_ft/train_pairs.json"
+  eval_pairs_source_file: "data/pas_v31_tao_ft/val_pairs.json"
+  train_image_dir: "data/pas_v31_tao_ft/images"
+  train_caption_dir: "data/pas_v31_tao_ft/captions"
+  source_image_dir: "data/pas_v31_tao_ft/images"
+  source_caption_dir: "data/pas_v31_tao_ft/captions"
+  eval_image_dir: "data/pas_v31_tao_ft/images"
+  eval_caption_dir: "data/pas_v31_tao_ft/captions"
+  seed_exclude_datasets: "CUHK_PEDES,ICFG_PEDES"
+  augmented_suffix: "_Aug"
+  query_types: "easy,medium,hard,natural_caption,original_captions"
+  mining_pool_mode: "real"
+  max_seed_rows: 0
+  max_aug_pool_rows: 0
+  val_sample_size: 512

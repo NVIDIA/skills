@@ -1,0 +1,67 @@
+{
+  "skill_name": "nemotron-voice-agent-builder",
+  "cases": [
+    {
+      "id": "nemotron-voice-agent-builder-explicit-dgx-spark",
+      "prompt": "Use the nemotron-voice-agent-builder skill to plan a Pipecat cascaded English voice assistant on my DGX Spark for one user. Do not write files yet.",
+      "expected_skill": "nemotron-voice-agent-builder",
+      "expected_output": "A concise proposal that routes DGX Spark to vLLM plus NeMo-Speech.cpp, uses current NVIDIA sources to resolve Nemotron 3.5 Lightning and speech models, requires HF_TOKEN rather than a NIM credential, and waits for approval before generating files.",
+      "assertions": [
+        "Loaded nemotron-voice-agent-builder/SKILL.md and the references routed for intake, preflight, Pipecat, models, and DGX Spark.",
+        "Selected the cascaded pipeline and Pipecat without asking the user to repeat choices already present.",
+        "Routed local deployment to vLLM plus NeMo-Speech.cpp rather than NIM.",
+        "Planned from available unified memory and included the measured speech reserve gate.",
+        "Presented one filled proposal table and did not write project files before approval."
+      ]
+    },
+    {
+      "id": "nemotron-voice-agent-builder-implicit-low-concurrency-workstation",
+      "prompt": "I have a Linux workstation with one RTX PRO 6000 Blackwell GPU. Build a private voice assistant for me and two colleagues using Pipecat, streaming speech, and low turn latency.",
+      "expected_skill": "nemotron-voice-agent-builder",
+      "expected_output": "The agent recognizes a low-concurrency NVIDIA voice-agent request, probes the host, proposes a cascaded Pipecat pipeline, and routes local services to vLLM plus NeMo-Speech.cpp with model-specific quantization and measured memory controls.",
+      "assertions": [
+        "Activated the skill without the user naming it.",
+        "Inferred low concurrency from the stated user count and recorded that assumption in the Deployment row.",
+        "Selected vLLM plus NeMo-Speech.cpp instead of workstation NIM.",
+        "Resolved quantization from the locked model page for the exact GPU rather than from memory.",
+        "Kept reasoning off by default for low voice latency."
+      ]
+    },
+    {
+      "id": "nemotron-voice-agent-builder-contextual-high-concurrency-workstation",
+      "prompt": "We are adding a spoken support agent to an existing service. It will run on an x86_64 NVIDIA GPU workstation and must serve hundreds of simultaneous customer sessions. Recommend the NVIDIA deployment and framework, then show the decisions for approval.",
+      "expected_skill": "nemotron-voice-agent-builder",
+      "expected_output": "A proposal that infers high concurrency, recommends the workstation NIM path, resolves the framework and pipeline, verifies each NIM service against its current documentation family, budgets all co-located services, and waits for approval.",
+      "assertions": [
+        "Inferred high concurrency without asking a separate concurrency question.",
+        "Recommended NIM for the high-concurrency workstation.",
+        "Kept LLM, Speech, and VLM NIM documentation families distinct.",
+        "Marked co-location provisional until the measured shared-GPU gate passes.",
+        "Did not silently move a slot to cloud or select a smaller model."
+      ]
+    },
+    {
+      "id": "nemotron-voice-agent-builder-livekit-omni-conflict",
+      "prompt": "Build the agent with LiveKit and the Nemotron 3 Omni pipeline.",
+      "expected_skill": "nemotron-voice-agent-builder",
+      "expected_output": "A single focused conflict question asking whether to keep LiveKit with a Cascaded pipeline or keep Omni with Pipecat. No files or deployment proposal are generated until the user resolves the conflict.",
+      "assertions": [
+        "Recognized that LiveKit is Cascaded-only in this skill.",
+        "Did not generate a LiveKit Omni implementation.",
+        "Asked exactly one conflict-resolution question.",
+        "Offered the two valid combinations without silently changing either choice.",
+        "Did not write files before resolution and approval."
+      ]
+    },
+    {
+      "id": "nemotron-voice-agent-builder-negative-text-rag",
+      "prompt": "Build a text-only RAG chatbot over my PDF collection. It has no microphone, speech input, or audio output.",
+      "expected_skill": null,
+      "expected_output": "The nemotron-voice-agent-builder skill does not activate because the request is explicitly text-only and contains no voice-agent workflow.",
+      "assertions": [
+        "Did not load or apply nemotron-voice-agent-builder.",
+        "Did not introduce ASR, TTS, Pipecat voice transports, or NVIDIA speech services."
+      ]
+    }
+  ]
+}

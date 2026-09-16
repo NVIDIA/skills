@@ -65,7 +65,7 @@ def prepare_render_stage(
     bundle_local_assets: bool = True,
     force_generate_camera: bool = False,
 ) -> PreparedStage:
-    from pxr import Gf, Sdf, Usd, UsdGeom, UsdLux
+    from pxr import Gf, Sdf, Usd, UsdGeom, UsdLux, UsdShade
 
     asset_path = asset_path.resolve()
     warnings: list[str] = []
@@ -170,6 +170,19 @@ def prepare_render_stage(
         if bundle_local_assets:
             local_asset_count, copied_files = _bundle_local_assets(main_usda, asset_path.parent, Sdf)
 
+        stripped_render_context_outputs = _strip_render_context_outputs_for_preview_fallback(
+            main_usda,
+            Usd,
+            UsdShade,
+        )
+        if stripped_render_context_outputs:
+            warnings.append(
+                "Stripped "
+                f"{stripped_render_context_outputs} render-context material output(s) "
+                "from the temporary OVRTX render payload where UsdPreviewSurface "
+                "fallbacks were available."
+            )
+
         if copied_files:
             archive = io.BytesIO()
             with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as bundle:
@@ -202,6 +215,7 @@ def prepare_render_stage(
         "default_lights_added": lights_added,
         "local_asset_count": local_asset_count,
         "copied_local_assets": copied_files,
+        "render_context_outputs_stripped": stripped_render_context_outputs,
         "turntable_angle": turntable_angle,
     }
     return PreparedStage(
@@ -454,6 +468,50 @@ def _bundle_local_assets(main_usda: Path, source_base_dir: Path, Sdf: Any) -> tu
     return len(set(copied_files)), sorted(set(copied_files))
 
 
+def _material_has_preview_surface_output(material: Any, UsdShade: Any) -> bool:
+    surface_output = material.GetSurfaceOutput()
+    try:
+        connected_sources, _ = surface_output.GetConnectedSources()
+    except Exception:
+        return False
+
+    for source_info in connected_sources:
+        try:
+            shader = UsdShade.Shader(source_info.source.GetPrim())
+            if shader.GetIdAttr().Get() == "UsdPreviewSurface":
+                return True
+        except Exception:
+            continue
+    return False
+
+
+def _strip_render_context_outputs_for_preview_fallback(
+    stage_path: Path,
+    Usd: Any,
+    UsdShade: Any,
+) -> int:
+    stage = Usd.Stage.Open(str(stage_path))
+    if stage is None:
+        return 0
+
+    removed = 0
+    for prim in stage.Traverse():
+        if not prim.IsA(UsdShade.Material):
+            continue
+        material = UsdShade.Material(prim)
+        if not _material_has_preview_surface_output(material, UsdShade):
+            continue
+        for prop in list(prim.GetProperties()):
+            prop_name = prop.GetName()
+            if prop_name.startswith(("outputs:mdl:", "outputs:mtlx:")):
+                prim.RemoveProperty(prop_name)
+                removed += 1
+
+    if removed:
+        stage.GetRootLayer().Save()
+    return removed
+
+
 def _json_bounds(bounds_info: dict[str, Any]) -> dict[str, Any]:
     return {
         "empty": bool(bounds_info.get("empty")),
@@ -462,31 +520,4 @@ def _json_bounds(bounds_info: dict[str, Any]) -> dict[str, Any]:
         "size": [float(v) for v in bounds_info.get("size", [])],
         "center": [float(v) for v in bounds_info.get("center", [])],
         "radius": float(bounds_info.get("radius", 0.0)),
-    }
-
-
-def inspect_png(path: Path) -> dict[str, Any]:
-    try:
-        from PIL import Image, ImageStat
-    except Exception as exc:
-        return {"available": False, "warning": f"Pillow is unavailable: {exc}"}
-
-    try:
-        image = Image.open(path).convert("RGB")
-    except Exception as exc:
-        return {"available": False, "warning": f"Could not inspect PNG pixels: {exc}"}
-    small = image.resize((min(64, image.width), min(64, image.height)))
-    pixels = small.get_flattened_data() if hasattr(small, "get_flattened_data") else small.getdata()
-    unique = len(set(pixels))
-    extrema = image.getextrema()
-    uniform = unique <= 1 or all(low == high for low, high in extrema)
-    all_black = all(high == 0 for _, high in extrema)
-    return {
-        "available": True,
-        "size": [image.width, image.height],
-        "extrema": [[int(low), int(high)] for low, high in extrema],
-        "unique_colors_after_resize": unique,
-        "channel_mean": [float(v) for v in ImageStat.Stat(image).mean],
-        "uniform": bool(uniform),
-        "all_black": bool(all_black),
     }

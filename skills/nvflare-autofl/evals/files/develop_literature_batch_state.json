@@ -1,0 +1,38 @@
+{
+  "schema_version": "nvflare.autofl.campaign_state.v1",
+  "updated_at": "2026-07-01T18:24:07Z",
+  "results": "results.tsv",
+  "decision": "continue",
+  "reason": "literature_exploration_batch",
+  "next_action": "develop_literature_batch",
+  "final_response_allowed": false,
+  "candidate_cap": null,
+  "candidate_cap_source": "uncapped",
+  "candidate_attempts": 5,
+  "pending_candidates": 0,
+  "scored_attempts": 5,
+  "best_score": 0.8412,
+  "stop_files": [],
+  "plateau": {
+    "available": true,
+    "recommendation": "continue",
+    "best_name": "fedprox-mu-0.01-faithful",
+    "best_score": 0.8412,
+    "best_scored_index": 2,
+    "last_literature_event_index": 5,
+    "last_batch_completion_index": -1,
+    "min_delta": 0.0005,
+    "reset_row_index": 6,
+    "scored_since_reset": 0,
+    "threshold": 8
+  },
+  "exploration_batch": {
+    "literature_event_id": "lit-0001",
+    "event_index": 5,
+    "required": 3,
+    "completed": 1,
+    "completion_index": null
+  },
+  "required_exploration": "source_backed_exploration",
+  "agent_instruction": "Do not produce a final answer. Literature event lit-0001 needs 2 more scored source-backed candidate(s) prepared with --literature-event before normal candidate flow resumes: a faithful implementation, a tuned variant, and an ablation under the same comparison budget."
+}

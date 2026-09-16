@@ -36,8 +36,34 @@ import sys
 import os
 import re
 import base64
+import shutil
 import subprocess
 import markdown
+
+def ensure_wkhtmltopdf():
+    """wkhtmltopdf is installed by setup.sh via apt, but that runs in an ephemeral
+    --rm container so the binary does NOT persist to later per-phase containers
+    (only the /work-mounted venv does). If it is missing, install it here so the
+    PDF step works on a fresh run without a manual reinstall."""
+    if shutil.which('wkhtmltopdf'):
+        return True
+    apt = shutil.which('apt-get')
+    if not apt:
+        return False
+    sudo = [] if os.geteuid() == 0 else (['sudo'] if shutil.which('sudo') else [])
+    # Minimal environment rather than a copy of os.environ: apt-get needs only PATH and
+    # HOME, and forwarding the full environment into a (possibly sudo-elevated) child
+    # would carry loader hooks and apt overrides such as LD_PRELOAD or APT_CONFIG.
+    env = {
+        'PATH': os.environ.get('PATH', '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'),
+        'HOME': os.environ.get('HOME', '/root'),
+        'DEBIAN_FRONTEND': 'noninteractive',
+    }
+    print("  wkhtmltopdf missing — installing (in-container, one-time per container)...")
+    for cmd in ([apt, 'update', '-qq'], [apt, 'install', '-y', '-qq', 'wkhtmltopdf']):
+        subprocess.run(sudo + cmd, env=env,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=600)
+    return shutil.which('wkhtmltopdf') is not None
 
 def embed_images(html: str, base_dir: str) -> str:
     """Replace <img src="file.png"> with base64-embedded data URIs."""
@@ -84,13 +110,13 @@ def main():
 
     base_dir = os.path.dirname(os.path.abspath(md_path))
 
-    with open(md_path) as f:
+    with open(md_path, encoding='utf-8') as f:
         md_text = f.read()
 
     # Strip YAML frontmatter
     md_text = re.sub(r'^---\n.*?\n---\n', '', md_text, count=1, flags=re.DOTALL)
 
-    with open(css_path) as f:
+    with open(css_path, encoding='utf-8') as f:
         css = f.read()
 
     # Convert markdown to HTML
@@ -123,9 +149,15 @@ def main():
     html_out = os.path.join(out_dir, 'benchmark_report.html')
     pdf_out = os.path.join(out_dir, f'benchmark_report_{model_name}.pdf')
 
-    with open(html_out, 'w') as f:
+    with open(html_out, 'w', encoding='utf-8') as f:
         f.write(html)
     print(f"  HTML: {html_out}")
+
+    # Ensure the PDF renderer is available (self-heal on fresh containers).
+    if not ensure_wkhtmltopdf():
+        print("  PDF generation skipped: wkhtmltopdf unavailable and could not be installed. "
+              "HTML report is complete.", file=sys.stderr)
+        sys.exit(1)
 
     # Convert to PDF.
     # Intentionally NOT passing --enable-local-file-access: all images have already

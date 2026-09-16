@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+interface:
+  display_name: "DeepStream Import Vision Model"
+  short_description: "Deploy object detectors into DeepStream"
+  default_prompt: "Use $deepstream-import-vision-model to deploy and benchmark this object-detection model in DeepStream."

@@ -8,24 +8,27 @@ This reference is documentation-driven, does not ship `scripts/run.py`, and shou
 
 ## Prerequisites
 
-- NVIDIA_API_KEY from `https://build.nvidia.com` for provider-backed services.
+- A provider API key for the selected Content Agents VLM/LLM backend. Use
+  `NVIDIA_API_KEY` from `https://build.nvidia.com` for NVIDIA-hosted defaults;
+  other hosted provider keys include `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`,
+  `GOOGLE_API_KEY`, and `GEMINI_API_KEY`.
 - Docker, Docker Compose v2, NVIDIA Container Toolkit, an NVIDIA driver, and an NVIDIA GPU on the deployment host.
-- A normalized upstream checkout of `https://github.com/nvidia-omniverse/content-agents` on branch `main`.
+- A normalized upstream checkout of `https://github.com/nvidia-omniverse/content-agents` at the exact ref in `upstream-versions.lock.json` (currently `v0.5.2`).
 
 ## Upstream Reference
 
-Use the NVIDIA Omniverse Content Agents `main` deployment skills as the source of truth:
+Use the NVIDIA Omniverse Content Agents deployment skills at the tested manifest pin as the source of truth:
 
 | Target | Upstream skill |
 |---|---|
-| Material Agent | `https://github.com/nvidia-omniverse/content-agents/blob/main/.codex/skills/deploy-material-agent-docker/SKILL.md` |
-| Physics Agent | `https://github.com/nvidia-omniverse/content-agents/blob/main/.codex/skills/deploy-physics-agent-docker/SKILL.md` |
-| Texture Agent | `https://github.com/nvidia-omniverse/content-agents/blob/main/.codex/skills/deploy-texture-agent-docker/SKILL.md` |
-| OVRTX renderer | `https://github.com/nvidia-omniverse/content-agents/blob/main/.codex/skills/deploy-ovrtx-docker/SKILL.md` |
+| Material Agent | `https://github.com/nvidia-omniverse/content-agents/blob/v0.5.2/.codex/skills/deploy-material-agent-docker/SKILL.md` |
+| Physics Agent | `https://github.com/nvidia-omniverse/content-agents/blob/v0.5.2/.codex/skills/deploy-physics-agent-docker/SKILL.md` |
+| Texture Agent | `https://github.com/nvidia-omniverse/content-agents/blob/v0.5.2/.codex/skills/deploy-texture-agent-docker/SKILL.md` |
+| OVRTX renderer | `https://github.com/nvidia-omniverse/content-agents/blob/v0.5.2/.codex/skills/deploy-ovrtx-docker/SKILL.md` |
 
-Repository: `https://github.com/nvidia-omniverse/content-agents`, branch `main`
+Repository: `https://github.com/nvidia-omniverse/content-agents`, ref `v0.5.2`
 
-If browser or raw-file fetches are blocked, use a local clone checked out to `main` and read `.codex/skills/<skill-name>/SKILL.md` from that checkout. Resolve it from `CONTENT_AGENTS_UPSTREAM_ROOT`, then `$PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT/content-agents`, then `$HOME/.physical-ai-skill-hub/upstreams/content-agents`. Do not scan broad developer workspaces.
+If browser or raw-file fetches are blocked, use a local clone checked out to the exact manifest ref and read `.codex/skills/<skill-name>/SKILL.md` from that checkout. Resolve it from `CONTENT_AGENTS_UPSTREAM_ROOT`, then `$OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT/content-agents`, then `$HOME/.omniverse-cad-to-simready/upstreams/content-agents`. Do not scan broad developer workspaces.
 
 Do not duplicate full upstream deployment runbooks here.
 
@@ -40,17 +43,20 @@ Collect:
 | `deployment_mode` | Local container deployment or reuse of healthy existing services. |
 | `render_endpoint` | Required for render-dependent agent services. |
 | `env_keys` | Provider/API keys required by the upstream skill. Never print or commit secrets. |
+| `vlm_backend` / `vlm_model` | Optional deployment-time VLM selection, for example `openai` / `gpt-5.5`. |
+| `llm_backend` / `llm_model` | Optional deployment-time LLM selection, for example `openai` / `gpt-5.5`. |
 
 ## Instructions
 
 1. Resolve the upstream checkout from the normalized root policy.
 2. Read the matching upstream deployment skill before issuing service-specific commands.
 3. Confirm required secrets are available from local shell state or a private `.env`; if missing, ask the user and wait.
-4. For `material`, `physics`, or `texture`, deploy or reuse OVRTX first when the selected upstream skill requires rendering.
-5. Prefer a shared standalone OVRTX renderer plus independently deployed agent services for this workflow. Use bundled agent-specific renderer stacks only when the user asks for isolation or the upstream skill requires it.
-6. Preserve upstream secret handling, build steps, image names, health checks, and service-specific environment details.
-7. Verify the renderer and selected agent health endpoints before exporting `CONTENT_AGENTS_*_BASE_URL` or `RENDER_ENDPOINT`.
-8. Return to the caller only after the requested service is healthy, or report the missing prerequisite as blocked.
+4. Treat explicit endpoints as user-owned. Probe them and block if they are unhealthy; do not deploy a replacement container for that service.
+5. For managed local deployment, deploy missing services in deterministic order: standalone OVRTX when Material or Physics will be deployed, then Material, Physics, and optional Texture one service at a time through the upstream collection deployment helper.
+6. Prefer a shared standalone OVRTX renderer plus independently deployed agent services for this workflow. Use bundled agent-specific renderer stacks only when the user asks for isolation or the upstream skill requires it.
+7. Preserve upstream secret handling, build steps, image names, health checks, and service-specific environment details.
+8. Verify the renderer and selected agent health endpoints before exporting `CONTENT_AGENTS_*_BASE_URL` or `RENDER_ENDPOINT`. For local deployments, `RENDER_ENDPOINT` should point the agent containers at the standalone OVRTX HTTP service; upstream may describe this as the `remote` renderer backend because it is reached over HTTP.
+9. Return to the caller only after the requested service is healthy, or report the missing prerequisite as blocked.
 
 ## Headless / Nested Host Notes
 
@@ -63,10 +69,37 @@ service-specific environment variables.
 
 For local evaluation, prefer one shared standalone OVRTX renderer on the local
 GPU plus independent Material, Physics, and Texture Agent service containers
-that use `NVIDIA_API_KEY` from `https://build.nvidia.com` for provider-backed
-VLM calls. This topology does not require a separate local VLM GPU. Verify the
-OVRTX host endpoint first, then verify each agent service reports configured API
-keys before exporting `CONTENT_AGENTS_*_BASE_URL`.
+that use a hosted provider key such as `NVIDIA_API_KEY`, `OPENAI_API_KEY`,
+`ANTHROPIC_API_KEY`, `GOOGLE_API_KEY`, or `GEMINI_API_KEY` for provider-backed
+VLM/LLM calls. This topology does not require a separate local VLM GPU.
+Verify the OVRTX host endpoint first, then verify each agent service
+reports configured API keys before exporting `CONTENT_AGENTS_*_BASE_URL`.
+For managed local deployment, treat OVRTX as part of the Content Agents
+deployment contract when Material or Physics will be deployed: start it first,
+verify render health, then deploy each missing agent service individually.
+
+For hosted providers, use the upstream collection deployment path with
+non-secret model overrides and keep keys in a private `.env`. Supported hosted
+backends include `openai`, `anthropic`, and `gemini`. GPT-style OpenAI model
+deployments should pin VLM/LLM temperatures to `1.0`, because some GPT models
+only accept the default temperature:
+
+```bash
+python3 skills/omniverse-cad-to-simready/references/preflight/scripts/preflight.py \
+  --content-agents-secret-env-file "$HOME/Codes/.env" \
+  --content-agents-vlm-backend openai \
+  --content-agents-vlm-model gpt-5.5 \
+  --content-agents-llm-backend openai \
+  --content-agents-llm-model gpt-5.5
+```
+
+For a custom OpenAI-compatible `/v1` VLM endpoint, set
+`--content-agents-vlm-backend openai`, then provide
+`--content-agents-vlm-endpoint` with the model ID served by that endpoint.
+Use `--content-agents-vlm-api-key-env` when that endpoint should read a custom
+secret name instead of the default `OPENAI_API_KEY`. Anthropic and Gemini use
+their matching upstream key environment names.
+Reserve `nim` for actual NVIDIA NIM endpoints.
 
 - Confirm Docker Compose v2 is installed before following the upstream
   deployment skills; the legacy `docker-compose` binary is not sufficient when
@@ -90,6 +123,14 @@ keys before exporting `CONTENT_AGENTS_*_BASE_URL`.
   container health result and the host endpoint result before declaring the
   renderer blocked.
 
+## Blocked Deployment Policy
+
+If deployment authentication is missing, ask the user for the matching
+provider key and wait; if deployment cannot produce healthy services, report
+Content Agents readiness as blocked instead of proceeding. See
+`../preflight/README.md` and this reference for provider-key, dotenv, and
+custom-endpoint detail.
+
 ## Handoff Map
 
 | Target | After deployment |
@@ -109,8 +150,8 @@ keys before exporting `CONTENT_AGENTS_*_BASE_URL`.
 
 | Symptom | Action |
 |---------|--------|
-| Upstream skill URL cannot be fetched | Use the local `content-agents` clone checked out to `main`. |
-| Required API key is missing | Ask the user for `NVIDIA_API_KEY` for deployment and wait. Usage tokens for already-running endpoints belong to the client references, not this deployment reference. |
+| Upstream skill URL cannot be fetched | Use the local `content-agents` clone checked out to the exact ref in `upstream-versions.lock.json`. |
+| Required API key is missing | Ask the user for the provider key matching the selected backend, such as `NVIDIA_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_API_KEY`, or `GEMINI_API_KEY`. Usage tokens for already-running endpoints belong to the client references, not this deployment reference. |
 | Service health is not ready | Follow the selected upstream deployment skill's health-check section. |
 | Renderer-dependent agent cannot reach OVRTX | Use the upstream renderer and agent deployment skills together; do not patch this repo with local Docker recipes. |
 | Nested host cannot start Docker containers | Check Docker Compose v2, GPU visibility, NVIDIA Container Toolkit, and whether the host requires the `vfs` storage-driver fallback. |

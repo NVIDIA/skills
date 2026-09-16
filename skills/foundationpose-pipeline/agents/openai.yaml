@@ -1,0 +1,4 @@
+interface:
+  display_name: "FoundationPose Pipeline"
+  short_description: "Run BOP datasets and assess FoundationPose pose metrics"
+  default_prompt: "Use $foundationpose-pipeline to run my BOP dataset with the TAO Deploy depth engine and report pose metrics."

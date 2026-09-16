@@ -1,0 +1,27 @@
+ground_truth_ann_path: null
+inference_ann_path: null
+images_dir: null
+results_dir: null
+kpi: null
+input_format: null       # kitti or coco — lowercase here (analytics kpi_analyze wants uppercase)
+iou_threshold: 0.5
+conf_threshold: 0.0      # inference already filtered at write time; a second gate filters twice
+min_area: 0
+class_mapping: {}
+
+# Per-class AP50 gates. An image is weak if ANY listed class falls below its gate.
+# Values below are the reference ITS defaults — use them unless the user supplies their own.
+# `car` is held to a far stricter gate than the vulnerable-road-user classes because it is
+# abundant and already well learned; the loop's job is to lift bicycle and person.
+weak_thresholds:
+  car:     {ap50: 0.99}
+  bicycle: {ap50: 0.7}
+  person:  {ap50: 0.7}
+
+# A class NOT listed above must never mark an image weak — that is what these zeros do.
+# The reference filter had no fallback at all; TAO DS defaults default_ap50_threshold to 0.5,
+# so leaving it unset silently gates every class you did not list. `road_sign` is the
+# concrete case: present in the ITS ground truth, deliberately ungated.
+default_ap50_threshold:      0.0
+default_recall_threshold:    0.0
+default_precision_threshold: 0.0

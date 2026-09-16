@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: BioNeMo Libraries
+repo: NVIDIA-BioNeMo/nvMolKit
+ref: main
+description: >-
+  Accelerate cheminformatics, genomic analysis, and equivariant model
+  development with NVIDIA GPU libraries and tools.
+links:
+  contributing: CONTRIBUTING.md
+  discussions: false
+  security: false
+skills:
+  - path: skills/nvmolkit-usage/
+    catalog_dir: bionemo-nvmolkit-usage

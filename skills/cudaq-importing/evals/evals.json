@@ -1,0 +1,61 @@
+{
+  "skill_name": "cudaq-importing",
+  "evals": [
+    {
+      "id": "cudaq-importing-001",
+      "prompt": "Using the cudaq-importing skill, help me port this Qiskit circuit to CUDA-Q:\n\n```python\nfrom qiskit import QuantumCircuit\nfrom qiskit_aer import AerSimulator\n\nqc = QuantumCircuit(3, 3)\nqc.x(0)\nqc.h(1)\nqc.cx(1, 2)\nqc.measure([0, 1, 2], [0, 1, 2])\n\nsim = AerSimulator()\nresult = sim.run(qc, shots=1000).result()\nprint(result.get_counts())\n```\n\nI want the CUDA-Q version to produce equivalent count keys so I can validate the port. This circuit should make bit ordering visible: Qiskit should report counts on keys like `001` and `111`, while raw CUDA-Q measurement order would include `100` and `111` unless the keys are remapped.",
+      "expected_output": "The agent used cudaq-importing to produce a complete CUDA-Q port using @cudaq.kernel decorator mode, correctly translating x, h, and cx gates, addressing bit-ordering conventions so raw CUDA-Q key `100` is remapped to Qiskit-style key `001`, and ensuring no Qiskit runtime dependency.",
+      "assertions": [
+        "The agent read the cudaq-importing SKILL.md to reference the gate-translation table and bit-ordering conventions",
+        "The agent produced a @cudaq.kernel decorated function with cudaq.qvector and equivalent x/h/cx gate calls",
+        "The agent explained or handled the bit-ordering difference between Qiskit and CUDA-Q count keys, including that raw CUDA-Q key `100` maps to Qiskit-style key `001` for this circuit",
+        "The agent ensured the ported code has no import or runtime dependency on qiskit",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "cudaq-importing",
+      "expected_script": null
+    },
+    {
+      "id": "cudaq-importing-002",
+      "prompt": "I have a Qiskit implementation of a 4-qubit Grover's algorithm with a custom oracle. I need to rewrite it in CUDA-Q so it runs on NVIDIA GPUs without needing Qiskit installed. The Qiskit version uses `.inverse()` for the diffuser and multi-controlled Z gates. How should I approach this migration, especially handling the `.inverse()` pattern and making sure the count results match between frameworks?",
+      "expected_output": "The agent used cudaq-importing to explain the porting approach for Grover's algorithm including handling .inverse() via the hand-rolled-inverse or gate-recorder pattern, translating multi-controlled gates using runtime-arity encoding, addressing fp32 vs fp64 precision differences, and validating via raw count-key comparison.",
+      "assertions": [
+        "The agent referenced the framework-decoupling patterns for handling .inverse() constructors (gate-recorder class or hand-rolled inverse)",
+        "The agent addressed multi-controlled gate translation using the runtime-arity list-comprehension pattern rather than fixed-arity dispatchers",
+        "The agent discussed count-key validation and floating-point precision differences (CUDA-Q fp32 vs Qiskit fp64)",
+        "The agent emphasized preserving the source algorithm without changing the quantum logic",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "cudaq-importing",
+      "expected_script": null
+    },
+    {
+      "id": "cudaq-importing-003",
+      "prompt": "Using the cudaq-importing skill, help me port this small parameterized Qiskit circuit to CUDA-Q:\n\n```python\nimport math\nfrom qiskit import QuantumCircuit\nfrom qiskit_aer import AerSimulator\n\ntheta = math.pi / 3\nphi = math.pi / 5\n\nqc = QuantumCircuit(4, 4)\nqc.x(0)\nqc.ry(theta, 1)\nqc.rz(phi, 1)\nqc.cx(1, 2)\nqc.h(3)\nqc.measure([0, 1, 2, 3], [0, 1, 2, 3])\n\nsim = AerSimulator()\nresult = sim.run(qc, shots=1000).result()\nprint(result.get_counts())\n```\n\nKeep `theta` and `phi` as runtime arguments to the CUDA-Q kernel, and make the CUDA-Q counts comparable to Qiskit's `get_counts()` keys.",
+      "expected_output": "The agent used cudaq-importing to produce a complete CUDA-Q port using @cudaq.kernel decorator mode with runtime float arguments for theta and phi, correctly translating x, ry, rz, cx, and h gates, handling Qiskit-vs-CUDA-Q count-key ordering, and ensuring no Qiskit runtime dependency.",
+      "assertions": [
+        "The agent read the cudaq-importing SKILL.md to reference the gate-translation table and bit-ordering conventions",
+        "The agent produced a @cudaq.kernel decorated function with runtime float arguments for theta and phi rather than hardcoding the angles inside the kernel",
+        "The agent translated x, ry, rz, cx, and h to their CUDA-Q decorator-mode equivalents",
+        "The agent explained or handled the bit-ordering difference between Qiskit and CUDA-Q count keys for measure([0, 1, 2, 3], [0, 1, 2, 3])",
+        "The agent ensured the ported code has no import or runtime dependency on qiskit",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "cudaq-importing",
+      "expected_script": null
+    },
+    {
+      "id": "cudaq-importing-004",
+      "prompt": "How do I set up a multi-node MPI simulation in CUDA-Q to distribute a 35-qubit statevector across multiple GPUs? I'm not porting from another framework, I just want to understand the CUDA-Q distributed execution model and which target/backend flags to use.",
+      "expected_output": "The agent recognized this as a pure CUDA-Q distributed simulation question unrelated to porting from Qiskit, and either used the cudaq-guide skill or general CUDA-Q knowledge to address multi-GPU statevector distribution without invoking the cudaq-importing skill.",
+      "assertions": [
+        "The agent did not invoke or reference the cudaq-importing skill since no framework porting is involved",
+        "The agent addressed the multi-node/multi-GPU distributed simulation topic using general CUDA-Q knowledge or the cudaq-guide skill",
+        "The agent discussed target selection or backend configuration relevant to distributed statevector simulation",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

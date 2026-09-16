@@ -1,0 +1,2791 @@
+{
+  "$schema": "https://developer.nvidia.com/schemas/versions.schema.json",
+  "skills": [
+    {
+      "name": "accelerated-computing-cudf",
+      "path": "skills/accelerated-computing-cudf",
+      "content_digest": "sha256:df67c51363357414ba634b62489f5a88c36d95d14d6e74fa82f1ad8a6b540ad7",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "path": "skills/ambient-healthcare-agent-with-nemotron-voice-agent",
+      "content_digest": "sha256:24537301b005d7016223c050b8a444c888764eedad76d96958ec6b52d483415d",
+      "last_commit": "5e8d7e4bdb3314b5e1a1c6beff2e933680f73026",
+      "last_modified": "2026-10-02"
+    },
+    {
+      "name": "amc-run-rtsp-calibration",
+      "path": "skills/amc-run-rtsp-calibration",
+      "content_digest": "sha256:7b48e2a0fe6ac9ac1dec34cd24482f3b5980cdbb0e597bed0622b809504603da",
+      "last_commit": "6d034104a85ed75c705535c0d9dd961412fd6be3",
+      "last_modified": "2026-09-04"
+    },
+    {
+      "name": "amc-run-sample-calibration",
+      "path": "skills/amc-run-sample-calibration",
+      "content_digest": "sha256:39a60c9659af6910187dd4de3eb295d4201cbd0279c3debc5cf56a33c8b10b87",
+      "last_commit": "6d034104a85ed75c705535c0d9dd961412fd6be3",
+      "last_modified": "2026-09-04"
+    },
+    {
+      "name": "amc-run-video-calibration",
+      "path": "skills/amc-run-video-calibration",
+      "content_digest": "sha256:832adf08fe30647364d123b92fc54138ed992cc6c50de8a7464ca7b143b321e1",
+      "last_commit": "6d034104a85ed75c705535c0d9dd961412fd6be3",
+      "last_modified": "2026-09-04"
+    },
+    {
+      "name": "amc-setup-calibration-stack",
+      "path": "skills/amc-setup-calibration-stack",
+      "content_digest": "sha256:3335500eaec1cc41912bc0664b6ab21e7f4e8764a93c482f846288a4a8b0ace1",
+      "last_commit": "de3c29225040d96960f77c327d9c5eef0a1acdba",
+      "last_modified": "2026-07-14"
+    },
+    {
+      "name": "bionemo-boltz2-nim",
+      "path": "skills/bionemo-boltz2-nim",
+      "content_digest": "sha256:b12e1701bd327d2b911444d81645a0009681336f77d13307dfe4920090bbc9b7",
+      "last_commit": "85ad8571bd181d61fe8ba0102ea83ddfe31c20c9",
+      "last_modified": "2026-10-02"
+    },
+    {
+      "name": "bionemo-diffdock-nim",
+      "path": "skills/bionemo-diffdock-nim",
+      "content_digest": "sha256:d4825b6a0a116a4affd7feb00d9fbdf54dcee32a77b0b60e6b349075983dedcb",
+      "last_commit": "65585a7a715e75167b9fa38d439cdd058eeee840",
+      "last_modified": "2026-09-29"
+    },
+    {
+      "name": "bionemo-drug-discovery-pipeline",
+      "path": "skills/bionemo-drug-discovery-pipeline",
+      "content_digest": "sha256:a6f2e8dc53e84877a469807d743e99928768d6b7414b2eeed630e34e2cb8aae3",
+      "last_commit": "85ad8571bd181d61fe8ba0102ea83ddfe31c20c9",
+      "last_modified": "2026-10-02"
+    },
+    {
+      "name": "bionemo-evo2-nim",
+      "path": "skills/bionemo-evo2-nim",
+      "content_digest": "sha256:a900004a09a497c37327a501ee3db57240df4edde97c18fb854f29723ff85c9c",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
+      "name": "bionemo-genmol-nim",
+      "path": "skills/bionemo-genmol-nim",
+      "content_digest": "sha256:a27ed94b0d4658911e9fafcd682b84d5d712cdc9cad1b4aed55292676299e609",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
+      "name": "bionemo-kermt-add-cmim-pretrain",
+      "path": "skills/bionemo-kermt-add-cmim-pretrain",
+      "content_digest": "sha256:cb2294cee2287ea6647c5253a5a3dd5e5ed2defbd11e89388d8e326b74e65da4",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-kermt-continue-pretrain",
+      "path": "skills/bionemo-kermt-continue-pretrain",
+      "content_digest": "sha256:7da12a9b27bfd4ca6928e8f0bc2445e89814bf26e4ccc5af84bf0982659cab69",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-kermt-embed",
+      "path": "skills/bionemo-kermt-embed",
+      "content_digest": "sha256:3e801ca2c19b1763a14145260f4388167b412ce9c2e65b31b983351061a492a5",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-kermt-finetune",
+      "path": "skills/bionemo-kermt-finetune",
+      "content_digest": "sha256:85c32d5818c8a26a80196d66b14675e5f0183236bdf7f53f66ee87850e1534ad",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-kermt-infer",
+      "path": "skills/bionemo-kermt-infer",
+      "content_digest": "sha256:da60058df885af1520e14f31cd963438f1995374ab35a84a89d8b7aa647cd3bc",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-kermt-monitor",
+      "path": "skills/bionemo-kermt-monitor",
+      "content_digest": "sha256:f68d11c26e056ee5e9d392d6bc919b283b18626bd452bcbd0c0610c3ceafc7bd",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-kermt-pretrain-scratch",
+      "path": "skills/bionemo-kermt-pretrain-scratch",
+      "content_digest": "sha256:8b1113d51653f9c78c23415782be72e41eb55187ab03198aa2e5213a53c78be8",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-kermt-setup",
+      "path": "skills/bionemo-kermt-setup",
+      "content_digest": "sha256:53ce1b9f89fa19fb0e08472b7109d2604622f625f3743c2ed3e4297dc035f779",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-molmim-nim",
+      "path": "skills/bionemo-molmim-nim",
+      "content_digest": "sha256:c66c7b1f123008539aa5ab9d88babeae3cd8ff7365cacabf5af199f2c7527da2",
+      "last_commit": "65585a7a715e75167b9fa38d439cdd058eeee840",
+      "last_modified": "2026-09-29"
+    },
+    {
+      "name": "bionemo-msa-search-nim",
+      "path": "skills/bionemo-msa-search-nim",
+      "content_digest": "sha256:c154b07f99a11cd144fa976a15b105ed1bec2b7b953520ca1d35444e890e904f",
+      "last_commit": "b78d9ad16855ce930a196f907a3f863064935b8e",
+      "last_modified": "2026-10-01"
+    },
+    {
+      "name": "bionemo-msa-structure-prediction-pipeline",
+      "path": "skills/bionemo-msa-structure-prediction-pipeline",
+      "content_digest": "sha256:d672fd6bd6e18694f4ef34c5e5722f78b2791be41104d7f0f81a452cb545e2ac",
+      "last_commit": "d232a173d316b2cd306ffb39e23238dcf8994937",
+      "last_modified": "2026-09-23"
+    },
+    {
+      "name": "bionemo-nvmolkit-usage",
+      "path": "skills/bionemo-nvmolkit-usage",
+      "content_digest": "sha256:b720a4a3f95dd156ee474605829ab6922698174b638d0f6bf7913236a4c737e8",
+      "last_commit": "6c055eb1002e20deae8681f31335552c8ff3c345",
+      "last_modified": "2026-09-23"
+    },
+    {
+      "name": "bionemo-openfold2-nim",
+      "path": "skills/bionemo-openfold2-nim",
+      "content_digest": "sha256:5356c7dc60ebe406264b1d0b729377bea88f3268099009ee7ea04860a2184804",
+      "last_commit": "d232a173d316b2cd306ffb39e23238dcf8994937",
+      "last_modified": "2026-09-23"
+    },
+    {
+      "name": "bionemo-openfold3-nim",
+      "path": "skills/bionemo-openfold3-nim",
+      "content_digest": "sha256:ec7a398c3798f8faa91790ee19b522f3517255e4ac337388fcbe13dc70d0873f",
+      "last_commit": "2390ad987ab2e89691a89124cd191d7f9dee408a",
+      "last_modified": "2026-10-01"
+    },
+    {
+      "name": "bionemo-proteinmpnn-nim",
+      "path": "skills/bionemo-proteinmpnn-nim",
+      "content_digest": "sha256:201722da7ea14df60542473d9ec621de924404af5a49f0dc646065108f956fd1",
+      "last_commit": "d9ccb63e891cb4817516d9dc8c829e1ed09981f7",
+      "last_modified": "2026-10-01"
+    },
+    {
+      "name": "bionemo-rfdiffusion-nim",
+      "path": "skills/bionemo-rfdiffusion-nim",
+      "content_digest": "sha256:f36888eb4b17db75a8a7f79031a04c27c22fa6ff9f0af80ff9566eeb197c9cb7",
+      "last_commit": "3ec135c8d32988d02af334ceb11895450b3bc955",
+      "last_modified": "2026-10-01"
+    },
+    {
+      "name": "cudaq-guide",
+      "path": "skills/cudaq-guide",
+      "content_digest": "sha256:1a71ecd2bcb906fdfadceb9dead2211135ed0b3327ff05c415da1821669b3555",
+      "last_commit": "46293cb1dcc3b6984f1569cf8d819a387d5a9916",
+      "last_modified": "2026-09-11"
+    },
+    {
+      "name": "cudaq-importing",
+      "path": "skills/cudaq-importing",
+      "content_digest": "sha256:fd23ed27cd6e22ee694478ac987348c3be1c1d3ba95ffc4b3e32c5cf4bcbbd6f",
+      "last_commit": "4b64e3cfdb359e7e4ce0644460566800c1f03d55",
+      "last_modified": "2026-09-12"
+    },
+    {
+      "name": "cuopt-developer",
+      "path": "skills/cuopt-developer",
+      "content_digest": "sha256:2146d5b9c801f3298e75179f6bd898c42a2c0ca26531fb2313b39449b99cf281",
+      "last_commit": "e37c0a0aa49eea95122d3ec27bbeaa001f40b773",
+      "last_modified": "2026-06-29"
+    },
+    {
+      "name": "cuopt-install",
+      "path": "skills/cuopt-install",
+      "content_digest": "sha256:af62fdd9987981b11afc08a863a6dd2388c25ed07437d4f97d2bf21748b349f5",
+      "last_commit": "ca9a15eb625a71a20d6996fe65d50cd9a88d846d",
+      "last_modified": "2026-08-25"
+    },
+    {
+      "name": "cuopt-multi-objective-exploration",
+      "path": "skills/cuopt-multi-objective-exploration",
+      "content_digest": "sha256:37663cd09b9ff7402903d38c0b20fd00fbf178f9dfa92bf0c075d89b7d341894",
+      "last_commit": "b3123b1702fe1cfa11e40338d04c1b7e927c65e4",
+      "last_modified": "2026-08-07"
+    },
+    {
+      "name": "cuopt-numerical-optimization-api",
+      "path": "skills/cuopt-numerical-optimization-api",
+      "content_digest": "sha256:cffb0fd68285d196408af6580d27151005c4f497ee5b9b207e3ea91b67db50db",
+      "last_commit": "e0cd22d572493dd3061708406a9ba53fddaa7087",
+      "last_modified": "2026-08-07"
+    },
+    {
+      "name": "cuopt-numerical-optimization-formulation",
+      "path": "skills/cuopt-numerical-optimization-formulation",
+      "content_digest": "sha256:4b98a111168f56b91b1f7378f0671122c6401184b3c76910fe147db52b38f7d9",
+      "last_commit": "e0cd22d572493dd3061708406a9ba53fddaa7087",
+      "last_modified": "2026-08-07"
+    },
+    {
+      "name": "cuopt-routing-api-python",
+      "path": "skills/cuopt-routing-api-python",
+      "content_digest": "sha256:27d199ace2c3add140367a961f7c21f4e372ea646c3a29c36999a180cd7649d3",
+      "last_commit": "77580296021eb309cfb372787409660ae35e6b2e",
+      "last_modified": "2026-08-13"
+    },
+    {
+      "name": "cuopt-server-api-python",
+      "path": "skills/cuopt-server-api-python",
+      "content_digest": "sha256:164bc205760fec78fa86c761613b00b8d6110e985aa5693e035d06872e44b0a5",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "dali-dynamic-mode",
+      "path": "skills/dali-dynamic-mode",
+      "content_digest": "sha256:921624692bb8b7fd70a93212f0808ab95746f2e480952051e9058ff0f85877aa",
+      "last_commit": "da0f5a8aa13e0ca05658d48d23fa62cebf696a57",
+      "last_modified": "2026-08-11"
+    },
+    {
+      "name": "data-designer",
+      "path": "skills/data-designer",
+      "content_digest": "sha256:c8b7a8619f0d978d4d2287fa248332a834d42f39b417dea6bb5681104fb56f2a",
+      "last_commit": "e695a8397463bbb64d787b3cd88d3c58889be633",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "deepstream-dev",
+      "path": "skills/deepstream-dev",
+      "content_digest": "sha256:e9c84553d75c447adb2282f78a928f820a6456d84b74505e141cb08d57935232",
+      "last_commit": "6d034104a85ed75c705535c0d9dd961412fd6be3",
+      "last_modified": "2026-09-04"
+    },
+    {
+      "name": "deepstream-generate-pipeline",
+      "path": "skills/deepstream-generate-pipeline",
+      "content_digest": "sha256:fe3d7e3eb20583aca9cb39044e8b2071c271f7e267e0ec4db060ded5fa6f9de1",
+      "last_commit": "4cb109230e78b1176e85e7bd9d5b4f36d92fbc9b",
+      "last_modified": "2026-07-01"
+    },
+    {
+      "name": "deepstream-import-vision-model",
+      "path": "skills/deepstream-import-vision-model",
+      "content_digest": "sha256:811986b26074f5b711df6f8581d34208919ab8a3c9261332a43b044ba486f084",
+      "last_commit": "6d034104a85ed75c705535c0d9dd961412fd6be3",
+      "last_modified": "2026-09-04"
+    },
+    {
+      "name": "deepstream-profile-pipeline",
+      "path": "skills/deepstream-profile-pipeline",
+      "content_digest": "sha256:a3cef8206e0933a2202ff124ed125a9ad798c17cc389faa07c0f44ece3a53e5d",
+      "last_commit": "4cb109230e78b1176e85e7bd9d5b4f36d92fbc9b",
+      "last_modified": "2026-07-01"
+    },
+    {
+      "name": "deepstream-run-mv3dt",
+      "path": "skills/deepstream-run-mv3dt",
+      "content_digest": "sha256:4f721aa4407f710f0cd7f69dd084ca14629e99a39aabd72f234d88919ee4d742",
+      "last_commit": "a8ca7bc1ddc433e91520892b087c5a704e34fdb2",
+      "last_modified": "2026-08-12"
+    },
+    {
+      "name": "deepstream-sop",
+      "path": "skills/deepstream-sop",
+      "content_digest": "sha256:a6e9de0fa22b505f349734532b020646e151790616f5922e49f4e279da5a6ea4",
+      "last_commit": "6d034104a85ed75c705535c0d9dd961412fd6be3",
+      "last_modified": "2026-09-04"
+    },
+    {
+      "name": "dicom-metadata-extract",
+      "path": "skills/dicom-metadata-extract",
+      "content_digest": "sha256:ac05b7f648c31f2bb3426e01bed81f4d8a5c8b7947273513f9ad00cfbc8bad92",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "dicom-series-preflight",
+      "path": "skills/dicom-series-preflight",
+      "content_digest": "sha256:adbe8f799f3fb15f83035cda0ee03101adc4fd974ac0347ab0c3c0847b4073df",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "dicom-series-to-volume",
+      "path": "skills/dicom-series-to-volume",
+      "content_digest": "sha256:a63a39aae2b9a6589a7ff39b20ec577ae900a4d2412fc520bee68906c610043c",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "digital-health-clinical-asr-build",
+      "path": "skills/digital-health-clinical-asr-build",
+      "content_digest": "sha256:7d9a91d7dc1d5eb6e1868ab2e0ed04f0c7590d258cc0eea33a1829220dc366ff",
+      "last_commit": "1ba3403f7466518d37b00a0b934877757a733144",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "digital-health-clinical-asr-eval",
+      "path": "skills/digital-health-clinical-asr-eval",
+      "content_digest": "sha256:7b74183efa393a01963b2e34377bc1cc2ffb04ac35c96f7c222ee1b423b857d4",
+      "last_commit": "1ba3403f7466518d37b00a0b934877757a733144",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "digital-health-clinical-asr-finetune",
+      "path": "skills/digital-health-clinical-asr-finetune",
+      "content_digest": "sha256:5005da91848154bbd4f178923cc51d1edb027df48fb0d160dd53c98f5e71f615",
+      "last_commit": "1ba3403f7466518d37b00a0b934877757a733144",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "digital-health-clinical-asr-setup",
+      "path": "skills/digital-health-clinical-asr-setup",
+      "content_digest": "sha256:f3cbe71f71c2c7cead83ed379a20d07033d19dca82e8badace1d456632595e01",
+      "last_commit": "1ba3403f7466518d37b00a0b934877757a733144",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "doca-aes-gcm",
+      "path": "skills/doca-aes-gcm",
+      "content_digest": "sha256:ed7c8a841c158df12cfe4eb54f29f7c00bc83c361971145f6fbf7e2387d975cc",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-argp",
+      "path": "skills/doca-argp",
+      "content_digest": "sha256:907b5fcc64816e1a0ebf2dcb55212d71337512f6364fe68349de59be5c32ecc0",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-argus",
+      "path": "skills/doca-argus",
+      "content_digest": "sha256:ea088625747bd78c6bb6d806bf9035d603f620cf1a071bc86bcebae52809810c",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-bare-metal-deployment",
+      "path": "skills/doca-bare-metal-deployment",
+      "content_digest": "sha256:e9e6d807ca1662934df2897a2d546124c23d6110c5af2228ca993f134ee46efa",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-bench",
+      "path": "skills/doca-bench",
+      "content_digest": "sha256:8bdc5cc4c3080e9c9a00f1ed2372aa14daaf938b37e1f1a45fa93dd5ec562f9e",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-bench-extension",
+      "path": "skills/doca-bench-extension",
+      "content_digest": "sha256:5d069c1a7563af361570a70819c1ea56365e47a45bf0722a0595d60b08669ab7",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-bf3-deployment",
+      "path": "skills/doca-bf3-deployment",
+      "content_digest": "sha256:f1530b84b02e5334875860056358ac42261bc8ca19fc95b39a046e2ec91492de",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-bf4-deployment",
+      "path": "skills/doca-bf4-deployment",
+      "content_digest": "sha256:3cf5436f099a93d24a17cd5964ad84afcd3e26e644b870db975b3c6b31e23b61",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-caps",
+      "path": "skills/doca-caps",
+      "content_digest": "sha256:2deb14eb2735df1a1c4919aebfa974bd05b2abf95f7daf968e6fa4d2e993a8a0",
+      "last_commit": "f64fa0e6135231263745114752084785bc3e1beb",
+      "last_modified": "2026-07-17"
+    },
+    {
+      "name": "doca-collectx-deployment",
+      "path": "skills/doca-collectx-deployment",
+      "content_digest": "sha256:595d0b34530784aeae50983a91fd1139df12875ac9a8abfce85a0b19885c7eb3",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-comch",
+      "path": "skills/doca-comch",
+      "content_digest": "sha256:3e3c4b26dfa23ab12436da8b1532728bb4586e5427d76f94778588411fcd4431",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-comm-channel-admin",
+      "path": "skills/doca-comm-channel-admin",
+      "content_digest": "sha256:d6511e7febddb2e4d27b80814e0bf3d7667baa6b90ea331c1a1d74ed31c146af",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-common",
+      "path": "skills/doca-common",
+      "content_digest": "sha256:2d8d5b0ad788da6f6a2b10c6e9147af6ba489a2c889be34978d3fe62726e93e0",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-compress",
+      "path": "skills/doca-compress",
+      "content_digest": "sha256:73a231e89fb661a75ed1d79bf01c448080469b6f2083bd3f78405cc6902e4cbe",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-container-deployment",
+      "path": "skills/doca-container-deployment",
+      "content_digest": "sha256:5a5c976f50144cb9053de30199bf49d27f6383055a9d1c06198c79cd1fdf698f",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-debug",
+      "path": "skills/doca-debug",
+      "content_digest": "sha256:d62a28b28cbac772e6e199c794d0218f613152ae017c37139f215bffebc4e038",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-devemu",
+      "path": "skills/doca-devemu",
+      "content_digest": "sha256:41f8ec33c0804dd5371e267d57cd638b714b714f72fd7a0ce67a9a3c3c3df792",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-dma",
+      "path": "skills/doca-dma",
+      "content_digest": "sha256:81d8cd2ed84ddf82a7495312be4331ba1be9af625e63dc63ce7995998127317c",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-dms",
+      "path": "skills/doca-dms",
+      "content_digest": "sha256:d746f684eb29d1c0b53ea8b1a95c6736efddc3744e000addf778ffeb34e69176",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-dpa",
+      "path": "skills/doca-dpa",
+      "content_digest": "sha256:70321d3ead07b2f6146ed3f0a08fb54d8273471287b1927d20c8233650f2969f",
+      "last_commit": "f64fa0e6135231263745114752084785bc3e1beb",
+      "last_modified": "2026-07-17"
+    },
+    {
+      "name": "doca-dpa-hl-tracer",
+      "path": "skills/doca-dpa-hl-tracer",
+      "content_digest": "sha256:db8ec464bfcfbaee139f315dfe77331e3729801b9866057c5c18ae5958fd4b68",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-dpdk-bridge",
+      "path": "skills/doca-dpdk-bridge",
+      "content_digest": "sha256:43515eeeff47b66c2ab24a8f839b86930138356411ba382d1323c61f337214a9",
+      "last_commit": "f64fa0e6135231263745114752084785bc3e1beb",
+      "last_modified": "2026-07-17"
+    },
+    {
+      "name": "doca-erasure-coding",
+      "path": "skills/doca-erasure-coding",
+      "content_digest": "sha256:f772df5d80922df9543627eb0dd354c24e0de437f393a690c501621cfa4e467c",
+      "last_commit": "f64fa0e6135231263745114752084785bc3e1beb",
+      "last_modified": "2026-07-17"
+    },
+    {
+      "name": "doca-eth",
+      "path": "skills/doca-eth",
+      "content_digest": "sha256:78f7a05ea308a4ca0121e4cfb4bfecdc5aedd5c2f3936fc23a8aad9c7ece09a0",
+      "last_commit": "f64fa0e6135231263745114752084785bc3e1beb",
+      "last_modified": "2026-07-17"
+    },
+    {
+      "name": "doca-firefly",
+      "path": "skills/doca-firefly",
+      "content_digest": "sha256:932b9df2ff37b6ab50440d68755e7e8279d8edd694668c2f024feecdfcc08307",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-flow",
+      "path": "skills/doca-flow",
+      "content_digest": "sha256:abed1972f329c63c66cac10b2a998198a67ce758b5e8d32afe278f03cdc554ef",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-flow-dpa-perf",
+      "path": "skills/doca-flow-dpa-perf",
+      "content_digest": "sha256:4d93f3c15aed093f2a02c79e209058984609476886f9fe1e597d4a34f9b52757",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-flow-dpa-provider",
+      "path": "skills/doca-flow-dpa-provider",
+      "content_digest": "sha256:fcf09d818d4be91171df97f5af19c123ec958625a9ecc9609a1a61aca1c1724e",
+      "last_commit": "f64fa0e6135231263745114752084785bc3e1beb",
+      "last_modified": "2026-07-17"
+    },
+    {
+      "name": "doca-flow-grpc-server",
+      "path": "skills/doca-flow-grpc-server",
+      "content_digest": "sha256:79344b9588fba1fad5f77f0775be5a3fb8c9fdc62684c6dce9d088bba368d7d9",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-flow-perf",
+      "path": "skills/doca-flow-perf",
+      "content_digest": "sha256:46cd3addb80cd57e4958d9485f9ba0f1cd8efab2698898a8ddf335caf2bd21d1",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-flow-tune",
+      "path": "skills/doca-flow-tune",
+      "content_digest": "sha256:186afc6f583b4f9357dd09744bd04db8eda76aed895560a10fa0ceb95031ed4f",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-gpi",
+      "path": "skills/doca-gpi",
+      "content_digest": "sha256:63d16ac17b20725740184779badbc43c2fca80b7b89187f40d23ee184daf1f3c",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-gpunetio",
+      "path": "skills/doca-gpunetio",
+      "content_digest": "sha256:5a7ef7883bc6abfc94b003b14db88b2061674155450e93e19f9494029ef88306",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-gpunetio-ib-write-bw",
+      "path": "skills/doca-gpunetio-ib-write-bw",
+      "content_digest": "sha256:5de22364df6f1df0dbc4704d12c7ae61d30bf09971d1cd231c758cee51aea903",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-gpunetio-ib-write-lat",
+      "path": "skills/doca-gpunetio-ib-write-lat",
+      "content_digest": "sha256:4480d1e583aa072b44bbf5fd4913dd95ae992f2026113acf438042091b1933ea",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-hardware-safety",
+      "path": "skills/doca-hardware-safety",
+      "content_digest": "sha256:492805ffccb5900579c5d77e69f66276cd2e0c16c7bc91a9895c7f367375662e",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-mgmt",
+      "path": "skills/doca-mgmt",
+      "content_digest": "sha256:fa972e87cb00916bfe479e6b6d628c0d9aa05944f1b0c48c9f46218e97ec1d18",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-pcc",
+      "path": "skills/doca-pcc",
+      "content_digest": "sha256:975d8e8e4af3383ca0eabd6cef6da79bb2f2e6550ab1838c2a6ec5278ed40e3d",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-pcc-counters",
+      "path": "skills/doca-pcc-counters",
+      "content_digest": "sha256:22c3fe14abb808818e9b69f5846ad8d894d4130f2886ca1e00468f24352a2d51",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-pcc-ztr-rttcc-algo",
+      "path": "skills/doca-pcc-ztr-rttcc-algo",
+      "content_digest": "sha256:70214edf90b53c90f83382a8a965ae1eb1b695810c65233f3c9dedb1db3469e2",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-programming-guide",
+      "path": "skills/doca-programming-guide",
+      "content_digest": "sha256:42d50424d0159f1e243c0f9d22b687d04ddc269cacb7569817d515f92967a899",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-public-knowledge-map",
+      "path": "skills/doca-public-knowledge-map",
+      "content_digest": "sha256:5282030db072d352f3842ff7d10c908d35c22091b1a8edaee67007dccb4d0786",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-rdma",
+      "path": "skills/doca-rdma",
+      "content_digest": "sha256:df433600e861bf1117c2efeb3c530c212fa3a7e2247401e1459ec53d690c2112",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-rdmi",
+      "path": "skills/doca-rdmi",
+      "content_digest": "sha256:5cdf1423773ed09003adbee3e783e2c973c215b15a6db701375cbb96fd7ee215",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-rmax",
+      "path": "skills/doca-rmax",
+      "content_digest": "sha256:44063c2eac97feed2ee0ce2f3bbc8e8fbe5eb73c4859259ab41d3da03dc7f5cc",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-setup",
+      "path": "skills/doca-setup",
+      "content_digest": "sha256:cd84f4a15c05931db69cbee642e59def899764f58a7e650d0ace91b2d99a4cbe",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-sha",
+      "path": "skills/doca-sha",
+      "content_digest": "sha256:21783d5f7ae6b933dfc6cb4f66ded96a467c6f6735d55a16dee5a5a57f60a1b0",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-sha-offload-engine",
+      "path": "skills/doca-sha-offload-engine",
+      "content_digest": "sha256:ccd7de1c0a17410eee92891a52c6372f95021aaa92b5224a828a206466321a08",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-socket-relay",
+      "path": "skills/doca-socket-relay",
+      "content_digest": "sha256:e3bcc1fa3fdade05ad7a35013dfe861082f25521fdf0c9c087c67b5da0e15687",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-spcx-cc",
+      "path": "skills/doca-spcx-cc",
+      "content_digest": "sha256:e6da01a2e740f1381c706a815f3041c6487a83ea0ffe38f1d09fde1f14cd3819",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-sta",
+      "path": "skills/doca-sta",
+      "content_digest": "sha256:d1435649f4d819eb110a43641d4bed30b7a5b179717ed99b4c3d7589f40f8d12",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-structured-tools-contract",
+      "path": "skills/doca-structured-tools-contract",
+      "content_digest": "sha256:9954b69cec641fc5bfaef03ef625a88437f39b5149a2dbe19dc76da043c62e24",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-telemetry",
+      "path": "skills/doca-telemetry",
+      "content_digest": "sha256:94d83990ad66d895f66957f0eb535ae7cc200ec0a9c22498e876cd46bc08fe65",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-telemetry-exporter",
+      "path": "skills/doca-telemetry-exporter",
+      "content_digest": "sha256:c4804b2ada57b528f73251b6911a53ae15c683b5c26c96b4d3939b50b9ff8770",
+      "last_commit": "36dd834694bd4a9d53cd421a7d9e908a4b08676f",
+      "last_modified": "2026-08-05"
+    },
+    {
+      "name": "doca-telemetry-utils",
+      "path": "skills/doca-telemetry-utils",
+      "content_digest": "sha256:a2c5430d2f939396059fda7e663c6e8de4043f39b373822c5a65cc336e24dbcc",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-upgrade",
+      "path": "skills/doca-upgrade",
+      "content_digest": "sha256:f9a7178b1174f4bfedd8b05c3049054c5e3d029bbf2c38d56a0ca10161175a34",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-urom",
+      "path": "skills/doca-urom",
+      "content_digest": "sha256:03bb2a518562c86d7c7d4bff20407cef2235b73c75878ed7f67c8e73bd444c30",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-urom-svc",
+      "path": "skills/doca-urom-svc",
+      "content_digest": "sha256:a4ff16d7b9ca74c6e75bfd012bc0def3f8495f2ec1f8990f99b541e7f631c8cd",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-verbs",
+      "path": "skills/doca-verbs",
+      "content_digest": "sha256:9ec96c14d621cc351fa259a30d3c82bf519cf7579d26e0b703675679663896e0",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "doca-version",
+      "path": "skills/doca-version",
+      "content_digest": "sha256:bb301143c6af37002092aadc29c865db117c070133df901c0294df8720aa85d2",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "dynamo-interconnect-check",
+      "path": "skills/dynamo-interconnect-check",
+      "content_digest": "sha256:f73bc4dd4d7b3f4a21c28463e8f5e889b4683e0cbd8b789f6d7ebaf8117c95ad",
+      "last_commit": "efd358a207cd9ab26db8296467f340efe4bfb9d7",
+      "last_modified": "2026-05-28"
+    },
+    {
+      "name": "dynamo-recipe-runner",
+      "path": "skills/dynamo-recipe-runner",
+      "content_digest": "sha256:0aae7329b2442c2f16b2772d2c92f591c8107409f51cfe95c5b80e4c3aef6f0f",
+      "last_commit": "efd358a207cd9ab26db8296467f340efe4bfb9d7",
+      "last_modified": "2026-05-28"
+    },
+    {
+      "name": "dynamo-router-starter",
+      "path": "skills/dynamo-router-starter",
+      "content_digest": "sha256:1bef1c68dcba0f776e904b5b3591ee4be1bc4729df756954c475ce798d2d1261",
+      "last_commit": "efd358a207cd9ab26db8296467f340efe4bfb9d7",
+      "last_modified": "2026-05-28"
+    },
+    {
+      "name": "dynamo-troubleshoot",
+      "path": "skills/dynamo-troubleshoot",
+      "content_digest": "sha256:21b41e29bcf4971065ae02c3e0839f35062ea7aa2119f6e4e7bdc2f64eb33667",
+      "last_commit": "efd358a207cd9ab26db8296467f340efe4bfb9d7",
+      "last_modified": "2026-05-28"
+    },
+    {
+      "name": "earth2studio-create-datasource",
+      "path": "skills/earth2studio-create-datasource",
+      "content_digest": "sha256:899a9e70bc694550d4cad5cb84f11f6889311190f77c6ade9f2a0326fc0d7df4",
+      "last_commit": "4cb109230e78b1176e85e7bd9d5b4f36d92fbc9b",
+      "last_modified": "2026-07-01"
+    },
+    {
+      "name": "earth2studio-create-diagnostic",
+      "path": "skills/earth2studio-create-diagnostic",
+      "content_digest": "sha256:6e46abb56b27f0c8e876b1c4099384329fef32ffb283c09367cf2f88e3b3572b",
+      "last_commit": "4cb109230e78b1176e85e7bd9d5b4f36d92fbc9b",
+      "last_modified": "2026-07-01"
+    },
+    {
+      "name": "earth2studio-create-prognostic",
+      "path": "skills/earth2studio-create-prognostic",
+      "content_digest": "sha256:bfb33cec0078d37f9e464b3d0e4ccd403975f85498c48c8305f6f8f784585d5e",
+      "last_commit": "4cb109230e78b1176e85e7bd9d5b4f36d92fbc9b",
+      "last_modified": "2026-07-01"
+    },
+    {
+      "name": "earth2studio-data-fetch",
+      "path": "skills/earth2studio-data-fetch",
+      "content_digest": "sha256:61f852bdbbfe4cae7388c44ff33df2e037bc62316fac6bf1d6e5f6913b5b0d9b",
+      "last_commit": "06f429016c4ae712a081d8c975f3358c79f63bec",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "earth2studio-deterministic-forecast",
+      "path": "skills/earth2studio-deterministic-forecast",
+      "content_digest": "sha256:8202a876c025047e4a4795511a9102a8aba52fecef8efae78eec54d27ea341e8",
+      "last_commit": "55d907bb3bc8e14acb4e8fe4f13e58b25a4f7920",
+      "last_modified": "2026-06-04"
+    },
+    {
+      "name": "earth2studio-discover",
+      "path": "skills/earth2studio-discover",
+      "content_digest": "sha256:4649dd935084dc42351d94586d51c58fadf90a24f3c1661aa8d90a6232bfb359",
+      "last_commit": "06f429016c4ae712a081d8c975f3358c79f63bec",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "earth2studio-install",
+      "path": "skills/earth2studio-install",
+      "content_digest": "sha256:377d5089f959bb8aa746a4cf2c2b3c063553c868fd4672c6f871d4992eba41c8",
+      "last_commit": "06f429016c4ae712a081d8c975f3358c79f63bec",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "foundationpose-pipeline",
+      "path": "skills/foundationpose-pipeline",
+      "content_digest": "sha256:8ab51cf9ccba291b0a21a8024dbee1d229548c1534777bdec58a7183844a5ae7",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "foundationpose-setup",
+      "path": "skills/foundationpose-setup",
+      "content_digest": "sha256:f7543a9a31a9ba851720cca7664d59917140a20d77b5e73226fac0377971bed5",
+      "last_commit": "a5a01eb1c6d8dc515a38060b019f7e19f9b0ef8f",
+      "last_modified": "2026-09-16"
+    },
+    {
+      "name": "g-assist-mcp-skill",
+      "path": "skills/g-assist-mcp-skill",
+      "content_digest": "sha256:2401c7be149918ecbef7f3f2f6360db0b5366ed295f0367dc8114346add76962",
+      "last_commit": "d9ccb63e891cb4817516d9dc8c829e1ed09981f7",
+      "last_modified": "2026-10-01"
+    },
+    {
+      "name": "holohub-app-lifecycle",
+      "path": "skills/holohub-app-lifecycle",
+      "content_digest": "sha256:b8061abb3fd732ec793e717a0deaace05e590db489e3ae27a2c86108c9430687",
+      "last_commit": "c4c9a315caaa4eccf414d577169d9f51641ede2b",
+      "last_modified": "2026-09-03"
+    },
+    {
+      "name": "holohub-debug-build-run",
+      "path": "skills/holohub-debug-build-run",
+      "content_digest": "sha256:58d66a3ca368ddb5e68638912fccbe08cf246ac1911b4f625d1018b2d1a99fd2",
+      "last_commit": "c4c9a315caaa4eccf414d577169d9f51641ede2b",
+      "last_modified": "2026-09-03"
+    },
+    {
+      "name": "holohub-module-lifecycle",
+      "path": "skills/holohub-module-lifecycle",
+      "content_digest": "sha256:1970a736218398e060acb4fcb4fd35591833896a71329dfaaa8043d2a7aa1288",
+      "last_commit": "c4c9a315caaa4eccf414d577169d9f51641ede2b",
+      "last_modified": "2026-09-03"
+    },
+    {
+      "name": "holoscan-install-conda",
+      "path": "skills/holoscan-install-conda",
+      "content_digest": "sha256:04885b4f0495d45024273cb5f02f1df2122726e68f020e803157e6ae1db31e71",
+      "last_commit": "a7c1463403ba9ac3d686e2e7397d3eac40572999",
+      "last_modified": "2026-05-31"
+    },
+    {
+      "name": "holoscan-install-container",
+      "path": "skills/holoscan-install-container",
+      "content_digest": "sha256:d047474d1e206af1d57324056908f1f1ef642227d18ce3f2a3841d04705e7622",
+      "last_commit": "a7c1463403ba9ac3d686e2e7397d3eac40572999",
+      "last_modified": "2026-05-31"
+    },
+    {
+      "name": "holoscan-install-debian",
+      "path": "skills/holoscan-install-debian",
+      "content_digest": "sha256:b7007e1c88c8c758e8ffc49e80149fd454d8623f770c7628a46324f24d970069",
+      "last_commit": "a7c1463403ba9ac3d686e2e7397d3eac40572999",
+      "last_modified": "2026-05-31"
+    },
+    {
+      "name": "holoscan-install-source",
+      "path": "skills/holoscan-install-source",
+      "content_digest": "sha256:8c6912279a79745c255b4e138fedb8f87ed72e1bff6efaf4fca616d3f5b12cc6",
+      "last_commit": "a7c1463403ba9ac3d686e2e7397d3eac40572999",
+      "last_modified": "2026-05-31"
+    },
+    {
+      "name": "holoscan-install-wheel",
+      "path": "skills/holoscan-install-wheel",
+      "content_digest": "sha256:3bca053da12b9b33a6a0adfefd3b12976dba09aca1c9ac428dccae0f82359b41",
+      "last_commit": "a7c1463403ba9ac3d686e2e7397d3eac40572999",
+      "last_modified": "2026-05-31"
+    },
+    {
+      "name": "holoscan-setup",
+      "path": "skills/holoscan-setup",
+      "content_digest": "sha256:debd8dcbd9e16481d8f8cc62b13deb83bcb082da9c4b41004f3f21f6350a65b7",
+      "last_commit": "3cf3b215d32f2e7072edadb187e502ab47612054",
+      "last_modified": "2026-07-06"
+    },
+    {
+      "name": "hsb-app",
+      "path": "skills/hsb-app",
+      "content_digest": "sha256:fea1fa01ee8aa384f4a13ced26201a7ac039a90b0f08cadd5d0f4a0f03eeb747",
+      "last_commit": "bb0436faf7c9c5270f2dbc3d30c39379e5e2305b",
+      "last_modified": "2026-06-04"
+    },
+    {
+      "name": "hsb-flash",
+      "path": "skills/hsb-flash",
+      "content_digest": "sha256:badf2a77d59cbe39fdad0c7499c5c0b5a8dac1cd4b5218a721192eb2a769b53f",
+      "last_commit": "bb0436faf7c9c5270f2dbc3d30c39379e5e2305b",
+      "last_modified": "2026-06-04"
+    },
+    {
+      "name": "hsb-ip-create-top",
+      "path": "skills/hsb-ip-create-top",
+      "content_digest": "sha256:9b9bda1ae7962a7ab3c5698a89ad51cf030daf5cdd56a50f9ebae9ea639fde81",
+      "last_commit": "283faf4cd0572820bc981523bddd19f000909c5d",
+      "last_modified": "2026-08-03"
+    },
+    {
+      "name": "hsb-ip-def",
+      "path": "skills/hsb-ip-def",
+      "content_digest": "sha256:46b2ea5e73ffbfcfa65c5ed1541e6264207eab6bb53d5c1a57639cd623989a3c",
+      "last_commit": "283faf4cd0572820bc981523bddd19f000909c5d",
+      "last_modified": "2026-08-03"
+    },
+    {
+      "name": "hsb-ip-packetizer",
+      "path": "skills/hsb-ip-packetizer",
+      "content_digest": "sha256:b696a59ee5db3da267b6b266f25a6da9378bf308b625dce383d6be8aa2fd5b10",
+      "last_commit": "283faf4cd0572820bc981523bddd19f000909c5d",
+      "last_modified": "2026-08-03"
+    },
+    {
+      "name": "hsb-setup",
+      "path": "skills/hsb-setup",
+      "content_digest": "sha256:c2a9624648a5e3a8a9cfd8890f922c3687e805075fc8f38c599e63d804b0ad1f",
+      "last_commit": "4cb109230e78b1176e85e7bd9d5b4f36d92fbc9b",
+      "last_modified": "2026-07-01"
+    },
+    {
+      "name": "hsb-test",
+      "path": "skills/hsb-test",
+      "content_digest": "sha256:b520bb14641001393ca8e3c469648fb2a90120afab4cc75e914f8cdf6c914ab2",
+      "last_commit": "bb0436faf7c9c5270f2dbc3d30c39379e5e2305b",
+      "last_modified": "2026-06-04"
+    },
+    {
+      "name": "i4h-lerobot-viz",
+      "path": "skills/i4h-lerobot-viz",
+      "content_digest": "sha256:5403d1a0f6dbc354676700506df1ff2a7a623b31e9feb81ce980c1b521b1cd49",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
+      "name": "i4h-workflow",
+      "path": "skills/i4h-workflow",
+      "content_digest": "sha256:4100ab9100d9417caf93c61b3bb70aef33b2b5099757ef1c147a9edfb42842c0",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
+      "name": "i4h-workflow-create",
+      "path": "skills/i4h-workflow-create",
+      "content_digest": "sha256:1172e04c046f7d1f6bfe31830f0d24fd9d6c55de75583fe2012accf3709b1310",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
+      "name": "i4h-workflow-dataset-annotate",
+      "path": "skills/i4h-workflow-dataset-annotate",
+      "content_digest": "sha256:67f638ddf672f4670eef3c4f9a24346f7bcd1ed21eb95044babcd3426096c2ce",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
+      "name": "i4h-workflow-dataset-convert",
+      "path": "skills/i4h-workflow-dataset-convert",
+      "content_digest": "sha256:717dfe50901515651a1fc94fd08c938ce029d9196ad5a254f3c840068a75f32b",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
+      "name": "i4h-workflow-dataset-mimic",
+      "path": "skills/i4h-workflow-dataset-mimic",
+      "content_digest": "sha256:5252646bac6770069736cbe80a432e01832e40ca35e8d8599855af0558167a9e",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
+      "name": "i4h-workflow-dataset-replay",
+      "path": "skills/i4h-workflow-dataset-replay",
+      "content_digest": "sha256:66c1469160ceb282d5038fdc01ae0e0e29996a0a62573f693c87fb0aa0bbfeee",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
+      "name": "i4h-workflow-dataset-teleop",
+      "path": "skills/i4h-workflow-dataset-teleop",
+      "content_digest": "sha256:a32ba3481b83093a4d015f5bf6db73b9c4617dea8620c7165eb5ea5c997d4b41",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
+      "name": "i4h-workflow-e2e",
+      "path": "skills/i4h-workflow-e2e",
+      "content_digest": "sha256:0e28b303c4e50b553e573e1ab128be1ea7aa4d71419e2564f3469a9f22ba6e25",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
+      "name": "i4h-workflow-finetune",
+      "path": "skills/i4h-workflow-finetune",
+      "content_digest": "sha256:673c1053ceff69767ec39e36f904ba3a99af9508a6717b54173b9d72fa016dc6",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
+      "name": "i4h-workflow-scene-edit",
+      "path": "skills/i4h-workflow-scene-edit",
+      "content_digest": "sha256:b2e347ac121c5d7be01b6ef7c5ad8b0513070b1dbe91a2797cb2e9146452321c",
+      "last_commit": "4aa3fd218f072597f804184967a7f1e4ed950042",
+      "last_modified": "2026-10-01"
+    },
+    {
+      "name": "i4h-workflow-setup",
+      "path": "skills/i4h-workflow-setup",
+      "content_digest": "sha256:f9dd21dd6a24364ea3c13e84d67075f76848faa11c9d17c64fe538f262be41b3",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
+      "name": "i4h-workflow-train-rl",
+      "path": "skills/i4h-workflow-train-rl",
+      "content_digest": "sha256:84d22047348647013a8a21eae979934bd28a3f6b1ade87ce47bb2b56bc9b1802",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
+      "name": "i4h-workflow-validate",
+      "path": "skills/i4h-workflow-validate",
+      "content_digest": "sha256:6f5d7cfdc21939358ab17ca4ee6a35b1a3cc26e4f808a1af9ac62d3fd4a71ada",
+      "last_commit": "4aa3fd218f072597f804184967a7f1e4ed950042",
+      "last_modified": "2026-10-01"
+    },
+    {
+      "name": "isaac-mission-control-showcase",
+      "path": "skills/isaac-mission-control-showcase",
+      "content_digest": "sha256:add44a74fb5f559ace399da795a8cc5e5d73dccf671d567d90dd5af5980ebaa4",
+      "last_commit": "e37f30b0e4095ae323223ad16b180eb6c39e0bd0",
+      "last_modified": "2026-09-29"
+    },
+    {
+      "name": "jetson-build-source",
+      "path": "skills/jetson-build-source",
+      "content_digest": "sha256:27fad2dfe13174f5d6ba426b0d6a5f14dd21d31ff2dfb89ac50a0ad0c4eade4a",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-customize-camera",
+      "path": "skills/jetson-customize-camera",
+      "content_digest": "sha256:ef2ab6d0991903f617cd8180655947b7198429773125022047fd113f272f094f",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-customize-clocks",
+      "path": "skills/jetson-customize-clocks",
+      "content_digest": "sha256:124495834294d7d8d2e2639e56426955d8bb663d692b52a31d21cb4c0e897632",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-customize-fan",
+      "path": "skills/jetson-customize-fan",
+      "content_digest": "sha256:61d627c2610ddd17dbaa11e91ec01760152cf8855333643778a477e6f90cfe49",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-customize-mgbe",
+      "path": "skills/jetson-customize-mgbe",
+      "content_digest": "sha256:6fe91f1be3b81dbf5f6c47485e5d1d666508caf2dbac4a2d07f54f69805831b2",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-customize-nvpmodel",
+      "path": "skills/jetson-customize-nvpmodel",
+      "content_digest": "sha256:8c91d007d72053f04a49cc6e26f04675b21b54ffa60c9637b552465f1fe26711",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-customize-pcie",
+      "path": "skills/jetson-customize-pcie",
+      "content_digest": "sha256:f5460bda66d2b986817a84e43faf30fc78073340f2dd5c9168eba7b52df8fbf2",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-customize-pinmux",
+      "path": "skills/jetson-customize-pinmux",
+      "content_digest": "sha256:5a9f2bb489f678f91133b0fa84e1cbf22147b8d8930ff7eb718d2760210c4655",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-customize-uphy",
+      "path": "skills/jetson-customize-uphy",
+      "content_digest": "sha256:abceaf21b259fc77d8ddbfd83e3d37d54c0394a1d3f1e5dd894f1932b709f371",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-customize-usb",
+      "path": "skills/jetson-customize-usb",
+      "content_digest": "sha256:c76d2d3e249a6986326fa7d84d9e37ce8b71dc3ab9f6b9f6c2c7647380615e0d",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-derive-carrier",
+      "path": "skills/jetson-derive-carrier",
+      "content_digest": "sha256:db1a923a99805b715f6bf12a264427db073097f57c3392a6aca66fe96d4195fc",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-diagnostic",
+      "path": "skills/jetson-diagnostic",
+      "content_digest": "sha256:8378fa206ffe1089ea1c18b25267020da0b687cde7dbc391587c3cd9e5b83149",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-download-bsp",
+      "path": "skills/jetson-download-bsp",
+      "content_digest": "sha256:3a08b235178ec4d20f6a4fa7f7f9ea11c2d3b374f2ed2cb43f958e7e5d9cc583",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-flash-image",
+      "path": "skills/jetson-flash-image",
+      "content_digest": "sha256:bb6db88bcb586f41bfced87d0dd9e8a509261faef81da153fba0749ef089db7e",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-generate-kb",
+      "path": "skills/jetson-generate-kb",
+      "content_digest": "sha256:9182dc479ef3a12c5d49a9f8c15a5f314abac924c0d8a827b6e4cb2dbd0098c5",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-headless-mode",
+      "path": "skills/jetson-headless-mode",
+      "content_digest": "sha256:8228f41b8fd1e5a214c5e6c59b2622920f1d5290dc20b068f341f97a6da905e1",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-inference-mem-tune",
+      "path": "skills/jetson-inference-mem-tune",
+      "content_digest": "sha256:885b87454bf2abab430ee2e22c1b45a963c1afa19788cd60010de077827bf4bd",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-init-image",
+      "path": "skills/jetson-init-image",
+      "content_digest": "sha256:f08b0e1cda93c231894ad4033541e5f43ff47b461a4d2d9dcc73bffb581707be",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-init-source",
+      "path": "skills/jetson-init-source",
+      "content_digest": "sha256:02825c7528ba7cc28eb1ad799415688a8c5078e507c9fadbe3c343b50326589d",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-init-target",
+      "path": "skills/jetson-init-target",
+      "content_digest": "sha256:57fe8964cce569707d2542020614ab7b932a9762871007c3883ab9eae524586a",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-link-docs",
+      "path": "skills/jetson-link-docs",
+      "content_digest": "sha256:1068de5b04689f8c9629cc672176e2ff5c91e4ceb6ddadf49da0036971a51881",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-llm-benchmark",
+      "path": "skills/jetson-llm-benchmark",
+      "content_digest": "sha256:136fc658013cef4d4b13e9d0a21a7ed1979c157968eebec685b79efd586d46bf",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-llm-serve",
+      "path": "skills/jetson-llm-serve",
+      "content_digest": "sha256:300044508637d7c32b7284a892cd1ed385a47c56da8ebdd5c242520b9a339ab2",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-memory-audit",
+      "path": "skills/jetson-memory-audit",
+      "content_digest": "sha256:7c8e6bdcd6d6f370d2f5e506b603e4e3533c0ef312ce7db2e8ef94a3b7cc61a1",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-optimize-memory",
+      "path": "skills/jetson-optimize-memory",
+      "content_digest": "sha256:bc3adb02fda81a85f1efab38cbf1d9e44142821377b8136683dba6f626046809",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-package",
+      "path": "skills/jetson-package",
+      "content_digest": "sha256:e84520bb134ee27028caf505785844801c994b39848fdbc884b14c7ff365ab7d",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-print-bsp-info",
+      "path": "skills/jetson-print-bsp-info",
+      "content_digest": "sha256:60c7649ad47a3bfb90f722f4567ab7d1a6e14d88637768982ed1286bdf0fdbc4",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-print-device-info",
+      "path": "skills/jetson-print-device-info",
+      "content_digest": "sha256:3eba74b3f340c353501ca2ecded67a3fbbdb3c95313cfb985f43dd0216315c7c",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-promote-image",
+      "path": "skills/jetson-promote-image",
+      "content_digest": "sha256:b37cc7792829611b1400c4fb70e50a12fbda7b7858e7f26a64773e4da2605eca",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-quick-start",
+      "path": "skills/jetson-quick-start",
+      "content_digest": "sha256:83324102d42ed8284913a0d90e7f9d6aef0155daf06e8fce20d065fb59d59a76",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-set-target",
+      "path": "skills/jetson-set-target",
+      "content_digest": "sha256:0cb1d556b4f302978ca6103b54481ff1c5dfb696a1964ff07bcfec72159743a3",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-speculative-decoding",
+      "path": "skills/jetson-speculative-decoding",
+      "content_digest": "sha256:50440c193d2d0d6992819c37b6de26fbe5ca77953b135f7e3fd78cd6de9fec56",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-validate-image",
+      "path": "skills/jetson-validate-image",
+      "content_digest": "sha256:366a07d61f46d5982d528e711d5b4c53fcb29ca57e772cb57718f42dd342055b",
+      "last_commit": "87053a0182e121cb4eec0b7b3a71f0d4d36cd4f1",
+      "last_modified": "2026-06-22"
+    },
+    {
+      "name": "jetson-video-benchmark",
+      "path": "skills/jetson-video-benchmark",
+      "content_digest": "sha256:5a5270ffce1b7369c07be80080ca66ed70fe9d9a9ae9aee162b9780215aa5f9c",
+      "last_commit": "9bb5a397cbddae039ca59c84a2fc2382c1c8c502",
+      "last_modified": "2026-09-24"
+    },
+    {
+      "name": "jetson-video-capability",
+      "path": "skills/jetson-video-capability",
+      "content_digest": "sha256:f791b6d7a3bd57b26028f2af014a5c296f331e3bd22417a19645167f90ea6fa8",
+      "last_commit": "9bb5a397cbddae039ca59c84a2fc2382c1c8c502",
+      "last_modified": "2026-09-24"
+    },
+    {
+      "name": "jetson-video-pipeline",
+      "path": "skills/jetson-video-pipeline",
+      "content_digest": "sha256:bac015476b19abf19ca112ede93d1003b9c98feaa4d282d3889b621720027370",
+      "last_commit": "9bb5a397cbddae039ca59c84a2fc2382c1c8c502",
+      "last_modified": "2026-09-24"
+    },
+    {
+      "name": "jetson-video-recipe",
+      "path": "skills/jetson-video-recipe",
+      "content_digest": "sha256:98bce4f1cd9ed5fcbd4f896a811c85a151f0b37e3b16d985073a5db264beb51b",
+      "last_commit": "9bb5a397cbddae039ca59c84a2fc2382c1c8c502",
+      "last_modified": "2026-09-24"
+    },
+    {
+      "name": "jetson-video-setup",
+      "path": "skills/jetson-video-setup",
+      "content_digest": "sha256:9101525e38c2591f5ef7a63a47d39d7c4150bfd6f3e62e4941299ae34b9d0c25",
+      "last_commit": "9bb5a397cbddae039ca59c84a2fc2382c1c8c502",
+      "last_modified": "2026-09-24"
+    },
+    {
+      "name": "launch-nemo-rl",
+      "path": "skills/launch-nemo-rl",
+      "content_digest": "sha256:3dbe5dd1adaaae42882251d603a04d368d0ac14c07c30f2bd32dcdabca3d13f6",
+      "last_commit": "6fb5c4ec2284422d80191c35f792c6554f3a37a1",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "mcore-create-issue",
+      "path": "skills/mcore-create-issue",
+      "content_digest": "sha256:45121705671d9b758cd3bedcc581fdc11397146b6c0d4657a522bb8b1ab7da19",
+      "last_commit": "416539cb3ce46f17706072b1571369c11bd1a49e",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "mcore-linting-and-formatting",
+      "path": "skills/mcore-linting-and-formatting",
+      "content_digest": "sha256:e5d4994f25babbffcce304105b88883d35187088e79a97b4b98ca70022255c83",
+      "last_commit": "416539cb3ce46f17706072b1571369c11bd1a49e",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "mcore-run-on-slurm",
+      "path": "skills/mcore-run-on-slurm",
+      "content_digest": "sha256:27519f4a0213a835ff408801ca9de5b4578489bdddac681321aeb1ed4eae71b7",
+      "last_commit": "416539cb3ce46f17706072b1571369c11bd1a49e",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "mcore-split-pr",
+      "path": "skills/mcore-split-pr",
+      "content_digest": "sha256:5ac9f958e2f3607fba8c3c461c4e197629952dc5af3ed8f01aec915b15589606",
+      "last_commit": "416539cb3ce46f17706072b1571369c11bd1a49e",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "mcore-testing",
+      "path": "skills/mcore-testing",
+      "content_digest": "sha256:6c7578c59ce815aadb87ca8fb0a8d74c9e2076311791a36465f4e9dd8628031d",
+      "last_commit": "416539cb3ce46f17706072b1571369c11bd1a49e",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "medtech-model-evidence-export",
+      "path": "skills/medtech-model-evidence-export",
+      "content_digest": "sha256:4e47f893327ea3cea6aad4889c25dea5db49b810725f3917c0845b2390f12ef7",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "nemo-automodel-distributed-training",
+      "path": "skills/nemo-automodel-distributed-training",
+      "content_digest": "sha256:af07e4932c5a3939f44d9be54f66867e56c77016f5cc407c879401e832d6260c",
+      "last_commit": "4e80e505b1d0c16f6a391aef01aea9a299339dea",
+      "last_modified": "2026-08-01"
+    },
+    {
+      "name": "nemo-automodel-launcher-config",
+      "path": "skills/nemo-automodel-launcher-config",
+      "content_digest": "sha256:2afb42f221662b02b4fe5a92530a6ede04ba4107a1d12a8956f5cc9ec34f6580",
+      "last_commit": "9a53de44bbace0c371aa625b2d2d49de4f947a0f",
+      "last_modified": "2026-05-28"
+    },
+    {
+      "name": "nemo-automodel-model-onboarding",
+      "path": "skills/nemo-automodel-model-onboarding",
+      "content_digest": "sha256:0a0c795b9fe470caf654d54cd40fed64524baffffe986e862c9b071777e75533",
+      "last_commit": "46293cb1dcc3b6984f1569cf8d819a387d5a9916",
+      "last_modified": "2026-09-11"
+    },
+    {
+      "name": "nemo-automodel-recipe-development",
+      "path": "skills/nemo-automodel-recipe-development",
+      "content_digest": "sha256:545928b755153f33a012486227bf5ed8418f6f0d415c3b0b2935e19898b9ca37",
+      "last_commit": "46293cb1dcc3b6984f1569cf8d819a387d5a9916",
+      "last_modified": "2026-09-11"
+    },
+    {
+      "name": "nemo-fabric-build-adapter",
+      "path": "skills/nemo-fabric-build-adapter",
+      "content_digest": "sha256:860482c2ef24890c89be004ca7017a73a4a0d111f110c0f5c71731e91fdd9e1e",
+      "last_commit": "353cfd90352f66e8d1bb4bb4844a717667d19c26",
+      "last_modified": "2026-09-02"
+    },
+    {
+      "name": "nemo-fabric-integrate",
+      "path": "skills/nemo-fabric-integrate",
+      "content_digest": "sha256:69f1546d965340eb35e1df5f018100d911a383688f5253d1e86797195462e5e8",
+      "last_commit": "353cfd90352f66e8d1bb4bb4844a717667d19c26",
+      "last_modified": "2026-09-02"
+    },
+    {
+      "name": "nemo-mbridge-mlm-bridge-training",
+      "path": "skills/nemo-mbridge-mlm-bridge-training",
+      "content_digest": "sha256:1e0f0b52fccc215ef95426fb1912fb299940a1e279dd12077cdf10eea5358423",
+      "last_commit": "da6c7d5e16959b3dcab39ecc76b0da30b4754985",
+      "last_modified": "2026-07-16"
+    },
+    {
+      "name": "nemo-mbridge-multi-node-slurm",
+      "path": "skills/nemo-mbridge-multi-node-slurm",
+      "content_digest": "sha256:11710e3124e70a3895a3250a10efa4a5fb4a9f40502759a13e1dcf761d2a1407",
+      "last_commit": "e695a8397463bbb64d787b3cd88d3c58889be633",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "nemo-mbridge-perf-activation-recompute",
+      "path": "skills/nemo-mbridge-perf-activation-recompute",
+      "content_digest": "sha256:1fd806cf7bf89ae5b43929b9f1a6a49be2296af56995784b872cc867f8814bec",
+      "last_commit": "d36ff704a11655e4abb0e30ad69c6bfa1b63c1b3",
+      "last_modified": "2026-08-17"
+    },
+    {
+      "name": "nemo-mbridge-perf-cpu-offloading",
+      "path": "skills/nemo-mbridge-perf-cpu-offloading",
+      "content_digest": "sha256:595f7a9b544dd14b011f48639c633d37e17019a375af37599452a62d7f81c05c",
+      "last_commit": "e695a8397463bbb64d787b3cd88d3c58889be633",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "nemo-mbridge-perf-cuda-graphs",
+      "path": "skills/nemo-mbridge-perf-cuda-graphs",
+      "content_digest": "sha256:6a646802006d849bf0eedafe17813ba5d737913f088575db1db3096d2ec0075b",
+      "last_commit": "a0136e5a8ce039b9a88ebdb706636c2872b2d665",
+      "last_modified": "2026-07-09"
+    },
+    {
+      "name": "nemo-mbridge-perf-expert-parallel-overlap",
+      "path": "skills/nemo-mbridge-perf-expert-parallel-overlap",
+      "content_digest": "sha256:03b249c1d41056c6e48845b12294496b16577d913de5140ceac233ba72ff2de6",
+      "last_commit": "eeeff9d8436e757a650bd20e19ae5ef99a177f70",
+      "last_modified": "2026-08-11"
+    },
+    {
+      "name": "nemo-mbridge-perf-hierarchical-context-parallel",
+      "path": "skills/nemo-mbridge-perf-hierarchical-context-parallel",
+      "content_digest": "sha256:b1b5eaa923fff57aa6e51010f9073c03b5d3fcb8a0822ade760506f8c495c2c7",
+      "last_commit": "e695a8397463bbb64d787b3cd88d3c58889be633",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "nemo-mbridge-perf-megatron-fsdp",
+      "path": "skills/nemo-mbridge-perf-megatron-fsdp",
+      "content_digest": "sha256:0bfad6cf5ca7e4acd8fdb0f835de57e08e8318617e370c4ca1fc2d011ad2ead1",
+      "last_commit": "e695a8397463bbb64d787b3cd88d3c58889be633",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "nemo-mbridge-perf-memory-tuning",
+      "path": "skills/nemo-mbridge-perf-memory-tuning",
+      "content_digest": "sha256:bfcab29c7cd9aa424192bb6ac46d0a710375bb86efccc153e85a1de52ceebaa8",
+      "last_commit": "7442a44c8e020fda62ed326006b2026ef0a24fac",
+      "last_modified": "2026-07-01"
+    },
+    {
+      "name": "nemo-mbridge-perf-moe-comm-overlap",
+      "path": "skills/nemo-mbridge-perf-moe-comm-overlap",
+      "content_digest": "sha256:80de714ca996ec6946641a8797ee3a8bfd0e7de6e4d2c02c0771d79a00237f98",
+      "last_commit": "eeeff9d8436e757a650bd20e19ae5ef99a177f70",
+      "last_modified": "2026-08-11"
+    },
+    {
+      "name": "nemo-mbridge-perf-moe-dispatcher-selection",
+      "path": "skills/nemo-mbridge-perf-moe-dispatcher-selection",
+      "content_digest": "sha256:f478ddcf5853fab84bd29cc9a4b57f32ad4282507cfe07ff89ba1b60d9327ec0",
+      "last_commit": "e695a8397463bbb64d787b3cd88d3c58889be633",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "nemo-mbridge-perf-moe-hardware-configs",
+      "path": "skills/nemo-mbridge-perf-moe-hardware-configs",
+      "content_digest": "sha256:69345e6a3615c68633df5b251f14f424eafb075dcb634eac7cc49df3d1d8e0e5",
+      "last_commit": "eeeff9d8436e757a650bd20e19ae5ef99a177f70",
+      "last_modified": "2026-08-11"
+    },
+    {
+      "name": "nemo-mbridge-perf-moe-long-context",
+      "path": "skills/nemo-mbridge-perf-moe-long-context",
+      "content_digest": "sha256:3d754c7238b5e021c6353eee3ffe248ac42c52f27b4575b649b0b904dc41b9d5",
+      "last_commit": "e695a8397463bbb64d787b3cd88d3c58889be633",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "nemo-mbridge-perf-moe-optimization-workflow",
+      "path": "skills/nemo-mbridge-perf-moe-optimization-workflow",
+      "content_digest": "sha256:a647eb74860e4090188b60b9898bf1a732e8fc777135479533e5a48241bfdbc6",
+      "last_commit": "eeeff9d8436e757a650bd20e19ae5ef99a177f70",
+      "last_modified": "2026-08-11"
+    },
+    {
+      "name": "nemo-mbridge-perf-moe-vlm-training",
+      "path": "skills/nemo-mbridge-perf-moe-vlm-training",
+      "content_digest": "sha256:2c5d78a42edacfea92c6a4019894b8227743fea958552f8dc549229ab84cf589",
+      "last_commit": "e695a8397463bbb64d787b3cd88d3c58889be633",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "nemo-mbridge-perf-parallelism-strategies",
+      "path": "skills/nemo-mbridge-perf-parallelism-strategies",
+      "content_digest": "sha256:05a0fe71eb08489074eac9e2e98001b46a8d9acde435664e24fe2bfca7c33df7",
+      "last_commit": "e695a8397463bbb64d787b3cd88d3c58889be633",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "nemo-mbridge-perf-sequence-packing",
+      "path": "skills/nemo-mbridge-perf-sequence-packing",
+      "content_digest": "sha256:caf3b860b34e0fb8996641a2d5b2dac060cab1071b33901e7e49f6b4d7aa4a61",
+      "last_commit": "871e31335a0d7fc84284574feb8426ab70338c41",
+      "last_modified": "2026-08-24"
+    },
+    {
+      "name": "nemo-mbridge-perf-tp-dp-comm-overlap",
+      "path": "skills/nemo-mbridge-perf-tp-dp-comm-overlap",
+      "content_digest": "sha256:a7f9ce9144171770f80e947b32c9b06a4a56a93b915f04e1dbc18d6aad96bf29",
+      "last_commit": "e695a8397463bbb64d787b3cd88d3c58889be633",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "nemo-mbridge-recipe-recommender",
+      "path": "skills/nemo-mbridge-recipe-recommender",
+      "content_digest": "sha256:676698981fc1794a8fea678042f5c7d129fc3ed555ef388ae2ff3937e474424d",
+      "last_commit": "eeeff9d8436e757a650bd20e19ae5ef99a177f70",
+      "last_modified": "2026-08-11"
+    },
+    {
+      "name": "nemo-mbridge-resiliency",
+      "path": "skills/nemo-mbridge-resiliency",
+      "content_digest": "sha256:28de1f96bab2a8941b3bf7385ac71523dc014183c03dc3cc37e60b01a219ede5",
+      "last_commit": "e695a8397463bbb64d787b3cd88d3c58889be633",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "nemo-relay-debug-runtime-integration",
+      "path": "skills/nemo-relay-debug-runtime-integration",
+      "content_digest": "sha256:1f770899d00ce6940090cefeaba679c91e44667b61505b2841c177d2ce7acc01",
+      "last_commit": "e3796e4d6f3a64854a4e24139036dd56215c8d43",
+      "last_modified": "2026-07-30"
+    },
+    {
+      "name": "nemo-relay-get-started",
+      "path": "skills/nemo-relay-get-started",
+      "content_digest": "sha256:6c8b75a699b43af661522be5e6ab700a233fbd4da135172cece1ed1d5b0dd314",
+      "last_commit": "871e31335a0d7fc84284574feb8426ab70338c41",
+      "last_modified": "2026-08-24"
+    },
+    {
+      "name": "nemo-relay-install",
+      "path": "skills/nemo-relay-install",
+      "content_digest": "sha256:771899e09fb4a1bc9e457b00da4dafc9b64ee56a75d757886187dec853da7394",
+      "last_commit": "31bd53822c1ac5998a23bd5f7c9efb5aefe99ca2",
+      "last_modified": "2026-07-17"
+    },
+    {
+      "name": "nemo-relay-instrument-calls",
+      "path": "skills/nemo-relay-instrument-calls",
+      "content_digest": "sha256:a7e167bae6c585de378b4da4ba63b44eea4ad147de5f35dea27a86467f92f516",
+      "last_commit": "31bd53822c1ac5998a23bd5f7c9efb5aefe99ca2",
+      "last_modified": "2026-07-17"
+    },
+    {
+      "name": "nemo-relay-instrument-context-isolation",
+      "path": "skills/nemo-relay-instrument-context-isolation",
+      "content_digest": "sha256:04d8bbaa37df3540b17b0469e5858ce89e7af40dbe4bca6881956cc696ec7125",
+      "last_commit": "31bd53822c1ac5998a23bd5f7c9efb5aefe99ca2",
+      "last_modified": "2026-07-17"
+    },
+    {
+      "name": "nemo-relay-instrument-typed-wrappers",
+      "path": "skills/nemo-relay-instrument-typed-wrappers",
+      "content_digest": "sha256:40decbdaac085d94a2f4bef7e03812dc1c7fa641322b211d44c6f941ebaf3418",
+      "last_commit": "31bd53822c1ac5998a23bd5f7c9efb5aefe99ca2",
+      "last_modified": "2026-07-17"
+    },
+    {
+      "name": "nemo-relay-migrate-from-flow",
+      "path": "skills/nemo-relay-migrate-from-flow",
+      "content_digest": "sha256:a8ed03bb869d234e041e9cf53a1b1943febd76036af56f0fc97d041db642902a",
+      "last_commit": "fa165e1bdf22c94a7552e80476668dca8c6fb14d",
+      "last_modified": "2026-08-13"
+    },
+    {
+      "name": "nemo-relay-plugin-adaptive-tuning",
+      "path": "skills/nemo-relay-plugin-adaptive-tuning",
+      "content_digest": "sha256:13eae663a4ffe2ce45e64b9efd958131da7c4bd5452a5fc512ac39338c3ce4f7",
+      "last_commit": "31bd53822c1ac5998a23bd5f7c9efb5aefe99ca2",
+      "last_modified": "2026-07-17"
+    },
+    {
+      "name": "nemo-relay-plugin-build",
+      "path": "skills/nemo-relay-plugin-build",
+      "content_digest": "sha256:7cb5056cc8291fdb009b371659f184bcc3935574dcf796f24ec60f7bd10c7a11",
+      "last_commit": "9333f376065b7ccc9f22b93e0d218ba6740cda9d",
+      "last_modified": "2026-08-12"
+    },
+    {
+      "name": "nemo-relay-plugin-observability",
+      "path": "skills/nemo-relay-plugin-observability",
+      "content_digest": "sha256:d5708d36174380dc24f5408c898f7a92d83edff61f69ff847664abe3e6733279",
+      "last_commit": "e3796e4d6f3a64854a4e24139036dd56215c8d43",
+      "last_modified": "2026-07-30"
+    },
+    {
+      "name": "nemo-retriever",
+      "path": "skills/nemo-retriever",
+      "content_digest": "sha256:4e3b83d18361842fe98cae8e34f935087db659a053be90d4431fa6e0f4f37837",
+      "last_commit": "46293cb1dcc3b6984f1569cf8d819a387d5a9916",
+      "last_modified": "2026-09-11"
+    },
+    {
+      "name": "nemo-retriever-mcp",
+      "path": "skills/nemo-retriever-mcp",
+      "content_digest": "sha256:61aa1e05217f2f8cf25a4da925853d20be758a0a0c8c19a7cfa7e72c1597bec0",
+      "last_commit": "4b64e3cfdb359e7e4ce0644460566800c1f03d55",
+      "last_modified": "2026-09-12"
+    },
+    {
+      "name": "nemo-rl-auto-research",
+      "path": "skills/nemo-rl-auto-research",
+      "content_digest": "sha256:328acbb4e91f008dadf78508a64305882e4ee7a311f090f85282b742fbe9261a",
+      "last_commit": "6fb5c4ec2284422d80191c35f792c6554f3a37a1",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "nemo-rl-brev-etiquette",
+      "path": "skills/nemo-rl-brev-etiquette",
+      "content_digest": "sha256:68085a54447a5beacb325b7627d0b4cdf1ec229d354212f4ca0be90a03b7eeb7",
+      "last_commit": "6fb5c4ec2284422d80191c35f792c6554f3a37a1",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "nemo-rl-docs",
+      "path": "skills/nemo-rl-docs",
+      "content_digest": "sha256:3ccd117d7637cede5f533f7692bc01a26b521ffc37965de2a70d9bc5664fd784",
+      "last_commit": "6fb5c4ec2284422d80191c35f792c6554f3a37a1",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "nemo-rl-session-memory",
+      "path": "skills/nemo-rl-session-memory",
+      "content_digest": "sha256:f8890a8bbddb94c7edf829f13d93804757fdfc08524eef641e2e54c6693aee8c",
+      "last_commit": "6fb5c4ec2284422d80191c35f792c6554f3a37a1",
+      "last_modified": "2026-06-02"
+    },
+    {
+      "name": "nemoclaw-user-guide",
+      "path": "skills/nemoclaw-user-guide",
+      "content_digest": "sha256:509865b8a0886f644699e9e9d8cd44372bc6165098db5c5f6e441d2783c65205",
+      "last_commit": "f64fa0e6135231263745114752084785bc3e1beb",
+      "last_modified": "2026-07-17"
+    },
+    {
+      "name": "nemotron-asr-finetune",
+      "path": "skills/nemotron-asr-finetune",
+      "content_digest": "sha256:73ac45ea58271b09cb419b4a75fa8b271f32966383e29be21c460609b4144743",
+      "last_commit": "a5a01eb1c6d8dc515a38060b019f7e19f9b0ef8f",
+      "last_modified": "2026-09-16"
+    },
+    {
+      "name": "nemotron-customize",
+      "path": "skills/nemotron-customize",
+      "content_digest": "sha256:f16a9a99a03feb16c48cf7243210b1b0031badfce1a4cebf974563dee4ebce65",
+      "last_commit": "55d907bb3bc8e14acb4e8fe4f13e58b25a4f7920",
+      "last_modified": "2026-06-04"
+    },
+    {
+      "name": "nemotron-policy-generator",
+      "path": "skills/nemotron-policy-generator",
+      "content_digest": "sha256:4daa5fb60569181c9b9a05177336ad8c23a1d7ae50b271864008df490ffa5803",
+      "last_commit": "55d907bb3bc8e14acb4e8fe4f13e58b25a4f7920",
+      "last_modified": "2026-06-04"
+    },
+    {
+      "name": "nemotron-retrieval-recipes",
+      "path": "skills/nemotron-retrieval-recipes",
+      "content_digest": "sha256:5a0c4af340956c9e11d20d072a30d6a1f00e68cc70e14e101d4cf588a9e7e15d",
+      "last_commit": "da6c7d5e16959b3dcab39ecc76b0da30b4754985",
+      "last_modified": "2026-07-16"
+    },
+    {
+      "name": "nemotron-speech",
+      "path": "skills/nemotron-speech",
+      "content_digest": "sha256:a24370802c3cf9dfdf830204ac93b862f20831d7c6d4c7351f88c64cd627de83",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "nemotron-voice-agent-builder",
+      "path": "skills/nemotron-voice-agent-builder",
+      "content_digest": "sha256:8ad59efc61e90d1f9c8df6925f7e89edf142139cebd8142537f77afbd7a82c0f",
+      "last_commit": "6edc3fc88fe761649bd89393a290c1a3cfa62b6d",
+      "last_modified": "2026-09-23"
+    },
+    {
+      "name": "nv-generate-ct-rflow",
+      "path": "skills/nv-generate-ct-rflow",
+      "content_digest": "sha256:a91579e7f4643eeb7fe6230d214a2d5d37c514687a3f1f9ca164a01be90305a5",
+      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
+      "last_modified": "2026-07-08"
+    },
+    {
+      "name": "nv-generate-mr",
+      "path": "skills/nv-generate-mr",
+      "content_digest": "sha256:a09025df5bc7d03677a9f561290935604e30fc3539c409f2c7037ee0351e2849",
+      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
+      "last_modified": "2026-07-08"
+    },
+    {
+      "name": "nv-generate-mr-brain",
+      "path": "skills/nv-generate-mr-brain",
+      "content_digest": "sha256:48c8efaa8609232389e58a10606d76676168b3c07da4ee76390ffc390bd3128a",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "nv-generate-mr-brain-finetune",
+      "path": "skills/nv-generate-mr-brain-finetune",
+      "content_digest": "sha256:6075d9d579124650d221075a68e4c5da0c1c4c6e584a04ab17df28817d68cfd8",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "nv-generate-vae-finetune",
+      "path": "skills/nv-generate-vae-finetune",
+      "content_digest": "sha256:437e6a4d234d45687ad9898228f671de2c4115eec204186003a7b73780c9fbfe",
+      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
+      "last_modified": "2026-07-08"
+    },
+    {
+      "name": "nv-reason-ct",
+      "path": "skills/nv-reason-ct",
+      "content_digest": "sha256:e89cd4d3a7c600ee2cc8108b578c7c9cd915d7b0f99f14904417c5df52d9f1e2",
+      "last_commit": "74d4e064fc56ed6a5271fda7d184a1e6e0ded0b6",
+      "last_modified": "2026-09-29"
+    },
+    {
+      "name": "nv-reason-cxr",
+      "path": "skills/nv-reason-cxr",
+      "content_digest": "sha256:27ddb44fe12a516fd9bc6eff284e143dbc206be870dca0f45c98f2a6c37c2914",
+      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
+      "last_modified": "2026-07-08"
+    },
+    {
+      "name": "nv-segment-ct",
+      "path": "skills/nv-segment-ct",
+      "content_digest": "sha256:1d2bcdce3fe45c3015a4e2f3b5add25deb1e201c6e3d447dc317e41d6f5d31fc",
+      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
+      "last_modified": "2026-07-08"
+    },
+    {
+      "name": "nv-segment-ct-finetune",
+      "path": "skills/nv-segment-ct-finetune",
+      "content_digest": "sha256:1d2971649d78d1d233b9efc770d61eb3a5acd5d600fd259e6b9fc7b9d8b2a67f",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "nv-segment-ctmr",
+      "path": "skills/nv-segment-ctmr",
+      "content_digest": "sha256:299426367dc8ac392b3d35e5aab31fb536b78fb1605b2372da8acdbb8e581016",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "nvflare-autofl",
+      "path": "skills/nvflare-autofl",
+      "content_digest": "sha256:56a440a829563823c6691a24d40264b68cd27bacfd654c88c33c7daa8a771930",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-autofl-report",
+      "path": "skills/nvflare-autofl-report",
+      "content_digest": "sha256:df3e310c28d4b7a45622334dd7d710736cdd004ff3afbfcde5fd2aadca56dfe2",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-convert-huggingface",
+      "path": "skills/nvflare-convert-huggingface",
+      "content_digest": "sha256:8dfdd1749879e2e4260539f51cceffab7693e66deadadb35cbaf46457e47c00a",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-convert-lightning",
+      "path": "skills/nvflare-convert-lightning",
+      "content_digest": "sha256:80b642eddbf89d493b21f50017562a3a01d477498f5ef804086b2a3b6f45dba8",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-convert-pytorch",
+      "path": "skills/nvflare-convert-pytorch",
+      "content_digest": "sha256:a39624c4438324f62f80b32e731843d0e25885e26ca8ea948da488f0f0cfaa55",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-diagnose-job",
+      "path": "skills/nvflare-diagnose-job",
+      "content_digest": "sha256:5c40476d6e3f3b6e9fe4b1e3b5a996ceb71f76e499b4e286a70123decaa54785",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-fed-stats",
+      "path": "skills/nvflare-fed-stats",
+      "content_digest": "sha256:26dcb728e5b0fb6f31572ad1de0c33c2fda19747e0992b1e21aba542a3de7dba",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-orient",
+      "path": "skills/nvflare-orient",
+      "content_digest": "sha256:853ba8a64c84cf27694fd5ea2ed39cfd6262539c8c8c88e952e5b92f016644ba",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvflare-shared",
+      "path": "skills/nvflare-shared",
+      "content_digest": "sha256:ea8b3b84962cda04f54ec362139076c68dc585d7156440ad2c176ba38cb531b4",
+      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
+      "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvidia-app",
+      "path": "skills/nvidia-app",
+      "content_digest": "sha256:16617cd658188b4554e9dbcc9a56eac85d6c09d374e970750e3940a614b6a019",
+      "last_commit": "85ad8571bd181d61fe8ba0102ea83ddfe31c20c9",
+      "last_modified": "2026-10-02"
+    },
+    {
+      "name": "nvidia-broadcast",
+      "path": "skills/nvidia-broadcast",
+      "content_digest": "sha256:1dcc05b987f877909c0a2b2a01ea024e7730f11e6537de8bd0af24d41584811e",
+      "last_commit": "a58506c6426092e02cd5a399b1d11cc235cfe172",
+      "last_modified": "2026-10-02"
+    },
+    {
+      "name": "nvidia-skill-finder",
+      "path": "skills/nvidia-skill-finder",
+      "content_digest": "sha256:da43951c0c8c69da5622f5299055228c70bc6345273e7869f3c59acb92af8310",
+      "last_commit": "13a0ce1d97a350e2a7c6d0ca82fea37d293af625",
+      "last_modified": "2026-10-01"
+    },
+    {
+      "name": "omniverse-cad-to-simready",
+      "path": "skills/omniverse-cad-to-simready",
+      "content_digest": "sha256:d04ef24c0c75416299ac484d324f3b450bec8f9976fe27d607b9e558ea30d8c0",
+      "last_commit": "ff7a9a96a123e3c50748e04953e085b4c0cc1075",
+      "last_modified": "2026-09-01"
+    },
+    {
+      "name": "omniverse-realtime-viewer",
+      "path": "skills/omniverse-realtime-viewer",
+      "content_digest": "sha256:985cd3fe6532b1090e97120596a17899d9c1e66e37878c6f5de3c3cdc04babb1",
+      "last_commit": "964fc48cee05057c30f88e133a31c3835e461915",
+      "last_modified": "2026-08-20"
+    },
+    {
+      "name": "omniverse-usd-performance-tuning",
+      "path": "skills/omniverse-usd-performance-tuning",
+      "content_digest": "sha256:14507580e1707c9664401775d5d2c3b3ec8e2f8e80e3926efc6e9af440b4ed86",
+      "last_commit": "afbce3f428130e0b5753d4553a8826cba1a42d30",
+      "last_modified": "2026-08-24"
+    },
+    {
+      "name": "paidf-augmentation",
+      "path": "skills/paidf-augmentation",
+      "content_digest": "sha256:8a3e72da19f22eba091409b6f1748dbe7d2a4eb41965cd26db56fe9e71e829f8",
+      "last_commit": "bc6adc00d7c75447733d359b9d4ac75881bb9b3c",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "paidf-auto-labeling",
+      "path": "skills/paidf-auto-labeling",
+      "content_digest": "sha256:44a8afdcbc425705b6beb483d5676175d25ca0a6168cb651676b74a372c9629a",
+      "last_commit": "d9c6f907a6e27063a1946a6d464eddf157f703be",
+      "last_modified": "2026-09-16"
+    },
+    {
+      "name": "paidf-cosmos-predict",
+      "path": "skills/paidf-cosmos-predict",
+      "content_digest": "sha256:695ce48a8e997ef8dad9a8b66171f77456cd4a5e08b2564a51513ba24628311b",
+      "last_commit": "7a90aad14dae821f704abd315bd4c5ca1dd7c107",
+      "last_modified": "2026-09-29"
+    },
+    {
+      "name": "paidf-curation-and-retrieval",
+      "path": "skills/paidf-curation-and-retrieval",
+      "content_digest": "sha256:b6895349b8b8a9a676cabb9c3ce8a843af55ce5294b427c0435bf5c2624a1e2b",
+      "last_commit": "d9c6f907a6e27063a1946a6d464eddf157f703be",
+      "last_modified": "2026-09-16"
+    },
+    {
+      "name": "paidf-orchestration-setup",
+      "path": "skills/paidf-orchestration-setup",
+      "content_digest": "sha256:fbe9150428018ef15b4cf5874b3f03789a3a8ea86b8fd0c07a4e6889991d52dc",
+      "last_commit": "1e08e5b597ef6847e79041f3f4dc86887155ab69",
+      "last_modified": "2026-09-02"
+    },
+    {
+      "name": "paidf-orchestration-write-dag",
+      "path": "skills/paidf-orchestration-write-dag",
+      "content_digest": "sha256:21dc1399456096c56ba7d1dad51f1a1c29ee38088a8ee8f03b7f00b4a8b21d46",
+      "last_commit": "1e08e5b597ef6847e79041f3f4dc86887155ab69",
+      "last_modified": "2026-09-02"
+    },
+    {
+      "name": "physical-ai-defect-image-generation",
+      "path": "skills/physical-ai-defect-image-generation",
+      "content_digest": "sha256:bef6d9992cb1b5ada7f16f5e6a5beb03ea0456fe4b8b337c15caea76e2cd28f1",
+      "last_commit": "5a9da9bbffff4fab04cd8f7e59cdf7dddf951c0b",
+      "last_modified": "2026-06-23"
+    },
+    {
+      "name": "physical-ai-event-video-generation",
+      "path": "skills/physical-ai-event-video-generation",
+      "content_digest": "sha256:7215677b4671cdac27e1e8644acaccde089c2d545ae7b8ade2ed3492f96f2eb1",
+      "last_commit": "1e08e5b597ef6847e79041f3f4dc86887155ab69",
+      "last_modified": "2026-09-02"
+    },
+    {
+      "name": "physical-ai-image-attribute-augmentation",
+      "path": "skills/physical-ai-image-attribute-augmentation",
+      "content_digest": "sha256:92c2af68bddbf020ede6cdcc956462d11e769378a2f9d7924d0c852264ceea96",
+      "last_commit": "1e08e5b597ef6847e79041f3f4dc86887155ab69",
+      "last_modified": "2026-09-02"
+    },
+    {
+      "name": "physical-ai-infrastructure-setup-and-resilient-scaling",
+      "path": "skills/physical-ai-infrastructure-setup-and-resilient-scaling",
+      "content_digest": "sha256:cffb0f4e223df78d64823f6f31bee1b78e312c61feec804bb69c51ccb44b88d8",
+      "last_commit": "6c6fc092703624a6ce66af814d9ec91d20930885",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "physical-ai-neural-reconstruction",
+      "path": "skills/physical-ai-neural-reconstruction",
+      "content_digest": "sha256:be55a248effc47dcea5beb5ed36d09467463f6fccadc8d35947c68799882d3d8",
+      "last_commit": "fa2ad210b810c36675136798ac9b23625da4b92f",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "physical-ai-video-data-augmentation",
+      "path": "skills/physical-ai-video-data-augmentation",
+      "content_digest": "sha256:f47ec19b735b98ed47fef1fad8c81424ff0954d92bac210a48b752ad34572962",
+      "last_commit": "7442a44c8e020fda62ed326006b2026ef0a24fac",
+      "last_modified": "2026-07-01"
+    },
+    {
+      "name": "physicsnemo-discover",
+      "path": "skills/physicsnemo-discover",
+      "content_digest": "sha256:0ae9831fa7d14a33ab39c689587fb217dfa901d6b5eeeea16f634fd9c6f8f19d",
+      "last_commit": "416539cb3ce46f17706072b1571369c11bd1a49e",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "physicsnemo-shard-tensor",
+      "path": "skills/physicsnemo-shard-tensor",
+      "content_digest": "sha256:15feecf4a1369303a38311b2b4c06d6b918e01a155714dd2ad895ffeba410d1b",
+      "last_commit": "35765104a48bc08d400e6f7d592c129967f4dd40",
+      "last_modified": "2026-08-06"
+    },
+    {
+      "name": "portfolio-optimization",
+      "path": "skills/portfolio-optimization",
+      "content_digest": "sha256:317052325fa8809753ac9c6f4b015f21d639fcf13c19b996f52793ba8aca1601",
+      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
+      "last_modified": "2026-09-15"
+    },
+    {
+      "name": "rag-blueprint",
+      "path": "skills/rag-blueprint",
+      "content_digest": "sha256:6a577e9d45945709e708c643eef89b236f1defaa965b8c5bef73b1ace699d944",
+      "last_commit": "baabfcb579e780282f4862f99fb985cb48dad463",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "rag-eval",
+      "path": "skills/rag-eval",
+      "content_digest": "sha256:ab129fb638d38b8c9edf8e2f40c3044ea3423c3b4dbf5a984805d87c892f299f",
+      "last_commit": "baabfcb579e780282f4862f99fb985cb48dad463",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "rag-perf",
+      "path": "skills/rag-perf",
+      "content_digest": "sha256:9aed5810be1f2b731f1afb8642b82ac5eec082e46f27fa83320f3e5e1b85cbc8",
+      "last_commit": "baabfcb579e780282f4862f99fb985cb48dad463",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "rtvi-cv-customize-model",
+      "path": "skills/rtvi-cv-customize-model",
+      "content_digest": "sha256:c3def8bacf1f8256208a5dac4b2cf8a816ec455f9d880682167f490aa28a5783",
+      "last_commit": "a8ca7bc1ddc433e91520892b087c5a704e34fdb2",
+      "last_modified": "2026-08-12"
+    },
+    {
+      "name": "rtvi-cv-scaffold-vss-service",
+      "path": "skills/rtvi-cv-scaffold-vss-service",
+      "content_digest": "sha256:852e4d07baccc1904e37b86cd785150fdddf4cba5d8b03494e7fd48d881caec6",
+      "last_commit": "a8ca7bc1ddc433e91520892b087c5a704e34fdb2",
+      "last_modified": "2026-08-12"
+    },
+    {
+      "name": "rtvi-vlm-customize-model",
+      "path": "skills/rtvi-vlm-customize-model",
+      "content_digest": "sha256:ea921150e46787becbdec287e241889fd039e2e8b2e135dfdd5cef2aa6307df1",
+      "last_commit": "a8ca7bc1ddc433e91520892b087c5a704e34fdb2",
+      "last_modified": "2026-08-12"
+    },
+    {
+      "name": "rtx-remix-modding",
+      "path": "skills/rtx-remix-modding",
+      "content_digest": "sha256:8e8edfeda9cf72834ad05ad77139fff873f967ae7bb148bbdfd60211517c460f",
+      "last_commit": "00b4ec809609c81d5991210b8e2b53c10c1b1a78",
+      "last_modified": "2026-09-23"
+    },
+    {
+      "name": "skill-card-generator",
+      "path": "skills/skill-card-generator",
+      "content_digest": "sha256:975d38ea360319d933276ad84e66e898b47472e16e70e9643741866e2a8e5860",
+      "last_commit": "2a23a9027a17e46f15b7d7ee9f6371ab03357c53",
+      "last_modified": "2026-07-01"
+    },
+    {
+      "name": "tao-analyze-changenet-rca",
+      "path": "skills/tao-analyze-changenet-rca",
+      "content_digest": "sha256:70f5d20765a475b89d0e4040293838c11bfb61e9d931bd264bf392df558d7b69",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-analyze-detection-kpi",
+      "path": "skills/tao-analyze-detection-kpi",
+      "content_digest": "sha256:0adf00c9011bbf87d8305c9269e6df538302aceeec6cddc8b49f8753726b52ed",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-analyze-gaps-od-map",
+      "path": "skills/tao-analyze-gaps-od-map",
+      "content_digest": "sha256:68b390e27514caf618792c73a34f24b16eeae8f7daf744d766b7df38c5a7ce65",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-analyze-gaps-visual-changenet",
+      "path": "skills/tao-analyze-gaps-visual-changenet",
+      "content_digest": "sha256:2cd0bb1456e354dfc67bcf73f36b79bdf79b6c457ebebb96a2bc39381865b08b",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-analyze-gaps-vlm-bcq",
+      "path": "skills/tao-analyze-gaps-vlm-bcq",
+      "content_digest": "sha256:f9c3f0030c50f349ae7901bee6f839b8111d6b6c2a51285db4a55de494d6b102",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-artifacts",
+      "path": "skills/tao-artifacts",
+      "content_digest": "sha256:8ff6b044e3020eb5c559bbb22859ee2fd28c3a62b41cf6065647b4b15e33c342",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-convert-dataset-format",
+      "path": "skills/tao-convert-dataset-format",
+      "content_digest": "sha256:0228c2d07e090e302e83906278390ed1bce64c1210a5cfd8d2b5de52db0e14fa",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-data-io",
+      "path": "skills/tao-data-io",
+      "content_digest": "sha256:64cff0cd0d29b0ce54cd8ee344eb7631e9946ecda3abf3f789bfa2b7cb1c7ea3",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-finetune-clip",
+      "path": "skills/tao-finetune-clip",
+      "content_digest": "sha256:9d379d37f42261db0e25267c9d3cf040820c51f23f7af34d18facd7cabf23597",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-finetune-cosmos-embed",
+      "path": "skills/tao-finetune-cosmos-embed",
+      "content_digest": "sha256:db00655784561c75b4bbb077456e02a8700cfeaf32940e33dd8c4c3c65db9c23",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-finetune-cosmos-reason",
+      "path": "skills/tao-finetune-cosmos-reason",
+      "content_digest": "sha256:476ec246b942039faea4c623c32329f081f12e63fbeacdbb6d5ec7078ad9334f",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-finetune-huggingface-model",
+      "path": "skills/tao-finetune-huggingface-model",
+      "content_digest": "sha256:f8f8e5536ba3a4837b5b10a7cfaa95c5b2c74271ce980f4b55caf5a978361107",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-finetune-nv-tesseract-ad-diffusion",
+      "path": "skills/tao-finetune-nv-tesseract-ad-diffusion",
+      "content_digest": "sha256:bbc8a67847b06e20763f63ba17e2610d4551b7be653c2d916f1c0cc2299c98ed",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-finetune-nv-tesseract-forecasting",
+      "path": "skills/tao-finetune-nv-tesseract-forecasting",
+      "content_digest": "sha256:1ddb0308a64e4e3d3eb3904aedf1287cb2825f7a924129dafba899b6cadffc76",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-finetune-video-clip",
+      "path": "skills/tao-finetune-video-clip",
+      "content_digest": "sha256:ee5af30995d0624c7c93027a20790275656fe974d787938d95e8cb0e74352197",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-generate-anomalies",
+      "path": "skills/tao-generate-anomalies",
+      "content_digest": "sha256:4c09bc2187f9e5eb53eb4fd69a7419b14027323db57aab462dd048f4c34a1bd9",
+      "last_commit": "7a90aad14dae821f704abd315bd4c5ca1dd7c107",
+      "last_modified": "2026-09-29"
+    },
+    {
+      "name": "tao-generate-image-embeddings",
+      "path": "skills/tao-generate-image-embeddings",
+      "content_digest": "sha256:53dfd48f317a44f0c2cea9dd40da776774ac5726d762b2e2f82cf203717deb52",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-generate-image-grounding",
+      "path": "skills/tao-generate-image-grounding",
+      "content_digest": "sha256:e4d0367cdaec08676c7ce7a9e382553336252b087e4426dad0896de7fec4220e",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-generate-referring-expressions",
+      "path": "skills/tao-generate-referring-expressions",
+      "content_digest": "sha256:58c578b62cd24d98e05f0c772809d768fe48df6affbd88e26411345249a9dd3d",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-generate-video-reasoning-annotations",
+      "path": "skills/tao-generate-video-reasoning-annotations",
+      "content_digest": "sha256:dd6d5a61e02e9f9ce7cef8cfb44587f325dc3754aa98d242f0a222cf0934aa93",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-launch-workflow",
+      "path": "skills/tao-launch-workflow",
+      "content_digest": "sha256:de0780b7d3b1c405925e6ce8fc99a100c6429dd88432316cc211487cbc2dca27",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-list-capabilities",
+      "path": "skills/tao-list-capabilities",
+      "content_digest": "sha256:0ec47fbe905da3463a3bdc16235b2e4ae1650f7dcf17842d40d5d0ff3bb05b69",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-mine-aoi-images",
+      "path": "skills/tao-mine-aoi-images",
+      "content_digest": "sha256:7472d901411c31927fa32505331c12cea28b34dfa7ad0e9dad5e8bd54c87933d",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-mine-nearest-neighbors",
+      "path": "skills/tao-mine-nearest-neighbors",
+      "content_digest": "sha256:88028c49d3989800d009523cd264a5c7b5a2da6894966ea7013e378fa59f8db1",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-mine-od-images",
+      "path": "skills/tao-mine-od-images",
+      "content_digest": "sha256:36b02384438d3ee544bec23553679e1a6c16f587a20748acd01b44f457ca82a4",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-port-huggingface-model",
+      "path": "skills/tao-port-huggingface-model",
+      "content_digest": "sha256:a8a950f2eb6e4d1e92910eccf8f6baff183f9e0ab423f7e017d1f6ad87ce835f",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-route-visual-changenet-samples",
+      "path": "skills/tao-route-visual-changenet-samples",
+      "content_digest": "sha256:c6a287b2ae472352e77225bcefe6cb902eeacab10c934053bbc06efddb4441bb",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-automl",
+      "path": "skills/tao-run-automl",
+      "content_digest": "sha256:8bf8b185034a51343e9a5c7541100a423085ea13084abe540164ad8f0aa9774e",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-automl-deft-pipeline",
+      "path": "skills/tao-run-automl-deft-pipeline",
+      "content_digest": "sha256:42ed16334a23bc7726feeb54cb56fb08a67b55156410bcbbe0333ad9bdc0ccb1",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-deft-aoi",
+      "path": "skills/tao-run-deft-aoi",
+      "content_digest": "sha256:d46b5dc42ec897874fa8c34bd4abfdf8734bad304940205064205ae1d533c053",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-deft-aoi-cosmos3",
+      "path": "skills/tao-run-deft-aoi-cosmos3",
+      "content_digest": "sha256:ab81b4b4215bcf91a40bc21937f883698ebbfb857a524e77e6529ffcb3ced7b4",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-deft-cr-its-mining",
+      "path": "skills/tao-run-deft-cr-its-mining",
+      "content_digest": "sha256:3dc7cfddfdcb75fde82f3d5f49ae48a1c9fc94dd3ee1048a6a48c27a88b1c1ba",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-deft-object-detection",
+      "path": "skills/tao-run-deft-object-detection",
+      "content_digest": "sha256:6c409089f01ac7908c99e12705eb806fa9c3855af8ab7c507e2f5bdb534ef927",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-deft-pas",
+      "path": "skills/tao-run-deft-pas",
+      "content_digest": "sha256:8f3cf53d813742417a88c0081b146628071eee4976fdd931b6bfb3f370bd279f",
+      "last_commit": "7a90aad14dae821f704abd315bd4c5ca1dd7c107",
+      "last_modified": "2026-09-29"
+    },
+    {
+      "name": "tao-run-inference-service",
+      "path": "skills/tao-run-inference-service",
+      "content_digest": "sha256:45bf9d277eb91ed9e50426a595e6fd6f133bc3986868a440256932f159807bcc",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-on-brev",
+      "path": "skills/tao-run-on-brev",
+      "content_digest": "sha256:d169af3f9614017498c74f90429f4eae3043e47c82ce3a07fc3ac38aa27f6a36",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-on-docker",
+      "path": "skills/tao-run-on-docker",
+      "content_digest": "sha256:ad3b427b884a3aa8dd6977c2a804f84577d33013d1784d66523f87db52aa3085",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-on-kubernetes",
+      "path": "skills/tao-run-on-kubernetes",
+      "content_digest": "sha256:db87bc6e9f55955e00a5b0b4c6361117d82e1b9a3b54040bd0061c5da80a1247",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-on-slurm",
+      "path": "skills/tao-run-on-slurm",
+      "content_digest": "sha256:ea09d10330f7be7ef6495d2254f8418513f85ce3c91560eb6bf15044578a28e7",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-on-virtualenv",
+      "path": "skills/tao-run-on-virtualenv",
+      "content_digest": "sha256:bbcd22a5dd9d0d7b859dcbf656b03089d4ddbb90d9547da5ea83366604f31747",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-setup",
+      "path": "skills/tao-setup",
+      "content_digest": "sha256:3854983ff5091dc243d61226d47d85b561878e9e90282c3a677e6905ade785b7",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-setup-nvidia-gpu-host",
+      "path": "skills/tao-setup-nvidia-gpu-host",
+      "content_digest": "sha256:68fd2700673c83f5213e2589657a6d82f742c820f570d8c369b52855750493f4",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-action-recognition",
+      "path": "skills/tao-train-action-recognition",
+      "content_digest": "sha256:67c067497e0eb2cc923abba231e7151b6e405aeb5279d457a0bbffe0517ba13b",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-bevfusion",
+      "path": "skills/tao-train-bevfusion",
+      "content_digest": "sha256:7f50c7ae49f570621d751beebfe26477c6c5210fc52fc286e32c4fa86078a017",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-centerpose",
+      "path": "skills/tao-train-centerpose",
+      "content_digest": "sha256:265ff41f8d4143e45dcf68755e3772f5c6564201d19a648605172a5db073c67f",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-codetr",
+      "path": "skills/tao-train-codetr",
+      "content_digest": "sha256:c22971693c2f1d9374a95f59f0e21fdac460e4053f785115ed587d8ad31b83bc",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-deformable-detr",
+      "path": "skills/tao-train-deformable-detr",
+      "content_digest": "sha256:dba25a435f196ef96d7aa96f5200478dfb041e453a3977b090583a125460cd5b",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-depth-anything-v2",
+      "path": "skills/tao-train-depth-anything-v2",
+      "content_digest": "sha256:1e365f536a18754ea2f45ba653a008cdc975afaa73ef7855bd59613e076c2ab9",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-dino",
+      "path": "skills/tao-train-dino",
+      "content_digest": "sha256:6f549a037c2be606705520cb176f51ead94bb4a1f4c180fd6c04f386e36fa90b",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-dinov3",
+      "path": "skills/tao-train-dinov3",
+      "content_digest": "sha256:69aa337637065506845e6d1a5962a7b70bb84eccb6d4af657ffb2b6454d03e73",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-fast-foundation-stereo",
+      "path": "skills/tao-train-fast-foundation-stereo",
+      "content_digest": "sha256:23947847a488c67c8c6db48ab2fdc2a15e5df9e2040942c3cbb7accc43345d6e",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-foundation-stereo",
+      "path": "skills/tao-train-foundation-stereo",
+      "content_digest": "sha256:d9f3d8100b2270bd7f697f02f0b11fb9edc60f51b7b83136d88bfa7adf6bcea3",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-grounding-dino",
+      "path": "skills/tao-train-grounding-dino",
+      "content_digest": "sha256:51ae3b045434beb449d9c5feefe017a99bd8f094144b432077b844a9b8e535e0",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-image-classification",
+      "path": "skills/tao-train-image-classification",
+      "content_digest": "sha256:1a987fd8d58e3216284ffb684f999f2468985bcb969efdaaebcdf7bad07d700c",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-mask-auto-encoder",
+      "path": "skills/tao-train-mask-auto-encoder",
+      "content_digest": "sha256:04bf72f5dc894af343e7287d44a04d6323553246475cecd635af48781b3ab6d0",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-mask-auto-label",
+      "path": "skills/tao-train-mask-auto-label",
+      "content_digest": "sha256:9ee38b0a491335024be814ab82a53714cdcab3a12fa1b694baf36058953bb44e",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-mask-grounding-dino",
+      "path": "skills/tao-train-mask-grounding-dino",
+      "content_digest": "sha256:a674f0f2debded598d8442b98c4005cc9f734fc4e1fce2f26e26a7726703832c",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-mask2former",
+      "path": "skills/tao-train-mask2former",
+      "content_digest": "sha256:5b78f5a83c07e1284e6ce87159992e9259fb5e0b02bc8dc11a33646d2172f83a",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-metric-learning-recognition",
+      "path": "skills/tao-train-metric-learning-recognition",
+      "content_digest": "sha256:916da495062ab56cb0596285131cfb4952f20d7f76d00165056d0cec4a6569f4",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-nvdinov2",
+      "path": "skills/tao-train-nvdinov2",
+      "content_digest": "sha256:3fe36027ba089869c98b8f6da6ecaa139dff4dddfef8479e88a14d08c85b03c7",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-nvpanoptix3d",
+      "path": "skills/tao-train-nvpanoptix3d",
+      "content_digest": "sha256:5cff6a88a784492a29258167b1ccf962f0f23405ae10feb5ec538d67df69d56c",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-ocdnet",
+      "path": "skills/tao-train-ocdnet",
+      "content_digest": "sha256:e38380c8260a6e8dfbd0bea6e9d3a4c2f19057525e94bf7172a5bd3920af4c6b",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-ocrnet",
+      "path": "skills/tao-train-ocrnet",
+      "content_digest": "sha256:7101b33dff0ca9940d566c0b761bfff7744d1f34ba8410a392fdba82a8834bcc",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-oneformer",
+      "path": "skills/tao-train-oneformer",
+      "content_digest": "sha256:d5838d8098391e1ada2c7d6d3d028edf70843af3c809fdf89877421cd1f9b03e",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-optical-inspection",
+      "path": "skills/tao-train-optical-inspection",
+      "content_digest": "sha256:912b4cdf9958d95f2e92dffb420cc97e33656f40b16d7027ab4621cca5530092",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-pointpillars",
+      "path": "skills/tao-train-pointpillars",
+      "content_digest": "sha256:175ab630a091bf8067c7e04868073d2e85d12d65de74dafedcdc68596a362485",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-pose-classification",
+      "path": "skills/tao-train-pose-classification",
+      "content_digest": "sha256:8d87cf0bd7208ee9a1ee40f5cef4141b7e1a29b6b2a8e5dba719b64434f0ae52",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-reid",
+      "path": "skills/tao-train-reid",
+      "content_digest": "sha256:154944921d6706db2222b461e2e383056406b4198106e38c1c99ab8100a62c99",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-rtdetr",
+      "path": "skills/tao-train-rtdetr",
+      "content_digest": "sha256:063b5a9840b2dc8d50293b9a461011150098a81706d006be40489d34a11a0443",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-segformer",
+      "path": "skills/tao-train-segformer",
+      "content_digest": "sha256:ec34536c516a790e265222115d909ce2dfb3e0882679f4a2adbe14f4803a45e0",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-single-step",
+      "path": "skills/tao-train-single-step",
+      "content_digest": "sha256:d1fd7cce65604d94f77b5f3769096dd6bd445b53a0621390f78350f16a529736",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-sparse4d",
+      "path": "skills/tao-train-sparse4d",
+      "content_digest": "sha256:d8391efceac2c74e06760ea52fc619fc3e9e9068d7ce0ad314f53ed309ba5f2c",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-visual-changenet",
+      "path": "skills/tao-train-visual-changenet",
+      "content_digest": "sha256:1ee822119685abbe7a1de762a9cf9f2a85b07f38fdd1404d3d07ce9d945c2e00",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-validate-dataset-format",
+      "path": "skills/tao-validate-dataset-format",
+      "content_digest": "sha256:96b0fe6e29c366372596a72fa65bfbc56a203fb4fc1a52bcaf59da72ee5afee4",
+      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-validate-recipe-transfer",
+      "path": "skills/tao-validate-recipe-transfer",
+      "content_digest": "sha256:95a2358064242fa93a29342823319e1bd1bb2334f65c684836a089be5df7cfd9",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tilegym-adding-cutile-kernel",
+      "path": "skills/tilegym-adding-cutile-kernel",
+      "content_digest": "sha256:45353e000de266521762deb79ebe0eb4e48b316206089d139d088f9db57bb26b",
+      "last_commit": "c31f899a3f2e363373622960a74bbbc4dd0ea861",
+      "last_modified": "2026-05-29"
+    },
+    {
+      "name": "tilegym-converting-cutile-to-julia",
+      "path": "skills/tilegym-converting-cutile-to-julia",
+      "content_digest": "sha256:d76955ac871225f2f61463fdaaab7d4ba5eb6a5c3baba1330d9933f3cf73ce63",
+      "last_commit": "276eb868b92c336de92be49622e6627135eb95cc",
+      "last_modified": "2026-06-11"
+    },
+    {
+      "name": "tilegym-converting-cutile-to-triton",
+      "path": "skills/tilegym-converting-cutile-to-triton",
+      "content_digest": "sha256:4f6cd572a598689f07b64079f7e761f4128e31bff90a42f2df5e8b8d59a0f8d1",
+      "last_commit": "de3c29225040d96960f77c327d9c5eef0a1acdba",
+      "last_modified": "2026-07-14"
+    },
+    {
+      "name": "tilegym-cutile-autotuning",
+      "path": "skills/tilegym-cutile-autotuning",
+      "content_digest": "sha256:c22302391a96a0dc8870ab1b6036e3e101b5d39ca1440b557b1928f967ab742e",
+      "last_commit": "276eb868b92c336de92be49622e6627135eb95cc",
+      "last_modified": "2026-06-11"
+    },
+    {
+      "name": "tilegym-cutile-python",
+      "path": "skills/tilegym-cutile-python",
+      "content_digest": "sha256:e6e1554e2ee83516a74b60433bc6a9bca4e3cbea7dc9e4aef176e7e232749c76",
+      "last_commit": "129a1087a1853f32a950e2f7bbc0fd7d57b9d422",
+      "last_modified": "2026-06-09"
+    },
+    {
+      "name": "tilegym-improve-cutile-kernel-perf",
+      "path": "skills/tilegym-improve-cutile-kernel-perf",
+      "content_digest": "sha256:22649c226429588f61fced9bf84adc22886681d594f9c671fb1a77e09b08c87f",
+      "last_commit": "a5736e4afb318c100e1309c9dd58a9382bd3fc6b",
+      "last_modified": "2026-07-27"
+    },
+    {
+      "name": "tilegym-monkey-patch-kernels-to-transformers",
+      "path": "skills/tilegym-monkey-patch-kernels-to-transformers",
+      "content_digest": "sha256:266017dab3f9ada052ecb9558303665c386e5776c950c5f48b1774a9404a7ed6",
+      "last_commit": "061d42ccc84cdcb64473a43e5f669986a9683bfc",
+      "last_modified": "2026-07-13"
+    },
+    {
+      "name": "vss-ask-video",
+      "path": "skills/vss-ask-video",
+      "content_digest": "sha256:f049b5be97d10d9c6f27715339394bf353dfc94d13f172a5f09f6845dd1015f0",
+      "last_commit": "276eb868b92c336de92be49622e6627135eb95cc",
+      "last_modified": "2026-06-11"
+    },
+    {
+      "name": "vss-deploy-dense-captioning",
+      "path": "skills/vss-deploy-dense-captioning",
+      "content_digest": "sha256:de533343f6449d18caad3e867eadc3e98d2f515c757427c48cd53e4bad7afb1e",
+      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
+      "last_modified": "2026-07-15"
+    },
+    {
+      "name": "vss-deploy-detection-tracking-2d",
+      "path": "skills/vss-deploy-detection-tracking-2d",
+      "content_digest": "sha256:664dee65a3147fd0b46740f558a1d8e74d431fde8e65774d66ebba74ebb30a9f",
+      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
+      "last_modified": "2026-07-15"
+    },
+    {
+      "name": "vss-deploy-detection-tracking-3d",
+      "path": "skills/vss-deploy-detection-tracking-3d",
+      "content_digest": "sha256:85cadbf9a0d96294c6f1cd75f880c7e67480f89a5b7781c2367c0ef0aa3bebb5",
+      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
+      "last_modified": "2026-07-15"
+    },
+    {
+      "name": "vss-deploy-profile",
+      "path": "skills/vss-deploy-profile",
+      "content_digest": "sha256:95b201e41e0de71ef7345a00604d1b7e1731747cbb6f557820e8fdccec01ed3f",
+      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
+      "last_modified": "2026-07-15"
+    },
+    {
+      "name": "vss-deploy-video-embedding",
+      "path": "skills/vss-deploy-video-embedding",
+      "content_digest": "sha256:53b79bb6b685f56295c1cdb685ba5a9ecae755c7316381d5877074d6005be9eb",
+      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
+      "last_modified": "2026-07-15"
+    },
+    {
+      "name": "vss-generate-video-calibration",
+      "path": "skills/vss-generate-video-calibration",
+      "content_digest": "sha256:71bb4bd45b39eba19f15517b151403c779e7ab2d7365971f534c01f9d7322bb0",
+      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
+      "last_modified": "2026-07-15"
+    },
+    {
+      "name": "vss-generate-video-report",
+      "path": "skills/vss-generate-video-report",
+      "content_digest": "sha256:1ce27692d923eb3d11296431aa5c407e2d2fc601d28809b253e8ad3d4c3a135a",
+      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
+      "last_modified": "2026-07-15"
+    },
+    {
+      "name": "vss-manage-alerts",
+      "path": "skills/vss-manage-alerts",
+      "content_digest": "sha256:eb574ba78055b3d74d6b6b9847095a6e756c0f330f5d1259545099ef9652fa71",
+      "last_commit": "85d89b0017e2486f941e3b902d8134e0f6aa4086",
+      "last_modified": "2026-08-31"
+    },
+    {
+      "name": "vss-manage-video-io-storage",
+      "path": "skills/vss-manage-video-io-storage",
+      "content_digest": "sha256:d5660dd083467dc78a9e75fec176e7b2fa0b6e433f1a5cc2a7ec5995be695bc5",
+      "last_commit": "276eb868b92c336de92be49622e6627135eb95cc",
+      "last_modified": "2026-06-11"
+    },
+    {
+      "name": "vss-query-analytics",
+      "path": "skills/vss-query-analytics",
+      "content_digest": "sha256:13673b47e8976577db33ddb2420a80eb8eef1aa0c9dd9af14c3ceda5a9796bb4",
+      "last_commit": "276eb868b92c336de92be49622e6627135eb95cc",
+      "last_modified": "2026-06-11"
+    },
+    {
+      "name": "vss-search-archive",
+      "path": "skills/vss-search-archive",
+      "content_digest": "sha256:2805f3b422b7ae3340ed00a0b04bfaa65e2fad28191459f5dd0f76df18356e03",
+      "last_commit": "84918884635c5f70c8e2d74bf8d1fdb7dcbe63c2",
+      "last_modified": "2026-06-16"
+    },
+    {
+      "name": "vss-setup-behavior-analytics",
+      "path": "skills/vss-setup-behavior-analytics",
+      "content_digest": "sha256:18c6c1fe5e4abb3a1f7c304a1742000eb33fe28554a9ae061a84c84346f52f2a",
+      "last_commit": "276eb868b92c336de92be49622e6627135eb95cc",
+      "last_modified": "2026-06-11"
+    },
+    {
+      "name": "vss-setup-video-analytics-api",
+      "path": "skills/vss-setup-video-analytics-api",
+      "content_digest": "sha256:556a29576736dfc007e1dfaaeea568e05e87bfeb33be631171b7f1d83ecb6792",
+      "last_commit": "276eb868b92c336de92be49622e6627135eb95cc",
+      "last_modified": "2026-06-11"
+    },
+    {
+      "name": "vss-summarize-video",
+      "path": "skills/vss-summarize-video",
+      "content_digest": "sha256:5c58a693617710702e61a2fd39d51634046b2846d05e8dfac304f9facefec8da",
+      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
+      "last_modified": "2026-07-15"
+    },
+    {
+      "name": "warp-compile-time-optimizer",
+      "path": "skills/warp-compile-time-optimizer",
+      "content_digest": "sha256:4a9bb49a333c4ad5cab45fc7fcb420d8d82d74c8a7fd5989ecd6a8f54b1e5ef1",
+      "last_commit": "e934e1a29275fd765f8d1eca9790d43bab239169",
+      "last_modified": "2026-08-13"
+    },
+    {
+      "name": "warp-debug-gradients",
+      "path": "skills/warp-debug-gradients",
+      "content_digest": "sha256:1e8ffa629f9b66d9ae2a9d06af05ef9faa800a51bd499b1a53deae35f69ab2f9",
+      "last_commit": "e934e1a29275fd765f8d1eca9790d43bab239169",
+      "last_modified": "2026-08-13"
+    },
+    {
+      "name": "warp-eval",
+      "path": "skills/warp-eval",
+      "content_digest": "sha256:512ad2aa982b643877345d2f8704cbc25819bdd76060e8d279e229025fff4ffa",
+      "last_commit": "e934e1a29275fd765f8d1eca9790d43bab239169",
+      "last_modified": "2026-08-13"
+    }
+  ]
+}

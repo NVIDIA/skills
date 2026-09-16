@@ -1,5 +1,5 @@
 ## Description: <br>
-Docker conventions for running NVIDIA GPU container workloads — NGC authentication, --gpus flag, mount patterns, env-var passthrough, container inspection, data-root relocation for split-disk hosts, and common error modes. <br>
+The Docker execution platform for TAO jobs — a local daemon or a remote GPU box via DOCKER_HOST=ssh://user@host, implementing the four-verb consumer contract (submit/status/logs/cancel) over the docker CLI. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers running NVIDIA GPU container workloads via Docker, including NGC image pulls, GPU-enabled container launches, bind-mount configuration, and container lifecycle management. <br>
+Developers and engineers running single-node TAO container training, evaluation, and inference jobs on Docker without the NVIDIA TAO SDK. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -27,7 +27,9 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [Docker CLI Reference](https://docs.docker.com/reference/cli/docker/) <br>
 - [Docker Engine Install](https://docs.docker.com/engine/install/) <br>
-- [NVIDIA NGC](https://ngc.nvidia.com/) <br>
+- [NGC](https://ngc.nvidia.com/) <br>
+- [TAO Skill Bank GitHub](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [skill_info.yaml](references/skill_info.yaml) <br>
 
 
 ## Skill Output: <br>
@@ -43,34 +45,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task in a k8s-sandbox environment using Skill Evaluator external profile. <br>
+2 evaluation tasks (2 positive), each with 3 attempts per task in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Final-answer correctness against the reference answer. <br>
+- Discoverability: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Equal-weight mean of goal completion (goal_accuracy) and expected workflow adherence (behavior_check). <br>
+- Efficiency: 50% tool-call productivity and 50% token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (routing is scored under Discoverability). <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
-|---|---:|---:|---:|
-| Security | 1 | 100% (+0%) | 100% (+0%) |
-| Correctness | 1 | 100% (+100%) | 100% (+100%) |
-| Discoverability | 1 | 100% (+100%) | 94% (+94%) |
-| Effectiveness | 1 | 100% (+83%) | 83% (+35%) |
-| Efficiency | 1 | 83% (+83%) | 100% (+100%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 61.1% | 45.4% |
+| Security | 50.0% → 25.0% (-25.0 pp) | 40.0% → 25.0% (-15.0 pp) |
+| Correctness | 20.0% → 90.0% (+70.0 pp) | 4.0% → 45.0% (+41.0 pp) |
+| Discoverability | 76.3% | 62.5% |
+| Effectiveness | 13.6% → 41.1% (+27.5 pp) | 17.3% → 30.4% (+13.1 pp) |
+| Efficiency | 73.2% | 64.3% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

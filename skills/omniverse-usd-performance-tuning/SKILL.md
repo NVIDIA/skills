@@ -1,7 +1,7 @@
 ---
 name: omniverse-usd-performance-tuning
 description: "Top-level workflow skill for USD performance diagnosis and optimization. Handles slow loading, high memory, low FPS, and broad scene-optimization requests; delegates auth/runtime setup to Phase 0 owners."
-version: "0.1.0"
+version: "0.4.1"
 license: Apache-2.0
 tools:
   - Read
@@ -35,7 +35,7 @@ Before any tuning output, except a static classification-only answer, follow `sk
 Required behavior:
 
 - Missing or unreadable preflight: invoke `setup-usd-performance-tuning`.
-- Present preflight: print Format A and wait for Continue, Change Kit, Switch to standalone, or Re-run probe.
+- Present preflight: print Format A and wait for the user's answer. That reference owns the option set; do not restate or invent options here.
 - Runtime already confirmed in this session: use compact Format B:
 
 ```text
@@ -152,6 +152,7 @@ This skill does not install runtimes, replace downstream reference instructions,
 Primary references:
 
 - `references/workflow.md`
+- `references/briefing-the-skill.md` — what a request should state, and why. Read it when a brief is thin: it names the four things that decide strategy, and the phrasings that silently cost quality (a stated triangle count, a stated mesh count).
 - `references/runtime-artifact-token-budget.md`
 - `references/skill-map.md`
 - `skills/omniverse-usd-performance-tuning/references/setup-usd-performance-tuning/references/runtime-context-header.md`

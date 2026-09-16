@@ -1,0 +1,138 @@
+# DINOv3 continual pre-training example (base resolution; Gram disabled).
+# Mirrors tao-pytorch nvidia_tao_pytorch/ssl/dinov3/experiment_specs/train_dinov3_vitb.yaml.
+# Schema source of truth: schemas/train.schema.json, generated from the tao-core
+# DINOv3 dataclasses (nvidia_tao_core/config/dinov3/default_config.py).
+encryption_key: ''
+results_dir: ''
+wandb:
+  enable: true
+  project: TAO Toolkit
+  entity: ''
+  group: ''
+  tags:
+  - tao-toolkit
+  - dinov3
+  - ssl
+  reinit: false
+  sync_tensorboard: true
+  save_code: false
+  name: TAO DINOv3 SSL
+  run_id: ''
+model:
+  distill:
+    enable: false
+    disable_masking: false
+    pretrained_non_distill_pl_model_path: ''
+  # DINOv3 uses Sinkhorn-Knopp (SwAV) centering for teacher outputs; 'softmax' is the
+  # collapse/instability fallback (see dinov3-method.md).
+  centering_method: sinkhorn
+  backbone:
+    teacher_type: vit_b
+    student_type: vit_b
+    num_register_tokens: 4
+    drop_path_rate: 0.4
+    patch_size: 16
+    img_size: 256
+    # Rotary frequency base. Changing it alters positional encoding.
+    rope_theta: 100.0
+  head:
+    num_layers: 3
+    hidden_dim: 2048
+    bottleneck_dim: 384
+  gram:
+    # Optional Gram anchoring. See dinov3-method.md.
+    enable: false
+    w_gram: 0.0
+    start_step: 0
+    teacher_source: pretrained
+    refresh_interval: 0
+    teacher_scale: 1.0
+  lora:
+    enable: false
+    rank: 8
+    alpha: 16.0
+    dropout: 0.05
+    target_modules:
+    - qkv
+    - proj
+    # 0 adapts every transformer block; otherwise adapt only the last N blocks.
+    num_last_blocks: 0
+  preservation:
+    # Preserve the frozen anchor teacher's global CLS representation.
+    enable: false
+    cls_mse_weight: 0.05
+    cls_cosine_weight: 0.05
+dataset:
+  train_dataset:
+    images_dir: ''
+  batch_size: 16
+  pin_memory: true
+  workers: 10
+  transform:
+    n_global_crops: 2
+    global_crops_scale:
+    - 0.32
+    - 1.0
+    global_crops_size: 256
+    n_local_crops: 8
+    local_crops_scale:
+    - 0.05
+    - 0.32
+    # Crop sizes must be multiples of patch_size 16.
+    local_crops_size: 112
+train:
+  num_gpus: 1
+  gpu_ids:
+  - 0
+  num_nodes: 1
+  seed: 1234
+  # xformers memory_efficient_attention does not provide a deterministic backward kernel.
+  cudnn:
+    benchmark: true
+    deterministic: false
+  # Adjust num_epochs and step-denominated fields for the corpus and global batch.
+  num_epochs: 10
+  # Adjust the checkpoint interval for the planned run length.
+  checkpoint_interval: 1000
+  checkpoint_interval_unit: step
+  validation_interval: 1
+  resume_training_checkpoint_path: ''
+  results_dir: ''
+  # timm-format public DINOv3 weights (dir with model.safetensors, or a direct file).
+  # Gated on HF: accept the facebook/dinov3-* license first.
+  pretrained_model_path: ''
+  layerwise_decay: 1.0
+  clip_grad_norm: 3.0
+  num_prototypes: 131072
+  precision: 16-mixed
+  use_custom_attention: true
+  distributed_strategy: auto
+  # Component and preservation losses are step-level metrics. Keep this at 1 for
+  # short smoke runs so every loss is visible in TensorBoard.
+  log_every_n_steps: 1
+  schedulers:
+    # LR auto-scales with global batch: 5e-5 * sqrt(global_batch / 1024).
+    # Adjust warm_up_steps and freeze_steps for the planned training length.
+    learning_rate:
+      val_base: "${eval: '5e-5 * (${dataset.batch_size} * ${train.num_gpus} * ${train.num_nodes} / 1024) ** (1/2)'}"
+      val_final: 1.0e-06
+      warm_up_steps: 10000
+    last_layer_learning_rate:
+      val_base: "${eval: '5e-5 * (${dataset.batch_size} * ${train.num_gpus} * ${train.num_nodes} / 1024) ** (1/2)'}"
+      val_final: 1.0e-06
+      warm_up_steps: 10000
+      freeze_steps: 1250
+    weight_decay:
+      val_base: 0.04
+      val_final: 0.2
+    # EMA momentum controls how quickly the teacher follows the student.
+    momentum:
+      val_base: 0.9999
+      val_final: 1.0
+    teacher_temperature:
+      val_base: 0.07
+      val_final: 0.07
+      val_start: 0.04
+      warm_up_steps: 37500
+  optim:
+    optim: adamw

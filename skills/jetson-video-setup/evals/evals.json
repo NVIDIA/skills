@@ -1,0 +1,71 @@
+{
+  "skill_name": "jetson-video-setup",
+  "evals": [
+    {
+      "id": "setup-native-only-smoke",
+      "prompt": "Install only the native Video Codec SDK and run an H.264 encode and decode smoke test.",
+      "expected_output": "Native-only setup verified with the official native encoder and decoder.",
+      "assertions": [
+        "Selects only the native SDK and does not install PyNvVideoCodec",
+        "Inspects the Jetson release and reuses each compatible installed native prerequisite without reinstalling it",
+        "For each absent or invalid required APT package, inspects the exact candidate and origin, runs the apt-get -s simulation, and applies the identical reviewed package spec with standard APT commands directly",
+        "After any APT mutation, runs dpkg --audit and stops unless it exits zero with empty output",
+        "Uses package-owned AppEncCuda followed by package-owned AppDec and reports ready only after the decoder produces one frame from the fresh bitstream"
+      ],
+      "expected_skill": "jetson-video-setup",
+      "expected_workflow": "setup"
+    },
+    {
+      "id": "setup-pynvc-only-smoke",
+      "prompt": "Install only PyNvVideoCodec in a new isolated Python environment and run an H.264 encode and decode smoke test.",
+      "expected_output": "Python-only setup verified with wheel-owned encoder and decoder samples.",
+      "assertions": [
+        "Selects only PyNvVideoCodec and does not install the native SDK developer package",
+        "Uses the absent conventional smoke path when no alternative is supplied, creates it with standard venv and pip commands, then reports and uses its exact interpreter",
+        "Inspects the installed distribution and loaded module through that exact interpreter and keeps it selected throughout verification",
+        "Uses the wheel-owned encoder followed by a wheel-owned independent decoder and reports ready only after their one-frame markers and fresh bitstream pass"
+      ],
+      "expected_skill": "jetson-video-setup",
+      "expected_workflow": "setup"
+    },
+    {
+      "id": "setup-reuse-pynvc-smoke",
+      "prompt": "PyNvVideoCodec is already installed. Reuse it and run an H.264 encode and decode smoke test.",
+      "expected_output": "The existing validated Python environment is reused without reinstallation and passes the smoke test.",
+      "assertions": [
+        "Uses an exact supplied or current-conversation interpreter, otherwise checks only the conventional smoke path instead of scanning for environments",
+        "Does not reinstall packages or create another environment when the existing one is valid",
+        "Uses the wheel-owned encoder followed by an independent decoder before reporting ready"
+      ],
+      "expected_skill": "jetson-video-setup",
+      "expected_workflow": "setup"
+    },
+    {
+      "id": "setup-ambiguous-surface-clarification",
+      "prompt": "Is my environment ready to run video SDK work right now? Probe the target and report readiness. (Report-only.)",
+      "expected_output": "A clarification asking whether to inspect native Video Codec SDK, PyNvVideoCodec, or both, with no target probe or action before the user chooses.",
+      "assertions": [
+        "Treats the bare phrase video SDK as ambiguous even though the request is report-only",
+        "Asks whether the user wants native Video Codec SDK, PyNvVideoCodec, or both",
+        "Stops before target inspection, probing, planning, installation, building, or codec operations"
+      ],
+      "expected_skill": "jetson-video-setup",
+      "expected_workflow": "setup"
+    },
+    {
+      "id": "setup-device-memory-not-interoperability",
+      "prompt": "The official video sample passed in device-memory mode. Confirm that its frames can be shared zero-copy with another pipeline stage.",
+      "expected_output": "A readiness-only result that does not promote device-memory sample success to an external sharing or synchronization claim.",
+      "assertions": [
+        "Separates the exact sample readiness result from buffer-interoperability evidence",
+        "Does not claim DMA-BUF, NvSciBuf, CUDA IPC, zero copy, or a synchronization primitive",
+        "Requires an authenticated interoperability test of the actual downstream stage that proves the sharing handle, format and layout, ownership and lifetime, signal and wait behavior, and safe reuse"
+      ],
+      "expected_skill_sequence": [
+        "jetson-video-setup",
+        "jetson-video-pipeline"
+      ],
+      "expected_workflow": "setup"
+    }
+  ]
+}

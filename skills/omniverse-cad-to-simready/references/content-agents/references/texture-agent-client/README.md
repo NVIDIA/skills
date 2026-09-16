@@ -10,11 +10,11 @@ Texture generation is optional for the current `omniverse-cad-to-simready` path.
 
 Use the upstream NVIDIA Omniverse Content Agents Texture Agent client skill as the authoritative reference for service API behavior, endpoint semantics, request fields, and client-side troubleshooting:
 
-- Upstream skill: `https://github.com/nvidia-omniverse/content-agents/blob/main/.codex/skills/texture-agent-client/SKILL.md`
-- Upstream repository: `https://github.com/nvidia-omniverse/content-agents` on branch `main`
-- Upstream service client: `https://github.com/nvidia-omniverse/content-agents/blob/main/apps/texture_agent_service/client/client.py`
+- Upstream skill: `https://github.com/nvidia-omniverse/content-agents/blob/v0.5.2/.codex/skills/texture-agent-client/SKILL.md`
+- Upstream repository: `https://github.com/nvidia-omniverse/content-agents` at manifest pin `v0.5.2`
+- Upstream service client: `https://github.com/nvidia-omniverse/content-agents/blob/v0.5.2/apps/texture_agent_service/client/client.py`
 
-Access note: Browser or raw-file fetches of the upstream skill URL can fail. If that happens, use the normalized local clone of `https://github.com/nvidia-omniverse/content-agents` checked out to `main` and read `.codex/skills/texture-agent-client/SKILL.md` from that checkout. Resolve that clone from `CONTENT_AGENTS_UPSTREAM_ROOT`, then `$PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT/content-agents`, then `$HOME/.physical-ai-skill-hub/upstreams/content-agents`.
+Access note: Browser or raw-file fetches of the upstream skill URL can fail. If that happens, use the normalized local clone of `https://github.com/nvidia-omniverse/content-agents` checked out to the exact ref in `upstream-versions.lock.json` and read `.codex/skills/texture-agent-client/SKILL.md` from that checkout. Resolve that clone from `CONTENT_AGENTS_UPSTREAM_ROOT`, then `$OMNIVERSE_CAD_TO_SIMREADY_UPSTREAM_ROOT/content-agents`, then `$HOME/.omniverse-cad-to-simready/upstreams/content-agents`.
 
 Do not copy or reinterpret upstream Texture Agent API behavior here. Keep this reference limited to this reference's wrapper contract, required environment, report shape, and workflow path selection.
 
@@ -65,6 +65,13 @@ Collect:
 5. Run this reference's portable `scripts/run.py`. The wrapper submits the USD as `usd_file` in one multipart `POST /pipeline` request.
 6. Preserve the JSON report, textured USDZ output, materials JSON, textures ZIP, and renders ZIP when available.
 7. Continue with the workflow asset path that matches user intent. For simulation validation, prefer the materialized/physics USD unless the user explicitly wants to validate the textured USDZ.
+
+Before the request, the wrapper uses an available OpenUSD runtime to inspect the
+input and package resolved external layers and assets into one USDZ. Texture
+Agent uploads reject unresolved dependencies, including missing source textures,
+and fail before creating a service session. Configure
+`CONTENT_AGENTS_OPENUSD_PYTHON` with a Python 3.12 `pxr` runtime when neither the
+process Python nor a trusted skill-project runtime can inspect the input.
 
 Do not use the upstream `--upload-first` option or the `/pipeline/upload-usd`
 submission path for Texture Agent workflows from this repo. Texture requests

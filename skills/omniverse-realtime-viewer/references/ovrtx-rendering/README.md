@@ -2,9 +2,15 @@
 
 ## Triggers
 
-Use this skill for `ovrtx`, `renderer.step`, `step_async`, `LdrColor`, AOVs, render vars, `HdrColor`, `NormalSD`, RenderProduct resolution, `write_attribute`, `omni:xform`, `OVRTX_BIN_PATH`, magenta materials, or RenderApi errors.
+Use this skill for `ovrtx`, `renderer.step`, `step_async`, `attach_ovstage`, `update_from_stage`, committed render ordinals, `LdrColor`, AOVs, render vars, `HdrColor`, `NormalSD`, RenderProduct resolution, standalone `write_attribute`, `omni:xform`, `OVRTX_BIN_PATH`, magenta materials, or RenderApi errors.
 
-ovrtx is a headless RTX renderer driven from Python. The app owns the render loop, camera updates, frame extraction, and any streaming/display handoff.
+ovrtx is a headless RTX renderer driven from Python. The app owns the render loop,
+frame extraction, and any streaming/display handoff. For new ovrtx viewer
+apps, OVStage owns scene population, hierarchy, runtime attributes, transforms,
+material/effect writes, and write-floor publication; ovrtx attaches to that
+stage and renders committed ordinals. Use direct ovrtx stage and attribute APIs
+only for standalone compatibility paths or projects intentionally pinned to the
+older renderer-owned stage model.
 
 For ovrtx renderer behavior, Python/C API behavior, release notes, or behavior
 not covered here, read `references/dependencies` for acquisition guidance and
@@ -13,43 +19,71 @@ supplemental dependency documentation.
 ## Core API
 
 ```python
-from ovrtx import Renderer, RendererConfig, Device, Semantic, PrimMode
+import ovstage
+from ovstage import PopulationDomain, population
+from ovrtx import Renderer, RendererConfig
 
+stage = ovstage.Stage("viewer")
+ordinal = 1
+population.open_usd(stage, "/path/to/composite.usda", ordinal=ordinal, domains=PopulationDomain.RENDERING)
+stage.advance_write_floor(ordinal).wait()
+
+# Create and populate the OVStage before constructing the renderer.
 renderer = Renderer(config=RendererConfig(
     sync_mode=True,
     active_cuda_gpus="0",
     keep_system_alive=True,
 ))
 print(renderer.version)
-renderer.open_usd("/path/to/composite.usda")
-products = renderer.step(render_products={"/Session/Render/Viewport"}, delta_time=1.0 / 60.0)
+
+renderer.attach_ovstage(stage)
+products = renderer.step(
+    render_products={"/Session/Render/Viewport"},
+    delta_time=1.0 / 60.0,
+    ordinal=ordinal,
+)
 with products as ctx:
     product = ctx["/Session/Render/Viewport"]
 ```
 
 `sync_mode=True` blocks until the GPU frame is complete. Async pipelines can use `False`, but then buffer lifetime and frame readiness need explicit care.
 
+`renderer.attach_ovstage(stage)` attaches a live, externally owned
+`ovstage.Stage`. Keep that Stage alive until `renderer.detach_ovstage()` or
+renderer destruction. When a stage is attached, `renderer.step(..., ordinal=N)`
+requires an ordinal and first updates the renderer through at least that
+committed OVStage publication. A separate `renderer.update_from_stage(N)` is
+only needed when the app must update renderer state before a step, such as
+pre-step sensor or status work.
+
 `renderer.step()` returns `RenderProductSetOutputs`, not a Python `dict`. It supports `[]`, `in`, `keys()`, `values()`, and `items()`, but not `.get()` or `.update()`. Some installed builds also support context-manager cleanup. Generated code should use context-manager cleanup when `__enter__` is available, and otherwise consume the mapping-like result directly while copying required frame data before the next step.
 
-`renderer.step_async()` enqueues the same frame work and returns an `Operation`. Poll `op.query_status()` from the runtime owner when you need the render loop to stay responsive, then call `op.wait()` before reading `RenderProductSetOutputs`. Do not mutate the stage while a step operation is in flight.
+`renderer.step_async()` enqueues the same frame work and returns an `Operation`. Poll `op.query_status()` from the runtime owner when you need the render loop to stay responsive, then call `op.wait()` before reading `RenderProductSetOutputs`. Do not mutate OVStage or the standalone renderer stage while a step operation is in flight.
 
-## Stage Composition APIs
+## OVStage And Standalone Composition
 
-ovrtx 0.3 uses explicit stage composition:
+ovrtx supports two scene-ownership modes:
 
-- `renderer.open_usd(path)` replaces the active root layer with a file/URL.
-- `renderer.open_usd_from_string(usda)` replaces the active root layer with generated inline USDA, commonly a wrapper root with `subLayers` and viewer-owned camera/render prims.
-- `renderer.add_usd_reference(path, prefix_path="/Runtime/Asset")` adds referenced content under an existing root stage and returns a handle.
-- `renderer.add_usd_reference_from_string(usda, prefix_path="/Runtime/Asset")` is the inline-string additive-reference path.
-- `renderer.remove_usd(handle)` removes additive content by handle.
-- `renderer.reset_stage()` clears the stage to empty. It is not needed for normal root replacement because `open_usd*` replaces the root.
+- Attached mode for new apps: create an `ovstage.Stage`; load composed USD with
+  `ovstage.population.open_usd(...)` or `open_usd_from_string(...)`; apply
+  reference, reset, time, hierarchy, transform, material, and effect changes
+  through OVStage; wait for the operation; advance the write floor; then render
+  with `renderer.step(..., ordinal=N)`.
+- Standalone compatibility mode: `renderer.open_usd*`, `add_usd_reference*`,
+  `remove_usd()`, `reset_stage()`, `query_prims*`, `read_attribute*`,
+  `write_attribute*`, `bind_attribute*`, and `map_attribute()` operate on a
+  renderer-owned stage. These APIs remain useful for compatibility and focused
+  standalone tests, but they are deprecated in ovrtx for production scene
+  ownership.
 
-Do not use older implicit stage-addition APIs as the main load path in 0.3 docs or examples.
+Do not use older implicit stage-addition APIs as the main load path. Do not mix
+OVStage writes with direct renderer stage writes for the same runtime state; pick
+one owner per app path.
 
 ## Frame Extraction
 
 ```python
-products = renderer.step(render_products={RENDER_PRODUCT_PATH}, delta_time=dt)
+products = renderer.step(render_products={RENDER_PRODUCT_PATH}, delta_time=dt, ordinal=ordinal)
 with products as ctx:
     if RENDER_PRODUCT_PATH in ctx:
         product = ctx[RENDER_PRODUCT_PATH]
@@ -63,7 +97,7 @@ with products as ctx:
 
 CUDA mapping exposes linear CUDA memory. CPU mapping transfers data to host. For local UI, copy inside the map context before returning.
 
-A 0.3 render variable output can contain one or more named tensors plus named params. For single-tensor outputs such as `LdrColor`, use the mapped object itself as the DLPack producer (`np.from_dlpack(rv)` / `wp.from_dlpack(rv)`). For multi-tensor outputs, address tensors by name (`rv["Coordinates"]`, `rv["Intensity"]`) and params through `rv.params["hitCount"]`. Do not write new code against older single-tensor convenience access.
+Current render variable output can contain one or more named tensors plus named params. For single-tensor outputs such as `LdrColor`, use the mapped object itself as the DLPack producer (`np.from_dlpack(rv)` / `wp.from_dlpack(rv)`). For multi-tensor outputs, address tensors by name (`rv["Coordinates"]`, `rv["Intensity"]`) and params through `rv.params["hitCount"]`. Do not write new code against older single-tensor convenience access.
 
 C maps an `ovrtx_render_var_output_t` with `ovrtx_map_render_var_output()`. Iterate its `tensors[]` and `params[]` by name; do not assume tensor index `0` is the only payload unless the RenderVar contract says it is.
 
@@ -89,34 +123,21 @@ The render product controls which AOVs ovrtx attempts to produce:
 def RenderProduct "ViewportTexture0"
 {
     rel camera = </OVCamera>
-    rel orderedVars = [
-        </Render/Vars/LdrColor>,
-        </Render/Vars/HdrColor>,
-        </Render/Vars/Depth>,
-        </Render/Vars/Normal>,
-        </Render/Vars/InstanceSeg>,
-        </Render/Vars/SemanticSeg>,
-        </Render/Vars/Metallic>,
-        </Render/Vars/Roughness>,
-        </Render/Vars/Emissive>,
-        </Render/Vars/Diffuse>,
-        </Render/Vars/Specular>,
-        </Render/Vars/AO>,
-        </Render/Vars/DirectDiffuse>,
-        </Render/Vars/DirectSpecular>,
-        </Render/Vars/IndirectDiffuse>,
-        </Render/Vars/IndirectSpecular>,
-        </Render/Vars/MotionVectors>,
-    ]
+    rel orderedVars = [</Render/Vars/LdrColor>]
 }
 
-def RenderVar "Normal"
+def RenderVar "LdrColor"
 {
-    uniform string sourceName = "NormalSD"
+    uniform string sourceName = "LdrColor"
 }
 ```
 
-`frame.render_vars` is keyed by source name, not necessarily by `RenderVar` prim name. For example, the `RenderVar "Normal"` prim appears as `NormalSD` in Python.
+Basic generated viewers should request only `LdrColor` until an explicit
+AOV/debug-view feature needs additional outputs. Add HDR, depth, normal,
+segmentation, or other debug AOVs together with the conversion, UI, and
+validation rules from `aov-switching` and `render-settings`.
+
+`frame.render_vars` is keyed by source name, not necessarily by `RenderVar` prim name. For example, a `RenderVar "Normal"` prim with `sourceName = "NormalSD"` appears as `NormalSD` in Python.
 
 Common displayable AOVs for viewer apps:
 
@@ -181,9 +202,57 @@ Include kernels for `uint8`, `uint16`, `uint32`, `float32`, and `float16`,
 with channel-last scalar, RGB, and RGBA forms. See `aov-switching` for the full
 dispatch rules.
 
-## Live Attribute Writes
+## Runtime Attribute Writes
 
-ovrtx consumes Fabric attributes such as `omni:xform`; standard authored USD `xformOp:*` is not the live update path.
+For new ovrtx applications, make OVStage the runtime data plane for
+transforms, camera motion, material/effect controls, visibility changes, and
+other stage-data state. Direct `renderer.write_attribute()` and
+`bind_attribute()` are compatibility APIs for standalone renderer-owned stages,
+not the source of truth when an OVStage is attached. Renderer-owned selection
+outline group/style writes remain ovrtx responsibilities; route them through
+`native-picking-selection`.
+
+OVStage writes are ordinal-keyed. Wait for the write, advance the write floor,
+then render that committed ordinal:
+
+```python
+import numpy as np
+from ovstage import (
+    AttributeSemantic,
+    DLDataType,
+    DLDataTypeCode,
+    PrimMode,
+    make_dltensor,
+)
+
+ordinal += 1
+matrices = np.asarray([...], dtype=np.float64).reshape(len(paths), 16)
+xform_tensor = make_dltensor(
+    matrices,
+    dtype=DLDataType(code=DLDataTypeCode.kDLFloat, bits=64, lanes=16),
+    shape=[len(paths)],
+)
+stage.write_attribute(
+    query,
+    "omni:xform",
+    ordinal=ordinal,
+    tensors=xform_tensor,
+    is_array=False,
+    semantic=AttributeSemantic.MATRIX,
+    prim_mode=PrimMode.UPSERT,
+).wait()
+stage.advance_write_floor(ordinal).wait()
+products = renderer.step({RENDER_PRODUCT_PATH}, delta_time=dt, ordinal=ordinal)
+```
+
+`omni:xform` matrices are row-major `float64` matrices using the USD row-vector
+convention, with translation in row `[3][0..2]`. In OVStage DLPack form, a
+matrix column is one 16-lane element per prim (`shape=[N]`, lanes `16`), not an
+`N x 4 x 4` tensor of one-lane elements.
+
+For standalone compatibility paths, ovrtx consumes Fabric attributes such as
+`omni:xform`; standard authored USD `xformOp:*` is not the live renderer update
+path.
 
 ```python
 xforms = np.array([...], dtype=np.float64).reshape(n, 4, 4)
@@ -197,7 +266,7 @@ renderer.write_attribute(
 )
 ```
 
-`PrimMode.EXISTING_ONLY` silently skips attributes not already registered. Use `CREATE_NEW` for camera, animation, and EffectLayer attributes that may not exist in Fabric yet.
+`PrimMode.EXISTING_ONLY` silently skips attributes not already registered. Use `CREATE_NEW` for compatibility camera, animation, and EffectLayer attributes that may not exist in Fabric yet. In OVStage examples, use OVStage's own `PrimMode` values, usually `PrimMode.UPSERT` for app-owned runtime state.
 
 ## Renderer Config And Process State
 
@@ -219,13 +288,32 @@ Subsequent steps are usually fast once the shader cache is populated. If every r
 
 ## Schema Registration And Path Dictionary
 
-ovrtx runtime population is schema-driven. Built-in stage data such as Cameras, RenderProducts, RenderVars, `omni:xform`, pickability, and selection-outline attributes use ovrtx-supported schemas. If an app depends on custom authored attributes, register the schema before loading the stage, or opt in with root-layer `customLayerData.populateAllAuthoredAttributes = true` when broad authored-attribute population is acceptable. The broad flag can significantly increase memory usage.
+OVStage and standalone ovrtx runtime population are schema-driven. Built-in stage data such as Cameras, RenderProducts, RenderVars, `omni:xform`, pickability, and selection-outline attributes use supported schemas. If an app depends on custom authored attributes, register the schema before loading the stage, or opt in with root-layer `customLayerData.populateAllAuthoredAttributes = true` when broad authored-attribute population is acceptable. The broad flag can significantly increase memory usage.
 
-Path and token IDs returned by C queries or pick-hit buffers are not user-facing strings. Resolve them through the renderer path dictionary (`ovrtx_get_path_dictionary()` and path-dictionary utilities). Python high-level stage queries return path strings, while Python pick-hit decoding uses `Renderer.resolve_prim_path_id()`.
+Path and token IDs returned by C queries or pick-hit buffers are not user-facing
+strings. In attached mode, decode OVStage query/read/write IDs with the
+OVStage-owned path dictionary and decode ovrtx pick/render-output IDs with the
+renderer-owned dictionary. Do not use one library's dictionary for IDs produced
+by the other. Python pick-hit decoding uses `Renderer.resolve_prim_path_id()`.
+
+For picking and selection-outline implementation, read `native-picking-selection`
+before writing code. Use `Renderer.enqueue_pick_query()` with normalized
+top-left RenderProduct bounds, `Renderer.resolve_prim_path_id(int_id)`,
+`Renderer.set_selection_group_styles({group_id: SelectionGroupStyle(...)})`, and
+`Renderer.set_selection_outline_group_strings(...)`. A consumed native query
+produces `OVRTX_RENDER_VAR_PICK_HIT` automatically; do not author it in USD
+`orderedVars`. Do not replace these with `hasattr`-driven picker fallbacks unless
+native picking is unavailable and the user explicitly asks for a compatibility
+path.
 
 ## Geometry Streaming
 
-For USD assets, prefer `open_usd*` and `add_usd_reference*` composition. Use geometry streaming only for runtime-generated geometry or high-frequency geometry updates that are owned by the application. Keep schemas registered before streaming attributes, keep stream ownership/lifetime explicit, and continue to render with ovrtx; do not replace this with browser-side geometry rendering.
+For USD assets in new ovrtx apps, prefer OVStage population and
+`population.add_usd_reference*` composition. Use geometry streaming only for
+runtime-generated geometry or high-frequency geometry updates that are owned by
+the application. Keep schemas registered before streaming attributes, keep
+stream ownership/lifetime explicit, and continue to render with ovrtx; do not
+replace this with browser-side geometry rendering.
 
 ## Multi-GPU
 
@@ -259,15 +347,28 @@ The reason is USD plugin registry ownership. Mixing `usd-core` and ovrtx's bundl
 
 ```python
 import os
-import numpy as np
-from PIL import Image
+
 os.environ["OVRTX_SKIP_USD_CHECK"] = "1"
+
+import numpy as np
+import ovstage
+from PIL import Image
+from ovstage import PopulationDomain, population
 from ovrtx import Renderer, RendererConfig, Device
 
+stage = ovstage.Stage("viewer")
+ordinal = 1
+population.open_usd(stage, "/path/to/composite.usda", ordinal=ordinal, domains=PopulationDomain.RENDERING)
+stage.advance_write_floor(ordinal).wait()
 renderer = Renderer(config=RendererConfig(sync_mode=True))
-renderer.open_usd("/path/to/composite.usda")
+renderer.attach_ovstage(stage)
+
 for _ in range(60):
-    products = renderer.step(render_products={"/Render/RenderProduct"}, delta_time=1/60)
+    products = renderer.step(
+        render_products={"/Render/RenderProduct"},
+        delta_time=1/60,
+        ordinal=ordinal,
+    )
     with products as ctx:
         product = ctx["/Render/RenderProduct"]
         for frame in product.frames:
@@ -290,14 +391,14 @@ UJITSO "multi-node material unsupported" warnings are informational if the full 
 | `multiple debug symbol definitions for SDF_ASSET` | two USD instances | put ovrtx bundled libs first |
 | `usd-core detected` | version check conflict | set `OVRTX_SKIP_USD_CHECK=1` |
 | `Default.mdl` parse crash | renderer initialized after wrong USD registry | fix import/construction order |
-| `RenderProductSetOutputs` has no `.get` | treated `renderer.step()` output as a dict | use `with products as ctx:` and `ctx[path]` |
+| `RenderProductSetOutputs` has no `.get` | treated `renderer.step()` output as a dict | use `ctx[path]` or `products[path]`; branch on `hasattr(products, "__enter__")` for context-manager cleanup |
 | `AttributeError: __enter__` from `with products as ctx:` | installed step result is mapping-like but not a context manager | branch on `hasattr(products, "__enter__")`, consume directly when absent, and copy frame data before the next step |
 | invalid output handle after returning frame data | frame or render var view outlived its `RenderProductSetOutputs` | copy inside the same step before the context exits |
 | first `renderer.step()` appears hung | cold RTX shader or pipeline compilation | use a 300s+ first-run timeout and inspect ovrtx logs |
-| `write_attribute` does nothing | missing Fabric attr with default mode | use `PrimMode.CREATE_NEW` |
-| transform not visible | wrote `xformOp:transform` | write `omni:xform` with semantic |
+| `write_attribute` does nothing | used direct renderer writes in an attached-stage app, or missed compatibility prim mode | write through OVStage at a new ordinal; for standalone compatibility use `PrimMode.CREATE_NEW` |
+| transform not visible | wrote authored `xformOp:*`, used wrong matrix layout, or rendered above the write floor | write `omni:xform` through OVStage as a row-major 16-lane matrix, advance the floor, then step with that ordinal |
 | `Semantic.XFORM_MAT4x4` becomes `NONE` | imported adapter implementation module `_ovrtx` | `import ovrtx` directly |
-| single-tensor examples fail or hide data | 0.3 render vars can be multi-tensor | use `np.from_dlpack(rv)` or named tensors such as `rv["TensorName"]` |
+| single-tensor examples fail or hide data | current render vars can be multi-tensor | use `np.from_dlpack(rv)` or named tensors such as `rv["TensorName"]` |
 | AOV listed but blank | ovrtx produced empty tensor | enable PT flags, check source name |
 | `Depth` mapping fails | wrong source name | use `DepthSD` not `Depth` |
 | `Diffuse` empty/fails | wrong source name | use `DiffuseAlbedoSD` not `Diffuse` |

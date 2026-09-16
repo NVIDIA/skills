@@ -6,8 +6,9 @@ service: "auto-magic-calib"
 version: "1.0.0"
 reviewed: "2026-04-28"
 license: "Apache-2.0"
+permissions: [env, file_read, network]
 metadata:
-  author: "NVIDIA CORPORATION"
+  author: "Shubham Agrawal <shuagrawal@nvidia.com>"
   tags: [amc, calibration, sample, rest-api, validation, python]
 ---
 
@@ -41,9 +42,9 @@ The sample includes GT, so the run produces evaluation metrics (L2 distance, rep
 
 - [ ] AMC microservice running (follow `skills/amc-setup-calibration-stack/SKILL.md` if not)
 - [ ] Sample zip present at `assets/sdg_08_2_sample_data_010926.zip`
-- [ ] Python 3 with `requests` available, or use the Swagger UI path below
-  - The bundled script self-heals: if `requests` is missing it creates a throwaway venv under `${TMPDIR:-/tmp}/amc-sample-test-venv` (nothing written to the repo)
-  - If `python3 -m venv` itself fails with `ensurepip not available`: `sudo apt install -y python3-venv python3-pip`
+- [ ] Python 3 with `requests` installed, or use the Swagger UI path below
+  - Install it explicitly before running the script: `python3 -m pip install requests`
+  - If `pip` is unavailable, install your distro's Python packaging support first
 
 ## Instructions
 
@@ -99,7 +100,7 @@ ls "$SAMPLE_DIR"
 
 ## Run Script
 
-Run the bundled script from the `amc-run-sample-calibration` skill package, not from the `auto-magic-calib` repo root. If the user points the agent at this skill folder directly instead of installing it, set `AMC_SAMPLE_SKILL_DIR` to the directory containing this `SKILL.md`, or run the command from that directory. Set `REPO_ROOT` to the AutoMagicCalib checkout resolved by `amc-setup-calibration-stack`; the script reads `compose/.env` from that checkout for the backend port, accepts `BASE_URL`, `MS_PORT`, `SAMPLE_DIR`, and `RUN_VGGT` overrides, creates a fresh project each run, attempts VGGT when ready, and prints the NGC warehouse dataset note at the end.
+Run the bundled script from the `amc-run-sample-calibration` skill package, not from the `auto-magic-calib` repo root. If the user points the agent at this skill folder directly instead of installing it, set `AMC_SAMPLE_SKILL_DIR` to the directory containing this `SKILL.md`, or run the command from that directory. Set `REPO_ROOT` to the AutoMagicCalib checkout resolved by `amc-setup-calibration-stack`; the script auto-detects a running backend on localhost ports `8000`-`8009` when `BASE_URL` / `MS_PORT` are not set, accepts `BASE_URL`, `MS_PORT`, `SAMPLE_DIR`, and `RUN_VGGT` overrides, creates a fresh project each run, attempts VGGT when ready, and prints the NGC warehouse dataset note at the end.
 
 ```bash
 # REPO_ROOT must point to the auto-magic-calib checkout, not the DeepStream repo.
@@ -217,8 +218,8 @@ docker compose -f "$REPO_ROOT/compose/compose.yml" logs -f auto-magic-calib-ms
 
 | Issue | Fix |
 |---|---|
-| `requests` not installed | Inside a venv: `python3 -m venv venv && ./venv/bin/pip install requests`. If `python3 -m venv` fails: `sudo apt install -y python3-venv python3-pip` first |
-| `[2] Uploaded N videos` where N >> 4 | `SAMPLE_DIR` resolved to the repo root (or another over-broad path) and `rglob("cam_*.mp4")` swept stale videos from `.cache/`, `projects/`, etc. Stop the run (`POST /v1/stop_calibration/{id}`), delete the project (`DELETE /v1/delete_project/{id}`), set `SAMPLE_DIR` explicitly to the extracted sample dir, re-run. The script anchors on `videos/` and asserts `len(videos) <= 16` to fail loud |
+| `requests` not installed | Install it before running the script: `python3 -m pip install requests` |
+| `[2] Uploaded N videos` where N >> 4 | `SAMPLE_DIR` resolved to the repo root (or another over-broad path) and `rglob("cam_*.mp4")` swept stale videos from `.cache/`, `projects/`, etc. Correct `SAMPLE_DIR`, then start a fresh project instead of trying to salvage the bad upload set. The script anchors on `videos/` and asserts `len(videos) <= 16` to fail loud |
 | `verify_project` returns state `!= READY` | Confirm all 4 videos + alignment + layout + GT uploaded; inspect `GET /v1/get_project_info/{id}` response |
 | Sample not extracted | `unzip <repo_root>/assets/sdg_08_2_sample_data_010926.zip -d <repo_root>/assets/.cache/sdg_08_2_sample_data_010926/` |
 | `cam_*.mp4` glob finds 0 files | Check wrapper-folder depth: `find <sample_dir> -name "cam_*.mp4"` |

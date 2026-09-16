@@ -18,7 +18,7 @@ version: 0.1.0
 upstream_refs:
   - kind: pypi_package
     name: pydicom
-    version_constraint: ">=2.4,<4"
+    version_constraint: ">=2.4.5,<4,!=3.0.0,!=3.0.1"
 license: Apache-2.0
 intended_use:
   summary: Engineering-time DICOM metadata extraction with a PHI-tag-presence flag.
@@ -46,12 +46,12 @@ runtime:
     - "${script}"
     - "${fixture}"
   dependencies:
-    pydicom: ">=2.4,<4"
+    pydicom: ">=2.4.5,<4,!=3.0.0,!=3.0.1"
     typer: ">=0.9"
   test_dependencies:
     jsonschema: ">=4.0"
   side_effects:
-    pip_packages: ["pydicom>=2.4,<4", "typer>=0.9"]
+    pip_packages: ["pydicom>=2.4.5,<4,!=3.0.0,!=3.0.1", "typer>=0.9"]
     local_writes:
       - {path: "<caller-provided --output>", approx_mb_max: 1, optional: true}
     home_writes: []
@@ -133,7 +133,7 @@ validation:
     # installed version drifts outside these bounds — catches what the
     # loose `runtime.dependencies` ranges silently allow (e.g. a pydicom
     # 3 → 4 bump that changes the save_as API).
-    pydicom: ">=2.4,<5"
+    pydicom: ">=2.4.5,<4,!=3.0.0,!=3.0.1"
   reproducibility:
     mode: repeat
     fixture: fixtures/sample_ct.dcm

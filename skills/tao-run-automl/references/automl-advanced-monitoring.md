@@ -184,7 +184,12 @@ def eval_on_held_out(rec, train_job_id):
 
 runner.run(
     ...,
-    automl_settings={"metric": task_metric, "direction": direction, ...},
+    automl_settings={
+        "metric": task_metric,
+        "direction": direction,
+        "session_id": session_id,
+        ...,
+    },
     eval_fn=eval_on_held_out,
 )
 ```
@@ -234,23 +239,107 @@ results from logs.
 
 Each rec takes 10–90 minutes depending on model size, dataset, epochs, and checkpoint save cost. Don't assume failure during long uploads.
 
+### Checkpoint retention
+
+`automl_delete_intermediate_ckpt` defaults to `True`. Sequential searches
+delete terminal failed and non-best trial artifacts as soon as they are no
+longer needed. Multi-fidelity searches retain parent/rung checkpoints while
+they are eligible for promotion or resume and prune them only after that
+dependency ends. Hybrid searches conservatively retain successful trial
+artifacts when full-fidelity provenance is ambiguous. For cleanup-supported
+sequential or provenance-verified scalar runs, completion retains the winning
+training artifacts and any separate final-evaluation result rather than one
+full checkpoint set per recommendation. Multi-objective runs retain every
+non-dominated Pareto-front checkpoint because there is no single winner across
+all objectives; conservative Hybrid runs can retain multiple successful
+trials. A run
+stopped by a recommendation budget is resumable and therefore does not receive
+completed-run pruning.
+
+Automatic cleanup covers SDK-routed job results: S3 prefixes, local absolute
+Docker `/results` binds, Lustre job directories, and VirtualEnv job results.
+For pruned Docker and Kubernetes trials it also verifies and removes the exact
+terminal container or UID-bound Job/pods before reporting cleanup complete, so
+stopped writable layers and pod-local storage do not accumulate.
+Keep checkpoints under the SDK-routed job results directory. Explicit output
+paths outside it are not owned by the cleanup policy. Before the first trial,
+cleanup-aware SDKs validate that the selected output route and identity can be
+reclaimed. With retention enabled, writable named Docker volumes, remote binds,
+root-output opt-outs, and unbound S3 identities are rejected rather than
+launched and silently accumulated. They may be used only with retention
+explicitly disabled and an externally owned cleanup lifecycle.
+Raw S3 secrets are never written to the durable job store. After a process or
+host restart, resume with the same explicit platform `env_vars`; retention
+preflight rebinds them to the recorded non-secret principal and endpoint before
+old trial cleanup is retried.
+
+Set the option to `False` only for an intentional all-trials debugging run and
+include the resulting storage cost and external cleanup owner in the launch
+review.
+
 ### Resume after interruption
 
-If the orchestrator dies mid-run (network timeout, machine sleep, Ctrl-C), re-run with `resume=True` and the **full suffixed path** (including the `run_<timestamp>` directory):
+On handled `SIGINT` or `SIGTERM`, the runner requests cancellation of active
+child jobs and waits for the platform to confirm that their writers are
+terminal before deleting anything. If termination cannot be confirmed within
+the bounded wait, the active-job record and artifacts remain for a later
+resume. An uncatchable process termination or host loss can also leave an
+in-flight backend job; recover that run with `resume=True` and the **full
+suffixed path** (including the `run_<timestamp>` directory):
+
+Resolve the controller identity before constructing the resumed runner:
+
+```bash
+SESSION_ID=$(python "$TAO_SKILL_BANK_PATH/skills/applications/tao-run-automl/scripts/resolve_automl_session.py" \
+  resolve --workspace ./my_experiment/run_20260423_183015)
+```
+
+The command fails closed if no controller state exists. It also refuses to
+choose arbitrarily when a workspace contains multiple controller files. For a
+workspace contaminated by an older failed resume, inspect the controller
+states and rerun with `--session-id <intended-id>`; never select the first file
+returned by the filesystem.
 
 ```python
 result = runner.run(
     ...,
     workspace_path="./my_experiment/run_20260423_183015",   # full suffixed path
+    automl_settings={**automl_settings, "session_id": "<resolved-session-id>"},
     resume=True,
 )
 ```
 
 When `resume=True`, the runner does NOT append a new timestamp suffix — it reuses the path as-is.
 
+For the original run, create the identity once after launch approval and before
+calling the runner:
+
+```bash
+SESSION_ID=$(python "$TAO_SKILL_BANK_PATH/skills/applications/tao-run-automl/scripts/resolve_automl_session.py" new)
+```
+
+Place that literal value in the sealed `automl_settings`. The resulting
+`.automl/controller/<session_id>.json` is the durable binding used by later
+resume invocations.
+
+Before either fresh or resumed `runner.run(...)`, call the bundled
+`validate_session_settings(automl_settings, resume=..., workspace=...)` gate
+shown in `SKILL.md`. Missing identities fail before the wheel can apply its
+random default; resumed identities must resolve to an existing controller.
+
+This is a skill-boundary safeguard. The currently packaged
+`nvidia-tao-automl` wheel still permits `resume=True` without a matching
+`session_id` and may silently create a fresh controller for callers outside
+this skill. NVBug 6662913 tracks that upstream fail-loud behavior; until the
+wheel changes, non-skill callers must apply the same explicit identity gate.
+
 Behaviour on resume:
-1. **Brain state** is reloaded from `<workspace>/.automl/*` — all completed rec results are already registered.
-2. **Any in-flight jobs** recorded in `<workspace>/active_jobs.json` (persisted after each submission) are polled to terminal, their metrics extracted, and reported to the brain — *before* the main propose-new-rec loop starts. No duplicate submissions; no leaked GPU work from the previous orchestrator.
+1. **Brain state** is reloaded from `<workspace>/.automl/*` for the explicit
+   `session_id` — all completed rec results are already registered. Treat
+   `Loaded controller state: 0 recommendations` as an error when the selected
+   controller file contains completed recommendations; cancel before a new
+   recommendation is submitted.
+2. **Any in-flight jobs** recorded in `<workspace>/active_jobs.json` (persisted after each submission) are polled to terminal, their recovered backend job IDs are restored on the recommendation, their metrics extracted, and reported to the brain — *before* the main propose-new-rec loop starts. No duplicate submissions or orphaned trial artifacts.
 3. After recovery, the loop continues normally until `automl.is_complete()`.
 
 ---
@@ -329,13 +418,13 @@ Model-specific notes do not belong in this AutoML skill. For every requested mod
 5. **Using a weak proxy metric.** The brain can optimize a metric that does not reflect real task quality. Use the metric recommended by the model skill or provide `eval_fn`.
 6. **Implicit direction trap.** If the metric name does not imply the desired direction, set `direction` explicitly.
 7. **Spec-override typos.** `save_freq_in_epochs` (plural) used to silently do nothing; now raises `ValueError` with suggestion. If you see that error, it's the fix working.
-8. **Orchestrator dies mid-sweep.** Relaunch with the same `workspace_path` and `resume=True`. In-flight jobs are recovered from `active_jobs.json`.
+8. **Orchestrator dies mid-sweep.** Resolve the existing `session_id`, then relaunch with the same full `workspace_path`, that session id in `automl_settings`, and `resume=True`. In-flight jobs are recovered from `active_jobs.json`. Missing or ambiguous controller state is a blocker, not permission to start a new search.
 9. **Rec never reports a metric.** Check the model skill's metric-emission requirements and custom extractor guidance.
 10. **Parallel Bayesian arms.** Bayesian is inherently sequential. If you want parallelism, use `asha`. If you use multiple `AutoMLRunner` instances, give each its own `<SDK>(state_file=...)` (e.g., `BrevSDK(state_file=...)`, `KubernetesSDK(state_file=...)`) to avoid SQLite write races on the SDK's job store.
 11. **LLM brain returning random configs.** If every LLM recommendation looks random, the LLM endpoint is probably failing silently. Check the logs for "LLM call failed" warnings. Verify your API key and endpoint are correct. Common cause: using the wrong endpoint URL (see pitfall #2).
 12. **`openai` package not installed.** The `llm`, `hybrid`, and `autoresearch` algorithms require the `openai` Python package. Install with `pip install openai` or reinstall tao-run-automl with the `llm` extra by resolving the platform wheel key from `versions.yaml` and appending `,llm` to the extra.
 13. **WandB not logging.** Ensure `wandb_config={"enabled": True}` is passed and either `api_key` is in the config or `WANDB_API_KEY` is set in the environment. Check logs for "WandB initialized" confirmation.
-14. **`No default train specs found` for a network.** The skill bank model directory is missing `references/spec_template_train.yaml`, or the packaged AutoML support check is missing `schemas/train.schema.json`. Generate both during skill-bank maintenance and ship them with the plugin; do not expect `~/tao-core` to exist on the runtime machine.
+14. **`No default specs found` for an action.** The skill bank model directory is missing `references/spec_template_<action>.yaml`, or the packaged AutoML support check is missing `schemas/<action>.schema.json`. Generate both during skill-bank maintenance and ship them with the plugin; do not expect `~/tao-core` to exist on the runtime machine.
 15. **`conda run` buffers output.** When running AutoML via `conda run -n tao_sdk python script.py`, all output is buffered until completion. Use `PYTHONUNBUFFERED=1 ~/miniconda3/envs/tao_sdk/bin/python script.py` for real-time output.
 
 ---
