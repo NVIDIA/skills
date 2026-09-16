@@ -1,0 +1,78 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+version: 2
+rules:
+  - id: "PE3"
+    path: "scripts/run.sh"
+    message: "*.[e]nv*"
+    reason: >-
+      Reviewed: reads the Mission Control stack's own explicitly named
+      docker-compose configuration file for the ports, MQTT transport and
+      broker login the runner needs to verify readiness. Fixed relative path
+      from the bring-up-cloud-stack dependency, not credential-file discovery.
+      No credential value is printed or transmitted.
+  - id: "PE3"
+    path: "scripts/doctor.py"
+    message: "*.[e]nv*"
+    reason: >-
+      Reviewed: read-only preflight. Resolves the same explicitly named
+      docker-compose files to report which image references the runner will
+      dereference. Values are reported as image tags; no credential value is
+      read, logged or transmitted.
+  - id: "PE5"
+    path: "scripts/run.sh"
+    message: "*--network host*"
+    reason: >-
+      Reviewed: Nova Carter SIL shares a ROS 2 DDS domain with Isaac Sim on the
+      host and with the Mission Control services, which are themselves
+      network_mode host. DDS discovery is multicast and does not cross a bridge
+      network, so host networking is required for the skill to function rather
+      than a convenience. The image is a pinned NVIDIA registry reference, and
+      the container is recorded in the run state file and stopped by --stop.
+  - id: "AE1"
+    path: "SKILL.md"
+    message: "*SKILL.md (partial)*"
+    reason: >-
+      Reviewed and accepted. These lines hand off to the resolved
+      isaac-sim-installation skill and instruct the agent to read that skill's
+      own runtime SKILL.md rather than restate its gates here, so the authority
+      for its behavior is a file this package deliberately does not vendor. The
+      reference is scoped, not evasive: upstream-versions.lock.json pins the
+      source repository and an immutable commit, and preflight refuses to mark
+      the manifest ready when the checkout is dirty or does not match the pin.
+      The artifact becomes locally analyzable once the upstream skills publish.
+  - id: "AE1"
+    path: "SKILL.md"
+    message: "*carter_warehouse_navigation.png (partial)*"
+    reason: >-
+      Reviewed: the referenced artifact is bundled at
+      assets/carter_warehouse_navigation.png and ships inside the package. It
+      is a Nav2 occupancy-grid image with no text content to inspect, which is
+      why it reports as partially analyzed. The surrounding prose documents how
+      the runtime copies that pair into Mission Control's generated config and
+      verifies the hashes; nothing is fetched at runtime and nothing is hidden.
+  - id: "AE1"
+    path: "SKILL.md"
+    message: "*scripts/doctor.py (partial)*"
+    reason: >-
+      Reviewed: scripts/doctor.py is bundled at
+      skills/isaac-orchestration/isaac-mission-control-showcase/scripts/doctor.py
+      and ships inside the package; nothing is fetched at runtime. It reports
+      as partially analyzed because of its size, not hidden or dynamic
+      content: it has no exec, eval, or dynamic import. Its subprocess calls
+      (git, docker, ROS CLI) and file-permission changes are already reviewed
+      individually by the Security Scan's own AST checks and are pinned to
+      explicit, non-user-controlled argument lists. The referenced
+      entrypoint, `scripts/doctor.py dependencies --prepare`, is a read-only
+      preflight and dependency resolver invoked exactly as shown at each
+      SKILL.md reference.
+  - id: "PE3"
+    path: "upstream-versions.lock.json"
+    message: "*.[e]nv*"
+    reason: >-
+      Reviewed: a filename inside the declared-resources array of the dependency
+      lock file, recording which files preflight verifies are present in the
+      bring-up-cloud-stack checkout. Declaring the paths the skill depends on is
+      disclosure rather than credential access; this file is data, opens
+      nothing, and no value is read from it.
+fingerprints: []
