@@ -46,7 +46,7 @@ the product checkout. `models/` contains the deployable ONNX and engine, not Fou
    venv use `uv sync --inexact --extra foundationpose` to preserve out-of-band packages.
 3. **Verify checkpoint access.** SAM3 is gated at Hugging Face; an existing authorized token
    or usable cached checkpoint is sufficient. Request user action only if access is missing.
-   FoundationPose and the documented FoundationStereo export are public NGC downloads;
+   FoundationPose and the documented FoundationStereo export are public Hugging Face downloads;
    credential hunting is not the first response to a network failure.
 4. **Prepare the depth engine.** Read [engine construction](references/engine.md). Use the
    user's ONNX location or the sibling `models/` directory. Adapt the dataset before measuring

@@ -86,6 +86,8 @@ git clone https://github.com/nvidia-isaac/foundation-pose-inference-library.git 
 Enter that checkout. Create `.env` from `.env.example` only if it does not exist; preserve any
 existing configuration. On a fresh setup set `FP_UID` and `FP_GID` to the current user's IDs.
 Keep `FP_WEIGHTS_DIR=./weights` unless using an intentional custom layout.
+The library's download script fetches the public ONNX weights from
+[nvidia/foundationpose on Hugging Face](https://huggingface.co/nvidia/foundationpose):
 
 ```bash
 cd "$PIPELINE_PARENT/foundation-pose-inference-library"

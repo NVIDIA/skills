@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `foundationpose-setup`
-- Evaluation date: 2026-09-14
+- Evaluation date: 2026-09-15
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.6% — baseline ran, but no comparable score was available; uplift unavailable | 93.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 95.2% — baseline ran, but no comparable score was available; uplift unavailable | 92.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 70.0% → 100.0% (+30.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Correctness | 85.0% → 100.0% (+15.0 points) | 80.0% → 100.0% (+20.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 86.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 69.4% → 94.4% (+25.0 points) | 71.3% → 88.8% (+17.5 points) |
-| Efficiency | 78.7% — baseline ran, but no comparable score was available; uplift unavailable | 90.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 74.4% → 99.4% (+25.0 points) | 62.1% → 86.3% (+24.2 points) |
+| Efficiency | 76.5% — baseline ran, but no comparable score was available; uplift unavailable | 90.4% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 424,252 | 413,557 | +10,695 | +2.59% | skill 4/4; base 4/4 |
-| claude-code | setup-context-engine-shape | 147,698 | 141,601 | +6,097 | +4.31% | skill 1/1; base 1/1 |
-| claude-code | setup-explicit-os-floor | 98,974 | 99,295 | -321 | -0.32% | skill 1/1; base 1/1 |
-| claude-code | setup-implicit-repair | 146,664 | 141,339 | +5,325 | +3.77% | skill 1/1; base 1/1 |
-| claude-code | setup-negative-dataset-results | 30,916 | 31,322 | -406 | -1.30% | skill 1/1; base 1/1 |
-| codex | All cases | 254,808 | 282,582 | -27,774 | -9.83% | skill 4/4; base 4/4 |
-| codex | setup-context-engine-shape | 101,693 | 81,146 | +20,547 | +25.32% | skill 1/1; base 1/1 |
-| codex | setup-explicit-os-floor | 61,325 | 68,751 | -7,426 | -10.80% | skill 1/1; base 1/1 |
-| codex | setup-implicit-repair | 77,939 | 119,251 | -41,312 | -34.64% | skill 1/1; base 1/1 |
-| codex | setup-negative-dataset-results | 13,851 | 13,434 | +417 | +3.10% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 679,060 | 696,139 | -17,079 | -2.45% | skill 8/8; base 8/8 |
+| claude-code | All cases | 597,942 | 379,728 | +218,214 | +57.47% | skill 4/4; base 4/4 |
+| claude-code | setup-context-engine-shape | 190,170 | 145,461 | +44,709 | +30.74% | skill 1/1; base 1/1 |
+| claude-code | setup-explicit-os-floor | 97,439 | 97,282 | +157 | +0.16% | skill 1/1; base 1/1 |
+| claude-code | setup-implicit-repair | 279,618 | 106,036 | +173,582 | +163.70% | skill 1/1; base 1/1 |
+| claude-code | setup-negative-dataset-results | 30,715 | 30,949 | -234 | -0.76% | skill 1/1; base 1/1 |
+| codex | All cases | 276,000 | 261,531 | +14,469 | +5.53% | skill 4/4; base 4/4 |
+| codex | setup-context-engine-shape | 81,772 | 88,279 | -6,507 | -7.37% | skill 1/1; base 1/1 |
+| codex | setup-explicit-os-floor | 76,845 | 101,292 | -24,447 | -24.14% | skill 1/1; base 1/1 |
+| codex | setup-implicit-repair | 103,490 | 58,226 | +45,264 | +77.74% | skill 1/1; base 1/1 |
+| codex | setup-negative-dataset-results | 13,893 | 13,734 | +159 | +1.16% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 873,942 | 641,259 | +232,683 | +36.29% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 4 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 3 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -82,8 +82,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <summary>Show detailed findings and successful checks</summary>
 
 - **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/foundationpose-setup/SKILL.md`)
-- **MEDIUM** SECURITY/External Transmission (E1): Data Exfiltration: https://api.ngc.nvidia.com/ (`references/engine.md:18`)
-- **MEDIUM** SECURITY/Unknown (RP1): MCP Rug Pull: The command `docker run --rm --gpus=all ubuntu:24.04 nvidia-smi` uses the `ubuntu:24.04` image with only a mutable versi (`references/installation.md:17`)
+- **MEDIUM** SECURITY/Unknown (RP1): MCP Rug Pull: The command `docker run --rm --gpus=all ubuntu:24.04 nvidia-smi` uses `ubuntu:24.04` without a digest (SHA256 pinned ref (`references/installation.md:17`)
 - **LOW** QUALITY/quality_discoverability: Description very long (214 chars, recommend 50-150) (`skills/foundationpose-setup/SKILL.md`)
 
 </details>
