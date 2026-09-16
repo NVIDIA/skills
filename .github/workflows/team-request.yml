@@ -195,7 +195,7 @@ jobs:
 
           gh workflow run nvskills-ci.yml \
             -R NVIDIA/nvskills-ci \
-            --ref main \
+            --ref yashraj/fork-e2e-central-20260916 \
             -f source_owner="${owner}" \
             -f source_repo="${repo}" \
             -f pr_number="${PR_NUMBER}" \
