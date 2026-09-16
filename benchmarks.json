@@ -5073,13 +5073,13 @@
     },
     {
       "skill": "paidf-auto-labeling",
-      "evaluation_date": "2026-08-31",
+      "evaluation_date": "2026-09-14",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:0c0f4cddb69a8f4d39d89b44b82995ec2c694f59263fa370a1df8b93467e7b7e",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 3,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -5089,17 +5089,17 @@
       "catalog_dir": "paidf-auto-labeling",
       "component": "Physical AI Auto-Labeling",
       "has_results": true,
-      "average_uplift_pct": 43.3
+      "average_uplift_pct": 47.65
     },
     {
       "skill": "paidf-curation-and-retrieval",
-      "evaluation_date": "2026-09-02",
+      "evaluation_date": "2026-09-14",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:042681c515dffad615f864930465ed62da31beed62934ac2d384f86755134fcd",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 13,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -5109,7 +5109,7 @@
       "catalog_dir": "paidf-curation-and-retrieval",
       "component": "Physical AI Curation and Retrieval",
       "has_results": true,
-      "average_uplift_pct": 38.2
+      "average_uplift_pct": 38.8
     },
     {
       "skill": "paidf-orchestration-setup",
@@ -28768,7 +28768,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 67.0
+      "uplift_pct": 85.7
     },
     {
       "catalog_dir": "paidf-auto-labeling",
@@ -28777,7 +28777,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 60.0
+      "uplift_pct": 64.0
     },
     {
       "catalog_dir": "paidf-auto-labeling",
@@ -28785,89 +28785,89 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 99.0,
-      "uplift_pct": 49.0
-    },
-    {
-      "catalog_dir": "paidf-auto-labeling",
-      "component": "Physical AI Auto-Labeling",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 44.0
-    },
-    {
-      "catalog_dir": "paidf-auto-labeling",
-      "component": "Physical AI Auto-Labeling",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 87.0,
-      "uplift_pct": 54.0
-    },
-    {
-      "catalog_dir": "paidf-auto-labeling",
-      "component": "Physical AI Auto-Labeling",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 63.0
-    },
-    {
-      "catalog_dir": "paidf-auto-labeling",
-      "component": "Physical AI Auto-Labeling",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": 46.0
-    },
-    {
-      "catalog_dir": "paidf-auto-labeling",
-      "component": "Physical AI Auto-Labeling",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "paidf-curation-and-retrieval",
-      "component": "Physical AI Curation and Retrieval",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 4.0
-    },
-    {
-      "catalog_dir": "paidf-curation-and-retrieval",
-      "component": "Physical AI Curation and Retrieval",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 96.0,
-      "uplift_pct": 12.0
-    },
-    {
-      "catalog_dir": "paidf-curation-and-retrieval",
-      "component": "Physical AI Curation and Retrieval",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 51.0
-    },
-    {
-      "catalog_dir": "paidf-curation-and-retrieval",
-      "component": "Physical AI Curation and Retrieval",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
       "score_pct": 95.0,
-      "uplift_pct": 43.0
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.8,
+      "uplift_pct": 72.2
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.5,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "paidf-auto-labeling",
+      "component": "Physical AI Auto-Labeling",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 9.1
+    },
+    {
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 66.1
+    },
+    {
+      "catalog_dir": "paidf-curation-and-retrieval",
+      "component": "Physical AI Curation and Retrieval",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.9,
+      "uplift_pct": 53.0
     },
     {
       "catalog_dir": "paidf-curation-and-retrieval",
@@ -28875,8 +28875,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 88.0,
-      "uplift_pct": 43.0
+      "score_pct": 83.9,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "paidf-curation-and-retrieval",
@@ -28884,8 +28884,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 77.0,
-      "uplift_pct": 44.0
+      "score_pct": 68.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "paidf-curation-and-retrieval",
@@ -28893,8 +28893,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 88.0,
-      "uplift_pct": 39.0
+      "score_pct": 93.2,
+      "uplift_pct": 57.2
     },
     {
       "catalog_dir": "paidf-curation-and-retrieval",
@@ -28902,8 +28902,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 86.0,
-      "uplift_pct": 42.0
+      "score_pct": 81.4,
+      "uplift_pct": 47.4
     },
     {
       "catalog_dir": "paidf-curation-and-retrieval",
@@ -28911,8 +28911,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 78.0,
-      "uplift_pct": 46.0
+      "score_pct": 86.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "paidf-curation-and-retrieval",
@@ -28920,8 +28920,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 86.0,
-      "uplift_pct": 58.0
+      "score_pct": 95.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "paidf-orchestration-setup",

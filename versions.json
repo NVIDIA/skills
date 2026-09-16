@@ -1845,16 +1845,16 @@
     {
       "name": "paidf-auto-labeling",
       "path": "skills/paidf-auto-labeling",
-      "content_digest": "sha256:d19a4d6e35edf75137ca7443c1a499fa91a5422dd747732004bf5fc028ce0602",
-      "last_commit": "7ba295872d03de3e5362ec07eddeb1850144f42e",
-      "last_modified": "2026-08-31"
+      "content_digest": "sha256:44a8afdcbc425705b6beb483d5676175d25ca0a6168cb651676b74a372c9629a",
+      "last_commit": "d9c6f907a6e27063a1946a6d464eddf157f703be",
+      "last_modified": "2026-09-16"
     },
     {
       "name": "paidf-curation-and-retrieval",
       "path": "skills/paidf-curation-and-retrieval",
-      "content_digest": "sha256:18dced75e582b3d7b106d6b862d38cbd87c9dbfb97576f58b080b917bf48dc56",
-      "last_commit": "b2ff05ff6eca47ab7c6ddca5af7c8422ecef0585",
-      "last_modified": "2026-09-03"
+      "content_digest": "sha256:b6895349b8b8a9a676cabb9c3ce8a843af55ce5294b427c0435bf5c2624a1e2b",
+      "last_commit": "d9c6f907a6e27063a1946a6d464eddf157f703be",
+      "last_modified": "2026-09-16"
     },
     {
       "name": "paidf-orchestration-setup",
