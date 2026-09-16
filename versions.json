@@ -809,9 +809,9 @@
     {
       "name": "foundationpose-setup",
       "path": "skills/foundationpose-setup",
-      "content_digest": "sha256:afa44f739e4e4ca2469206d75fb70148de74ca2cda65347c62283779ab4141c7",
-      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
-      "last_modified": "2026-09-15"
+      "content_digest": "sha256:f7543a9a31a9ba851720cca7664d59917140a20d77b5e73226fac0377971bed5",
+      "last_commit": "a5a01eb1c6d8dc515a38060b019f7e19f9b0ef8f",
+      "last_modified": "2026-09-16"
     },
     {
       "name": "holohub-app-lifecycle",
@@ -1642,9 +1642,9 @@
     {
       "name": "nemotron-asr-finetune",
       "path": "skills/nemotron-asr-finetune",
-      "content_digest": "sha256:5b73f16432d3c09b28a604d6f9cb62205f84581e0cc0ad61bffab59cfea3741c",
-      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
-      "last_modified": "2026-09-15"
+      "content_digest": "sha256:73ac45ea58271b09cb419b4a75fa8b271f32966383e29be21c460609b4144743",
+      "last_commit": "a5a01eb1c6d8dc515a38060b019f7e19f9b0ef8f",
+      "last_modified": "2026-09-16"
     },
     {
       "name": "nemotron-customize",

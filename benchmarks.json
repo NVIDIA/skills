@@ -2,7 +2,7 @@
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
   "skill_count": 365,
-  "result_row_count": 3370,
+  "result_row_count": 3375,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -2131,7 +2131,7 @@
     },
     {
       "skill": "foundationpose-setup",
-      "evaluation_date": "2026-09-14",
+      "evaluation_date": "2026-09-15",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:630465a8eabab5dc1555b505a71728ed5e9bf504f29da89fde0808baaa447d61",
@@ -2147,7 +2147,7 @@
       "catalog_dir": "foundationpose-setup",
       "component": "FoundationPose Perception Pipeline",
       "has_results": true,
-      "average_uplift_pct": 15.42
+      "average_uplift_pct": 14.03
     },
     {
       "skill": "holohub-app-lifecycle",
@@ -4496,7 +4496,7 @@
     },
     {
       "skill": "nemotron-asr-finetune",
-      "evaluation_date": "2026-09-11",
+      "evaluation_date": "2026-09-15",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:1265bdc5a4c5f3bcc2526b4d79cee536998a77dcc82765150ae3cbc7bcb05c2d",
@@ -4504,7 +4504,7 @@
       "tasks": 17,
       "attempts_per_task": 3,
       "pass_threshold_pct": null,
-      "verdict": "INCOMPLETE",
+      "verdict": "PASS",
       "agents": [
         "claude-code",
         "codex"
@@ -4512,7 +4512,7 @@
       "catalog_dir": "nemotron-asr-finetune",
       "component": "Nemotron Speech",
       "has_results": true,
-      "average_uplift_pct": 17.4
+      "average_uplift_pct": 20.22
     },
     {
       "skill": "nemotron-customize",
@@ -16573,7 +16573,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 30.0
+      "uplift_pct": 15.0
     },
     {
       "catalog_dir": "foundationpose-setup",
@@ -16608,7 +16608,7 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 94.4,
+      "score_pct": 99.4,
       "uplift_pct": 25.0
     },
     {
@@ -16617,8 +16617,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 88.8,
-      "uplift_pct": 17.5
+      "score_pct": 86.3,
+      "uplift_pct": 24.2
     },
     {
       "catalog_dir": "foundationpose-setup",
@@ -16626,7 +16626,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 78.7,
+      "score_pct": 76.5,
       "uplift_pct": null
     },
     {
@@ -16635,7 +16635,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.5,
+      "score_pct": 90.4,
       "uplift_pct": null
     },
     {
@@ -26498,9 +26498,27 @@
       "component": "Nemotron Speech",
       "dimension": "Security",
       "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.1,
+      "uplift_pct": -5.9
+    },
+    {
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
+      "dimension": "Security",
+      "num": null,
       "agent": "codex",
       "score_pct": 80.0,
-      "uplift_pct": 2.2
+      "uplift_pct": -5.2
+    },
+    {
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.1,
+      "uplift_pct": 33.1
     },
     {
       "catalog_dir": "nemotron-asr-finetune",
@@ -26508,8 +26526,17 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 82.0,
-      "uplift_pct": 19.8
+      "score_pct": 83.0,
+      "uplift_pct": 24.5
+    },
+    {
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.2,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemotron-asr-finetune",
@@ -26517,7 +26544,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 92.1,
+      "score_pct": 91.8,
       "uplift_pct": null
     },
     {
@@ -26525,9 +26552,27 @@
       "component": "Nemotron Speech",
       "dimension": "Effectiveness",
       "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.3,
+      "uplift_pct": 46.2
+    },
+    {
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
+      "dimension": "Effectiveness",
+      "num": null,
       "agent": "codex",
-      "score_pct": 64.7,
-      "uplift_pct": 30.2
+      "score_pct": 66.7,
+      "uplift_pct": 28.6
+    },
+    {
+      "catalog_dir": "nemotron-asr-finetune",
+      "component": "Nemotron Speech",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemotron-asr-finetune",
@@ -26535,7 +26580,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 76.7,
+      "score_pct": 80.3,
       "uplift_pct": null
     },
     {
