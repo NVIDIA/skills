@@ -1753,6 +1753,18 @@
       }
     },
     {
+      "path": "skills/isaac-mission-control-showcase",
+      "name": "isaac-mission-control-showcase",
+      "description": "Run and validate an end-to-end Mission Control showcase with a locally installed Isaac Sim launched in its GUI window, driven through the isaac-sim-remote Python server, with Nova Carter SIL. Use for demos, showcase replays, Mission Control driving a simulated robot, or diagnosing the integrated small-warehouse scenario. Detect existing Isaac Sim installations without modifying them, automatically select a usable runtime without prompting whenever compatibility can be confirmed, and delegate requested installation or version changes to isaac-sim-installation. Defaults to a canonical Isaac 6.0 warehouse and deterministic circular route when the user does not specify another scenario.",
+      "metadata": {
+        "product.primary": "Mission Control",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "robotics-simulation",
+        "audience": "robotics_developer,simulation_engineer,developer",
+        "discovery.activity_tags": "validate,operate,troubleshoot,integrate,configure"
+      }
+    },
+    {
       "path": "skills/jetson-build-source",
       "name": "jetson-build-source",
       "description": "Use when you need to rebuild the BSP overlay — DT, OOT modules, or kernel — from changes under bsp_sources/. Triggers: build bsp, rebuild dtb, rebuild kernel.",

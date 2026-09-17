@@ -107,7 +107,8 @@
         "i4h-workflow-create",
         "i4h-workflow-dataset-replay",
         "i4h-workflow-scene-edit",
-        "i4h-workflow-validate"
+        "i4h-workflow-validate",
+        "isaac-mission-control-showcase"
       ]
     },
     {

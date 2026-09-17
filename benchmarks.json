@@ -2765,7 +2765,7 @@
         "codex"
       ],
       "catalog_dir": "isaac-mission-control-showcase",
-      "component": null,
+      "component": "Physical AI",
       "has_results": true,
       "average_uplift_pct": 24.1
     },
@@ -19180,7 +19180,7 @@
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
-      "component": null,
+      "component": "Physical AI",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -19189,7 +19189,7 @@
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
-      "component": null,
+      "component": "Physical AI",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -19198,7 +19198,7 @@
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
-      "component": null,
+      "component": "Physical AI",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -19207,7 +19207,7 @@
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
-      "component": null,
+      "component": "Physical AI",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -19216,7 +19216,7 @@
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
-      "component": null,
+      "component": "Physical AI",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -19225,7 +19225,7 @@
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
-      "component": null,
+      "component": "Physical AI",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -19234,7 +19234,7 @@
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
-      "component": null,
+      "component": "Physical AI",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -19243,7 +19243,7 @@
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
-      "component": null,
+      "component": "Physical AI",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -19252,7 +19252,7 @@
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
-      "component": null,
+      "component": "Physical AI",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -19261,7 +19261,7 @@
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
-      "component": null,
+      "component": "Physical AI",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
