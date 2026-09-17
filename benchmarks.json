@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 365,
-  "result_row_count": 3375,
+  "skill_count": 366,
+  "result_row_count": 3385,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -2748,6 +2748,26 @@
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
       "average_uplift_pct": 28.4
+    },
+    {
+      "skill": "isaac-mission-control-showcase",
+      "evaluation_date": "2026-09-17",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:43742a466533f3d0d814ea60502c8cf27d813445291cbbfda6f2f931faed3fe2",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": null,
+      "has_results": true,
+      "average_uplift_pct": 24.1
     },
     {
       "skill": "jetson-build-source",
@@ -19157,6 +19177,96 @@
       "agent": "claude-code",
       "score_pct": 86.0,
       "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": null,
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": null,
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 41.7,
+      "uplift_pct": -58.3
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": null,
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": null,
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 70.0,
+      "uplift_pct": 47.8
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": null,
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": null,
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 82.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": null,
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.1,
+      "uplift_pct": 56.5
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": null,
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 49.2,
+      "uplift_pct": 23.6
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": null,
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": null,
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "jetson-build-source",
