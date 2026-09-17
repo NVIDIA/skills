@@ -6,7 +6,7 @@
     "expected_script": null,
     "ground_truth": "The agent should select the isaac-mission-control-showcase skill, apply the canonical default (Isaac 6.0 warehouse, deterministic circular route) since no other scenario is specified, and follow the default workflow: resolve dependencies, apply runtime selection, run the read-only preflight, then start or demo the stack.",
     "expected_behavior": [
-      "Reads skills/isaac-orchestration/isaac-mission-control-showcase/SKILL.md.",
+      "Reads skills/isaac-mission-control-showcase/SKILL.md.",
       "Selects isaac-mission-control-showcase rather than a generic Isaac Sim or Mission Control skill.",
       "Uses the canonical Isaac 6.0 warehouse and deterministic circular route because no other scenario was specified.",
       "Runs scripts/doctor.py dependencies --prepare or the read-only --preflight check before starting the stack."
