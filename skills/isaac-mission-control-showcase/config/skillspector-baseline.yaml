@@ -56,7 +56,7 @@ rules:
     message: "*scripts/doctor.py (partial)*"
     reason: >-
       Reviewed: scripts/doctor.py is bundled at
-      skills/isaac-orchestration/isaac-mission-control-showcase/scripts/doctor.py
+      skills/isaac-mission-control-showcase/scripts/doctor.py
       and ships inside the package; nothing is fetched at runtime. It reports
       as partially analyzed because of its size, not hidden or dynamic
       content: it has no exec, eval, or dynamic import. Its subprocess calls
