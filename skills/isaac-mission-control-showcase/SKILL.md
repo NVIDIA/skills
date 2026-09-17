@@ -85,7 +85,7 @@ first run that is still populating shader and asset caches.
    read-only preflight:
 
    ```bash
-   skills/isaac-orchestration/isaac-mission-control-showcase/scripts/run.sh --preflight
+   skills/isaac-mission-control-showcase/scripts/run.sh --preflight
    ```
 
 3. Ask the user to stop or relocate every reported running container that is
@@ -96,13 +96,13 @@ first run that is still populating shader and asset caches.
 4. Start the stack and leave the robot idle:
 
    ```bash
-   skills/isaac-orchestration/isaac-mission-control-showcase/scripts/run.sh
+   skills/isaac-mission-control-showcase/scripts/run.sh
    ```
 
 5. Or run the deterministic closed route and wait for completion:
 
    ```bash
-   skills/isaac-orchestration/isaac-mission-control-showcase/scripts/run.sh --demo
+   skills/isaac-mission-control-showcase/scripts/run.sh --demo
    ```
 
 6. Watch the robot in the Isaac Sim window that the runner opens. The runner
@@ -111,7 +111,7 @@ first run that is still populating shader and asset caches.
 7. Stop only the recorded showcase resources:
 
    ```bash
-   skills/isaac-orchestration/isaac-mission-control-showcase/scripts/run.sh --stop
+   skills/isaac-mission-control-showcase/scripts/run.sh --stop
    ```
 
 Every run writes `run-manifest.json` into its work directory before anything
@@ -120,7 +120,7 @@ described and stopped precisely. `run-result.json` is the machine-readable
 acceptance artifact. Inspect a run, including one that was interrupted, with:
 
 ```bash
-skills/isaac-orchestration/isaac-mission-control-showcase/scripts/showcase.py \
+skills/isaac-mission-control-showcase/scripts/showcase.py \
   run-status --work-dir <dir>
 ```
 
@@ -250,7 +250,7 @@ For a user-selected noncanonical Isaac version that is already installed:
    ```bash
    ISAAC_SIM_DIR=<resolved-install-path> \
    WAREHOUSE_USD_URI=<resolved-uri> \
-     skills/isaac-orchestration/isaac-mission-control-showcase/scripts/run.sh
+     skills/isaac-mission-control-showcase/scripts/run.sh
    ```
 
 3. Do not infer a future URI by substituting a version number. A local
@@ -264,7 +264,7 @@ For a user-selected noncanonical Isaac version that is already installed:
 `carter01` is only the default. Set another identity with either:
 
 ```bash
-skills/isaac-orchestration/isaac-mission-control-showcase/scripts/run.sh \
+skills/isaac-mission-control-showcase/scripts/run.sh \
   --robot-name my_robot --demo
 ```
 
