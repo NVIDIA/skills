@@ -1,7 +1,7 @@
 ## Description: <br>
 Run and validate an end-to-end Mission Control showcase with a locally installed Isaac Sim launched in its GUI window, driven through the isaac-sim-remote Python server, with Nova Carter SIL. <br>
 
-This skill is for demonstration purposes and not for production usage. <br>
+This skill is ready for commercial/non-commercial use. <br>
 
 ## Owner
 NVIDIA <br>
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and robotics engineers who need to run, validate, or demonstrate an end-to-end Mission Control scenario with Nova Carter SIL in a simulated Isaac Sim warehouse environment. <br>
+Developers and robotics engineers use this skill to run and validate end-to-end Mission Control showcase demonstrations with Isaac Sim and Nova Carter SIL, including demos, showcase replays, and integrated small-warehouse scenario diagnostics. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,21 +25,21 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Workflow reference](references/workflow.md) <br>
-- [Troubleshooting guide](references/troubleshooting.md) <br>
-- [Publishing layout](references/publishing-layout.md) <br>
-- [Bring up cloud stack](references/bring-up-cloud-stack/README.md) <br>
-- [Change fleet composition](references/change-fleet-composition/README.md) <br>
-- [Change map](references/change-map/README.md) <br>
-- [Isaac Sim remote](references/isaac-sim-remote/README.md) <br>
-- [Isaac Sim installation](references/isaac-sim-installation/README.md) <br>
+- [Workflow and Stage Router](references/workflow.md) <br>
+- [Troubleshooting](references/troubleshooting.md) <br>
+- [Publishing Layout](references/publishing-layout.md) <br>
+- [Bring Up Cloud Stack](references/bring-up-cloud-stack/README.md) <br>
+- [Change Fleet Composition](references/change-fleet-composition/README.md) <br>
+- [Change Map](references/change-map/README.md) <br>
+- [Isaac Sim Remote](references/isaac-sim-remote/README.md) <br>
+- [Isaac Sim Installation](references/isaac-sim-installation/README.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Validation results] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Files] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Writes run-manifest.json and run-result.json for machine-readable acceptance] <br>
+**Other Properties Related to Output:** [Writes run-manifest.json and run-result.json acceptance artifacts to the work directory] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -48,23 +48,23 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 evaluation tasks (3 positive, 1 negative) from skill-evaluator-dataset-snapshot/1, each attempt in an isolated sandbox pod. <br>
+4 evaluation tasks (3 positive, 1 negative) from skill-evaluator-dataset-snapshot/1, each run with 3 attempts in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- Effectiveness: Checks whether the user's goal was achieved and the expected workflow behavior was followed (equal-weight mean of goal_accuracy and behavior_check). <br>
-- Efficiency: Checks tool-call productivity and token efficiency (50% each). <br>
+- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was selected and activated when needed. <br>
+- Effectiveness: Whether the skill helps complete the user's goal (50% goal completion + 50% expected workflow adherence). <br>
+- Efficiency: Whether the skill avoids wasted tool calls and token usage (50% tool productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability, not here). <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
@@ -72,12 +72,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 88.8% | 79.5% |
-| Security | 85.7% → 87.5% (+1.8 pts) | 50.0% → 75.0% (+25.0 pts) |
-| Correctness | 37.1% → 100.0% (+62.9 pts) | 33.3% → 85.0% (+51.7 pts) |
-| Discoverability | 94.3% | 76.7% |
-| Effectiveness | 36.1% → 84.4% (+48.3 pts) | 30.3% → 78.8% (+48.5 pts) |
-| Efficiency | 77.7% | 81.8% |
+| Overall | 93.1% — baseline ran, but no comparable score was available; uplift unavailable | 65.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 41.7% (-58.3 points) |
+| Correctness | 25.0% → 100.0% (+75.0 points) | 22.2% → 70.0% (+47.8 points) |
+| Discoverability | 90.0% — baseline ran, but no comparable score was available; uplift unavailable | 82.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 31.6% → 88.1% (+56.5 points) | 25.6% → 49.2% (+23.6 points) |
+| Efficiency | 87.2% — baseline ran, but no comparable score was available; uplift unavailable | 85.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
 0.3.0 (source: changelog, released 2025-05-21) <br>

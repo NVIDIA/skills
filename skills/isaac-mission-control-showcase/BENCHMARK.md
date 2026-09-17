@@ -9,11 +9,11 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `isaac-mission-control-showcase`
-- Evaluation date: 2026-09-16
+- Evaluation date: 2026-09-17
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
-- Dataset digest: `sha256:6774b0e98e607d6fb492ba23b54ff01a25404929216b1bbec887b97f4f393e0a` (skill-evaluator-dataset-snapshot/1)
+- Dataset digest: `sha256:43742a466533f3d0d814ea60502c8cf27d813445291cbbfda6f2f931faed3fe2` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 3
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 88.8% — baseline ran, but no comparable score was available; uplift unavailable | 79.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 85.7% → 87.5% (+1.8 points) | 50.0% → 75.0% (+25.0 points) |
-| Correctness | 37.1% → 100.0% (+62.9 points) | 33.3% → 85.0% (+51.7 points) |
-| Discoverability | 94.3% — baseline ran, but no comparable score was available; uplift unavailable | 76.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 36.1% → 84.4% (+48.3 points) | 30.3% → 78.8% (+48.5 points) |
-| Efficiency | 77.7% — baseline ran, but no comparable score was available; uplift unavailable | 81.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 93.1% — baseline ran, but no comparable score was available; uplift unavailable | 65.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 41.7% (-58.3 points) |
+| Correctness | 25.0% → 100.0% (+75.0 points) | 22.2% → 70.0% (+47.8 points) |
+| Discoverability | 90.0% — baseline ran, but no comparable score was available; uplift unavailable | 82.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 31.6% → 88.1% (+56.5 points) | 25.6% → 49.2% (+23.6 points) |
+| Efficiency | 87.2% — baseline ran, but no comparable score was available; uplift unavailable | 85.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,676,317 | 1,726,553 | N/A | N/A | skill 4/4; base 7/7 |
-| claude-code | isaac-mission-control-showcase-reasoning-isaac-sim-not-installed | 531,151 | 408,604 | N/A | N/A | skill 1/1; base 2/2 |
-| claude-code | isaac-mission-control-showcase-reasoning-swap-resize-refusal | 304,491 | 385,408 | -80,917 | -21.00% | skill 1/1; base 1/1 |
-| claude-code | isaac-mission-control-showcase-trigger-kit-extension-negative | 91,283 | 30,781 | +60,502 | +196.56% | skill 1/1; base 1/1 |
-| claude-code | isaac-mission-control-showcase-trigger-run-demo | 749,392 | 901,760 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 862,326 | 2,364,476 | N/A | N/A | skill 4/4; base 9/9 |
-| codex | isaac-mission-control-showcase-reasoning-isaac-sim-not-installed | 288,154 | 1,006,324 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | isaac-mission-control-showcase-reasoning-swap-resize-refusal | 211,888 | 475,570 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | isaac-mission-control-showcase-trigger-kit-extension-negative | 32,295 | 51,801 | -19,506 | -37.66% | skill 1/1; base 1/1 |
-| codex | isaac-mission-control-showcase-trigger-run-demo | 329,989 | 830,781 | N/A | N/A | skill 1/1; base 2/2 |
-| ALL AGENTS | Dataset aggregate | 2,538,643 | 4,091,029 | N/A | N/A | skill 8/8; base 16/16 |
+| claude-code | All cases | 1,532,910 | 1,617,779 | N/A | N/A | skill 4/4; base 8/8 |
+| claude-code | isaac-mission-control-showcase-reasoning-isaac-sim-not-installed | 666,432 | 487,827 | N/A | N/A | skill 1/1; base 3/3 |
+| claude-code | isaac-mission-control-showcase-reasoning-swap-resize-refusal | 199,093 | 319,336 | -120,243 | -37.65% | skill 1/1; base 1/1 |
+| claude-code | isaac-mission-control-showcase-trigger-kit-extension-negative | 61,433 | 30,563 | +30,870 | +101.00% | skill 1/1; base 1/1 |
+| claude-code | isaac-mission-control-showcase-trigger-run-demo | 605,952 | 780,053 | N/A | N/A | skill 1/1; base 3/3 |
+| codex | All cases | 1,358,777 | 1,029,948 | N/A | N/A | skill 6/6; base 9/9 |
+| codex | isaac-mission-control-showcase-reasoning-isaac-sim-not-installed | 355,064 | 392,450 | N/A | N/A | skill 1/1; base 3/3 |
+| codex | isaac-mission-control-showcase-reasoning-swap-resize-refusal | 568,072 | 204,911 | N/A | N/A | skill 3/3; base 2/2 |
+| codex | isaac-mission-control-showcase-trigger-kit-extension-negative | 60,734 | 50,550 | +10,184 | +20.15% | skill 1/1; base 1/1 |
+| codex | isaac-mission-control-showcase-trigger-run-demo | 374,907 | 382,037 | N/A | N/A | skill 1/1; base 3/3 |
+| ALL AGENTS | Dataset aggregate | 2,891,687 | 2,647,727 | N/A | N/A | skill 10/10; base 17/17 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 44 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 49 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -90,7 +90,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** QUALITY/quality_correctness: Instructions don't mention 'run_script' (`skills/isaac-mission-control-showcase/SKILL.md`)
 - **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/isaac-mission-control-showcase/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/isaac-mission-control-showcase/SKILL.md`)
-- 40 additional finding(s) are available in the full evaluation artifacts.
+- 45 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 
