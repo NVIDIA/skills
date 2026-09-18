@@ -18,7 +18,7 @@
 - **Memory preflight fails:** use a 64 GB-class host with at least 48 GB
   available RAM and 4 GB free swap. Carter receives a 20 GB memory limit and
   a 24 GB combined memory-plus-swap limit.
-- **Warehouse URI fails:** keep the canonical 6.0 URI for the default. For a
+- **Warehouse URI fails:** keep the canonical 6.1 URI for the default. For a
   custom Isaac installation, resolve and provide a compatible canonical URI;
   never substitute a local cache.
 - **Isaac Sim will not launch:** confirm `ISAAC_SIM_DIR/isaac-sim.sh` exists
