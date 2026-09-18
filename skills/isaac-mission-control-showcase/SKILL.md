@@ -1,9 +1,10 @@
 ---
 name: isaac-mission-control-showcase
-description: Run and validate an end-to-end Mission Control showcase with a locally installed Isaac Sim launched in its GUI window, driven through the isaac-sim-remote Python server, with Nova Carter SIL. Use for demos, showcase replays, Mission Control driving a simulated robot, or diagnosing the integrated small-warehouse scenario. Detect existing Isaac Sim installations without modifying them, automatically select a usable runtime without prompting whenever compatibility can be confirmed, and delegate requested installation or version changes to isaac-sim-installation. Defaults to a canonical Isaac 6.0 warehouse and deterministic circular route when the user does not specify another scenario.
+description: Run and validate an end-to-end Mission Control showcase with a locally installed Isaac Sim launched in its GUI window, driven through the isaac-sim-remote Python server, with Nova Carter SIL. Use for demos, showcase replays, Mission Control driving a simulated robot, or diagnosing the integrated small-warehouse scenario. Detect existing Isaac Sim installations without modifying them, automatically select a usable runtime without prompting whenever compatibility can be confirmed, and delegate requested installation or version changes to isaac-sim-installation. Defaults to a canonical Isaac 6.1 warehouse and deterministic circular route when the user does not specify another scenario.
 license: CC-BY-4.0 AND Apache-2.0
 metadata:
   author: "NVIDIA Isaac Team <info@nvidia.com>"
+  version: 1.0.0
 ---
 
 # Mission Control Showcase
@@ -11,7 +12,23 @@ metadata:
 Use the bundled runner for the default small-warehouse Nova Carter showcase.
 It owns the integration and coordinates five upstream skills that it resolves
 at runtime rather than vendoring. Resolve those dependencies once with
-`scripts/doctor.py dependencies --prepare` before the first run.
+`python3 "$SKILL_DIR/scripts/doctor.py" dependencies --prepare` before the first run.
+
+## Locate bundled resources
+
+Before running any command, set `SKILL_DIR` to the absolute path of the
+directory containing this loaded `SKILL.md`, using the skill location supplied
+by the skill loader. Preserve that value in each shell invocation. Do not
+derive it from the current working directory or assume a source repository
+layout or a fixed installation directory.
+
+All bundled paths in this document and its references, including `scripts/`,
+`references/`, `shared/`, `assets/`, `config/`, and
+`upstream-versions.lock.json`, are relative to `SKILL_DIR`. Read them beneath
+that directory and prefix bundled script paths with `"$SKILL_DIR/"` when
+following command examples in the references. Runtime output paths and
+upstream skill paths reported by the dependency manifest retain their own
+locations. Commands below can run from any working directory.
 
 ## Runtime selection
 
@@ -33,7 +50,7 @@ Sim is not proof of compatibility.
 
 Apply this selection policy:
 
-- If a 6.0 installation is present at `ISAAC_SIM_DIR`, report the detected
+- If a 6.1.0 installation is present at `ISAAC_SIM_DIR`, report the detected
   version and continue without an unnecessary prompt.
 - If a different version is detected and the launcher, ROS 2 bridge, and a
   verified warehouse URI are all present, use it automatically — no prompt —
@@ -56,7 +73,7 @@ Apply this selection policy:
   SIL, but never for Isaac Sim itself.
 - If nothing is installed, route to the resolved `isaac-sim-installation`
   skill rather than guessing a path. Resolve it through
-  `scripts/doctor.py dependencies`;
+  `python3 "$SKILL_DIR/scripts/doctor.py" dependencies`;
   never search for it and never vendor a copy.
 
 Never upgrade, downgrade, overwrite, delete, repair, relabel, refresh, or
@@ -85,7 +102,7 @@ first run that is still populating shader and asset caches.
    read-only preflight:
 
    ```bash
-   skills/isaac-mission-control-showcase/scripts/run.sh --preflight
+   bash "$SKILL_DIR/scripts/run.sh" --preflight
    ```
 
 3. Ask the user to stop or relocate every reported running container that is
@@ -96,13 +113,13 @@ first run that is still populating shader and asset caches.
 4. Start the stack and leave the robot idle:
 
    ```bash
-   skills/isaac-mission-control-showcase/scripts/run.sh
+   bash "$SKILL_DIR/scripts/run.sh"
    ```
 
 5. Or run the deterministic closed route and wait for completion:
 
    ```bash
-   skills/isaac-mission-control-showcase/scripts/run.sh --demo
+   bash "$SKILL_DIR/scripts/run.sh" --demo
    ```
 
 6. Watch the robot in the Isaac Sim window that the runner opens. The runner
@@ -111,7 +128,7 @@ first run that is still populating shader and asset caches.
 7. Stop only the recorded showcase resources:
 
    ```bash
-   skills/isaac-mission-control-showcase/scripts/run.sh --stop
+   bash "$SKILL_DIR/scripts/run.sh" --stop
    ```
 
 Every run writes `run-manifest.json` into its work directory before anything
@@ -120,7 +137,7 @@ described and stopped precisely. `run-result.json` is the machine-readable
 acceptance artifact. Inspect a run, including one that was interrupted, with:
 
 ```bash
-skills/isaac-mission-control-showcase/scripts/showcase.py \
+python3 "$SKILL_DIR/scripts/showcase.py" \
   run-status --work-dir <dir>
 ```
 
@@ -155,6 +172,9 @@ are not copies of upstream skills.
 by their own repositories, read and invoked from pinned checkouts **outside**
 this package, and never copied in.
 
+In the table below, adapter paths are relative to the corresponding reference
+directory.
+
 | Reference | Fronts | Adapter |
 |---|---|---|
 | `references/bring-up-cloud-stack/` | `bring-up-cloud-stack` | `scripts/run.py` |
@@ -170,7 +190,7 @@ skill's required entrypoints and resources.
 Resolve once per host, then run:
 
 ```bash
-python3 scripts/doctor.py dependencies --prepare \
+python3 "$SKILL_DIR/scripts/doctor.py" dependencies --prepare \
   --env-file "$HOME/.mission-control-showcase/state/showcase-deps.env"
 ```
 
@@ -217,10 +237,10 @@ and the preflight command. Never work around a blocker by vendoring a skill.
 The default is:
 
 - Isaac Sim: a local installation at `ISAAC_SIM_DIR` (default `~/isaacsim`),
-  launched with its GUI window. Isaac Sim 6.0 is the last-known-good runtime.
+  launched with its GUI window. Isaac Sim 6.1.0 is the last-known-good runtime.
   This is a default, not a compatibility ceiling.
 - Warehouse:
-  `https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Environments/Simple_Warehouse/warehouse.usd`.
+  `https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/Environments/Simple_Warehouse/warehouse.usd`.
 - Nova Carter SIL:
   `nvcr.io/nvidia/isaac/nova_carter_sil:release-3.2`.
 - NVIDIA driver R590 or newer.
@@ -250,7 +270,7 @@ For a user-selected noncanonical Isaac version that is already installed:
    ```bash
    ISAAC_SIM_DIR=<resolved-install-path> \
    WAREHOUSE_USD_URI=<resolved-uri> \
-     skills/isaac-mission-control-showcase/scripts/run.sh
+     bash "$SKILL_DIR/scripts/run.sh"
    ```
 
 3. Do not infer a future URI by substituting a version number. A local
@@ -264,7 +284,7 @@ For a user-selected noncanonical Isaac version that is already installed:
 `carter01` is only the default. Set another identity with either:
 
 ```bash
-skills/isaac-mission-control-showcase/scripts/run.sh \
+bash "$SKILL_DIR/scripts/run.sh" \
   --robot-name my_robot --demo
 ```
 

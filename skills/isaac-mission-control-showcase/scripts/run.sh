@@ -46,6 +46,20 @@ except dm.Blocked as exc:
 ' "$1"
 }
 
+# Resolved upstream entrypoint for tools that inspect resources relative to the
+# upstream skill. Runtime invocation still goes through the reference adapter.
+component_entrypoint() {
+  SHOWCASE_SHARED="$SHOWCASE_DIR/shared" python3 -c '
+import os, sys
+sys.path.insert(0, os.environ["SHOWCASE_SHARED"])
+import dependency_manifest as dm
+try:
+    print(dm.entrypoint(dm.load(), sys.argv[1], sys.argv[2]))
+except dm.Blocked as exc:
+    print(f"BLOCKED: {exc}", file=sys.stderr); raise SystemExit(3)
+' "$1" "$2"
+}
+
 verify_dependencies() {
   # Read-only freshness check. The adapters consume the persisted manifest.
   if ! python3 "$DOCTOR" dependencies --check-only >/dev/null 2>&1; then
@@ -95,6 +109,7 @@ SHOWCASE_HELPER="${SHOWCASE_HELPER:-$SCRIPT_DIR/showcase.py}"
 # clean up must still be able to clean them up after its dependencies moved.
 CLOUD_RESOURCES_RESOLVED=0
 RUNTIME_ENTRYPOINTS_RESOLVED=0
+CLOUD_UPSTREAM_ENTRYPOINT=""
 CLOUD_RESOURCE_DIR=""
 CLOUD_COMPOSE_FILE=""
 CLOUD_ENV_FILE=""
@@ -120,6 +135,7 @@ resolve_runtime_entrypoints() {
   (( RUNTIME_ENTRYPOINTS_RESOLVED )) && return 0
   verify_dependencies || return 1
   resolve_cloud_resources || return 1
+  CLOUD_UPSTREAM_ENTRYPOINT="$(component_entrypoint bring-up-cloud-stack up)" || return 1
   BRING_UP_CLOUD="$(adapter bring-up-cloud-stack)" || return 1
   CHANGE_MAP="$(adapter change-map)" || return 1
   CHANGE_FLEET="$(adapter change-fleet-composition)" || return 1
@@ -132,7 +148,7 @@ resolve_runtime_entrypoints() {
   RUNTIME_ENTRYPOINTS_RESOLVED=1
 }
 
-LKG_WAREHOUSE_USD_URI="https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Environments/Simple_Warehouse/warehouse.usd"
+LKG_WAREHOUSE_USD_URI="https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/Environments/Simple_Warehouse/warehouse.usd"
 MAP_BASENAME="carter_warehouse_navigation"
 MAP_PNG="${MAP_BASENAME}.png"
 MAP_YAML="${MAP_BASENAME}.yaml"
@@ -261,7 +277,7 @@ done
 # the asset contract. Never infer a URI by substituting a version number.
 if [[ "$WAREHOUSE_USD_URI_WAS_SET" -eq 0 && ! -d "$ISAAC_SIM_DIR" ]]; then
   echo "ERROR: ISAAC_SIM_DIR does not exist: $ISAAC_SIM_DIR" >&2
-  echo "       Set ISAAC_SIM_DIR to a local Isaac Sim 6.0 installation, or set" >&2
+  echo "       Set ISAAC_SIM_DIR to a local Isaac Sim 6.1.0 installation, or set" >&2
   echo "       WAREHOUSE_USD_URI explicitly for a different version." >&2
   exit 2
 fi
@@ -516,7 +532,7 @@ run_doctor() {
   local args=(
     --skills-dir "$SKILLS_DIR"
     --asset-dir "$SHOWCASE_DIR/assets"
-    --bring-up-cloud "$BRING_UP_CLOUD"
+    --bring-up-cloud "$CLOUD_UPSTREAM_ENTRYPOINT"
     --change-map "$CHANGE_MAP"
     --change-fleet "$CHANGE_FLEET"
     --isaac-send "$ISAAC_SEND"
@@ -894,6 +910,85 @@ start_static_tf() {
       --frame-id map --child-frame-id odom \
       --ros-args -r __node:=showcase_map_to_odom_static_tf
   "
+}
+
+# Nav2 subscribes to /scan. Isaac Sim 6.1 publishes the 2D LiDAR under the
+# sensor's own namespace, so relay whatever LaserScan topic exists onto /scan
+# rather than depending on the scene graph carrying a particular topic name.
+scan_topic_probe() {
+  local wait_s="$1"
+  timeout "$2" docker exec -i "$NOVA_CONTAINER" \
+    bash -lc "$ROS_SETUP_SNIPPET; exec python3 - $wait_s" <<'PYEOF'
+import sys
+import time
+
+import rclpy
+
+rclpy.init()
+node = rclpy.create_node("showcase_scan_topic_probe")
+deadline = time.monotonic() + float(sys.argv[1])
+topics = []
+while time.monotonic() < deadline:
+    topics = [
+        name
+        for name, types in node.get_topic_names_and_types()
+        if "sensor_msgs/msg/LaserScan" in types
+    ]
+    if topics:
+        break
+    rclpy.spin_once(node, timeout_sec=0.5)
+if not topics:
+    sys.exit(1)
+print("/scan" if "/scan" in topics else sorted(topics)[0], end="")
+PYEOF
+}
+
+ensure_scan_topic() {
+  if [[ $DRY_RUN -eq 1 ]]; then
+    echo "+ ensure a sensor_msgs/msg/LaserScan is published on /scan"
+    return 0
+  fi
+
+  local source_topic
+  if ! source_topic="$(scan_topic_probe 90 120)"; then
+    echo "ERROR: no sensor_msgs/msg/LaserScan topic is being published." >&2
+    echo "       The Isaac 2D LiDAR render product is not enabled; check the" >&2
+    echo "       set_graph_attr lines in the restore_isaac output." >&2
+    return 1
+  fi
+
+  if [[ "$source_topic" == "/scan" ]]; then
+    echo "scan_topic=/scan (no relay needed)"
+    return 0
+  fi
+
+  echo "scan_topic=$source_topic relaying to /scan"
+  docker exec -i "$NOVA_CONTAINER" \
+    bash -lc "cat > /tmp/showcase_scan_relay.py" <<'RELAYEOF'
+import sys
+
+import rclpy
+from rclpy.qos import qos_profile_sensor_data
+from sensor_msgs.msg import LaserScan
+
+source, target = sys.argv[1], sys.argv[2]
+rclpy.init()
+node = rclpy.create_node("showcase_scan_relay")
+publisher = node.create_publisher(LaserScan, target, qos_profile_sensor_data)
+node.create_subscription(
+    LaserScan, source, publisher.publish, qos_profile_sensor_data
+)
+rclpy.spin(node)
+RELAYEOF
+  docker exec -d "$NOVA_CONTAINER" bash -lc \
+    "$ROS_SETUP_SNIPPET; exec python3 /tmp/showcase_scan_relay.py '$source_topic' /scan"
+
+  local relayed
+  if ! relayed="$(scan_topic_probe 30 60)" || [[ "$relayed" != "/scan" ]]; then
+    echo "ERROR: relay from $source_topic to /scan did not come up" >&2
+    return 1
+  fi
+  echo "scan_relay_ready=/scan"
 }
 
 # Require a usable navigation stack, not only Mission Control registration.
@@ -1343,6 +1438,7 @@ if [[ $DRY_RUN -eq 1 ]]; then
   start_nova_carter
   verify_active_map_consumers
   start_static_tf
+  ensure_scan_topic
   wait_nav2_ready
   probe_runtime_consistency
   require_nova_carter_healthy
@@ -1368,6 +1464,7 @@ wait_cloud_ready
 start_nova_carter
 verify_active_map_consumers
 start_static_tf
+ensure_scan_topic
 wait_nav2_ready 240
 probe_runtime_consistency
 require_nova_carter_healthy
