@@ -2751,10 +2751,10 @@
     },
     {
       "skill": "isaac-mission-control-showcase",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-09-18",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:43742a466533f3d0d814ea60502c8cf27d813445291cbbfda6f2f931faed3fe2",
+      "dataset_digest": "sha256:53df5054895d6c1cfa04e19d9145af4857e6310543c98498d2c49226247b9259",
       "validation_status": null,
       "tasks": 4,
       "attempts_per_task": 3,
@@ -2767,7 +2767,7 @@
       "catalog_dir": "isaac-mission-control-showcase",
       "component": "Physical AI",
       "has_results": true,
-      "average_uplift_pct": 24.1
+      "average_uplift_pct": 40.32
     },
     {
       "skill": "jetson-build-source",
@@ -19193,8 +19193,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 41.7,
-      "uplift_pct": -58.3
+      "score_pct": 87.5,
+      "uplift_pct": 43.7
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
@@ -19203,7 +19203,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 75.0
+      "uplift_pct": 62.5
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
@@ -19211,8 +19211,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 70.0,
-      "uplift_pct": 47.8
+      "score_pct": 80.0,
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
@@ -19220,7 +19220,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 90.0,
+      "score_pct": 99.3,
       "uplift_pct": null
     },
     {
@@ -19229,7 +19229,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 82.0,
+      "score_pct": 86.7,
       "uplift_pct": null
     },
     {
@@ -19238,8 +19238,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 88.1,
-      "uplift_pct": 56.5
+      "score_pct": 91.9,
+      "uplift_pct": 59.4
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
@@ -19247,8 +19247,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 49.2,
-      "uplift_pct": 23.6
+      "score_pct": 76.9,
+      "uplift_pct": 36.3
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
@@ -19256,7 +19256,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 87.2,
+      "score_pct": 86.0,
       "uplift_pct": null
     },
     {
@@ -19265,7 +19265,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 85.7,
+      "score_pct": 87.7,
       "uplift_pct": null
     },
     {
