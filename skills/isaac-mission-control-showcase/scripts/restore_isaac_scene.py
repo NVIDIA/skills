@@ -21,7 +21,7 @@ import omni.usd
 
 DEFAULT_WAREHOUSE_USD_URI = (
     "https://omniverse-content-production.s3-us-west-2.amazonaws.com/"
-    "Assets/Isaac/6.0/Isaac/Environments/Simple_Warehouse/warehouse.usd"
+    "Assets/Isaac/6.1/Isaac/Environments/Simple_Warehouse/warehouse.usd"
 )
 WAREHOUSE_USD_URI = os.environ.get(
     "WAREHOUSE_USD_URI", DEFAULT_WAREHOUSE_USD_URI
@@ -95,9 +95,13 @@ def configure_sensor_graphs():
     """Apply the sensor toggles used by the mission-client tutorial."""
     import omni.graph.core as og
 
+    sensors = f"{ROBOT_PRIM}/chassis_link/sensors"
     toggles = {
-        f"{ROBOT_PRIM}/ros_lidars/front_2d_lidar_render_product.inputs:enabled": True,
-        f"{ROBOT_PRIM}/ros_lidars/publish_front_2d_lidar_scan.inputs:topicName": "scan",
+        # 6.1 layout
+        f"{sensors}/front_RPLidar/ROS_Lidar/RenderProduct.inputs:enabled": True,
+        f"{sensors}/front_hawk/ROS_Camera_Info/left_camera_render_product.inputs:enabled": False,
+        f"{sensors}/front_hawk/ROS_Camera_Info/right_camera_render_product.inputs:enabled": False,
+        # 6.0 layout; the paths that do not exist warn and are skipped
         f"{ROBOT_PRIM}/ros_lidars/front_3d_lidar_render_product.inputs:enabled": False,
         f"{ROBOT_PRIM}/front_hawk/left_camera_render_product.inputs:enabled": False,
         f"{ROBOT_PRIM}/front_hawk/right_camera_render_product.inputs:enabled": False,

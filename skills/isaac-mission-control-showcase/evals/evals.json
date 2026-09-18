@@ -4,12 +4,12 @@
     "question": "Run the Mission Control showcase with the default small-warehouse Nova Carter scenario.",
     "expected_skill": "isaac-mission-control-showcase",
     "expected_script": null,
-    "ground_truth": "The agent should select the isaac-mission-control-showcase skill, apply the canonical default (Isaac 6.0 warehouse, deterministic circular route) since no other scenario is specified, and follow the default workflow: resolve dependencies, apply runtime selection, run the read-only preflight, then start or demo the stack.",
+    "ground_truth": "The agent should select the isaac-mission-control-showcase skill, apply the canonical default (Isaac 6.1 warehouse, deterministic circular route) since no other scenario is specified, and follow the default workflow: resolve dependencies, apply runtime selection, run the read-only preflight, then start or demo the stack.",
     "expected_behavior": [
-      "Reads skills/isaac-mission-control-showcase/SKILL.md.",
+      "Reads \"$SKILL_DIR/SKILL.md\", where SKILL_DIR is the directory supplied by the skill loader.",
       "Selects isaac-mission-control-showcase rather than a generic Isaac Sim or Mission Control skill.",
-      "Uses the canonical Isaac 6.0 warehouse and deterministic circular route because no other scenario was specified.",
-      "Runs scripts/doctor.py dependencies --prepare or the read-only --preflight check before starting the stack."
+      "Uses the canonical Isaac 6.1 warehouse and deterministic circular route because no other scenario was specified.",
+      "Runs python3 \"$SKILL_DIR/scripts/doctor.py\" dependencies --prepare or bash \"$SKILL_DIR/scripts/run.sh\" --preflight before starting the stack."
     ]
   },
   {
@@ -32,7 +32,7 @@
     "ground_truth": "The agent must inspect state read-only, confirm nothing is installed at ISAAC_SIM_DIR, and route to the resolved isaac-sim-installation skill through the dependency manifest rather than guessing a path, searching for a copy, or vendoring one. It must not attempt to install Isaac Sim itself inside the showcase workflow.",
     "expected_behavior": [
       "Performs a read-only inspection of ISAAC_SIM_DIR before concluding nothing is installed.",
-      "Resolves isaac-sim-installation through scripts/doctor.py dependencies rather than searching the filesystem.",
+      "Resolves isaac-sim-installation through python3 \"$SKILL_DIR/scripts/doctor.py\" dependencies rather than searching the filesystem.",
       "Does not attempt to install, download, or vendor Isaac Sim itself.",
       "Stops the showcase workflow and hands off to isaac-sim-installation, resuming runtime selection only after that handoff completes."
     ]
