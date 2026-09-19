@@ -32,7 +32,7 @@ Docker/platform skill instead when it gives a stricter environment-specific
 command (non-root UID mapping, cache redirects, remote daemons).
 
 ```bash
-TAO_PYT_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
+TAO_PYT_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt  # versions-key: images.tao_toolkit.pyt
 TAO_PYT_IMAGE="${TAO_PYT_IMAGE:-$TAO_PYT_IMAGE_DEFAULT}"
 RUN_ROOT="${RUN_ROOT:-$PWD}"
 DOCKER_COMMON=(
@@ -99,7 +99,10 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 
 - **Dataset type:** pose_classification
 - **Formats:** default
-- **Monitoring metric:** val_loss
+- **AutoML training metric:** `val_loss`, with `direction=minimize`
+- **Standalone evaluation metric:** `accuracy`, with `direction=maximize`. Use
+  `val_loss` to rank train-stage AutoML recommendations and use `accuracy` only
+  to verify that the selected checkpoint loads and evaluates successfully.
 
 ### Per-Action Dataset Requirements
 
@@ -199,7 +202,7 @@ Dataset conversion is optional for Pose Classification. Run `pose_classification
 
 ## Eval Dataset
 
-Optional. Validation data is provided alongside training as val_data.npy / val_label.pkl. TAO training emits `val_loss` as the TensorBoard validation scalar for this model; use `val_loss` with minimize direction for AutoML selection unless a custom evaluation hook supplies a different metric.
+Optional. Validation data is provided alongside training as val_data.npy / val_label.pkl. TAO training emits `val_loss` as the TensorBoard validation scalar for this model; use `val_loss` with minimize direction for AutoML selection unless a custom evaluation hook supplies a different metric. The standalone evaluate action emits `accuracy`; compare that value with the selected checkpoint's evaluation result, but do not substitute it for the train-stage `val_loss` ranking KPI.
 
 ## Important Parameters
 

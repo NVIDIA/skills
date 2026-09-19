@@ -44,7 +44,8 @@ The parent PyT CLI does not expose `gen_trt_engine`. Use `models/segformer/deplo
 
 - **Dataset type:** segmentation
 - **Formats:** unet
-- **Monitoring metric:** val_miou, maximize
+- **AutoML training metric:** `val_miou` (maximize).
+- **Standalone evaluation metric:** `test_miou`. Use the train-status `val_miou` for AutoML ranking and the evaluator's `test_miou` only for checkpoint verification.
 
 ### Per-Action Dataset Requirements
 
@@ -237,4 +238,3 @@ For `parent_model` or `parent_model_folder`, pass the upstream train/export/Auto
 ## Deployment
 
 - [tao-deploy-segformer](references/tao-deploy-segformer.md)
-

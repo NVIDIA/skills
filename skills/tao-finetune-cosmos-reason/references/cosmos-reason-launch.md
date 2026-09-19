@@ -2,6 +2,11 @@
 
 Load this only when `SKILL.md` points here. If this conflicts with `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the current/compact source wins.
 
+This is the Cosmos-RL backend supplement. First resolve the shared frontend
+with `scripts/cosmos_workflow.py`; do not use this reference to select a
+backend. Plain Nano SFT defaults to Cosmos-RL; Cosmos3-Edge and an explicit
+Framework request resolve to Cosmos Framework.
+
 ## Launch Intake Reminder
 
 When prompting for Cosmos-RL train or AutoML data, list the actual spec keys as
@@ -17,11 +22,12 @@ For root mode, explain the automatic mapping: `train_root` maps to
 `custom.train_dataset.media_path=train_root`; `eval_root` maps the same way for
 `custom.val_dataset`.
 
-Before train or AutoML runner generation, read the pinned action=train
-container image from `references/skill_info.yaml` (`container_image`), show the
-exact image to the user, and ask whether to use it or override with
-`image=<override>`. Do not silently launch on the default image. This skill does not package a
-`skills/models/tao-finetune-cosmos-reason/config.json` file.
+Before train or AutoML runner generation, resolve the Cosmos-RL backend
+contract and its pinned action image, show the exact image to the user, and ask
+whether to use it or override with `image=<override>`. Do not read the shared
+top-level image instead of the selected backend contract; the two pins match
+only to preserve compatibility with legacy skill consumers. This skill does
+not package a `skills/models/tao-finetune-cosmos-reason/config.json` file.
 
 The same metadata declares model-level GPU host minimums. They override the
 TAO-wide platform defaults for Cosmos-RL. On a self-managed Docker host, run:
@@ -45,10 +51,10 @@ shared helper:
 
 ```bash
 scripts/check_tao_launch_preflight.py --platform slurm \
-  --path train_annotation=/lustre/.../train/annotations.json \
-  --path train_media=/lustre/.../train \
-  --path val_annotation=/lustre/.../eval/annotations.json \
-  --path val_media=/lustre/.../eval \
+  --path train_annotation=<TRAIN_ANNOTATION_PATH> \
+  --path train_media=<TRAIN_MEDIA_ROOT> \
+  --path val_annotation=<VALIDATION_ANNOTATION_PATH> \
+  --path val_media=<VALIDATION_MEDIA_ROOT> \
   --gpu-min-total-memory-gb 256 \
   --gpu-arch-allowlist cosmos_rl=sm_80,sm_90,sm_100,sm_103,sm_103a,sm_120
 ```
@@ -60,12 +66,29 @@ checks before any model/data download:
 ```bash
 scripts/check_tao_launch_preflight.py --platform local-docker \
   --container-image <resolved-cosmos-rl-image> \
+  --target-gpu-index 0 --target-gpu-index 1 \
+  --target-gpu-index 2 --target-gpu-index 3 \
+  --path results_dir=/abs/path/to/job-results \
+  --min-free-disk-gb results_dir=384 \
   --path train_annotation=/abs/path/train/annotations.json \
   --path train_media=/abs/path/train \
   --path val_annotation=/abs/path/eval/annotations.json \
   --path val_media=/abs/path/eval \
   --gpu-min-total-memory-gb 256
 ```
+
+Set `--target-gpu-index` to the exact indices passed to Docker's `--gpus`
+allocation. This prevents an unallocated display or heterogeneous accelerator
+from contaminating memory, architecture, and allocated-runtime checks.
+
+The 384 GiB result-filesystem gate is mandatory for Cosmos-RL Nano training
+with synchronous epoch checkpoints. A dense four-way sharded checkpoint plus
+its optimizer state and Hugging Face safetensor export can consume roughly
+115 GiB; retention briefly needs the new checkpoint and retained predecessors
+at the same time. Check actual free bytes on the filesystem containing the
+host-mounted result directory, not Docker's logical/reclaimable size. If this
+gate fails, reclaim or relocate storage before launch; a PyTorch zip-writer
+`unexpected pos` error during `torch.save` is a common ENOSPC symptom.
 
 For `s3://` paths, if this helper reports that `aws` is missing, ask for
 approval and rerun the same command with `--install-missing-tools` so the helper
@@ -86,7 +109,7 @@ the actual visible GPU count, and set `policy.parallelism.dp_replicate_size=1`
 for a single node. Workflows that allocate separate policy and rollout replicas
 must still satisfy their explicit topology. In every case, each visible GPU
 architecture must be in the image-supported allowlist above and the selected
-image must pass the runtime CUDA-stack smoke test along with normal
+image must pass the allocated-node CUDA-stack gate along with normal
 Docker/platform, S3, and credential preflight checks. Architecture-specific
 suffixes such as `a` and `f` are matched to the same base SM family by the
 preflight helper.
@@ -94,8 +117,8 @@ preflight helper.
 The production recommendation remains at least 4 GPUs with 80GB-class memory.
 A single high-memory GB300 is also supported when the selected image passes
 architecture introspection and the spec sets
-`policy.parallelism.dp_shard_size=1`; apply the WTS/GB300 guards in
-`cosmos-reason-wts-gb300.md` when that workflow is selected. A remote image
+`policy.parallelism.dp_shard_size=1`; apply the single-GPU video guards in
+`cosmos-reason-single-gpu-video.md` when that profile is selected. A remote image
 manifest that advertises `linux/arm64` only proves CPU architecture support; it
 does not prove CUDA SM support. `sm_121` must be blocked for this image unless
 direct runtime validation confirms support or the user chooses a compatible
@@ -131,20 +154,19 @@ dataset mutation.
 cosmos-rl is `mode: config`. **Always start from the packaged
 `references/spec_template_<action>.yaml` for the requested action** — load it
 as your base spec via `yaml.safe_load(...)` and apply user overrides on top.
-Don't rebuild from scratch. See `skills/platform/tao-run-platform/SKILL.md`'s "Constructing the
-spec / args" section for the load-template-then-override pattern.
+Don't rebuild from scratch.
 
 ```python
 import yaml
 from pathlib import Path
 
-skill = Path.home() / "tao-sdk/tao-skills-external/skills/models/tao-finetune-cosmos-reason"
+skill = Path.home() / "tao-sdk/tao-skill-bank/skills/models/tao-finetune-cosmos-reason"
 action = "train"  # train, evaluate, inference, or quantize
 specs = yaml.safe_load((skill / f"references/spec_template_{action}.yaml").read_text())
 # Now apply your overrides on top of `specs` (next section).
 ```
 
-The reference TOML (and the spec the model actually consumes) is **nested dicts**, not flat dotted keys. The dotted notation in the override examples below denotes *paths into the nested spec* — the agent must walk the path and assign at the leaf, not store the dotted string as a literal key. See `skills/platform/tao-run-platform/SKILL.md`'s "spec is nested dicts" callout.
+The reference TOML (and the spec the model actually consumes) is **nested dicts**, not flat dotted keys. The dotted notation in the override examples below denotes *paths into the nested spec* — the agent must walk the path and assign at the leaf, not store the dotted string as a literal key.
 
 ### Typical Spec Overrides
 
@@ -184,6 +206,11 @@ validation frequency, and logging. The packaged template keeps
 `custom.vision.nframes=8` for bounded 1-GPU memory; switch to `fps` only after
 checking token budget and GPU memory.
 
+The DAFT hook also forwards FPS-only `min_frames` / `max_frames`, clip-time
+`video_start` / `video_end`, paired `resized_height` / `resized_width`, and
+`min_pixels` / `max_pixels` / `total_pixels`. Record all selected values in
+the sealed plan and inherit them into linked evaluation.
+
 Keep cadence epoch-based by default: use `train.epoch` for training duration,
 `train.ckpt.save_freq_in_epoch=1` for checkpoints, and
 `validation.freq_in_epoch=1` for validation. Do not select step-based
@@ -191,20 +218,14 @@ Keep cadence epoch-based by default: use `train.epoch` for training duration,
 topology, or runtime image. Use step cadence only when the user explicitly
 requests it.
 
-Do not require per-record `video_fps` for the packaged `nframes` template. If a
-run switches to `custom.vision.fps` or a selected dataset/image profile
-requires per-record timing, validate the annotation files before launching:
-
-```bash
-scripts/check_tao_launch_preflight.py --platform <platform> \
-  --path train_annotation=/path/to/train.json \
-  --path val_annotation=/path/to/val.json \
-  --json-required-field train_annotation=video_fps \
-  --json-required-field val_annotation=video_fps
-```
+Neither `nframes` nor `fps` sampling requires a per-record `video_fps` field.
+The selected decoder reads the source frame rate from each media stream and
+qwen-vl-utils uses it to resolve FPS sampling. Treat annotation-level `fps` or
+`video_fps` as optional descriptive metadata and validate it when present;
+never invent it or reject an otherwise valid dataset because it is absent.
 
 The packaged train/evaluate/inference/quantize templates default to
-`hf_model://nvidia/Cosmos3-Nano` for base-model fields. Override that only when
+the user-supplied immutable model URI or local path for base-model fields. Resolve it only when
 the user provides a different HuggingFace model id, `hf_model://...` URI, or
 cluster-local snapshot path.
 

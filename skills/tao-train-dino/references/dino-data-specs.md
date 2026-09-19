@@ -129,7 +129,7 @@ provides a different image artifact name.
 | quantize | dataset.val_data_sources | train_datasets | image_dir: images.tar.gz, json_file: annotations.json | Yes |
 | quantize | dataset.quant_calibration_data_sources | train_datasets | image_dir: images.tar.gz, json_file: annotations.json | No |
 | train | dataset.train_data_sources | train_datasets | image_dir: images.tar.gz, json_file: annotations.json | Yes |
-| train | dataset.val_data_sources | train_datasets | image_dir: images.tar.gz, json_file: annotations.json | Yes |
+| train | dataset.val_data_sources | eval_dataset | image_dir: images.tar.gz, json_file: annotations.json | Yes |
 
 ### Typical Spec Overrides
 

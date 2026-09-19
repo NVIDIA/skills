@@ -14,7 +14,7 @@ MODEL_PATH=google/siglip-base-patch16-224  # or a local checkpoint path
 TOPN=5
 METRIC=cosine
 FILTER_BY_LABEL=false
-IMG=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-data-services  # versions-key: images.tao_toolkit.data_services
+IMG=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
 
 mkdir -p "$OUT"
 
@@ -32,7 +32,7 @@ filter_by_label: "$FILTER_BY_LABEL"
 EOF
 
 # Step 1: embed targets
-docker run --gpus all --rm --ipc=host \
+docker run --gpus all --rm --shm-size=8g \
     -v "$WORKSPACE:$WORKSPACE" -w "$WORKSPACE" \
     "$IMG" embedding image_embeddings \
     -e "$EMBED_SPEC" \
@@ -40,7 +40,7 @@ docker run --gpus all --rm --ipc=host \
     output_parquet="$OUT/target_embeddings.parquet"
 
 # Step 2: embed source pool (SAME embedding spec as Step 1)
-docker run --gpus all --rm --ipc=host \
+docker run --gpus all --rm --shm-size=8g \
     -v "$WORKSPACE:$WORKSPACE" -w "$WORKSPACE" \
     "$IMG" embedding image_embeddings \
     -e "$EMBED_SPEC" \
@@ -48,7 +48,7 @@ docker run --gpus all --rm --ipc=host \
     output_parquet="$OUT/source_embeddings.parquet"
 
 # Step 3: mine nearest neighbours
-docker run --gpus all --rm --ipc=host \
+docker run --gpus all --rm --shm-size=8g \
     -v "$WORKSPACE:$WORKSPACE" -w "$WORKSPACE" \
     "$IMG" tmm nearest_neighbors \
     -e "$MINE_SPEC" \

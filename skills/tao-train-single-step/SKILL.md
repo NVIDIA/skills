@@ -41,8 +41,7 @@ model action remains container-backed.
 ### Required
 - **model**: A compatible TAO model (e.g., clip, nvdinov2, grounding_dino)
 - **train_dataset_uri**: URI of the training dataset (e.g., `s3://bucket/train/`)
-- **platform**: Ask from the generated supported-platform list:
-  `${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_tao_platforms.py --format text`
+- **platform**: Discover the execution platforms from the installed platform skills (tao-run-on-docker / -slurm / -kubernetes / -brev, plus any external one); on a runtime that surfaces only the core router skills, read `skills/platform/tao-run-on-*/SKILL.md` frontmatter.
 - **container image confirmation**: resolve the default image from the selected
   model/action config, show it to the user, and require confirmation or
   `image=<override>` before creating runner files or submitting training.
@@ -57,9 +56,10 @@ model action remains container-backed.
 ## Launch Intake
 
 After the user confirms they want this standard train/eval/export workflow,
-ask which supported platform they intend to run on. Generate the choices with
-`scripts/list_tao_platforms.py --format text`; do not scan platform docs or
-folders.
+ask which supported platform they intend to run on. Discover the execution
+platforms from the installed platform skills (tao-run-on-docker / -slurm /
+-kubernetes / -brev, plus any external one); on a runtime that surfaces only the
+core router skills, read `skills/platform/tao-run-on-*/SKILL.md` frontmatter.
 
 Before creating a plain train runner, inspect the selected model's metadata
 with `scripts/list_tao_models.py --scope automl --format json` or read
@@ -78,8 +78,7 @@ After the model/action are known, run `scripts/resolve_tao_image.py --model
 image or an `image=<override>`. Do not create the tao-train-single-step runner until the
 image is confirmed.
 
-After platform selection, run
-`scripts/list_tao_platforms.py --platform <platform> --format text` and ask
-only for credentials relevant to that platform, plus any selected-model
-credentials. Do not ask for unrelated platform credentials.
-
+After platform selection, read the chosen platform skill's `## Credentials`
+section and `references/skill_info.yaml` (required_credentials /
+credential_groups) and ask only for credentials relevant to that platform, plus
+any selected-model credentials. Do not ask for unrelated platform credentials.

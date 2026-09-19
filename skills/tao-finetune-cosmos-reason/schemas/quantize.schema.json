@@ -9,9 +9,9 @@
       "media_dir": ""
     },
     "model": {
-      "base_model_path": "hf_model://nvidia/Cosmos3-Nano",
+      "base_model_path": "",
       "enable_lora": false,
-      "model_path": "hf_model://nvidia/Cosmos3-Nano"
+      "model_path": ""
     },
     "quantize": {
       "kv_precision": "bf16",
@@ -27,7 +27,7 @@
     "dataset": {
       "properties": {
         "annotation_path": {
-          "default": "hf_model://nvidia/Cosmos3-Nano",
+          "default": "",
           "type": "string"
         },
         "dataset_id": {
@@ -56,7 +56,7 @@
           "type": "boolean"
         },
         "model_path": {
-          "default": "hf_model://nvidia/Cosmos3-Nano",
+          "default": "",
           "type": "string"
         }
       },

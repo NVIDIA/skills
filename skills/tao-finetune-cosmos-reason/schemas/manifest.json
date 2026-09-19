@@ -2,8 +2,15 @@
   "actions": {
     "evaluate": {
       "automl_default_parameters": [
-        "evaluate.vision.fps"
+        "dataset.system_prompt",
+        "generation.frequency_penalty",
+        "generation.max_tokens",
+        "generation.presence_penalty",
+        "generation.repetition_penalty",
+        "generation.temperature",
+        "vision.num_frames"
       ],
+      "backend": "cosmos-rl",
       "automl_disabled_parameters": [
         "evaluate",
         "evaluate.dataset",
@@ -25,6 +32,7 @@
     },
     "inference": {
       "automl_default_parameters": [],
+      "backend": "cosmos-rl",
       "automl_disabled_parameters": [],
       "core_module": "cosmos-rl",
       "path": "schemas/inference.schema.json",
@@ -34,6 +42,7 @@
     },
     "quantize": {
       "automl_default_parameters": [],
+      "backend": "cosmos-rl",
       "automl_disabled_parameters": [],
       "core_module": "cosmos-rl",
       "path": "schemas/quantize.schema.json",
@@ -43,14 +52,15 @@
     },
     "train": {
       "automl_default_parameters": [
+        "custom.vision.fps",
         "policy.lora.lora_alpha",
         "policy.lora.lora_dropout",
         "policy.lora.r",
-        "train.optm_weight_decay",
+        "train.epoch",
         "train.optm_decay_type",
-        "train.optm_lr",
-        "train.train_batch_per_replica"
+        "train.optm_lr"
       ],
+      "backend": "cosmos-rl",
       "automl_disabled_parameters": [
         "custom",
         "custom.train_dataset",
@@ -76,12 +86,12 @@
       ],
       "core_module": "cosmos-rl",
       "path": "schemas/train.schema.json",
+      "metadata_schema": "schemas/cosmos-job-metadata.schema.json",
+      "planner_request_schema": "schemas/train_request.schema.json",
       "popular": {
         "train": {
           "compile": false,
           "epoch": 10,
-          "optm_warmup_epochs": 0,
-          "optm_weight_decay": 0.01,
           "train_batch_per_replica": 1
         }
       },
@@ -91,7 +101,10 @@
   },
   "automl_enabled": true,
   "failures": {},
-  "model": "cosmos-rl",
-  "network_arch": "cosmos-rl",
+  "model": "cosmos-reason",
+  "metadata_schemas": {
+    "job": "schemas/cosmos-job-metadata.schema.json"
+  },
+  "network_arch": "cosmos-reason",
   "schema_version": 1
 }

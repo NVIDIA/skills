@@ -44,7 +44,11 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 - **Dataset type:** image_classification
 - **Formats:** ssl
 - **Accepted dataset intents:** training, evaluation, testing
-- **Monitoring metric:** train_loss
+- **Pretraining monitoring metric:** `train_loss`, minimized.
+- **AutoML metric contract:** for fine-tuning, use `ACC_all` with maximize
+  direction. Fine-tune validation and the packaged `evaluate` action emit
+  `ACC_all` (plus `val_loss`); they do not emit `train_loss`. Use `ACC_all` for trial and final
+  checkpoint selection when `train.stage: finetune`.
 
 ### Per-Action Dataset Requirements
 
@@ -192,4 +196,3 @@ specs so the checkpoint and ONNX/engine shapes match.
 ## Deployment
 
 - [tao-deploy-mask-auto-encoder](references/tao-deploy-mask-auto-encoder.md)
-

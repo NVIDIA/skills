@@ -15,7 +15,7 @@ license: Apache-2.0
 compatibility: Runs `--check-only` on any Linux distribution. `--install` automates Ubuntu 22.04/24.04 + Debian 12 (apt), Fedora + RHEL/Rocky/AlmaLinux 9/10 (dnf), and openSUSE Leap / SLES 15 (zypper). Requires sudo/root, internet access to NVIDIA package repositories (and download.docker.com on rhel-family), and an x86_64 or aarch64 (sbsa) host. Other distributions (Arch, Alpine, Gentoo, NixOS, …) get a clear error that names the version targets and the NVIDIA install-guide URL.
 metadata:
   author: NVIDIA Corporation
-  version: "0.1.1"
+  version: "0.1.2"
 allowed-tools: Read Bash
 tags:
 - setup
@@ -172,6 +172,18 @@ sudo docker run --rm --runtime=nvidia --gpus all "$TAO_IMAGE" nvidia-smi -L
 The detected driver, CUDA Toolkit, and Container Toolkit versions must meet the
 active TAO-wide or model-specific minimums. Then run the selected image's GPU
 smoke test; version comparison alone is not sufficient compatibility proof.
+
+For a Cosmos backend, extend that smoke with the backend contract's Python and
+entrypoint checks. Cosmos Framework must execute
+`/workspace/.venv/bin/python` as a non-root UID, import
+`cosmos_framework.callbacks.tao_status`, find native torchrun, and verify the
+A100 PatchEmbed compatibility marker when the host reports compute capability
+8.0. Cosmos-RL must resolve its requested action executable, import
+system PyAV for video workflows, resolve the restricted FFmpeg `h264_cuvid`
+decoder, load `libnvcuvid.so.1`, verify the backward-safe linear Qwen3-VL
+PatchEmbed marker, and verify its checkpoint loader accepts the prepared
+`qwen3_vl` directory. A container that only passes `nvidia-smi` is not ready
+for Cosmos training.
 
 ## Kubernetes Notes
 

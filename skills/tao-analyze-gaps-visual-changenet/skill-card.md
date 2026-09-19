@@ -1,5 +1,5 @@
 ## Description: <br>
-Performs gap analysis on NVIDIA TAO VCN Classify (Visual Component Net) experiments by invoking the pinned TAO data-services container directly via docker run — picks the optimal decision threshold, ranks per-sample weakness, and emits a top-K weakest parquet expanded per-lighting for downstream augmentation. <br>
+Performs gap analysis on NVIDIA TAO VCN Classify (Visual Component Net) experiments by invoking the pinned TAO data-services container directly via docker run, picking the optimal decision threshold, ranking per-sample weakness, and emitting a top-K weakest parquet expanded per-lighting for downstream augmentation. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers analyzing VCN classification failures, picking SDA augmentation targets, or auditing PASS/NO_PASS boundary cases in NVIDIA TAO Visual ChangeNet experiments. <br>
+Developers and engineers use this skill to analyze VCN classification failures, pick SDA augmentation targets, or audit PASS/NO_PASS boundary cases in NVIDIA TAO Visual Component Net experiments. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,16 +25,16 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [container-setup.md](references/container-setup.md) <br>
-- [output-template.md](references/output-template.md) <br>
-- [pitfalls.md](references/pitfalls.md) <br>
-- [visual-spot-check.md](references/visual-spot-check.md) <br>
+- [Container Setup and Path Mounting](references/container-setup.md) <br>
+- [Report Output Template](references/output-template.md) <br>
+- [Common Pitfalls](references/pitfalls.md) <br>
+- [Visual Spot Check Guide](references/visual-spot-check.md) <br>
 - [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Files, Shell commands] <br>
-**Output Format:** [Markdown report with Parquet data files] <br>
+**Output Format:** [Markdown report with parquet data files] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -45,35 +45,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 task (1 positive) in isolated sandbox pods. <br>
+1 evaluation task (1 positive), 3 attempts per task in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks whether the skill helped complete the user's goal (goal_accuracy 50% + behavior_check 50%). <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Checks whether the user's goal was achieved and expected workflow behavior was followed (equal-weight mean of goal_accuracy and behavior_check). <br>
+- Efficiency: Checks tool-call productivity and token efficiency (50% each). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Verifies absence of unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
-- `skill_execution`: Verifies whether the expected skill was found and executed. <br>
-- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
-- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Verifies routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected and the workflow executed. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 23% → 100% (+77 points) | 34% → 95% (+62 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 0% → 100% (+100 points) | 20% → 100% (+80 points) |
-| Discoverability | 0% → 100% (+100 points) | 0% → 94% (+94 points) |
-| Effectiveness | 17% → 100% (+83 points) | 48% → 83% (+35 points) |
-| Efficiency | 0% → 100% (+100 points) | 0% → 100% (+100 points) |
+| Overall | 94.4% | 73.7% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 13.3% → 100.0% (+86.7 points) | 20.0% → 100.0% (+80.0 points) |
+| Discoverability | 100.0% | 0.0% |
+| Effectiveness | 22.2% → 100.0% (+77.8 points) | 48.3% → 70.0% (+21.7 points) |
+| Efficiency | 71.9% | 99.7% → 98.6% (-1.1 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

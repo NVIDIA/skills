@@ -57,7 +57,7 @@ mkdir -p <output_dir>/home \
 ```
 
 ```
-docker run --gpus 'device=0' --shm-size 16G --ipc=host \
+docker run --gpus 'device=0' --shm-size 16G --shm-size=8g \
   --user "$(id -u):$(id -g)" \
   -e USER="$(id -un)" \
   -e LOGNAME="$(id -un)" \

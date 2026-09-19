@@ -1,5 +1,5 @@
 ## Description: <br>
-PyTorch-based TAO image classification skill supporting a wide range of backbones (FAN, EfficientNet, ResNet, etc.) with distillation and quantization for deployment. <br>
+PyTorch-based TAO image classification that supports a wide range of backbones (FAN, EfficientNet, ResNet, etc.) with distillation and quantization for deployment. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, distilling, quantizing, exporting, or running inference on PyTorch image classification models using NVIDIA TAO. <br>
+Developers and engineers training, evaluating, distilling, quantizing, exporting, or running inference on TAO image-classification models using PyTorch backbones. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,7 +26,9 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [TAO Deploy Image Classification](references/tao-deploy-image-classification.md) <br>
-- [TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [Skill Info (model metadata)](references/skill_info.yaml) <br>
+- [TAO Skill Bank Repository](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [Agent Skills Open Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
@@ -42,35 +44,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) on trusted local host. <br>
+1 evaluation task (1 positive), 3 attempts per task, each in an isolated sandbox pod. Dataset digest: sha256:206d62dbc15f845e57ca15d252f0c09ea9b4ea530419388f2525b5f7db4a1d0a. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (equal-weight mean of goal completion and behavior adherence). <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage via routing quality and productive tool use. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Verifies final-answer correctness against the reference answer. <br>
+- Discoverability: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal (50% goal completion + 50% expected workflow adherence). <br>
+- Efficiency: Tool-call productivity and token efficiency (50% each), measuring avoidance of wasted skill and tool usage. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Detects unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 55% → 92% (+37 points) | 54% → 39% (-15 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 60% → 100% (+40 points) | 100% → 40% (-60 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 0% (±0 points) |
-| Effectiveness | 32% → 78% (+47 points) | 70% → 53% (-17 points) |
-| Efficiency | 35% → 83% (+48 points) | 0% → 0% (±0 points) |
+| Overall | 96.1% | 71.4% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 40.0% → 100.0% (+60.0 points) |
+| Discoverability | 100.0% | 0.0% |
+| Effectiveness | 11.1% → 83.3% (+72.2 points) | 48.3% → 58.3% (+10.0 points) |
+| Efficiency | 97.3% | 99.6% → 98.5% (-1.1 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

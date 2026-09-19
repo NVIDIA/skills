@@ -1,5 +1,5 @@
 ## Description: <br>
-Predicts disparity maps from stereo image pairs for 3D reconstruction using the FoundationStereo architecture, supporting train, evaluate, inference, export, and quantize actions via NVIDIA TAO. <br>
+Stereo depth estimation using FoundationStereo. Predicts disparity maps from stereo image pairs for 3D reconstruction. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, and running inference on stereo depth estimation models using NVIDIA TAO FoundationStereo. <br>
+Developers and engineers training, evaluating, exporting, or running inference on TAO FoundationStereo stereo depth estimation models for 3D reconstruction from stereo image pairs. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,12 +25,12 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [parameters-foundation-stereo.md](references/parameters-foundation-stereo.md) <br>
-- [spec-overrides-foundation-stereo.md](references/spec-overrides-foundation-stereo.md) <br>
-- [tao-deploy-foundation-stereo.md](references/tao-deploy-foundation-stereo.md) <br>
-- [troubleshooting-foundation-stereo.md](references/troubleshooting-foundation-stereo.md) <br>
-- [checkpoint-inference-mappings-foundation-stereo.md](references/checkpoint-inference-mappings-foundation-stereo.md) <br>
-- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [Parameters — Foundation Stereo](references/parameters-foundation-stereo.md) <br>
+- [Spec Overrides — Foundation Stereo](references/spec-overrides-foundation-stereo.md) <br>
+- [TAO Deploy — Foundation Stereo](references/tao-deploy-foundation-stereo.md) <br>
+- [Troubleshooting — Foundation Stereo](references/troubleshooting-foundation-stereo.md) <br>
+- [Checkpoint Inference Mappings — Foundation Stereo](references/checkpoint-inference-mappings-foundation-stereo.md) <br>
+- [Skill Info](references/skill_info.yaml) <br>
 
 
 ## Skill Output: <br>
@@ -46,35 +46,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), each attempt in an isolated sandbox pod. <br>
+1 evaluation task (1 positive), 3 attempts per task, evaluated in k8s-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks whether the skill helped complete the user's goal and expected workflow (equal-weight mean of goal completion and behavior adherence). <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Correctness: Validates final-answer correctness against the reference answer. <br>
+- Discoverability: Whether the expected skill was selected and the workflow executed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
+- Efficiency: Tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Verifies absence of unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
-- `skill_execution`: Verifies whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Verifies routing quality, workspace-aware skill reads, and productive tool use. <br>
-- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
-- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
-| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+| Measure | Claude Code | Codex |
 |---|---:|---:|
-| Overall | 33% → 100% (+67 points) | 33% → 55% (+22 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 0% → 100% (+100 points) | 40% → 100% (+60 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 0% (±0 points) |
-| Effectiveness | 0% → 100% (+100 points) | 27% → 75% (+48 points) |
-| Efficiency | 17% → 100% (+83 points) | 0% → 0% (±0 points) |
+| Overall | 99.5% | 95.3% |
+| Security | 100.0% | 100.0% |
+| Correctness | 100.0% | 100.0% |
+| Discoverability | 100.0% | 95.0% |
+| Effectiveness | 100.0% | 83.3% |
+| Efficiency | 97.3% | 98.3% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

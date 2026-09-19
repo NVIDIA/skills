@@ -47,7 +47,12 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 
 - **Dataset type:** ocdnet
 - **Formats:** default
-- **Monitoring metric:** hmean
+- **AutoML training metric:** `train_loss` (the status logger's final
+  `train_loss_epoch` value), with `direction=minimize`
+- **AutoML metric contract:** Use `train_loss` emitted during training and
+  minimize it. Treat `train_loss_epoch` as a log fallback alias only; use
+  standalone `hmean` solely to validate the selected checkpoint.
+- **Standalone evaluation metric:** `hmean`, with `direction=maximize`
 
 ### Per-Action Dataset Requirements
 
@@ -226,4 +231,3 @@ For `parent_model` or `parent_model_folder`, pass the upstream train/export/Auto
 ## Deployment
 
 - [tao-deploy-ocdnet](references/tao-deploy-ocdnet.md)
-

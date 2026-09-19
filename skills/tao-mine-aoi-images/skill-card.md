@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to mine nearest-neighbour source images from a pool for downstream training augmentation, as the step after gap analysis or routing in a Visual ChangeNet AOI pipeline. <br>
+Developers and engineers use this skill to embed target and source images via the DEFT workflow and mine nearest-neighbour source images for data augmentation in iterative VCN AOI training pipelines. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,10 +25,10 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Setup](references/setup.md) <br>
+- [Setup and Environment](references/setup.md) <br>
 - [Reference Invocation](references/reference-invocation.md) <br>
 - [Outputs and Reporting](references/outputs-and-reporting.md) <br>
-- [Troubleshooting](references/troubleshooting.md) <br>
+- [Troubleshooting and Common Pitfalls](references/troubleshooting.md) <br>
 
 
 ## Skill Output: <br>
@@ -44,35 +44,35 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), evaluated in isolated sandbox pods with Tier 3 live agent evaluation. <br>
+1 evaluation task (1 positive), 3 attempts per task, in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks whether the skill helped complete the user's goal and expected workflow (equal-weight mean of goal completion and behavior adherence). <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Discoverability: Checks whether the expected skill was selected and the workflow executed. <br>
+- Effectiveness: Checks whether the user's goal was achieved and the expected workflow behavior was followed. <br>
+- Efficiency: Checks tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Verifies no unsafe operations, secret leakage, or unauthorized access occurred. <br>
-- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
-- `skill_execution`: Verifies the expected skill was found and executed. <br>
-- `goal_accuracy`: Verifies the user's goal was achieved. <br>
-- `behavior_check`: Verifies the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Verifies routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 37% → 95% (+58 points) | 33% → 53% (+19 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 0% → 100% (+100 points) | 40% → 100% (+60 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 0% (±0 points) |
-| Effectiveness | 0% → 100% (+100 points) | 27% → 63% (+37 points) |
-| Efficiency | 36% → 75% (+39 points) | 0% → 0% (±0 points) |
+| Overall | 71.1% | 74.7% |
+| Security | 100.0% → 100.0% (±0.0 pts) | 100.0% → 100.0% (±0.0 pts) |
+| Correctness | 0.0% → 100.0% (+100.0 pts) | 26.7% → 100.0% (+73.3 pts) |
+| Discoverability | 0.0% | 0.0% |
+| Effectiveness | 5.6% → 58.3% (+52.7 pts) | 16.7% → 75.0% (+58.3 pts) |
+| Efficiency | 94.6% → 97.1% (+2.5 pts) | 99.5% → 98.6% (-0.9 pts) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

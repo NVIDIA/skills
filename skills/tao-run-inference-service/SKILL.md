@@ -49,8 +49,9 @@ tags:
 ## Secrets rule (applies to every generated code block in this skill)
 
 **Never ask the user to type a secret value into a prompt.** For every secret value:
-1. Tell the user which environment variable to set (e.g. `export HF_TOKEN=...`).
-2. Generate code that reads it with `os.environ["VAR_NAME"]` — never hard-code, interpolate, or prompt for the value.
+1. Tell the user which environment variable to set — `export HF_TOKEN=...` in their shell, or a `KEY=value` line in a user-approved env file loaded with `set -a; source /path/to/.env; set +a`.
+2. Never print, `cat`, or `Read` such a file — verify presence only: `[ -n "$HF_TOKEN" ] && echo SET || echo UNSET`.
+3. Generate code that reads it with `os.environ["VAR_NAME"]` — never hard-code, interpolate, or prompt for the value.
 
 **Secret env vars** (full list in `references/service.yaml` → `secrets_handling`):
 `HF_TOKEN`, `WANDB_API_KEY`, `CLEARML_API_ACCESS_KEY`, `CLEARML_API_SECRET_KEY`, `TAO_API_KEY`, `TAO_USER_KEY`.
@@ -74,10 +75,11 @@ tags:
 
 Each `network_arch` has a sidecar config file named `{network_arch}.config.json`. Resolve the container image as follows:
 
-1. Read `{network_arch}.config.json` and take `api_params.image` (e.g. `COSMOS_RL`). This is a key into `docker_image_defaults.mapping` in `references/service.yaml`.
-2. Look up that key in the mapping. If the host env var `IMAGE_<KEY>` is set (e.g. `IMAGE_COSMOS_RL`), it overrides the mapped default.
-3. The mapped value is normally a dotted key into the repo-root `versions.yaml` manifest (e.g. `tao_toolkit.cosmos_rl`). Resolve it to a concrete `nvcr.io/...` image URI by looking up `versions.yaml` → `images.<group>.<name>`. Absolute URIs pass through unchanged, so an `IMAGE_<KEY>` env-var override that contains a full URI still works. The Python helper for this lives in `references/code-templates.yaml`.
-4. If the config file is missing or `api_params.image` is empty, fall back to the `COSMOS_RL` key.
+1. Read `{network_arch}.config.json` and take `api_params.image` (e.g. `COSMOS_RL`). This selects an entry from `docker_image_defaults` in `references/service.yaml`.
+2. If the host env var `IMAGE_<KEY>` is set (e.g. `IMAGE_COSMOS_RL`), it overrides the packaged default.
+3. For a key under `model_skill_defaults`, call `scripts/resolve_tao_image.py` with its model, action, and backend. This keeps the exact Cosmos image in the Cosmos model skill's `references/skill_info.yaml`.
+4. For a key under `mapping`, resolve the dotted value against the repo-root `versions.yaml` with `scripts/resolve_versions_key.py`. Absolute environment overrides pass through unchanged. The Python examples live in `references/code-templates.yaml`.
+5. If the config file is missing or `api_params.image` is empty, fall back to the `COSMOS_RL` key.
 
 The config file also has `spec_params.inference.model_path` which drives **folder vs file** path semantics: if the value contains the substring `folder`, the container treats the path as a directory.
 
@@ -147,7 +149,7 @@ Read **`skills/platform/<platform>/SKILL.md`** and follow it to start the contai
 | **slurm** | `partition` and `account` — check `SLURM_PARTITION`/`SLURM_ACCOUNT` env vars; ask user if unset |
 | **kubernetes** | `namespace` (default: `default`); `image_pull_secret` (required for `nvcr.io` images) |
 
-**Port binding (local-docker and brev):** use **direct docker run** (not DockerSDK) so that `-p <host_port>:8080` can be passed and the container name equals `job_id` exactly.
+**Port binding (local-docker and brev):** use **direct docker run** so that `-p <host_port>:8080` can be passed and the container name equals `job_id` exactly.
 
 **Port allocation rule (local-docker and brev, REQUIRED for concurrent services):** Before starting a service, read the registry (`/tmp/tao-inf-ms-state.json`) and collect the set of `host_port` values from every existing entry on the same platform (and, for brev, the same `instance_id`). Pick the **lowest free port starting from 8080** that is not in that set — e.g. `host_port = next(p for p in range(8080, 8200) if p not in used_ports)`. The default `8080` only applies when no other service is running. This is what makes "start 3 services, each reachable at a distinct `host_url`" work; without it, services 2 and 3 fail with `bind: address already in use`. SLURM and kubernetes get distinct endpoints from their own platform mechanisms and do not need this step.
 
@@ -242,4 +244,3 @@ Send a `POST` to `{BASE_URL}/v1/chat/completions` with `Content-Type: applicatio
 | **500** | Unhandled exception during inference | Check container logs |
 
 For 202 and 503, the body contains `{"error": {"type": "<error_type>", "message": "<reason>"}}`. See `container_response_shapes` in `references/request.yaml` for error type strings.
-

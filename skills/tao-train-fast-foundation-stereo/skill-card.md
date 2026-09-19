@@ -1,5 +1,5 @@
 ## Description: <br>
-Real-time stereo depth estimation using FastFoundationStereo (FFS), the distilled bp2 commercial variant of FoundationStereo, predicting disparity maps from stereo image pairs with ~10× lower latency than full FoundationStereo. <br>
+Real-time stereo depth estimation using FastFoundationStereo (FFS), the distilled bp2 commercial variant of FoundationStereo that predicts disparity maps from rectified stereo image pairs with ~10× lower latency than full FoundationStereo. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, or running inference for real-time stereo depth estimation models using NVIDIA TAO FastFoundationStereo. <br>
+Developers and engineers use this skill to train, evaluate, export, and run inference for NVIDIA TAO FastFoundationStereo (FFS) stereo depth estimation models using Docker containers with NVIDIA Container Toolkit. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,14 +25,13 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Setup and Run Guide](references/setup-and-run.md) <br>
-- [Important Parameters](references/important-parameters.md) <br>
-- [Error Patterns](references/error-patterns.md) <br>
-- [Spec Overrides](references/spec-overrides.md) <br>
-- [Parent Model Inference](references/parent-model-inference.md) <br>
-- [TAO Deploy Fast Foundation Stereo](references/tao-deploy-fast-foundation-stereo.md) <br>
-- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
+- [setup-and-run.md](references/setup-and-run.md) <br>
+- [important-parameters.md](references/important-parameters.md) <br>
+- [error-patterns.md](references/error-patterns.md) <br>
+- [spec-overrides.md](references/spec-overrides.md) <br>
+- [parent-model-inference.md](references/parent-model-inference.md) <br>
+- [tao-deploy-fast-foundation-stereo.md](references/tao-deploy-fast-foundation-stereo.md) <br>
+- [skill_info.yaml](references/skill_info.yaml) <br>
 
 
 ## Skill Output: <br>
@@ -48,35 +47,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) run in isolated k8s-sandbox pods with evaluator v1.3.2. <br>
+1 evaluation task (1 positive), 3 attempts per task, evaluated in k8s-sandbox environment with isolated sandbox pods per attempt. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Equal-weight mean of goal completion and expected workflow adherence. <br>
-- Efficiency: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Correctness: Checks whether the answer is correct against the reference answer. <br>
+- Discoverability: Checks whether the right skill was loaded and activated when needed. <br>
+- Effectiveness: Checks whether the skill helped complete the user's goal and expected workflow (equal-weight mean of goal completion and workflow adherence). <br>
+- Efficiency: Checks whether the skill avoided wasted tool calls and token usage (50% tool-call productivity, 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Verifies absence of unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
+- `skill_execution`: Verifies whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
+- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Verifies tool-call productivity (routing is scored under Discoverability). <br>
+- `token_efficiency`: Verifies actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 27% → 100% (+73 points) | 33% → 39% (+6 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 20% → 100% (+80 points) | 20% → 40% (+20 points) |
-| Discoverability | 0% → 100% (+100 points) | 0% → 0% (±0 points) |
-| Effectiveness | 17% → 100% (+83 points) | 43% → 53% (+10 points) |
-| Efficiency | 0% → 100% (+100 points) | 0% → 0% (±0 points) |
+| Overall | 99.5% | 62.4% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 13.3% → 100.0% (+86.7 points) | 20.0% → 60.0% (+40.0 points) |
+| Discoverability | 100.0% | 0.0% |
+| Effectiveness | 22.2% → 100.0% (+77.8 points) | 48.3% → 53.3% (+5.0 points) |
+| Efficiency | 97.6% | 99.7% → 98.5% (-1.2 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

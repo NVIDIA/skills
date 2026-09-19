@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers creating Chain-of-Thought video reasoning training datasets from raw video data using VLM/LLM distillation pipelines. <br>
+Developers and engineers who need to create Chain-of-Thought video training datasets from raw videos, generating multi-level captions, structured descriptions, and QA pairs with reasoning traces using VLM/LLM distillation. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -29,13 +29,15 @@ Mitigation: Review and scan skill before deployment. <br>
 - [domain_adaptation.md](references/domain_adaptation.md) <br>
 - [prompts_traffic.py](references/prompts_traffic.py) <br>
 - [prompts_warehouse.py](references/prompts_warehouse.py) <br>
+- [skill_info.yaml](references/skill_info.yaml) <br>
+- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Files, Configuration instructions] <br>
-**Output Format:** [JSONL and JSON (tao-vl-reason-v1.0 envelope format)] <br>
+**Output Type(s):** [Files] <br>
+**Output Format:** [JSONL and tao-vl-reason-v1.0 JSON] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Per-step subdirectories; Step 4 produces up to 10 task-specific JSON files with metadata envelope] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -44,35 +46,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive case) on the trusted local host. <br>
+1 evaluation task (1 positive), 3 attempts per task, each in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the right skill was found and executed when needed. <br>
-- Effectiveness: Checks whether the skill helped complete the user’s goal and expected workflow. <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded and activated when needed. <br>
+- Effectiveness: Whether the skill helped the agent complete the user's goal and expected workflow. <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Whether the user’s goal was achieved. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 47% → 95% (+48 points) | 33% → 54% (+21 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 20% → 100% (+80 points) | 20% → 100% (+80 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 0% (±0 points) |
-| Effectiveness | 27% → 92% (+66 points) | 43% → 70% (+27 points) |
-| Efficiency | 38% → 83% (+46 points) | 0% → 0% (±0 points) |
+| Overall | 99.6% — uplift unavailable | 73.7% — uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 6.7% → 100.0% (+93.3 points) | 20.0% → 100.0% (+80.0 points) |
+| Discoverability | 100.0% — uplift unavailable | 0.0% — uplift unavailable |
+| Effectiveness | 11.1% → 100.0% (+88.9 points) | 48.3% → 70.0% (+21.7 points) |
+| Efficiency | 98.1% — uplift unavailable | 93.7% → 98.4% (+4.7 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

@@ -11,15 +11,22 @@ Write everything into a timestamped folder under the experiment / iteration dire
 ├── mining_spec.yaml            # The -e spec used for Step 3
 ├── target_embeddings.parquet   # Step 1 output (filepath, embedding, + carried metadata)
 ├── source_embeddings.parquet   # Step 2 output (filepath, embedding, + carried metadata)
-├── mined.parquet               # Step 3 output — unique mined source filepaths
+├── mined_candidates.parquet    # Iterative only: retained pre-history candidates
+├── mined.parquet               # Final unique mined source filepaths
 ├── mining_summary.txt          # Auto-emitted next to mined.parquet by the container
+├── mining_history_summary.json # Iterative only: current novel/duplicate audit
 ├── mining_config/              # Auto-copied by hook
 └── claude_session.jsonl        # Auto-copied by hook
 ```
 
 At the start of the run, get the real timestamp by running `date +%Y-%m-%d_%H%M%S` in Bash. Do NOT hardcode or guess. If the user specifies a custom output path, use it directly but maintain the same internal layout.
 
-The mined parquet is the artifact downstream training consumes. The two embedding parquets are intermediate but worth retaining: they are reusable across multiple mining runs against the same source pool, and they are the only place to look when a "looks unrelated" report needs encoder-level debugging.
+The final mined parquet is the artifact downstream training consumes. Iterative
+workflows also retain the candidate parquet and a run-level
+`mining_history.json` outside the timestamp directory. Together they prove
+which samples k-NN returned, which prior iterations already selected, and which
+novel rows entered this iteration. The two embedding parquets remain useful for
+reuse and encoder-level debugging.
 
 ## Report template
 
@@ -34,6 +41,7 @@ Keep the report tight (600–1200 words). Mining is a deterministic pipeline; th
 - Mined out: <N_mined> unique source filepaths → `mined.parquet`
 - Encoder: <model> @ <model_path>
 - Mining params: topn=<topn>, knn_metric=<metric>, filter_by_label=<bool>
+- History-aware selection: <disabled / N novel, M already mined, cumulative C>
 - One-line headline: "<N_mined> source images mined for <N_targets> targets, ready for the next training round."
 
 ## 2. Inputs
@@ -80,4 +88,8 @@ Keep the report tight (600–1200 words). Mining is a deterministic pipeline; th
    parquet lacked it, then re-run Step 3 only (Steps 1–2 do not need to repeat).
 4. **If mined images "look unrelated"** — verify Steps 1 and 2 used the *same* `model` and
    `model_path`. The encoder consistency section above is the first thing to check.
+5. **If history filtering drops most/all candidates** — increase `topn` to cast
+   a wider net or expand the source pool. If weak targets remain nearly
+   identical, the larger neighborhood may still contain no novel samples;
+   report that limitation rather than replaying duplicates.
 ```

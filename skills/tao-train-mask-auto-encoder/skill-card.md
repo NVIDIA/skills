@@ -1,5 +1,5 @@
 ## Description: <br>
-Masked Auto-Encoder (MAE) for self-supervised pretraining and fine-tuning; masks random patches and reconstructs them to learn visual representations, supporting pretrain and finetune stages. <br>
+Masked Auto-Encoder (MAE) skill for self-supervised pretraining and fine-tuning that masks random patches and reconstructs them to learn visual representations, supporting pretrain and finetune stages. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers training, evaluating, exporting, or running inference with Masked Auto-Encoder (MAE) models for self-supervised visual representation learning using NVIDIA TAO Toolkit. <br>
+Developers and engineers training, evaluating, exporting, or running inference for MAE self-supervised vision backbones using the NVIDIA TAO toolkit. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,9 +25,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [skill_info.yaml](references/skill_info.yaml) <br>
-- [tao-deploy-mask-auto-encoder](references/tao-deploy-mask-auto-encoder.md) <br>
-- [Agent Skills Open Standard](https://agentskills.io) <br>
+- [TAO Deploy Mask Auto Encoder](references/tao-deploy-mask-auto-encoder.md) <br>
+- [Skill Info](references/skill_info.yaml) <br>
+- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
@@ -43,35 +43,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot. <br>
+1 evaluation task (1 positive), 3 attempts per task, each in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks whether the skill helped complete the user's goal and expected workflow (goal_accuracy 50% + behavior_check 50%). <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Security: Whether the skill is safe to use: checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was selected when needed and decoys were avoided. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (50% goal completion + 50% behavior check). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool-call productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Verifies absence of unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Verifies routing quality, workspace-aware skill reads, and productive tool use. <br>
-- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
-- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity measured against expected tool usage. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 52% → 92% (+40 points) | 58% → 94% (+36 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 40% → 100% (+60 points) | 100% → 100% (±0 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 94% (+94 points) |
-| Effectiveness | 37% → 78% (+42 points) | 90% → 78% (-12 points) |
-| Efficiency | 33% → 83% (+50 points) | 0% → 100% (+100 points) |
+| Overall | 94.4% — uplift unavailable | 74.7% — uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 100.0% — uplift unavailable | 0.0% — uplift unavailable |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 48.3% → 75.0% (+26.7 points) |
+| Efficiency | 72.1% — uplift unavailable | 99.5% → 98.5% (-1.0 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

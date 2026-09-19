@@ -20,11 +20,11 @@ tags:
 
 > **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
 
-You are the operator of the DEFT embed-then-mine workflow for VCN AOI. Your job is to take a parquet of weak target images (the gap-analysis or routing output) and a source pool, then produce a deduplicated parquet of mined source images that look similar to the targets — ready to feed into the next training round.
+You are the operator of the DEFT embed-then-mine workflow for VCN AOI. Your job is to take a parquet of weak target images (the gap-analysis or routing output) and a source pool, then produce a deduplicated parquet of mined source images that look similar to the targets — ready to feed into the next training round. Iterative DEFT callers also run the bundled history-aware post-processing step so a sample selected in an earlier iteration is not selected again.
 
-The workflow is fixed and deterministic: **embed the targets, embed the source pool, then mine nearest neighbours.** Each step's output parquet is the next step's input. There is no iterative search, no clustering pass, no human-in-the-loop selection — depth comes from picking the right encoder and the right `topn`, not from a multi-phase investigation.
+The workflow is fixed and deterministic: **embed the targets, embed the source pool, mine nearest neighbours, then (for iterative workflows) remove previously mined samples.** Each GPU step's output parquet is the next step's input; history-aware selection is a host-side post-processing step, not another k-NN search. There is no clustering pass or human-in-the-loop selection — depth comes from picking the right encoder and a `topn` wide enough to leave novel candidates after history filtering.
 
-The whole skill is a thin wrapper around three direct `docker run` invocations against the pinned TAO data-services image (see `versions.yaml` (resolved at runtime — see Setup). The container's entrypoint takes `<category> <action> -e <spec.yaml> [hydra overrides...]` — pass `embedding image_embeddings -e <embedding_spec.yaml> …` for embedding and `tmm nearest_neighbors -e <mining_spec.yaml> …` for mining. The `-e` flag points at a YAML that supplies default values for the subtask's schema; anything afterward is a bare Hydra override (`key=value`) that selectively overrides spec fields per run. (There is no `dataset` keyword inside the container — that's the TAO launcher's pillar prefix and is dropped here.) Pull the image once if it isn't cached: `docker pull "$DS_IMAGE"` (after resolving `$DS_IMAGE` per Setup).
+The whole skill is a thin wrapper around three direct `docker run` invocations against the pinned TAO data-services image plus one optional bundled host-Python post-processor for iterative history (see `versions.yaml`, resolved at runtime in Setup). The container's entrypoint takes `<category> <action> -e <spec.yaml> [hydra overrides...]` — pass `embedding image_embeddings -e <embedding_spec.yaml> …` for embedding and `tmm nearest_neighbors -e <mining_spec.yaml> …` for mining. The `-e` flag points at a YAML that supplies default values for the subtask's schema; anything afterward is a bare Hydra override (`key=value`) that selectively overrides spec fields per run. (There is no `dataset` keyword inside the container — that's the TAO launcher's pillar prefix and is dropped here.) Pull the image once if it isn't cached: `docker pull "$DS_IMAGE"` (after resolving `$DS_IMAGE` per Setup).
 
 Schema keys can rename between data-services releases (the RCA skill saw `inference_csv` → `inference_results_dir`, `output_dir` → `results_dir`). When in doubt, introspect the actual schema once per image: `docker run --rm "$DS_IMAGE" embedding image_embeddings --cfg=job` and `... tmm nearest_neighbors --cfg=job`.
 
@@ -32,10 +32,11 @@ Schema keys can rename between data-services releases (the RCA skill saw `infere
 
 ## Inputs
 
-1. **Target parquet** — the gap-analysis output, typically `mining_gaps.parquet` from `tao-route-visual-changenet-samples` (or `gaps.parquet` from `tao-analyze-gaps-visual-changenet` if routing was skipped). Required column: `filepath`. If `label` is also present, label-aware filtering during mining is available; otherwise the mining task silently no-ops the filter.
+1. **Target parquet** — the gap-analysis output, typically `mining_gaps.parquet` from `tao-route-visual-changenet-samples` (or `kpi_gaps.parquet` from `tao-analyze-gaps-visual-changenet` if routing was skipped). Required column: `filepath`. If `label` is also present, label-aware filtering during mining is available; otherwise the mining task silently no-ops the filter.
 2. **Source pool** — a parquet of candidate images to mine against, with a `filepath` column. If the user only has a CSV, convert it to a parquet **with the same columns** before Step 2. For label-aware filtering, the pool must also carry a `label` column.
 3. **Embedding spec file** — a YAML containing `model`, `model_path`, `batch_size`, and (only when `model_path` is a TAO `.pth`/`.ckpt`) `model_config_path`. Reused across Steps 1 and 2; `input_parquet`/`output_parquet` are supplied per run as Hydra overrides. The **same** spec MUST drive both embedding steps — embeddings from different encoders are not comparable, and mismatched encoders are the most common cause of "the mined images look unrelated" reports.
 4. **Mining spec file** — a YAML containing `topn`, `knn_metric`, `filter_by_label`, and (rarely changed) `source_embed_column_name`/`target_embed_column_name`. `source_parquet`/`target_parquet`/`output_parquet` are Hydra overrides at run time. SigLIP and CLIP embeddings should use `knn_metric: cosine`. When `filter_by_label: true` but either embedding parquet lacks a `label` column, the container logs a warning and proceeds **without** filtering.
+5. **Mining history (iterative workflows only)** — one JSON ledger under the run-level results directory, plus a per-iteration history summary. `scripts/filter_mined_history.py` owns both files. It identifies a sample by normalized `filepath`, validates all earlier output hashes, and rejects an iteration gap or duplicate selection. Never hand-edit or reconstruct this ledger on resume.
 
 ---
 
@@ -45,7 +46,7 @@ Use the pinned TAO data-services URI below, then confirm Docker, the NVIDIA cont
 
 ```bash
 # Pinned TAO data-services container URI (stamped from the release manifest)
-DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-data-services  # versions-key: images.tao_toolkit.data_services
+DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
 echo "DS_IMAGE=$DS_IMAGE"
 
 docker info > /dev/null && echo "OK: docker"
@@ -58,12 +59,12 @@ Every host path the container reads or writes must be bind-mounted. The most pre
 
 ```bash
 WORKSPACE=<absolute path that contains all parquets, outputs, and the source-pool images>
-DOCKER="docker run --gpus all --rm --ipc=host -v $WORKSPACE:$WORKSPACE -w $WORKSPACE $DS_IMAGE"
+DOCKER="docker run --gpus all --rm --shm-size=8g -v $WORKSPACE:$WORKSPACE -w $WORKSPACE $DS_IMAGE"
 ```
 
 Do **not** pass `--user $(id -u):$(id -g)` — it triggers a `getpwuid()` `KeyError` during the `transformers` import before any work starts. The container runs as root; chown outputs back to the host UID afterward.
 
-Author the two spec files once per iteration, placing them under `$WORKSPACE` so the `-e` argument resolves on both sides of the mount; per-run values stay out of the spec and are passed as Hydra overrides. If the source pool is a CSV, convert it to parquet up front (preserving `filepath`, and `label` if present). The default `embedding_spec.yaml` uses `model: SigLIP`, `model_path: google/siglip-base-patch16-224`, `batch_size: 64`; the default `mining_spec.yaml` uses `topn: 5`, `knn_metric: cosine`, `filter_by_label: "false"` (quoted — the schema reads it as a string).
+Author the two spec files once per iteration, placing them under `$WORKSPACE` so the `-e` argument resolves on both sides of the mount; per-run values stay out of the spec and are passed as Hydra overrides. If the source pool is a CSV, convert it to parquet up front (preserving `filepath`, and `label` if present). The default `embedding_spec.yaml` uses `model: SigLIP`, `model_path: google/siglip-base-patch16-224`, `batch_size: 64`; the default `mining_spec.yaml` uses `topn: 5`, `knn_metric: cosine`, `filter_by_label: "false"` (quoted — the schema reads it as a string). Iterative DEFT workflows keep the same `topn: 5` default; preserve an explicit user value. Increase it only when the history summary shows that the narrow neighborhood is dominated by prior selections.
 
 See `references/setup.md` for the full environment notes, `TAO_SKILL_BANK_PATH` handling, the path-mounting rationale, the `getpwuid` chown workaround, the CSV-to-parquet snippet, and the verbatim spec-file authoring blocks.
 
@@ -107,11 +108,37 @@ $DOCKER tmm nearest_neighbors \
     output_parquet=<mined_parquet>
 ```
 
-For each target embedding, finds the `topn` closest source embeddings under the chosen metric, deduplicates across targets, and writes a single-column (`filepath`) parquet of unique mined source paths. The container also drops a `mining_summary.txt` next to the output parquet with: query count, neighbour count, duplicates removed, and (when label filtering is on) kept-vs-dropped pair counts. Tweak `topn`, `knn_metric`, or `filter_by_label` via inline Hydra override when sweeping (e.g. `topn=10`) — no need to rewrite the spec.
+For each target embedding, finds the `topn` closest source embeddings under the chosen metric, deduplicates across targets, and writes a single-column (`filepath`) parquet of unique mined source paths. For a one-off run this may be the final `mined.parquet`; for a DEFT iteration write it as `mined_candidates.parquet` so the immutable candidate set is preserved for Step 4. The container also drops a `mining_summary.txt` next to the output parquet with: query count, neighbour count, duplicates removed, and (when label filtering is on) kept-vs-dropped pair counts. Tweak `topn`, `knn_metric`, or `filter_by_label` via inline Hydra override when sweeping — no need to rewrite the spec.
 
 When `filter_by_label=true` but one of the embedding parquets is missing the `label` column, the container logs a warning and proceeds without filtering. If the mined output looks larger than expected or contains cross-label pairs, scan the docker log for that warning before assuming the task did the right thing.
 
 See `references/reference-invocation.md` for the minimal paste-and-edit end-to-end recipe (resolves `$DS_IMAGE`, writes both specs, runs all three steps, chowns outputs, and prints row counts) to run as a single streamed Bash block.
+
+### Step 4 — History-aware selection (iterative DEFT only)
+
+Run after any label/similarity retention filter, so the input represents the
+actual candidates eligible for training:
+
+```bash
+python3 skills/data/tao-mine-aoi-images/scripts/filter_mined_history.py \
+    --candidate-parquet <mined_candidates.parquet> \
+    --output-parquet <mined.parquet> \
+    --history-file <run_results_dir>/mining_history.json \
+    --summary <iteration_dir>/mining_history_summary.json \
+    --iteration <N> \
+    --topn <topn>
+```
+
+The output preserves candidate order and schema but contains only filepaths not
+selected by an earlier committed iteration. The ledger records selected paths,
+candidate/output hashes, counts, and `topn`; `--resume` reuses an already
+committed iteration only after verifying those artifacts. A zero-row output is
+valid evidence that the current k-NN candidate set contained no novel samples.
+The caller decides whether another producer (for example AnomalyGen) can carry
+the iteration or whether to hard-stop. When the summary reports a high
+`historical_candidate_rate`, increase `topn` or expand the source pool; history
+filtering cannot manufacture variance when every iteration retrieves the same
+weak neighborhood.
 
 ---
 
@@ -119,7 +146,7 @@ See `references/reference-invocation.md` for the minimal paste-and-edit end-to-e
 
 Write everything into a timestamped folder under the experiment / iteration directory. Get the real timestamp by running `date +%Y-%m-%d_%H%M%S` in Bash — do NOT hardcode or guess. If the user specifies a custom output path, use it directly but maintain the same internal layout. The packaging hook adds `mining_config/` and `claude_session.jsonl` automatically when `Mining_Report.md` is written.
 
-The mined parquet is the artifact downstream training consumes. The two embedding parquets are intermediate but worth retaining — reusable across multiple mining runs against the same source pool, and the only place to look when a "looks unrelated" report needs encoder-level debugging.
+The final history-filtered mined parquet is the artifact an iterative downstream training stage consumes. Preserve the pre-history candidate parquet, per-iteration history summary, and run-level `mining_history.json` alongside the two embedding parquets; these distinguish "k-NN found nothing" from "k-NN returned only samples already used by prior iterations."
 
 See `references/outputs-and-reporting.md` for the full output-directory layout and the verbatim `Mining_Report.md` template (Verdict, Inputs, Encoder Consistency, Mining Run, Per-Label Breakdown, Output Sanity, Recommended Actions; keep it 600–1200 words).
 
@@ -127,7 +154,7 @@ See `references/outputs-and-reporting.md` for the full output-directory layout a
 
 ## Common pitfalls
 
-The most frequent failure is **mismatched encoders between the two embedding steps** — the single most common cause of garbage mining output; both steps must consume the same `embedding_spec.yaml`. Other recurring traps: passing `--user` (the `getpwuid` `KeyError`), skipping an embedding step, a missing `label` column silently no-oping `filter_by_label=true`, spec files outside `$WORKSPACE`, unresolved `???` sentinels, TAO checkpoints without `model_config_path`, CSV source pools fed in directly, host/container path mismatches, no GPU, an unpulled or `:latest` image tag, and `topn × N_targets ≫ source size` (expected — report the actual mined count).
+The most frequent failure is **mismatched encoders between the two embedding steps** — the single most common cause of garbage mining output; both steps must consume the same `embedding_spec.yaml`. Other recurring traps: passing `--user` (the `getpwuid` `KeyError`), skipping an embedding step, a missing `label` column silently no-oping `filter_by_label=true`, spec files outside `$WORKSPACE`, unresolved `???` sentinels, TAO checkpoints without `model_config_path`, CSV source pools fed in directly, host/container path mismatches, no GPU, an unpulled or `:latest` image tag, `topn × N_targets ≫ source size` (expected — report the actual mined count), and a `topn` too narrow to yield any novel samples after history filtering.
 
 See `references/troubleshooting.md` for the full pitfall list with the exact errors, causes, and fixes.
 
@@ -141,6 +168,7 @@ See `references/troubleshooting.md` for the full pitfall list with the exact err
 4. If the source pool is a CSV, convert to parquet first (preserve `filepath` and `label`).
 5. Run Step 1 (embed targets) via `docker run … embedding image_embeddings -e embedding_spec.yaml input_parquet=… output_parquet=…`. Print the output parquet's row count and columns to stdout.
 6. Run Step 2 (embed source pool) with the **identical** `embedding_spec.yaml` as Step 1. Print output row count and columns.
-7. Run Step 3 (mine nearest neighbours) via `docker run … tmm nearest_neighbors -e mining_spec.yaml source_parquet=… target_parquet=… output_parquet=…`. Confirm `mining_summary.txt` was written next to `mined.parquet`.
-8. Compute the per-label breakdown (Section 5) by joining the target embeddings parquet with the mined output on filepath, if both carry `label`.
-9. Write `Mining_Report.md` last — writing it triggers the packaging hook, which copies session logs and skill config alongside.
+7. Run Step 3 (mine nearest neighbours) via `docker run … tmm nearest_neighbors -e mining_spec.yaml source_parquet=… target_parquet=… output_parquet=…`. Confirm `mining_summary.txt` was written next to the raw/candidate parquet.
+8. For an iterative DEFT caller, apply every configured retention filter and then run Step 4 with the current iteration number, recorded `topn`, run-level ledger path, and a distinct final `mined.parquet`. Never feed the raw candidate parquet directly into cumulative training.
+9. Compute the per-label breakdown (Section 5) by joining the target embeddings parquet with the final mined output on filepath, if both carry `label`.
+10. Write `Mining_Report.md` last — writing it triggers the packaging hook, which copies session logs and skill config alongside.

@@ -128,7 +128,7 @@ mkdir -p <output_dir>/home \
 ```
 
 ```
-docker run --gpus 'device=0' --shm-size 16G --ipc=host \
+docker run --gpus 'device=0' --shm-size 16G --shm-size=8g \
   --user "$(id -u):$(id -g)" \
   -e USER="$(id -un)" \
   -e LOGNAME="$(id -un)" \
@@ -156,7 +156,18 @@ For TAO Deploy TensorRT actions (`gen_trt_engine`, TensorRT `evaluate`, and Tens
 
 ## Training Requirements
 
-- **Monitoring metric:** val/loss
+- **AutoML metric contract:** when recommendations are scored with the packaged `evaluate` action, use `val/epe` with minimize direction.
+- **Training monitoring metric:** `val/loss`
+  Use this only for live training-loss monitoring.
+- **AutoML/evaluation KPI:** `val/epe`, minimized. The packaged `evaluate`
+  action writes this key to `status.json`; using `val/loss` as the AutoML
+  objective makes trial metric extraction fail. Its Lightning console table
+  labels the same evaluator output `test/epe`, so compare AutoML's recorded
+  `val/epe` value with the console's `test/epe` value when verifying a run.
+- **Recommended AutoML train parameters:** `train.optim.lr` and
+  `train.optim.weight_decay`. Do not search validation/test/inference
+  augmentation fields, and do not search `model.volume_dim` because the current
+  implementation does not consume it.
 - **Eval dataset:** optional. Val dataset configured via `dataset.val_dataset.data_sources` (each entry needs `data_file` and `dataset_name`).
 
 See `references/spec-overrides-foundation-stereo.md` for the per-action dataset-requirements table and every action's mandatory data-source override block.

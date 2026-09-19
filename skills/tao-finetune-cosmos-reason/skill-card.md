@@ -1,5 +1,5 @@
 ## Description: <br>
-Cosmos3-Nano video QA supervised fine-tuning with FSDP parallelism across variable-width GPU configurations. <br>
+Shared Cosmos3 frontend that explicitly routes Cosmos Framework and Cosmos-RL, validates runtime model/video-dataset/SLURM inputs, consumes an SQSH or packaged backend image, optionally plans explicit clean source builds, prepares checkpoints, validates the first update in-process, and returns token-weighted losses and task-aware accuracy. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,13 +9,13 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers fine-tuning Cosmos3-Nano or compatible Cosmos Reason video QA models using SFT/LoRA, evaluating video question-answering performance, or running Cosmos-RL workflows. <br>
+Developers and engineers use this skill to fine-tune NVIDIA Cosmos3 vision-language models (Nano and Edge) on video-conversation and task-aware video-reasoning datasets, using either the Cosmos Framework or Cosmos-RL backend on Docker or SLURM platforms. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Yes] <br>
+**Requires API Key or External Credential:** [Optional] <br>
 **Credential Type(s):** [API key] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
@@ -25,15 +25,15 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [cosmos-reason-launch.md](references/cosmos-reason-launch.md) <br>
-- [cosmos-reason-evaluate.md](references/cosmos-reason-evaluate.md) <br>
-- [cosmos-reason-automl.md](references/cosmos-reason-automl.md) <br>
-- [cosmos-reason-parameters.md](references/cosmos-reason-parameters.md) <br>
-- [cosmos-reason-wts-gb300.md](references/cosmos-reason-wts-gb300.md) <br>
-- [cosmos-data-specs.md](references/cosmos-data-specs.md) <br>
-- [detailed-guide.md](references/detailed-guide.md) <br>
-- [Cosmos3-Nano on Hugging Face](https://huggingface.co/nvidia/Cosmos3-Nano) <br>
-- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [TAO Skill Bank Repository](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [Detailed Guide](references/detailed-guide.md) <br>
+- [Cosmos Reason Parameters](references/cosmos-reason-parameters.md) <br>
+- [Cosmos Reason Evaluate](references/cosmos-reason-evaluate.md) <br>
+- [Cosmos Reason Launch](references/cosmos-reason-launch.md) <br>
+- [Cosmos Backend Operations](references/cosmos-backend-operations.md) <br>
+- [Cosmos Reproducibility Gates](references/cosmos-reproducibility-gates.md) <br>
+- [Cosmos Data Specs](references/cosmos-data-specs.md) <br>
+- [Skill Info](references/skill_info.yaml) <br>
 
 
 ## Skill Output: <br>
@@ -49,38 +49,39 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-3 evaluation tasks (3 positive) run in isolated sandbox pods. <br>
+7 evaluation tasks (7 positive), 3 attempts per task, each in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks whether the user's goal was achieved and expected workflow behavior was followed. <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Final-answer correctness against the reference answer. <br>
+- Discoverability: Whether the expected skill was selected and the workflow executed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal (50% goal completion + 50% expected workflow adherence). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool-call productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Detects unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
-- `skill_execution`: Verifies the expected skill was found and executed. <br>
-- `goal_accuracy`: Verifies the user's goal was achieved. <br>
-- `behavior_check`: Verifies the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Verifies routing quality and productive tool use. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 53% → 96% (+43 points) | 52% → 64% (+12 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 40% → 100% (+60 points) | 80% → 80% (±0 points) |
-| Discoverability | 42% → 98% (+56 points) | 25% → 25% (±0 points) |
-| Effectiveness | 38% → 93% (+55 points) | 52% → 81% (+28 points) |
-| Efficiency | 45% → 92% (+46 points) | 0% → 33% (+33 points) |
+| Overall | 86.1% — baseline ran, but no comparable score was available; uplift unavailable | 74.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 96.7% → 100.0% (+3.3 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 26.7% → 68.6% (+41.9 points) | 45.3% → 84.0% (+38.7 points) |
+| Discoverability | 96.4% — baseline ran, but no comparable score was available; uplift unavailable | 35.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 20.7% → 80.0% (+59.3 points) | 26.9% → 52.6% (+25.7 points) |
+| Efficiency | 85.6% — baseline ran, but no comparable score was available; uplift unavailable | 98.4% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
-0.1.2 (source: frontmatter) <br>
+0.3.6 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
