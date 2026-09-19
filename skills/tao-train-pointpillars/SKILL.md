@@ -43,7 +43,8 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 
 - **Dataset type:** pointpillars
 - **Formats:** default
-- **Monitoring metric:** loss
+- **AutoML training metric:** `loss` (minimize). This is the per-epoch KPI emitted by the train action and is the metric AutoML must extract for trial ranking.
+- **Standalone evaluation metrics:** the evaluate action emits recall KPIs plus dataset-specific detection metrics. For the general point-cloud dataset, verify `bev mAP` and `3d mAP`; do not substitute an evaluation mAP for AutoML's emitted training `loss`.
 
 ### Per-Action Dataset Requirements
 
@@ -241,4 +242,3 @@ For `parent_model` or `parent_model_folder`, pass the upstream train/export/Auto
 ## Deployment
 
 - [tao-deploy-pointpillars](references/tao-deploy-pointpillars.md)
-

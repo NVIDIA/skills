@@ -1,5 +1,5 @@
 ## Description: <br>
-Recognizes text content from cropped text-region images and supports CTC and attention-based decoders for training, evaluating, exporting, pruning, quantizing, retraining, and running inference for TAO OCRNet models. <br>
+Trains, evaluates, exports, prunes, quantizes, retrains, and runs inference for NVIDIA TAO OCRNet scene text recognition models, supporting CTC and attention-based decoders on cropped text-region images. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, pruning, quantizing, exporting, and running inference on OCRNet scene text recognition models using NVIDIA TAO Toolkit. <br>
+Developers and engineers training, evaluating, and deploying OCRNet scene text recognition models using NVIDIA TAO Toolkit for automated optical character recognition workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,16 +25,8 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [skill_info.yaml](references/skill_info.yaml) <br>
 - [TAO Deploy OCRNet](references/tao-deploy-ocrnet.md) <br>
-- [Deploy skill_info.yaml](references/tao-deploy-ocrnet.skill_info.yaml) <br>
-- [Spec Template: Train](references/spec_template_train.yaml) <br>
-- [Spec Template: Evaluate](references/spec_template_evaluate.yaml) <br>
-- [Spec Template: Export](references/spec_template_export.yaml) <br>
-- [Spec Template: Inference](references/spec_template_inference.yaml) <br>
-- [Spec Template: Prune](references/spec_template_prune.yaml) <br>
-- [Spec Template: Quantize](references/spec_template_quantize.yaml) <br>
-- [Spec Template: Retrain](references/spec_template_retrain.yaml) <br>
+- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
@@ -50,35 +42,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot/1. <br>
+1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot/1, each attempt in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed. <br>
-- Effectiveness: Checks whether the user's goal was achieved and expected workflow behavior was followed. <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Correctness: Checks whether the final answer is correct against the reference answer. <br>
+- Discoverability: Checks whether the right skill was loaded and activated when needed. <br>
+- Effectiveness: Checks whether the skill helped the agent complete the user's goal and expected workflow. <br>
+- Efficiency: Checks whether wasted tool calls and token usage were avoided. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 46% → 93% (+47 points) | 55% → 95% (+40 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 20% → 100% (+80 points) | 100% → 100% (±0 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 94% (+94 points) |
-| Effectiveness | 17% → 83% (+67 points) | 75% → 83% (+8 points) |
-| Efficiency | 45% → 83% (+38 points) | 0% → 100% (+100 points) |
+| Overall | 99.4% | 79.7% |
+| Security | 100.0% → 100.0% (±0.0 pts) | 100.0% → 100.0% (±0.0 pts) |
+| Correctness | 0.0% → 100.0% (+100.0 pts) | 100.0% → 100.0% (±0.0 pts) |
+| Discoverability | 100.0% | 0.0% |
+| Effectiveness | 0.0% → 100.0% (+100.0 pts) | 70.0% → 100.0% (+30.0 pts) |
+| Efficiency | 97.0% | 99.5% → 98.4% (-1.1 pts) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

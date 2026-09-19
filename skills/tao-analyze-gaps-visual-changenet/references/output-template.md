@@ -10,13 +10,15 @@ Keep the report tight (1000–1800 words). This is a computational gap analysis,
 - KPI reachability: <yes/no — and the recall it actually achieves>
 - Total samples: <N>  |  Total weak samples kept: <K>  |  Misclassified: <M>
 - Top-3 labels by misclassification share
-- One-line headline: "<K> weak samples written to gaps.parquet for augmentation"
+- One-line headline: "<K> weak samples written to kpi_gaps.parquet for augmentation"
 
 ## 2. Threshold Selection
 - Target NO_PASS recall: <KPI>
 - Candidates evaluated: <count>; candidates meeting recall target: <count>
 - Chosen threshold and tie-break reasoning (best F1 → precision → threshold)
-- Confusion matrix at chosen threshold (from `metrics.json`):
+- Confusion matrix at chosen threshold (calculate from the full `inference.csv`
+  using `siamese_score >= threshold` as predicted NO_PASS; a NO_PASS sample tied
+  at the threshold is correctly classified and has zero weakness):
 
 | | Predicted NO_PASS | Predicted PASS |
 |--|--|--|
@@ -27,16 +29,18 @@ Keep the report tight (1000–1800 words). This is a computational gap analysis,
 | Label | Total Samples | Mean Weakness | Median Weakness | Max Weakness | # Misclassified |
 |-------|---------------|----------------|------------------|---------------|------------------|
 
-(One row per ground-truth label across the FULL inference CSV — read directly from
-`metrics.json` per-label stats — not just the kept K.)
+(One row per ground-truth label across the FULL inference CSV — calculate these
+statistics directly from `inference.csv` and the chosen `threshold.txt`, not just
+the kept K. Signed weakness is `siamese_score - threshold` for PASS and
+`threshold - siamese_score` for NO_PASS, so positive values are misclassified.)
 
 ## 4. Top-K Weakest Samples (per label)
 | Label | object_name | input_path | siamese_score | weakness | misclassified? |
 |-------|-------------|-------------|----------------|-----------|-----------------|
 
 (Up to top_k_per_label rows per label group. Sorted by weakness descending within each group.
-Read from gaps.parquet, deduplicated to one row per (input_path, object_name) — gaps.parquet
-is per-lighting, but the table is per-sample.)
+Read from `kpi_gaps.parquet`, deduplicated to one row per (input_path, object_name) —
+`kpi_gaps.parquet` is per-lighting, but the table is per-sample.)
 
 ## 5. Visual Spot Check (10 samples)
 | Label | object_name | siamese_score | weakness | Test Image | Verdict |

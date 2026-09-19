@@ -3,7 +3,7 @@ name: tao-convert-dataset-format
 description: Run `tao-daft convert` to convert NVIDIA TAO DAFT datasets between supported formats. Do not use for non-DAFT data.
   Use when the user asks to convert a DAFT dataset, change DAFT format, change a TAO dataset format, or run `tao-daft convert`.
 license: Apache-2.0
-compatibility: Requires Python 3.10+ and the nvidia-tao-sdk package (pip install nvidia-tao-daft).
+compatibility: Requires Python 3.10+ and the nvidia-tao-daft package (pip install nvidia-tao-daft).
 metadata:
   author: NVIDIA Corporation
   version: "0.1.0"
@@ -137,4 +137,3 @@ the full output and partial-read if huge.
   flags (media handling, task subset) via leaf `--help`; a misset
   flag often produces a structurally valid but semantically wrong
   target.
-

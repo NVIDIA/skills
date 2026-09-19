@@ -12,6 +12,8 @@ train:
   num_nodes: 1
   validation_interval: 50
   checkpoint_interval: 200
+  # For FAR-optimized retention, set enable_topk=true, monitor=val_far, and
+  # mode=min. optim.monitor_name alone does not select checkpoints.
   checkpointer:
     enable_topk: false
     replace_periodic: false
@@ -113,7 +115,9 @@ dataset:
       augment: true
     num_classes: 2
 evaluate:
-  checkpoint: ${results_dir}/train/changenet_model_classify_latest.pth
+  # Resolve a concrete parent-training checkpoint; do not interpolate results_dir
+  # across action-specific output directories.
+  checkpoint: ''
   trt_engine: ${results_dir}/gen_trt_engine/changenet-classify.trt
   batch_size: ${dataset.classify.batch_size}
 inference:
@@ -122,7 +126,7 @@ inference:
   batch_size: ${dataset.classify.batch_size}
 export:
   gpu_id: 0
-  checkpoint: ${results_dir}/train/changenet_model_classify_latest.pth
+  checkpoint: ''
   onnx_file: ${results_dir}/export/changenet-classify.onnx
   input_width: 128
   input_height: 512

@@ -4,7 +4,7 @@ description: Run `tao-daft validate` to check NVIDIA TAO DAFT datasets for struc
   not use for non-DAFT formats. Use when the user asks to validate a DAFT dataset, check DAFT schema, validate a TAO dataset
   format, or run `tao-daft validate`.
 license: Apache-2.0
-compatibility: Requires Python 3.10+ and the nvidia-tao-sdk package (pip install nvidia-tao-daft).
+compatibility: Requires Python 3.10+ and the nvidia-tao-daft package (pip install nvidia-tao-daft).
 metadata:
   author: NVIDIA Corporation
   version: "0.1.0"
@@ -133,4 +133,3 @@ and read it in slices rather than scrolling inline.
   via the format's scope-restriction flag; discover the name from the
   leaf `--help`.
 - **CI wants warnings to fail** — add `--strict`.
-

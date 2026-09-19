@@ -3,12 +3,12 @@
 ## Error Patterns
 
 **Checkpoint not found**: The evaluate, inference, export, and quantize actions
-require a valid checkpoint path. Current TAO 6.25.10 Visual ChangeNet training
-emits epoch/step checkpoint files such as `model_epoch_000_step_00012.pth`;
-it does not necessarily write `changenet_model_classify_latest.pth` or
-`changenet_model_segment_latest.pth`. Use the model-skill `parent_model`
-resolver for downstream actions and `resume_model` for resume, or pass the exact
-epoch/step checkpoint when running local Docker directly.
+require a concrete checkpoint path. Training emits files such as
+`model_epoch_000_step_00012.pth` and the task-specific latest symlink. Use the
+model-skill `parent_model` resolver for downstream actions and `resume_model`
+for resume, or pass the exact container path when running local Docker. Do not
+build a cross-action path from `${results_dir}`; TAO rebases it to the current
+action's output directory.
 
 **CSV format mismatch**: The classify CSV must have exactly four columns:
 `input_path`, `golden_path`, `label`, and `object_name`. Missing columns or
@@ -20,8 +20,6 @@ characters and uses comma delimiters (not semicolons or tabs).
 **OOM during training**: Reduce `dataset.classify.batch_size` (16 -> 8 -> 4). With the default image size of 224x224, batch_size=16 typically fits on a 16GB GPU. If using larger images via `image_width`/`image_height`, reduce batch size proportionally.
 
 **Low evaluation accuracy with correct training loss**: The `eval_margin` threshold may be miscalibrated for your data. After training, run inference on a validation set and inspect the embedding distance distribution to pick an appropriate threshold. The default 0.3 is tuned for the reference dataset and may not generalize.
-
-**`AssertionError: Contrastive loss only supports Euclidean distance module`** at evaluate/inference: the spec dropped the `train` subtree. Model `__init__` reads `train.classify.loss` regardless of action; omitting it falls back to contrastive loss, which then conflicts with non-default `model.classify.difference_module` (e.g. `learnable`) saved in the checkpoint. Keep `train.classify.loss` (and `train.classify.cls_weight`) in the spec for evaluate and inference too.
 
 **Checkpoint load key mismatch at evaluate/inference**: Keep the classify model
 architecture fields aligned with the train spec. C-RADIO classify checkpoints

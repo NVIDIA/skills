@@ -139,7 +139,6 @@ All outputs go to `results_dir/`:
 
 ## Prerequisites
 
-- **Container**: `nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt` <!-- versions-key: images.tao_toolkit.pyt -->
+- **Container**: `nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt` <!-- versions-key: images.tao_toolkit.pyt -->
 - **API access**: At least one VLM endpoint (Gemini API key or OpenAI-compatible endpoint capable of image input)
 - **PIL / Pillow**: Required to read image dimensions during seeding (already present in the TAO container)
-

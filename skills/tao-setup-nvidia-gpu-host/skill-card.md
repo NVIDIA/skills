@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to check and install NVIDIA GPU runtime dependencies (driver, CUDA Toolkit, Container Toolkit, Docker) on Linux hosts before running TAO workflows on Docker or Kubernetes GPU backends. <br>
+Developers and engineers preparing NVIDIA GPU hosts for TAO training, evaluation, and inference workflows on Docker or Kubernetes backends. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,10 +25,10 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [skill_info.yaml](references/skill_info.yaml) <br>
 - [NVIDIA CUDA Installation Guide for Linux](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/) <br>
-- [NVIDIA Container Toolkit Install Guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) <br>
-- [Docker Engine Install Guide](https://docs.docker.com/engine/install/) <br>
+- [NVIDIA Container Toolkit Installation Guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) <br>
+- [Docker Engine Installation Guide](https://docs.docker.com/engine/install/) <br>
+- [Skill runtime profile schema](references/skill_info.yaml) <br>
 
 
 ## Skill Output: <br>
@@ -44,38 +44,39 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), evaluated in isolated k8s-sandbox pods with 1 attempt per task. <br>
+1 evaluation task (1 positive), each attempt in an isolated sandbox pod. Dataset digest: sha256:906b47f67164bf4211efaf087e292e7014b9d8923002af0a07a00469b12ae6dc. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal (goal completion and expected workflow adherence, equally weighted). <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage through quality routing and productive tool use. <br>
+- Discoverability: Whether the expected skill was selected and the workflow executed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and followed the expected workflow. <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies the expected skill was found and executed. <br>
-- `skill_efficiency`: Assesses routing quality, workspace-aware skill reads, and productive tool use. <br>
-- `accuracy`: Measures final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Evaluates whether the user's goal was achieved. <br>
-- `behavior_check`: Checks whether the expected workflow behavior was followed. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity; routing is scored under Discoverability. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 23% → 97% (+73 points) | 33% → 54% (+21 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 0% → 100% (+100 points) | 20% → 100% (+80 points) |
-| Discoverability | 0% → 100% (+100 points) | 0% → 0% (±0 points) |
-| Effectiveness | 17% → 83% (+67 points) | 43% → 70% (+27 points) |
-| Efficiency | 0% → 100% (+100 points) | 0% → 0% (±0 points) |
+| Overall | 99.5% | 95.3% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 6.7% → 100.0% (+93.3 points) | 20.0% → 100.0% (+80.0 points) |
+| Discoverability | 100.0% | 95.0% |
+| Effectiveness | 16.7% → 100.0% (+83.3 points) | 48.3% → 83.3% (+35.0 points) |
+| Efficiency | 97.5% | 98.1% |
 
 ## Skill Version(s): <br>
-0.1.1 (source: frontmatter) <br>
+0.1.2 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -1,5 +1,5 @@
 ## Description: <br>
-Monocular depth estimation using Metric Depth Anything v2 or Relative Depth Anything architectures, predicting per-pixel depth from single RGB images for training, evaluating, exporting, or running inference on TAO monocular depth models. <br>
+Monocular depth estimation using Metric Depth Anything v2 or Relative Depth Anything architectures, predicting per-pixel depth from single RGB images for training, evaluating, exporting, or running inference with TAO. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, or running inference on NVIDIA TAO monocular depth estimation models using Metric Depth Anything v2 or Relative Depth Anything architectures. <br>
+Developers and engineers who need to train, evaluate, export, or run inference for monocular depth estimation models using the NVIDIA TAO toolkit with Docker-based GPU workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,13 +25,13 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Parameters glossary](references/parameters.md) <br>
-- [Finetuning recipes](references/finetuning-recipes.md) <br>
-- [Typical spec overrides](references/spec-overrides.md) <br>
-- [Spec param and parent model inference](references/spec-param-inference.md) <br>
-- [TAO Deploy Depth Anything v2](references/tao-deploy-depth-anything-v2.md) <br>
-- [Troubleshooting](references/troubleshooting.md) <br>
-- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [TAO Skill Bank (GitHub)](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [parameters.md](references/parameters.md) <br>
+- [finetuning-recipes.md](references/finetuning-recipes.md) <br>
+- [spec-overrides.md](references/spec-overrides.md) <br>
+- [tao-deploy-depth-anything-v2.md](references/tao-deploy-depth-anything-v2.md) <br>
+- [troubleshooting.md](references/troubleshooting.md) <br>
+- [spec-param-inference.md](references/spec-param-inference.md) <br>
 
 
 ## Skill Output: <br>
@@ -47,35 +47,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) against skill-evaluator-dataset-snapshot/1, evaluated in isolated k8s-sandbox pods. <br>
+Evaluated against 1 task (1 positive) with 3 attempts per task in isolated sandbox pods. Evaluator version 1.5.6. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal (50% goal completion + 50% expected workflow adherence). <br>
-- Efficiency: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Discoverability: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal (50% goal_accuracy + 50% behavior_check). <br>
+- Efficiency: Tool-call productivity and token efficiency (50% skill_efficiency + 50% token_efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Detects unsafe operations, secret leakage, and unauthorized access. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `skill_execution`: Whether the expected skill was selected and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 36% → 95% (+59 points) | 43% → 95% (+52 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 0% → 100% (+100 points) | 80% → 100% (+20 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 94% (+94 points) |
-| Effectiveness | 0% → 100% (+100 points) | 37% → 83% (+47 points) |
-| Efficiency | 29% → 75% (+46 points) | 0% → 100% (+100 points) |
+| Overall | 94.3% | 70.4% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 100.0% | 0.0% |
+| Effectiveness | 5.6% → 100.0% (+94.4 points) | 31.7% → 53.3% (+21.6 points) |
+| Efficiency | 71.4% | 99.5% → 98.5% (-1.0 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

@@ -80,7 +80,7 @@ if re.search(r"filter_by_label\s*=\s*true", command):
 
 # 5. Empty mined parquet hint
 if re.search(r'mined.*0\s+(unique|rows?|images?)', combined, re.IGNORECASE):
-    warnings.append("Mining produced 0 rows. Likely causes: empty source pool, encoder mismatch (Steps 1/2 disagreed), or label filter dropped every pair.")
+    warnings.append("Mining produced 0 rows. Likely causes: empty source pool, encoder mismatch (Steps 1/2 disagreed), label/similarity filtering dropped every pair, or history-aware selection found only samples used by earlier iterations. Inspect the history summary and consider a wider topn.")
 
 # 6. Missing GPU / CUDA
 if re.search(r'(CUDA.*not available|no CUDA-capable device|nvidia-smi.*not found|could not select device driver.*gpu)', combined, re.IGNORECASE):

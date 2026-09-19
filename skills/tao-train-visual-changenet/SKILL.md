@@ -29,14 +29,11 @@ Visual ChangeNet is a TAO Toolkit model for visual inspection and defect detecti
 - **Classify** — Binary image classification using a siamese-style architecture with a shared backbone (C-RADIO ViT) and a learnable difference module. Compares image pairs to classify defects as PASS/NO_PASS.
 - **Segment** — Pixel-level change segmentation using a ViT-Large NVDINOv2 backbone. Compares before/after image pairs to produce a binary change mask.
 
-The backbone weight (`c_radio_v2_vit_base_patch16_224`) is the **public** `nvidia/C-RADIOv2-B` model from HuggingFace, distributed as `model.safetensors` (~393 MB). **The TAO container does not auto-fetch from HF URLs** — `ptm_utils.load_pretrained_weights()` hands the `pretrained_backbone_path` value to `torch.load(path)` / `safetensors.torch.load_file(path)` directly. Passing an `https://huggingface.co/...` URL or a repo id produces `FileNotFoundError` and the run fails with `Execution status: FAIL` within a few seconds. Stage the file locally before launch with the bundled helper (idempotent — reuses an already-staged file):
-
-```bash
-python3 skills/models/tao-train-visual-changenet/scripts/stage_backbone.py --workspace <workspace>
-# -> <workspace>/pretrained_models/C-RADIOv2_B.safetensors
-```
-
-This is a **public** download — **no NGC CLI, no NGC org, and no credentials** are required, and there is **no `ngc://` transfer-learning checkpoint dependency** (VCN trains from this backbone). Run it in the CPU shell, where host network and `HF_TOKEN` live; `HF_TOKEN` is read only if set (gated mirror / rate limit) and is needed at staging time only, never inside the training container. Mount the staged file into the container (`-v <workspace>/pretrained_models/C-RADIOv2_B.safetensors:/data/pretrained_models/C-RADIOv2_B.safetensors`) and set the spec `model.backbone.pretrained_backbone_path` to the container path.
+Classify supports the public C-RADIOv2-B backbone and six frozen DINOv3
+variants. Read `references/dinov3-backbones.md` before selecting DINOv3; it
+contains the exact variant map, freeze requirement, Hugging Face access rules,
+and local-staging overlay. For C-RADIO, use the bundled
+`scripts/stage_backbone.py` and the mount in `references/local-docker.md`.
 
 Segment specs use `model.backbone.type: vit_large_nvdinov2` and the NVDINOv2
 checkpoint family. Keep the checkpoint architecture aligned with the backbone
@@ -84,6 +81,11 @@ Visual ChangeNet has two separate task modes with different dataset types and da
 - **Formats:** default
 - **Accepted dataset intents:** training, evaluation, testing, calibration
 - **Monitoring metric:** val_loss
+- **Standalone evaluate metric:** `test_acc` (with `test_fpr`, `test_fnr`, and
+  `defect_acc` also emitted). AutoML must rank recommendations by the training
+  `val_loss`; use `test_acc` only to verify that the selected checkpoint loads
+  and evaluates successfully. Do not expect the evaluate action to emit
+  `val_loss`.
 
 #### Per-Action Dataset Requirements (Classify)
 
@@ -252,9 +254,9 @@ S3_EVAL = "s3://bucket/data/eval"
     "gen_trt_engine.tensorrt.calibration.cal_image_dir": [f"{S3_TRAIN}/images.tar.gz"],
 }
 ```
-## Optional: running via the TAO SDK
+## Running via local Docker
 
-When running without the TAO SDK (local docker), use the pinned TAO pyt image and invoke `visual_changenet <train|evaluate|inference|export|quantize>` directly. `--shm-size=8g` is required, the C-RADIO `.safetensors` must be mounted to `/data/pretrained_models/C-RADIOv2_B.safetensors`, and checkpoint/results_dir can be overridden on the command line. See `references/local-docker.md` for the full `docker run` command, mounts, and overrides.
+Use the pinned TAO pyt image and invoke `visual_changenet <train|evaluate|inference|export|quantize>` directly. `--shm-size=8g` is required, the C-RADIO `.safetensors` must be mounted to `/data/pretrained_models/C-RADIOv2_B.safetensors`, and checkpoint/results_dir can be overridden on the command line. See `references/local-docker.md` for the full `docker run` command, mounts, and overrides.
 
 ## Tasks
 
@@ -305,7 +307,7 @@ For checkpoint-not-found, CSV format mismatch, image extension mismatch, OOM, lo
 
 ## Spec Param / Parent Model Inference
 
-Model-specific parent-model mappings are declared in `references/skill_info.yaml` under `spec_params`, so generated runners and agents resolve checkpoints before `create_job()` instead of guessing file names. For `parent_model` or `parent_model_folder`, pass the upstream train/export/AutoML child job id as `parent_job_id`; the SDK lists the parent result folder, filters checkpoint artifacts, and returns the selected model file or folder. See `references/parent-model-inference.md` for the full per-action spec-field-to-inference-function mapping table.
+Model-specific parent-model mappings are declared in `references/skill_info.yaml` under `spec_params`, so agents resolve checkpoints before launching a job instead of guessing file names. For `parent_model` or `parent_model_folder`, pass the upstream train/export/AutoML child job id as the parent job id; list the parent result folder, filter checkpoint artifacts, and select the resolved model file or folder. See `references/parent-model-inference.md` for the full per-action spec-field-to-inference-function mapping table.
 
 ## Deployment
 

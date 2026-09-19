@@ -41,6 +41,10 @@ Non-train actions such as `inference`, `export`, and deploy flows stay in this m
 - **Dataset type:** image_classification
 - **Formats:** ssl
 - **Monitoring metric:** train_loss
+- **AutoML metric contract:** Use `train_loss` emitted by the train action and
+  minimize it. This model has no packaged evaluate action, so do not invent an
+  evaluation KPI; validate the selected `student_epoch_*` checkpoint through
+  inference.
 
 ### Per-Action Dataset Requirements
 
@@ -113,6 +117,9 @@ run representative while avoiding the much slower ViT-Large default.
     "model.backbone.student_type": "<same value used for train>",
     "model.backbone.img_size": "<same value used for train>",
     "train.use_custom_attention": "<same value used for train>",
+    # NVDINOv2 enables persistent_workers in its prediction DataLoader.
+    # Keep this positive; dataset.workers=0 makes inference fail before loading data.
+    "dataset.workers": 2,
     "dataset.test_dataset.images_dir": TEST_IMAGES_DIR,
 }
 ```
@@ -165,6 +172,11 @@ not `nvdinov2_model_latest.pth`. The latest file is a training checkpoint and
 the inference loader reports unexpected keys such as `state_dict`, optimizer
 state, and scheduler state.
 
+**Inference fails with `persistent_workers option needs num_workers > 0`**:
+Set `dataset.workers` to a positive value (use `2` for a minimal local run).
+The NVDINOv2 prediction DataLoader enables persistent workers and cannot run
+with the generic zero-worker smoke-test override.
+
 **Export checkpoint has unexpected Lightning keys**: Export also consumes the
 selected `student_epoch_*.pth` checkpoint. Use the full `model_epoch_*.pth`
 checkpoint only for resume/retrain via `train.resume_training_checkpoint_path`.
@@ -211,4 +223,3 @@ For `parent_model` or `parent_model_folder`, pass the upstream train/export/Auto
 ## Deployment
 
 - [tao-deploy-nvdinov2](references/tao-deploy-nvdinov2.md)
-

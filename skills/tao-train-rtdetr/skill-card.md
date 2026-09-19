@@ -1,5 +1,5 @@
 ## Description: <br>
-RT-DETR (Real-Time DEtection TRansformer) for 2D object detection, designed for real-time inference with competitive accuracy and supporting distillation and quantization for deployment optimization. <br>
+RT-DETR (Real-Time DEtection TRansformer) for 2D object detection, designed for real-time inference with competitive accuracy and supporting training, evaluation, distillation, quantization, export, and inference for TAO RT-DETR models. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, distilling, quantizing, exporting, or running inference for RT-DETR real-time object detection models using NVIDIA TAO Toolkit. <br>
+Developers and engineers training, evaluating, distilling, quantizing, exporting, or running inference on NVIDIA TAO RT-DETR object detection models for real-time 2D detection applications. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,11 +25,8 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [skill_info.yaml](references/skill_info.yaml) <br>
-- [RT-DETR Deploy Reference](references/tao-deploy-rtdetr.md) <br>
-- [Train Spec Template](references/spec_template_train.yaml) <br>
-- [Export Spec Template](references/spec_template_export.yaml) <br>
-- [Distill Spec Template](references/spec_template_distill.yaml) <br>
+- [TAO Deploy RT-DETR](references/tao-deploy-rtdetr.md) <br>
+- [Skill Info](references/skill_info.yaml) <br>
 - [TAO Skill Bank Repository](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
@@ -46,35 +43,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot/1. <br>
+1 evaluation task (1 positive) against the skill-evaluator-dataset-snapshot/1 dataset, run in isolated k8s-sandbox pods with 3 attempts per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Verifies final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and followed expected workflow behavior. <br>
-- Efficiency: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was selected and activated when needed. <br>
+- Effectiveness: Equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Tool-call productivity and token efficiency to avoid wasted usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 56% → 96% (+40 points) | 55% → 43% (-12 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 60% → 100% (+40 points) | 100% → 60% (-40 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 0% (±0 points) |
-| Effectiveness | 32% → 95% (+63 points) | 75% → 53% (-22 points) |
-| Efficiency | 39% → 83% (+44 points) | 0% → 0% (±0 points) |
+| Overall | 95.9% | 94.9% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 100.0% | 95.0% |
+| Effectiveness | 5.6% → 100.0% (+94.4 points) | 70.0% → 83.3% (+13.3 points) |
+| Efficiency | 79.5% | 96.3% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

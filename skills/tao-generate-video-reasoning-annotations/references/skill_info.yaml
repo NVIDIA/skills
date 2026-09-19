@@ -1,6 +1,6 @@
 network_arch: tao-generate-video-reasoning-annotations
 type: data
-container_image: nvcr.io/nvidia/tao/tao-toolkit:7.1.0-data-services  # versions-key: images.tao_toolkit.data_services
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
 gpu_spec_key: null
 required_credentials: []
 actions:

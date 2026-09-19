@@ -45,7 +45,8 @@ The parent PyT CLI does not expose `gen_trt_engine`. Use `models/rtdetr/deploy` 
 
 - **Dataset type:** object_detection
 - **Formats:** coco, coco_raw
-- **Monitoring metric:** mAP50 for quick operational checks; `val_mAP` for COCO/paper-style benchmark comparisons.
+- **AutoML training metrics:** `val_mAP50` for quick operational checks or `val_mAP` for COCO/paper-style benchmark comparisons; both are maximized. These are the exact structured train-status KPI names.
+- **Standalone evaluation metrics:** `test_mAP50` and `test_mAP`. Do not use the evaluator's `test_*` names for AutoML trial ranking.
 
 ### Per-Action Dataset Requirements
 
@@ -248,7 +249,7 @@ for a different shape. The older packaged `960x544` template shape can fail
 during ONNX tracing with `The size of tensor a (...) must match the size of
 tensor b (...)` in `hybrid_encoder.py` positional embedding addition.
 
-**AutoML metric extraction**: RT-DETR emits detection metrics in structured training status and logs. For COCO/paper-style benchmark comparisons, optimize `val_mAP` with `direction: maximize`; for explicit AP50 workflows, optimize `mAP50`. Prefer `results_dir/train/status.json` or AutoML result state before parsing raw logs. Do not optimize `val_loss` for default detection model invocations.
+**AutoML metric extraction**: RT-DETR emits detection metrics in structured training status and logs. For COCO/paper-style benchmark comparisons, optimize `val_mAP` with `direction: maximize`; for explicit AP50 workflows, optimize `val_mAP50`. Standalone evaluation emits the corresponding `test_mAP` and `test_mAP50` keys. Prefer `results_dir/train/status.json` or AutoML result state before parsing raw logs. Do not optimize `val_loss` for default detection model invocations.
 
 **Checkpoint handoff**: For evaluate/export/inference/quantize/distill/resume, use the checkpoint resolver on the best AutoML child job's `results_dir/train/` folder and select the action-appropriate `model_epoch_*.pth` checkpoint. RT-DETR may also write a latest symlink, but that should only be used when a caller explicitly requests latest. Keep `dataset.num_classes`, `dataset.eval_class_ids`, `model.num_queries`, and `model.num_select` consistent with training.
 
@@ -291,4 +292,3 @@ For `parent_model` or `parent_model_folder`, pass the upstream train/export/Auto
 ## Deployment
 
 - [tao-deploy-rtdetr](references/tao-deploy-rtdetr.md)
-

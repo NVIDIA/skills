@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nvidia.com/tao/schemas/cosmos-job-metadata-v1.json",
+  "title": "Cosmos TAO job metadata",
+  "type": "object",
+  "required": ["schema_version", "experiment_id", "dataset", "training_mode", "backend", "tao_job_id", "slurm", "image", "repositories", "config", "paths", "dataset_fingerprints", "model", "launch_command", "environment", "stdout", "stderr", "results_dir", "checkpoint_dir", "timestamps", "scheduler", "child_process", "terminal_tao_status", "metrics", "artifacts"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "experiment_id": {"type": "string", "minLength": 1},
+    "dataset": {"enum": ["video_conversation", "task_aware_video_reasoning"]},
+    "training_mode": {"enum": ["dense", "peft"]},
+    "backend": {"enum": ["cosmos-framework", "cosmos-rl"]},
+    "slurm": {
+      "type": "object",
+      "required": ["job_id", "submission_host", "cluster", "partition", "account", "qos", "reservation", "requested_resources", "allocated_resources", "node_list", "master_address", "master_port", "requeue", "exclusive", "time_limit", "timeout"]
+    },
+    "image": {"type": "object", "required": ["tag", "digest", "provenance", "sqsh_path", "sqsh_sha256"]},
+    "model": {"type": "object", "required": ["identity", "revision", "fingerprint", "prepared"]},
+    "scheduler": {"type": "object", "required": ["state", "reason", "exit_code"]},
+    "child_process": {"type": "object", "required": ["exit_code"]},
+    "metrics": {"type": "object", "required": ["average_training_loss", "average_validation_loss", "average_validation_accuracy"]}
+  },
+  "additionalProperties": true
+}

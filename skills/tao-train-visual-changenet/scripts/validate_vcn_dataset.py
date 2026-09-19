@@ -57,7 +57,7 @@ def validate(
     csv_path: pathlib.Path,
     images_dir: pathlib.Path | None,
     mode: str = "train",
-    light: str = "SolderLight",
+    lights: list[str] | None = None,
     image_ext: str = ".jpg",
     batch_size: int | None = None,
     num_gpus: int = 1,
@@ -67,6 +67,8 @@ def validate(
     Uses stdlib csv so the script runs on bare hosts without pandas.
     """
     errors: list[str] = []
+    lights = list(lights) if lights else ["SolderLight"]
+    light = lights[0]  # representative suffix for message templates
 
     if not csv_path.is_file():
         return [f"CSV not found: {csv_path}"]
@@ -139,9 +141,10 @@ def validate(
                 if not obj:
                     missing.append((i, "<empty object_name>"))
                     continue
-                resolved = images_dir / raw / f"{obj}_{light}{image_ext}"
-                if not resolved.is_file():
-                    missing.append((i, f"{raw} -> {resolved}"))
+                for suffix in lights:
+                    resolved = images_dir / raw / f"{obj}_{suffix}{image_ext}"
+                    if not resolved.is_file():
+                        missing.append((i, f"{raw} -> {resolved}"))
             if missing:
                 sample = ", ".join(f"row {i}: {p}" for i, p in missing[:5])
                 errors.append(
@@ -149,6 +152,24 @@ def validate(
                     f"(expected <images_dir>/<{col}>/<object_name>_{light}{image_ext}); "
                     f"first: {sample}"
                 )
+
+    # 3.5 Label hygiene (all modes): the loader computes
+    #     int(label != 'PASS') without stripping or casefolding, so 'pass',
+    #     'Pass' or ' PASS ' silently become DEFECT rows.
+    for i, row in enumerate(rows):
+        raw_label = row.get("label") or ""
+        if raw_label and raw_label != raw_label.strip():
+            errors.append(
+                f"row {i}: label {raw_label!r} has surrounding whitespace; the "
+                "loader compares against exact 'PASS' and would silently score "
+                "this row as a defect"
+            )
+        elif raw_label.strip().casefold() == "pass" and raw_label.strip() != "PASS":
+            errors.append(
+                f"row {i}: invalid label {raw_label!r}; non-defective rows must "
+                "use exact case-sensitive 'PASS' (the loader computes "
+                "int(label != 'PASS'), so this row would silently become a defect)"
+            )
 
     # 4. Single-class training set -> ZeroDivisionError in the classify loader.
     if mode == "train":
@@ -222,8 +243,12 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Dataset role. 'train' additionally enforces a two-class label set.",
     )
     parser.add_argument(
-        "--light", default="SolderLight",
-        help="Lighting suffix for siamese resolution. Default: SolderLight.",
+        "--light", action="append", default=None,
+        help=(
+            "Lighting suffix for siamese resolution; repeat once per entry in "
+            "dataset.classify input_map (e.g. --light SolderLight --light "
+            "WhiteLight). Default: SolderLight."
+        ),
     )
     parser.add_argument(
         "--image-ext", default=".jpg",
@@ -248,7 +273,7 @@ def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     errors = validate(
         args.csv, args.images_dir, mode=args.mode,
-        light=args.light, image_ext=args.image_ext,
+        lights=args.light, image_ext=args.image_ext,
         batch_size=args.batch_size, num_gpus=args.num_gpus,
     )
     if errors:

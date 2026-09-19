@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, quantizing, or running inference for multi-camera temporal 3D object detection and tracking models using NVIDIA TAO Sparse4D. <br>
+Developers and engineers who need to train, evaluate, export, quantize, or run inference on Sparse4D multi-camera temporal 3D object detection and tracking models using NVIDIA TAO. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,15 +25,10 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [local_docker_conversion.md](references/local_docker_conversion.md) <br>
-- [skill_info.yaml](references/skill_info.yaml) <br>
-- [spec_param_inference.md](references/spec_param_inference.md) <br>
-- [spec_template_train.yaml](references/spec_template_train.yaml) <br>
-- [spec_template_evaluate.yaml](references/spec_template_evaluate.yaml) <br>
-- [spec_template_export.yaml](references/spec_template_export.yaml) <br>
-- [spec_template_inference.yaml](references/spec_template_inference.yaml) <br>
-- [spec_template_quantize.yaml](references/spec_template_quantize.yaml) <br>
-- [spec_template_dataset_convert.yaml](references/spec_template_dataset_convert.yaml) <br>
+- [Local Docker Conversion Guide](references/local_docker_conversion.md) <br>
+- [Skill Info](references/skill_info.yaml) <br>
+- [Spec Param Inference Mappings](references/spec_param_inference.md) <br>
+- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
@@ -49,35 +44,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot/1. <br>
+1 evaluation task (1 positive), 3 attempts per task, each run in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Verifies final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
-- Efficiency: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was selected and the workflow executed. <br>
+- Effectiveness: Checks whether the skill helped complete the user's goal and followed the expected workflow. <br>
+- Efficiency: Checks tool-call productivity and token efficiency to avoid wasted usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys avoided, and workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 44% → 92% (+48 points) | 58% → 48% (-10 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 20% → 100% (+80 points) | 100% → 80% (-20 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 0% (±0 points) |
-| Effectiveness | 17% → 78% (+62 points) | 90% → 58% (-32 points) |
-| Efficiency | 35% → 83% (+48 points) | 0% → 0% (±0 points) |
+| Overall | 99.5% | 62.4% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 60.0% (-40.0 points) |
+| Discoverability | 100.0% | 0.0% |
+| Effectiveness | 5.6% → 100.0% (+94.4 points) | 70.0% → 53.3% (-16.7 points) |
+| Efficiency | 97.5% | 99.5% → 98.5% (-1.0 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

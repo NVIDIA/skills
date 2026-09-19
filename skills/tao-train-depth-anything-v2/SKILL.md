@@ -132,7 +132,7 @@ mkdir -p <output_dir>/home \
 ```
 
 ```
-docker run --gpus 'device=0' --shm-size 16G --ipc=host \
+docker run --gpus 'device=0' --shm-size 16G --shm-size=8g \
   --user "$(id -u):$(id -g)" \
   -e USER="$(id -un)" \
   -e LOGNAME="$(id -un)" \
@@ -160,8 +160,17 @@ For TAO Deploy TensorRT actions (`gen_trt_engine`, TensorRT `evaluate`, and Tens
 ## Training Requirements
 
 - **Valid `dataset_name` values for mono `data_sources`** (case-insensitive): `ThreeDVLM`, `FSD`, `NvCLIP`, `IssacStereo`, `Crestereo`, `Middlebury`, `NYUDV2`, `NYUDV2Relative`, `RelativeMonoDataset`, `MetricMonoDataset`. `NYUDV2` carries metric depth GT (meters) — pair with `MetricDepthAnything`; `NYUDV2Relative` is the same data with relative-depth conventions — pair with `RelativeDepthAnything`.
-- **Monitoring metric:** val/d1, val/loss
-- For AutoML sanity runs on the packaged relative-depth smoke data, use `val/d1` as the primary monitor. `val/loss` can be emitted as `NaN` even when the trainer exits successfully and writes a usable checkpoint, so it is not a reliable AutoML objective unless the run's status metrics show a finite value.
+- **Monitoring metric:** `val/d1` (maximize), `val/loss` (minimize).
+- **AutoML metric contract:** for AutoML sanity runs on the packaged
+  relative-depth smoke data, use `val/d1` as the primary monitor and maximize
+  it. Mono `d1` is Delta-1
+  accuracy: the fraction of valid pixels where
+  `max(pred/target, target/pred) < 1.25`. Do not apply the stereo `d1` error-rate
+  direction to this mono metric. `val/loss` can be emitted as `NaN` even when
+  the trainer exits successfully and writes a usable checkpoint, so it is not
+  a reliable AutoML objective unless the run's status metrics show a finite
+  value.
+- **Mono AutoML search allowlist:** use `train.optim.lr` and `train.optim.weight_decay` for the default relative-depth train workflow. Do not search `dataset.val_dataset`, `dataset.test_dataset`, or `dataset.infer_dataset` augmentation fields because they change scoring/non-train behavior rather than training. Do not search `model.corr_radius`, `model.cv_group`, or `model.volume_dim` for mono; those fields belong to the stereo architecture and are inert for `RelativeDepthAnything`.
 
 ### Per-Action Dataset Requirements
 
