@@ -289,54 +289,6 @@
       }
     },
     {
-      "path": "skills/cupynumeric-hdf5",
-      "name": "cupynumeric-hdf5",
-      "description": "Read and write large cuPyNumeric arrays to HDF5 with Legate's parallel, distributed HDF5 I/O (legate.io.hdf5: to_file, from_file, from_file_batched). Use when a developer needs to save a cuPyNumeric array to an .h5/.hdf5 file, load an HDF5 dataset into a distributed cuPyNumeric array, read a large HDF5 dataset in chunks, hand arrays to an HPC pipeline as a single file, or accelerate HDF5 disk I/O with GPUDirect Storage (GDS). Do not use it for Parquet/cuDF/raw-binary or other sharded/custom layouts (see the cupynumeric-parallel-data-load skill), Zarr or object-store/S3 output, .npz or pickled archives, plain h5py without cuPyNumeric, or pure array compute such as FFT, matmul, or reductions.",
-      "metadata": {
-        "product.primary": "cuPyNumeric",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "data-science",
-        "audience": "developer,data_scientist,hpc_developer",
-        "discovery.activity_tags": "extract,transform,configure,validate"
-      }
-    },
-    {
-      "path": "skills/cupynumeric-install",
-      "name": "cupynumeric-install",
-      "description": "Install and verify cuPyNumeric for Python — requirements, commands, verification. Source builds are out of scope.",
-      "metadata": {
-        "product.primary": "cuPyNumeric",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "data-science",
-        "audience": "developer,data_scientist,hpc_developer",
-        "discovery.activity_tags": "get_started,configure,validate"
-      }
-    },
-    {
-      "path": "skills/cupynumeric-migration-readiness",
-      "name": "cupynumeric-migration-readiness",
-      "description": "Pre-migration readiness assessor for porting NumPy to cuPyNumeric. Use BEFORE substantial porting work begins when the user asks whether code will scale on GPU, whether they should migrate to cuPyNumeric, which NumPy patterns transfer cleanly, what must be refactored before porting, or mentions pre-port assessment, scaling analysis, or refactor planning. Inspect the user's source code, look up NumPy usage, cross-reference the cuPyNumeric API support manifest, and distinguish distributed-scaling-friendly patterns from blockers such as unsupported APIs, scalar synchronization, host round-trips, Python/object-heavy control flow, shape/data-dependent branching, and in-place mutation hazards. Produce a verdict of READY, LIGHT REFACTOR, SIGNIFICANT REFACTOR, or NOT RECOMMENDED, with concrete refactor pointers.",
-      "metadata": {
-        "product.primary": "cuPyNumeric",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "data-science",
-        "audience": "developer,data_scientist,hpc_developer",
-        "discovery.activity_tags": "assess,migrate,inspect,validate"
-      }
-    },
-    {
-      "path": "skills/cupynumeric-parallel-data-load",
-      "name": "cupynumeric-parallel-data-load",
-      "description": "Load a sharded, on-disk dataset (sharded .npy, Parquet/Arrow, raw binary, sharded HDF5, custom layouts) into a distributed cuPyNumeric ndarray via a manual partition + leaf @task launch with CPU/OMP/GPU variants. Use when no single-call loader fits, including when per-shard row counts differ across files. Prefer cupynumeric.load or legate.io.hdf5.from_file when they apply.",
-      "metadata": {
-        "product.primary": "cuPyNumeric",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "data-science",
-        "audience": "developer,data_scientist,hpc_developer",
-        "discovery.activity_tags": "extract,transform,configure,optimize"
-      }
-    },
-    {
       "path": "skills/dali-dynamic-mode",
       "name": "dali-dynamic-mode",
       "description": "DALI imperative dynamic mode (`nvidia.dali.experimental.dynamic`, ndd): use when working on ndd code or migrating pipelines; skip pipeline-only tasks.",
@@ -3459,7 +3411,7 @@
     {
       "path": "skills/tao-finetune-clip",
       "name": "tao-finetune-clip",
-      "description": "CLIP vision-language model for image-text retrieval, zero-shot classification, embedding extraction, ONNX export, and TensorRT deployment. Use when fine-tuning or training CLIP, running zero-shot classification, computing image embeddings, or deploying CLIP to ONNX/TensorRT.",
+      "description": "CLIP vision-language model for image-text retrieval, zero-shot classification, embedding extraction, ONNX export, and TensorRT deployment. Use when fine-tuning or training CLIP, running zero-shot classification, computing image embeddings, or deploying CLIP to ONNX/TensorRT. This is a single-action model skill; do not use it for an iterative weak-attribute improvement loop that keeps retraining and evaluating until progress stops, which belongs to tao-run-deft-pas.",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -3483,13 +3435,13 @@
     {
       "path": "skills/tao-finetune-cosmos-reason",
       "name": "tao-finetune-cosmos-reason",
-      "description": "Cosmos3-Nano video QA supervised fine-tuning with FSDP parallelism across variable-width GPU configurations. Use when training or evaluating video question-answering models, fine-tuning Cosmos3-Nano or compatible Cosmos Reason models with SFT/LoRA, or working with Cosmos-RL. Trigger phrases include \"fine-tune Cosmos\", \"Cosmos3 Nano Reasoner\", \"Cosmos-RL SFT\", \"video QA fine-tune\", \"Cosmos3-Nano training\".",
+      "description": "Shared Cosmos3 frontend that explicitly routes Cosmos Framework and Cosmos-RL, validates runtime model/video-dataset/SLURM inputs, consumes an SQSH or packaged backend image, optionally plans explicit clean source builds, prepares checkpoints, validates the first update in-process, and returns token-weighted losses and task-aware accuracy.",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "ml_engineer,ai_engineer,data_scientist,research_academic,developer",
-        "discovery.activity_tags": "fine_tune,train,evaluate,inference,configure"
+        "discovery.activity_tags": "fine_tune,train,validate,evaluate,configure"
       }
     },
     {
@@ -3543,7 +3495,7 @@
     {
       "path": "skills/tao-launch-workflow",
       "name": "tao-launch-workflow",
-      "description": "Shared launch intake for any TAO workflow or action. Use when the user wants to run TAO AutoML, train, evaluate, infer, export, generate TensorRT engines, or launch DEFT/workflow jobs on an execution platform.",
+      "description": "The mandatory pre-launch gate and four-verb execution contract for every TAO workflow or action. Invoke BEFORE launching anything side-effecting — AutoML, train, evaluate, inference, export, TensorRT engine generation, or DEFT/application workflows — on any execution platform. Covers platform selection, credentials, image confirmation, dataset intake, preflight, the launch review, job records, monitoring, and failure/retry classification. Trigger phrases include \"train this model\", \"run AutoML\", \"launch on SLURM/docker/k8s/brev/virtualenv\", \"evaluate my checkpoint\", \"start a TAO job\".",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -3603,7 +3555,7 @@
     {
       "path": "skills/tao-run-automl",
       "name": "tao-run-automl",
-      "description": "Run container-backed AutoML / hyperparameter optimization (HPO) for NVIDIA TAO networks using AutoMLRunner. Handles algorithm selection (bayesian, hyperband, asha, bohb, llm, hybrid, autoresearch), WandB experiment tracking, job execution on any TAO SDK platform, result interpretation, and per-rec custom evaluation hooks. Use when the user mentions TAO AutoML, hyperparameter optimization, HPO, automl, automl_settings, AutoMLRunner, tao_automl, bayesian search, hyperband, ASHA, LLM-guided search, autoresearch, or wants to tune train/distill/prune/quantize action parameters for any TAO network. Model actions use the model skill's resolved container image by default; venv training requires an explicit user request. Platform-agnostic — runs on any SDK (Brev, SLURM, Kubernetes, Docker).",
+      "description": "Run container-backed AutoML / hyperparameter optimization (HPO) for NVIDIA TAO networks using AutoMLRunner. Handles algorithm selection (bayesian, hyperband, asha, bohb, llm, hybrid, autoresearch), WandB experiment tracking, job execution on any TAO SDK platform, result interpretation, and per-rec custom evaluation hooks. Use when the user mentions TAO AutoML, hyperparameter optimization, HPO, automl, automl_settings, AutoMLRunner, tao_automl, bayesian search, hyperband, ASHA, LLM-guided search, autoresearch, or wants to tune train/evaluate/inference/distill/prune/quantize for a TAO network. Model actions use the resolved image; venv training requires an explicit request. Platform-agnostic — runs on any SDK (Brev, SLURM, Kubernetes, Docker). Do not use generic \"keep improving\" language alone to override a matching domain-specific DEFT workflow; attribute-labelled CLIP / SigLIP image-retrieval loops belong to tao-run-deft-pas unless HPO is explicit.",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -3627,7 +3579,7 @@
     {
       "path": "skills/tao-run-deft-aoi",
       "name": "tao-run-deft-aoi",
-      "description": "Run the full DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection models: baseline evaluate, RCA, Cosmos AnomalyGen / AMP synthetic defects, k-NN mining, retraining, and deployment gating until FAR / recall KPI targets are met. Use for prompts like \"run the DEFT loop\", \"fine-tune until FAR below 0.1% at recall=100%\", or \"improve my AOI ChangeNet model with RCA and synthetic defects\"; do not use for standalone TAO training, one-off inference, generic anomaly generation, or RCA-only analysis.\n",
+      "description": "Run the full DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection models: baseline evaluate, RCA, Cosmos AnomalyGen / AMP synthetic defects, k-NN mining, retraining, and deployment gating against a customer-defined primary metric and optional constraints. Use only when the request identifies an AOI / automated-optical-inspection, PCB-defect, VisualChangeNet, or ChangeNet workflow. Supports air-gapped/offline runs with pre-staged assets. Never infer AOI from generic iterative-improvement language. Do not use for CLIP / SigLIP image retrieval, attribute-labelled image data, standalone TAO training, one-off inference, generic anomaly generation, or RCA-only analysis.\n",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -3651,7 +3603,7 @@
     {
       "path": "skills/tao-run-on-brev",
       "name": "tao-run-on-brev",
-      "description": "Brev managed GPU instances with Docker support. Use when running TAO training, evaluation, or inference on Brev GPU instances, managing Brev deployments, or dispatching TAO jobs through the Brev CLI. Trigger phrases include \"run on Brev\", \"Brev GPU instance\", \"submit job to Brev\", \"Brev CLI deployment\".",
+      "description": "Run a TAO training/evaluation/inference container on an NVIDIA Brev GPU instance. Instance provisioning (create/search/stop/delete/login) is delegated to the official brev-cli agent skill or the Brev MCP server; this skill covers only the TAO-specific part — running the container over `brev exec` via the four-verb docker contract. Trigger phrases include \"run on Brev\", \"Brev GPU instance\", \"TAO on Brev\", \"submit job to Brev\".",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "infrastructure",
@@ -3663,7 +3615,7 @@
     {
       "path": "skills/tao-run-on-docker",
       "name": "tao-run-on-docker",
-      "description": "Docker conventions for running NVIDIA GPU container workloads — NGC authentication, --gpus flag, mount patterns, env-var passthrough, container inspection, data-root relocation for split-disk hosts, and common error modes. Use when another skill requires running an nvcr.io container or any docker run command on a GPU host. Trigger keywords — docker, docker run, nvcr.io, NGC, --gpus, nvidia-container-toolkit, container image, docker login, docker pull.",
+      "description": "The Docker execution platform for TAO jobs — a local daemon or a remote GPU box via DOCKER_HOST=ssh://user@host. Implements the four-verb consumer contract (submit/status/logs/cancel) over the docker CLI, wired to the job-record, tao-data-io staging, and the redact lint, on top of the underlying docker conventions (--gpus, mounts, NGC auth, inspection, data-root relocation, error modes). Use to run any single-node TAO container action on Docker without the SDK. Trigger keywords — docker, docker run, run on docker, DOCKER_HOST, remote docker, nvcr.io, --gpus, single-node GPU job.",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "infrastructure",
@@ -3675,7 +3627,7 @@
     {
       "path": "skills/tao-run-on-kubernetes",
       "name": "tao-run-on-kubernetes",
-      "description": "Kubernetes execution platform — submits TAO container jobs as single-pod k8s Jobs with NVIDIA GPU scheduling. Use when running on EKS / GKE / AKS / on-prem clusters with the NVIDIA GPU Operator installed, or when integrating TAO into an existing k8s-native ML platform.",
+      "description": "Kubernetes execution platform — submits TAO container jobs as k8s Jobs with NVIDIA GPU scheduling; single-pod for one node, Indexed Jobs for multi-node distributed training. Use when running on EKS / GKE / AKS / on-prem clusters with the NVIDIA GPU Operator installed, or when integrating TAO into an existing k8s-native ML platform.",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "infrastructure",
