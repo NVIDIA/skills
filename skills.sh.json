@@ -226,10 +226,6 @@
       "description": "Prepare, analyze, explore, and model data for AI and accelerated analytics workflows that are not specific to one training, inference, or agent task.",
       "skills": [
         "accelerated-computing-cudf",
-        "cupynumeric-hdf5",
-        "cupynumeric-install",
-        "cupynumeric-migration-readiness",
-        "cupynumeric-parallel-data-load",
         "nvflare-fed-stats"
       ]
     },
