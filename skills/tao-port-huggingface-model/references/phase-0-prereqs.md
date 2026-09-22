@@ -70,14 +70,13 @@ moment that skill bumps.
 ### NGC registry login (TAO-Toolkit-specific)
 
 ```bash
+set -a; source /path/to/.env; set +a   # omit if already exported
 # NGC Docker registry authentication (required to pull the TAO Toolkit container images from nvcr.io)
-docker login nvcr.io
-# Username: $oauthtoken
-# Password: <NGC API Key>
+echo "$NGC_KEY" | docker login nvcr.io -u '$oauthtoken' --password-stdin
 # Verify: should print "Login Succeeded"
 ```
 
-**NGC API Key:** required to pull the TAO Toolkit container images from `nvcr.io`. If the user does not have one, they must generate it at https://ngc.nvidia.com/setup/api-key. The login uses `$oauthtoken` as the username (literal string) and the NGC API key as the password.
+**NGC API Key:** required to pull the TAO Toolkit container images from `nvcr.io`. If the user does not have one, they must generate it at https://ngc.nvidia.com/setup/api-key. The login uses `$oauthtoken` as the username (literal string) and `NGC_KEY` as the password.
 
 **Checklist:**
 - [ ] Python >= 3.10 installed

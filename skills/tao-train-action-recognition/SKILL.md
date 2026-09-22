@@ -30,7 +30,7 @@ Docker/platform skill instead when it gives a stricter environment-specific
 command (non-root UID mapping, cache redirects, remote daemons).
 
 ```bash
-TAO_PYT_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
+TAO_PYT_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt  # versions-key: images.tao_toolkit.pyt
 TAO_PYT_IMAGE="${TAO_PYT_IMAGE:-$TAO_PYT_IMAGE_DEFAULT}"
 RUN_ROOT="${RUN_ROOT:-$PWD}"
 DOCKER_COMMON=(
@@ -90,7 +90,15 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 
 - **Dataset type:** action_recognition
 - **Formats:** default
-- **Monitoring metric:** val_loss
+- **Training monitoring metrics:** `val_loss`, `val_acc`
+- **Evaluate task metrics:** `accuracy`, `m_accuracy`
+- **AutoML metric contract:** for the required evaluation-backed baseline and
+  final comparison, use `accuracy` with maximize direction and run `evaluate`
+  through `eval_fn` for every recommendation. `val_loss` is suitable only for
+  an explicitly accepted training-proxy run because `evaluate` does not emit
+  it. Scratch runs with no starting checkpoint require a minimal default train
+  job followed by evaluation of its exact epoch/step checkpoint for the
+  baseline.
 
 ### Per-Action Dataset Requirements
 
@@ -173,9 +181,11 @@ being resumed.
 
 Optional. Test dataset may be distributed as `test.tar.gz` separate from
 training; extract it and point the spec to the extracted `test/` directory.
-TAO training emits `val_loss` as the validation scalar for the packaged sample
-data; use `val_loss` with minimize direction for AutoML selection unless a
-custom evaluator supplies an accuracy metric.
+TAO training emits `val_loss` and `val_acc` for the packaged sample data, while
+the evaluate action emits `accuracy` and `m_accuracy`. Use `accuracy` with
+maximize direction for the normal evaluation-backed AutoML workflow. Use
+`val_loss` with minimize direction only when the user explicitly accepts a
+training-only proxy without the required impact baseline.
 
 ## Important Parameters
 

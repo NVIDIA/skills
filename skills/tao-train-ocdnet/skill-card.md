@@ -1,5 +1,5 @@
 ## Description: <br>
-Detects arbitrary-oriented text regions in natural images using a differentiable binarization approach for TAO OCDNet model training, evaluation, export, pruning, quantization, retraining, and inference. <br>
+Detects arbitrary-oriented text regions in natural images using a differentiable binarization approach, supporting training, evaluation, export, pruning, quantization, retraining, and inference for TAO OCDNet models. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, pruning, quantizing, and running inference on NVIDIA TAO OCDNet scene text detection models. <br>
+Developers and engineers training, evaluating, exporting, pruning, quantizing, and deploying OCDNet scene text detection models in natural images using NVIDIA TAO Toolkit. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,9 +25,8 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [TAO Deploy OCDNet](references/tao-deploy-ocdnet.md) <br>
-- [Skill Info](references/skill_info.yaml) <br>
-- [TAO Skill Bank Repository](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [TAO Deploy OCDNet Reference](references/tao-deploy-ocdnet.md) <br>
+- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
@@ -43,35 +42,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot/1. <br>
+1 evaluation task (1 positive) across isolated sandbox pods, with 3 attempts per task. Dataset digest: sha256:efa0c4ae0da611bf0297a3690e59845bfb8c639705d8ead0825326c2b3602047. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks whether the final answer is correct against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks whether the skill helped complete the user's goal and expected workflow. <br>
-- Efficiency: Checks whether the skill avoided wasted tool or skill usage. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: 50% tool-call productivity and 50% token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Verifies absence of unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
-- `skill_execution`: Verifies that the expected skill was found and executed. <br>
-- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
-- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Verifies routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected and the workflow executed. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 49% → 96% (+47 points) | 60% → 95% (+35 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 40% → 100% (+60 points) | 100% → 100% (±0 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 94% (+94 points) |
-| Effectiveness | 32% → 98% (+66 points) | 100% → 83% (-17 points) |
-| Efficiency | 25% → 83% (+58 points) | 0% → 100% (+100 points) |
+| Overall | 99.5% — baseline ran, but no comparable score was available; uplift unavailable | 95.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 5.6% → 100.0% (+94.4 points) | 53.3% → 83.3% (+30.0 points) |
+| Efficiency | 97.6% — baseline ran, but no comparable score was available; uplift unavailable | 98.2% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

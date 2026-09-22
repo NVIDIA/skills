@@ -24,19 +24,73 @@
     ]
   },
   {
-    "id": "tao-finetune-cosmos-reason-wts-single-gb300",
-    "question": "Plan WTS LoRA SFT of nvidia/Cosmos3-Nano on exactly one GB300 using cosmos-rl:cuda-stack-test. The user specifies the number of training epochs but does not request checkpoint or validation cadence overrides. State the pre-launch runtime guards and cadence defaults. Do not execute anything.",
+    "id": "tao-finetune-cosmos-reason-conversation-single-gpu",
+    "question": "Plan LoRA SFT of nvidia/Cosmos3-Nano on a customer-provided ShareGPT-style video-conversation dataset using exactly one GB300 and cosmos-rl:cuda-stack-test. The user specifies epochs but no checkpoint or validation cadence overrides. State the pre-launch runtime guards and cadence defaults. Do not execute anything.",
     "expected_skill": "tao-finetune-cosmos-reason",
-    "expected_script": "scripts/train_wts_gb300.py",
-    "ground_truth": "Use the packaged WTS/GB300 helper in the requested image, one policy shard and no rollout/distillation replicas, zero train/validation dataloader workers with no prefetch factor, and nframes=8. Keep training duration, checkpointing, and validation epoch-based: train.epoch, train.ckpt.save_freq_in_epoch=1, and validation.freq_in_epoch=1. Do not infer step cadence from WTS, GB300, topology, or the runtime image.",
+    "expected_script": "scripts/train_video_conversation_single_gpu.py",
+    "ground_truth": "Use the packaged single-GPU conversation helper in the requested image, one policy shard and no rollout/distillation replicas, zero train/validation dataloader workers with no prefetch factor, and a frame count selected from model/dataset metadata. Keep training duration, checkpointing, and validation epoch-based: train.epoch, train.ckpt.save_freq_in_epoch=1, and validation.freq_in_epoch=1. Do not infer step cadence from a dataset name, GPU, topology, or runtime image.",
     "expected_behavior": [
       "Uses cosmos-rl:cuda-stack-test on exactly one GB300 with policy dp_shard_size 1",
-      "Uses the packaged WTS/GB300 helper and disables unused rollout and distillation replicas",
+      "Uses the packaged single-GPU conversation helper and disables unused rollout and distillation replicas",
       "Sets both dataloader worker counts to zero and removes their prefetch factors",
       "Uses train.epoch as the training-duration control",
       "Keeps checkpointing epoch-based with train.ckpt.save_freq_in_epoch=1",
       "Keeps validation epoch-based with validation.freq_in_epoch=1",
-      "Does not infer step cadence from WTS, GB300, topology, or the runtime image"
+      "Does not infer step cadence from a dataset name, GPU, topology, or the runtime image"
+    ]
+  },
+  {
+    "id": "tao-finetune-cosmos-reason-backend-selection",
+    "question": "Plan plain dense SFT for nvidia/Cosmos3-Nano on an arbitrary customer video-conversation dataset without an explicit backend, then explain what changes if the request is evaluate instead. Do not execute anything.",
+    "expected_skill": "tao-finetune-cosmos-reason",
+    "expected_script": "scripts/cosmos_workflow.py",
+    "ground_truth": "Use the shared frontend. Plain Nano SFT preserves the Cosmos-RL compatibility default and reports why; evaluate also defaults to Cosmos-RL. An explicit Cosmos Framework request still selects its separate backend runtime, TOML, topology, and checkpoint contract. A supplied SQSH is authoritative; otherwise use the packaged backend image.",
+    "expected_behavior": [
+      "Selects cosmos-rl for plain Nano SFT",
+      "Selects cosmos-rl for evaluate",
+      "Reports the backend-selection rationale",
+      "Keeps the backend-specific image, TOML, entrypoint, topology, and checkpoint contracts separate"
+    ]
+  },
+  {
+    "id": "tao-finetune-cosmos-reason-dense-sft-parity",
+    "question": "Plan a full dense-SFT parity run on SLURM for Cosmos3-Nano using customer-supplied video-conversation annotations and media. The validation loss must be reported after completion. Do not execute anything.",
+    "expected_skill": "tao-finetune-cosmos-reason",
+    "expected_script": "scripts/cosmos_workflow.py",
+    "ground_truth": "Preflight host/SSH/Pyxis/Enroot/shared storage/checkpoint/datasets, use an exact supplied SQSH or the packaged backend image with one-time SQSH conversion when absent, fingerprint train and validation manifests and prompt, omit LoRA configuration, and launch the requested full job directly. Source repositories and build provenance are requested only for an explicit source-build. The Cosmos-RL child must verify the padding-aware attention mask and visual gradient flow before its first optimizer update. Monitor structured status and extract validation-complete loss rather than train loss or validation batch progress.",
+    "expected_behavior": [
+      "Uses a supplied SQSH directly or converts the packaged backend image once before allocating full training GPUs",
+      "Requires qwen3_vl safetensors for Nano",
+      "Omits policy.lora for dense SFT",
+      "Uses the in-process first-update visual-gradient gate instead of a separate smoke job",
+      "Reports structured train loss and epoch validation-complete loss"
+    ]
+  },
+  {
+    "id": "tao-finetune-cosmos-reason-framework-status",
+    "question": "Explain how a Cosmos Framework training run exposes TAO progress, validation loss, checkpoints, early failures, and completion without relying only on console logs. Do not execute anything.",
+    "expected_skill": "tao-finetune-cosmos-reason",
+    "expected_script": "scripts/extract_cosmos_metrics.py",
+    "ground_truth": "Use the native TAOStatusCallback for early failures, checkpoint completion, globally reduced token-weighted train/validation metrics, and terminal status; preserve the training child exit code separately and ignore validation heartbeat loss when extracting the final metric.",
+    "expected_behavior": [
+      "Uses the Framework TAOStatusCallback structured JSONL",
+      "Uses native Framework callbacks for checkpoint and early-failure records",
+      "Preserves the native training exit code",
+      "Uses extract_cosmos_metrics.py and ignores validation heartbeat loss for the final validation metric"
+    ]
+  },
+  {
+    "id": "tao-finetune-cosmos-reason-evaluation-inheritance",
+    "question": "Plan evaluation of a checkpoint from a completed Cosmos fine-tuning job. The selected job has a sealed training plan and structured status, but the user has not repeated its validation paths, prompt, frame count, model path, LoRA mode, or scoring semantics. Explain which inputs to infer, which to ask for, and how Framework DCP differs. Do not execute anything.",
+    "expected_skill": "tao-finetune-cosmos-reason",
+    "expected_script": "scripts/evaluation_workflow.py",
+    "ground_truth": "Verify the sealed training plan and terminal structured status, then use evaluation_workflow.py to inherit the exact validation fingerprint/paths, prompt, preprocessing, model/LoRA/base-model provenance, task metrics, and resources. Ask only for fields reported in required_user_inputs, such as a new results directory, ambiguous checkpoint selection, or generation length that was never recorded. Treat Framework DCP export as an automated framework_checkpoint_action.py pre-action, not a user question, and never submit the raw dataset-neutral template.",
+    "expected_behavior": [
+      "Runs evaluation_workflow.py over the selected job's sealed training plan and structured status",
+      "Inherits fine-tuning validation, prompt, preprocessing, model, LoRA, and task semantics instead of asking the user to repeat them",
+      "Asks only for required_user_inputs and does not use a template or historical path as an experiment profile",
+      "Runs Framework DCP export and verification automatically before shared evaluation",
+      "Preserves field provenance and config SHA256"
     ]
   }
 ]

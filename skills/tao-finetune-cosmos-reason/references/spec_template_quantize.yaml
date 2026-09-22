@@ -1,8 +1,8 @@
 results_dir: ''
 model:
-  model_path: hf_model://nvidia/Cosmos3-Nano
+  model_path: ''
   enable_lora: false
-  base_model_path: hf_model://nvidia/Cosmos3-Nano
+  base_model_path: ''
 dataset:
   dataset_id: ''
   dataset_split: test[:1]

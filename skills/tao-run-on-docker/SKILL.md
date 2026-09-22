@@ -1,9 +1,6 @@
 ---
 name: tao-run-on-docker
-description: Docker conventions for running NVIDIA GPU container workloads — NGC authentication, --gpus flag, mount patterns,
-  env-var passthrough, container inspection, data-root relocation for split-disk hosts, and common error modes. Use when
-  another skill requires running an nvcr.io container or any docker run command on a GPU host. Trigger keywords — docker,
-  docker run, nvcr.io, NGC, --gpus, nvidia-container-toolkit, container image, docker login, docker pull.
+description: The Docker execution platform for TAO jobs — a local daemon or a remote GPU box via DOCKER_HOST=ssh://user@host. Implements the four-verb consumer contract (submit/status/logs/cancel) over the docker CLI, wired to the job-record, tao-data-io staging, and the redact lint, on top of the underlying docker conventions (--gpus, mounts, NGC auth, inspection, data-root relocation, error modes). Use to run any single-node TAO container action on Docker without the SDK. Trigger keywords — docker, docker run, run on docker, DOCKER_HOST, remote docker, nvcr.io, --gpus, single-node GPU job.
 license: Apache-2.0
 compatibility: Requires NVIDIA driver 580 or newer, CUDA Toolkit 13.0 or newer, Docker, and NVIDIA Container Toolkit 1.19.0 or newer, unless the selected model declares different minimums in runtime_requirements.gpu_host.
 metadata:
@@ -19,7 +16,13 @@ tags:
 
 > **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
 
-This skill documents the generic Docker conventions that GPU container workloads rely on. Model and data skills specify **what** image and **what** command to run; this skill covers **how** to run docker in a way that satisfies GPU + NVIDIA container requirements.
+The Docker execution platform: a **consumer** that runs a model/data skill's
+spec-bundle by implementing four verbs (`submit`/`status`/`logs`/`cancel`) over
+the docker CLI, on a **local daemon or a remote GPU box via
+`DOCKER_HOST=ssh://`**. The verbs (§ Execution) sit on top of the docker
+conventions in the rest of this file — GPU flags, mounts, NGC auth, inspection,
+error modes — which are the *how* the model/data skill defers to. Single-node
+only; for multi-node use SLURM or Kubernetes.
 
 Sources: official Docker CLI reference (<https://docs.docker.com/reference/cli/docker/>) and NVIDIA Container Toolkit docs.
 
@@ -30,6 +33,7 @@ Sources: official Docker CLI reference (<https://docs.docker.com/reference/cli/d
 3. **NGC API key** for `nvcr.io/*` pulls. Get from <https://ngc.nvidia.com/>.
 
 ```bash
+set -a; source /path/to/.env; set +a   # omit if already exported
 SB="${TAO_SKILL_BANK_PATH:-${TAO_SKILL_BANK_ROOT:-$PWD}}"
 SETUP_SCRIPT="${SB}/skills/platform/tao-setup-nvidia-gpu-host/scripts/setup-nvidia-gpu-host.sh"
 
@@ -53,14 +57,96 @@ install command. Do not apply one model's override to unrelated workflows.
 ## NGC authentication
 
 ```bash
+set -a; source /path/to/.env; set +a   # omit if already exported
 echo "$NGC_KEY" | docker login nvcr.io -u '$oauthtoken' --password-stdin
 ```
 
 Persists in `~/.docker/config.json` across reboots. Re-run on `unauthorized` errors.
 
+## Execution — the four verbs
+
+Run a spec-bundle by implementing exactly these four verbs, mutating only the
+job-record. Status values are the fixed vocabulary from `tao-artifacts`
+(`PENDING RUNNING COMPLETE ERROR CANCELED UNKNOWN`); native docker states map
+below, with the raw state carried in the transition `message`. `$BANK` =
+`${TAO_SKILL_BANK_PATH}`.
+
+### submit
+
+1. **Stage** inputs via `tao-data-io`: it picks the storage tier and returns the
+   mount args + compute-frame paths. Docker uses **tier A** (bind-mount a host
+   dir, `-v /host/data:/data`) as the norm, or **tier C** (pass S3 creds, the
+   container fetches). Author the spec file at `<stage>/spec.yaml` with those
+   compute-frame paths.
+2. **Lint** the assembled command — `redact_secrets.py lint` must pass (no inline
+   secrets; pass creds as `-e VAR` with no value).
+3. **Open the record — this mints the id and binds `results_dir` BEFORE launch:**
+   ```bash
+   JOB_ID=$("$BANK/scripts/tao_job_record.py" open \
+     --platform docker --image "$IMAGE" \
+     --network-arch "$ARCH" --action "$ACTION" \
+     --storage-tier "$TIER" --results-root "$RESULTS_ROOT")
+   ```
+4. **Launch detached**, naming the container after the id so the other verbs find
+   it (keep `--rm` OFF so an exited container stays inspectable):
+   ```bash
+   set -a; source /path/to/.env; set +a   # omit if already exported
+   CID=$(docker run -d --name "$JOB_ID" --label "tao-job=$JOB_ID" \
+     --gpus "$GPUS" --shm-size=8g \
+     -v "$STAGE:/workspace" \
+     -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e HF_TOKEN -e NGC_KEY \
+     "$IMAGE" <bundle command, reading /workspace/spec.yaml>)
+   ```
+5. **Record RUNNING:**
+   `"$BANK/scripts/tao_job_record.py" mark "$JOB_ID" --state RUNNING --backend-ref "$CID"`.
+
+A submit that skipped step 3 has no id, so it cannot launch — that is the
+record-then-launch invariant.
+
+### status
+
+```bash
+read -r st code < <(docker inspect --format '{{.State.Status}} {{.State.ExitCode}}' "$JOB_ID" 2>/dev/null) || st=missing
+```
+
+| docker state | vocab |
+|---|---|
+| `created` / `restarting` | `PENDING` |
+| `running` / `paused` | `RUNNING` |
+| `exited`, code 0 | `COMPLETE` |
+| `exited`, code ≠ 0 | `ERROR` |
+| `dead` / missing | `UNKNOWN` (confirm via `docker ps -a`) |
+
+On a terminal state, `mark` it — and for **tier C**, `tao-data-io` uploads
+results **before** you `docker rm` (the container is the only copy).
+
+### logs
+
+```bash
+docker logs --tail "${N:-200}" "$JOB_ID"    # add -f to follow in-turn
+```
+
+### cancel
+
+```bash
+docker rm -f "$JOB_ID"
+"$BANK/scripts/tao_job_record.py" mark "$JOB_ID" --state CANCELED --source agent
+```
+
+## Local vs remote (DOCKER_HOST)
+
+There is no separate "remote docker" — point the daemon at an SSH-reachable box:
+`export DOCKER_HOST=ssh://user@gpu-host`. Every verb above is **byte-identical**;
+the docker CLI marshals the request over SSH (reuses your key, avoids
+nested-quoting the command). One consequence: **`-v` bind-mount sources then refer
+to the *remote* host's filesystem, not the launcher** — stage data there (tier A)
+or fetch in-container (tier C). Fallback for `sudo docker`-only hosts:
+`ssh host 'sudo docker …'` (same skill, different prefix).
+
 ## `docker run` — canonical flags
 
 ```bash
+set -a; source /path/to/.env; set +a   # omit if already exported
 HOST_RESULTS=/host/results
 HOST_UID="$(id -u)"
 HOST_GID="$(id -g)"
@@ -94,7 +180,7 @@ docker run \
 
 Notes:
 
-- `--gpus '"device=0,1"'` — specific GPUs (double-quote-escaped). Without nvidia-container-toolkit: `could not select device driver "" with capabilities: [[gpu]]`.
+- `--gpus '"device=0,1"'` — **select GPUs by id, not by count, on any shared host** (double-quote-escaped). A count-based request resolves to the *first* N devices, so `--gpus 1` can only ever land on GPU 0: if GPU 0 is busy, every job OOMs there while the other GPUs sit idle, and there is no way to steer it — `-e NVIDIA_VISIBLE_DEVICES` is overwritten by `--gpus`. Read current occupancy (`nvidia-smi --query-gpu=index,memory.used --format=csv`) and pass the free ids. Ids may also be GPU UUIDs. Without nvidia-container-toolkit: `could not select device driver "" with capabilities: [[gpu]]`.
 - `--rm` — clean up the container at exit; omit when you want `docker logs` after exit.
 - `--shm-size=8g` — torchrun + PyTorch DataLoaders exhaust the default 64 MB `/dev/shm` otherwise; size it for multi-GPU training and raise (e.g. `16g`) if you still hit `Bus error`.
 - `--user "$(id -u):$(id -g)"` — required by default whenever a bind mount is writable. It prevents root-owned checkpoint trees that the submitting host user cannot clean up.
@@ -293,9 +379,9 @@ du -xhd1 <results_root> 2>/dev/null | sort -h
 find <results_root> -maxdepth 3 -printf '%u:%g %m %s %p\n' 2>/dev/null | head
 ```
 
-For a bind mount, clean only confirmed terminal job directories using the SDK
-retention path or a reviewed ownership repair; never assume `docker system
-prune` touches them. For Docker's own root, relocate `data-root` as described
+For a bind mount, clean only job directories whose record is in a terminal state
+(`tao_job_record.py get "$JOB_ID"`), via a reviewed ownership repair; never assume
+`docker system prune` touches them. For Docker's own root, relocate `data-root` as described
 above. `docker system prune -a --volumes` is destructive and may remove unused
 images and volumes belonging to other workflows, so run it only after explicit
 user approval and a reviewed `docker system df` inventory.
@@ -310,9 +396,14 @@ user approval and a reviewed `docker system df` inventory.
 
 ## Scope boundary
 
-This skill covers the *how* of running docker on a GPU host. Platform-specific layering (how to get onto the host, dispatch via a CLI wrapper) lives in:
+This skill both **runs** TAO jobs on Docker (§ Execution) and documents the docker
+*how* that other skills defer to. Related:
 
-- `tao-skill-bank:tao-run-on-brev` — running docker via `brev exec` on a Brev instance
-- `tao-skill-bank:tao-run-platform` — optional Python layer wrapping docker invocations with Job handles, state persistence, and S3 I/O
+- `tao-skill-bank:tao-run-on-brev` — provisions a Brev instance, then defers the
+  container-how to these same docker verbs.
+- `tao-skill-bank:tao-launch-workflow` — the intake/routing front door and the
+  platform-agnostic four-verb contract this skill implements.
+- `tao-skill-bank:tao-data-io` — the storage-tier decision + staging + the
+  compute-frame verify gate the `submit` verb calls.
 
-Model and data skills specify **what** image and command; they defer to this skill for the **how**.
+Model and data skills produce the spec-bundle (**what**); this skill runs it (**how**).

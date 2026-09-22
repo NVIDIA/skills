@@ -39,7 +39,8 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 
 - **Dataset type:** optical_inspection
 - **Formats:** default
-- **Monitoring metric:** val_acc
+- **AutoML training metric:** `val_acc`, with `direction=maximize`
+- **Standalone evaluation metric:** `test_acc`, with `direction=maximize`
 
 ### Per-Action Dataset Requirements
 
@@ -56,15 +57,111 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 | train | dataset.test_dataset.images_dir | eval_dataset | images.tar.gz | No |
 | train | dataset.test_dataset.csv_path | eval_dataset | dataset.csv | No |
 
+`images.tar.gz` is the transfer artifact. After staging/extraction,
+`dataset.*_dataset.images_dir` must point at the inner directory that directly
+contains `golden/` and the board directories used by the CSV.
+
+## `dataset.csv` Contract
+
+The Optical Inspection loader reads the CSV by column name and constructs both
+sides of every Siamese comparison as:
+
+```text
+<images_dir>/<input_path>/<object_name>_<lighting><image_ext>
+<images_dir>/<golden_path>/<object_name>_<lighting><image_ext>
+```
+
+Absolute `input_path` and `golden_path` values are also accepted by the loader;
+an absolute value replaces `images_dir`. Relative directories are recommended
+because they remain portable after staging. Do not put a filename in either
+path column and do not put a lighting suffix or extension in `object_name`.
+
+| Column | Type | Required | Allowed values and meaning |
+|---|---|---|---|
+| `input_path` | string directory path | yes | Board/capture component directory, relative to `images_dir` or absolute. |
+| `golden_path` | string directory path | yes | Golden/reference component directory, relative to `images_dir` or absolute. |
+| `label` | string | yes | Exact case-sensitive `PASS` means non-defective (class 0). Any other non-empty defect name means defective (class 1), for example `missing`, `shift`, `excess_solder`, `lifted_lead`, `polarity`, `tombstone`, or `upside down`. `pass` is invalid because the loader would silently treat it as a defect. |
+| `object_name` | string filename stem | yes | Component identifier such as `C1018@1`; no directory, `_SolderLight`, or `.jpg`. The loader forces this column to string so numeric-looking identifiers retain their text form. |
+
+Additional metadata columns are allowed but ignored by this loader. Empty
+values are invalid. One complete row, grounded in the production layout, is:
+
+```csv
+input_path,golden_path,label,object_name
+690-5G190-0510-001P1/AOI_B/FXLH_690-5G190-0510-001P1_30332_P_AOI_B_20230317130332/PerComponent,golden/images/690-5G190-0510-001P1BOT/,PASS,C1018@1
+```
+
+With the standard four-light configuration, each row requires eight files:
+
+```text
+<images_dir>/
+├── golden/images/690-2G133-0210-000BOT/
+│   ├── R821@1_LowAngleLight.jpg
+│   ├── R821@1_SolderLight.jpg
+│   ├── R821@1_UniformLight.jpg
+│   └── R821@1_WhiteLight.jpg
+└── 690-2G133-0210-000/AOI_B/<capture>/PerComponent/
+    ├── R821@1_LowAngleLight.jpg
+    ├── R821@1_SolderLight.jpg
+    ├── R821@1_UniformLight.jpg
+    └── R821@1_WhiteLight.jpg
+```
+
+The three selection fields must agree:
+
+- `input_map` keys are the exact filename lighting suffixes. Current loader
+  behavior iterates the YAML key insertion order; it does not sort by the
+  integer values. Keep values contiguous and in matching order (`0..N-1`).
+- `num_input` must equal the number of `input_map` entries. The loader opens
+  every key, so a mismatched value does not limit the file list and produces a
+  tensor/export shape mismatch.
+- `concat_type: linear` stacks inputs in key order along image height. With
+  four 128×128 inputs this produces a 512×128 tensor; `grid_map` is ignored.
+- `concat_type: grid` requires an even `num_input` and
+  `grid_map.x * grid_map.y == num_input`. Placement is row-major in key order.
+  For the standard `2 x 2` map: LowAngle is upper-left, Solder upper-right,
+  Uniform lower-left, and White lower-right.
+
+If the dataset genuinely contains only `*_SolderLight.jpg`, use
+`num_input: 1`, `input_map: {SolderLight: 0}`, and `concat_type: linear`. Do not
+declare four inputs when three variants are absent.
+
+Run the packaged preflight before train, evaluate, or inference, using the
+same dataset settings as the spec:
+
+```bash
+python3 skills/models/tao-train-optical-inspection/scripts/validate_dataset.py \
+  --csv /data/optical-inspection/train/dataset.csv \
+  --images-dir /data/optical-inspection/train/images \
+  --num-input 4 \
+  --concat-type grid \
+  --grid-x 2 --grid-y 2
+```
+
+For a custom map, repeat `--input-map LIGHT=INDEX` in YAML key order and pass
+the spec's `--image-ext`. The validator reports missing columns, unsafe PASS
+case, unresolvable row directories, and every missing lighting file with its
+CSV row number. A two-row path-stub fixture is under
+`tests/fixtures/dataset/valid/`; it verifies the contract and is not PCB
+training data.
+
+No published Optical Inspection sample dataset is discoverable from this
+skill bank. Obtain converted AOI data from the dataset owner for your product
+or organization, then stage it at the paths mounted into the container. Do not
+use the committed validator fixture for model training.
+
 ### Typical Spec Overrides
 
 Data source overrides are **mandatory for every action** — the agent MUST construct data source paths from the Per-Action Dataset Requirements table above and include them in `spec_overrides`.
 
 ```python
-S3_TRAIN = "s3://bucket/data/train"
-S3_EVAL = "s3://bucket/data/eval"
-S3_INFERENCE = "s3://bucket/data/inference"
+TRAIN_ROOT = "/data/optical-inspection/train"
+EVAL_ROOT = "/data/optical-inspection/eval"
+INFERENCE_ROOT = "/data/optical-inspection/inference"
 ```
+
+These are example in-container mount points after obtaining and staging data
+from its owner; they are not download locations.
 
 **train (mandatory data sources):**
 ```python
@@ -74,12 +171,12 @@ S3_INFERENCE = "s3://bucket/data/inference"
     "train.validation_interval": 10,
     "train.num_gpus": 1,
     "dataset.batch_size": 8,
-    "dataset.train_dataset.images_dir": f"{S3_TRAIN}/images.tar.gz",
-    "dataset.train_dataset.csv_path": f"{S3_TRAIN}/dataset.csv",
-    "dataset.validation_dataset.images_dir": f"{S3_EVAL}/images.tar.gz",
-    "dataset.validation_dataset.csv_path": f"{S3_EVAL}/dataset.csv",
-    "dataset.test_dataset.images_dir": f"{S3_EVAL}/images.tar.gz",
-    "dataset.test_dataset.csv_path": f"{S3_EVAL}/dataset.csv",
+    "dataset.train_dataset.images_dir": f"{TRAIN_ROOT}/images",
+    "dataset.train_dataset.csv_path": f"{TRAIN_ROOT}/dataset.csv",
+    "dataset.validation_dataset.images_dir": f"{EVAL_ROOT}/images",
+    "dataset.validation_dataset.csv_path": f"{EVAL_ROOT}/dataset.csv",
+    "dataset.test_dataset.images_dir": f"{EVAL_ROOT}/images",
+    "dataset.test_dataset.csv_path": f"{EVAL_ROOT}/dataset.csv",
 }
 ```
 
@@ -87,8 +184,8 @@ S3_INFERENCE = "s3://bucket/data/inference"
 ```python
 {
     "evaluate.checkpoint": "<selected train/AutoML checkpoint>",
-    "dataset.test_dataset.images_dir": f"{S3_EVAL}/images.tar.gz",
-    "dataset.test_dataset.csv_path": f"{S3_EVAL}/dataset.csv",
+    "dataset.test_dataset.images_dir": f"{EVAL_ROOT}/images",
+    "dataset.test_dataset.csv_path": f"{EVAL_ROOT}/dataset.csv",
 }
 ```
 
@@ -109,8 +206,8 @@ Use the workflow's checkpoint resolver for downstream actions instead of guessin
 ```python
 {
     "inference.checkpoint": "<selected train/AutoML checkpoint>",
-    "dataset.infer_dataset.images_dir": f"{S3_INFERENCE}/images.tar.gz",
-    "dataset.infer_dataset.csv_path": f"{S3_INFERENCE}/dataset.csv",
+    "dataset.infer_dataset.images_dir": f"{INFERENCE_ROOT}/images",
+    "dataset.infer_dataset.csv_path": f"{INFERENCE_ROOT}/dataset.csv",
 }
 ```
 
@@ -118,9 +215,14 @@ Use the workflow's checkpoint resolver for downstream actions instead of guessin
 
 Dataset conversion is optional for Optical Inspection. If the dataset is already in TAO-ready Optical Inspection format, start directly from the `images.tar.gz` plus `dataset.csv` splits and run `train`, `evaluate`, `inference`, and downstream checkpoint/export/deploy actions on that converted data.
 
-The PyT container exposes `optical_inspection dataset_convert`, but this model skill does not package a `dataset_convert` action/template. The converter expects the raw Factory PCB layout (`root_dataset_dir`, train/val/all PCB directories, `golden_csv_dir`, `project_name`, and `bot_top`). The S3 validation bucket currently contains preconverted Optical Inspection `images.tar.gz` plus `dataset.csv` splits, not the raw PCB/golden CSV source. Do not synthesize a fake PCB dataset. In model validation reports, mark dataset conversion as `not run: preconverted dataset provided` rather than failed or blocked when only converted data is available.
+The PyT container exposes `optical_inspection dataset_convert`, but this model skill does not package a `dataset_convert` action/template. The converter expects the raw Factory PCB layout (`root_dataset_dir`, train/val/all PCB directories, `golden_csv_dir`, `project_name`, and `bot_top`). Data owners may instead provide preconverted Optical Inspection `images.tar.gz` plus `dataset.csv` splits without the raw PCB/golden CSV source. Do not synthesize a fake PCB dataset. In model validation reports, mark dataset conversion as `not run: preconverted dataset provided` rather than failed or blocked when only converted data is available.
 
-When using the preconverted S3 validation tarballs locally, verify the extracted directory before writing specs. The tarballs may unpack an `images/` wrapper directory; point `dataset.*.images_dir` at the inner directory that contains `golden/` and the board/image folders referenced by `dataset.csv`, for example `.../<split>/images/images`, not the outer wrapper.
+When using preconverted transfer archives locally, verify the extracted directory before writing specs. The archives may unpack an `images/` wrapper directory; point `dataset.*.images_dir` at the inner directory that contains `golden/` and the board/image folders referenced by `dataset.csv`, for example `.../<split>/images/images`, not the outer wrapper.
+
+Product-side follow-ups remain: publish a licensed, trainable sample dataset and
+package the existing container `dataset_convert` entrypoint as a skill action
+with its own schema/template. Neither is implemented by this documentation and
+preflight change.
 
 ## Eval Dataset
 
@@ -155,9 +257,11 @@ Minimum 1 GPU(s), recommended 1 GPU(s). 8GB+ VRAM per GPU. Siamese networks for 
 
 ## Error Patterns
 
-**CSV format error**: Ensure dataset.csv has the correct column format for image pair paths and labels.
+**CSV format error**: Require `input_path,golden_path,label,object_name`, then
+run `scripts/validate_dataset.py` with the spec's `images_dir`, lighting map,
+`num_input`, concatenation, grid, and image extension before launch.
 
-**Extracted image root mismatch**: If train, evaluate, or inference cannot find paths from `dataset.csv`, inspect the extracted `images.tar.gz` tree. The TAO-ready root must contain `golden/` plus the board folders referenced in the CSV. For validation S3 tarballs this can be one level below the extraction target, such as `images/images`.
+**Extracted image root mismatch**: If train, evaluate, or inference cannot find paths from `dataset.csv`, inspect the extracted `images.tar.gz` tree. The TAO-ready root must contain `golden/` plus the board folders referenced in the CSV. For transferred archives this can be one level below the extraction target, such as `images/images`.
 
 **Training batch size assertion**: The Optical Inspection dataloader rejects
 `dataset.batch_size: 1` for train. Keep the template default of 8 for normal
@@ -198,4 +302,3 @@ For `parent_model` or `parent_model_folder`, pass the upstream train/export/Auto
 ## Deployment
 
 - [tao-deploy-optical-inspection](references/tao-deploy-optical-inspection.md)
-

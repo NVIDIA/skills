@@ -70,10 +70,10 @@ Then run Phase 5 (counterfactual) yourself, because it needs findings from ALL a
 **BEFORE writing RCA_Report.md**, run `ls rca_images/` to inventory all available thumbnails. You need exact filenames for inline embedding.
 
 ### Image Embedding Protocol (MANDATORY)
-Every visual evidence table row MUST have inline thumbnail columns using `![caption](rca_images/<filename>.jpg)` syntax. A report without per-row images is incomplete — the hook will reject it.
+Every visual evidence table row MUST have inline thumbnail columns using `![caption] (rca_images/<filename>.jpg)` syntax. A report without per-row images is incomplete — the hook will reject it.
 
 Rules:
-- **Section 3.1 (Golden Audit)**: Every audited golden row gets a `![golden](rca_images/...)` column
+- **Section 3.1 (Golden Audit)**: Every audited golden row gets a `![golden] (rca_images/<filename>.jpg)` column
 - **Section 3.2 (Failure Mode Clustering)**: Every defect sample row gets BOTH a test thumbnail column AND a golden thumbnail column
 - **Section 3.3 (False Positive Analysis)**: Every FP row gets BOTH test and golden thumbnail columns
 - **Section 3.4 (Visual Detectability)**: Every comparison pair gets side-by-side test + golden thumbnails
@@ -85,7 +85,7 @@ Table format for image-heavy sections:
 ```
 | Sample | Score | Test Image | Golden Image | Failure Mode | ... |
 |--------|-------|------------|--------------|--------------|-----|
-| <obj> | <score> | ![test](rca_images/<test_thumb>.jpg) | ![golden](rca_images/<golden_thumb>.jpg) | <mode> | ... |
+| <obj> | <score> | ![test] (rca_images/<filename>.jpg) | ![golden] (rca_images/<filename>.jpg) | <mode> | ... |
 ```
 
 Add a dedicated section for exploratory findings:

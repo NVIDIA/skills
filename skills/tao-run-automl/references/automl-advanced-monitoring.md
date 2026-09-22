@@ -184,7 +184,12 @@ def eval_on_held_out(rec, train_job_id):
 
 runner.run(
     ...,
-    automl_settings={"metric": task_metric, "direction": direction, ...},
+    automl_settings={
+        "metric": task_metric,
+        "direction": direction,
+        "session_id": session_id,
+        ...,
+    },
     eval_fn=eval_on_held_out,
 )
 ```
@@ -282,18 +287,58 @@ resume. An uncatchable process termination or host loss can also leave an
 in-flight backend job; recover that run with `resume=True` and the **full
 suffixed path** (including the `run_<timestamp>` directory):
 
+Resolve the controller identity before constructing the resumed runner:
+
+```bash
+SESSION_ID=$(python "$TAO_SKILL_BANK_PATH/skills/applications/tao-run-automl/scripts/resolve_automl_session.py" \
+  resolve --workspace ./my_experiment/run_20260423_183015)
+```
+
+The command fails closed if no controller state exists. It also refuses to
+choose arbitrarily when a workspace contains multiple controller files. For a
+workspace contaminated by an older failed resume, inspect the controller
+states and rerun with `--session-id <intended-id>`; never select the first file
+returned by the filesystem.
+
 ```python
 result = runner.run(
     ...,
     workspace_path="./my_experiment/run_20260423_183015",   # full suffixed path
+    automl_settings={**automl_settings, "session_id": "<resolved-session-id>"},
     resume=True,
 )
 ```
 
 When `resume=True`, the runner does NOT append a new timestamp suffix — it reuses the path as-is.
 
+For the original run, create the identity once after launch approval and before
+calling the runner:
+
+```bash
+SESSION_ID=$(python "$TAO_SKILL_BANK_PATH/skills/applications/tao-run-automl/scripts/resolve_automl_session.py" new)
+```
+
+Place that literal value in the sealed `automl_settings`. The resulting
+`.automl/controller/<session_id>.json` is the durable binding used by later
+resume invocations.
+
+Before either fresh or resumed `runner.run(...)`, call the bundled
+`validate_session_settings(automl_settings, resume=..., workspace=...)` gate
+shown in `SKILL.md`. Missing identities fail before the wheel can apply its
+random default; resumed identities must resolve to an existing controller.
+
+This is a skill-boundary safeguard. The currently packaged
+`nvidia-tao-automl` wheel still permits `resume=True` without a matching
+`session_id` and may silently create a fresh controller for callers outside
+this skill. NVBug 6662913 tracks that upstream fail-loud behavior; until the
+wheel changes, non-skill callers must apply the same explicit identity gate.
+
 Behaviour on resume:
-1. **Brain state** is reloaded from `<workspace>/.automl/*` — all completed rec results are already registered.
+1. **Brain state** is reloaded from `<workspace>/.automl/*` for the explicit
+   `session_id` — all completed rec results are already registered. Treat
+   `Loaded controller state: 0 recommendations` as an error when the selected
+   controller file contains completed recommendations; cancel before a new
+   recommendation is submitted.
 2. **Any in-flight jobs** recorded in `<workspace>/active_jobs.json` (persisted after each submission) are polled to terminal, their recovered backend job IDs are restored on the recommendation, their metrics extracted, and reported to the brain — *before* the main propose-new-rec loop starts. No duplicate submissions or orphaned trial artifacts.
 3. After recovery, the loop continues normally until `automl.is_complete()`.
 
@@ -373,7 +418,7 @@ Model-specific notes do not belong in this AutoML skill. For every requested mod
 5. **Using a weak proxy metric.** The brain can optimize a metric that does not reflect real task quality. Use the metric recommended by the model skill or provide `eval_fn`.
 6. **Implicit direction trap.** If the metric name does not imply the desired direction, set `direction` explicitly.
 7. **Spec-override typos.** `save_freq_in_epochs` (plural) used to silently do nothing; now raises `ValueError` with suggestion. If you see that error, it's the fix working.
-8. **Orchestrator dies mid-sweep.** Relaunch with the same `workspace_path` and `resume=True`. In-flight jobs are recovered from `active_jobs.json`.
+8. **Orchestrator dies mid-sweep.** Resolve the existing `session_id`, then relaunch with the same full `workspace_path`, that session id in `automl_settings`, and `resume=True`. In-flight jobs are recovered from `active_jobs.json`. Missing or ambiguous controller state is a blocker, not permission to start a new search.
 9. **Rec never reports a metric.** Check the model skill's metric-emission requirements and custom extractor guidance.
 10. **Parallel Bayesian arms.** Bayesian is inherently sequential. If you want parallelism, use `asha`. If you use multiple `AutoMLRunner` instances, give each its own `<SDK>(state_file=...)` (e.g., `BrevSDK(state_file=...)`, `KubernetesSDK(state_file=...)`) to avoid SQLite write races on the SDK's job store.
 11. **LLM brain returning random configs.** If every LLM recommendation looks random, the LLM endpoint is probably failing silently. Check the logs for "LLM call failed" warnings. Verify your API key and endpoint are correct. Common cause: using the wrong endpoint URL (see pitfall #2).

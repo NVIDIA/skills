@@ -220,9 +220,10 @@ All tests must pass before Phase 6 training is allowed to start.
 ### Run stages individually
 
 ```bash
+set -a; source /path/to/.env; set +a   # omit if already exported
 NGC_IMAGE={{NGC_IMAGE}}
 docker run --rm --gpus all --shm-size=16g \
-  -e HF_TOKEN="$HF_TOKEN" -e WANDB_API_KEY="$WANDB_API_KEY" \
+  -e HF_TOKEN -e WANDB_API_KEY \
   -e PYTHONUNBUFFERED=1 -e HF_HUB_DISABLE_XET=1 \
   -v $(pwd):/workspace \
   hft-{{SHORT_NAME}}:0.1.0 \
@@ -298,8 +299,8 @@ HF_CACHE_VOLUME="hft-hf-cache"
 # from minutes to seconds.
 COMMON_FLAGS=(
   --gpus all --shm-size=16g
-  -e HF_TOKEN="${HF_TOKEN:-}"
-  -e WANDB_API_KEY="${WANDB_API_KEY:-}"
+  -e HF_TOKEN
+  -e WANDB_API_KEY
   -e WANDB_PROJECT="${WANDB_PROJECT:-hft-${SHORT}}"
   -e WANDB_RUN_NAME="${WANDB_RUN_NAME:-${SHORT}-$(date +%s)}"
   -e PYTHONUNBUFFERED=1

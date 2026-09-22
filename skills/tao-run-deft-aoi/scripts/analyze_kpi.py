@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import math
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -638,6 +639,24 @@ def main() -> None:
         generated_plot_paths=plot_paths,
         best_f1_missed_no_pass_count=len(best_f1_missed_no_pass_rows),
     )
+    if recall_100_threshold is not None:
+        metric_result = {
+            "name": "far_pct",
+            "value": recall_100_threshold.far * 100.0,
+            "unit": "%",
+            "threshold": recall_100_threshold.threshold,
+            "constraints": {
+                "recall_pct": recall_100_threshold.recall * 100.0,
+            },
+            "diagnostics": {
+                "recall_pct": recall_100_threshold.recall * 100.0,
+                "precision": recall_100_threshold.precision,
+                "f1": recall_100_threshold.f1,
+            },
+        }
+        (output_dir / "metric_result.json").write_text(
+            json.dumps(metric_result, indent=2) + "\n"
+        )
 
     print(f"Input CSV: {csv_path}")
     print(f"Output directory: {output_dir}")
@@ -669,6 +688,8 @@ def main() -> None:
         f"(rows={len(best_f1_missed_no_pass_rows)})"
     )
     print(f"Threshold metrics CSV: {output_dir / 'threshold_metrics.csv'}")
+    if recall_100_threshold is not None:
+        print(f"Metric result JSON: {output_dir / 'metric_result.json'}")
     print(f"Summary: {output_dir / 'summary.txt'}")
     if plot_paths:
         for plot_path in plot_paths:

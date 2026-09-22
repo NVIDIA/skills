@@ -43,7 +43,7 @@ mount `$OUTPUT_DIR` (or `$(pwd)` when invoked from a generated rerun skill) at
 `<short>` = `model_short_name` from `config.yaml`.
 
 **Authority:** the generic flag conventions — `--gpus`, `-e VAR` passthrough,
-`--ipc=host`, `-v host:container`, NGC auth, container-name reuse, common
+`--shm-size=8g`, `-v host:container`, NGC auth, container-name reuse, common
 error modes — are owned by [`tao-skill-bank:tao-run-on-docker`](../../../platform/tao-run-on-docker/SKILL.md).
 This catalog only adds workflow-specific flags on top: `--entrypoint /bin/bash
 -lc` (to wrap commands around NGC's `nvidia_entrypoint.sh`), `--shm-size=16g`
@@ -118,7 +118,10 @@ docker build -t run-<short>:latest .
 
 ## 2. Prepare data
 
+Steps 3-8 below assume the same load line as this block.
+
 ```bash
+set -a; source /path/to/.env; set +a   # omit if already exported
 docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
   -e HF_TOKEN \

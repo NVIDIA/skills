@@ -3,9 +3,11 @@ name: tao-run-deft-aoi
 description: >
   Run the full DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection models:
   baseline evaluate, RCA, Cosmos AnomalyGen / AMP synthetic defects, k-NN mining, retraining, and deployment
-  gating until FAR / recall KPI targets are met. Use for prompts like "run the DEFT loop", "fine-tune until
-  FAR below 0.1% at recall=100%", or "improve my AOI ChangeNet model with RCA and synthetic defects"; do not use
-  for standalone TAO training, one-off inference, generic anomaly generation, or RCA-only analysis.
+  gating against a customer-defined primary metric and optional constraints. Use only when the request identifies
+  an AOI / automated-optical-inspection, PCB-defect, VisualChangeNet, or ChangeNet workflow. Supports air-gapped/offline
+  runs with pre-staged assets. Never infer AOI from generic iterative-improvement language. Do not use for CLIP / SigLIP
+  image retrieval, attribute-labelled image data, standalone TAO training, one-off inference, generic anomaly generation,
+  or RCA-only analysis.
 license: Apache-2.0 AND CC-BY-4.0
 compatibility: Requires docker + nvidia-container-toolkit. Workflows declare additional requirements.
 metadata:
@@ -24,20 +26,94 @@ tags:
 
 > **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
 
+## Execution Contract
+
+Treat this as a disk-backed state machine, not as a prose recipe.
+
+1. Preserve every explicit user value. `epoch 1` means `num_epochs=1` and
+   `iteration 1` means `max_iterations=1`; a heuristic or spec default applies
+   only when the user did not supply that parameter. Show the source of every
+   run parameter (`user`, `spec`, or `default`) in the Pre-Flight Summary.
+   Preserve the customer's metric name, operator, target, unit, evaluator, and
+   constraints. The approved `metric_contract` is the source of truth for
+   evaluation, checkpoint selection, completion, and reporting.
+2. After the user approves the Summary, set
+   `PYTHON=$(bash scripts/deft_python.sh)`, then initialize `deft_state.json`
+   once with `"$PYTHON" scripts/init_deft_state.py`, passing Preflight's exact GPU model/memory,
+   resolved `--network-mode`, activation source, and selected absolute Python.
+   The resulting `execution_policy` is immutable run state. Never hand-author
+   or reinitialize it on resume.
+3. On startup, after context compaction, before every stage, and before any
+   completion claim, run `"$PYTHON" scripts/deft_context.py --state ... --stage ...`.
+   Use its durable `next_stage` plus the state file's
+   `status`, `current_iteration`, `iterations.*.status`, `stage_completed`,
+   and latest `events` entry to resume. Do not infer progress from assistant
+   prose or from an artifact that is not recorded in state.
+4. Invoke the mapped underlying skill after reading the DEFT overlay. Do not
+   replace a missing/unread stage reference or a failed skill call with guessed
+   shell commands, inline Python, a different output tree, or data fabricated
+   from the KPI set.
+5. After initialization, run install/fetch/login/container commands through
+   `"$PYTHON" scripts/deft_exec.py --state ... -- <command>`. Air-gap mode rejects egress
+   and installs, injects offline flags, and enforces no-pull. Selected
+   platforms must enforce the equivalent policy.
+6. Commit every stage with `"$PYTHON" scripts/commit_stage.py`; it verifies the stage's
+   required inputs and atomically updates both the resume snapshot and ordered
+   `events` array inside `deft_state.json`. Never edit the state file with
+   inline Python, jq, heredocs, or an editor. Fix rejected evidence; never
+   fabricate state. For evaluate, pass the metric result,
+   checkpoint, inference CSV, and threshold directly to `commit_stage.py`.
+   Pass positive measured `--duration-sec` from backend elapsed time or a host
+   timer for executed stages. A documented `--skip` may record `0`; negative
+   durations are always rejected.
+7. Claim the loop complete only after `"$PYTHON" scripts/finalize_run.py` creates the
+   handoff artifacts, successfully commits `loop_stop`, and a
+   fresh read of `deft_state.json` shows `status == "complete"`,
+   `iterations.baseline.status == "complete"`, and the final iteration's
+   `status == "complete"`. A checkpoint, inference CSV, report, or assistant
+   message is not completion evidence by itself.
+
+## Context Discipline
+
+- Load references just in time. Re-read state, then read only the current
+  stage's named section and act.
+  Never preload/cat every reference or underlying skill, recursively list the
+  skill tree, or re-read a reference already present in the current context.
+- Redirect verbose train, inference, Docker, and SDG output to files. Inspect
+  at most the final 40 lines or a one-line status/artifact check; never print a
+  full spec, state file, loop log, or generated script into the conversation.
+- A Skill-tool call loads stage instructions; it does not start a background
+  orchestrator. Continue the documented stage in the parent immediately after
+  it returns. Never sleep or poll waiting for a Skill-tool process. For actual
+  background Docker work, save the PID and poll at intervals no longer than 30s.
+- At the start of Pre-Flight, resolve network mode before dependencies. Read
+  exactly one branch: `references/air-gap.md` for air-gap mode or
+  `references/network-bootstrap.md` for network-enabled mode. Never load the
+  network bootstrap in an air-gapped run.
+
 ## When to Use This Skill
 
 Use this skill when the user wants an agent to run the full DEFT AOI improvement loop for an NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection model: baseline evaluation, RCA, synthetic defect generation, data mining, retraining, and deployment gating until a KPI target is met.
 
 - "Run the DEFT loop"
-- "Fine-tune until FAR below 0.1% at recall=100%"
+- "Fine-tune until the configured quality metric meets its target"
+- "Optimize a customer-defined metric while preserving its constraints"
 - "Improve my AOI ChangeNet model using RCA and synthetic defects"
-- "Iterate training until false accept rate meets the target"
+- "Iterate training until the deployment KPI meets the target"
 
 Do not use this skill for a single standalone TAO training run, one-off inference, generic anomaly generation, or RCA-only analysis. Use the relevant agent directly when the user asks for only that step.
 
 ## Base Model
 
-The loop operates on **NVIDIA TAO Visual ChangeNet** classify with the **NVIDIA C-RADIOv2-B** backbone, fine-tuned end-to-end. The architecture is defined in `specs/baseline_spec.yaml` — that file is the source of truth. All pretrained weights come from HuggingFace (`HF_TOKEN` required); `NGC_KEY` only gates container pulls. ChangeNet backbone resolution + the staged-file/HF-URL fallback for `model.backbone.pretrained_backbone_path` are owned by `references/visual-changenet.md`. SigLIP for k-NN mining is owned by `references/tao-mine-aoi-images.md`. AnomalyGen-side checkpoints (Cosmos-Predict2, T5, NVDINOV2, C-RADIO-V3, DINOv2-large, SAM2, Qwen3-VL — ~22 GB for 2B-only, ~140 GB with 14B + T5-11b) live under `<workspace>/augmentation/anomalygen/base_checkpoints/`; the paidf-anomalygen container auto-downloads them on first use. The PCB reference dataset under `<workspace>/augmentation/anomalygen/datasets/<project>/` is also auto-fetchable. See `references/paidf-anomalygen.md`.
+The loop uses **NVIDIA TAO Visual ChangeNet** classify with either end-to-end
+C-RADIOv2-B or a frozen DINOv3 backbone. `specs/baseline_spec.yaml` defines the
+architecture. Backbone variants, staging, `HF_TOKEN`, and mount rules are owned
+by `references/visual-changenet.md`; the spec always points to a local mounted
+file. `NGC_KEY` gates container pulls. SigLIP mining is owned by
+`references/tao-mine-aoi-images.md`; AnomalyGen assets and network/air-gap rules
+are owned by `references/tao-generate-anomalies.md` and
+`references/air-gap.md`. The container owns its base-asset list; this workflow
+keeps bootstrap on Text2Image 2B by passing `--model_sizes 2B` explicitly.
 
 ## Train AutoML Policy
 
@@ -68,16 +144,21 @@ not apply this policy to other workflows.
 ## Launch Intake
 
 After the user confirms they want to run this workflow, ask which supported
-platform they intend to run on. The supported platforms are the installed
-platform skills — `tao-run-on-local-docker` (default for a local GPU host),
-`tao-run-on-brev`, `tao-run-on-slurm`, and `tao-run-on-kubernetes`. Never
-default silently; if the user has not chosen, ask.
+platform they intend to run on. Discover the execution platforms from the
+installed platform skills (tao-run-on-docker / -slurm / -kubernetes / -brev,
+plus any external one); on a runtime that surfaces only the core router skills,
+read `skills/platform/tao-run-on-*/SKILL.md` frontmatter.
 
-After platform selection, read the chosen platform skill's SKILL.md and run
-its Preflight section for the credential and environment requirements.
+After platform selection, read the chosen platform skill's `## Credentials`
+section and `references/skill_info.yaml` (required_credentials /
+credential_groups).
 
-Ask only for credentials relevant to that platform, plus model-specific
-credentials required by the selected workflow.
+Never ask for or print credential values. Check only whether the variable is
+set (`[ -n "$VAR" ] && echo SET || echo UNSET`); if unset, name it so the user
+can export it or put it in a user-approved env file (`~/.tao/secrets.env`,
+`~/.config/tao/.env`, or one they point at), loaded with
+`set -a; source /path/to/.env; set +a`. The run never creates or writes that
+file.
 
 ## Agent Behavior
 
@@ -101,12 +182,25 @@ credentials required by the selected workflow.
 > stalls on the first prompt. Remind the user at the Pre-Flight Summary to enable auto-mode
 > (shift+tab) before approving.
 >
-> **Blocker recovery.** Fix recoverable blockers yourself — missing image (pull), unstaged
-> C-RADIO backbone (stage `.pth` per `references/visual-changenet.md`), missing pydeps (venv),
-> absent AnomalyGen assets (paidf auto-fetches) — then resume the Pre-Flight step you were on
-> (`<blocker> cleared → resuming step N`) and continue to the Summary. Halt only for what you
-> can't fix (missing workspace/specs/CSVs/credentials, empty pool, leakage). A fix is not the
-> user gate.
+> **Blocker recovery.** Before the user gate, select a complete installed host
+> interpreter through `deft_python.sh`. If none exists, follow only the
+> already-selected network-mode reference. Air-gap mode hard-stops without a
+> package-manager command; network-enabled bootstrap is isolated in
+> `references/network-bootstrap.md`.
+> Apply the network-mode branches in `references/air-gap.md`; record permitted
+> fetches and directory creation as
+> post-approval work, or validate staged assets in air-gap mode. After
+> approval, fix recoverable blockers yourself, then
+> resume the Pre-Flight step you were on (`<blocker> cleared → resuming step N`).
+> Halt only for what you cannot fix (missing workspace/specs/CSVs/credentials,
+> empty pool, leakage). A fix is not another user gate.
+>
+> **Non-zero command rule.** Never repeat an unchanged failed command and never
+> switch to an undocumented CLI/module path by trial and error. Read the final
+> error block (not only the container banner), map it to the loaded stage
+> reference/underlying skill, make one evidence-based correction, and rerun its
+> documented verification. If the reference does not cover the failure, commit
+> `status=error` and halt instead of improvising a reduced workflow.
 >
 > **Revised plan.** If any run parameter changes after the original summary was shown (user imposes a time limit, overrides epochs, changes max_iterations, etc.), always re-run Pre-Flight and show an updated summary before proceeding.
 
@@ -115,31 +209,53 @@ credentials required by the selected workflow.
 Execute the loop in this order (full detail in `references/pipeline-and-state.md` → Pipeline + Stage Execution):
 
 1. **Pre-Flight.** Run every check in `references/preflight.md`. Resolve workspace, specs, CSVs, checkpoints, container images. Hard stop only on missing input you can't resolve yourself (see `## Agent Behavior` → Blocker recovery).
-2. **Baseline.** If `deft_state.json` already has `iterations.baseline.stage_completed == "train"` and a `best_ckpt_path` pointing at an existing file (the upstream `automl-deft-pipeline` pre-seeds these from its Phase 1 AutoML winner — see its Phase 1 → Phase 2 handoff), **skip the train sub-step** and resume at `inference -> evaluate` against the pre-seeded checkpoint. Otherwise run `train -> inference -> evaluate` by invoking the `tao-skill-bank:tao-train-visual-changenet` skill. Either way, then `rca` by invoking `tao-skill-bank:tao-analyze-gaps-visual-changenet`. Read `references/visual-changenet.md` and `references/tao-analyze-gaps-visual-changenet.md` first for DEFT-loop-specific args (mounts, output dirs, `deft_state.json` updates).
-3. **Iterate.** For each iteration up to `max_iterations`, execute Pipeline steps 1-7. Between every step, re-read `results/loop_log.jsonl` tail + `results/deft_state.json` from disk — disk is canonical.
-4. **Stop** when the KPI target is met, `max_iterations` is reached, or a hard-stop gate fires (silent-drop, AMP allocation mismatch, train/val leakage). Never auto-retry hard stops.
-5. **Render** `results/DEFT_Loop_Report.html` after each completed iteration (and once more at loop end) by spawning the `reporter` subagent (`agents/reporter.md`). Per-stage renders are not done — every stage already appends one line to `loop_log.jsonl`, which is enough for a tail-watching user; the HTML render carries an iteration's worth of state and one render per iteration keeps the per-loop token cost roughly linear in iteration count, not in stage count. Do not render inline.
+2. **Baseline.** If `deft_state.json` already has `iterations.baseline.stage_completed == "train"` and a `best_ckpt_path` pointing at an existing file (the upstream `automl-deft-pipeline` pre-seeds these from its Phase 1 AutoML winner — see its Phase 1 → Phase 2 handoff), **skip the train sub-step** and resume at `inference -> evaluate` against the pre-seeded checkpoint. Otherwise run `train -> inference -> evaluate` by invoking the `tao-skill-bank:tao-train-visual-changenet` skill. Evaluate with the approved contract and evaluator in `references/metric-contract.md`. Either way, then `rca` by invoking `tao-skill-bank:tao-analyze-gaps-visual-changenet`. Read `references/visual-changenet.md`, `references/metric-contract.md`, and `references/tao-analyze-gaps-visual-changenet.md` first for DEFT-loop-specific args.
+3. **Iterate.** For each iteration up to `max_iterations`, execute Pipeline steps 1-7. Between steps re-read `deft_state.json` and continue from its `stage_completed` value; do not print the full state.
+4. **Stop** when the KPI target is met or `max_iterations` is reached by running
+   `"$PYTHON" scripts/finalize_run.py` with the matching reason. Hard-stop failures are
+   committed as errors and are never relabeled as successful `loop_stop`.
+5. **Render automatically.** `scripts/init_deft_state.py` writes the initial
+   `results/DEFT_Loop_Report.html`; every successful `commit_stage.py` call
+   then refreshes it with the deterministic report hook implemented in
+   `scripts/render_report.py`. The `loop_stop` commit therefore produces the final
+   report even when the parent context is saturated. If a hook reports an
+   error, run `"$PYTHON" scripts/render_report.py --results-dir "${RESULTS_DIR}"`
+   directly after repairing the named presentation input; never hand-author
+   report HTML.
 
-All pipeline stages run inline in the parent context — the parent invokes the underlying `tao-skill-bank:*` skills directly via the Skill tool, layering DEFT-loop conventions on top via the matching `references/*.md` file. The **only** delegated work is HTML report rendering, handled by the `reporter` subagent in a fresh context so an end-of-loop render is never silently dropped when the parent's context is saturated. See `references/scripts-and-agents.md` → Agents for the `reporter` spawn contract.
+All pipeline stages run inline in the parent context. Prefer invoking the underlying `tao-skill-bank:*` skills directly via the Skill tool, layering DEFT-loop conventions on top via the matching `references/*.md` file. If the mapped Skill tool is unavailable but Docker, the skill source tree, and the stage reference modules are present, use the documented direct-container fallback in `references/scripts-and-agents.md`; before the first fallback stage, write `execution_path=direct-container` to the transcript, and for each fallback stage record the mapped underlying skill name plus the exact direct command used. Preserve the same `deft_state.json`, artifact, and script-backed report contracts. HTML rendering is not delegated.
 
 ### Using Bundled Scripts
 
-Run bundled scripts from `scripts/` via `run_script()` when the harness provides it (a Claude Code plugin runtime helper, not a function defined in this repo); otherwise fall back to direct `python`. Resolve every path argument to an absolute host path first. Never write `loop_log.jsonl` via `echo` or inline `jq` — the `seq` invariant requires reading the live tail through `next_seq()`. See `references/scripts-and-agents.md` for the full **Available Scripts** table, per-script **invocation examples** (`run_script()` / direct-python / in-process), the `agents/reporter.md` spawn contract, the **Stage Reference Modules** stage→skill mapping, the path-rule invariant, and the workflow-level AutoML-policy pitfall.
+For each tool call, set `PYTHON=$(bash <skill_root>/scripts/deft_python.sh)`;
+then use `"$PYTHON" <skill_root>/scripts/<name>.py`. Resolve every path
+argument to an absolute host path first. Use
+`deft_context.py` before each stage, `deft_exec.py` for external execution, and
+`commit_stage.py` for all state writes. See
+`references/scripts-and-agents.md` for script invocations, the automatic
+report hook, stage mapping, direct-container fallback, and path invariants.
 
 ## Stage Reference Modules
 
-Each pipeline stage maps to one underlying skill in the bank; the matching `references/*.md` file layers DEFT-loop conventions (mounts, output dirs, `deft_state.json` updates, `log_stage.py` summary string) on top of the skill's generic instructions. **Read the reference file first, then invoke the skill via the Skill tool.** If a reference file is missing, stop and ask the user to reinstall the plugin. The full stage→reference→skill→ownership table lives in `references/scripts-and-agents.md` → **Stage Reference Modules**. The stages: `train`/`evaluate` (`references/visual-changenet.md`), `anomalygen` (`references/paidf-anomalygen.md`), `rca` (`references/tao-analyze-gaps-visual-changenet.md`), `routing` (`references/tao-route-visual-changenet-samples.md`), and `data_mining` (`references/tao-mine-aoi-images.md`).
+Each pipeline stage maps to one underlying skill in the bank; the matching `references/*.md` file layers DEFT-loop conventions (mounts, output dirs, and `commit_stage.py` arguments) on top of the skill's generic instructions. **Read only the current stage's relevant section, then invoke the skill via the Skill tool or the documented direct-container fallback; never preload all stage references.** If a reference file is missing, stop and ask the user to reinstall the plugin. The full stage→reference→skill→ownership table lives in `references/scripts-and-agents.md` → **Stage Reference Modules**. The stages: `train`/`evaluate` (`references/visual-changenet.md`), `anomalygen` (`references/tao-generate-anomalies.md`), `rca` (`references/tao-analyze-gaps-visual-changenet.md`), `routing` (`references/tao-route-visual-changenet-samples.md`), and `data_mining` (`references/tao-mine-aoi-images.md`).
 
-**Path rule (invariant).** Use absolute host paths under `${RESULTS_DIR}/iter${ITER}/` for every stage's output, mount `<workspace>` into the container at the same path, pre-create dirs world-writable, and reject any config containing `output: /results/...` or any path outside `<workspace>`.
+**Path rule (invariant).** Record absolute host artifact paths under
+`${RESULTS_DIR}`. For ChangeNet direct containers, mount
+`"$WORKSPACE:/data/workspace"` and `"$RESULTS_DIR:/results"`; specs use
+`/results/baseline/<stage>` or `/results/iterN/<stage>`. Other stages retain
+their reference module's required workspace mount. Never remap the run
+directory to `/results/iterN`.
 
 ## Data, Pre-Flight, Pipeline, and State references
 
 | Topic | Reference | Contents |
 |---|---|---|
+| Air-gap activation and offline execution | `references/air-gap.md` | Global mode triggers, precedence, prohibited network actions, staged-asset requirements, and Pre-Flight evidence |
 | Bring-your-own-data, data contract, output layout, augmentation pool | `references/data-layout.md` | No public AOI dataset; full `<workspace>` input tree, ChangeNet four-column required CSV schema, `${RESULTS_DIR}/` output tree, and the two-source mining-pool table |
+| Customer metric contract and evaluator adapter | `references/metric-contract.md` | Primary metric schema, comparison direction, evaluator JSON, constraints, evaluate commit, and compatibility behavior |
 | Pre-Flight checks, defaults, Pre-Flight Summary template, runtime estimate | `references/preflight.md` | The 10 ordered Pre-Flight checks, required input `max_iterations`, all defaults, the full Pre-Flight Summary table + populate commands, and the per-iteration runtime estimate |
-| Pipeline steps, state/logging, stage execution, reports, runtime behavior | `references/pipeline-and-state.md` | Baseline pre-seed/skip-train logic, the 7 iteration Pipeline steps, `deft_state.json` + `loop_log.jsonl` schema and `seq` cadence, post-stage check, per-iteration HTML render, and the loop-end sequence |
-| Bundled scripts, reporter agent, stage modules, AutoML pitfall | `references/scripts-and-agents.md` | Available Scripts table, `agents/reporter.md` spawn contract, Stage Reference Modules table, path-rule invariant, AutoML-policy spec trap |
+| Pipeline steps, state, stage execution, reports, runtime behavior | `references/pipeline-and-state.md` | Baseline pre-seed/skip-train logic, the 7 iteration Pipeline steps, the `deft_state.json` snapshot + event schema, post-stage check, per-iteration HTML render, and the loop-end sequence |
+| Bundled scripts, report hook, stage modules, AutoML pitfall | `references/scripts-and-agents.md` | Available Scripts table, deterministic report renderer and post-commit hook, Stage Reference Modules table, path-rule invariant, AutoML-policy spec trap |
 
 **Required input — `max_iterations`.** No default; ask the user if not supplied and do not proceed past Pre-Flight without it. If the user gives a time limit instead, convert it to an estimated `max_iterations` using the per-iteration runtime figure in `references/preflight.md` and surface the estimate for confirmation. All other run parameters have defaults — never ask about a parameter with a default. The full defaults list and the Pre-Flight Summary the user approves at the single gate are in `references/preflight.md`.
 
@@ -147,6 +263,4 @@ Each pipeline stage maps to one underlying skill in the bank; the matching `refe
 
 Run the full Pre-Flight (`references/preflight.md`), print the Pre-Flight Summary, then STOP at the one user gate. After approval, run the baseline (with the pre-seed/skip-train logic) and the 7-step iteration Pipeline, all detailed in `references/pipeline-and-state.md`.
 
-Hard-stop and never auto-retry on: any stage `status=error`; train/validation leakage (the mid-iteration check on `mining_filter/mining_pool.csv` right after mining, and the post-assembly check on the combined CSV); a missing or zero-row mining pool; a failed CSV existence check; silent-drop; and AMP allocation mismatch. The loop stops when the KPI target is met, `max_iterations` is reached, or an unrecoverable gate fires. Each terminal path runs the loop-end sequence: append the final `loop_stop` entry via `scripts/log_stage.py`, backfill token usage with `scripts/align_token_usage.py`, spawn the `reporter` agent one final time (`trigger="loop-end"`), then run `scripts/prepare_inference_spec.py` — skipped only when no valid checkpoint exists. Per-stage state cadence (one `loop_log.jsonl` entry per stage, `seq=last+1` from disk, disk is canonical, HTML render once per iteration and at loop end) is specified in `references/pipeline-and-state.md`.
-
-
+Hard-stop and never auto-retry on: any stage `status=error`; train/validation leakage; a missing or zero-row mining pool; a failed CSV existence check; silent-drop; AMP allocation mismatch; a PAIDF-incompatible AnomalyGen fine-tuned checkpoint; a missing AnomalyGen Guardrail checkpoint; or an SDG log showing disabled screening. The loop stops when the KPI target is met, `max_iterations` is reached, or an unrecoverable gate fires. Each terminal path commits `loop_stop` through `commit_stage.py`, then follows the loop-end sequence in `references/pipeline-and-state.md`.

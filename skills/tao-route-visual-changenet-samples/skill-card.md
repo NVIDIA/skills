@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to route weak Visual ChangeNet samples from gap analysis into per-augmentation-module subsets (k-NN Mining and AnomalyGen) as part of a VCN AOI SDA iteration pipeline. <br>
+Developers and engineers who need to route weak VCN gap-analysis samples into per-augmentation-module subsets (k-NN Mining and AnomalyGen) as part of a VCN AOI SDA iteration pipeline. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -31,7 +31,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Skill Output: <br>
 **Output Type(s):** [Files, Analysis] <br>
-**Output Format:** [Parquet data files, plain text summary, and Markdown report] <br>
+**Output Format:** [Parquet files, plain-text summary, and Markdown report] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -42,35 +42,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) in isolated k8s-sandbox pods. Evaluator version 1.3.2. <br>
+1 evaluation task (1 positive), 3 attempts per task, evaluated in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks goal completion (50%) and expected workflow adherence (50%). <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Correctness: Final-answer correctness against the reference answer. <br>
+- Discoverability: Whether the expected skill was selected and the workflow executed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and followed the expected workflow (equal-weight mean of goal completion and behavior check). <br>
+- Efficiency: Tool-call productivity and token efficiency (50% each). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 40% → 100% (+60 points) | 38% → 54% (+16 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 20% → 100% (+80 points) | 40% → 100% (+60 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 0% (±0 points) |
-| Effectiveness | 17% → 100% (+83 points) | 48% → 70% (+22 points) |
-| Efficiency | 15% → 100% (+85 points) | 0% → 0% (±0 points) |
+| Overall | 94.4% | 70.4% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 100.0% (+80.0 points) |
+| Discoverability | 100.0% | 0.0% |
+| Effectiveness | 16.7% → 100.0% (+83.3 points) | 43.3% → 53.3% (+10.0 points) |
+| Efficiency | 72.2% | 99.7% → 98.5% (-1.2 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

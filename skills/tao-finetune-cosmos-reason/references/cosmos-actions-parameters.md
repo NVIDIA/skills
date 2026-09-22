@@ -1,6 +1,7 @@
 # Cosmos-Reason Actions And Parameters
 
-Evaluate behavior, dataset notes, important parameters, hardware, error patterns, and parent-model inference.
+Historical Cosmos-RL action supplement. Load it only after the shared frontend
+selects `cosmos-rl`; current backend contracts supersede conflicting defaults.
 
 Load this file only when the compact `SKILL.md` points here for the current task. If this reference conflicts with `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the compact/current source wins.
 
@@ -27,7 +28,7 @@ Load this file only when the compact `SKILL.md` points here for the current task
 
 ## Evaluate
 
-The `actions.evaluate` block in `references/skill_info.yaml` declares the action's inputs (annotation file + media folder + model) and outputs (results directory). For SDK invocation see `skills/platform/tao-run-platform/SKILL.md`.
+The `actions.evaluate` block in `references/skill_info.yaml` declares the action's inputs (annotation file + media folder + model) and outputs (results directory).
 
 ### Config format
 
@@ -51,7 +52,7 @@ To evaluate a fine-tuned LoRA model, pass the checkpoint path via spec_overrides
 spec_overrides={
     'model.model_name': 's3://bucket/results/{train_job_id}/safetensors/epoch_2',
     'model.enable_lora': True,
-    'model.base_model_path': 'hf_model://nvidia/Cosmos3-Nano',
+    'model.base_model_path': '<BASE_MODEL_PATH_OR_URI>',
     'evaluation.batch_size': 10,
 }
 ```
@@ -66,7 +67,7 @@ When the input declaration carries a `selective` block (`{annotation, format, ke
 
 - `results.json` — per-sample predictions with `video_id`, `response`, `question`, `gt`
 - Binary metrics: accuracy, balanced accuracy, precision, recall, F1
-- Text metrics: BLEU, ROUGE, BERTScore
+- Text metrics: `BLEU`, `ROUGE*`, and the emitted `BERTScore_F1` scalar
 - When Lustre is available, results write to Lustre for cross-job persistence (e.g., gap analysis reads directly), then upload to S3.
 
 ## Datasets
@@ -101,26 +102,30 @@ explicitly asks for that dataset mutation.
 
 ### Training Loop
 - **train.epoch**: Number of training epochs. Default 10. Use at least 2 for
-  local smoke or AutoML runs that need a host-visible best checkpoint for
+  explicitly requested diagnostic subsets or AutoML runs that need a host-visible best checkpoint for
   evaluate/inference; one-epoch runs can leave only a broken `best` symlink
   after checkpoint cleanup.
-- **train.train_batch_per_replica**: Global batch size per training step. Ideally >= 32 for stability. CRITICAL: must be divisible by `train.train_policy.mini_batch` (default 1 in the packaged smoke-safe template). Recommended production value: 32.
+- **train.train_batch_per_replica**: Global batch size per training step. Ideally >= 32 for stability. CRITICAL: must be divisible by `train.train_policy.mini_batch` (default 1 in the packaged template). Recommended production value: 32.
 - **train.compile**: Set to true for potential speedup on newer GPUs (H100), else false.
 - **train.output_dir**: Output directory for checkpoints and logs.
 
 ### Model & Policy
-- **policy.model_name_or_path**: HuggingFace model path. The packaged default is `hf_model://nvidia/Cosmos3-Nano`. Override this only when the user provides a different HuggingFace model id, `hf_model://...` URI, or cluster-local snapshot path.
+- **policy.model_name_or_path**: Required runtime Hugging Face model ID/URL or cluster-local snapshot path. The planner resolves an omitted revision as `main`, or a supplied branch/tag, to an immutable Hub commit automatically. Local snapshots use content fingerprints and need no revision.
 - **policy.model_max_length**: Context window size. Must be 40960 for video SFT. Affected by FPS, resolution, and prompt length.
 - **policy.model_gradient_checkpointing**: Save VRAM by recomputing activations. Keep true for large models.
 
 ### Parallelism (Multi-GPU / Multi-Node)
-- **policy.parallelism.dp_shard_size**: Data-parallel shard size. CRITICAL: should equal **GPUs per node** (the Cosmos-RL equivalent of `num_gpus`).
-- **policy.parallelism.dp_replicate_size**: Data-parallel replication = **node count** (equivalent of `num_nodes`). For single-node training set to 1.
+- **policy.parallelism.dp_shard_size**: Single-node shard size equals visible
+  GPUs. Validated custom policy-only multi-node SFT uses total policy ranks.
+- **policy.parallelism.dp_replicate_size**: Keep 1 for the validated
+  single-node and custom policy-only multi-node SFT launchers.
 - **policy.parallelism.tp_size**: Tensor parallelism. Default 1.
 - **policy.parallelism.cp_size**: Context parallelism. Default 1.
 - **policy.parallelism.pp_size**: Pipeline parallelism. Default 1.
 
-For multi-node, set `dp_replicate_size = num_nodes` and `dp_shard_size = gpus_per_node`. Cosmos-RL handles the distributed init internally via FSDP — it does **not** rely on the platform-level `MASTER_ADDR` / `WORLD_SIZE` env vars the way `torchrun`-launched jobs do. Just submit with `gpu_count=<gpus_per_node>` and `num_nodes=<N>` on the SDK; the Cosmos-RL spec keys drive the actual sharding.
+For multi-node policy-only SFT, start one controller on node zero and one
+policy replica on every node with the SLURM rendezvous variables. Preserve the
+policy process exit code. Do not submit the single-node CLI unchanged.
 
 For platform-side multi-node setup (sbatch flags on SLURM, Indexed Job + Service on Kubernetes), see the platform skill's "Multi-node training" section: `skills/platform/tao-run-on-slurm`, `skills/platform/tao-run-on-kubernetes`. Brev and local Docker are single-host only.
 
@@ -138,21 +143,18 @@ For platform-side multi-node setup (sbatch flags on SLURM, Indexed Job + Service
 
 ### Vision Encoders
 - **custom.vision.fps** *or* **custom.vision.nframes** — **mutually exclusive**, set exactly one.
-  - `nframes` (default in template): extract this many frames evenly across the clip. This is the safest default for 1-GPU AutoML smoke runs.
+  - `nframes` (default in template): extract this many frames evenly across the clip. This is the safest default for 1-GPU AutoML diagnostic runs.
   - `fps`: extract frames at this rate. High motion: 3. Low motion/static: 1–2. Use when the selected videos, `policy.model_max_length`, and GPU memory can absorb the expanded token count.
   - Setting both makes qwen-vl-utils' decord backend error out (`Only accept either fps or nframes`) and silently fall back to torchvision, which deadlocks under multi-worker dataloading (`BlockingIOError [Errno 11]` swscaler errors). If you switch from `fps` to `nframes`, also delete `fps` from your spec.
-- Do not require per-record `video_fps` for the packaged `nframes` template.
-  If a run switches to `custom.vision.fps` or a selected dataset/image profile
-  requires per-record timing, validate annotations before any download or job
-  launch:
-  ```bash
-  scripts/check_tao_launch_preflight.py --platform <platform> \
-    --path train_annotation=/path/to/train.json \
-    --path val_annotation=/path/to/val.json \
-    --json-required-field train_annotation=video_fps \
-    --json-required-field val_annotation=video_fps
-  ```
-- **custom.vision.total_pixels**: Resolution constraint. Increase if the object of focus is small relative to the frame. Default 3136000.
+- Neither `nframes` nor `fps` sampling requires a per-record `video_fps`
+  field. The selected decoder reads the source frame rate from each media
+  stream and qwen-vl-utils uses it to resolve FPS sampling. Annotation-level
+  `fps` or `video_fps` is optional descriptive metadata; validate it when
+  present, but never invent or require it.
+- **custom.vision.min_frames** / **custom.vision.max_frames** — optional lower and upper sampled-frame bounds used only with `fps`. Qwen rounds the resolved count to its frame factor and clamps it to the selected clip length.
+- **custom.vision.video_start** / **custom.vision.video_end** — optional nonnegative clip boundaries in seconds; when both are present, start must be less than end.
+- **custom.vision.resized_height** / **custom.vision.resized_width** — explicit frame dimensions. Set both together; they replace automatic pixel-budget resizing.
+- **custom.vision.min_pixels** / **custom.vision.max_pixels** / **custom.vision.total_pixels** — per-frame minimum, per-frame maximum, and aggregate video pixel budgets forwarded to qwen-vl-utils.
 - **custom.system_prompt**: Instructions prepended to every prompt.
 
 ### Checkpointing
@@ -182,7 +184,7 @@ For evaluate, pass the resolved LoRA folder directly:
 `model.model_name=<train_output_dir>/<timestamp>/safetensors/epoch_N`,
 `model.enable_lora=true`, and
 `model.base_model_path=<same base model used for training>` (default
-`hf_model://nvidia/Cosmos3-Nano`, or the local base-model snapshot path). For
+the user-supplied immutable model URI, or the local base-model snapshot path). For
 resume/retrain, pass the exact Cosmos checkpoint policy folder as a string:
 `train.resume=<train_output_dir>/<timestamp>/checkpoints/epoch_N/policy`.
 Avoid `train.resume=true` for local Docker epoch-based checkpoints because the
@@ -204,7 +206,7 @@ fine-tuned checkpoints for handoff.
 
 ## Hardware
 
-Cosmos-RL models are 8B parameters and use FSDP sharding. SFT requires at least 256 GB of cumulative visible GPU memory, with no fixed device count or per-device capacity. Set `dp_shard_size` to the actual visible GPU count and `dp_replicate_size=1` for a single node. Every visible architecture must be supported by the selected image and pass the runtime CUDA-stack smoke test.
+Cosmos-RL models are 8B parameters and use FSDP sharding. SFT requires at least 256 GB of cumulative visible GPU memory, with no fixed device count or per-device capacity. Set `dp_shard_size` to the actual visible GPU count and `dp_replicate_size=1` for a single node. Every visible architecture must be supported by the selected image and pass the allocated-node CUDA-stack gate.
 
 Apply `runtime_requirements.gpu_host` from `references/skill_info.yaml` as
 minimum-version overrides to the shared host setup check.
@@ -221,7 +223,7 @@ minimum-version overrides to the shared host setup check.
 
 **Quantize image/video token mismatch**: `Mismatch in image token count between
 text and input_ids` during calibration means `quantize.max_sequence_length` is
-too small for the sampled media tokens. The packaged smoke template uses 4096;
+too small for the sampled media tokens. The packaged template uses 4096;
 do not lower it to tiny values such as 128 for video calibration.
 
 **train_batch_per_replica not divisible by mini_batch**: The default `train_batch_per_replica=1` from the TAO Core schema is invalid because `mini_batch` defaults to 4. Immediate AssertionError on all ranks. Fix: set `train_batch_per_replica` to a multiple of `mini_batch` (recommended: 32 for large datasets, 4 for small datasets).
@@ -232,7 +234,7 @@ do not lower it to tiny values such as 128 for video calibration.
 
 **Checkpoint save failure (scheduler is None)**: The cosmos-rl trainer crashes with `'NoneType' object has no attribute 'state_dict'` when saving a checkpoint before any training step has executed. This happens when the dataset is too small for the batch size (0 steps per epoch). See the batch size error above.
 
-**You are trying to access a gated repo**: The HuggingFace model `nvidia/Cosmos3-Nano` requires authentication. All ranks will retry in a loop until they time out. Fix: ensure `HF_TOKEN` is set in your environment (e.g., `export HF_TOKEN=...` in your shell) and passed into the container with `-e HF_TOKEN`. The user must also accept the model agreement at <https://huggingface.co/nvidia/Cosmos3-Nano>.
+**You are trying to access a gated repo**: The HuggingFace model `nvidia/Cosmos3-Nano` requires authentication. All ranks will retry in a loop until they time out. Fix: ensure `HF_TOKEN` is set in your environment (`export HF_TOKEN=...` in your shell, or `set -a; source /path/to/.env; set +a`) and passed into the container with `-e HF_TOKEN`. The user must also accept the model agreement at <https://huggingface.co/nvidia/Cosmos3-Nano>.
 
 **Cosmos-RL GPU resource and architecture gate**: For SFT, the actionable
 launch gate is at least 256 GB of cumulative visible GPU memory, a GPU
@@ -253,7 +255,7 @@ fix with a compatible image, not as a platform resource incompatibility.
 
 ## Spec Param / Parent Model Inference
 
-Model-specific inference mappings belong in this MD file, not in `config.json`. Generated runners should read this section and apply the mappings with SDK helpers before `create_job()`. This mirrors the old microservices `infer_params.py` flow.
+Model-specific inference mappings belong in this MD file. Agents should read this section and apply the mappings before launching a job. This mirrors the old microservices `infer_params.py` flow.
 
 - **Checkpoint metadata:** format: safetensors, folder: true
 
@@ -271,4 +273,4 @@ Inference mappings from TAO Core `cosmos-rl.config.json`:
 | train | `train.output_dir` | `output_dir` | current job results directory |
 | train | `train.resume` | `resume_model` | exact checkpoint policy folder inferred from the current job results folder |
 
-For `parent_model` or `parent_model_folder`, pass the upstream train/export/AutoML child job id as `parent_job_id`. The SDK lists the parent result folder, filters checkpoint artifacts, and returns the selected model file or folder. Do not add these mappings back to `config.json` and do not patch generated runner scripts to guess checkpoint paths.
+For `parent_model` or `parent_model_folder`, pass the upstream train/export/AutoML child job id as the parent job id; list the parent result folder, filter checkpoint artifacts, and select the resolved model file or folder. Do not patch generated runner scripts to guess checkpoint paths.

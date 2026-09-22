@@ -1,15 +1,13 @@
 # SLURM Preflight Storage And Credentials
 
-SSH preflight, SDK availability, enroot credentials, prerequisite setup, backend details, storage, and SSH remediation.
+SSH preflight, enroot credentials, prerequisite setup, backend details, storage, and SSH remediation. No nvidia-tao-sdk is required; jobs run over ssh + sbatch/squeue/sacct/scancel.
 
 Load this file only when the compact `SKILL.md` points here for the current task. If this reference conflicts with `SKILL.md`, `skill_info.yaml`, schemas, or platform/model skills, the compact/current source wins.
 
 ## Contents
 
 - 1. SSH to the login node works without a password prompt
-- 2. Optional: TAO SDK wrapper for Job handles + S3 wrapping.
-- nvidia-tao-sdk is not on public PyPI yet — install from the GitLab repo:
-- 3. Enroot credentials on the cluster for private nvcr.io images.
+- 2. Enroot credentials on the cluster for private nvcr.io images.
 - Pyxis on the compute nodes invokes enroot to import the Docker image. Enroot
 - does NOT read NGC_KEY from the SLURM job env — it requires persistent
 - credentials in ~/.config/enroot/.credentials on the login/compute nodes.
@@ -29,7 +27,9 @@ Load this file only when the compact `SKILL.md` points here for the current task
 # 1. SSH to the login node works without a password prompt
 SLURM_HOST="${SLURM_HOSTNAME%%,*}"
 [ -n "$SLURM_USER" ] && [ -n "$SLURM_HOST" ] || {
-  echo "MISSING: export SLURM_USER and SLURM_HOSTNAME (comma-separated for failover) in your shell before launching."
+  echo "MISSING: SLURM_USER and SLURM_HOSTNAME (comma-separated for failover)."
+  echo "Export them in your shell before launching, or source a user-approved env file:"
+  echo "  set -a; source /path/to/.env; set +a"
   exit 1
 }
 ssh -o BatchMode=yes -o ConnectTimeout=10 "${SLURM_USER}@${SLURM_HOST}" "true" 2>/dev/null || {
@@ -37,16 +37,7 @@ ssh -o BatchMode=yes -o ConnectTimeout=10 "${SLURM_USER}@${SLURM_HOST}" "true" 2
   exit 1
 }
 
-# 2. Optional: TAO SDK wrapper for Job handles + S3 wrapping.
-# nvidia-tao-sdk is not on public PyPI yet — install from the GitLab repo:
-REPO='git+https://gitlab-master.nvidia.com/nvidia-tao-toolkit/tao-sdk.git'
-python -c "import tao_sdk" 2>/dev/null || {
-  echo "MISSING: nvidia-tao-sdk not installed. Run:"
-  echo "  pip install \"nvidia-tao-sdk[slurm] @ $REPO\""
-  exit 1
-}
-
-# 3. Enroot credentials on the cluster for private nvcr.io images.
+# 2. Enroot credentials on the cluster for private nvcr.io images.
 # Pyxis on the compute nodes invokes enroot to import the Docker image. Enroot
 # does NOT read NGC_KEY from the SLURM job env — it requires persistent
 # credentials in ~/.config/enroot/.credentials on the login/compute nodes.
@@ -70,18 +61,18 @@ fi
 
 If a check fails, the agent prompts the user to authorize the install/fix via Bash.
 
-The enroot-credentials step (#3) only needs to run **once per (cluster, user)** —
+The enroot-credentials step (#2) only needs to run **once per (cluster, user)** —
 subsequent SLURM sessions inherit the file. Use the `printf | ssh` heredoc
 pattern above so the `NGC_KEY` value never lands in shell history, intermediate
 files, or chat output. Do not `cat` or `echo` the value at any step. After the
-file is in place, both the SDK's SQSH pre-conversion job (which runs on
+file is in place, both the SQSH pre-conversion job (which runs on
 `sqsh_conversion_partition`) and the actual training job's Pyxis pull will
 authenticate as `$oauthtoken` against `nvcr.io`.
 
 # SLURM
 
 Remote GPU compute platform for clusters managed by SLURM. Jobs are submitted
-from the TAO service or SDK host to a login node over SSH, staged on a shared
+from the launch host to a login node over SSH, staged on a shared
 filesystem, submitted with `sbatch`, and executed with `srun` container support.
 
 Use SLURM when the user has access to a managed GPU cluster, shared Lustre
@@ -92,7 +83,7 @@ the cluster.
 ## Prerequisites
 
 Before any SLURM job can be submitted or any runner script is generated, the
-host running the TAO service or SDK must be able to log in to at least one host
+launch host must be able to log in to at least one host
 from `SLURM_HOSTNAME` over SSH **without an interactive password prompt**. The
 handler runs `sbatch`, `squeue`, `sacct`, `scancel`, and log tails
 non-interactively, so password or 2FA prompts will fail the job at submit or
@@ -169,8 +160,8 @@ handler via `SSH_AUTH_SOCK`.
   below; do not bury this behind several alternate choices.
 - **SSH_AUTH_SOCK** (advanced fallback): SSH agent socket with an accepted key
   already loaded. Prefer `SSH_KEY_PATH` in user-facing remediation prompts.
-- **SLURM_BASE_RESULTS_DIR** (optional): Base shared filesystem path. Default
-  convention from `tao-core` is `/lustre/fsw/portfolios/edgeai/users/<user>`.
+- **SLURM_BASE_RESULTS_DIR** (required for tracked Cosmos workflows): Base
+  shared filesystem path supplied explicitly at runtime; there is no site default.
 - **SLURM_ACCOUNT** (usually required by site policy): Account charged by
   `#SBATCH --account`.
 
@@ -208,18 +199,18 @@ dataset paths. Prefer shared filesystem URIs:
 
 Accept either dataset roots or direct spec-key paths:
 
-- Root mode: `/lustre/.../<model>/train`, which model skills map to required
+- Root mode: `<SHARED_TRAIN_ROOT>`, which model skills map to required
   files such as `<root>/annotations.json` and `<root>` as media path.
 - Direct spec mode: exact fields such as
-  `custom.train_dataset.annotation_path=/lustre/.../train.json` and
-  `custom.train_dataset.media_path=/lustre/.../videos.tar.gz`.
+  `custom.train_dataset.annotation_path=<TRAIN_ANNOTATION_PATH>` and
+  `custom.train_dataset.media_path=<TRAIN_MEDIA_PATH>`.
 
 After passwordless SSH succeeds and before generating scripts, validate each
 required dataset file/path from the login host:
 
 ```bash
 ssh -o BatchMode=yes <SLURM_USER>@<working-login-host> \
-  'test -e /lustre/.../annotations.json && test -e /lustre/.../media_or_archive'
+  'test -e <ANNOTATION_PATH> && test -e <MEDIA_PATH>'
 ```
 
 If the remote `test -e` fails, stop and ask for corrected paths or for the data
@@ -250,13 +241,11 @@ If you have not set up passwordless access yet:
 After that, rerun with SSH_KEY_PATH=~/.ssh/id_ed25519.
 ```
 
-Results default to:
+Results are supplied at runtime, for example:
 
 ```text
-/lustre/fsw/portfolios/edgeai/<your-dir>/results/<job_id>
+<SHARED_RESULTS_ROOT>/<job_id>
 ```
-
-`<your-dir>` is your per-user directory on the cluster's Lustre share.
 
 The runner sets `TAO_API_RESULTS_DIR` to the parent results directory because
 container code appends the job id when writing status and artifacts.

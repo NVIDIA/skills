@@ -61,6 +61,7 @@ User: confirmed
     "llm_endpoint": "https://inference-api.nvidia.com",
     "llm_model": "gcp/google/gemini-3.1-pro-preview",
     "llm_api_key": os.environ["AUTOML_LLM_API_KEY"],
+    "session_id": session_id,
     ...
 })]
 ```
@@ -90,6 +91,7 @@ User: confirmed
     "llm_endpoint": "https://inference-api.nvidia.com",
     "llm_model": "gcp/google/gemini-3.1-pro-preview",
     "llm_api_key": os.environ["AUTOML_LLM_API_KEY"],
+    "session_id": session_id,
     ...
 })]
 ```
@@ -100,7 +102,12 @@ User: confirmed
 Agent: Resuming. The runner will poll any jobs that were in flight when we stopped, report their results, then show a resume review before submitting any new recommendation jobs.
 [shows resume review with completed/failed/in-flight recs, remaining budget, metric state, image/platform/data checks, and ETA]
 User: confirmed
-[executes runner.run(..., workspace_path="./my_experiment", resume=True)]
+[executes runner.run(
+    ...,
+    workspace_path="./my_experiment/run_<timestamp>",
+    automl_settings={**automl_settings, "session_id": resolved_session_id},
+    resume=True,
+)]
 ```
 
 ### User: "Switch to ASHA with 30 trials and track in WandB"
@@ -110,7 +117,12 @@ Agent: Switching to ASHA — parallel + early-stopping. I’ll first check the m
 [shows launch review with ASHA rungs, max concurrent jobs, WandB project, search bounds, and estimated runtime]
 User: confirmed
 [executes runner.run(
-    automl_settings={"algorithm": "asha", "automl_max_epochs": 9, ...},
+    automl_settings={
+        "algorithm": "asha",
+        "automl_max_epochs": 9,
+        "session_id": session_id,
+        ...,
+    },
     wandb_config={"enabled": True, "project": "tao-hpo"},
 )]
 ```

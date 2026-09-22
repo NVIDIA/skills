@@ -6,5 +6,6 @@ If a split reference conflicts with `SKILL.md`, `skill_info.yaml`, schemas, or p
 
 ## Reference Map
 
-- `slurm-preflight-storage.md` — SSH access, SDK/enroot preflight, credentials, storage, or SSH remediation
-- `slurm-execution-sdk.md` — container execution, resources, monitoring, cancellation, multi-node, SDK use, retries, or failures
+- `slurm-preflight-storage.md` — SSH access, enroot preflight, credentials, storage, or SSH remediation
+- `slurm-container-execution.md` — container execution, resources, monitoring, cancellation, multi-node, retries, or failures
+- `slurm-ssh-credentials.md` — SSH/key setup, credential list, backend details, storage rules, SSH remediation prompt

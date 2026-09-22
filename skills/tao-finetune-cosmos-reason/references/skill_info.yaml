@@ -1,14 +1,48 @@
-network_arch: cosmos-rl
+network_arch: cosmos-reason
 huggingface_model_ids:
 - nvidia/Cosmos3-Nano
+- nvidia/Cosmos3-Edge
 aliases:
 - Cosmos Reason 3
 - Cosmos3 Nano Reasoner
 - Cosmos3-Nano
+- Cosmos3-Edge
+- cosmos-rl
+- cosmos-framework
 automl_enabled: true
-container_image: nvcr.io/nvidia/tao/tao-toolkit:7.1.0-cosmos-rl  # versions-key: images.tao_toolkit.cosmos_rl
-required_credentials:
-- HF_TOKEN
+backend_contracts:
+  cosmos-framework:
+    path: references/cosmos-framework-backend.yaml
+    container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-cosmos-framework  # versions-key: images.tao_toolkit.cosmos_framework
+  cosmos-rl:
+    path: references/cosmos-rl-backend.yaml
+    container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-cosmos-rl  # versions-key: images.tao_toolkit.cosmos_rl
+backend_resolver: scripts/cosmos_workflow.py
+backend_selection:
+  policy: explicit backend wins; otherwise select by model, action, and workflow and report the rationale
+  defaults:
+    train: cosmos-rl
+    export: cosmos-framework
+    evaluate: cosmos-rl
+    inference: cosmos-rl
+    inference_microservice: cosmos-rl
+    quantize: cosmos-rl
+  rules:
+  - match: Cosmos3-Edge train
+    backend: cosmos-framework
+  - match: Cosmos3-Edge export, evaluate, inference, or inference_microservice
+    backend: cosmos-framework
+  - match: Cosmos3-Nano AutoML or HPO train
+    backend: cosmos-rl
+  - match: Cosmos3-Nano plain SFT train
+    backend: cosmos-rl
+  - match: Cosmos3-Nano evaluate, inference, inference_microservice, or quantize
+    backend: cosmos-rl
+  ambiguity_behavior: preserve the Cosmos-RL compatibility default and emit backend and backend_selection_reason in the launch review
+required_credentials: []
+conditional_credentials:
+  HF_TOKEN: required only when fetching a gated Hugging Face checkpoint; not required for a complete local checkpoint
+  NGC_KEY: required only when pulling or converting an authenticated nvcr.io image; not required for an existing local image or SQSH
 data_format: llava
 gpu_spec_key: policy.parallelism.dp_shard_size
 node_spec_key: policy.parallelism.dp_replicate_size
@@ -17,6 +51,198 @@ runtime_requirements:
     min_driver_version: '580'
     min_cuda_version: '13.0'
     min_container_toolkit_version: '1.19.1'
+workflow_contract:
+  planner: scripts/cosmos_workflow.py
+  nano_checkpoint_intake:
+    explicit_user_choice_required: true
+    choices:
+      qwen3_vl: direct_compatible_huggingface_checkpoint
+      cosmos3_omni: backend_packaged_exact_key_conversion_to_qwen3_vl_before_training
+    inference_from_checkpoint_or_history: forbidden
+    conversion_storage:
+      docker: user_owned_checkpoint_dir_on_docker_host
+      slurm: compute_verified_shared_checkpoint_dir
+    runtime_model_path: verified_direct_or_converted_qwen3_vl_path
+    source_checkpoint_mutation: forbidden
+    nano_architecture_mapping:
+      model_id: Qwen/Qwen3-VL-8B-Instruct
+      user_input_required: false
+      revision_resolution: automatic_immutable_hub_commit
+    preparation_runtime:
+      source: selected_backend_image_and_sqsh
+      separate_user_input: forbidden
+      shared_entrypoint: cosmos_rl.model_preparation.vlm_safetensors
+      native_implementation: cosmos_framework.scripts.convert_model_to_vlm_safetensors
+      sqsh_required_entries:
+        - cosmos_rl/model_preparation/vlm_safetensors.py
+        - cosmos_framework/scripts/convert_model_to_vlm_safetensors.py
+        - opt/tao/framework-converter-runtime.json
+    huggingface_revision_resolution:
+      user_commit_sha_required: false
+      default_requested_ref: main
+      optional_user_ref: branch_tag_or_commit
+      resolved_value: immutable_hub_commit_sha
+      local_snapshot_identity: content_fingerprint
+      private_model_blocker: request_HF_TOKEN_presence_only
+  framework_checkpoint_action: scripts/framework_checkpoint_action.py
+  action_helper_dependencies:
+    framework_checkpoint:
+      entrypoint: scripts/framework_checkpoint_action.py
+      files:
+      - scripts/framework_checkpoint_action.py
+      - scripts/cosmos_common.py
+    cosmos_rl_checkpoint:
+      entrypoint: scripts/cosmos_rl_checkpoint_action.py
+      files:
+      - scripts/cosmos_rl_checkpoint_action.py
+      - scripts/cosmos_common.py
+    staging_contract: tao-artifacts.spec_bundle.execution.supporting_files
+    staging_owner: selected_platform
+  metric_extractor: scripts/extract_cosmos_metrics.py
+  diagnostic_subset:
+    policy: opt-in only; never submit a separate smoke job unless the user explicitly requests it
+    train_samples: max(16, total_gpus)
+    validation_samples: max(8, total_gpus)
+  first_update_gate:
+    execution: inside the requested Cosmos-RL training job after backward and before the first optimizer update
+    requires:
+    - padding-aware attention_mask emitted by the HF VLM collator
+    - component total and trainable parameter counts
+    - finite nonzero gradient norm for each trainable visual component
+    status_output: vision encoder, visual projector, language model, and language-head counts and gradient norms
+    failure_behavior: terminate the training child before the first optimizer update
+  parity_fingerprint:
+  - train record and media fingerprints
+  - validation record and media fingerprints
+  - original and resolved runtime paths
+  - system prompt
+  - checkpoint identity and format
+  - frame count
+  - optimizer, scheduler, batch size, epochs, and random seed
+  - backend and container digest
+  public_model_profiles:
+    cosmos3_edge:
+      checkpoint_input: public Hugging Face model ID with automatically resolved immutable commit or complete local snapshot
+      alternate_workload_checkpoint: false
+      checkpoint_mutation: false
+      runtime_processor_defaults:
+        frames: 6
+        frame_width: 1280
+        frame_height: 720
+        max_video_pixels: 5529600
+        sequence_length: 16000
+        attention_implementation: flash_attention_2
+      provenance: base checkpoint and runtime processor profile have independent fingerprints
+  dataset_resolution:
+    default: auto
+    families: [video_conversation, task_aware_video_reasoning]
+    selection_inputs:
+    - annotation structure and metadata
+    - record and unique-media counts
+    - media reuse ratio and byte-size distribution
+    - declared resolution, FPS, and duration
+    - model tier and explicit user overrides
+    forbidden_routing_inputs: [dataset project name, benchmark name, directory basename, historical path]
+  cosmos_rl_video_runtime:
+    selector: --rl-video-profile
+    choices: [auto, system-pyav, pynv-device-rgbp]
+    auto:
+      video_conversation: pynv-device-rgbp
+      task_aware_video_reasoning: system-pyav
+    pynv-device-rgbp:
+      decoder: pynvvideocodec
+      transfer: device_rgbp_dlpack
+      dataloader: {workers: 1, prefetch_factor: 2, persistent_workers: true}
+      sft_batch_threads: 4
+      processed_video_cache: rank_local_memory_populated_on_demand
+      decoder_session_cache: rank_local_native_populated_on_demand
+      worker_decoder_cache_forwarding: TAO_PYNV_DECODER_CACHE_SIZE_required
+      processed_video_cache_capacity_default: inspected_unique_media_capacity
+      decoder_session_cache_capacity_default: inspected_unique_media_capacity
+      prewarm: false
+      disk_cache: false
+    validation:
+      selection_inputs: [dataset_family, validation_record_count, validation_unique_media_count]
+      auto_repeated_media_condition: video_conversation_and_record_count_greater_than_unique_media_count
+      shard_strategy: media_grouped
+      padded_multiset: preserved_exactly
+      video_feature_cache: rank_local_gpu_embeddings_populated_on_demand
+      feature_cache_capacity_default: min_inspected_unique_media_capacity_512
+      feature_cache_environment: TAO_VALIDATION_VIDEO_FEATURE_CACHE_SIZE
+      exact_validation_batch: preserved_from_user_contract
+      maximum_throughput_overrides:
+        validation_batch_size: 16
+        cache_frontload_batch_size: 16
+        cache_frontload_unique_per_batch: 8
+      prewarm: false
+      disk_cache: false
+      compatibility_artifact: optional_and_never_a_direct_launch_gate
+      capability_fallback: tao_system_pyav_sparse
+      capability_fallback_scope: nvdec_incompatible_stream_only
+    system-pyav:
+      decoder: torchvision
+      implementation: sparse_software_system_PyAV
+      dataloader: {workers: 0, prefetch_factor: omitted}
+      sft_batch_threads: 1
+      prewarm: false
+      disk_cache: false
+  cosmos_framework_video_runtime:
+    profile: torchcodec-cuda-on-demand
+    decoder: torchcodec
+    device: cuda
+    device_binding: explicit_local_rank
+    frame_transfer: cuda_uint8_to_host_pil
+    dataloader:
+      workers: 1
+      prefetch_factor:
+        video_conversation: 4
+        task_aware_video_reasoning: 2
+      multiprocessing_context: spawn
+      persistent_workers: true
+      pin_memory: true_for_video_conversation
+    sft_process_threads: 8
+    decoder_threads: 1
+    decoded_frame_cache: rank_local_memory_populated_on_demand
+    capacity_default: inspected_unique_media_count
+    nano_per_forward_batch_default: effective_global_batch_divided_by_total_gpus
+    nano_gradient_accumulation_default: 1
+    batcher: resume_safe_contiguous
+    actual_device_attestation: first_successful_decode_per_rank
+    actual_device_requirement: resolved_device_equals_cuda_local_rank
+    prewarm: false
+    disk_cache: false
+    validation:
+      selection_inputs: [dataset_family, validation_record_count, validation_unique_media_count]
+      auto_repeated_media_condition: video_conversation_and_record_count_greater_than_unique_media_count
+      shard_strategy: media_grouped
+      padded_multiset: preserved_exactly
+      finite_stream: true
+      video_feature_cache: rank_local_gpu_embeddings_populated_on_demand
+      feature_cache_capacity_default: min_inspected_unique_media_capacity_512
+      feature_cache_environment: TAO_FRAMEWORK_VALIDATION_VIDEO_FEATURE_CACHE_SIZE
+      processed_video_cache: worker_local_host_tensors_populated_on_demand
+      processed_video_cache_capacity_default: inspected_unique_media_capacity
+      processed_video_cache_environment: TAO_FRAMEWORK_VALIDATION_PROCESSED_VIDEO_CACHE_SIZE
+      exact_validation_batch: preserved_from_user_contract
+      maximum_throughput_frontload:
+        selection_condition: repeated_media_and_user_selected_validation_batch_at_least_2
+        unique_per_batch_default: min_8_and_half_validation_batch
+        environment: TAO_FRAMEWORK_VALIDATION_CACHE_FRONTLOAD_UNIQUE_PER_BATCH
+      deferred_metric_scalar_transfer: validation_end
+      prewarm: false
+      disk_cache: false
+  backend_action_commands:
+    cosmos-framework:
+      export: python -m cosmos_framework.scripts.export_vlm_dcp
+      evaluate: cosmos-framework-evaluate --config {config_path}
+      inference: cosmos-framework-inference <arguments>
+      inference_microservice: cosmos-framework-inference-microservice <arguments>
+      required_pre_action: scripts/framework_checkpoint_action.py prepare
+    cosmos-rl:
+      evaluate: cosmos-rl-evaluate --config {config_path}
+      inference: cosmos-rl-inference <arguments>
+      inference_microservice: cosmos-rl-inference-microservice <arguments>
+      quantize: cosmos-rl-quantize <arguments>
 data_sources:
   train:
     custom.train_dataset.annotation_path:
@@ -96,6 +322,18 @@ actions:
     command: cosmos-rl-evaluate --config {config_path}
     config_format: toml
     mode: config
+    execution_contract:
+      source: scripts/evaluation_workflow.py output spec_bundle.execution
+      platform_owned: [helper_staging, container_mounts, distributed_launcher, timeout, child_exit_preservation]
+      model_owned: [runtime_attestation, evaluator_command, metric_extraction, structured_success]
+    automl_default_parameters:
+    - dataset.system_prompt
+    - vision.num_frames
+    - generation.max_tokens
+    - generation.temperature
+    - generation.repetition_penalty
+    - generation.presence_penalty
+    - generation.frequency_penalty
     inputs:
       dataset.annotation_path:
         type: file
@@ -137,6 +375,8 @@ actions:
           args.extend(["--num_gpus", str(cfg["num_gpus"])])
       if cfg.get("fps") not in (None, ""):
           args.extend(["--fps", str(cfg["fps"])])
+      if cfg.get("num_frames") not in (None, ""):
+          args.extend(["--num_frames", str(cfg["num_frames"])])
       if cfg.get("total_pixels") not in (None, ""):
           args.extend(["--total_pixels", str(cfg["total_pixels"])])
       if cfg.get("base_model_path"):
@@ -223,7 +463,10 @@ actions:
     upload_excludes:
     - inputs/
   train:
-    command: cosmos-rl --config {config_path} /opt/cosmos_rl/tao_sft_example.py
+    command: |
+      hook="$(/opt/venv/cosmos_rl/bin/python -c 'import cosmos_rl; from pathlib import Path; print(Path(cosmos_rl.__file__).parent / "tools" / "custom_hooks" / "tao_sft_example.py")')"
+      test -f "$hook"
+      cosmos-rl --config {config_path} "$hook"
     config_format: toml
     mode: config
     inputs:

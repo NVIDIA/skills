@@ -26,8 +26,8 @@ BEVFusion for multi-sensor 3D object detection. Fuses LiDAR point clouds and cam
 Set pretrained backbone paths for Swin image backbone.
 
 BEVFusion requires the BEVFusion-specific TAO container
-`nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt`. <!-- unpinned: BEVFusion-only container --> The shared TAO PyTorch 7.0 RC image
-does not package `mmdet3d` and fails before any BEVFusion action can parse its
+`nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt`. <!-- unpinned: BEVFusion-only container --> Shared TAO PyTorch 7.x images do
+not package `mmdet3d` and fail before any BEVFusion action can parse its
 spec. The model-skill action is named `dataset_convert`, but the 5.5 container
 CLI subtask is `bevfusion convert -e <spec>`.
 
@@ -151,7 +151,10 @@ Optional. Val dataset split is configured via ann_file in dataset config.
 
 ## Hardware
 
-Minimum 2 GPU(s), recommended 4 GPU(s). 24GB+ (A100 recommended) VRAM per GPU. BEVFusion is memory-intensive due to multi-sensor fusion. A100 GPUs strongly recommended. Multi-GPU training expected.
+One GPU is supported for minimal smoke/AutoML validation with a small dataset
+and batch size. Use 2+ GPUs for ordinary training and 4 GPUs when practical.
+24GB+ (A100 recommended) VRAM per GPU. BEVFusion is memory-intensive due to
+multi-sensor fusion.
 
 ## Error Patterns
 
@@ -180,8 +183,8 @@ experiment config before running the selected action. Use YAML null, not an
 empty string, for `train.pretrained_checkpoint` and
 `train.resume_training_checkpoint_path` when no checkpoint is intended.
 
-**`ModuleNotFoundError: No module named 'mmdet3d'`**: The shared TAO PyTorch
-7.0 RC image does not include the BEVFusion `mmdet3d` dependency. Use
+**`ModuleNotFoundError: No module named 'mmdet3d'`**: Shared TAO PyTorch 7.x
+images do not include the BEVFusion `mmdet3d` dependency. Use
 `nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt`; <!-- unpinned: BEVFusion-only container --> it contains `mmdet3d` and exposes
 the BEVFusion `convert`, `train`, `evaluate`, and `inference` subtasks.
 
@@ -189,7 +192,11 @@ the BEVFusion `convert`, `train`, `evaluate`, and `inference` subtasks.
 checkpoints or prediction files and still finish with TAO `Execution status:
 FAIL` after `Signal 11 (SIGSEGV)` in `cuMemRetainAllocationHandle`. Do not mark
 the action successful from the Docker exit code alone; inspect the TAO log or
-`status.json`. If a checkpoint was produced before this failure, use only the
+`status.json`. On CUDA 12+ hosts, retain the TAO 5.5 dependency stack and apply
+the BEVFusion rotated-IoU CPU fallback and runner cleanup from `tao-pytorch`;
+do not switch the action to a shared 7.x image. The fallback is the default;
+`BEVFUSION_ROTATE_IOU_BACKEND=gpu` is an explicit opt-in to the legacy Numba
+CUDA evaluator. If a checkpoint was produced before this failure, use only the
 exact intended checkpoint such as `epoch_1.pth` for downstream diagnostics and
 do not treat `last_checkpoint` as a best checkpoint unless the action explicitly
 requests the latest checkpoint.
@@ -226,4 +233,3 @@ Inference mappings from TAO Core `bevfusion.config.json`:
 | train | `train.resume_training_checkpoint_path` | `resume_model` | model file inferred from the current job results folder |
 
 For `parent_model` or `parent_model_folder`, pass the upstream train/export/AutoML child job id as `parent_job_id`. The SDK lists the parent result folder, filters checkpoint artifacts, and returns the selected model file or folder. Do not add these mappings back to `config.json` and do not patch generated runner scripts to guess checkpoint paths.
-

@@ -13,7 +13,7 @@
 # For a small seed training set (~200 rows, as is typical for a first DEFT run),
 # use num_epochs: 10. ChangeNet on a 150M-param C-RADIOv2-B backbone overfits a
 # few-hundred-row set quickly; beyond ~10 epochs val_loss climbs while train_loss
-# keeps falling, and FAR@recall=100% degrades. Raise epochs only as the combined
+# keeps falling, and held-out evaluation quality degrades. Raise epochs only as the combined
 # training CSV grows across iterations (mining + synthetic rows). 20 is reasonable
 # once you are in the low thousands of rows.
 # ------------------------------------------------------------------------------
@@ -113,16 +113,18 @@ dataset:
       augment: True
     num_classes: 2
 evaluate:
-  checkpoint: "${results_dir}/train/changenet_classify.pth"
-  trt_engine: "${results_dir}/gen_trt_engine/changenet-classify.trt"
+  # The loop discovers successful artifacts and passes explicit container
+  # paths. Never derive them from the action-local results_dir.
+  checkpoint: ''
+  trt_engine: ''
   batch_size: ${dataset.classify.batch_size}
 inference:
-  checkpoint: "${results_dir}/train/changenet_model_classify_latest.pth"
-  trt_engine: "${results_dir}/gen_trt_engine/changenet-classify.trt"
+  checkpoint: ''
+  trt_engine: ''
   batch_size: ${dataset.classify.batch_size}
 export:
   gpu_id: 0
-  checkpoint: "${results_dir}/train/changenet_classify.pth"
+  checkpoint: ''
   onnx_file: "${results_dir}/export/changenet-classify.onnx"
   input_width: 224
   input_height: 224
